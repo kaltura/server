@@ -105,18 +105,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const MAX_CATEGORIES_PER_ENTRY = 32;
 	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 200;
 	
-	const FILE_SYNC_ENTRY_SUB_TYPE_DATA = 1;
-	const FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT = 2;
-	const FILE_SYNC_ENTRY_SUB_TYPE_THUMB = 3;
-	const FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE = 4;
-	const FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD = 5;
-	const FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB = 6;
-	const FILE_SYNC_ENTRY_SUB_TYPE_ISM = 7;
-	const FILE_SYNC_ENTRY_SUB_TYPE_ISMC = 8;
-	const FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG = 9;
-	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY = 10; 
-	const FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY = 11; 
-	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
 
@@ -431,7 +419,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$results = array();
 		for ($version = 100000; $version <= $current_version; $version++ )
 		{
-			$version_sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version);
+			$version_sync_key = $this->getSyncKey( kEntryFileSyncSubType::DATA , $version);
 			$local_file_sync = kFileSyncUtils::getLocalFileSyncForKey($version_sync_key, false);
 			if ($local_file_sync)
 			{
@@ -491,17 +479,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		static::validateFileSyncSubType ( $sub_type );
 		$key = new FileSyncKey();
 		$key->object_type = FileSyncObjectType::ENTRY;
-		
-//		// remarked by Tan-Tan 13/01/2010
-//		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB && $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE)
-//		{
-//			$key->object_sub_type = self::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
-//		}
-//		else
-//		{
-			$key->object_sub_type = $sub_type;
-//		}
-
+		$key->object_sub_type = $sub_type;
 		$key->object_id = $this->getId();
 
 		$key->version = $this->getVersionForSubType ( $sub_type, $version );
@@ -509,9 +487,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		return $key;
 	}
-	
-	
+
+
 	/**
+	 * @param $sub_type
+	 * @param $version
 	 * @return string
 	 */
 	public function generateBaseFileName( $sub_type, $version = null)
@@ -520,10 +500,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$version = $this->getVersion();
 			
 		// TODO - remove after Akamai bug fixed and create the file names with sub type
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if($sub_type == kEntryFileSyncSubType::ISM)
 			return "_{$version}";
 			
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)
+		if($sub_type == kEntryFileSyncSubType::ISMC)
 			return "_{$version}";
 		// remove till here
 			
@@ -535,10 +515,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if($sub_type == kEntryFileSyncSubType::ISM)
 			return $this->getId() . '_' . $this->generateBaseFileName(0, $version) . '.ism';
 			
-		if($sub_type == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)
+		if($sub_type == kEntryFileSyncSubType::ISMC)
 			return $this->getId() . '_' . $this->generateBaseFileName(0, $version) . '.ismc';
 			
 		return $this->getId() . '_' . $this->generateBaseFileName($sub_type, $version);
@@ -552,7 +532,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function generateFilePathArr( $sub_type, $version = null)
 	{
 		static::validateFileSyncSubType ( $sub_type );
-		if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA )
+		if ( $sub_type == kEntryFileSyncSubType::DATA )
 		{
 			$data = $this->getData();
 			if($this->getType() == entryType::MIX && (!$this->getData() || !strpos($this->getData(), 'xml')))
@@ -562,15 +542,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$res = myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $data, $version);
 //			$res = myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version);
 		}
-		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT )
+		elseif ( $sub_type == kEntryFileSyncSubType::DATA_EDIT )
 		{
 			$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version) );
 		}
-		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB )
+		elseif ( $sub_type == kEntryFileSyncSubType::THUMB )
 		{
 			$res =  myContentStorage::getGeneralEntityPath("entry/bigthumbnail", $this->getIntId(), $this->getId(), $this->getThumbnail() , $version);
 		}
-		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE )
+		elseif ( $sub_type == kEntryFileSyncSubType::ARCHIVE )
 		{
 			$res = null;
 			$data_path = myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version);
@@ -595,7 +575,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 					$res =  $archive_pattern;
 			}
 		}
-		elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD )
+		elseif ( $sub_type == kEntryFileSyncSubType::DOWNLOAD )
 		{
 			// in this case the $version  is used as the format
 			$basename = kFile::getFileNameNoExtension ( $this->getData() );
@@ -608,17 +588,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$path =  "entry/data";
 			switch($sub_type)
 			{
-				case self::FILE_SYNC_ENTRY_SUB_TYPE_ISM:
+				case kEntryFileSyncSubType::ISM:
 					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
 					$basename .= '.ism';
 					break;
 					
-				case self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC:
+				case kEntryFileSyncSubType::ISMC:
 					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
 					$basename .= '.ismc';
 					break;
 					
-				case self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG:
+				case kEntryFileSyncSubType::CONVERSION_LOG:
 					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
 					$basename .= '.log';
 					break;
@@ -632,11 +612,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	protected function getVersionForSubType ( $sub_type, $version = null  )
 	{
 		if (
-				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISM
+				$sub_type == kEntryFileSyncSubType::ISM
 				||
-				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC
+				$sub_type == kEntryFileSyncSubType::ISMC
 				||
-				$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG
+				$sub_type == kEntryFileSyncSubType::CONVERSION_LOG
 			)
 		{
 			if(!is_null($version))
@@ -648,7 +628,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$new_version = "";
 		if ( $version )
 		{
-			if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD )
+			if ( $sub_type == kEntryFileSyncSubType::DOWNLOAD )
 			{
 				// MUST have A VERSION !
 				$new_version = $this->getVersion() . "." . $version;
@@ -660,13 +640,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		else
 		{
-			if ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT )
+			if ( $sub_type == kEntryFileSyncSubType::DATA || $sub_type == kEntryFileSyncSubType::DATA_EDIT )
 				$new_version = $this->getVersion();
-			elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB )
+			elseif ( $sub_type == kEntryFileSyncSubType::THUMB )
 				$new_version = $this->getThumbnailVersion();
-			elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE )
+			elseif ( $sub_type == kEntryFileSyncSubType::ARCHIVE )
 				$new_version = "";
-			elseif ( $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD )
+			elseif ( $sub_type == kEntryFileSyncSubType::DOWNLOAD )
 			{
 				// MUST have A VERSION !
 				$new_version = $this->getVersion();
@@ -699,31 +679,40 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	protected static function validateFileSyncSubType ( $sub_type )
 	{
-		if ($sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ISM  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG  &&
-			$sub_type != self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB
+		if ($sub_type != kEntryFileSyncSubType::DATA &&
+			$sub_type != kEntryFileSyncSubType::DATA_EDIT &&
+			$sub_type != kEntryFileSyncSubType::THUMB &&
+			$sub_type != kEntryFileSyncSubType::ARCHIVE &&
+			$sub_type != kEntryFileSyncSubType::DOWNLOAD  &&
+			$sub_type != kEntryFileSyncSubType::ISM  &&
+			$sub_type != kEntryFileSyncSubType::ISMC  &&
+			$sub_type != kEntryFileSyncSubType::CONVERSION_LOG  &&
+			$sub_type != kEntryFileSyncSubType::OFFLINE_THUMB &&
+			$sub_type != kEntryFileSyncSubType::INTERACTIVITY_DATA &&
+			$sub_type != kEntryFileSyncSubType::VOLATILE_INTERACTIVITY_DATA
 		)
 			throw new FileSyncException ( FileSyncObjectType::ENTRY ,
-				 $sub_type , array (
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISM ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_ISMC ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG ,
-				 	self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB ,
-				 ) );
+				 $sub_type , self::getEntryFileSyncSubTypes());
 	}
 
-	
+	public static function getEntryFileSyncSubTypes()
+	{
+		return array
+		(
+			kEntryFileSyncSubType::DATA,
+			kEntryFileSyncSubType::DATA_EDIT,
+			kEntryFileSyncSubType::THUMB,
+			kEntryFileSyncSubType::ARCHIVE,
+			kEntryFileSyncSubType::DOWNLOAD,
+			kEntryFileSyncSubType::OFFLINE_THUMB,
+			kEntryFileSyncSubType::ISM,
+			kEntryFileSyncSubType::ISMC,
+			kEntryFileSyncSubType::CONVERSION_LOG,
+			kEntryFileSyncSubType::INTERACTIVITY_DATA,
+			kEntryFileSyncSubType::VOLATILE_INTERACTIVITY_DATA,
+		);
+	}
+
 	// return the full path on the disk
 	public function getFullDataPath( $version = NULL )
 	{
@@ -818,18 +807,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			}
 			elseif ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_IMAGE )
 			{
-				$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+				$sync_key = $this->getSyncKey( kEntryFileSyncSubType::DATA , $version );
 			}
 		}
 		elseif ( $this->getType() == entryType::MIX )
 		{
 			// if roughcut - the version should be used
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $version );
+			$sync_key = $this->getSyncKey( kEntryFileSyncSubType::DOWNLOAD , $version );
 		}
 		else
 		{
 			// if not roughcut -  the format should be used
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $format );
+			$sync_key = $this->getSyncKey( kEntryFileSyncSubType::DOWNLOAD , $format );
 		}
 		
 		if(!$sync_key)
@@ -879,13 +868,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		// used by ppt-convert flow (downloadPath in addDownload response)
 		// and perhaps by other clients as name
-		$download_path = $this->getDownloadPath( $version , $format , self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD );
+		$download_path = $this->getDownloadPath( $version , $format , kEntryFileSyncSubType::DOWNLOAD );
 		if($download_path)
 			return $download_path;
 		
 		// if did not return anything, probably due to missing fileSync
 		// missing fileSync - if conversion was not done yet
-		$key = $this->getSyncKey(self::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $format);
+		$key = $this->getSyncKey(kEntryFileSyncSubType::DOWNLOAD, $format);
 		return kFileSyncUtils::getLocalFilePathForKey($key);
 	}
 	
@@ -954,7 +943,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$version = $this->desired_version;
 			if ( ! $version || $version == -1 ) $version = null;
 			
-			$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+			$sync_key = $this->getSyncKey( kEntryFileSyncSubType::DATA , $version );
 			$content = kFileSyncUtils::file_get_contents( $sync_key , true , false ); // don't be strict when fetching this content
 				
 			if ( $content )
@@ -1017,7 +1006,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				$this->should_call_set_data_content = false;
 				$this->save();
 				
-				$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+				$sync_key = $this->getSyncKey( kEntryFileSyncSubType::DATA );
 				kFileSyncUtils::file_put_contents( $sync_key , $v , $strict );
 			}
 		}
@@ -1067,9 +1056,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_KMC_DRILL_DOWN_THUMB_RESIZE, $this->getPartnerId()))
 		{
-			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
+			$subType = kEntryFileSyncSubType::DATA;
 			if($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
-				$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+				$subType = kEntryFileSyncSubType::THUMB;
 			
 			$syncKey = $this->getSyncKey($subType);
 			
@@ -1465,7 +1454,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 
 		if ( $version <= 0  ) $version=null;
-		$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+		$sync_key = $this->getSyncKey( kEntryFileSyncSubType::DATA , $version );
 		$content = kFileSyncUtils::file_get_contents( $sync_key , true , false ); // don't be strict when fetching metadata
 		if ( $content )
 			return $content;
@@ -1501,7 +1490,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 //		$content_dir =  myContentStorage::getFSContentRootPath();
 //		$file_name = $content_dir . $this->getDataPath( $specific_version ); // replaced__getDataPath
 
-		$sync_key = $this->getSyncKey ( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $specific_version );
+		$sync_key = $this->getSyncKey ( kEntryFileSyncSubType::DATA , $specific_version );
 		
 		if ( $override_existing || ! kFileSyncUtils::file_exists( $sync_key ,false )  )
 		{
@@ -1515,7 +1504,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->setModifiedAt(time());		// update the modified_at date
 			$this->save();
 			
-			$sync_key = $this->getSyncKey ( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+			$sync_key = $this->getSyncKey ( kEntryFileSyncSubType::DATA , $version );
 			// TODO: here we assume we are UPDATING an exising version of the file - make sure all the following functions are tolerant.
 			kFileSyncUtils::file_put_contents( $sync_key , $fixed_content , false ); // replaced__setFileContent
 
@@ -1547,7 +1536,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$this->setData ( parent::getData() );
 		}
 
-		$file_name = kFileSyncUtils::getLocalFilePathForKey($this->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $specific_version)); // replaced__getDataPath
+		$file_name = kFileSyncUtils::getLocalFilePathForKey($this->getSyncKey(kEntryFileSyncSubType::DATA, $specific_version)); // replaced__getDataPath
 		
 		$duration = $total_duration ? $total_duration : myMetadataUtils::getDuration ( $content );
 		$this->setLengthInMsecs ( $duration * 1000 );
@@ -1558,7 +1547,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$this->save();
 		
-		$sync_key = $this->getSyncKey ( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+		$sync_key = $this->getSyncKey ( kEntryFileSyncSubType::DATA , $version );
 		kFileSyncUtils::file_put_contents( $sync_key , $fixed_content , false ); // replaced__setFileContent
 		
 		return $fixed_content;
@@ -1617,7 +1606,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if ( $desired_version ==  $current_version)
 			return $current_version;
 
-		$source_syc_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $desired_version );
+		$source_syc_key = $this->getSyncKey( kEntryFileSyncSubType::DATA , $desired_version );
 /*
 		// check that the file of the desired version really exists
 		$content =  myContentStorage::getFSContentRootPath();
@@ -1632,7 +1621,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		// increment the counter of the file
 		$this->setData ( parent::getData() );
 
-		$target_syc_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+		$target_syc_key = $this->getSyncKey( kEntryFileSyncSubType::DATA );
 /*
 		$new_path = $content . $this->getDataPath( ); //replaced__getDataPath
 
@@ -2234,7 +2223,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function incrementIsmVersion (  )
 	{
-		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getIsmVersion(), FileSyncObjectType::ENTRY, self::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($this->getId(), $this->getIsmVersion(), FileSyncObjectType::ENTRY, kEntryFileSyncSubType::ISM);
 
 		$this->setIsmVersion($newVersion);
 		
@@ -2287,7 +2276,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function updateImageDimensions ( )
 	{
-		$data = kFileSyncUtils::file_get_contents($this->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA));
+		$data = kFileSyncUtils::file_get_contents($this->getSyncKey(kEntryFileSyncSubType::DATA));
 		list ($width, $height) = myFileConverter::getImageDimensionsFromString($data);
 		if ( $width )
 		{
@@ -2481,20 +2470,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		// if res == 1 - only for partner , if == 2 - also for kaltura network
 		return mySearchUtils::addPartner($partner_id, $prepared_text, $displayInSearch, $extra_invisible_data);
 	}
-	
-/*
-	public function dumpContent()
-	{
-		
-//		$dataPath = myContentStorage::getFSContentRootPath() . $this->getDataPath(); // replaced__getDataPath
-		
-//		kFileUtils::dumpFile($dataPath);
 
-		$sync_key = $this->getSyncKey( self::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
-		
-	}
-*/
-	
 	public function getTypeAsString()
 	{
 		$t = $this->getMediaType();
@@ -2508,7 +2484,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getFileSize()
 	{
 		return 0; // temp fix
-		$dataFileKey = $this->getSyncKey(self::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$dataFileKey = $this->getSyncKey(kEntryFileSyncSubType::DATA);
 		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($dataFileKey);
 		if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY) return $fileSync->getFileSize();
 		return "";
@@ -3531,7 +3507,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			if ($audioThumbEntry && $audioThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 			{
 				$fileSyncVersion = $partner->getAudioThumbEntryVersion();
-				$audioEntryKey = $audioThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+				$audioEntryKey = $audioThumbEntry->getSyncKey(kEntryFileSyncSubType::DATA,$fileSyncVersion);
 				$contentPath = kFileSyncUtils::getLocalFilePathForKey($audioEntryKey);
 				if ($contentPath)
 				{

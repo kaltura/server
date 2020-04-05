@@ -445,7 +445,7 @@ class myInsertEntryHelper
 				/*$thumbBigFinalPath = $content.$entry->getBigThumbnailPath();
 				myContentStorage::moveFile($thumbBigFullPath, $thumbBigFinalPath, true , $should_copy );
 				*/
-				$entryThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+				$entryThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 				try
 				{
 					if(!$should_copy)
@@ -659,7 +659,7 @@ class myInsertEntryHelper
 			else
 			{
 				KalturaLog::debug("handleEntry: creating data file sync for file [$entry_fullPath]");
-				$entryDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+				$entryDataKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 				if(!kFileSyncUtils::file_exists($entryDataKey))
 				{
 					try {
@@ -682,19 +682,6 @@ class myInsertEntryHelper
 				$entry->setStatus(entryStatus::READY);
 				$entry->save();
 			}
-			
-//			Remarked by Tan-Tan, the flavor asset should be synced instead of the entry
-//
-//			$entryDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-//			if(!$should_copy)
-//			{
-//				kFileSyncUtils::moveFromFile($entry_fullPath, $entryDataKey);
-//			}
-//			else
-//			{
-//				// copy & create file sync from $entry_fullPath
-//				kFileSyncUtils::copyFromFile($entry_fullPath, $entryDataKey);
-//			}
 		}
 		
 		if ($entry->getStatus() == entryStatus::READY)

@@ -9,18 +9,6 @@
 class EntryAdminService extends KalturaBaseService
 {
 	const GET_TRACKS_LIMIT = 30;
-	
-	private static $fileSyncKeysToRestore = array (
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC,
-		entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG
-	);
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -112,8 +100,8 @@ class EntryAdminService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$fileSyncKeys = array();
-		foreach (self::$fileSyncKeysToRestore as $key) {
-			$fileSyncKeys[] = $deletedEntry->getSyncKey($key);
+		foreach (entry::getEntryFileSyncSubTypes() as $entrySubType) {
+			$fileSyncKeys[] = $deletedEntry->getSyncKey($entrySubType);
 		}
 
 		$c = new Criteria();

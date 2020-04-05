@@ -342,7 +342,7 @@ class MixingService extends KalturaEntryService
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MIX)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $mixId);
 		
-		$dataSyncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$dataSyncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 		$mixFileName = kFileSyncUtils::getReadyLocalFilePathForKey($dataSyncKey, false);
 		if(!$mixFileName)
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);

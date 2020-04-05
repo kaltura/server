@@ -527,7 +527,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setDimensions($width, $height);
 			$dbEntry->setData(".jpg"); // this will increase the data version
 			$dbEntry->save();
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			try
 			{
 				kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
@@ -625,7 +625,7 @@ class KalturaEntryService extends KalturaBaseService
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 	   		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey);
 	   		
 			$dbEntry->setStatus(entryStatus::READY);
@@ -779,7 +779,7 @@ class KalturaEntryService extends KalturaBaseService
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			foreach($resources as $currentResource)
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
@@ -1227,7 +1227,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, kEntryFileSyncSubType::DATA);
 		$c->add(FileSyncPeer::OBJECT_ID, $entryId);
 		$c->add(FileSyncPeer::VERSION, $dbEntry->getVersion());
 		$c->add(FileSyncPeer::PARTNER_ID, $dbEntry->getPartnerId());
@@ -1621,7 +1621,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 	
-	protected function updateThumbnailForEntryFromUrl($entryId, $url, $entryType = null, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	protected function updateThumbnailForEntryFromUrl($entryId, $url, $entryType = null, $fileSyncType = kEntryFileSyncSubType::THUMB)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
@@ -1651,7 +1651,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $entry;
 	}
 	
-	protected function updateThumbnailJpegForEntry($entryId, $fileData, $entryType = null, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	protected function updateThumbnailJpegForEntry($entryId, $fileData, $entryType = null, $fileSyncType = kEntryFileSyncSubType::THUMB)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 

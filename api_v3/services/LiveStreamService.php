@@ -332,7 +332,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateOfflineThumbnailJpegAction($entryId, $fileData)
 	{
-		return parent::updateThumbnailJpegForEntry($entryId, $fileData, KalturaEntryType::LIVE_STREAM, entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB);
+		return parent::updateThumbnailJpegForEntry($entryId, $fileData, KalturaEntryType::LIVE_STREAM, kEntryFileSyncSubType::OFFLINE_THUMB);
 	}
 	
 	/**
@@ -348,7 +348,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateOfflineThumbnailFromUrlAction($entryId, $url)
 	{
-		return parent::updateThumbnailForEntryFromUrl($entryId, $url, KalturaEntryType::LIVE_STREAM, entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB);
+		return parent::updateThumbnailForEntryFromUrl($entryId, $url, KalturaEntryType::LIVE_STREAM, kEntryFileSyncSubType::OFFLINE_THUMB);
 	}
 	
 	/**
