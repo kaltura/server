@@ -306,6 +306,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAYMANIFEST,
 		self::EVENT_TYPE_REGISTERED,
 		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
+		self::EVENT_TYPE_HOTSPOT_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
