@@ -455,7 +455,7 @@ class addentryAction extends defPartnerservices2Action
                 {
                     KalturaLog::err ( "paramsArray" . print_r ( $paramsArray , true ) );
 
-                    $insert_entry_helper = new myInsertEntryHelper($this , $kuser_id, $kshow_id, $paramsArray );
+                    $insert_entry_helper = new myInsertEntryHelper($this , $kuser_id, $paramsArray );
                     $insert_entry_helper->setPartnerId( $partner_id , $subp_id );
                     $insert_entry_helper->insertEntry( $token , $entry->getType() , $entry->getId() , $entry->getName() , $entry->getTags() , $entry );
                     $insert_entry_helper->getEntry();
