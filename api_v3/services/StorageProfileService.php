@@ -264,6 +264,7 @@ class StorageProfileService extends KalturaBaseService
 		$baseCriteria->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
 		$baseCriteria->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$baseCriteria->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
+		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
 
 		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
 		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
