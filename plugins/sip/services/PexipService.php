@@ -54,7 +54,6 @@ class PexipService extends KalturaBaseService
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
-		$dbLiveEntry->setExplicitLive(false);
 		$dbLiveEntry->setIsSipEnabled(true);
 		$dbLiveEntry->save();
 
