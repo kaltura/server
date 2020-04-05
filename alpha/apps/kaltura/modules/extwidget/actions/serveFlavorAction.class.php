@@ -395,9 +395,9 @@ class serveFlavorAction extends kalturaAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 
-			if ($entry->getType() == entryType::LIVE_CHANNEL)
+			if( ($entry->getType() == entryType::LIVE_CHANNEL) && ($entry->getPlaylistId()) )
 			{
-				$this->serveLiveChannel($entry);
+				$this->servePlaylistAsLiveChannel($entry);
 			}
 
 			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
@@ -798,18 +798,23 @@ class serveFlavorAction extends kalturaAction
 		return $clipDesc ;
 	}
 
-	protected function serveLiveChannel(LiveChannel $entry)
+	protected function servePlaylistAsLiveChannel(LiveChannel $entry)
 	{
-		$repeat = $entry->getRepeat();
 		$playlist = entryPeer::retrieveByPK($entry->getPlaylistId());
 
-		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($playlist, null);
+		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($playlist);
 
 		// get cycle info
 		$cycleDurations = $durations;
 		$cycleEntryIds = $entryIds;
 		$cycleClipCount = count($cycleDurations);
 		$cycleDuration = array_sum($cycleDurations);
+
+		if($cycleDuration == 0)
+		{
+			KExternalErrors::dieError(KExternalErrors::PLAYLIST_DURATION_IS_ZERO,
+				"Entry [$entry->getId()] has a playlist with duration zero");
+		}
 		$cycleSegmentCount = 0;
 		foreach ($cycleDurations as $duration)
 		{
@@ -848,8 +853,7 @@ class serveFlavorAction extends kalturaAction
 					// set first clip details
 					$firstClipStartTime = $currentTime;
 
-
-					if (!$repeat)
+					if (!$entry->getRepeat())
 					{
 						$initialClipIndex = $clipIndex + 1;
 						$initialSegmentIndex = $segmentIndex + 1;
