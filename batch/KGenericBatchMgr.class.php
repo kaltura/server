@@ -10,6 +10,16 @@ if(strtoupper(PHP_SAPI) != 'CLI' && strtoupper(PHP_SAPI) != 'CGI-FCGI')
 	exit (1);
 }
 
+function gracefullyKill($signal)
+{
+	global $kscheduler;
+	echo "Got signal [$signal] from terminal";
+	$kscheduler->preKill($signal);
+}
+
+pcntl_signal(SIGINT, 'gracefullyKill');
+pcntl_signal(SIGTERM, 'gracefullyKill');
+
 $phpPath = 'php';
 if(isset($argc) && $argc > 1)
 {
@@ -36,3 +46,4 @@ require_once(__DIR__ . "/bootstrap_scheduler.php");
 
 $kscheduler = new KGenericScheduler($phpPath, $iniDir);
 $kscheduler->run();
+$kscheduler=null;
