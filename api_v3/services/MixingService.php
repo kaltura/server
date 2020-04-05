@@ -39,9 +39,6 @@ class MixingService extends KalturaEntryService
 		$this->validateAccessControlId($mixEntry);
 		$this->validateEntryScheduleDates($mixEntry, $dbEntry);
 		
-		$kshow = $this->createDummyKShow();
-
-		$dbEntry->setKshowId($kshow->getId());
 		$dbEntry->setPartnerId($this->getPartnerId());
 		$dbEntry->setSubpId($this->getPartnerId() * 100);
 		$dbEntry->setStatus(KalturaEntryStatus::READY);
