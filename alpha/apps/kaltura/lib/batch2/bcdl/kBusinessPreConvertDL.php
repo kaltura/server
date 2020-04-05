@@ -1326,6 +1326,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		foreach($list as $flavorParamsConversionProfile)
 		{
 			$flavorsId = $flavorParamsConversionProfile->getFlavorParamsId();
+			if($originalFlavorAsset->getFlavorParamsId() == $flavorsId)
+			{
+				continue;
+			}
 			$flavorsIds[] = $flavorsId;
 			$conversionProfileFlavorParams[$flavorsId] = $flavorParamsConversionProfile;
 		}

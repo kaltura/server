@@ -94,6 +94,7 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 	{
 		// reset readonly attributes
 		$configurationItem->lastUpdate = null;
+		$configurationItem->createdAt = null;
 		$configurationItem->version = null;
 		$configurationItem->isEditable = null;
 		$configurationItem->sourceLocation = null;
