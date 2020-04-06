@@ -552,4 +552,13 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	 */
 	public function getCopiedFrom()	{ return $this->getFromCustomData(self::COPIED_FROM);	}
 
+	/**
+	 * return current children count without calculation
+	 */
+	public function getCurrentChildrenCount()
+	{
+		return $this->children_count;
+	}
+
+
 } // CuePoint

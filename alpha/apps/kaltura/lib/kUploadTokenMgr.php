@@ -4,6 +4,8 @@ class kUploadTokenMgr
 	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
+	const MAX_APPEND_TIME = 5;
+	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	
 	/**
 	 * @var UploadToken
@@ -89,19 +91,28 @@ class kUploadTokenMgr
 			
 		try
 		{
-			$this->checkIfFileIsValid($fileData);
+			$this->checkIfFileIsValid($fileData, $resumeAt, $this->_finalChunk);
 		}
 		catch(kUploadTokenException $ex)
 		{
+			if($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY)
+			{
+				return;
+			}
+			
 			if(!$resume && $this->_finalChunk)
+			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
+			}
 			
 			$this->tryMoveToErrors($fileData);
 			throw $ex;
 		}
 		
 		if ($resume)
+		{
 			$fileSize = $this->handleResume($fileData, $resumeAt);
+		}
 		else
 		{
 			$this->handleMoveFile($fileData);
@@ -118,9 +129,10 @@ class kUploadTokenMgr
 			}
 			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
 		}
-		else 
+		else
 		{
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
+			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
+			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
 		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
@@ -142,7 +154,7 @@ class kUploadTokenMgr
 	 * Validate the file data
 	 * @param file $fileData
 	 */
-	protected function checkIfFileIsValid($fileData)
+	protected function checkIfFileIsValid($fileData, $resumeAt, $finalChunk)
 	{
 		// check file name
 		$fileName = isset($fileData['name']) ? $fileData['name'] : null;
@@ -163,12 +175,21 @@ class kUploadTokenMgr
 		}
 		
 		// check if is a real uploaded file
-		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null; 
+		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null;
 		if (!is_uploaded_file($tempPath))
 		{
 			$msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
+		}
+		
+		$tempFileSize = kFile::fileSize($tempPath);
+		if($tempFileSize == 0 && !$finalChunk && $resumeAt > 0)
+		{
+			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
+			KalturaLog::log($msg . ' ' . print_r($fileData, true));
+			kFile::doDeleteFile($tempPath);
+			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY);
 		}
 	}
 
@@ -185,7 +206,7 @@ class kUploadTokenMgr
 	}
 
 	/**
-	 * Updates the file name of the token (if empty) using the file name from the file data 
+	 * Updates the file name of the token (if empty) using the file name from the file data
 	 */
 	protected function updateFileName($fileData)
 	{
@@ -206,8 +227,11 @@ class kUploadTokenMgr
 	{
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
-			
-		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
+		
+		return myContentStorage::getFSUploadsPath().
+			substr($uploadTokenId, -2).'/'.
+			substr($uploadTokenId, -4, 2).'/'.
+			$uploadTokenId.'.'.$extension;
 	}
 	
 	protected function tryMoveToErrors($fileData)
@@ -221,10 +245,10 @@ class kUploadTokenMgr
 
 	/**
 	 * Resume the upload token with the uploaded file optionally at a given offset
-	 * 
-	 * @param file $fileData        	
-	 * @param bool $finalChunk        	
-	 * @param float $resumeAt        	
+	 *
+	 * @param file $fileData
+	 * @param bool $finalChunk
+	 * @param float $resumeAt
 	 */
 	protected function handleResume($fileData, $resumeAt)
 	{
@@ -236,7 +260,7 @@ class kUploadTokenMgr
 		
 		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
 		{
-			// support backwards compatibility of overriding a final chunk at the offset zero  
+			// support backwards compatibility of overriding a final chunk at the offset zero
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
@@ -244,7 +268,7 @@ class kUploadTokenMgr
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = rename($sourceFilePath, $chunkFilePath);
+			$succeeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
@@ -260,7 +284,7 @@ class kUploadTokenMgr
 				if ($count ++)
 					Sleep(1);
 				
-				$currentFileSize = self::appendAvailableChunks($uploadFilePath);
+				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $verifyFinalChunk, $this->_uploadToken->getId());
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
 
@@ -280,7 +304,7 @@ class kUploadTokenMgr
 			fclose($uploadFileResource);
 		}
 		
-		return $currentFileSize; 
+		return $currentFileSize;
 	}
 	
 	private function checkIsFinalChunk($currentFileSize)
@@ -357,19 +381,21 @@ class kUploadTokenMgr
 		unlink($sourceFilePath);
 	}
 
-	static protected function appendAvailableChunks($targetFilePath)
+	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk, $uploadTokenId)
 	{
 		$targetFileResource = fopen($targetFilePath, 'r+b');
 		
 		fseek($targetFileResource, 0, SEEK_END);
 		
 		// use glob to find existing chunks and append ones which start within or at the end of the file and will increase its size
-		// in order to prevent race conditions, rename the chunk to "{chunkname}.{random}.locked" before appending it   
+		// in order to prevent race conditions, rename the chunk to "{chunkname}.{random}.locked" before appending it
 		// the code should handle the following rare scenarios:
 		// 1. parallel procesess trying to add the same chunk
 		// 2. append failing half way and recovered by the client resneding the same chunk. The random part in the locked file name
 		// will prevent the re-uploaded chunk from coliding with the failed one
-		while (1) {
+		$appendStartTime = microtime(true);
+		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
+		{
 			$currentFileSize = ftell($targetFileResource);
 			
 			$validChunk = false;
@@ -378,6 +404,13 @@ class kUploadTokenMgr
 			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
 			$globTook = (microtime(true) - $globStart);
 			KalturaLog::debug("glob took - " . $globTook . " seconds");
+			
+			$chunkCount = count($chunks);
+			if($chunkCount > self::MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED && !$verifyFinalChunk)
+			{
+				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id [$uploadTokenId]");
+				//return null;
+			}
 						
 			foreach($chunks as $nextChunk)
 			{
@@ -394,7 +427,7 @@ class kUploadTokenMgr
 					{
 						fseek($targetFileResource, $chunkOffset, SEEK_SET);
 						$validChunk = true;
-						break; 
+						break;
 					}
 					else
 					{
@@ -407,7 +440,7 @@ class kUploadTokenMgr
 				break;
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;

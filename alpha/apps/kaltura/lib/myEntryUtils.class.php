@@ -760,10 +760,10 @@ class myEntryUtils
 		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
 		
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
-		$thumbName .= "_" . uniqid() . "_";
+		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
 		
 		//create path for processing thumbnail request
-		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );;
 		
 		if(!is_null($format))
 		{
@@ -771,9 +771,9 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 		
-		foreach ($thumbDirs as $key => $value)
+		foreach ($thumbDirs as $thumbDir)
 		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$value, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
 			{
 				if($currPath != $finalThumbPath)
@@ -1401,18 +1401,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
+		{
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
+		}
 	}
 
-	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true, $originalEntryId)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
-			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
+		if ($sourceAsset instanceof timedThumbAsset || (!$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| (!$copyCaptions && $sourceAsset instanceof captionAsset))
+		{
 			return false;
+		}
+
+		if (!kParentChildEntryUtils::shouldCopyAsset($sourceAsset, $originalEntryId))
+		{
+			return false;
+		}
+
 		return true;
 	}
 
