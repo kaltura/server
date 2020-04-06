@@ -1,3 +1,12 @@
+# Propus 16.0.1 #
+
+## Add new permission to new action extendBatchJobLockExpiration in batchService ##
+Issue Type: Task
+Issue ID : PLAT-10653
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_25_add_action_extend_batch_job_lock_expiration.php
+
 # Orion 15.20.0 #
 
 ## Update permissions for systemPartner and job services ##
