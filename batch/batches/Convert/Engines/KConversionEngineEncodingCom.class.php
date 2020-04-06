@@ -49,7 +49,7 @@ class KConversionEngineEncodingCom  extends KJobConversionEngine
 	/* (non-PHPdoc)
 	 * @see batches/Convert/Engines/KConversionEngine#convertJob()
 	 */
-	public function convertJob ( KalturaConvertJobData &$data )
+	public function convertJob ( KalturaConvertJobData &$data, $jobId = null )
 	{
 		$sendData = new KEncodingComData();
 		
