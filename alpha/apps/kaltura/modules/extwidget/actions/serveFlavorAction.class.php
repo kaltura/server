@@ -14,6 +14,7 @@ class serveFlavorAction extends kalturaAction
 	const LIVE_CHANNEL_SEGMENT_DURATION = 10 * self::SECOND_IN_MILLISECONDS;
 	const LIVE_CHANNEL_SEGMENT_COUNT = 10;
 	const TIME_MARGIN = 10 * self::SECOND_IN_MILLISECONDS; // a safety margin to compensate for clock differences
+	const DVR_WINDOW_SIZE = self::LIVE_CHANNEL_SEGMENT_DURATION * self::LIVE_CHANNEL_SEGMENT_COUNT;
 
 	protected $pathOnly = false;
 	
@@ -798,78 +799,108 @@ class serveFlavorAction extends kalturaAction
 		return $clipDesc ;
 	}
 
+	protected function getCurrentLiveChannelEntryIndex($cycleDurations, $currentCycleStartTime, $startTime)
+	{
+		$timeIterator = $currentCycleStartTime;
+		$firstEntryIndex = -1;
+		do{
+			$firstEntryIndex++;
+			$timeIterator += $cycleDurations[$firstEntryIndex];
+		}while($timeIterator <= $startTime);
+
+		return $firstEntryIndex;
+	}
+
+	protected function getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex,
+	                                                  &$firstClipStartTime, &$initialClipIndex, &$initialSegmentIndex)
+	{
+		//Get supporting information
+		$accumulateCycleSegmentsCount = array();
+		$accumulateCycleDurations = array();
+
+		$durationsSum = 0;
+		$cycleSegmentsCount = 0;
+		foreach ($cycleDurations as $duration)
+		{
+			$accumulateCycleDurations[] = $durationsSum;
+			$durationsSum += $duration;
+
+			$accumulateCycleSegmentsCount[] = $cycleSegmentsCount;
+			$cycleSegmentsCount += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
+		}
+
+		// Set the values
+		$firstClipStartTime = $currentCycleStartTime + $accumulateCycleDurations[$firstEntryIndex];
+
+		$initialClipIndex = ($cycleNumber * count($cycleDurations)) + $firstEntryIndex + 1;
+		$initialSegmentIndex = ($cycleNumber * $cycleSegmentsCount) + $accumulateCycleSegmentsCount[$firstEntryIndex] + 1;
+	}
+
+	protected function getCurrentLiveChannelEntries($cycleEntryIds, $cycleDurations, $firstClipStartTime, $firstEntryIndex, $currentTime,
+	                                                &$entryIds, &$durations)
+	{
+		$entryIds = array();
+		$durations = array();
+
+		$cycleEntriesCount = count($cycleEntryIds);
+
+		$entryIndex = $firstEntryIndex;
+		$timeIterator = $firstClipStartTime;
+
+		while($timeIterator < $currentTime)
+		{
+			$durations[] = $cycleDurations[$entryIndex];
+			$entryIds[] = $cycleEntryIds[$entryIndex];
+
+			$timeIterator += $cycleDurations[$entryIndex];
+
+			$entryIndex++;
+			if($entryIndex == $cycleEntriesCount)
+			{
+				$entryIndex = 0;
+			}
+		}
+	}
+
 	protected function servePlaylistAsLiveChannel(LiveChannel $entry)
 	{
+		// get cycle info
 		$playlist = entryPeer::retrieveByPK($entry->getPlaylistId());
 
-		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($playlist);
+		list($cycleEntryIds, $cycleDurations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($playlist);
 
-		// get cycle info
-		$cycleDurations = $durations;
-		$cycleEntryIds = $entryIds;
-		$cycleClipCount = count($cycleDurations);
+		// Sanity
 		$cycleDuration = array_sum($cycleDurations);
-
 		if($cycleDuration == 0)
 		{
 			KExternalErrors::dieError(KExternalErrors::PLAYLIST_DURATION_IS_ZERO,
 				"Entry [$entry->getId()] has a playlist with duration zero");
 		}
-		$cycleSegmentCount = 0;
-		foreach ($cycleDurations as $duration)
-		{
-			$cycleSegmentCount += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
-		}
 
-		// find the start / end time
-		$dvrWindowSize = self::LIVE_CHANNEL_SEGMENT_DURATION * self::LIVE_CHANNEL_SEGMENT_COUNT;
-		$endTime = time() * self::SECOND_IN_MILLISECONDS;
-		$startTime = $endTime - self::TIME_MARGIN - $dvrWindowSize;
-
-		// get the reference time (start time of the first run)
+		// Start time of the first run
 		$playlistStartTime = $entry->getStartDate('U') * self::SECOND_IN_MILLISECONDS;
 
-		// get the initial cycle info
-		$cycleIndex = floor(($startTime - $playlistStartTime) / $cycleDuration);
-		$clipIndex = $cycleIndex * $cycleClipCount;
-		$segmentIndex = $cycleIndex * $cycleSegmentCount;
-		$durations = array();
-		$entryIds = array();
+		// start window time and current time (which is the end time)
+		$currentTime = time() * self::SECOND_IN_MILLISECONDS;
+		$startTime = $currentTime - self::TIME_MARGIN - self::DVR_WINDOW_SIZE;
 
-		$initialSegmentIndex = 0;
-		$initialClipIndex = 0;
-		$firstClipStartTime = 0;
+		// Current cycle number
+		$cycleNumber = floor(($startTime - $playlistStartTime) / $cycleDuration);
 
-		$currentTime = $playlistStartTime + $cycleIndex * $cycleDuration;
-		while ($currentTime < $endTime)
-		{
-			// get the current clip duration
-			$cycleClipIndex = $clipIndex % $cycleClipCount;
-			$duration = $cycleDurations[$cycleClipIndex];
-			if ($currentTime + $duration > $startTime)
-			{
-				if (!$durations)
-				{
-					// set first clip details
-					$firstClipStartTime = $currentTime;
+		// Set the time to the beginning of the current cycle (beginning of the 1st entry in the playlist)
+		$currentCycleStartTime = $playlistStartTime + ($cycleNumber * $cycleDuration);
 
-					if (!$entry->getRepeat())
-					{
-						$initialClipIndex = $clipIndex + 1;
-						$initialSegmentIndex = $segmentIndex + 1;
-					}
-				}
+		// Find the entry that should be played now (when 'startTime' is in the middle of it).
+		// Not necessarily the first entry in the playlist
+		$firstEntryIndex = $this->getCurrentLiveChannelEntryIndex($cycleDurations, $currentCycleStartTime, $startTime);
 
-				// add the current clip
-				$durations[] = $duration;
-				$entryIds[] = $cycleEntryIds[$cycleClipIndex];
-			}
+		// Get Info about the first entry that should be played now
+		$this->getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex,
+			$firstClipStartTime, $initialClipIndex, $initialSegmentIndex);
 
-			// move to the next clip
-			$clipIndex++;
-			$segmentIndex += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
-			$currentTime += $duration;
-		}
+		// Get Entries & Durations for the current window
+		$this->getCurrentLiveChannelEntries($cycleEntryIds, $cycleDurations, $firstClipStartTime, $firstEntryIndex, $currentTime,
+			$entryIds, $durations);
 
 		//Make sure the referenceEntry is one of the entryIds
 		if( ! in_array($referenceEntry->getId(), $entryIds) )
