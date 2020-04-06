@@ -1590,6 +1590,9 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
+			self::REPORT_COLUMN_MAP => array(
+				'hotspot_clicked' => self::EVENT_TYPE_HOTSPOT_CLICKED,
+			),
 		),
 
 	);
