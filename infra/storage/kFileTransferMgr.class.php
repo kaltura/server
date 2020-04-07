@@ -58,6 +58,9 @@ abstract class kFileTransferMgr
 	const FILETRANSFERMGR_RES_OK  = true;
 	const FILETRANSFERMGR_RES_ERR = false;
 
+    // const for maximum depth scan of folder
+    const MAX_DIR_DEPTH = 4;
+
 	// resource used to identify the current connection
 	protected $connection_id;
 	// user's starting directory

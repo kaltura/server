@@ -192,9 +192,13 @@ class ftpMgr extends kFileTransferMgr
 	    return $matches['fileSize'];
 	}
 
-	protected function doListFileObjects ($remoteDir)
+	protected function doListFileObjects($remoteDir, $relativeDir = '', $currentDepth = parent::MAX_DIR_DEPTH)
 	{
 		$fileObjectsResult = array ();
+		if ($currentDepth < 0)
+		{
+			return $fileObjectsResult;
+		}
 		KalturaLog::debug($remoteDir);
 		$remoteDir = ltrim($remoteDir,'/');
 		$filesInfo = ftp_rawlist($this->getConnection(), $remoteDir);
@@ -214,14 +218,28 @@ class ftpMgr extends kFileTransferMgr
 	    	}
 			
 	    	KalturaLog::debug('info: ' . print_r($matches, true));
-	    	$fileObject = new FileObject();
-			$fileObject->filename = $matches['file'];
-			$fileObject->fileSize = $matches['fileSize'];
-			$fileObject->modificationTime = strtotime($matches['date']);
-			$fileObjectsResult[] = $fileObject;
+			if ($this->isDir($matches))
+			{
+				$subDirFiles = $this->doListFileObjects("$remoteDir/" . $matches['file'], $relativeDir.$matches['file']. '/', $currentDepth - 1);
+				foreach($subDirFiles as $subDirFile)
+				{
+					$fileObjectsResult[] = $subDirFile;
+				}
+			} else {
+                $fileObject = new FileObject();
+                $fileObject->filename = $relativeDir == '' ? $matches['file'] : "$relativeDir" . $matches['file'];
+                $fileObject->fileSize = $matches['fileSize'];
+                $fileObject->modificationTime = strtotime($matches['date']);
+                $fileObjectsResult[] = $fileObject;
+			}
 	    }
-		
+
 	    return $fileObjectsResult;
+	}
+
+	private function isDir($fileProperties)
+	{
+		return $fileProperties[1][0] === 'd';
 	}
 	
 	protected function matchFtpRawListOutput($fileInfo, &$matches)

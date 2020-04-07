@@ -397,24 +397,50 @@ class sftpMgr extends kFileTransferMgr
 		$sftp = $this->getSftpConnection();
 		$absolutePath = trim($remotePath, '/');
 		$handle = opendir("ssh2.sftp://" . intval($sftp) . "/$absolutePath");
-	   	if($handle !== false)
+	   	if ($handle !== false)
 	   	{
-	   		$ls = array();
-			while (false !== ($file = readdir($handle))) 
-			{
-				if ($file == '.' || $file == '..')
-					continue;
-					
-				$ls[] = $file;
-			}
-			closedir($handle);
-			return $ls; 
+            closedir($handle);
+            return $this->doListRecursively($remotePath);
 	   	}
         	
 		$lsDirCmd = "ls $remotePath";
 		$execOutput = $this->execSftpCommand($lsDirCmd);
 		KalturaLog::info("sftp rawlist [$execOutput]");
 		return array_filter(array_map('trim', explode("\n", $execOutput)), 'strlen');
+	}
+
+	protected function doListRecursively($remotePath, $currentDepth = parent::MAX_DIR_DEPTH)
+	{
+		$ls = array();
+		if ($currentDepth < 0)
+		{
+			return $ls;
+		}
+		$sftp = $this->getSftpConnection();
+		$absolutePath = trim($remotePath, '/');
+		$handle = opendir('ssh2.sftp://' . intval($sftp) . "/$absolutePath");
+		if ($handle !== false)
+		{
+			while (false !== ($fileName = readdir($handle)))
+			{
+				if ($fileName == '.' || $fileName == '..')
+				{
+					continue;
+				}
+				if (is_dir('ssh2.sftp://' . intval($sftp) . "/$absolutePath/$fileName/"))
+				{
+					$subDirFiles = $this->doListRecursively("/$absolutePath/$fileName", $currentDepth - 1);
+					foreach($subDirFiles as $subDirFile)
+					{
+						$ls[] = $fileName . '/' . $subDirFile;
+					}
+				} else {
+					$ls[] = $fileName;
+				}
+			}
+			closedir($handle);
+			return $ls;
+		}
 	}
 	
 	protected function doListFileObjects ($remote_path)
