@@ -211,6 +211,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$srcFileSync = kFileSyncUtils::resolve($fileSync);
 		if($externalStorage->getExportPeriodically())
 		{
+			$externalFileSync->setFileSize($srcFileSync->getFileSize());
 			$externalFileSync->setSrcPath($srcFileSync->getFullPath());
 			$externalFileSync->setSrcEncKey($srcFileSync->getSrcEncKey());
 			$externalFileSync->save();
