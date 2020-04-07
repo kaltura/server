@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage zoom.data
  */
 class kZoomTranscriptCompleted implements iZoomObject
@@ -38,7 +38,12 @@ class kZoomTranscriptCompleted implements iZoomObject
 		{
 			$kZoomRecordingFile = new kZoomRecordingFile();
 			$kZoomRecordingFile->parseData($recordFileData);
-			$this->recordingFiles[] = $kZoomRecordingFile;
+			if(!isset($this->recordingFiles[$kZoomRecordingFile->recordingFileType]))
+			{
+				$this->recordingFiles[$kZoomRecordingFile->recordingFileType] = array();
+			}
+
+			$this->recordingFiles[$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
 	}
 }

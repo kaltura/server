@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage zoom.data
  */
 interface iZoomObject

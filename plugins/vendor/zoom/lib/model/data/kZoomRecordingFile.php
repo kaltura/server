@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage zoom.data
  */
 class kZoomRecordingFile implements iZoomObject
@@ -10,13 +10,13 @@ class kZoomRecordingFile implements iZoomObject
 	const ID = 'id';
 	const NO_ID = 'noID';
 
-	public $fileType;
+	public $recordingFileType;
 	public $download_url;
 	public $id;
 
 	public function parseData($data)
 	{
-		$this->fileType = $data[self::FILE_TYPE];
+		$this->parseFileType($data[self::FILE_TYPE]);
 		$this->download_url = $data[self::DOWNLOAD_URL];
 		if(isset($data[self::ID]))
 		{
@@ -25,6 +25,24 @@ class kZoomRecordingFile implements iZoomObject
 		else
 		{
 			$this->id = self::NO_ID;
+		}
+	}
+
+	protected function parseFileType($fileType)
+	{
+		switch($fileType)
+		{
+			case 'MP4':
+				$this->recordingFileType = kRecordingFileType::VIDEO;
+			break;
+			case 'CHAT':
+				$this->recordingFileType = kRecordingFileType::CHAT;
+				break;
+			case 'TRANSCRIPT':
+				$this->recordingFileType = kRecordingFileType::TRANSCRIPT;
+				break;
+			default:
+				$this->recordingFileType = kRecordingFileType::UNDEFINED;
 		}
 	}
 }

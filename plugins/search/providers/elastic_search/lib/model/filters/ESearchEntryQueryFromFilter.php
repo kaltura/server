@@ -356,7 +356,63 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected  function handleFreeTextField($field, $fieldValue)
 	{
-		$this->addingFieldPartIntoQuery(baseObjectFilter::IN, $field, $fieldValue);
+		$searchItem = null;
+		$values = explode(self::NOT_OPERATOR, $fieldValue, 2);
+
+		if (isset($values[1]) && trim($values[1]))
+		{
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createUnifiedSearchItem(trim($values[1])));
+			$freeTextValue = trim($values[0]);
+			if ($freeTextValue)
+			{
+				$searchItem = new ESearchOperator();
+				$searchItem->setOperator(ESearchOperatorType::AND_OP);
+				$freeTextSearchItem = $this->createUnifiedSearchItem($freeTextValue, true);
+				$searchItem->setSearchItems(array($freeTextSearchItem, $searchItemNot));
+			}
+			else
+			{
+				$searchItem = $searchItemNot;
+			}
+		}
+
+		elseif (isset($values[0]) && trim($values[0]))
+		{
+			$searchItem = $this->createUnifiedSearchItem(trim($values[0]), true);
+		}
+
+		if ($searchItem)
+		{
+			$this->searchItems[] = $searchItem;
+		}
+	}
+
+	protected function createUnifiedSearchItem($value, $removeWildCard = false)
+	{
+		if ($removeWildCard)
+		{
+			$value = str_replace(self::WILDCARD_OPERATOR, '', $value);
+		}
+
+		$freeTextSearchExact = new ESearchUnifiedItem();
+		$freeTextSearchExact->setItemType(ESearchItemType::EXACT_MATCH);
+		$freeTextSearchExact->setSearchTerm($value);
+
+		if (ESearchQueryFromAdvancedSearch::enclosedInQuotationMarks($value))
+		{
+			$value  = substr($value, 1, -1);
+			$freeTextSearchExact->setSearchTerm($value);
+			return $freeTextSearchExact;
+		}
+
+		$searchItem = new ESearchOperator();
+		$searchItem->setOperator(ESearchOperatorType::OR_OP);
+		$freeTextSearchItemPartial = new ESearchUnifiedItem();
+		$freeTextSearchItemPartial->setItemType(ESearchItemType::PARTIAL);
+		$freeTextSearchItemPartial->setSearchTerm($value);
+		$searchItem->setSearchItems(array($freeTextSearchExact, $freeTextSearchItemPartial));
+
+		return $searchItem;
 	}
 
 	protected function handleDurationType($fieldValue)

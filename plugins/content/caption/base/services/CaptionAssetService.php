@@ -84,6 +84,8 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	function addAction($entryId, KalturaCaptionAsset $captionAsset)
 	{
+		$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($entryId);
+
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -436,6 +438,7 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveByEntryIdAction($entryId, $captionParamId = null)
 	{
+		$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($entryId);
 		$entry = null;
 		if (!kCurrentContext::$ks)
 		{

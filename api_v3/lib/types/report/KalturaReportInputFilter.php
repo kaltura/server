@@ -222,6 +222,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $applicationVersionIn;
 
+	/**
+	 * filter by node id
+	 *
+	 * @var string
+	 */
+	public $nodeIdsIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -255,6 +262,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'playerVersionIn' => 'player_versions',
 		'ispIn' => 'isp',
 		'applicationVersionIn' => 'application_versions',
+		'nodeIdsIn' => 'node_ids',
 	);
 
 	protected function getMapBetweenObjects()

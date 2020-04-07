@@ -50,7 +50,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	{
 		// updated in the entry in the indexing server
 		$entry = $object->getentry();
-		if($entry)
+		if($entry && $entry->getStatus() != entryStatus::DELETED)
 		{
 			$entry->setUpdatedAt(time());
 			$entry->save();

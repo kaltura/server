@@ -12,6 +12,7 @@ class ESearchQueryFromAdvancedSearch
 	const ENTRY_CAPTION_ADVANCED_FILTER = 'kEntryCaptionAdvancedFilter';
 	const QUIZ_ADVANCED_FILTER = 'kQuizAdvancedFilter';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
+	const ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX =  '/(\"){1}[^\"]+(\"){1}/';
 
 	protected $currentMetadataProfileId = null;
 
@@ -125,7 +126,7 @@ class ESearchQueryFromAdvancedSearch
 		return $result;
 	}
 
-	protected static function createNegativeQuery($item)
+	public static function createNegativeQuery($item)
 	{
 		$result = new ESearchOperator();
 		$result->setOperator(ESearchOperatorType::NOT_OP);
@@ -133,6 +134,17 @@ class ESearchQueryFromAdvancedSearch
 		return $result;
 	}
 
+	public static function enclosedInQuotationMarks($searchTerm)
+	{
+		/*
+		 * if searchTerm is wrapped with '"' - return true
+		 */
+		if(preg_match_all(self::ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX, $searchTerm, $matches))
+		{
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * Some fields have special usage in the sphinx so we need to return the relevant ESearchItemType for it
 	 * @param $field
