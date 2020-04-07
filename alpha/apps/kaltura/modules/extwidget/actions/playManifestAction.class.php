@@ -680,7 +680,10 @@ class playManifestAction extends kalturaAction
 			switch ($servePriority)
 			{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				if(!kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId()))
+				{
+					$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				}
 				break;
 				
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
@@ -714,6 +717,8 @@ class playManifestAction extends kalturaAction
 			$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId(
 				$this->entry->getPartnerId(), 
 				$storageProfileIds);
+			$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
+			$storageProfiles = array_merge($storageProfiles, $periodicStorageProfiles);
 
 			$activeStorageProfileIds = array();
 			foreach ($storageProfiles as $storageProfile)
@@ -749,8 +754,21 @@ class playManifestAction extends kalturaAction
 		// choose the flavor set according to the serve priority
 		if ($this->shouldUseLocalFlavors($localFlavors, $remoteFlavors))
 		{
-			$this->deliveryAttributes->setStorageId(null);
-			$this->deliveryAttributes->setFlavorAssets($localFlavors);
+			$storageId = null;
+			$deliveryFlavors = $localFlavors;
+
+			if($maxDc && (count($localFlavors) == 0))
+			{
+				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+				if($periodicStorageIds && in_array($maxDc, $periodicStorageIds))
+				{
+					$storageId = $maxDc;
+					$deliveryFlavors = $remoteFlavors;
+				}
+			}
+
+			$this->deliveryAttributes->setStorageId($storageId);
+			$this->deliveryAttributes->setFlavorAssets($deliveryFlavors);
 		}
 		else if ($maxDc)
 		{
@@ -821,7 +839,7 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 				
 		// storage doesn't belong to the partner
-		if($storageProfile->getPartnerId() != $this->entry->getPartnerId())
+		if(($storageProfile->getPartnerId() != $this->entry->getPartnerId()) && !$storageProfile->getExportPeriodically())
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	

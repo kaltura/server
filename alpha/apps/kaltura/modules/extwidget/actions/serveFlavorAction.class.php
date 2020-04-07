@@ -484,7 +484,7 @@ class serveFlavorAction extends kalturaAction
 				if(!$local)
 				{
 					$storage = StorageProfilePeer::retrieveByPK($file_sync->getDc());
-					if($storage->getUseServeFlavor())
+					if($storage->getExportPeriodically())
 					{
 						$allowRemotePath = true;
 					}
