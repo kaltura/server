@@ -388,9 +388,9 @@ class thumbnailAction extends sfAction
 			$src_h  = $src_h * $heightRatio;
 		}
 		
-		$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$subType = kEntryFileSyncSubType::THUMB;
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
-			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
+			$subType = kEntryFileSyncSubType::DATA;
 			
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
@@ -554,7 +554,7 @@ class thumbnailAction extends sfAction
 	{
 		if(!$isCapturing)
 		{
-			$entryImageSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$entryImageSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey,false);
 			if($fileSync)
 			{
