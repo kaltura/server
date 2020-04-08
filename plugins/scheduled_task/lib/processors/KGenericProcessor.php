@@ -240,6 +240,7 @@ class KGenericProcessor
 				$this->additionalActions($profile, $object, $tasksCompleted, $error);
 			}
 			$this->handlePager($pager);
+			sleep(1);
 		}
 		return $objectsData;
 	}
