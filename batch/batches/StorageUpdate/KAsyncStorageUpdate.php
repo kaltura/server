@@ -64,7 +64,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				foreach($partners->objects as $partner)
 				{
 					$this->handlePartner($partner, KAsyncStorageUpdateUtils::PARTNER_PACKAGE_FREE);
-				 	unset($partner);
 				}
 
 				$partner = end($partners->objects);
@@ -74,10 +73,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 			}
 			unset($partners);
-			if(function_exists('gc_collect_cycles'))
-			{
-				gc_collect_cycles();
-			}
 		} while ($countPartners);
 
 		KalturaLog::debug('Done.');
