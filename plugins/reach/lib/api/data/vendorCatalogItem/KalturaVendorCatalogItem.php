@@ -6,6 +6,7 @@
  */
 abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
+	const INVALID_CSV_DATA = 'N\A';
 	/**
 	 * @var int
 	 * @readonly
@@ -201,12 +202,38 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				$object = new KalturaVendorCaptionsCatalogItem();
 				break;
 		}
-		
+
 		if (!$object)
 			return null;
-		
+
 		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCsvData()
+	{
+		$csvData = array(
+			'id' => isset($this->id) ? $this->id : self::INVALID_CSV_DATA,
+			'status' => isset($this->status) ? $this->status : self::INVALID_CSV_DATA,
+			'vendorPatnerId' => isset($this->vendorPartnerId) ? $this->vendorPartnerId : self::INVALID_CSV_DATA,
+			'name' => isset($this->name) ? $this->name : self::INVALID_CSV_DATA,
+			'systemName' => isset($this->systemName) ? $this->systemName : self::INVALID_CSV_DATA,
+			'serviceFeature' => isset($this->serviceFeature) ? $this->serviceFeature : self::INVALID_CSV_DATA,
+			'serviceType' => isset($this->serviceType) ? $this->serviceType : self::INVALID_CSV_DATA,
+			'turnAroundTime' => isset($this->turnAroundTime) ? $this->turnAroundTime : self::INVALID_CSV_DATA,
+			'sourceLanguage' => isset($this->sourceLanguage) ? $this->sourceLanguage : self::INVALID_CSV_DATA,
+			'targetLanguage' => isset($this->targetLanguage) ? $this->targetLanguage : self::INVALID_CSV_DATA,
+			'createdAt' => isset($this->createdAt) ? $this->createdAt : self::INVALID_CSV_DATA,
+			'updatedAt' => isset($this->updatedAt) ? $this->updatedAt : self::INVALID_CSV_DATA,
+			'enableSpeakerId' => isset($this->enableSpeakerId) ? $this->enableSpeakerId : self::INVALID_CSV_DATA,
+			'fixedPriceAddons' => isset($this->fixedPriceAddons) ? $this->fixedPriceAddons : self::INVALID_CSV_DATA,
+			'pricePerUnit' => isset($this->pricing->pricePerUnit) ? $this->pricing->pricePerUnit : self::INVALID_CSV_DATA,
+			'priceFunction' => isset($this->pricing->priceFunction) ? $this->pricing->priceFunction : self::INVALID_CSV_DATA,
+		);
+		return $csvData;
 	}
 }

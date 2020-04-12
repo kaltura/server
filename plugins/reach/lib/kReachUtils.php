@@ -4,6 +4,43 @@
  */
 class kReachUtils
 {
+	static private $vendorCatalogItemStatusEnumTranslate = array(
+		1 => "DEPRECATED",
+		2 => "ACTIVE",
+		3 => "DELETED",
+	);
+
+	static private $turnAroundTimeEnumTranslate = array(
+		-1 => "BEST_EFFORT",
+		0 => "IMMEDIATE",
+		1800 => "THIRTY_MINUTES",
+		7200 => "TWO_HOURS",
+		10800 => "THREE_HOURS",
+		21600 => "SIX_HOURS",
+		28800 => "EIGHT_HOURS",
+		43200 => "TWELVE_HOURS",
+		86400 => "TWENTY_FOUR_HOURS",
+		172800 => "FORTY_EIGHT_HOURS",
+		345600 => "FOUR_DAYS",
+		432000 => "FIVE_DAYS",
+		864000 => "TEN_DAYS",
+	);
+
+	static private $serviceFeatureEnumTranslate = array(
+		1 => "CAPTIONS",
+		2 => "TRANSLATION",
+		3 => "ALIGNMENT",
+		4 => "AUDIO_DESCRIPTION",
+		5 => "CHAPTERING",
+		"N/A" => "N/A",
+	);
+
+	static private $serviceTypeEnumTranslate = array(
+		1 => "HUMAN",
+		2 => "MACHINE",
+		"N/A" => "N/A",
+	);
+
 	/**
 	 * @param $entryId
 	 * @param $shouldModerateOutput
@@ -177,4 +214,81 @@ class kReachUtils
 		return $result;
 	}
 
+	/**
+	 * @return string
+	 */
+	public static function getVendorCatalogItemsCsvHeaders()
+	{
+		$headers = "ID,Status,vendorPatnerID,Name,systemName,serviceFeature,serviceType,Turn Around Time,Source Language,Target Language,Created at,Updated at,Enable speaker ID,Fixed Price Addons,Price Per Unit,Price Function\n";
+		return $headers;
+	}
+
+	/**
+	 * @param $csvData
+	 * @return array
+	 */
+	public static function validateAndTranslateCatalogItemCsvData($csvData)
+	{
+		if (isset($csvData['createdAt']))
+		{
+			$csvData['createdAt'] = self::getHumanReadbaleDate($csvData['createdAt']);
+		}
+		if (isset($csvData['updatedAt']))
+		{
+			$csvData['updatedAt'] = self::getHumanReadbaleDate($csvData['updatedAt']);
+		}
+		if (isset($csvData['status']))
+		{
+			$csvData['status'] = self::translateEnumsToHumanReadable("vendorCatalogItemStatus", $csvData['status']);
+		}
+		if (isset($csvData['serviceType']))
+		{
+			$csvData['serviceType'] = self::translateEnumsToHumanReadable("serviceType", $csvData['serviceType']);
+		}
+		if (isset($csvData['serviceFeature']))
+		{
+			$csvData['serviceFeature'] = self::translateEnumsToHumanReadable("serviceFeature", $csvData['serviceFeature']);
+		}
+		if (isset($csvData['turnAroundTime']))
+		{
+			$csvData['turnAroundTime'] = self::translateEnumsToHumanReadable("turnAroundTime", $csvData['turnAroundTime']);
+		}
+
+		$csvData = KCsvWrapper::validateCsvFields($csvData);
+		return $csvData;
+	}
+
+	/**
+	 * @param $enumName
+	 * @param $enumValue
+	 * @return string
+	 */
+	protected static function translateEnumsToHumanReadable($enumName, $enumValue)
+	{
+		if (!self::${$enumName . "EnumTranslate"})
+		{
+			return 'N\A';
+		}
+
+		if (!isset(self::${$enumName . "EnumTranslate"}[$enumValue]))
+		{
+			return 'N\A';
+		}
+
+		return self::${$enumName . "EnumTranslate"}[$enumValue];
+	}
+
+	/**
+	 * @param $unixTimeStamp
+	 * @return false|string
+	 */
+	protected static function getHumanReadbaleDate($unixTimeStamp)
+	{
+		if (!$unixTimeStamp)
+		{
+			return 'N\A';
+		}
+
+		return date("Y-m-d H:i", $unixTimeStamp);
+	}
 }

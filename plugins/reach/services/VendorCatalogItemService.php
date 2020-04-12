@@ -10,7 +10,6 @@
 
 class VendorCatalogItemService extends KalturaBaseService
 {
-	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -167,4 +166,60 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DELETED);
 		$dbVendorCatalogItem->save();
 	}
+
+	/**
+	 * @action export
+	 * @param int $vendorId
+	 * @return file
+	 */
+	public function exportAction($vendorId = null)
+	{
+		$filter = new KalturaVendorCatalogItemFilter();
+		if($vendorId)
+		{
+			$filter->vendorPartnerIdEqual = $vendorId;
+		}
+
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+
+		$content = kReachUtils::getVendorCatalogItemsCsvHeaders();
+		$res =  $filter->getTypeListResponse($pager, $this->getResponseProfile());
+		$totalCount = $res->totalCount;
+		while ($totalCount > 0)
+		{
+			foreach ($res->objects as $vendorCatalogItems)
+			{
+				/** @var KalturaVendorCatalogItem $vendorCatalogItems */
+				$csvData = $vendorCatalogItems->getCsvData();
+				$csvData = kReachUtils::validateAndTranslateCatalogItemCsvData($csvData);
+				$content .= implode(',' , $csvData) . "\n";
+			}
+
+			$pager->pageIndex++;
+			$totalCount = $totalCount - $pager->pageSize;
+			$res = $filter->getTypeListResponse($pager, $this->getResponseProfile());
+		}
+		$fileName = "export.csv";
+		header('Content-Disposition: attachment; filename="'.$fileName.'"');
+		return new kRendererString($content, 'text/csv');
+	}
+
+	/**
+	 * @action getExportUrl
+	 * @param int $vendorId
+	 * @return string $url
+	 */
+	public function getExportUrlAction($vendorId = null)
+	{
+		$finalPath = '/api_v3/service/reach_vendorcatalogitem/action/export/';
+		if ($vendorId)
+		{
+			$finalPath .= "vendorId/$vendorId";
+		}
+		$finalPath .= "/ks/" . kCurrentContext::$ks;
+		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $finalPath;
+		return $url;
+	}
+
 }
