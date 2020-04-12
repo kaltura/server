@@ -328,6 +328,7 @@ class kKavaBase extends kDruidBase
 		'expressrecorder' => 'Express Recorder',
 		'kmsnativeandroid' => 'KMS GO Android',
 		'kmsnativeios' => 'KMS GO iOS',
+		'kalturameeting' => 'Kaltura Meeting',
 	);
 
 	protected static $sourceTypes = array(
