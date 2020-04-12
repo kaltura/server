@@ -21,7 +21,7 @@ class CatalogItemExportAction extends KalturaApplicationPlugin
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
-		$exportUrl = $reachPluginClient->vendorCatalogItem->getExportUrl($vendorPartnerId);
+		$exportUrl = $reachPluginClient->vendorCatalogItem->getServeUrl($vendorPartnerId);
 		$action->view->exportUrl = $exportUrl;
 	}
 }

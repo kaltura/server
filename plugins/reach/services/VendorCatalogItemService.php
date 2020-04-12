@@ -168,32 +168,32 @@ class VendorCatalogItemService extends KalturaBaseService
 	}
 
 	/**
-	 * @action export
+	 * @action serve
 	 * @param int $vendorId
 	 * @return file
 	 */
-	public function exportAction($vendorId = null)
+	public function serveAction($vendorPartnerId = null)
 	{
 		$filter = new KalturaVendorCatalogItemFilter();
-		if($vendorId)
+		if($vendorPartnerId)
 		{
-			$filter->vendorPartnerIdEqual = $vendorId;
+			$filter->vendorPartnerIdEqual = $vendorPartnerId;
 		}
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
 
-		$content = kReachUtils::getVendorCatalogItemsCsvHeaders();
+		$content = implode(',', kReachUtils::getVendorCatalogItemsCsvHeaders()) . PHP_EOL;
 		$res =  $filter->getTypeListResponse($pager, $this->getResponseProfile());
 		$totalCount = $res->totalCount;
 		while ($totalCount > 0)
 		{
-			foreach ($res->objects as $vendorCatalogItems)
+			foreach ($res->objects as $vendorCatalogItem)
 			{
-				/** @var KalturaVendorCatalogItem $vendorCatalogItems */
-				$csvData = $vendorCatalogItems->getCsvData();
-				$csvData = kReachUtils::validateAndTranslateCatalogItemCsvData($csvData);
-				$content .= implode(',' , $csvData) . "\n";
+				$catalogItemValues = kReachUtils::getObejctValues($vendorCatalogItem);
+				$csvRowData = kReachUtils::createCatalogItemCsvRowData($catalogItemValues);
+				$content .= $csvRowData . PHP_EOL;
 			}
 
 			$pager->pageIndex++;
@@ -206,18 +206,18 @@ class VendorCatalogItemService extends KalturaBaseService
 	}
 
 	/**
-	 * @action getExportUrl
-	 * @param int $vendorId
+	 * @action getServeUrl
+	 * @param int $vendorPartnerId
 	 * @return string $url
 	 */
-	public function getExportUrlAction($vendorId = null)
+	public function getServeUrlAction($vendorPartnerId = null)
 	{
-		$finalPath = '/api_v3/service/reach_vendorcatalogitem/action/export/';
-		if ($vendorId)
+		$finalPath = '/api_v3/service/reach_vendorcatalogitem/action/serve/';
+		if ($vendorPartnerId)
 		{
-			$finalPath .= "vendorId/$vendorId";
+			$finalPath .= "vendorPartnerId/$vendorPartnerId";
 		}
-		$finalPath .= "/ks/" . kCurrentContext::$ks;
+		$finalPath .= '/ks/' . kCurrentContext::$ks;
 		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $finalPath;
 		return $url;
 	}

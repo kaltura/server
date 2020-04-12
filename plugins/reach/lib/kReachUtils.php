@@ -4,10 +4,18 @@
  */
 class kReachUtils
 {
-	static private $vendorCatalogItemStatusEnumTranslate = array(
+	static private $dateFields = array('createdAt', 'updatedAt');
+	static private $catalogItemTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime','outputFormat');
+
+	static private $statusEnumTranslate = array(
 		1 => "DEPRECATED",
 		2 => "ACTIVE",
 		3 => "DELETED",
+	);
+
+	static private $outputFormatEnumTranslate = array(
+		1 => "SRT",
+		2 => "DFXP",
 	);
 
 	static private $turnAroundTimeEnumTranslate = array(
@@ -215,47 +223,76 @@ class kReachUtils
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
 	public static function getVendorCatalogItemsCsvHeaders()
 	{
-		$headers = "ID,Status,vendorPatnerID,Name,systemName,serviceFeature,serviceType,Turn Around Time,Source Language,Target Language,Created at,Updated at,Enable speaker ID,Fixed Price Addons,Price Per Unit,Price Function\n";
-		return $headers;
+		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction');
 	}
 
 	/**
-	 * @param $csvData
-	 * @return array
+	 * @param $catalogItemValues
+	 * @return string
 	 */
-	public static function validateAndTranslateCatalogItemCsvData($csvData)
+	public static function createCatalogItemCsvRowData($catalogItemValues)
 	{
-		if (isset($csvData['createdAt']))
+		$csvData = array();
+		foreach (self::$dateFields as $dateField)
 		{
-			$csvData['createdAt'] = self::getHumanReadbaleDate($csvData['createdAt']);
-		}
-		if (isset($csvData['updatedAt']))
-		{
-			$csvData['updatedAt'] = self::getHumanReadbaleDate($csvData['updatedAt']);
-		}
-		if (isset($csvData['status']))
-		{
-			$csvData['status'] = self::translateEnumsToHumanReadable("vendorCatalogItemStatus", $csvData['status']);
-		}
-		if (isset($csvData['serviceType']))
-		{
-			$csvData['serviceType'] = self::translateEnumsToHumanReadable("serviceType", $csvData['serviceType']);
-		}
-		if (isset($csvData['serviceFeature']))
-		{
-			$csvData['serviceFeature'] = self::translateEnumsToHumanReadable("serviceFeature", $csvData['serviceFeature']);
-		}
-		if (isset($csvData['turnAroundTime']))
-		{
-			$csvData['turnAroundTime'] = self::translateEnumsToHumanReadable("turnAroundTime", $csvData['turnAroundTime']);
+			if (isset($catalogItemValues[$dateField]))
+			{
+				$catalogItemValues[$dateField] = self::getHumanReadbaleDate($catalogItemValues[$dateField]);
+			}
 		}
 
+		foreach (self::$catalogItemTranslateableFields as $catalogItemTranslateableField)
+		{
+			if (isset($catalogItemValues[$catalogItemTranslateableField]))
+			{
+				$catalogItemValues[$catalogItemTranslateableField] = self::translateEnumsToHumanReadable($catalogItemTranslateableField, $catalogItemValues[$catalogItemTranslateableField]);
+			}
+		}
+
+		foreach (self::getVendorCatalogItemsCsvHeaders() as $field)
+		{
+			if (isset($catalogItemValues[$field]))
+			{
+				$csvData[$field] = $catalogItemValues[$field];
+			}
+			else
+			{
+				$csvData[$field] = 'N\A';
+			}
+		}
 		$csvData = KCsvWrapper::validateCsvFields($csvData);
-		return $csvData;
+		return implode(',',$csvData);
+	}
+
+	/**
+	 * @param $object
+	 * @return array|null
+	 */
+	public static function getObejctValues($object)
+	{
+		if (!$object)
+		{
+			return null;
+		}
+		$values = get_object_vars($object);
+		$additionalValues = array();
+		foreach ($values as $key => $value)
+		{
+			if (is_object($value))
+			{
+				$objectValues = self::getObejctValues($value);
+				foreach ($objectValues as $innerKey => $innerValue)
+				{
+					$additionalValues[$key . ':' . $innerKey] = $innerValue;
+				}
+				unset($values[$key]);
+			}
+		}
+		return array_merge($values,$additionalValues);
 	}
 
 	/**
