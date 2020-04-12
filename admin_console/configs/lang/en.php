@@ -1438,6 +1438,8 @@ return array(
 	
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT' => 'BEST_EFFORT',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::IMMEDIATE' => 'IMMEDIATE',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::ONE_BUSINESS_DAY' => 'ONE_BUSINESS_DAY',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_BUSINESS_DAYS' => 'TWO_BUSINESS_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THIRTY_MINUTES' => 'THIRTY_MINUTES',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_HOURS' => 'TWO_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THREE_HOURS' => 'THREE_HOURS',
@@ -1445,9 +1447,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::EIGHT_HOURS' => 'EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWELVE_HOURS' => 'TWELVE_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
-	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::ONE_BUSINESS_DAY' => 'ONE_BUSINESS_DAY',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
-	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_BUSINESS_DAYS' => 'TWO_BUSINESS_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_DAYS' => 'FIVE_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
