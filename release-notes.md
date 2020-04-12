@@ -1,6 +1,6 @@
 # Propus 16.0.1 #
 
-## Add new permission to new action extendBatchJobLockExpiration in batchService ##
+## Add new permission to new action extendLockExpiration in batchService ##
 Issue Type: Task
 Issue ID : PLAT-10653
 

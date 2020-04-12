@@ -237,7 +237,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 		{
 			try
 			{
-				KBatchBase::$kClient->batch->extendBatchJobLockExpiration($jobId, $maximumExecutionTime);
+				KBatchBase::$kClient->batch->extendLockExpiration($jobId, $maximumExecutionTime);
 				$timeout += $maximumExecutionTime;
 			}
 			catch (Exception $e)
