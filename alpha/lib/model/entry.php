@@ -3715,6 +3715,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function getkshow(PropelPDO $con = null)
 	{
+		if (!$this->kshow_id)
+		{
+			return null;
+		}
 		return kshowPeer::retrieveByPK($this->kshow_id, $con);
 	}
 	

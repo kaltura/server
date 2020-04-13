@@ -1164,9 +1164,6 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry = $this->prepareEntryForInsert($newEntry);
 	  	$dbEntry->setSourceId( $srcEntry->getId() );
 	  	
-	 	$kshow = $this->createDummyKShow();
-		$kshowId = $kshow->getId();
-		
 		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		if(!$flavorAsset)
 		{
@@ -1543,22 +1540,6 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_SCHEDULE_DATES);
 		}
-	}
-	
-
-	protected function createDummyKShow()
-	{
-		$kshow = new kshow();
-		$kshow->setName(kshow::DUMMY_KSHOW_NAME);
-		$kshow->setProducerId($this->getKuser()->getId());
-		$kshow->setPartnerId($this->getPartnerId());
-		$kshow->setSubpId($this->getPartnerId() * 100);
-		$kshow->setViewPermissions(kshow::KSHOW_PERMISSION_EVERYONE);
-		$kshow->setPermissions(kshow::PERMISSIONS_PUBLIC);
-		$kshow->setAllowQuickEdit(true);
-		$kshow->save();
-		
-		return $kshow;
 	}
 	
 	protected function updateEntry($entryId, KalturaBaseEntry $entry, $entryType = null)
