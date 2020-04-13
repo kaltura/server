@@ -137,6 +137,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
 	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
+	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'INTERACTIVITY_VERSION';
+	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'VOLATILE_INTERACTIVITY_VERSION';
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -469,10 +472,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 
 
-
 	/**
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#getSyncKey()
+	 * @param $sub_type
+	 * @param $version
+	 * @return FileSyncKey
+	 * @throws FileSyncException
 	 */
 	public function getSyncKey ( $sub_type , $version = null )
 	{
@@ -523,87 +529,87 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			
 		return $this->getId() . '_' . $this->generateBaseFileName($sub_type, $version);
 	}
-	
-	
+
+
 	/**
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
+	 * @param $sub_type
+	 * @param null $version
+	 * @return array
+	 * @throws FileSyncException
 	 */
 	public function generateFilePathArr( $sub_type, $version = null)
 	{
 		static::validateFileSyncSubType ( $sub_type );
-		if ( $sub_type == kEntryFileSyncSubType::DATA )
+		switch ($sub_type)
 		{
-			$data = $this->getData();
-			if($this->getType() == entryType::MIX && (!$this->getData() || !strpos($this->getData(), 'xml')))
-			{
-				$data .= ".xml";
-			}
-			$res = myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $data, $version);
-//			$res = myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version);
-		}
-		elseif ( $sub_type == kEntryFileSyncSubType::DATA_EDIT )
-		{
-			$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version) );
-		}
-		elseif ( $sub_type == kEntryFileSyncSubType::THUMB )
-		{
-			$res =  myContentStorage::getGeneralEntityPath("entry/bigthumbnail", $this->getIntId(), $this->getId(), $this->getThumbnail() , $version);
-		}
-		elseif ( $sub_type == kEntryFileSyncSubType::ARCHIVE )
-		{
-			$res = null;
-			$data_path = myContentStorage::getGeneralEntityPath("entry/data", $this->getIntId(), $this->getId(), $this->getData(), $version);
-			// assume the suffix is not the same as the one on the data
-			$archive_path = dirname ( str_replace ( "content/entry/" , "archive/" , $data_path ) ) . "/" . $this->getId();
-			if ($this->getArchiveExtension())
-			{
-				$res = $archive_path  . "." . $this->getArchiveExtension();
-			}
-			else
-			{
-				$archive_pattern =  $archive_path . ".*" ;
-				$arc_files =  glob ( myContentStorage::getFSContentRootPath( ) . $archive_pattern );
-				foreach ( $arc_files as $full_path_name )
+			case kEntryFileSyncSubType::DATA:
+				$data = $this->getData();
+				if($this->getType() == entryType::MIX && (!$this->getData() || !strpos($this->getData(), 'xml')))
 				{
-					// return the first file found
-					$res =  $full_path_name;
-					break;
+					$data .= '.xml';
 				}
-				
-				if ( ! $res )
-					$res =  $archive_pattern;
-			}
-		}
-		elseif ( $sub_type == kEntryFileSyncSubType::DOWNLOAD )
-		{
-			// in this case the $version  is used as the format
-			$basename = kFile::getFileNameNoExtension ( $this->getData() );
-			$path = myContentStorage::getGeneralEntityPath("entry/download", $this->getIntId(), $this->getId(), $basename);
-			$download_path = $path.".$version";
-			 $res =  $download_path;
-		}
-		else
-		{
-			$path =  "entry/data";
-			switch($sub_type)
-			{
-				case kEntryFileSyncSubType::ISM:
-					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
-					$basename .= '.ism';
-					break;
-					
-				case kEntryFileSyncSubType::ISMC:
-					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
-					$basename .= '.ismc';
-					break;
-					
-				case kEntryFileSyncSubType::CONVERSION_LOG:
-					$basename = $this->generateBaseFileName(0, $this->getIsmVersion());
-					$basename .= '.log';
-					break;
-			}
-			$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+
+				$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $data, $version);
+				break;
+			case kEntryFileSyncSubType::DATA_EDIT:
+				$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $this->getData(), $version) );
+				break;
+			case kEntryFileSyncSubType::THUMB:
+				$res =  myContentStorage::getGeneralEntityPath('entry/bigthumbnail', $this->getIntId(), $this->getId(), $this->getThumbnail() , $version);
+				break;
+			case kEntryFileSyncSubType::ARCHIVE:
+				$res = null;
+				$data_path = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $this->getData(), $version);
+				// assume the suffix is not the same as the one on the data
+				$archive_path = dirname ( str_replace ( 'content/entry/' , 'archive/' , $data_path ) ) . '/' . $this->getId();
+				if ($this->getArchiveExtension())
+				{
+					$res = $archive_path  . '.' . $this->getArchiveExtension();
+				}
+				else
+				{
+					$archive_pattern =  $archive_path . '.*' ;
+					$arc_files =  glob ( myContentStorage::getFSContentRootPath( ) . $archive_pattern );
+					foreach ( $arc_files as $full_path_name )
+					{
+						// return the first file found
+						$res =  $full_path_name;
+						break;
+					}
+
+					if ( ! $res )
+					{
+						$res = $archive_pattern;
+					}
+				}
+				break;
+			case  kEntryFileSyncSubType::DOWNLOAD:
+				// in this case the $version is used as the format
+				$basename = kFile::getFileNameNoExtension ( $this->getData() );
+				$path = myContentStorage::getGeneralEntityPath('entry/download', $this->getIntId(), $this->getId(), $basename);
+				$download_path = $path.'.$version';
+				$res =  $download_path;
+				break;
+			case kEntryFileSyncSubType::ISM:
+				$path =  'entry/data';
+				$basename = $this->generateBaseFileName(0, $this->getIsmVersion()) . '.ism';
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+				break;
+			case kEntryFileSyncSubType::ISMC:
+				$path =  'entry/data';
+				$basename = $this->generateBaseFileName(0, $this->getIsmVersion()) . '.ismc';
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+				break;
+			case kEntryFileSyncSubType::CONVERSION_LOG:
+				$path =  'entry/data';
+				$basename = $this->generateBaseFileName(0, $this->getIsmVersion()) . '.log';
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+				break;
+			default:
+				$path =  'entry/data';
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $this->generateBaseFileName($sub_type, $version));
 		}
 
 		return array ( myContentStorage::getFSContentRootPath( ) , $res );
@@ -640,16 +646,36 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		else
 		{
-			if ( $sub_type == kEntryFileSyncSubType::DATA || $sub_type == kEntryFileSyncSubType::DATA_EDIT )
-				$new_version = $this->getVersion();
-			elseif ( $sub_type == kEntryFileSyncSubType::THUMB )
-				$new_version = $this->getThumbnailVersion();
-			elseif ( $sub_type == kEntryFileSyncSubType::ARCHIVE )
-				$new_version = "";
-			elseif ( $sub_type == kEntryFileSyncSubType::DOWNLOAD )
+			switch($sub_type)
 			{
-				// MUST have A VERSION !
-				$new_version = $this->getVersion();
+				case kEntryFileSyncSubType::DATA:
+				case kEntryFileSyncSubType::DATA_EDIT:
+					$new_version = $this->getVersion();
+					break;
+				case kEntryFileSyncSubType::THUMB:
+					$new_version = $this->getThumbnailVersion();
+					break;
+				case kEntryFileSyncSubType::ARCHIVE:
+					$new_version = "";
+					break;
+				case kEntryFileSyncSubType::DOWNLOAD:
+					// MUST have A VERSION !
+					$new_version = $this->getVersion();
+					break;
+				case kEntryFileSyncSubType::INTERACTIVITY_DATA:
+					$new_version = $this->getInteractivityVersion();
+					if(is_null($new_version))
+					{
+						$new_version = "";
+					}
+					break;
+				case kEntryFileSyncSubType::VOLATILE_INTERACTIVITY_DATA:
+					$new_version = $this->getVolatileInteractivityVersion();
+					if(is_null($new_version))
+					{
+						$new_version = "";
+					}
+					break;
 			}
 		}
 
@@ -4323,5 +4349,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getSyncFlavorsOnceReady()
 	{
 		return (bool) $this->getFromCustomData( "syncFlavorsOnceReady" ,null, false );
+	}
+
+	public function setInteractivityVersion($version)
+	{
+		$this->putInCustomData( self::CUSTOM_DATA_INTERACTIVITY_VERSION ,$version, null);
+	}
+
+	public function getInteractivityVersion()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_INTERACTIVITY_VERSION ,null, null);
+	}
+
+	public function setVolatileInteractivityVersion($version)
+	{
+		$this->putInCustomData( self::CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION ,$version, null);
+	}
+
+	public function getVolatileInteractivityVersion()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION ,null, null);
 	}
 }

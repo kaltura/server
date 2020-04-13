@@ -5,12 +5,13 @@
  * @subpackage api.services
  */
 
-class ThumbnailService extends KalturaBaseUserService
+class ThumbnailService extends KalturaBaseService
 {
 	/**
 	 * Retrieves a thumbnail according to the required transformation
 	 * @action transform
 	 * @param string $transformString
+	 * @throws kThumbnailException
 	 */
 	public function transformAction($transformString)
 	{
