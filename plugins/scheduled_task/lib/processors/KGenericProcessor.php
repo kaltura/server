@@ -238,7 +238,7 @@ class KGenericProcessor
 			{
 				if (array_key_exists($object->id, $uniqueObjectIds))
 				{
-					break;
+					continue;
 				}
 				else
 				{
