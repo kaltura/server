@@ -201,10 +201,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				$object = new KalturaVendorCaptionsCatalogItem();
 				break;
 		}
-		
+
 		if (!$object)
 			return null;
-		
+
 		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
