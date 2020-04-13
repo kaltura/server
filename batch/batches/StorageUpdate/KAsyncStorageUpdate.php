@@ -207,7 +207,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		catch (Exception $e)
 		{
 			KBatchBase::unimpersonate();
-			KalturaLog::debug('Moving to next partner. Could not get partner statistics on pid: ' . $partner->id . 'Error: '. $e->getMessage());
+			KalturaLog::debug('Moving to next partner. Failed to get partner statistics on pid: ' . $partner->id . 'Error: '. $e->getMessage());
 			return array(null, null);
 		}
 
@@ -273,7 +273,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 					}
 					catch (Exception $e)
 					{
-						KalturaLog::debug('Could not update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
+						KalturaLog::debug('Failed to update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
 					}
 				}
 
@@ -305,7 +305,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 				catch (Exception $e)
 				{
-					KalturaLog::debug('Could not update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
+					KalturaLog::debug('Failed to update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
 				}
 			}
 		}
@@ -336,7 +336,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 				catch (Exception $e)
 				{
-					KalturaLog::debug('Could not update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
+					KalturaLog::debug('Failed to update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
 				}
 			}
 
@@ -364,7 +364,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			}
 			catch (Exception $e)
 			{
-				KalturaLog::debug('Could not update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
+				KalturaLog::debug('Failed to update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
 			}
 		}
 	}
@@ -403,7 +403,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 					}
 					catch (Exception $e)
 					{
-						KalturaLog::debug('Could not update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
+						KalturaLog::debug('Failed to update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
 						return null;
 					}
 				}
@@ -457,7 +457,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 				catch (Exception $e)
 				{
-					KalturaLog::debug('Could not update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
+					KalturaLog::debug('Failed to update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
 				}
 			}
 		}
@@ -508,8 +508,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		{
 			try
 			{
-				KalturaLog::debug('sending mail. job data: '. print_r($mailJobData, true));
-				//self::$kClient->jobs->addMailJob($mailJobData);
+				self::$kClient->jobs->addMailJob($mailJobData);
 			}
 			catch (Exception $e)
 			{
