@@ -1,5 +1,12 @@
 # Propus 16.0.1 #
 
+## export catalog items to CSV ##
+Issue Type: Task
+Issue ID : REACH-836
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_06_04_add_permission_vendor_catalog_items.php
+
 ## Add new permission to new action extendLockExpiration in batchService ##
 Issue Type: Task
 Issue ID : PLAT-10653
