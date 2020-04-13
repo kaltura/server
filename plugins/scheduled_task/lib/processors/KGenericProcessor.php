@@ -236,7 +236,7 @@ class KGenericProcessor
 
 			foreach ($result->objects as $object)
 			{
-				if (array_key_exists($object->id, $uniqueObjectIds))
+				if (isset($uniqueObjectIds[$object->id]))
 				{
 					continue;
 				}
