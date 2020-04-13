@@ -59,7 +59,7 @@ class kAssetUtils
 		}
 		else
 		{
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 			if ($fileSync)
 				$fileExt = $fileSync->getFileExt();

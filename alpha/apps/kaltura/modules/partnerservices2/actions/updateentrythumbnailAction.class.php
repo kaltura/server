@@ -78,7 +78,7 @@ class updateentrythumbnailAction extends defPartnerservices2Action
 			if (myMetadataUtils::updateThumbUrl($xml_doc, $entry->getThumbnailUrl()))
 				$xml_doc->save($roughcutPath);
 	*/
-			$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+			$sync_key = $entry->getSyncKey ( kEntryFileSyncSubType::DATA );
 			$xml_doc = new KDOMDocument();
 			$xml_doc->loadXML( kFileSyncUtils::file_get_contents( $sync_key ) );
 			if (myMetadataUtils::updateThumbUrl($xml_doc, $entry->getThumbnailUrl()))

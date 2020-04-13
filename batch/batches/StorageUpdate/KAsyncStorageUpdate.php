@@ -84,10 +84,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 			}
 			unset($partners);
-			if(function_exists('gc_collect_cycles'))
-			{
-				gc_collect_cycles();
-			}
 		} while ($countPartners);
 
 		KalturaLog::debug('Done.');

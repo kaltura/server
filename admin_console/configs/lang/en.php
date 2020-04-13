@@ -249,6 +249,8 @@ return array(
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::CONVERSION_LOG' => 'Conversion Log',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_PRIMARY' => 'Primary Live Segments', 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_SECONDARY' => 'Secondary Live Segments',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::INTERACTIVITY_DATA' => 'Interactivity Data',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::VOLATILE_INTERACTIVITY_DATA' => 'Volatile Interactivity Data',
 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::FEATURES' => 'Features',

@@ -54,7 +54,7 @@ class getlastversionsinfoAction extends defPartnerservices2Action
 			return;	
 		}
 		
-		$sync_key = $showEntry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+		$sync_key = $showEntry->getSyncKey ( kEntryFileSyncSubType::DATA );
 		$showEntryDataPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
 		
 		$versionsInfoFilePath 	= $showEntryDataPath.'.info';
@@ -90,7 +90,7 @@ class getlastversionsinfoAction extends defPartnerservices2Action
 			// start from the first edited version (100001) and don't use 100000
 			for ($i = myContentStorage::MIN_OBFUSCATOR_VALUE + 1; $i <= $lastVersion; $i++)
 			{
-				$version_sync_key = $showEntry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $i );
+				$version_sync_key = $showEntry->getSyncKey ( kEntryFileSyncSubType::DATA , $i );
 				
 				if (kFileSyncUtils::file_exists($version_sync_key,false))
 				{

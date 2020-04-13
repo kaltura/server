@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * Add new permissions to new action extendBatchJobLockExpiration in batchService
+ * Add new permissions to new action extendLockExpiration in batchService
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';

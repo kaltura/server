@@ -303,8 +303,6 @@ class MediaService extends KalturaEntryService
 		if($bulkUploadId)
 			$dbEntry->setBulkUploadId($bulkUploadId);
 
-        $kshowId = $dbEntry->getKshowId();
-
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
 			"entry_media_source" => KalturaSourceType::URL,
@@ -317,7 +315,7 @@ class MediaService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
@@ -383,8 +381,6 @@ class MediaService extends KalturaEntryService
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
       	$dbEntry->setSourceId( $searchResult->id );
 
-        $kshowId = $dbEntry->getKshowId();
-
        	// $searchResult->licenseType; // FIXME, No support for licenseType
         // FIXME - no need to clone entry if $dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS
 		if ($dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
@@ -416,7 +412,7 @@ class MediaService extends KalturaEntryService
 			);
 
 			$token = $this->getKsUniqueString();
-			$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+			$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 			$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 			$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 			$dbEntry = $insert_entry_helper->getEntry();
@@ -489,8 +485,6 @@ class MediaService extends KalturaEntryService
 
 		$dbEntry = parent::add($mediaEntry, $mediaEntry->conversionProfileId);
 
-        $kshowId = $dbEntry->getKshowId();
-
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
 			"entry_media_source" => KalturaSourceType::FILE,
@@ -503,7 +497,7 @@ class MediaService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
@@ -562,8 +556,6 @@ class MediaService extends KalturaEntryService
 
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 
-        $kshowId = $dbEntry->getKshowId();
-
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
 			"entry_media_source" => KalturaSourceType::WEBCAM,
@@ -576,7 +568,7 @@ class MediaService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
@@ -1154,9 +1146,6 @@ class MediaService extends KalturaEntryService
 
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 
-		$kshow = $this->createDummyKShow();
-	        $kshowId = $kshow->getId();
-		$dbEntry->setKshowId($kshowId);
 		$dbEntry->save();
 		return $dbEntry;
 	}

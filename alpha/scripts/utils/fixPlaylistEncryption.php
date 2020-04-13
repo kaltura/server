@@ -41,7 +41,7 @@ try
 	{
 		if($playlist->getUpdateAtAsInt() != $playlist->getCreatedAtAsInt())
 		{
-			$sync_key = $playlist->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, null);
+			$sync_key = $playlist->getSyncKey(kEntryFileSyncSubType::DATA, null);
 			list($file_sync, $local) = kFileSyncUtils::getReadyFileSyncForKey($sync_key, false, false);
 			if($file_sync && $file_sync->isEncrypted() && !$file_sync->getFileSize())
 			{
