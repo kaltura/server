@@ -24,6 +24,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	const SHORT_DURATION_LOWER_BOUND = 0;
 	const SHORT_DURATION_UPPER_BOUND = 240000; // 4 minutes in ms
 	const MEDIUM_DURATION_UPPER_BOUND = 1200000; // 20 minutes in ms
+	const COMMA_SEPARATOR = ',';
 
 	protected static $puserFields = array(
 		ESearchEntryFilterFields::USER_ID,
@@ -404,7 +405,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$freeTextSearchExact->setSearchTerm($value);
 			return $freeTextSearchExact;
 		}
-		$items = explode(',',$value);
+		$items = explode(self::COMMA_SEPARATOR, $value);
 		$commaSeparetedSearchItems = array();
 		if(count($items) > 1)
 		{
