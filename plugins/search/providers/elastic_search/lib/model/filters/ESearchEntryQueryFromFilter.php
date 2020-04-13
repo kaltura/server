@@ -404,13 +404,26 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			$freeTextSearchExact->setSearchTerm($value);
 			return $freeTextSearchExact;
 		}
-
+		$items = explode(',',$value);
+		$commaSeparetedSearchItems = array();
+		if(count($items) > 1)
+		{
+			foreach ($items as $item)
+			{
+				$item = trim($item);
+				if ($item)
+				{
+					$commaSeparetedSearchItems[] = $this->createUnifiedSearchItem($item);
+				}
+			}
+		}
 		$searchItem = new ESearchOperator();
 		$searchItem->setOperator(ESearchOperatorType::OR_OP);
 		$freeTextSearchItemPartial = new ESearchUnifiedItem();
 		$freeTextSearchItemPartial->setItemType(ESearchItemType::PARTIAL);
 		$freeTextSearchItemPartial->setSearchTerm($value);
-		$searchItem->setSearchItems(array($freeTextSearchExact, $freeTextSearchItemPartial));
+		$textSearchItems = array_merge(array($freeTextSearchExact, $freeTextSearchItemPartial),$commaSeparetedSearchItems);
+		$searchItem->setSearchItems($textSearchItems);
 
 		return $searchItem;
 	}
