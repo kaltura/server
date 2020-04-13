@@ -111,7 +111,6 @@ abstract class kBaseInteractivity extends BaseObject
 
 	/**
 	 * @param string $entryId
-	 * @throws PropelException
 	 * @throws kCoreException
 	 * @throws kFileSyncException
 	 */
@@ -125,25 +124,27 @@ abstract class kBaseInteractivity extends BaseObject
 
 	/**
 	 * @param string $entryId
-	 * @throws PropelException
+	 * @param int $version
 	 * @throws kCoreException
 	 * @throws kFileSyncException
+	 * @throws kInteractivityException
 	 */
-	public function update($entryId)
+	public function update($entryId, $version)
 	{
 		$this->setEntry($entryId);
 		$syncKey = $this->getSyncKey();
-		$oldVersion = $syncKey->getVersion();
-		if($this->version < $oldVersion)
+		$currentVersion = $syncKey->getVersion();
+		if($version != $currentVersion)
 		{
-			throw new kInteractivityException( kInteractivityException::NEWER_VERSION_DATA_EXISTS, kInteractivityException::NEWER_VERSION_DATA_EXISTS);
+			$data = array(kInteractivityErrorMessages::VERSION_PARAMETER => $currentVersion);
+			throw new kInteractivityException( kInteractivityException::DIFFERENT_DATA_VERSION, kInteractivityException::DIFFERENT_DATA_VERSION, $data);
 		}
 
-		$newVersion = kFileSyncUtils::calcObjectNewVersion($entryId, $oldVersion, FileSyncObjectType::ENTRY, $this->getFileSyncSubType());
+		$newVersion = kFileSyncUtils::calcObjectNewVersion($entryId, $currentVersion, FileSyncObjectType::ENTRY, $this->getFileSyncSubType());
 		$syncKey->setVersion($newVersion);
 		kFileSyncUtils::file_put_contents($syncKey, $this->data, false);
 		$this->setEntryInteractivityVersion($newVersion);
-		$syncKey->setVersion($oldVersion);
+		$syncKey->setVersion($currentVersion);
 		kFileSyncUtils::deleteSyncFileForKey($syncKey);
 	}
 

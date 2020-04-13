@@ -29,20 +29,20 @@ class InteractivityService extends KalturaBaseService
 	 *
 	 * @action update
 	 * @param string $entryId
+	 * @param int $version
 	 * @param KalturaInteractivity $kalturaInteractivity
 	 * @return KalturaInteractivity
-	 * @throws PropelException
 	 * @throws kCoreException
 	 * @throws kFileSyncException
 	 * @validateUser entry kalturaInteractivity edit
 	 */
-	public function update($entryId, $kalturaInteractivity)
+	public function update($entryId, $version, $kalturaInteractivity)
 	{
 		$kInteractivity = new kInteractivity();
 		$kalturaInteractivity->toUpdatableObject($kInteractivity);
 		$validator = kInteractivityDataValidatorFactory::getValidator($entryId);
 		$validator->validate(json_decode($kInteractivity->getData(), true));
-		$kInteractivity->update($entryId);
+		$kInteractivity->update($entryId, $version);
 		$kalturaInteractivity->fromObject($kInteractivity, $this->getResponseProfile());
 		return $kalturaInteractivity;
 	}
@@ -81,7 +81,6 @@ class InteractivityService extends KalturaBaseService
 	 * @param KalturaInteractivity $kalturaInteractivity
 	 * @return KalturaInteractivity
 	 * @throws KalturaAPIException
-	 * @throws PropelException
 	 * @throws kCoreException
 	 * @validateUser entry entryId edit
 	 */

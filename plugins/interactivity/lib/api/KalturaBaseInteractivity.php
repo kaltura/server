@@ -13,7 +13,7 @@ abstract class KalturaBaseInteractivity extends KalturaObject
 	public $data;
 
 	/**
-	 *
+	 * @readonly
 	 * @var int
 	 */
 	public $version;
@@ -74,7 +74,6 @@ abstract class KalturaBaseInteractivity extends KalturaObject
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		parent::validateForUpdate($propertiesToSkip);
-		$this->validateVersion();
 		$this->validateData();
 	}
 
@@ -96,14 +95,6 @@ abstract class KalturaBaseInteractivity extends KalturaObject
 		}
 
 		return $fileSync;
-	}
-
-	protected function validateVersion()
-	{
-		if(is_null($this->version))
-		{
-			throw new KalturaAPIException(KalturaInteractivityErrors::VERSION_IS_MANDATORY);
-		}
 	}
 
 	protected function validateData()

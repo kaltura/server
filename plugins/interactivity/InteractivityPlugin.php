@@ -40,8 +40,8 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 		$data = $exception->getData();
 		switch ($code)
 		{
-			case kInteractivityException::NEWER_VERSION_DATA_EXISTS:
-				$object = new KalturaAPIException(KalturaInteractivityErrors::NEWER_VERSION_DATA_EXISTS);
+			case kInteractivityException::DIFFERENT_DATA_VERSION:
+				$object = new KalturaAPIException(KalturaInteractivityErrors::DIFFERENT_DATA_VERSION, $data[kInteractivityErrorMessages::VERSION_PARAMETER]);
 				break;
 			case kInteractivityException::MISSING_MANDATORY_PARAMETERS:
 				$object = new KalturaAPIException(KalturaInteractivityErrors::MISSING_MANDATORY_PARAMETER, $data[kInteractivityErrorMessages::MISSING_PARAMETER]);

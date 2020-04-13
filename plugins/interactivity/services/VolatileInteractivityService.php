@@ -29,18 +29,18 @@ class VolatileInteractivityService extends KalturaBaseService
 	 *
 	 * @action update
 	 * @param string $entryId
+	 * @param int $version
 	 * @param KalturaVolatileInteractivity $kalturaVolatileInteractivity
 	 * @return KalturaVolatileInteractivity
-	 * @throws PropelException
 	 * @throws kCoreException
 	 * @throws kFileSyncException
 	 * @validateUser entry entryId edit
 	 */
-	public function update($entryId, $kalturaVolatileInteractivity)
+	public function update($entryId, $version, $kalturaVolatileInteractivity)
 	{
 		$kVolatileInteractivity = new kVolatileInteractivity();
 		$kalturaVolatileInteractivity->toUpdatableObject($kVolatileInteractivity);
-		$kVolatileInteractivity->update($entryId);
+		$kVolatileInteractivity->update($entryId, $version);
 		$kalturaVolatileInteractivity->fromObject($kVolatileInteractivity, $this->getResponseProfile());
 		return $kalturaVolatileInteractivity;
 	}
@@ -79,7 +79,6 @@ class VolatileInteractivityService extends KalturaBaseService
 	 * @param KalturaVolatileInteractivity $kalturaVolatileInteractivity
 	 * @return KalturaVolatileInteractivity
 	 * @throws KalturaAPIException
-	 * @throws PropelException
 	 * @throws kCoreException
 	 * @throws kFileSyncException
 	 * @validateUser entry entryId edit
