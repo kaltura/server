@@ -240,9 +240,8 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_FEATURE);
 	}
 
-	protected function calculateNextBusinessDay()
+	protected function calculateNextBusinessDay($currentDay, $currentTime)
 	{
-		$currentDay = date("N");
 
 		$endDayString = sprintf("Y-m-d %s:00:00", self::BUSINESS_DAY_END_HOUR);
 
@@ -254,18 +253,16 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		}
 		else
 		{
-			$now = date("His");
-
 			$endDayTime = self::BUSINESS_DAY_END_HOUR * self::BUSINESS_DAY_TIME_NORMALIZATION_FACTOR;
 			$startDayTime = self::BUSINESS_DAY_START_HOUR * self::BUSINESS_DAY_TIME_NORMALIZATION_FACTOR;
 
 			//Middle of a business day - expiration time: add 24 hours
-			if( ($startDayTime <= $now) && ($now <= $endDayTime) )
+			if( ($startDayTime <= $currentTime) && ($currentTime <= $endDayTime) )
 			{
 				$expTime = date("Y-m-d H:i:s", strtotime('+1 days'));
 			}
 			//Before work hours - expiration time: End Day today
-			elseif ($now < $startDayTime)
+			elseif ($currentTime < $startDayTime)
 			{
 				$expTime = date($endDayString, strtotime('now'));
 			}
@@ -286,15 +283,19 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 		//Set to EST Time
 		date_default_timezone_set('America/New_York');
+
 		$currentDateTime = new DateTime("now");
+		$currentDay = date("N");
+		$currentTime = date("His");
 
-		//Calculate the next business day
-		$expTime = $this->calculateNextBusinessDay();
+		//Calculate the next (1st) business day
+		$expTime = $this->calculateNextBusinessDay($currentDay, $currentTime);
 
-		//Calculate the second business day
-		if ($numBusinessDays == 2)
+		//Calculate the other business days
+		if ($numBusinessDays > 1)
 		{
-			$expTime = date("Y-m-d H:i:s", strtotime($expTime . ' +1 days'));
+			$numBusinessDays--;
+			$expTime = date("Y-m-d H:i:s", strtotime("$expTime +$numBusinessDays days"));
 		}
 
 		//if expiration time falls on the weekend, jump 2 days
