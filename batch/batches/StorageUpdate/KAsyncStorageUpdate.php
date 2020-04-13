@@ -56,6 +56,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$maxPartner = $this->getAdditionalParams('maxPartner');
 		$minPartner = $this->getAdditionalParams('minPartner');
 		$lowPartnerWaterMark = $minPartner ? $minPartner : KAsyncStorageUpdateUtils::LOWEST_PARTNER;
+		$maxPartnerReached = false;
 		do
 		{
 			$partners = $this->getSystemPartnerList($lowPartnerWaterMark, KAsyncStorageUpdateUtils::PAGE_INDEX, KAsyncStorageUpdateUtils::PAGE_SIZE);
@@ -72,7 +73,8 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 					}
 					else
 					{
-						$countPartners = 0;
+						$maxPartnerReached = true;
+						KalturaLog::debug( 'Finished handling partners: ' .$lowPartnerWaterMark .' < partner_id <= ' . $maxPartner);
 						break;
 					}
 				}
@@ -88,7 +90,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			{
 				gc_collect_cycles();
 			}
-		} while ($countPartners);
+		} while ($countPartners && !$maxPartnerReached);
 
 		KalturaLog::debug('Done.');
 	}
@@ -267,14 +269,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 				else
 				{
-					try
-					{
-						$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
-					}
-					catch (Exception $e)
-					{
-						KalturaLog::debug('Failed to update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
-					}
+					$this->partnerUpdateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
 				}
 
 			}
@@ -299,14 +294,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			}
 			else
 			{
-				try
-				{
-					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
-				}
-				catch (Exception $e)
-				{
-					KalturaLog::debug('Failed to update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
-				}
+				$this->partnerUpdateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_CONTENT_BLOCK, $reason);
 			}
 		}
 
@@ -330,14 +318,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			}
 			else
 			{
-				try
-				{
-					$this->systemPartnerClientPlugin->systemPartner->updateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_DELETED, $reason);
-				}
-				catch (Exception $e)
-				{
-					KalturaLog::debug('Failed to update status on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
-				}
+				$this->partnerUpdateStatus($partner->id, KAsyncStorageUpdateUtils::PARTNER_STATUS_DELETED, $reason);
 			}
 
 		}
@@ -358,14 +339,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		}
 		else
 		{
-			try
-			{
-				$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::debug('Failed to update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
-			}
+			$this->partnerUpdateConfiguration($partner->id, $systemPartnerConfiguration);
 		}
 	}
 
@@ -397,15 +371,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 				}
 				else
 				{
-					try
-					{
-						$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
-					}
-					catch (Exception $e)
-					{
-						KalturaLog::debug('Failed to update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
-						return null;
-					}
+					$this->partnerUpdateConfiguration($partner->id, $systemPartnerConfiguration);
 				}
 
 				$emailLinkHash = 'pid='.$partner->id.'&h='.(self::getEmailLinkHash($partner->id, $partner->secret));
@@ -451,14 +417,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			}
 			else
 			{
-				try
-				{
-					$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($partner->id, $systemPartnerConfiguration);
-				}
-				catch (Exception $e)
-				{
-					KalturaLog::debug('Failed to update configuration on pid: ' . $partner->id . ' Error is: '. $e->getMessage());
-				}
+				$this->partnerUpdateConfiguration($partner->id, $systemPartnerConfiguration);
 			}
 		}
 	}
@@ -486,14 +445,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		}
 		else
 		{
-			try
-			{
-				self::$kClient->jobs->addMailJob($mailJobData);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::debug('Failed to add job Mail: '.$e->getMessage());
-			}
+			self::$kClient->jobs->addMailJob($mailJobData);
 		}
 
 		$mailJobData = $this->createMailJobData($mailType, KAsyncStorageUpdateUtils::KALTURA_ACCOUNT_UPGRADES_NOTIFICATION_EMAIL);
@@ -506,14 +458,39 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		}
 		else
 		{
-			try
-			{
-				self::$kClient->jobs->addMailJob($mailJobData);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::debug('Failed to add job Mail: '.$e->getMessage());
-			}
+			self::$kClient->jobs->addMailJob($mailJobData);
+		}
+	}
+
+	protected function partnerUpdateStatus($pid, $status, $reason)
+	{
+		try
+		{
+			$this->systemPartnerClientPlugin->systemPartner->updateStatus($pid, $status, $reason);
+		}
+		catch(KalturaException $kex)
+		{
+			KalturaLog::debug('Failed to update status on pid: ' . $pid . ' Error is: '. $kex->getMessage());
+		}
+		catch(KalturaClientException $kcex)
+		{
+			KalturaLog::debug('Failed to update status on pid: ' . $pid . ' Error is: '. $kcex->getMessage());
+		}
+	}
+
+	protected function partnerUpdateConfiguration($pid, $systemPartnerConfiguration)
+	{
+		try
+		{
+			$this->systemPartnerClientPlugin->systemPartner->updateConfiguration($pid, $systemPartnerConfiguration);
+		}
+		catch(KalturaException $kex)
+		{
+			KalturaLog::debug('Failed to update configuration on pid: ' . $pid . ' Error is: '. $kex->getMessage());
+		}
+		catch(KalturaClientException $kcex)
+		{
+			KalturaLog::debug('Failed to update configuration on pid: ' . $pid . ' Error is: '. $kcex->getMessage());
 		}
 	}
 
