@@ -206,10 +206,16 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			$partnerStatistics = self::$kClient->partner->getStatistics();
 			KBatchBase::unimpersonate();
 		}
-		catch (Exception $e)
+		catch(KalturaException $kex)
 		{
 			KBatchBase::unimpersonate();
-			KalturaLog::debug('Moving to next partner. Failed to get partner statistics on pid: ' . $partner->id . 'Error: '. $e->getMessage());
+			KalturaLog::debug('Moving to next partner. Failed to get partner statistics on pid: ' . $partner->id . 'Error: '. $kex->getMessage());
+			return array(null, null);
+		}
+		catch(KalturaClientException $kcex)
+		{
+			KBatchBase::unimpersonate();
+			KalturaLog::debug('Moving to next partner. Failed to get partner statistics on pid: ' . $partner->id . 'Error: '. $kcex->getMessage());
 			return array(null, null);
 		}
 
