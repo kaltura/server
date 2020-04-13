@@ -169,7 +169,7 @@ class VendorCatalogItemService extends KalturaBaseService
 
 	/**
 	 * @action serve
-	 * @param int $vendorId
+	 * @param int $vendorPartnerId
 	 * @return file
 	 */
 	public function serveAction($vendorPartnerId = null)
