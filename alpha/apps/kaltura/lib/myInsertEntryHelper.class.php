@@ -12,12 +12,11 @@ class myInsertEntryHelper
 	
 	private $partner_id = null;
 	
-	public function __construct($action, $kuser_id, $kshow_id, $paramsArray = null)
+	public function __construct($action, $kuser_id, $paramsArray = null)
 	{
 		$this->paramsArray = $paramsArray;
 		$this->action = $action;
 		$this->kuser_id = $kuser_id;
-		$this->kshow_id = $kshow_id;
 	}
 	
 	public function getEntry() { return $this->entry; }
@@ -394,7 +393,6 @@ class myInsertEntryHelper
 			}
 		}
 			
-		$entry->setkshowId($this->kshow_id);
 		$entry->setKuserId($kuser_id);
 		$entry->setCreatorKuserId($kuser_id);
 		
