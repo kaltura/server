@@ -51,7 +51,11 @@ class KalturaAttachmentAsset extends KalturaAsset
 	{
 		if (!$object_to_fill)
 			$object_to_fill = new AttachmentAsset();
-	
+
+		if (isset($this->filename))
+		{
+			$this->filename = trim(str_replace (array("\r\n", "\n", "\r"), ' ', $this->filename));
+		}
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
