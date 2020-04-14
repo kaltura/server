@@ -8,6 +8,7 @@ Issue ID: PLAT-10652
 add Interactivity to plugins.ini
 
 #### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
 run: php deployment/updates/scripts/add_permissions/2020_04_12_interactivityServices.php
 
 ## export catalog items to CSV ##
