@@ -294,7 +294,8 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$turnAroundTime = 0;
 
 		//Calculate the business days
-		do{
+		do
+		{
 			$expTime = $turnAroundTime + $currentUnixTime;
 
 			$day = date("N", $expTime);
