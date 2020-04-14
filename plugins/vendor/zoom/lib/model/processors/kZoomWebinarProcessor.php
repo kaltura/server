@@ -29,7 +29,7 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 		return $this->zoomClient->retrieveWebinarPanelists($accessToken, $recordingId);
 	}
 
-	protected function parseAdditionalZoomUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration)
+	protected function parseAdditionalUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration)
 	{
 		$panelists = new kZoomPanelists();
 		$panelists->parseData($additionalUsersZoomResponse);
@@ -38,12 +38,14 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 		{
 			KalturaLog::debug('Found the following panelists: ' . implode(", ", $panelistsEmails));
 			$result = array();
-			foreach ($panelistsEmails as $panelistEmails)
+			foreach ($panelistsEmails as $panelistEmail)
 			{
-				$userName = $this->matchZoomUserName($panelistEmails, $zoomIntegration);
-				if($userToExclude !== strtolower($userName))
+				$zoomUser = new kZoomUser();
+				$zoomUser->setOriginalName($panelistEmail);
+				$zoomUser->setProcessedName($this->processZoomUserName($panelistEmail, $zoomIntegration));
+				if($userToExclude !== strtolower($zoomUser->getOriginalName()) && $userToExclude !== strtolower($zoomUser->getProcessedName()))
 				{
-					$result[] = $userName;
+					$result[] = $zoomUser;
 				}
 			}
 		}
