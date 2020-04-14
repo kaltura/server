@@ -240,7 +240,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_FEATURE);
 	}
 
-	protected function calculateNextBusinessDay($currentDay, $currentTime)
+	protected function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
 	{
 
 		$endDayString = sprintf("Y-m-d %s:00:00", self::BUSINESS_DAY_END_HOUR);
@@ -249,7 +249,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		{
 			//Weekend
 			$daysToSkip = self::BUSINESS_DAY_NEXT_MONDAY - $currentDay;
-			$expTime = date($endDayString, strtotime("+$daysToSkip days"));
+			$expTime = date($endDayString, strtotime("+$daysToSkip days", $currentDateTime));
 		}
 		else
 		{
@@ -259,24 +259,31 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			//Middle of a business day - expiration time: add 24 hours
 			if( ($startDayTime <= $currentTime) && ($currentTime <= $endDayTime) )
 			{
-				$expTime = date("Y-m-d H:i:s", strtotime('+1 days'));
+				$expTime = date("Y-m-d H:i:s", strtotime('+1 days', $currentDateTime));
 			}
 			//Before work hours - expiration time: End Day today
 			elseif ($currentTime < $startDayTime)
 			{
-				$expTime = date($endDayString, strtotime('now'));
+				$expTime = date($endDayString, $currentDateTime);
 			}
 			//After work hours - expiration time: End Day tomorrow
 			else
 			{
-				$expTime = date($endDayString, strtotime('+1 days'));
+				$expTime = date($endDayString, strtotime('+1 days', $currentDateTime));
+			}
+
+			//if expiration time falls on the weekend, jump 2 days
+			$expTimeDay = date("N", strtotime($expTime));
+			if ($expTimeDay > self::BUSINESS_DAY_FRIDAY)
+			{
+				$expTime = date("Y-m-d H:i:s", strtotime($expTime . ' +2 days'));
 			}
 		}
 
-		return $expTime;
+		return strtotime($expTime) - $currentDateTime;
 	}
 
-	protected function calculateBusinessDays($numBusinessDays)
+	protected function calculateBusinessDays($numBusinessDays, $currentUnixTime)
 	{
 		//Get Local TZ
 		$localTimeZone = date_default_timezone_get();
@@ -284,35 +291,26 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		//Set to EST Time
 		date_default_timezone_set('America/New_York');
 
-		$currentDateTime = new DateTime("now");
-		$currentDay = date("N");
-		$currentTime = date("His");
+		$turnAroundTime = 0;
 
-		//Calculate the next (1st) business day
-		$expTime = $this->calculateNextBusinessDay($currentDay, $currentTime);
+		//Calculate the business days
+		do{
+			$expTime = $turnAroundTime + $currentUnixTime;
 
-		//Calculate the other business days
-		if ($numBusinessDays > 1)
-		{
+			$day = date("N", $expTime);
+			$time = date("His", $expTime);
+
+			$turnAroundTime += $this->calculateSecondsToNextBusinessDay($expTime, $day, $time);
 			$numBusinessDays--;
-			$expTime = date("Y-m-d H:i:s", strtotime("$expTime +$numBusinessDays days"));
-		}
 
-		//if expiration time falls on the weekend, jump 2 days
-		$expTimeDay = date("N", strtotime($expTime));
-		if ($expTimeDay > self::BUSINESS_DAY_FRIDAY)
-		{
-			$expTime = date("Y-m-d H:i:s", strtotime($expTime . ' +2 days'));
-		}
+		}while($numBusinessDays);
 
 		//Restore
 		date_default_timezone_set($localTimeZone);
 
-		KalturaLog::info("Expiration Time Is: " . $expTime);
+		KalturaLog::info("Seconds To Expiration Time: $turnAroundTime");
 
-		//Convert to seconds
-		$diff = date_diff(date_create($expTime), $currentDateTime);
-		return ($diff->d * 3600 * 24) + ($diff->h * 3600) + ($diff->i * 60) + $diff->s + 1;
+		return $turnAroundTime;
 	}
 
 /* (non-PHPdoc)
@@ -332,11 +330,12 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				{
 					$turnAroundTime = self::SEVEN_DAYS;
 				}
-				elseif( ($turnAroundTime == VendorServiceTurnAroundTime::ONE_BUSINESS_DAY) ||
-					($turnAroundTime == VendorServiceTurnAroundTime::TWO_BUSINESS_DAYS) )
+				elseif( (VendorServiceTurnAroundTime::ONE_BUSINESS_DAY <= $turnAroundTime) &&
+					($turnAroundTime <= VendorServiceTurnAroundTime::SEVEN_BUSINESS_DAYS) )
 				{
-					$turnAroundTime = $this->calculateBusinessDays($turnAroundTime);
+					$turnAroundTime = $this->calculateBusinessDays($turnAroundTime, $time);
 				}
+
 				$this->setExpectedFinishTime($turnAroundTime + $time);
 			}
 		}
