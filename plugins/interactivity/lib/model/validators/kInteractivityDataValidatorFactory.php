@@ -21,7 +21,7 @@ class kInteractivityDataValidatorFactory
 
 		if(self::isPathPlaylist($entry))
 		{
-			return new kInteractivityNodeValidator($entry);
+			return new kInteractivityDataValidator($entry);
 		}
 
 		return new kEntryInteractivityDataValidator($entry);
