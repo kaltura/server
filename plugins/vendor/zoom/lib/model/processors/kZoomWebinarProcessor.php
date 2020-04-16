@@ -43,6 +43,7 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 				$zoomUser = new kZoomUser();
 				$zoomUser->setOriginalName($panelistEmail);
 				$zoomUser->setProcessedName($this->processZoomUserName($panelistEmail, $zoomIntegration));
+				$result[] = $zoomUser;
 			}
 		}
 		else
