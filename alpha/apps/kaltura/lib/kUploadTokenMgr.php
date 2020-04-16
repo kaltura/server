@@ -298,8 +298,7 @@ class kUploadTokenMgr
 			
 			if(!$verifyFinalChunk && $resumeAt > 0 && $resumeAt == $uploadedFileSize)
 			{
-				KalturaLog::debug("TTT: In optimized flow");
-				KalturaLog::debug("TTT: Appending chunk with offset $resumeAt to file with size $uploadedFileSize");
+				KalturaLog::debug("Appending chunk with offset $resumeAt to file with size $uploadedFileSize");
 				$currentFileSize = $this->trySyncedAppend($sourceFilePath, $chunkSize, $resumeAt, $uploadFilePath, $uploadedFileSize);
 			}
 			else
