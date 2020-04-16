@@ -53,4 +53,8 @@ abstract class KExportEngine
 				return KalturaPluginManager::loadObject('KExportEngine', $protocol, array($data, $partnerId));
 		}
 	}
+
+	public function setExportDataFields($storageProfile, $fileSync)
+	{
+	}
 }

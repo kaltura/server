@@ -137,8 +137,15 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
 
+		$this->addElement('checkbox', 'exportPeriodically', array(
+			'label'			=> 'Export all assets periodically:',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addDisplayGroup ( array ('exportPeriodically', 'delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+
 		$this->addDisplayGroup ( array ('delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
-		
+
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',
 				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))

@@ -197,6 +197,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $regularPackagerUrl;
 
+	/**
+	 * @var bool
+	 */
+	public $exportPeriodically;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -233,6 +238,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'shouldExportThumbs',
 		'mappedPackagerUrl',
 		'regularPackagerUrl',
+		'exportPeriodically',
 	);
 	
 	/* (non-PHPdoc)

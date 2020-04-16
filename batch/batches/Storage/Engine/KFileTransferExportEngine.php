@@ -139,4 +139,58 @@ class KFileTransferExportEngine extends KExportEngine
 			catch(Exception $e){}
 		}
 	}
+
+	public function setExportDataFields($storageProfile, $fileSync)
+	{
+		if ($storageProfile->protocol == StorageProfileProtocol::S3)
+		{
+			$storageExportData = new KalturaAmazonS3StorageExportJobData();
+		}
+		else
+		{
+			$storageExportData = new KalturaStorageExportJobData();
+		}
+
+		$storageExportData = $this->fillStorageExportJobData($storageExportData, $storageProfile, $fileSync);
+		$this->data = $storageExportData;
+		$this->srcFile = str_replace('//', '/', trim($this->data->srcFileSyncLocalPath));
+		$this->destFile = str_replace('//', '/', trim($this->data->destFileSyncStoredPath));
+		$this->encryptionKey = $this->data->srcFileEncryptionKey;
+	}
+
+	protected function fillStorageExportJobData($storageExportData, $externalStorage, $fileSync, $force = false)
+	{
+		$storageExportData->serverUrl = $externalStorage->storageUrl;
+		$storageExportData->serverUsername = $externalStorage->storageUsername;
+		$storageExportData->serverPassword = $externalStorage->storagePassword;
+		$storageExportData->serverPrivateKey = $externalStorage->privateKey;
+		$storageExportData->serverPublicKey = $externalStorage->publicKey;
+		$storageExportData->serverPassPhrase = $externalStorage->passPhrase;
+		$storageExportData->ftpPassiveMode = $externalStorage->storageFtpPassiveMode;
+
+		$storageExportData->srcFileSyncLocalPath = $fileSync->srcPath;
+		$storageExportData->srcFileEncryptionKey = $fileSync->srcEncKey;
+		$storageExportData->srcFileSyncId = $fileSync->id;
+
+		$storageExportData->force = $force;
+		$storageExportData->destFileSyncStoredPath = $externalStorage->storageBaseDir . '/' . $fileSync->filePath;
+		$storageExportData->createLink = $externalStorage->createFileLink;
+
+		if($externalStorage->protocol == StorageProfileProtocol::S3)
+		{
+			$storageExportData = $this->addS3FieldsToStorageData($storageExportData, $externalStorage);
+		}
+
+		return $storageExportData;
+	}
+
+	protected function addS3FieldsToStorageData($storageExportData, $externalStorage)
+	{
+		$storageExportData->filesPermissionInS3 = $externalStorage->filesPermissionInS3;
+		$storageExportData->s3Region = $externalStorage->s3Region;
+		$storageExportData->sseType = $externalStorage->sseType;
+		$storageExportData->sseKmsKeyId = $externalStorage->sseKmsKeyId;
+		$storageExportData->signatureType = $externalStorage->signatureType;
+		return $storageExportData;
+	}
 }
