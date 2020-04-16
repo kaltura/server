@@ -124,7 +124,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 	}
 
-	protected function getValidatedUsers($zoomUsers, $partnerId, $createIfNotFound)
+	protected function getValidatedUsers($zoomUsers, $partnerId, $createIfNotFound, $userToExclude)
 	{
 		$validatedUsers=array();
 		if(!$zoomUsers)
@@ -138,7 +138,10 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 			$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
 			if($dbUser)
 			{
-				$validatedUsers[] = $dbUser->getPuserId();
+				if (strtolower($dbUser->getPuserId()) !== $userToExclude)
+				{
+					$validatedUsers[] = $dbUser->getPuserId();
+				}
 			}
 			elseif($createIfNotFound)
 			{
@@ -206,11 +209,11 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$userToExclude = strtolower($userToExclude);
 		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
 		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($accessToken, $recordingId);
-		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration);
-		return $this->getValidatedUsers($additionalZoomUsers, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration);
+		return $this->getValidatedUsers($additionalZoomUsers, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist(), $userToExclude);
 	}
 
 	protected abstract function getAdditionalUsersFromZoom($accessToken, $recordingId);
 
-	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration);
+	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration);
 }

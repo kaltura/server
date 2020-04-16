@@ -29,7 +29,7 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 		return $this->zoomClient->retrieveWebinarPanelists($accessToken, $recordingId);
 	}
 
-	protected function parseAdditionalUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration)
+	protected function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration)
 	{
 		$panelists = new kZoomPanelists();
 		$panelists->parseData($additionalUsersZoomResponse);
@@ -43,10 +43,6 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 				$zoomUser = new kZoomUser();
 				$zoomUser->setOriginalName($panelistEmail);
 				$zoomUser->setProcessedName($this->processZoomUserName($panelistEmail, $zoomIntegration));
-				if($userToExclude !== strtolower($zoomUser->getOriginalName()) && $userToExclude !== strtolower($zoomUser->getProcessedName()))
-				{
-					$result[] = $zoomUser;
-				}
 			}
 		}
 		else
