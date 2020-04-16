@@ -137,8 +137,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const TEMPLATE_ENTRY_ID = "templateEntryId";
 
 	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
-	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'INTERACTIVITY_VERSION';
-	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'VOLATILE_INTERACTIVITY_VERSION';
+	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'interactivity_version';
+	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'volatile_interactivity_version';
 
 	private $appears_in = null;
 
