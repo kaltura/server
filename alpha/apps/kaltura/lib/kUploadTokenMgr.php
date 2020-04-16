@@ -6,7 +6,11 @@ class kUploadTokenMgr
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 	const MAX_APPEND_TIME = 5;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
-	
+	const EICAR_MD5 = '44d88612fea8a8f36de82e1278abb02f';
+	const EICAR_MIN_FILE_SIZE = 68;
+	const EICAR_MAX_FILE_SIZE = 128;
+	const BAT_FILE_EXTENSION = 'bat';
+	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
 	/**
 	 * @var UploadToken
 	 */
@@ -91,12 +95,19 @@ class kUploadTokenMgr
 			
 		try
 		{
-			$this->checkIfFileIsValid($fileData);
+			$this->checkIfFileIsValid($fileData, $resumeAt, $this->_finalChunk);
 		}
 		catch(kUploadTokenException $ex)
 		{
+			if($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY)
+			{
+				return;
+			}
+			
 			if(!$resume && $this->_finalChunk)
+			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
+			}
 			
 			$this->tryMoveToErrors($fileData);
 			throw $ex;
@@ -147,7 +158,7 @@ class kUploadTokenMgr
 	 * Validate the file data
 	 * @param file $fileData
 	 */
-	protected function checkIfFileIsValid($fileData)
+	protected function checkIfFileIsValid($fileData, $resumeAt, $finalChunk)
 	{
 		// check file name
 		$fileName = isset($fileData['name']) ? $fileData['name'] : null;
@@ -175,6 +186,15 @@ class kUploadTokenMgr
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
+		
+		$tempFileSize = kFile::fileSize($tempPath);
+		if($tempFileSize == 0 && !$finalChunk && $resumeAt > 0)
+		{
+			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
+			KalturaLog::log($msg . ' ' . print_r($fileData, true));
+			kFile::doDeleteFile($tempPath);
+			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY);
+		}
 	}
 
 	/**
@@ -185,6 +205,24 @@ class kUploadTokenMgr
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFileUtils::getMimeType($uploadFilePath);
 
+		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
+		{
+			if ( strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)) == self::BAT_FILE_EXTENSION)
+			{
+				return false;
+			}
+			else
+			{
+				if ( filesize($uploadFilePath) >= self::EICAR_MIN_FILE_SIZE && filesize($uploadFilePath) <= self::EICAR_MAX_FILE_SIZE)
+				{
+					$content = file_get_contents($uploadFilePath);
+					if (md5(trim($content)) === self::EICAR_MD5)
+					{
+						return false;
+					}
+				}
+			}
+		}
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
 	}

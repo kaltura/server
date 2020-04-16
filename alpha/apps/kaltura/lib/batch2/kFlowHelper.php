@@ -149,7 +149,7 @@ class kFlowHelper
 				$dbEntry->setData(".jpg");
 			
 			
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 
 			try
 			{
@@ -1111,7 +1111,7 @@ class kFlowHelper
 			$entry->setThumbnail(".jpg");
 			$entry->setCreateThumb(false);
 			$entry->save();
-			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$entrySyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey);
 
 			if($syncFile)
@@ -1425,7 +1425,7 @@ class kFlowHelper
 		// syncing the ismc file
 		if(file_exists($ismcPath))
 		{
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::ISMC, $ismVersion);
 			kFileSyncUtils::moveFromFile($ismcPath,	$syncKey);
 		}
 
@@ -1442,10 +1442,10 @@ class kFlowHelper
 
 		// syncing ism and lig files
 		if(file_exists($ismPath))
-			kFileSyncUtils::moveFromFile($ismPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion));
+			kFileSyncUtils::moveFromFile($ismPath, $entry->getSyncKey(kEntryFileSyncSubType::ISM, $ismVersion));
 
 		if(file_exists($logPath))
-			kFileSyncUtils::moveFromFile($logPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG, $ismVersion));
+			kFileSyncUtils::moveFromFile($logPath, $entry->getSyncKey(kEntryFileSyncSubType::CONVERSION_LOG, $ismVersion));
 
 		// saving entry changes
 		$entry->save();
@@ -1707,7 +1707,7 @@ class kFlowHelper
 			$entry->reload(); // make sure that the thumbnail version is the latest
 			$entry->setThumbnail(".jpg");
 			$entry->save();
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::moveFromFile($data->getThumbPath(), $syncKey);
 		}
 	}
@@ -2684,7 +2684,7 @@ class kFlowHelper
 			$dbEntry->setData('100000.'.$ext);
 			$dbEntry->save();
 
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			try
 			{
 				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);

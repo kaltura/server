@@ -241,7 +241,7 @@ class kBusinessPreConvertDL
 			$entry->setThumbnail(".jpg");
 			$entry->setCreateThumb(false);
 			$entry->save();
-			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$entrySyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey);
 
 			if($syncFile)
@@ -1326,6 +1326,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		foreach($list as $flavorParamsConversionProfile)
 		{
 			$flavorsId = $flavorParamsConversionProfile->getFlavorParamsId();
+			if($originalFlavorAsset->getFlavorParamsId() == $flavorsId)
+			{
+				continue;
+			}
 			$flavorsIds[] = $flavorsId;
 			$conversionProfileFlavorParams[$flavorsId] = $flavorParamsConversionProfile;
 		}

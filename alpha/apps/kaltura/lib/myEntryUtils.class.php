@@ -15,7 +15,7 @@ class myEntryUtils
 		EntrySourceType::LECTURE_CAPTURE,
 	);
 
-	public static function updateThumbnailFromContent(entry $dbEntry, $content, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	public static function updateThumbnailFromContent(entry $dbEntry, $content, $fileSyncType = kEntryFileSyncSubType::THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
 		$dbEntry->setCreateThumb(false);
@@ -116,10 +116,10 @@ class myEntryUtils
 		{
 			if ($echo)
 				echo ( "Copying file: " . $content . $source_thumbnail_path . " -> " .  $content . $target_thumbnail_path ."\n");
-			$sourceThumbFileKey = $source->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$sourceThumbFileKey = $source->getSyncKey(kEntryFileSyncSubType::THUMB);
 			if(kFileSyncUtils::file_exists($sourceThumbFileKey))
 			{
-				$targetThumbFileKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+				$targetThumbFileKey = $target->getSyncKey(kEntryFileSyncSubType::THUMB);
 				kFileSyncUtils::softCopy($sourceThumbFileKey, $targetThumbFileKey);
 			}
 			//myContentStorage::moveFile( $content . $source_thumbnail_path , $content . $target_thumbnail_path , false , true );
@@ -134,8 +134,8 @@ class myEntryUtils
 		{
 			if ($echo)
 				echo ( "Copying file: " . $content . $source_data_path . " -> " .  $content . $target_data_path . "\n");
-			$sourceDataFileKey = $source->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			$targetDataFileKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$sourceDataFileKey = $source->getSyncKey(kEntryFileSyncSubType::DATA);
+			$targetDataFileKey = $target->getSyncKey(kEntryFileSyncSubType::DATA);
 			kFileSyncUtils::softCopy($sourceDataFileKey, $targetDataFileKey);
 			//myContentStorage::moveFile( $content . $source_data_path , $content . $target_data_path , false , true );
 		}
@@ -182,16 +182,16 @@ class myEntryUtils
 //		$target->setMediaType( $source_entry->getMediaType() );
 //		$target->setTags ( $source_entry->getTags () );
 
-		$sourceThumbKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); //replaced__getThumbnailPat
-		$sourceDataKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);  //replaced__getDataPath
-		$sourceDataEditKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); //replaced__getDataPathEdit
+		$sourceThumbKey = $source_entry->getSyncKey(kEntryFileSyncSubType::THUMB); //replaced__getThumbnailPat
+		$sourceDataKey = $source_entry->getSyncKey(kEntryFileSyncSubType::DATA);  //replaced__getDataPath
+		$sourceDataEditKey = $source_entry->getSyncKey(kEntryFileSyncSubType::DATA_EDIT); //replaced__getDataPathEdit
 
 //		$target->setThumbnail ( $source_thumbnail_path );
 //		$target->setData ( $source_data_path );
 
-		$targetThumbKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); 		//replaced__getThumbnailPath
-		$targetDataKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); 		//replaced__getDataPath
-		$targetDataEditKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); 	//replaced__getDataPathEdit
+		$targetThumbKey = $target->getSyncKey(kEntryFileSyncSubType::THUMB); 		//replaced__getThumbnailPath
+		$targetDataKey = $target->getSyncKey(kEntryFileSyncSubType::DATA); 		//replaced__getDataPath
+		$targetDataEditKey = $target->getSyncKey(kEntryFileSyncSubType::DATA_EDIT); 	//replaced__getDataPathEdit
 
 		$content = myContentStorage::getFSContentRootPath();
 
@@ -250,7 +250,7 @@ class myEntryUtils
 			// this will reset the data and increment the count
 			$entry->setData( ".xml" );
 		}
-		$targetFileSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$targetFileSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 		
 		// doesn't require kFileSyncUtils change - this is a static template that should not be represented as row in the table
 		$source = $content . myContentStorage::getGeneralEntityPath ( "entry/data" , 0, 0 , "&metadata_text.xml" );
@@ -448,12 +448,6 @@ class myEntryUtils
 
 		$content_path = myContentStorage::getFSContentRootPath();
 
-//		Remarked by Tan-Tan 27/09/2010
-//		Handled by kObjectDeleteHandler
-//		$currentDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-//		$currentDataEditKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); // replaced__getDataPathEdit
-//		$currentThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
-
 		$entry->setData( $entry->getData() ); 				// once to increment the verions
 		$entry->setData( $template_file ); 					// the other to set the template
 		$entry->setThumbnail( $entry->getThumbnail() );		// once to increment the verions
@@ -513,10 +507,10 @@ class myEntryUtils
 		if ( $deleted_paths )
 		{
 			$original_play = @$deleted_paths[0];
-			$dataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, @$deleted_paths[0]);
+			$dataKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA, @$deleted_paths[0]);
 			kFileSyncUtils::undeleteSyncFile($dataKey);
 			//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[0] );
-			$dataEditKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT, @$deleted_paths[1]);
+			$dataEditKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA_EDIT, @$deleted_paths[1]);
 			kFileSyncUtils::undeleteSyncFile($dataEditKey);
 			//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[1] );
 			
@@ -534,7 +528,7 @@ class myEntryUtils
 			{
 				$entry->setThumbnail( null ); // reset the thumb before setting - it won't increment the version count
 				$entry->setThumbnail( $entry->getFromCustomData( "deleted_original_thumb" ) , true ); // force the value that was set beforehand
-				$thumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB, @$deleted_paths[2]);
+				$thumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB, @$deleted_paths[2]);
 				kFileSyncUtils::undeleteSyncFile($thumbKey);
 				//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[2] ); // 
 			}	
@@ -657,13 +651,13 @@ class myEntryUtils
 			$entry->save();
 			
 			// create new thumb file for entry
-			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::moveFromFile($thumbBigFullPath, $newThumbKey);
 		}
 		else if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO && $time_offset == -1 ||
 			$media_type == entry::ENTRY_MEDIA_TYPE_SHOW) // not time offset - copying existing thumb
 		{
-			$thumbBigFullKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$thumbBigFullKey = $source_entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			if(!kFileSyncUtils::fileSync_exists($thumbBigFullKey))
 			{
 				return false;
@@ -673,18 +667,18 @@ class myEntryUtils
 			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
-			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::softCopy($thumbBigFullKey, $newThumbKey);
 		}
 		elseif($media_type == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$thumb_key = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$thumb_key = $source_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 			$thumb_path = kFileSyncUtils::getLocalFilePathForKey($thumb_key);
 			$entry->setThumbnail ( ".jpg");
 			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
-			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::copyFromFile($thumb_path, $newThumbKey);
 		}
 		else
@@ -1156,7 +1150,7 @@ class myEntryUtils
 
 	public static function getEntryLocalImageFileSync(entry $entry, $version = null)
 	{
-		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? kEntryFileSyncSubType::DATA : kEntryFileSyncSubType::THUMB;
 		$entryImageKey = $entry->getSyncKey($sub_type, $version);
 		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey, false, false);
 		return ($local ? $file_sync : null);
@@ -1164,7 +1158,7 @@ class myEntryUtils
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
 	{
-		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? kEntryFileSyncSubType::DATA : kEntryFileSyncSubType::THUMB;
 		$entry_image_key = $entry->getSyncKey($sub_type, $version);
 		$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
 		if (!$entry_image_path && $version == 100000)
@@ -1280,17 +1274,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		$entry_id = $entry->getId();
 		
-		$entrySyncKeys = array(
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG),
-		);
+		$entrySyncKeys = $entry::getEntryFileSyncSubTypes();
 		
 		$assets = assetPeer::retrieveByEntryId($entry_id);
 		foreach($assets as $asset)
@@ -1347,29 +1331,29 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
 		{
 			// copy the data
-			$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-			$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+			$from = $entry->getSyncKey(kEntryFileSyncSubType::DATA); // replaced__getDataPath
+			$to = $targetEntry->getSyncKey(kEntryFileSyncSubType::DATA); // replaced__getDataPath
 			KalturaLog::log("copyEntriesByType - copying entry data [".$from."] to [".$to."]");
 			kFileSyncUtils::softCopy($from, $to);
 		}
 
-		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$ismFrom = $entry->getSyncKey(kEntryFileSyncSubType::ISM);
 		if(kFileSyncUtils::fileSync_exists($ismFrom))
 		{
-			$ismTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			$ismTo = $targetEntry->getSyncKey(kEntryFileSyncSubType::ISM);
 			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
 			kFileSyncUtils::softCopy($ismFrom, $ismTo);
 		}
 
-		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$ismcFrom = $entry->getSyncKey(kEntryFileSyncSubType::ISMC);
 		if(kFileSyncUtils::fileSync_exists($ismcFrom))
 		{
-			$ismcTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+			$ismcTo = $targetEntry->getSyncKey(kEntryFileSyncSubType::ISMC);
 			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
 			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
 		}
 
-		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+		$from = $entry->getSyncKey(kEntryFileSyncSubType::THUMB); // replaced__getThumbnailPath
 		$considerCopyThumb = true;
 		// if entry is image - data is thumbnail, and it was copied
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -1392,7 +1376,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 			if(!$skipThumb)
 			{
-				$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+				$to = $targetEntry->getSyncKey(kEntryFileSyncSubType::THUMB); // replaced__getThumbnailPath
 				KalturaLog::log("copyEntriesByType - copying entry thumbnail [".$from."] to [".$to."]");
 				kFileSyncUtils::softCopy($from, $to);
 			}
@@ -1401,18 +1385,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
+		{
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
+		}
 	}
 
-	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true, $originalEntryId)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
-			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
+		if ($sourceAsset instanceof timedThumbAsset || (!$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| (!$copyCaptions && $sourceAsset instanceof captionAsset))
+		{
 			return false;
+		}
+
+		if (!kParentChildEntryUtils::shouldCopyAsset($sourceAsset, $originalEntryId))
+		{
+			return false;
+		}
+
 		return true;
 	}
 
@@ -2126,7 +2120,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		else if (($dbObject instanceof entry) && ($dbObject->getMediaType() == KalturaMediaType::IMAGE))
 		{
-			$syncKey = $dbObject->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbObject->getSyncKey(kEntryFileSyncSubType::DATA);
 		}
 
 		if($syncKey)

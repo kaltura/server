@@ -124,7 +124,7 @@ class myBatchFlattenServer extends myBatchBase
 						continue;
 					}
 					
-					$fileSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $file_format);
+					$fileSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::DOWNLOAD, $file_format);
 					$fullFinalPath = kFileSyncUtils::getLocalFilePathForKey($fileSyncKey);
 					$finalPathNoExt = substr($fullFinalPath, 0 , strlen($fullFinalPath)-strlen($file_format));
 

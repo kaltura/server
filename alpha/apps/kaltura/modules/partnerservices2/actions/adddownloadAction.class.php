@@ -80,7 +80,7 @@ class adddownloadAction extends defPartnerservices2Action
 			$sync_key = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
 		if(!$sync_key)
-			$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+			$sync_key = $entry->getSyncKey ( kEntryFileSyncSubType::DATA , $version );
 		
 		if ( ! kFileSyncUtils::file_exists( $sync_key ) )
 		{

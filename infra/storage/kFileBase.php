@@ -286,7 +286,6 @@ class kFileBase
 
 	public static function checkFileExists($path)
 	{
-		KalturaLog::debug("Check file exists for file [$path]");
 		return file_exists($path);
 	}
 }

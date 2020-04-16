@@ -24,6 +24,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	const SHORT_DURATION_LOWER_BOUND = 0;
 	const SHORT_DURATION_UPPER_BOUND = 240000; // 4 minutes in ms
 	const MEDIUM_DURATION_UPPER_BOUND = 1200000; // 20 minutes in ms
+	const COMMA_SEPARATOR = ',';
 
 	protected static $puserFields = array(
 		ESearchEntryFilterFields::USER_ID,
@@ -361,13 +362,13 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		if (isset($values[1]) && trim($values[1]))
 		{
-			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createPartialUnifiedSearchItem(trim($values[1])));
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createUnifiedSearchItem(trim($values[1])));
 			$freeTextValue = trim($values[0]);
 			if ($freeTextValue)
 			{
 				$searchItem = new ESearchOperator();
 				$searchItem->setOperator(ESearchOperatorType::AND_OP);
-				$freeTextSearchItem = $this->createPartialUnifiedSearchItem($freeTextValue, true);
+				$freeTextSearchItem = $this->createUnifiedSearchItem($freeTextValue, true);
 				$searchItem->setSearchItems(array($freeTextSearchItem, $searchItemNot));
 			}
 			else
@@ -378,7 +379,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		elseif (isset($values[0]) && trim($values[0]))
 		{
-			$searchItem = $this->createPartialUnifiedSearchItem(trim($values[0]), true);
+			$searchItem = $this->createUnifiedSearchItem(trim($values[0]), true);
 		}
 
 		if ($searchItem)
@@ -387,17 +388,45 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function createPartialUnifiedSearchItem($value, $removeWildCard = false)
+	protected function createUnifiedSearchItem($value, $removeWildCard = false)
 	{
 		if ($removeWildCard)
 		{
 			$value = str_replace(self::WILDCARD_OPERATOR, '', $value);
 		}
-		$freeTextSearchItem = new ESearchUnifiedItem();
-		$freeTextSearchItem->setItemType(ESearchItemType::PARTIAL);
-		$freeTextSearchItem->setSearchTerm($value);
-		return $freeTextSearchItem;
 
+		$freeTextSearchExact = new ESearchUnifiedItem();
+		$freeTextSearchExact->setItemType(ESearchItemType::EXACT_MATCH);
+		$freeTextSearchExact->setSearchTerm($value);
+
+		if (ESearchQueryFromAdvancedSearch::enclosedInQuotationMarks($value))
+		{
+			$value  = substr($value, 1, -1);
+			$freeTextSearchExact->setSearchTerm($value);
+			return $freeTextSearchExact;
+		}
+		$items = explode(self::COMMA_SEPARATOR, $value);
+		$commaSeparetedSearchItems = array();
+		if(count($items) > 1)
+		{
+			foreach ($items as $item)
+			{
+				$item = trim($item);
+				if ($item)
+				{
+					$commaSeparetedSearchItems[] = $this->createUnifiedSearchItem($item);
+				}
+			}
+		}
+		$searchItem = new ESearchOperator();
+		$searchItem->setOperator(ESearchOperatorType::OR_OP);
+		$freeTextSearchItemPartial = new ESearchUnifiedItem();
+		$freeTextSearchItemPartial->setItemType(ESearchItemType::PARTIAL);
+		$freeTextSearchItemPartial->setSearchTerm($value);
+		$textSearchItems = array_merge(array($freeTextSearchExact, $freeTextSearchItemPartial),$commaSeparetedSearchItems);
+		$searchItem->setSearchItems($textSearchItems);
+
+		return $searchItem;
 	}
 
 	protected function handleDurationType($fieldValue)
