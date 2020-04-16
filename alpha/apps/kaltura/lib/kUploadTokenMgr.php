@@ -6,7 +6,11 @@ class kUploadTokenMgr
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 	const MAX_APPEND_TIME = 5;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
-	
+	const EICAR_MD5 = '44d88612fea8a8f36de82e1278abb02f';
+	const EICAR_MIN_FILE_SIZE = 68;
+	const EICAR_MAX_FILE_SIZE = 128;
+	const BAT_FILE_EXTENSION = 'bat';
+
 	/**
 	 * @var UploadToken
 	 */
@@ -201,6 +205,27 @@ class kUploadTokenMgr
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFileUtils::getMimeType($uploadFilePath);
 
+		if ($fileType == 'text/plain')
+		{
+			if ( strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)) == self::BAT_FILE_EXTENSION)
+			{
+				return false;
+			}
+			else
+			{
+				if (file_exists($uploadFilePath)
+					&& filesize($uploadFilePath) >= self::EICAR_MIN_FILE_SIZE
+					&& filesize($uploadFilePath) <= self::EICAR_MAX_FILE_SIZE)
+				{
+					$content = file_get_contents($uploadFilePath);
+					if (md5(file_get_contents($content)) == self::EICAR_MD5)
+					{
+						return false;
+					}
+				}
+			}
+		}
+		
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
 	}
