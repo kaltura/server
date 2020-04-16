@@ -216,7 +216,7 @@ class kUploadTokenMgr
 				if ( filesize($uploadFilePath) >= self::EICAR_MIN_FILE_SIZE && filesize($uploadFilePath) <= self::EICAR_MAX_FILE_SIZE)
 				{
 					$content = file_get_contents($uploadFilePath);
-					if (md5(trim($content)) == self::EICAR_MD5)
+					if (md5(trim($content)) === self::EICAR_MD5)
 					{
 						return false;
 					}
