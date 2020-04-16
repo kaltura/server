@@ -216,14 +216,14 @@ class kReplacementHelper
 	 */
 	public static function createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry)
 	{
-		$tempEntryIsmSyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		$tempEntryIsmcSyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$tempEntryIsmSyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::ISM);
+		$tempEntryIsmcSyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::ISMC);
 		if(kFileSyncUtils::fileSync_exists($tempEntryIsmSyncKey) && kFileSyncUtils::fileSync_exists($tempEntryIsmcSyncKey))
 		{
 			$ismVersion = $replacedEntry->incrementIsmVersion();
-			$realEntryIsmSyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion);
+			$realEntryIsmSyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::ISM, $ismVersion);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmSyncKey, $tempEntryIsmSyncKey);
-			$realEntryIsmcSyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			$realEntryIsmcSyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::ISMC, $ismVersion);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmcSyncKey, $tempEntryIsmcSyncKey);
 		}
 	}
@@ -304,6 +304,7 @@ class kReplacementHelper
 		kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newAssets, $defaultThumbAssetNew);
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry, false);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
+		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $oldAssets);
 	}
 
 	/**
@@ -391,8 +392,8 @@ class kReplacementHelper
 		KalturaLog::info("No default ThumbAsset found for replacing entry [". $replacingEntry->getId() ."]");
 		$replacedEntry->setThumbnail(".jpg"); // thumbnailversion++
 		$replacedEntry->save();
-		$tempEntrySyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-		$realEntrySyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$tempEntrySyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
+		$realEntrySyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 	}
 
@@ -505,6 +506,29 @@ class kReplacementHelper
 		$newNonReadyAssets = kReplacementHelper::getNonReadyAssetsFromReplacingEntry($replacingEntry->getId(), $replacedEntry->getId());
 		$newNonReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($newNonReadyAssets);
 		return kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
+	}
+
+	public static function exportReadyReplacedFlavors($partnerId, $replacingEntryId, $assets)
+	{
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+		if(!$periodicStorageIds)
+		{
+			return;
+		}
+
+		KalturaLog::info("Found periodic storage profiles, exporting ready flavors");
+		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($partnerId);
+		if(!$externalStorages)
+		{
+			$externalStorages = kStorageExporter::getPeriodicStorageProfiles($partnerId);
+		}
+		foreach($externalStorages as $externalStorage)
+		{
+			if ($externalStorage->triggerFitsReadyAsset($replacingEntryId))
+			{
+				kStorageExporter::exportMultipleFlavors($assets, $externalStorage);
+			}
+		}
 	}
 
 }

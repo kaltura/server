@@ -124,24 +124,29 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 	}
 
-	protected function getValidatedUsers($usersNames, $partnerId, $createIfNotFound)
+	protected function getValidatedUsers($zoomUsers, $partnerId, $createIfNotFound, $userToExclude)
 	{
 		$validatedUsers=array();
-		if(!$usersNames)
+		if(!$zoomUsers)
 		{
-			return $usersNames;
+			return $zoomUsers;
 		}
 
-		foreach ($usersNames as $userName)
+		foreach ($zoomUsers as $zoomUser)
 		{
-			if(kuserPeer::getKuserByPartnerAndUid($partnerId, $userName, true))
+			/* @var $zoomUser kZoomUser */
+			$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
+			if($dbUser)
 			{
-				$validatedUsers[] = $userName;
+				if (strtolower($dbUser->getPuserId()) !== $userToExclude)
+				{
+					$validatedUsers[] = $dbUser->getPuserId();
+				}
 			}
 			elseif($createIfNotFound)
 			{
-				kuserPeer::createKuserForPartner($partnerId, $userName);
-				$validatedUsers[] = $userName;
+				kuserPeer::createKuserForPartner($partnerId, $zoomUser->getProcessedName());
+				$validatedUsers[] = $zoomUser->getProcessedName();
 			}
 		}
 
@@ -204,11 +209,11 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$userToExclude = strtolower($userToExclude);
 		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
 		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($accessToken, $recordingId);
-		$additionalUsersNames = $this->parseAdditionalZoomUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration);
-		return $this->getValidatedUsers($additionalUsersNames, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist());
+		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration);
+		return $this->getValidatedUsers($additionalZoomUsers, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist(), $userToExclude);
 	}
 
 	protected abstract function getAdditionalUsersFromZoom($accessToken, $recordingId);
 
-	protected abstract function parseAdditionalZoomUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration);
+	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration);
 }

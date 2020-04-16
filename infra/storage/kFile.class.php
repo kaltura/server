@@ -562,6 +562,16 @@ class kFile extends kFileBase
 	{
 		return is_dir($path);
 	}
+
+	public static function getLineFromFileTail($file , $lineNum)
+	{
+		$lines = file($file);
+		if ($lines && count($lines))
+		{
+			return $lines[count($lines) - $lineNum];
+		}
+		return $lines;
+	}
 	
 }
 

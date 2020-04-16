@@ -22,7 +22,7 @@ class KCsvWrapper
 		fputcsv($file, $sanitizedFields);
 	}
 
-	protected static function validateCsvFields(array $fields)
+	public static function validateCsvFields(array $fields)
 	{
 		foreach ($fields as &$csvField)
 		{

@@ -96,9 +96,10 @@ abstract class KConversionEngine
 	 * $end_params_index - the index of the kConversionParams in the kConversionCommand to which to end at. -1 - the end
 	 * 
 	 * @param KalturaConvartableJobData $data
+	 * @param int $jobId
 	 * @return array 
 	 */
-	abstract public function convert ( KalturaConvartableJobData &$data );
+	abstract public function convert ( KalturaConvartableJobData &$data, $jobId = null );
 	
 	public function getLogData()
 	{

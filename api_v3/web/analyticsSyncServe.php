@@ -29,6 +29,7 @@ define('SOURCE_EXPRESS_RECORDER', -17);
 define('SOURCE_KMS_NATIVE_ANDROID_APP', -18);
 define('SOURCE_KMS_NATIVE_IOS_APP', -19);
 define('SOURCE_EXTERNAL_YOUTUBE', -20);
+define('SOURCE_MEETING', -21);
 
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
@@ -43,6 +44,7 @@ $sourceFromAdminTag = array(
 	'expressrecorder' => SOURCE_EXPRESS_RECORDER,
 	'kmsnativeandroid' => SOURCE_KMS_NATIVE_ANDROID_APP,
 	'kmsnativeios' => SOURCE_KMS_NATIVE_IOS_APP,
+	'kalturameeting' => SOURCE_MEETING,
 );
 
 $externalSources = array(
