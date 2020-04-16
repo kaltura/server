@@ -34,7 +34,7 @@ class InteractivityService extends KalturaBaseService
 	 * @return KalturaInteractivity
 	 * @throws kCoreException
 	 * @throws kFileSyncException
-	 * @validateUser entry kalturaInteractivity edit
+	 * @validateUser entry entryId edit
 	 */
 	public function update($entryId, $version, $kalturaInteractivity)
 	{
