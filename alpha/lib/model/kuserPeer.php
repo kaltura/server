@@ -370,9 +370,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	{
 		return 0;
 	}
-	
+
 	/**
 	 * @param string $email
+	 * @param int|null $partnerId
 	 * @return kuser
 	 */
 	public static function getKuserByEmail($email, $partnerId = null)

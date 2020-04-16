@@ -143,7 +143,7 @@ class ThumbAssetService extends KalturaAssetService
    		
 		$thumbAssetsCount = assetPeer::countThumbnailsByEntryId($dbThumbAsset->getEntryId());
 		
-		$defaultThumbKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$defaultThumbKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
     		
  		//If the thums has the default tag or the entry is in no content and this is the first thumb
  		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || ($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT 
@@ -419,7 +419,7 @@ class ThumbAssetService extends KalturaAssetService
 		$fileName = $entry->getId() . '.jpg';
 		
 		if(is_null($thumbParamId))
-			return $this->serveFile($entry, entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB, $fileName, $entryId);
+			return $this->serveFile($entry, kEntryFileSyncSubType::THUMB, $fileName, $entryId);
 		
 		$thumbAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $thumbParamId);
 		if(!$thumbAsset)

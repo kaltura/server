@@ -52,7 +52,7 @@ abstract class LiveEntry extends entry
 		if ($liveThumbEntry && $liveThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
 			$fileSyncVersion = $partner->getLiveThumbEntryVersion();
-			$liveEntryKey = $liveThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+			$liveEntryKey = $liveThumbEntry->getSyncKey(kEntryFileSyncSubType::DATA,$fileSyncVersion);
 			$contentPath = kFileSyncUtils::getLocalFilePathForKey($liveEntryKey);
 			if ($contentPath)
 			{
@@ -74,15 +74,15 @@ abstract class LiveEntry extends entry
 	 */
 	protected static function validateFileSyncSubType($sub_type)
 	{
-		if(	$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || 
-			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY || 
-			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB || 
-			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB )
+		if(	$sub_type == kEntryFileSyncSubType::LIVE_PRIMARY ||
+			$sub_type == kEntryFileSyncSubType::LIVE_SECONDARY ||
+			$sub_type == kEntryFileSyncSubType::THUMB ||
+			$sub_type ==kEntryFileSyncSubType::OFFLINE_THUMB )
 			{
 				return true;
 			}
 			
-			KalturaLog::log("Sub type provided [$sub_type] is not one of knowen LiveEntry sub types validating from parent");
+			KalturaLog::log("Sub type provided [$sub_type] is not one of known LiveEntry sub types validating from parent");
 			return parent::validateFileSyncSubType($sub_type);
 		
 	}
@@ -96,7 +96,7 @@ abstract class LiveEntry extends entry
 	 */
 	protected function getVersionForSubType($sub_type, $version = null)
 	{
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY && $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 			return 1;
 			
 		return parent::getVersionForSubType($sub_type, $version);
@@ -109,7 +109,7 @@ abstract class LiveEntry extends entry
 	{
 		static::validateFileSyncSubType($sub_type);
 		
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY || $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 		{
 			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type);
 			return array(myContentStorage::getFSContentRootPath(), $res);
@@ -123,7 +123,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY || $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 		{
 			return $this->getId() . '_' . $sub_type;
 		}

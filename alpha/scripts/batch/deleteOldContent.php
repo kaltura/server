@@ -95,9 +95,9 @@ class kOldContentCleaner
 			uiConf::FILE_SYNC_UICONF_SUB_TYPE_FEATURES,
 		),
 		FileSyncObjectType::ENTRY => array(
-			entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB,
-			entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,
-			entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD,
+			kEntryFileSyncSubType::THUMB,
+			kEntryFileSyncSubType::DATA,
+			kEntryFileSyncSubType::DOWNLOAD,
 		),
 		FileSyncObjectType::METADATA => array(
 			Metadata::FILE_SYNC_METADATA_DATA,
@@ -637,13 +637,13 @@ class kOldContentCleaner
 				        
 				switch($objectSubType)
 				{
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB:
+					case kEntryFileSyncSubType::THUMB:
 				        $join->addCondition(FileSyncPeer::VERSION, entryPeer::THUMBNAIL, Criteria::NOT_EQUAL);
 						$criteria->add(entryPeer::THUMBNAIL, null, Criteria::ISNOTNULL);
 				        break;
 					
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA:
-					case entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD:
+					case kEntryFileSyncSubType::DATA:
+					case kEntryFileSyncSubType::DOWNLOAD:
 				        $join->addCondition(FileSyncPeer::VERSION, entryPeer::DATA, Criteria::NOT_EQUAL);
 						$criteria->add(entryPeer::DATA, null, Criteria::ISNOTNULL);
 				        break;

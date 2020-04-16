@@ -5,6 +5,8 @@
  * @package Scheduler
  * @subpackage Conversion.engines
  */
+require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/dateUtils.class.php');
+require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/storage/kFileUtils.php');
 abstract class KJobConversionEngine extends KConversionEngine
 {
 	/**
@@ -79,12 +81,12 @@ abstract class KJobConversionEngine extends KConversionEngine
 		return  $this->getExecutionCommandAndConversionString ( $data );
 	}
 	
-	public function convert ( KalturaConvartableJobData &$data )
+	public function convert ( KalturaConvartableJobData &$data, $jobId = null )
 	{
-		return  $this->convertJob ( $data );
+		return  $this->convertJob ( $data, $jobId );
 	}
 	
-	public function convertJob ( KalturaConvertJobData &$data )
+	public function convertJob ( KalturaConvertJobData &$data, $jobId = null )
 	{
 
 		$error_message = "";  
@@ -125,8 +127,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 			KalturaLog::info ( $execution_command_str );
 	
 			$start = microtime(true);
-			// TODO add BatchEvent - before conversion + conversion engine 
-			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value );
+			// TODO add BatchEvent - before conversion + conversion engine
+			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value , $jobId);
 			// TODO add BatchEvent - after conversion + conversion engine		
 			$end = microtime(true);
 	
@@ -146,14 +148,115 @@ abstract class KJobConversionEngine extends KConversionEngine
 		
 		return array ( true , $error_message );// indicate all was converted properly
 	}
-	
+
+	protected function isConversionProgressing($currentModificationTime)
+	{
+		if (kFile::checkFileExists($this->inFilePath))
+		{
+			$newModificationTime = kFile::getFileLastUpdatedTime($this->inFilePath);
+			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+			{
+				return $newModificationTime;
+			}
+		}
+		return false;
+	}
+
+	protected function getReturnValues($handle)
+	{
+		$return_var = 1;
+		$output = false;
+		if ($handle)
+		{
+			$return_var = 0;
+			$file = $this->outFilePath;
+			if (kFile::checkFileExists($file))
+			{
+				$output = kFile::getLineFromFileTail($file , 1);
+			}
+		}
+		return array($output, $return_var);
+	}
+
 	/**
 	 *
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var)
+	protected function execute_conversion_cmdline($command, &$return_var, $jobId = null)
 	{
-		$output = system($command, $return_var);
+		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
+		{
+			return $this->executeConversionCmdlineSmartTimeout($command, $return_var, $jobId);
+		}
+		else
+		{
+			$output = system($command, $return_var);
+			return $output;
+		}
+	}
+
+	protected function executeConversionCmdlineSmartTimeout($command, &$return_var, $jobId = null)
+	{
+		$handle = popen($command, 'r');
+		stream_set_blocking ($handle,0) ;
+		$currentModificationTime = 0;
+		$lastTimeOutSet = time();
+		$maximumExecutionTime = KBatchBase::$taskConfig->maximumExecutionTime;
+		$extendTime = $maximumExecutionTime ? ($maximumExecutionTime / 3) : dateUtils::HOUR;
+		$timeout = $maximumExecutionTime;
+		while(!feof($handle))
+		{
+			clearstatcache();
+			$buffer = fread($handle,1);
+			$newModificationTime = $this->isConversionProgressing($currentModificationTime);
+			if($newModificationTime)
+			{
+				if ($lastTimeOutSet + $extendTime < time())
+				{
+					$timeout = self::extendExpiration($jobId, $maximumExecutionTime, $timeout);
+					$lastTimeOutSet = time();
+					KalturaLog::debug('Previous modification time was:  ' . $currentModificationTime . ', new modification time is: '. $newModificationTime);
+				}
+				$currentModificationTime = $newModificationTime;
+			}
+			sleep(1);
+			if(self::isReachedTimeout($timeout))
+			{
+				pclose($handle);
+				$return_var = 1;
+				return false;
+			}
+		}
+		list($output, $return_var) = $this->getReturnValues($handle);
+		pclose($handle);
 		return $output;
+	}
+
+	protected static function extendExpiration($jobId, $maximumExecutionTime, $timeout)
+	{
+		if ($jobId)
+		{
+			try
+			{
+				KBatchBase::$kClient->batch->extendLockExpiration($jobId, $maximumExecutionTime);
+				$timeout += $maximumExecutionTime;
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::debug('Extend batch job lock failed. '. $e->getMessage());
+			}
+		}
+		return $timeout;
+	}
+
+	protected static function isReachedTimeout(&$timeout)
+	{
+		$timeout--;
+		if($timeout <= 0)
+		{
+			KalturaLog::debug("Reached to TIMEOUT");
+			return true;
+		}
+		return false;
 	}
 }
 

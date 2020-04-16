@@ -1671,6 +1671,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 *
 	 * @param FileSync $fileSync
 	 * @return bool
+	 * @throws kCoreException
 	 */
 	public static function shouldSyncFileObjectType($fileSync)
 	{

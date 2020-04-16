@@ -17,7 +17,7 @@ abstract class kZoomProcessor
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @return string kalturaUserName
 	 */
-	protected function matchZoomUserName($userName, $zoomIntegration)
+	protected function processZoomUserName($userName, $zoomIntegration)
 	{
 		$result = $userName;
 		switch ($zoomIntegration->getUserMatching())
@@ -97,13 +97,15 @@ abstract class kZoomProcessor
 	protected function getEntryOwner($hostEmail, $zoomIntegration)
 	{
 		$partnerId = $zoomIntegration->getPartnerId();
-		$hostEmail = $this->matchZoomUserName($hostEmail, $zoomIntegration);
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $hostEmail, true);
+		$zoomUser = new kZoomUser();
+		$zoomUser->setOriginalName($hostEmail);
+		$zoomUser->setProcessedName($this->processZoomUserName($hostEmail, $zoomIntegration));
+		$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
 		if (!$dbUser)
 		{
 			if ($zoomIntegration->getCreateUserIfNotExist())
 			{
-				$dbUser = kuserPeer::createKuserForPartner($partnerId, $hostEmail);
+				$dbUser = kuserPeer::createKuserForPartner($partnerId, $zoomUser->getProcessedName());
 			}
 			else
 			{
@@ -114,4 +116,19 @@ abstract class kZoomProcessor
 		return $dbUser;
 	}
 
+	/**
+	 * @param int $partnerId
+	 * @param kZoomUser $kZoomUser
+	 * @return kuser
+	 */
+	protected function getKalturaUser($partnerId, $kZoomUser)
+	{
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $kZoomUser->getProcessedName(), true);
+		if (!$dbUser)
+		{
+			$dbUser = kuserPeer::getKuserByEmail($kZoomUser->getOriginalName(), $partnerId);
+		}
+
+		return $dbUser;
+	}
 }
