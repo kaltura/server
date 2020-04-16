@@ -89,13 +89,13 @@ class kDataCenterMgr
 			$dc = $dc_list[$dc_id];
 		else if ($partnerId)
 		{
-			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
-			if(in_array($dc_id, $cloudStorageProfiles))
+			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+			if(in_array($dc_id, $cloudStorageProfileIds))
 			{
-				$url = kConf::get('delivery_base_url', 'cloud_storage', null);
-				if($url)
+				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);
+				if($storageProfile->getRegularPackagerUrl())
 				{
-					$dc["url"] = $url;
+					$dc["url"] = $storageProfile->getRegularPackagerUrl();
 				}
 			}
 
