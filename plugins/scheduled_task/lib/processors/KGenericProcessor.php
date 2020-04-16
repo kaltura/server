@@ -203,6 +203,7 @@ class KGenericProcessor
 	{
 		$objectsData = array();
 		$errorObjectsIds = array();
+		$uniqueObjectIds = array();
 
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
@@ -235,6 +236,14 @@ class KGenericProcessor
 
 			foreach ($result->objects as $object)
 			{
+				if (isset($uniqueObjectIds[$object->id]))
+				{
+					continue;
+				}
+				else
+				{
+					$uniqueObjectIds[$object->id] = $object->id;
+				}
 				list($error, $objectsData, $tasksCompleted) = $this->handleObject($profile, $object, $errorObjectsIds, $objectsData);
 
 				$this->additionalActions($profile, $object, $tasksCompleted, $error);

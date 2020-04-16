@@ -20,7 +20,7 @@ class KOperationEngineOldVersionWrapper extends KOperationEngine
 
 	protected function doOperation()
 	{
-		list($ok, $errorMessage) = $this->convertor->convert($this->data);
+		list($ok, $errorMessage) = $this->convertor->convert($this->data, $this->job->id);
 		if(!$ok)
 			throw new KOperationEngineException($errorMessage);
 	}

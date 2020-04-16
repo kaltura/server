@@ -232,11 +232,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			{
 				if($externalStorage->triggerFitsReadyAsset($entry->getId()))
 				{
-					$ismKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+					$ismKey = $entry->getSyncKey(kEntryFileSyncSubType::ISM);
 					if(kFileSyncUtils::fileSync_exists($ismKey))
 						self::export($entry, $externalStorage, $ismKey);
 					
-					$ismcKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+					$ismcKey = $entry->getSyncKey(kEntryFileSyncSubType::ISMC);
 					if(kFileSyncUtils::fileSync_exists($ismcKey))
 						self::export($entry, $externalStorage, $ismcKey);
 				}
@@ -341,7 +341,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	protected static function exportAdditionalEntryFiles(entry $entry, StorageProfile $profile)
 	{
-		$additionalFileSyncKeys = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$additionalFileSyncKeys = array(kEntryFileSyncSubType::DATA, kEntryFileSyncSubType::ISM, kEntryFileSyncSubType::ISMC);
 		foreach ($additionalFileSyncKeys as $subType) 
 		{
 			$key = $entry->getSyncKey($subType);
@@ -360,7 +360,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	protected static function deleteAdditionalEntryFilesFromStorage(entry $entry, StorageProfile $profile)
 	{
-		$additionalFileSyncKeys = array(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$additionalFileSyncKeys = array(kEntryFileSyncSubType::DATA, kEntryFileSyncSubType::ISM, kEntryFileSyncSubType::ISMC);
 		foreach ($additionalFileSyncKeys as $subType) 
 		{
 			$key = $entry->getSyncKey($subType);

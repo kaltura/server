@@ -249,6 +249,8 @@ return array(
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::CONVERSION_LOG' => 'Conversion Log',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_PRIMARY' => 'Primary Live Segments', 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_SECONDARY' => 'Secondary Live Segments',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::INTERACTIVITY_DATA' => 'Interactivity Data',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::VOLATILE_INTERACTIVITY_DATA' => 'Volatile Interactivity Data',
 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::FEATURES' => 'Features',
@@ -1445,7 +1447,9 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::EIGHT_HOURS' => 'EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWELVE_HOURS' => 'TWELVE_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::ONE_BUSINESS_DAY' => 'ONE_BUSINESS_DAY',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_BUSINESS_DAYS' => 'TWO_BUSINESS_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_DAYS' => 'FIVE_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',

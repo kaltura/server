@@ -87,21 +87,27 @@ class KScheduleHelper extends KPeriodicWorker
 	 */
 	private function sendConfigItems(KalturaScheduler $scheduler, array $configItems)
 	{
-		$configItemsArr = array_chunk($configItems, 100);
-		
+		$uniqItems = array();
+		foreach ($configItems as $item)
+		{
+			/* @var $item KalturaSchedulerConfig*/
+			if($item instanceof KalturaSchedulerConfig)
+			{
+				$uniqItems[$item->workerConfiguredId] = $item;
+			}
+		}
+
+		$configItemsArr = array_chunk($uniqItems, 100);
 		foreach($configItemsArr as $configItems)
 		{
 			self::$kClient->startMultiRequest();
 			
 			foreach($configItems as $configItem)
 			{
-				if($configItem instanceof KalturaSchedulerConfig)
-				{
 					if(is_null($configItem->value))
 						$configItem->value = '';
 						
 					self::$kClient->batchcontrol->configLoaded($scheduler, $configItem->variable, $configItem->value, $configItem->variablePart, $configItem->workerConfiguredId, $configItem->workerName);
-				}
 			}
 			
 			self::$kClient->doMultiRequest();

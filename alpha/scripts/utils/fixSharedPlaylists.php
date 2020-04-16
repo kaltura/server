@@ -9,7 +9,7 @@ foreach($playlists as $playlist)
 	
 	$criteria = new Criteria();
 	$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);
-	$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+	$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, kEntryFileSyncSubType::DATA);
 	$criteria->add(FileSyncPeer::OBJECT_ID, $playlist->getId());
 	$criteria->add(FileSyncPeer::PARTNER_ID, 0);
 	$criteria->add(FileSyncPeer::DC, 0);

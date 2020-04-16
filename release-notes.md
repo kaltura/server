@@ -1,3 +1,30 @@
+# Propus 16.0.1 #
+
+## Interactivity plugin ##
+Issue Type: Story
+Issue ID: PLAT-10652
+
+### Configuration ###
+add Interactivity to plugins.ini
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
+run: php deployment/updates/scripts/add_permissions/2020_04_12_interactivityServices.php
+
+## export catalog items to CSV ##
+Issue Type: Task
+Issue ID : REACH-836
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_06_04_add_permission_vendor_catalog_items.php
+
+## Add new permission to new action extendLockExpiration in batchService ##
+Issue Type: Task
+Issue ID : PLAT-10653
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_25_add_action_extend_batch_job_lock_expiration.php
+
 # Orion 15.20.0 #
 
 ## Update permissions for systemPartner and job services ##
@@ -13,7 +40,7 @@ run: php deployment/updates/scripts/add_permissions/2020_03_17_update_permission
 Issue Type: Task
 Issue ID : PLAT-10320
 
-### Configuration ##
+### Configuration ###
 Add the following to batch.ini:
 
 enabledWorkers.KAsyncStorageUpdate = xxx (number of workers)
@@ -34,7 +61,7 @@ run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_t
 Issue Type: Task
 Issue ID : PLAT-10625
 
-### Configuration ##
+### Configuration ###
   None
 	
 #### Deployment Scripts ####
@@ -45,7 +72,7 @@ Issue ID : PLAT-10625
 Issue Type: Task
 Issue ID : PLAT-10358
 
-### Configuration ##
+### Configuration ###
   Add LiveCluster plugin in: configurations/plugins.ini 
 	
 
@@ -61,7 +88,7 @@ Issue ID : PLAT-10358
 Issue Type: Task
 Issue ID : PLAT-10713
 
-### Configuration ##
+### Configuration ###
 	* Make sure "sphinx_dynamic_config" exists in your configuration maps 
  
 	* To enable the feature for specific partner ids add the following section to the map:
@@ -78,7 +105,7 @@ None.
 Issue Type: Task
 Issue ID : PLAT-10694
 
-### Configuration ##
+### Configuration ###
 - Add a worker (follow 'KAsyncConvertPdfLinux' in 'batch.ini.template).
 - Make sure that 'lowriter' is installed by running 'lowriter --version'.
 
@@ -91,7 +118,7 @@ none.
 Issue Type: Task
 Issue ID : REACH-779
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -101,7 +128,7 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_02_03_
 Issue Type: Task
 Issue ID : No-Plat
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -113,7 +140,7 @@ Run 'php /opt/kaltura/app/deployment/updates/sql/2020_02_03_audit_trail_config_a
 Issue Type: Task
 Issue ID : FEV-426
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -151,7 +178,7 @@ None.
 Issue Type: Task
 Issue ID : WEBC-1574
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -161,7 +188,7 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_p
 - Issue Type: Task
 - Issue ID : PLAT-10432
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -175,7 +202,7 @@ Run:
 ## Modify confMaps content column ##
 - Issue Type: Task
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -185,7 +212,7 @@ mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deploy
 - Issue Type: Task
 - Issue ID : PLAT-10432
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -199,7 +226,7 @@ Run:
 - Issue Type: Task
 - Issue ID : PLAT-10269
 
-### Configuration ##
+### Configuration ###
     To support sharding sphinx category table add the follwoing to you db.ini file:
         [sphinx_split_index]
         enabled = true
@@ -267,7 +294,7 @@ Run:
 - Issue Type: Task
 - Issue ID : REACH2-737
 
-### Configuration ##
+### Configuration ###
 First replace all tokens from the XML files below and remove ".template" from the file name:
 /opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryAddedPrivacyContextsBooleanNotification.template.xml
 /opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryChangedPrivacyContextsBooleanNotification.template.xml
@@ -281,7 +308,7 @@ php /opt/kaltura/app/deployment/updates/scripts/2019_12_22_deploy_category_entry
 - Issue Type: Task
 - Issue ID : PLAT-10357
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -293,7 +320,7 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_04_
 - Issue Type: Task
 - Issue ID : PLAT-10347
 
-### Configuration ##
+### Configuration ###
 
 1) Make sure "elasticDynamicMap" exists in your configuration maps 
 2) Add the following section "filterExecutionTags" with following values:
@@ -313,7 +340,7 @@ None.
 - Issue Type: Task
 - Issue ID : PLAT-10351
 
-### Configuration ##
+### Configuration ###
 
 Only after the deployment script is executed, one can add this permission to user-roles via admin console
 
@@ -3049,7 +3076,7 @@ None.
 - Issue Type: Task
 - Issue ID: SUP-12069
 
-### Configuration ####
+### Configuration ###
 
 - Add upload domain in dc_config.ini 
 example:
