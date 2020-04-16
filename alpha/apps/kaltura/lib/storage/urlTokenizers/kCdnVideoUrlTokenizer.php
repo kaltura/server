@@ -26,7 +26,7 @@ class kCdnVideoUrlTokenizer extends kUrlTokenizer
 		else
 			$s = '?';
 
-		return $url.$s.'md5='.$token.'&e='.$expiryTime;
+		return "$url$s"."md5=$token&e=$expiryTime";
 	}
 	/**
 	 * @param $hashData

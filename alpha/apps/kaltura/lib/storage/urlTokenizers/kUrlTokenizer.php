@@ -77,7 +77,7 @@ abstract class kUrlTokenizer
 	}
 	
 	/**
-	 * @return number $window
+	 * @return int $window
 	 */
 	public function getWindow() {
 		return $this->window;
@@ -112,7 +112,7 @@ abstract class kUrlTokenizer
 	}
 
 	/**
-	 * @return the $limitIpAddress
+	 * @return bool
 	 */
 	public function getLimitIpAddress() {
 		return $this->limitIpAddress;
