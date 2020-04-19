@@ -666,14 +666,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 					$new_version = $this->getInteractivityVersion();
 					if(is_null($new_version))
 					{
-						$new_version = "";
+						$new_version = 0;
 					}
 					break;
 				case kEntryFileSyncSubType::VOLATILE_INTERACTIVITY_DATA:
 					$new_version = $this->getVolatileInteractivityVersion();
 					if(is_null($new_version))
 					{
-						$new_version = "";
+						$new_version = 0;
 					}
 					break;
 			}
