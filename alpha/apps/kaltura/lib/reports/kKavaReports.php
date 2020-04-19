@@ -1587,11 +1587,24 @@ class kKavaReports extends kKavaReportsMgr
 		ReportType::INTERACTIVE_VIDEO_NODE_TOP_HOTSPOTS => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'hotspot_id' => self::DIMENSION_EVENT_VAR1,
+				'destination' => self::DIMENSION_EVENT_VAR2,
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
 			self::REPORT_COLUMN_MAP => array(
 				'hotspot_clicked' => self::EVENT_TYPE_HOTSPOT_CLICKED,
+			),
+		),
+
+		ReportType::INTERCATIVE_VIDEO_NODE_SWITCH_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR3,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_METRICS => array(self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED),
+			self::REPORT_COLUMN_MAP => array(
+				'hotspot_clicked' => self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED,
 			),
 		),
 
