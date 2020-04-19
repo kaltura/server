@@ -133,6 +133,14 @@ abstract class kBaseInteractivity extends BaseObject
 	{
 		$this->setEntry($entryId);
 		$syncKey = $this->getSyncKey();
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		/* @var $fileSync FileSync */
+		if (!$fileSync)
+		{
+			$type = array(kInteractivityErrorMessages::TYPE_PARAMETER => $this->getFileSyncSubType(), kInteractivityErrorMessages::ENTRY_ID => $entryId);
+			throw new kInteractivityException(kInteractivityException::CANT_UPDATE_NO_DATA, kInteractivityException::CANT_UPDATE_NO_DATA, $type);
+		}
+
 		$currentVersion = $syncKey->getVersion();
 		if($version != $currentVersion)
 		{
