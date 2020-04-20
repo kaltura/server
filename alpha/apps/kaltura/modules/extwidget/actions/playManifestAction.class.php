@@ -667,6 +667,9 @@ class playManifestAction extends kalturaAction
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
 		$remoteFileSyncs = array();
+
+		$cloudFlavorsByDc = array();
+		$cloudFileSyncs = array();
 		
 		foreach($flavorAssets as $flavorAsset)
 		{
@@ -676,15 +679,24 @@ class playManifestAction extends kalturaAction
 			$c = new Criteria();
 			$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 			$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
-			
+
+			$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+
 			switch ($servePriority)
 			{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				if(!$cloudStorageIds)
+				{
+					$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				}
 				break;
 				
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+				if($cloudStorageIds)
+				{
+					$c->add(FileSyncPeer::DC, $cloudStorageIds, Criteria::NOT_IN);
+				}
 				break;
 			}
 			
@@ -697,8 +709,16 @@ class playManifestAction extends kalturaAction
 				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 				{
 					$dc = $fileSync->getDc();
-					$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
-					$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+					if(!in_array($dc, $cloudStorageIds))
+					{
+						$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+						$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+					}
+					else
+					{
+						$cloudFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+						$cloudFileSyncs[$dc][$flavorId] = $fileSync;
+					}
 				}
 				else
 				{
@@ -731,26 +751,40 @@ class playManifestAction extends kalturaAction
 				unset($remoteFileSyncs[$storageProfileId]);
 			}
 		}
-		
+
 		// choose the storage profile with the highest number of flavors
-		$maxDc = null;
-		$maxDcFlavorCount = 0;
-		$remoteFlavors = array();
-		foreach ($remoteFlavorsByDc as $dc => $curDcFlavors)
+		list ($maxDc, $remoteFlavors) = $this->getMaxDcFlavors($remoteFlavorsByDc);
+
+		if($cloudFileSyncs && count($localFlavors) == 0)
 		{
-			$curDcFlavorCount = count($curDcFlavors);
-			if ($curDcFlavorCount <= $maxDcFlavorCount)
-				continue;
-			$maxDc = $dc;
-			$maxDcFlavorCount = $curDcFlavorCount;
-			$remoteFlavors = $curDcFlavors;
+			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
+			foreach ($cloudStorageProfiles as $cloudProfile)
+			{
+				if(!$this->shouldIncludeStorageProfile($cloudProfile))
+				{
+					$profileId = $cloudProfile->getId();
+					unset($cloudFlavorsByDc[$profileId]);
+					unset($cloudFileSyncs[$profileId]);
+				}
+			}
 		}
+		list ($cloudMaxDc, $cloudRemoteFlavors) = $this->getMaxDcFlavors($cloudFlavorsByDc);
 				
 		// choose the flavor set according to the serve priority
-		if ($this->shouldUseLocalFlavors($localFlavors, $remoteFlavors))
+		if ($this->shouldUseLocalFlavors(array_merge($localFlavors, $cloudRemoteFlavors), $remoteFlavors))
 		{
-			$this->deliveryAttributes->setStorageId(null);
-			$this->deliveryAttributes->setFlavorAssets($localFlavors);
+			$storageId = null;
+			$deliveryFlavors = $localFlavors;
+
+			if($cloudMaxDc && (count($localFlavors) == 0))
+			{
+				$storageId = $cloudMaxDc;
+				$deliveryFlavors = $cloudRemoteFlavors;
+				$this->deliveryAttributes->setRemoteFileSyncs($cloudFileSyncs[$cloudMaxDc]);
+			}
+
+			$this->deliveryAttributes->setStorageId($storageId);
+			$this->deliveryAttributes->setFlavorAssets($deliveryFlavors);
 		}
 		else if ($maxDc)
 		{
@@ -821,7 +855,7 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 				
 		// storage doesn't belong to the partner
-		if($storageProfile->getPartnerId() != $this->entry->getPartnerId())
+		if(($storageProfile->getPartnerId() != $this->entry->getPartnerId()) && !$storageProfile->getExportPeriodically())
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
@@ -1437,5 +1471,24 @@ class playManifestAction extends kalturaAction
 			return true;
 		}
 		return false;
+	}
+
+	protected function getMaxDcFlavors($remoteFlavorsByDc)
+	{
+		// choose the storage profile with the highest number of flavors
+		$maxDc = null;
+		$maxDcFlavorCount = 0;
+		$remoteFlavors = array();
+		foreach ($remoteFlavorsByDc as $dc => $curDcFlavors)
+		{
+			$curDcFlavorCount = count($curDcFlavors);
+			if ($curDcFlavorCount <= $maxDcFlavorCount)
+				continue;
+			$maxDc = $dc;
+			$maxDcFlavorCount = $curDcFlavorCount;
+			$remoteFlavors = $curDcFlavors;
+		}
+
+		return array($maxDc, $remoteFlavors);
 	}
 }

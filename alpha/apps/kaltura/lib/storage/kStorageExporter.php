@@ -10,19 +10,42 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @var array of kContextDataResult per storage profile and entry id
 	 */
 	public static $entryContextDataResult = array();
+
+	const ALL_PARTNERS_WILD_CHAR = "*";
+	const NULL_STR = 'NULL';
 	
 	/* (non-PHPdoc)
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
-	{		
-		// if changed object is entry 
-		if($object instanceof entry && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
+	{
+		if(!($object instanceof entry) && !($object instanceof flavorAsset) && !($object instanceof FileSync))
+		{
+			return false;
+		}
+
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()))
+		{
+			return false;
+		}
+
+		// if changed object is entry
+		if($object instanceof entry && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 			return true;
 		
 		// if changed object is flavor asset or thumb asset
-		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
+
+		// if changed object is file sync
+		if ($object instanceof FileSync
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
+			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			return true;
+		}
 			
 		return false;		
 	}
@@ -51,6 +74,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$entry = $object->getentry();
 			
 			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+			if(!$externalStorages)
+			{
+				$externalStorages = self::getPeriodicStorageProfiles($object->getPartnerId());
+			}
 			foreach($externalStorages as $externalStorage)
 			{
 				if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
@@ -59,6 +86,32 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				}
 			}
 		}
+
+		// if changed object is file sync
+		if ($object instanceof FileSync
+			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
+			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
+			if($storageProfile)
+			{
+				if($storageProfile->getExportPeriodically())
+				{
+					self::handlePeriodicFileExportFinished($object, $storageProfile);
+				}
+				else if($object->getLinkedId() !== self::NULL_STR)
+				{
+					$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
+					if($storageProfiles)
+					{
+						self::exportToPeriodicStorage($object, $storageProfiles);
+					}
+				}
+			}
+		}
+
 		return true;
 	}
 
@@ -66,17 +119,37 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	{
 		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
 			return true;
-		
+
+		if ($object instanceof FileSync
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
+			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+			return true;
 	}
 
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-		foreach($externalStorages as $externalStorage)
+		if($object instanceof thumbAsset)
 		{
-			if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
+			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+			foreach($externalStorages as $externalStorage)
 			{
-				self::exportFlavorAsset($object, $externalStorage);
+				if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
+				{
+					self::exportFlavorAsset($object, $externalStorage);
+				}
+			}
+		}
+
+		if ($object instanceof FileSync)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
+			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() != 'NULL')
+			{
+				$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
+				if($storageProfiles)
+				{
+					self::exportToPeriodicStorage($object, $storageProfiles);
+				}
 			}
 		}
 		return true;
@@ -114,7 +187,23 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @param FileSyncKey $key
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
-	{			
+	{
+
+		$partner = $entry->getPartner();
+
+		// all export jobs for replacing entry that has periodic storage will happen on the original replaced entry
+		// after we will copy the matching file sync
+		if($entry->getReplacedEntryId() && $partner && kStorageExporter::getPeriodicStorageIdsByPartner($partner->getId()))
+		{
+			return;
+		}
+
+		// dont export to periodic local storage if partner configured delete local content
+		if($externalStorage->getExportPeriodically() && $partner && $partner->getStorageDeleteFromKaltura())
+		{
+			return;
+		}
+
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
 		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
@@ -125,7 +214,17 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$externalFileSync = kFileSyncUtils::createPendingExternalSyncFileForKey($key, $externalStorage, $fileSync->getIsDir());
 		
 		$srcFileSync = kFileSyncUtils::resolve($fileSync);
-		kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+		if($externalStorage->getExportPeriodically())
+		{
+			$externalFileSync->setFileSize($srcFileSync->getFileSize());
+			$externalFileSync->setSrcPath($srcFileSync->getFullPath());
+			$externalFileSync->setSrcEncKey($srcFileSync->getSrcEncKey());
+			$externalFileSync->save();
+		}
+		else
+		{
+			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+		}
 		return true;
 	}
 	
@@ -440,5 +539,98 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
-	
+
+
+	public static function handlePeriodicFileExportFinished($fileSync, StorageProfile $storageProfile)
+	{
+		$keysArray = array();
+		$object = assetPeer::retrieveById($fileSync->getObjectId());
+		if(!$object)
+		{
+			return;
+		}
+		$entryId = $object->getEntryId();
+		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$flavorsToExport = array();
+
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			if(!$storageProfile->isFlavorAssetConfiguredForExport($flavorAsset))
+			{
+				continue;
+			}
+			$flavorsToExport[] = $flavorAsset;
+			foreach ($fileSyncSubTypes as $subType)
+			{
+				$key = $flavorAsset->getSyncKey($subType);
+				if(!kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfile->getId()))
+				{
+					KalturaLog::debug("Required file for flavor asset [{$flavorAsset->getId()}] was not exported yet");
+					return;
+				}
+				$keysArray[$flavorAsset->getId()] = $key->getVersion();
+			}
+		}
+
+		foreach ($flavorsToExport as $flavorAsset)
+		{
+			kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
+		}
+	}
+
+	public static function getPeriodicStorageIdsByPartner($partnerId)
+	{
+		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
+		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
+		{
+			$storageIds = kConf::get('periodic_storage_ids','cloud_storage', null);
+			return explode(',', $storageIds);
+		}
+		return null;
+	}
+
+	public static function getPeriodicStorageProfiles($partnerId)
+	{
+		// check if should export to periodically only if we dont have existing storage profiles, if we do add export only after they finish
+		$externalStorages = array();
+		$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
+		if($storageIds)
+		{
+			$externalStorages = StorageProfilePeer::retrieveByPKs($storageIds);
+		}
+		return $externalStorages;
+	}
+
+	public static function exportMultipleFlavors($assets, $storage)
+	{
+		foreach ($assets as $asset)
+		{
+			$exported = kStorageExporter::exportFlavorAsset($asset, $storage);
+			KalturaLog::debug("assetId [{$asset->getId()}] exported status is [$exported]");
+		}
+	}
+
+
+	protected static function getPeriodicStorageProfilesForExport($object)
+	{
+		if($object->getObjectType() != FileSyncObjectType::ASSET || $object->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
+		{
+			return null;
+		}
+
+		$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($object->getPartnerId());
+		return $periodicStorageProfiles;
+	}
+
+	protected static function exportToPeriodicStorage($object, $periodicStorageProfiles)
+	{
+		$asset = assetPeer::retrieveById($object->getObjectId());
+		if($asset)
+		{
+			$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
+			kFlowHelper::addPeriodicStorageExports($asset->getEntryId(), $partner, $periodicStorageProfiles);
+		}
+	}
+
 }
