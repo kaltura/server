@@ -1,31 +1,4 @@
-# Propus 16.0.1 #
-
-## Interactivity plugin ##
-Issue Type: Story
-Issue ID: PLAT-10652
-
-### Configuration ###
-add Interactivity to plugins.ini
-
-#### Deployment Scripts ####
-run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
-run: php deployment/updates/scripts/add_permissions/2020_04_12_interactivityServices.php
-
-## export catalog items to CSV ##
-Issue Type: Task
-Issue ID : REACH-836
-
-#### Deployment Scripts ####
-run: php deployment/updates/scripts/add_permissions/2020_06_04_add_permission_vendor_catalog_items.php
-
-## Add new permission to new action extendLockExpiration in batchService ##
-Issue Type: Task
-Issue ID : PLAT-10653
-
-#### Deployment Scripts ####
-run: php deployment/updates/scripts/add_permissions/2020_03_25_add_action_extend_batch_job_lock_expiration.php
-
-# Orion 15.20.0 #
+# Propus 16.1.0 #
 
 ## Add periodic storage export batch ##
 Issue Type: Task
@@ -61,6 +34,35 @@ Issue ID : PLAT-10735
 #### Deployment Scripts ####
     php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
     php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+# Propus 16.0.1 #
+
+## Interactivity plugin ##
+Issue Type: Story
+Issue ID: PLAT-10652
+
+### Configuration ###
+add Interactivity to plugins.ini
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
+run: php deployment/updates/scripts/add_permissions/2020_04_12_interactivityServices.php
+
+## export catalog items to CSV ##
+Issue Type: Task
+Issue ID : REACH-836
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_06_04_add_permission_vendor_catalog_items.php
+
+## Add new permission to new action extendLockExpiration in batchService ##
+Issue Type: Task
+Issue ID : PLAT-10653
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_25_add_action_extend_batch_job_lock_expiration.php
+
+# Orion 15.20.0 #
 
 ## Update permissions for systemPartner and job services ##
 Issue Type: Task
