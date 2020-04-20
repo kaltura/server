@@ -587,7 +587,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			$storageIds = kConf::get('periodic_storage_ids','cloud_storage', null);
 			return explode(',', $storageIds);
 		}
-		return null;
+		return array();
 	}
 
 	public static function getPeriodicStorageProfiles($partnerId)
