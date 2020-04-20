@@ -10,4 +10,5 @@ class kInteractivityException extends kCoreException
 	const ILLEGAL_FIELD_VALUE = 'illegal field value';
 	const ENTRY_ILLEGAL_NODE_NUMBER = 'entry illegal node number';
 	const ILLEGAL_ENTRY_NODE_ENTRY_ID = 'illegal entry node entry id';
+	const CANT_UPDATE_NO_DATA = 'CANT_UPDATE_NO_DATA';
 }
