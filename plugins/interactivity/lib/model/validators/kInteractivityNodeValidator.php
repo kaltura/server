@@ -29,11 +29,12 @@ class kInteractivityNodeValidator extends kInteractivityBaseValidator
 		$this->validateMandatoryField($data, self::OBJECT_NAME, self::ID);
 		$this->validateMandatoryField($data, self::OBJECT_NAME, self::NAME);
 		$this->validateMandatoryField($data, self::OBJECT_NAME, self::ENTRY_ID);
-		$this->validateMandatoryField($data, self::OBJECT_NAME, self::INTERACTIONS);
-
-		foreach ($data[self::INTERACTIONS] as $interaction)
+		if(isset($data[self::INTERACTIONS]))
 		{
-			$this->interactionValidator->validate($interaction);
+			foreach ($data[self::INTERACTIONS] as $interaction)
+			{
+				$this->interactionValidator->validate($interaction);
+			}
 		}
 	}
 }
