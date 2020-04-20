@@ -53,7 +53,7 @@ class flvproviderAction extends sfAction
 					die;
 				}
 				
-				$dataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+				$dataKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA); // replaced__getDataPath
 				$path = kFileSyncUtils::getReadyLocalFilePathForKey($dataKey);
 				
 				$host = requestUtils::getHost();
@@ -129,7 +129,7 @@ class flvproviderAction extends sfAction
 			//WidgetLog::incPlaysIfExists( $this->kshow_id , $this->entry_id );
 		}
 		
-		$dataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version); // replaced__getDataPath
+		$dataKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA, $version); // replaced__getDataPath
 		$this->flv_streamer = new myFlvStreamer( $dataKey, $this->timeline, $this->streamNum, $addPadding );
 		
 		$this->total_length = $this->flv_streamer->getTotalLength( true ); // $total_length;

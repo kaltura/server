@@ -29,7 +29,7 @@ foreach ($entries as $deletedEntry)
 	$deletedEntry->save();
 	entryPeer::clearInstancePool();
 	
-	$entryFileSyncKey = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+	$entryFileSyncKey = $deletedEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
 	
 	$entryFileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($entryFileSyncKey);
 	foreach ($entryFileSyncs as $entryFileSync){

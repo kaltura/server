@@ -53,4 +53,3 @@ require_once(__DIR__ . "/bootstrap_scheduler.php");
 
 $kscheduler = new KGenericScheduler($phpPath, $iniDir);
 $kscheduler->run();
-$kscheduler=null;
