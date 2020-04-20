@@ -82,7 +82,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
 	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
-	const METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED = 'node_switch_by_hotspot_clicked';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -918,12 +917,6 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
 			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
-
-		self::$aggregations_def[self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED] = self::getFilteredAggregator(
-			self::getAndFilter(array(
-				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_NODE_SWITCH),
-				self::getNotFilter(self::getSelectorFilter(self::DIMENSION_EVENT_VAR3, self::VALUE_UNKNOWN)))),
-			self::getLongSumAggregator(self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -2010,7 +2003,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
-			if (isset($report_filter[self::DRUID_DIMENSION]))
+			if (isset($report_filter[self::DRUID_DIMENSION]) || isset($report_filter[self::DRUID_TYPE]))
 			{
 				$report_filter = array($report_filter);
 			}

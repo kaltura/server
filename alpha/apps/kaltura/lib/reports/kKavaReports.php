@@ -1601,10 +1601,17 @@ class kKavaReports extends kKavaReportsMgr
 				'hotspot_id' => self::DIMENSION_EVENT_VAR3,
 				'destination' => self::DIMENSION_EVENT_VAR2,
 			),
-			self::REPORT_METRICS => array(self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED),
-			self::REPORT_GRAPH_METRICS => array(self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN)
+				)
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
 			self::REPORT_COLUMN_MAP => array(
-				'hotspot_clicked' => self::METRIC_NODE_SWITCH_BY_HOTSPOT_CLICKED,
+				'hotspot_clicked' => self::EVENT_TYPE_NODE_SWITCH,
 			),
 		),
 

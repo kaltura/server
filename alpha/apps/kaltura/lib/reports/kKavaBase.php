@@ -197,6 +197,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_ROOT_ENTRY_ID => 1,
 			self::DIMENSION_NODE_ID => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
