@@ -180,7 +180,7 @@ class rawAction extends sfAction
 		elseif ($entry->getType() == entryType::DATA)
 		{
 			$version = $this->getRequestParameter("version");
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA, $version);
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 			
 			$path = null;
@@ -209,8 +209,8 @@ class rawAction extends sfAction
 		if ( $media_type == entry::ENTRY_MEDIA_TYPE_IMAGE )
 		{
 			// image - use data for entry
-			$file_sync = $this->redirectIfRemote ( $entry ,  entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , null );
-			$key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$file_sync = $this->redirectIfRemote ( $entry ,  kEntryFileSyncSubType::DATA , null );
+			$key = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true));
 		}
 		elseif ( $media_type == entry::ENTRY_MEDIA_TYPE_VIDEO || $media_type == entry::ENTRY_MEDIA_TYPE_AUDIO  )
@@ -281,7 +281,7 @@ class rawAction extends sfAction
 				if($key !== FALSE)
 					unset($try_formats[$key]);
 				
-				$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $format, false);
+				$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $format, false);
 			}
 			
 			if(!isset($file_sync) || !$file_sync || !file_exists($file_sync->getFullPath()))
@@ -289,7 +289,7 @@ class rawAction extends sfAction
 				foreach($try_formats as $ext)
 				{
 					KalturaLog::log( "raw for mix - trying to find filesync for extension: [$ext] on entry [{$entry->getId()}]");
-					$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $ext, false);
+					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, false);
 					if($file_sync && file_exists($file_sync->getFullPath()))
 					{
 						KalturaLog::log( "raw for mix - found flattened video of extension: [$ext] continuing with this file {$file_sync->getFullPath()}");
@@ -298,13 +298,10 @@ class rawAction extends sfAction
 				}
 				if(!$file_sync || !file_exists($file_sync->getFullPath()))
 				{
-					$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $ext, true);
+					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, true);
 				}
 			}
-			
-			// use fileSync for entry - roughcuts don't have flavors
-			//$file_sync =  $this->redirectIfRemote ( $entry ,  entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $version , true );  // strict - nothing to do if no flattened version
-			
+
 			// if got to here - fileSync was found for one of the extensions - continue with that file
 			$archive_file = $file_sync->getFullPath();
 		}

@@ -425,7 +425,7 @@ class playManifestAction extends kalturaAction
 		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				
 		if(!$key)
-			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			$key = $this->entry->getSyncKey(kEntryFileSyncSubType::ISM);
 			
 		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);

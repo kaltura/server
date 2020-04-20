@@ -69,7 +69,7 @@ class myMetadataUtils
 		$show_entry_id = $kshow->getShowEntryId();
 		$show_entry = entryPeer::retrieveByPK( $show_entry_id );
 
-		$show_entry_data_key = $show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$show_entry_data_key = $show_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 
 		if ($show_entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_SHOW)
 			return array(null, null);
@@ -100,7 +100,7 @@ class myMetadataUtils
 	{
 		$xml_content = "";
 
-		$show_entry_data_key = $show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$show_entry_data_key = $show_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 		
 		$current_content = ($show_entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_SHOW) ? "" : kFileSyncUtils::file_get_contents( $show_entry_data_key );
 		if ( $ignore_current ) $current_content = "";
@@ -112,7 +112,7 @@ class myMetadataUtils
 		{
 			$show_entry->setData( "metadata.xml" );
 			// re-create data key (to get latest version)
-			$show_entry_data_key = $show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$show_entry_data_key = $show_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 
 			//$version = myContentStorage::getVersion($file_name);
 			//$comments = "file path: " . $file_name . "\n";

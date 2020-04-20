@@ -216,14 +216,14 @@ class kReplacementHelper
 	 */
 	public static function createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry)
 	{
-		$tempEntryIsmSyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		$tempEntryIsmcSyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$tempEntryIsmSyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::ISM);
+		$tempEntryIsmcSyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::ISMC);
 		if(kFileSyncUtils::fileSync_exists($tempEntryIsmSyncKey) && kFileSyncUtils::fileSync_exists($tempEntryIsmcSyncKey))
 		{
 			$ismVersion = $replacedEntry->incrementIsmVersion();
-			$realEntryIsmSyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion);
+			$realEntryIsmSyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::ISM, $ismVersion);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmSyncKey, $tempEntryIsmSyncKey);
-			$realEntryIsmcSyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			$realEntryIsmcSyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::ISMC, $ismVersion);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmcSyncKey, $tempEntryIsmcSyncKey);
 		}
 	}
@@ -391,8 +391,8 @@ class kReplacementHelper
 		KalturaLog::info("No default ThumbAsset found for replacing entry [". $replacingEntry->getId() ."]");
 		$replacedEntry->setThumbnail(".jpg"); // thumbnailversion++
 		$replacedEntry->save();
-		$tempEntrySyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-		$realEntrySyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$tempEntrySyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
+		$realEntrySyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 	}
 
