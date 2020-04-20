@@ -18,7 +18,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
-	{		
+	{
+		if(!($object instanceof entry) && !($object instanceof flavorAsset) && !($object instanceof FileSync))
+		{
+			return false;
+		}
+
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()))
 		{
 			return false;
