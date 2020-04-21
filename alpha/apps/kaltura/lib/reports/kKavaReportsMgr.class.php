@@ -356,6 +356,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
 		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
 		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
+		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
+		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 	);
 
 	//global transform
