@@ -34,12 +34,26 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 		);
 	}
 
+	/**
+	 * @param $exception
+	 * @return KalturaAPIException|null
+	 * @throws Exception
+	 */
 	public static function handleInteractivityException($exception)
 	{
 		$code = $exception->getCode();
 		$data = $exception->getData();
 		switch ($code)
 		{
+			case kInteractivityException::DUPLICATE_INTERACTIONS_IDS:
+				$object = new KalturaAPIException(KalturaInteractivityErrors::DUPLICATE_INTERACTIONS_IDS);
+				break;
+			case kInteractivityException::DUPLICATE_NODES_IDS:
+				$object = new KalturaAPIException(KalturaInteractivityErrors::DUPLICATE_NODES_IDS);
+				break;
+			case kInteractivityException::EMPTY_INTERACTIVITY_DATA:
+				$object = new KalturaAPIException(KalturaInteractivityErrors::EMPTY_INTERACTIVITY_DATA);
+				break;
 			case kInteractivityException::DIFFERENT_DATA_VERSION:
 				$object = new KalturaAPIException(KalturaInteractivityErrors::DIFFERENT_DATA_VERSION, $data[kInteractivityErrorMessages::VERSION_PARAMETER]);
 				break;
