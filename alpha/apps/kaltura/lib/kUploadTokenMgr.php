@@ -372,7 +372,7 @@ class kUploadTokenMgr
 			$lockedFile = "$nextChunkPath.".microtime(true).".locked";
 			if (! kFile::moveFile($nextChunkPath, $lockedFile)) // another process is already appending this file
 			{
-				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
+				KalturaLog::log("rename ($nextChunk, $lockedFile) failed");
 				break;
 			}
 			
