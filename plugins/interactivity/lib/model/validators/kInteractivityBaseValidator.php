@@ -32,6 +32,62 @@ abstract class kInteractivityBaseValidator implements IInteractivityDataValidato
 			throw new kInteractivityException(kInteractivityException::MISSING_MANDATORY_PARAMETERS, kInteractivityException::MISSING_MANDATORY_PARAMETERS, $data);
 		}
 	}
+
+	/**
+	 * @param array $data
+	 * @param string $objectName
+	 * @param string $fieldName
+	 * @throws kInteractivityException
+	 */
+	protected function validateMandatoryStringField($data, $objectName, $fieldName)
+	{
+		$this->validateMandatoryField($data, $objectName, $fieldName);
+		$this->validateStringField($data, $objectName, $fieldName);
+	}
+
+	/**
+	 * @param array $data
+	 * @param string $objectName
+	 * @param string $fieldName
+	 * @throws kInteractivityException
+	 */
+	protected function validateOptionalStringField($data, $objectName, $fieldName)
+	{
+		if(isset($data[$fieldName]))
+		{
+			$this->validateStringField($data, $objectName, $fieldName);
+		}
+	}
+
+	/**
+	 * @param array $data
+	 * @param string $objectName
+	 * @param string $fieldName
+	 * @throws kInteractivityException
+	 */
+	protected function validateArrayField($data, $objectName, $fieldName)
+	{
+		if(!is_array($data[$fieldName]))
+		{
+			$data = array(kInteractivityErrorMessages::ERR_MSG => "{$objectName} {$fieldName} " . kInteractivityErrorMessages::ARRAY_VALUE);
+			throw new kInteractivityException(kInteractivityException::ILLEGAL_FIELD_VALUE, kInteractivityException::ILLEGAL_FIELD_VALUE, $data);
+		}
+	}
+
+	/**
+	 * @param array $data
+	 * @param string $objectName
+	 * @param string $fieldName
+	 * @throws kInteractivityException
+	 */
+	protected function validateStringField($data, $objectName, $fieldName)
+	{
+		if(!is_string($data[$fieldName]))
+		{
+			$data = array(kInteractivityErrorMessages::ERR_MSG => "{$objectName} {$fieldName} " . kInteractivityErrorMessages::STRING_VALUE);
+			throw new kInteractivityException(kInteractivityException::ILLEGAL_FIELD_VALUE, kInteractivityException::ILLEGAL_FIELD_VALUE, $data);
+		}
+	}
 }
 
 
