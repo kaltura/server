@@ -7,7 +7,6 @@
 class kInteractivityNodeValidator extends kInteractivityBaseValidator
 {
 	const ID = 'id';
-	const INTERACTION_ID = 'id';
 	const NAME = 'name';
 	const ENTRY_ID = 'entryId';
 	const OBJECT_NAME = 'node';
@@ -45,7 +44,7 @@ class kInteractivityNodeValidator extends kInteractivityBaseValidator
 			foreach ($data[self::INTERACTIONS] as $interaction)
 			{
 				$this->interactionValidator->validate($interaction);
-				$this->interactionsIds[] = $interaction[self::INTERACTION_ID];
+				$this->interactionsIds[] = $interaction[$this->interactionValidator::ID];
 			}
 		}
 	}
