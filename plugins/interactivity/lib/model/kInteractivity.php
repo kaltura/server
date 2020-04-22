@@ -22,4 +22,17 @@ class kInteractivity extends kBaseInteractivity
 		$this->entry->setInteractivityVersion($newVersion);
 		$this->entry->save();
 	}
+
+	/**
+	 * @param string $entryId
+	 * @throws kCoreException
+	 * @throws kFileSyncException
+	 */
+	public function insert($entryId)
+	{
+		$this->setEntry($entryId);
+		$syncKey = $this->getSyncKey();
+		kFileSyncUtils::file_put_contents($syncKey, $this->data, true);
+		$this->setEntryInteractivityVersionAndCapability($syncKey->getVersion());
+	}
 }
