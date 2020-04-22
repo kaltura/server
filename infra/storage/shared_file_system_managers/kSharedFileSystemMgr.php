@@ -486,8 +486,18 @@ abstract class kSharedFileSystemMgr
 		{
 			return $this->doMoveLocalToShared($from, $to, !$deleteSrc);
 		}
-		
-		return $this->doRename($from, $to);
+
+		if(!$this->doCopy($from, $to))
+		{
+			return false;
+		}
+
+		if($deleteSrc)
+		{
+			$this->doUnlink($from);
+		}
+
+		return true;
 	}
 	
 	public function listFiles($filePath, $pathPrefix = '')

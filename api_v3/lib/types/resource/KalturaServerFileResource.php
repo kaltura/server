@@ -55,8 +55,8 @@ class KalturaServerFileResource extends KalturaGenericDataCenterContentResource
 		$object_to_fill->setKeepOriginalFile($keepOriginalFile);
 		$ret = parent::toObject($object_to_fill, $props_to_skip);
 		/* @var $ret kLocalFileResource */
-		
-		if(!file_exists($ret->getLocalFilePath()))
+
+		if(!kFile::checkFileExists($ret->getLocalFilePath()))
 			throw new KalturaAPIException(KalturaErrors::LOCAL_FILE_NOT_FOUND, $ret->getLocalFilePath());
 		
 		return $ret;

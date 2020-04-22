@@ -483,24 +483,34 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::info("$temp_file_path file doesnt exist");
 		}
 
-		if(!kFile::isSharedPath($temp_file_path) || kSharedFileSystemMgr::getCopySharedToSharedAllowed())
+		$targetCreated = false;
+		if(!kFile::isSharedPath($temp_file_path) || kSharedFileSystemMgr::getCopySharedToSharedAllowed() || $copyOnly)
 		{
-			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
-			$targetFullPath = $rootPath . $filePath;
-			if(!$targetFullPath)
+			if(kFile::isSharedPath($temp_file_path) && !kSharedFileSystemMgr::getCopySharedToSharedAllowed())
 			{
-				$targetFullPath = kPathManager::getFilePath($target_key);
-				KalturaLog::info("Generated new path [$targetFullPath]");
+				$targetFullPath = kFile::createUniqueFilePath(myContentStorage::getFSUploadsPath());
+				list($rootPath, $filePath) = self::getNewSharedPath($targetFullPath);
+				$targetCreated = true;
+			}
+			else
+			{
+				list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
+				$targetFullPath = $rootPath . $filePath;
+				if(!$targetFullPath)
+				{
+					$targetFullPath = kPathManager::getFilePath($target_key);
+				}
 			}
 
 			$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
+			KalturaLog::info("Generated new path [$targetFullPath]");
 
 			if (!kFile::checkFileExists(dirname( $targetFullPath)))
 			{
 				kFile::fullMkdir($targetFullPath);
 			}
 
-			if (kFile::checkFileExists($targetFullPath))
+			if (!$targetCreated && kFile::checkFileExists($targetFullPath))
 			{
 				$time = time();
 				$targetFullPath .= $time;
@@ -509,7 +519,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 			if($copyOnly)
 			{
-				$success = kFile::moveFile($temp_file_path, $targetFullPath, true);
+				$success = kFile::moveFile($temp_file_path, $targetFullPath, false, true);
 			}
 			else
 			{
@@ -520,9 +530,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			// if temp file is shared we set the file path to be the temp path and don't move the file to new location
 			$targetFullPath = $temp_file_path;
-			list($rootPath, $filePath) = explode("/",ltrim($targetFullPath,"/"),2);
-			$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
-			$filePath = DIRECTORY_SEPARATOR . $filePath;
+			list($rootPath, $filePath) = self::getNewSharedPath($targetFullPath);
 			$success = true;
 		}
 
@@ -1736,6 +1744,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return true;
 
 		return false;
+	}
+
+	public static function getNewSharedPath($path)
+	{
+		list($rootPath, $filePath) = explode("/",ltrim($path,"/"),2);
+		$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
+		$filePath = DIRECTORY_SEPARATOR . $filePath;
+		return array($rootPath, $filePath);
 	}
 
 
