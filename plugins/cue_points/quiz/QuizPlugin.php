@@ -305,7 +305,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 		return kPluginableEnumsManager::apiToCore('CuePointType', $value);
 	}
 
-	public static  function getCapatabilityCoreValue()
+	public static  function getCapabilityCoreValue()
 	{
 		return kPluginableEnumsManager::apiToCore('EntryCapability', self::PLUGIN_NAME . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . self::PLUGIN_NAME);
 	}
@@ -372,7 +372,7 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	public static function setQuizData( entry $entry, kQuiz $kQuiz )
 	{
 		$entry->putInCustomData( self::QUIZ_DATA, $kQuiz);
-		$entry->addCapability(self::getCapatabilityCoreValue());
+		$entry->addCapability(self::getCapabilityCoreValue());
 	}
 
 	/**

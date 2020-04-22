@@ -71,6 +71,8 @@ class InteractivityService extends KalturaBaseService
 		}
 
 		kFileSyncUtils::deleteSyncFileForKey($syncKey);
+		$entry->removeCapability(InteractivityPlugin::getCapabilityCoreValue());
+		$entry->save();
 	}
 
 	/**

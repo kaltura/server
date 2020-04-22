@@ -2,7 +2,7 @@
 /**
  * @package plugins.interactivity
  */
-class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaExceptionHandler
+class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaExceptionHandler, IKalturaEnumerator
 {
 	const PLUGIN_NAME = 'interactivity';
 	const INTERACTIVITY_CORE_EXCEPTION = 'kInteractivityException';
@@ -10,6 +10,29 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
+	}
+
+	public static function getCapabilityCoreValue()
+	{
+		return kPluginableEnumsManager::apiToCore(KalturaEntryCapability::getEnumClass(), self::PLUGIN_NAME . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . self::PLUGIN_NAME);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaEnumerator::getEnums()
+	 */
+	public static function getEnums($baseEnumName = null)
+	{
+		if (is_null($baseEnumName))
+		{
+			return array('InteractivityEntryCapability');
+		}
+
+		if ($baseEnumName == KalturaEntryCapability::getEnumClass())
+		{
+			return array('InteractivityEntryCapability');
+		}
+
+		return array();
 	}
 
 	/* (non-PHPdoc)
@@ -26,7 +49,7 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 		return array($dependency);
 	}
 
-	public static function getServicesMap ()
+	public static function getServicesMap()
 	{
 		return array(
 			'interactivity' => 'InteractivityService',

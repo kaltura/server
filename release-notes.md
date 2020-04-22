@@ -1,10 +1,17 @@
 # Propus 16.1.0 #
 
+## Interactivity plugin ##
+Issue Type: sub task
+Issue ID: PLAT-10793
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
+
 ## Add periodic storage export batch ##
 Issue Type: Task
 Issue ID : PLAT-10735
 
-### Configuration ##
+### Configuration ###
     - Add FEATURE_REMOTE_STORAGE permission to partner -1
     - Add configuration map with the name 'cloud_storage' with following config:
 

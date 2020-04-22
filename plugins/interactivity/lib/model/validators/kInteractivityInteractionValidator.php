@@ -31,13 +31,13 @@ class kInteractivityInteractionValidator extends kInteractivityBaseValidator
 	 */
 	protected function validateTimeFields($data)
 	{
-		if(isset($data[self::START_TIME]) && !is_numeric($data[self::START_TIME]))
+		if(isset($data[self::START_TIME]) && !is_int($data[self::START_TIME]))
 		{
 			$data = array(kInteractivityErrorMessages::ERR_MSG => 'start time ' . kInteractivityErrorMessages::LEGAL_TIME_FORMAT);
 			throw new kInteractivityException(kInteractivityException::ILLEGAL_FIELD_VALUE, kInteractivityException::ILLEGAL_FIELD_VALUE, $data);
 		}
 
-		if(isset($data[self::END_TIME]) && !is_numeric($data[self::END_TIME]))
+		if(isset($data[self::END_TIME]) && !is_int($data[self::END_TIME]))
 		{
 			$data = array(kInteractivityErrorMessages::ERR_MSG => 'end time ' . kInteractivityErrorMessages::LEGAL_TIME_FORMAT);
 			throw new kInteractivityException(kInteractivityException::ILLEGAL_FIELD_VALUE, kInteractivityException::ILLEGAL_FIELD_VALUE, $data);
