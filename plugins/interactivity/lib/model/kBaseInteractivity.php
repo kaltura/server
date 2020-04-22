@@ -119,7 +119,7 @@ abstract class kBaseInteractivity extends BaseObject
 		$this->setEntry($entryId);
 		$syncKey = $this->getSyncKey();
 		kFileSyncUtils::file_put_contents($syncKey, $this->data, true);
-		$this->setEntryInteractivityVersion($syncKey->getVersion());
+		$this->setEntryInteractivityVersionAndCapability($syncKey->getVersion());
 	}
 
 	/**

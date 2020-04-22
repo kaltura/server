@@ -1552,7 +1552,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if ($quizData)
 		{
 			$newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
-			$newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
+			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
 
 	    	// save the entry
