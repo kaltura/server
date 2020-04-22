@@ -3278,7 +3278,7 @@ class kFlowHelper
 		}
 
 		// if all exports that are not periodic finished add pending file sync to each flavor
-		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId->getEntryId());
+		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId);
 		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner, $assetsIds);
 		if(!$nonPeriodicFinished)
 		{
