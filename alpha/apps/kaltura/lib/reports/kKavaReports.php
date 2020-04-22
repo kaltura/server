@@ -1590,7 +1590,6 @@ class kKavaReports extends kKavaReportsMgr
 				'destination' => self::DIMENSION_EVENT_VAR2,
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
 		),
 
 		ReportType::INTERCATIVE_VIDEO_NODE_SWITCH_TOP_HOTSPOTS => array(
@@ -1606,7 +1605,6 @@ class kKavaReports extends kKavaReportsMgr
 				)
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
 		),
 
 	);
