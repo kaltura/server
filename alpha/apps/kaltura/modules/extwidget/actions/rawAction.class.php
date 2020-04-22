@@ -133,7 +133,7 @@ class rawAction extends sfAction
 			$archive_file = $file_sync->getFullPath();
 			$mime_type = kFile::mimeType( $archive_file );
 						
-			kFileUtils::dumpFile($archive_file, $mime_type);
+			kFileUtils::dumpFile($archive_file, $mime_type, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv());
 		}
 		
 		// TODO - move to a different action - document should be plugin
@@ -175,7 +175,7 @@ class rawAction extends sfAction
 				$name = kString::removeNewLine($name. '.' .$ext);
 				header("Content-Disposition: attachment; filename=\"$name\"");
 			}
-			kFileUtils::dumpFile($file_sync->getFullPath());
+			kFileUtils::dumpFile($file_sync->getFullPath(), null, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv());
 		}
 		elseif ($entry->getType() == entryType::DATA)
 		{
@@ -201,7 +201,7 @@ class rawAction extends sfAction
 				header("HTTP/1.0 404 Not Found");
 			}
 			else
-				kFileUtils::dumpFile($path);
+				kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv());
 		}
 		
 		//$archive_file = $entry->getArchiveFile();
@@ -211,7 +211,7 @@ class rawAction extends sfAction
 			// image - use data for entry
 			$file_sync = $this->redirectIfRemote ( $entry ,  kEntryFileSyncSubType::DATA , null );
 			$key = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
-			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true));
+			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true),  null, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv());
 		}
 		elseif ( $media_type == entry::ENTRY_MEDIA_TYPE_VIDEO || $media_type == entry::ENTRY_MEDIA_TYPE_AUDIO  )
 		{
