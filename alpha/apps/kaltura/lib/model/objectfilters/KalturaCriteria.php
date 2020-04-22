@@ -280,8 +280,15 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
-		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
+		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE || $escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE )
 		{
+			if ($escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE)
+			{
+				$from = array ('\\', '"', '!');
+				$to = array ('\\\\', '\\"', '\\!');
+				$str =  str_replace($from, $to ,$str);
+			}
+
 			// NOTE: it appears that sphinx performs double decoding on SELECT values, so we encode twice.
 			//		" and ! are escaped once to enable clients to use them, " = exact match, ! = AND NOT
 			//	This code could have been implemented more elegantly using array_map, but this implementation is the fastest
@@ -308,6 +315,18 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 			$md5Str = md5($str);
 			KalturaLog::debug('md5(' . $str . ')' . ' = ' . $md5Str );
 
+			return $md5Str;
+		}
+		elseif($escapeType == SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE)
+		{
+			$str = strtolower($str);
+			
+			if(substr($str, -2) == '\*')
+				return '&' . md5(substr($str, 0, strlen($str) - 2)) . '\\\*';
+			
+			$md5Str = '&' . md5($str);
+			KalturaLog::debug('md5(' . $str . ')' . ' = ' . $md5Str );
+			
 			return $md5Str;
 		}
 		elseif($escapeType == SearchIndexFieldEscapeType::NO_ESCAPE)

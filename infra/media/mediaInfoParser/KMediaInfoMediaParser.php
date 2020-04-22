@@ -38,6 +38,8 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		$ffParser = new KFFMpegMediaParser($this->filePath);//, "ffmpeg-20140326", "ffprobe-20140326");
 		$ffMi = null;
 		try {
+			if(isset($this->encryptionKey))
+				$ffParser->setEncryptionKey($this->encryptionKey);
 			$ffMi = $ffParser->getMediaInfo();
 		}
 		catch(Exception $ex)
@@ -161,7 +163,8 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			 * On off-sanity wid/height - use ffprobe object vals (overwrite the dar too)
 			 */
 			if(isset($kMi->videoWidth) && isset($kMi->videoHeight) 
-				 &&($kMi->videoWidth>KDLSanityLimits::MaxDimension  || $kMi->videoWidth<KDLSanityLimits::MinDimension 
+				 &&($this->encryptionKey
+				 || $kMi->videoWidth>KDLSanityLimits::MaxDimension  || $kMi->videoWidth<KDLSanityLimits::MinDimension 
 				 || $kMi->videoHeight>KDLSanityLimits::MaxDimension || $kMi->videoHeight<KDLSanityLimits::MinDimension)){
 				if(isset($ffMi->videoWidth) && isset($ffMi->videoHeight) 
 				 && !($ffMi->videoWidth>KDLSanityLimits::MaxDimension  || $ffMi->videoWidth<KDLSanityLimits::MinDimension 
@@ -198,6 +201,16 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 			 */
 			$kMi->isFastStart = $ffMi->isFastStart;
 			$kMi->contentStreams = $ffMi->contentStreams;
+			/*
+			 * HDR related metrics
+			 */
+			$kMi->matrixCoefficients = $ffMi->matrixCoefficients;
+			$kMi->colorTransfer      = $ffMi->colorTransfer;
+			$kMi->colorPrimaries     = $ffMi->colorPrimaries;
+			$kMi->pixelFormat        = $ffMi->pixelFormat;
+			$kMi->colorSpace         = $ffMi->colorSpace;
+			$kMi->chromaSubsampling  = $ffMi->chromaSubsampling;
+			$kMi->bitsDepth          = $ffMi->bitsDepth;
 		}	
 		$compareStr = self::compareFields($kMi, $ffMi);
 		KalturaLog::log("compareFields(".(isset($compareStr)?$compareStr:"IDENTICAL")."), file($this->filePath)");

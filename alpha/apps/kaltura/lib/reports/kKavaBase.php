@@ -19,10 +19,12 @@ class kKavaBase extends kDruidBase
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
+	const DIMENSION_PARTNER_PARENT_ID = 'partnerParentId';
 	const DIMENSION_ENTRY_ID = 'entryId';
 	const DIMENSION_LOCATION_COUNTRY = 'location.country';
 	const DIMENSION_LOCATION_REGION = 'location.region';
 	const DIMENSION_LOCATION_CITY = 'location.city';
+	const DIMENSION_LOCATION_ISP = 'location.isp';
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
 	const DIMENSION_KUSER_ID = 'kuserId';
@@ -60,11 +62,18 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_USER_ENGAGEMENT = 'userEngagement';
 	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
 	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
+	const DIMENSION_PLAYER_VERSION = 'playerVersion';
+	const DIMENSION_POSITION = 'position';
+	const DIMENSION_EXTRACT_TIME = 'extract_time';
+	const DIMENSION_ROOT_ENTRY_ID = 'rootEntryId';
+	const DIMENSION_NODE_ID = 'nodeId';
+	const DIMENSION_APPLICATION_VER = 'applicationVer';
 
 	// metrics
 	const METRIC_COUNT = 'count';
 	const METRIC_BUFFER_TIME_SUM = 'bufferTimeSum';
 	const METRIC_BITRATE_SUM = 'bitrateSum';
+	const METRIC_EVENT_DOUBLE_SUM1 = 'eventDoubleSum1';
 
 	// playback types
 	const PLAYBACK_TYPE_VOD = 'vod';
@@ -98,8 +107,15 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_SOURCE_SELECTED = 'sourceSelected';
 	const EVENT_TYPE_INFO = 'info';
 	const EVENT_TYPE_SPEED = 'speed';
+	const EVENT_TYPE_FLAVOR_SWITCH = 'flavorSwitch';
+	const EVENT_TYPE_BUFFER_START = 'bufferStart';
+	const EVENT_TYPE_ERROR = 'error';
 	const EVENT_TYPE_VIEW = 'view';
 	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
+	const EVENT_TYPE_NODE_PLAY = 'nodePlay';
+	const EVENT_TYPE_PLAYMANIFEST = 'playManifest';
+	const EVENT_TYPE_REGISTERED = 'registered';
+	const EVENT_TYPE_REGISTRATION_IMPRESSION = 'registrationImpression';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -130,20 +146,25 @@ class kKavaBase extends kDruidBase
 	const TASK_READY = "Ready";
 
 	// event properties
-
 	const PROPERTY_HAS_BITRATE = 'hasBitrate';
 	const PROPERTY_IS_BUFFERING = 'isBuffering';
 	const PROPERTY_HAS_BANDWIDTH = 'hasBandwidth';
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
 	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
+	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
 
 	//user engagement values
 	const USER_ENGAGED = 'SoundOnTabFocused';
+
+	//general values
+	const VALUE_UNKNOWN = 'Unknown';
+	const VALUE_ZERO = '0';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
@@ -155,6 +176,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -169,10 +191,16 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_PLAYER_VERSION => 1,
+			self::DIMENSION_ROOT_ENTRY_ID => 1,
+			self::DIMENSION_NODE_ID => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_APPLICATION_VER => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -183,6 +211,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_STORAGE_USAGE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -191,6 +220,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_BANDWIDTH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -199,6 +229,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -210,6 +241,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_TRANSCODING_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_KUSER_ID => 1,
@@ -220,19 +252,23 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_USER_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_USER_TYPE => 1,
 		),
 		self::DATASOURCE_API_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_APPLICATION => 1,
 			self::DIMENSION_DOMAIN => 1,
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 		),
 		self::DATASOURCE_REACH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -248,6 +284,7 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
@@ -257,6 +294,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -272,8 +310,74 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_PLAYER_VERSION => 1,
+			self::DIMENSION_POSITION => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_APPLICATION_VER => 1,
 		),
 	);
+
+	protected static $sourceFromAdminTag = array(
+		'kalturaclassroom' => 'Classroom Capture',
+		'kalturacapture' => 'Kaltura Capture',
+		'videomessage' => 'Kaltura Pitch',
+		'kms-webcast-event' => 'Kaltura Webcast',
+		'raptentry' => 'Interactive Video',
+		'webexentry' => 'Webex',
+		'zoomentry' => 'Zoom',
+		'expressrecorder' => 'Express Recorder',
+		'kmsnativeandroid' => 'KMS GO Android',
+		'kmsnativeios' => 'KMS GO iOS',
+		'kalturameeting' => 'Kaltura Meeting',
+	);
+
+	protected static $sourceTypes = array(
+		0 => 'Other',
+		1 => 'Upload',
+		2 => 'Webcam',
+		3 => 'Flickr',
+		4 => 'Youtube',
+		5 => 'Url',
+		6 => 'Text',
+		7 => 'Myspace',
+		8 => 'Photobucket',
+		9 => 'Jamendo',
+		10 => 'Ccmixter',
+		11 => 'Nypl',
+		12 => 'Current',
+		13 => 'Commons',
+		20 => 'Kaltura',
+		21 => 'Kaltura user clips',
+		22 => 'Archive org',
+		23 => 'Kaltura partner',
+		24 => 'Metacafe',
+		29 => 'Live stream akamai legacy',
+		30 => 'Live stream manual',
+		31 => 'Live stream akamai universal',
+		32 => 'Live stream',
+		33 => 'Live channel',
+		34 => 'Recorded live stream',
+		35 => 'Clip',
+		36 => 'Recorded live stream',
+		37 => 'Classroom Capture',
+	);
+
+	public static function getEntrySourceType($sourceType, $adminTags)
+	{
+		// check for specific admin tags
+		$adminTags = explode(',', strtolower($adminTags));
+		foreach ($adminTags as $adminTag)
+		{
+			$adminTag = trim($adminTag);
+			if (isset(self::$sourceFromAdminTag[$adminTag]))
+			{
+				return self::$sourceFromAdminTag[$adminTag];
+			}
+		}
+
+		// use the source type
+		return self::$sourceTypes[$sourceType];
+	}
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
 	    if (kConf::hasParam(self::DRUID_URL)) {

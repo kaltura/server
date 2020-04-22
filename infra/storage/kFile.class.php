@@ -7,7 +7,10 @@ class kFile extends kFileBase
 {
 	const MO_PATTERN = "GNU message catalog";
 	const TEXT = "text";
-
+	
+	const COPY_FAILED_CODE = "COPY_FAILED";
+	const RENAME_FAILED_CODE = "RENAME_FAILED";
+	
 	/**
 	 * Returns directory $path contents as an array of :
 	 *  array[0] = name
@@ -265,10 +268,13 @@ class kFile extends kFileBase
 		}
 		else
 		{
-			kFile::copySingleFile($src, $dest, $deleteSrc);
+			$res = kFile::copySingleFile($src, $dest, $deleteSrc);
+			if (! $res)
+				return false;
 		}
 		return true;
 	}
+	
 	
 	public static function copySingleFile($src, $dest, $deleteSrc)
 	{
@@ -282,25 +288,42 @@ class kFile extends kFileBase
 		{
 			// In case of move, first try to move the file before copy & unlink.
 			$startTime = microtime(true);
-			if(rename($src, $dest))
+			$renameSucceeded = rename($src, $dest);
+			$timeTook = microtime(true) - $startTime;
+			if(class_exists('KalturaMonitorClient'))
 			{
-				KalturaLog::log("rename took : ".(microtime(true) - $startTime)." [$src] to [$dest] size: ".filesize($dest));
+				KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $renameSucceeded ? null : self::RENAME_FAILED_CODE);
+			}
+			
+			if($renameSucceeded)
+			{
+				KalturaLog::log("rename took : $timeTook [$src] to [$dest] size: ".filesize($dest));
 				return true;
 			}
 			
 			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
 		}
 		
-		if (!copy($src,$dest))
+		$startTime = microtime(true);
+		$copySucceeded  = copy($src,$dest);
+		$timeTook = microtime(true) - $startTime;
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess('COPY', $timeTook, $copySucceeded ? null : self::COPY_FAILED_CODE);
+		}
+		
+		if (!$copySucceeded)
 		{
 			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
 			return false;
 		}
+		
 		if ($deleteSrc && (!unlink($src)))
 		{
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
 		}
+		
 		return true;
 	}
 	
@@ -528,6 +551,39 @@ class kFile extends kFileBase
 		return shell_exec('file -b '.$realPath);
 	}
 
+	public static function getFilesByPattern($pattern)
+	{
+		return glob($pattern);
+	}
+
+	public static function doDeleteFile($file)
+	{
+		return @unlink($file);
+	}
+	public static function removeDir($dir)
+	{
+		return @rmdir($dir);
+	}
+
+	public static function getFileLastUpdatedTime($file)
+	{
+		return filemtime($file);
+	}
+
+	public static function checkIsDir($path)
+	{
+		return is_dir($path);
+	}
+
+	public static function getLineFromFileTail($file , $lineNum)
+	{
+		$lines = file($file);
+		if ($lines && count($lines))
+		{
+			return $lines[count($lines) - $lineNum];
+		}
+		return $lines;
+	}
 	
 }
 

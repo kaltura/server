@@ -38,7 +38,7 @@ class kEntrySource extends kThumbnailSource
 	{
 		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$fileSyncKey = $this->dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$fileSyncKey = $this->dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			$imageBlob = kFileSyncUtils::file_get_contents($fileSyncKey);
 			$imagick = new Imagick();
 			$imagick->readImageBlob($imageBlob);
@@ -53,7 +53,7 @@ class kEntrySource extends kThumbnailSource
 	{
 		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$fileSyncKey = $this->dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$fileSyncKey = $this->dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($fileSyncKey,false);
 			if($fileSync)
 			{

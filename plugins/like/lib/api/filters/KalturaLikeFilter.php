@@ -40,12 +40,22 @@ class KalturaLikeFilter extends KalturaLikeBaseFilter
 			$c->add(kvotePeer::ENTRY_ID,explode(',',$this->entryIdIn),Criteria::IN);
 
 		$pager->attachToCriteria($c);
-	
 		$list = kvotePeer::doSelect($c);
-	
+
+		$resultCount = count($list);
+		if ($resultCount && ($resultCount < $pager->pageSize))
+		{
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = kvotePeer::doCount($c);
+		}
+
 		$response = new KalturaLikeListResponse();
 		$response->objects = KalturaLikeArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = count($list);
+		$response->totalCount = $totalCount;
 		return $response;
 	}
 	

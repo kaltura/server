@@ -54,12 +54,12 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 	public static function retrieveAutomaticByPartnerId($partnerId, $con = null)
 	{
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
-		$criteria->add(StorageProfilePeer::PARTNER_ID, array(0, $partnerId), Criteria::IN);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
 		$criteria->add(StorageProfilePeer::STATUS, StorageProfile::STORAGE_STATUS_AUTOMATIC);
 
 		return StorageProfilePeer::doSelect($criteria, $con);
 	}
-	
+
 	public static function retrieveExternalByPartnerId($partnerId, $ids = null, $con = null)
 	{
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
@@ -68,6 +68,15 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		if (!is_null($ids) && !(empty($ids)))
 			$criteria->add(StorageProfilePeer::ID, $ids, Criteria::IN);	
 		return StorageProfilePeer::doSelect($criteria, $con);
+	}
+
+	public static function retrieveByIdAndPartnerId($storageId, $partnerId, $con = null)
+	{
+		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
+		$criteria->add(StorageProfilePeer::ID, $storageId);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		
+		return StorageProfilePeer::doSelectOne($criteria, $con);
 	}
 	
 	public static function getCacheInvalidationKeys()

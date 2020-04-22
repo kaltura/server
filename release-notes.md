@@ -1,3 +1,717 @@
+# Propus 16.1.0 #
+
+## Add periodic storage export batch ##
+Issue Type: Task
+Issue ID : PLAT-10735
+
+### Configuration ##
+    - Add FEATURE_REMOTE_STORAGE permission to partner -1
+    - Add configuration map with the name 'cloud_storage' with following config:
+
+        storage_lock_expiry = @TIME_TO_ACQUIRE_LOCK@
+        last_id_loop_addition = @INT_NUM_ADDED_TO_LAST_ID_LOOP@
+        max_id_delay = @INT_NUM_TO_SUBSTRACT_FROM_MAX_ID@
+        periodic_storage_ids = @STORAGE_IDS_COMMA_SEPERATED@
+
+       [export_to_cloud]
+        0 = @PARTNER_ID_0@
+        1 = @PARTNER_ID_1@
+
+    - Add the following to batch.ini:
+
+        enabledWorkers.KAsyncStoragePeriodicExport            = 1
+
+        [KAsyncStoragePeriodicExport : PeriodicWorker]
+        id                                                  = @ID@
+        friendlyName                                        = Storage Periodic Export
+        type                                                = KAsyncStoragePeriodicExport
+        scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicExportExe.php
+        params.maxCount                                     = @MAX_COUNT@
+        params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+        params.sleepInterval                                = @SLEEP_INTERVAL@
+        params.profileIdsIn                                 = @PRODILE_IDS_COMMA_SEPERATED@
+
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+# Propus 16.0.1 #
+
+## Interactivity plugin ##
+Issue Type: Story
+Issue ID: PLAT-10652
+
+### Configuration ###
+add Interactivity to plugins.ini
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
+run: php deployment/updates/scripts/add_permissions/2020_04_12_interactivityServices.php
+
+## export catalog items to CSV ##
+Issue Type: Task
+Issue ID : REACH-836
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_06_04_add_permission_vendor_catalog_items.php
+
+## Add new permission to new action extendLockExpiration in batchService ##
+Issue Type: Task
+Issue ID : PLAT-10653
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_25_add_action_extend_batch_job_lock_expiration.php
+
+# Orion 15.20.0 #
+
+## Update permissions for systemPartner and job services ##
+Issue Type: Task
+Issue ID : PLAT-10740
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_17_update_permissions_systemPartner_jobs.php
+
+# Orion 15.19.0 #
+
+## Changing storageUpdate script to run as a batch ##
+Issue Type: Task
+Issue ID : PLAT-10320
+
+### Configuration ###
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncStorageUpdate = xxx (number of workers)
+
+[KAsyncStorageUpdate : PeriodicWorker]
+id                                                  = 800
+friendlyName                                        = STORAGE UPDATE
+type                                                = KAsyncStorageUpdate
+scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
+sleepBetweenStopStart                               = 86400
+params.debugMode				    = @1 for debuging mode, 0 for real run mode@
+
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_systempartner_jobs_partner.php
+
+## ecdn monitoring allow listTemplates ##
+Issue Type: Task
+Issue ID : PLAT-10625
+
+### Configuration ###
+  None
+
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
+
+## Add Live NG plugin ##
+Issue Type: Task
+Issue ID : PLAT-10358
+
+### Configuration ###
+  Add LiveCluster plugin in: configurations/plugins.ini 
+	
+
+#### Deployment Scripts ####
+  install plugins: 
+  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+
+# Orion 15.18.0 #
+
+## Support sphinx sticky connection for read operations ##
+Issue Type: Task
+Issue ID : PLAT-10713
+
+### Configuration ###
+	* Make sure "sphinx_dynamic_config" exists in your configuration maps 
+ 
+	* To enable the feature for specific partner ids add the following section to the map:
+    [sphinx_sticky_partners]
+    0 = XXXX
+    1 = YYYY
+    where XXXX and YYYY are the partner ids you want to enable the feature for.
+	
+
+#### Deployment Scripts ####
+None.
+
+## Add support of documents conversion on Linux machine ##
+Issue Type: Task
+Issue ID : PLAT-10694
+
+### Configuration ###
+- Add a worker (follow 'KAsyncConvertPdfLinux' in 'batch.ini.template).
+- Make sure that 'lowriter' is installed by running 'lowriter --version'.
+
+#### Deployment Scripts ####
+none.
+
+# Orion 15.17.0 #
+
+## Allow catalog item pricing view from KMC ##
+Issue Type: Task
+Issue ID : REACH-779
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_02_03_add_reach_catalog_item_kmc_permissions.php'
+
+## Add partner package to audit trail config ##
+Issue Type: Task
+Issue ID : No-Plat
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/sql/2020_02_03_audit_trail_config_admin_console_partner_updates.sql'
+
+# Orion 15.16.0 #
+
+## Add liveStream->getDetails API action ##
+Issue Type: Task
+Issue ID : FEV-426
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_23_01_live_stream_get_details_action.php'
+
+## New notification template Item_Pending_Moderation_Extended ##
+- Issue Type: Task
+- Issue ID: PLAT-10546
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2020_02_02_mediaspaceNotificationtTemplate.template.xml
+
+#### Deployment scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_02_02_deploy_mediaspace_notification.php
+
+## SIP - Use rtmps as default streaming ##
+ - Issue Type: Task
+ - Issue ID: PLAT-10575
+
+### Installation ###
+None.
+### Configuration ###
+None.
+To force non secure rtmp streaming set forceNonSecureStreaming = true in sip.ini 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2020_01_19_add_rtmps_permissions_KalturaLiveEntry.php
+ 
+
+# Orion 15.15.0 #
+
+## Enabling auto archive when using live with recording ##
+Issue Type: Task
+Issue ID : WEBC-1574
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_permissions.php'
+
+## Update server healthCheck API action permissions ##
+- Issue Type: Task
+- Issue ID : PLAT-10432
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run:
+
+    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_01_09_update_system_gethealthcheck_action.php'
+
+
+# Orion 15.14.0 #
+
+## Modify confMaps content column ##
+- Issue Type: Task
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_12_26_alter_config_maps_table.sql
+
+## add server healthCheck API action ##
+- Issue Type: Task
+- Issue ID : PLAT-10432
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run: 
+
+    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_19_add_system_gethealthcheck_action.php'
+
+# Orion 15.13.0 #
+
+## Escape category MD5 values to avoid long query times + support sphinx category sharding ##
+- Issue Type: Task
+- Issue ID : PLAT-10269
+
+### Configuration ###
+    To support sharding sphinx category table add the follwoing to you db.ini file:
+        [sphinx_split_index]
+        enabled = true
+        category = 10
+        
+        Updaet your sphinx kaltura.conf when it comes to the category table definition:
+        index kaltura_category_base:kaltura_base_gt_in_charset
+        {
+        
+        	rt_mem_limit	 = 10240M
+        	min_prefix_len	 = 1
+        	rt_attr_uint	 = category_id
+        	rt_field         = str_category_id
+        	rt_attr_uint	 = parent_id
+        	rt_field	 = name
+        	rt_attr_string	 = name
+        	rt_attr_bigint	 = partner_id
+        	rt_field	 = full_name
+        	rt_attr_string	 = full_name
+        	rt_field	 = full_ids
+        	rt_field	 = description
+        	rt_field	 = tags
+        	rt_field	 = display_in_search
+        	rt_attr_uint	 = kuser_id
+        	rt_attr_uint	 = category_status
+        	rt_field	 = members
+        	rt_field	 = plugins_data
+        	rt_attr_uint	 = depth
+        	rt_field	 = reference_id
+        	rt_field	 = privacy_context
+        	rt_field	 = privacy_contexts
+        	rt_field	 = privacy
+        	rt_field     = sphinx_match_optimizations
+        	rt_attr_uint	 = members_count
+        	rt_attr_uint	 = pending_members_count
+        	rt_attr_uint	 = entries_count
+        	rt_attr_uint	 = direct_entries_count
+        	rt_attr_uint	 = direct_sub_categories_count
+        	rt_attr_uint	 = inheritance_type
+        	rt_attr_uint	 = user_join_policy
+        	rt_attr_uint	 = default_permission_level
+        	rt_attr_uint	 = contribution_policy
+        	rt_attr_uint	 = inherited_parent_id
+        	rt_attr_timestamp	 = created_at
+        	rt_attr_timestamp	 = updated_at
+        	rt_attr_timestamp	 = deleted_at
+        	rt_attr_bigint	 = partner_sort_value
+        	rt_attr_json = dynamic_attributes
+        	rt_field = aggregation_categories
+        }
+        
+        index kaltura_category_0:kaltura_category_base
+        {
+        	path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
+        }
+        
+        duplicate the above index to kaltura_category_0 .... kaltura_category_9
+
+#### Deployment Scripts ####
+    Reindex category tables to sphinx to support the md5 query time fix:
+        php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
+
+
+## Reach boolean event notification for privacy context ##
+- Issue Type: Task
+- Issue ID : REACH2-737
+
+### Configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryAddedPrivacyContextsBooleanNotification.template.xml
+/opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryChangedPrivacyContextsBooleanNotification.template.xml
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2019_12_22_deploy_category_entry_boolen_notifications.php
+
+
+# Orion 15.12.0 #
+## giving partner -8 permission to partner get ##
+- Issue Type: Task
+- Issue ID : PLAT-10357
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_04_add_permission_partner_get.php'
+
+
+## BaseEntry list with ESearch ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10347
+
+### Configuration ###
+
+1) Make sure "elasticDynamicMap" exists in your configuration maps 
+2) Add the following section "filterExecutionTags" with following values:
+    0 = KScheduledTaskDryRunner
+    1 = KScheduledTaskRunner
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Restore deleted entry ##
+
+- Issue Type: Task
+- Issue ID : PLAT-10351
+
+### Configuration ###
+
+Only after the deployment script is executed, one can add this permission to user-roles via admin console
+
+#### Deployment Scripts ####
+
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_01_update_adminconsole_entryadmin_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
+
+
+## Clip concat job closer ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10317
+
+### Configuration ###
+
+batch.ini requires the addition of 'KClipConcatCloser' worker definition and enabling. a template can be found at batch.ini.template
+
+#### Deployment Scripts ####
+
+None.
+
+#### Known Issues & Limitations ####
+
+None.
+
+## create KMC_ANALYTICS_ROLE for partner 0 ##
+
+- Issue Type: Story
+- Issue ID: PLAT-10346
+
+### Configuration ###
+
+#### Deployment Scripts ####
+
+- Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_27_add_kmc_analytics_role_and_permissions.php'
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Optimize entry_vendor_task queries ##
+- Issue Type: Task
+- Issue ID: PLAT-10292
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
+
+## Configurations Maps Modifications ##
+- Issue Type: Task
+- Issue ID: PLAT-10245 and PLAT-10246
+
+### Deployment scripts ###
+Run php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_05_update_confmaps_permissions.php 
+
+### configuration ###
+modify /opt/kaltura/app/configurations/db_sync.template.ini to /opt/kaltura/app/configurations/db_sync.ini and configure relevant db connection
+This is required to be able to run syncDbConfigMapsToCache.php and insertConfigMapToDb.php scripts syncs conf maps from db to remote cache.
+
+modify /opt/kaltura/app/configurations/batchBase.template.ini to /opt/kaltura/app/configurations/batchBase.ini and modify as needed
+
+# Orion 15.11.0 #
+
+## Optimize batch_job_log queries ##
+- Issue Type: Task
+- Issue ID: PLAT-10294
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
+
+## Adding new KalturaUserEntryType called registration ##
+- Issue Type: Task
+- Issue ID: PLAT-10283
+
+### configuration ###
+Add Registration to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Kava - move rounding client tags to config ##
+- Issue Type: Task
+- Issue ID: AN-1102
+
+### configuration ###
+add kava_skip_date_rounding_client_tags section to local.ini with:
+0 = kmc-analytics
+
+## 5-star rating ##
+- Issue Type: Task
+- Issue ID: PSVAMB-8935
+
+### Deployment scripts ###
+Add new kvote table index    
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
+Add new permissions
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
+Run installPlugins script  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+# Orion 15.10.0 #
+
+## AP Feed Drop Folder ##
+- Issue Type: Task
+- Issue ID: PSVAMB-6815
+
+### Deployment scripts ###
+Run installPlugins script
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Sso - add new column:redirect url, and be able to search sso profile by redirect url ##
+- Issue Type: Task
+- Issue ID: PLAT-10251
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_10_alter_sso_add_redirect_url_column.sql
+Run mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_10_alter_sso_index.sql
+
+## Sso - add new dedicated partner for kmc sso server ##
+- Issue Type: Task
+- Issue ID: PLAT-10252
+
+### configuration ###
+First replace all tokens from the ini file below (under kmc-sso-server section) and remove".template" from the file name :
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment scripts ###
+ php deployment/updates/scripts/add_permissions/2019_11_10_kmc_sso_server_add_partner.php
+
+# Orion 15.9.0 #
+
+## ESearch - reduce results in partial search ##
+- Issue Type: Task
+- Issue ID: PLAT-10234
+
+### configuration ###
+To use it you should set the elasticDynamicMap.ini with:
+cutoff_frequency = CUTOFF_FREQUENCY(EXMAPLE_0.001)
+max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
+
+[reduced_results_partner_list]
+0 = PARTNER_ID
+
+
+## Index all caption text on entry document elasticSearch ##
+- Issue Type: Task
+- Issue ID: PLAT-10231
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    OnPrem - reindex entry index in elastic:
+	1) Remove old index - delete kaltura_entry
+	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' -H 'Content-Type: application/json' --data-binary "@entry_mapping.json"
+	3) Index the entries - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticEntries.php
+	
+
+## Reach new dashboard in admin console ##
+- Issue Type: Task
+- Issue ID: REACH2-704
+
+### configuration ###
+    update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
+    rt_attr_timestamp=expected_finish_time
+    
+    Add the following to admin.ini:
+    settings.refreshInterval30Sec = 30
+
+### Deployment scripts ###
+    - php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php
+    - Re-build & Re-index kaltura_entry_vendor_task table
+
+# Orion 15.8.0 #
+
+## Add systemName name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1554
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
+
+
+## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
+- Issue Type: Task
+- Issue ID: PLAT-10199
+
+### Configuration ###
+    update kaltura.conf file and remove from kaltura_cue_point table the following field
+	rt_attr_string	 = str_entry_id
+	
+#### Deployment Scripts ####	
+    Re-index kaltura_cue_point table
+
+# Orion 15.7.0 #
+
+## Add first+last name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1429
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+
+
+## Sso emails ##
+- Issue Type: Task
+- Issue ID: PLAT-9973
+
+### configuration ###
+To use the sso emails you should set the sso login link in sso.ini
+
+## Adding flavorparam permission to Capture app ##
+- Issue Type: Task
+- Issue ID: LEC-1832
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+    php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
+
+## Add SSO ##
+- Issue Type: Task
+- Issue ID: PLAT-9838,KMCNG-2166,PLAT-10099
+
+### configuration ###
+Add Sso plugin in: configurations/plugins.ini
+
+### Deployment scripts ###
+Run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_09_01_create_sso_table.sql
+Run install plugins:  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+php deployment/updates/scripts/add_permissions/2019_09_04_add_sso_role_and_permissions.php
+php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
+
+
+# Orion 15.6.0 #
+
+## Add ESearch read only permission ##
+- Issue Type: Task
+- Issue ID: PLAT-10084
+
+### configuration ###
+    None
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permissions.php
+
+## Add permission in the admin console to Multi Account Analytics Filter ##
+
+- Issue Type: Feature
+- Issue ID: AN-801
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.multiPublishersAnalytics.enabled = true
+    moduls.multiPublishersAnalytics.permissionType = 2
+    moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
+    moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
+    moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Orion 15.5.0 #
+
+## Adding monitoring-proxy partner ##
+
+- Issue Type: Task
+- Issue ID: PLAT-9986
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/base/scripts/init_data/01.Partner.template.ini
+deployment/updates/scripts/xml/2019_07_22_server_node_email_alert.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/add_permissions/2019_07_22_monitoring_proxy_add_partner.php
+php deployment/updates/scripts/2019_07_28_add_server_node_email_alert_template.php
+
+
+# Orion 15.4.0 #
+
+## changing reach notifications subject ##
+
+- Issue Type: Task
+- Issue ID: REACH2-663
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_approved_execution.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_finished_processing.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_24_update_task_rejected_for_execution.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_24_deploy_update_subject_reach_notifications.php
+
+## update reach credit notification ##
+
+- Issue Type: Task
+- Issue ID: REACH2-563
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_expired.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_75_percent.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_90_percent.template.xml
+deployment/updates/scripts/xml/notifications/2019_07_23_update_reach_credit_usage_over_100_percent.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_23_deploy_update_credit_notifications.php
+
+## update reach notification: Task Pending Moderation ##
+
+- Issue Type: Task
+- Issue ID: REACH2-662
+
+### configuration ###
+First replace all tokens from the XML files below and remove ".template" from the file name:
+deployment/updates/scripts/xml/notifications/2019_07_22_update_entry_vendor_pending_moderation.template.xml
+
+### Deployment scripts ###
+php deployment/updates/scripts/2019_07_22_deploy_update_entry_vendor_pending_moderation.php
+
 # Orion 15.3.0 #
 
 ## Add new type of userEntry called watch later ##
@@ -2410,7 +3124,7 @@ None.
 - Issue Type: Task
 - Issue ID: SUP-12069
 
-### Configuration ####
+### Configuration ###
 
 - Add upload domain in dc_config.ini 
 example:

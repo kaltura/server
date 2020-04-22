@@ -112,7 +112,8 @@ class KalturaErrors extends APIErrors
 	const FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE = "FAILED_TO_CALCULATE_DYNAMIC_DEPENDENT_VALUE;DYNAMIC_VALUE;Dynamic dependent value \"@DYNAMIC_VALUE@\" not found";
 
 	const FAILED_TO_INIT_OBJECT = "FAILED_TO_INIT_OBJECT;RESOURCE_ID;Failed to initialize necessary object";
-
+	
+	const ANONYMOUS_ACCESS_FORBIDDEN = "ANONYMOUS_ACCESS_FORBIDDEN;;Anonymous access to this functionality is forbidden";
 	/**
 	 * Service Oriented Errors
 	 *
@@ -430,6 +431,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD = "UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD;;Upload token is restricted due to the file type";
 
 	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
+	
+	const MAX_ALLOWED_CHUNK_COUNT_EXCEEDED = "MAX_ALLOWED_CHUNK_COUNT_EXCEEDED;;Max allowed waiting chunks to be concatenated has exceeded allowed limit";
 
 	const UPLOAD_TOKEN_EXCEEDED_MAX_PARTS = "UPLOAD_TOKEN_EXCEEDED_MAX_PARTS;PARTS_NUM,MAX_NUM;Number of upload token parts expected to be [@PARTS_NUM@] while maximum number of parts allowed is [@MAX_NUM@]";
 

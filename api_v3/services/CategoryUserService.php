@@ -26,6 +26,15 @@ class CategoryUserService extends KalturaBaseService
 		if($category->getMembersCount() >= $maxUserPerCategory)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_MAX_USER_REACHED,$maxUserPerCategory);
 
+		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
+		$dbCategoryKuser = kLock::runLocked($lockKey, array($this, 'addCategoryUserImpl'), array($categoryUser, $dbCategoryKuser, $category));
+
+		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
+		return $categoryUser;
+	}
+
+	function addCategoryUserImpl(KalturaCategoryUser $categoryUser, $dbCategoryKuser, $category)
+	{
 		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryUser->categoryId, kCurrentContext::getCurrentKsKuserId());
 		if (!kEntitlementUtils::getEntitlementEnforcement())
 		{
@@ -55,9 +64,7 @@ class CategoryUserService extends KalturaBaseService
 		$dbCategoryKuser->setCategoryFullIds($category->getFullIds());
 		$dbCategoryKuser->setPartnerId($this->getPartnerId());
 		$dbCategoryKuser->save();
-		
-		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
-		return $categoryUser;
+		return $dbCategoryKuser;
 	}
 	
 	/**

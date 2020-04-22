@@ -320,22 +320,55 @@ class myPlaylistUtils
 	public static function executeStaticPlaylist ( entry $playlist , $filter  = null, $detailed = true, $pager = null )
 	{
 		$entry_id_list_str = $playlist->getDataContent();
-		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
+			kCurrentContext::$ks_object &&
+			kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlist->getEntryId())
+		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			entryPeer::setDefaultCriteriaFilter();
+			$result =  self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+			kEntitlementUtils::initEntitlementEnforcement();
+			entryPeer::setDefaultCriteriaFilter();
+		}
+		else
+		{
+			$result = self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+		}
+
+		return $result;
 	}
 	
 	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
 	{
-		if(! trim($entry_id_list_str))
-			return null;
-		
-		$entry_id_list = explode ( "," , $entry_id_list_str );
-		// clear white spaces - TODO - assume this is done at insert time
-		foreach ( $entry_id_list as &$entry_id ) 
-			$entry_id=trim($entry_id);
-		
-		return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
+		$entry_id_list = self::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
+		if($entry_id_list)
+		{
+			return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
+		}
+
+		return null;
 	}
-	
+
+	/**
+	 * @param string $entry_id_list_str
+	 * @return array|null
+	 */
+	public static function getEntryIdsFromStaticPlaylistString($entry_id_list_str)
+	{
+		if(!trim($entry_id_list_str))
+		{
+			return null;
+		}
+
+		$entry_id_list = explode ( "," , $entry_id_list_str );
+		foreach ( $entry_id_list as &$entry_id )
+		{
+			$entry_id = trim($entry_id);
+		}
+
+		return $entry_id_list;
+	}
+
 	public static function executeStaticPlaylistFromEntryIds(array $entry_id_list, $entry_filter = null, $detailed = true, $pager = null)
 	{
 		// if exists extra_filters - use the first one to filter the entry_id_list
@@ -361,6 +394,7 @@ class myPlaylistUtils
 			{
 				$limit = $entry_filter->getLimit();
 			}
+
 			$entry_filter->setLimit(null);
 
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion - see bellow
@@ -379,20 +413,23 @@ class myPlaylistUtils
 			if ( $display_in_search >= 2 )
 			{
 				// We don't allow searching in the KalturaNEtwork anymore (mainly for performance reasons)
-				// allow only assets for the partner  
-				$c->addAnd ( entryPeer::PARTNER_ID , $partner_id ); // 
-/*				
-				$crit = $c->getNewCriterion ( entryPeer::PARTNER_ID , $partner_id );
-				$crit->addOr ( $c->getNewCriterion ( entryPeer::DISPLAY_IN_SEARCH , $display_in_search ) );
-				$c->addAnd ( $crit );
-*/
+				// allow only assets for the partner
+				if(kCurrentContext::$ks_partner_id)
+				{
+					$c->addAnd(entryPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
+				}
+
 			}
 		}
 
 		if ( $detailed )
-			$unsorted_entry_list = entryPeer::doSelectJoinkuser( $c ); // maybe join with kuser to add some data about the contributor
+		{
+			$unsorted_entry_list = entryPeer::doSelectJoinkuser($c); // maybe join with kuser to add some data about the contributor
+		}
 		else
-			$unsorted_entry_list = entryPeer::doSelect( $c ); // maybe join with kuser to add some data about the contributor
+		{
+			$unsorted_entry_list = entryPeer::doSelect($c);
+		}
 	
 		// now sort the list according to $entry_id_list
 		
@@ -409,45 +446,47 @@ class myPlaylistUtils
 		// VERY STRANGE !! &$entry_id must be with a & or else the values of the array change !!!
 		foreach ( $entry_id_list as &$entry_id )
 		{
-			if ( $entry_id != "" )
+			if ( $entry_id !== "" && isset($id_list[$entry_id]) )
 			{
-				$current_entry = @$id_list[$entry_id];
-				if ( $current_entry )
+				$current_entry = $id_list[$entry_id];
+				if ( isset($limit) && ($limit-- === 0) )
 				{
-					if ( isset($limit) && ($limit-- === 0) )
-					{
-						break;
-					}
+					break;
+				}
 
-					if ( $pager )
+				if ( $pager )
+				{
+					if ( $startOffset > 0 )
 					{
-						if ( $startOffset > 0 )
+						$startOffset--;
+						continue;
+					}
+					else
+					{
+						if ( $pageSize > 0 )
 						{
-							$startOffset--;
-							continue;
+							$pageSize--;
 						}
 						else
 						{
-							if ( $pageSize > 0 )
-							{
-								$pageSize--;
-							}
-							else
-							{
-								break;
-							}
+							break;
 						}
 					}
+				}
 
-					// add to the entry_list only when the entry_id is not empty 
-					$entry_list[] = $current_entry;
-				} 
+				// add to the entry_list only when the entry_id is not empty
+				$entry_list[] = $current_entry;
 			}
 		}
-		if ( count( $entry_list ) == 0 ) return null;
+
+		if ( count( $entry_list ) == 0 )
+		{
+			return null;
+		}
 
 		return $entry_list;
 	}
+
 	private static function buildIdMap ( $list )
 	{
 		if( ! $list ) return null;
@@ -511,8 +550,8 @@ class myPlaylistUtils
 	}
 
 	//splitting entry filters into filters that will run in Esearch and in Sphinx:
-	// Elastic - advancesSearch is not set OR advancesSearch is set and includes KalturaMetadataSearchItem
-	// Sphinx  - advancesSearch is set and NOT including KalturaMetadataSearchItem
+	// Elastic - can Transform Filter
+	// Sphinx  - cannot Transform Filter
 	public static function splitEntryFilters($xml)
 	{
 		$entryFiltersViaEsearch = array();
@@ -520,8 +559,8 @@ class myPlaylistUtils
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
 		foreach ($entryFilters as $entryFilter)
 		{
-			if (!isset($entryFilter->advancedSearch) ||
-				( isset($entryFilter->advancedSearch) && (string)$entryFilter->advancedSearch[self::KALTURA_CLASS] === PlaylistService::KALTURA_METADATA_SEARCH_ITEM))
+			$entryFilterFromXml = self::fillEntryFilter($entryFilter);
+			if (ESearchEntryQueryFromFilter::canTransformFilter($entryFilterFromXml))
 			{
 				$entryFiltersViaEsearch[] = $entryFilter;
 			}
@@ -530,15 +569,29 @@ class myPlaylistUtils
 				$entryFiltersViaSphinx[] = $entryFilter;
 			}
 		}
+
 		return array($entryFiltersViaEsearch, $entryFiltersViaSphinx, $totalResults);
+	}
+
+	protected static function fillEntryFilter($filter)
+	{
+		self::replaceContextTokens($filter);
+		$entryFilter = new entryFilter();
+		$entryFilter->fillObjectFromXml($filter, '_');
+		return $entryFilter;
 	}
 
 	public static function executeDynamicPlaylistViaEsearch ($entryFilters ,$totalResults, $pager = null)
 	{
+		$totalResults = (int)$totalResults;
 		$entryKPager = new kPager();
 		if ($pager)
 		{
 			$pager->toObject($entryKPager);
+		}
+		else
+		{
+			$entryKPager->setPageSize($totalResults);
 		}
 		$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
 		$entryIds= array();
@@ -590,9 +643,7 @@ class myPlaylistUtils
 		$entryFilters = array();
 		foreach ($listOfFilters as $filter)
 		{
-			self::replaceContextTokens($filter);
-			$entryFilter = new entryFilter();
-			$entryFilter->fillObjectFromXml($filter, '_');
+			$entryFilter = self::fillEntryFilter($filter);
 			self::updateEntryFilterFields($entryFilter, $partnerId);
 			$entryFilters[] = $entryFilter;
 		}

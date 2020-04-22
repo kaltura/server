@@ -20,7 +20,6 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 
 	// the search index column names for additional fields
 	const ROOTS = 'cue_point.ROOTS';
-	const STR_ENTRY_ID = 'cue_point.STR_ENTRY_ID';
 	const STR_CUE_POINT_ID = 'cue_point.STR_CUE_POINT_ID';
 	const FORCE_STOP = 'cue_point.FORCE_STOP';
 	const DURATION = 'cue_point.DURATION';
@@ -231,6 +230,29 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
 		return CuePointPeer::doSelect($criteria, $con);
 	}
+
+	/**
+	 * Retrieve multiple AnswerCuePoints objects.
+	 *
+	 * @param	string $entryId the entry id.
+	 * @param	$parentId
+	 * @param	$kuserId
+	 * @param	PropelPDO $con the connection to use
+	 * @return	CuePoint
+	 * @throws	PropelException
+	 */
+	public static function retrieveCuePointAnswers($entryId, $parentId, $kuserId, PropelPDO $con = null)
+	{
+		$criteria = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$criteria->add(CuePointPeer::ENTRY_ID, $entryId);
+		$criteria->add(CuePointPeer::PARENT_ID, $parentId);
+		$criteria->add(CuePointPeer::KUSER_ID, $kuserId);
+		$criteria->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType',QuizCuePointType::QUIZ_ANSWER), Criteria::EQUAL);
+		$criteria->add(CuePointPeer::STATUS, CuePointStatus::DELETED, Criteria::NOT_EQUAL);
+		$criteria->addAscendingOrderByColumn(CuePointPeer::CREATED_AT);
+		$criteria->addAscendingOrderByColumn(CuePointPeer::START_TIME);
+		return CuePointPeer::doSelect($criteria, $con);
+	}
 	
 	/**
 	 * @param 	string 		$entryId		the entry id.
@@ -366,4 +388,5 @@ class CuePointPeer extends BaseCuePointPeer implements IMetadataPeer, IRelatedOb
 	
 		return true;
 	}
+
 }

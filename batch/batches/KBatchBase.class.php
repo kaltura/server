@@ -9,6 +9,7 @@ abstract class KBatchBase implements IKalturaLogger
 	const PRIVILEGE_BATCH_JOB_TYPE = "jobtype";
 	const DEFAULT_SLEEP_INTERVAL = 5;
 	const DEFUALT_API_RETRIES_ATTEMPS = 3;
+	const MAX_FILE_ACCESS_TIME = 4;
 	
 	/**
 	 * @var KSchedularTaskConfig
@@ -49,6 +50,8 @@ abstract class KBatchBase implements IKalturaLogger
 	 * @var resource
 	 */
 	protected $monitorHandle = null;
+
+	protected static $iv;
 
 	/**
 	 * @param array $jobs
@@ -447,10 +450,130 @@ abstract class KBatchBase implements IKalturaLogger
 			kFile::chmod($filePath, $chmod);
 		}
 	}
-	
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @return array
+	 */
+	protected function getBatchJobFiles(KalturaBatchJob $job)
+	{
+		return array();
+	}
+
+	public function validateFileAccess(KalturaBatchJob $job)
+	{
+		$result = $this->verifyFilesAccess($job);
+		if(!$result)
+		{
+			$exception = new kTemporaryException();
+			$exception->setResetJobExecutionAttempts(true);
+			throw $exception;
+		}
+	}
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @return bool
+	 */
+	protected function verifyFilesAccess(KalturaBatchJob $job)
+	{
+		$result = true;
+		try
+		{
+			$files = $this->getBatchJobFiles($job);
+			foreach ($files as $file)
+			{
+				if(!kFileBase::checkFileExists($file))
+				{
+					$file = dirname($file);
+				}
+
+				if (is_dir($file))
+				{
+					$result = $this->checkDirAccess($file);
+				}
+				else
+				{
+					$result = $this->checkFileAccess($file);
+				}
+
+				if (!$result)
+				{
+					break;
+				}
+			}
+		}
+		catch (Exception $ex)
+		{
+			$result = false;
+		}
+
+		return $result;
+	}
+
+	protected function checkDirAccess($dir)
+	{
+		$result = true;
+		$time_elapsed_secs = 10;
+		try
+		{
+			$start = microtime(true);
+			$fileName = $dir . '/test' . uniqid() . '.txt';
+			$handle = fopen($fileName, "w");
+			$bytes  = fwrite($handle, 'test');
+			if(!$bytes)
+			{
+				$result = false;
+			}
+
+			fclose($handle);
+			$time_elapsed_secs = microtime(true) - $start;
+			unlink($fileName);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::crit("No write access to directory {$dir}");
+			$result = false;
+		}
+
+		if($result && $time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
+		{
+			KalturaLog::crit("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
+			$result = false;
+		}
+		return $result;
+	}
+
+	protected function checkFileAccess($file)
+	{
+		$time_elapsed_secs = 10;
+		try
+		{
+			$start = microtime(true);
+			$handle = fopen($file, "rb");
+			fread($handle, 5);
+			fclose($handle);
+			$time_elapsed_secs = microtime(true) - $start;
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::crit("No read access to file {$file}");
+			return false;
+		}
+
+		if($time_elapsed_secs > self::MAX_FILE_ACCESS_TIME)
+		{
+			KalturaLog::crit("No read access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param string $file
 	 * @param int $size
+	 * @param bool|null $directorySync
 	 * @return bool
 	 */
 	protected function checkFileExists($file, $size = null, $directorySync = null)
@@ -668,10 +791,18 @@ abstract class KBatchBase implements IKalturaLogger
 	
 	public static function getIV()
 	{
-		return kConf::get("encryption_iv");
+		return self::getConfigParam('encryption_iv');
 	}
 
-	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
+	/**
+	 * @param $callback
+	 * @param $params
+	 * @param int $numOfRetries
+	 * @param int $apiIntervalInSec
+	 * @param array $ignoredApiErrors
+	 * @return bool|mixed|null
+	 */
+	public static function tryExecuteApiCall($callback, $params,  $ignoredApiErrors = array(), $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
 	{
 		while ($numOfRetries-- > 0)
 		{
@@ -683,11 +814,39 @@ abstract class KBatchBase implements IKalturaLogger
 				return $res;
 			}
 			catch  (Exception $ex) {
-				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed number of retires $numOfRetries");
+				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed with code [" . $ex->getCode() . "] number of retires $numOfRetries");
+				if (in_array($ex->getCode(), $ignoredApiErrors))
+				{
+					//Not retring on specific errors that retrying is not needed anyhow
+					return null;
+				}
 				KalturaLog::err($ex->getMessage());
 				sleep($apiIntervalInSec);
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param $key
+	 * @param string $mapName
+	 * @param null $defaultValue
+	 */
+	public static function getConfigParam($key, $mapName = 'local' , $defaultValue = null)
+	{
+		$configurationPluginClient = KalturaConfMapsClientPlugin::get(self::$kClient);
+		$configurationMapFilter = new KalturaConfMapsFilter();
+		$configurationMapFilter->nameEqual = $mapName;
+		$configurationMapFilter->relatedHostEqual = self::$taskConfig->getSchedulerName();
+		$configurationMap = $configurationPluginClient->confMaps->get($configurationMapFilter);
+		if ($configurationMap)
+		{
+			$configArray = json_decode($configurationMap->content, true);
+			if ($configArray && isset($configArray[$key]))
+			{
+				return $configArray[$key];
+			}
+		}
+		return $defaultValue;
 	}
 }

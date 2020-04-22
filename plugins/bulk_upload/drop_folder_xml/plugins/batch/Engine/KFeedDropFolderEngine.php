@@ -9,7 +9,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 	/**
 	 * @var array
 	 */
-	protected $feedNamespaces;
+	protected $feedNamespaces = array();
 	
 	protected $handledUniqueIds = array();
 	
@@ -54,41 +54,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 				break;
 			}
 			
-			/* @var $feedItem SimpleXMLElement */
-			$uniqueId = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemUniqueIdentifierXPath, $feedItem));
-			if (is_null($uniqueId) || $uniqueId === '')
-			{
-				KalturaLog::err("No unique identifier for the current feed item! Skipping.");
-				continue;
-			}
-			
-			//If we already encountered this uniqueId in this run- ignore subsequent iterations.
-			if (in_array ($uniqueId, $this->handledUniqueIds))
-			{
-				KalturaLog::err("The unique identifer value [$uniqueId] was encountered before during this scan of the feed. Ignoring.");
-				continue;
-			}
-			
-			// The unique feed item identifier is the GUID, so that is what we set as the drop folder file name.
-			if (!array_key_exists($uniqueId, $existingDropFolderFilesMap))
-			{
-				//In this case, we are required to add this item as a new drop folder file
-				KalturaLog::info("Item not found in drop folder file list- adding as new drop folder file.");
-				$this->handleItemAdded ($uniqueId, $feedItem);
-				$counter++;
-			}
-			else
-			{
-				KalturaLog::info("Item found in drop folder file list- adding as existing drop folder file.");
-				$dropFolderFile = $existingDropFolderFilesMap[$uniqueId];
-				unset ($existingDropFolderFilesMap[$uniqueId]);
-				//if file exist in the folder remove it from the map
-				//all the files that are left in a map will be marked as PURGED					
-				if ($this->handleExistingItem($dropFolderFile, $feedItem))
-					$counter++;
-			}
-			
-			$this->handledUniqueIds[] = $uniqueId;
+			$counter += $this->watchProcessSingleItem($feedItem, $existingDropFolderFilesMap);
 		}
 		
 		foreach ($existingDropFolderFilesMap as $existingDropFolderFile)
@@ -98,6 +64,47 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		
 	}
 	
+	protected function watchProcessSingleItem (SimpleXMLElement $feedItem, array &$existingDropFolderFilesMap)
+	{
+		$result = 0;
+		
+		$uniqueId = strval($this->getSingleXPathResult($this->dropFolder->feedItemInfo->itemUniqueIdentifierXPath, $feedItem));
+		if (is_null($uniqueId) || $uniqueId === '')
+		{
+			KalturaLog::err("No unique identifier for the current feed item! Skipping.");
+			return $result;
+		}
+		
+		//If we already encountered this uniqueId in this run- ignore subsequent iterations.
+		if (in_array ($uniqueId, $this->handledUniqueIds))
+		{
+			KalturaLog::err("The unique identifier value [$uniqueId] was encountered before during this scan of the feed. Ignoring.");
+			return $result;
+		}
+		
+		// The unique feed item identifier is the GUID, so that is what we set as the drop folder file name.
+		if (!array_key_exists($uniqueId, $existingDropFolderFilesMap))
+		{
+			//In this case, we are required to add this item as a new drop folder file
+			KalturaLog::info("Item not found in drop folder file list- adding as new drop folder file.");
+			$this->handleItemAdded ($uniqueId, $feedItem);
+			$result = 1;
+		}
+		else
+		{
+			KalturaLog::info("Item found in drop folder file list- adding as existing drop folder file.");
+			$dropFolderFile = $existingDropFolderFilesMap[$uniqueId];
+			unset ($existingDropFolderFilesMap[$uniqueId]);
+			//if file exist in the folder remove it from the map
+			//all the files that are left in a map will be marked as PURGED
+			if ($this->handleExistingItem($dropFolderFile, $feedItem))
+				$result = 1;
+		}
+		
+		$this->handledUniqueIds[] = $uniqueId;
+		
+		return $result;
+	}
 	
 	/**
 	 * Add a new item from the MRSS feed
@@ -172,7 +179,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Cannot add new drop folder file with name ['.$feedItem->guid.'] - '.$e->getMessage());
+			KalturaLog::err("Cannot add new drop folder file with name [uniqueId] - " . $e->getMessage());
 			return null;
 		}
 	}
@@ -294,10 +301,15 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		$dom = $doc->appendChild($dom);
 		$domXpath = new DOMXPath($doc);
 		
-		if (!is_object($domXpath->evaluate($fieldXpath))) {
-			$itemXPathRes = $domXpath->evaluate($fieldXpath);
-		} else {
-			$itemXPathRes = strval($domXpath->evaluate($fieldXpath)->item(0)->nodeValue);
+		$evalResult = $domXpath->evaluate($fieldXpath);
+		
+		if ($evalResult instanceof DOMNodeList)
+		{
+			$itemXPathRes = $evalResult->length > 0 ? strval($evalResult->item(0)->nodeValue) : null;
+		}
+		else
+		{
+			$itemXPathRes = $evalResult;
 		}
 		
 		return $itemXPathRes;
@@ -362,6 +374,7 @@ class KFeedDropFolderEngine extends KDropFolderEngine
 		{
 			KalturaLog::info("For URL [$url], the curl result is: " . substr($res, 0, 1000));
 		}
+		
 		return $res;
 	}
 

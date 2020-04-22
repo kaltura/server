@@ -348,6 +348,56 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $authenticationType;
 
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $extendedFreeTrailExpiryReason;
+
+	/**
+	 *  Unix timestamp (In seconds)
+	 * @var int
+	 * @readonly
+	 */
+	public $extendedFreeTrailExpiryDate;
+
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $extendedFreeTrail;
+
+	/**
+	 * @var bool
+	 * @readonly
+	 */
+	public $extendedFreeTrailEndsWarning;
+
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $eightyPercentWarning;
+
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $usageLimitWarning;
+
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $lastFreeTrialNotificationDay;
+
+	/**
+	 * @var int
+	 * @filter eq
+	 * @readonly
+	 */
+	public $monitorUsage;
+
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' ,
@@ -357,7 +407,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
-		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType',
+		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
+		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -378,12 +429,24 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
+		$this->describeYourself = kString::stripUtf8InvalidChars($this->describeYourself);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		if (!$this->host){
 			$this->host = null;
 		}
 		if (!$this->cdnHost){
 			$this->cdnHost = null;
+		}
+		if (kCurrentContext::getCurrentPartnerId() > 0)
+		{
+			$this->extendedFreeTrailExpiryReason = null;
+			$this->extendedFreeTrailExpiryDate = null;
+			$this->extendedFreeTrail = null;
+			$this->extendedFreeTrailEndsWarning = null;
+			$this->eightyPercentWarning = null;
+			$this->usageLimitWarning = null;
+			$this->lastFreeTrialNotificationDay = null;
+			$this->monitorUsage = null;
 		}
 	}
 	
@@ -444,7 +507,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		
 		return $partner;
 	}
-	
+
 	public function getExtraFilters()
 	{
 		return array(

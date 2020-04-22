@@ -24,6 +24,7 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
+			/** @var LiveEntry $liveEntry */
 			$shouldIndex = true;
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
@@ -36,6 +37,12 @@ class LiveEntryServerNode extends EntryServerNode
 				{
 					$shouldIndex = true;
 				}
+			}
+
+			if (!$liveEntry->getBroadcastTime() && $liveEntry->getViewMode() == ViewMode::ALLOW_ALL)
+			{
+				$liveEntry->setBroadcastTime(time());
+				$liveEntry->save();
 			}
 			if ($shouldIndex)
 			{
@@ -102,7 +109,7 @@ class LiveEntryServerNode extends EntryServerNode
 		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
 			/* @var $liveEntry LiveEntry */
-			$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($liveEntry->getId());
+			$entryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($liveEntry->getId());
 			if(!count($entryServerNodes))
 				$liveEntry->unsetMediaServer();
 			

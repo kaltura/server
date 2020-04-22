@@ -61,6 +61,12 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	 *
 	 * @var string
 	 */
+	protected $shareToMe;
+
+	/**
+	 *
+	 * @var string
+	 */
 	protected $fileURL;
 	
 	/**
@@ -185,6 +191,9 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 				return 'string';
 
 			case 'hostStreamURL':
+				return 'string';
+
+			case 'shareToMe':
 				return 'string';
 
 			case 'fileURL':
@@ -450,7 +459,23 @@ class WebexXmlEpRecordingType extends WebexXmlRequestType
 	{
 		return $this->hostStreamURL;
 	}
-	
+
+	/**
+	 * @param string $shareToMe
+	 */
+	public function setShareToMe($shareToMe)
+	{
+		$this->shareToMe = $shareToMe;
+	}
+
+	/**
+	 * @return string $shareToMe
+	 */
+	public function getShareToMe()
+	{
+		return $this->shareToMe;
+	}
+
 	/**
 	 * @param string $fileURL
 	 */

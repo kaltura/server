@@ -11,6 +11,9 @@ class kDruidBase
 	const DRUID_SELECTOR_FILTER = 'selector';
 	const DRUID_IN_FILTER = 'in';
 	const DRUID_BOUND_FILTER = 'bound';
+	const DRUID_AND = 'and';
+	const DRUID_OR = 'or';
+	const DRUID_NOT = 'not';
 	const DRUID_TYPE = 'type';
 	const DRUID_FILTER = 'filter';
 	const DRUID_DIMENSION = 'dimension';
@@ -48,7 +51,6 @@ class kDruidBase
 	const DRUID_PRIORITY = 'priority';
 	const DRUID_SKIP_EMPTY_BUCKETS = 'skipEmptyBuckets';
 	const DRUID_TIMEOUT = 'timeout';
-	const DRUID_AND = 'and';
 	const DRUID_DIRECTION = 'direction';
 	const DRUID_DIMENSION_ORDER = 'dimensionOrder';
 	const DRUID_ORDER_LEX = 'lexicographic';
@@ -76,7 +78,9 @@ class kDruidBase
 	const DRUID_UPPER_STRICT = 'upperStrict';
 	const DRUID_ORDERING = 'ordering';
 	const DRUID_DOUBLE_LEAST = 'doubleLeast';
-	const DRUID_NOT = 'not';
+	const DRUID_EXTRACTION = 'extraction';
+	const DRUID_EXTRACTION_FUNC = 'extractionFn';
+	const DRUID_TIME_FORMAT = 'timeFormat';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
@@ -160,6 +164,22 @@ class kDruidBase
 		return array(
 			self::DRUID_TYPE => self::DRUID_AND,
 			self::DRUID_FIELDS => $subFilters,
+		);
+	}
+
+	protected static function getOrFilter($subFilters)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_OR,
+			self::DRUID_FIELDS => $subFilters,
+		);
+	}
+
+	protected static function getNotFilter($filter)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_NOT,
+			self::DRUID_FIELD => $filter,
 		);
 	}
 	
@@ -330,7 +350,7 @@ class kDruidBase
 		$clientTag = kCurrentContext::$client_lang;
 		$comment = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 		$comment .= "[$uniqueId][$clientTag]";
-		$post = str_replace(self::COMMENT_MARKER, $comment, $post);
+		$post = str_replace(json_encode(self::COMMENT_MARKER), json_encode($comment), $post);
 		KalturaLog::log($post);
 			
 		$url = kConf::get(self::DRUID_URL);

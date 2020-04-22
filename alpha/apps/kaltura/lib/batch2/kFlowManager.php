@@ -271,6 +271,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return kFlowHelper::handleBulkDownloadPending($dbBatchJob, $data);
 			case BatchJob::BATCHJOB_STATUS_FINISHED:
 				return kFlowHelper::handleBulkDownloadFinished($dbBatchJob, $data);
+			//Bulk download has now worker so there is no point to retry it.
+			case BatchJob::BATCHJOB_STATUS_RETRY:
+				return kFlowHelper::handleBulkDownloadRetried($dbBatchJob, $data);
 			default:
 				return $dbBatchJob;
 		}
@@ -326,6 +329,16 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return $dbBatchJob;
 		}
 	}
+
+	protected function updatedLiveToVod(BatchJob $dbBatchJob, kLiveToVodJobData $data)
+	{
+        switch($dbBatchJob->getStatus()) {
+            case BatchJob::BATCHJOB_STATUS_FINISHED:
+                return kFlowHelper::handleLiveToVodFinished($dbBatchJob, $data);
+            default:
+                return $dbBatchJob;
+        }
+    }
 
 	/* (non-PHPdoc)
 	 * @see kBatchJobStatusEventConsumer::shouldConsumeJobStatusEvent()
@@ -443,6 +456,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 					$dbBatchJob = $this->updatedReportExport($dbBatchJob, $dbBatchJob->getData());
 					break;
 
+				case BatchJobType::LIVE_TO_VOD:
+					$dbBatchJob = $this->updatedLiveToVod($dbBatchJob, $dbBatchJob->getData());
+					break;
+
 				default:
 					break;
 			}
@@ -476,7 +493,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		$jobData->setMailPriority( kMailJobData::MAIL_PRIORITY_HIGH);
 		$jobData->setStatus(kMailJobData::MAIL_STATUS_PENDING);
 
-		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n".$exception);
+		KalturaLog::alert("Error in job [{$dbBatchJob->getId()}]\n".$exception->getMessage());
 
 		$jobData->setMailType(90); // is the email template
 		$jobData->setBodyParamsArray(array($dbBatchJob->getId(), $exception->getFile(), $exception->getLine(), $exception->getMessage(), $exception->getTraceAsString()));
@@ -616,6 +633,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				return true;
 			}
 
+        if(
+            ($object instanceof KuserKgroup)
+            &&	in_array(KuserKgroupPeer::STATUS, $modifiedColumns))
+        {
+            return true;
+        }
+
 		return false;
 	}
 
@@ -669,8 +693,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 				
 			return true;
 		}
-			
-		if ($object instanceof UserRole
+
+        if(
+            $object instanceof KuserKgroup
+            && in_array(KuserKgroupPeer::STATUS, $modifiedColumns)
+        )
+        {
+            kFlowHelper::handleKuserKgroupStatusUpdate($object);
+            return true;
+        }
+
+        if ($object instanceof UserRole
 			&& in_array(UserRolePeer::PERMISSION_NAMES, $modifiedColumns))
 		{
 			$filter = new kuserFilter();
@@ -689,6 +722,18 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
 
 		KalturaLog::info("Asset id [" . $object->getId() . "] isOriginal [" . $object->getIsOriginal() . "] status [" . $object->getStatus() . "]");
+
+		if(kReplacementHelper::shouldSyncFlavorInfo($object, $object->getEntryId()))
+		{
+			KalturaLog::info('Syncing flavor ' . $object->getId());
+			$entry = entryPeer::retrieveByPkWithoutInstancePooling($object->getEntryId());
+			$originalFlavor = kReplacementHelper::getOriginalReplacedFlavorByEntryAndFlavorParams($entry, $object->getFlavorParamsId(), $object->getType());
+			if($originalFlavor)
+			{
+				kReplacementHelper::syncReplacedAssetFields($originalFlavor, $object);
+			}
+		}
+
 		if($object->getIsOriginal())
 			return true;
 		

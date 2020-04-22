@@ -152,7 +152,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * 
 	 * @var float
 	 * @readonly
-	 * @filter order
+	 * @filter lte,gte,order
 	 */
 	public $rank;
 	

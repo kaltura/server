@@ -201,14 +201,39 @@ class kBeacon
 		$docId = $this->calculateDocId();
 		//Modify base object to index to State
 		$stateIndexObjectJson = $this->getIndexObjectForState($indexBaseObject, $docId);
-		$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
+		try
+		{
+			$queueProvider->send(self::BEACONS_QUEUE_NAME, $stateIndexObjectJson);
+		}
+		catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
+		{
+			//Don't fail the request retry it again while going via the API layer
+			return false;
+		}
+		catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+		{
+			return false;
+		}
+		
 		$this->deleteItemsFromOldIndex($docId, $queueProvider);
 
 		//Sent to log index of requested
 		if ($shouldLog) 
 		{
 			$logIndexObjectJson = $this->getIndexObjectForLog($indexBaseObject);
-			$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
+			try
+			{
+				$queueProvider->send(self::BEACONS_QUEUE_NAME, $logIndexObjectJson);
+			}
+			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
+			{
+				//Don't fail the request retry it again while going via the API layer
+				return false;
+			}
+			catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+			{
+				return false;
+			}
 		}
 		
 		return true;
@@ -224,7 +249,19 @@ class kBeacon
 		$deleteFromOldIndexObjectsJson = $this->generateDeleteFromOldIndexCmds($docId);
 		foreach($deleteFromOldIndexObjectsJson as $deleteFromOldIndexObjectJson)
 		{
-			$queueProvider->send(self::BEACONS_QUEUE_NAME, $deleteFromOldIndexObjectJson);
+			try
+			{
+				$queueProvider->send(self::BEACONS_QUEUE_NAME, $deleteFromOldIndexObjectJson);
+			}
+			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
+			{
+				//Don't fail the request retry it again while going via the API layer
+				return false;
+			}
+			catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+			{
+				return false;
+			}
 		}
 	}
 

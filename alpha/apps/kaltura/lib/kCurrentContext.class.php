@@ -1,7 +1,7 @@
 <?php
 /**
  * Will hold the current context of the API call / current running batch.
- * The inforamtion is static per call and can be used from anywhare in the code. 
+ * The information is static per call and can be used from anywhere in the code. 
  */
 class kCurrentContext
 {
@@ -21,7 +21,7 @@ class kCurrentContext
 	public static $ks_hash;
 	
 	/**
-	 * This value is populated only in case of impersonation using partnerId in the request.
+	 * This value is populated only in case of impersonation using the partnerId parameter in the request.
 	 * It's used by the batch and the admin console only.
 	 * 
 	 * @var int
@@ -128,7 +128,9 @@ class kCurrentContext
 	 * @var bool
 	 */
 	public static $HTMLPurifierBaseListOnlyUsage = null;
-	
+
+	public static $isInMultiRequest = false;
+
 	public static function getEntryPoint()
 	{
 		if(self::$service && self::$action)

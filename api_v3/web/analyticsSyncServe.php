@@ -8,6 +8,7 @@ define('MAX_ITEMS', 2000);
 define('PARTNER_SECRET', 's');
 define('PARTNER_CRM_ID', 'ci');
 define('PARTNER_VERTICAL', 'v');
+define('PARTNER_PARENT_ID', 'pp');
 
 define('ENTRY_KUSER_ID', 'ku');
 define('ENTRY_TYPE', 't');
@@ -25,6 +26,11 @@ define('SOURCE_RAPT', -14);
 define('SOURCE_WEBEX', -15);
 define('SOURCE_ZOOM', -16);
 define('SOURCE_EXPRESS_RECORDER', -17);
+define('SOURCE_KMS_NATIVE_ANDROID_APP', -18);
+define('SOURCE_KMS_NATIVE_IOS_APP', -19);
+define('SOURCE_EXTERNAL_YOUTUBE', -20);
+define('SOURCE_MEETING', -21);
+
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
 $sourceFromAdminTag = array(
@@ -36,6 +42,13 @@ $sourceFromAdminTag = array(
 	'webexentry' => SOURCE_WEBEX,
 	'zoomentry' => SOURCE_ZOOM,
 	'expressrecorder' => SOURCE_EXPRESS_RECORDER,
+	'kmsnativeandroid' => SOURCE_KMS_NATIVE_ANDROID_APP,
+	'kmsnativeios' => SOURCE_KMS_NATIVE_IOS_APP,
+	'kalturameeting' => SOURCE_MEETING,
+);
+
+$externalSources = array(
+	'YouTube' => SOURCE_EXTERNAL_YOUTUBE,
 );
 
 function getPartnerVertical($customData)
@@ -54,9 +67,9 @@ function getPartnerVertical($customData)
 	}
 }
 
-function getEntrySourceTypeInt($sourceType, $adminTags)
+function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
-	global $sourceFromAdminTag;
+	global $sourceFromAdminTag, $externalSources;
 
 	// check for specific admin tags
 	$adminTags = explode(',', strtolower($adminTags));
@@ -67,6 +80,12 @@ function getEntrySourceTypeInt($sourceType, $adminTags)
 		{
 			return $sourceFromAdminTag[$adminTag];
 		}
+	}
+
+	// check for external source
+	if (isset($customData['externalSource']) && isset($externalSources[$customData['externalSource']]))
+	{
+		return $externalSources[$customData['externalSource']];
 	}
 
 	// use the source type
@@ -86,6 +105,7 @@ function getPartnerUpdates($updatedAt)
 	$c->addSelectColumn(PartnerPeer::STATUS);
 	$c->addSelectColumn(PartnerPeer::ADMIN_SECRET);
 	$c->addSelectColumn(PartnerPeer::CUSTOM_DATA);
+	$c->addSelectColumn(PartnerPeer::PARTNER_PARENT_ID);
 	$c->addSelectColumn(PartnerPeer::UPDATED_AT);
 	$c->add(PartnerPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
@@ -109,6 +129,7 @@ function getPartnerUpdates($updatedAt)
 				PARTNER_SECRET => $row['ADMIN_SECRET'],
 				PARTNER_CRM_ID => isset($customData['crmId']) ? $customData['crmId'] : '',
 				PARTNER_VERTICAL => getPartnerVertical($customData),
+				PARTNER_PARENT_ID => $row['PARTNER_PARENT_ID'],
 			);
 			$info = json_encode($info);
 		}
@@ -200,7 +221,7 @@ function getEntryUpdates($updatedAt)
 				ENTRY_KUSER_ID => $row['KUSER_ID'],
 				ENTRY_TYPE => $row['TYPE'],
 				ENTRY_MEDIA_TYPE => $row['MEDIA_TYPE'],
-				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS']),
+				ENTRY_SOURCE_TYPE => getEntrySourceTypeInt($row['SOURCE'], $row['ADMIN_TAGS'], $customData),
 				ENTRY_CREATED_AT => $row[CREATED_DAY_TS],
 				ENTRY_CREATOR_ID => isset($customData['creatorKuserId']) ? $customData['creatorKuserId'] : $row['KUSER_ID'],
 			);

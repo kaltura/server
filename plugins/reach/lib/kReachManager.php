@@ -29,7 +29,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"kuser" => objectType::KUSER,
 			"permission" => objectType::PERMISSION,
 			"permissionItem" => objectType::PERMISSIONITEM,
-			"userRole" => objectType::USERROLE );
+			"userRole" => objectType::USERROLE,
+			"categoryEntry" => objectType::CATEGORY_ENTRY );
 		if (isset($mapObjectType[$eventObjectClassName]))
 		{
 			return $mapObjectType[$eventObjectClassName];
@@ -125,7 +126,20 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			return false;
 		}
-		
+		$this->buildingReachArrays($event, $partnerId, $scope, true);
+		return count(self::$booleanNotificationTemplatesFulfilled);
+	}
+
+	protected function buildingReachArrays($event, $partnerId, $scope, $shouldConsumeEventHelper = false)
+	{
+		if (!$shouldConsumeEventHelper)
+		{
+			self::$booleanNotificationTemplatesFulfilled = array();
+			if (!ReachPlugin::isAllowedPartner($partnerId))
+			{
+				return;
+			}
+		}
 		$eventType = kEventNotificationFlowManager::getEventType($event);
 		$eventObjectClassName = kEventNotificationFlowManager::getEventObjectType($event);
 		$objectType = self::getObjectType($eventObjectClassName);
@@ -152,7 +166,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				}
 			}
 		}
-		return count(self::$booleanNotificationTemplatesFulfilled);
 	}
 
 	/**
@@ -163,7 +176,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if ($object instanceof categoryEntry)
+		{
+			$event = new kObjectAddedEvent($object);
+			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
+		}
 		return false;
 	}
 
@@ -211,8 +228,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
 
@@ -238,7 +257,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		{
+			if (count(self::$booleanNotificationTemplatesFulfilled))
+			{
+				$event = new kObjectAddedEvent($object);
+				$this->consumeEvent($event);
+			}
 			$this->checkAutomaticRules($object);
+		}
 
 		return true;
 	}
@@ -301,8 +327,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof categoryEntry && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
+			if (count(self::$booleanNotificationTemplatesFulfilled))
+			{
+				$event = new kObjectChangedEvent($object,$modifiedColumns);
+				$this->consumeEvent($event);
+			}
 			return $this->checkAutomaticRules($object);
 		}
 
@@ -456,9 +487,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		if(!kReachUtils::isEntryTypeSupported($entry->getType()))
+		if(!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
+			return true;
+		}
+
+		if($entry->getParentEntryId())
+		{
+			KalturaLog::log("Entry [{$entry->getId()}] is a child entry, entry vendor task object wont be created for it");
 			return true;
 		}
 
@@ -500,6 +537,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
+		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
+		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 
 		if ($context)
 			$entryVendorTask->setContext($context);

@@ -12,6 +12,7 @@
 				<th><?php echo $this->translate('ID'); ?></th>
 				<th><?php echo $this->translate('Type'); ?></th>
 				<th><?php echo $this->translate('Name'); ?></th>
+                <th><?php echo $this->translate('System Name'); ?></th>
 				<th><?php echo $this->translate('Creation Date'); ?></th>
 				<th><?php echo $this->translate('Action'); ?></th>
 			</tr>
@@ -28,6 +29,7 @@
 				<td><?php echo $template->id; ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_EventNotification_Enum_EventNotificationTemplateType', $template->type); ?></td>
 				<td><?php echo $template->name; ?></td>
+                <td><?php echo $template->systemName; ?></td>
 				<td><?php $d = (new Zend_Date($template->createdAt)); echo $d->toString(Zend_Date::DATE_LONG); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $template->partnerId; ?>, <?php echo $template->id; ?>)">

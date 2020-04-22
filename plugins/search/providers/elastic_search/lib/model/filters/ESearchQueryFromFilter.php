@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.elasticSearch
+ * @subpackage model.filters
+ */
 
 class ESearchQueryFromFilter
 {
@@ -15,6 +19,11 @@ class ESearchQueryFromFilter
 	const FIELD_NAME_LOCATION = 0;
 	const FIELD_CLASS_LOCATION = 1;
 	const FIELD_NAME = 'fieldName';
+	const KALTURA_METADATA_SEARCH_ITEM = 'KalturaMetadataSearchItem';
+	const KALTURA_CLASS = 'kalturaClass';
+
+	const WILDCARD_OPERATOR = '*';
+	const NOT_OPERATOR = '!';
 
 	public function __construct()
 	{
@@ -27,6 +36,57 @@ class ESearchQueryFromFilter
 		$this->nestedSearchItem = array();
 	}
 
+	/**
+	 * @param baseObjectFilter $filter
+	 * @return bool
+	 */
+	public static function canTransformFilter($filter)
+	{
+		$result = true;
+		$emptyFilter = true;
+		foreach($filter->fields as $field => $fieldValue)
+		{
+			if($field === entryFilter::ORDER || $field === ESearchEntryFilterFields::FREE_TEXT)
+			{
+				continue;
+			}
+
+			$fieldParts = explode(baseObjectFilter::FILTER_PREFIX, $field, 3);
+			if (count($fieldParts) < 3)
+			{
+				continue;
+			}
+
+			list( , $operator, $fieldName) = $fieldParts;
+			if(!(is_null($fieldValue) || $fieldValue == ''))
+			{
+				$emptyFilter = false;
+				if (!in_array($fieldName, static::getSupportedFields()))
+				{
+					KalturaLog::debug('Cannot convert field:' . $fieldName);
+					return false;
+				}
+			}
+		}
+
+		if($emptyFilter && !$filter->getAdvancedSearch())
+		{
+			return false;
+		}
+
+		if($filter->getAdvancedSearch())
+		{
+			$result = ESearchQueryFromAdvancedSearch::canTransformAdvanceFilter($filter->getAdvancedSearch());
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param baseObjectFilter $filter
+	 * @return array
+	 * @throws KalturaAPIException
+	 */
 	public function createElasticQueryFromFilter(baseObjectFilter $filter)
 	{
 		$this->init();
@@ -61,21 +121,57 @@ class ESearchQueryFromFilter
 
 	public function retrieveElasticQueryEntryIds(baseObjectFilter $filter, kPager $pager)
 	{
-		list($query, $kEsearchOrderBy ) = $this->createElasticQueryFromFilter($filter);
-
-		$entrySearch = new kEntrySearch();
-		$entrySearch->setFilterOnlyContext();
-		$elasticResults = $entrySearch->doSearch($query, $pager, self::$validStatuses,null, $kEsearchOrderBy);
-
-		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
-			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
-
+		list($coreResults, $objectCount) = self::retrieveElasticQueryEntriesResult($filter, $pager);
 		$entryIds = array_keys($coreResults);
 		return array ($entryIds, $objectCount);
 	}
 
+	protected static function buildSorter($objectsOrder)
+	{
+		return function ($a, $b) use ($objectsOrder)
+		{
+			return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
+		};
+	}
+
+	protected static function sortResults($elasticSortedResults,&$coreObjects)
+	{
+		$objectOrder = array();
+		$index = 0;
+		foreach($elasticSortedResults as $key => $value)
+		{
+			$objectOrder[$key] = $index;
+			$index++;
+		}
+		usort($coreObjects, self::buildSorter($objectOrder));
+	}
+
+	public function retrieveElasticQueryCoreEntries(baseObjectFilter $filter, kPager $pager)
+	{
+		list($coreResults, $objectCount, $entrySearch) = self::retrieveElasticQueryEntriesResult($filter, $pager);
+		$coreObjects = $entrySearch->fetchCoreObjectsByIds(array_keys($coreResults));
+		self::sortResults($coreResults, $coreObjects);
+		return array($coreObjects, $objectCount);
+	}
+
+	protected function retrieveElasticQueryEntriesResult(baseObjectFilter $filter, kPager $pager)
+	{
+		list($query, $kEsearchOrderBy ) = $this->createElasticQueryFromFilter($filter);
+		$entrySearch = new kEntrySearch();
+		$entrySearch->setFilterOnlyContext();
+		$elasticResults = $entrySearch->doSearch($query, $pager, self::$validStatuses,null, $kEsearchOrderBy);
+		list($coreResults, $objectOrder, $objectCount, $objectHighlight) = kESearchCoreAdapter::getElasticResultAsArray($elasticResults,
+			$entrySearch->getQueryAttributes()->getQueryHighlightsAttributes());
+		return array ($coreResults, $objectCount, $entrySearch);
+	}
+
 	protected function AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
 	{
+		if(in_array($elasticFieldName, $this->getTimeFields()))
+		{
+			$fieldValue = kTime::getRelativeTime($fieldValue);
+		}
+
 		switch($searchItemType)
 		{
 			case ESearchFilterItemType::EXACT_MATCH:
@@ -85,7 +181,11 @@ class ESearchQueryFromFilter
 			case ESearchFilterItemType::EXACT_MATCH_MULTI_OR :
 				if ($elasticFieldName === ESearchCategoryEntryFieldName::FULL_IDS)
 				{
-					$searchItem = $this->addMultiQueryCategoryFullName($elasticFieldName, $fieldValue,  ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
+					$searchItem = $this->getFullNameCategoryQuery($fieldValue);
+				}
+				else if($elasticFieldName === ESearchCategoryEntryFieldName::ANCESTOR_ID)
+				{
+					$searchItem = $this->addCategoryMultiQuery(array($elasticFieldName, ESearchCategoryEntryIdItem::CATEGORY_IDS_MAPPING_FIELD), $fieldValue, ESearchOperatorType::OR_OP);
 				}
 				else
 				{
@@ -93,8 +193,16 @@ class ESearchQueryFromFilter
 				}
 				break;
 
+			case ESearchFilterItemType::MATCH_AND:
 			case ESearchFilterItemType::EXACT_MATCH_MULTI_AND :
-				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::AND_OP);
+				if($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD)
+				{
+					$searchItem = $this->addCategoryMultiQuery(array($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_NAME), $fieldValue, ESearchOperatorType::AND_OP);
+				}
+				else
+				{
+					$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::AND_OP);
+				}
 				break;
 
 			case ESearchFilterItemType::PARTIAL :
@@ -109,12 +217,24 @@ class ESearchQueryFromFilter
 				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::PARTIAL, ESearchOperatorType::AND_OP);
 				break;
 
-			case ESearchFilterItemType::EXACT_MATCH_NOT:
-				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::NOT_OP);
-				break;
-
 			case ESearchFilterItemType::NOT_CONTAINS:
-				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::NOT_OP);
+			case ESearchFilterItemType::EXACT_MATCH_NOT:
+				$statuses = array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE, CategoryEntryStatus::REJECTED);
+				if($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_IDS_MAPPING_FIELD)
+				{
+					$searchItemCategory = $this->addCategoryMultiQuery(array($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_ID), $fieldValue, ESearchOperatorType::OR_OP, $statuses);
+					$searchItem = $this->createOperator(ESearchOperatorType::NOT_OP, array($searchItemCategory), $elasticFieldName);
+				}
+				else if($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD)
+				{
+					$searchItemCategory = $this->addCategoryMultiQuery(array($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_NAME), $fieldValue, ESearchOperatorType::OR_OP, $statuses);
+					$searchItem = $this->createOperator(ESearchOperatorType::NOT_OP, array($searchItemCategory), $elasticFieldName);
+
+				}
+				else
+				{
+					$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::NOT_OP);
+				}
 				break;
 
 			case ESearchFilterItemType::IS_EMPTY:
@@ -143,20 +263,23 @@ class ESearchQueryFromFilter
 
 			case ESearchFilterItemType::RANGE_LTE_OR_NULL:
 				$searchItem = $this->getSearchItemWithRange($elasticFieldName, $fieldValue,'setLessThanOrEqual');
-				$searchItem = $this->allowNullValues($searchItem,$elasticFieldName);
+				$searchItem = $this->allowNullValues($searchItem, $elasticFieldName);
 				break;
 
 			case ESearchFilterItemType::RANGE_GTE_OR_NULL:
 				$searchItem = $this->getSearchItemWithRange($elasticFieldName, $fieldValue,'setGreaterThanOrEqual');
-				$searchItem = $this->allowNullValues($searchItem,$elasticFieldName);
-				break;
-
-			case ESearchFilterItemType::MATCH_AND:
-				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::AND_OP);
+				$searchItem = $this->allowNullValues($searchItem, $elasticFieldName);
 				break;
 
 			case ESearchFilterItemType::MATCH_OR:
-				$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
+				if($elasticFieldName === ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD)
+				{
+					$searchItem = $this->addCategoryMultiQuery(array($elasticFieldName, ESearchCategoryEntryFieldName::ANCESTOR_NAME), $fieldValue, ESearchOperatorType::OR_OP);
+				}
+				else
+				{
+					$searchItem = $this->addMultiQuery($elasticFieldName, $fieldValue, ESearchItemType::EXACT_MATCH, ESearchOperatorType::OR_OP);
+				}
 				break;
 
 			default:
@@ -164,6 +287,7 @@ class ESearchQueryFromFilter
 		}
 		$this->addToSearchItemsByField($elasticFieldName, $searchItem);
 	}
+
 
 	protected function addMultiQuery($elasticFieldName, $fieldValue, $searchType, $operatorType)
 	{
@@ -176,6 +300,7 @@ class ESearchQueryFromFilter
 				$searchItem = $this->addSearchItem($elasticFieldName, $value, $searchType);
 				$innerSearchItems[] = $searchItem;
 			}
+
 			$operator = $this->getEsearchOperatorByField($elasticFieldName);
 			$operator->setOperator($operatorType);
 			$operator->setSearchItems($innerSearchItems);
@@ -190,47 +315,14 @@ class ESearchQueryFromFilter
 		{
 			$searchItem->setFieldName($elasticFieldName);
 		}
+
 		if(!$range)
 		{
 			$searchItem->setSearchTerm($value);
 		}
+
 		$searchItem->setItemType($itemType);
 		return $searchItem;
-	}
-
-	protected function getSearchItemForCategories($values, $searchType)
-	{
-		$innerSearchItems = array();
-		if(count($values))
-		{
-			if (count($values) > 1)
-			{	//all values excepts from the last value should be parent category p1>p2>c3
-				for ($i = 0; $i < count($values) - 1; $i++)
-				{
-					$innerSearchItems[] =  $this->addSearchItem(KalturaESearchCategoryEntryFieldName::ANCESTOR_NAME, $values[$i], $searchType);
-				}
-			}
-			$innerSearchItems[] = $this->addSearchItem(ESearchBaseCategoryEntryItem::CATEGORY_NAMES_MAPPING_FIELD, $values[count($values) - 1], $searchType);
-		}
-		return $innerSearchItems;
-	}
-
-	protected function addMultiQueryCategoryFullName($elasticFieldName, $fieldValue, $searchType, $operatorType)
-	{
-		$categoriesValues = array();
-		$andOperator = array();
-		$values = $this->createValuesArray($fieldValue);
-		foreach ($values as $value)
-		{
-			$categoriesValues[] = explode(categoryPeer::CATEGORY_SEPARATOR, $value);
-		}
-		foreach ($categoriesValues as $categoriesValue)
-		{
-			$searchItemsAndArray = $this->getSearchItemForCategories($categoriesValue, $searchType);
-			$andOperator[]  = $this->createOperator(ESearchOperatorType::AND_OP, $searchItemsAndArray, $elasticFieldName);
-		}
-		$orOprator = $this->createOperator($operatorType, $andOperator, $elasticFieldName);
-		return $orOprator;
 	}
 
 	protected function allowNullValues($searchItem,$elasticFieldName)
@@ -369,4 +461,8 @@ class ESearchQueryFromFilter
 		return array();
 	}
 
+	protected function getTimeFields()
+	{
+		return array();
+	}
 }

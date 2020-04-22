@@ -9,7 +9,7 @@
  */
 class LiveStreamService extends KalturaLiveEntryService
 {
-	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 10;
+	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
 	const ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY = 10;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
@@ -332,7 +332,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateOfflineThumbnailJpegAction($entryId, $fileData)
 	{
-		return parent::updateThumbnailJpegForEntry($entryId, $fileData, KalturaEntryType::LIVE_STREAM, entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB);
+		return parent::updateThumbnailJpegForEntry($entryId, $fileData, KalturaEntryType::LIVE_STREAM, kEntryFileSyncSubType::OFFLINE_THUMB);
 	}
 	
 	/**
@@ -348,7 +348,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	function updateOfflineThumbnailFromUrlAction($entryId, $url)
 	{
-		return parent::updateThumbnailForEntryFromUrl($entryId, $url, KalturaEntryType::LIVE_STREAM, entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB);
+		return parent::updateThumbnailForEntryFromUrl($entryId, $url, KalturaEntryType::LIVE_STREAM, kEntryFileSyncSubType::OFFLINE_THUMB);
 	}
 	
 	/**
@@ -553,7 +553,6 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function regenerateStreamTokenAction($entryId)
 	{
-		
 		$this->dumpApiRequest($entryId, true);
 	
 		$liveEntry = entryPeer::retrieveByPK($entryId);
@@ -575,5 +574,132 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($liveEntry->getType());
 		$entry->fromObject($liveEntry, $this->getResponseProfile());
 		return $entry;
+
 	}
+
+    /**
+     * Archive a live entry which was recorded
+     *
+     * @action archive
+     * @param string $liveEntryId
+	 * @param string $vodEntryId
+     * @return bool
+     * @throws KalturaAPIException
+     * @throws KalturaClientException
+     * @throws PropelException
+     */
+	public function archiveAction($liveEntryId, $vodEntryId)
+	{
+        $liveEntry = entryPeer::retrieveByPK($liveEntryId);
+        /** @var LiveStreamEntry $liveEntry */
+        if (!$liveEntry)
+        {
+            throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $liveEntryId);
+        }
+
+        $liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+        $liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+        $liveEntryArchiveJobData->setVodEntryId($vodEntryId);
+
+        $liveEntryArchiveJob = new BatchJob();
+        $liveEntryArchiveJob->setEntryId($liveEntryId);
+        $liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+
+        kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
+
+        return true;
+    }
+
+	/**
+	 * Delivering the status of a live stream (on-air/offline) if it is possible
+	 *
+	 * @action getDetails
+	 * @param string $id ID of the live stream entry
+	 * @return KalturaLiveStreamDetails
+	 * @ksOptional
+	 *
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function getDetailsAction($id)
+	{
+		if (!kCurrentContext::$ks)
+		{
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
+			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+			// enforce entitlement
+			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
+		}
+		else
+		{
+			$liveStreamEntry = entryPeer::retrieveByPK($id);
+		}
+
+		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+		/** @var LiveStreamEntry $liveStreamEntry */
+
+		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
+		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		{
+			return $this->getLiveStreamDetails($id, $liveStreamEntry);
+		}
+
+		throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+
+	}
+
+	/**
+	 * @param $id
+	 * @param $liveStreamEntry
+	 * @return KalturaLiveStreamDetails
+	 */
+	protected function getLiveStreamDetails($id, $liveStreamEntry)
+	{
+		/** @var LiveEntry $liveStreamEntry*/
+		$res = new KalturaLiveStreamDetails();
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($id, EntryServerNodePeer::$connectedServerNodeStatuses);
+		$primaryIsPlayableUser = false;
+		$secondaryIsPlayableUser = false;
+		foreach ($entryServerNodes as $currESN)
+		{
+			/** @var LiveEntryServerNode $currESN */
+			if ($currESN->getServerType() == EntryServerNodeType::LIVE_PRIMARY)
+			{
+				$res->primaryStreamStatus = $currESN->getStatus();
+				$primaryIsPlayableUser = $currESN->getIsPlayableUser();
+			} else if ($currESN->getServerType() == EntryServerNodeType::LIVE_BACKUP)
+			{
+				$res->secondaryStreamStatus = $currESN->getStatus();
+				$secondaryIsPlayableUser = $currESN->getIsPlayableUser();
+			}
+		}
+		$res->viewMode = $liveStreamEntry->getViewMode();
+		$res->wasBroadcast = $liveStreamEntry->getBroadcastTime() ? true : false;
+
+		$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::OFFLINE;
+		if ($res->primaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+		{
+			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
+			if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $primaryIsPlayableUser)
+			{
+				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+			}
+		}
+		if ($res->broadcastStatus != KalturaLiveStreamBroadcastStatus::LIVE && $res->secondaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+		{
+			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
+			if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $secondaryIsPlayableUser)
+			{
+				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+			}
+		}
+		$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
+		return $res;
+	}
+
 }

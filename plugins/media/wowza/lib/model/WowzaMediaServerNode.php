@@ -7,7 +7,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 	const DEFAULT_TRANSCODER = 'default';
 	const DEFAULT_GPUID = -1;
 	
-	const CUSTOM_DATA_APP_PREFIX = 'app_prefix';
 	const CUSTOM_DATA_TRANSCODER_CONFIG = 'transcoder';
 	const CUSTOM_DATA_GPUID = 'gpuid';
 	const CUSTOM_DATA_LIVE_SERVICE_PORT = 'live_service_port';
@@ -70,7 +69,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $url;
 	}
 	
-	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null)
+	public function getPlaybackHost($protocol = 'http', $format = null, $baseUrl = null, $deliveryType = null)
 	{
 		$hostname = $this->getHostname();
 		if(!$this->getIsExternalMediaServer())
@@ -114,8 +113,18 @@ class WowzaMediaServerNode extends MediaServerNode {
 		
 		return $appNameAndPrefix;
 	}
-	
-	public function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
+
+	public function getEnvDc()
+	{
+		return 'dc-' . $this->getDc();
+	}
+
+    public function getSegmentDurationUrlString($sd)
+    {
+        return "sd/$sd/";
+    }
+
+	protected function getDomainByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{
 		$domain = $this->getPlaybackDomain();
 		$domainField = "domain" . ($format ? "-$format" : "");
@@ -131,8 +140,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 		
 		return $domain;
 	}
-	
-	public function getPortByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
+
+	protected function getPortByProtocolAndFormat($mediaServerConfig, $protocol = 'http', $format = null)
 	{
 		$port = WowzaMediaServerNode::DEFAULT_MANIFEST_PORT;
 		$portField = 'port' . ($protocol != 'http' ? "-$protocol" : "") . ($format ? "-$format" : "");
@@ -148,8 +157,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 		
 		return $port;
 	}
-	
-	public function getApplicationPrefix($mediaServerConfig)
+
+	protected function getApplicationPrefix($mediaServerConfig)
 	{
 		$appPrefix = "";
 		$appPrefix = $this->getValueByField($mediaServerConfig, 'appPrefix', $appPrefix);
@@ -160,7 +169,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $appPrefix;
 	}
 	
-	public function getValueByField($config, $filedValue, $defaultValue)
+	protected function getValueByField($config, $filedValue, $defaultValue)
 	{
 		$value = $defaultValue;
 		
@@ -172,16 +181,6 @@ class WowzaMediaServerNode extends MediaServerNode {
 			$value = $config[$this->getHostname()][$filedValue];
 		
 		return $value;
-	}
-	
-	public function setAppPrefix($appPrefix)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_APP_PREFIX, $appPrefix);
-	}
-	
-	public function getAppPrefix()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
 	
 	public function setTranscoder($transcoder)

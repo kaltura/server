@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <schema>
-<object name="category">
+<object name="category" splitIndexFieldName="PARTNER_ID">
 	<field name="id" indexName="category_id" getter="id" type="int" orderable="yes" skipField="yes" />
 	<field name="category_id" indexName="str_category_id" getter="id" type="string" />
 	<field name="parent_id" indexName="parent_id" type="int" />
 	<field name="partner_id" indexName="partner_id" type="bint" orderable="yes" keepCondition="yes" />
 	<field name="name" indexName="name" type="string" orderable="yes" matchable="yes" sphinxStringAttribute="both" />
-	<field name="full_name" indexName="full_name" getter="searchIndexfullName" type="string" orderable="yes" searchEscapeType="3" matchable="yes" skipField="yes" sphinxStringAttribute="both" />
-	<field name="full_ids" indexName="full_ids" getter="searchIndexfullIds" type="string" indexEscapeType="2" searchEscapeType="3" matchable="yes" />
+	<field name="full_name" indexName="full_name" getter="searchIndexfullName" type="string" orderable="yes" searchEscapeType="5" matchable="yes" skipField="yes" sphinxStringAttribute="both" />
+	<field name="full_ids" indexName="full_ids" getter="searchIndexfullIds" type="string" indexEscapeType="2" searchEscapeType="5" matchable="yes" />
 	<field name="description" indexName="description" type="string" nullable="yes" matchable="yes" />
 	<field name="tags" indexName="tags" type="string" nullable="yes" matchable="yes" />
 	<field name="status" indexName="category_status" getter="status" type="int" orderable="yes" />
@@ -52,6 +52,12 @@
 		<value field="id" />
 		<value field="partner_id" />
 	</cacheInvalidationKey>
+	<ignoreOptimizationKeys>
+		<disableFields name="partner_id">
+			<value field="str_category_id" />
+			<value field="reference_id" />
+		</disableFields>
+	</ignoreOptimizationKeys>
 </object>
 <object name="categoryKuser">
 	<field name="category_id" indexName="category_id" type="string" matchable="yes" />
@@ -139,6 +145,22 @@
 		<value field="id" />
 		<value field="partner_id" />
 	</cacheInvalidationKey>
+	<ignoreOptimizationKeys>
+		<disableFields name="partner_id">
+			<value field="entry_id" />
+			<value field="reference_id" />
+			<value field="replacing_entry_id" />
+			<value field="replaced_entry_id" />
+			<value field="roots" />
+			<value field="kuser_id" />
+			<value field="puser_id" />
+			<value field="entitled_kusers_publish" />
+			<value field="entitled_kusers_edit" />
+			<value field="entitled_kusers_view" />
+			<value field="creator_kuser_id" />
+			<value field="creator_puser_id" />
+		</disableFields>
+	</ignoreOptimizationKeys>
 </object>
 <object name="kuser">
 	<field name="login_data_id" indexName="login_data_id" type="int" orderable="yes" />

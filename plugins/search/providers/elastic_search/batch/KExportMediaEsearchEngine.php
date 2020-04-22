@@ -13,7 +13,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
-		KalturaLog::info ('Exporting content for media items through Esearch');
+		KalturaLog::info ('Exporting content for media items through Esearch, data:'.json_encode($data));
 		$entrySearchParams = clone $data->searchParams;
 		
 		$results = KalturaElasticSearchClientPlugin::get(KBatchBase::$kClient)->eSearch->searchEntry($entrySearchParams);
@@ -51,7 +51,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		}
 		while (count($results->objects) == self::PAGE_SIZE);
 		
-		$this->addContentToCsv ($entriesToReturn, $csvFile);
+		$this->addContentToCsv ($entriesToReturn, $csvFile, $data);
 	}
 	
 	/**
@@ -68,7 +68,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	/**
 	 * The function grabs all the fields values for each entry and adds them as a new row to the csv file
 	 */
-	protected function addContentToCsv($entriesArray, $csvFile)
+	protected function addContentToCsv($entriesArray, $csvFile, $data)
 	{
 		if(!count($entriesArray))
 			return;
@@ -76,7 +76,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		$entriesData = array();
 		foreach ($entriesArray as $entry)
 		{
-			$entriesData[$entry->id] = $this->getCsvRowValues($entry);
+			$entriesData[$entry->id] = $this->getCsvRowValues($entry, $data);
 		}
 		
 		foreach ($entriesData as $entryId => $values)
@@ -84,14 +84,15 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			KCsvWrapper::sanitizedFputCsv($csvFile, $values);
 		}
 	}
-	
+
 	/**
 	 * This function calculates the default values for CSV row representing a single entry and returns them as an array
 	 *
 	 * @param KalturaBaseEntry $entry
+	 * @param                  $data
 	 * @return array
 	 */
-	protected function getCsvRowValues (KalturaBaseEntry $entry)
+	protected function getCsvRowValues (KalturaBaseEntry $entry, $data)
 	{
 		$entryCategories = $this->retrieveEntryCategories ($entry->id);
 		
@@ -102,13 +103,13 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			$entry->tags,
 			implode (',', $entryCategories),
 			$entry->userId,
-			$entry->createdAt,
-			$entry->updatedAt,
+			$this->formatTimestamp($entry->createdAt, $data->options),
+			$this->formatTimestamp($entry->updatedAt, $data->options),
 		);
 		
 		return $values;
 	}
-	
+
 	/**
 	 * Function returns an array of every category the entry is published to.
 	 *
@@ -128,12 +129,30 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		
 		$categoryEntryResult = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $pager);
 		
-		$result = array();
 		foreach ($categoryEntryResult->objects as $categoryEntry)
 		{
 			$result[] = $categoryEntry->categoryId;
 		}
 		
 		return $result;
+	}
+	/**
+	 * @param int $timestamp
+	 * @param array $options
+	 * @return false|string
+	 */
+	protected function formatTimestamp($timestamp, $options)
+	{
+		if(is_array($options))
+		{
+			foreach($options as $option)
+			{
+				if($option instanceof KalturaExportToCsvOptions)
+				{
+					return date($option->format, $timestamp);
+				}
+			}
+		}
+		return $timestamp;
 	}
 }

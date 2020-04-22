@@ -17,11 +17,6 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	 */
 	public $fromDate;
 	
-	/**
-	 *  @var time
-	 */
-	public $toDate;
-
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -29,8 +24,7 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 
 	private static $map_between_objects = array (
 		'fromDate',
-		'credit',
-		'toDate',
+		'credit'
 	);
 
 	/* (non-PHPdoc)
@@ -38,8 +32,8 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	*/
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("fromDate");
-		parent::validateForInsert(array("credit"));
+		$this->validatePropertyNotNull('fromDate');
+		parent::validateForInsert(array_merge($propertiesToSkip,array('credit')));
 
 	}
 	
@@ -52,21 +46,36 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 		{
 			$dbObject = new kUnlimitedVendorCredit();
 		}
-
 		return parent::toObject($dbObject, $propsToSkip);
 	}
 	
 	public function hasObjectChanged($sourceObject)
 	{
-		if(parent::hasObjectChanged($sourceObject))
+		if (parent::hasObjectChanged($sourceObject))
+		{
 			return true;
-		
+		}
+
 		/* @var $sourceObject kUnlimitedVendorCredit */
-		if( ($this->credit && $this->credit != $sourceObject->getCredit())
-			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate())
-		)
+		if (($this->credit && $this->credit != $sourceObject->getCredit())
+			|| ($this->fromDate && $this->fromDate != $sourceObject->getFromDate()))
+		{
 			return true;
-		
+		}
 		return false;
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyNotNull('fromDate');
+		return parent::validateForUpdate($sourceObject, array_merge($propertiesToSkip, array('credit')));
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getMatchingCoreClassName()
+	{
+		return 'kUnlimitedVendorCredit';
 	}
 }

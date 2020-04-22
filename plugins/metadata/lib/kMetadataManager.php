@@ -17,6 +17,7 @@ class kMetadataManager
 		MetadataObjectType::CATEGORY => 'category',
 		MetadataObjectType::USER => 'kuser',
 		MetadataObjectType::PARTNER => 'Partner',
+		MetadataObjectType::USER_ENTRY => 'UserEntry',
 	);
 	
 	protected static $metadataFieldTypesToValidate = array(
@@ -45,6 +46,9 @@ class kMetadataManager
 		        
 		    case MetadataObjectType::USER:
 		        return new MetadataKuserPeer();
+
+		    case MetadataObjectType::USER_ENTRY:
+			return new MetadataUserEntryPeer();
 		        
 			default:
 				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);
@@ -815,10 +819,13 @@ class kMetadataManager
 			$profileFieldData['metadata_profile_id'] = $profileId;
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($profileId);
 			if($metadataProfile)
+			{
 				$systemName = $metadataProfile->getSystemName();
-
-			if($systemName)
-				$profileFieldData['system_name'] = $systemName;
+				if ($systemName)
+				{
+					$profileFieldData['system_name'] = $systemName;
+				}
+			}
 
 			$xpath = $profileField->getXpath();
 			$profileFieldData['xpath'] = $xpath;

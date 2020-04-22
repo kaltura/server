@@ -148,6 +148,11 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 			$contentParametersValues = array_merge($contentParametersValues, $pluginContentParameters);
 		}
 
+		foreach ($scope->getDynamicValues() as $dynamicValueKey => $dynamicValueValue)
+		{
+			$contentParametersValues[$dynamicValueKey] = $dynamicValueValue;
+		}
+
 		$jobData->setContentParameters($contentParametersValues);
 		
 		return $jobData;

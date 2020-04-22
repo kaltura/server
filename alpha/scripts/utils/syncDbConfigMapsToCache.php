@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 $port = $argv[1];
 $cacheHostList = explode(',',$argv[2]);
-
+const DB_MAP_NAME = 'db_sync';
 //Init all cache items
 $cacheObjects = array();
 foreach ($cacheHostList as $cacheHost)
@@ -40,7 +40,7 @@ foreach($mapsInfo as $mapInfo)
 	$cmdLine = "select version,content from conf_maps where conf_maps.map_name='$rawMapName' and conf_maps.host_name='$hostNameFilter' and status=1 order by version desc limit 1 ;";
 
 	$output2 = query($dbConnection,$cmdLine);
-	$mapName = $rawMapName.kRemoteMemCacheConf::MAP_DELIMITER.$hostNameFilter;
+	$mapName = $rawMapName.kRemoteMemCacheConf::MAP_DELIMITER.strtolower($hostNameFilter);
 	$version = $output2[0]['version'];
 	$content = $output2[0]['content'];
 	if(!isset($mapListInCache[$mapName]))
@@ -79,10 +79,10 @@ foreach ($cacheObjects as $cacheObject)
 
 function getPdoConnection()
 {
-	$dbMap = kConf::getMap('db');
+	$dbMap = kConf::getMap(DB_MAP_NAME);
 	if(!$dbMap)
 	{
-		die('Cannot get db.ini map from configuration!');
+		die('Cannot get ' . DB_MAP_NAME .' map from configuration!');
 	}
 	$defaultSource = $dbMap['datasources']['default'];
 	$dbConfig = $dbMap['datasources'][$defaultSource]['connection'];

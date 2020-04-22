@@ -35,9 +35,9 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 	 */
 	public static function getMapByVersion($mapName , $hostNameRegex = null, $version = null)
 	{
-		$c = new criteria();
+		$c = new Criteria();
 		$c->add(self::MAP_NAME ,$mapName );
-		if($hostNameRegex)
+		if(!is_null($hostNameRegex))
 		{
 			$c->add(self::HOST_NAME, $hostNameRegex);
 		}
@@ -54,7 +54,7 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 
 	public static function addNewMapVersion($mapName, $hostNameRegex, $content, $newVersion)
 	{
-		$c = new criteria();
+		$c = new Criteria();
 		$c->add(self::MAP_NAME ,$mapName );
 		$c->add(self::HOST_NAME ,$hostNameRegex );
 		$c->add(self::CONTENT ,$content );

@@ -7,11 +7,18 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	const CUSTOM_DATA_PROTOCOL_PORT_CONFIG_ARRAY = 'media_server_port_config';
 	const CUSTOM_DATA_PLAYBACK_DOMAIN_CONFIG_ARRAY = 'media_server_playback_domain_config';
 	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
+	const CUSTOM_DATA_APP_PREFIX = 'app_prefix';
 	const DEFAULT_APPLICATION = 'kLive';
 	
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
-	
+	abstract public function getEnvDc();
+
+	public function getAppNameAndPrefix()
+	{
+		return '';
+	}
+
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseservernode#preInsert()
 	 */
@@ -62,5 +69,20 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	{
 		$this->partner_media_server_config = $partnerMediaServerConfiguration;
 	}
+
+	public function setAppPrefix($appPrefix)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_APP_PREFIX, $appPrefix);
+	}
+
+	public function getAppPrefix()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
+	}
+
+    public function getSegmentDurationUrlString($sd)
+    {
+        return '';
+    }
 
 } // MediaServerNode

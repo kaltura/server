@@ -153,6 +153,12 @@ class kBusinessPostConvertDL
 				kBusinessConvertDL::checkForPendingLiveClips($entry);
 			}
 		}
+
+		if(kReplacementHelper::shouldSyncFlavorInfo($currentFlavorAsset, $currentFlavorAsset->getEntryId()))
+		{
+			KalturaLog::info('Syncing flavor ' . $currentFlavorAsset->getId() . ' and copying content');
+			kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($currentFlavorAsset);
+		}
 		
 		return $currentFlavorAsset;
 	}
@@ -288,18 +294,11 @@ class kBusinessPostConvertDL
 				$inCompleteFlavorIds[] = $inCompleteFlavorId;
 				
 			KalturaLog::info('Convert Finished - has In-Complete Required flavors [[' . print_r($inCompleteRequiredFlavorParamsIds, true) . ']');
-		} 
-		elseif($currentFlavorAsset->getStatus() == asset::ASSET_STATUS_READY && ($currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_OPTIONAL || $currentReadyBehavior == flavorParamsConversionProfile::READY_BEHAVIOR_REQUIRED))
+		}
+		elseif (self::shouldUpdateEntry($entry, $currentFlavorAsset, $currentReadyBehavior))
 		{
 			// mark the entry as ready if all required conversions completed or any of the optionals
-			if($currentFlavorAsset->getentry()->getReplacedEntryId())
-			{
-				KalturaLog::info('Entry is temporary replacement and requires all flavors to complete');
-			}
-			else
-			{
-				kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-			}
+			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 		}
 		
 		if ($origianlAssetFlavorId) {
@@ -355,7 +354,33 @@ class kBusinessPostConvertDL
 		
 		return $dbBatchJob;
 	}
-	
+
+	/**
+	 * @param $entry
+	 * @param $currentFlavorAsset
+	 * @param $currentReadyBehavior
+	 * @return bool
+	 */
+	protected static function shouldUpdateEntry($entry, $currentFlavorAsset, $currentReadyBehavior)
+	{
+		if ($currentFlavorAsset->getStatus() != asset::ASSET_STATUS_READY)
+		{
+			return false;
+		}
+
+		if (in_array($currentReadyBehavior, array(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE, flavorParamsConversionProfile::READY_BEHAVIOR_NO_IMPACT)))
+		{
+			return false;
+		}
+
+		if ($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $entry->getReplacedEntryId())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param BatchJob $dbBatchJob
 	 * @param kConvertCollectionJobData $data

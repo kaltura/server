@@ -25,6 +25,7 @@ class BulkUploadService extends KalturaBaseService
 	 * @param string $uploadedBy
 	 * @param string $fileName Friendly name of the file, used to be recognized later in the logs.
 	 * @return KalturaBulkUpload
+	 * @deprecated Use media.bulkUploadAdd() instead.
 	 */
 	public function addAction($conversionProfileId, $csvFileData, $bulkUploadType = null, $uploadedBy = null, $fileName = null)
 	{
@@ -141,12 +142,7 @@ class BulkUploadService extends KalturaBaseService
 	    $c = new Criteria();
 		$c->addAnd(BatchJobLogPeer::PARTNER_ID, $this->getPartnerId());
 		$c->addAnd(BatchJobLogPeer::JOB_TYPE, BatchJobType::BULKUPLOAD);
-		
-		$crit = $c->getNewCriterion(BatchJobLogPeer::ABORT, null);
-		$critOr = $c->getNewCriterion(BatchJobLogPeer::ABORT, 0);
-		$crit->addOr($critOr);
-		$c->add($crit);
-		
+		$c->addAnd(BatchJobLogPeer::ABORT, 0);
 		$c->addDescendingOrderByColumn(BatchJobLogPeer::ID);
 		
 		$count = BatchJobLogPeer::doCount($c);

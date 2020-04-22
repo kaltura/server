@@ -9,6 +9,12 @@ class ConfMapsService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			return;
+		}
+
 		$kuser = kCurrentContext::getCurrentKsKuser();
 		if(!$kuser)
 		{
@@ -26,6 +32,8 @@ class ConfMapsService extends KalturaBaseService
 	 */
 	function addAction(KalturaConfMaps $map)
 	{
+		$map->relatedHost = strtolower($map->relatedHost);
+
 		$dbMap = ConfMapsPeer::getMapByVersion($map->name, $map->relatedHost);
 		if($dbMap)
 		{
@@ -52,6 +60,7 @@ class ConfMapsService extends KalturaBaseService
 	 */
 	function updateAction(KalturaConfMaps $map)
 	{
+		$map->relatedHost = strtolower($map->relatedHost);
 		//get map by values name / hostname
 		$dbMap = ConfMapsPeer::getMapByVersion($map->name, $map->relatedHost);
 		if(!$dbMap)
@@ -59,6 +68,7 @@ class ConfMapsService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::MAP_DOES_NOT_EXIST );
 		}
 		$map->validateContent();
+
 		$newMapVersion = new ConfMaps();
 		$newMapVersion->addNewMapVersion($dbMap, $map->content);
 		$newMapVersion->syncMapsToCache();
@@ -107,6 +117,42 @@ class ConfMapsService extends KalturaBaseService
 		$mapNames= ConfMapsPeer::retrieveMapsNames();
 		$result =  KalturaStringArray::fromDbArray($mapNames);
 		return $result;
+	}
+
+	/**
+	 * Get configuration map cache key
+	 *
+	 * @action getCacheVersionId
+	 * @return string
+	 */
+	public function getCacheVersionIdAction()
+	{
+		return kConf::getCachedVersionId();
+	}
+
+	/**
+	 * Get batch configuration map
+	 *
+	 * @action getBatchMap
+	 * @return string
+	 * @param string $hostName
+	 */
+	function getBatchMapAction($hostName)
+	{
+		kApiCache::disableCache();
+		$res = IniUtils::getBatchConfigFromFS();
+		if (!$res)
+		{
+			$batchMapNames = array('batch','workers');
+			/*  @var kRemoteMemCacheConf $remoteCache  */
+			$remoteCache = kCacheConfFactory::getInstance(kCacheConfFactory::REMOTE_MEM_CACHE);
+			$map = $remoteCache->loadByHostName($batchMapNames ,$hostName);
+			if (!empty($map))
+			{
+				$res = IniUtils::arrayToIniString($map);
+			}
+		}
+		return json_encode($res);
 	}
 }
 

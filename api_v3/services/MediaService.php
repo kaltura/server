@@ -88,11 +88,6 @@ class MediaService extends KalturaEntryService
 		return $entry;
     }
 
-    protected function shoudlValidateLocal()
-	{
-		//if multi request of more than one api call
-		return  (kCurrentContext::$multiRequest_index <= 1);
-	}
 
     /**
      * Add content to media entry which is not yet associated with content (therefore is in status NO_CONTENT).
@@ -120,14 +115,14 @@ class MediaService extends KalturaEntryService
 	    {
 			try
 			{
-				$validateLocalExist = $this->shoudlValidateLocal();
+				$validateLocalExist = myEntryUtils::shouldValidateLocal();
 				$resource->validateEntry($dbEntry, $validateLocalExist);
 				$kResource = $resource->toObject();
 				$this->attachResource($kResource, $dbEntry);
 			}
 		    catch (Exception $e)
 		    {
-			    $this->handleErrorDuringSetResource($entryId, $e, $resource);
+			    $this->handleErrorDuringSetResource($entryId, $e);
 		    }
 		    $this->validateContent($dbEntry);
 		       $resource->entryHandled($dbEntry);
@@ -308,8 +303,6 @@ class MediaService extends KalturaEntryService
 		if($bulkUploadId)
 			$dbEntry->setBulkUploadId($bulkUploadId);
 
-        $kshowId = $dbEntry->getKshowId();
-
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
 			"entry_media_source" => KalturaSourceType::URL,
@@ -322,7 +315,7 @@ class MediaService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
@@ -388,8 +381,6 @@ class MediaService extends KalturaEntryService
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
       	$dbEntry->setSourceId( $searchResult->id );
 
-        $kshowId = $dbEntry->getKshowId();
-
        	// $searchResult->licenseType; // FIXME, No support for licenseType
         // FIXME - no need to clone entry if $dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_KALTURA_USER_CLIPS
 		if ($dbEntry->getSource() == entry::ENTRY_MEDIA_SOURCE_KALTURA ||
@@ -421,7 +412,7 @@ class MediaService extends KalturaEntryService
 			);
 
 			$token = $this->getKsUniqueString();
-			$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+			$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 			$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 			$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 			$dbEntry = $insert_entry_helper->getEntry();
@@ -494,8 +485,6 @@ class MediaService extends KalturaEntryService
 
 		$dbEntry = parent::add($mediaEntry, $mediaEntry->conversionProfileId);
 
-        $kshowId = $dbEntry->getKshowId();
-
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
 			"entry_media_source" => KalturaSourceType::FILE,
@@ -508,7 +497,7 @@ class MediaService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
@@ -567,8 +556,6 @@ class MediaService extends KalturaEntryService
 
 		$dbEntry = $this->prepareEntryForInsert($mediaEntry);
 
-        $kshowId = $dbEntry->getKshowId();
-
 		// setup the needed params for my insert entry helper
 		$paramsArray = array (
 			"entry_media_source" => KalturaSourceType::WEBCAM,
@@ -581,7 +568,7 @@ class MediaService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
@@ -1159,9 +1146,6 @@ class MediaService extends KalturaEntryService
 
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 
-		$kshow = $this->createDummyKShow();
-	        $kshowId = $kshow->getId();
-		$dbEntry->setKshowId($kshowId);
 		$dbEntry->save();
 		return $dbEntry;
 	}
@@ -1248,17 +1232,21 @@ class MediaService extends KalturaEntryService
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
 	 * @return file
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaAPIException
 	 */
 	function getVolumeMapAction($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
 
-		$flavorAsset = myEntryUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
+		$flavorAsset = myPackagerUtils::getFlavorSupportedByPackagerForVolumeMap($entryId);
 		if (!$flavorAsset)
+		{
 			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
+		}
 
 		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;

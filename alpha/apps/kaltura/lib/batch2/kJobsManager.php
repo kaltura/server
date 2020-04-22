@@ -836,6 +836,10 @@ class kJobsManager
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$flavorParamsOutput = null;
+		if($flavorAsset && $flavorAsset->getEncryptionKey()) {
+			$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
+		}
+		
 		if($createThumb)
 		{
 			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
@@ -845,7 +849,6 @@ class kJobsManager
 				{
 					$postConvertData->setThumbHeight($flavorAsset->getHeight());
 					$postConvertData->setThumbBitrate($flavorAsset->getBitrate());
-					$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 				}
 				else
 				{
@@ -883,7 +886,6 @@ class kJobsManager
 						$postConvertData->setCreateThumb(true);
 						$postConvertData->setThumbHeight($thisFlavorHeight);
 						$postConvertData->setThumbBitrate($thisFlavorBitrate);
-						$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 					}
 				}
 			}
@@ -1887,7 +1889,7 @@ class kJobsManager
 		else
 			$filePath = $fileSync->getFullPath();
 		$actualFileDescription = trim(kFile::getFileDescription($filePath));
-		$blackList = kconf::get('file_descriptions_black_list');
+		$blackList = kConf::get('file_descriptions_black_list');
 		$shouldBlock = in_array($actualFileDescription,$blackList['fileDescriptions']);
 		if($fileSync->isEncrypted())
 			$fileSync->deleteTempClear();

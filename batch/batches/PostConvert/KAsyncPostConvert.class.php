@@ -87,6 +87,10 @@ class KAsyncPostConvert extends KJobHandlerWorker
 			$engine = KBaseMediaParser::getParser($job->jobSubType, kFile::realPath($mediaFile), KBatchBase::$taskConfig, $job);
 			if($engine)
 			{
+				if($data->flavorAssetEncryptionKey){
+					$decryptionKey = bin2hex(base64_decode($data->flavorAssetEncryptionKey));
+					$engine->setEncryptionKey($decryptionKey);
+				}
 				KalturaLog::info("Media info engine [" . get_class($engine) . "]");
 				if (!$key)
 				{

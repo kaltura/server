@@ -123,7 +123,11 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			return true;
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		if ($partner)
+		{
+			return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		}
+		return false;
 	}
 	
 	
@@ -156,6 +160,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new CatalogItemListAction();
 		$pages[] = new CatalogItemConfigureAction();
 		$pages[] = new CatalogItemSetStatusAction();
+		$pages[] = new CatalogItemExportAction();
 		$pages[] = new PartnerCatalogItemListAction();
 		$pages[] = new PartnerCatalogItemConfigureAction();
 		$pages[] = new PartnerCatalogItemSetStatusAction();
@@ -165,6 +170,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new ReachProfileSetStatusAction();
 		$pages[] = new ReachProfileCreditConfigureAction();
 		$pages[] = new ReachProfileCloneAction();
+		$pages[] = new ReachRequestsListAction();
 
 		return $pages;
 	}
@@ -233,7 +239,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			return new KalturaCategoryEntryCondition();
 		
 		if ($baseClass == 'kRuleAction' && $enumValue == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
-			return new kAddEntryVendroTaskAction();
+			return new kAddEntryVendorTaskAction();
 		
 		if ($baseClass == 'KalturaRuleAction' && $enumValue ==  ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 			return new KalturaAddEntryVendorTaskAction();

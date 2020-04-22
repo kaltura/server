@@ -294,6 +294,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$c->addAnd(PermissionPeer::PARTNER_ID, array(strval(PartnerPeer::GLOBAL_PARTNER), strval(self::$operatingPartnerId)), Criteria::IN);
 		$c->addAnd(PermissionItemPeer::PARTNER_ID, array(strval(PartnerPeer::GLOBAL_PARTNER), strval(self::$operatingPartnerId)), Criteria::IN);
 		$lookups = PermissionToPermissionItemPeer::doSelectJoinAll($c);
+		if (!$lookups)
+		{
+			throw new kCoreException('', kCoreException::INTERNAL_SERVER_ERROR);
+		}
 		foreach ($lookups as $lookup)
 		{
 			$item       = $lookup->getPermissionItem();

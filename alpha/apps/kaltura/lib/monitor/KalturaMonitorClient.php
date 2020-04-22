@@ -7,15 +7,17 @@ class KalturaMonitorClient
 {
 	const MAX_PACKET_SIZE = 1400;
 	
-	const EVENT_API_START = 'start';
-	const EVENT_API_END = 	'end';
-	const EVENT_DATABASE = 	'db';
-	const EVENT_SPHINX = 	'sphinx';
-	const EVENT_CONNTOOK =  'conn';
-	const EVENT_DUMPFILE = 	'file';
-	const EVENT_ELASTIC =	'elastic';
-	const EVENT_DRUID =		'druid';
-	const EVENT_COUCHBASE =	'couchbase';
+	const EVENT_API_START      = 'start';
+	const EVENT_API_END        = 	'end';
+	const EVENT_DATABASE       = 	'db';
+	const EVENT_SPHINX         = 	'sphinx';
+	const EVENT_CONNTOOK       =  'conn';
+	const EVENT_DUMPFILE       = 	'file';
+	const EVENT_ELASTIC        =	'elastic';
+	const EVENT_DRUID          =		'druid';
+	const EVENT_COUCHBASE      =	'couchbase';
+	const EVENT_FILE_SYSTEM    =	'filesystem';
+	const EVENT_RABBIT         =	'rabbit';
 
 
 	const FIELD_EVENT_TYPE = 		'e';
@@ -35,6 +37,8 @@ class KalturaMonitorClient
 	const FIELD_QUERY_TYPE = 		'q';
 	const FIELD_FILE_PATH = 		'f';
 	const FIELD_LENGTH =			'n';
+
+	const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_X_KALTURA_SESSION_COUNTERS';
 	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
@@ -49,7 +53,52 @@ class KalturaMonitorClient
 	protected static $apiStartTime = null;
 	
 	protected static $bufferedPacket = '';
-	
+
+	static protected $sessionCounters = array (
+		self::EVENT_DATABASE    =>  0,
+		self::EVENT_SPHINX      =>  0,
+		self::EVENT_COUCHBASE   =>  0,
+		self::EVENT_ELASTIC     =>  0,
+		self::EVENT_DRUID       =>  0,
+		self::EVENT_FILE_SYSTEM =>  0
+	);
+
+	public static function prettyPrintCounters()
+	{
+		$serviceInfo = kCurrentContext::$isInMultiRequest ?  ' S:multiRequest A:null' : ' S:' . kCurrentContext::$service . ' A:' . kCurrentContext::$action;
+		$str='pid:' . kCurrentContext::getCurrentPartnerId() . $serviceInfo . ' ';
+		foreach (self::$sessionCounters as $key => $value)
+		{
+			$str .= $key . ':' . $value . ' ';
+		}
+		return $str;
+	}
+
+	public static function monitorRequestEnd()
+	{
+		KalturaLog::info('Session counters ' . self::prettyPrintCounters());
+
+		if(!isset ($_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]))
+		{
+			return;
+		}
+
+		$sessionCountersShardSecret = kConf::get('SESSION_COUNTERS_SECRET', 'local', null);
+		list ($clientRequestTime,$hash) = explode(',', $_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]);
+
+		if($sessionCountersShardSecret && $clientRequestTime && $hash)
+		{
+			if(abs(time() - $clientRequestTime) < 300)
+			{
+				if($hash === hash('sha256', "$clientRequestTime,$sessionCountersShardSecret"))
+				{
+					header('X-Kaltura-session-counters: ' . base64_encode(json_encode(self::$sessionCounters)));
+				}
+			}
+		}
+	}
+
+
 	protected static function init()
 	{
 		if(!kConf::hasParam('monitor_uri'))
@@ -93,6 +142,12 @@ class KalturaMonitorClient
 	
 	protected static function writeDeferredEvent($data)
 	{
+		$eventType = $data[self::FIELD_EVENT_TYPE];
+		if(isset(self::$sessionCounters[$eventType]))
+		{
+			self::$sessionCounters[$eventType]++;
+		}
+
 		$str = json_encode($data);
 		if (strlen($str) > self::MAX_PACKET_SIZE)
 			return;
@@ -118,7 +173,7 @@ class KalturaMonitorClient
 		
 		if (!self::$stream)
 			return;
-		
+
 		self::$apiStartTime = microtime(true);
 		
 		self::$basicEventInfo = array(
@@ -184,7 +239,7 @@ class KalturaMonitorClient
 	{
 		if (!self::$stream)
 			return;
-		
+
 		// strip the comment
 		if (substr($sql, 0, 2) == '/*')
 		{
@@ -318,6 +373,21 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);		
 	}
 	
+	public static function monitorFileSystemAccess($operation, $timeTook, $execStatus)
+	{
+		if (!self::$stream)
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_FILE_SYSTEM,
+			self::FIELD_EXECUTION_TIME	=> $timeTook,
+			self::FIELD_QUERY_TYPE	=> $operation,
+			self::FIELD_ERROR_CODE => $execStatus,
+		));
+		
+		self::writeDeferredEvent($data);
+	}
+	
 	protected static function getRangeLength($size)
 	{		
 		if (!isset($_SERVER['HTTP_RANGE']))
@@ -365,4 +435,23 @@ class KalturaMonitorClient
 		
 		self::writeEvent($data);
 	}
+
+	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorType = '')
+	{
+		if (!self::$stream)
+			return;
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_RABBIT,
+			self::FIELD_DATABASE		=> $dataSource,
+			self::FIELD_TABLE		=> $tableName,
+			self::FIELD_QUERY_TYPE		=> $queryType,
+			self::FIELD_EXECUTION_TIME	=> $queryTook,
+			self::FIELD_LENGTH		=> $querySize ? $querySize : 0,
+			self::FIELD_ERROR_CODE		=> $errorType,
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
 }

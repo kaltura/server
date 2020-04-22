@@ -7,15 +7,19 @@ class kBroadcastUrlManager
 	const DEFAULT_SUFFIX = 'default';
 	const DEFAULT_PORT_RTMP = 1935;
 	const DEFAULT_PORT_RTSP = 554;
+	const DEFAULT_PORT_RTMPS = 443;
 	
 	const PROTOCOL_RTMP = 'rtmp';
 	const PROTOCOL_RTSP = 'rtsp';
+	const PROTOCOL_RTMPS = 'rtmps';
 
 	const RTMP_DOMAIN = 'domain';
 	const RTMP_PORT = 'port';
 
 	const RTSP_DOMAIN = 'rtsp_domain';
 	const RTSP_PORT = 'rtsp_port';
+
+	const RTMPS_PORT = 'rtmps_port';
 
 	
 	protected $partnerId;
@@ -53,10 +57,14 @@ class kBroadcastUrlManager
 			$dbEntry->setPrimaryBroadcastingUrl($this->getPrimaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP));
 		if($dbEntry->getFromCustomData('primaryRtspBroadcastingUrl'))
 			$dbEntry->setPrimaryRtspBroadcastingUrl($this->getPrimaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP));
+		if($dbEntry->getFromCustomData('primaryRtmpsBroadcastingUrl'))
+			$dbEntry->setPrimarySecuredBroadcastingUrl($this->getPrimaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMPS));
 		if($dbEntry->getFromCustomData('secondaryBroadcastingUrl'))
 			$dbEntry->setSecondaryBroadcastingUrl($this->getSecondaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMP));
 		if($dbEntry->getFromCustomData('secondaryRtspBroadcastingUrl'))
 			$dbEntry->setSecondaryRtspBroadcastingUrl($this->getSecondaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTSP));
+		if($dbEntry->getFromCustomData('secondaryRtmpsBroadcastingUrl'))
+			$dbEntry->setSecondarySecuredBroadcastingUrl($this->getSecondaryBroadcastUrl($dbEntry, kBroadcastUrlManager::PROTOCOL_RTMPS));
 	}
 
 	protected function getPostfixValue ($sourceType)
@@ -104,6 +112,8 @@ class kBroadcastUrlManager
 		$port = kBroadcastUrlManager::DEFAULT_PORT_RTMP;
 		if($protocol == kBroadcastUrlManager::PROTOCOL_RTSP)
 			$port = kBroadcastUrlManager::DEFAULT_PORT_RTSP;
+		if($protocol == kBroadcastUrlManager::PROTOCOL_RTMPS)
+			$port = kBroadcastUrlManager::DEFAULT_PORT_RTMPS;
 	
 		$broadcastConfig = $this->getConfiguration();	
 		if(isset($broadcastConfig[$portParam]))
@@ -185,6 +195,8 @@ class kBroadcastUrlManager
 	{
 		if($protocol == kBroadcastUrlManager::PROTOCOL_RTMP)
 			return array(kBroadcastUrlManager::RTMP_DOMAIN, kBroadcastUrlManager::RTMP_PORT);
+		if($protocol == kBroadcastUrlManager::PROTOCOL_RTMPS)
+			return array(kBroadcastUrlManager::RTMP_DOMAIN, kBroadcastUrlManager::RTMPS_PORT);
 		if($protocol == kBroadcastUrlManager::PROTOCOL_RTSP)
 			return array(kBroadcastUrlManager::RTSP_DOMAIN, kBroadcastUrlManager::RTSP_PORT);
 	}

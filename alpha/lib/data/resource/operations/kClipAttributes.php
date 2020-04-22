@@ -124,7 +124,7 @@ class kClipAttributes extends kOperationAttributes
 	 */
 	public function getEffectArray()
 	{
-		return $this->effectArray;
+		return $this->effectArray ? $this->effectArray : array();
 	}
 
 	/**

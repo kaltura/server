@@ -1531,7 +1531,9 @@ class reportsInputFilter
 	public $regions;
 	public $devices;
 	public $os_families;
+	public $os;
 	public $browsers_families;
+	public $browsers;
 	public $cities;
 	public $media_types;
 	public $source_types;
@@ -1540,6 +1542,14 @@ class reportsInputFilter
 	public $gte_entry_created_at;
 	public $lte_entry_created_at;
 	public $entries_ids;
+	public $playback_context_ids;
+	public $root_entries_ids;
+	public $event_var1;
+	public $player_versions;
+	public $isp;
+	public $application_versions;
+	public $node_ids;
+	public $categories_ancestor_ids;
 
 	public function getFilterBy() {
 		return "";

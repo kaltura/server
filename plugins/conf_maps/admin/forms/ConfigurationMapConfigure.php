@@ -26,6 +26,20 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 		$titleElement->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag', array('tag' => 'b'))));
 		$this->addElement($titleElement);
 
+		$this->addElement('text', 'userId', array(
+			'label' => 'Creator:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly' => true,
+		));
+
+		$this->addElement('text', 'createdAt', array(
+			'label' => 'Last Updated Date:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly' => true,
+		));
+
 		$this->addElement('text', 'name', array(
 			'label' => 'Map Name:',
 			'required' => true,
@@ -41,7 +55,7 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 			'readonly' => $this->disableAttributes,
 		));
 
-		$this->addElement('textarea', 'content', array(
+		$this->addElement('textarea', 'rawData', array(
 			'label' => 'Content:',
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
@@ -80,6 +94,7 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 	{
 		// reset readonly attributes
 		$configurationItem->lastUpdate = null;
+		$configurationItem->createdAt = null;
 		$configurationItem->version = null;
 		$configurationItem->isEditable = null;
 		$configurationItem->sourceLocation = null;
@@ -95,18 +110,20 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 	public function isValid($data)
 	{
 		$res = parent::isValid($data);
-		if(!$data['content'])
+		if (!$res)
+		{
+			return false;
+		}
+		if(!$data['rawData'])
 		{
 			return true;
 		}
-		$content = preg_replace('/^\h*\v+/m', '', $data['content']); // remove empty line
+		$content = preg_replace('/^;.*$/m', '', $data['rawData']); // remove comments
+		$content = preg_replace('/^\h*\v+/m', '', $content ); // remove empty line
 		if ( preg_match('/^((?!(\[.*\])|(.*=.)).)*$/im',$content , $matches)) //match invalid ini lines
 		{
 				return false;
 		}
-		if ( parse_ini_string( $data['content'], true, INI_SCANNER_RAW) === false)
-			return false;
-
 		return $res;
 	}
 }

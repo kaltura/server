@@ -6,7 +6,6 @@
 abstract class kReportExportEngine
 {
 	const DEFAULT_TITLE = 'default';
-	const DISCLAIMER_CONFIG_KEY = 'report_filter_disclaimer_message';
 
 	protected $reportItem;
 	protected $fp;
@@ -63,7 +62,7 @@ abstract class kReportExportEngine
 			return;
 		}
 
-		$disclaimerMessage = kConf::get(self::DISCLAIMER_CONFIG_KEY, 'local', null);
+		$disclaimerMessage = KBatchBase::$taskConfig->params->disclaimerMessage;
 		if ($disclaimerMessage)
 		{
 			$this->writeRow($disclaimerMessage);
@@ -88,6 +87,17 @@ abstract class kReportExportEngine
 			$this->writeRow("Filtered entries: $entryIds");
 		}
 
+		if ($filter->categoriesIdsIn)
+		{	
+			$categoriesIds = $filter->categoriesIdsIn;
+			$this->writeRow("Filtered categories: $categoriesIds");
+		}
+
+		if (isset($filter->playbackContext))
+		{
+			$playbackContextIds = $filter->playbackContext;
+			$this->writeRow("Filtered categories pages: $playbackContextIds");
+		}
 	}
 
 	protected function writeDelimitedRow($row)

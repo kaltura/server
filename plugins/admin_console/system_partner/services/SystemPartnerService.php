@@ -155,7 +155,10 @@ class SystemPartnerService extends KalturaBaseService
 
 		$partnerFilter = new partnerFilter();
 		$filter->toObject($partnerFilter);
-		$partnerFilter->set('_gt_id', 0);
+		if (kCurrentContext::getCurrentPartnerId() != Partner::BATCH_PARTNER_ID)
+		{
+			$partnerFilter->set('_gt_id', 0);
+		}
 		
 		$c = new Criteria();
 		$partnerFilter->attachToCriteria($c);
@@ -228,7 +231,17 @@ class SystemPartnerService extends KalturaBaseService
 		$dbPartner = PartnerPeer::retrieveByPK($pId);
 		if (!$dbPartner)
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
-		$configuration->toUpdatableObject($dbPartner);
+		try
+		{
+			$configuration->toUpdatableObject($dbPartner);
+		}
+		catch(KalturaAPIException $e)
+		{
+			if($e->getCode() === SystemPartnerErrors::DOMAINS_NOT_ALLOWED_CODE)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$e->getArgs()));
+			}
+		}
 		$dbPartner->save();
 		PartnerPeer::removePartnerFromCache($pId);
 	}

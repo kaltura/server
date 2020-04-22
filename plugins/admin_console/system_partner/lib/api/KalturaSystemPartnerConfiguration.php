@@ -360,6 +360,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
  */
 	public $defaultLiveStreamSegmentDuration;
 
+    /**
+     * @var int
+     */
+    public $defaultRecordingConversionProfile;
+
 	/**
 	 * @var string
 	 */
@@ -399,6 +404,42 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $blockDirectLogin;
+
+	/**
+	 * @var bool
+	 */
+	public $ignoreSynonymEsearch;
+
+	/**
+	 * @var bool
+	 */
+	public $avoidIndexingSearchHistory;
+
+	/**
+	 * @var int
+	 */
+	public $usagePercent;
+
+	/**
+	 * @var int
+	 */
+	public $eightyPercentWarning;
+
+	/**
+	 * @var int
+	 */
+	public $usageLimitWarning;
+
+	/**
+	 * @var int
+	 */
+	public $lastFreeTrialNotificationDay;
+
+	/**
+	 * @var bool
+	 */
+	public $extendedFreeTrailEndsWarning;
+
 
 	private static $map_between_objects = array
 	(
@@ -469,6 +510,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
 		"defaultLiveStreamSegmentDuration",
+		"defaultRecordingConversionProfile",
 		"eSearchLanguages",
 		"publisherEnvironmentType",
 		"ovpEnvironmentUrl",
@@ -477,6 +519,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"useTwoFactorAuthentication",
 		"useSso",
 		"blockDirectLogin",
+		"ignoreSynonymEsearch",
+		"avoidIndexingSearchHistory",
+		"usagePercent",
+		"eightyPercentWarning",
+		"usageLimitWarning",
+		"lastFreeTrialNotificationDay",
+		"extendedFreeTrailEndsWarning"
 	);
 
 	public function getMapBetweenObjects()
@@ -553,8 +602,54 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
 			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
-	
+
+		if (!$this->isNull('defaultRecordingConversionProfile'))
+        {
+            $this->validatePropertyNumeric('defaultRecordingConversionProfile');
+            $conversionProfile = conversionProfile2Peer::retrieveByPKAndPartnerId($this->defaultRecordingConversionProfile, $sourceObject->getId());
+            if ($this->defaultRecordingConversionProfile != 0 && !$conversionProfile) {  // 0 is for disable the feature - not need to check if conversion profile exist
+                throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
+            }
+        }
+
+		$this->validateAllowedFromEmailWhiteList();
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
+	}
+	protected function validateAllowedFromEmailWhiteList()
+	{
+		if ($this->allowedFromEmailWhiteList)
+		{
+			$fromEmailList =  array_map('trim',explode(',',$this->allowedFromEmailWhiteList));
+			$domains = self::getDomains($fromEmailList);
+			$domainsNotAllowed = kSpfMailerValidator::getDomainsNotAllowed($domains);
+			if ($domainsNotAllowed)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$domainsNotAllowed));
+			}
+			KalturaLog::debug('All domains are allowing Kaltura');
+		}
+	}
+
+	protected static function getDomains($fromEmailList)
+	{
+		$domains = array();
+		foreach ($fromEmailList as $email)
+		{
+			if ($email)	//don't handel empty emails
+			{
+				$domainPos = strpos($email,'@');
+				if ($domainPos === false || $domainPos === strlen($email) - 1)
+				{
+					$domains[$email] = $email;
+				}
+				else if ($domainPos < strlen($email) - 1)	//get the domain from the email
+				{
+					$emailDomain = substr($email, $domainPos + 1);
+					$domains[$emailDomain] = $emailDomain;
+				}
+			}
+		}
+		return $domains;
 	}
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )

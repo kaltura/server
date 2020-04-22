@@ -43,7 +43,8 @@ class ReachProfile extends BaseReachProfile
 	
 	const MAX_CREDIT_HISTORY_TO_KEEP =                      10;
 	const DEFAULT_MAX_CHARS_PER_LINE =                      26;
-	
+
+	protected $ignoreUpdatedAt = false;
 	//setters
 	
 	public function setEnableMachineModeration($v)
@@ -205,9 +206,18 @@ class ReachProfile extends BaseReachProfile
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_TASK_PROCESSING_REGION, $v);
 	}
-	
+
+	public function setIgnoreUpdatedAt($v)
+	{
+		$this->ignoreUpdatedAt = $v;
+	}
 	//getters
-	
+
+	public function getIgnoreUpdatedAt()
+	{
+		return $this->ignoreUpdatedAt;
+	}
+
 	public function getEnableMachineModeration()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENABLE_MACHINE_MODERATION,null, false);
@@ -365,7 +375,7 @@ class ReachProfile extends BaseReachProfile
 
 		if ($reachProfileCredit )
 		{
-			$syncedCredit = $reachProfileCredit->syncCredit($this->getId());
+			$syncedCredit = $reachProfileCredit->syncCredit($this->getId(), $this->getPartnerId());
 			$this->setUsedCredit($syncedCredit);
 		}
 		$this->setCredit($reachProfileCredit);
@@ -414,25 +424,28 @@ class ReachProfile extends BaseReachProfile
 		
 		return false;
 	}
-	
+
 	public function syncCreditPercentageUsage()
 	{
 		//We updated the credit usage while using a custom query so we need to reload the object from the DB
 		$this->reload();
-		
-		$currentCredit = $this->getCredit()->getCurrentCredit(false);
-		$creditUsagePercentage = ($currentCredit == ReachProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
-		
-		if($currentCredit != 0 && $currentCredit != ReachProfileCreditValues::UNLIMITED_CREDIT)
-		{
-			$usedCredit = $this->getUsedCredit();
-			$creditUsagePercentage = ($usedCredit/$currentCredit)*100;
-		}
-		
-		$this->setCreditUsagePercentage($creditUsagePercentage);
+		$this->calculateCreditPercentUsage();
 		$this->save();
 	}
-	
+
+	public function calculateCreditPercentUsage()
+	{
+		$currentCredit = $this->getCredit()->getCurrentCredit(false);
+		$creditUsagePercentage = ($currentCredit == ReachProfileCreditValues::UNLIMITED_CREDIT) ? 0 : 100;
+		if ($currentCredit != 0 && $currentCredit != ReachProfileCreditValues::UNLIMITED_CREDIT)
+		{
+			$usedCredit = $this->getUsedCredit();
+			$creditUsagePercentage = ($usedCredit / $currentCredit) * 100;
+			KalturaLog::debug('Sync reach profile ' . $this->getId() . " percentage [$creditUsagePercentage] according to used credit[$usedCredit] and current credit [$currentCredit] ");
+		}
+		$this->setCreditUsagePercentage($creditUsagePercentage);
+	}
+
 	/**
 	 * Validate if the entry should be exported to the remote storage according to the defined export rules
 	 *
@@ -470,8 +483,21 @@ class ReachProfile extends BaseReachProfile
 			if($gotNonBooleanCondition && $checkEmptyRulesOnly )
 				continue;
 
-			if(!$checkEmptyRulesOnly && !count($rule->getConditions()))
-				continue;
+			if(!$checkEmptyRulesOnly)
+			{
+				if (!count($rule->getConditions()))
+				{
+					continue;
+				}
+				else if (count($rule->getConditions()) == 1)
+				{
+					$conditions = $rule->getConditions();
+					if ($conditions[0]->getType() == ConditionType::BOOLEAN)
+					{
+						continue;
+					}
+				}
+			}
 
 			$rule->setScope($scope);
 			$fulfilled = $rule->applyContext($context);
@@ -495,5 +521,20 @@ class ReachProfile extends BaseReachProfile
 		
 		return $fullFilledCatalogItemIds;
 	}
-	
+
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return boolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		$before = $this->getUpdatedAt();
+		$ret = parent::preUpdate($con);
+		if($this->isModified() && $this->getIgnoreUpdatedAt())
+		{
+			$this->setUpdatedAt($before);
+		}
+		return $ret;
+	}
 } // ReachProfile

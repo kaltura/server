@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by IntelliJ IDEA.
- * User: David.Winder
- * Date: 10/22/2017
- * Time: 5:10 PM
- */
 class kFileBase 
 {
     /**

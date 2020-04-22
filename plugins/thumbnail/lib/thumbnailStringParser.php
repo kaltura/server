@@ -41,11 +41,16 @@ class thumbnailStringParser
 		'imageTextureText' => 'kImageTextureTextAction',
 		'filter' => 'kFilterAction',
 		'f' => 'kFilterAction',
+		'o' => 'kImageOutputAction',
+		'io' => 'kImageOutputAction',
+		'output' => 'kImageOutputAction',
+		'imageoutput' => 'kImageOutputAction',
 	);
 
 	/**
 	 * @param $stepString
 	 * @return kImageTransformationStep
+	 * @throws kThumbnailException
 	 */
 	protected static function parseImageTransformationStep($stepString)
 	{
@@ -139,6 +144,7 @@ class thumbnailStringParser
 	/**
 	 * @param $transformString
 	 * @return kImageTransformation
+	 * @throws kThumbnailException
 	 */
 	public static function parseTransformString($transformString)
 	{

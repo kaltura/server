@@ -233,12 +233,24 @@ class DbManager
 
 	protected static function getStickySessionKey()
 	{
+		$stickySession = self::getKsPrivilegeStickySessionKey();
+		
+		if(!$stickySession)
+		{
+			$stickySession = self::STICKY_SESSION_PREFIX . infraRequestUtils::getRemoteAddress();
+		}
+		
+		return $stickySession;
+	}
+	
+	protected static function getKsPrivilegeStickySessionKey()
+	{
 		$ksObject = kCurrentContext::$ks_object;
-
-		if($ksObject && $ksObject->hasPrivilege(kSessionBase::PRIVILEGE_SESSION_KEY)) 
+		
+		if($ksObject && $ksObject->hasPrivilege(kSessionBase::PRIVILEGE_SESSION_KEY))
 			return self::STICKY_SESSION_PREFIX . kCurrentContext::getCurrentPartnerId() . "_" . $ksObject->getPrivilegeValue(kSessionBase::PRIVILEGE_SESSION_KEY);
 		
-		return self::STICKY_SESSION_PREFIX . infraRequestUtils::getRemoteAddress();
+		return null;
 	}
 	
 	/**
@@ -247,6 +259,12 @@ class DbManager
 	public static function getSphinxConnection($read = true, $indexName = null)
 	{
 		KalturaLog::debug("Using index with name [$indexName]");
+		if($indexName && !isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
+		{
+			KalturaLog::debug("Table is not shareded will use generic index name");
+			$indexName = "sphinx_generic_connection";
+		}
+		
 		if(!isset(self::$sphinxConnection[$indexName]))
 		{
 			if($indexName && isset(self::$config['sphinx_datasources_'.$indexName]['datasources']))
@@ -278,7 +296,8 @@ class DbManager
 			KalturaLog::debug("Actual sphinx index [". self::$connIndexes[$indexName]. "] sphinx index by best lag [" . $preferredIndex. "]");
 		}
 	
-		if (!$read)
+		$sphinxStickyPartnerIds = kConf::get('sphinx_sticky_partners', 'sphinx_dynamic_config', array());
+		if (!$read || (self::getKsPrivilegeStickySessionKey() && in_array(kCurrentContext::getCurrentPartnerId(), $sphinxStickyPartnerIds)) )
 			self::setSphinxConnIndexInCache($indexName);
 		return self::$sphinxConnection[$indexName];
 	}

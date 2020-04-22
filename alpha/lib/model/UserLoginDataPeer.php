@@ -322,7 +322,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
 		kuserPeer::setUseCriteriaFilter(false);
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($loginData->getConfigPartnerId(), $loginData->getLoginEmail(), true);
+		$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $loginData->getConfigPartnerId());
 		kuserPeer::setUseCriteriaFilter(true);
 		if (!$dbUser)
 		{
@@ -557,6 +557,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 
+		return self::setLastLoginFields($loginData, $kuser);
+	}
+
+	public static function setLastLoginFields($loginData, $kuser)
+	{
 		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
 		$isAdmin = $kuser->getIsAdmin();
@@ -574,7 +579,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$kuser->setLastLoginTime($currentTime);
 		
 		$kuser->save();
-		
 		return $kuser;
 	}
 	
@@ -805,7 +809,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		$originPartnerAuthType = $originPartner->getAuthenticationType();
 		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
-
+		if ($requestedPartnerAuthType === PartnerAuthenticationType::SSO)
+		{
+			throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
+		}
 		if($originPartnerAuthType !== $requestedPartnerAuthType)
 		{
 			if($requestedPartnerAuthType !== PartnerAuthenticationType::PASSWORD_ONLY)
@@ -813,6 +820,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
 			}
 		}
+	}
+
+	public static function getPartnerIdFromLoginData($email)
+	{
+		$loginData = UserLoginDataPeer::getByEmail($email);
+		if (!$loginData)
+		{
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		$partnerId = $loginData->getLastLoginPartnerId() ? $loginData->getLastLoginPartnerId() : $loginData->getConfigPartnerId();
+		return $partnerId;
 	}
 
 } // UserLoginDataPeer

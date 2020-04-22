@@ -54,7 +54,6 @@ class PexipService extends KalturaBaseService
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
-		$dbLiveEntry->setExplicitLive(false);
 		$dbLiveEntry->setIsSipEnabled(true);
 		$dbLiveEntry->save();
 
@@ -125,7 +124,7 @@ class PexipService extends KalturaBaseService
 		/** @var  SipEntryServerNode $sipEntryServerNode */
 		if (!$sipEntryServerNode)
 		{
-			$msg = 'Entry is Live and Active. can\'t connect call.';
+			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is Live and Active. can\'t connect call.';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			return $response;
 		}

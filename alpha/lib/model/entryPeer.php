@@ -303,11 +303,12 @@ class entryPeer extends BaseentryPeer
 	public static function retrieveByPKNoFilter ($pk, $con = null, $filterEntitlements = true)
 	{
 		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		$currentFilterResultsState = self::$filterResults;
 		self::$filterResults = $filterEntitlements;
 		self::setUseCriteriaFilter ( false );
 		$res = parent::retrieveByPK( $pk , $con );
 		self::setUseCriteriaFilter ( true );
-		self::$filterResults = false;
+		self::$filterResults = $currentFilterResultsState;
 		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
 		return $res;
 	}
@@ -692,15 +693,15 @@ class entryPeer extends BaseentryPeer
 	public static function getDurationType($duration)
 	{
 		if ($duration >= 0 && $duration <= 4*60)
-			return entry::ENTRY_DURATION_TYPE_SHORT;
+			return durationType::SHORT;
 
 		if ($duration > 4*60 && $duration <= 20*60)
-			return entry::ENTRY_DURATION_TYPE_MEDIUM;
+			return durationType::MEDIUM;
 
 		if ($duration > 20*60)
-			return entry::ENTRY_DURATION_TYPE_LONG;
+			return durationType::LONG;
 
-		return entry::ENTRY_DURATION_TYPE_NOTAVAILABLE;
+		return durationType::NOT_AVAILABLE;
 	}
 
 	public static function getCacheInvalidationKeys()
@@ -832,14 +833,21 @@ class entryPeer extends BaseentryPeer
 		self::$validatedEntries[] = $entryId;
 	}
 
+	public static function filterEmptyEntry($entryId)
+	{
+		return !empty($entryId);
+	}
+
 	public static function filterEntriesByPartnerOrKalturaNetwork(array $entryIds, $partnerId)
 	{
+		$entryIds = array_filter($entryIds, array('entryPeer', 'filterEmptyEntry'));
 		$validatedEntries = array_intersect($entryIds, self::$validatedEntries);
 		$entryIds = array_diff($entryIds, self::$validatedEntries);
 
 		if(count($entryIds) === 1)
 		{
-			if(entryPeer::retrieveByPK($entryIds[0]))
+			$entryId = reset($entryIds);
+			if($entryId && entryPeer::retrieveByPK($entryId))
 			{
 				return $entryIds;
 			}
@@ -913,6 +921,14 @@ class entryPeer extends BaseentryPeer
 			$entryData = isset($data[$key]) ? $data[$key] : null;
 			$entry->setPlaysViewsData($entryData);
 		}
+	}
+
+	public static function retrieveByPkWithoutInstancePooling($id)
+	{
+		Propel::disableInstancePooling();
+		$entry = entryPeer::retrieveByPKNoFilter($id);
+		Propel::enableInstancePooling();
+		return $entry;
 	}
 
 }

@@ -17,6 +17,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
@@ -44,6 +46,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
@@ -65,6 +69,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
@@ -87,6 +93,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
+				self::EVENT_TYPE_VIEW,
+				self::METRIC_AVG_VIEW_ENGAGEMENT,
 			),
 		),
 
@@ -95,10 +103,13 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				self::METRIC_VIEW_UNIQUE_BUFFERING_USERS,
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 		),
 
 		ReportType::DISCOVERY_REALTIME => array(
+			self::REPORT_GRANULARITY => self::GRANULARITY_DYNAMIC,
+			self::REPORT_SKIP_TOTAL_FROM_GRAPH => true,
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
@@ -112,7 +123,23 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_DVR,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
+			self::REPORT_TOTAL_METRICS => array(
+				self::METRIC_VIEW_UNIQUE_AUDIENCE,
+				self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
+				self::METRIC_VIEW_UNIQUE_BUFFERING_USERS,
+				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+				self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR,
+				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_PLAY_TIME_SEC,
+				self::METRIC_AVG_VIEW_LIVE_LATENCY,
+				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
+				self::METRIC_AVG_VIEW_BUFFERING,
+				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_AVG_VIEW_DVR,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+			)
 		),
 
 		ReportType::ENTRY_LEVEL_USERS_DISCOVERY_REALTIME => array(
@@ -135,9 +162,11 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
 			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
+			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_TABLE_MAP => array(
 				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
 				'sum_view_time_dvr' => self::METRIC_VIEW_DVR_PLAY_TIME_SEC,
@@ -145,6 +174,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 			self::REPORT_TOTAL_MAP => array(
 				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
@@ -153,6 +183,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
 		),
 
@@ -183,6 +214,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PLAY_TIME_SEC,
 				self::METRIC_AVG_VIEW_BUFFERING,
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
@@ -194,6 +226,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'sum_view_time' => self::METRIC_VIEW_PLAY_TIME_SEC,
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 			self::REPORT_TOTAL_MAP => array(
@@ -203,6 +236,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'sum_view_time' => self::METRIC_VIEW_PLAY_TIME_SEC,
 				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
 				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'view_buffer_time_ratio' => self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				'known_flavor_params_view_count' => self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
 		),
@@ -226,6 +260,31 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::DISCOVERY_VIEW_REALTIME => array(
+			self::REPORT_GRANULARITY => self::GRANULARITY_DYNAMIC,
+			self::REPORT_SKIP_TOTAL_FROM_GRAPH => true,
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_DYNAMIC_VIEWERS,
+				self::METRIC_DYNAMIC_VIEWERS_BUFFERING,
+				self::METRIC_DYNAMIC_VIEWERS_ENGAGEMENT,
+				self::METRIC_DYNAMIC_VIEWERS_DVR,
+				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_PLAY_TIME_SEC,
+				self::METRIC_AVG_VIEW_LIVE_LATENCY,
+				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+			),
+			self::REPORT_TOTAL_METRICS => array(
+				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_PLAY_TIME_SEC,
+				self::METRIC_AVG_VIEW_LIVE_LATENCY,
+				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
+				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+			),
+		),
+
 	);
 
 	protected static function initTransformTimeDimensions()
@@ -236,10 +295,11 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId'),
 			self::GRANULARITY_TEN_SECOND => array('kKavaReportsMgr', 'timestampToUnixtime'),
 			self::GRANULARITY_MINUTE => array('kKavaReportsMgr', 'timestampToUnixtime'),
+			self::GRANULARITY_DYNAMIC => array('kKavaReportsMgr', 'timestampToUnixtime'),
 		);
 	}
 
-	public static function getReportDef($report_type)
+	public static function getReportDef($report_type, $input_filter)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))

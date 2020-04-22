@@ -60,9 +60,9 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$this->frequency = $frequency;
 	}
 
-	public function syncCredit($reachProfileId)
+	public function syncCredit($reachProfileId, $partnerId)
 	{
-		$syncedCredit = parent::syncCredit($reachProfileId);
+		$syncedCredit = parent::syncCredit($reachProfileId, $partnerId);
 		if ($this->getLastSyncTime() > $this->periodEndDate)
 		{
 			$syncedCredit = 0;
@@ -121,11 +121,15 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		}
 
 		$credit = $this->credit;
-		if ($this->overageCredit)
+		if ($includeOverages && $this->overageCredit)
+		{
 			$credit += $this->overageCredit;
+		}
 
 		if($this->addOn)
+		{
 			$credit += $this->addOn;
+		}
 
 		return $credit;
 	}
@@ -137,7 +141,9 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	{
 		$now = $time != null ? $time : time();
 		if (!parent::isActive($now))
+		{
 			return false;
+		}
 
 		if ($now < $this->periodStartDate || $now > $this->periodEndDate)
 		{

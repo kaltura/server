@@ -398,6 +398,10 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	 */
 	public function copyToEntry( $entry, PropelPDO $con = null)
 	{
+		if (!$this->hasPermissionToCopyToEntry($entry))
+		{
+			throw new kCoreException('No permission to copy cuepoint '. $this->getId() .' to entry '. $entry->getId(), kCuePointException::COPY_CUE_POINT_TO_ENTRY_NOT_PERMITTED);
+		}
 		$cuePointCopy = $this->copy();
 		$cuePointCopy->setEntryId($entry->getId());
 		return $cuePointCopy;
@@ -547,5 +551,14 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	 * @return string|null the original entry
 	 */
 	public function getCopiedFrom()	{ return $this->getFromCustomData(self::COPIED_FROM);	}
+
+	/**
+	 * return current children count without calculation
+	 */
+	public function getCurrentChildrenCount()
+	{
+		return $this->children_count;
+	}
+
 
 } // CuePoint

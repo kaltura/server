@@ -66,6 +66,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$this->handleImportFinished($batchJob->getRootJob());
 			}
+			elseif ($this->isImportFailed($batchJob))
+			{
+				//When import fails the concat job would have been stuck in queue, in this case we need to fail the concat job as well
+				$this->handleImportFailed($batchJob->getRootJob());
+			}
 			elseif ($this->shouldStartConcat($batchJob))
 			{
 				$this->startConcat($batchJob->getRootJob());
@@ -77,8 +82,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		catch (Exception $ex)
 		{
-			KalturaLog::err('Error During Concat Job' . $ex);
-			return false;
+			KalturaLog::err('Error During Concat Job [' . $ex->getMessage() . ']');
 		}
 		return true;
 	}
@@ -87,12 +91,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		return 	$batchJob->getJobType() == BatchJobType::IMPORT && $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED;
 	}
+	
+	protected function isImportFailed(BatchJob $batchJob)
+	{
+		return 	$batchJob->getJobType() == BatchJobType::IMPORT && in_array($batchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_ABORTED));
+	}
+	
 	protected function shouldStartConcat(BatchJob $batchJob)
 	{
 		return 	$batchJob->getParentJob() &&
 				$batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT &&
 				!$this->concatJobExist($batchJob->getRootJob());
 	}
+	
 	protected function isConcatFinished(BatchJob $batchJob)
 	{
 		return 	$batchJob->getParentJob() &&
@@ -107,7 +118,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$rootJob->setData($jobData);
 		kEventsManager::raiseEventDeferred(new kBatchJobStatusEvent($rootJob));
 	}
-
+	
+	protected function handleImportFailed(BatchJob $rootJob)
+	{
+		$rootJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
+		$rootJob->setMessage("Failed to import source file for clipping");
+		$rootJob->save();
+	}
+	
 	/**
 	 * @param BatchJob $batchJob
 	 * @return bool true if the consumer should handle the event
@@ -151,14 +169,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	public function startBatchJob($resource, entry $dbEntry, $operationAttributes, $clipEntry, $importUrl = null)
 	{
+		$entryInternalResource = $resource->getResource()->getOriginEntryId();
 		if ($importUrl)
 		{
-			$this->createParentBatchJob(null, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, 0 , $importUrl);
+			$this->createParentBatchJob($entryInternalResource, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes, 0 , $importUrl);
 		}
 		else
 		{
-			$internalResource = $resource->getResource();
-			$this->createParentBatchJob($internalResource->getOriginEntryId(), $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
+			$this->createParentBatchJob($entryInternalResource, $clipEntry, $dbEntry, $dbEntry->getPartnerId(), $operationAttributes);
 		}
 	}
 
@@ -316,8 +334,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					$errDesc = '';
 					$this->addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc,
 						$jobData->getPartnerId(),
-						$jobData->getOperationAttributes(), $jobData->getPriority());
-					kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PROCESSING);
+						$jobData->getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY);
+					kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 				}
 				break;
 			default:
@@ -357,7 +375,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute, true));
 			if($singleAttribute->getDuration()<=0)
 			{
-				KalturaLog::info("Ingnoring clip attribute with non-positive duration");
+				KalturaLog::info("Ignoring clip attribute with non-positive duration");
 				continue;
 			}
 

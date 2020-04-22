@@ -5,6 +5,9 @@
  */
 class UserController extends Zend_Controller_Action
 {
+	const INVALID_CREDENTIALS = 0;
+	const MISSING_AUTH_SERVER_URL = 1;
+
 	public function indexAction()
 	{
 		$request = $this->getRequest();
@@ -142,6 +145,28 @@ class UserController extends Zend_Controller_Action
 	
 	public function loginAction()
 	{
+		if($this->shouldUseSsoLogin())
+		{
+			$this->ssoLogin();
+		}
+		else
+		{
+			$this->formLogin();
+		}
+	}
+
+	protected function shouldUseSsoLogin()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	protected function formLogin()
+	{
 		$loginForm = new Form_Login();
 		$resetForm = new Form_ResetPassword();
 		$request = $this->getRequest();
@@ -193,6 +218,52 @@ class UserController extends Zend_Controller_Action
 		$this->view->resetForm = $resetForm;
 		$this->render('login');
 	}
+
+	protected function ssoLogin()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		$partnerId = $settings->partnerId;
+		$client = Infra_ClientHelper::getClient();
+		$ssoPlugin = Kaltura_Client_Sso_Plugin::get($client);
+
+		try
+		{
+			$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+			if(!$redirectUrl)
+			{
+				throw new Exception('Missing authentication server url', self::MISSING_AUTH_SERVER_URL);
+			}
+
+			// if we got session from sso server validate it, if we didnt redirect to sso server
+			$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
+			if(!$ks)
+			{
+				$this->getResponse()->setRedirect($redirectUrl);
+			}
+			else
+			{
+				$client->setKs($ks);
+				$client->user->loginByKs($partnerId);
+
+				$adapter = new Kaltura_AdminAuthAdapter();
+				$adapter->setKs($ks);
+				$auth = Infra_AuthHelper::getAuthInstance();
+				$result = $auth->authenticate($adapter);
+				if ($result->isValid())
+				{
+					$this->_helper->redirector('list', 'partner');
+				}
+				else
+				{
+					throw new Exception('Could not authenticate with the given credentials', self::INVALID_CREDENTIALS);
+				}
+			}
+		}
+		catch(Exception $ex)
+		{
+			throw $ex;
+		}
+	}
 	
 	public function logoutAction()
 	{
@@ -200,7 +271,15 @@ class UserController extends Zend_Controller_Action
 		$client = Infra_ClientHelper::getClient();
 		$client->session->end();
 		Infra_AuthHelper::getAuthInstance()->clearIdentity();
-		$this->_helper->redirector('index', 'index');
+
+		if($this->shouldUseSsoLogin())
+		{
+			$this->render('logout');
+		}
+		else
+		{
+			$this->_helper->redirector('index', 'index');
+		}
 	}
 	
 	public function blockAction()

@@ -153,7 +153,7 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		$this->setDefault('filterTypeStr', get_class($object->objectFilter));
 
 		foreach ($object->objectFilter as $key => $value)
-			if ($value)
+			if (isset($value))
 				$this->setDefault(self::FILTER_PREFIX.$key, $value);
 
 		$this->populateAdvanceSearch($object->objectFilter);

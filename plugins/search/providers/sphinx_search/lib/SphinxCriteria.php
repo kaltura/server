@@ -10,6 +10,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
 	
+	protected static $NEGATIVE_COMPARISON_VALUES = array(baseObjectFilter::NOT_IN, baseObjectFilter::NOT, baseObjectFilter::NOT_CONTAINS);
 	/**
 	 * @var string none or sph04
 	 */
@@ -38,6 +39,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @var array
 	 */
 	protected $conditionClause = array();
+
+	/**
+	 * Sphinx condition clauses equal to Zero
+	 * @var array
+	 */
+	protected $conditionClauseEqualsZero = array();
 	
 	/**
 	 * Sphinx orderby clauses
@@ -92,6 +99,27 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * @var array
 	 */
 	public $forcedOrderIds;
+
+	protected static $forceSkipSphinx = false;
+
+	protected $sphinxOptimizationsFilterKeys = array();
+
+	protected $disablePartnerOptimization = false;
+
+	public function setDisablePartnerOptimization($value)
+	{
+		$this->disablePartnerOptimization = $value;
+	}
+
+	public static function enableForceSkipSphinx()
+	{
+		self::$forceSkipSphinx = true;
+	}
+	
+	public static function disableForceSkipSphinx()
+	{
+		self::$forceSkipSphinx = false;
+	}
 	
 	protected function applyIds(array $ids)
 	{
@@ -164,11 +192,53 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				throw new kCoreException("Invalid sphinx query [$sql]\nMatched regular expression [$badQuery]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 			}
 		}
+		
+		$cache = null;
+		//Block only external queries, batch should always work
+		if(kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+		{
+			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		}
+		
+		$sqlHash = "SPHSearch_" . md5(preg_replace('/\d/', '', $sql) . "_" . kCurrentContext::getCurrentPartnerId());
+		if ($cache)
+		{
+			$cache->add($sqlHash, 5, 3600);
+			$searchCounter = $cache->decrement($sqlHash);
+			KalturaLog::log("sphinxSearchLimit: Sql hash [$sqlHash], counter [$searchCounter]");
+			if($searchCounter <= 0)
+			{
+				KalturaLog::log("sphinxSearchLimit: Exceeded max queries allowed for given hash [$sqlHash] and query [$sql]");
+				//throw new kCoreException("Exceeded max queries allowed for query [$sql]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
+			}
+		}
 
 		//debug query
 
 		$sqlConditions = array();
-		$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
+		try
+		{
+			$QueryStartTime = microtime(true);
+			$ids = $pdo->queryAndFetchAll($sql, PDO::FETCH_COLUMN, $sqlConditions, 0);
+			$queryRunTime = microtime(true) - $QueryStartTime;
+		}
+		catch(Exception $e)
+		{
+			if(strpos($e->getMessage(), 'server has gone away') !== false && $cache)
+			{
+				KalturaLog::log("MySQL server has gone away, decrementing search query count");
+				$searchCounter = $cache->decrement($sqlHash, 3);
+			}
+			throw $e;
+		}
+		
+		if ($cache)
+		{
+			$delta = ($queryRunTime <= 0.5) ? 2 : 1;
+			$searchCounter = $cache->increment($sqlHash, $delta);
+			KalturaLog::log("sphinxSearchLimit: Sql hash [$sqlHash], new counter [$searchCounter] queryTime [$queryRunTime]");
+		}
+		
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
@@ -359,9 +429,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	protected function addSphinxOptimizationMatches(array $criterionsMap) 
 	{
 		$objectClass = $this->getIndexObjectName();
-		$optimizationField = $objectClass::getSphinxOptimizationMap();
-		
-		foreach($optimizationField as $formatParams) {
+		$optimizationMap = $objectClass::getSphinxOptimizationMap();
+		if (isset($this->disablePartnerOptimization) && $this->disablePartnerOptimization)
+		{
+			$this->removePartnerIdFromOptimizationMap($objectClass, $optimizationMap);
+		}
+
+		foreach($optimizationMap as $formatParams) {
 			$hasEmptryField = false;
 			$values = array();
 			
@@ -396,7 +470,33 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->matchClause[] = "( @sphinx_match_optimizations " . implode(" | ", $formatedStr) . ")";
 		}
 	}
-	
+
+	/**
+	 * @param $objectClass
+	 * @param $optimizationMap
+	 * remove remove array from array of arrays if partner_id pattern is found the inner array values.
+	 */
+	protected function removePartnerIdFromOptimizationMap($objectClass, &$optimizationMap)
+	{
+		foreach ($this->sphinxOptimizationsFilterKeys as $ignoreOptimazationKey)
+		{
+			$pattern = "/$ignoreOptimazationKey$/";
+			for ($i = count($optimizationMap) - 1; $i >= 0; $i--)
+			{
+				foreach ($optimizationMap[$i] as $optimizationParam)
+				{
+					if (preg_match($pattern, $optimizationParam, $result))
+					{
+						KalturaLog::debug("Removing $optimizationParam from optimization Map");
+						unset($optimizationMap[$i]);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+
 	/* (non-PHPdoc)
 	 * @see SphinxCriteria#applyFilters()
 	 */
@@ -486,7 +586,17 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$conditions .=	', (' . $this->conditionClause[$i] . ') as cnd' . $i . ' ';
 			$this->addWhere('cnd' . $i . ' > 0');
 			
-			$i++; 
+			$i++;
+		}
+		foreach ($this->conditionClauseEqualsZero as $conditionClause)
+		{
+			if ($conditionClause == '')
+			{
+				continue;
+			}
+			$conditions .=	', (' . $conditionClause . ') as cnd' . $i . ' ';
+			$this->addWhere('cnd' . $i . ' = 0');
+			$i++;
 		}
 		
 		$wheres = '';
@@ -698,9 +808,19 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			
 			KalturaLog::debug("Attach field[$fieldName] as sphinx field[$sphinxField] of type [$type] and comparison[$operator] for value[$valStr]");
 
+			if ( !in_array($operator, self::$NEGATIVE_COMPARISON_VALUES) && $this->shouldFilterFieldFromSphinxOptimizations($objectClass,$sphinxField))
+			{
+				$this->setDisablePartnerOptimization(true);
+			}
+
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 			$notEmpty = kSphinxSearchManager::HAS_VALUE . $partnerId;
-			
+
+			if(in_array($operator, array(baseObjectFilter::IN, baseObjectFilter::EQ, baseObjectFilter::NOT_IN)) &&  $fieldsEscapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE)
+			{
+				$fieldsEscapeType = SearchIndexFieldEscapeType::FULL_ESCAPE;
+			}
+
 			switch($operator)
 			{
 				case baseObjectFilter::MULTI_LIKE_OR:
@@ -726,10 +846,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				case baseObjectFilter::NOT_IN:
 					$vals = is_array($val) ? $val : explode(',', $val);
-						
 					foreach($vals as $valIndex => $valValue)
 					{
-						if(!strlen($valValue))							
+						if(!strlen($valValue))
 							unset($vals[$valIndex]);
 						elseif(preg_match('/[\s\t]/', $valValue))
 							$vals[$valIndex] = '"' . SphinxUtils::escapeString($valValue, $fieldsEscapeType) . '"';
@@ -748,7 +867,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 				case baseObjectFilter::IN:
 					$vals = is_array($val) ? $val : explode(',', $val);
-						
+					
 					foreach($vals as $valIndex => &$valValue)
 					{
 						$valValue = trim($valValue);
@@ -780,7 +899,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				case baseObjectFilter::EQ:
 					if(is_numeric($val) || strlen($val) > 0)
 					{
-						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);	
+						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
 						if($objectClass::isNullableField($fieldName))
 							$this->addMatch("@$sphinxField \\\"^$val $notEmpty$\\\"");
 						else							
@@ -840,7 +959,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			        if(strlen($val))
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
-						if ($fieldsEscapeType != SearchIndexFieldEscapeType::MD5_LOWER_CASE)
+						if (!in_array($fieldsEscapeType, array(SearchIndexFieldEscapeType::MD5_LOWER_CASE, SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE)))
 						{
 							$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
 						}
@@ -957,6 +1076,11 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	
 	private function shouldSkipSphinx()
 	{
+		if(self::$forceSkipSphinx)
+		{
+			return true;
+		}
+		
 		$objectClass = $this->getIndexObjectName();
 		$skipFields = $objectClass::getIndexSkipFieldsList();
 		
@@ -1089,6 +1213,15 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$this->conditionClause[] = $condition;
 		}
 	}
+
+	public function addConditionEqualsZero($condition)
+	{
+		if(strlen(trim($condition)))
+		{
+			KalturaLog::debug("Added [$condition]");
+			$this->conditionClauseEqualsZero[] = $condition;
+		}
+	}
 	
 	public function addNumericOrderBy($column, $orderByType = Criteria::ASC) 
 	{
@@ -1203,6 +1336,30 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				
 			$this->matchClause[] = $matches;
 		}
+	}
+
+	/**
+	 * @param $objectClass
+	 * @param $fieldName
+	 * @return bool
+	 *
+	 */
+	public function shouldFilterFieldFromSphinxOptimizations($objectClass, $fieldName)
+	{
+		$ignoreOptimazationItems = $objectClass::getIgnoreOptimizationKeys();
+		foreach ($ignoreOptimazationItems as $key => $ignoreOptimazationKeys)
+		{
+			if (count($ignoreOptimazationKeys) && in_array($fieldName, $ignoreOptimazationKeys))
+			{
+				KalturaLog::debug("Found ignore sphinx optimization match for $objectClass - $fieldName");
+				if (!in_array($key, $this->sphinxOptimizationsFilterKeys))
+				{
+					$this->sphinxOptimizationsFilterKeys[] = $key;
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 }
 

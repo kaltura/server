@@ -40,6 +40,31 @@ class CaptionAssetService extends KalturaAssetService
 		return parent::partnerRequired($actionName);
 	}
 
+	protected function shouldDisableCategoryEntitlement($entryId)
+	{
+		if(kCurrentContext::$isInMultiRequest)
+		{
+			return false;
+		}
+
+		$ks = null;
+		$ksString = kCurrentContext::$ks ? kCurrentContext::$ks : '';
+		if ($ksString != '') // for actions with no KS or when creating ks.
+		{
+			$ks = ks::fromSecureString($ksString);
+		}
+
+		if($ks)
+		{
+			if(in_array($entryId, $ks->getDisableEntitlementForEntry()))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Add caption asset
 	 *
@@ -59,6 +84,8 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	function addAction($entryId, KalturaCaptionAsset $captionAsset)
 	{
+		$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($entryId);
+
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -73,7 +100,7 @@ class CaptionAssetService extends KalturaAssetService
 		$dbCaptionAsset = new CaptionAsset();
 		$dbCaptionAsset = $captionAsset->toInsertableObject($dbCaptionAsset);
 		
-		if($this->getKs() && $this->getKs()->getPrivilegeByName(KSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
+		if($this->getKs() && $this->getKs()->getPrivilegeByName(kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION))
 			$dbCaptionAsset->setDisplayOnPlayer(false);
 				
 		$dbCaptionAsset->setEntryId($entryId);
@@ -100,23 +127,33 @@ class CaptionAssetService extends KalturaAssetService
 	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
 	 * @throws KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 * @validateUser asset::entry id edit
 	 */
 	function setContentAction($id, KalturaContentResource $contentResource)
 	{
 		$dbCaptionAsset = assetPeer::retrieveById($id);
 		if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
+		{
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $id);
+		}
 
 		$dbEntry = $dbCaptionAsset->getentry();
 		if (!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
-
+		}
 
 		$previousStatus = $dbCaptionAsset->getStatus();
 		$contentResource->validateEntry($dbCaptionAsset->getentry());
 		$contentResource->validateAsset($dbCaptionAsset);
 		$kContentResource = $contentResource->toObject();
+		if($this->shouldDisableCategoryEntitlement($dbEntry->getId()))
+		{
+			categoryPeer::disableCategoryEntitlementEnforcement();
+		}
+
 		$this->attachContentResource($dbCaptionAsset, $kContentResource);
 
 		if ($dbCaptionAsset->getContainerFormat() == CaptionType::SCC)
@@ -130,21 +167,23 @@ class CaptionAssetService extends KalturaAssetService
 		}
 
 		$contentResource->entryHandled($dbCaptionAsset->getentry());
-		
-    	$newStatuses = array(
-    		CaptionAsset::ASSET_STATUS_READY,
-    		CaptionAsset::ASSET_STATUS_VALIDATING,
-    		CaptionAsset::ASSET_STATUS_TEMP,
-    	);
-    	
-    	if($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
-   			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
-   		else
-	    {
-		    kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
-		    $dbEntry->setCacheFlavorVersion($dbEntry->getCacheFlavorVersion() + 1);
-		    $dbEntry->save();
-	    }
+
+		$newStatuses = array(
+			CaptionAsset::ASSET_STATUS_READY,
+			CaptionAsset::ASSET_STATUS_VALIDATING,
+			CaptionAsset::ASSET_STATUS_TEMP,
+		);
+
+		if ($previousStatus == CaptionAsset::ASSET_STATUS_QUEUED && in_array($dbCaptionAsset->getStatus(), $newStatuses))
+		{
+			kEventsManager::raiseEvent(new kObjectAddedEvent($dbCaptionAsset));
+		}
+		else
+		{
+			kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbCaptionAsset));
+			$dbEntry->setCacheFlavorVersion($dbEntry->getCacheFlavorVersion() + 1);
+			$dbEntry->save();
+		}
 
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
@@ -194,8 +233,16 @@ class CaptionAssetService extends KalturaAssetService
 		list($width, $height, $type, $attr) = getimagesize($fullPath);
 
 		$captionAsset->incrementVersion();
-		if ($ext && $ext != kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
+
+		if (!$ext || $ext == kUploadTokenMgr::NO_EXTENSION_IDENTIFIER )
+		{
+			$types = CaptionPlugin::getCaptionNamesByTypes();
+			$ext = isset($types[$captionAsset->getContainerFormat()]) ? $types[$captionAsset->getContainerFormat()] : null;
+		}
+		if($ext)
+		{
 			$captionAsset->setFileExt($ext);
+		}
 
 		$captionAsset->setSize(filesize($fullPath));
 		$captionAsset->save();
@@ -391,6 +438,7 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	public function serveByEntryIdAction($entryId, $captionParamId = null)
 	{
+		$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($entryId);
 		$entry = null;
 		if (!kCurrentContext::$ks)
 		{

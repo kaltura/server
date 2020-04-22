@@ -12,12 +12,14 @@ class kEntitlementUtils
 	const TYPE_SEPERATOR = "TYPE";
 	const ENTRY_PRIVACY_CONTEXT = 'ENTRYPC';
 	const PARTNER_ID_PREFIX = 'pid';
+	const CACHE_KEY_SEPERATOR = '_';
 
 	protected static $initialized = false;
 	protected static $entitlementEnforcement = false;
 	protected static $entitlementForced = null;
 	protected static $privacyContextSearch = null;
 	protected static $categoryModeration = false;
+	protected static $entitlementResponseCache = array();
 
 	public static function getDefaultContextString( $partnerId )
 	{
@@ -73,6 +75,54 @@ class kEntitlementUtils
 	}
 
 	/**
+	 * @param $entryId
+	 * @param null $kuserId
+	 * @param null $ks
+	 * @return string
+	 */
+	protected static function getCacheKey($entryId, $kuserId = null, $ks = null)
+	{
+		$privacyContexts = $ks ? $ks->getPrivacyContext() : null;
+		$userId = ($kuserId && trim($kuserId) != '') ? $kuserId : 'nouser';
+		$ksType = $ks ? (int)$ks->isAnonymousSession() : 'noks';
+		$pc = ($privacyContexts && trim($privacyContexts) != '') ? $privacyContexts : 'nopc';
+		return $entryId . self::CACHE_KEY_SEPERATOR . $userId . self::CACHE_KEY_SEPERATOR . $ksType . self::CACHE_KEY_SEPERATOR . $pc;
+	}
+
+	/**
+	 * @param $entryId
+	 * @param null $kuserId
+	 * @param null $ks
+	 */
+	protected static function storeInCache($entryId, $kuserId = null, $ks = null)
+	{
+		$key = self::getCacheKey($entryId, $kuserId, $ks);
+		KalturaLog::debug("Storing key in cache: " . $key);
+		self::$entitlementResponseCache[$key] = true;
+}
+
+	/**
+	 * @param $entryId
+	 * @param null $kuserId
+	 * @param null $ks
+	 * @return bool
+	 */
+	protected static function isCached($entryId, $kuserId = null, $ks = null)
+	{
+		$key = self::getCacheKey($entryId, $kuserId, $ks);
+		$res = isset(self::$entitlementResponseCache[$key]);
+		if ($res)
+		{
+			KalturaLog::debug('Key found in cache: ' . $key);
+		}
+		else
+		{
+			KalturaLog::debug('Could not find key in cache: ' . $key);
+		}
+		return $res;
+	}
+
+	/**
 	 * Returns true if kuser or current kuser is entitled to entryId
 	 * @param entry $entry
 	 * @param int $kuser
@@ -80,6 +130,20 @@ class kEntitlementUtils
 	 */
 	public static function isEntryEntitled(entry $entry, $kuserId = null)
 	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_API_V3);
+		if($cache)
+		{
+			$disableEntitlementValidationKeys = array('disable_entitlement_validation',
+				'disable_entitlement_validation_entry_'.$entry->getId(),
+				'disable_entitlement_validation_partner_'.$entry->getPartnerId());
+			$disableEntitlementValidation = $cache->multiGet($disableEntitlementValidationKeys);
+			if(is_array($disableEntitlementValidation) && count($disableEntitlementValidation) > 0)
+			{
+				KalturaLog::debug("Disable entitlement validation was enabled for key [" . print_r(array_keys($disableEntitlementValidation), true) . "], entitlement validation will not run");
+				return true;
+			}
+		}
+		
 		if($entry->getPartnerId() == PartnerPeer::GLOBAL_PARTNER)
 		{
 			return true;
@@ -120,73 +184,29 @@ class kEntitlementUtils
 
 		if($ks && in_array($entry->getId(), $ks->getDisableEntitlementForEntry()))
 		{
-			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disble entitlement for this entry');
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disable entitlement for this entry');
+			return true;
+		}
+
+		if($ks && in_array($entry->getId(), $ks->getDisableEntitlementForPlaylistEntries()))
+		{
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks disable entitlement for this playlist that contain this entry');
 			return true;
 		}
 
 		$kuserId = self::getKuserIdForEntitlement($kuserId, $ks);
 
-		if($ks && $kuserId)
+		if (self::isCached($entry->getId(), $kuserId, $ks))
 		{
-			// kuser is set on the entry as creator or uploader
-			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
-				return true;
-			}
-
-			// kuser is set on the entry entitled users edit or publish or view
-			if($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId) || $entry->isEntitledKuserView($kuserId))
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish or entry->entitledKusersView');
-				return true;
-			}
+			return true;
 		}
 
-		if(!$ks)
+		$result = self::validateEntryEntitlements($entry, $kuserId, $ks, $partner);
+		if ($result)
 		{
-			// entry that doesn't belong to any category is public
-			//when ks is not provided - the entry is still public (for example - download action)
-			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
-			if(!$categoryEntry)
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
-				return true;
-			}
+			self::storeInCache($entry->getId(), $kuserId, $ks);
 		}
-
-		$ksPrivacyContexts = null;
-		if($ks)
-			$ksPrivacyContexts = $ks->getPrivacyContext();
-
-		$allCategoriesEntry = array();
-
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partner->getId()))
-		{
-			if(!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
-			{
-				$categoryEntry = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId(), array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE));
-				if($categoryEntry)
-				{
-					KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
-					return true;
-				}
-			}
-			else
-				$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryIdAndPrivacyContext($entry->getId(), $ksPrivacyContexts);
-		}
-		else
-		{
-			$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
-			if($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
-			{
-				// entry that doesn't belong to any category is public
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
-				return true;
-			}
-		}
-
-		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
+		return $result;
 	}
 
 	public static function getKuserIdForEntitlement($kuserId = null, $ks = null)
@@ -268,10 +288,11 @@ class kEntitlementUtils
 	}
 
 	/**
-	 * Set Entitlement Enforcement - if entitelement is enabled \ disabled in this session
-	 * @param int $categoryId
-	 * @param int $kuser
-	 * @return bool
+	 * Set Entitlement Enforcement - if entitlement is enabled \ disabled in this session
+	 * @param int $partnerId
+	 * @param bool $enableEntit
+	 * @return void
+	 * @throws Exception
 	 */
 	public static function initEntitlementEnforcement($partnerId = null, $enableEntit = null)
 	{
@@ -574,5 +595,77 @@ class kEntitlementUtils
 			return true;
 
 		return $dbEntry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+	}
+
+	/**
+	 * @param entry $entry
+	 * @param $kuserId
+	 * @param $ks
+	 * @param $partner
+	 * @return bool
+	 */
+	protected static function validateEntryEntitlements(entry $entry, $kuserId, $ks, $partner)
+	{
+		if ($ks && $kuserId)
+		{
+			// kuser is set on the entry as creator or uploader
+			if ($kuserId != '' && ($entry->getKuserId() == $kuserId))
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->kuserId or entry->creatorKuserId [' . $kuserId . ']');
+				return true;
+			}
+
+			// kuser is set on the entry entitled users edit or publish or view
+			if ($entry->isEntitledKuserEdit($kuserId) || $entry->isEntitledKuserPublish($kuserId) || $entry->isEntitledKuserView($kuserId))
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: ks user is the same as entry->entitledKusersEdit or entry->entitledKusersPublish or entry->entitledKusersView');
+				return true;
+			}
+		}
+
+		if (!$ks)
+		{
+			// entry that doesn't belong to any category is public
+			//when ks is not provided - the entry is still public (for example - download action)
+			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
+			if (!$categoryEntry)
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
+				return true;
+			}
+		}
+
+		$ksPrivacyContexts = null;
+		if ($ks)
+			$ksPrivacyContexts = $ks->getPrivacyContext();
+
+		$allCategoriesEntry = array();
+
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partner->getId()))
+		{
+			if (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '')
+			{
+				$categoryEntry = categoryEntryPeer::retrieveOneByEntryIdStatusPrivacyContextExistance($entry->getId(), array(CategoryEntryStatus::PENDING, CategoryEntryStatus::ACTIVE));
+				if ($categoryEntry)
+				{
+					KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry belongs to public category and privacy context on the ks is not set');
+					return true;
+				}
+			}
+			else
+				$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryIdAndPrivacyContext($entry->getId(), $ksPrivacyContexts);
+		}
+		else
+		{
+			$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
+			if ($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
+			{
+				// entry that doesn't belong to any category is public
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
+				return true;
+			}
+		}
+
+		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
 	}
 }

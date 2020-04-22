@@ -15,7 +15,7 @@ class myEntryUtils
 		EntrySourceType::LECTURE_CAPTURE,
 	);
 
-	public static function updateThumbnailFromContent(entry $dbEntry, $content, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	public static function updateThumbnailFromContent(entry $dbEntry, $content, $fileSyncType = kEntryFileSyncSubType::THUMB)
 	{
 		$dbEntry->setThumbnail(".jpg"); // this will increase the thumbnail version
 		$dbEntry->setCreateThumb(false);
@@ -116,10 +116,10 @@ class myEntryUtils
 		{
 			if ($echo)
 				echo ( "Copying file: " . $content . $source_thumbnail_path . " -> " .  $content . $target_thumbnail_path ."\n");
-			$sourceThumbFileKey = $source->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$sourceThumbFileKey = $source->getSyncKey(kEntryFileSyncSubType::THUMB);
 			if(kFileSyncUtils::file_exists($sourceThumbFileKey))
 			{
-				$targetThumbFileKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+				$targetThumbFileKey = $target->getSyncKey(kEntryFileSyncSubType::THUMB);
 				kFileSyncUtils::softCopy($sourceThumbFileKey, $targetThumbFileKey);
 			}
 			//myContentStorage::moveFile( $content . $source_thumbnail_path , $content . $target_thumbnail_path , false , true );
@@ -134,8 +134,8 @@ class myEntryUtils
 		{
 			if ($echo)
 				echo ( "Copying file: " . $content . $source_data_path . " -> " .  $content . $target_data_path . "\n");
-			$sourceDataFileKey = $source->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			$targetDataFileKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$sourceDataFileKey = $source->getSyncKey(kEntryFileSyncSubType::DATA);
+			$targetDataFileKey = $target->getSyncKey(kEntryFileSyncSubType::DATA);
 			kFileSyncUtils::softCopy($sourceDataFileKey, $targetDataFileKey);
 			//myContentStorage::moveFile( $content . $source_data_path , $content . $target_data_path , false , true );
 		}
@@ -182,16 +182,16 @@ class myEntryUtils
 //		$target->setMediaType( $source_entry->getMediaType() );
 //		$target->setTags ( $source_entry->getTags () );
 
-		$sourceThumbKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); //replaced__getThumbnailPat
-		$sourceDataKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);  //replaced__getDataPath
-		$sourceDataEditKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); //replaced__getDataPathEdit
+		$sourceThumbKey = $source_entry->getSyncKey(kEntryFileSyncSubType::THUMB); //replaced__getThumbnailPat
+		$sourceDataKey = $source_entry->getSyncKey(kEntryFileSyncSubType::DATA);  //replaced__getDataPath
+		$sourceDataEditKey = $source_entry->getSyncKey(kEntryFileSyncSubType::DATA_EDIT); //replaced__getDataPathEdit
 
 //		$target->setThumbnail ( $source_thumbnail_path );
 //		$target->setData ( $source_data_path );
 
-		$targetThumbKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); 		//replaced__getThumbnailPath
-		$targetDataKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); 		//replaced__getDataPath
-		$targetDataEditKey = $target->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); 	//replaced__getDataPathEdit
+		$targetThumbKey = $target->getSyncKey(kEntryFileSyncSubType::THUMB); 		//replaced__getThumbnailPath
+		$targetDataKey = $target->getSyncKey(kEntryFileSyncSubType::DATA); 		//replaced__getDataPath
+		$targetDataEditKey = $target->getSyncKey(kEntryFileSyncSubType::DATA_EDIT); 	//replaced__getDataPathEdit
 
 		$content = myContentStorage::getFSContentRootPath();
 
@@ -250,7 +250,7 @@ class myEntryUtils
 			// this will reset the data and increment the count
 			$entry->setData( ".xml" );
 		}
-		$targetFileSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$targetFileSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 		
 		// doesn't require kFileSyncUtils change - this is a static template that should not be represented as row in the table
 		$source = $content . myContentStorage::getGeneralEntityPath ( "entry/data" , 0, 0 , "&metadata_text.xml" );
@@ -448,12 +448,6 @@ class myEntryUtils
 
 		$content_path = myContentStorage::getFSContentRootPath();
 
-//		Remarked by Tan-Tan 27/09/2010
-//		Handled by kObjectDeleteHandler
-//		$currentDataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-//		$currentDataEditKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT); // replaced__getDataPathEdit
-//		$currentThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
-
 		$entry->setData( $entry->getData() ); 				// once to increment the verions
 		$entry->setData( $template_file ); 					// the other to set the template
 		$entry->setThumbnail( $entry->getThumbnail() );		// once to increment the verions
@@ -513,10 +507,10 @@ class myEntryUtils
 		if ( $deleted_paths )
 		{
 			$original_play = @$deleted_paths[0];
-			$dataKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, @$deleted_paths[0]);
+			$dataKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA, @$deleted_paths[0]);
 			kFileSyncUtils::undeleteSyncFile($dataKey);
 			//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[0] );
-			$dataEditKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT, @$deleted_paths[1]);
+			$dataEditKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA_EDIT, @$deleted_paths[1]);
 			kFileSyncUtils::undeleteSyncFile($dataEditKey);
 			//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[1] );
 			
@@ -534,7 +528,7 @@ class myEntryUtils
 			{
 				$entry->setThumbnail( null ); // reset the thumb before setting - it won't increment the version count
 				$entry->setThumbnail( $entry->getFromCustomData( "deleted_original_thumb" ) , true ); // force the value that was set beforehand
-				$thumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB, @$deleted_paths[2]);
+				$thumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB, @$deleted_paths[2]);
 				kFileSyncUtils::undeleteSyncFile($thumbKey);
 				//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[2] ); // 
 			}	
@@ -657,13 +651,13 @@ class myEntryUtils
 			$entry->save();
 			
 			// create new thumb file for entry
-			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::moveFromFile($thumbBigFullPath, $newThumbKey);
 		}
 		else if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO && $time_offset == -1 ||
 			$media_type == entry::ENTRY_MEDIA_TYPE_SHOW) // not time offset - copying existing thumb
 		{
-			$thumbBigFullKey = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$thumbBigFullKey = $source_entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			if(!kFileSyncUtils::fileSync_exists($thumbBigFullKey))
 			{
 				return false;
@@ -673,18 +667,18 @@ class myEntryUtils
 			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
-			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::softCopy($thumbBigFullKey, $newThumbKey);
 		}
 		elseif($media_type == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
-			$thumb_key = $source_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$thumb_key = $source_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 			$thumb_path = kFileSyncUtils::getLocalFilePathForKey($thumb_key);
 			$entry->setThumbnail ( ".jpg");
 			$entry->setCreateThumb(false);
 			$entry->save();
 			// copy existing thumb
-			$newThumbKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::copyFromFile($thumb_path, $newThumbKey);
 		}
 		else
@@ -754,15 +748,16 @@ class myEntryUtils
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
 		
-		//create final path for thumbnail created
-		$finalBasePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
-		$finalThumbPath = $contentPath.$finalBasePath;
+		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
-		//Add unique id to the proccesing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
-		$thumbName .= "_" . uniqid() . "_";
+		//create final path for thumbnail created
+		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+		
+		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
+		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
+		
 		//create path for processing thumbnail request
-		$processingBasePath = myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
-		$processingThumbPath = $contentPath.$processingBasePath;
+		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );;
 		
 		if(!is_null($format))
 		{
@@ -770,12 +765,27 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 		
-		if (kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
+		foreach ($thumbDirs as $thumbDir)
 		{
-			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
-			return $finalThumbPath;
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+			if (kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
+			{
+				if($currPath != $finalThumbPath)
+				{
+					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+					if(!$moveFileSuccess)
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+						header("X-Kaltura:cached-thumb-exists,".md5($currPath));
+						return $currPath;
+					}
+				}
+				
+				header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
+				return $finalThumbPath;
+			}
 		}
-
+		
 		/* @var  $fileSync FileSync*/
 		if ($fileSync)
 			$orig_image_path = $fileSync->getFullPath();
@@ -871,10 +881,10 @@ class myEntryUtils
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
-				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/tempthumb", $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
+				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
-	
+				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
@@ -883,34 +893,44 @@ class myEntryUtils
 
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
+					{
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+					}
 
 					$success = false;
-					if(($multi || $servingVODfromLive || $isStaticPlaylist) && $packagerRetries)
+					if( ($multi || $servingVODfromLive || $isStaticPlaylist) && $packagerRetries)
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
-						$success = self::captureThumbUsingPackager($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$success = myPackagerUtils::captureThumbUsingPackager($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
 						$packagerResizeFullPath = $destPath . self::TEMP_FILE_POSTFIX;
 						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
 						if(!$success)
+						{
 							$packagerRetries--;
+						}
+
 						$thumbCaptureByPackager = $success;
 					}
 
 					if (!$success)
 					{
 						if ($entry->getType() == entryType::PLAYLIST)
+						{
 							$success = self::capturePlaylistThumbUsingFirstEntry($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $orig_image_path);
+						}
 
 						if (!$success)
 						{
-							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) || self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
+								myPackagerUtils::captureRemoteThumbUsingPackager($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
 						}
 					}
 
 					if ($cache)
+					{
 						$cache->delete($cacheLockKeyProcessing);
+					}
 					
 					if (!$success)
 					{
@@ -1038,110 +1058,17 @@ class myEntryUtils
 		$entry = myPlaylistUtils::getFirstEntryFromPlaylist($playlist);
 		if (!$entry)
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-		$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) || self::captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+		$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
+			myPackagerUtils::captureRemoteThumbUsingPackager($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
 		return $success;
 	}
 
-
-	public static function captureThumbUsingPackager($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null)
-	{
-		if (myEntryUtils::shouldServeVodFromLive($entry))
-			return self::captureLiveThumbUsingPackager($entry, 'recording', $capturedThumbPath, $calc_vid_sec, $width, $height);
-
-		$mappedThumbEntryTypes = array(entryType::PLAYLIST);
-		$isPlayList = in_array($entry->getType(), $mappedThumbEntryTypes);
-		if($isPlayList)
-		{
-			$firstEntry = myPlaylistUtils::getFirstEntryFromPlaylist($entry);
-			if (!$firstEntry)
-			{
-				return false;
-			}
-			$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($firstEntry->getId());
-		}
-		else
-		{
-			$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getId());
-		}
-
-		if(!$flavorAsset)
-		{
-			return false;
-		}
-
-		if ($isPlayList || $flavorAsset->getEncryptionKey())
-		{
-			return self::captureMappedThumbUsingPackager($entry, $flavorAsset, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
-		}
-		else
-		{
-			return self::captureLocalThumbUsingPackager( $flavorAsset, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
-		}
-	}
-
-	private static function captureLiveThumbUsingPackager(entry $entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
-	{
-		$packagerCaptureUrl = kConf::get('packager_local_live_thumb_capture_url', 'local', null);
-		if (!$packagerCaptureUrl)
-			return false;
-
-		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
-		if (is_null($dc))
-			return false;
-		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
-		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
-		if (!$calc_vid_sec) //Temp until packager support time 0
-			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
-		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
-	}
-	
-	private static function getLiveEntryDcId($entryId, $type)
+	public static function getLiveEntryDcId($entryId, $type)
 	{
 		$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $type);
 		if (!$entryServerNode)
 			return null;
 		return $entryServerNode->getDCId();
-	}
-
-	private static function captureMappedThumbUsingPackager($entry, $flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
-	{
-		$packagerCaptureUrl = kConf::get('packager_mapped_thumb_capture_url', 'local', null);
-		if (!$packagerCaptureUrl)
-			return false;
-
-		if(!$flavorAsset)
-			return false;
-
-		$flavorAssetId = $flavorAsset->getId();
-		$flavorParamsId = $flavorAsset->getFlavorParamsId();
-		if(!$flavorParamsId)
-			return false;
-
-		$flavorUrl = self::buildThumbUrl($entry, $flavorAsset);
-
-		return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-	}
-
-
-	protected static function buildThumbUrl($entry, $flavorAsset)
-	{
-		$partnerId = $flavorAsset->getPartnerId();
-		$subpId = $entry->getSubpId();
-		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-		$entryVersion = $entry->getVersion();
-
-		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
-		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		if($entry->getType() == entryType::PLAYLIST)
-		{
-			$url .= "/flavorParamIds/" . $flavorAsset->getFlavorParamsId();
-		}
-		else
-		{
-			$url .= '/flavorId/' . $flavorAsset->getId();
-		}
-		$url .= self::MP4_FILENAME_PARAMETER;
-		return $url;
 	}
 
 	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
@@ -1203,102 +1130,12 @@ class myEntryUtils
 		return true;
 	}
 
-	protected static function captureLocalThumbUsingPackager($flavorAsset, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width, $height)
-	{
-		$packagerCaptureUrl = kConf::get('packager_local_thumb_capture_url', 'local', null);
-		if (!$packagerCaptureUrl)
-			return false;
-
-		$flavorAssetId = $flavorAsset->getId();
-		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
-		$entry_data_path = ltrim($entry_data_path, "/");
-
-		if (!$entry_data_path)
-			return false;
-		return self::curlThumbUrlWithOffset($entry_data_path, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-	}
-
-
-	private static function getFlavorSupportedByPackagerForThumbCapture($entryId)
-	{
-		//look for the highest bitrate flavor tagged with thumbsource
-		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
-
-		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
-		{
-			// look for the highest bitrate flavor the packager can parse
-			$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
-			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
-			{
-				//retrieve original ready
-				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
-				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
-					return null;
-			}
-		}
-		return $flavorAsset;
-	}
-
-	public static function isFlavorSupportedByPackager($flavorAsset, $excludeAudioFlavors = true)
-	{
-		if($excludeAudioFlavors)
-		{
-			if (!$flavorAsset->getVideoCodecId() || ($flavorAsset->getWidth() == 0) || ($flavorAsset->getHeight() == 0))
-				return false;
-		}
-
-		if($flavorAsset->hasTag(flavorParams::TAG_WEB) && self::isSupportedContainerFormat($flavorAsset))
-			return true;
-		return false;
-	}
-
 	public static function isSupportedContainerFormat($flavorAsset){
 		if ($flavorAsset->getContainerFormat() == assetParams::CONTAINER_FORMAT_MP42)
 			return true;
 		if (strpos($flavorAsset->getContainerFormat(), assetParams::CONTAINER_FORMAT_ISOM) !== false)
 			return true;
 		return false;
-	}
-
-	public static function captureRemoteThumb($entry, $orig_image_path, $calc_vid_sec, &$flavorAssetId)
-	{
-		$packagerCaptureUrl = kConf::get('packager_thumb_capture_url', 'local', null);
-		if (!$packagerCaptureUrl)
-			return false;
-		
-		// look for the highest bitrate MBR tagged bitrate (a flavor the packager can parse)
-		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_MBR, null, true);
-		if (is_null($flavorAsset))
-			return false;
-
-		$flavorAssetId = $flavorAsset->getId();
-		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$remoteFS = kFileSyncUtils::getReadyExternalFileSyncForKey($flavorSyncKey);
-		if (!$remoteFS)
-			return false;
-
-		$dp = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($remoteFS->getDc(), $flavorAsset->getEntryId()), null, $flavorAsset);
-		if (is_null($dp))
-			return false;
-		
-		$url = $dp->getFileSyncUrl($remoteFS);
-		if (strpos($url, "://") === false)
-			$url = rtrim($dp->getUrl(), "/") . "/".ltrim($url, '/');
-		
-		@list($baseUrl, $queryString) = explode("?", $url, 2);
-
-		$remoteThumbCapture = str_replace(
-			array ( "{url}", "{offset}" ),
-			array ( str_replace("://", "/", $baseUrl) , floor($calc_vid_sec*1000)  ) ,
-			$packagerCaptureUrl );
-	
-		if ($queryString)
-			$remoteThumbCapture .= "?$queryString";
-				
-		kFile::closeDbConnections();
-		KCurlWrapper::getDataFromFile($remoteThumbCapture, $orig_image_path, null, true);
-		return true;
 	}
 
 	public static function getRotate($flavorAssetId)
@@ -1313,7 +1150,7 @@ class myEntryUtils
 
 	public static function getEntryLocalImageFileSync(entry $entry, $version = null)
 	{
-		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? kEntryFileSyncSubType::DATA : kEntryFileSyncSubType::THUMB;
 		$entryImageKey = $entry->getSyncKey($sub_type, $version);
 		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey, false, false);
 		return ($local ? $file_sync : null);
@@ -1321,7 +1158,7 @@ class myEntryUtils
 	
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
 	{
-		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA : entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? kEntryFileSyncSubType::DATA : kEntryFileSyncSubType::THUMB;
 		$entry_image_key = $entry->getSyncKey($sub_type, $version);
 		$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
 		if (!$entry_image_path && $version == 100000)
@@ -1437,17 +1274,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		$entry_id = $entry->getId();
 		
-		$entrySyncKeys = array(
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC),
-			$entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG),
-		);
+		$entrySyncKeys = $entry::getEntryFileSyncSubTypes();
 		
 		$assets = assetPeer::retrieveByEntryId($entry_id);
 		foreach($assets as $asset)
@@ -1504,29 +1331,29 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($shouldCopyDataForNonClip || $shouldCopyDataForClip)
 		{
 			// copy the data
-			$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
-			$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA); // replaced__getDataPath
+			$from = $entry->getSyncKey(kEntryFileSyncSubType::DATA); // replaced__getDataPath
+			$to = $targetEntry->getSyncKey(kEntryFileSyncSubType::DATA); // replaced__getDataPath
 			KalturaLog::log("copyEntriesByType - copying entry data [".$from."] to [".$to."]");
 			kFileSyncUtils::softCopy($from, $to);
 		}
 
-		$ismFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+		$ismFrom = $entry->getSyncKey(kEntryFileSyncSubType::ISM);
 		if(kFileSyncUtils::fileSync_exists($ismFrom))
 		{
-			$ismTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			$ismTo = $targetEntry->getSyncKey(kEntryFileSyncSubType::ISM);
 			KalturaLog::log("copying entry ism [".$ismFrom."] to [".$ismTo."]");
 			kFileSyncUtils::softCopy($ismFrom, $ismTo);
 		}
 
-		$ismcFrom = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$ismcFrom = $entry->getSyncKey(kEntryFileSyncSubType::ISMC);
 		if(kFileSyncUtils::fileSync_exists($ismcFrom))
 		{
-			$ismcTo = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+			$ismcTo = $targetEntry->getSyncKey(kEntryFileSyncSubType::ISMC);
 			KalturaLog::log("copying entry ism [".$ismcFrom."] to [".$ismcTo."]");
 			kFileSyncUtils::softCopy($ismcFrom, $ismcTo);
 		}
 
-		$from = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+		$from = $entry->getSyncKey(kEntryFileSyncSubType::THUMB); // replaced__getThumbnailPath
 		$considerCopyThumb = true;
 		// if entry is image - data is thumbnail, and it was copied
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -1549,7 +1376,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 			if(!$skipThumb)
 			{
-				$to = $targetEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB); // replaced__getThumbnailPath
+				$to = $targetEntry->getSyncKey(kEntryFileSyncSubType::THUMB); // replaced__getThumbnailPath
 				KalturaLog::log("copyEntriesByType - copying entry thumbnail [".$from."] to [".$to."]");
 				kFileSyncUtils::softCopy($from, $to);
 			}
@@ -1558,18 +1385,28 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
 		foreach($sourceAssets as $sourceAsset)
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions))
+		{
+			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
+		}
 	}
 
-	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true)
+	private static function shouldCopyAsset($sourceAsset, $copyFlavors = true, $copyCaptions = true, $originalEntryId)
 	{
 		// timedThumbAsset are copied when ThumbCuePoint are copied
-			if ($sourceAsset instanceof timedThumbAsset || ( !$copyFlavors && $sourceAsset instanceof flavorAsset)
-			|| ( !$copyCaptions && $sourceAsset instanceof captionAsset))
+		if ($sourceAsset instanceof timedThumbAsset || (!$copyFlavors && $sourceAsset instanceof flavorAsset)
+			|| (!$copyCaptions && $sourceAsset instanceof captionAsset))
+		{
 			return false;
+		}
+
+		if (!kParentChildEntryUtils::shouldCopyAsset($sourceAsset, $originalEntryId))
+		{
+			return false;
+		}
+
 		return true;
 	}
 
@@ -2139,25 +1976,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $relatedEntries;
 	}
 
-
-	public static function getFlavorSupportedByPackagerForVolumeMap($entryId)
-	{
-		$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId);
-		if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-		{
-			// look for the lowest bitrate flavor the packager can parse
-			$flavorAsset = assetPeer::retrieveLowestBitrateByEntryId($entryId, flavorParams::TAG_MBR);
-			if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-			{
-				//retrieve original ready
-				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
-				if (is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset, false))
-					return null;
-			}
-		}
-		return $flavorAsset;
-	}
-
 	public static function getVolumeMapContent($flavorAsset)
 	{
 		$flavorId = $flavorAsset->getId();
@@ -2273,14 +2091,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 	}
 
-	public static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
-	{
-		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix);
-		kFile::closeDbConnections();
-		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
-		return $success;
-	}
-
 	public static function verifyThumbSrcExist($entry, $destThumbParams)
 	{
 		$srcAsset = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail(null, $destThumbParams->getSourceParamsId(), $entry->getId());
@@ -2310,7 +2120,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		else if (($dbObject instanceof entry) && ($dbObject->getMediaType() == KalturaMediaType::IMAGE))
 		{
-			$syncKey = $dbObject->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbObject->getSyncKey(kEntryFileSyncSubType::DATA);
 		}
 
 		if($syncKey)
@@ -2323,6 +2133,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 		}
 
+	}
+
+	public static function shouldValidateLocal()
+	{
+		//if multi request of more than one api call
+		return  (kCurrentContext::$multiRequest_index <= 1);
 	}
 
 }

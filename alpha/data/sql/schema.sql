@@ -297,6 +297,7 @@ CREATE TABLE `kvote`
 	PRIMARY KEY (`id`),
 	KEY `kshow_index`(`kshow_id`),
 	KEY `entry_user_status_index`(`entry_id`, `kuser_id`, `status`),
+	KEY `entry_rank_index`(`entry_id`, `rank`),
 	CONSTRAINT `kvote_FK_1`
 		FOREIGN KEY (`kshow_id`)
 		REFERENCES `kshow` (`id`),
@@ -2260,7 +2261,7 @@ CREATE TABLE `batch_job_log`
 	`duplication_key` VARCHAR(2047),
 	`log_status` INTEGER,
 	`status` INTEGER,
-	`abort` TINYINT,
+	`abort` TINYINT default 0,
 	`check_again_timeout` INTEGER,
 	`progress` TINYINT,
 	`message` VARCHAR(1024),
@@ -2411,7 +2412,6 @@ CREATE TABLE `user_entry`
 	`updated_at` DATETIME,
 	`status` INTEGER,
 	`type` INTEGER,
-	`custom_data` TEXT,
 	`extended_status` INTEGER,
 	`privacy_context` VARCHAR(255),
 	`custom_data` TEXT,
@@ -2493,11 +2493,35 @@ CREATE TABLE `conf_maps`
 	`status` INTEGER  NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`remarks` VARCHAR(255),
-	`content` TEXT,
+	`content` MEDIUMTEXT,
 	`version` INTEGER,
 	PRIMARY KEY (`id`),
 	KEY `primary_map_index`(`map_name`, `host_name`, `version`),
 	KEY `id_index`(`id`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- sso
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sso`;
+
+
+CREATE TABLE `sso`
+(
+	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`application_type` VARCHAR(64)  NOT NULL,
+	`partner_id` INTEGER,
+	`domain` VARCHAR(64),
+	`status` TINYINT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	`redirect_url` VARCHAR(1024)  NOT NULL,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_status_index`(`partner_id`, `status`),
+	KEY `domain_status_index`(`domain`, `status`),
+	KEY `redirect_url_status_index`(`redirect_url`, `status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

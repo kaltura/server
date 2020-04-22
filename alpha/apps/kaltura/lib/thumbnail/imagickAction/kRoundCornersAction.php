@@ -25,7 +25,7 @@ class kRoundCornersAction extends kImagickAction
 		{
 			$background = new Imagick();
 			$background->newImage($this->image->getImageWidth(), $this->image->getImageHeight(), new ImagickPixel($this->backgroundColor));
-			$this->image->compositeImage($background, imagick::COMPOSITE_DSTATOP, 0, 0);
+			$this->image->compositeImage($background, Imagick::COMPOSITE_DSTATOP, 0, 0);
 		}
 
 		return $this->image;

@@ -60,6 +60,7 @@ class KExternalErrors
 	const ENTRY_NOT_SEQUENCE = 48;
 	const INVALID_MIN_BITRATE = 49;
 	const INVALID_PARAMETER = 50;
+	const PLAYLIST_DURATION_IS_ZERO = 51;
 
 	const HTTP_STATUS_NOT_FOUND = 404;
 
@@ -118,6 +119,7 @@ class KExternalErrors
 		self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
 		self::INVALID_MIN_BITRATE => "min bitrate is not valid",
 		self::INVALID_PARAMETER => "Request parameter [%s] is invalid",
+		self::PLAYLIST_DURATION_IS_ZERO => "The duration of the playlist is zero",
 	);
 
 	public static function dieError($errorCode, $message = null)

@@ -114,13 +114,29 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		if (!$pager)
 			$pager = new KalturaFilterPager();
-		
-		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
-			$this->applyPartnerFilterForClass('entryVendorTask');
-		else
-			$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
-		
+
+		$this->applyFiltersAccordingToPartner($filter);
+
 		return $filter->getListResponse($pager, $this->getResponseProfile());
+	}
+
+	protected function applyFiltersAccordingToPartner($filter)
+	{
+		if (kCurrentContext::$ks_partner_id == partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+				$this->applyPartnerFilterForClass('entryVendorTask');
+		}
+		else
+		{
+			if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::getCurrentPartnerId()))
+			{
+				$this->applyPartnerFilterForClass('entryVendorTask');
+			}
+			else
+			{
+				$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+			}
+		}
 	}
 	
 	/**
@@ -270,7 +286,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPKAndVendorPartnerId($id, kCurrentContext::$ks_partner_id);
 		if (!$dbEntryVendorTask)
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
-		
+
+		$partnerId = $dbEntryVendorTask->getPartnerId();
+		$this->setPartnerFilters($partnerId);
+		kCurrentContext::$partner_id = $partnerId;
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
 		

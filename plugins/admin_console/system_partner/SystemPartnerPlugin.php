@@ -21,7 +21,7 @@ class SystemPartnerPlugin extends KalturaPlugin implements IKalturaPermissions, 
 
 	public static function isAllowedPartner($partnerId)
 	{
-		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
 			return true;
 		
 		return false;

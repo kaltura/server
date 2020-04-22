@@ -31,7 +31,7 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	{
 		return KalturaBatchJobType::LIVE_TO_VOD;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */

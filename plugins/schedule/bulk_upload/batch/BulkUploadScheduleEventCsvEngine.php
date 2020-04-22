@@ -284,7 +284,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 		
 		if (count($columns) != count($values))
 		{
-			$this->setResultError($result, 'The number of values is not equal to the number of columns. Event wll not be created.');
+			$this->setResultError($result, 'The number of values is not equal to the number of columns. Event will not be created.');
 			$this->addBulkUploadResult($result);
 			return;
 		}
@@ -316,27 +316,38 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			return;
 		}
 		
-		if (isset($row['resource']) && $row['resource'])
+		
+		$resourceFilter = new KalturaScheduleResourceFilter();
+		$resourceFilter->statusEqual = KalturaScheduleResourceStatus::ACTIVE;
+		if (isset($row['resourceID']) && $row['resourceID'])
 		{
-			$resourceFilter = new KalturaScheduleResourceFilter();
+			$resourceFilter->idEqual = $row['resourceID'];
+		}
+		elseif (isset($row['resource']) && $row['resource'])
+		{
 			$resourceFilter->systemNameEqual = $row['resource'];
-			$resourceFilter->statusEqual = KalturaScheduleResourceStatus::ACTIVE;
-			
-			KBatchBase::impersonate($this->getCurrentPartnerId());
-			$resourceResults = $this->schedulePlugin->scheduleResource->listAction($resourceFilter);
-			KBatchBase::unimpersonate();
-			
-			if (!$resourceResults->totalCount)
-			{
-				//If the resource could not be found - input validation error must be set on the bulk upload result.
-				$this->setResultError($result, 'Invalid resource system name ' . $row['resource'] . ' passed. Event was not created.');
-				$this->addBulkUploadResult($result);
-				return;
-			}
-			else
-			{
-				$result->resourceId = $resourceResults->objects[0]->id;
-			}
+		}
+		else
+		{
+			$this->setResultError($result, 'Neither the resource system name nor the resource ID were specified. Event was not created.');
+			$this->addBulkUploadResult($result);
+			return;
+		}
+		
+		KBatchBase::impersonate($this->getCurrentPartnerId());
+		$resourceResults = $this->schedulePlugin->scheduleResource->listAction($resourceFilter);
+		KBatchBase::unimpersonate();
+		
+		if (!$resourceResults->totalCount)
+		{
+			//If the resource could not be found - input validation error must be set on the bulk upload result.
+			$this->setResultError($result, 'Invalid resource system name or ID passed. Event was not created.');
+			$this->addBulkUploadResult($result);
+			return;
+		}
+		else
+		{
+			$result->resourceId = $resourceResults->objects[0]->id;
 		}
 		
 		
@@ -445,7 +456,6 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			'action',
 			'eventType',
 			'title',
-			'resource',
 			'startTime',
 			'eventOrganizerId',
 			'contentOwnerId',
@@ -463,6 +473,7 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 			'categoryIds',
 			'categoryPaths',
 			'resource',
+			'resourceID',
 			'startTime',
 			'duration',
 			'endTime',

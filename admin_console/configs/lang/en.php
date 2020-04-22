@@ -69,6 +69,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
 	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
 	'Kaltura_Client_Enum_BatchJobType::CLIP_CONCAT' => 'Clip Concat',
+	'Kaltura_Client_Enum_BatchJobType::CONVERT_CAPTION_ASSET' => 'Convert Caption Asset',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
@@ -248,6 +249,8 @@ return array(
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::CONVERSION_LOG' => 'Conversion Log',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_PRIMARY' => 'Primary Live Segments', 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_SECONDARY' => 'Secondary Live Segments',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::INTERACTIVITY_DATA' => 'Interactivity Data',
+	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::VOLATILE_INTERACTIVITY_DATA' => 'Volatile Interactivity Data',
 
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::DATA' => 'Data',
 	'Kaltura_Client_FileSync_Enum_FileSyncObjectType::UICONF::FEATURES' => 'Features',
@@ -308,6 +311,9 @@ return array(
 
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::ENTRY_READY' => 'On entry ready',
 	'Kaltura_Client_ContentDistribution_Enum_DistributeTrigger::MODERATION_APPROVED'  => 'On moderation approved',
+
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::REGULAR' => 'Regular assets',
+	'Kaltura_Client_TvinciDistribution_Enum_TvinciAssetsType::VIRTUAL' => 'Virtual assets',
 
 	'init client failed' => 'Could not initiate the Kaltura client',
 	'entry not found' => 'Entry not found',
@@ -1434,6 +1440,13 @@ return array(
 	
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::BEST_EFFORT' => 'BEST_EFFORT',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::IMMEDIATE' => 'IMMEDIATE',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::ONE_BUSINESS_DAY' => 'ONE_BUSINESS_DAY',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_BUSINESS_DAYS' => 'TWO_BUSINESS_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THREE_BUSINESS_DAYS' => 'THREE_BUSINESS_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_BUSINESS_DAYS' => 'FOUR_BUSINESS_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_BUSINESS_DAYS' => 'FIVE_BUSINESS_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::SIX_BUSINESS_DAYS' => 'SIX_BUSINESS_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::SEVEN_BUSINESS_DAYS' => 'SEVEN_BUSINESS_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THIRTY_MINUTES' => 'THIRTY_MINUTES',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWO_HOURS' => 'TWO_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::THREE_HOURS' => 'THREE_HOURS',
@@ -1443,6 +1456,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS' => 'TWENTY_FOUR_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FORTY_EIGHT_HOURS' => 'FORTY_EIGHT_HOURS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FOUR_DAYS' => 'FOUR_DAYS',
+	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::FIVE_DAYS' => 'FIVE_DAYS',
 	'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime::TEN_DAYS' => 'TEN_DAYS',
 	
 	'Kaltura_Client_Reach_Type_VendorCatalogItemPricing' => "Default Pricing",
@@ -1512,4 +1526,21 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FI' => "Finnish",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IS' => "Icelandic",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PL' => "Polish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IN' => "Indonesian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EL' => "Greek",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RO' => "Romanian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::HU' => "Hungarian",
+
+	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
+	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
+	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',
+
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PROCESSING' => 'Processing',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_MODERATION' => 'Pending Moderation',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::REJECTED' => 'Rejected',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ERROR' => 'Error',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ABORTED' => 'Aborted',
+	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_ENTRY_READY' => 'Pending Entry Ready',
 );

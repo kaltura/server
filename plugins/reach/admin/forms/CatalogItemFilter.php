@@ -73,5 +73,12 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 			'onclick' => "addNewCatalogItem($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val())",
 			'decorators' => array('ViewHelper'),
 		));
+
+		$this->addElement('button', 'exportCsv', array(
+			'ignore' => true,
+			'label' => 'Export to CSV',
+			'onclick' => "exportToCsv($('#filter_input').val())",
+			'decorators' => array('ViewHelper'),
+		));
 	}
 }

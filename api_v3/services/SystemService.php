@@ -9,7 +9,6 @@
  */
 class SystemService extends KalturaBaseService
 {
-	const APIV3_FAIL_PING = "APIV3_FAIL_PING";
 	
 	protected function partnerRequired($actionName)
 	{
@@ -26,10 +25,7 @@ class SystemService extends KalturaBaseService
 	 */
 	function pingAction()
 	{
-		if(function_exists('apc_fetch') && apc_fetch(self::APIV3_FAIL_PING))
-			return false;
-		
-		return true;
+		return mySystemUtils::ping();
 	}
 	
 	/**
@@ -39,19 +35,7 @@ class SystemService extends KalturaBaseService
 	 */
 	function pingDatabaseAction()
 	{
-		$hostname = infraRequestUtils::getHostname();
-		$server = ApiServerPeer::retrieveByHostname($hostname);
-		if(!$server)
-		{
-			$server = new ApiServer();
-			$server->setHostname($hostname);
-		}
-		
-		$server->setUpdatedAt(time());
-		if(!$server->save())
-			return false;
-			
-		return true;
+		return mySystemUtils::pingMySql();
 	}
 	
 	/**
@@ -75,7 +59,19 @@ class SystemService extends KalturaBaseService
 	function getVersionAction()
 	{	
 		KalturaResponseCacher::disableCache();
-		$version = file_get_contents(realpath(dirname(__FILE__)) . '/../../VERSION.txt');
-		return trim($version);
+		return mySystemUtils::getVersion();
+	}
+
+
+	/**
+	 * @action getHealthCheck
+	 * @return string the server healthCheck info
+	 * @ksIgnored
+	 */
+	function getHealthCheckAction()
+	{
+		KalturaResponseCacher::disableCache();
+		list($healthCheckInfo, $notifyError) = mySystemUtils::getHealthCheckInfo();
+		return new kRendererString($healthCheckInfo, 'text/plain', 8640000, null, $notifyError);
 	}
 }

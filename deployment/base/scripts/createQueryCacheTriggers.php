@@ -51,14 +51,16 @@ $INVALIDATION_KEYS = array(
 	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
 	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
-	
+	array('table' => "scheduler_worker", 				'keys' => array(array("'schedulerWorker:schedulerConfiguredId='", '@OBJ@.scheduler_configured_id'))),
 	);
+
+$setFunc = 'memc_set';
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
 
 $SPECIAL_TRIGGERS = array(
-	"invalid_session/INSERT" => "DO memc_set(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));",
-	"file_sync/INSERT" => "IF (NEW.original) THEN DO memc_set(concat('fileSyncMaxId-dc', NEW.dc), NEW.id); END IF;",
+	"invalid_session/INSERT" => "DO $setFunc(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));",
+	"file_sync/INSERT" => "DO $setFunc(concat('fileSyncMaxId-dc', NEW.dc), NEW.id, 0);",
 );
 
 function generateInvalidationKeyCode($invalidationKey)
@@ -213,7 +215,7 @@ function compareTriggerBodies($body1, $body2)
 
 function buildTriggerBody($invalidationKey, $triggerType)
 {
-	global $SPECIAL_TRIGGERS;
+	global $SPECIAL_TRIGGERS, $setFunc;
 
 	$tableName = $invalidationKey['table'];
 	$triggerBody = array();
@@ -234,7 +236,7 @@ function buildTriggerBody($invalidationKey, $triggerType)
 		}
 		$curKey = 'concat(' . implode(', ', $curKey) . ')';
 		
-		$memSetCmd = "memc_set($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000)";
+		$memSetCmd = "$setFunc($curKey, UNIX_TIMESTAMP(SYSDATE()), 90000)";
 		$memSetCmdOld = str_replace('@OBJ@', 'OLD', $memSetCmd);
 		$memSetCmdNew = str_replace('@OBJ@', 'NEW', $memSetCmd);
 		
@@ -312,7 +314,7 @@ $link = mysqli_connect($HOST_NAME, $USER_NAME, $PASSWORD)
 
 // Make sure 'Memcached Functions for MySQL' is installed
 mysqli_select_db($link,'mysql') or die("Error: Could not select 'mysql' database\n");
-$query = "SELECT * FROM func WHERE name='memc_server_count'";
+$query = "SELECT * FROM func WHERE name='$setFunc'";
 $result = mysqli_query($link,$query) or die('Error: Select from func table query failed: ' . mysqli_error($link) . "\n");
 
 if (!mysqli_fetch_array($result, MYSQLI_ASSOC))
@@ -326,18 +328,18 @@ mysqli_free_result($result);
 mysqli_select_db($link,'kaltura') or die("Error: Could not select 'kaltura' database\n");
 
 // Make sure the memcache server is configured
-$query = "SELECT memc_server_count()";
-$result = mysqli_query($link,$query) or die('Error: Select memc_server_count query failed: ' . mysqli_error($link) . "\n");
+$query = "SELECT $setFunc('test', 'test', 10)";
+$result = mysqli_query($link,$query) or die('Error: Select memcache set query failed: ' . mysqli_error($link) . "\n");
 
 $line = mysqli_fetch_array($result, MYSQLI_NUM);
 if (!$line)
 {
-	die("Unexpected: memc_server_count returned nothing\n");
+	die("Unexpected: $setFunc returned nothing\n");
 }
 
 if ($line[0] <= 0)
 {
-	die("Error: Memcached server not configured\n");
+	die("Error: Memcached set failed\n");
 }
 
 mysqli_free_result($result);

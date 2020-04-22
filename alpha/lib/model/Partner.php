@@ -1953,6 +1953,16 @@ class Partner extends BasePartner
 		$this->putInCustomData( "default_live_stream_segment_duration", $v );
 	}
 
+    public function getDefaultRecordingConversionProfile()
+    {
+        return $this->getFromCustomData("default_recording_conversion_profile" );
+    }
+
+    public function setDefaultRecordingConversionProfile($v)
+    {
+        $this->putInCustomData( "default_recording_conversion_profile", $v );
+    }
+
 	/**
 	 * @param      string $name
 	 * @param      string $namespace
@@ -2120,5 +2130,27 @@ class Partner extends BasePartner
 	{
 		return (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ANALYTICS_PERSISTENT_SESSION_ID, $this->getId())) ? true : false;
 	}
+
+	public function getIgnoreSynonymEsearch()
+	{
+		return $this->getFromCustomData('ignoreSynonymEsearch', null, false);
+	}
+
+	public function setIgnoreSynonymEsearch($v)
+	{
+		$this->putInCustomData('ignoreSynonymEsearch', $v);
+	}
+
+	public function getAvoidIndexingSearchHistory()
+	{
+		return $this->getFromCustomData('avoidIndexingSearchHistory', null, false);
+	}
+
+	public function setAvoidIndexingSearchHistory($v)
+	{
+		$this->putInCustomData('avoidIndexingSearchHistory', $v);
+	}
+
+
 
 }

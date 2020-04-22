@@ -42,8 +42,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	{
 		if($object instanceof entry && $object->getStatus() != entryStatus::DELETED)
 		{
-			if((in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
-				|| in_array(entryPeer::MODERATION_STATUS, $modifiedColumns))
+			if(in_array(entryPeer::STATUS, $modifiedColumns) && $object->getStatus() == entryStatus::READY)
 			{
 				return self::onEntryReady($object);
 			}
@@ -106,7 +105,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 	public function objectUpdated(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		$entry = entryPeer::retrieveByPKNoFilter($object->getEntryId());
-		if($entry)
+		if($entry && $entry->getStatus() != entryStatus::DELETED)
 		{
 			$entry->setUpdatedAt(time());
 			$entry->save();
@@ -1606,13 +1605,14 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					$validationErrors = $entryDistribution->getValidationErrors();
 					
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] validation errors [" . print_r($validationErrors, true) . "]");
-					
-					if(!count($validationErrors) && $entry->getStatus() == entryStatus::READY)
+					if(!count($validationErrors) && $distributionProfile->shouldDistributeEntry($entryDistribution->getEntry()))
+					{
 						self::submitAddEntryDistribution($entryDistribution, $distributionProfile);
+					}
+
 					break;
 				
 				default:
-				
 					if($entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::UPDATE_REQUIRED || $entryDistribution->getDirtyStatus() == EntryDistributionDirtyStatus::SUBMIT_REQUIRED)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] already flagged for updating");
@@ -1812,14 +1812,6 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		$distributionProfiles = DistributionProfilePeer::retrieveByPartnerId($entry->getPartnerId());
 		foreach($distributionProfiles as $distributionProfile)
 		{
-			if($distributionProfile->getDistributeTrigger() == kDistributeTrigger::MODERATION_APPROVED)
-			{
-				if(!in_array($entry->getModerationStatus(), self::$validModerationStatuses))
-				{
-					continue;
-				}
-			}
-
 			self::distributeNewEntry($entry, $distributionProfile);
 		}
 		
@@ -1838,6 +1830,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 		{
 			KalturaLog::info("Found entry distribution object with id [" . $entryDistribution->getId() . "] for distribution profile [" . $distributionProfile->getId() . "]");
 			self::onEntryDistributionUpdateRequired($entryDistribution);
+
 			return false;
 		}
 

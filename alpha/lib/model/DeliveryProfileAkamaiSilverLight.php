@@ -13,7 +13,7 @@ class DeliveryProfileAkamaiSilverLight extends DeliveryProfileSilverLight {
 		$partnerPath = myPartnerUtils::getUrlForPartner($fileSync->getPartnerId(), $fileSync->getPartnerId() * 100);
 		$objectSubType = $fileSync->getObjectSubType();
 		
-		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $objectSubType == entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)
+		if($fileSync->getObjectType() == FileSyncObjectType::ENTRY && $objectSubType == kEntryFileSyncSubType::ISM)
 			return $this->doGetServeIsmUrl($fileSync, $partnerPath, $storage);
 
 		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats

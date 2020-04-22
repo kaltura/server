@@ -149,7 +149,7 @@ class kFlowHelper
 				$dbEntry->setData(".jpg");
 			
 			
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 
 			try
 			{
@@ -1111,7 +1111,7 @@ class kFlowHelper
 			$entry->setThumbnail(".jpg");
 			$entry->setCreateThumb(false);
 			$entry->save();
-			$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$entrySyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			$syncFile = kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $syncKey);
 
 			if($syncFile)
@@ -1191,6 +1191,12 @@ class kFlowHelper
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
+
+		if(!$dbBatchJob->getEntry())
+		{
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
+			return $dbBatchJob;
+		}
 
 		$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
 		// verifies that flavor asset exists
@@ -1419,7 +1425,7 @@ class kFlowHelper
 		// syncing the ismc file
 		if(file_exists($ismcPath))
 		{
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::ISMC, $ismVersion);
 			kFileSyncUtils::moveFromFile($ismcPath,	$syncKey);
 		}
 
@@ -1436,10 +1442,10 @@ class kFlowHelper
 
 		// syncing ism and lig files
 		if(file_exists($ismPath))
-			kFileSyncUtils::moveFromFile($ismPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion));
+			kFileSyncUtils::moveFromFile($ismPath, $entry->getSyncKey(kEntryFileSyncSubType::ISM, $ismVersion));
 
 		if(file_exists($logPath))
-			kFileSyncUtils::moveFromFile($logPath, $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG, $ismVersion));
+			kFileSyncUtils::moveFromFile($logPath, $entry->getSyncKey(kEntryFileSyncSubType::CONVERSION_LOG, $ismVersion));
 
 		// saving entry changes
 		$entry->save();
@@ -1701,7 +1707,7 @@ class kFlowHelper
 			$entry->reload(); // make sure that the thumbnail version is the latest
 			$entry->setThumbnail(".jpg");
 			$entry->save();
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::moveFromFile($data->getThumbPath(), $syncKey);
 		}
 	}
@@ -1811,32 +1817,32 @@ class kFlowHelper
 		return $logFileUrl;
 	}
 
-    	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
-    	{
+	public static function sendBulkUploadNotificationEmail(BatchJob $dbBatchJob, $email_id, $params)
+	{
 
-        	$emailRecipients = $dbBatchJob->getPartner()->getBulkUploadNotificationsEmail();
-        	$batchJobData = $dbBatchJob->getData();
+		$emailRecipients = $dbBatchJob->getPartner()->getBulkUploadNotificationsEmail();
+		$batchJobData = $dbBatchJob->getData();
 
-        	if($batchJobData instanceof kBulkUploadJobData){
-            		$jobRecipients = $batchJobData->getEmailRecipients();
-            		if(isset($jobRecipients)) {
-                		$emailRecipients = $jobRecipients;
-            		}
-        	}
+		if($batchJobData instanceof kBulkUploadJobData){
+			$jobRecipients = $batchJobData->getEmailRecipients();
+			if(isset($jobRecipients)) {
+				$emailRecipients = $jobRecipients;
+			}
+		}
 
-        	kJobsManager::addMailJob(
-            		null,
-            		0,
-            		$dbBatchJob->getPartnerId(),
-            		$email_id,
-            		kMailJobData::MAIL_PRIORITY_NORMAL,
-            		kConf::get( "batch_alert_email" ),
-            		kConf::get( "batch_alert_name" ),
-            		$emailRecipients,
-            		$params
-        	);
+		kJobsManager::addMailJob(
+			null,
+			0,
+			$dbBatchJob->getPartnerId(),
+			$email_id,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get( "batch_alert_email" ),
+			kConf::get( "batch_alert_name" ),
+			$emailRecipients,
+			$params
+		);
 
-    	}
+	}
 
 	/**
 	 * @param BatchJob $dbBatchJob
@@ -1898,15 +1904,29 @@ class kFlowHelper
 		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
 		{
 			$partner = $dbBatchJob->getPartner();
-			if($partner && $partner->getStorageDeleteFromKaltura())
+			if(!$partner)
+			{
+				return $dbBatchJob;
+			}
+
+			if($partner->getStorageDeleteFromKaltura())
 			{
 				if(self::isAssetExportFinished($fileSync, $asset))
 				{
 					if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
 						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
-					
+
 					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
 				}
+			}
+			else
+			{
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($partner->getId());
+				if(!$periodicStorageProfiles)
+				{
+					return $dbBatchJob;
+				}
+				self::addPeriodicStorageExports($asset->getEntryId(), $partner, $periodicStorageProfiles);
 			}
 		}
 
@@ -1919,7 +1939,7 @@ class kFlowHelper
 	 * @param FileSync $fileSync
 	 * @param array $fileSyncSubTypesToHandle
 	 */
-	private static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
+	public static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
 	{	
 		$c = new Criteria();
 		$c->add(FileSyncPeer::FILE_TYPE, array (FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_FILE), Criteria::IN);
@@ -1950,7 +1970,7 @@ class kFlowHelper
 		}
 	}
 	
-	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
+	public static function isAssetExportFinished(FileSync $fileSync, asset $asset)
 	{
 		$c = new Criteria();
 		$c->addAnd ( FileSyncPeer::OBJECT_ID , $fileSync->getObjectId() );
@@ -1966,7 +1986,7 @@ class kFlowHelper
 			return true;
 	}
 	
-	private static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
+	public static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
 	{
 		$unClosedStatuses = array (
 			asset::ASSET_STATUS_QUEUED,
@@ -2009,7 +2029,7 @@ class kFlowHelper
 		}
 	}
 	
-	private static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
+	public static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
 	{
 		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSyncVersion);
 		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
@@ -2046,26 +2066,26 @@ class kFlowHelper
 		$asset = assetPeer::retrieveByFileSync($fileSync);
 		if ($asset && $asset->getStatus() == asset::ASSET_STATUS_EXPORTING) // meaning that export is required for asset readiness
 		{
-            $asset->setStatus(asset::ASSET_STATUS_ERROR);
-            $asset->save();
+			$asset->setStatus(asset::ASSET_STATUS_ERROR);
+			$asset->save();
 
-		    if ($asset instanceof flavorAsset)
-            {
-                $flavorParamsOutput = $asset->getFlavorParamsOutput();
-                $flavorParamsOutputId = $flavorParamsOutput ? $flavorParamsOutput->getId() : null;
-                $mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
-                $mediaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
-                kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, null, $asset->getId(), $flavorParamsOutputId, $mediaInfoId);
-            }
+			if ($asset instanceof flavorAsset)
+			{
+				$flavorParamsOutput = $asset->getFlavorParamsOutput();
+				$flavorParamsOutputId = $flavorParamsOutput ? $flavorParamsOutput->getId() : null;
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
+				$mediaInfoId = $mediaInfo ? $mediaInfo->getId() : null;
+				kBusinessPostConvertDL::handleConvertFailed($dbBatchJob, null, $asset->getId(), $flavorParamsOutputId, $mediaInfoId);
+			}
 		}
 
 
 		return $dbBatchJob;
 	}
 
-    public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
+	public static function handleStorageDeleteFinished (BatchJob $dbBatchJob, kStorageDeleteJobData $data)
 	{
-	    $fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
+		$fileSync = FileSyncPeer::retrieveByPK($data->getSrcFileSyncId());
 		if(!$fileSync)
 		{
 			KalturaLog::err("FileSync [" . $data->getSrcFileSyncId() . "] not found");
@@ -2120,24 +2140,28 @@ class kFlowHelper
 
 	public static function handleConvertProfileFailed(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
-		kBatchManager::updateEntry($dbBatchJob->getEntryId(), entryStatus::ERROR_CONVERTING);
+		$entryId = self::getEntryIdToUpdate($dbBatchJob);
 
-		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
+		kBatchManager::updateEntry($entryId, entryStatus::ERROR_CONVERTING);
+
+		self::deleteTemporaryFlavors($entryId);
 		
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
+		self::handleLocalFileSyncDeletion($entryId, $dbBatchJob->getPartner());
 
 		return $dbBatchJob;
 	}
 
 	public static function handleConvertProfileFinished(BatchJob $dbBatchJob, kConvertProfileJobData $data)
 	{
-		self::deleteTemporaryFlavors($dbBatchJob->getEntryId());
-		
-		self::handleLocalFileSyncDeletion($dbBatchJob->getEntryId(), $dbBatchJob->getPartner());
-
-		kFlowHelper::generateThumbnailsFromFlavor($dbBatchJob->getEntryId(), $dbBatchJob);
-
 		$entry = $dbBatchJob->getEntry();
+		$entryId = self::getEntryIdToUpdate($dbBatchJob);
+
+		self::deleteTemporaryFlavors($entryId);
+
+		self::handleLocalFileSyncDeletion($entryId, $dbBatchJob->getPartner());
+
+		kFlowHelper::generateThumbnailsFromFlavor($entryId, $dbBatchJob);
+
 		if($entry)
 		{
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
@@ -2159,6 +2183,22 @@ class kFlowHelper
 		}
 		
 		return $dbBatchJob;
+	}
+
+	protected static function getEntryIdToUpdate($dbBatchJob)
+	{
+		$entryId = $dbBatchJob->getEntryId();
+		$entry = $dbBatchJob->getEntry();
+		if($entry)
+		{
+			$replacedEntryId = $entry->getReplacedEntryId();
+			if($replacedEntryId && $entry->getSyncFlavorsOnceReady())
+			{
+				$entryId = $replacedEntryId;
+			}
+		}
+
+		return $entryId;
 	}
 
 	public static function handleBulkDownloadPending(BatchJob $dbBatchJob, kBulkDownloadJobData $data)
@@ -2644,7 +2684,7 @@ class kFlowHelper
 			$dbEntry->setData('100000.'.$ext);
 			$dbEntry->save();
 
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			try
 			{
 				kFileSyncUtils::moveFromFile($fullPath, $syncKey, true);
@@ -2897,6 +2937,11 @@ class kFlowHelper
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
+
+		if ($partner->getEnforceHttpsApi())
+		{
+			$url = str_replace("http:", "https:", $url);
+		}
 
 		return $url;
 	}
@@ -3166,5 +3211,105 @@ class kFlowHelper
 				break;
 		}
 	}
+	
+	public static function handleBulkDownloadRetried(BatchJob $dbBatchJob, kBulkDownloadJobData $data)
+	{
+		//Bulk download has now worker so there is no point to retry it. Instead fail the job.
+		//No one will pick it up so both the sep and lock object will be stuck in an unclosed state.
+		//Setting the job status to fatal will make sure the lock record is also deleted.
+		$dbBatchJob->setStatus(KalturaBatchJobStatus::FATAL);
+		$dbBatchJob->save();
+	}
 
+	public static function handleLiveToVodFinished(BatchJob $dbBatchJob, kLiveToVodJobData $data)
+	{
+		KalturaLog::info('Handling live to vod finished');
+		$liveEntryId = $data->getLiveEntryId();
+		$vodEntryId = $data->getVodEntryId();
+		$liveEntry = entryPeer::retrieveByPK($liveEntryId);
+		/** @var LiveStreamEntry $liveEntry */
+		if (!$liveEntry){
+			throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $liveEntryId);
+		}
+		$recordStatus = $liveEntry->getRecordStatus();
+		$shouldAutoArchive = $liveEntry->getRecordingOptions() ?
+			$liveEntry->getRecordingOptions()->getShouldAutoArchive() : false;
+		if ($recordStatus == RecordStatus::PER_SESSION && $shouldAutoArchive == true) {
+			$liveEntryArchiveJobData = new kLiveEntryArchiveJobData();
+			$liveEntryArchiveJobData->setLiveEntryId($liveEntryId);
+			$liveEntryArchiveJobData->setVodEntryId($vodEntryId);
+
+			$liveEntryArchiveJob = new BatchJob();
+			$liveEntryArchiveJob->setEntryId($liveEntryId);
+			$liveEntryArchiveJob->setPartnerId($liveEntry->getPartnerId());
+
+			KalturaLog::info('Adding a job for auto archive');
+			kJobsManager::addJob($liveEntryArchiveJob, $liveEntryArchiveJobData, BatchJobType::LIVE_ENTRY_ARCHIVE);
+		}
+		return $dbBatchJob;
+
+	}
+
+	public static function handleKuserKgroupStatusUpdate($kuserkgroup)
+	{
+		if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+		{
+			$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+			$numberOfUsersPerGroup = $kgroup->getMembersCount();
+			$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+			$kgroup->save();
+		}
+	}
+
+	public static function addPeriodicStorageExports($entryId, $partner, $periodicStorageProfiles)
+	{
+		$unClosedStatuses = array (
+			asset::ASSET_STATUS_QUEUED,
+			asset::ASSET_STATUS_CONVERTING,
+			asset::ASSET_STATUS_WAIT_FOR_CONVERT,
+			asset::ASSET_STATUS_EXPORTING
+		);
+		$unClosedAssets = assetPeer::retrieveReadyByEntryId($entryId, null, $unClosedStatuses);
+
+		if(count($unClosedAssets))
+		{
+			KalturaLog::debug('Assets with unclosed status exists');
+			return;
+		}
+
+		// if all exports that are not periodic finished add pending file sync to each flavor
+		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId);
+		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner, $assetsIds);
+		if(!$nonPeriodicFinished)
+		{
+			return;
+		}
+
+		foreach ($periodicStorageProfiles as $periodicStorage)
+		{
+			KalturaLog::debug("Exporting assets to profileId [{$periodicStorage->getId()}]");
+			$assets = assetPeer::retrieveByIds($assetsIds);
+			kStorageExporter::exportMultipleFlavors($assets, $periodicStorage);
+		}
+	}
+
+	protected static function checkNonPeriodicExportsFinished($partner, $assetsIds)
+	{
+		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partner->getId());
+		$status = array(FileSync::FILE_SYNC_STATUS_PENDING, FileSync::FILE_SYNC_STATUS_ERROR);
+		$types = array(FileSyncObjectType::ASSET);
+		$subTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$allFinished = true;
+		foreach($storageProfiles as $profile)
+		{
+			$fileSyncs = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partner->getId(), $status, $assetsIds, $types, $subTypes);
+			if(count($fileSyncs))
+			{
+				KalturaLog::debug("found unfinished file syncs for profile [{$profile->getId()}]");
+				$allFinished = false;
+				break;
+			}
+		}
+		return $allFinished;
+	}
 }

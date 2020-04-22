@@ -533,7 +533,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
 				}
 				else
-					$c->addAnd(assetPeer::ENTRY_ID, $config->entryId);
+				{
+					$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($config->entryId);
+					$c->addAnd(assetPeer::ENTRY_ID, $entryId);
+				}
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
 				$captionAssets = assetPeer::doSelect($c);
 
@@ -542,9 +545,11 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				$captionLanguages = array();
 
 				$useThreeCodeLang = false;
-				if (kConf::hasParam('three_code_language_partners') &&
-					in_array($entry->getPartnerId(), kConf::get('three_code_language_partners')))
+				$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
+				if(in_array($entry->getPartnerId(), $threeCodeLanguagePartnersMap))
+				{
 					$useThreeCodeLang = true;
+				}
 
 				foreach ($captionAssets as $captionAsset)
 				{
@@ -641,11 +646,11 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		if ($entryPlayingDataParams->getType() == self::getPluginName())
 		{
-			$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
+			$captionAssets = assetPeer::retrieveByEntryId(kParentChildEntryUtils::getCaptionAssetEntryId($entry->getId()), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY));
 			$playbackCaptions = array();
 			$useThreeCodeLang = false;
-			if (kConf::hasParam('three_code_language_partners') &&
-				in_array($entry->getPartnerId(), kConf::get('three_code_language_partners')))
+			$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
+			if(in_array($entry->getPartnerId(), $threeCodeLanguagePartnersMap))
 			{
 				$useThreeCodeLang = true;
 			}
@@ -695,6 +700,14 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	public function constructUrl($drmProfile, $scheme, $customDataObject)
 	{
 		return '';
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getCaptionNamesByTypes()
+	{
+		return array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'vtt', CaptionType::SCC =>'scc', CaptionType::CAP => 'cap');
 	}
 }
 

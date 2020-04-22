@@ -328,22 +328,38 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 		$res = self::modifyEntryVotes($entry, $kvote->getRank(), $kvote->getStatus());
 		return $res; 
 	}
+	
+	public static function modifyEntryVotesByChangedVoteDelta (kvote $kvote, $delta)
+	{
+		$entry = $kvote->getEntry();
+		$res = self::modifyEntryVotes($entry, $delta, $kvote->getStatus(), false);
+		
+		return $res;
+	}
 
 	// - will update votes , total_rank & rank
-	// if the ebtry is of type roughcut -0 will update the kshow's rank too
-	private static function modifyEntryVotes ( entry $entry , $delta_rank, $kvoteStatus )
+	// if the entry is of type roughcut -0 will update the kshow's rank too
+	private static function modifyEntryVotes ( entry $entry , $delta_rank, $kvoteStatus, $shouldModifyVotes = true )
 	{
 		$res = array();
 		
 		$votes = $entry->getVotes();
 		if ( self::shouldModify ( $entry , entryPeer::VOTES ) );
 		{
-		    if ($kvoteStatus == KVoteStatus::VOTED)
-			    self::inc ($votes);
-			else 
-			    self::dec($votes);
-			$entry->setVotes( $votes );
+			if ($shouldModifyVotes)
+			{
+				if ($kvoteStatus == KVoteStatus::VOTED)
+				{
+					self::inc ($votes);
+				}
+				else
+				{
+					self::dec($votes);
+				}
 				
+				$entry->setVotes( $votes );
+			}
+			
 			$total_rank = $entry->getTotalRank();
 			if ($kvoteStatus == KVoteStatus::VOTED)
 			    self::inc ($total_rank, $delta_rank);

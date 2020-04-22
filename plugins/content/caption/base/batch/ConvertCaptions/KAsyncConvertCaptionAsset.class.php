@@ -5,12 +5,19 @@
  */
 class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 {
+	// time regex is: xx:dd:dd:dd  while xx is 2 digits except from 00
+	const TIME_REGEX = '/(0[1-9]|[1-9]0|[1-9][1-9])(:\d\d){3}/';
+
+	//time regex is: 00:dd:dd:dd
+	const TIME_REGEX_STARTS_WITH_00 = '/00(:\d\d){3}/';
+
 	/*
 	 * @var KalturaCaptionClientPlugin
 	 */
 	private $captionClientPlugin = null;
 
 	private $formatToName = array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'webvtt', CaptionType::SCC =>'scc');
+	private $formatToExtensionName = array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'vtt', CaptionType::SCC =>'scc');
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -46,13 +53,16 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 
-		$content = kEncryptFileUtils::getEncryptedFileContent($data->fileLocation, $data->fileEncryptionKey, kConf::get("encryption_iv"));
+		$content = kEncryptFileUtils::getEncryptedFileContent($data->fileLocation, $data->fileEncryptionKey, self::getConfigParam('encryption_iv'));
 		if (!$content)
 		{
 			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, 'UNABLE_TO_GET_FILE', "Error: " . 'UNABLE_TO_GET_FILE', KalturaBatchJobStatus::FAILED, $data);
 			return $job;
 		}
-
+		if ($data->fromType == CaptionType::SCC && $data->toType == CaptionType::SRT)
+		{
+			$this->convertSccTimeStamp($content);
+		}
 		$convertedContent = $this->convertContent($content, $this->formatToName[$data->fromType], $this->formatToName[$data->toType]);
 		if ($convertedContent === false)
 		{
@@ -61,6 +71,26 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 		}
 
 		return $this->handleConvertedContent($job, $data, $convertedContent);
+	}
+
+	//converting the time stamps - will start at 00:dd:dd:dd instead of 01:dd:dd:dd
+	protected function convertSccTimeStamp(&$content)
+	{
+		if (preg_match(self::TIME_REGEX_STARTS_WITH_00, $content, $matches))
+		{
+			return;
+		}
+		if(preg_match_all(self::TIME_REGEX, $content, $matches))
+		{
+			$replacingMatches = array();
+			foreach ($matches[0] as $match)
+			{
+				$colonFirstPos = strpos($match, ':');
+				$newHour = '0'. intval(substr($match, 0, $colonFirstPos)) - 1;
+				$replacingMatches[] = $newHour . substr($match, $colonFirstPos);
+			}
+			$content = str_replace($matches[0], $replacingMatches, $content);
+		}
 	}
 
 	/***
@@ -87,7 +117,7 @@ class KAsyncConvertCaptionAsset extends KJobHandlerWorker
 			return $job;
 		}
 
-		$captionsCreated = $this->cloneCaptionAssetToSrtAndSetContent($captionAsset->entryId, $captionAsset, $content,$data->toType, $this->formatToName[$data->toType]);
+		$captionsCreated = $this->cloneCaptionAssetToSrtAndSetContent($captionAsset->entryId, $captionAsset, $content,$data->toType, $this->formatToExtensionName[$data->toType]);
 		self::unimpersonate();
 		if ($captionsCreated)
 		{

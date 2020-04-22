@@ -5,7 +5,7 @@
  */
 class Form_DictionariesSubForm extends ConfigureSubForm
 {
-	private $ignore = array('relatedObjects', 'type', 'gs');
+	private $ignore = array('relatedObjects', 'type', 'gs','data');
 	private $prefix = "Dictionary_";
 
 	private $type;
@@ -26,6 +26,7 @@ class Form_DictionariesSubForm extends ConfigureSubForm
 
 		$obj = new $this->type();
 		$this->addObjectProperties($obj, $this->ignore, $this->prefix);
+		$this->addStringAreaElement("data", "Dictionary_");
 
 	}
 

@@ -341,6 +341,10 @@
 			<index-column name="kuser_id" />
 			<index-column name="status" />
 		</index>
+		<index name="entry_rank_index">
+			<index-column name="entry_id" />
+			<index-column name="rank" />
+		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="comment" phpName="comment">
 		<column lazyLoad="false" name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
@@ -1947,7 +1951,7 @@
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="duplication_key" type="varchar" size="2047" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="log_status" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
-        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="abort" type="tinyint" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="abort" type="tinyint" default="0" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="check_again_timeout" type="integer" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="progress" type="tinyint" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="message" type="varchar" size="1024" />
@@ -2186,6 +2190,29 @@
 		</index>
 		<index name="id_index">
 			<index-column name="id" />
+		</index>
+	</table>
+	<table skipSql="false" abstract="false" name="sso">
+		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="integer" autoIncrement="true" />
+		<column primaryKey="false" required="true"  lazyLoad="false" name="application_type" type="varchar" size="64" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="domain" type="varchar" size="64" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="true"  lazyLoad="false" name="redirect_url" type="varchar" size="1024" />
+		<index name="partner_id_status_index">
+			<index-column name="partner_id" />
+			<index-column name="status" />
+		</index>
+		<index name="domain_status_index">
+			<index-column name="domain" />
+			<index-column name="status" />
+		</index>
+		<index name="redirect_url_status_index">
+			<index-column name="redirect_url" />
+			<index-column name="status" />
 		</index>
 	</table>
 </database>

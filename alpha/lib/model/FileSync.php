@@ -175,6 +175,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC)
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 
+		if(is_null($storage->getProtocol()))
+		{
+			return null;
+		}
+
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
 		if(is_null($urlManager) && infraRequestUtils::getProtocol() != 'http')
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId));
@@ -266,11 +271,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
 	public function getIv() {return kConf::get("encryption_iv");}
-
+	
 	public function getFileExtension () { return $this->getFromCustomData("extension"); }
 	public function setFileExtension ($v) { $this->putInCustomData("extension", $v);  }
 
-
+	public function getSrcPath () { return $this->getFromCustomData("srcPath"); }
+	public function setSrcPath ($v) { $this->putInCustomData("srcPath", $v);  }
+	public function getSrcEncKey () { return $this->getFromCustomData("srcEncKey"); }
+	public function setSrcEncKey ($v) { $this->putInCustomData("srcEncKey", $v);  }
 }
 
 

@@ -98,11 +98,25 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	public $operatingSystemFamilyIn;
 
 	/**
+	 * Filter by operating system
+	 *
+	 * @var string
+	 */
+	public $operatingSystemIn;
+
+	/**
 	 * Filter by browser family
 	 *
 	 * @var string
 	 */
 	public $browserFamilyIn;
+
+	/**
+	 * Filter by browser
+	 *
+	 * @var string
+	 */
+	public $browserIn;
 
 	/**
 	 * Time zone offset in minutes
@@ -161,6 +175,67 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $entryIdIn;
 
+	/**
+	 * @var string
+	 */
+	public $playbackTypeIn;
+
+	/**
+	 * filter by playback context ids
+	 * 
+	 * @var string
+	 */
+	public $playbackContextIdsIn;
+
+	/**
+	 * filter by root entry ids
+	 *
+	 * @var string
+	 */
+	public $rootEntryIdIn;
+
+	/**
+	 * filter by error code
+	 * 
+	 * @var string
+	 */
+	public $errorCodeIn;
+
+	/**
+	 * filter by player version
+	 *
+	 * @var string
+	 */
+	public $playerVersionIn;
+
+	/**
+	 * filter by isp
+	 *
+	 * @var string
+	 */
+	public $ispIn;
+
+	/**
+	 * filter by application version
+	 *
+	 * @var string
+	 */
+	public $applicationVersionIn;
+
+	/**
+	 * filter by node id
+	 *
+	 * @var string
+	 */
+	public $nodeIdsIn;
+
+	/**
+	 * filter by categories ancestor
+	 *
+	 * @var string
+	 */
+	public $categoriesAncestorIdIn;
+	 
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -176,7 +251,9 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'regionIn' => 'regions',
 		'citiesIn' => 'cities',
 		'operatingSystemFamilyIn' => 'os_families',
+		'operatingSystemIn' => 'os',
 		'browserFamilyIn' => 'browsers_families',
+		'browserIn' => 'browsers',
 		'timeZoneOffset',
 		'interval',
 		'mediaTypeIn' => 'media_types',
@@ -185,6 +262,15 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'entryCreatedAtGreaterThanOrEqual' => 'gte_entry_created_at',
 		'entryCreatedAtLessThanOrEqual' => 'lte_entry_created_at',
 		'entryIdIn' => 'entries_ids',
+		'playbackTypeIn' => 'playback_types',
+		'playbackContextIdsIn' => 'playback_context_ids',
+		'rootEntryIdIn' => 'root_entries_ids',
+		'errorCodeIn' => 'event_var1',
+		'playerVersionIn' => 'player_versions',
+		'ispIn' => 'isp',
+		'applicationVersionIn' => 'application_versions',
+		'nodeIdsIn' => 'node_ids',
+		'categoriesAncestorIdIn'=> 'categories_ancestor_ids',
 	);
 
 	protected function getMapBetweenObjects()

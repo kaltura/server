@@ -222,9 +222,6 @@ class EmailIngestionProfileService extends KalturaEntryService
 		$te->setParam3Str($emailProfId.'::'.$emailIP->emailAddress.'::'.$emailIP->mailboxId);
 		TrackEntry::addTrackEntry( $te );
 
-		$kshow = $this->createDummyKShow();
-		$kshowId = $kshow->getId();
-
 		myEntryUtils::setEntryTypeAndMediaTypeFromFile($dbEntry, $entryFullPath);
 
 		// setup the needed params for my insert entry helper
@@ -239,7 +236,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		);
 
 		$token = $this->getKsUniqueString();
-		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+		$insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();

@@ -228,8 +228,10 @@ class thumbnailAction extends sfAction
 					// and resize it
 					myFileConverter::convertImage($src_full_path, $thumb_full_path, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, null, $format);
 					kFileUtils::dumpFile($thumb_full_path);
-				} else {
-					KalturaLog::info ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to romote DC");
+				}
+				else
+				{
+					KalturaLog::info ( "token_id [$upload_token_id] not found in DC [". kDataCenterMgr::getCurrentDcId ()."]. dump url to remote DC");
 					$remoteUrl = kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) .$_SERVER['REQUEST_URI'];
 					kFileUtils::dumpUrl($remoteUrl);
 				}
@@ -386,9 +388,9 @@ class thumbnailAction extends sfAction
 			$src_h  = $src_h * $heightRatio;
 		}
 		
-		$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB;
+		$subType = kEntryFileSyncSubType::THUMB;
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
-			$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA;
+			$subType = kEntryFileSyncSubType::DATA;
 			
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
@@ -552,7 +554,7 @@ class thumbnailAction extends sfAction
 	{
 		if(!$isCapturing)
 		{
-			$entryImageSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+			$entryImageSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			$fileSync= kFileSyncUtils::getOriginFileSyncForKey($entryImageSyncKey,false);
 			if($fileSync)
 			{

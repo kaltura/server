@@ -15,13 +15,26 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 	
 	const MEMBERS = 'category.MEMBERS';
 	const CATEGORY_ID = 'category.CATEGORY_ID';
-	
+
 	private static $invalid_characters = array('>','<',',');
 	
 	private static $replace_character = "_";
 	
 	private static $ignoreDeleted = false;
-	
+
+	protected static $categoryEntitlementEnforcement = true;
+
+	public static function disableCategoryEntitlementEnforcement()
+	{
+		self::$categoryEntitlementEnforcement = false;
+		categoryPeer::setDefaultCriteriaFilter();
+	}
+
+	public static function getCategoryEntitlementEnforcement()
+	{
+		return self::$categoryEntitlementEnforcement;
+	}
+
 	public static function setIgnoreDeleted ($ignore)
 	{
 		self::$ignoreDeleted = $ignore;
@@ -46,8 +59,9 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 		{
 			$c->add ( self::STATUS, CategoryStatus::PURGED, Criteria::NOT_EQUAL );
 		}
-		
-		if (kEntitlementUtils::getEntitlementEnforcement())
+
+		//hasPrivilege
+		if (kEntitlementUtils::getEntitlementEnforcement() && self::getCategoryEntitlementEnforcement())
 		{
 			//add context as filter
 			$privacyContextCrit = $c->getNewCriterion(self::PRIVACY_CONTEXTS, kEntitlementUtils::getKsPrivacyContext(), KalturaCriteria::IN_LIKE);
