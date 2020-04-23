@@ -103,7 +103,7 @@ abstract class KConversionEngine
 	
 	public function getLogData()
 	{
-		return file_get_contents($this->logFilePath);
+		return kFile::getFileContent($this->logFilePath);
 	}
 	
 	/**
@@ -212,9 +212,9 @@ abstract class KConversionEngine
 			
 		try
 		{			
-			if ( file_exists ( $file ))
+			if (kFile::checkFileExists($file))
 			{
-				$media_info = shell_exec("mediainfo ".realpath($file));
+				$media_info = shell_exec("mediainfo ".kFile::realpath($file));
 				$this->addToLogFile ( $log_file ,$media_info ) ;
 			}
 			else

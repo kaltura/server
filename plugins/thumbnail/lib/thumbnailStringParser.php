@@ -56,14 +56,14 @@ class thumbnailStringParser
 	{
 		$imageActions =  explode(self::IMAGE_ACTION_DELIMITER, $stepString);
 		$imageActionsCount = count($imageActions);
-		$source = thumbnailStringParser::parseSource($imageActions[self::SOURCE_INDEX]);
+		$source = self::parseSource($imageActions[self::SOURCE_INDEX]);
 		$step = new kImageTransformationStep();
 		$step->setSource($source);
 		for ($i = 1; $i < $imageActionsCount; $i++)
 		{
 			if(!empty($imageActions[$i]))
 			{
-				$imageAction = thumbnailStringParser::parseImageAction($imageActions[$i]);
+				$imageAction = self::parseImageAction($imageActions[$i]);
 				$step->addAction($imageAction);
 			}
 		}
@@ -140,7 +140,6 @@ class thumbnailStringParser
 		$className = self::$actionsAlias[$actionName];
 		return new $className();
 	}
-
 
 	/**
 	 * @param $transformString

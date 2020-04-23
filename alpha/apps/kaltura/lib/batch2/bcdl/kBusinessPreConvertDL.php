@@ -294,17 +294,17 @@ class kBusinessPreConvertDL
 		$srcPath = $fileSync->getFullPath();
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-		if(!file_exists($tempDir))
+		if(!kFile::checkFileExists($tempDir))
 			mkdir($tempDir, 0700, true);
 		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 
-		if(!file_exists($srcPath))
+		if(!kFile::checkFileExists($srcPath))
 		{
 			$errDescription = "Source file [$srcPath] does not exist";
 			return false;
 		}
 
-		if(!is_file($srcPath))
+		if(!kFile::isFile($srcPath))
 		{
 			$errDescription = "Source file [$srcPath] is not a file";
 			return false;
@@ -330,7 +330,7 @@ class kBusinessPreConvertDL
 				// generates the thumbnail
 				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
 				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), $params);
-				if(!$created || !file_exists($destPath))
+				if(!$created || !kFile::checkFileExists($destPath))
 				{
 					$errDescription = "Thumbnail not captured";
 					return false;
@@ -339,16 +339,16 @@ class kBusinessPreConvertDL
 				$uniqid = uniqid('thumb_');
 
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-				if(!file_exists($tempDir))
-					mkdir($tempDir, 0700, true);
+				if(!kFile::checkFileExists($tempDir))
+					kFile::mkdir($tempDir, 0700, true);
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 
 			if($srcAsset->getType() == assetType::THUMBNAIL)
 			{
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-				if(!file_exists($tempDir))
-					mkdir($tempDir, 0700, true);
+				if(!kFile::checkFileExists($tempDir))
+					kFile::mkdir($tempDir, 0700, true);
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . "." . $srcAsset->getFileExt();
 			}
 

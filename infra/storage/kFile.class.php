@@ -22,6 +22,12 @@ class kFile extends kFileBase
 	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
+		if (kFile::isSharedPath($path))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $sharedFsMgr->listFiles($path, $pathPrefix);
+		}
+		
 		$fileList = array();
 		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $path);
 		$handle = opendir($path);
@@ -224,54 +230,60 @@ class kFile extends kFileBase
 	 * Doesn't support non-flat directories!
 	 * One can't use rename because rename isn't supported between partitions.
 	 */
-	private static function copyRecursively($src, $dest, $deleteSrc = false) {
-		if (is_dir($src)) {
-			
+	private static function copyRecursively($src, $dest, $deleteSrc = false)
+	{
+		if (kFile::isDir($src))
+		{
 			// Generate target directory
-			if (file_exists ($dest)) {
-				if (! is_dir($dest)) {
+			if (kFile::checkFileExists($dest))
+			{
+				if (! kFile::isDir($dest))
+				{
 					KalturaLog::err("Can't override a file with a directory [$dest]");
 					return false;
 				}
-			} else {
-				if (! mkdir($dest)) {
+			}
+			else
+			{
+				if (! kFile::mkdir($dest))
+				{
 					KalturaLog::err("Failed to create directory [$dest]");
 					return false;
 				}
 			}
 			
 			// Copy files
-			$dir = dir($src);
-			while ( false !== $entry = $dir->read () ) {
-				if ($entry == '.' || $entry == '..') {
-					continue;
-				}
-				
-				$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
-				if(is_dir($newSrc)) {
-					KalturaLog::err("Copying of non-flat directroeis is illegal");
-					return false;
-				}
-				
-				$res =  self::copySingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
-				if (! $res)
-					return false;
+			$success = kFile::copyDir($src, $dest, $deleteSrc);
+			if(!$success)
+			{
+				return false;
 			}
 			
 			// Delete source
-			if ($deleteSrc && (! rmdir($src))) {
+			if ($deleteSrc && (! kFile::rmdir($src)))
+			{
 				KalturaLog::err("Failed to delete source directory : [$src]");
 				return false;
 			}
-		} else {
-			$res = self::copySingleFile($src, $dest, $deleteSrc);
+		}
+		else
+		{
+			$res = kFile::copySingleFile($src, $dest, $deleteSrc);
 			if (! $res)
 				return false;
 		}
 		return true;
 	}
 	
-	private static function copySingleFile($src, $dest, $deleteSrc) {
+	
+	public static function copySingleFile($src, $dest, $deleteSrc)
+	{
+		if (kFile::isSharedPath($src) || kFile::isSharedPath($dest))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);
+		}
+
 		if($deleteSrc)
 		{
 			// In case of move, first try to move the file before copy & unlink.
@@ -317,11 +329,11 @@ class kFile extends kFileBase
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 		
 		// Validation
-		if(!file_exists($from))
+		if(!kFile::checkFileExists($from))
 		{
 			KalturaLog::err("Source doesn't exist [$from]");
 			return false;
@@ -334,12 +346,12 @@ class kFile extends kFileBase
 		}
 		
 		// Preperation
-		if($override_if_exists && is_file($to))
+		if($override_if_exists && kFile::isFile($to))
 		{
 			self::deleteFile($to);
 		}
 		
-		if(! is_dir(dirname($to)))
+		if(!kFile::isDir(dirname($to)))
 		{
 			self::fullMkdir($to);
 		}
@@ -350,8 +362,8 @@ class kFile extends kFileBase
 	
 	public static function linkFile($from, $to, $overrideIfExists = false, $copyIfLinkFailed = true)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 		
 		if($overrideIfExists && (is_file($to) || is_link($to)))
 		{

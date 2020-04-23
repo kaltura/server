@@ -52,6 +52,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		}
+		
 		return $fullPath;
 	}
 
@@ -75,7 +76,7 @@ class serveFlavorAction extends kalturaAction
 	{
 		$source = array(
 			'type' => 'source',
-			'path' => $path,
+			'path' => str_replace('//','/',$path), //Temporary hack need to handle double slash issue in a general way
 		);
 
 		if ($asset && $asset->getEncryptionKey())

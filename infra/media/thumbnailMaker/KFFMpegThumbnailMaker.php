@@ -34,10 +34,10 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		$logFilePath = "$this->targetPath.log";
 		
 		$logFileDir = dirname($logFilePath);
-		if(!file_exists($logFileDir))
-			mkdir(dirname($logFilePath), 0665, true);
+		if(!kFile::checkFileExists($logFileDir))
+			kFile::mkdir(dirname($logFilePath), 0665, true);
 			
-		file_put_contents($logFilePath, $cmd, FILE_APPEND);
+		kFile::filePutContents($logFilePath, $cmd, FILE_APPEND);
 		$output = system( $cmd , $rv );
 		KalturaLog::debug("Returned value: '$rv'");
 
@@ -53,7 +53,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 			else {
 				$rv = null;
 				KalturaLog::info("Executing: $cmd");
-				file_put_contents($logFilePath, $cmd, FILE_APPEND);
+				kFile::filePutContents($logFilePath, $cmd, FILE_APPEND);
 				$output = system( $cmd , $rv );
 				KalturaLog::debug("Returned value: '$rv'");
 				
@@ -98,9 +98,10 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 			$command .= ' -decryption_key ' . $decryptionKey;
 		}
 
-		$cmdArr[] = "$command $position_str -noautorotate -i $this->srcPath -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
+		$srcPath = '"' . kFile::realPath($this->srcPath) . '"';
+		$cmdArr[] = "$command $position_str -noautorotate -i $srcPath -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType $position_str_suffix" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
-		$cmdArr[] = "$command -noautorotate -i $this->srcPath $position_str -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
+		$cmdArr[] = "$command -noautorotate -i $srcPath $position_str -an$scanType -y -r 1 $dimensions -vframes $frameCount -f $targetType" .
 			" $this->targetPath >> $this->targetPath.log 2>&1";
 		return $cmdArr;
 		
@@ -108,7 +109,7 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 	
 	protected function parseOutput($output)
 	{
-		$output=file_get_contents("$this->targetPath.log");
+		$output = kFile::getFileContent("$this->targetPath.log");
 		if(strpos($output,"first frame not a keyframe")===false
 		&& strpos($output,"first frame is no keyframe")===false){
 			return true;

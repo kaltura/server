@@ -49,7 +49,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		if(!$this->pollingFileExists($mediaFile))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 		
-		if(!is_file($mediaFile))
+		if(!kFile::isFile($mediaFile))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 		
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
@@ -99,8 +99,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		$mediaInfo = null;
 		try
 		{
-			$mediaFile = realpath($mediaFile);
-			
+			$mediaFile = kFile::realPath($mediaFile);
 			$engine = KBaseMediaParser::getParser($job->jobSubType, $mediaFile, self::$taskConfig, $job);
 			if($engine)
 			{
@@ -157,10 +156,11 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		{
 			$kalturaId3TagParser = new KSyncPointsMediaInfoParser($filePath);
 			$syncPointArray = $kalturaId3TagParser->getStreamSyncPointData();
-			
+
 			$outputFileName = pathinfo($filePath, PATHINFO_FILENAME) . ".data";
 			$localTempSyncPointsFilePath = self::$taskConfig->params->localTempPath . DIRECTORY_SEPARATOR . $outputFileName;
-			$sharedTempSyncPointFilePath = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $outputFileName;
+
+			$sharedTempSyncPointFilePath = kFile::createUniqueFilePath(self::$taskConfig->params->sharedTempPath) . ".data";
 
 			$retries = 3;
 			$interval = (self::$taskConfig->fileSystemCommandInterval ? self::$taskConfig->fileSystemCommandInterval : self::DEFAULT_SLEEP_INTERVAL);

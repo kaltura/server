@@ -44,7 +44,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$startTime = microtime(true);
 
-		$file_exists = file_exists ( $file_sync->getFullPath() );
+		$file_exists = kFile::checkFileExists ( $file_sync->getFullPath() );
 
 		KalturaLog::info("file_exists? [$file_exists] took [".(microtime(true)-$startTime)."] path [".$file_sync->getFullPath()."]");
 
@@ -66,14 +66,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalContentsByFileSync(FileSync $file_sync, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
 	{
 		$full_path = $file_sync->getFullPath();
-		$real_path = realpath( $full_path );
-		if ( file_exists ( $real_path ) )
+		$real_path = kFile::realPath($full_path, false);
+		if (kFile::checkFileExists($real_path))
 		{
 			$startTime = microtime(true);
 			if (!$maxlen)
-				$contents = file_get_contents( $real_path);
+				$contents = kFile::getFileContent($real_path);
 			else
-				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
+				$contents = kFile::getFileContent($real_path, $offset, $offset + $maxlen);
 			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
 			if ($file_sync->isEncrypted())
 			{
@@ -235,15 +235,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fullPath = $rootPath . $filePath; 
 		$fullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $fullPath);
 
-		if ( !file_exists( dirname( $fullPath )))
+		if ( !kFile::checkFileExists( dirname( $fullPath )))
 		{
 			self::fullMkdir($fullPath);
 		}
 
 		// create a file path for the current key - the fileSyncKey should already include the file path
 		// place the content there
-		file_put_contents ( $fullPath , $content );
+		$fullPath = str_replace("//", "/", $fullPath);
+		kFile::filePutContents ( $fullPath , $content );
 		self::setPermissions($fullPath);
+
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 		self::encryptByFileSyncKey($key);
 	}
@@ -255,22 +257,25 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(is_numeric($contentGroup))
 			$contentGroup = intval($contentGroup);
 			
-		@chgrp($filePath, $contentGroup);
+		@kFile::chgrp($filePath, $contentGroup);
 		
-		if(is_dir($filePath))
+		if(kFile::isDir($filePath))
 		{
-			@chmod($filePath, 0770);
+			@kFile::chmod($filePath, 0770);
 			$dir = dir($filePath);
-			while (false !== ($file = $dir->read()))
+			if($dir)
 			{
-				if($file[0] != '.')
-					self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+				while (false !== ($file = $dir->read()))
+				{
+					if($file[0] != '.')
+						self::setPermissions($filePath . DIRECTORY_SEPARATOR . $file);
+				}
+				$dir->close();
 			}
-			$dir->close();
 		}
 		else
 		{
-			@chmod($filePath, 0640);
+			@kFile::chmod($filePath, 0640);
 		}
 	}
 
@@ -290,7 +295,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	    foreach ($dirs as $dir)
 	    {
 	        $path .= DIRECTORY_SEPARATOR . $dir;
-	        if (is_dir($path))
+	        if (kFile::isDir($path))
 	        	continue;
 	        	
 	        if(!kFile::fullMkfileDir($path, 0770))
@@ -403,7 +408,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 			$dirFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $dirFullPath);
 	
-			if (file_exists($dirFullPath))
+			if (kFile::checkFileExists($dirFullPath))
 			{
 				$time = time(); 
 				$dirFullPath .= $time;
@@ -469,22 +474,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 
-		list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
-		$targetFullPath = $rootPath . $filePath; 
-		if(!$targetFullPath)
-		{
-			$targetFullPath = kPathManager::getFilePath($target_key);
-			KalturaLog::info("Generated new path [$targetFullPath]");
-		}
-		
-		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-
-		if ( !file_exists( dirname( $targetFullPath )))
-		{
-			self::fullMkdir($targetFullPath);
-		}
-
-		if ( file_exists( $temp_file_path ))
+		if ( kFile::checkFileExists( $temp_file_path ))
 		{
 			KalturaLog::info("$temp_file_path file exists");
 		}
@@ -492,21 +482,48 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			KalturaLog::info("$temp_file_path file doesnt exist");
 		}
-		
-		if (file_exists($targetFullPath))
-		{
-			$time = time(); 
-			$targetFullPath .= $time;
-			$filePath .= $time; 
-		}
 
-		if($copyOnly)
+		if(!kFile::isSharedPath($temp_file_path) || kSharedFileSystemMgr::getCopySharedToSharedAllowed())
 		{
-			$success = copy($temp_file_path, $targetFullPath);
+			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
+			$targetFullPath = $rootPath . $filePath;
+			if(!$targetFullPath)
+			{
+				$targetFullPath = kPathManager::getFilePath($target_key);
+				KalturaLog::info("Generated new path [$targetFullPath]");
+			}
+
+			$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
+
+			if (!kFile::checkFileExists(dirname( $targetFullPath)))
+			{
+				kFile::fullMkdir($targetFullPath);
+			}
+
+			if (kFile::checkFileExists($targetFullPath))
+			{
+				$time = time();
+				$targetFullPath .= $time;
+				$filePath .= $time;
+			}
+
+			if($copyOnly)
+			{
+				$success = kFile::moveFile($temp_file_path, $targetFullPath, true);
+			}
+			else
+			{
+				$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			}
 		}
 		else
 		{
-			$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			// if temp file is shared we set the file path to be the temp path and don't move the file to new location
+			$targetFullPath = $temp_file_path;
+			list($rootPath, $filePath) = explode("/",ltrim($targetFullPath,"/"),2);
+			$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
+			$filePath = DIRECTORY_SEPARATOR . $filePath;
+			$success = true;
 		}
 
 		if($success)
@@ -965,6 +982,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalFilePathForKey ( FileSyncKey $key , $strict = false )
 	{
 		$path = implode('', self::getLocalFilePathArrForKey ($key, $strict));
+		$path = kFile::fixPath($path);
 		KalturaLog::info("path [$path]");
 		return $path; 
 	}
@@ -1052,6 +1070,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$currentDCFileSync->setDc( $dcId );
 			$currentDCFileSync->setFileRoot ( $rootPath );
 			$currentDCFileSync->setFilePath ( $filePath );
+			$currentDCFileSync->setFileExtension(strtolower(pathinfo($filePath, PATHINFO_EXTENSION)));
 			$currentDCFileSync->setPartnerId ( $key->partner_id);
 			$currentDCFileSync->setOriginal ( 1 );
 			if (!is_null($md5))
@@ -1061,7 +1080,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fullPath = $currentDCFileSync->getFullPath();
 		$isDir = is_dir($fullPath);
 		
-		if ( file_exists( $fullPath ) )
+		if ( kFile::checkFileExists($fullPath ))
 		{
 			$currentDCFileSync->setFileSizeFromPath ( $fullPath );
 			$currentDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_READY );

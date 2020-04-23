@@ -132,16 +132,19 @@ class kJobsManager
 		$c->add(BatchJobPeer::STATUS, BatchJobPeer::getClosedStatusList(), Criteria::NOT_IN);
 		$c->setLimit($maxJobsForQuery);
 		// aborts all child jobs in chunks
-		while(true) {
+		while(true)
+		{
 			$dbChildJobs = $dbBatchJob->getChildJobs($c);
-		foreach($dbChildJobs as $dbChildJob) {
-			$dbChildJob->setMessage("Parent job was aborted.");
-			if($dbChildJob->getId() != $dbBatchJob->getId())
-				self::abortDbBatchJob($dbChildJob);
-		}
+			foreach($dbChildJobs as $dbChildJob)
+			{
+				$dbChildJob->setMessage("Parent job was aborted.");
+				if($dbChildJob->getId() != $dbBatchJob->getId())
+					self::abortDbBatchJob($dbChildJob);
+			}
+			
 			if(count($dbChildJobs) < $maxJobsForQuery)
 				break;
-	}
+		}
 	}
 	/**
 	 * @param int $jobId
@@ -1250,7 +1253,7 @@ class kJobsManager
 			$inputFileSyncLocalPath = $fileSync->getFilePath();
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
+		if (!kFile::checkFileExists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
 			KalturaLog::info("Input file [$inputFileSyncLocalPath] does not exist");
 			

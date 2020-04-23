@@ -419,24 +419,19 @@ abstract class KBatchBase implements IKalturaLogger
 
 	protected static function foldersize($path)
 	{
-	  if(!file_exists($path)) return 0;
-	  if(is_file($path)) return kFile::fileSize($path);
-	  $ret = 0;
-	  foreach(glob($path."/*") as $fn)
-	    $ret += KBatchBase::foldersize($fn);
-	  return $ret;
+	  kFile::getFolderSize($path);
 	}
 
 	protected function setFilePermissions($filePath)
 	{
-		if(is_dir($filePath))
+		if(kFile::isDir($filePath))
 		{
 			$chmod = 0750;
 			if(self::$taskConfig->getDirectoryChmod())
 				$chmod = octdec(self::$taskConfig->getDirectoryChmod());
 				
 			KalturaLog::debug("chmod($filePath, $chmod)");
-			@chmod($filePath, $chmod);
+			kFile::chmod($filePath, $chmod);
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -452,7 +447,7 @@ abstract class KBatchBase implements IKalturaLogger
 				$chmod = octdec(self::$taskConfig->getChmod());
 		
 			KalturaLog::debug("chmod($filePath, $chmod)");
-			@chmod($filePath, $chmod);
+			kFile::chmod($filePath, $chmod);
 		}
 	}
 
@@ -656,12 +651,12 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function createDir($path, $rights = 0777)
 	{
-		if(!is_dir($path))
+		if(!kFile::isDir($path))
 		{
-			if(!file_exists($path))
+			if(!kFile::checkFileExists($path))
 			{
 				KalturaLog::info("Creating temp directory [$path]");
-				mkdir($path, $rights, true);
+				kFile::fullMkfileDir($path, $rights, true);
 			}
 			else
 			{
@@ -765,7 +760,7 @@ abstract class KBatchBase implements IKalturaLogger
 		for ($retry = 0; $retry < $retries; $retry++)
 		{
 			clearstatcache();
-			if (file_exists($fileName))
+			if (kFile::checkFileExists($fileName))
 				return true;
 
 			KalturaLog::log("File $fileName does not exist, try $retry, waiting $interval seconds");

@@ -880,6 +880,19 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_19_updat
     php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_reach_notifications.php
 
 
+## add custom_data column to upload_token DB table ##
+
+- Issue Type: Task
+- Issue ID: No Ticket Opened
+
+### Configuration ###
+
+	None.	
+
+#### Deployment Scripts ####
+
+		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_06_16_alter_upload_token_table_custom_data_field.sql
+
 ## Add addition fields in entry vendor task csv ##
 
 - Issue Type: Task

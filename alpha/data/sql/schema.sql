@@ -2007,6 +2007,7 @@ CREATE TABLE `upload_token`
 	`dc` INTEGER,
 	`object_type` VARCHAR(127),
 	`object_id` VARCHAR(31),
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `int_id`(`int_id`),
 	KEY `partner_id_status`(`partner_id`, `status`),

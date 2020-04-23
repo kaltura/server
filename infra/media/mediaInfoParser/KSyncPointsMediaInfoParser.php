@@ -25,7 +25,7 @@ class KSyncPointsMediaInfoParser
 		{
 			$this->ffprobeBin = $ffprobeBin;
 		}
-		if (!file_exists($filePath))
+		if (!kFile::checkFileExists($filePath))
 			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 		
 		$this->filePath = $filePath;

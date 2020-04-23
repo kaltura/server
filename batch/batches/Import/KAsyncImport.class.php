@@ -440,16 +440,17 @@ class KAsyncImport extends KJobHandlerWorker
 				KalturaLog::err( "Cannot continue import without shared directory");
 				die();
 			}
-			$uniqid = uniqid('import_');
-			$sharedFile = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
+
+			$sharedFile = kFile::createUniqueFilePath($rootPath);
 
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
 				$sharedFile .= ".$ext";
 
 			KalturaLog::debug("rename('$destFile', '$sharedFile')");
-			rename($destFile, $sharedFile);
-			if(!file_exists($sharedFile))
+			kFile::moveFile($destFile, $sharedFile);
+			sleep(5);
+			if(!kFile::checkFileExists($sharedFile))
 			{
 				KalturaLog::err("Error: renamed file doesn't exist");
 				die();

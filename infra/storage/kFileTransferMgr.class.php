@@ -814,7 +814,7 @@ abstract class kFileTransferMgr
 		KalturaLog::debug("Fix path [$path] with start directory [$this->start_dir]");
 		
 		$new_path = trim($path);
-		$new_path = str_replace("\\", "/", $new_path);
+		$new_path = kFile::fixPath($new_path);
 		
 		KalturaLog::debug("Fixed path [$new_path]");
 		return $new_path;

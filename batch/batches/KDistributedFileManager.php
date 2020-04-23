@@ -35,7 +35,7 @@ class KDistributedFileManager
 			clearstatcache();
 			if(filemtime($localPath) > (time() - $this->fileCacheTimeout))
 				return true;
-				
+			
 			@unlink($localPath);
 		}
 		$fetched = true;
@@ -118,7 +118,7 @@ class KDistributedFileManager
 				$curlWrapper->close();
 			}
 			
-			if(!file_exists($localPath))
+			if(!kFile::checkFileExists($localPath))
 			{
 				$errDescription = "Error: output file doesn't exist";
 				return false;
