@@ -476,4 +476,29 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_EXPORT_PERIODICALLY, $v);
 	}
+
+	/**
+	 * @param $fileSync
+	 * @param $partner
+	 * @return bool
+	 */
+	public static function shouldImportFile($fileSync, $partner)
+	{
+		if ($fileSync && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner )
+		{
+			if ( $partner->getImportRemoteSourceForConvert())
+			{
+				return true;
+			}
+			else
+			{
+				$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
+				if($storageProfile && $storageProfile->getExportPeriodically())
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
