@@ -1534,7 +1534,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 				if ($fileSync && !$local)
 				{
-					if (!$fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || !$partner || !$partner->getImportRemoteSourceForConvert())
+					if (!StorageProfile::shouldImportFile($fileSync, $partner))
 					{
 						KalturaLog::err("Source file not found locally for flavor conversion [" . $flavorAsset->getId() . "]");
 						return false;
