@@ -584,8 +584,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
 		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
 		{
-			$storageIds = kConf::get('periodic_storage_ids','cloud_storage', null);
-			return explode(',', $storageIds);
+			return kConf::get('periodic_storage_ids','cloud_storage', array());
 		}
 		return null;
 	}
