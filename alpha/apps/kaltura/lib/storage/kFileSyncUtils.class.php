@@ -927,6 +927,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			else
 				KalturaLog::info("FileSync was found but doesn't exists locally");
 
+			KalturaLog::info("FileSync DC: " . $desired_file_sync->getDc());
+
 			return array ( $desired_file_sync , $local );
 		}
 
@@ -952,8 +954,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner_id);
 		}
 
-		KalturaLog::info(print_r($periodicStorageIds, true));
-
 		foreach ($file_sync_list as $file_sync)
 		{
 			// make sure not link and work on original
@@ -974,37 +974,22 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				return array($tmp_file_sync);
 			}
 
-			if($fetch_from_remote_if_no_local)
+			if(in_array($tmp_file_sync->getDc(), kDataCenterMgr::getDcIds()))
 			{
-				if(in_array($tmp_file_sync->getDc(), kDataCenterMgr::getDcIds()))
-				{
-					$dcFileSyncs[] = $tmp_file_sync;
-				}
-				else if(in_array($tmp_file_sync->getDc(), $periodicStorageIds))
-				{
-					$periodicFileSyncs[] = $tmp_file_sync;
-				}
-				else
-				{
-					$remoteFileSyncs[] = $tmp_file_sync;
-				}
+				$dcFileSyncs[] = $tmp_file_sync;
+			}
+			else if(in_array($tmp_file_sync->getDc(), $periodicStorageIds))
+			{
+				$periodicFileSyncs[] = $tmp_file_sync;
+			}
+			else
+			{
+				$remoteFileSyncs[] = $tmp_file_sync;
 			}
 		}
 
-		usort($dcFileSyncs, array('kFileSyncUtils', 'compareFileSyncs'));
-		usort($periodicFileSyncs, array('kFileSyncUtils', 'compareFileSyncs'));
-		usort($remoteFileSyncs, array('kFileSyncUtils', 'compareFileSyncs'));
-
 		// always prefer local file syncs, then periodic and lastly remote
 		return array_merge($dcFileSyncs, $periodicFileSyncs, $remoteFileSyncs);
-	}
-
-	protected static function compareFileSyncs(fileSync $a, filesync $b)
-	{
-		if ($a->getDc() == $b->getDc()) {
-			return 0;
-		}
-		return ($a->getDc() < $b->getDc()) ? -1 : 1;
 	}
 
 	/**
