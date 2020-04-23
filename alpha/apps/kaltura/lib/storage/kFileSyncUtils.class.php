@@ -908,7 +908,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 
+		$periodicStorageIds = array();
+		if($fetch_from_remote_if_no_local)
+		{
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($key->partner_id);
+		}
+
 		$desired_file_sync = null;
+		$periodic_file_sync = null;
 		$local = false;
 		foreach ( $file_sync_list as $file_sync )
 		{
@@ -934,6 +941,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$desired_file_sync = $tmp_file_sync;
 			}
+
+			if($periodicStorageIds && in_array($tmp_file_sync->getDc(), $periodicStorageIds))
+			{
+				$periodic_file_sync = $tmp_file_sync;
+			}
+		}
+
+		if($periodic_file_sync && !in_array($desired_file_sync->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			$desired_file_sync = $periodic_file_sync;
 		}
 
 		if ( $desired_file_sync )
