@@ -285,7 +285,9 @@ class APIErrors
 	const NO_FIELDS_SET_FOR_UI_CONF = "NO_FIELDS_SET_FOR_UI_CONF;;Missing fiedls when adding uiconf" ;
 	
 	const INVALID_PLAYLIST_TYPE = "INVALID_PLAYLIST_TYPE;;Invalid playlist type";
-	
+
+	const CLONING_PATH_PLAYLIST_NOT_SUPPORTED = 'CLONING_PATH_PLAYLIST_NOT_SUPPORTED;;Cloning Path playlist is not supported';
+
 	// SRC_FILE - source file to be converted and downloaded
 	const DOWNLOAD_ERROR = "DOWNLOAD_ERROR;SRC_FILE;Cannot find source file [@SRC_FILE@] in archive";
 

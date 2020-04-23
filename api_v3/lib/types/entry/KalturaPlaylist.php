@@ -111,6 +111,8 @@ class KalturaPlaylist extends KalturaBaseEntry
 				return KalturaPlaylistType::STATIC_LIST;
 			case entry::ENTRY_MEDIA_TYPE_GENERIC_1:
 				return KalturaPlaylistType::EXTERNAL;
+			case entry::ENTRY_MEDIA_TYPE_GENERIC_2:
+				return KalturaPlaylistType::PATH;
 		}
 	}
 
