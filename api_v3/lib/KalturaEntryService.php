@@ -857,7 +857,7 @@ class KalturaEntryService extends KalturaBaseService
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
-			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
+			    $entryFullPath = rtrim(myContentStorage::getFSUploadsPath(), "/") . '/' . $dbEntry->getId() . '.' . $ext;
     			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
 

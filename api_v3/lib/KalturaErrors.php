@@ -434,6 +434,14 @@ class KalturaErrors extends APIErrors
 	
 	const MAX_ALLOWED_CHUNK_COUNT_EXCEEDED = "MAX_ALLOWED_CHUNK_COUNT_EXCEEDED;;Max allowed waiting chunks to be concatenated has exceeded allowed limit";
 
+	const UPLOAD_TOKEN_EXCEEDED_MAX_PARTS = "UPLOAD_TOKEN_EXCEEDED_MAX_PARTS;PARTS_NUM,MAX_NUM;Number of upload token parts expected to be [@PARTS_NUM@] while maximum number of parts allowed is [@MAX_NUM@]";
+
+	const UPLOAD_TOKEN_INVALID_PART_SIZE = "UPLOAD_TOKEN_INVALID_PART_SIZE;MAX_SIZE;The minimum size for uploaded part is not allowed. The maximum value allowed is [@MAX_SIZE@]";
+
+	const UPLOAD_TOKEN_PROCESSING_ERROR = "UPLOAD_TOKEN_PROCESSING_ERROR;;Could not complete upload token processing";
+
+	const UPLOAD_TOKEN_SMALL_PART_SIZE = "UPLOAD_TOKEN_SMALL_PART_SIZE;;upload token chunk size is smaller then expected minimum chunk size";
+
 	/*
 	 * Partenrs service
 	 * PID - the parent partner_id

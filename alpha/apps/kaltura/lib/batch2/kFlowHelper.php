@@ -127,7 +127,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFileLocalPath()))
+		if(!kFile::checkFileExists($data->getDestFileLocalPath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
 		// get entry
@@ -837,7 +837,7 @@ class kFlowHelper
 		}
 		
 		// creats the file sync
-		if(file_exists($data->getLogFileSyncLocalPath()))
+		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			try{
@@ -2543,7 +2543,7 @@ class kFlowHelper
 
 		$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
 
-		if(!file_exists($fullPath))
+		if(!kFile::checkFileExists($fullPath))
 		{
 			KalturaLog::info("File path [$fullPath] not found");
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());

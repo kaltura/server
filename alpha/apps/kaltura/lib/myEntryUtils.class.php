@@ -768,7 +768,7 @@ class myEntryUtils
 		foreach ($thumbDirs as $thumbDir)
 		{
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
-			if (file_exists($currPath) && @filesize($currPath))
+			if (kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 			{
 				if($currPath != $finalThumbPath)
 				{
@@ -790,7 +790,7 @@ class myEntryUtils
 		if ($fileSync)
 			$orig_image_path = $fileSync->getFullPath();
 		
-		if ($orig_image_path === null || !file_exists($orig_image_path))
+		if ($orig_image_path === null || !kFile::checkFileExists($orig_image_path))
 		{
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
@@ -1552,7 +1552,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if ($quizData)
 		{
 			$newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
-			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
+			$newEntry->addCapability(QuizPlugin::getCapatabilityCoreValue());
 		}
 
 	    	// save the entry

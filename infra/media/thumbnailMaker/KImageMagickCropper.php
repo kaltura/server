@@ -53,8 +53,9 @@ class KImageMagickCropper extends KBaseCropper
 	{
 
 		$attributes = array();
+		$srcPath = kFile::realPath($this->srcPath);
 
-		$exifData = @exif_read_data($this->srcPath);
+		$exifData = @exif_read_data($srcPath);
 		$orientation = isset($exifData["Orientation"]) ? $exifData["Orientation"] : 1;
 		
 		if(isset($forceRotation)) {
@@ -314,7 +315,7 @@ class KImageMagickCropper extends KBaseCropper
 		if ($targetFileExtension === 'gif')
 		{
 			$tmpTarget = $this->targetPath.'.tmp.gif';
-			$coalesceCmd = "\"$this->cmdPath\" \"$this->srcPath\" -coalesce \"$tmpTarget\"";
+			$coalesceCmd = "\"$this->cmdPath\" \"$srcPath\" -coalesce \"$tmpTarget\"";
 			$mainCmd = "\"$this->cmdPath\" \"$tmpTarget\" $options \"$this->targetPath\"";
 			$rmCmd = "rm \"$tmpTarget\"";
 
@@ -322,7 +323,7 @@ class KImageMagickCropper extends KBaseCropper
 		}
 		else
 		{
-			return "\"$this->cmdPath\" \"$this->srcPath\" $options \"$this->targetPath\"  2>&1";
+			return "\"$this->cmdPath\" \"$srcPath\" $options \"$this->targetPath\"  2>&1";
 		}
 	}
 

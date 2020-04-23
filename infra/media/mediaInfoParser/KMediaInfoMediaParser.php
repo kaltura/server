@@ -19,8 +19,10 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	public function __construct($filePath, $cmdPath="mediainfo")
 	{
 		$this->cmdPath = $cmdPath;
-		if (!file_exists($filePath))
-			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
+		if(strstr($filePath, "http")===false) {
+			if (!kFile::checkFileExists($filePath))
+				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
+		}
 		parent::__construct($filePath);
 	}
 	
@@ -44,9 +46,21 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		{
 			KalturaLog::log(print_r($ex,1));
 		}
-				
-		$output = $this->getRawMediaInfo();
-		$kMi = $this->parseOutput($output);
+			
+		try
+		{
+			$output = $this->getRawMediaInfo();
+			$kMi = $this->parseOutput($output);
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::log(print_r($ex,1));
+		}
+		
+		if(!isset($kMi) && !isset($ffMi))
+		{
+			throw new kApplicativeException(KBaseMediaParser::MEDIA_PARSER_TYPE_MEDIAINFO, "Failed to get media data for file [{$this->filePath}]");
+		}
 
 		if(!isset($kMi)) {
 			$compareStr = self::compareFields($kMi, $ffMi);

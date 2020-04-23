@@ -340,7 +340,19 @@ class myContentStorage
 		if ( $add_root )
 			return myContentStorage::getFSContentRootPath()."content/uploads/";
 		else
-			return "content/uploads/";;
+			return "content/uploads/";
+	}
+
+	public static function getFSTempUploadsPath( $add_root = true )
+	{
+		if ($add_root)
+		{
+			return myContentStorage::getFSContentRootPath()."content/tmp/uploads/";
+		}
+		else
+		{
+			return "content/tmp/uploads/";
+		}
 	}
 
 	public static function getFileNameEdit ( $file_name )

@@ -23,8 +23,8 @@
 	 * Session setup values
 	 */
 	class KChunkedEncodeSetup {
-				// DefaultChunkDuration for frame height>1280 (basically 4K and QHD). 
-				// Chunk dur's for smaller frames evaluated from that value.
+		// DefaultChunkDuration for frame height>1280 (basically 4K and QHD).
+		// Chunk dur's for smaller frames evaluated from that value.
 		const	DefaultChunkDuration = 30;  // secs
 		const	DefaultChunkOverlap =  0.5; // secs
 		const	DefaultConcurrentChunks = 1;// secs
@@ -52,6 +52,8 @@
 		
 		public $createFolder = 1;
 		public $cleanUp = 1;
+		
+		public $sharedChunkPath = null; //Added to support FS wrappers which do not support shared NFS storage (S3)
 
 		/********************
 		 * C'tor
@@ -68,6 +70,9 @@
 			 * Update setup to defaults
 			 */
 			$this->concurrent = $this->concurrentMin = self::DefaultConcurrentChunks;
+			
+			$this->ffmpegBin = kConf::get('bin_path_ffmpeg') ? kConf::get('bin_path_ffmpeg') : "ffmpeg";
+			$this->ffprobeBin = kConf::get('bin_path_ffprobe') ? kConf::get('bin_path_ffprobe') : "ffprobe";
 		}
 		
 		/********************
@@ -140,9 +145,9 @@
 		 */
 		protected static function getData1($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
-				/*
-				 * Retrieve data for first frame and for last 10
-				 */
+			/*
+			 * Retrieve data for first frame and for last 10
+			 */
 			$cmdLine = "$ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet $chunkFileName | (head -n1 && tail -n10)";
 			KalturaLog::log($cmdLine);
 			$lastLine=exec($cmdLine , $outputArr, $rv);
@@ -180,13 +185,13 @@
 		protected static function getData2($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
 			KalturaLog::log("$chunkFileName");
-				/*
-				 * In order to save AWS egress traffic, 
-				 * store the tmp MP4 file in th local /tmp folder
-				 */
+			/*
+			 * In order to save AWS egress traffic,
+			 * store the tmp MP4 file in th local /tmp folder
+			 */
 //			$mp4TmpFile = "$chunkFileName.mp4";
 			$mp4TmpFile = "/tmp/".basename($chunkFileName).".mp4";
-			$cmdLine = "$ffmpegBin -i $chunkFileName -c copy -f mp4 -v quiet -y $mp4TmpFile;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $mp4TmpFile; unlink $mp4TmpFile";
+			$cmdLine = "$ffmpegBin -i \"$chunkFileName\" -c copy -f mp4 -v quiet -y $mp4TmpFile;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $mp4TmpFile; unlink $mp4TmpFile";
 			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -196,9 +201,9 @@
 			KalturaLog::log("copy:rv($rv), output:\n".print_r($outputArr,1));
 			list($stam,$duration,$frames,$stam2) = explode(",",$outputArr[0]);
 			KalturaLog::log("duration:$duration,frames:$frames");
-/**/
+			/**/
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
+			$cmdLine = "$ffmpegBin -t 1 -i \"$chunkFileName\"  -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -212,7 +217,7 @@
 			else {
 				$startFrom = $duration-4;
 			}
-			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
+			$cmdLine = "$ffmpegBin -ss $startFrom -i \"$chunkFileName\"  -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
 			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -229,7 +234,7 @@
 				}
 			}
 			KalturaLog::log("trimmed:output:\n".print_r($outputArr,1));
-
+			
 			$outputLine = array_shift($outputArr);
 			list($stam,$pts,$size,$type,$frame) = explode(",",$outputLine);
 			$framesStat->start = $pts;
@@ -252,7 +257,7 @@
 		public static function getFrameData($fileName, $startFrom, $duration, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i $fileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - ";
+			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i \"$fileName\" -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - ";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {

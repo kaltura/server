@@ -133,7 +133,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getFullPath ()
 	{
-		return $this->getFileRoot() . $this->getFilePath();
+		$path = $this->getFileRoot() . $this->getFilePath();
+		return kFile::fixPath($path);
 	}
 
 	/**
@@ -153,8 +154,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function deleteTempClear()
 	{
 		$tempPath = $this->getClearTempPath();
-		if (file_exists($tempPath))
-			unlink($tempPath);
+		if (kFile::checkFileExists($tempPath))
+			kFile::unlink($tempPath);
 	}
 
 	
@@ -270,13 +271,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function setEncryptionKey ($v) { $this->putInCustomData("encryptionKey", $v);  }
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
 	public function getIv() {return kConf::get("encryption_iv");}
+	
+	public function getFileExtension () { return $this->getFromCustomData("extension"); }
+	public function setFileExtension ($v) { $this->putInCustomData("extension", $v);  }
 
 	public function getSrcPath () { return $this->getFromCustomData("srcPath"); }
 	public function setSrcPath ($v) { $this->putInCustomData("srcPath", $v);  }
 	public function getSrcEncKey () { return $this->getFromCustomData("srcEncKey"); }
 	public function setSrcEncKey ($v) { $this->putInCustomData("srcEncKey", $v);  }
-
-
 }
 
 

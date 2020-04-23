@@ -265,51 +265,9 @@ class KCurlWrapper
 	
 	public static function getDataFromFile($url, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
 	{
-		if(!is_null($maxFileSize))
-		{
-			$curlWrapper = new KCurlWrapper();
-			$curlHeaderResponse = $curlWrapper->getHeader($url, true);
-			$curlWrapper->close();
-			
-			if(!$curlHeaderResponse || $curlWrapper->getError())
-				throw new Exception("Failed to retrive Curl header response from file path [$url] with Error " . $curlWrapper->getError());
-				
-			if(!$curlHeaderResponse->isGoodCode())
-				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
-			
-			if(isset($curlHeaderResponse->headers['content-length']))
-			{
-				$fileSize = $curlHeaderResponse->headers['content-length'];
-				if($fileSize > $maxFileSize)
-					throw new Exception("File size [$fileSize] Excedded Max Siae Allowed [$maxFileSize]");
-					
-				KalturaLog::info("File size [$fileSize] validated");
-			}
-			else 
-			{
-				KalturaLog::info("File size validation skipped");
-			}
-		}
-		
-		$curlWrapper = new KCurlWrapper();
-		$res = $curlWrapper->exec($url, $destFilePath, null, $allowInternalUrl);
-
-		$httpCode = $curlWrapper->getHttpCode();
-		if (KCurlHeaderResponse::isError($httpCode))
-		{
-			KalturaLog::info("curl request [$url] return with http-code of [$httpCode]");
-			if ($destFilePath && file_exists($destFilePath))
-				unlink($destFilePath);
-			$res = false;
-		}
-
-
-		$curlWrapper->close();
-		
-		return $res;
+		return kFile::getDataFromFile($url, $destFilePath, $maxFileSize, $allowInternalUrl);
 	}
-
-
+	
 	/**
 	 * @return false|string
 	 */

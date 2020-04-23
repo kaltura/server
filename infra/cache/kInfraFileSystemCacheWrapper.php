@@ -1,6 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
+require_once(dirname(__FILE__) . '/../storage/shared_file_system_managers/kSharedFileSystemMgr.php');
+
 
 /**
  * @package infra
@@ -8,12 +10,16 @@ require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
  */
 class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 {
-	const EXPIRY_SUFFIX = '__expiry';
+	const EXPIRY_SUFFIX = '__expiry.txt';
 
 	protected $baseFolder;
 	protected $keyFolderChars;
 	protected $defaultExpiry;
 	protected $supportExpiry;
+	protected $sharedFileSystemType;
+	
+	/* @var $kSharedFSManager kSharedFileSystemMgr */
+	protected $kSharedFSManager;
 
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()
@@ -24,6 +30,9 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 		$this->keyFolderChars = $config['keyFolderChars'];
 		$this->defaultExpiry = $config['defaultExpiry'];
 		$this->supportExpiry = isset($config['supportExpiry']) ? $config['supportExpiry'] : false;
+		$this->sharedFileSystemType = isset($config['sharedFSType']) ? $config['sharedFSType'] : kSharedFileSystemMgrType::LOCAL;
+		
+		$this->kSharedFSManager = kSharedFileSystemMgr::getInstance($this->sharedFileSystemType, $config);
 		return true;
 	}
 	
@@ -36,8 +45,12 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 		$filePath = $this->baseFolder;
 		$keyFileName = basename($key);
 		$keyDirName = dirname($key);
+		
 		if ($keyDirName != '.')
+		{
 			$filePath .= $keyDirName . '/';
+		}
+		
 		if ($this->keyFolderChars)
 		{
 			$dashPos = strrpos($keyFileName, '-');
@@ -46,25 +59,23 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 			{
 				$startPos = $dashPos + 1;
 			}
+			
 			$foldersPart = substr($keyFileName, $startPos, $this->keyFolderChars);
 			for ($curPos = 0; $curPos < strlen($foldersPart); $curPos += 2)
 			{
 				$filePath .= substr($foldersPart, $curPos, 2) . '/';
 			}
 		}
+		
 		return $filePath . $keyFileName;
 	}
 
 	/**
 	 * @param string $filePath
 	 */
-	protected static function createDirForPath($filePath)
+	protected function createDirForPath($filePath)
 	{
-		$dirname = dirname($filePath);
-		if (!is_dir($dirname))
-		{
-			mkdir($dirname, 0777, true);
-		}
+		$this->kSharedFSManager->createDirForPath($filePath);
 	}
 		
 	/* (non-PHPdoc)
@@ -73,12 +84,12 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	protected function doGet($key)
 	{
 		$filePath = $this->getFilePath($key);
-		if (!file_exists($filePath))
+		if (!$this->kSharedFSManager->checkFileExists($filePath))
 			return false;
 		
 		if ($this->supportExpiry)
 		{
-			$cacheExpiry = self::safeFileGetContents($filePath . self::EXPIRY_SUFFIX);
+			$cacheExpiry = $this->safeFileGetContents($filePath . self::EXPIRY_SUFFIX);
 			if ($cacheExpiry === false && $this->defaultExpiry)
 			{
 				$cacheExpiry = filemtime($filePath) + $this->defaultExpiry;		
@@ -86,13 +97,13 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 			
 			if ($cacheExpiry && $cacheExpiry <= time())
 			{
-				self::safeUnlink($filePath);
-				self::safeUnlink($filePath . self::EXPIRY_SUFFIX);
+				$this->safeUnlink($filePath);
+				$this->safeUnlink($filePath . self::EXPIRY_SUFFIX);
 				return false;
 			}
 		}
 		
-		$result = self::safeFileGetContents($filePath);
+		$result = $this->safeFileGetContents($filePath);
 
 		return $result;
 	}
@@ -104,16 +115,16 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	{
 		$filePath = $this->getFilePath($key);
 		
-		self::createDirForPath($filePath);
+		$this->createDirForPath($filePath);
 		
 		// write the expiry if non default
 		if ($this->supportExpiry && $this->defaultExpiry != $expiry)
 		{
-			if (self::safeFilePutContents($filePath . self::EXPIRY_SUFFIX, $expiry ? time() + $expiry : 0) === false)
+			if ($this->safeFilePutContents($filePath . self::EXPIRY_SUFFIX, $expiry ? time() + $expiry : 0) === false)
 				return false;
 		}
 		
-		return self::safeFilePutContents($filePath, $var);
+		return $this->safeFilePutContents($filePath, $var);
 	}
 	
 	/* (non-PHPdoc)
@@ -132,9 +143,9 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 		$filePath = $this->getFilePath($key);
 		if ($this->supportExpiry)
 		{
-			self::safeUnlink($filePath . self::EXPIRY_SUFFIX);
+			$this->safeUnlink($filePath . self::EXPIRY_SUFFIX);
 		}
-		return self::safeUnlink($filePath);
+		return $this->safeUnlink($filePath);
 	}
 
 	/**
@@ -142,44 +153,36 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 	 * @param string $var
 	 * @return bool
 	 */
-	protected static function safeFilePutContents($filePath, $var)
+	protected function safeFilePutContents($filePath, $var)
 	{
-		// write to a temp file and then rename, so that the write will be atomic
-		$tempFilePath = tempnam(dirname($filePath), basename($filePath));
-		if (file_put_contents($tempFilePath, $var) === false)
-			return false;
-		if (rename($tempFilePath, $filePath) === false)
-		{
-			self::safeUnlink($tempFilePath);
-			return false;
-		}
-		return true;
+		return $this->kSharedFSManager->putFileContentAtomic($filePath, $var);
 	}
 		
 	/**
 	 * @param string $filePath
 	 * @return string
 	 */
-	protected static function safeFileGetContents($filePath)
+	protected function safeFileGetContents($filePath)
 	{
 		// This function avoids the 'file does not exist' warning
-		if (!file_exists($filePath))
+		if (!$this->kSharedFSManager->checkFileExists($filePath))
 		{
 			return false;
 		}
-		return @file_get_contents($filePath);
+		
+		return $this->kSharedFSManager->getFileContent($filePath);
 	}
 
 	/**
 	 * @param string $filePath
 	 * @return bool false on error
 	 */
-	protected static function safeUnlink($filePath)
+	protected function safeUnlink($filePath)
 	{
-		if (!file_exists($filePath))
+		if (!$this->kSharedFSManager->checkFileExists($filePath))
 		{
 			return false;
 		}
-		return @unlink($filePath);
+		return $this->kSharedFSManager->unlink($filePath);
 	}
 }

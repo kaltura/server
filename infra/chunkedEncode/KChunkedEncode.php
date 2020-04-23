@@ -59,8 +59,8 @@
 				KalturaLog::log($msgStr="ERROR: missing essential - source");
 				return false;
 			}
-
-				// Get source mediaData. Required for 'supported' validation
+			
+			// Get source mediaData. Required for 'supported' validation
 			$this->sourceFileDt = $this->getMediaData($params->source);
 			if(!isset($this->sourceFileDt)){
 				KalturaLog::log($msgStr="ERROR: failed on media data retrieval of the source file ($params->source)");
@@ -72,14 +72,31 @@
 				 */
 			$pInfo = pathinfo($params->output);
 			$setup->output = realpath($pInfo['dirname'])."/".$pInfo['basename'];
+			
+			//Build remote shared path to follow same setting as output path
+			if($setup->sharedChunkPath)
+			{
+				$setup->sharedChunkPath .= $pInfo['basename'];
+			}
 
-			if(isset($setup->createFolder) && $setup->createFolder==1) {
+			if(isset($setup->createFolder) && $setup->createFolder==1)
+			{
 				$setup->output.= "_".$this->chunkEncodeToken."/";
-				if(!file_exists($setup->output)) {
+				if(!kFile::checkFileExists($setup->output)) {
 					KalturaLog::log("Create tmp folder:".$setup->output);
-					mkdir($setup->output);
+					kFile::mkdir($setup->output);
 				}
 				$setup->output.= $pInfo['filename'];
+				
+				if($setup->sharedChunkPath)
+				{
+					$setup->sharedChunkPath .= "_".$this->chunkEncodeToken."/";
+					if(!kFile::checkFileExists($setup->sharedChunkPath)) {
+						KalturaLog::log("Create tmp folder:".$setup->sharedChunkPath);
+						kFile::fullMkdir($setup->sharedChunkPath);
+					}
+					$setup->sharedChunkPath.= $pInfo['filename'];
+				}
 			}
 			
 				/*
@@ -189,8 +206,8 @@
 						 * SRT splitting
 						 */
 					$chunkSrtFile = $this->getChunkName($chunkData->index,"srt");
-					if(file_exists($chunkSrtFile))
-						unlink($chunkSrtFile);
+					if(kFile::checkFileExists($chunkSrtFile))
+						kFile::unlink($chunkSrtFile);
 					KSrtText::SplitSrtFile($subsFileHd, $chunkSrtFile, $chunkData->start, $chunkData->duration, $subsArr);
 					KalturaLog::log("$chunkSrtFile, $chunkData->start, $chunkData->duration");
 				}
@@ -303,7 +320,7 @@
 			 */
 			$srcIndexes = array_keys($cmdLineArr,'-i');
 			foreach($srcIndexes as $idx) {
-				$cmdLineArr[$idx+1] = realpath($cmdLineArr[$idx+1]);
+				$cmdLineArr[$idx+1] = '"' . kFile::realpath($cmdLineArr[$idx+1]) . '"';
 			}
 			
 			$toAddFps = false;
@@ -604,13 +621,16 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
+			$sharedMode = $this->setup->sharedChunkPath ? "shared" : null;
 			
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				if(isset($chunkData->toFix))
-					$vidConcatStr.= $this->getChunkName($idx,"fix").'|';
-				else 
-					$vidConcatStr.= $this->getChunkName($idx).'|';
+					$currVidStr = $this->getChunkName($idx,"fix");
+				else
+					$currVidStr = $this->getChunkName($idx, $sharedMode);
+				
+				$vidConcatStr .= kFile::realPath($currVidStr) . "|";
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
@@ -619,7 +639,8 @@
 			$params = $this->params;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
-				$audioFilename = $this->getSessionName("audio");
+				$sessionName = $sharedMode ? "shared_audio" : "audio";
+				$audioFilename = $this->getSessionName($sessionName);
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
@@ -629,7 +650,7 @@
 				}
 				if($this->chunkFileFormat=="mpegts")
 					$audioInputParams.= " -itsoffset -1.4";
-				$audioInputParams.= " -i $audioFilename";
+				$audioInputParams.= " -i '" . kfile::realPath($audioFilename) . "'";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
 					$audioCopyParams.= " -bsf:a aac_adtstoasc";
@@ -639,9 +660,15 @@
 			}
 
 			$mergeCmd = $setup->ffmpegBin;
-			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
+			if($sharedMode)
+				$mergeCmd .= ' -protocol_whitelist "http,https,concat,tcp,file" ';
+			
+			if(isset($params->fps))
+				$mergeCmd.= " -r ".$params->fps;
+			
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
+			
 			$mergeCmd.= " -i $vidConcatStr";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
@@ -755,7 +782,7 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
-			$cmdLine.= " -i $params->source";
+			$cmdLine.= " -i \"$params->source\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
@@ -885,6 +912,12 @@
 			case "audio":
 				$name = $this->setup->output."_audio";
 				break;
+			case "shared_audio":
+				if(!$this->setup->sharedChunkPath)
+					return null;
+					
+				$name = $this->setup->sharedChunkPath . "_audio";
+				break;
 			case "qpfile":
 				$name = $this->setup->output."_qpfile";
 				break;
@@ -912,6 +945,13 @@
 			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.";
 			switch($mode){
 			case null:
+				$name.= "$this->videoChunkPostfix".$chunkIdx;
+				break;
+			case "shared":
+				if(!$this->setup->sharedChunkPath)
+					return null;
+				
+				$name = $this->setup->sharedChunkPath . "_$this->chunkEncodeToken"."_$chunkIdx.";
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
 			case "fix":
@@ -1417,8 +1457,10 @@
 			else
 				$this->formatParams = null;
 			
-			if(($key=array_search("-i", $cmdLineArr))!==false) {
+			if(($key=array_search("-i", $cmdLineArr))!==false)
+			{
 				$this->source = $cmdLineArr[$key+1];
+				$cmdLineArr[$key+1] = '"' . $cmdLineArr[$key+1] . '"';
 			}
 			$this->output = end($cmdLineArr);
 		}

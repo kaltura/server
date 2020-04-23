@@ -91,7 +91,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 		$error_message = "";  
 		$actualFileSyncLocalPath = $this->getSrcActualPathFromData($data);
-		if ( ! file_exists ( $actualFileSyncLocalPath ) )
+		if ( ! kFile::checkFileExists($actualFileSyncLocalPath ) )
 		{
 			$error_message = "File [{$actualFileSyncLocalPath}] does not exist";
 			KalturaLog::err(  $error_message );
