@@ -1,5 +1,12 @@
 <?php
-class kUploadTokenMgr
+/**
+ * Created by IntelliJ IDEA.
+ * User: inbal.bendavid
+ * Date: 6/20/2019
+ * Time: 4:46 PM
+ */
+
+abstract class kBaseUploadTokenMgr
 {
 	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
@@ -11,47 +18,96 @@ class kUploadTokenMgr
 	const EICAR_MAX_FILE_SIZE = 128;
 	const BAT_FILE_EXTENSION = 'bat';
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
+
 	/**
 	 * @var UploadToken
 	 */
 	protected $_uploadToken;
-	
+
 	/**
 	 * @var bool
 	 */
-	private $_autoFinalize;
-	
+	protected $_autoFinalize;
+
 	/**
 	 * @var bool
 	 */
-	private $_finalChunk;
-	
+	protected $_finalChunk;
+
 	/**
 	 * @var kBaseCacheWrapper
 	 */
-	private $_autoFinalizeCache;
-	
+	protected $_autoFinalizeCache;
+
 	/**
-	 * Construct new upload token manager for the upload token object
+	 * kBaseUploadTokenMgr constructor.
 	 * @param UploadToken $uploadToken
+	 * @param bool $finalChunk
 	 */
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
 	{
-		KalturaLog::info("Init for upload token id [{$uploadToken->getId()}]");
 		$this->_uploadToken = $uploadToken;
 		$this->_finalChunk = $finalChunk;
 	}
-	
-	private function initUploadTokenMemcache()
+
+	/**
+	 * Resume the upload token with the uploaded file optionally at a given offset
+	 *
+	 * @param file $fileData
+	 * @param float $resumeAt
+	 */
+	abstract protected function handleResume($fileData, $resumeAt);
+
+	/**
+	 * Returns the target upload path for upload token id and extension
+	 *
+	 * @param $uploadTokenId
+	 * @param string $extension
+	 * @return string
+	 */
+	abstract protected function getUploadPath($uploadTokenId, $extension = '');
+
+
+	abstract protected function getFinalFilePath();
+
+	/**
+	 * get upload token manager by storage type
+	 *
+	 * @param $uploadToken
+	 * @param bool $finalChunk
+	 * @param null $type
+	 * @return kS3UploadTokenMgr|kUploadTokenMgr
+	 */
+	public static function getInstance($uploadToken, $finalChunk = true, $type = null)
+	{
+		$dc_config = kConf::getMap("dc_config");
+		if(!$type)
+		{
+			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
+		}
+
+		switch($type)
+		{
+			case kSharedFileSystemMgrType::S3:
+				return new kS3UploadTokenMgr($uploadToken, $finalChunk);
+			default:
+				return new kUploadTokenMgr($uploadToken, $finalChunk);
+		}
+	}
+
+	/**
+	 * @throws kUploadTokenException
+	 */
+	protected function initUploadTokenMemcache()
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
 		if (!$cache)
 			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
-		
+
 		$this->_autoFinalizeCache = $cache;
 		$this->_autoFinalizeCache->add($this->_uploadToken->getId() . ".retries", self::MAX_AUTO_FINALIZE_RETIRES);
 	}
-	
+
 	/**
 	 * Set default values and save the new upload token
 	 */
@@ -62,9 +118,10 @@ class kUploadTokenMgr
 		$this->_uploadToken->setUploadTempPath(null);
 		$this->_uploadToken->setUserIp(requestUtils::getRemoteAddress());
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
+		$this->_uploadToken->setFinalFilePath($this->getFinalFilePath());
 		$this->_uploadToken->save();
 	}
-	
+
 	/**
 	 * Get the current upload token used by the manager
 	 */
@@ -72,27 +129,28 @@ class kUploadTokenMgr
 	{
 		return $this->_uploadToken;
 	}
-	
+
 	/**
 	 * Upload a file to the current upload token
-	 * @param file $fileData
+	 *
+	 * @param $fileData
 	 * @param bool $resume
-	 * @param bool $finalChunk
 	 * @param int $resumeAt
-	 * @throw kUploadTokenException
+	 * @throws PropelException
+	 * @throws kUploadTokenException
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $resumeAt = -1)
 	{
 		$this->_autoFinalize = $this->_uploadToken->getAutoFinalize();
 		if($this->_autoFinalize)
 			$this->initUploadTokenMemcache();
-		
+
 		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
 		if (!in_array($this->_uploadToken->getStatus(), $allowedStatuses, true))
 			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
 
 		$this->updateFileName($fileData);
-			
+
 		try
 		{
 			$this->checkIfFileIsValid($fileData, $resumeAt, $this->_finalChunk);
@@ -119,10 +177,10 @@ class kUploadTokenMgr
 		}
 		else
 		{
-			$this->handleMoveFile($fileData);
-			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
+			throw new kUploadTokenException("Failed to save upload token file", kUploadTokenException::UPLOAD_TOKEN_PROCESSING_FAILURE);
 		}
-		
+
+
 		if ($this->_finalChunk)
 		{
 			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId())
@@ -131,6 +189,7 @@ class kUploadTokenMgr
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
 				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
 			}
+			$this->closeFullFileUpload();
 			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
 		}
 		else
@@ -138,13 +197,13 @@ class kUploadTokenMgr
 			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
 			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
-		
+
 		$this->_uploadToken->setUploadedFileSize($fileSize);
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
-		
+
 		$this->_uploadToken->save();
 	}
-	
+
 	/**
 	 * Delete the current upload token
 	 */
@@ -156,7 +215,9 @@ class kUploadTokenMgr
 
 	/**
 	 * Validate the file data
-	 * @param file $fileData
+	 *
+	 * @param $fileData
+	 * @throws kUploadTokenException
 	 */
 	protected function checkIfFileIsValid($fileData, $resumeAt, $finalChunk)
 	{
@@ -177,7 +238,7 @@ class kUploadTokenMgr
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_UPLOAD_ERROR_OCCURRED);
 		}
-		
+
 		// check if is a real uploaded file
 		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null;
 		if (!is_uploaded_file($tempPath))
@@ -199,6 +260,9 @@ class kUploadTokenMgr
 
 	/**
 	 * Validate the file type
+	 *
+	 * @return bool
+	 * @throws Exception
 	 */
 	protected function checkIfFileIsAllowed()
 	{
@@ -229,6 +293,9 @@ class kUploadTokenMgr
 
 	/**
 	 * Updates the file name of the token (if empty) using the file name from the file data
+	 * @param $fileData
+	 * @throws PropelException
+
 	 */
 	protected function updateFileName($fileData)
 	{
@@ -237,99 +304,27 @@ class kUploadTokenMgr
 			$this->_uploadToken->setFileName(isset($fileData['name']) ? $fileData['name'] : null);
 			$this->_uploadToken->save();
 		}
-		
+
 	}
-	
+
 	/**
-	 * Returns the target upload path for upload token id and extension
-	 * @param string $uploadTokenId
-	 * @param string $extension
+	 * @param $fileData
 	 */
-	protected function getUploadPath($uploadTokenId, $extension = '')
-	{
-		if (!$extension)
-			$extension = self::NO_EXTENSION_IDENTIFIER;
-		
-		return myContentStorage::getFSUploadsPath().
-			substr($uploadTokenId, -2).'/'.
-			substr($uploadTokenId, -4, 2).'/'.
-			$uploadTokenId.'.'.$extension;
-	}
-	
 	protected function tryMoveToErrors($fileData)
 	{
-		if (file_exists($fileData['tmp_name']))
+		if (kFile::checkFileExists($fileData['tmp_name']))
 		{
-			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true));
-			rename($fileData['tmp_name'], $errorFilePath);
+			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true), false);
+			kFile::rename($fileData['tmp_name'], $errorFilePath);
 		}
 	}
 
 	/**
-	 * Resume the upload token with the uploaded file optionally at a given offset
-	 *
-	 * @param file $fileData
-	 * @param bool $finalChunk
-	 * @param float $resumeAt
+	 * @param $currentFileSize
+	 * @return bool
+	 * @throws kUploadTokenException
 	 */
-	protected function handleResume($fileData, $resumeAt)
-	{
-		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
-		if (!file_exists($uploadFilePath))
-			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
-		
-		$sourceFilePath = $fileData['tmp_name'];
-		
-		if ($resumeAt != -1) // this may not be a sequential chunk added at the end of the file
-		{
-			// support backwards compatibility of overriding a final chunk at the offset zero
-			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
-			
-			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$chunkSize = filesize($sourceFilePath);
-			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
-
-			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
-			
-			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
-			{
-				$verifyFinalChunk = true;
-				$expectedFileSize = $this->_uploadToken->getFileSize();
-			}
-			
-			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
-			
-			// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
-			$count = 0;
-			do {
-				if ($count ++)
-					Sleep(1);
-				
-				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $verifyFinalChunk, $this->_uploadToken->getId());
-				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
-			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
-
-			if ($verifyFinalChunk && $currentFileSize != $expectedFileSize)
-				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
-		} else {
-			$uploadFileResource = fopen($uploadFilePath, 'r+b');
-			fseek($uploadFileResource, 0, SEEK_END);
-			
-			self::appendChunk($sourceFilePath, $uploadFileResource);
-			
-			$currentFileSize = ftell($uploadFileResource);
-			
-			if($this->_autoFinalize && $this->_uploadToken->getFileSize() >= $currentFileSize)
-				$this->_finalChunk = true;
-			
-			fclose($uploadFileResource);
-		}
-		
-		return $currentFileSize;
-	}
-	
-	private function checkIsFinalChunk($currentFileSize)
+	protected function checkIsFinalChunk($currentFileSize)
 	{
 		$cacheFileSizeValue = $this->_autoFinalizeCache->increment($this->_uploadToken->getId().".size", $currentFileSize);
 		if($cacheFileSizeValue >= $this->_uploadToken->getFileSize())
@@ -338,33 +333,30 @@ class kUploadTokenMgr
 			{
 				if($this->_autoFinalizeCache->decrement($this->_uploadToken->getId() . ".retries") == 0)
 					throw new kUploadTokenException("Max retires reached when trying to auto finalize uploadToken", kUploadTokenException::UPLOAD_TOKEN_MAX_AUTO_FINALIZE_RETRIES_REACHED);
-				
+
 				$this->_finalChunk = true;
-					return true;
+				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Move the uploaded file
-	 * @param unknown_type $fileData
+	 *
+	 * @param $fileData
+	 * @throws kUploadTokenException
 	 */
-	protected function handleMoveFile($fileData)
+	protected function handleMoveFile($fileData, $resumeAt)
 	{
 		// get the upload path
-		$extension = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
-
-		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
-		// the original file name that was passed to the uploadToken
-		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
-			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
-
+		$extension = $this->getFileExtension($fileData['name']);
 		$uploadFilePath = $this->getUploadPath($this->_uploadToken->getId(), $extension);
 		$this->_uploadToken->setUploadTempPath($uploadFilePath);
+
 		kFile::fullMkdir($uploadFilePath, 0700);
-		
+
 		$moveFileSuccess = kFile::moveFile($fileData['tmp_name'], $uploadFilePath);
 		if (!$moveFileSuccess)
 		{
@@ -372,113 +364,28 @@ class kUploadTokenMgr
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
 		}
-		
-		chmod($uploadFilePath, 0600);
-		
+
+		kFile::chmod($uploadFilePath, 0600);
+		$fileSize = kFile::fileSize($uploadFilePath);
+
+		$updatedFileSize = $this->startFullFileUpload($uploadFilePath, $fileSize, $resumeAt);
+
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
 		{
-			$fileSize = filesize($uploadFilePath);
 			$this->_autoFinalizeCache->set($this->_uploadToken->getId().".size", $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;
 		}
-	}
-
-	static protected function appendChunk($sourceFilePath, $targetFileResource)
-	{
-		$sourceFileResource = fopen($sourceFilePath, 'rb');
-		if(!$sourceFileResource)
-		{
-			KalturaLog::err("Could not open file [{$sourceFilePath}] for read");
-			return;
-		}
-		
-		while (! feof($sourceFileResource)) {
-			$data = fread($sourceFileResource, 1024 * 100);
-			fwrite($targetFileResource, $data);
-		}
-		
-		fclose($sourceFileResource);
-		unlink($sourceFilePath);
-	}
-
-	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk, $uploadTokenId)
-	{
-		$targetFileResource = fopen($targetFilePath, 'r+b');
-		
-		fseek($targetFileResource, 0, SEEK_END);
-		
-		// use glob to find existing chunks and append ones which start within or at the end of the file and will increase its size
-		// in order to prevent race conditions, rename the chunk to "{chunkname}.{random}.locked" before appending it
-		// the code should handle the following rare scenarios:
-		// 1. parallel procesess trying to add the same chunk
-		// 2. append failing half way and recovered by the client resneding the same chunk. The random part in the locked file name
-		// will prevent the re-uploaded chunk from coliding with the failed one
-		$appendStartTime = microtime(true);
-		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
-		{
-			$currentFileSize = ftell($targetFileResource);
-			
-			$validChunk = false;
-			
-			$globStart = microtime(true);
-			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
-			$globTook = (microtime(true) - $globStart);
-			KalturaLog::debug("glob took - " . $globTook . " seconds");
-			
-			$chunkCount = count($chunks);
-			if($chunkCount > self::MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED && !$verifyFinalChunk)
-			{
-				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id [$uploadTokenId]");
-				//return null;
-			}
-						
-			foreach($chunks as $nextChunk)
-			{
-				$parts = explode(".", $nextChunk);
-				if (count($parts))
-				{
-					$chunkOffset = $parts[count($parts) - 1];
-					if ($chunkOffset == "locked") // don't touch chunks that were locked and may have failed appending half way
-						continue;
-					
-					// dismiss chunks which won't enlarge the file or which are starting after the end of the file
-					// support backwards compatibility of overriding a final chunk at the offset zero
-					if ($chunkOffset == 0 || ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize))
-					{
-						fseek($targetFileResource, $chunkOffset, SEEK_SET);
-						$validChunk = true;
-						break;
-					}
-					else
-					{
-						KalturaLog::log("ignoring chunk: $nextChunk offset: $chunkOffset fileSize: $currentFileSize");
-					}
-				}
-			}
-			
-			if (!$validChunk)
-				break;
-			
-			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
-			{
-				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
-				break;
-			}
-			
-			self::appendChunk($lockedFile, $targetFileResource);
-		}
-		
-		fclose($targetFileResource);
-		
-		return $currentFileSize;
+		return $updatedFileSize;
 	}
 	
 	/**
 	 * Return the full path of the upload token, if the token is not part of the new machanism, it will fallback to the old one (myUploadUtils)
-	 * @param string $uploadTokenId
+	 *
+	 * @param $uploadTokenId
+	 * @return string
+	 * @throws kUploadTokenException
 	 */
 	public static function getFullPathByUploadTokenId($uploadTokenId)
 	{
@@ -488,7 +395,7 @@ class kUploadTokenMgr
 		{
 			if ($uploadToken->getStatus() !== UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
 				throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
-				
+
 			return $uploadToken->getUploadTempPath();
 		}
 		else
@@ -497,7 +404,7 @@ class kUploadTokenMgr
 			return myUploadUtils::getUploadPath($uploadTokenId, "", null , $fileExtension);
 		}
 	}
-	
+
 	/**
 	 * get DC host for remote upload token
 	 *
@@ -519,11 +426,13 @@ class kUploadTokenMgr
 		}
 		return kDataCenterMgr::getRemoteDcExternalUrlByDcId($uploadToken->getDc());
 	}
-	
-	
+
+
 	/**
 	 * Marks the token as used (Status is changed to CLOSED)
-	 * @param string $uploadTokenId
+	 *
+	 * @param $uploadTokenId
+	 * @throws PropelException
 	 */
 	public static function closeUploadTokenById($uploadTokenId)
 	{
@@ -533,5 +442,34 @@ class kUploadTokenMgr
 			$uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_CLOSED);
 			$uploadToken->save();
 		}
+	}
+
+	/**
+	 * get file extension for a given file
+	 *
+	 * @param $fileName
+	 * @return string
+	 */
+	protected function getFileExtension($fileName)
+	{
+		// get the upload path
+		$extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+		// in firefox html5 upload the extension is missing (file name is "blob") so try fetching the extesion from
+		// the original file name that was passed to the uploadToken
+		if ($extension === "" || ($extension == "tmp" && $this->_uploadToken->getFileName()))
+			$extension = strtolower(pathinfo($this->_uploadToken->getFileName(), PATHINFO_EXTENSION));
+
+		return $extension;
+	}
+
+	protected function startFullFileUpload($uploadFilePath, $fileSize, $resumeAt)
+	{
+
+	}
+
+	protected function closeFullFileUpload()
+	{
+
 	}
 }

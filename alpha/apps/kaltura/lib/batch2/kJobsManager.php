@@ -132,16 +132,19 @@ class kJobsManager
 		$c->add(BatchJobPeer::STATUS, BatchJobPeer::getClosedStatusList(), Criteria::NOT_IN);
 		$c->setLimit($maxJobsForQuery);
 		// aborts all child jobs in chunks
-		while(true) {
+		while(true)
+		{
 			$dbChildJobs = $dbBatchJob->getChildJobs($c);
-		foreach($dbChildJobs as $dbChildJob) {
-			$dbChildJob->setMessage("Parent job was aborted.");
-			if($dbChildJob->getId() != $dbBatchJob->getId())
-				self::abortDbBatchJob($dbChildJob);
-		}
+			foreach($dbChildJobs as $dbChildJob)
+			{
+				$dbChildJob->setMessage("Parent job was aborted.");
+				if($dbChildJob->getId() != $dbBatchJob->getId())
+					self::abortDbBatchJob($dbChildJob);
+			}
+			
 			if(count($dbChildJobs) < $maxJobsForQuery)
 				break;
-	}
+		}
 	}
 	/**
 	 * @param int $jobId
@@ -577,7 +580,7 @@ class kJobsManager
 		
 		if($isLocal && !$local)
 		{		
-			if(StorageProfile::shouldImportFile($fileSync, $partner))
+			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 				$addImportJob = true;
 			else	
 				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);
@@ -738,7 +741,7 @@ class kJobsManager
 		
 		if(!$local)
 		{
-			if(StorageProfile::shouldImportFile($fileSync, $partner))
+			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 			{
 				$url = $fileSync->getExternalUrl($entryId);
 				$originalAsset = kFileSyncUtils::retrieveObjectForSyncKey($srcSyncKey);
@@ -1250,7 +1253,7 @@ class kJobsManager
 			$inputFileSyncLocalPath = $fileSync->getFilePath();
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
+		if (!kFile::checkFileExists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
 			KalturaLog::info("Input file [$inputFileSyncLocalPath] does not exist");
 			
@@ -1310,10 +1313,10 @@ class kJobsManager
 					if($storageId == StorageProfile::STORAGE_KALTURA_DC)
 					{
 						$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-						list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
-						if(StorageProfile::shouldImportFile($fileSync, $partner))
+						list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+						if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 						{
-							$url = $fileSync->getExternalUrl($entry->getId());
+							$url = $syncFile->getExternalUrl($entry->getId());
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
 							$importingSources = true;
 							continue;
