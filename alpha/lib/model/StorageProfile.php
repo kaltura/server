@@ -492,11 +492,8 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 			}
 			else
 			{
-				$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-				if($storageProfile && $storageProfile->getExportPeriodically())
-				{
-					return true;
-				}
+				$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner->getId());
+				return in_array($fileSync->getDc(), $cloudStorageProfileIds);
 			}
 		}
 		return false;

@@ -18,7 +18,9 @@ Issue ID : PLAT-10735
         storage_lock_expiry = @TIME_TO_ACQUIRE_LOCK@
         last_id_loop_addition = @INT_NUM_ADDED_TO_LAST_ID_LOOP@
         max_id_delay = @INT_NUM_TO_SUBSTRACT_FROM_MAX_ID@
-        periodic_storage_ids = @STORAGE_IDS_COMMA_SEPERATED@
+        [periodic_storage_ids]
+	0 = @STORAGE_ID@
+	1 = @STORAGE_ID@
 
        [export_to_cloud]
         0 = @PARTNER_ID_0@
