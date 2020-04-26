@@ -1,5 +1,12 @@
 # Propus 16.1.0 #
 
+## import vendor catalog items from csv ##
+Issue Type: Task
+Issue ID : REACH2-840
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_05_03_add_vendorCatalogItemActionInBulk_addPermissionsVendorCatalogItem.php
+
 ## Interactivity plugin ##
 Issue Type: sub task
 Issue ID: PLAT-10793
