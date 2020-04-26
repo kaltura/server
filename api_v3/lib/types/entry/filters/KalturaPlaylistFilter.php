@@ -5,6 +5,22 @@
  */
 class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
 {
+	/**
+	 * @var KalturaPlaylistType
+	 */
+	public $playListTypeEqual;
+
+	/**
+	 * @var string
+	 */
+	public $playListTypeIn;
+
+	static private $map_between_objects = array
+	(
+		"playListTypeEqual" => "_eq_media_type",
+		"playListTypeIn" => "_in_media_type",
+	);
+
 	/* (non-PHPdoc)
 	 * @see KalturaBaseEntryFilter::getListResponse()
 	 */
@@ -18,5 +34,10 @@ class KalturaPlaylistFilter extends KalturaPlaylistBaseFilter
 		$response->totalCount = $totalCount;
 		
 		return $response;
+	}
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 }

@@ -186,15 +186,18 @@ class KalturaPlaylist extends KalturaBaseEntry
 		list($totalResults, $listOfFilters) = myPlaylistUtils::getPlaylistFilterListStruct($this->playlistContent);
 		// $totalResults is SimpleXMLElement
 		$this->filters = new KalturaMediaEntryFilterForPlaylistArray();
-		foreach($listOfFilters as $entryFilterXml)
+		if($listOfFilters)
 		{
-			$entryFilter = new mediaEntryFilterForPlaylist();
-			$entryFilter->fillObjectFromXml($entryFilterXml, "_"); 
-			$filter = new KalturaMediaEntryFilterForPlaylist();
-			$filter->fromObject($entryFilter);
-			$this->filters[] = $filter;
+			foreach ($listOfFilters as $entryFilterXml)
+			{
+				$entryFilter = new mediaEntryFilterForPlaylist();
+				$entryFilter->fillObjectFromXml($entryFilterXml, "_");
+				$filter = new KalturaMediaEntryFilterForPlaylist();
+				$filter->fromObject($entryFilter);
+				$this->filters[] = $filter;
+			}
 		}
-		
+
 		$this->totalResults = (int)$totalResults; // will cast SimpleXMLElement correctly
 	}
 
