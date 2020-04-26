@@ -1191,7 +1191,7 @@ class kFlowHelper
 		// verifies that flavor asset created
 		if(!$data->getFlavorAssetId())
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
-		
+
 		if(!$dbBatchJob->getEntry())
 		{
 			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
@@ -1904,15 +1904,29 @@ class kFlowHelper
 		if($asset && $asset->getStatus() == asset::ASSET_STATUS_READY && $dbBatchJob->getJobSubType() != StorageProfile::STORAGE_KALTURA_DC)
 		{
 			$partner = $dbBatchJob->getPartner();
-			if($partner && $partner->getStorageDeleteFromKaltura())
+			if(!$partner)
+			{
+				return $dbBatchJob;
+			}
+
+			if($partner->getStorageDeleteFromKaltura())
 			{
 				if(self::isAssetExportFinished($fileSync, $asset))
 				{
 					if(!is_null($asset->getentry()) && !is_null($asset->getentry()->getReplacedEntryId()))
 						self::handleEntryReplacementFileSyncDeletion($fileSync, array(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ISM, asset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
-					
+
 					self::conditionalAssetLocalFileSyncsDelete($fileSync, $asset);
 				}
+			}
+			else
+			{
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($partner->getId());
+				if(!$periodicStorageProfiles)
+				{
+					return $dbBatchJob;
+				}
+				self::addPeriodicStorageExports($asset->getEntryId(), $partner, $periodicStorageProfiles);
 			}
 		}
 
@@ -1925,7 +1939,7 @@ class kFlowHelper
 	 * @param FileSync $fileSync
 	 * @param array $fileSyncSubTypesToHandle
 	 */
-	private static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
+	public static function handleEntryReplacementFileSyncDeletion (FileSync $fileSync, $fileSyncSubTypesToHandle)
 	{	
 		$c = new Criteria();
 		$c->add(FileSyncPeer::FILE_TYPE, array (FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_FILE), Criteria::IN);
@@ -1956,7 +1970,7 @@ class kFlowHelper
 		}
 	}
 	
-	private static function isAssetExportFinished(FileSync $fileSync, asset $asset)
+	public static function isAssetExportFinished(FileSync $fileSync, asset $asset)
 	{
 		$c = new Criteria();
 		$c->addAnd ( FileSyncPeer::OBJECT_ID , $fileSync->getObjectId() );
@@ -1972,7 +1986,7 @@ class kFlowHelper
 			return true;
 	}
 	
-	private static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
+	public static function conditionalAssetLocalFileSyncsDelete(FileSync $fileSync, asset $asset)
 	{
 		$unClosedStatuses = array (
 			asset::ASSET_STATUS_QUEUED,
@@ -2015,7 +2029,7 @@ class kFlowHelper
 		}
 	}
 	
-	private static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
+	public static function deleteAssetLocalFileSyncs($fileSyncVersion, asset $asset)
 	{
 		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $fileSyncVersion);
 		kFileSyncUtils::deleteSyncFileForKey($syncKey, false, true);
@@ -3245,5 +3259,57 @@ class kFlowHelper
 			$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
 			$kgroup->save();
 		}
+	}
+
+	public static function addPeriodicStorageExports($entryId, $partner, $periodicStorageProfiles)
+	{
+		$unClosedStatuses = array (
+			asset::ASSET_STATUS_QUEUED,
+			asset::ASSET_STATUS_CONVERTING,
+			asset::ASSET_STATUS_WAIT_FOR_CONVERT,
+			asset::ASSET_STATUS_EXPORTING
+		);
+		$unClosedAssets = assetPeer::retrieveReadyByEntryId($entryId, null, $unClosedStatuses);
+
+		if(count($unClosedAssets))
+		{
+			KalturaLog::debug('Assets with unclosed status exists');
+			return;
+		}
+
+		// if all exports that are not periodic finished add pending file sync to each flavor
+		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId);
+		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner, $assetsIds);
+		if(!$nonPeriodicFinished)
+		{
+			return;
+		}
+
+		foreach ($periodicStorageProfiles as $periodicStorage)
+		{
+			KalturaLog::debug("Exporting assets to profileId [{$periodicStorage->getId()}]");
+			$assets = assetPeer::retrieveByIds($assetsIds);
+			kStorageExporter::exportMultipleFlavors($assets, $periodicStorage);
+		}
+	}
+
+	protected static function checkNonPeriodicExportsFinished($partner, $assetsIds)
+	{
+		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partner->getId());
+		$status = array(FileSync::FILE_SYNC_STATUS_PENDING, FileSync::FILE_SYNC_STATUS_ERROR);
+		$types = array(FileSyncObjectType::ASSET);
+		$subTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$allFinished = true;
+		foreach($storageProfiles as $profile)
+		{
+			$fileSyncs = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partner->getId(), $status, $assetsIds, $types, $subTypes);
+			if(count($fileSyncs))
+			{
+				KalturaLog::debug("found unfinished file syncs for profile [{$profile->getId()}]");
+				$allFinished = false;
+				break;
+			}
+		}
+		return $allFinished;
 	}
 }

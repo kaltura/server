@@ -12,6 +12,10 @@ class KalturaInteractivityErrors extends KalturaErrors
 	const DATA_IS_NOT_VALID_JSON = 'DATA_IS_NOT_VALID_JSON;;Data is not valid JSON';
 	const DIFFERENT_DATA_VERSION = "DIFFERENT_DATA_VERSION;currentVersion;Current data have different version \"@currentVersion@\"";
 	const ENTRY_ILLEGAL_NODE_NUMBER = 'ENTRY_ILLEGAL_NODE_NUMBER;;Entry interactivity data must have exactly one node';
-	const ILLEGAL_ENTRY_NODE_ENTRY_ID = 'ILLEGAL_ENTRY_NODE_ENTRY_ID;;Entry node must have identical entry id to the entry the interaction attached to';
+	const EMPTY_INTERACTIVITY_DATA = 'EMPTY_INTERACTIVITY_DATA;;Interactivity data must not be empty';
+	const ILLEGAL_ENTRY_NODE_ENTRY_ID = 'ILLEGAL_ENTRY_NODE_ENTRY_ID;;Entry node must not have entry id';
 	const ILLEGAL_FIELD_VALUE = "ILLEGAL_FIELD_VALUE;errMsg;Illegal field value \"@errMsg@\"";
+	const DUPLICATE_INTERACTIONS_IDS = 'DUPLICATE_INTERACTIONS_IDS;;The interaction have duplicate interactions ids';
+	const DUPLICATE_NODES_IDS = 'DUPLICATE_NODES_IDS;;The interaction have duplicate nodes ids';
 }
+

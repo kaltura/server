@@ -43,6 +43,9 @@ class kZoomEventHanlder
 		switch($event->eventType)
 		{
 			case kEventType::RECORDING_VIDEO_COMPLETED:
+			case kEventType::RECORDING_TRANSCRIPT_COMPLETED:
+				KalturaLog::notice('This is an old Zoom event type - Not processing');
+				break;
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
 				/* @var kZoomRecording $recording */
 				$recording = $event->object;
@@ -58,7 +61,6 @@ class kZoomEventHanlder
 
 				$zoomRecordingProcessor->handleRecordingVideoComplete($event);
 				break;
-			case kEventType::RECORDING_TRANSCRIPT_COMPLETED:
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
 				$transcriptProcessor = new kZoomTranscriptProcessor();
 				$transcriptProcessor->handleRecordingTranscriptComplete($event);

@@ -306,6 +306,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAYMANIFEST,
 		self::EVENT_TYPE_REGISTERED,
 		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
+		self::EVENT_TYPE_HOTSPOT_CLICKED,
+		self::EVENT_TYPE_NODE_SWITCH,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -354,6 +356,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
 		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
 		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
+		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
+		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 	);
 
 	//global transform
@@ -2001,7 +2005,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
-			if (isset($report_filter[self::DRUID_DIMENSION]))
+			if (isset($report_filter[self::DRUID_DIMENSION]) || isset($report_filter[self::DRUID_TYPE]))
 			{
 				$report_filter = array($report_filter);
 			}

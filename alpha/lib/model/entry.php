@@ -666,14 +666,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 					$new_version = $this->getInteractivityVersion();
 					if(is_null($new_version))
 					{
-						$new_version = "";
+						$new_version = 0;
 					}
 					break;
 				case kEntryFileSyncSubType::VOLATILE_INTERACTIVITY_DATA:
 					$new_version = $this->getVolatileInteractivityVersion();
 					if(is_null($new_version))
 					{
-						$new_version = "";
+						$new_version = 0;
 					}
 					break;
 			}
@@ -3707,11 +3707,26 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $capabilitiesStr;
 	}
 
-	public function addCapability( $capability)
+	public function addCapability($capability)
 	{
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
 		$capabilities[$capability] = $capability;
 		$this->putInCustomData( self::CAPABILITIES, $capabilities);
+	}
+
+	public function removeCapability($capabilityToRemove)
+	{
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$newCapabilties = array();
+		foreach ($capabilities as $capability)
+		{
+			if($capability !== $capabilityToRemove)
+			{
+				$newCapabilties[$capability] = $capability;
+			}
+		}
+
+		$this->putInCustomData( self::CAPABILITIES, $newCapabilties);
 	}
 
 	/**

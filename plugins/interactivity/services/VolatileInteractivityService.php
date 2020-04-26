@@ -14,6 +14,7 @@ class VolatileInteractivityService extends KalturaBaseService
 	 * @param string $entryId
 	 * @return KalturaVolatileInteractivity
 	 * @throws Exception
+	 * @validateUser entry entryId edit
 	 */
 	public function get($entryId)
 	{
