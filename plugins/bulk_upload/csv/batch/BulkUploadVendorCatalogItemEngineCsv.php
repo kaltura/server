@@ -50,7 +50,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 		foreach($columns as $index => $column)
 		{
-			if(!is_numeric($index) || $values[$index] === 'N/A' || $values[$index] === '')
+			if(!is_numeric($index) || $values[$index] === 'N\A' || $values[$index] === '')
 			{
 				continue;
 			}
