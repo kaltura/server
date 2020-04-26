@@ -1,6 +1,8 @@
 <?php
 class kUploadTokenMgr extends kBaseUploadTokenMgr
 {
+	const MAX_APPEND_TIME = 5;
+	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 
 	/**
 	 * kUploadTokenMgr constructor.
@@ -165,7 +167,7 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 	 * @param $targetFilePath
 	 * @return bool|int
 	 */
-	static protected function appendAvailableChunks($targetFilePath)
+	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk, $uploadTokenId)
 	{
 		$targetFileResource = fopen($targetFilePath, 'r+b');
 		
@@ -177,7 +179,9 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 		// 1. parallel procesess trying to add the same chunk
 		// 2. append failing half way and recovered by the client resneding the same chunk. The random part in the locked file name
 		// will prevent the re-uploaded chunk from coliding with the failed one
-		while (1) {
+		$appendStartTime = microtime(true);
+		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
+		{
 			$currentFileSize = ftell($targetFileResource);
 			
 			$validChunk = false;
@@ -186,7 +190,14 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
 			$globTook = (microtime(true) - $globStart);
 			KalturaLog::debug("glob took - " . $globTook . " seconds");
-						
+			
+			$chunkCount = count($chunks);
+			if($chunkCount > self::MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED && !$verifyFinalChunk)
+			{
+				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id [$uploadTokenId]");
+				//return null;
+			}
+			
 			foreach($chunks as $nextChunk)
 			{
 				$parts = explode(".", $nextChunk);
@@ -202,7 +213,7 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 					{
 						fseek($targetFileResource, $chunkOffset, SEEK_SET);
 						$validChunk = true;
-						break; 
+						break;
 					}
 					else
 					{
@@ -215,7 +226,7 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 				break;
 			
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! rename($nextChunk, $lockedFile)) // another process is already appending this file
+			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;
@@ -241,7 +252,10 @@ class kUploadTokenMgr extends kBaseUploadTokenMgr
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 
-		return myContentStorage::getFSUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId.'.'.$extension;
+		return myContentStorage::getFSUploadsPath().
+			substr($uploadTokenId, -2).'/'.
+			substr($uploadTokenId, -4, 2).'/'.
+			$uploadTokenId.'.'.$extension;
 	}
 
 	protected function startFullFileUpload($uploadFilePath, $fileSize, $resumeAt)

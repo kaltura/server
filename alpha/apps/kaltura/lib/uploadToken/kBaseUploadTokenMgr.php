@@ -11,13 +11,10 @@ abstract class kBaseUploadTokenMgr
 	const NO_EXTENSION_IDENTIFIER = 'noex';
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
-	const MAX_APPEND_TIME = 5;
-	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	const EICAR_MD5 = '44d88612fea8a8f36de82e1278abb02f';
 	const EICAR_MIN_FILE_SIZE = 68;
 	const EICAR_MAX_FILE_SIZE = 128;
 	const BAT_FILE_EXTENSION = 'bat';
-	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
 
 	/**
 	 * @var UploadToken
@@ -153,29 +150,29 @@ abstract class kBaseUploadTokenMgr
 
 		try
 		{
-			$this->checkIfFileIsValid($fileData, $resumeAt, $this->_finalChunk);
+			$this->checkIfFileIsValid($fileData);
 		}
 		catch(kUploadTokenException $ex)
 		{
-			if($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY)
-			{
-				return;
-			}
-			
 			if(!$resume && $this->_finalChunk)
-			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
-			}
 			
 			$this->tryMoveToErrors($fileData);
 			throw $ex;
 		}
 		
-		if ($resume)
+		try
 		{
-			$fileSize = $this->handleResume($fileData, $resumeAt);
+			if ($resume)
+			{
+				$fileSize = $this->handleResume($fileData, $resumeAt);
+			}
+			else
+			{
+				$fileSize = $this->handleMoveFile($fileData, $resumeAt);
+			}
 		}
-		else
+		catch(Exception $ex)
 		{
 			throw new kUploadTokenException("Failed to save upload token file", kUploadTokenException::UPLOAD_TOKEN_PROCESSING_FAILURE);
 		}
@@ -194,8 +191,7 @@ abstract class kBaseUploadTokenMgr
 		}
 		else
 		{
-			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
-			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
+			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
 		}
 
 		$this->_uploadToken->setUploadedFileSize($fileSize);
@@ -219,7 +215,7 @@ abstract class kBaseUploadTokenMgr
 	 * @param $fileData
 	 * @throws kUploadTokenException
 	 */
-	protected function checkIfFileIsValid($fileData, $resumeAt, $finalChunk)
+	protected function checkIfFileIsValid($fileData)
 	{
 		// check file name
 		$fileName = isset($fileData['name']) ? $fileData['name'] : null;
@@ -247,15 +243,6 @@ abstract class kBaseUploadTokenMgr
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
-		
-		$tempFileSize = kFile::fileSize($tempPath);
-		if($tempFileSize == 0 && !$finalChunk && $resumeAt > 0)
-		{
-			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
-			KalturaLog::log($msg . ' ' . print_r($fileData, true));
-			kFile::doDeleteFile($tempPath);
-			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_EMPTY);
-		}
 	}
 
 	/**
@@ -269,7 +256,7 @@ abstract class kBaseUploadTokenMgr
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
 		$fileType = kFileUtils::getMimeType($uploadFilePath);
 
-		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
+		if ($fileType == 'text/plain')
 		{
 			if ( strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)) == self::BAT_FILE_EXTENSION)
 			{
@@ -277,25 +264,28 @@ abstract class kBaseUploadTokenMgr
 			}
 			else
 			{
-				if ( filesize($uploadFilePath) >= self::EICAR_MIN_FILE_SIZE && filesize($uploadFilePath) <= self::EICAR_MAX_FILE_SIZE)
+				if (file_exists($uploadFilePath)
+					&& filesize($uploadFilePath) >= self::EICAR_MIN_FILE_SIZE
+					&& filesize($uploadFilePath) <= self::EICAR_MAX_FILE_SIZE)
 				{
 					$content = file_get_contents($uploadFilePath);
-					if (md5(trim($content)) === self::EICAR_MD5)
+					if (md5(file_get_contents($content)) == self::EICAR_MD5)
 					{
 						return false;
 					}
 				}
 			}
 		}
+		
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
 	}
 
 	/**
 	 * Updates the file name of the token (if empty) using the file name from the file data
+	 *
 	 * @param $fileData
 	 * @throws PropelException
-
 	 */
 	protected function updateFileName($fileData)
 	{

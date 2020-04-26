@@ -88,7 +88,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		}
 
-		return myContentStorage::getFSTempUploadsPath().substr($uploadTokenId, -2).'/'.$uploadTokenId. '/0.' .$extension;
+		return kFile::createUniqueFilePath(myContentStorage::getFSTempUploadsPath(), true) . '0.' .$extension;
 	}
 
 	/**
