@@ -391,7 +391,7 @@ class PlaylistService extends KalturaEntryService
 		$entryList = null;
 		switch($playlistType)
 		{
-			case alturaPlaylistType::DYNAMIC:
+			case KalturaPlaylistType::DYNAMIC:
 				$entryList = self::handlingDynamicPlaylist($entryFiltersViaEsearch,$entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults);
 				break;
 			case KalturaPlaylistType::STATIC_LIST:

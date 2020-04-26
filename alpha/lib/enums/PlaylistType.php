@@ -6,8 +6,8 @@
 
 interface PlaylistType extends BaseEnum
 {
-	const DYNAMIC = 10;//entry::ENTRY_MEDIA_TYPE_XML;
-	const STATIC_LIST = 3;//entry::ENTRY_MEDIA_TYPE_TEXT;
-	const EXTERNAL = 101;//entry::ENTRY_MEDIA_TYPE_GENERIC_1;
-	const PATH = 102;//entry::ENTRY_MEDIA_TYPE_GENERIC_2;
+	const DYNAMIC = entry::ENTRY_MEDIA_TYPE_XML;
+	const STATIC_LIST = entry::ENTRY_MEDIA_TYPE_TEXT;
+	const EXTERNAL = entry::ENTRY_MEDIA_TYPE_GENERIC_1;
+	const PATH = entry::ENTRY_MEDIA_TYPE_GENERIC_2;
 }
