@@ -27,7 +27,7 @@ abstract class kBaseUploadTokenMgr
 	/**
 	 * @var bool
 	 */
-	protected $_autoFinalize;
+	protected $_autoFinalize; 
 
 	/**
 	 * @var bool
