@@ -472,4 +472,20 @@ class kString
 			return $str;
 	}
 
+	public static function explode($string, $delimiter=',')
+	{
+		$output = array();
+		$values = explode($delimiter, $string);
+		foreach ($values as $value)
+		{
+			$value = trim($value);
+			if($value!=='')
+			{
+				$output[] = $value;
+			}
+		}
+		return $output;
+	}
+
+
 }

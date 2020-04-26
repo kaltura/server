@@ -38,7 +38,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_REGULAR_PACKAGER_URL = 'regular_packager_url';
 	const CUSTOM_DATA_MAPPED_PACKAGER_URL = 'mapped_packager_url';
 	const CUSTOM_DATA_EXPORT_PERIODICALLY = 'export_periodically';
-	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAM_IDS = 'excluded_flavor_param_id';
+	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS = 'excluded_flavor_params_ids';
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -335,18 +335,16 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 
 		//get this flavorId
 		$id = $flavorAsset->getFlavorParamsId();
-
 		//get Ids to include
-		$idsToInclude = array_map('trim', explode(',', $this->getFlavorParamsIds()));
-
+		$idsToInclude = kString::explode($this->getFlavorParamsIds());
 		//get ids to exclude
-		$idsToExclude = array_map('trim', explode(',', $this->getExcludedFlavorParamsIds()));
+		$idsToExclude = kString::explode($this->getExcludedFlavorParamsIds());
 
 		//include if in list or list is empty
 		$configuredForExport = $idsToInclude ? in_array($id,$idsToInclude) : true;
 
 		//exclude if in black list
-		$configuredForExport &= !in_array($id,$idsToExclude);
+		$configuredForExport &= !($idsToExclude && in_array($id,$idsToExclude));
 
 		KalturaLog::log("Flavor ID {$id} include list {" . $this->getFlavorParamsIds() . "} exclude list {" .
 						$this->getExcludedFlavorParamsIds()."}, should export {$configuredForExport}");
@@ -473,14 +471,13 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 
 	public function getExcludedFlavorParamsIds()
 	{
-
-		return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAM_IDS,null, null);
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS);
 	}
 
 
 	public function setExcludedFlavorParamsIds($flavorParamIds)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAM_IDS,$flavorParamIds);
+		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS,$flavorParamIds);
 	}
 
 	/**
