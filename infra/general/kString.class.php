@@ -479,7 +479,7 @@ class kString
 		foreach ($values as $value)
 		{
 			$value = trim($value);
-			if($value!=='')
+			if($value !== '')
 			{
 				$output[] = $value;
 			}

@@ -341,10 +341,10 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$idsToExclude = kString::explode($this->getExcludedFlavorParamsIds());
 
 		//include if in list or list is empty
-		$configuredForExport = $idsToInclude ? in_array($id,$idsToInclude) : true;
+		$configuredForExport = $idsToInclude ? in_array($id, $idsToInclude) : true;
 
 		//exclude if in black list
-		$configuredForExport &= !($idsToExclude && in_array($id,$idsToExclude));
+		$configuredForExport &= !($idsToExclude && in_array($id, $idsToExclude));
 
 		KalturaLog::log("Flavor ID {$id} include list {" . $this->getFlavorParamsIds() . "} exclude list {" .
 						$this->getExcludedFlavorParamsIds()."}, should export {$configuredForExport}");
@@ -477,7 +477,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 
 	public function setExcludedFlavorParamsIds($flavorParamIds)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS,$flavorParamIds);
+		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS, $flavorParamIds);
 	}
 
 	/**
