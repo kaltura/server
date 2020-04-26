@@ -80,7 +80,7 @@ class KalturaBulkUploadResultVendorCatalogItem extends KalturaBulkUploadResult
 	 */
 	public $clearAudioFlavorParamsId;
 
-	private static $mapBetweenObjects = array  //todo maybe needed to convert
+	private static $mapBetweenObjects = array
 	(
 		'vendorCatalogItemId',
 		'vendorPartnerId',
