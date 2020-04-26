@@ -11,6 +11,10 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	const OBJECT_TYPE_TITLE = 'vendor catalog item';
 	const MANDATORY_COLUMN_MISSING = 'Mandatory Column missing from CSV';
 	const EXCEEDED_MAX_RECORDS = 'Exceeded max records count per bulk';
+	const NA = 'N\A';
+	const PRICING_PER_UNIT = 'pricing:pricePerUnit';
+	const PRICING_FUNCTION = 'pricing:priceFunction';
+	const UTF = 'UTF-8';
 
 	/**
 	 * (non-PHPdoc)
@@ -50,7 +54,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 		foreach($columns as $index => $column)
 		{
-			if(!is_numeric($index) || $values[$index] === 'N\A' || $values[$index] === '')
+			if(!is_numeric($index) || $values[$index] === self::NA || $values[$index] === '')
 			{
 				continue;
 			}
@@ -58,7 +62,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			{
 				self::handleEnumColumns($values[$index], $column, $bulkUploadResult);
 			}
-			else if(($column === 'pricing:pricePerUnit' || $column === 'pricing:priceFunction') && isset($values[$index]))
+			else if(($column === self::PRICING_PER_UNIT || $column === self::PRICING_FUNCTION) && isset($values[$index]))
 			{
 				self::handlePriceColumns($pricing, $bulkUploadResult, $column, $values[$index]);
 			}
@@ -67,7 +71,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 				$bulkUploadResult->vendorCatalogItemId = $values[$index];
 				KalturaLog::info("Set value vendorCatalogItemId [{$bulkUploadResult->vendorCatalogItemId}]");
 			}
-			else if(iconv_strlen($values[$index], 'UTF-8'))
+			else if(iconv_strlen($values[$index], self::UTF))
 			{
 				$bulkUploadResult->$column = $values[$index];
 				KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
