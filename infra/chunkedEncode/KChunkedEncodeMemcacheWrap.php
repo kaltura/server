@@ -416,13 +416,17 @@ ini_set("memory_limit","512M");
 		 * FetchNextJob
 		 *	Get next job from the mmecache storage
 		 * 	if missing => return false 
+		 * fetchRangeRandMax - represents the max randomization range of the fetched job index (between the readIdx and writeIdx).
+		 * Motivation - to ease race condition over the locking of the fetch/read idx, 
+		 * when large number of srvs attempt to fetch the same job. 
+		 * This situation occurred in AWS env, with high connect/'walk around' times to DC memcache srv
 		 */
-		public function FetchNextJob()
+		public function FetchNextJob($fetchRangeRandMax=10)
 		{
 			$writeIndex = null;
 			$readIndex = null;
 			
-				// semaphore token - process-id + hostname + rand
+			// semaphore token - process-id + hostname + rand
 			$semaphoreToken = getmypid().".".gethostname().".".rand();
 			while(true) {
 				if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
@@ -434,19 +438,29 @@ ini_set("memory_limit","512M");
 					 */
 				if($readIndex>=$writeIndex+1) 
 					break;
-
-				KalturaLog::log("RD:$readIndex), WR:$writeIndex");
+				
+					/*
+					 * Evaluate the fetch job index, within the 'fetchRangeRandMax' value.
+					 * If the chunk Q is smaller than the fetch range - take the job in the readIdx
+					 */
+				$queueSize = $writeIndex-$readIndex;
+				if($fetchRangeRandMax==0 || $queueSize<$fetchRangeRandMax)
+					$fetchIndex = $readIndex;
+				else
+					$fetchIndex = rand($readIndex, min($readIndex+$fetchRangeRandMax, $writeIndex));
+                			KalturaLog::log("RD:$readIndex, WR:$writeIndex, FCH:$fetchIndex");
 
 					/*
 					 * Try to lock the next unread job object
 					 * if failed - carry on to next
 					 */
-				$semaphoreKey = $this->getSemaphoreKeyName($readIndex);
+				$semaphoreKey = $this->getSemaphoreKeyName($fetchIndex);
+				
 				$rv = $this->lock($semaphoreKey, $semaphoreToken, 0);
 				if($rv!==true){
-					if($this->setReadIndex($readIndex+1)===false)
+					if($fetchIndex==$readIndex && $this->setReadIndex($readIndex+1)===false)
 						return false;
-					KalturaLog::log("Unable to lock readIndex($readIndex), skipping to the next ");
+					KalturaLog::log("Unable to lock fetchIndex($fetchIndex), skipping to the next ");
 					continue;
 				}
 				
@@ -454,21 +468,21 @@ ini_set("memory_limit","512M");
 					 * Try to fetch the job object from the memcache storage
 					 * If failed - delete the sempahore (unlock) and try the next one
 					 */
-				$job = $this->FetchJob($readIndex); 
+				$job = $this->FetchJob($fetchIndex); 
 				if($job!==false) {
 					return $job;
 				}
 				else {
 					$this->delete($semaphoreKey);
-					KalturaLog::log("Unable to access job ($readIndex), skip to next");
-					if($this->setReadIndex($readIndex+1)===false)
+					KalturaLog::log("Unable to access job ($fetchIndex), skip to next");
+					if($fetchIndex==$readIndex && $this->setReadIndex($readIndex+1)===false)
 						return false;
 				}
 			}
 			
 			return null;
 		}
-			
+
 		/* ---------------------------
 		 * RefreshJobs
 		 */
