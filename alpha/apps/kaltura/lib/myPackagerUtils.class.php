@@ -8,6 +8,7 @@ class myPackagerUtils
 	const PACKAGER_REMOTE_THUMB_URL = 'packager_thumb_capture_url';
 	const PACKAGER_MAPPED_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
 	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
+	const PACKAGER_URL = "packager_url";
 
 	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
@@ -287,7 +288,7 @@ class myPackagerUtils
 		$result = null;
 		if (!$packagerUrl)
 		{
-			$packagerUrl = kConf::get("packager_url",self::LOCAL_MAP_NAME, null);
+			$packagerUrl = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null);
 		}
 
 		switch ($packagerUrlType)
@@ -299,10 +300,10 @@ class myPackagerUtils
 				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::REMOTE_THUMB:
-				$result = kConf::get("packager_url",self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::LOCAL_LIVE_THUMB:
-				$result = kConf::get("packager_url",self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_LOCAL_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_LOCAL_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::REGULAR_VOLUME_MAP:
 				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
