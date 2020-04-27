@@ -206,18 +206,11 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 
 	protected function addPackagerConfigurationFields()
 	{
-		$this->addElement('text', 'regularPackagerUrl', array(
-			'label'			=> 'Regular packager URL:',
+		$this->addElement('text', 'packagerUrl', array(
+			'label'			=> 'Packager URL:',
 			'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElementToDisplayGroup('advanced', 'regularPackagerUrl');
-
-		$this->addElement('text', 'mappedPackagerUrl', array(
-			'label'			=> 'Mapped packager (playlist/encrypt) URL:',
-			'filters'		=> array('StringTrim'),
-		));
-
-		$this->addElementToDisplayGroup('advanced', 'mappedPackagerUrl');
+		$this->addElementToDisplayGroup('advanced', 'packagerUrl');
 	}
 }
