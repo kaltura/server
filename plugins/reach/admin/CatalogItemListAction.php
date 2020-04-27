@@ -39,7 +39,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 
 		// init filter
 		$catalogItemProfileFilter = $this->getCatalogItemFilter($serviceFeature);
-		$catalogItemProfileFilter->orderBy = "-createdAt,-id";
+		$catalogItemProfileFilter->orderBy = "-id";
 		$catalogItemProfileFilter->serviceFeatureEqual = $serviceFeature;
 		$catalogItemProfileFilter->serviceTypeEqual = $serviceType;
 		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAroundTime;
