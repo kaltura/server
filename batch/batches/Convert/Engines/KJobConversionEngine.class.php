@@ -173,7 +173,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 			if (kFile::checkFileExists($file))
 			{
 				KalturaLog::debug('output file is : '. $file);
-				$output = kFile::getLineFromFileTail($file);
+				$output = kFile::getLinesFromFileTail($file);
 			}
 		}
 		return array($output, $return_var);
