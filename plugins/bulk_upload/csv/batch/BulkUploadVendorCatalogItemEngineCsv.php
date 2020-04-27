@@ -49,7 +49,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected function setResultValues($columns, $values, &$bulkUploadResult)
 	{
-		$shouldConvertValueToEnum = array('serviceFeature', 'serviceType', 'turnAroundTime', 'outputFormat', 'enableSpeakerId');
+		$shouldConvertValueToEnum = array('serviceFeature', 'serviceType', 'turnAroundTime', 'outputFormat');
 		$pricing = null;
 
 		foreach($columns as $index => $column)
@@ -115,10 +115,6 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 			case 'outputFormat':
 				$enumValue = self::getEnumValue('KalturaVendorCatalogItemOutputFormat', $value);
-				break;
-
-			case 'enableSpeakerId':
-				$enumValue = self::getEnumValue('KalturaNullableBoolean', $value);
 				break;
 
 			default:
