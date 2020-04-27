@@ -7,7 +7,7 @@ class myPackagerUtils
 	const PACKAGER_LOCAL_THUMB_URL = 'packager_local_thumb_capture_url';
 	const PACKAGER_REMOTE_THUMB_URL = 'packager_thumb_capture_url';
 	const PACKAGER_MAPPED_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
-	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
+	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_local_volume_map_url';
 	const PACKAGER_URL = "packager_url";
 
 	const LOCAL_MAP_NAME = 'local';
