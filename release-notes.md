@@ -45,8 +45,7 @@ Issue ID : PLAT-10735
         params.maxCount                                     = @MAX_COUNT@
         params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
         params.sleepInterval                                = @SLEEP_INTERVAL@
-        params.profileIdsIn                                 = @PRODILE_IDS_COMMA_SEPERATED@
-
+      
 #### Deployment Scripts ####
     php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
     php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
