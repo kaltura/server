@@ -69,8 +69,6 @@ class MixingService extends KalturaEntryService
 		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_MIX");
 		TrackEntry::addTrackEntry($trackEntry);
 		
-		$kshow->setShowEntry($dbEntry);
-		$kshow->save();
 		$mixEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
