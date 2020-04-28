@@ -16,6 +16,8 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	const PRICING_FUNCTION = 'pricing:priceFunction';
 	const UTF = 'UTF-8';
 
+
+
 	/**
 	 * (non-PHPdoc)
 	 * @see BulkUploadGeneralEngineCsv::createUploadResult()
@@ -49,7 +51,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected function setResultValues($columns, $values, &$bulkUploadResult)
 	{
-		$shouldConvertValueToEnum = array('serviceFeature', 'serviceType', 'turnAroundTime', 'outputFormat', 'enableSpeakerId');
+		$shouldConvertValueToEnum = array('serviceFeature', 'serviceType', 'turnAroundTime', 'outputFormat');
 		$pricing = null;
 
 		foreach($columns as $index => $column)
@@ -115,10 +117,6 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 			case 'outputFormat':
 				$enumValue = self::getEnumValue('KalturaVendorCatalogItemOutputFormat', $value);
-				break;
-
-			case 'enableSpeakerId':
-				$enumValue = self::getEnumValue('KalturaNullableBoolean', $value);
 				break;
 
 			default:
@@ -318,59 +316,18 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function createVendorCatalogItemFromResult (KalturaBulkUploadResultVendorCatalogItem $bulkUploadResult)
 	{
+		$bulkUploadResultParams = array('vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
+			'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
+			'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId');
+
 		$kalturaVendorCatalogItem = self::getObjectByServiceFeature($bulkUploadResult->serviceFeature);
 
-		if ($bulkUploadResult->vendorPartnerId)
+		foreach ($bulkUploadResultParams as $param)
 		{
-			$kalturaVendorCatalogItem->vendorPartnerId = $bulkUploadResult->vendorPartnerId;
-		}
-		if ($bulkUploadResult->name)
-		{
-			$kalturaVendorCatalogItem->name = $bulkUploadResult->name;
-		}
-		if ($bulkUploadResult->systemName)
-		{
-			$kalturaVendorCatalogItem->systemName = $bulkUploadResult->systemName;
-		}
-		if ($bulkUploadResult->serviceType)
-		{
-			$kalturaVendorCatalogItem->serviceType = $bulkUploadResult->serviceType;
-		}
-		if ($bulkUploadResult->turnAroundTime)
-		{
-			$kalturaVendorCatalogItem->turnAroundTime = $bulkUploadResult->turnAroundTime;
-		}
-		if ($bulkUploadResult->sourceLanguage)
-		{
-			$kalturaVendorCatalogItem->sourceLanguage = $bulkUploadResult->sourceLanguage;
-		}
-		if ($bulkUploadResult->targetLanguage)
-		{
-			$kalturaVendorCatalogItem->targetLanguage = $bulkUploadResult->targetLanguage;
-		}
-		if ($bulkUploadResult->outputFormat)
-		{
-			$kalturaVendorCatalogItem->outputFormat = $bulkUploadResult->outputFormat;
-		}
-		if ($bulkUploadResult->enableSpeakerId)
-		{
-			$kalturaVendorCatalogItem->enableSpeakerId = $bulkUploadResult->enableSpeakerId;
-		}
-		if ($bulkUploadResult->fixedPriceAddons)
-		{
-			$kalturaVendorCatalogItem->fixedPriceAddons = $bulkUploadResult->fixedPriceAddons;
-		}
-		if ($bulkUploadResult->pricing)
-		{
-			$kalturaVendorCatalogItem->pricing = $bulkUploadResult->pricing;
-		}
-		if ($bulkUploadResult->flavorParamsId)
-		{
-			$kalturaVendorCatalogItem->flavorParamsId = $bulkUploadResult->flavorParamsId;
-		}
-		if ($bulkUploadResult->clearAudioFlavorParamsId)
-		{
-			$kalturaVendorCatalogItem->clearAudioFlavorParamsId = $bulkUploadResult->clearAudioFlavorParamsId;
+			if (isset($bulkUploadResult->$param))
+			{
+				$kalturaVendorCatalogItem->$param = $bulkUploadResult->$param;
+			}
 		}
 		return $kalturaVendorCatalogItem;
 	}
