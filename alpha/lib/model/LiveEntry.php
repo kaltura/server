@@ -145,7 +145,7 @@ abstract class LiveEntry extends entry
 			$this->setRedirectEntryId(null);
 			$this->setCustomDataObj();
 		}
-		if (!$this->getBroadcastTime() && $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_VIEW_MODE) && $this->getViewMode() == ViewMode::ALLOW_ALL)
+		if (!$this->getBroadcastTime() && $this->getViewMode() == ViewMode::ALLOW_ALL)
 		{
 			$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 			if (count($liveEntryServerNodes) > 0)
