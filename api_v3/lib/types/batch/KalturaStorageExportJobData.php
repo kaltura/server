@@ -15,12 +15,23 @@ class KalturaStorageExportJobData extends KalturaStorageJobData
 	 * @var bool
 	 */   	
     public $createLink;
-	
-    
+
+	/**
+	 * @var string
+	 */
+	public $assetId;
+
+	/**
+	 * @var string
+	 */
+	public $externalUrl;
+
 	private static $map_between_objects = array
 	(
 	    "force",
 		"createLink",
+		"assetId",
+		"externalUrl",
 	);
 
 	public function getMapBetweenObjects ( )
