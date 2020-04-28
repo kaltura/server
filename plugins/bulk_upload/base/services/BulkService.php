@@ -247,53 +247,6 @@ class BulkService extends KalturaBaseService
 		
 		return $bulkUpload;
 	}
-
-	/**
-	 * @action addVendorCatalogItem
-	 * @actionAlias reach_vendorcatalogitem.addFromBulkUpload
-	 * Action adds vendor catalog items from a bulkupload CSV file
-	 * @param file $fileData
-	 * @param KalturaBulkUploadJobData $bulkUploadData
-	 * @param KalturaBulkUploadVendorCatalogItemData $bulkUploadVendorCatalogItemData
-	 * @return KalturaBulkUpload
-	 */
-	public function addVendorCatalogItemAction ($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadVendorCatalogItemData $bulkUploadVendorCatalogItemData = null)
-	{
-		if (!$bulkUploadData)
-		{
-			$bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
-		}
-
-		if (!$bulkUploadVendorCatalogItemData)
-		{
-			$bulkUploadVendorCatalogItemData = new KalturaBulkUploadVendorCatalogItemData();
-		}
-
-		if(!$bulkUploadData->fileName)
-			$bulkUploadData->fileName = $fileData['name'];
-
-		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
-		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadData->type);
-
-		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::VENDOR_CATALOG_ITEM);
-		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
-		$dbObjectData = $bulkUploadVendorCatalogItemData->toInsertableObject();
-		$dbBulkUploadJobData->setObjectData($dbObjectData);
-		$dbBulkUploadJobData->setFilePath($fileData['tmp_name']);
-
-		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
-		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
-		if(!$dbJobLog)
-		{
-			return null;
-		}
-
-		$bulkUpload = new KalturaBulkUpload();
-		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
-
-		return $bulkUpload;
-	}
-	
 	/**
 	 * Get bulk upload batch job by id
 	 *
