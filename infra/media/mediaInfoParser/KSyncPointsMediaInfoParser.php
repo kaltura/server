@@ -33,12 +33,12 @@ class KSyncPointsMediaInfoParser
 	
 	private function getLocateDataStreamIndexCommand()
 	{
-		return "{$this->ffprobeBin} -i {$this->filePath} -show_streams -v quiet -print_format json";
+		return "{$this->ffprobeBin} -i \"$filePath\" -show_streams -v quiet -print_format json";
 	}
 	
 	private function getExtrackStreamInfoCommand($streamIndex)
 	{
-		return "{$this->ffprobeBin} -i {$this->filePath} -select_streams $streamIndex:$streamIndex -v quiet -show_data -show_packets -print_format json";
+		return "{$this->ffprobeBin} -i \"$filePath\" -select_streams $streamIndex:$streamIndex -v quiet -show_data -show_packets -print_format json";
 	}
 	
 	public function getStreamSyncPointData()

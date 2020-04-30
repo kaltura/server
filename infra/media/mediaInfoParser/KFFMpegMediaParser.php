@@ -53,9 +53,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		
 		if(isset($this->encryptionKey))
-			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i \"$filePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 		else	
-			return "{$this->ffprobeBin} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+			return "{$this->ffprobeBin} -i \"$filePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 	}
 	
 	/**
@@ -515,7 +515,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($detectDur) && $detectDur>0){
 			$cmdLine.= "-t $detectDur";
 		}
-		$cmdLine.= " -i $srcFileName $detectFiltersStr -nostats -f null dummyfilename 2>&1";
+		$cmdLine.= " -i \"$srcFileName\" $detectFiltersStr -nostats -f null dummyfilename 2>&1";
 		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
 	
 		/*

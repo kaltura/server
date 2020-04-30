@@ -151,7 +151,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		try
 		{
 			// check that the uploaded file exists
-			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+			$entryFullPath = kBaseUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
 		}
 		catch(kCoreException $ex)
 		{
@@ -241,7 +241,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
 
-		kUploadTokenMgr::closeUploadTokenById($uploadTokenId);
+		kBaseUploadTokenMgr::closeUploadTokenById($uploadTokenId);
 
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 

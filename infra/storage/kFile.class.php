@@ -24,7 +24,7 @@ class kFile extends kFileBase
 	{
 		if (kFile::isSharedPath($path))
 		{
-			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$sharedFsMgr = self::getSharedStorageInstanceType();
 			return $sharedFsMgr->listFiles($path, $pathPrefix);
 		}
 		
@@ -280,7 +280,7 @@ class kFile extends kFileBase
 	{
 		if (kFile::isSharedPath($src) || kFile::isSharedPath($dest))
 		{
-			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$sharedFsMgr = self::getSharedStorageInstanceType();
 			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);
 		}
 

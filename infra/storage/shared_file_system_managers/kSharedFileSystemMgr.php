@@ -16,13 +16,9 @@
 
 require_once(dirname(__FILE__) . '/kS3SharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/kNfsSharedFileSystemMgr.php');
+require_once(dirname(__FILE__) . '/kSharedFileSystemType.php');
 require_once(dirname(__FILE__) . '/../kFileBase.php');
 
-interface kSharedFileSystemMgrType
-{
-	const LOCAL = "NFS";
-	const S3 = "S3";
-}
 
 abstract class kSharedFileSystemMgr
 {
@@ -342,7 +338,42 @@ abstract class kSharedFileSystemMgr
 	 * @return bool
 	 */
 	abstract protected function doCopySharedToSharedAllowed();
-
+	
+	public static function getInstance($type = null, $options = null, $partner_id = null)
+	{
+		$dc_config = kConf::getMap("dc_config");
+		if(!$type)
+		{
+			if($partner_id)
+			{
+				$partner = PartnerPeer::retrieveByPK($partner_id);
+				$type = $partner->getStorageType();
+			}
+			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::NFS;
+		}
+			
+		if(!$options)
+			$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
+		
+		if(isset(self::$kSharedFsMgr[$type]))
+			return self::$kSharedFsMgr[$type];
+		
+		switch($type)
+		{
+			case kSharedFileSystemMgrType::NFS:
+				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr($options);
+				break;
+			
+			case kSharedFileSystemMgrType::S3:
+				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr($options);
+				break;
+		}
+		
+		self::$kCopySharedToShared = self::$kSharedFsMgr[$type]->doCopySharedToSharedAllowed();
+		
+		return self::$kSharedFsMgr[$type];
+	}
+	
 
 	public function createDirForPath($filePath)
 	{
@@ -570,34 +601,6 @@ abstract class kSharedFileSystemMgr
 			}
 		}
 		return true;
-	}
-	
-	public static function getInstance($type = null, $options = null)
-	{
-		
-		$dc_config = kConf::getMap("dc_config");
-		if(!$type)
-			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
-		if(!$options)
-			$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
-		
-		if(isset(self::$kSharedFsMgr[$type]))
-			return self::$kSharedFsMgr[$type];
-		
-		switch($type)
-		{
-			case kSharedFileSystemMgrType::LOCAL:
-				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr($options);
-				break;
-			
-			case kSharedFileSystemMgrType::S3:
-				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr($options);
-				break;
-		}
-
-		self::$kCopySharedToShared = self::$kSharedFsMgr[$type]->doCopySharedToSharedAllowed();
-		
-		return self::$kSharedFsMgr[$type];
 	}
 	
 	public static function getSharedRootPath()

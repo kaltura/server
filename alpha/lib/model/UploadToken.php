@@ -126,7 +126,7 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 		if (!$cache)
 			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
 		
-		$cache->add($this->getId().".autoFinalize", true, kUploadTokenMgr::AUTO_FINALIZE_CACHE_TTL);
+		$cache->add($this->getId().".autoFinalize", true, kBaseUploadTokenMgr::AUTO_FINALIZE_CACHE_TTL);
 	}
 
 	public function getMinimumChunkSize()

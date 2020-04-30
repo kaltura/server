@@ -1,11 +1,11 @@
 <?php
-class kUploadTokenMgr extends kBaseUploadTokenMgr
+class kNfsUploadTokenMgr extends kBaseUploadTokenMgr
 {
 	const MAX_APPEND_TIME = 5;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 
 	/**
-	 * kUploadTokenMgr constructor.
+	 * kNfsUploadTokenMgr constructor.
 	 * @param UploadToken $uploadToken
 	 * @param bool $finalChunk
 	 */

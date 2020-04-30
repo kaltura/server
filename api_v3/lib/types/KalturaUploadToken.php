@@ -151,7 +151,7 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_MISSING_FILE_SIZE);
 		}
 
-		$fileSystemManager = kSharedFileSystemMgr::getInstance();
+		$fileSystemManager = kSharedFileSystemMgr::getInstance(null, null, kCurrentContext::getCurrentPartnerId());
 		$maxUploadSize = $fileSystemManager->getUploadMaxSize();
 		$maxParts = $fileSystemManager->getMaximumPartsNum();
 

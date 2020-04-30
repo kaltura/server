@@ -30,7 +30,7 @@ class kInfraFileSystemCacheWrapper extends kInfraBaseCacheWrapper
 		$this->keyFolderChars = $config['keyFolderChars'];
 		$this->defaultExpiry = $config['defaultExpiry'];
 		$this->supportExpiry = isset($config['supportExpiry']) ? $config['supportExpiry'] : false;
-		$this->sharedFileSystemType = isset($config['sharedFSType']) ? $config['sharedFSType'] : kSharedFileSystemMgrType::LOCAL;
+		$this->sharedFileSystemType = isset($config['sharedFSType']) ? $config['sharedFSType'] : kSharedFileSystemMgrType::NFS;
 		
 		$this->kSharedFSManager = kSharedFileSystemMgr::getInstance($this->sharedFileSystemType, $config);
 		return true;

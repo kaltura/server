@@ -41,7 +41,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
 	{
 		KalturaLog::info("Init for upload token id [{$uploadToken->getId()}]");
-		self::$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+		self::$sharedFsMgr = kSharedFileSystemMgr::getInstance(null, null, $uploadToken->getPartnerId());
 		parent::__construct($uploadToken, $finalChunk);
 		$this->initMultipartMemcache();
 	}

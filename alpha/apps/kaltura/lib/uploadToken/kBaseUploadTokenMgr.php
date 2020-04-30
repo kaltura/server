@@ -73,14 +73,14 @@ abstract class kBaseUploadTokenMgr
 	 * @param $uploadToken
 	 * @param bool $finalChunk
 	 * @param null $type
-	 * @return kS3UploadTokenMgr|kUploadTokenMgr
+	 * @return kS3UploadTokenMgr|kNfsUploadTokenMgr
 	 */
 	public static function getInstance($uploadToken, $finalChunk = true, $type = null)
 	{
 		$dc_config = kConf::getMap("dc_config");
 		if(!$type)
 		{
-			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
+			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::NFS;
 		}
 
 		switch($type)
@@ -88,7 +88,7 @@ abstract class kBaseUploadTokenMgr
 			case kSharedFileSystemMgrType::S3:
 				return new kS3UploadTokenMgr($uploadToken, $finalChunk);
 			default:
-				return new kUploadTokenMgr($uploadToken, $finalChunk);
+				return new kNfsUploadTokenMgr($uploadToken, $finalChunk);
 		}
 	}
 
@@ -138,6 +138,7 @@ abstract class kBaseUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $resumeAt = -1)
 	{
+		KalturaLog::debug("TTT: Inside uploadFileToToken");
 		$this->_autoFinalize = $this->_uploadToken->getAutoFinalize();
 		if($this->_autoFinalize)
 			$this->initUploadTokenMemcache();
