@@ -19,25 +19,11 @@ class kInteractivityDataValidatorFactory
 			throw new kCoreException("Entry [$entryId] not found", kCoreException::INVALID_ENTRY_ID);
 		}
 
-		if(self::isPathPlaylist($entry))
+		if(InteractivityPlugin::isInteractivityPlaylist($entry))
 		{
 			return new kInteractivityDataValidator($entry);
 		}
 
 		return new kEntryInteractivityDataValidator($entry);
-	}
-
-	/**
-	 * @param entry $entry
-	 * @return bool
-	 */
-	protected static function isPathPlaylist($entry)
-	{
-		if($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
-		{
-			return true;
-		}
-
-		return false;
 	}
 }
