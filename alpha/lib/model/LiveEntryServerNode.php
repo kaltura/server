@@ -74,6 +74,10 @@ class LiveEntryServerNode extends EntryServerNode
 				if(!count($playableServerNodes))
 				{
 					$liveEntry->unsetMediaServer();
+					if (!$liveEntry->getBroadcastTime())
+					{
+						$liveEntry->setBroadcastTime(time());
+					}
 				}
 				
 				if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
@@ -106,7 +110,13 @@ class LiveEntryServerNode extends EntryServerNode
 			/* @var $liveEntry LiveEntry */
 			$entryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($liveEntry->getId());
 			if(!count($entryServerNodes))
+			{
 				$liveEntry->unsetMediaServer();
+				if (!$liveEntry->getBroadcastTime())
+				{
+					$liveEntry->setBroadcastTime(time());
+				}
+			}
 			
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 					$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
