@@ -116,4 +116,18 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 			self::INTERACTIVITY_CORE_EXCEPTION => array('InteractivityPlugin', 'handleInteractivityException'),
 		);
 	}
+
+	/**
+	 * @param entry $entry
+	 * @return bool
+	 */
+	public static function isInteractivityPlaylist($entry)
+	{
+		if($entry->getType() == entryType::PLAYLIST && ($entry->getMediaType() == PlaylistType::STATIC_LIST || $entry->getMediaType() == PlaylistType::PATH))
+		{
+			return true;
+		}
+
+		return false;
+	}
 }
