@@ -38,12 +38,7 @@ class LiveEntryServerNode extends EntryServerNode
 					$shouldIndex = true;
 				}
 			}
-
-			if (!$liveEntry->getBroadcastTime() && $liveEntry->getViewMode() == ViewMode::ALLOW_ALL)
-			{
-				$liveEntry->setBroadcastTime(time());
-				$liveEntry->save();
-			}
+			
 			if ($shouldIndex)
 			{
 				$liveEntry->indexToSearchIndex();
