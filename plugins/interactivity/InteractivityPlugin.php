@@ -92,6 +92,9 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 			case kInteractivityException::ILLEGAL_ENTRY_NODE_ENTRY_ID:
 				$object = new KalturaAPIException(KalturaInteractivityErrors::ILLEGAL_ENTRY_NODE_ENTRY_ID);
 				break;
+			case kInteractivityException::UNSUPPORTED_PLAYLIST_TYPE:
+				$object = new KalturaAPIException(KalturaInteractivityErrors::UNSUPPORTED_PLAYLIST_TYPE);
+				break;
 			case kInteractivityException::CANT_UPDATE_NO_DATA:
 				switch($data[kInteractivityErrorMessages::TYPE_PARAMETER])
 				{
@@ -115,19 +118,5 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 		return array(
 			self::INTERACTIVITY_CORE_EXCEPTION => array('InteractivityPlugin', 'handleInteractivityException'),
 		);
-	}
-
-	/**
-	 * @param entry $entry
-	 * @return bool
-	 */
-	public static function isInteractivityPlaylist($entry)
-	{
-		if($entry->getType() == entryType::PLAYLIST && ($entry->getMediaType() == PlaylistType::STATIC_LIST || $entry->getMediaType() == PlaylistType::PATH))
-		{
-			return true;
-		}
-
-		return false;
 	}
 }

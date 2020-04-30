@@ -19,9 +19,14 @@ class kInteractivityDataValidatorFactory
 			throw new kCoreException("Entry [$entryId] not found", kCoreException::INVALID_ENTRY_ID);
 		}
 
-		if(InteractivityPlugin::isInteractivityPlaylist($entry))
+		if($entry->getType() == entryType::PLAYLIST)
 		{
-			return new kInteractivityDataValidator($entry);
+			if ($entry->getMediaType() == PlaylistType::PATH) 
+			{
+				return new kInteractivityDataValidator($entry);
+			}
+			
+			throw new kInteractivityException(kInteractivityException::UNSUPPORTED_PLAYLIST_TYPE, kInteractivityException::UNSUPPORTED_PLAYLIST_TYPE);
 		}
 
 		return new kEntryInteractivityDataValidator($entry);
