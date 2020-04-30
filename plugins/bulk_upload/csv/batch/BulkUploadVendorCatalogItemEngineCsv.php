@@ -149,6 +149,13 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected function validateBulkUploadResultByAction($bulkUploadResult)
 	{
+		if (($bulkUploadResult->action == KalturaBulkUploadAction::ADD || $bulkUploadResult->action == KalturaBulkUploadAction::UPDATE)
+		&& !$bulkUploadResult->serviceFeature)
+		{
+			return $this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::MANDATORY_COLUMN_MISSING .' :serviceFeature');
+
+		}
+
 		switch ($bulkUploadResult->action)
 		{
 			case KalturaBulkUploadAction::ADD:
