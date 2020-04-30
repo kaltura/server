@@ -2,9 +2,9 @@
 
 class DeliveryProfileLivePackagerHls extends DeliveryProfileLiveAppleHttp {
 	
-	protected function getHttpUrl($serverNode)
+	protected function getHttpUrl($entryServerNode)
 	{
-		$httpUrl = $this->getLivePackagerUrl($serverNode, PlaybackProtocol::HLS);
+		$httpUrl = $this->getLivePackagerUrl($entryServerNode, PlaybackProtocol::HLS);
 		
 		$httpUrl .= "master";
 		
