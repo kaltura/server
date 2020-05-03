@@ -341,7 +341,7 @@ class serveFlavorAction extends kalturaAction
 		$isLive = $this->getRequestParameter("live");
 
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr,
-			$captionFiles, $captionLanguages, $isLive);
+			$captionFiles, $captionLanguages, $isLive, 0, 0, 0, 0);
 	}
 
 	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges, $partnerId, $mainEntry)
