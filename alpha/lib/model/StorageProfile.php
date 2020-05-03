@@ -27,6 +27,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	
 	const STORAGE_DEFAULT_KALTURA_PATH_MANAGER = 'kPathManager';
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
+	const STORAGE_S3_PATH_MANAGER = 'kS3PathManager';
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
@@ -56,6 +57,10 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 			if($this->getProtocol() == self::STORAGE_KALTURA_DC)
 			{
 				$class = self::STORAGE_DEFAULT_KALTURA_PATH_MANAGER;
+			}
+			elseif($this->getProtocol() == self::STORAGE_PROTOCOL_S3 && $this->getExportPeriodically())
+			{
+				$class = self::STORAGE_S3_PATH_MANAGER;
 			}
 			else
 			{
