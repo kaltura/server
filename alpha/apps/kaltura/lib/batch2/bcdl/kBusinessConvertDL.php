@@ -52,6 +52,10 @@ class kBusinessConvertDL
 		$nonExistingNonReadyAssets = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
 
+		$existingReadyAssets = assetPeer::retrieveByIds($existingReadyAssetIds);
+		$allReadyAssets = array_merge($existingReadyAssets, $nonExistingReadyAssets);
+		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $allReadyAssets);
+
 		if($lock)
 		{
 			$lock->unlock();

@@ -1547,8 +1547,8 @@ class kKavaReports extends kKavaReportsMgr
 		),
 
 		ReportType::CATEGORY_HIGHLIGHTS => array(
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_USERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_USERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS)
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_VIEWERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_VIEWERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS)
 
 		),
 
@@ -1582,6 +1582,29 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
+		),
+
+		ReportType::INTERACTIVE_VIDEO_NODE_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR1,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
+		),
+
+		ReportType::INTERCATIVE_VIDEO_NODE_SWITCH_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR3,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN)
+				)
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
 		),
 
 	);

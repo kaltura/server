@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.multiCenters
- * @subpackage api.objects
+ * @package api
+ * @subpackage objects
  */
 class KalturaLockFileSyncsResponse extends KalturaObject
 {

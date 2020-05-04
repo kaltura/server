@@ -288,9 +288,7 @@ class kUploadTokenMgr
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
 			$chunkSize = filesize($sourceFilePath);
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
-
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
-			$succeeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
 			{
@@ -298,35 +296,94 @@ class kUploadTokenMgr
 				$expectedFileSize = $this->_uploadToken->getFileSize();
 			}
 			
-			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
+			if(!$verifyFinalChunk)
+			{
+				KalturaLog::debug("This is not the final chunk trying to append available chunks");
+				$currentFileSize = $this->syncAppendAvailableChunks($uploadFilePath);
+				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
+				{
+					KalturaLog::debug("Appending current chunk [$sourceFilePath] to final file [$uploadFilePath]");
+					$currentFileSize = $this->appendCurrentChunk($uploadFilePath, $sourceFilePath);
+				}
+				else
+				{
+					kFile::moveFile($sourceFilePath, $chunkFilePath);
+				}
+				
+				return $currentFileSize;
+			}
 			
+			kFile::moveFile($sourceFilePath, $chunkFilePath);
+			
+			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 30);
+				
 			// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
 			$count = 0;
 			do {
 				if ($count ++)
 					Sleep(1);
-				
+					
 				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $verifyFinalChunk, $this->_uploadToken->getId());
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
-
+				
 			if ($verifyFinalChunk && $currentFileSize != $expectedFileSize)
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
-		} else {
-			$uploadFileResource = fopen($uploadFilePath, 'r+b');
-			fseek($uploadFileResource, 0, SEEK_END);
-			
-			self::appendChunk($sourceFilePath, $uploadFileResource);
-			
-			$currentFileSize = ftell($uploadFileResource);
+		}
+		else
+		{
+			$currentFileSize = $this->appendCurrentChunk($uploadFilePath, $sourceFilePath);
 			
 			if($this->_autoFinalize && $this->_uploadToken->getFileSize() >= $currentFileSize)
 				$this->_finalChunk = true;
-			
-			fclose($uploadFileResource);
 		}
 		
 		return $currentFileSize;
+	}
+	
+	private function appendCurrentChunk($targetFilePath, $chunkFilePath)
+	{
+		$targetFileResource = fopen($targetFilePath, 'r+b');
+		fseek($targetFileResource, 0, SEEK_END);
+		
+		self::appendChunk($chunkFilePath, $targetFileResource);
+		
+		$targetFileSize = ftell($targetFileResource);
+		
+		fclose($targetFileResource);
+		
+		return $targetFileSize;
+	}
+	
+	private function syncAppendAvailableChunks($targetFilePath)
+	{
+		$targetFileResource = fopen($targetFilePath, 'r+b');
+		fseek($targetFileResource, 0, SEEK_END);
+		$targetFileSize = ftell($targetFileResource);
+		
+		for ($maxSyncedConcat = 10; $maxSyncedConcat > 0; $maxSyncedConcat--)
+		{
+			$nextChunkPath = "$targetFilePath.chunk.$targetFileSize";
+			if(!kFile::checkFileExists($nextChunkPath))
+			{
+				break;
+			}
+			
+			$lockedFile = "$nextChunkPath.".microtime(true).".locked";
+			if (! kFile::moveFile($nextChunkPath, $lockedFile)) // another process is already appending this file
+			{
+				KalturaLog::log("rename ($nextChunk, $lockedFile) failed");
+				break;
+			}
+			
+			KalturaLog::debug("Appending chunk $lockedFile to target file $targetFilePath");
+			$chunkSize = kfile::fileSize($lockedFile);
+			self::appendChunk($lockedFile, $targetFileResource);
+			$targetFileSize += $chunkSize;
+		}
+		
+		fclose($targetFileResource);
+		return $targetFileSize;
 	}
 	
 	private function checkIsFinalChunk($currentFileSize)

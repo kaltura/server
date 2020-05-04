@@ -8,8 +8,9 @@ class kInteractivityDataValidator extends kInteractivityBaseValidator
 {
 	const NODES = 'nodes';
 	const OBJECT_NAME = 'InteractivityData';
+	const NODE_ID = 'id';
 
-	/** @var IInteractivityDataValidator*/
+	/** @var kInteractivityNodeValidator*/
 	protected $nodeValidator;
 
 	/**
@@ -27,13 +28,53 @@ class kInteractivityDataValidator extends kInteractivityBaseValidator
 		$this->nodeValidator = new kInteractivityNodeValidator($entry);
 	}
 
+	/**
+	 * @param array $data
+	 * @throws kInteractivityException
+	 */
 	public function validate($data)
 	{
-		$this->validateMandatoryField($data, self::OBJECT_NAME, self::NODES);
-
-		foreach ($data[self::NODES] as $node)
+		if(!$data)
 		{
-			$this->nodeValidator->validate($node);
+			throw new kInteractivityException(kInteractivityException::EMPTY_INTERACTIVITY_DATA);
 		}
+
+		$this->validateNodes($data);
+	}
+
+
+	/**
+	 * @param array $data
+	 * @throws kInteractivityException
+	 */
+	protected function validateNodes($data)
+	{
+		if(isset($data[self::NODES]))
+		{
+			$nodesIds = array();
+			$interactionsIds = array();
+			$this->validateArrayField($data, self::OBJECT_NAME, self::NODES);
+			foreach ($data[self::NODES] as $node)
+			{
+				$this->nodeValidator->validate($node);
+				$nodesIds[] = $node[self::NODE_ID];
+				$interactionsIds = array_merge($interactionsIds, $this->nodeValidator->getInteractionIds());
+			}
+
+			if($this->isThereDuplicateValues($nodesIds))
+			{
+				throw new kInteractivityException(kInteractivityException::DUPLICATE_NODES_IDS, kInteractivityException::DUPLICATE_NODES_IDS);
+			}
+
+			if($this->isThereDuplicateValues($interactionsIds))
+			{
+				throw new kInteractivityException(kInteractivityException::DUPLICATE_INTERACTIONS_IDS, kInteractivityException::DUPLICATE_INTERACTIONS_IDS);
+			}
+		}
+	}
+
+	protected function isThereDuplicateValues($arrayIds)
+	{
+		return count($arrayIds) > count(array_unique($arrayIds));
 	}
 }

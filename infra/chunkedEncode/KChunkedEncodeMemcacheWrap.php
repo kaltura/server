@@ -448,7 +448,7 @@ ini_set("memory_limit","512M");
 					$fetchIndex = $readIndex;
 				else
 					$fetchIndex = rand($readIndex, min($readIndex+$fetchRangeRandMax, $writeIndex));
-				KalturaLog::log("RD:$readIndex, WR:$writeIndex, FCH:$fetchIndex");
+                			KalturaLog::log("RD:$readIndex, WR:$writeIndex, FCH:$fetchIndex");
 
 					/*
 					 * Try to lock the next unread job object
@@ -482,7 +482,7 @@ ini_set("memory_limit","512M");
 			
 			return null;
 		}
-			
+
 		/* ---------------------------
 		 * RefreshJobs
 		 */

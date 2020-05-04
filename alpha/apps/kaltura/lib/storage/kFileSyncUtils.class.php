@@ -910,29 +910,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$desired_file_sync = null;
 		$local = false;
-		foreach ( $file_sync_list as $file_sync )
+		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $dc_id);
+		if($sortedFileSync)
 		{
-			$tmp_file_sync = $file_sync;
-			// make sure not link and work on original
-			
-			if($resolve)
-				$tmp_file_sync = self::resolve($file_sync);
-				
-			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-				continue;
-			
-
-			// always prefer the current dc
-			if ( $tmp_file_sync->getDc() == $dc_id)
+			$desired_file_sync = $sortedFileSync[0];
+			if($desired_file_sync->getDc() == $dc_id)
 			{
-				$desired_file_sync = $tmp_file_sync;
 				$local = true;
-				break;
-			}
-			else if ( $fetch_from_remote_if_no_local == true &&
-					($desired_file_sync == null || $tmp_file_sync->getDc() < $desired_file_sync->getDc()) )			// prefer local file syncs if they exist
-			{
-				$desired_file_sync = $tmp_file_sync;
 			}
 		}
 
@@ -942,6 +926,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				KalturaLog::info("FileSync was found locally");
 			else
 				KalturaLog::info("FileSync was found but doesn't exists locally");
+
+			KalturaLog::info("FileSync DC: " . $desired_file_sync->getDc());
 
 			return array ( $desired_file_sync , $local );
 		}
@@ -955,6 +941,55 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::info("exact FileSync was not found");
 			return array ( null , false );
 		}
+	}
+
+	public static function getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $partner_id, $dc_id)
+	{
+		$dcFileSyncs = array();
+		$remoteFileSyncs = array();
+		$periodicFileSyncs = array();
+
+		if($fetch_from_remote_if_no_local)
+		{
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner_id);
+		}
+
+		foreach ($file_sync_list as $file_sync)
+		{
+			// make sure not link and work on original
+			$tmp_file_sync = $file_sync;
+			if ($resolve)
+			{
+				$tmp_file_sync = self::resolve($file_sync);
+			}
+
+			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+			{
+				continue;
+			}
+
+			// always prefer files from current dc
+			if($tmp_file_sync->getDc() == $dc_id)
+			{
+				return array($tmp_file_sync);
+			}
+
+			if(in_array($tmp_file_sync->getDc(), kDataCenterMgr::getDcIds()))
+			{
+				$dcFileSyncs[] = $tmp_file_sync;
+			}
+			else if(in_array($tmp_file_sync->getDc(), $periodicStorageIds))
+			{
+				$periodicFileSyncs[] = $tmp_file_sync;
+			}
+			else
+			{
+				$remoteFileSyncs[] = $tmp_file_sync;
+			}
+		}
+
+		// always prefer local file syncs, then periodic and lastly remote
+		return array_merge($dcFileSyncs, $periodicFileSyncs, $remoteFileSyncs);
 	}
 
 	/**
