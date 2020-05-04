@@ -206,7 +206,7 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		$version = $this->getFileSyncSubTypeVersion($sub_type, $version);
 		

@@ -105,7 +105,7 @@ abstract class LiveEntry extends entry
 	/* (non-PHPdoc)
 	 * @see entry::generateFilePathArr($sub_type, $version)
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		static::validateFileSyncSubType($sub_type);
 		
@@ -115,7 +115,7 @@ abstract class LiveEntry extends entry
 			return array(myContentStorage::getFSContentRootPath(), $res);
 		}
 		
-		return parent::generateFilePathArr($sub_type, $version);
+		return parent::generateFilePathArr($sub_type, $version, $externalPath);
 	}
 	
 	/* (non-PHPdoc)

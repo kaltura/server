@@ -160,7 +160,7 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	/* (non-PHPdoc)
 	 * @see ISyncableFile::generateFilePathArr()
 	 */
-	public function generateFilePathArr ( $sub_type , $version=null )
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		

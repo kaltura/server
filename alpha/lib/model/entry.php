@@ -536,10 +536,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 * @param $sub_type
 	 * @param null $version
+	 * @param bool $externalPath
 	 * @return array
 	 * @throws FileSyncException
 	 */
-	public function generateFilePathArr( $sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		static::validateFileSyncSubType ( $sub_type );
 		switch ($sub_type)

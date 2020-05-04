@@ -113,13 +113,13 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		
 		if(!$version)
 			$version = $this->getVersion();
-		
+
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
 		$path =  "/content/syndication/data/$dir/" . $this->generateFileName($sub_type, $version);
 

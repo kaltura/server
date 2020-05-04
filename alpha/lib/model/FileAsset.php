@@ -51,16 +51,14 @@ class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
 	/* (non-PHPdoc)
 	 * @see ISyncableFile::generateFilePathArr()
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType($sub_type);
 		
 		if(!$version)
 			$version = $this->getVersion();
-		
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
 		$path = "/content/fileAsset/$dir/" . $this->generateFileName($sub_type, $version);
-		
 		return array(myContentStorage::getFSContentRootPath(), $path);
 	}
 	
