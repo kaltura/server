@@ -46,11 +46,12 @@
 					        echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceType', $entryVendorTask->serviceType); ?></td>
 				<td><?php if (isset($entryVendorTask->serviceFeature))
 						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceFeature', $entryVendorTask->serviceFeature); ?></td>
-				<td><?php if (isset($entryVendorTask->expectedFinishTime) && $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime == 604800)
+				<td><?php if (isset($entryVendorTask->turnAroundTime))
+				        	echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $entryVendorTask->turnAroundTime);
+					else if (isset($entryVendorTask->expectedFinishTime) && $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime == 604800)
 						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', -1);
 					else if (isset($entryVendorTask->expectedFinishTime))
-						echo  $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime);?>
-				</td>
+						echo  $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime', $entryVendorTask->expectedFinishTime - $entryVendorTask->queueTime); ?></td>
 				<td><?php if (isset($entryVendorTask->expectedFinishTime))
 				        echo date($this->translate('time format'), $entryVendorTask->expectedFinishTime); ?></td>
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_EntryVendorTaskStatus', $entryVendorTask->status); ?></td>
