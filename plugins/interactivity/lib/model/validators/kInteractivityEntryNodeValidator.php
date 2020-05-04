@@ -8,11 +8,11 @@ class kInteractivityEntryNodeValidator extends kInteractivityNodeValidator
 {
 	public function validate($data)
 	{
-		parent::validate($data);
-
-		if($data[self::ENTRY_ID] != $this->entry->getEntryId())
+		if(isset($data[self::ENTRY_ID]))
 		{
 			throw new kInteractivityException(kInteractivityException::ILLEGAL_ENTRY_NODE_ENTRY_ID, kInteractivityException::ILLEGAL_ENTRY_NODE_ENTRY_ID);
 		}
+
+		parent::validate($data);
 	}
 }

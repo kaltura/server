@@ -69,4 +69,16 @@ class FileSyncPeer extends BaseFileSyncPeer
 	{
 		return array(array("fileSync:id=%s", self::ID), array("fileSync:objectId=%s", self::OBJECT_ID));		
 	}
+
+	public static function retrieveFileSyncsByFlavorAndDc($dc, $partnerId, $status, $objectIds, $types, $subTypes)
+	{
+		$c = new Criteria();
+		$c->add(self::DC, $dc);
+		$c->add(self::PARTNER_ID, $partnerId);
+		$c->add(self::STATUS, $status,Criteria::IN);
+		$c->add(self::OBJECT_ID, $objectIds,Criteria::IN);
+		$c->add(self::OBJECT_TYPE, $types,Criteria::IN);
+		$c->add(self::OBJECT_SUB_TYPE, $subTypes,Criteria::IN);
+		return self::doSelectOne($c);
+	}
 }

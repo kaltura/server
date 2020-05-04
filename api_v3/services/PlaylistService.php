@@ -40,7 +40,7 @@ class PlaylistService extends KalturaEntryService
 		}
 		return parent::partnerRequired($actionName);
 	}
-	
+
 	/**
 	 * Add new playlist
 	 * Note that all entries used in a playlist will become public and may appear in KalturaNetwork
@@ -51,6 +51,7 @@ class PlaylistService extends KalturaEntryService
 	 * @return KalturaPlaylist
 	 *
 	 * @disableRelativeTime $playlist
+	 * @throws KalturaAPIException
 	 */
 	function addAction( KalturaPlaylist $playlist , $updateStats = false)
 	{
@@ -84,7 +85,7 @@ class PlaylistService extends KalturaEntryService
 		
 		return $playlist;
 	}
-	
+
 
 	/**
 	 * Retrieve a playlist
@@ -96,6 +97,7 @@ class PlaylistService extends KalturaEntryService
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
+	 * @throws KalturaAPIException
 	 */
 	function getAction( $id, $version = -1 )
 	{
@@ -187,49 +189,65 @@ class PlaylistService extends KalturaEntryService
 
 		$this->deleteEntry($id, KalturaEntryType::PLAYLIST);
 	}
-	
-	
+
+
 	/**
 	 * Clone an existing playlist
 	 *
 	 * @action clone
-	 * @param string $id  Id of the playlist to clone
+	 * @param string $id Id of the playlist to clone
 	 * @param KalturaPlaylist $newPlaylist Parameters defined here will override the ones in the cloned playlist
 	 * @return KalturaPlaylist
 	 *
 	 * @throws APIErrors::INVALID_ENTRY_ID
 	 * @throws APIErrors::INVALID_PLAYLIST_TYPE
+	 * @throws KalturaAPIException
 	 */
 	function cloneAction( $id, KalturaPlaylist $newPlaylist = null)
 	{
 		$dbPlaylist = entryPeer::retrieveByPK( $id );
 		
 		if ( !$dbPlaylist )
-			throw new KalturaAPIException ( APIErrors::INVALID_ENTRY_ID , "Playlist" , $id  );
+		{
+			throw new KalturaAPIException (APIErrors::INVALID_ENTRY_ID, "Playlist", $id);
+		}
 			
 		if ( $dbPlaylist->getType() != entryType::PLAYLIST )
-			throw new KalturaAPIException ( APIErrors::INVALID_PLAYLIST_TYPE );
+		{
+			throw new KalturaAPIException (APIErrors::INVALID_PLAYLIST_TYPE);
+		}
 			
 		if ($newPlaylist->playlistType && ($newPlaylist->playlistType != $dbPlaylist->getMediaType()))
-			throw new KalturaAPIException ( APIErrors::CANT_UPDATE_PARAMETER, 'playlistType' );
-		
+		{
+			throw new KalturaAPIException (APIErrors::CANT_UPDATE_PARAMETER, 'playlistType');
+		}
+
+		if($dbPlaylist->getMediaType() == PlaylistType::PATH)
+		{
+			throw new KalturaAPIException(APIErrors::CLONING_PATH_PLAYLIST_NOT_SUPPORTED);
+		}
+
 		$oldPlaylist = new KalturaPlaylist();
 		$oldPlaylist->fromObject($dbPlaylist, $this->getResponseProfile());
 			
-		if (!$newPlaylist) {
+		if (!$newPlaylist)
+		{
 			$newPlaylist = new KalturaPlaylist();
 		}
 		
 		$reflect = new ReflectionClass($newPlaylist);
 		$props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC);
-		foreach ($props as $prop) {
+		foreach ($props as $prop)
+		{
 			$propName = $prop->getName();
 			// do not override new parameters
-			if ($newPlaylist->$propName) {
+			if ($newPlaylist->$propName)
+			{
 				continue;
 			}
 			// do not copy read only parameters
-			if (stristr($prop->getDocComment(), '@readonly')) {
+			if (stristr($prop->getDocComment(), '@readonly'))
+			{
 				continue;
 			}
 			// copy from old to new
@@ -262,7 +280,6 @@ class PlaylistService extends KalturaEntryService
 	function listAction( KalturaPlaylistFilter $filter=null, KalturaFilterPager $pager=null )
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
-		
 
 	    if (!$filter)
 			$filter = new KalturaPlaylistFilter();
@@ -323,7 +340,7 @@ class PlaylistService extends KalturaEntryService
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
 	    
-		// the default of detrailed should be true - most of the time the kuse is needed
+		// the default of detailed should be true - most of the time the kuse is needed
 		if (is_null($detailed))
 			 $detailed = true ;
 
@@ -371,14 +388,18 @@ class PlaylistService extends KalturaEntryService
 
 	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent)
 	{
-		if ($playlistType == KalturaPlaylistType::DYNAMIC)
+		$entryList = null;
+		switch($playlistType)
 		{
-			$entryList = self::handlingDynamicPlaylist($entryFiltersViaEsearch,$entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults);
+			case KalturaPlaylistType::DYNAMIC:
+				$entryList = self::handlingDynamicPlaylist($entryFiltersViaEsearch,$entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults);
+				break;
+			case KalturaPlaylistType::STATIC_LIST:
+			case KalturaPlaylistType::PATH:
+				$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
+				break;
 		}
-		else if ($playlistType == KalturaPlaylistType::STATIC_LIST)
-		{
-			$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
-		}
+
 		return $entryList;
 	}
 
@@ -403,7 +424,7 @@ class PlaylistService extends KalturaEntryService
 
 	//When queries are going to run both in Esearch and Sphinx, pager handling will be done after merging the results -> ($pagerSeperateQueries = null)
 	//In case only one of them will run (for example only in sphinx), pager handling will be done only there (in this example: in sphinx query) -> ($pagerSeperateQueries = $pager)
-	protected static function decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx)
+	protected static function decideWhereHandlingPager($pager, $entryFiltersViaEsearch, $entryFiltersViaSphinx)
 	{
 		$pagerSeparateQueries = $pager;
 		if ($entryFiltersViaEsearch && $entryFiltersViaSphinx)
@@ -455,8 +476,8 @@ class PlaylistService extends KalturaEntryService
 		$tempPlaylist->filtersToPlaylistContentXml();
 		return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, true, $pager);
 	}
-	
-	
+
+
 	/**
 	 * Retrieve playlist statistics
 	 * @deprecated

@@ -563,16 +563,45 @@ class kFile extends kFileBase
 		return is_dir($path);
 	}
 
-	public static function getLineFromFileTail($file , $lineNum)
+	public static function getLinesFromFileTail($file, $numberOfLines = 1, $ignoreEmptyEnds = true)
 	{
-		$lines = file($file);
-		if ($lines && count($lines))
+		$eol = self::getArrEndOfLine();
+		$f = fopen($file, 'r');
+		$index = -1;
+		fseek($f, $index, SEEK_END);
+		$char = fgetc($f);	//get the last char in the file
+
+		while ($ignoreEmptyEnds && in_array($char, $eol))
 		{
-			return $lines[count($lines) - $lineNum];
+			fseek($f, $index--, SEEK_END);
+			$char = fgetc($f);
+		}
+
+		$lines = '';
+		while ($char !== false &&
+			($numberOfLines > 1 || ($numberOfLines == 1 && !in_array($char, $eol))))
+		{
+			$lines = $char . $lines;
+			fseek($f, $index--, SEEK_END);
+			$char = fgetc($f);
+
+			while ($numberOfLines > 1 && in_array($char, $eol))
+			{
+				$numberOfLines--;
+				$lines = $char . $lines;
+				fseek($f, $index--, SEEK_END);
+				$char = fgetc($f);
+			}
 		}
 		return $lines;
 	}
-	
+
+	public static function getArrEndOfLine()
+	{
+		return array("\n", "\r");
+	}
+
+
 }
 
 /**
