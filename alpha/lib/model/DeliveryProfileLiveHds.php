@@ -23,9 +23,9 @@ class DeliveryProfileLiveHds extends DeliveryProfileLive {
 		
 	}
 
-	protected function getHttpUrl($serverNode)
+	protected function getHttpUrl($entryServerNode)
 	{
-		$baseUrl = $this->getBaseUrl($serverNode);
+		$baseUrl = $this->getBaseUrl($entryServerNode->serverNode);
 		return rtrim($baseUrl, "/") . "/" . $this->getStreamName() . "/manifest.f4m" . $this->getQueryAttributes();
 	}
 	
