@@ -107,6 +107,17 @@ class kEntrySearch extends kBaseESearch
     public function fetchCoreObjectsByIds($ids)
     {
         $entries = entryPeer::retrieveByPKsNoFilter($ids);
+
+        // remove deleted entries from results (in case there is major lag - elastic may return IDs that are deleted in DB)
+		foreach ($entries as $key => $entry)
+		{
+			/** @var entry $entry */
+			if ($entry->getStatus() === entryStatus::DELETED)
+			{
+				KalturaLog::notice("Entry ID: {$entry->getId()} status is 'DELETED' - removing from elastic results");
+				unset($entries[$key]);
+			}
+		}
         entryPeer::fetchPlaysViewsData($entries);
         return $entries;
     }
