@@ -202,7 +202,7 @@ class FairplayPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 					$customDataObject = reset($customDataJson);
 					$data = new kFairPlayPlaybackPluginData();
 					$licenseUrl = $this->constructUrl($fairplayProfile, self::getUrlName(), $customDataObject);
-					$data->setLicenseURL(DrmLicenseUtils::purifyUrl($licenseUrl));
+					$data->setLicenseURL(DrmLicenseUtils::prepareUrl($licenseUrl));
 					$data->setScheme($this->getDrmSchemeCoreValue());
 					$data->setCertificate($fairplayProfile->getPublicCertificate());
 					$result->addToPluginData(self::getPluginName(), $data);

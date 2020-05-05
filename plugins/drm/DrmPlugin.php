@@ -178,7 +178,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 					{
 						$data = new kDrmPlaybackPluginData();
 						$licenseUrl = $this->constructUrl($dbProfile, $this->getUrlName($scheme), $customDataObject);
-						$data->setLicenseURL(DrmLicenseUtils::purifyUrl($licenseUrl));
+						$data->setLicenseURL(DrmLicenseUtils::prepareUrl($licenseUrl));
 						$data->setScheme($this->getDrmSchemeCoreValue($scheme));
 						$result->addToPluginData($scheme, $data);
 					}
