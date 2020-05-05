@@ -57,6 +57,9 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 		$criteria->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId(), Criteria::EQUAL);
 		$criteria->add(FileSyncPeer::ID, $lastHandledId, Criteria::GREATER_THAN);
 		$criteria->add(FileSyncPeer::UPDATED_AT, $lastUpdatedAt, Criteria::LESS_THAN);
+		$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+		$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$criteria->add(FileSyncPeer::FILE_PATH, 'NULL', Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(FileSyncPeer::ID);
 		$criteria->setLimit(100);
 
@@ -69,6 +72,9 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 			//create new fileSync With status pending and new storageId
 			$newfileSync = $fileSync->copy(true);
 			$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
+			$newfileSync->setSrcPath($fileSync->getFullPath());
+			$newfileSync->setSrcEncKey($fileSync->getSrcEncKey());
+			$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
 			$newfileSync->setDc($storageId);
 			$newfileSync->save();
 			$lastHandledId = $fileSync->getId();
