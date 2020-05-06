@@ -198,6 +198,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $serviceFeature;
 
+	/**
+	 * @var KalturaVendorServiceTurnAroundTime
+	 * @readonly
+	 */
+	public $turnAroundTime;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -227,7 +233,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'taskJobData',
 		'expectedFinishTime',
 		'serviceType',
-		'serviceFeature'
+		'serviceFeature',
+		'turnAroundTime'
 	);
 	
 	/* (non-PHPdoc)
