@@ -31,37 +31,22 @@ foreach ($entries as $deletedEntryId){
 	$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
 	$deletedEntry->save();
 	
-	//undelete all entry's file syncs sub types 
-	$entryFileSyncKeys = array (); 
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA)){
-		$entryFileSyncKeys[] = $key; 
+	//undelete all entry's file syncs sub types
+	$syncSubTypes = $deletedEntry::getEntryFileSyncSubTypes();
+	$entryFileSyncKeys = array ();
+	foreach($syncSubTypes as $syncSubType)
+	{
+		$key = $deletedEntry->getSyncKey($syncSubType);
+		if ($key)
+		{
+			$entryFileSyncKeys[] = $key;
+		}
 	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC)){
-		$entryFileSyncKeys[] = $key; 
-	}
-	if ($key = $deletedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG)){
-		$entryFileSyncKeys[] = $key; 
-	}
+
 	foreach ($entryFileSyncKeys as $entryFileSyncKey)
+	{
 		restoreFileSyncByKey($entryFileSyncKey);
+	}
 	
 	//Restore assets
 	$assetCrit = new Criteria();

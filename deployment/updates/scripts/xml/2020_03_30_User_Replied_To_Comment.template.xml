@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://{prompt:Host name:}/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <!-- script will ask for username / password interactively -->
+    </session>
+    <multirequest>
+        <!-- Entry was added to channel -->
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>User replied to a comment</name>
+                <systemName>User_Replied_To_A_Comment</systemName>
+                <description>Email notification template to be sent when user replied to a comment which is not the owner of the entry and not his reply</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventObjectType>annotationEventNotifications.Annotation</eventObjectType>
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Comment is a reply because it has parent id</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getDepth() == 1</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status is active</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getStatus() == 1</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Entry owner is not the same as the reply owner</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>entryPeer::retrieveByPK($scope->getObject()->getEntryId())->getKuserId() != $scope->getObject()->getKuserId()</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Comment owner is not the same as the reply owner</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>!is_null(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())) &amp;&amp; CuePointPeer::retrieveByPK($scope->getObject()->getParentId())->getKuserId() != $scope->getObject()->getKuserId()</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <subject>[AppTitle] - A new reply was added to your comment</subject>
+                <body> <![CDATA[A new reply was added to your comment on media {entry_name} by {user_id}.<br/> Reply Text: {comment_text}]]></body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <to objectType="KalturaEmailNotificationStaticRecipientProvider">
+                    <!-- Retrieving the owner id of the comment  -->
+                    <emailRecipients objectType="array">
+                        <item objectType = "KalturaEmailNotificationRecipient">
+                            <email objectType="KalturaEvalStringField">
+                                <code>!is_null(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())) &amp;&amp; !is_null(kuserPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())->getKuserId())) ? kuserPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())->getKuserId())->getEmail() : ''</code>
+                            </email>
+                            <name objectType="KalturaEvalStringField">
+                                <code>!is_null(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())) &amp;&amp; !is_null(kuserPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())->getKuserId())) ? kuserPeer::retrieveByPk(CuePointPeer::retrieveByPK($scope->getObject()->getParentId())->getKuserId())->getFullName() : ''</code>
+                            </name>
+                        </item>
+                    </emailRecipients>
+                </to>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <description>Server configuration: partner_notification_email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <description>Server configuration: partner_notification_name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_id</key>
+                        <description>Entry ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getObject()->getEntryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>entry_name</key>
+                        <description>Entry name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>comment_text</key>
+                        <description>Comment text</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getObject()->getText()) ? $scope->getObject()->getText() : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_id</key>
+                        <description>Comment owner id</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kuserPeer::retrieveByPK($scope->getObject()->getKuserId())->getPuserId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_name</key>
+                        <description>User Name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kuserPeer::retrieveByPk($scope->getObject()->getKuserId())->getFullName()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

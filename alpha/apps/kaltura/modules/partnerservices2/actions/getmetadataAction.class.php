@@ -59,14 +59,14 @@ class getmetadataAction extends defPartnerservices2Action
 		elseif ( $version == "-1" ) $version = null;
 				
 			// in case we're making a roughcut out of a regular invite, we start from scratch
-		$entry_data_path = kFileSyncUtils::getLocalFilePathForKey($entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version)); //replaced__getDataPath
+		$entry_data_path = kFileSyncUtils::getLocalFilePathForKey($entry->getSyncKey(kEntryFileSyncSubType::DATA, $version)); //replaced__getDataPath
 		if ($entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_SHOW || $entry_data_path === null)
 		{
 			$this->xml_content = "<xml></xml>"; 
 			return;
 		}
 
-		$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version );
+		$sync_key = $entry->getSyncKey ( kEntryFileSyncSubType::DATA , $version );
 		$file_name = kFileSyncUtils::getReadyLocalFilePathForKey( $sync_key , false );
 			
 		// fetch content of file from disk - it should hold the XML

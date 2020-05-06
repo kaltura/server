@@ -859,10 +859,10 @@ return array($genericWidget, $myspaceWidget);
 		// copy the show_entry file content
 		$source_show_entry = entryPeer::retrieveByPK( $source_kshow->getShowEntryId() );
 
-		$source_show_entry_data_key = $source_show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$source_show_entry_data_key = $source_show_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 		$target_show_entry->setData ( null );
 		$target_show_entry->setData ( $source_show_entry->getData() );
-		$target_show_entry_data_key = $target_show_entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$target_show_entry_data_key = $target_show_entry->getSyncKey(kEntryFileSyncSubType::DATA);
 		
 		$target_show_entry->setName ( $source_show_entry->getName() );
 		$target_show_entry->setLengthInMsecs( $source_show_entry->getLengthInMsecs() );
@@ -1022,33 +1022,4 @@ return array($genericWidget, $myspaceWidget);
 		
 		return $kshow;
 	}
-	
-	public static function getKshowFromPartnerPolicy ( $partner_id, $subp_id , $puser_kuser , $kshow_id , $entry )
-	{
-	    if ( $kshow_id == kshow::KSHOW_ID_USE_DEFAULT )
-        {
-            // see if the partner has some default kshow to add to
-            $kshow = myPartnerUtils::getDefaultKshow ( $partner_id, $subp_id , $puser_kuser  );
-            if ( $kshow ) $kshow_id = $kshow->getId();
-        }
-		elseif ( $kshow_id == kshow::KSHOW_ID_CREATE_NEW )
-        {
-            // if the partner allows - create a new kshow 
-            $kshow = myPartnerUtils::getDefaultKshow ( $partner_id, $subp_id , $puser_kuser , null , true );
-            if ( $kshow ) $kshow_id = $kshow->getId();
-        }   
-		else
-        {
-            $kshow = kshowPeer::retrieveByPK( $kshow_id );
-        }
-
-        if ( ! $kshow )
-        {
-            // the partner is attempting to add an entry to some invalid or non-existing kwho
-            $this->addError( APIErrors::INVALID_KSHOW_ID, $kshow_id );
-            return;
-        }	
-        return $kshow;	
-	}	
 }
-?>

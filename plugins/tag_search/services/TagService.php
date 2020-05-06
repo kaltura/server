@@ -176,7 +176,12 @@ class TagService extends KalturaBaseService
 			/* @var $tag Tag */
 			$tag->decrementInstanceCount();
 		}
-		
+
+		if(!$pcToIncrement)
+		{
+			return;
+		}
+
 		$pcToIncrementArray = explode(',', $pcToIncrement);
 		$tagsToIncrement = array();
 		$c = new Criteria();

@@ -92,7 +92,7 @@ class serveManifestAction extends sfAction
 				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET || $subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM)
 					$isAsset = true;
 				else 
-					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM;
+					$subType = kEntryFileSyncSubType::ISM;
 				break;
 			case 'ismc':
 				if($subType == flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC)
@@ -100,7 +100,7 @@ class serveManifestAction extends sfAction
 				if($isAsset)
 					$subType = flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC;
 				else
-					$subType = entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC;
+					$subType = kEntryFileSyncSubType::ISMC;
 				break;
 			case 'ismv':
 			case 'isma':

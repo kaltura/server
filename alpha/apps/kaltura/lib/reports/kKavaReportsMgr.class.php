@@ -306,6 +306,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAYMANIFEST,
 		self::EVENT_TYPE_REGISTERED,
 		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
+		self::EVENT_TYPE_HOTSPOT_CLICKED,
+		self::EVENT_TYPE_NODE_SWITCH,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -354,6 +356,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
 		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
 		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
+		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
+		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 	);
 
 	//global transform
@@ -2001,7 +2005,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
-			if (isset($report_filter[self::DRUID_DIMENSION]))
+			if (isset($report_filter[self::DRUID_DIMENSION]) || isset($report_filter[self::DRUID_TYPE]))
 			{
 				$report_filter = array($report_filter);
 			}
@@ -2053,6 +2057,7 @@ class kKavaReportsMgr extends kKavaBase
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
+			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -2083,6 +2088,28 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
 		{
 			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $input_filter->gte_entry_created_at, $input_filter->lte_entry_created_at, self::DRUID_ORDER_NUMERIC);
+		}
+
+		if ($input_filter->categories_ancestor_ids)
+		{
+			$category_filter = new categoryFilter();
+
+			$category_filter->set('_in_ancestor_id', explode($response_options->getDelimiter(), $input_filter->categories_ancestor_ids));
+
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$category_filter->attachToCriteria($c);
+			$category_filter->setPartnerSearchScope($partner_id);
+			$c->applyFilters();
+
+			$category_ids_from_db = $c->getFetchedIds();
+			if (!count($category_ids_from_db))
+			{
+				$category_ids_from_db = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			}
+
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+				self::DRUID_VALUES => $category_ids_from_db);
 		}
 
 		$entry_ids_from_db = array();
@@ -2451,7 +2478,31 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
-		$report_def[self::DRUID_DIMENSIONS] = $dimensions;
+
+		$group_by_dimensions = array();
+		foreach ($dimensions as $dimension)
+		{
+			if (in_array($dimension, self::$multi_value_dimensions))
+			{
+				$values = self::getFilterValues($filter, $dimension);
+				if ($values)
+				{
+					// use a list filtered dimension, otherwise we may get values that don't match the filter
+					$dimension = array(
+						self::DRUID_TYPE => self::DRUID_LIST_FILTERED,
+						self::DRUID_DELEGATE => array(
+							self::DRUID_TYPE => self::DRUID_DEFAULT,
+							self::DRUID_DIMENSION => $dimension,
+							self::DRUID_OUTPUT_NAME => $dimension,
+						),
+						self::DRUID_VALUES => $values,
+					);
+				}
+			}
+			$group_by_dimensions[] = $dimension;
+
+		}
+		$report_def[self::DRUID_DIMENSIONS] = $group_by_dimensions;
 		return $report_def;
 	}
 

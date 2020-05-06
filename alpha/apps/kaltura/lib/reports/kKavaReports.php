@@ -1547,9 +1547,64 @@ class kKavaReports extends kKavaReportsMgr
 		),
 
 		ReportType::CATEGORY_HIGHLIGHTS => array(
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_USERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS),
-			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_USERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS)
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_VIEWERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_ENTRIES, self::METRIC_UNIQUE_VIEWERS, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_OWNERS)
 
+		),
+
+		ReportType::SUB_CATEGORIES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_CATEGORIES,
+				'name' => self::DIMENSION_CATEGORIES,
+				'entries_count' => self::DIMENSION_CATEGORIES,
+				'direct_sub_categories_count' => self::DIMENSION_CATEGORIES,
+				'parent_name' => self::DIMENSION_CATEGORIES,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('name', 'entries_count', 'direct_sub_categories_count', 'parent_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'categoryPeer',
+						'int_ids_only' => true,
+						'columns' => array('NAME', 'ENTRIES_COUNT', 'DIRECT_SUB_CATEGORIES_COUNT', 'PARENT_ID'),
+					),
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('parent_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'categoryPeer',
+						'int_ids_only' => true,
+						'columns' => array('NAME'),
+					),
+				),
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
+		),
+
+		ReportType::INTERACTIVE_VIDEO_NODE_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR1,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
+		),
+
+		ReportType::INTERCATIVE_VIDEO_NODE_SWITCH_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR3,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN)
+				)
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
 		),
 
 	);

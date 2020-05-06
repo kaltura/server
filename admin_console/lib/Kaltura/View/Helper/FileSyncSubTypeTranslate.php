@@ -10,37 +10,43 @@ class Kaltura_View_Helper_FileSyncSubTypeTranslate extends Zend_View_Helper_Abst
 		switch($objectSubType)
 		{
 			case 1: // FILE_SYNC_ENTRY_SUB_TYPE_DATA = 1;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::DATA');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA');
 				
 			case 2: // FILE_SYNC_ENTRY_SUB_TYPE_DATA_EDIT = 2;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::DATA_EDIT');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DATA_EDIT');
 				
 			case 3: // FILE_SYNC_ENTRY_SUB_TYPE_THUMB = 3;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::THUMB');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::THUMB');
 				
 			case 4: // FILE_SYNC_ENTRY_SUB_TYPE_ARCHIVE = 4;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::ARCHIVE');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::ARCHIVE');
 				
 			case 5: // FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD = 5;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::DOWNLOAD');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::DOWNLOAD');
 				
 			case 6: // FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB = 6;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::OFFLINE_THUMB');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::OFFLINE_THUMB');
 				
 			case 7: // FILE_SYNC_ENTRY_SUB_TYPE_ISM = 7;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::ISM');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::ISM');
 				
 			case 8: // FILE_SYNC_ENTRY_SUB_TYPE_ISMC = 8;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::ISMC');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::ISMC');
 				
 			case 9: // FILE_SYNC_ENTRY_SUB_TYPE_CONVERSION_LOG = 9;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::CONVERSION_LOG');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::CONVERSION_LOG');
 				
 			case 10: // FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY = 10;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::LIVE_PRIMARY');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_PRIMARY');
 				 
 			case 11: // FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY = 11;
-				return $this->view->translate('Kaltura_Client_Enum_FileSyncObjectType::ENTRY::LIVE_SECONDARY');
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::LIVE_SECONDARY');
+
+			case 12:
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::INTERACTIVITY_DATA');
+
+			case 13:
+				return $this->view->translate('Kaltura_Client_FileSync_Enum_FileSyncObjectType::ENTRY::VOLATILE_INTERACTIVITY_DATA');
 	
 			default:
 				return $this->view->translate("unknown entry sub type [$objectSubType]");

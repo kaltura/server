@@ -369,20 +369,23 @@ class playManifestAction extends kalturaAction
 	{
 		switch ($this->entry->getType())
 		{
-		case entryType::MEDIA_CLIP:
-			if(!in_array($this->entry->getMediaType(), array(
-					entry::ENTRY_MEDIA_TYPE_VIDEO,
-					entry::ENTRY_MEDIA_TYPE_AUDIO)))
-				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-			break;
-			
-		case entryType::PLAYLIST: 
-			if ($this->entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
-				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
-			break;
+			case entryType::MEDIA_CLIP:
+				if(!in_array($this->entry->getMediaType(), array(
+						entry::ENTRY_MEDIA_TYPE_VIDEO,
+						entry::ENTRY_MEDIA_TYPE_AUDIO)))
+					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
+
+			case entryType::LIVE_CHANNEL:
+				break;
+
+			case entryType::PLAYLIST:
+				if ($this->entry->getMediaType() != entry::ENTRY_MEDIA_TYPE_TEXT)
+					KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+				break;
 				
-		default:
-			KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
+			default:
+				KExternalErrors::dieError(KExternalErrors::INVALID_ENTRY_TYPE);
 		}
 	}
 	
@@ -425,7 +428,7 @@ class playManifestAction extends kalturaAction
 		$key = $this->getFlavorKeyByTag($flavorAssets, assetParams::TAG_ISM_MANIFEST, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 				
 		if(!$key)
-			$key = $this->entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
+			$key = $this->entry->getSyncKey(kEntryFileSyncSubType::ISM);
 			
 		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
@@ -541,10 +544,12 @@ class playManifestAction extends kalturaAction
 		return true;
 	}
 
-	protected function initPlaylistFlavorAssetArray()
+	protected function initPlaylistFlavorAssetArray($playlist = null)
 	{
-		list($entryIds, $durations, $mediaEntry, $captionFiles) =
-			myPlaylistUtils::executeStitchedPlaylist($this->entry);
+		$entry = !is_null($playlist) ? $playlist : $this->entry;
+
+		list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry);
+
 		if (!$mediaEntry)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
@@ -667,6 +672,9 @@ class playManifestAction extends kalturaAction
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
 		$remoteFileSyncs = array();
+
+		$cloudFlavorsByDc = array();
+		$cloudFileSyncs = array();
 		
 		foreach($flavorAssets as $flavorAsset)
 		{
@@ -676,15 +684,24 @@ class playManifestAction extends kalturaAction
 			$c = new Criteria();
 			$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 			$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
-			
+
+			$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+
 			switch ($servePriority)
 			{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				if(!$cloudStorageIds)
+				{
+					$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+				}
 				break;
 				
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+				if($cloudStorageIds)
+				{
+					$c->add(FileSyncPeer::DC, $cloudStorageIds, Criteria::NOT_IN);
+				}
 				break;
 			}
 			
@@ -697,8 +714,16 @@ class playManifestAction extends kalturaAction
 				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 				{
 					$dc = $fileSync->getDc();
-					$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
-					$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+					if(!in_array($dc, $cloudStorageIds))
+					{
+						$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+						$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+					}
+					else
+					{
+						$cloudFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+						$cloudFileSyncs[$dc][$flavorId] = $fileSync;
+					}
 				}
 				else
 				{
@@ -731,26 +756,40 @@ class playManifestAction extends kalturaAction
 				unset($remoteFileSyncs[$storageProfileId]);
 			}
 		}
-		
+
 		// choose the storage profile with the highest number of flavors
-		$maxDc = null;
-		$maxDcFlavorCount = 0;
-		$remoteFlavors = array();
-		foreach ($remoteFlavorsByDc as $dc => $curDcFlavors)
+		list ($maxDc, $remoteFlavors) = $this->getMaxDcFlavors($remoteFlavorsByDc);
+
+		if($cloudFileSyncs && count($localFlavors) == 0)
 		{
-			$curDcFlavorCount = count($curDcFlavors);
-			if ($curDcFlavorCount <= $maxDcFlavorCount)
-				continue;
-			$maxDc = $dc;
-			$maxDcFlavorCount = $curDcFlavorCount;
-			$remoteFlavors = $curDcFlavors;
+			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
+			foreach ($cloudStorageProfiles as $cloudProfile)
+			{
+				if(!$this->shouldIncludeStorageProfile($cloudProfile))
+				{
+					$profileId = $cloudProfile->getId();
+					unset($cloudFlavorsByDc[$profileId]);
+					unset($cloudFileSyncs[$profileId]);
+				}
+			}
 		}
+		list ($cloudMaxDc, $cloudRemoteFlavors) = $this->getMaxDcFlavors($cloudFlavorsByDc);
 				
 		// choose the flavor set according to the serve priority
-		if ($this->shouldUseLocalFlavors($localFlavors, $remoteFlavors))
+		if ($this->shouldUseLocalFlavors(array_merge($localFlavors, $cloudRemoteFlavors), $remoteFlavors))
 		{
-			$this->deliveryAttributes->setStorageId(null);
-			$this->deliveryAttributes->setFlavorAssets($localFlavors);
+			$storageId = null;
+			$deliveryFlavors = $localFlavors;
+
+			if($cloudMaxDc && (count($localFlavors) == 0))
+			{
+				$storageId = $cloudMaxDc;
+				$deliveryFlavors = $cloudRemoteFlavors;
+				$this->deliveryAttributes->setRemoteFileSyncs($cloudFileSyncs[$cloudMaxDc]);
+			}
+
+			$this->deliveryAttributes->setStorageId($storageId);
+			$this->deliveryAttributes->setFlavorAssets($deliveryFlavors);
 		}
 		else if ($maxDc)
 		{
@@ -821,7 +860,7 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 				
 		// storage doesn't belong to the partner
-		if($storageProfile->getPartnerId() != $this->entry->getPartnerId())
+		if(($storageProfile->getPartnerId() != $this->entry->getPartnerId()) && !$storageProfile->getExportPeriodically())
 			KExternalErrors::dieGracefully();			// TODO use a dieError
 	}
 	
@@ -866,28 +905,33 @@ class playManifestAction extends kalturaAction
 		
 		switch($this->entry->getType())
 		{
-		case entryType::PLAYLIST:
-			$this->initPlaylistFlavorAssetArray();
-			break;
-		
-		case entryType::MEDIA_CLIP:
-			if ($this->deliveryAttributes->getSequence())
-			{
-				$sequenceArr = explode(',',$this->deliveryAttributes->getSequence());
-				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
-				if (count($sequenceEntries))
+			case entryType::PLAYLIST:
+				$this->initPlaylistFlavorAssetArray();
+				break;
+
+			case entryType::LIVE_CHANNEL:
+				$playlist = entryPeer::retrieveByPK($this->entry->getPlaylistId());
+				$this->initPlaylistFlavorAssetArray($playlist);
+				break;
+
+			case entryType::MEDIA_CLIP:
+				if ($this->deliveryAttributes->getSequence())
 				{
-					$this->deliveryAttributes->setHasValidSequence(true);
-					list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
-					$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
+					$sequenceArr = explode(',',$this->deliveryAttributes->getSequence());
+					$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
+					if (count($sequenceEntries))
+					{
+						$this->deliveryAttributes->setHasValidSequence(true);
+						list($entryIds, $durations, $mediaEntry, $captionFiles) = myPlaylistUtils::getPlaylistDataFromEntries($sequenceEntries, null, null);
+						$this->setPlaylistFlavorAssets($durations, $this->entry->getId());
+					}
 				}
-			}
-			if (!$this->deliveryAttributes->getHasValidSequence())
-			{
-				$this->initFlavorAssetArray();
-				$this->initEntryDuration();
-			}
-			break;
+				if (!$this->deliveryAttributes->getHasValidSequence())
+				{
+					$this->initFlavorAssetArray();
+					$this->initEntryDuration();
+				}
+				break;
 		}
 		
 		if ($this->duration && $this->duration < 10 && $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
@@ -1261,13 +1305,13 @@ class playManifestAction extends kalturaAction
 		{
 			case entryType::PLAYLIST:
 			case entryType::MEDIA_CLIP:
+			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
 				$entryType = 'vod';
 				break;
 				
 			case entryType::LIVE_STREAM:			
-			case entryType::LIVE_CHANNEL:
 				// Live stream
 				$renderer = $this->serveLiveEntry();
 				$entryType = 'live';
@@ -1437,5 +1481,24 @@ class playManifestAction extends kalturaAction
 			return true;
 		}
 		return false;
+	}
+
+	protected function getMaxDcFlavors($remoteFlavorsByDc)
+	{
+		// choose the storage profile with the highest number of flavors
+		$maxDc = null;
+		$maxDcFlavorCount = 0;
+		$remoteFlavors = array();
+		foreach ($remoteFlavorsByDc as $dc => $curDcFlavors)
+		{
+			$curDcFlavorCount = count($curDcFlavors);
+			if ($curDcFlavorCount <= $maxDcFlavorCount)
+				continue;
+			$maxDc = $dc;
+			$maxDcFlavorCount = $curDcFlavorCount;
+			$remoteFlavors = $curDcFlavors;
+		}
+
+		return array($maxDc, $remoteFlavors);
 	}
 }

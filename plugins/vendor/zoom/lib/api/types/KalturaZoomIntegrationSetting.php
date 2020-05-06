@@ -31,12 +31,12 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	public $createUserIfNotExist;
 
 	/**
-	 * @var kalturaHandleParticipantsMode
+	 * @var KalturaHandleParticipantsMode
 	 */
 	public $handleParticipantMode;
 
 	/**
-	 * @var string
+	 * @var KalturaZoomUsersMatching
 	 */
 	public $zoomUserMatchingMode;
 

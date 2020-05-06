@@ -10,6 +10,23 @@ if(strtoupper(PHP_SAPI) != 'CLI' && strtoupper(PHP_SAPI) != 'CGI-FCGI')
 	exit (1);
 }
 
+function gracefulShutDown($signal)
+{
+	global $kscheduler;
+	echo "Got signal [$signal] from terminal";
+	$kscheduler->preKill($signal);
+}
+
+function shutDown($signal)
+{
+	global $kscheduler;
+	echo "Got signal [$signal] from terminal";
+	exit(0);
+}
+
+pcntl_signal(SIGINT, 'gracefulShutDown');
+pcntl_signal(SIGTERM, 'shutDown');
+
 $phpPath = 'php';
 if(isset($argc) && $argc > 1)
 {

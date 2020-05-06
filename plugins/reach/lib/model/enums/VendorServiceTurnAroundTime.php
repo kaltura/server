@@ -7,6 +7,17 @@ interface VendorServiceTurnAroundTime extends BaseEnum
 {
 	const BEST_EFFORT           = -1;
 	const IMMEDIATE             = 0;
+
+	//Values represent Business Days: Reserved (1-30)
+	const ONE_BUSINESS_DAY      = 1;
+	const TWO_BUSINESS_DAYS     = 2;
+	const THREE_BUSINESS_DAYS   = 3;
+	const FOUR_BUSINESS_DAYS    = 4;
+	const FIVE_BUSINESS_DAYS    = 5;
+	const SIX_BUSINESS_DAYS     = 6;
+	const SEVEN_BUSINESS_DAYS   = 7;
+
+	//Values represent Seconds
 	const THIRTY_MINUTES        = 1800;
 	const TWO_HOURS             = 7200;
 	const THREE_HOURS           = 10800;

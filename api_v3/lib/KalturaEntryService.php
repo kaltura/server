@@ -527,7 +527,7 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setDimensions($width, $height);
 			$dbEntry->setData(".jpg"); // this will increase the data version
 			$dbEntry->save();
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			try
 			{
 				kFileSyncUtils::moveFromFile($entryFullPath, $syncKey, true, $copyOnly);
@@ -625,7 +625,7 @@ class KalturaEntryService extends KalturaBaseService
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 	   		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey);
 	   		
 			$dbEntry->setStatus(entryStatus::READY);
@@ -779,7 +779,7 @@ class KalturaEntryService extends KalturaBaseService
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$syncKey = $dbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			foreach($resources as $currentResource)
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($currentResource->getStorageProfileId());
@@ -1164,9 +1164,6 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry = $this->prepareEntryForInsert($newEntry);
 	  	$dbEntry->setSourceId( $srcEntry->getId() );
 	  	
-	 	$kshow = $this->createDummyKShow();
-		$kshowId = $kshow->getId();
-		
 		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
 		if(!$flavorAsset)
 		{
@@ -1227,7 +1224,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, kEntryFileSyncSubType::DATA);
 		$c->add(FileSyncPeer::OBJECT_ID, $entryId);
 		$c->add(FileSyncPeer::VERSION, $dbEntry->getVersion());
 		$c->add(FileSyncPeer::PARTNER_ID, $dbEntry->getPartnerId());
@@ -1545,22 +1542,6 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 	
-
-	protected function createDummyKShow()
-	{
-		$kshow = new kshow();
-		$kshow->setName(kshow::DUMMY_KSHOW_NAME);
-		$kshow->setProducerId($this->getKuser()->getId());
-		$kshow->setPartnerId($this->getPartnerId());
-		$kshow->setSubpId($this->getPartnerId() * 100);
-		$kshow->setViewPermissions(kshow::KSHOW_PERMISSION_EVERYONE);
-		$kshow->setPermissions(kshow::PERMISSIONS_PUBLIC);
-		$kshow->setAllowQuickEdit(true);
-		$kshow->save();
-		
-		return $kshow;
-	}
-	
 	protected function updateEntry($entryId, KalturaBaseEntry $entry, $entryType = null)
 	{
 		$entry->type = null; // because it was set in the constructor, but cannot be updated
@@ -1621,7 +1602,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 	}
 	
-	protected function updateThumbnailForEntryFromUrl($entryId, $url, $entryType = null, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	protected function updateThumbnailForEntryFromUrl($entryId, $url, $entryType = null, $fileSyncType = kEntryFileSyncSubType::THUMB)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 
@@ -1651,7 +1632,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $entry;
 	}
 	
-	protected function updateThumbnailJpegForEntry($entryId, $fileData, $entryType = null, $fileSyncType = entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB)
+	protected function updateThumbnailJpegForEntry($entryId, $fileData, $entryType = null, $fileSyncType = kEntryFileSyncSubType::THUMB)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 

@@ -116,6 +116,8 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_PLAYMANIFEST = 'playManifest';
 	const EVENT_TYPE_REGISTERED = 'registered';
 	const EVENT_TYPE_REGISTRATION_IMPRESSION = 'registrationImpression';
+	const EVENT_TYPE_HOTSPOT_CLICKED = 'hotspotClicked';
+	const EVENT_TYPE_NODE_SWITCH = 'nodeSwitch';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -195,6 +197,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_ROOT_ENTRY_ID => 1,
 			self::DIMENSION_NODE_ID => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
@@ -328,6 +332,7 @@ class kKavaBase extends kDruidBase
 		'expressrecorder' => 'Express Recorder',
 		'kmsnativeandroid' => 'KMS GO Android',
 		'kmsnativeios' => 'KMS GO iOS',
+		'kalturameeting' => 'Kaltura Meeting',
 	);
 
 	protected static $sourceTypes = array(

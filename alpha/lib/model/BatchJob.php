@@ -188,17 +188,23 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	}
 	
 	public function postInsert(PropelPDO $con = null) {
-	
+
 		if((!$this->root_job_id && $this->id) || ($this->useNewRoot))
 		{
 			// set the root to point to itself
 			$this->setRootJobId($this->id);
-			$res = parent::save($con);
 		}
 	
 		if(BatchJobLockPeer::shouldCreateLockObject($this,true, $con)) 
+		{
 			BatchJobLockPeer::createLockObject($this);
-	
+		}
+
+		if ($this->isModified())
+		{
+			parent::save($con);
+		}
+
 		return parent::postInsert($con);
 	}
 	

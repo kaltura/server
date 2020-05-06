@@ -160,7 +160,7 @@ class DataService extends KalturaEntryService
 		
 		$fileName = $dbEntry->getName();
 		
-		$syncKey = $dbEntry->getSyncKey( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , $version);
+		$syncKey = $dbEntry->getSyncKey( kEntryFileSyncSubType::DATA , $version);
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		
 		header("Content-Disposition: attachment; filename=\"$fileName\"");

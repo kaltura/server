@@ -37,9 +37,30 @@ class kParentChildEntryUtils
 		foreach ($entries as $entry)
 		{
 			/** @var $entry entry */
-			$parentEntryIds[] = !is_null($entry->getParentEntryId()) ? $entry->getParentEntryId() : $entry->getId();
+			if (!is_null($entry->getParentEntryId()) && $entry->getParentEntryId() !== '')
+			{
+				$parentEntryIds[] = $entry->getParentEntryId();
+			}
+			else
+			{
+				$parentEntryIds[] = $entry->getId();
+			}
 		}
 		myDbHelper::$use_alternative_con = null;
 		return array_unique($parentEntryIds);
+	}
+	
+	/**
+	 * @param $asset
+	 * @param $entryId
+	 * @return bool
+	 */
+	public static function shouldCopyAsset($asset, $originalEntryId)
+	{
+		if ($asset instanceof captionAsset && $asset->getEntryId() != $originalEntryId)
+		{
+			return false;
+		}
+		return true;
 	}
 }
