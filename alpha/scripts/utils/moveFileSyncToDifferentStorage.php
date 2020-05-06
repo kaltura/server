@@ -15,7 +15,7 @@ $lastUpdatedAt = $argv[3];
 $dryRun = $argv[4] != 'realrun';
 if (!$storageId)
 {
-	KalturaLog::debug(" No Stroge Id");
+	KalturaLog::warning('No Storage Id');
 	exit(0);
 }
 
@@ -43,7 +43,7 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 	$partner = PartnerPeer::retrieveByPK($partnerId);
 	if (!$partner)
 	{
-		KalturaLog::debug("Partner [$partnerId] does not exists ");
+		KalturaLog::warning("Partner [$partnerId] does not exists");
 		exit(0);
 	}
 
@@ -65,18 +65,18 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 
 		$fileSyncs = FileSyncPeer::doSelect($criteria);
 		KalturaLog::debug("Found: " . count($fileSyncs) . " file syncs to copy");
-		foreach ($fileSyncs as $fileSync)
+		foreach ($fileSyncs as /** @var FileSync $fileSync **/ $fileSync)
 		{
-			/** @var FileSync $fileSync */
-			KalturaLog::debug('Handling file sync with id ' . $fileSync->getId());
-			//create new fileSync With status pending and new storageId
-			$newfileSync = $fileSync->copy(true);
-			$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
-			$newfileSync->setSrcPath($fileSync->getFullPath());
-			$newfileSync->setSrcEncKey($fileSync->getSrcEncKey());
-			$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
-			$newfileSync->setDc($storageId);
-			$newfileSync->save();
+			try
+			{
+				KalturaLog::debug('Handling file sync with id ' . $fileSync->getId());
+				$newfileSync = $fileSync->createFileSyncCopyForStorageExport($storageId);
+				KalturaLog::debug('New FileSync created ' . $newfileSync->getId());
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::warning("Could not create newFileSync for fileSync [".$fileSync->getId()."]" . $e->getMessage());
+			}
 			$lastHandledId = $fileSync->getId();
 		}
 		kMemoryManager::clearMemory();

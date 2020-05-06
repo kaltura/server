@@ -271,7 +271,27 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
 	public function getIv() {return kConf::get("encryption_iv");}
 
+	/**
+	 * Create new fileSync With status pending and new storageId
+	 * @param $storageId
+	 * @return FileSync
+	 * @throws PropelException
+	 */
+	public function createFileSyncCopyForStorageExport($storageId)
+	{
+		$newfileSync = $this->copy(true);
+		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
+		$newfileSync->setSrcPath($this->getFullPath());
+		$newfileSync->setSrcEncKey($this->getSrcEncKey());
+		$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$newfileSync->setDc($storageId);
 
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
+		list($root, $filePath) = kPathManager::getFilePathArr($fileSyncKey, $storageId);
+		$newfileSync->setFilePath($filePath);
+		$newfileSync->save();
+		return $newfileSync;
+	}
 }
 
 
