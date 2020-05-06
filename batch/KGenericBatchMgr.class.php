@@ -24,8 +24,12 @@ function shutDown($signal)
 	exit(0);
 }
 
-pcntl_signal(SIGINT, 'gracefulShutDown');
-pcntl_signal(SIGTERM, 'shutDown');
+//Windows machines by default do not have the pcntl installed, so check if function exists before calling it
+if(function_exists("pcntl_signal"))
+{
+	pcntl_signal(SIGINT, 'gracefulShutDown');
+	pcntl_signal(SIGTERM, 'shutDown');
+}
 
 $phpPath = 'php';
 if(isset($argc) && $argc > 1)
