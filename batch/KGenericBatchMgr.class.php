@@ -24,7 +24,7 @@ function shutDown($signal)
 	exit(0);
 }
 
-//Windows machines do not support pcntl by default so check if function exists before calling it
+//Windows machines by default do not have the pcntl installed, so check if function exists before calling it
 if(function_exists("pcntl_signal"))
 {
 	pcntl_signal(SIGINT, 'gracefulShutDown');
