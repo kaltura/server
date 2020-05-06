@@ -42,6 +42,11 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 	 * Deleted via api
 	 */
 	const UPLOAD_TOKEN_DELETED = 5;
+	
+	/**
+	 * Upload put in error state
+	 */
+	const UPLOAD_TOKEN_ERROR = 6;
 
 	public function save(PropelPDO $con = null, $skipReload = false)
 	{

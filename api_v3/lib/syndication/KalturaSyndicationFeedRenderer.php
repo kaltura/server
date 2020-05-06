@@ -17,7 +17,10 @@ class KalturaSyndicationFeedRenderer
 	const PAGE_SIZE_MAX_VALUE = 500;
 
 	const DYNAMIC_TOTAL_RESULTS = 200;
-	
+
+	const SYNDICATION_MAP = 'syndication';
+	const PLAYLIST_EXECUTION_LIMIT_PARTNERS = 'playlistExecutionLimitPartners';
+
 	/**
 	 * Maximum number of items to list
 	 * @var int
@@ -329,7 +332,7 @@ class KalturaSyndicationFeedRenderer
 			return $c->getRecordsCount();
 		}
 
-		if ($this->dynamicPlaylist)
+		if ($this->shouldUseDynamicPlaylist())
 		{
 			return $this->getEntriesCountFromDynamic($actualEntryCount);
 		}
@@ -398,7 +401,7 @@ class KalturaSyndicationFeedRenderer
 
 	public function getNextEntryByPlaylistType()
 	{
-		if ($this->dynamicPlaylist)
+		if ($this->shouldUseDynamicPlaylist())
 		{
 			return $this->getNextEntryViaDynamic();
 		}
@@ -406,6 +409,17 @@ class KalturaSyndicationFeedRenderer
 		{
 			return $this->getNextEntry();
 		}
+	}
+
+	protected function shouldUseDynamicPlaylist()
+	{
+		$playlistExecutionLimitPartners = kConf::get(self::PLAYLIST_EXECUTION_LIMIT_PARTNERS, self::SYNDICATION_MAP, array());
+		if (is_array($playlistExecutionLimitPartners)
+			&& in_array($this->syndicationFeed->partnerId, $playlistExecutionLimitPartners))
+		{
+			return false;
+		}
+		return $this->dynamicPlaylist;
 	}
 
 	public function getNextEntryViaDynamic()

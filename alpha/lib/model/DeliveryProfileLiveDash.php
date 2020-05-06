@@ -29,9 +29,9 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 		return false;
 	}
 
-	protected function getHttpUrl($serverNode)
+	protected function getHttpUrl($entryServerNode)
 	{
-		$baseUrl = $this->getBaseUrl($serverNode);
+		$baseUrl = $this->getBaseUrl($entryServerNode->serverNode);
 		return rtrim($baseUrl, "/") . "/" . $this->getStreamName() . "/manifest.mpd" . $this->getQueryAttributes();
 	}
 	

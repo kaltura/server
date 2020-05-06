@@ -4,6 +4,7 @@
 class LiveClusterMediaServerNode extends MediaServerNode
 {
     const ENVIRONMENT = 'env';
+    const SESSION_ID = 'sid';
 
     /**
      * Applies default values to this object.
@@ -42,5 +43,10 @@ class LiveClusterMediaServerNode extends MediaServerNode
     public function getEnvDc()
     {
         return self::ENVIRONMENT . '/' . $this->getEnvironment();
+    }
+
+    public function getSessionIdUrlString($entryServerNode)
+    {
+        return self::SESSION_ID . '/' . $entryServerNode->getId() . '/';
     }
 }

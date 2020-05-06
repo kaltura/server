@@ -4,6 +4,51 @@
  */
 class kReachUtils
 {
+	static private $dateFields = array('createdAt', 'updatedAt');
+	static private $catalogItemTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime','outputFormat');
+
+	static private $statusEnumTranslate = array(
+		1 => "DEPRECATED",
+		2 => "ACTIVE",
+		3 => "DELETED",
+	);
+
+	static private $outputFormatEnumTranslate = array(
+		1 => "SRT",
+		2 => "DFXP",
+	);
+
+	static private $turnAroundTimeEnumTranslate = array(
+		-1 => "BEST_EFFORT",
+		0 => "IMMEDIATE",
+		1800 => "THIRTY_MINUTES",
+		7200 => "TWO_HOURS",
+		10800 => "THREE_HOURS",
+		21600 => "SIX_HOURS",
+		28800 => "EIGHT_HOURS",
+		43200 => "TWELVE_HOURS",
+		86400 => "TWENTY_FOUR_HOURS",
+		172800 => "FORTY_EIGHT_HOURS",
+		345600 => "FOUR_DAYS",
+		432000 => "FIVE_DAYS",
+		864000 => "TEN_DAYS",
+	);
+
+	static private $serviceFeatureEnumTranslate = array(
+		1 => "CAPTIONS",
+		2 => "TRANSLATION",
+		3 => "ALIGNMENT",
+		4 => "AUDIO_DESCRIPTION",
+		5 => "CHAPTERING",
+		"N/A" => "N/A",
+	);
+
+	static private $serviceTypeEnumTranslate = array(
+		1 => "HUMAN",
+		2 => "MACHINE",
+		"N/A" => "N/A",
+	);
+
 	/**
 	 * @param $entryId
 	 * @param $shouldModerateOutput
@@ -177,4 +222,110 @@ class kReachUtils
 		return $result;
 	}
 
+	/**
+	 * @return array
+	 */
+	public static function getVendorCatalogItemsCsvHeaders()
+	{
+		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId');
+	}
+
+	/**
+	 * @param $catalogItemValues
+	 * @return string
+	 */
+	public static function createCatalogItemCsvRowData($catalogItemValues)
+	{
+		$csvData = array();
+		foreach (self::$dateFields as $dateField)
+		{
+			if (isset($catalogItemValues[$dateField]))
+			{
+				$catalogItemValues[$dateField] = self::getHumanReadbaleDate($catalogItemValues[$dateField]);
+			}
+		}
+
+		foreach (self::$catalogItemTranslateableFields as $catalogItemTranslateableField)
+		{
+			if (isset($catalogItemValues[$catalogItemTranslateableField]))
+			{
+				$catalogItemValues[$catalogItemTranslateableField] = self::translateEnumsToHumanReadable($catalogItemTranslateableField, $catalogItemValues[$catalogItemTranslateableField]);
+			}
+		}
+
+		foreach (self::getVendorCatalogItemsCsvHeaders() as $field)
+		{
+			if (isset($catalogItemValues[$field]))
+			{
+				$csvData[$field] = $catalogItemValues[$field];
+			}
+			else
+			{
+				$csvData[$field] = 'N\A';
+			}
+		}
+		$csvData = KCsvWrapper::validateCsvFields($csvData);
+		return implode(',',$csvData);
+	}
+
+	/**
+	 * @param $object
+	 * @return array|null
+	 */
+	public static function getObejctValues($object)
+	{
+		if (!$object)
+		{
+			return null;
+		}
+		$values = get_object_vars($object);
+		$additionalValues = array();
+		foreach ($values as $key => $value)
+		{
+			if (is_object($value))
+			{
+				$objectValues = self::getObejctValues($value);
+				foreach ($objectValues as $innerKey => $innerValue)
+				{
+					$additionalValues[$key . ':' . $innerKey] = $innerValue;
+				}
+				unset($values[$key]);
+			}
+		}
+		return array_merge($values,$additionalValues);
+	}
+
+	/**
+	 * @param $enumName
+	 * @param $enumValue
+	 * @return string
+	 */
+	protected static function translateEnumsToHumanReadable($enumName, $enumValue)
+	{
+		if (!self::${$enumName . "EnumTranslate"})
+		{
+			return 'N\A';
+		}
+
+		if (!isset(self::${$enumName . "EnumTranslate"}[$enumValue]))
+		{
+			return 'N\A';
+		}
+
+		return self::${$enumName . "EnumTranslate"}[$enumValue];
+	}
+
+	/**
+	 * @param $unixTimeStamp
+	 * @return false|string
+	 */
+	protected static function getHumanReadbaleDate($unixTimeStamp)
+	{
+		if (!$unixTimeStamp)
+		{
+			return 'N\A';
+		}
+
+		return date("Y-m-d H:i", $unixTimeStamp);
+	}
 }

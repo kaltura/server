@@ -8,9 +8,9 @@ class DeliveryProfileLivePackagerMss extends DeliveryProfileLive
 		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 	}
 	
-	protected function getHttpUrl($serverNode)
+	protected function getHttpUrl($entryServerNode)
 	{
-		$httpUrl = $this->getLivePackagerUrl($serverNode);
+		$httpUrl = $this->getLivePackagerUrl($entryServerNode);
 		$httpUrl .= "manifest";
 		
 		foreach($this->getDynamicAttributes()->getFlavorParamIds() as $flavorId)

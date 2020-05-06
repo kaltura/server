@@ -52,6 +52,10 @@ class kBusinessConvertDL
 		$nonExistingNonReadyAssets = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
 
+		$existingReadyAssets = assetPeer::retrieveByIds($existingReadyAssetIds);
+		$allReadyAssets = array_merge($existingReadyAssets, $nonExistingReadyAssets);
+		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $allReadyAssets);
+
 		if($lock)
 		{
 			$lock->unlock();
@@ -160,7 +164,7 @@ class kBusinessConvertDL
 		$entry->save();
 
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$entrySyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 	}
 

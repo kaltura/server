@@ -3,9 +3,11 @@
  * @package Scheduler
  * @subpackage Conversion.engines
  */
+
 class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 {
 	const CHUNKED_FFMPEG = "chunked_ffmpeg";
+	const CHUNKED_DIR = 'chunkenc';
 	
 	public function getName()
 	{
@@ -28,7 +30,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	'executionMode' config field used to differntiate between the modes, 
 	 *	allowed values - 'standalone'/'memcache'
 	 */
-	protected function execute_conversion_cmdline($command, &$returnVar)
+	protected function execute_conversion_cmdline($command, &$returnVar ,$jobId = null)
 	{
 		KalturaLog::log($command);
 		if(strstr($command,"ffmpeg")===false)
@@ -45,7 +47,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$output=$this->execute_chunked_encode_standalone($command, $returnVar);
 		}
 		else if($executionMode=="memcache"){
-			$output=$this->execute_chunked_encode_memcache($command, $returnVar);
+			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $jobId);
 		}
 		else {
 			$returnVar = -1;
@@ -66,7 +68,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	- chunkedEncodeMemcacheToken - token to differentiate between general/global Kaltura jobs and per customer dedicated servers (optional, default:null)
 	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
 	 */
-	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar)
+	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $jobId = null)
 	{
 		KalturaLog::log("Original cmdLine:$cmdLine");
 		
@@ -121,9 +123,30 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
 
-		$output = system($cmdLine, $returnVar);
+		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
+		{
+			$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $jobId);
+		}
+		else
+		{
+			$output = system($cmdLine, $returnVar);
+		}
 		KalturaLog::log("rv($returnVar),".print_r($output,1));
 		return $output;
+	}
+
+	protected function isConversionProgressing($currentModificationTime)
+	{
+		$dir = $this->inFilePath .'_'.self::CHUNKED_DIR.'/';
+		if (kFile::checkIsDir($dir))
+		{
+			$newModificationTime = kFileUtils::getMostRecentModificationTimeFromDir($dir);
+			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+			{
+				return $newModificationTime;
+			}
+		}
+		return false;
 	}
 	
 	/**

@@ -63,14 +63,14 @@ class updateentrythumbnailjpegAction extends defPartnerservices2Action
 
 		$thumb_data_size = strlen( $thumb_data );
 
-		$fileSyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$fileSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 		$fileSync = FileSync::createForFileSyncKey($fileSyncKey);
 		kFileSyncUtils::file_put_contents($fileSyncKey, $thumb_data );
 		
 		// update the metadata in case of a roughcut
 		if ($entry->getType() == entryType::MIX)
 		{
-			$sync_key = $entry->getSyncKey ( entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA );
+			$sync_key = $entry->getSyncKey ( kEntryFileSyncSubType::DATA );
 			$xml_doc = new DOMDocument();
 			$xml_doc->loadXML( kFileSyncUtils::file_get_contents( $sync_key ) );
 			if (myMetadataUtils::updateThumbUrl($xml_doc, $entry->getThumbnailUrl()))

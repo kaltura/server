@@ -133,7 +133,7 @@ class rawAction extends sfAction
 			$archive_file = $file_sync->getFullPath();
 			$mime_type = kFile::mimeType( $archive_file );
 						
-			kFileUtils::dumpFile($archive_file, $mime_type);
+			kFileUtils::dumpFile($archive_file, $mime_type, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
 		
 		// TODO - move to a different action - document should be plugin
@@ -175,12 +175,12 @@ class rawAction extends sfAction
 				$name = kString::removeNewLine($name. '.' .$ext);
 				header("Content-Disposition: attachment; filename=\"$name\"");
 			}
-			kFileUtils::dumpFile($file_sync->getFullPath());
+			kFileUtils::dumpFile($file_sync->getFullPath(), null, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
 		elseif ($entry->getType() == entryType::DATA)
 		{
 			$version = $this->getRequestParameter("version");
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA, $version);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA, $version);
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 			
 			$path = null;
@@ -201,7 +201,9 @@ class rawAction extends sfAction
 				header("HTTP/1.0 404 Not Found");
 			}
 			else
-				kFileUtils::dumpFile($path);
+			{
+				kFileUtils::dumpFile($path, null, null, 0, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSync->getFileSize());
+			}
 		}
 		
 		//$archive_file = $entry->getArchiveFile();
@@ -209,9 +211,9 @@ class rawAction extends sfAction
 		if ( $media_type == entry::ENTRY_MEDIA_TYPE_IMAGE )
 		{
 			// image - use data for entry
-			$file_sync = $this->redirectIfRemote ( $entry ,  entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA , null );
-			$key = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
-			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true));
+			$file_sync = $this->redirectIfRemote ( $entry ,  kEntryFileSyncSubType::DATA , null );
+			$key = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
+			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true),  null, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
 		elseif ( $media_type == entry::ENTRY_MEDIA_TYPE_VIDEO || $media_type == entry::ENTRY_MEDIA_TYPE_AUDIO  )
 		{
@@ -281,7 +283,7 @@ class rawAction extends sfAction
 				if($key !== FALSE)
 					unset($try_formats[$key]);
 				
-				$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $format, false);
+				$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $format, false);
 			}
 			
 			if(!isset($file_sync) || !$file_sync || !file_exists($file_sync->getFullPath()))
@@ -289,7 +291,7 @@ class rawAction extends sfAction
 				foreach($try_formats as $ext)
 				{
 					KalturaLog::log( "raw for mix - trying to find filesync for extension: [$ext] on entry [{$entry->getId()}]");
-					$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $ext, false);
+					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, false);
 					if($file_sync && file_exists($file_sync->getFullPath()))
 					{
 						KalturaLog::log( "raw for mix - found flattened video of extension: [$ext] continuing with this file {$file_sync->getFullPath()}");
@@ -298,13 +300,10 @@ class rawAction extends sfAction
 				}
 				if(!$file_sync || !file_exists($file_sync->getFullPath()))
 				{
-					$file_sync = $this->redirectIfRemote( $entry , entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD, $ext, true);
+					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, true);
 				}
 			}
-			
-			// use fileSync for entry - roughcuts don't have flavors
-			//$file_sync =  $this->redirectIfRemote ( $entry ,  entry::FILE_SYNC_ENTRY_SUB_TYPE_DOWNLOAD , $version , true );  // strict - nothing to do if no flattened version
-			
+
 			// if got to here - fileSync was found for one of the extensions - continue with that file
 			$archive_file = $file_sync->getFullPath();
 		}

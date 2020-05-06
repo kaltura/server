@@ -24,7 +24,7 @@ class kZoomMeetingProcessor extends kZoomRecordingProcessor
 		}
 	}
 
-	protected function parseAdditionalZoomUsers($additionalUsersZoomResponse, $userToExclude, $zoomIntegration)
+	protected function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration)
 	{
 		$participants = new kZoomParticipants();
 		$participants->parseData($additionalUsersZoomResponse);
@@ -35,11 +35,10 @@ class kZoomMeetingProcessor extends kZoomRecordingProcessor
 			$result = array();
 			foreach ($participantsEmails as $participantEmail)
 			{
-				$userName = $this->matchZoomUserName($participantEmail, $zoomIntegration);
-				if($userToExclude !== strtolower($userName))
-				{
-					$result[] = $userName;
-				}
+				$zoomUser = new kZoomUser();
+				$zoomUser->setOriginalName($participantEmail);
+				$zoomUser->setProcessedName($this->processZoomUserName($participantEmail, $zoomIntegration));
+				$result[] = $zoomUser;
 			}
 		}
 		else
