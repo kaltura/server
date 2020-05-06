@@ -277,7 +277,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	 * @return FileSync
 	 * @throws PropelException
 	 */
-	public function createFileSyncCopyForStorageExport($storageId)
+	public function cloneToAnotherStorage($storageId)
 	{
 		$newfileSync = $this->copy(true);
 		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
@@ -289,7 +289,6 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
 		list($root, $filePath) = kPathManager::getFilePathArr($fileSyncKey, $storageId);
 		$newfileSync->setFilePath($filePath);
-		$newfileSync->save();
 		return $newfileSync;
 	}
 }

@@ -70,7 +70,8 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 			try
 			{
 				KalturaLog::debug('Handling file sync with id ' . $fileSync->getId());
-				$newfileSync = $fileSync->createFileSyncCopyForStorageExport($storageId);
+				$newfileSync = $fileSync->cloneToAnotherStorage($storageId);
+				$newfileSync->save();
 				KalturaLog::debug('New FileSync created ' . $newfileSync->getId());
 			}
 			catch (Exception $e)
