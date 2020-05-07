@@ -225,6 +225,8 @@ class kPlaybackContextDataHelper
 		if($dbEntry->getType() == entryType::LIVE_STREAM)
 			return;
 
+		$storageIds = kConf::get('periodic_storage_ids','cloud_storage', array());
+
 		foreach ($this->flavorAssets as $flavorAsset)
 		{
 			$flavorId = $flavorAsset->getId();
@@ -236,7 +238,9 @@ class kPlaybackContextDataHelper
 			switch($servePriority)
 			{
 				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-					$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+					$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+					$c1->addOr( $c->getNewCriterion(FileSyncPeer::DC, $storageIds, Criteria::IN));
+					$c->addAnd($c1);
 					break;
 
 				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
@@ -413,7 +417,7 @@ class kPlaybackContextDataHelper
 		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $this->remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
-		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
+		if (!empty($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($remoteDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn, $contextDataHelper);
 
 		$this->filterDeliveryProfilesByStreamerType($remoteDeliveryProfiles, $contextDataHelper);
@@ -448,6 +452,7 @@ class kPlaybackContextDataHelper
 			}
 		}
 	}
+
 	/**
 	 * @param entry $dbEntry
 	 */
@@ -664,7 +669,7 @@ class kPlaybackContextDataHelper
 		switch ($servePriority)
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$this->playbackContext->setSources($this->localPlaybackSources);
+				$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
 				$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
