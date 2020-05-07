@@ -225,8 +225,6 @@ class kPlaybackContextDataHelper
 		if($dbEntry->getType() == entryType::LIVE_STREAM)
 			return;
 
-		$storageIds = kConf::get('periodic_storage_ids','cloud_storage', array());
-
 		foreach ($this->flavorAssets as $flavorAsset)
 		{
 			$flavorId = $flavorAsset->getId();
@@ -238,9 +236,7 @@ class kPlaybackContextDataHelper
 			switch($servePriority)
 			{
 				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-					$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-					$c1->addOr( $c->getNewCriterion(FileSyncPeer::DC, $storageIds, Criteria::IN));
-					$c->addAnd($c1);
+					$this->addKalturaOnlyFileSyncQueryPart($c);
 					break;
 
 				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
@@ -669,7 +665,7 @@ class kPlaybackContextDataHelper
 		switch ($servePriority)
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
+				$this->setPlaybackContextSourcesForKalturOnlyPriority();
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
 				$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
@@ -683,6 +679,21 @@ class kPlaybackContextDataHelper
 			default:
 				$this->playbackContext->setSources(array());
 				break;
+		}
+	}
+
+	private function setPlaybackContextSourcesForKalturOnlyPriority()
+	{
+		/** Since Kaltura only can now have remote source (when starting use S3 storage as kaltura local storage)
+		 *  we can now have "local" playback flavors in the remote sources.
+		 */
+		if (empty($this->remotePlaybackSources))
+		{
+			$this->playbackContext->setSources($this->localPlaybackSources);
+		}
+		else
+		{
+			$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
 		}
 	}
 
@@ -746,5 +757,20 @@ class kPlaybackContextDataHelper
 		$defaultDeliveryProfiles = DeliveryProfilePeer::getDefaultOrWhiteListedDeliveries($dbEntry, $dbEntry->getPartner(), $streamsTypesToExclude, $whiteListedDeliveryProfileIds);
 		$deliveryProfiles = array_merge($deliveryProfiles, $defaultDeliveryProfiles);
 		return $deliveryProfiles;
+	}
+
+	/**
+	 * @param Criteria $c
+	 */
+	private function addKalturaOnlyFileSyncQueryPart(Criteria $c)
+	{
+		/**
+		 * Since "Kaltura only" can now be local and from cloud storage (S3) we need to retrive local file syncs that are not url type
+		 * and retrieve file syncs from our dedicated cloud storages
+		 */
+		$storageIds = kConf::get('periodic_storage_ids', 'cloud_storage', array());
+		$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+		$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, $storageIds, Criteria::IN));
+		$c->addAnd($c1);
 	}
 }
