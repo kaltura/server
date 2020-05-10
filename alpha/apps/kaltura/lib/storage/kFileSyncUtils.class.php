@@ -1761,5 +1761,22 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return false;
 	}
 
+	public static function getFileSyncFromPeriodicStorage($asset, $syncKey)
+	{
+		$fileSync = null;
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
+		if($periodicStorageIds)
+		{
+			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+		}
+
+		if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+		}
+
+		return $fileSync;
+	}
+
 
 }

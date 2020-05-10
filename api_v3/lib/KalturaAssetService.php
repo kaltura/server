@@ -93,7 +93,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 					break;
 				}
 
-				$fileSync = kStorageExporter::getFileSyncFromPeriodicStorage($asset, $syncKey);
+				$fileSync = kFileSyncUtils::getFileSyncFromPeriodicStorage($asset, $syncKey);
 				$serveRemote = true;
 				break;
 		}

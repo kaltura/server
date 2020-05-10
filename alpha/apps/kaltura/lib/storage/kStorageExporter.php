@@ -96,7 +96,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if( ($object instanceof thumbAsset || $object instanceof captionAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
+		if( ($object instanceof thumbAsset || $object instanceof captionAsset) && $object->isLocalReadyStatus())
 			return true;
 
 		if ($object instanceof FileSync
@@ -524,7 +524,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$entryId = $object->getEntryId();
 		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$flavorTypes[] = CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
-		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE, asset::ASSET_STATUS_DELETED), $flavorTypes);
+		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING), $flavorTypes);
 		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$flavorsToExport = array();
 
@@ -655,23 +655,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 
 		return false;
-	}
-
-	public static function getFileSyncFromPeriodicStorage($asset, $syncKey)
-	{
-		$fileSync = null;
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
-		if($periodicStorageIds)
-		{
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-		}
-
-		if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))
-		{
-			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-		}
-
-		return $fileSync;
 	}
 
 }
