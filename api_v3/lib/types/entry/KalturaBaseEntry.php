@@ -382,6 +382,22 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 */
 	public $displayInSearch;
 
+	/**
+	 * Entry source application
+	 *
+	 * @var KalturaEntrySourceApplication
+	 * @insertonly
+	 */
+	public $sourceApplication;
+
+	/**
+	 * Entry source application version
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $sourceApplicationVersion;
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
@@ -430,6 +446,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"capabilities",
 		"templateEntryId",
 		"displayInSearch",
+		"sourceApplication",
+		"sourceApplicationVersion",
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -1857,6 +1857,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setOriginalCreationDate ( $v )	{	$this->putInCustomData ( "originalCreationDate" , $v);	}
 	public function getOriginalCreationDate() 	{	return $this->getFromCustomData( "originalCreationDate", null, null);	}
 
+	public function setSourceApplication ( $v )	{	$this->putInCustomData ( "sourceApplication" , $v);	}
+	public function getSourceApplication() 	{	return $this->getFromCustomData( "sourceApplication", null, null);	}
+
+	public function setSourceApplicationVersion ( $v )	{	$this->putInCustomData ( "sourceApplicationVersion" , $v);	}
+	public function getSourceApplicationVersion() 	{	return $this->getFromCustomData( "sourceApplicationVersion", null, null);	}
+
 
 	public function getParentEntry()
 	{
