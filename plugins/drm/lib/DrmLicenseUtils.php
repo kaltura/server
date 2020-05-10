@@ -111,4 +111,10 @@ class DrmLicenseUtils {
 
 		return $customData;
 	}
+
+	public static function prepareUrl($url)
+	{
+		$url = preg_replace('/\s+/', '', $url);
+		return $url;
+	}
 }

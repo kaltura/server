@@ -357,7 +357,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		array_walk($deliveries, "DeliveryProfileComparator::decorateWithUserOrder", $partnersDeliveryProfileIdsByUserOrder);
 		uasort($deliveries, array($cmp, "compare"));
-
 		return $deliveries;
 	}
 
@@ -473,7 +472,9 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 
 		self::filterDeliveryProfilesArray($deliveryIds, $deliveryAttributes);
-		$deliveries = DeliveryProfilePeer::retrieveByPKs($deliveryIds);
+
+		$deliveries = PeerUtils::retrieveByPKsOrdered('DeliveryProfilePeer', $deliveryIds);
+
 		$delivery = self::selectByDeliveryAttributes($storageProfile->getPartnerId(), $deliveries, $deliveryAttributes);
 		if($delivery) {
 			KalturaLog::info("Delivery ID for storageId [$storageId] ( PartnerId [" . $storageProfile->getPartnerId() . "] ) and streamer type [$streamerType] is " . $delivery->getId());
@@ -487,7 +488,6 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		return $delivery;
 	}
-	
 	/**
 	 * Selects between a list of deliveries by a requested media protocol
 	 * @param array $deliveries list of deliveries
@@ -839,6 +839,5 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		return $deliveryIds;
 	}
-
 } // DeliveryProfilePeer
 

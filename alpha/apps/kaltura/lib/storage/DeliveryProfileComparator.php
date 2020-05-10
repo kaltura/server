@@ -12,7 +12,12 @@ class DeliveryProfileComparator
 	
 	public static function decorateWithUserOrder(DeliveryProfile $v, $k , $originalOrder)
 	{
-		$v->userOrder = array_search($v->getId(), $originalOrder);
+		$value = array_search($v->getId(), $originalOrder);
+		if ($value === false)
+		{
+			$value = PHP_INT_MAX;
+		}
+		$v->userOrder = $value;
 	}
 
 	public function compare(DeliveryProfile $a,DeliveryProfile $b)
