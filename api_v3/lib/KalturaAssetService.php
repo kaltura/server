@@ -93,17 +93,8 @@ abstract class KalturaAssetService extends KalturaBaseService
 					break;
 				}
 
-				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
-				if($periodicStorageIds)
-				{
-					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-					$serveRemote = true;
-				}
-
-				if(!$fileSync || ($serveRemote && ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))))
-				{
-					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-				}
+				$fileSync = kStorageExporter::getFileSyncFromPeriodicStorage($asset, $syncKey);
+				$serveRemote = true;
 				break;
 		}
 		

@@ -34,15 +34,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return true;
 
 		// if changed object is flavor asset / thumb asset / caption asset
-		if(($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if(self::shouldHandleAssetObjectChanged($object, $modifiedColumns))
 			return true;
 
 		// if changed object is file sync
-		if ($object instanceof FileSync
-			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
-			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
-			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
-			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		if (self::shouldHandleFileSyncObjectChanged($object, $modifiedColumns))
 		{
 			return true;
 		}
@@ -69,17 +65,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 
 		// if changed object is flavor asset / thumb asset / caption asset
-		if ( ($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+		if (self::shouldHandleAssetObjectChanged($object, $modifiedColumns))
 		{
 			self::handleAssetStorageExports($object);
 		}
 
 		// if changed object is file sync
-		if ($object instanceof FileSync
-			&& in_array(FileSyncPeer::STATUS, $modifiedColumns)
-			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
-			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
-			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		if (self::shouldHandleFileSyncObjectChanged($object, $modifiedColumns))
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
 			if($storageProfile)
@@ -628,6 +620,58 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				self::exportFlavorAsset($object, $externalStorage);
 			}
 		}
+	}
+
+	protected static function shouldHandleAssetObjectChanged($object, $modifiedColumns)
+	{
+		if($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset)
+		{
+			if(in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected static function shouldHandleFileSyncObjectChanged($object, $modifiedColumns)
+	{
+		if(!($object instanceof FileSync))
+		{
+			return false;
+		}
+
+		// handle only file syncs from remote dc's (external storage)
+		if(in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			return false;
+		}
+
+		if (in_array(FileSyncPeer::STATUS, $modifiedColumns)
+			&& $object->getColumnsOldValue(FileSyncPeer::STATUS) == FileSync::FILE_SYNC_STATUS_PENDING
+			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	public static function getFileSyncFromPeriodicStorage($asset, $syncKey)
+	{
+		$fileSync = null;
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
+		if($periodicStorageIds)
+		{
+			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+		}
+
+		if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+		}
+
+		return $fileSync;
 	}
 
 }
