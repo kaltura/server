@@ -35,8 +35,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
 	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
-	const CUSTOM_DATA_REGULAR_PACKAGER_URL = 'regular_packager_url';
-	const CUSTOM_DATA_MAPPED_PACKAGER_URL = 'mapped_packager_url';
+	const CUSTOM_DATA_PACKAGER_URL = 'regular_packager_url';
 	const CUSTOM_DATA_EXPORT_PERIODICALLY = 'export_periodically';
 	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS = 'excluded_flavor_params_ids';
 	/**
@@ -440,23 +439,14 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, $v);
 	}
 
-	public function getRegularPackagerUrl()
+	public function getPackagerUrl()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_REGULAR_PACKAGER_URL,null, null);
+		return $this->getFromCustomData(self::CUSTOM_DATA_PACKAGER_URL,null, null);
 	}
 
 	public function setRegularPackagerUrl($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_REGULAR_PACKAGER_URL, $v);
-	}
-
-	public function getMappedPackagerUrl()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_MAPPED_PACKAGER_URL,null, null);
-	}
-	public function setMappedPackagerUrl($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_MAPPED_PACKAGER_URL, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_PACKAGER_URL, $v);
 	}
 
 	public function getExportPeriodically()
