@@ -88,9 +88,22 @@ abstract class KalturaAssetService extends KalturaBaseService
 			
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
 				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if(!$fileSync)
+				if($fileSync)
+				{
+					break;
+				}
+
+				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
+				if($periodicStorageIds)
+				{
+					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+					$serveRemote = true;
+				}
+
+				if(!$fileSync || ($serveRemote && ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))))
+				{
 					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-				
+				}
 				break;
 		}
 		

@@ -769,8 +769,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return;
 		}
 
+		$partnerIds = array($partnerId);
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+		if($periodicStorageIds)
+		{
+			$partnerIds[] = PartnerPeer::GLOBAL_PARTNER;
+		}
+
 		$criteria = new Criteria();
-		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
 		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(StorageProfilePeer::DELIVERY_PRIORITY);
 

@@ -1,3 +1,13 @@
+# Propus 16.2.0  #
+
+## Support export captions to remote storage ##
+- Issue Type: Task
+- Issue ID: PLAT-10846
+
+### Deployment scripts ###
+Run:
+	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
+
 # Propus 16.1.0 #
 
 ## import vendor catalog items from csv ##

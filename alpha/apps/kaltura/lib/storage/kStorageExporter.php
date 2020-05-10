@@ -32,9 +32,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		// if changed object is entry
 		if($object instanceof entry && in_array(entryPeer::MODERATION_STATUS, $modifiedColumns) && $object->getModerationStatus() == entry::ENTRY_MODERATION_STATUS_APPROVED)
 			return true;
-		
-		// if changed object is flavor asset or thumb asset
-		if(($object instanceof flavorAsset || $object instanceof thumbAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+
+		// if changed object is flavor asset / thumb asset / caption asset
+		if(($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			return true;
 
 		// if changed object is file sync
@@ -67,24 +67,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				}
 			}
 		}
-		
-		// if changed object is flavor asset
-		if ( ($object instanceof flavorAsset || $object instanceof thumbAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
+
+		// if changed object is flavor asset / thumb asset / caption asset
+		if ( ($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset) && in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 		{
-			$entry = $object->getentry();
-			
-			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-			if(!$externalStorages)
-			{
-				$externalStorages = self::getPeriodicStorageProfiles($object->getPartnerId());
-			}
-			foreach($externalStorages as $externalStorage)
-			{
-				if ($externalStorage->triggerFitsReadyAsset($entry->getId()))
-				{
-					self::exportFlavorAsset($object, $externalStorage);
-				}
-			}
+			self::handleAssetStorageExports($object);
 		}
 
 		// if changed object is file sync
@@ -117,7 +104,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if( $object instanceof thumbAsset && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
+		if( ($object instanceof thumbAsset || $object instanceof captionAsset) && PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE, $object->getPartnerId()) && $object->isLocalReadyStatus())
 			return true;
 
 		if ($object instanceof FileSync
@@ -128,16 +115,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		if($object instanceof thumbAsset)
+		if($object instanceof thumbAsset || $object instanceof captionAsset)
 		{
-			$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-			foreach($externalStorages as $externalStorage)
-			{
-				if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
-				{
-					self::exportFlavorAsset($object, $externalStorage);
-				}
-			}
+			self::handleAssetStorageExports($object);
 		}
 
 		if ($object instanceof FileSync)
@@ -550,13 +530,15 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return;
 		}
 		$entryId = $object->getEntryId();
-		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
+		$flavorTypes[] = CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
+		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING), $flavorTypes);
 		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$flavorsToExport = array();
 
 		foreach ($flavorAssets as $flavorAsset)
 		{
-			if(!$storageProfile->isFlavorAssetConfiguredForExport($flavorAsset))
+			if(!$storageProfile->shouldExportFlavorAsset($flavorAsset))
 			{
 				continue;
 			}
@@ -629,6 +611,22 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
 			kFlowHelper::addPeriodicStorageExports($asset->getEntryId(), $partner, $periodicStorageProfiles);
+		}
+	}
+
+	protected static function handleAssetStorageExports($object)
+	{
+		$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+		if(!$externalStorageProfiles)
+		{
+			$externalStorageProfiles = self::getPeriodicStorageProfiles($object->getPartnerId());
+		}
+		foreach($externalStorageProfiles as $externalStorage)
+		{
+			if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
+			{
+				self::exportFlavorAsset($object, $externalStorage);
+			}
 		}
 	}
 
