@@ -532,7 +532,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$entryId = $object->getEntryId();
 		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$flavorTypes[] = CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
-		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING), $flavorTypes);
+		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE, asset::ASSET_STATUS_DELETED), $flavorTypes);
 		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$flavorsToExport = array();
 

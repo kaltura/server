@@ -347,7 +347,8 @@ class WidevinePlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 					$customDataJson = DrmLicenseUtils::createCustomDataForEntry($entry->getId(), $entryPlayingDataParams->getFlavors(), $signingKey);
 					$customDataObject = reset($customDataJson);
 					$data = new kDrmPlaybackPluginData();
-					$data->setLicenseURL($this->constructUrl($widevineProfile, self::getPluginName(), $customDataObject));
+					$licenseUrl = $this->constructUrl($widevineProfile, self::getPluginName(), $customDataObject);
+					$data->setLicenseURL(DrmLicenseUtils::prepareUrl($licenseUrl));
 					$data->setScheme($this->getDrmSchemeCoreValue());
 					$result->addToPluginData(self::getPluginName(), $data);
 				}

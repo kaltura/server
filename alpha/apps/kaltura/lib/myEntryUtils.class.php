@@ -2006,7 +2006,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function retrieveMappedVolumeMapFromPackager($flavorAsset)
 	{
-		$packagerVolumeMapUrlPattern = kConf::get('packager_mapped_volume_map_url', 'local', null);
+		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::MAPPED_VOLUME_MAP, $flavorAsset);
 		if (!$packagerVolumeMapUrlPattern)
 		{
 			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
@@ -2031,7 +2031,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
 	{
-		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
+		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::REGULAR_VOLUME_MAP, $flavorAsset);
 		if (!$packagerVolumeMapUrlPattern)
 			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
 
