@@ -1,5 +1,38 @@
 # Propus 16.2.0 #
 
+## Add periodic storage delete batch ##
+Issue Type: Task
+Issue ID : PLAT-10769
+
+### Configuration ###
+Add the following to batch.ini:
+
+    enabledWorkers.KAsyncStoragePeriodicDelete            = 1
+
+    [KAsyncStoragePeriodicExport : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Delete
+    type                                                = KAsyncStoragePeriodicDelete
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxCount                                     = @MAX_COUNT@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+    params.gap                                          = @GAP@
+    filter.statusEqual                                  = 3
+    filter.dcIn                                         = @DC@
+    filter.fileTypeIn                                   = 1,3
+    
+    [KAsyncStoragePeriodicExport : PeriodicWorker]
+    ....
+    filter.statusEqual                                  = 1
+    filter.dcIn                                         = @DC@
+    filter.fileTypeEqual                                = 3
+    
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
+
 ## Support volume map and thumb serving ##
 Issue Type: Task
 Issue ID: PLAT-10835

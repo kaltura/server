@@ -42,4 +42,22 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	public function buildFileSyncNotLinkedCriteria()
+	{
+		$baseCriteria = new Criteria();
+
+		// Filter
+		$fileSyncFilter = new FileSyncFilter();
+		$this->toObject($fileSyncFilter);
+		$fileSyncFilter->attachToCriteria($baseCriteria);
+
+		// More
+		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
+
+		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
+		$baseCriteria->setLimit(FileSync::MAX_FILESYNCS_PER_CHUNK);
+
+		return $baseCriteria;
+	}
 }

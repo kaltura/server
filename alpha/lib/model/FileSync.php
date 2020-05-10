@@ -20,7 +20,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_READY = 2;
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
-	
+
+	const MAX_FILESYNCS_PER_CHUNK = 100;
+
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
 		self::FILE_SYNC_STATUS_PENDING => "Pending", 
@@ -41,6 +43,118 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$file_sync->setVersion ( $key->version );
 		if ( $key->partner_id ) $file_sync->setPartnerId ( $key->partner_id );
 		return $file_sync;
+	}
+
+	public static function createFileSyncsPath(&$fileSyncs)
+	{
+		// make sure all file syncs have a path
+		foreach ($fileSyncs as $fileSync)
+		{
+			$fileSync->createPath();
+		}
+	}
+
+	public function createPath()
+	{
+		if ($this->getFileRoot() && $this->getFilePath())
+		{
+			return;
+		}
+
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
+		list($fileRoot, $realPath) = kPathManager::getFilePathArr($fileSyncKey);
+
+		$this->setFileRoot($fileRoot);
+		$this->setFilePath($realPath);
+	}
+
+	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId, $toId)
+	{
+		$c = clone $baseCriteria;
+		$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_EQUAL);
+		$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
+		$c->addAnd($idCriterion);
+
+		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
+		// once that bug is fixed, this can be removed
+		FileSyncPeer::setUseCriteriaFilter(false);
+		$fileSyncs = FileSyncPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		FileSyncPeer::setUseCriteriaFilter(true);
+
+		return $fileSyncs;
+	}
+
+	public static function getLastFileSyncId($fileSyncs, $idLimit)
+	{
+		// if we got less than the limit no reason to perform any more queries
+		if (count($fileSyncs) < self::MAX_FILESYNCS_PER_CHUNK)
+		{
+			$lastId = $idLimit;
+		}
+		else
+		{
+			$lastFileSync = end($fileSyncs);
+			$lastId = $lastFileSync->getId() + 1;
+		}
+
+		KalturaLog::debug("Update lastId to [$lastId]");
+		return $lastId;
+	}
+
+	public static function getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix)
+	{
+		// get locked file syncs with multi get
+		$lockKeys = array();
+		foreach ($fileSyncs as $fileSync)
+		{
+			$lockKeys[] = $lockKeyPrefix . $fileSync->getId();
+		}
+
+		$lockKeys = $lockCache->get($lockKeys);
+		return $lockKeys;
+	}
+
+	public static function lockFileSyncs($fileSyncs, $lockKeys, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, $maxCount, $maxSize,
+	                                     &$lockedFileSyncs, &$limitReached, &$lastId = null, &$lockedFileSyncsSize = null)
+	{
+		// try to lock file syncs
+		foreach ($fileSyncs as $fileSync)
+		{
+			$curKey = $lockKeyPrefix . $fileSync->getId();
+
+			if (isset($lockKeys[$curKey]))
+			{
+				KalturaLog::info('file sync '.$fileSync->getId().' already locked');
+				continue;
+			}
+
+			if (!$lockCache->add($curKey, true, $lockExpiryTimeOut))
+			{
+				KalturaLog::info('failed to lock file sync '.$fileSync->getId());
+				continue;
+			}
+
+			KalturaLog::info('locked file sync ' . $fileSync->getId());
+
+			// add to the result set
+			$lockedFileSyncs[] = $fileSync;
+			if($lockedFileSyncsSize !== null)
+			{
+				$lockedFileSyncsSize += $fileSync->getFileSize();
+			}
+
+			if (count($lockedFileSyncs) >= $maxCount ||
+				($maxSize && $lockedFileSyncsSize >= $maxSize))
+			{
+				if($lastId !== null)
+				{
+					$lastId = min($lastId, $fileSync->getId() + 1);
+				}
+
+				$limitReached = true;
+				break;
+			}
+		}
 	}
 
 	private function generateKey()
