@@ -1,4 +1,4 @@
-# Propus 16.1.0 #
+# Propus 16.2.0 #
 
 ## Support volume map and thumb serving ##
 Issue Type: Task
