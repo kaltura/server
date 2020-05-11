@@ -211,7 +211,11 @@ class KGenericScheduler
 		while($this->keepRunning)
 		{
 			$this->loop();
-			pcntl_signal_dispatch();
+			//Windows machines by default do not have the pcntl installed, so check if function exists before calling it
+			if(function_exists("pcntl_signal_dispatch"))
+			{
+				pcntl_signal_dispatch();
+			}
 		}
 
 		KalturaLog::debug("Ended after [" . (time() - $startTime) . "] seconds");

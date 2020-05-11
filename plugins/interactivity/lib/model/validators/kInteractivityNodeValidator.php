@@ -44,7 +44,7 @@ class kInteractivityNodeValidator extends kInteractivityBaseValidator
 			foreach ($data[self::INTERACTIONS] as $interaction)
 			{
 				$this->interactionValidator->validate($interaction);
-				$this->interactionsIds[] = $interaction[$this->interactionValidator::ID];
+				$this->interactionsIds[] = $interaction[kInteractivityInteractionValidator::ID];
 			}
 		}
 	}

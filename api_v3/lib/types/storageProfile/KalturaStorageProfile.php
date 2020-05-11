@@ -190,12 +190,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 */
-	public $mappedPackagerUrl;
-
-	/**
-	 * @var string
-	 */
-	public $regularPackagerUrl;
+	public $packagerUrl;
 
 	/**
 	 * @var bool
@@ -242,8 +237,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'publicKey',
 		'passPhrase',
 		'shouldExportThumbs',
-		'mappedPackagerUrl',
-		'regularPackagerUrl',
+		'packagerUrl',
 		'exportPeriodically',
 		'excludedFlavorParamsIds'
 	);

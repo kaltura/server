@@ -93,9 +93,9 @@ class kDataCenterMgr
 			if(in_array($dc_id, $cloudStorageProfileIds))
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);
-				if($storageProfile->getRegularPackagerUrl())
+				if($storageProfile->getPackagerUrl())
 				{
-					$dc["url"] = $storageProfile->getRegularPackagerUrl();
+					$dc["url"] = $storageProfile->getPackagerUrl();
 				}
 			}
 

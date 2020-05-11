@@ -751,13 +751,13 @@ class myEntryUtils
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
 		//create final path for thumbnail created
-		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );;
+		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
 		
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
 		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
 		
 		//create path for processing thumbnail request
-		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );;
+		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
 		
 		if(!is_null($format))
 		{
@@ -2006,7 +2006,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function retrieveMappedVolumeMapFromPackager($flavorAsset)
 	{
-		$packagerVolumeMapUrlPattern = kConf::get('packager_mapped_volume_map_url', 'local', null);
+		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::MAPPED_VOLUME_MAP, $flavorAsset);
 		if (!$packagerVolumeMapUrlPattern)
 		{
 			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
@@ -2031,7 +2031,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
 	{
-		$packagerVolumeMapUrlPattern = kConf::get('packager_local_volume_map_url', 'local', null);
+		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::REGULAR_VOLUME_MAP, $flavorAsset);
 		if (!$packagerVolumeMapUrlPattern)
 			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
 

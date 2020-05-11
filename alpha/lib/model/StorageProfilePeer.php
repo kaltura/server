@@ -63,10 +63,16 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 	public static function retrieveExternalByPartnerId($partnerId, $ids = null, $con = null)
 	{
 		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
-		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
 		$criteria->add(StorageProfilePeer::STATUS, array(StorageProfile::STORAGE_STATUS_AUTOMATIC, StorageProfile::STORAGE_STATUS_MANUAL), Criteria::IN);
 		if (!is_null($ids) && !(empty($ids)))
-			$criteria->add(StorageProfilePeer::ID, $ids, Criteria::IN);	
+		{
+			$criteria->add(StorageProfilePeer::ID, $ids, Criteria::IN);
+			$criteria->add(StorageProfilePeer::PARTNER_ID,array( $partnerId , PartnerPeer::GLOBAL_PARTNER) , Criteria::IN);
+		}
+		else
+		{
+			$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		}
 		return StorageProfilePeer::doSelect($criteria, $con);
 	}
 
