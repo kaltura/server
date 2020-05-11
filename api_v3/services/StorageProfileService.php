@@ -225,7 +225,7 @@ class StorageProfileService extends KalturaBaseService
 	protected static function getCacheLayers()
 	{
 		// get caches
-		$keysCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		$keysCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_STORAGE_CACHE_KEYS);
 		if (!$keysCache)
 		{
 			throw new KalturaAPIException(MultiCentersErrors::GET_KEYS_CACHE_FAILED);
