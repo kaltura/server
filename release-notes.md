@@ -1,5 +1,12 @@
 # Propus 16.2.0 #
 
+## Add Reach Profile to Audit Trail ##
+Issue Type: Task
+Issue ID: REACH2-845
+
+#### Deployment Scripts ####
+run 'php /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql'
+
 ## Support volume map and thumb serving ##
 Issue Type: Task
 Issue ID: PLAT-10835
