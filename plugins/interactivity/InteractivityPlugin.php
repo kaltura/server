@@ -92,6 +92,9 @@ class InteractivityPlugin extends KalturaPlugin implements IKalturaServices, IKa
 			case kInteractivityException::ILLEGAL_ENTRY_NODE_ENTRY_ID:
 				$object = new KalturaAPIException(KalturaInteractivityErrors::ILLEGAL_ENTRY_NODE_ENTRY_ID);
 				break;
+			case kInteractivityException::UNSUPPORTED_PLAYLIST_TYPE:
+				$object = new KalturaAPIException(KalturaInteractivityErrors::UNSUPPORTED_PLAYLIST_TYPE);
+				break;
 			case kInteractivityException::CANT_UPDATE_NO_DATA:
 				switch($data[kInteractivityErrorMessages::TYPE_PARAMETER])
 				{

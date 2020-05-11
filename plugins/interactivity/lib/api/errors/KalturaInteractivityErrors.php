@@ -17,5 +17,6 @@ class KalturaInteractivityErrors extends KalturaErrors
 	const ILLEGAL_FIELD_VALUE = "ILLEGAL_FIELD_VALUE;errMsg;Illegal field value \"@errMsg@\"";
 	const DUPLICATE_INTERACTIONS_IDS = 'DUPLICATE_INTERACTIONS_IDS;;The interaction have duplicate interactions ids';
 	const DUPLICATE_NODES_IDS = 'DUPLICATE_NODES_IDS;;The interaction have duplicate nodes ids';
+	const UNSUPPORTED_PLAYLIST_TYPE = 'UNSUPPORTED_PLAYLIST_TYPE;;Playlist interactivity can only be added to playlists of type PATH';
 }
 

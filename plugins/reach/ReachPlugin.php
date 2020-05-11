@@ -181,7 +181,8 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function dependsOn()
 	{
 		$eventNotificationDependency = new KalturaDependency(EventNotificationPlugin::getPluginName());
-		return array($eventNotificationDependency);
+		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::getPluginName());
+		return array($eventNotificationDependency, $bulkUploadDependency);
 	}
 	
 	/**

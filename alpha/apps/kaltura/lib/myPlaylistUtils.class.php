@@ -14,7 +14,6 @@ class myPlaylistUtils
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
-	const KALTURA_CLASS = 'kalturaClass';
 
 	private static $user_cache = null;
 	
@@ -46,56 +45,59 @@ class myPlaylistUtils
 	/**
 	 * Playlist is an entry of type ENTRY_TYPE_PLAYLIST = 5.
 	 * Within this type there are 3 media_types to tell the difference between dynamic,static and external playslits:
-	 * dynamic 	media_type = ENTRY_MEDIA_TYPE_XML = 10
-	 * static 	media_type = ENTRY_MEDIA_TYPE_TEXT = 3
-	 * external media_type = ENTRY_MEDIA_TYPE_GENERIC_1= 101;	// these types can be used for derived classes - assume this is some kind of TXT file
+	 * dynamic    media_type = ENTRY_MEDIA_TYPE_XML = 10
+	 * static    media_type = ENTRY_MEDIA_TYPE_TEXT = 3
+	 * external media_type = ENTRY_MEDIA_TYPE_GENERIC_1= 101;    // these types can be used for derived classes - assume this is some kind of TXT file
 	 *
-	 * 
-	 */	
+	 * @param entry $playlist
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
 	public static function validatePlaylist ( $playlist )
 	{
-		if ( ! $playlist )	 throw new Exception ( "No playlist to validate" );
-		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT )
+		if (!$playlist)
 		{
-			// assume this is a static playlist
-			$static_playlist_str = $playlist->getDataContent(true);
-			$static_playlist = explode ( "," , $static_playlist_str );
-			$fixed_playlist = array();
-//			$entry_id = "";
-			foreach ( $static_playlist as &$entry_id ) 
-			{
-				// TODO - hack for removing 'null' from the entry id due to a bug on the client's side
-				$trimmed = preg_replace ( "/null/" , "" , trim ( $entry_id ) );
-				if ($trimmed)
-				{
-					$fixed_playlist[] = $trimmed;
-					self::validatePlaylistInnerEntry($trimmed);
-				}
-			}
+			throw new Exception ("No playlist to validate");
+		}
 
-			$fixed_playlist_str = implode ( "," , $fixed_playlist );
-			$playlist->setDataContent( $fixed_playlist_str , false ); // don't increment the version after fixing the data
-		}
-		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
+		switch($playlist->getMediaType())
 		{
-			// assume this is a dynamic playlist			
-			// TODO - validate XML
-			$dynamic_playlist_str = $playlist->getDataContent(true);
-			KalturaLog::log( "Playlist [" . $playlist->getId() . "] [" . $playlist->getName() . "] dataContent:\n" . $dynamic_playlist_str );
-			if ( ! $dynamic_playlist_str ) $playlist->setDataContent( null , false ); // set to null and it the content of the xml won't be update
+			case PlaylistType::STATIC_LIST:
+			case PlaylistType::PATH:
+				$static_playlist_str = $playlist->getDataContent(true);
+				$static_playlist = explode ( "," , $static_playlist_str );
+				$fixed_playlist = array();
+				foreach ( $static_playlist as &$entry_id )
+				{
+					// TODO - hack for removing 'null' from the entry id due to a bug on the client's side
+					$trimmed = preg_replace ( "/null/" , "" , trim ( $entry_id ) );
+					if ($trimmed)
+					{
+						$fixed_playlist[] = $trimmed;
+						self::validatePlaylistInnerEntry($trimmed);
+					}
+				}
+
+				$fixed_playlist_str = implode ( "," , $fixed_playlist );
+				$playlist->setDataContent( $fixed_playlist_str , false ); // don't increment the version after fixing the data
+				break;
+			case PlaylistType::DYNAMIC:
+				// TODO - validate XML
+				$dynamic_playlist_str = $playlist->getDataContent(true);
+				KalturaLog::log( "Playlist [" . $playlist->getId() . "] [" . $playlist->getName() . "] dataContent:\n" . $dynamic_playlist_str );
+				if ( ! $dynamic_playlist_str ) $playlist->setDataContent( null , false ); // set to null and it the content of the xml won't be update
+				break;
+			case PlaylistType::EXTERNAL:
+				break;
+			default:
+				throw new Exception ( 'Invalid play list type' );
 		}
-		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
-		{
-			// assume this is an external playlist			
-		}
-		else
-		{
-			throw new Exception ( 'Invalid play list type' );
-		}
-		
-		
 	}
 
+	/**
+	 * @param string $entryId
+	 * @throws KalturaAPIException
+	 */
 	public static function validatePlaylistInnerEntry ($entryId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
@@ -164,41 +166,48 @@ class myPlaylistUtils
 		
 		return self::executePlaylist ( $partner_id , $playlist ,  $filter , $detailed);
 	}
-	
-	public static function executePlaylist ( $partner_id , $playlist ,  $filter = null , $detailed = true, $pager = null )
+
+	/**
+	 * @param string $partner_id
+	 * @param entry $playlist
+	 * @param entryFilter $filter
+	 * @param bool $detailed
+	 * @param KalturaFilterPager $pager
+	 * @return array|null
+	 * @throws kCoreException
+	 */
+	public static function executePlaylist ($partner_id , $playlist , $filter = null , $detailed = true, $pager = null )
 	{
 		if ( ! $playlist )
 		{
 			throw new kCoreException("Invalid entry id", APIErrors::INVALID_ENTRY_ID);
 		}
 		 
-		// the default of detrailed should be true - most of the time the kuse is needed 
+		// the default of detailed should be true - most of the time the kuse is needed
 		if ( is_null ( $detailed ) ) $detailed = true ; 
 
 		$entryObjectsArray = null;
-		
-		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
+
+		switch($playlist->getMediaType())
 		{
-			// dynamix playlist
-		 	// the content is a valid xml that holds the list
-			$filter_list_content = $playlist->getDataContent();
-			if ( ! $filter_list_content )
-			{
-				$filter_list_content = $playlist->getDataContent( true );
-			}
-			
-			$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $filter , $detailed, $pager );
-		}
-		elseif ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
-		{
-			// assume this is an external playlist			
-			// TODO - validate XML
-		}
-		else
-		{
-			// static playlist
-			// search the roughcut_entry for the playlist as a roughcut / group
-			$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed, $pager );
+			case PlaylistType::DYNAMIC:
+				//the content is a valid xml that holds the list
+				$filter_list_content = $playlist->getDataContent();
+				if ( ! $filter_list_content )
+				{
+					$filter_list_content = $playlist->getDataContent( true );
+				}
+
+				$entryObjectsArray = self::executeDynamicPlaylist ( $partner_id ,  $filter_list_content , $filter , $detailed, $pager );
+				break;
+			case PlaylistType::EXTERNAL:
+				// TODO - validate XML
+				break;
+			case PlaylistType::STATIC_LIST:
+			case PlaylistType::PATH:
+				$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed, $pager );
+			default:
+				break;
 		}
 
 		// Perform entries redirection
@@ -294,7 +303,7 @@ class myPlaylistUtils
 	
 	public static function getPlaylistFilters(entry $playlist)
 	{
-		if($playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML)
+		if($playlist->getMediaType() == PlaylistType::DYNAMIC)
 		{
 			$xml = $playlist->getDataContent();
 			if(!$xml)
@@ -498,31 +507,31 @@ class myPlaylistUtils
 		return $ids;
 	}
 	
-// TODO - create a schema for the xml 
-		
-/**
- * <playlist>
-	<total_results>6</total_results>
-	<filters>
-		<filter>
-			<limit>3</limit>
-			<mlikeor_tags>dog football</mlikeor_tags>
-			<gte_created_at></gte_created_at>
-			<lte_created_at></lte_created_at>
-			<in_media_type>1,5</in_media_type>
-			<order_by>-created_at</order_by>
-		</filter>
-		<filter>
-			<limit>7</limit>
-			<like_tags>cat</like_tags>
-			<gte_created_at></gte_created_at>
-			<lte_created_at></lte_created_at>
-			<in_media_type>1,5</in_media_type>
-		</filter>
-	</filters>
-</playlist>
- 
- */	
+	// TODO - create a schema for the xml
+
+	/**
+	 * <playlist>
+		<total_results>6</total_results>
+		<filters>
+			<filter>
+				<limit>3</limit>
+				<mlikeor_tags>dog football</mlikeor_tags>
+				<gte_created_at></gte_created_at>
+				<lte_created_at></lte_created_at>
+				<in_media_type>1,5</in_media_type>
+				<order_by>-created_at</order_by>
+			</filter>
+			<filter>
+				<limit>7</limit>
+				<like_tags>cat</like_tags>
+				<gte_created_at></gte_created_at>
+				<lte_created_at></lte_created_at>
+				<in_media_type>1,5</in_media_type>
+			</filter>
+		</filters>
+	</playlist>
+
+	 */
 	public static function getDynamicPlaylistFilters($xml)
 	{
 		list ( $total_results , $list_of_filters ) = self::getPlaylistFilterListStruct ( $xml );
@@ -593,6 +602,7 @@ class myPlaylistUtils
 		{
 			$entryKPager->setPageSize($totalResults);
 		}
+
 		$entryQueryToFilterESearch = new ESearchEntryQueryFromFilter();
 		$entryIds= array();
 		foreach ($entryFilters as $entryFilter)
@@ -605,6 +615,7 @@ class myPlaylistUtils
 				break;
 			}
 		}
+
 		return array(self::getEntriesSorted($entryIds), $totalResults);
 	}
 
@@ -697,7 +708,7 @@ class myPlaylistUtils
 			// Get the max results from the limit of the first filter
 			$total_results = min( $total_results, $filterLimit );
 
-			// Clear this limit so it won't overcloud the limits of $entry_filter_xml rules
+			// Clear this limit so it won't over cloud the limits of $entry_filter_xml rules
 			$filter->setLimit( null );
 		}
 
@@ -959,12 +970,12 @@ HTML;
 		return array ( $embed , $ui_conf->getWidth() ,  $ui_conf->getHeight() ); 		
 	}
 	
-	public static function toPlaylistUrl ( entry $playlist , $host  , $uid = null )
+	public static function toPlaylistUrl ( entry $playlist, $host, $uid = null )
 	{
 		$partner_id = $playlist->getPartnerId();
 		$subp_id  = $playlist->getSubpId();			
 		
-		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 ) 
+		if ( $playlist->getMediaType() == PlaylistType::EXTERNAL)
 		{
 			$playlist_url = urlencode ( $playlist->getDataContent() ); // when of type GENERIC === MRSS -> the data content is the url to point to 
 		}
@@ -976,7 +987,6 @@ HTML;
 				self::toQueryString( $playlist , false ) ); 
 		}
 		
-//		$str = "k_pl_autoContinue=true&k_pl_autoInsertMedia=true&k_pl_0_name=" . $playlist->getName() . "&k_pl_0_url=" . $playlist_url;
 		$str = "k_pl_0_name=" . $playlist->getName() . "&k_pl_0_url=" . $playlist_url;
 		return $str;
 	}
@@ -984,7 +994,7 @@ HTML;
 	public static function getExecutionUrl ( entry $playlist )
 	{
 		if ( ! $playlist ) return "";
-		if ( $playlist->getMediaType() == entry::ENTRY_MEDIA_TYPE_GENERIC_1 )
+		if ( $playlist->getMediaType() == PlaylistType::EXTERNAL )
 		{
 			return $playlist->getDataContent(); 
 		}
@@ -998,12 +1008,12 @@ HTML;
 		return 	$playlist_url;			
 	}
 	
-	// for now - don't appen dht efilter to the url
+	// for now - don't append the filter to the url
 	public static function toQueryString ( entry $playlist ,$should_append_filter_to_url = false )
 	{
 		$query = "playlist_id={$playlist->getId()}";
 		
-		if ( $playlist->getMediaType() != entry::ENTRY_MEDIA_TYPE_XML )
+		if ( $playlist->getMediaType() != PlaylistType::DYNAMIC)
 			return $query;
 			
 		if ( !$should_append_filter_to_url ) return $query;
@@ -1081,22 +1091,25 @@ HTML;
 	 */
 	protected static function getCaptionFilePath($captionAsset, &$localFilePath)
 	{
-		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, true, false);
 		if (!$captionFileSync)
 		{
 			return false;
 		}
+
 		if($local)
 		{
 			$localFilePath = $captionFileSync->getFullPath();
 		}
+
 		return true;
 	}
 
 	/**
-	 * @param $entryId
+	 * @param $entryIds
 	 * @return array
+	 * @throws PropelException
 	 */
 	public static function getEntryIdsCaptions($entryIds)
 	{
@@ -1106,7 +1119,6 @@ HTML;
 		$captionAssets = assetPeer::doSelect($c);
 		return $captionAssets;
 	}
-
 
 	private static function getIds ( $list )
 	{
@@ -1206,38 +1218,43 @@ HTML;
 			entry::ENTRY_MODERATION_STATUS_REJECTED);
 		$c->add(entryPeer::MODERATION_STATUS, $moderationStatusesNotIn, Criteria::NOT_IN);
 	}
-	
+
 	/**
+	 * @param string $entryId
+	 * @param string $playlistId
+	 * @param string $partnerId
 	 * @return bool
+	 * @throws PropelException
 	 */
 	public static function isEntryReferredByPlaylist($entryId, $playlistId, $partnerId)
 	{
 		$playlistEntry = entryPeer::retrieveByPK($playlistId);
-		if(!$playlistEntry) return false;
+		if(!$playlistEntry)
+		{
+			return false;
+		}
 		
-		if($playlistEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		if($playlistEntry->getMediaType() == PlaylistType::STATIC_LIST || $playlistEntry->getMediaType() == PlaylistType::PATH )
 		{
 			// assume static playlist
 			$static_playlist_str = $playlistEntry->getDataContent();
 			$static_playlist = explode ( "," , $static_playlist_str );
 			if(in_array($entryId, $static_playlist))
+			{
 				return true;
+			}
 
 			//check if entryId is redirectEntryId of an entry in the playlist
 			$playlistEntries = entryPeer::retrieveByPKs($static_playlist);
 			foreach ($playlistEntries as $entry)
 			{
 				if($entry->getRedirectEntryId() == $entryId)
+				{
 					return true;
+				}
 			}
 		}
-		/*
-		elseif ( $playlistEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_XML )
-		{
-			$entries = self::executeDynamicPlaylist($partnerId, $playlistEntry->getDataContent());
-			$entryIds = self::getIds($entries);
-			if(in_array($entryId, $entryIds)) return true;
-		}*/
+
 		return false;
 	}
 	
