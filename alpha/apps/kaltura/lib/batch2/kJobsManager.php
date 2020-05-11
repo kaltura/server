@@ -758,7 +758,7 @@ class kJobsManager
 		
 		if(!$local)
 		{
-			if(StorageProfile::shouldImportFile($fileSync, $partner))
+			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 			{
 				$url = $fileSync->getExternalUrl($entryId);
 				$originalAsset = kFileSyncUtils::retrieveObjectForSyncKey($srcSyncKey);
@@ -1330,8 +1330,8 @@ class kJobsManager
 					if($storageId == StorageProfile::STORAGE_KALTURA_DC)
 					{
 						$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-						list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
-						if(StorageProfile::shouldImportFile($fileSync, $partner))
+						list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+						if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
 						{
 							$url = $syncFile->getExternalUrl($entry->getId());
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);

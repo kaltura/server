@@ -110,6 +110,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			{
 				$sharedChunkPath = KBatchBase::$taskConfig->params->sharedChunkPath;
 			}
+
 			KalturaLog::debug("TTT:: sharedChunkPath = [$sharedChunkPath]");
 			$sessionName = null;
 		}

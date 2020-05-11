@@ -3714,7 +3714,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$capabilities[$capability] = $capability;
 		$this->putInCustomData( self::CAPABILITIES, $capabilities);
 	}
-	
+  
 	public function removeCapability($capabilityToRemove)
 	{
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
