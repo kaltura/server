@@ -93,8 +93,17 @@ class GenericDistributionProviderAction extends BaseGenericDistributionProviderA
 		
 		if(!$version)
 			$version = $this->getFileSyncVersion($sub_type);
+
+		if($externalPath)
+		{
+			$path = '/distribution/generic/';
+		}
+		else
+		{
+			$path = '/content/distribution/generic/';
+		}
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
-		$path =  "/content/distribution/generic/$dir/" . $this->generateFileName($sub_type, $version);
+		$path .=  $dir .'/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

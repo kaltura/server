@@ -119,13 +119,18 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 		if(!$version)
 			$version = $this->getVersion();
 
-		$path = "/content/metadata/data/";
 		if ($externalPath)
 		{
-			$path = "/data/";
+			$path = "/metadata/data/";
+			$dir = substr($this->getEntryId(), -2) . '/' . substr($this->getEntryId(), -4, 2);
 		}
-		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+		else
+		{
+			$path = "/content/metadata/data/";
+			$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+		}
 		$path .= "/$dir/" .$this->generateFileName($sub_type, $version);
+
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

@@ -57,8 +57,19 @@ class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
 		
 		if(!$version)
 			$version = $this->getVersion();
-		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
-		$path = "/content/fileAsset/$dir/" . $this->generateFileName($sub_type, $version);
+
+		if($externalPath)
+		{
+			$path = '/fileAsset/';
+			$dir= substr($this->getObjectId(),-2) . '/' . substr($this->getObjectId(),-4,2);
+		}
+		else
+		{
+			$path = '/content/fileAsset/';
+			$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+		}
+		
+		$path .= $dir . '/' . $this->generateFileName($sub_type, $version);
 		return array(myContentStorage::getFSContentRootPath(), $path);
 	}
 	

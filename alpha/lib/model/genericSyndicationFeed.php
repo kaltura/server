@@ -120,8 +120,16 @@ class genericSyndicationFeed extends syndicationFeed implements ISyncableFile
 		if(!$version)
 			$version = $this->getVersion();
 
+		if ($externalPath)
+		{
+			$path = '/syndication/data/';
+		}
+		else
+		{
+			$path = '/content/syndication/data/';
+		}
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
-		$path =  "/content/syndication/data/$dir/" . $this->generateFileName($sub_type, $version);
+		$path .=  $dir .'/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

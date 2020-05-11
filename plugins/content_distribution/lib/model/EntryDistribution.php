@@ -189,10 +189,13 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		if(!$version)
 			$version = $this->getFileSyncVersion($sub_type);
 
-		$path = '/content/distribution/generic/';
 		if ($externalPath)
 		{
-			$path ='';
+			$path = '/distribution/generic/';
+		}
+		else
+		{
+			$path = '/content/distribution/generic/';
 		}
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
 		$path .=  "/$dir/" . $this->generateFileName($sub_type, $version);

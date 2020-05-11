@@ -209,9 +209,17 @@ class MetadataProfile extends BaseMetadataProfile implements ISyncableFile
 	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		$version = $this->getFileSyncSubTypeVersion($sub_type, $version);
-		
+
+		if ($externalPath)
+		{
+			$path = "/metadata/data/";
+		}
+		else
+		{
+			$path = "/content/metadata/profile/";
+		}
 		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
-		$path =  "/content/metadata/profile/$dir/" . $this->generateFileName($sub_type, $version);
+		$path .= $dir . '/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

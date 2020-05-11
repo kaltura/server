@@ -387,12 +387,15 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	{
 		self::validateFileSyncSubType ( $sub_type );
 
-		$path = '/content/batchfiles/' . $this->getPartnerId();
 		if($externalPath)
 		{
-			$path = '';
+			$path = '/batchfiles/';
 		}
-		$path .= '/' . $this->generateFileName($sub_type, $version);
+		else
+		{
+			$path = '/content/batchfiles/';
+		}
+		$path .= $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}
