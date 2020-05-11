@@ -378,9 +378,13 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 		$fileSyncDcId = $kalturaFileSync->getDc();
 		if(!$local && in_array($fileSyncDcId, kDataCenterMgr::getDcIds()))
+=======
+		if(!$local && in_array($kalturaFileSync->getDc(), kDataCenterMgr::getDcIds()))
+>>>>>>> 4f5829b... PLAT-10810: Export a file from a remote storage
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] was found but in a different DC");
 			return false;
