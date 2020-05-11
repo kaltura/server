@@ -881,8 +881,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
-		$dc = kDataCenterMgr::getCurrentDc();
-		$dc_id = $dc["id"];
+		$dc_id = kDataCenterMgr::getCurrentDcId();
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		if ( ! $fetch_from_remote_if_no_local )

@@ -363,8 +363,8 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function isValidFileSync(FileSyncKey $key)
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $this->getId() . "]");
-		
-		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
+
+		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 		if(!$kalturaFileSync) // no local copy to export from
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] not found localy");

@@ -1427,7 +1427,16 @@ class kJobsManager
 		$batchJob->setObjectId($fileSync->getId());
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
-		$batchJob->setDc($dc);
+
+		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}
+		else
+		{
+			$batchJob->setDc($dc);
+		}
+
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
 	}
