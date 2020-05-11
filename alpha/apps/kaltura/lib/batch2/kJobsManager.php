@@ -596,8 +596,8 @@ class kJobsManager
 		}
 		
 		if($isLocal && !$local)
-		{		
-			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+		{
+			if(StorageProfile::shouldImportFile($fileSync, $partner))
 				$addImportJob = true;
 			else	
 				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);
@@ -758,7 +758,7 @@ class kJobsManager
 		
 		if(!$local)
 		{
-			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+			if(StorageProfile::shouldImportFile($fileSync, $partner))
 			{
 				$url = $fileSync->getExternalUrl($entryId);
 				$originalAsset = kFileSyncUtils::retrieveObjectForSyncKey($srcSyncKey);
@@ -1330,8 +1330,8 @@ class kJobsManager
 					if($storageId == StorageProfile::STORAGE_KALTURA_DC)
 					{
 						$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-						list($syncFile, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
-						if($syncFile && $syncFile->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+						list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+						if(StorageProfile::shouldImportFile($fileSync, $partner))
 						{
 							$url = $syncFile->getExternalUrl($entry->getId());
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
