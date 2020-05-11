@@ -366,7 +366,11 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $this->getId() . "]");
 
+<<<<<<< HEAD
 		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
+=======
+		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
+>>>>>>> ebcca3d... PLAT-10810: Export a file from a remote storage
 		if(!$kalturaFileSync) // no local copy to export from
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
