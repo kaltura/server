@@ -70,7 +70,7 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path, asset $asset = null)
+	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null)
 	{
 		$source = array(
 			'type' => 'source',
@@ -80,6 +80,15 @@ class serveFlavorAction extends kalturaAction
 		if ($asset && $asset->getEncryptionKey())
 		{
 			$source['encryptionKey'] = $asset->getEncryptionKey();
+		}
+		else if ($fileSync && $fileSync->getEncryptionKey())
+		{
+			$encryptionKey = $fileSync->getEncryptionKey();
+			$encryptionKey = substr($encryptionKey, 0, 32);
+			$encryptionKey .= str_repeat("\0", 32 - strlen($encryptionKey));
+			$source['encryptionKey'] = base64_encode($encryptionKey);
+			$source['encryptionIv'] = base64_encode(kConf::get("encryption_iv"));
+			$source['encryptionScheme'] = 'aes-cbc';
 		}
 		
 		$sequence = array(
@@ -476,6 +485,7 @@ class serveFlavorAction extends kalturaAction
 		if ($this->pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
 		{
 			$path = '';
+			$parent_file_sync = null;
 			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , true, false );
 			if ( $file_sync )
 			{
@@ -500,7 +510,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 		
-			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset);
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $parent_file_sync);
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
