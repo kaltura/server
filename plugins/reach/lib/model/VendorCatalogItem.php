@@ -38,6 +38,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	}
 	
 	const CUSTOM_DATA_PRICING = "pricing";
+	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
 	
 	public function setPricing($pricing)
 	{
@@ -55,6 +56,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 			$pricing = unserialize($pricing);
 		
 		return $pricing;
+	}
+
+	public function setBulkUploadId($bulkUploadId)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID ,$bulkUploadId);
+	}
+
+	public function getBulkUploadId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID);
 	}
 	
 	public function getPartnerId()

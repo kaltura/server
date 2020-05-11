@@ -1584,6 +1584,29 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 		),
 
+		ReportType::INTERACTIVE_VIDEO_NODE_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR1,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
+		),
+
+		ReportType::INTERCATIVE_VIDEO_NODE_SWITCH_TOP_HOTSPOTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'hotspot_id' => self::DIMENSION_EVENT_VAR3,
+				'destination' => self::DIMENSION_EVENT_VAR2,
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN)
+				)
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)

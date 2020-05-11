@@ -627,7 +627,8 @@ class ks extends kSessionBase
 		$result = false;
 		switch($mediaType)
 		{
-			case entry::ENTRY_MEDIA_TYPE_TEXT:
+			case PlaylistType::STATIC_LIST:
+			case PlaylistType::PATH:
 				$result = true;
 				break;
 		}

@@ -11,13 +11,12 @@ class serveFlavorAction extends kalturaAction
 	const JSON_CONTENT_TYPE = 'application/json';
 
 	const SECOND_IN_MILLISECONDS = 1000;
-	const LIVE_CHANNEL_SEGMENT_DURATION = 10 * self::SECOND_IN_MILLISECONDS;
-	const LIVE_CHANNEL_SEGMENT_COUNT = 10;
-	const TIME_MARGIN = 10 * self::SECOND_IN_MILLISECONDS; // a safety margin to compensate for clock differences
-	const DVR_WINDOW_SIZE = self::LIVE_CHANNEL_SEGMENT_DURATION * self::LIVE_CHANNEL_SEGMENT_COUNT;
+	const LIVE_CHANNEL_SEGMENT_DURATION = 10000; // 10 seconds in milliseconds
+	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
+	const DVR_WINDOW_SIZE = 100000; // LIVE_CHANNEL_SEGMENT_DURATION * 10 segments;
 
 	protected $pathOnly = false;
-	
+
 	protected static function jsonEncode($obj)
 	{
 		$options = 0;
@@ -342,7 +341,7 @@ class serveFlavorAction extends kalturaAction
 		$isLive = $this->getRequestParameter("live");
 
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, $flavorParamsIdsArr,
-			$captionFiles, $captionLanguages, $isLive);
+			$captionFiles, $captionLanguages, $isLive, 0, 0, 0, 0);
 	}
 
 	protected function serveCaptionsWithSequence($entryIds, $captionFiles, $durations, $captionLangauges, $partnerId, $mainEntry)

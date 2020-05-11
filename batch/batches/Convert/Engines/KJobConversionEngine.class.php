@@ -172,7 +172,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 			$file = $this->outFilePath;
 			if (kFile::checkFileExists($file))
 			{
-				$output = kFile::getLineFromFileTail($file , 1);
+				KalturaLog::debug('output file is : '. $file);
+				$output = kFile::getLinesFromFileTail($file);
 			}
 		}
 		return array($output, $return_var);
@@ -194,6 +195,16 @@ abstract class KJobConversionEngine extends KConversionEngine
 		}
 	}
 
+	/*
+	 * This function is executing the conversion while also checking if the conversion is progressing.
+	 * progress in Convert FFMPEG - we check the modification time on file: inFilePath
+	 * progress in Chunked FFMPEG - we check the modification time on the files in the directory: inFilePath_chunkenc/
+	 *
+	 * after every $extendTime - if the file/s are keep progressing we will extend the expiration of the batch job lock,
+	 * and this will postponed the timeout of the job.
+	 * We keep the $timeout parameter to know when timeout is reached.
+	 * if the conversion is not progressing, and the timeout is Reached - we will end it even if the execution was not finished.
+	 */
 	protected function executeConversionCmdlineSmartTimeout($command, &$return_var, $jobId = null)
 	{
 		$handle = popen($command, 'r');

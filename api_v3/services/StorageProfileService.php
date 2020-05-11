@@ -9,7 +9,7 @@
  */
 class StorageProfileService extends KalturaBaseService
 {
-	const MAX_FILESYNC_ID_PREFIX = 'fileSyncMaxId-dc';
+	const MAX_FILESYNC_ID_PREFIX = 'lastCreatedFileSyncId-dc';
 	const LAST_FILESYNC_ID_PREFIX = 'storage-fileSyncLastId-worker';
 	const LOCK_KEY_PREFIX = 'storage-fileSyncLock:id=';
 	const STORAGE_LOCK_EXPIRY = 'storage_lock_expiry';

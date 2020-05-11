@@ -13,4 +13,5 @@ interface BulkUploadAction extends BaseEnum
 	const ADD_OR_UPDATE = 6;
 	const ACTIVATE = 7;
 	const REJECT = 8;
+	const UPDATE_STATUS = 9;
 }
