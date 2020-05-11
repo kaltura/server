@@ -56,6 +56,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 		$maxPartner = $this->getAdditionalParams('maxPartner');
 		$minPartner = $this->getAdditionalParams('minPartner');
 		$lowPartnerWaterMark = $minPartner ? $minPartner : KAsyncStorageUpdateUtils::LOWEST_PARTNER;
+		$minimumPartner = $lowPartnerWaterMark;
 		$maxPartnerReached = false;
 		do
 		{
@@ -74,7 +75,6 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 					else
 					{
 						$maxPartnerReached = true;
-						KalturaLog::debug( 'Finished handling partners: ' .$lowPartnerWaterMark .' < partner_id <= ' . $maxPartner);
 						break;
 					}
 				}
@@ -92,6 +92,11 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			}
 		} while ($countPartners && !$maxPartnerReached);
 
+		if (!$maxPartnerReached)
+		{
+			$maxPartner = $lowPartnerWaterMark;	//the last partnerId we handled
+		}
+		KalturaLog::debug( 'Finished handling partners: ' .$minimumPartner .' < partner_id <= ' . $maxPartner);
 		KalturaLog::debug('Done.');
 	}
 
