@@ -5,7 +5,7 @@ Issue Type: Task
 Issue ID: REACH2-845
 
 #### Deployment Scripts ####
-run 'php /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql'
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
 
 ## Support volume map and thumb serving ##
 Issue Type: Task
