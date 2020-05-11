@@ -370,7 +370,14 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
 			return false;
 		}
-		
+
+		$fileSyncDcId = $kalturaFileSync->getDc();
+		if(!$local && in_array($fileSyncDcId, kDataCenterMgr::getDcIds()))
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] was found but in a different DC");
+			return false;
+		}
+
 		KalturaLog::log(__METHOD__ . " validating file size [" . $kalturaFileSync->getFileSize() . "] is between min [" . $this->getMinFileSize() . "] and max [" . $this->getMaxFileSize() . "]");
 		if($this->getMaxFileSize() && $kalturaFileSync->getFileSize() > $this->getMaxFileSize()) // too big
 		{

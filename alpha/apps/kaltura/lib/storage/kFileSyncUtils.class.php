@@ -881,13 +881,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
-		$dc_id = kDataCenterMgr::getCurrentDcId();
+		$dcId = kDataCenterMgr::getCurrentDcId();
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		if ( ! $fetch_from_remote_if_no_local )
 		{
 			// if $fetch_from_remote_if_no_local is true - don't restrict to the current DC - this will save an extra hit to the DB in case the file is not present
-			$c->addAnd ( FileSyncPeer::DC , $dc_id );
+			$c->addAnd ( FileSyncPeer::DC , $dcId );
 		}
 		// search only for ready
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
@@ -922,7 +922,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			
 
 			// always prefer the current dc
-			if ( $tmp_file_sync->getDc() == $dc_id)
+			if ( $tmp_file_sync->getDc() == $dcId)
 			{
 				$desired_file_sync = $tmp_file_sync;
 				$local = true;
