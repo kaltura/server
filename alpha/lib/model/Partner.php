@@ -53,40 +53,29 @@ class Partner extends BasePartner
 	const PARTNER_TYPE_BLACKBOARD = 107;
 	const PARTNER_TYPE_SAKAI = 108;
 	const PARTNER_TYPE_ADMIN_CONSOLE = 109;
-	
-	const CUSTOM_DATA_USAGE_WARNINGS = 'usageWarnings';
-	
-	public static $s_content_root ;
+	const PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT = 10;
+	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
 	
 	const CDN_HOST_WHITE_LIST = 'CDNHostWhiteList';
-
 	const HTML_PURIFIER_BEHAVIOUR = "htmlPurifierBehaviour";
-
 	const HTML_PURIFIER_BASE_LIST_USAGE = "htmlPurifierBaseListUsage";
-
 	const PUBLISHER_ENVIRONMENT_TYPE = "publisherEnvironmentType";
 	const OVP_ENVIRONMENT_URL = "ovpEnvironmentUrl";
 	const OTT_ENVIRONMENT_URL = "ottEnvironmentUrl";
-
-	private $partnerUsagePercent;
-
-	const CUSTOM_DATA_LIVE_STREAM_INPUTS = 'live_stream_inputs';
-
-	const CUSTOM_DATA_LIVE_STREAM_OUTPUTS = 'live_stream_outputs';
-
-	const PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT = 10;
-
-	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
-
 	const CUSTOMER_DATA_RTC_ENV = 'rtc_env_name';
-
 	const RTC_SERVER_NODE_ENV = 'rtc_server_node_env';
-
 	const ANALYTICS_HOST = "analytics_host";
-
-	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
-
+	
+	public static $s_content_root ;
+	private $partnerUsagePercent;
 	private $cdnWhiteListCache = array();
+	
+	// Custom data fields
+	const CUSTOM_DATA_USAGE_WARNINGS = 'usageWarnings';
+	const CUSTOM_DATA_LIVE_STREAM_INPUTS = 'live_stream_inputs';
+	const CUSTOM_DATA_LIVE_STREAM_OUTPUTS = 'live_stream_outputs';
+	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
+	const CUSTOM_DATE_STORAGE_STOORGAE_TYPE = 'storage_type';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -2150,7 +2139,15 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
-
-
+	
+	public function getSharedStorageType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATE_STORAGE_STOORGAE_TYPE, null, null);
+	}
+	
+	public function setSharedStorageType($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATE_STORAGE_STOORGAE_TYPE, $v);
+	}
 
 }

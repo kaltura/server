@@ -64,7 +64,7 @@ class DocumentsService extends KalturaEntryService
 		try
 		{
 			// check that the uploaded file exists
-			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+			$entryFullPath = kBaseUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
 		}
 		catch(kCoreException $ex)
 		{
@@ -77,7 +77,7 @@ class DocumentsService extends KalturaEntryService
 
 		if (!file_exists($entryFullPath))
 		{
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+			$remoteDCHost = kBaseUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
 				kFileUtils::dumpApiRequest($remoteDCHost);
@@ -121,9 +121,9 @@ class DocumentsService extends KalturaEntryService
 			
 			kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset));
 		}
- 		
-			
-		kUploadTokenMgr::closeUploadTokenById($uploadTokenId);
+		
+		
+		kBaseUploadTokenMgr::closeUploadTokenById($uploadTokenId);
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 

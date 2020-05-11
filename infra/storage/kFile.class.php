@@ -24,7 +24,7 @@ class kFile extends kFileBase
 	{
 		if (kFile::isSharedPath($path))
 		{
-			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
 			return $sharedFsMgr->listFiles($path, $pathPrefix);
 		}
 		
@@ -278,9 +278,15 @@ class kFile extends kFileBase
 	
 	public static function copySingleFile($src, $dest, $deleteSrc)
 	{
-		if (kFile::isSharedPath($src) || kFile::isSharedPath($dest))
+		if (kFile::isSharedPath($dest))
 		{
-			$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($dest);
+			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);
+		}
+		
+		if (kFile::isSharedPath($src))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($src);
 			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);
 		}
 
@@ -329,6 +335,7 @@ class kFile extends kFileBase
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
+		KalturaLog::debug("TTT:: moveFile from [$from] to [$to]");
 		$from = kFile::fixPath($from);
 		$to = kFile::fixPath($to);
 		

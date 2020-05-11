@@ -20,8 +20,6 @@ class kmcngAction extends kalturaAction
 		$isSecuredLogin = kConf::get('kmc_secured_login');
 		$enforceSecureProtocol = isset($isSecuredLogin) && $isSecuredLogin == "1";
 		$requestSecureProtocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on');
-		//Temporary Aws hack until headers issue will be resolved  
-		$requestSecureProtocol = 1;
 
 		// Check for forced HTTPS
 

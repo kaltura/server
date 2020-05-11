@@ -48,7 +48,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 * @return kPathManager
 	 */
 	
-	public function getPathManager()
+	public function \()
 	{
 		$class = $this->getPathManagerClass();
 		if(!$class || !strlen(trim($class)) || !class_exists($class))
