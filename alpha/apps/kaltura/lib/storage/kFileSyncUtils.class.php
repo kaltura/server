@@ -888,13 +888,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
-		$dc_id = kDataCenterMgr::getCurrentDcId();
+		$dcId = kDataCenterMgr::getCurrentDcId();
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		if ( ! $fetch_from_remote_if_no_local )
 		{
 			// if $fetch_from_remote_if_no_local is true - don't restrict to the current DC - this will save an extra hit to the DB in case the file is not present
-			$c->addAnd ( FileSyncPeer::DC , $dc_id );
+			$c->addAnd ( FileSyncPeer::DC , $dcId );
 		}
 		// search only for ready
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
@@ -919,8 +919,23 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $dc_id);
 		if($sortedFileSync)
 		{
+<<<<<<< HEAD
 			$desired_file_sync = $sortedFileSync[0];
 			if($desired_file_sync->getDc() == $dc_id)
+=======
+			$tmp_file_sync = $file_sync;
+			// make sure not link and work on original
+			
+			if($resolve)
+				$tmp_file_sync = self::resolve($file_sync);
+				
+			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+				continue;
+			
+
+			// always prefer the current dc
+			if ( $tmp_file_sync->getDc() == $dcId)
+>>>>>>> 6d2d1d5... PLAT-10810: Export a file from a remote storage
 			{
 				$local = true;
 			}
