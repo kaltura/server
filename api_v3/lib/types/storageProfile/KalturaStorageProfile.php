@@ -202,6 +202,12 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $exportPeriodically;
 
+
+	/**
+	 * @var string
+	 */
+	public $excludedFlavorParamsIds;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -239,6 +245,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'mappedPackagerUrl',
 		'regularPackagerUrl',
 		'exportPeriodically',
+		'excludedFlavorParamsIds'
 	);
 	
 	/* (non-PHPdoc)

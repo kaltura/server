@@ -75,6 +75,8 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 			        return new BulkUploadCategoryUserEngineCsv($job);
 			    case KalturaBulkUploadObjectType::CATEGORY_ENTRY:
 			        return new BulkUploadCategoryEntryEngineCsv($job);
+			    case KalturaBulkUploadObjectType::VENDOR_CATALOG_ITEM:
+				return new BulkUploadVendorCatalogItemEngineCsv($job);
 			}
 			
 		}

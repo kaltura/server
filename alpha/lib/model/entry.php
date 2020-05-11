@@ -1048,7 +1048,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return ".xml";
 		}
 		elseif ( $this->getMediaType() == self::ENTRY_MEDIA_TYPE_TEXT ||
-				$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 )
+				$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_1 ||
+				$this->getMediaType() == self::ENTRY_MEDIA_TYPE_GENERIC_2 )
 		{
 			return ".txt";
 		}
