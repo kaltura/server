@@ -9,7 +9,7 @@ Add the following to batch.ini:
 
     enabledWorkers.KAsyncStoragePeriodicDelete            = 1
 
-    [KAsyncStoragePeriodicExport : PeriodicWorker]
+    [KAsyncStoragePeriodicDelete : PeriodicWorker]
     id                                                  = @ID@
     friendlyName                                        = Storage Periodic Delete
     type                                                = KAsyncStoragePeriodicDelete
