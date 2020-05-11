@@ -1767,7 +1767,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
 		if($periodicStorageIds)
 		{
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+			$fileSync = self::getReadyExternalFileSyncForKey($syncKey);
 		}
 
 		if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))
