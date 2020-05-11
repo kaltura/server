@@ -371,8 +371,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 			return false;
 		}
 
-		$fileSyncDcId = $kalturaFileSync->getDc();
-		if(!$local && in_array($fileSyncDcId, kDataCenterMgr::getDcIds()))
+		if(!$local && in_array($kalturaFileSync->getDc(), kDataCenterMgr::getDcIds()))
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] was found but in a different DC");
 			return false;
