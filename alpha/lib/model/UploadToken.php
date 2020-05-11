@@ -126,7 +126,57 @@ class UploadToken extends BaseUploadToken implements IBaseObject
 		if (!$cache)
 			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
 		
-		$cache->add($this->getId().".autoFinalize", true, kUploadTokenMgr::AUTO_FINALIZE_CACHE_TTL);
+		$cache->add($this->getId().".autoFinalize", true, kBaseUploadTokenMgr::AUTO_FINALIZE_CACHE_TTL);
+	}
+
+	public function getMinimumChunkSize()
+	{
+		return $this->getFromCustomData('minimumChunkSize', null , 0);
+	}
+
+	public function setMinimumChunkSize($v)
+	{
+		$this->putInCustomData('minimumChunkSize', $v);
+	}
+
+	public function getParts()
+	{
+		return $this->getFromCustomData('parts', null , array(array('Parts')));
+	}
+
+	public function setParts($v)
+	{
+		$this->putInCustomData('parts', $v);
+	}
+
+	public function getUploadedPartsNumber()
+	{
+		return $this->getFromCustomData('uploadedPartsNumber', null , 0);
+	}
+
+	public function setUploadedPartsNumber($v)
+	{
+		$this->putInCustomData('uploadedPartsNumber', $v);
+	}
+
+	public function getUploadId()
+	{
+		return $this->getFromCustomData('uploadId', null , null);
+	}
+
+	public function setUploadId($v)
+	{
+		$this->putInCustomData('uploadId', $v);
+	}
+
+	public function getFinalFilePath()
+	{
+		return $this->getFromCustomData('finalFilePath', null , null);
+	}
+
+	public function setFinalFilePath($v)
+	{
+		$this->putInCustomData('finalFilePath', $v);
 	}
 
 	public function getMinimumChunkSize()

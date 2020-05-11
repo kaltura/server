@@ -264,7 +264,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
-		return infraRequestUtils::dumpFilePart($this->filePath, $range_from, $range_length);
+		return infraRequestUtils::dumpFilePart($filePath, $range_from, $range_length);
 	}
 	
 	protected function doChgrp($filePath, $contentGroup)

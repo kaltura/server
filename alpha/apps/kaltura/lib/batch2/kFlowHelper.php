@@ -2541,12 +2541,12 @@ class kFlowHelper
 			return;
 		}
 
-		$fullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
+		$fullPath = kBaseUploadTokenMgr::getFullPathByUploadTokenId($uploadToken->getId());
 
 		if(!kFile::checkFileExists($fullPath))
 		{
 			KalturaLog::info("File path [$fullPath] not found");
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());
+			$remoteDCHost = kBaseUploadTokenMgr::getRemoteHostForUploadToken($uploadToken->getId(), kDataCenterMgr::getCurrentDcId());
 			if(!$remoteDCHost)
 			{
 				KalturaLog::err("File path [$fullPath] could not be redirected");

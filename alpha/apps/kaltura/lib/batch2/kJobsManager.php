@@ -518,7 +518,24 @@ class kJobsManager
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
-
+		
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
+		{
+			$pathMgr = new kS3SharedPathManager();
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+			$sharedPath = kFile::fixPath($root.$path);
+			
+			KalturaLog::debug("TTT:: shared path $sharedPath");
+			$convertData->setDestFileSyncSharedPath($sharedPath);
+//			$sharedPath = kSharedFileSystemMgr::getSharedRootByType(kSharedFileSystemMgrType::S3) . '/entry/asset/' .  substr($flavorAsset->getEntryId(), -2) . '/' .
+//				substr($flavorAsset->getEntryId(), -4, 2) . '/' . $flavorAsset->generateFileName(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+			
+		}
+		
+//		$sharedPath = '/yossi-aio-u16/'. $flavorAsset->getPartnerId() . "/entry/asset/" .
+//			substr($flavorAsset->getEntryId(), -2). '/' . $flavorAsset->getEntryId() . "_" . $flavorAsset->getId() . "_" . $flavorAsset->getVersion() . "." . $flavor->getFormat();
+		
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
 			return null;
@@ -579,8 +596,8 @@ class kJobsManager
 		}
 		
 		if($isLocal && !$local)
-		{		
-			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+		{
+			if(StorageProfile::shouldImportFile($fileSync, $partner))
 				$addImportJob = true;
 			else	
 				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);

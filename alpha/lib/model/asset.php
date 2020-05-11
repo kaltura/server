@@ -399,7 +399,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $sharedStorageType = null)
 	{
 		static::validateFileSyncSubType ( $sub_type );
 		$version = (is_null($version) ? $this->getVersionForSubType($sub_type) : $version);

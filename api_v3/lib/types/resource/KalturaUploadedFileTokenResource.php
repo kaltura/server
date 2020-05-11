@@ -49,7 +49,7 @@ class KalturaUploadedFileTokenResource extends KalturaGenericDataCenterContentRe
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
 		
 		if($dbUploadToken->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
-			kUploadTokenMgr::closeUploadTokenById($this->token);
+			kBaseUploadTokenMgr::closeUploadTokenById($this->token);
 	}
 	
 	/* (non-PHPdoc)
@@ -76,7 +76,7 @@ class KalturaUploadedFileTokenResource extends KalturaGenericDataCenterContentRe
 		
 		try
 		{
-			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($this->token);
+			$entryFullPath = kBaseUploadTokenMgr::getFullPathByUploadTokenId($this->token);
 		}
 		catch(kCoreException $ex)
 		{
@@ -89,7 +89,7 @@ class KalturaUploadedFileTokenResource extends KalturaGenericDataCenterContentRe
 		
 		if(!kFile::checkFileExists($entryFullPath))
 		{
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($this->token, kDataCenterMgr::getCurrentDcId());
+			$remoteDCHost = kBaseUploadTokenMgr::getRemoteHostForUploadToken($this->token, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
 				kFileUtils::dumpApiRequest($remoteDCHost);

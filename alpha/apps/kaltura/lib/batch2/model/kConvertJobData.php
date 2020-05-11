@@ -14,6 +14,11 @@ class kConvertJobData extends kConvartableJobData
 	 * @var string
 	 */
 	private $destFileSyncLocalPath;
+	
+	/**
+	 * @var string
+	 */
+	private $destFileSyncSharedPath;
 
 	/**
 	 * @var string
@@ -53,7 +58,7 @@ class kConvertJobData extends kConvartableJobData
 	/**
 	 * @var array<kDestFileSyncDescriptor>
 	 */
-	private $extraDestFileSyncs;	
+	private $extraDestFileSyncs;
 	
 	/**
 	 * @var string
@@ -67,7 +72,15 @@ class kConvertJobData extends kConvartableJobData
 	{
 		return $this->destFileSyncLocalPath;
 	}
-
+	
+	/**
+	 * @return the $destFileSyncSharedPath
+	 */
+	public function getDestFileSyncSharedPath()
+	{
+		return $this->destFileSyncSharedPath;
+	}
+	
 	/**
 	 * @return the $logFileSyncLocalPath
 	 */
@@ -139,6 +152,14 @@ class kConvertJobData extends kConvartableJobData
 	public function setDestFileSyncLocalPath($destFileSyncLocalPath)
 	{
 		$this->destFileSyncLocalPath = $destFileSyncLocalPath;
+	}
+	
+	/**
+	 * @param $destFileSyncSharedPath the $destFileSyncSharedPath to set
+	 */
+	public function setDestFileSyncSharedPath($destFileSyncSharedPath)
+	{
+		$this->destFileSyncSharedPath = $destFileSyncSharedPath;
 	}
 
 	/**

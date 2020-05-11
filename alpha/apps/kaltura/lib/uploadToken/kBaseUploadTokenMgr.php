@@ -77,19 +77,24 @@ abstract class kBaseUploadTokenMgr
 	 */
 	public static function getInstance($uploadToken, $finalChunk = true, $type = null)
 	{
-		$dc_config = kConf::getMap("dc_config");
-		if(!$type)
-		{
-			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::LOCAL;
-		}
-
-		switch($type)
+		return new kUploadTokenMgr($uploadToken, $finalChunk);
+		
+		/*
+		$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+		$sharedStorageType = $partner->getSharedStorageType();
+		$sharedStorageType = kSharedFileSystemMgrType::NFS;
+		
+		KalturaLog::debug("Storage type [$sharedStorageType]");
+		switch($sharedStorageType)
 		{
 			case kSharedFileSystemMgrType::S3:
 				return new kS3UploadTokenMgr($uploadToken, $finalChunk);
+			case kSharedFileSystemMgrType::NFS:
+				return new kUploadTokenMgr($uploadToken, $finalChunk);
 			default:
 				return new kUploadTokenMgr($uploadToken, $finalChunk);
 		}
+		*/
 	}
 
 	/**

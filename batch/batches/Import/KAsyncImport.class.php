@@ -440,8 +440,11 @@ class KAsyncImport extends KJobHandlerWorker
 				KalturaLog::err( "Cannot continue import without shared directory");
 				die();
 			}
-
-			$sharedFile = kFile::createUniqueFilePath($rootPath);
+      
+			// aws comment: Commented for now wince it breaks onPrem env when running with user kaltura and NFS
+			// $sharedFile = kFile::createUniqueFilePath($rootPath);
+			$uniqid = uniqid('import_');
+			$sharedFile = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
 
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
