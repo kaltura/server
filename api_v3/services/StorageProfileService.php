@@ -170,9 +170,7 @@ class StorageProfileService extends KalturaBaseService
 
 		$maxId = self::getMaxId($keysCache, $storageProfileId, $maxIdDelay);
 		KalturaLog::info("got maxId [$maxId] for worker [$workerId]");
-		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
-		KalturaLog::info("got lastId [$initialLastId] for worker [$workerId]");
-		$lastId = $initialLastId ? $initialLastId : $maxId;
+		$lastId = self::getInitialLastId($keysCache, $workerId, $maxId);
 
 		// created at less than handled explicitly
 		$createdAtLessThanOrEqual = $filter->createdAtLessThanOrEqual;
@@ -379,8 +377,10 @@ class StorageProfileService extends KalturaBaseService
 		if (!$initialLastId || $lastId > $initialLastId)
 		{
 			KalturaLog::info("setting lastId to [$lastId] for worker [$workerId]");
-
-			$keysCache->set(self::LAST_FILESYNC_ID_PREFIX . $workerId, $lastId);
+			$key = self::LAST_FILESYNC_ID_PREFIX . $workerId;
+			$keysCache->set($key, $lastId);
+			$tmpPath = kConf::get('temp_folder') . '/' . $key;
+			file_put_contents($tmpPath, $lastId);
 		}
 	}
 
@@ -409,5 +409,22 @@ class StorageProfileService extends KalturaBaseService
 			return $configMap[$configField];
 		}
 		return $defaultVal;
+	}
+
+	protected static function getInitialLastId($keysCache, $workerId, $maxId)
+	{
+		$key = self::LAST_FILESYNC_ID_PREFIX . $workerId;
+		$initialLastId = $keysCache->get($key);
+		if(!$initialLastId)
+		{
+			$tmpPath = kConf::get('temp_folder') . '/' . $key;
+			if(file_exists($tmpPath))
+			{
+				$initialLastId = file_get_contents($tmpPath);
+			}
+		}
+		KalturaLog::info("got lastId [$initialLastId] for worker [$workerId]");
+		$lastId = $initialLastId ? $initialLastId : $maxId;
+		return $lastId;
 	}
 }
