@@ -795,7 +795,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		return false;
 	}
 
-	public static function retrieveDscFlavorsByEntryIdAndStatus($entryId, array $excludedStatuses = array())
+	public static function retrieveDscFlavorsByEntryIdAndStatus($entryId, array $excludedStatuses = array(), $flavorTypes = array())
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
@@ -804,8 +804,6 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		{
 			$c->add(assetPeer::STATUS, $excludedStatuses, Criteria::NOT_IN);
 		}
-
-		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 
 		$c->addDescendingOrderByColumn(assetPeer::INT_ID);
