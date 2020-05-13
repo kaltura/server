@@ -32,7 +32,7 @@ class KFileTransferExportEngine extends KExportEngine
 		{
 			$srcTempFile = $this->getAssetFile($this->data->assetId, $this->data->externalUrl);
 
-			if($srcTempFile === null)
+			if(!$srcTempFile)
 			{
 				throw new kTemporaryException("Source file {$this->srcFile} does not exist");
 			}

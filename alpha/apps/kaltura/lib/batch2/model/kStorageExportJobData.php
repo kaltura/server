@@ -67,11 +67,6 @@ class kStorageExportJobData extends kStorageJobData
 			$this->setAssetId($assetId);
 			$this->setExternalUrl($srcFileSync->getExternalUrl($asset->getEntryId()));
 		}
-		else
-		{
-			$this->setAssetId(null);
-			$this->setExternalUrl(null);
-		}
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
