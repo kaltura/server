@@ -277,7 +277,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr ( $sub_type, $version = null  )
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		// TODO - implement field version
 		self::validateFileSyncSubType ( $sub_type );

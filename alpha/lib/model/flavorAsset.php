@@ -389,4 +389,13 @@ class flavorAsset extends exportableAsset
 		return $this->height * $this->width;
 	}
 
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getTypeFolderName()
+	 */
+	public function getTypeFolderName()
+	{
+		return 'flavors';
+	}
+
 }

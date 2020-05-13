@@ -116,4 +116,13 @@ class CaptionAsset extends asset
 	
 	public function shouldCopyOnReplacement() {return false;}
 
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getTypeFolderName()
+	 */
+	public function getTypeFolderName()
+	{
+		return 'captions';
+	}
+
 }
