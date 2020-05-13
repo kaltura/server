@@ -5,6 +5,8 @@
  */
 class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 {
+	const MAX_FILESYNCS_PER_CHUNK = 100;
+
 	/**
 	 * @var KalturaNullableBoolean
 	 */
@@ -56,7 +58,7 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
 
 		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
-		$baseCriteria->setLimit(FileSync::MAX_FILESYNCS_PER_CHUNK);
+		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
 
 		return $baseCriteria;
 	}

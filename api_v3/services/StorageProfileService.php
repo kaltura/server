@@ -16,7 +16,6 @@ class StorageProfileService extends KalturaBaseService
 	const LAST_ID_LOOP_ADDITION = 'last_id_loop_addition';
 	const MAX_ID_DELAY = 'max_id_delay';
 	const DEFAULT_LOCK_EXPIRY = 36000;
-	const MAX_FILESYNCS_PER_CHUNK = 100;
 	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
 	const MAX_FILESYNC_ID_RANGE = 20000;
 	const DEFAULT_MAX_ID_DELAY = 1000;
@@ -32,7 +31,7 @@ class StorageProfileService extends KalturaBaseService
 			
 		$this->applyPartnerFilterForClass('StorageProfile');
 	}
-	
+
 	/**
 	 * Adds a storage profile to the Kaltura DB.
 	 *
@@ -198,20 +197,25 @@ class StorageProfileService extends KalturaBaseService
 			$idLimit = min($lastId + self::MAX_FILESYNC_ID_RANGE, $maxId);
 			$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria, $lastId, $idLimit);
 
-			$lastId = FileSync::getLastFileSyncId($fileSyncs, $idLimit);
-			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
-
 			if (!$fileSyncs)
 			{
-				continue;
+				break;
 			}
 
-			$lockKeys = FileSync::getLockedFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX);
+			if (count($fileSyncs) < KalturaFileSyncFilter::MAX_FILESYNCS_PER_CHUNK)
+			{
+				$done = true;
+			}
 
+			$lastId = FileSync::getLastFileSyncId($fileSyncs);
+			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
+
+			$lockKeys = FileSync::getLockedFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX);
 			FileSync::lockFileSyncs($fileSyncs, $lockKeys, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry,
 				$maxCount, $maxSize, $lockedFileSyncs, $limitReached, $lastId, $lockedFileSyncsSize);
 		}
 
+		KalturaLog::info("trying setting lastId to [$lastId] when initialized ID is [$initialLastId]");
 		self::setLastIdInCache($initialLastId, $lastId, $keysCache, $workerId);
 		FileSync::createFileSyncsPath($lockedFileSyncs);
 

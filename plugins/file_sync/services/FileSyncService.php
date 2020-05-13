@@ -9,8 +9,6 @@
 class FileSyncService extends KalturaBaseService
 {
 	const LOCK_KEY_PREFIX = 'fileSync_fileSyncLock:id=';
-	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
-	const BIGINT_MAX = 9223372036854775807;
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -121,37 +119,19 @@ class FileSyncService extends KalturaBaseService
 
 		$lockedFileSyncs = array();
 		$limitReached = false;
-		$selectCount = 0;
-		$lastId = 0;
 
-		$maxId = self::BIGINT_MAX;
+		// Get file syncs
+		$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria);
 
-		while ( !$limitReached && ($selectCount < self::MAX_FILESYNC_QUERIES_PER_CALL) && ($lastId < $maxId) )
+		if ($fileSyncs)
 		{
-			// clear the instance pool every once in a while (not clearing every time since some objects repeat between selects)
-			$selectCount++;
-			if ($selectCount % 5 == 0)
-			{
-				FileSyncPeer::clearInstancePool();
-			}
-
-			$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria, $lastId, $maxId);
-
-			if (!$fileSyncs)
-			{
-				KalturaLog::debug('No file syncs to lock');
-				break;
-			}
-
-			$lastId = FileSync::getLastFileSyncId($fileSyncs, $maxId);
-
 			$lockKeys = FileSync::getLockedFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX);
 
 			FileSync::lockFileSyncs($fileSyncs, $lockKeys, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeOut,
 				$maxCount, 0, $lockedFileSyncs, $limitReached);
-		}
 
-		FileSync::createFileSyncsPath($lockedFileSyncs);
+			FileSync::createFileSyncsPath($lockedFileSyncs);
+		}
 
 		// build the response object
 		$result = new KalturaLockFileSyncsResponse;

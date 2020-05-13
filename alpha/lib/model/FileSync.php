@@ -21,8 +21,6 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
 
-	const MAX_FILESYNCS_PER_CHUNK = 100;
-
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
 		self::FILE_SYNC_STATUS_PENDING => "Pending", 
@@ -68,12 +66,16 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$this->setFilePath($realPath);
 	}
 
-	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId, $toId)
+	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId = 0, $toId = 0)
 	{
 		$c = clone $baseCriteria;
-		$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_EQUAL);
-		$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
-		$c->addAnd($idCriterion);
+
+		if($toId)
+		{
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
+			$c->addAnd($idCriterion);
+		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
 		// once that bug is fixed, this can be removed
@@ -84,17 +86,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $fileSyncs;
 	}
 
-	public static function getLastFileSyncId($fileSyncs, $idLimit)
+	public static function getLastFileSyncId($fileSyncs)
 	{
-		// if we got less than the limit no reason to perform any more queries
-		if (count($fileSyncs) < self::MAX_FILESYNCS_PER_CHUNK)
-		{
-			$lastId = $idLimit;
-		}
-		else
+		$lastId = 0;
+
+		if ($fileSyncs)
 		{
 			$lastFileSync = end($fileSyncs);
-			$lastId = $lastFileSync->getId() + 1;
+			$lastId = $lastFileSync->getId();
 		}
 
 		KalturaLog::debug("Update lastId to [$lastId]");
