@@ -61,12 +61,12 @@ class FileAsset extends BaseFileAsset implements ISyncableFile, IRelatedObject
 		if($externalPath)
 		{
 			$path = '/fileAsset/';
-			$dir= substr($this->getObjectId(),-2) . '/' . substr($this->getObjectId(),-4,2);
+			$dir = myContentStorage::getPathFromId($this->getObjectId());
 		}
 		else
 		{
 			$path = '/content/fileAsset/';
-			$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+			$dir = myContentStorage::getPathFromIntId($this->getId());
 		}
 		
 		$path .= $dir . '/' . $this->generateFileName($sub_type, $version);

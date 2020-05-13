@@ -76,13 +76,23 @@ class myContentStorage
 	{
 		if ($externalStorageMode && $id)
 		{
-			$dir =  substr($id, -2) . '/' . substr($id, -4, 2);
+			$dir = self::getPathFromId($id);
 		}
 		else
 		{
-			$dir = (intval($int_id / 1000000)).'/'.	(intval($int_id / 1000) % 1000);
+			$dir = self::getPathFromIntId($int_id);
 		}
 		return $dir .'/'. ( $file_name !== NULL ? $file_name : $id ) ;
+	}
+
+	public static function getPathFromId($id)
+	{
+		return substr($id, -4, 2) . '/' . substr($id, -2);
+	}
+
+	public static function getPathFromIntId($intId)
+	{
+		return  (intval($intId / 1000000)).'/'.	(intval($intId / 1000) % 1000);
 	}
 
 	public static function getVersion ($fileName)

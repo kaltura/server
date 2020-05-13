@@ -144,7 +144,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		{
 			$path = '/content/conversion/xsl/';
 		}
-		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+		$dir = myContentStorage::getPathFromIntId($this->getId());
 		$path .=  $dir .'/'. $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 

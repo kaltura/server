@@ -122,12 +122,12 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 		if ($externalPath)
 		{
 			$path = "/metadata/data/";
-			$dir = substr($this->getEntryId(), -2) . '/' . substr($this->getEntryId(), -4, 2);
+			$dir = myContentStorage::getPathFromId($this->getEntryId());
 		}
 		else
 		{
 			$path = "/content/metadata/data/";
-			$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+			$dir = myContentStorage::getPathFromIntId($this->getId());
 		}
 		$path .= "/$dir/" .$this->generateFileName($sub_type, $version);
 
