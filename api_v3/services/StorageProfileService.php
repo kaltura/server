@@ -163,15 +163,12 @@ class StorageProfileService extends KalturaBaseService
 		kApiCache::disableConditionalCache();
 		list($keysCache, $lockCache) = self::getCacheLayers();
 
-		$cloudStorageConfig =  kConf::getMap('cloud_storage');
+		$cloudStorageConfig = kConf::getMap('cloud_storage');
 		$storageLockExpiry = self::getConfigVal($cloudStorageConfig, self::STORAGE_LOCK_EXPIRY, self::DEFAULT_LOCK_EXPIRY);
 		$lastIdLoopAddition = self::getConfigVal($cloudStorageConfig, self::LAST_ID_LOOP_ADDITION, self::DEFAULT_LAST_ID_LOOP_ADDITION);
 		$maxIdDelay = self::getConfigVal($cloudStorageConfig, self::MAX_ID_DELAY, self::DEFAULT_MAX_ID_DELAY);
-
-		$maxId = self::getMaxId($keysCache, $storageProfileId, $maxIdDelay);
-		KalturaLog::info("got maxId [$maxId] for worker [$workerId]");
-		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
-		KalturaLog::info("got lastId [$initialLastId] for worker [$workerId]");
+		$maxId = self::getMaxId($keysCache, $storageProfileId, $maxIdDelay, $workerId);
+		$initialLastId = self::getLastFileSyncIdToLock($keysCache, $storageProfileId, $workerId);
 		$lastId = $initialLastId ? $initialLastId : $maxId;
 
 		// created at less than handled explicitly
@@ -240,7 +237,15 @@ class StorageProfileService extends KalturaBaseService
 		return array($keysCache, $lockCache);
 	}
 
-	protected static function getMaxId($keysCache, $storageProfileId, $maxIdDelay)
+	/**
+	 * @param $keysCache
+	 * @param $storageProfileId
+	 * @param $maxIdDelay
+	 * @param $workerId
+	 * @return mixed
+	 * @throws KalturaAPIException
+	 */
+	protected static function getMaxId($keysCache, $storageProfileId, $maxIdDelay, $workerId)
 	{
 		// get the max id / last id
 		$maxId = $keysCache->get(self::MAX_FILESYNC_ID_PREFIX . $storageProfileId);
@@ -249,6 +254,7 @@ class StorageProfileService extends KalturaBaseService
 			throw new KalturaAPIException(MultiCentersErrors::GET_MAX_FILESYNC_ID_FAILED, $storageProfileId);
 		}
 		$maxId -= $maxIdDelay;
+		KalturaLog::info("got maxId [$maxId] for worker [$workerId]");
 		return $maxId;
 	}
 
@@ -409,5 +415,41 @@ class StorageProfileService extends KalturaBaseService
 			return $configMap[$configField];
 		}
 		return $defaultVal;
+	}
+
+	/**
+	 * @param $workerId
+	 * @param $keysCache
+	 * @param $storageProfileId
+	 * @return int
+	 * @throws PropelException
+	 */
+	protected static function getLastFileSyncIdToLock($keysCache, $storageProfileId, $workerId)
+	{
+		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
+		if (!$initialLastId)
+		{
+			$fileSyncThresholdCreationTime = time() - kConf::get('lastFileSyncIdCreationTimeThreshold', 'cloud_storage', 0);
+
+			$c = new Criteria();
+			$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+			$c->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
+			$c->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
+			$c->addAscendingOrderByColumn(FileSyncPeer::ID);
+			$c->add(FileSyncPeer::CREATED_AT, $fileSyncThresholdCreationTime, Criteria::GREATER_THAN);
+			$c->setLimit(1);
+
+			FileSyncPeer::setUseCriteriaFilter(false);
+			$fileSync = FileSyncPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+			FileSyncPeer::setUseCriteriaFilter(true);
+
+			if ($fileSync)
+			{
+				$initialLastId = $fileSync->getId();
+			}
+		}
+		KalturaLog::info("got lastId [$initialLastId] for worker [$workerId]");
+		return $initialLastId;
 	}
 }
