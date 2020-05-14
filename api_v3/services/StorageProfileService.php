@@ -168,7 +168,7 @@ class StorageProfileService extends KalturaBaseService
 		$lastIdLoopAddition = self::getConfigVal($cloudStorageConfig, self::LAST_ID_LOOP_ADDITION, self::DEFAULT_LAST_ID_LOOP_ADDITION);
 		$maxIdDelay = self::getConfigVal($cloudStorageConfig, self::MAX_ID_DELAY, self::DEFAULT_MAX_ID_DELAY);
 		$maxId = self::getMaxId($keysCache, $storageProfileId, $maxIdDelay, $workerId);
-		$initialLastId = self::getLastFileSyncIdToLock($keysCache, $storageProfileId, $workerId);
+		$initialLastId = self::getLastFileSyncIdToLock($keysCache, $storageProfileId, $filter, $workerId);
 		$lastId = $initialLastId ? $initialLastId : $maxId;
 
 		// created at less than handled explicitly
@@ -418,18 +418,19 @@ class StorageProfileService extends KalturaBaseService
 	}
 
 	/**
-	 * @param $workerId
 	 * @param $keysCache
 	 * @param $storageProfileId
+	 * @param $filter
+	 * @param $workerId
 	 * @return int
 	 * @throws PropelException
 	 */
-	protected static function getLastFileSyncIdToLock($keysCache, $storageProfileId, $workerId)
+	protected static function getLastFileSyncIdToLock($keysCache, $storageProfileId, $filter,  $workerId)
 	{
 		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
-		if (!$initialLastId)
+		if (!$initialLastId && $filter->createdAtGreaterThanOrEqual)
 		{
-			$fileSyncThresholdCreationTime = time() - kConf::get('lastFileSyncIdCreationTimeThreshold', 'cloud_storage', 0);
+			$fileSyncThresholdCreationTime = $filter->createdAtGreaterThanOrEqual - kConf::get('lastFileSyncIdCreationTimeThreshold', 'cloud_storage', 0);
 
 			$c = new Criteria();
 			$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
