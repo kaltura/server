@@ -28,8 +28,15 @@ class KAsyncStoragePeriodicExport extends KStorageFileSyncsBase
 
 	protected function lockFileSyncs($filter)
 	{
-		$storageProfile = $this->getNextStorageProfile();
+		// Get storage profile
+		$storageProfile = current($this->storageProfiles);
 
+		if(!next($this->storageProfiles))
+		{
+			reset($this->storageProfiles);
+		}
+
+		// Update filter
 		$filter->dcIn = null;
 		$filter->dcEqual = $storageProfile->id;
 
@@ -66,25 +73,5 @@ class KAsyncStoragePeriodicExport extends KStorageFileSyncsBase
 			$status = KalturaFileSyncStatus::ERROR;
 		}
 		return $status;
-	}
-
-	protected function getNextStorageProfile()
-	{
-		if($this->currentIndex == count($this->storageProfiles))
-		{
-			$this->currentIndex = 0;
-		}
-
-		if($this->currentIndex == 0)
-		{
-			$storageProfile = reset($this->storageProfiles);
-		}
-		else
-		{
-			$storageProfile = next($this->storageProfiles);
-		}
-		$this->currentIndex++;
-
-		return $storageProfile;
 	}
 }
