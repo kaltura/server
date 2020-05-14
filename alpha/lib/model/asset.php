@@ -416,7 +416,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		else
 		{
 			$path = '/content/entry/data/';
-			$dir = myContentStorage::getPathFromIntId($this->getId());
+			$dir = myContentStorage::getPathFromIntId($entry->getIntId());
 			$path .= "/$dir/" . $this->generateFileName($sub_type, $version);
 		}
 
