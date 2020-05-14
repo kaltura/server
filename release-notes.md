@@ -7,13 +7,13 @@ Issue ID : PLAT-10769
 ### Configuration ###
 Add the following to batch.ini:
 
-    enabledWorkers.KAsyncStoragePeriodicDelete            = 1
+    enabledWorkers.KAsyncStoragePeriodicPurge            = 1
 
-    [KAsyncStoragePeriodicDelete : PeriodicWorker]
+    [KAsyncStoragePeriodicPurge : PeriodicWorker]
     id                                                  = @ID@
     friendlyName                                        = Storage Periodic Delete
-    type                                                = KAsyncStoragePeriodicDelete
-    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteExe.php
+    type                                                = KAsyncStoragePeriodicPurge
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicPurgeExe.php
     maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
     params.maxCount                                     = @MAX_COUNT@
     params.maxExecutionTime                             = @MAX_EXECUTION_TIME@

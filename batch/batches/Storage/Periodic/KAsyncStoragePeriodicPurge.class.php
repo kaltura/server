@@ -6,7 +6,7 @@
  * @package Scheduler
  * @subpackage Storage
  */
-class KAsyncStoragePeriodicDelete extends KStorageFileSyncsBase
+class KAsyncStoragePeriodicPurge extends KStorageFileSyncsBase
 {
 	const GAP = 'gap';
 	const LOCK_EXPIRY_TIMEOUT = 'lockExpiryTimeout';

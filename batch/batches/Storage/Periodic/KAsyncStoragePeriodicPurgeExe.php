@@ -1,6 +1,6 @@
 <?php
 /**
- * Will run KAsyncStoragePeriodicDelete.class.php
+ * Will run KAsyncStoragePeriodicPurge.class.php
  * 
  *
  * @package Scheduler
@@ -8,6 +8,6 @@
  */
 require_once(__DIR__ . "/../../../bootstrap.php");
 
-$instance = new KAsyncStoragePeriodicDelete();
+$instance = new KAsyncStoragePeriodicPurge();
 $instance->run(); 
 $instance->done();
