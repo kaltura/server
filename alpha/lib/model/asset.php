@@ -522,57 +522,21 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		
 		return $url;
 	}
-	
+
+	/**
+	 * @param bool $useCdn
+	 * @param bool $forceProxy
+	 * @param null $preview
+	 * @param null $fileName
+	 * @param bool $includeKs
+	 * @return string
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
 	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null, $fileName = null, $includeKs = true)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		
-		$fileSync = null;
-		$serveRemote = false;
-		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		
-		switch($partner->getStorageServePriority())
-		{
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-				$serveRemote = true;
-				$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($syncKey);
-				if(!$fileSync)
-				{
-					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				} 
-				else if ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-				{
-					throw new kCoreException("File sync is pending: $syncKey",kCoreException::FILE_PENDING);
-				}
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
-				{
-					$serveRemote = true;
-					break;
-				}
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if(!$fileSync)
-				    throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if($fileSync)
-					break;
-					
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				
-				$serveRemote = true;
-				break;
-		}
+		list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey, true);
 		
 		if($serveRemote && $fileSync) {
 			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
@@ -817,5 +781,4 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	{
 		return true;
 	}
-		
 }

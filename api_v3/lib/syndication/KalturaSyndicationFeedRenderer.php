@@ -854,9 +854,14 @@ class KalturaSyndicationFeedRenderer
 			return null;
 			
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
-			if(kFileSyncUtils::getReadyInternalFileSyncForKey($key)) // check if having file sync on kaltura dcs
+		{
+			list ($fileSync, $remote) = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key);// check if having file sync on kaltura dcs
+			if ($fileSync)
+			{
 				return null;
-				
+			}
+		}
+
 		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		if(!$fileSync)
 			return null;
