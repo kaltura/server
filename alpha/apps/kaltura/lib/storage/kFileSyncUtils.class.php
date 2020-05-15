@@ -1857,7 +1857,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @throws KalturaAPIException
 	 * @throws kCoreException
 	 */
-	public static function getFileSyncByStoragePriority($partnerId, FileSyncKey $syncKey, $includePending = false): array
+	public static function getFileSyncByStoragePriority($partnerId, FileSyncKey $syncKey, $includePending = false)
 	{
 		$fileSync = null;
 		$serveRemote = false;
