@@ -1818,7 +1818,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			// use serve file local url
 			$dcConfig = kDataCenterMgr::getDcById($fileSync->getDc());
-			$path = '/' . $dcConfig['name'] . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
+			$path = '/' . strtolower($dcConfig['name']) . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
 		}
 		else
 		{
