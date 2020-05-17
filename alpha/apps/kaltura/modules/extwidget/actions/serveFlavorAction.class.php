@@ -27,13 +27,8 @@ class serveFlavorAction extends kalturaAction
 		return json_encode($obj, $options);
 	}
 	
-	public function getFileSyncFullPath(FileSync $fileSync, $local = true)
+	public function getFileSyncFullPath(FileSync $fileSync)
 	{
-		if(!$local)
-		{
-			return $fileSync->getFilePath();
-		}
-
 		$fullPath = $fileSync->getFullPath();
 		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local', array());
 		
@@ -394,6 +389,7 @@ class serveFlavorAction extends kalturaAction
 		$sequence = $this->getRequestParameter('sequence');
 		$captionLanguages = $this->getRequestParameter('captions', '');
 		$this->pathOnly = $this->getRequestParameter('pathOnly', false);
+		$useDcOrdering = $this->getRequestParameter('dcOrdering');
 
 		if ($entryId)
 		{
@@ -486,23 +482,23 @@ class serveFlavorAction extends kalturaAction
 		{
 			$path = '';
 			$parent_file_sync = null;
-			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , true, false );
-			if ( $file_sync )
-			{
-				$allowRemotePath = false;
-				if(!$local)
-				{
-					$storage = StorageProfilePeer::retrieveByPK($file_sync->getDc());
-					if($storage->getExportPeriodically())
-					{
-						$allowRemotePath = true;
-					}
-				}
 
-				if($local || $allowRemotePath)
+			if($useDcOrdering)
+			{
+				$file_sync = kFileSyncUtils::getFileSyncByDcOrder($syncKey);
+				if($file_sync)
 				{
 					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-					$path = $this->getFileSyncFullPath($parent_file_sync, $local);
+					$path = kFileSyncUtils::getPathByFileSync($file_sync);
+				}
+			}
+			else
+			{
+				list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
+				if ( $file_sync )
+				{
+					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
+					$path = $this->getFileSyncFullPath($parent_file_sync);
 					if ($fileParam && is_dir($path))
 					{
 						$path .= "/$fileParam";

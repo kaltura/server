@@ -13,6 +13,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
+	const CLOUD_PREFIX = '/s3';
+
 	/**
 	 * Contain all object types and sub types that should not be synced
 	 * @var array
@@ -1776,6 +1778,56 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		return $fileSync;
+	}
+
+	public static function getReadyFileSyncForKeyAndDc($key, $dcId)
+	{
+		KalturaLog::debug("key [$key], DC Id [$dcId]");
+		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
+		$c->addAnd (FileSyncPeer::DC , $dcId);
+		$c->addAnd (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
+		$c->addAscendingOrderByColumn(FileSyncPeer::DC);
+		$fileSync = FileSyncPeer::doSelectOne($c);
+		if (!$fileSync)
+		{
+			KalturaLog::notice("FileSync was not found");
+			return null;
+		}
+		return $fileSync;
+	}
+
+
+	public static function getFileSyncByDcOrder($syncKey)
+	{
+		$dcPlaybackOrder = explode(',', kConf::get('dc_playback_order', 'local', null));
+		foreach ($dcPlaybackOrder as $dcId)
+		{
+			$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, $dcId);
+			if($fileSync)
+			{
+				return $fileSync;
+			}
+		}
+		return null;
+	}
+
+	public static function getPathByFileSync($fileSync)
+	{
+		KalturaLog::debug(print_r($fileSync, true));
+		KalturaLog::debug(print_r($fileSync->getFilePath, true));
+
+		$localDcIds = kDataCenterMgr::getDcIds();
+		if(in_array($fileSync->getDc(), $localDcIds))
+		{
+			// use serve file local url
+			$path = kDataCenterMgr::getInternalRemoteUrl($fileSync);
+		}
+		else
+		{
+			// use cloud file location
+			$path = self::CLOUD_PREFIX . $fileSync->getFilePath();
+		}
+		return $path;
 	}
 
 
