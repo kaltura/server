@@ -74,19 +74,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if (self::shouldHandleFileSyncObjectChanged($object, $modifiedColumns))
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
-			if($storageProfile)
+			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() !== self::NULL_STR)
 			{
-				if($storageProfile->getExportPeriodically())
+				$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
+				if($storageProfiles)
 				{
-					KalturaLog::info("zaza skip delete local upon status READY");
-				}
-				else if($object->getLinkedId() !== self::NULL_STR)
-				{
-					$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
-					if($storageProfiles)
-					{
-						self::exportToPeriodicStorage($object, $storageProfiles);
-					}
+					self::exportToPeriodicStorage($object, $storageProfiles);
 				}
 			}
 		}
