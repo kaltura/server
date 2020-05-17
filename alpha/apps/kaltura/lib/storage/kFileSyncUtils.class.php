@@ -13,7 +13,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
-	const CLOUD_PREFIX = '/s3';
+	const CLOUD_S3_PREFIX = '/s3';
 
 	/**
 	 * Contain all object types and sub types that should not be synced
@@ -1813,19 +1813,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function getPathByFileSync($fileSync)
 	{
-		KalturaLog::debug(print_r($fileSync, true));
-		KalturaLog::debug(print_r($fileSync->getFilePath, true));
-
 		$localDcIds = kDataCenterMgr::getDcIds();
 		if(in_array($fileSync->getDc(), $localDcIds))
 		{
 			// use serve file local url
-			$path = kDataCenterMgr::getInternalRemoteUrl($fileSync);
+			$dcConfig = kDataCenterMgr::getDcById($fileSync->getDc());
+			$path = $dcConfig['name'] . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
 		}
 		else
 		{
 			// use cloud file location
-			$path = self::CLOUD_PREFIX . $fileSync->getFilePath();
+			$path = self::CLOUD_S3_PREFIX . $fileSync->getFilePath();
 		}
 		return $path;
 	}
