@@ -78,7 +78,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			{
 				if($storageProfile->getExportPeriodically())
 				{
-					self::handlePeriodicFileExportFinished($object, $storageProfile);
+					KalturaLog::info("zaza skip delete local upon status READY");
 				}
 				else if($object->getLinkedId() !== self::NULL_STR)
 				{
@@ -511,47 +511,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			}			
 		}
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
-	}
-
-
-	public static function handlePeriodicFileExportFinished($fileSync, StorageProfile $storageProfile)
-	{
-		$keysArray = array();
-		$object = assetPeer::retrieveById($fileSync->getObjectId());
-		if(!$object)
-		{
-			return;
-		}
-		$entryId = $object->getEntryId();
-		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
-		$flavorTypes[] = CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
-		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE, asset::ASSET_STATUS_DELETED), $flavorTypes);
-		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$flavorsToExport = array();
-
-		foreach ($flavorAssets as $flavorAsset)
-		{
-			if(!$storageProfile->shouldExportFlavorAsset($flavorAsset))
-			{
-				continue;
-			}
-			$flavorsToExport[] = $flavorAsset;
-			foreach ($fileSyncSubTypes as $subType)
-			{
-				$key = $flavorAsset->getSyncKey($subType);
-				if(!kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfile->getId()))
-				{
-					KalturaLog::debug("Required file for flavor asset [{$flavorAsset->getId()}] was not exported yet");
-					return;
-				}
-				$keysArray[$flavorAsset->getId()] = $key->getVersion();
-			}
-		}
-
-		foreach ($flavorsToExport as $flavorAsset)
-		{
-			kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
-		}
 	}
 
 	public static function getPeriodicStorageIdsByPartner($partnerId)

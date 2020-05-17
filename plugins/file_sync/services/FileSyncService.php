@@ -9,6 +9,8 @@
 class FileSyncService extends KalturaBaseService
 {
 	const LOCK_KEY_PREFIX = 'fileSync_fileSyncLock:id=';
+	const LAST_FILESYNC_ID_PREFIX = 'fileSync-fileSyncLastId-worker-';
+	const MAX_FILESYNCS_PER_CHUNK = 100;
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -53,6 +55,83 @@ class FileSyncService extends KalturaBaseService
 		$response->objects = $list;
 		$response->totalCount = $totalCount;
 		return $response;
+	}
+
+	/**
+	 * Delete local file syncs by filter
+	 *
+	 * @action deleteLocalFileSyncs
+	 * @param KalturaFileSyncFilter $filter
+	 * @param int $workerId The id of the file sync import worker
+	 * @return KalturaFileSyncListResponse
+	 */
+	function deleteLocalFileSyncsAction(KalturaFileSyncFilter $filter, $workerId)
+	{
+		//Get Cache
+		$keysCache = self::getCache();
+
+		// Last Id
+		$lastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
+		if(!$lastId)
+		{
+			$lastId = 0;
+		}
+		KalturaLog::info("Last ID is [{$lastId}]");
+
+		// Get file syncs
+		$fileSyncs = self::getFileSyncsChunk($filter, $lastId);
+
+		if($fileSyncs)
+		{
+			// Delete siblings
+			foreach ($fileSyncs as $fileSync)
+			{
+				KalturaLog::info("Delete siblings for file sync [{$fileSync->getObjectId()}] with ID [{$fileSync->getId()}]");
+
+				$fileSYncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+				kFileSyncUtils::deleteSyncFileForKey($fileSYncKey, false, true);
+			}
+
+			// Update last ID
+			$lastFileSync = end($fileSyncs);
+			$lastId = $lastFileSync->getId();
+
+			KalturaLog::info("Set last ID to [{$lastId}]");
+			$keysCache->set(self::LAST_FILESYNC_ID_PREFIX . $workerId, $lastId);
+		}
+
+		// Response
+		$response = new KalturaFileSyncListResponse();
+		$response->objects = KalturaFileSyncArray::fromDbArray($fileSyncs, $this->getResponseProfile());
+		return $response;
+	}
+
+	protected static function getCache()
+	{
+		$keysCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		if (!$keysCache)
+		{
+			throw new KalturaAPIException(MultiCentersErrors::GET_KEYS_CACHE_FAILED);
+		}
+		return $keysCache;
+	}
+
+	protected static function getFileSyncsChunk($filter, $lastId)
+	{
+		// build the criteria
+		$fileSyncFilter = new FileSyncFilter();
+		$filter->toObject($fileSyncFilter);
+
+		$baseCriteria = new Criteria();
+		$fileSyncFilter->attachToCriteria($baseCriteria);
+
+		$baseCriteria->add(FileSyncPeer::ID, $lastId, Criteria::GREATER_THAN);
+		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
+
+		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
+		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
+
+		return FileSyncPeer::doSelect($baseCriteria, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 	}
 
 	/**
