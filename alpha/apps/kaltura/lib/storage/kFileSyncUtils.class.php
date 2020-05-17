@@ -1796,21 +1796,42 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fileSync;
 	}
 
-
-	public static function getFileSyncByDcOrder($syncKey)
+	/**
+	 * return file sync to serve if at least one of the entry flavors doesnt exist locally
+	 * prefer provided dc over the local dc
+	 *
+	 * @param $syncKey
+	 * @param $flavorAsset
+	 * @param $preferredStorageId
+	 * @return FileSync|null
+	 * @throws PropelException
+	 */
+	public static function getFileSyncByPreferredOrder($syncKey, $flavorAsset, $preferredStorageId)
 	{
-		$dcPlaybackOrder = explode(',', kConf::get('dc_playback_order', 'local', null));
-		foreach ($dcPlaybackOrder as $dcId)
+		// if the entry fully exist locally return empty fileSync and path
+		// to make the request redirected for local serving
+		if(self::entryFullyExistLocally($flavorAsset->getEntryId()))
 		{
-			$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, $dcId);
-			if($fileSync)
-			{
-				return $fileSync;
-			}
+			return null;
 		}
-		return null;
+
+		$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
+		if($fileSync)
+		{
+			return $fileSync;
+		}
+
+		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, false, false);
+		return $fileSync;
 	}
 
+	/**
+	 * get the object path in remote location or the serveFile path for local location
+	 *
+	 * @param $fileSync
+	 * @return string
+	 * @throws Exception
+	 */
 	public static function getPathByFileSync($fileSync)
 	{
 		$localDcIds = kDataCenterMgr::getDcIds();
@@ -1826,6 +1847,32 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$path = self::CLOUD_S3_PREFIX . $fileSync->getFilePath();
 		}
 		return $path;
+	}
+
+	/**
+	 * check if all the flavors of an entry exist in the current dc
+	 *
+	 * @param $entryId
+	 * @return bool
+	 * @throws PropelException
+	 */
+	public static function entryFullyExistLocally($entryId)
+	{
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($entryId, $flavorTypes);
+
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
+			if(!$fileSync)
+			{
+				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was not found locally");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 

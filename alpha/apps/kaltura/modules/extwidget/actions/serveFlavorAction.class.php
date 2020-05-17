@@ -389,7 +389,7 @@ class serveFlavorAction extends kalturaAction
 		$sequence = $this->getRequestParameter('sequence');
 		$captionLanguages = $this->getRequestParameter('captions', '');
 		$this->pathOnly = $this->getRequestParameter('pathOnly', false);
-		$useDcOrdering = $this->getRequestParameter('dcOrdering');
+		$preferredStorageId = $this->getRequestParameter('preferredStorageId');
 
 		if ($entryId)
 		{
@@ -483,9 +483,9 @@ class serveFlavorAction extends kalturaAction
 			$path = '';
 			$parent_file_sync = null;
 
-			if($useDcOrdering)
+			if($preferredStorageId)
 			{
-				$file_sync = kFileSyncUtils::getFileSyncByDcOrder($syncKey);
+				$file_sync = kFileSyncUtils::getFileSyncByPreferredOrder($syncKey, $flavorAsset, $preferredStorageId);
 				if($file_sync)
 				{
 					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
