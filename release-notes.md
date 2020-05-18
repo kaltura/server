@@ -7,6 +7,31 @@ Issue ID: PLAT-10890
 Modify cloud_storage.ini:
 add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
 
+## Add periodic storage delete local batch ##
+Issue Type: Task
+Issue ID : PLAT-10894
+
+### Configuration ###
+Add the following to batch.ini:
+
+    enabledWorkers.KAsyncStoragePeriodicDeleteLocal     = 1
+
+    [KAsyncStoragePeriodicDeleteLocal : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Delete Local
+    type                                                = KAsyncStoragePeriodicDeleteLocal
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteLocalExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.gap                                          = @GAP@
+    filter.statusEqual                                  = 2
+    filter.dcEqual                                      = @DC@
+    filter.fileTypeEqual                                = 3
+
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
+    
 ## Support export captions to remote storage ##
 - Issue Type: Task
 - Issue ID: PLAT-10846
