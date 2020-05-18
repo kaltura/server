@@ -303,7 +303,7 @@ class kUploadTokenMgr
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
 					KalturaLog::debug("Appending current chunk [$sourceFilePath] to final file [$uploadFilePath]");
-					$currentFileSize = $this->appendCurrentChunk($uploadFilePath, $sourceFilePath);
+					$currentFileSize = $this->appendCurrentChunk($uploadFilePath, $sourceFilePath, $resumeAt);
 				}
 				else
 				{
@@ -332,7 +332,7 @@ class kUploadTokenMgr
 		}
 		else
 		{
-			$currentFileSize = $this->appendCurrentChunk($uploadFilePath, $sourceFilePath);
+			$currentFileSize = $this->appendCurrentChunk($uploadFilePath, $sourceFilePath, $resumeAt);
 			
 			if($this->_autoFinalize && $this->_uploadToken->getFileSize() >= $currentFileSize)
 				$this->_finalChunk = true;
@@ -341,10 +341,17 @@ class kUploadTokenMgr
 		return $currentFileSize;
 	}
 	
-	private function appendCurrentChunk($targetFilePath, $chunkFilePath)
+	private function appendCurrentChunk($targetFilePath, $chunkFilePath, $resumeAt)
 	{
 		$targetFileResource = fopen($targetFilePath, 'r+b');
-		fseek($targetFileResource, 0, SEEK_END);
+		if($resumeAt == -1)
+		{
+			fseek($targetFileResource, 0, SEEK_END);
+		}
+		else
+		{
+			fseek($targetFileResource, $resumeAt, SEEK_SET);
+		}
 		
 		self::appendChunk($chunkFilePath, $targetFileResource);
 		

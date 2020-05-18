@@ -11,14 +11,14 @@ interface ISyncableFile extends IBaseObject
 	 * @return FileSyncKey
 	 */
 	public function getSyncKey( $sub_type , $version=null);
-	
+
 	/**
-	 * will return a pair of file_root and file_path
-	 *
-	 * @param int $sub_type
+	 * @param $sub_type
 	 * @param unknown_type $version
+	 * @param bool $externalPath
+	 * @return mixed
 	 */
-	public function generateFilePathArr ( $sub_type , $version=null ); 
+	public function generateFilePathArr ( $sub_type , $version = null, $externalPath = false );
 
 	/**
 	 * will return a string of the base file name

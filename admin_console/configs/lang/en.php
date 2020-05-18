@@ -1009,9 +1009,10 @@ return array(
     'storage was autoed' => 'Remote storage status is now "auto".',
     'storage was disabled' => 'Remote storage has been disabled.',
 	'default_path_manager' => 'Kaltura Path',
-		'kPathManager' => 'Kaltura Path',
-		'kExternalPathManager' => 'External Path',
-	    'kXslPathManager' => 'XSL Path',
+	'kPathManager' => 'Kaltura Path',
+	'kExternalPathManager' => 'External Path',
+	'kXslPathManager' => 'XSL Path',
+	'kS3PathManager' => 'S3 Path',
 
 	// partner-configure
 	'partner-configure intro text' => 'NOTE:  changing these settings here will override the existing default settings for this storage.',

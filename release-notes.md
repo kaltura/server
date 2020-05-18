@@ -1,3 +1,35 @@
+# Propus 16.2.0  #
+
+## Support export captions to remote storage ##
+- Issue Type: Task
+- Issue ID: PLAT-10846
+
+### Deployment scripts ###
+Run:
+	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
+
+## Add Reach Profile to Audit Trail ##
+Issue Type: Task
+Issue ID: REACH2-845
+
+#### Deployment Scripts ####
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
+
+## Support volume map and thumb serving ##
+Issue Type: Task
+Issue ID: PLAT-10835
+
+### Configuration ###
+Modify local.ini:
+add new param packager_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@ and replace placeholders
+Remove VOD_PACKAGER_HOST and VOD_PACKAGER_PORT from previously define params 
+packager_local_thumb_capture_url, packager_mapped_thumb_capture_url, packager_local_volume_map_url, packager_mapped_volume_map_url and packager_local_live_thumb_capture_url. 
+example: 
+Old value:
+packager_mapped_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedvolume/{url}/volume_map.csv
+New value:
+packager_mapped_volume_map_url = /mappedvolume/{url}/volume_map.csv
+
 # Propus 16.1.0 #
 
 ## import vendor catalog items from csv ##

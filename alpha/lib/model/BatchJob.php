@@ -383,11 +383,19 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr( $sub_type, $version = null)
+	public function generateFilePathArr( $sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType ( $sub_type );
-		
-		$path = '/content/batchfiles/' . $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
+
+		if($externalPath)
+		{
+			$path = '/batchfiles/';
+		}
+		else
+		{
+			$path = '/content/batchfiles/';
+		}
+		$path .= $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

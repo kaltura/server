@@ -10,6 +10,27 @@ if(strtoupper(PHP_SAPI) != 'CLI' && strtoupper(PHP_SAPI) != 'CGI-FCGI')
 	exit (1);
 }
 
+function gracefulShutDown($signal)
+{
+	global $kscheduler;
+	echo "Got signal [$signal] from terminal";
+	$kscheduler->preKill($signal);
+}
+
+function shutDown($signal)
+{
+	global $kscheduler;
+	echo "Got signal [$signal] from terminal";
+	exit(0);
+}
+
+//Windows machines by default do not have the pcntl installed, so check if function exists before calling it
+if(function_exists("pcntl_signal"))
+{
+	pcntl_signal(SIGINT, 'gracefulShutDown');
+	pcntl_signal(SIGTERM, 'shutDown');
+}
+
 $phpPath = 'php';
 if(isset($argc) && $argc > 1)
 {

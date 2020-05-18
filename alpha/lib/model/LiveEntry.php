@@ -105,17 +105,17 @@ abstract class LiveEntry extends entry
 	/* (non-PHPdoc)
 	 * @see entry::generateFilePathArr($sub_type, $version)
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalStorageMode = false )
 	{
 		static::validateFileSyncSubType($sub_type);
 		
 		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY || $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 		{
-			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type);
+			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type, null, $externalStorageMode);
 			return array(myContentStorage::getFSContentRootPath(), $res);
 		}
 		
-		return parent::generateFilePathArr($sub_type, $version);
+		return parent::generateFilePathArr($sub_type, $version, $externalStorageMode);
 	}
 	
 	/* (non-PHPdoc)

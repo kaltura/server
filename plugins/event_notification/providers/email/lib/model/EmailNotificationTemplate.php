@@ -209,15 +209,23 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 	/* (non-PHPdoc)
 	 * @see ISyncableFile::generateFilePathArr()
 	 */
-	public function generateFilePathArr ( $sub_type , $version=null )
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		
 		if(!$version)
 			$version = $this->getFileSyncVersion($sub_type);
-		
-		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
-		$path =  "/content/notifications/$dir/" . $this->generateFileName($sub_type, $version);
+
+		if($externalPath)
+		{
+			$path = '/notifications/';
+		}
+		else
+		{
+			$path = '/content/notifications/';
+		}
+		$dir = myContentStorage::getPathFromIntId($this->getId());
+		$path .= $dir . '/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	} 

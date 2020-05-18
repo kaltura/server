@@ -769,8 +769,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return;
 		}
 
+		$partnerIds = array($partnerId);
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+		if($periodicStorageIds)
+		{
+			$partnerIds[] = PartnerPeer::GLOBAL_PARTNER;
+		}
+
 		$criteria = new Criteria();
-		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerIds, Criteria::IN);
 		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(StorageProfilePeer::DELIVERY_PRIORITY);
 
@@ -1752,6 +1759,23 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return true;
 
 		return false;
+	}
+
+	public static function getFileSyncFromPeriodicStorage($asset, $syncKey)
+	{
+		$fileSync = null;
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($asset->getPartnerId());
+		if($periodicStorageIds)
+		{
+			$fileSync = self::getReadyExternalFileSyncForKey($syncKey);
+		}
+
+		if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY || !in_array($fileSync->getDc(), $periodicStorageIds))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+		}
+
+		return $fileSync;
 	}
 
 

@@ -536,10 +536,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 * @param $sub_type
 	 * @param null $version
+	 * @param bool $externalStorageMode
 	 * @return array
 	 * @throws FileSyncException
 	 */
-	public function generateFilePathArr( $sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalStorageMode = false )
 	{
 		static::validateFileSyncSubType ( $sub_type );
 		switch ($sub_type)
@@ -551,17 +552,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 					$data .= '.xml';
 				}
 
-				$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $data, $version);
+				$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $data, $version, $externalStorageMode);
 				break;
 			case kEntryFileSyncSubType::DATA_EDIT:
-				$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $this->getData(), $version) );
+				$res =  myContentStorage::getFileNameEdit( myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $this->getData(), $version, $externalStorageMode) );
 				break;
 			case kEntryFileSyncSubType::THUMB:
-				$res =  myContentStorage::getGeneralEntityPath('entry/bigthumbnail', $this->getIntId(), $this->getId(), $this->getThumbnail() , $version);
+				$res =  myContentStorage::getGeneralEntityPath('entry/bigthumbnail', $this->getIntId(), $this->getId(), $this->getThumbnail() , $version, $externalStorageMode);
 				break;
 			case kEntryFileSyncSubType::ARCHIVE:
 				$res = null;
-				$data_path = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $this->getData(), $version);
+				$data_path = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $this->getData(), $version, $externalStorageMode);
 				// assume the suffix is not the same as the one on the data
 				$archive_path = dirname ( str_replace ( 'content/entry/' , 'archive/' , $data_path ) ) . '/' . $this->getId();
 				if ($this->getArchiveExtension())
@@ -588,28 +589,28 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			case  kEntryFileSyncSubType::DOWNLOAD:
 				// in this case the $version is used as the format
 				$basename = kFile::getFileNameNoExtension ( $this->getData() );
-				$path = myContentStorage::getGeneralEntityPath('entry/download', $this->getIntId(), $this->getId(), $basename);
+				$path = myContentStorage::getGeneralEntityPath('entry/download', $this->getIntId(), $this->getId(), $basename, null, $externalStorageMode);
 				$download_path = $path.'.$version';
 				$res =  $download_path;
 				break;
 			case kEntryFileSyncSubType::ISM:
 				$path =  'entry/data';
 				$basename = $this->generateBaseFileName(0, $this->getIsmVersion()) . '.ism';
-				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename, null, $externalStorageMode);
 				break;
 			case kEntryFileSyncSubType::ISMC:
 				$path =  'entry/data';
 				$basename = $this->generateBaseFileName(0, $this->getIsmVersion()) . '.ismc';
-				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename, null, $externalStorageMode);
 				break;
 			case kEntryFileSyncSubType::CONVERSION_LOG:
 				$path =  'entry/data';
 				$basename = $this->generateBaseFileName(0, $this->getIsmVersion()) . '.log';
-				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename);
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $basename, null, $externalStorageMode);
 				break;
 			default:
 				$path =  'entry/data';
-				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $this->generateBaseFileName($sub_type, $version));
+				$res = myContentStorage::getGeneralEntityPath($path, $this->getIntId(), $this->getId(), $this->generateBaseFileName($sub_type, $version), null, $externalStorageMode);
 		}
 
 		return array ( myContentStorage::getFSContentRootPath( ) , $res );

@@ -1,0 +1,1 @@
+insert into audit_trail_config (partner_id,object_type,descriptors,actions) values (-2,'ReachProfile','vendor_credit,credit_usage_percentage,reach_profile.STATUS','CHANGED,CREATED');

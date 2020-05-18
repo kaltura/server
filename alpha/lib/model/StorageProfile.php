@@ -27,6 +27,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	
 	const STORAGE_DEFAULT_KALTURA_PATH_MANAGER = 'kPathManager';
 	const STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER = 'kExternalPathManager';
+	const STORAGE_S3_PATH_MANAGER = 'kS3PathManager';
 	
 	const CUSTOM_DATA_DELIVERY_IDS = 'delivery_profile_ids';
 	const CUSTOM_DATA_PATH_MANAGER_PARAMS = 'path_manager_params';
@@ -35,10 +36,10 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_RULES = 'rules';
 	const CUSTOM_DATA_CREATE_FILE_LINK ='create_file_link';
 	const CUSTOM_DATA_SHOULD_EXPORT_THUMBS ='should_export_thumbs';
-	const CUSTOM_DATA_REGULAR_PACKAGER_URL = 'regular_packager_url';
-	const CUSTOM_DATA_MAPPED_PACKAGER_URL = 'mapped_packager_url';
+	const CUSTOM_DATA_PACKAGER_URL = 'regular_packager_url';
 	const CUSTOM_DATA_EXPORT_PERIODICALLY = 'export_periodically';
 	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS = 'excluded_flavor_params_ids';
+	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -56,6 +57,10 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 			if($this->getProtocol() == self::STORAGE_KALTURA_DC)
 			{
 				$class = self::STORAGE_DEFAULT_KALTURA_PATH_MANAGER;
+			}
+			elseif($this->getProtocol() == self::STORAGE_PROTOCOL_S3 && $this->getExportPeriodically())
+			{
+				$class = self::STORAGE_S3_PATH_MANAGER;
 			}
 			else
 			{
@@ -187,6 +192,11 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 
 		if ($flavorAsset instanceof thumbAsset)
 			return $this->getShouldExportThumbs();
+
+		if ($flavorAsset instanceof captionAsset)
+		{
+			return $this->getShouldExportCaptions();
+		}
 
 		if(!$this->isFlavorAssetConfiguredForExport($flavorAsset))
 		{
@@ -440,23 +450,14 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_THUMBS, $v);
 	}
 
-	public function getRegularPackagerUrl()
+	public function getPackagerUrl()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_REGULAR_PACKAGER_URL,null, null);
+		return $this->getFromCustomData(self::CUSTOM_DATA_PACKAGER_URL,null, null);
 	}
 
 	public function setRegularPackagerUrl($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_REGULAR_PACKAGER_URL, $v);
-	}
-
-	public function getMappedPackagerUrl()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_MAPPED_PACKAGER_URL,null, null);
-	}
-	public function setMappedPackagerUrl($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_MAPPED_PACKAGER_URL, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_PACKAGER_URL, $v);
 	}
 
 	public function getExportPeriodically()
@@ -500,5 +501,15 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 			}
 		}
 		return false;
+	}
+
+	public function getShouldExportCaptions()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS,null, false);
+	}
+
+	public function setShouldExportCaptions($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS, $v);
 	}
 }

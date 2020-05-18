@@ -41,7 +41,7 @@ class kBusinessConvertDL
 		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		$newReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($tempReadyAssets);
 		list($existingReadyAssetIds, $existingNonReadyAssetIds) = kReplacementHelper::relinkReplacingEntryAssetsToReplacedEntryAssets($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $replacingEntry->getId());
-		$nonExistingReadyAssets = kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
+		$nonExistingReadyAssetIds = kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
 
 		// add flag in order to copy later and update the info of non ready assets from replacing entry to the replaced entry
 		$replacingEntry->setSyncFlavorsOnceReady(true);
@@ -49,11 +49,10 @@ class kBusinessConvertDL
 
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry);
 		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry);
-		$nonExistingNonReadyAssets = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
+		$nonExistingNonReadyAssetIds = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
 
-		$existingReadyAssets = assetPeer::retrieveByIds($existingReadyAssetIds);
-		$allReadyAssets = array_merge($existingReadyAssets, $nonExistingReadyAssets);
+		$allReadyAssets = assetPeer::retrieveByIds(array_merge($existingReadyAssetIds, $nonExistingReadyAssetIds));
 		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $allReadyAssets);
 
 		if($lock)
@@ -69,7 +68,7 @@ class kBusinessConvertDL
 
 		myEntryUtils::deleteEntry($replacingEntry,null,true);
 
-		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry, $existingReadyAssetIds, $existingNonReadyAssetIds, $nonExistingReadyAssets, $nonExistingNonReadyAssets);
+		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry, $existingReadyAssetIds, $existingNonReadyAssetIds, $nonExistingReadyAssetIds, $nonExistingNonReadyAssetIds);
 	}
 
 	public static function checkForPendingLiveClips(entry $entry)

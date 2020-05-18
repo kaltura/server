@@ -22,6 +22,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'multiOptions'  => array('kPathManager' => 'Kaltura Path',
 									'kExternalPathManager' => 'External Path',
 		    						'kXslPathManager' => 'XSL Path',
+									'kS3PathManager' => 'S3 Path',
 									),	
 		));
 		$this->getElement('pathManagerClass')->setRegisterInArrayValidator(false);
@@ -149,6 +150,14 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		));
 		$this->addElementToDisplayGroup('advanced', 'shouldExportThumbnails');
 
+		$this->addElement('checkbox', 'shouldExportCaptions', array(
+			'label'			=> "Should export caption assets",
+			'checked'		=> false,
+			'indicator'		=> 'dynamic',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt')))
+		));
+		$this->addElementToDisplayGroup('advanced', 'shouldExportCaptions');
+
 		$this->addPackagerConfigurationFields();
 	}
 
@@ -160,6 +169,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 	    parent::populateFromObject($object, $add_underscore);
 	    $this->setDefault('pathManagerParams', json_encode($object->pathManagerParams));
 		$this->setDefault('shouldExportThumbnails', $object->shouldExportThumbs);
+		$this->setDefault('shouldExportCaptions', $object->shouldExportCaptions);
 	}
 	
     public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
@@ -192,6 +202,7 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 		
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
 		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
+		$object->shouldExportCaptions = $properties['shouldExportCaptions'];
 		return $object;
 	}
 	
@@ -206,18 +217,11 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 
 	protected function addPackagerConfigurationFields()
 	{
-		$this->addElement('text', 'regularPackagerUrl', array(
-			'label'			=> 'Regular packager URL:',
+		$this->addElement('text', 'packagerUrl', array(
+			'label'			=> 'Packager URL:',
 			'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElementToDisplayGroup('advanced', 'regularPackagerUrl');
-
-		$this->addElement('text', 'mappedPackagerUrl', array(
-			'label'			=> 'Mapped packager (playlist/encrypt) URL:',
-			'filters'		=> array('StringTrim'),
-		));
-
-		$this->addElementToDisplayGroup('advanced', 'mappedPackagerUrl');
+		$this->addElementToDisplayGroup('advanced', 'packagerUrl');
 	}
 }
