@@ -438,7 +438,7 @@ class StorageProfileService extends KalturaBaseService
 			$c->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
 			$c->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
 			$c->addAscendingOrderByColumn(FileSyncPeer::ID);
-			$c->add(FileSyncPeer::CREATED_AT, $fileSyncThresholdCreationTime, Criteria::GREATER_THAN);
+			$c->add(FileSyncPeer::UPDATED_AT, $fileSyncThresholdCreationTime, Criteria::GREATER_THAN);
 			$c->setLimit(1);
 
 			FileSyncPeer::setUseCriteriaFilter(false);
