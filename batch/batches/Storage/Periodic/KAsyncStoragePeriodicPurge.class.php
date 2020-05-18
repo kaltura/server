@@ -36,7 +36,7 @@ class KAsyncStoragePeriodicPurge extends KStorageFileSyncsBase
 
 	protected function processOperation($engine)
 	{
-		return $engine->delete();;
+		return $engine->delete();
 	}
 
 	protected function getOperationStatusSuccess()

@@ -41,7 +41,7 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 
 			if ($lockResult->fileSyncs)
 			{
-				KalturaLog::debug("Found file syncs to process");
+				KalturaLog::debug('Found file syncs to process');
 
 				//Process
 				$this->processFileSyncs($lockResult->fileSyncs);

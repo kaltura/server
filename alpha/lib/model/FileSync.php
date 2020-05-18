@@ -86,20 +86,6 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $fileSyncs;
 	}
 
-	public static function getLastFileSyncId($fileSyncs)
-	{
-		$lastId = 0;
-
-		if ($fileSyncs)
-		{
-			$lastFileSync = end($fileSyncs);
-			$lastId = $lastFileSync->getId();
-		}
-
-		KalturaLog::debug("Update lastId to [$lastId]");
-		return $lastId;
-	}
-
 	public static function getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix)
 	{
 		// get locked file syncs with multi get

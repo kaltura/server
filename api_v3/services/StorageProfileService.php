@@ -207,15 +207,17 @@ class StorageProfileService extends KalturaBaseService
 				$done = true;
 			}
 
-			$lastId = FileSync::getLastFileSyncId($fileSyncs);
+			$lastId = end($fileSyncs)->getId();
+
 			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
 
 			$lockKeys = FileSync::getLockedFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX);
 			FileSync::lockFileSyncs($fileSyncs, $lockKeys, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry,
 				$maxCount, $maxSize, $lockedFileSyncs, $limitReached, $lastId, $lockedFileSyncsSize);
+
+			KalturaLog::debug("Update lastId to [$lastId]");
 		}
 
-		KalturaLog::info("trying setting lastId to [$lastId] when initialized ID is [$initialLastId]");
 		self::setLastIdInCache($initialLastId, $lastId, $keysCache, $workerId);
 		FileSync::createFileSyncsPath($lockedFileSyncs);
 
