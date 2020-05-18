@@ -29,7 +29,7 @@ class kNetworkUtils
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
 		$url = $_SERVER['REQUEST_URI'];
-		$secret = kConf::get('authentication_secret','local', null);
+		$secret = kConf::get('authentication_secret','secrets', null);
 		if (!$secret)
 		{
 			KalturaLog::warning("Missing authentication_secret in configuration");

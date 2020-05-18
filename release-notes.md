@@ -1,3 +1,12 @@
+# Propus 16.3.0  #
+
+## Authenticate uris ##
+- Issue Type: Task
+- Issue ID: PLAT-10806
+
+### Configuration ###
+Add the appropriate secret to 'authentication_secret' param in 'secrets' map
+
 # Propus 16.2.0  #
 
 ## Support export captions to remote storage ##
