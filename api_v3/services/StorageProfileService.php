@@ -430,10 +430,10 @@ class StorageProfileService extends KalturaBaseService
 		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
 		if (!$initialLastId)
 		{
-			$fileSyncThresholdCreationTime = time() - kConf::get('lastFileSyncIdUpdateTimeThreshold', 'cloud_storage', 3600);
+			$fileSyncThresholdUpdatedTime = time() - kConf::get('last_file_sync_update_time_threshold', 'cloud_storage', 3600);
 
 			$c = new Criteria();
-			$c->add(FileSyncPeer::UPDATED_AT, $fileSyncThresholdCreationTime, Criteria::GREATER_THAN);
+			$c->add(FileSyncPeer::UPDATED_AT, $fileSyncThresholdUpdatedTime, Criteria::GREATER_THAN);
 			$c->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
 			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 			$c->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
