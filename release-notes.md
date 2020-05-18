@@ -11,7 +11,7 @@ Add the following to batch.ini:
 
     [KAsyncStoragePeriodicPurge : PeriodicWorker]
     id                                                  = @ID@
-    friendlyName                                        = Storage Periodic Delete
+    friendlyName                                        = Storage Periodic Purge
     type                                                = KAsyncStoragePeriodicPurge
     scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicPurgeExe.php
     maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
