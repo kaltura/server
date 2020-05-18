@@ -120,7 +120,7 @@ class kAssetUtils
 			
 		if(is_null($storageId) && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
 		{
-			list ($fileSync, $remote) = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key);// check if having file sync on kaltura dcs
+			$fileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key, $isRemote);// check if having file sync on kaltura dcs
 			if ($fileSync)
 			{
 				return null;

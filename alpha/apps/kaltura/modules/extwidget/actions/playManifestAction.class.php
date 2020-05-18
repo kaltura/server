@@ -429,8 +429,8 @@ class playManifestAction extends kalturaAction
 				
 		if(!$key)
 			$key = $this->entry->getSyncKey(kEntryFileSyncSubType::ISM);
-			
-		$localFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key);
+
+		$localFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key, $isRemote);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		
 		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
@@ -441,7 +441,7 @@ class playManifestAction extends kalturaAction
 			{
 				return false;
 			}
-			$localFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key);
+			$localFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key,$isRemote);
 			$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		}
 		
@@ -469,7 +469,7 @@ class playManifestAction extends kalturaAction
 		if (!$key)
 			return false;
 
-		$localFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key);
+		$localFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($key, $isRemote);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
 		{

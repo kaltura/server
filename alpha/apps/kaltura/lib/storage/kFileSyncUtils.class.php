@@ -1819,10 +1819,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	/**
 	 * @param FileSyncKey $syncKey
-	 * @return array
+	 * @param $isRemote
+	 * @return FileSync|null
 	 * @throws KalturaAPIException
 	 */
-	public static function getReadyKalturaInternalFileSyncForKey(FileSyncKey $syncKey)
+	public static function getReadyKalturaInternalFileSyncForKey(FileSyncKey $syncKey, &$isRemote = false)
 	{
 		$fileSync = self::getFileSyncFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
 		$isRemote = false;
@@ -1834,7 +1835,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 		}
-		return array ($fileSync, $isRemote);
+		return $fileSync;
 	}
 
 	/**
@@ -1896,7 +1897,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					$serveRemote = true;
 					break;
 				}
-				list ($fileSync, $serveRemote) = self::getReadyKalturaInternalFileSyncForKey($syncKey);
+				$fileSync = self::getReadyKalturaInternalFileSyncForKey($syncKey, $serveRemote);
 				if (!$fileSync)
 				{
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
@@ -1904,7 +1905,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				break;
 
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				list ($fileSync, $serveRemote) = self::getReadyKalturaInternalFileSyncForKey($syncKey);
+				$fileSync = self::getReadyKalturaInternalFileSyncForKey($syncKey, $serveRemote);
 				if (!$fileSync)
 				{
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
@@ -1912,7 +1913,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				break;
 
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				list ($fileSync, $serveRemote) = self::getReadyKalturaInternalFileSyncForKey($syncKey);
+				$fileSync = self::getReadyKalturaInternalFileSyncForKey($syncKey, $serveRemote);
 				if ($fileSync)
 				{
 					break;
