@@ -246,7 +246,7 @@ class KFileTransferExportEngine extends KExportEngine
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::info("Can't serve asset id [$assetId] " . $e->getMessage());
+			KalturaLog::info("Can't serve asset id [$assetId] from [$externalUrl] " . $e->getMessage());
 		}
 
 		return $res;
@@ -260,3 +260,4 @@ class KFileTransferExportEngine extends KExportEngine
 		}
 	}
 }
+
