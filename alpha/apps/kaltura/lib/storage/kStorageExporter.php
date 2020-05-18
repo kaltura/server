@@ -555,11 +555,28 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
+		$isPartnerValid = false;
+
 		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
 		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
 		{
+			$isPartnerValid = true;
+		}
+		else
+		{
+			$partnerPackages = kConf::get('export_to_cloud_partner_package', 'cloud_storage', array());
+			$partner = PartnerPeer::retrieveActiveByPK($partnerId);
+			if ( $partner && in_array($partner->getPartnerPackage(), $partnerPackages) )
+			{
+				$isPartnerValid = true;
+			}
+		}
+
+		if($isPartnerValid)
+		{
 			return kConf::get('periodic_storage_ids','cloud_storage', array());
 		}
+
 		return array();
 	}
 
