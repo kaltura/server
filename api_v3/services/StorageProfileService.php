@@ -428,17 +428,17 @@ class StorageProfileService extends KalturaBaseService
 	protected static function getLastFileSyncIdToLock($keysCache, $storageProfileId, $filter,  $workerId)
 	{
 		$initialLastId = $keysCache->get(self::LAST_FILESYNC_ID_PREFIX . $workerId);
-		if (!$initialLastId && $filter->createdAtGreaterThanOrEqual)
+		if (!$initialLastId)
 		{
-			$fileSyncThresholdCreationTime = $filter->createdAtGreaterThanOrEqual - kConf::get('lastFileSyncIdCreationTimeThreshold', 'cloud_storage', 0);
+			$fileSyncThresholdCreationTime = time() - kConf::get('lastFileSyncIdUpdateTimeThreshold', 'cloud_storage', 3600);
 
 			$c = new Criteria();
-			$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
-			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-			$c->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
-			$c->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
-			$c->addAscendingOrderByColumn(FileSyncPeer::ID);
 			$c->add(FileSyncPeer::UPDATED_AT, $fileSyncThresholdCreationTime, Criteria::GREATER_THAN);
+			$c->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+			$c->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
+			$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
+			$c->addAscendingOrderByColumn(FileSyncPeer::UPDATED_AT);
 			$c->setLimit(1);
 
 			FileSyncPeer::setUseCriteriaFilter(false);
