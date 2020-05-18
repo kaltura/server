@@ -478,7 +478,7 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($this->pathOnly && kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+		if ($this->pathOnly && (kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR'])) || kNetworkUtils::isAuthenticatedURI())
 		{
 			$path = '';
 			$parent_file_sync = null;
