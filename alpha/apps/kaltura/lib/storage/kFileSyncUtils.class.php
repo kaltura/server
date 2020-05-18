@@ -819,21 +819,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @return FileSync
 	 */
-	public static function getReadyInternalFileSyncForKey(FileSyncKey $key)
-	{
-		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
-
-		return FileSyncPeer::doSelectOne( $c );
-	}
-
-	/**
-	 * Get the internal from kaltura data centers only FileSync object by its key
-	 *
-	 * @param FileSyncKey $key
-	 * @return FileSync
-	 */
 	public static function getReadyInternalFileSyncsForKey(FileSyncKey $key)
 	{
 		$c = new Criteria();
@@ -1823,7 +1808,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @return FileSync|null
 	 * @throws KalturaAPIException
 	 */
-	public static function getReadyKalturaInternalFileSyncForKey(FileSyncKey $syncKey, &$isRemote = false)
+	public static function getReadyInternalFileSyncForKey(FileSyncKey $syncKey, &$isRemote = false)
 	{
 		$fileSync = self::getFileSyncFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
 		$isRemote = false;
@@ -1833,7 +1818,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		else
 		{
-			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
+			$c = FileSyncPeer::getCriteriaForFileSyncKey( $syncKey );
+			$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+			$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+			$fileSync = FileSyncPeer::doSelectOne( $c );
 		}
 		return $fileSync;
 	}
@@ -1897,7 +1885,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					$serveRemote = true;
 					break;
 				}
-				$fileSync = self::getReadyKalturaInternalFileSyncForKey($syncKey, $serveRemote);
+				$fileSync = self::getReadyInternalFileSyncForKey($syncKey, $serveRemote);
 				if (!$fileSync)
 				{
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
@@ -1905,7 +1893,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				break;
 
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$fileSync = self::getReadyKalturaInternalFileSyncForKey($syncKey, $serveRemote);
+				$fileSync = self::getReadyInternalFileSyncForKey($syncKey, $serveRemote);
 				if (!$fileSync)
 				{
 					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
@@ -1913,7 +1901,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				break;
 
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$fileSync = self::getReadyKalturaInternalFileSyncForKey($syncKey, $serveRemote);
+				$fileSync = self::getReadyInternalFileSyncForKey($syncKey, $serveRemote);
 				if ($fileSync)
 				{
 					break;

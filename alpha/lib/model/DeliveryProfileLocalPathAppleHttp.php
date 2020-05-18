@@ -21,7 +21,7 @@ class DeliveryProfileLocalPathAppleHttp extends DeliveryProfileAppleHttp {
 	{
 		//In this instance, since we require the local path of the flavor asset, it's the same thing as returning its filesync path.
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($syncKey);
+		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 		return $this->getFileSyncUrl($fileSync);
 	}
 	

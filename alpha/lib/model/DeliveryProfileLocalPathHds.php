@@ -20,7 +20,7 @@ class DeliveryProfileLocalPathHds extends DeliveryProfileHds {
 	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($syncKey);
+		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 		return $this->getFileSyncUrl($fileSync);
 	}
 	

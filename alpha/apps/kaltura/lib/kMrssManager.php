@@ -357,7 +357,7 @@ class kMrssManager
 		self::$addedIsmUrl = true;
 		$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::ISM);
 		
-		$kalturaFileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($syncKey);
+		$kalturaFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 
 		$urlManager = DeliveryProfilePeer::getDeliveryProfile($entry->getId(), PlaybackProtocol::SILVER_LIGHT);
 		if(!$urlManager)

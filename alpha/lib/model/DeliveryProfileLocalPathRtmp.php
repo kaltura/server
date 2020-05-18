@@ -5,7 +5,7 @@ class DeliveryProfileLocalPathRtmp extends DeliveryProfileRtmp {
 	protected function doGetFlavorAssetUrl(asset $flavorAsset)
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::getReadyKalturaInternalFileSyncForKey($syncKey);
+		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
 		$url = $this->getFileSyncUrl($fileSync);
 		$url = $this->formatByExtension($url, false);
 		return $url;
