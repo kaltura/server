@@ -366,31 +366,19 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $this->getId() . "]");
 
-<<<<<<< HEAD
-		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
-=======
 		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
->>>>>>> ebcca3d... PLAT-10810: Export a file from a remote storage
 		if(!$kalturaFileSync) // no local copy to export from
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
 			return false;
 		}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-		$fileSyncDcId = $kalturaFileSync->getDc();
-		if(!$local && in_array($fileSyncDcId, kDataCenterMgr::getDcIds()))
-=======
 		if(!$local && in_array($kalturaFileSync->getDc(), kDataCenterMgr::getDcIds()))
->>>>>>> 4f5829b... PLAT-10810: Export a file from a remote storage
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] was found but in a different DC");
 			return false;
 		}
 
->>>>>>> 6d2d1d5... PLAT-10810: Export a file from a remote storage
 		KalturaLog::log(__METHOD__ . " validating file size [" . $kalturaFileSync->getFileSize() . "] is between min [" . $this->getMinFileSize() . "] and max [" . $this->getMaxFileSize() . "]");
 		if($this->getMaxFileSize() && $kalturaFileSync->getFileSize() > $this->getMaxFileSize()) // too big
 		{
