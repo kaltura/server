@@ -5,22 +5,23 @@
  */
 class kNetworkUtils
 {
+	const KALTURA_AUTH_HEADER = 'HTTP_X_KALTURA_AUTH';
 	/**
 	 * @return bool
 	 * @throws Exception
 	 */
 	public static function isAuthenticatedURI()
 	{
-		if (!isset($_SERVER['HTTP_X_KALTURA_AUTH']))
+		if (!isset($_SERVER[self::KALTURA_AUTH_HEADER]))
 		{
-			KalturaLog::warning("Missing Header Parameter - X-Kaltura-Auth");
+			KalturaLog::warning("Missing Header Parameter - ". self::KALTURA_AUTH_HEADER);
 			return false;
 		}
-		$xKalturaAuth = $_SERVER['HTTP_X_KALTURA_AUTH'];
+		$xKalturaAuth = $_SERVER[self::KALTURA_AUTH_HEADER];
 		$parts = explode(',', $xKalturaAuth);
 		if (count($parts) != 3)
 		{
-			KalturaLog::warning("Invalid X-Kaltura-Auth Format");
+			KalturaLog::warning('Invalid Fromat for ' . self::KALTURA_AUTH_HEADER);
 			return false;
 		}
 
