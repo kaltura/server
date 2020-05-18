@@ -10,6 +10,8 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 {
 	const OBJECT_TYPE_TITLE = 'vendor catalog item';
 	const MANDATORY_COLUMN_MISSING = 'Mandatory Column missing from CSV';
+	const ENUM_VALUE_NOT_FOUND = 'Enum value not found ';
+	const PRICE_VALUES_MISSING = 'Cannot add/update only one of the values: pricePerUnit/priceFunction';
 	const EXCEEDED_MAX_RECORDS = 'Exceeded max records count per bulk';
 	const NA = 'N\A';
 	const PRICING_PER_UNIT = 'pricing:pricePerUnit';
@@ -33,6 +35,11 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 		$bulkUploadResult->bulkUploadResultObjectType = KalturaBulkUploadObjectType::VENDOR_CATALOG_ITEM;
 		array_walk($values, array('BulkUploadVendorCatalogItemEngineCsv', 'trimArray'));
 		$this->setResultValues($columns, $values, $bulkUploadResult);
+		if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
+		{
+			$this->addBulkUploadResult($bulkUploadResult);
+			return;
+		}
 
 		$bulkUploadResult->status = KalturaBulkUploadResultStatus::IN_PROGRESS;
 		$bulkUploadResult->objectStatus = KalturaVendorCatalogItemStatus::ACTIVE;
@@ -62,7 +69,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			}
 			if (in_array($column, $shouldConvertValueToEnum) && isset($values[$index]))
 			{
-				self::handleEnumColumns($values[$index], $column, $bulkUploadResult);
+				$this->handleEnumColumns($values[$index], $column, $bulkUploadResult);
 			}
 			else if(($column === self::PRICING_PER_UNIT || $column === self::PRICING_FUNCTION) && isset($values[$index]))
 			{
@@ -99,7 +106,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 		KalturaLog::info("Set value $column [{$bulkUploadPricing->$columnName}]");
 	}
 
-	protected static function handleEnumColumns($value, $column, $bulkUploadResult)
+	protected function handleEnumColumns($value, $column, $bulkUploadResult)
 	{
 		switch($column)
 		{
@@ -122,8 +129,11 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			default:
 				$enumValue = null;
 		}
-
-		if ($enumValue)
+		if ($enumValue === null || $enumValue === '')
+		{
+			$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::ENUM_VALUE_NOT_FOUND . $column . ':' . $value);
+		}
+		else
 		{
 			$bulkUploadResult->$column = $enumValue;
 			KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
@@ -149,11 +159,17 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected function validateBulkUploadResultByAction($bulkUploadResult)
 	{
-		if (($bulkUploadResult->action == KalturaBulkUploadAction::ADD || $bulkUploadResult->action == KalturaBulkUploadAction::UPDATE)
-		&& !$bulkUploadResult->serviceFeature)
+		if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD || $bulkUploadResult->action == KalturaBulkUploadAction::UPDATE)
 		{
-			return $this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::MANDATORY_COLUMN_MISSING .' :serviceFeature');
-
+			if (!$bulkUploadResult->serviceFeature)
+			{
+				return $this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::MANDATORY_COLUMN_MISSING .' :serviceFeature');
+			}
+			if ( (isset($bulkUploadResult->pricing->pricePerUnit) && !isset($bulkUploadResult->pricing->priceFunction)) ||
+				(!isset($bulkUploadResult->pricing->pricePerUnit) && isset($bulkUploadResult->pricing->priceFunction)) )
+			{
+				return $this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::PRICE_VALUES_MISSING);
+			}
 		}
 
 		switch ($bulkUploadResult->action)
