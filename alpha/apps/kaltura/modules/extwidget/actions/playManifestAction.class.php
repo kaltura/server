@@ -749,7 +749,7 @@ class playManifestAction extends kalturaAction
 		// choose the storage profile with the highest number of flavors
 		list ($maxDc, $remoteFlavors) = $this->getMaxDcFlavors($remoteFlavorsByDc);
 
-		if($cloudFileSyncs && count($localFlavors) == 0)
+		if($cloudFileSyncs)
 		{
 			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
 			foreach ($cloudStorageProfiles as $cloudProfile)
@@ -770,7 +770,7 @@ class playManifestAction extends kalturaAction
 			$storageId = null;
 			$deliveryFlavors = $localFlavors;
 
-			if($cloudMaxDc && (count($localFlavors) == 0))
+			if($cloudMaxDc)
 			{
 				$storageId = $cloudMaxDc;
 				$deliveryFlavors = $cloudRemoteFlavors;
