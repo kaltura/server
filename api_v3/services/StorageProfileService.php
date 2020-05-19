@@ -177,7 +177,7 @@ class StorageProfileService extends KalturaBaseService
 		$createdAtLessThanOrEqual = $filter->createdAtLessThanOrEqual;
 		$filter->createdAtLessThanOrEqual = null;
 
-		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria();
+		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::ID);
 
 		$lockedFileSyncs = array();
 		$lockedFileSyncsSize = 0;

@@ -115,7 +115,7 @@ class FileSyncService extends KalturaBaseService
 
 		$lockCache = self::getLockCache();
 
-		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria();
+		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::UPDATED_AT);
 
 		$lockedFileSyncs = array();
 		$limitReached = false;

@@ -45,7 +45,7 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
-	public function buildFileSyncNotLinkedCriteria()
+	public function buildFileSyncNotLinkedCriteria($orderByColumn)
 	{
 		$baseCriteria = new Criteria();
 
@@ -57,7 +57,7 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 		// More
 		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
 
-		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
+		$baseCriteria->addAscendingOrderByColumn($orderByColumn);
 		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
 
 		return $baseCriteria;
