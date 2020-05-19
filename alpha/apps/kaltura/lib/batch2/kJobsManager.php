@@ -555,9 +555,13 @@ class kJobsManager
 		$isLocal = ($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC);
 		
 		if($isLocal)
+		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		}
 		else 
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey, $flavor->getSourceRemoteStorageProfileId());		
+		{
+			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey, $flavor->getSourceRemoteStorageProfileId());
+		}
 		
 		if(!$fileSync)
 		{
