@@ -13,7 +13,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 	const MAX_COUNT = 'maxCount';
 	const MAX_SIZE = 'maxSize';
 	const STORAGE_PROFILE_IDS = 'periodic_storage_ids';
-	const FILE_SYNC_RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey';
+	const FILE_SYNC_RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey,storageClass';
 
 	protected $storageProfiles;
 	protected $currentIndex;

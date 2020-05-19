@@ -276,9 +276,30 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getSrcEncKey () { return $this->getFromCustomData("srcEncKey"); }
 	public function setSrcEncKey ($v) { $this->putInCustomData("srcEncKey", $v);  }
 
+	public function getStorageClass () { return $this->getFromCustomData("storageClass"); }
+	public function setStorageClass ($v) { $this->putInCustomData("storageClass", $v);  }
 
+ 	/**
+	 * Create new fileSync With status pending and new storageId
+	 * @param $storageId
+	 * @return FileSync
+	 * @throws PropelException
+	 */
+	public function cloneToAnotherStorage($storageId)
+	{
+		$newfileSync = $this->copy(true);
+		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
+		$newfileSync->setSrcPath($this->getFullPath());
+		$newfileSync->setSrcEncKey($this->getSrcEncKey());
+		$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$newfileSync->setDc($storageId);
+
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
+		list($root, $filePath) = kPathManager::getFilePathArr($fileSyncKey, $storageId);
+		$newfileSync->setFilePath($filePath);
+		return $newfileSync;
+	}
 }
-
 
 class FileSyncKey 
 {

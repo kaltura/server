@@ -25,6 +25,7 @@ class s3Mgr extends kFileTransferMgr
 	protected $sseKmsKeyId = '';
 	protected $signatureType = null;
 	protected $endPoint = null;
+	protected $storageClass = null;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
@@ -59,6 +60,11 @@ class s3Mgr extends kFileTransferMgr
 		if($options && isset($options['endPoint']))
 		{
 			$this->endPoint = $options['endPoint'];
+		}
+
+		if($options && isset($options['storageClass']))
+		{
+			$this->storageClass = $options['storageClass'];
 		}
 		
 		// do nothing
@@ -142,6 +148,11 @@ class s3Mgr extends kFileTransferMgr
 		if ($this->sseType === "AES256")
 		{
 			$params['ServerSideEncryption'] = "AES256";
+		}
+
+		if ($this->storageClass)
+		{
+			$params['StorageClass'] = $this->storageClass;
 		}
 
 		while ($retries)

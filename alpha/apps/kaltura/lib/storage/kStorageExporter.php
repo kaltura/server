@@ -160,7 +160,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
 	{
-
 		$partner = $entry->getPartner();
 
 		// all export jobs for replacing entry that has periodic storage will happen on the original replaced entry
@@ -178,7 +177,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
-		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
+		if (!$fileSync)
+		{
 			KalturaLog::info("no ready fileSync was found for key [$key]");
 			return;
 		}
@@ -195,7 +195,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		else
 		{
-			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(),
+				$externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
 		}
 		return true;
 	}
@@ -555,11 +556,28 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
+		$isPartnerValid = false;
+
 		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
 		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
 		{
+			$isPartnerValid = true;
+		}
+		else
+		{
+			$partnerPackages = kConf::get('export_to_cloud_partner_package', 'cloud_storage', array());
+			$partner = PartnerPeer::retrieveActiveByPK($partnerId);
+			if ( $partner && in_array($partner->getPartnerPackage(), $partnerPackages) )
+			{
+				$isPartnerValid = true;
+			}
+		}
+
+		if($isPartnerValid)
+		{
 			return kConf::get('periodic_storage_ids','cloud_storage', array());
 		}
+
 		return array();
 	}
 
