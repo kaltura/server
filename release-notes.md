@@ -1,4 +1,11 @@
 # Propus 16.2.0  #
+## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
+Issue Type: Task
+Issue ID: PLAT-10890
+
+### Configuration ###
+Modify cloud_storage.ini:
+add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
 
 ## Support export captions to remote storage ##
 - Issue Type: Task

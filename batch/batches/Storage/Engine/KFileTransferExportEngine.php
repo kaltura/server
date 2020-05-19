@@ -26,8 +26,19 @@ class KFileTransferExportEngine extends KExportEngine
 	 */
 	function export() 
 	{
+		$srcTempFile = null;
+
 		if(!KBatchBase::pollingFileExists($this->srcFile))
-			throw new kTemporaryException("Source file {$this->srcFile} does not exist");
+		{
+			$srcTempFile = $this->getAssetFile($this->data->assetId, $this->data->externalUrl);
+
+			if(!$srcTempFile)
+			{
+				throw new kTemporaryException("Source file {$this->srcFile} does not exist");
+			}
+
+			$this->srcFile = $srcTempFile;
+		}
 
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
 		$engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
@@ -62,6 +73,7 @@ class KFileTransferExportEngine extends KExportEngine
 		}
 		catch(Exception $e)
 		{
+			$this->unlinkFileIfNeeded($srcTempFile);
 			throw new kTemporaryException($e->getMessage());
 		}
 
@@ -84,12 +96,15 @@ class KFileTransferExportEngine extends KExportEngine
 		}
 		catch(kFileTransferMgrException $e)
 		{
+			$this->unlinkFileIfNeeded($srcTempFile);
+
 			if($e->getCode() == kFileTransferMgrException::remoteFileExists)
 				throw new kApplicativeException(KalturaBatchJobAppErrors::FILE_ALREADY_EXISTS, $e->getMessage());
 			
 			throw new Exception($e->getMessage(), $e->getCode());
 		}
 
+		$this->unlinkFileIfNeeded($srcTempFile);
 		return true;
 	}
 
@@ -194,6 +209,56 @@ class KFileTransferExportEngine extends KExportEngine
 		$storageExportData->signatureType = $externalStorage->signatureType;
 		$storageExportData->storageClass = $fileSync->storageClass;
 		return $storageExportData;
+	}
+
+	protected function getAssetFile($assetId, $externalUrl)
+	{
+		// Needed arguments
+		if( ($assetId === null) || ($externalUrl === null) )
+		{
+			KalturaLog::info("Received NULL as assetId / externalUrl");
+			return null;
+		}
+
+		// Create the temporary file path
+		$tempDirectoryPath = sys_get_temp_dir();
+		if (!is_dir($tempDirectoryPath))
+		{
+			kFile::fullMkfileDir($tempDirectoryPath, 0700, true);
+		}
+
+		$filePath = $tempDirectoryPath . '/asset_'.$assetId;
+
+		// Retrieve the file
+		$res = null;
+		try
+		{
+			$stat = KCurlWrapper::getDataFromFile($externalUrl, $filePath, null, true);
+
+			if ($stat)
+			{
+				$res = $filePath;
+				KalturaLog::info("Succeeded to retrieve asset content for assetId: [$assetId]");
+			}
+			else
+			{
+				KalturaLog::info("Failed to retrieve asset content for assetId: [$assetId]");
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Can't serve asset id [$assetId] from [$externalUrl] " . $e->getMessage());
+		}
+
+		return $res;
+	}
+
+	protected function unlinkFileIfNeeded($tempFile)
+	{
+		if($tempFile)
+		{
+			unlink($tempFile);
+		}
 	}
 
 }
