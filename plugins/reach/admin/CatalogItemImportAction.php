@@ -31,6 +31,7 @@ class CatalogItemImportAction extends KalturaApplicationPlugin
 				$bulkGetUrl = Infra_ClientHelper::getServiceUrl() . '/api_v3/service/bulkupload_bulk/action/get/id/' . $bulkUploadId . '/ks/' . Infra_ClientHelper::getKs();
 				$action->view->bulkGetUrl = $bulkGetUrl;
 			}
+			unlink($csvPath);
 		}
 		catch (Exception $e)
 		{
