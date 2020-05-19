@@ -35,6 +35,7 @@ class CatalogItemImportAction extends KalturaApplicationPlugin
 		catch (Exception $e)
 		{
 			KalturaLog::err('Error in vendorCatalogItem->addFromBulkUpload ' . $e->getMessage());
+			$action->view->errMessage =  $e->getMessage();
 		}
 	}
 
