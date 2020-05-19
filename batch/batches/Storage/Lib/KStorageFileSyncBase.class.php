@@ -24,7 +24,7 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 		$this->getParamsOperation();
 
 		//Get All Storage Profiles
-		$this->getStorageProfiles($filter->dcIn);
+		$this->initStorageProfiles($filter->dcIn);
 		if(!$this->storageProfiles)
 		{
 			KalturaLog::debug("No storage profiles to process");
@@ -41,8 +41,6 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 
 			if ($lockResult->fileSyncs)
 			{
-				KalturaLog::debug('Found file syncs to process');
-
 				//Process
 				$this->processFileSyncs($lockResult->fileSyncs);
 
@@ -157,7 +155,7 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 		self::$kClient->setResponseProfile($responseProfile);
 	}
 
-	protected function getStorageProfiles($dcs)
+	protected function initStorageProfiles($dcs)
 	{
 		$storageProfileIds = explode(',', $dcs);
 		if(!$storageProfileIds)
@@ -201,8 +199,8 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 				$processed = $this->process($storageProfile, $fileSync);
 				if($processed)
 				{
-					KalturaLog::debug("File sync id [{$fileSync->id}] from storage id [{$storageProfile->id}] was processed");
 					$status = $this->getOperationStatusSuccess();
+					KalturaLog::debug("File sync id [{$fileSync->id}] from storage id [{$storageProfile->id}] was processed. New status [{$status}]");
 				}
 			}
 			catch(kApplicativeException $e)

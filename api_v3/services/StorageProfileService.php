@@ -156,7 +156,7 @@ class StorageProfileService extends KalturaBaseService
 	 * @param int $maxSize The maximum total size of file syncs that should be returned, this limit may be exceeded by one file sync
 	 * @return KalturaLockFileSyncsResponse
 	 */
-	function lockPendingFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $storageProfileId, $maxCount, $maxSize = null)
+	function lockPendingFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $storageProfileId, $maxCount, $maxSize = PHP_INT_MAX)
 	{
 		// need to explicitly disable the cache since this action may not perform any queries
 		kApiCache::disableConditionalCache();
@@ -211,9 +211,8 @@ class StorageProfileService extends KalturaBaseService
 
 			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
 
-			$lockKeys = FileSync::getLockedFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX);
-			FileSync::lockFileSyncs($fileSyncs, $lockKeys, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry,
-				$maxCount, $maxSize, $lockedFileSyncs, $limitReached, $lastId, $lockedFileSyncsSize);
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry, $maxCount,
+				$maxSize, $lockedFileSyncs, $limitReached, $lastId);
 
 			KalturaLog::debug("Update lastId to [$lastId]");
 		}

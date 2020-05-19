@@ -47,7 +47,7 @@ class KAsyncStoragePeriodicExport extends KStorageFileSyncsBase
 
 	protected function processOperation($engine)
 	{
-		return $engine->export();;
+		return $engine->export();
 	}
 
 	protected function getOperationStatusSuccess()

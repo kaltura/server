@@ -19,7 +19,7 @@ class KAsyncStoragePeriodicPurge extends KStorageFileSyncsBase
 	 */
 	public static function getType()
 	{
-		return KalturaBatchJobType::STORAGE_PERIODIC_DELETE;
+		return KalturaBatchJobType::STORAGE_PERIODIC_PURGE;
 	}
 
 	protected function getParamsOperation()

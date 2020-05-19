@@ -117,6 +117,7 @@ class FileSyncService extends KalturaBaseService
 
 		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::UPDATED_AT);
 
+		$maxSize = PHP_INT_MAX;
 		$lockedFileSyncs = array();
 		$limitReached = false;
 
@@ -125,10 +126,8 @@ class FileSyncService extends KalturaBaseService
 
 		if ($fileSyncs)
 		{
-			$lockKeys = FileSync::getLockedFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX);
-
-			FileSync::lockFileSyncs($fileSyncs, $lockKeys, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeOut,
-				$maxCount, 0, $lockedFileSyncs, $limitReached);
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeOut,
+				$maxCount, $maxSize, $lockedFileSyncs, $limitReached);
 
 			FileSync::createFileSyncsPath($lockedFileSyncs);
 		}

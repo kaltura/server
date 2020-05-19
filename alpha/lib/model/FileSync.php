@@ -70,11 +70,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		$c = clone $baseCriteria;
 
+		if($fromId)
+		{
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+		}
 		if($toId)
 		{
-			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
-			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
-			$c->addAnd($idCriterion);
+			$c->add(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL);
 		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
@@ -86,7 +88,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $fileSyncs;
 	}
 
-	public static function getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix)
+	protected static function getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix)
 	{
 		// get locked file syncs with multi get
 		$lockKeys = array();
@@ -99,9 +101,12 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $lockKeys;
 	}
 
-	public static function lockFileSyncs($fileSyncs, $lockKeys, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, $maxCount, $maxSize,
-	                                     &$lockedFileSyncs, &$limitReached, &$lastId = null, &$lockedFileSyncsSize = null)
+	public static function lockFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, $maxCount,
+	                                     &$maxSize, &$lockedFileSyncs, &$limitReached, &$lastId = null)
 	{
+		// Get lock file syncs
+		$lockKeys = self::getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix);
+
 		// try to lock file syncs
 		foreach ($fileSyncs as $fileSync)
 		{
@@ -123,13 +128,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 			// add to the result set
 			$lockedFileSyncs[] = $fileSync;
-			if($lockedFileSyncsSize !== null)
-			{
-				$lockedFileSyncsSize += $fileSync->getFileSize();
-			}
+			$maxSize -= $fileSync->getFileSize();
 
-			if (count($lockedFileSyncs) >= $maxCount ||
-				($maxSize && $lockedFileSyncsSize >= $maxSize))
+			// check limit
+			if ((count($lockedFileSyncs) >= $maxCount) || ($maxSize < 0))
 			{
 				if($lastId !== null)
 				{
