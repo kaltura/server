@@ -99,13 +99,12 @@ ini_set("memory_limit","512M");
 		 * FetchJob
 		 *	Get job from memcache storage
 		 */
-		public function FetchJob($keyIdx)
+		public function FetchJob($keyIdx, $maxTries=10)
 		{
 			$key = $this->getJobKeyName($keyIdx);
 			/*
 			 * 10 attempts to get the job object
 			 */
-			$maxTries = 10;
 			for($try=0; $try<$maxTries; $try++) {
 				if(($jobStr=$this->get($key))!==false){
 					break;
@@ -367,9 +366,9 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * ExecuteSession
 		 */
-		public static function ExecuteSession($host, $port, $token, $concurrent, $sessionName, $cmdLine)
+		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine)
 		{
-			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, sessionName:$sessionName, cmdLine:$cmdLine");
+			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
 				// 'flags=1' stands for 'compress stored data'
 			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
@@ -377,9 +376,10 @@ ini_set("memory_limit","512M");
 			
 			$setup = new KChunkedEncodeSetup;
 			$setup->concurrent = $concurrent;
+
+			$setup->concurrentMin = $concurrentMin;
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
-			
 			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName);
 			
 			if(($rv=$session->Initialize())!=true) {
@@ -482,7 +482,31 @@ ini_set("memory_limit","512M");
 			
 			return null;
 		}
-
+		
+		/* ---------------------------
+		 * GetRunningJobs
+		 */
+		public function GetRunningJobs($lookBackward=3000) {
+			KalturaLog::log("lookBackward:$lookBackward");
+			if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+				KalturaLog::log("ERROR: Missing write or read index ");
+				return false;
+			}
+			$localHostname = gethostname();
+			$jobs = array();
+			$idx=max(0,$readIndex-$lookBackward);
+			for(; $idx<$writeIndex; $idx++) {
+				$job = $this->FetchJob($idx,1);
+				if($job!==false && $job->state==$job::STATE_RUNNING 
+				&& strcmp($localHostname, $job->hostname)=== 0 && KProcessExecutionData::isProcessRunning($job->process)) {
+					$jobs[] = $job;
+					KalturaLog::log("Job: keyIdx($idx), pId($job->process)");
+				}
+			}
+			KalturaLog::log("Found running jobs - ".count($jobs));
+			return($jobs);
+		}
+		
 		/* ---------------------------
 		 * RefreshJobs
 		 */
@@ -559,50 +583,39 @@ ini_set("memory_limit","512M");
 			if(is_array($job->cmdLine) && count($job->cmdLine)>1) {
 				$outFilename = $job->cmdLine[1];
 				$pInfo = pathinfo($outFilename);
-				$this->tmpFolder = realpath($pInfo['dirname']);
+				$logFolder = realpath($pInfo['dirname']);
+			}
+			else {
+				$logFolder = $this->tmpFolder;
 			}
 			
-			$logName = $this->tmpFolder;
-			$logName.= "/$job->session"."_$job->id"."_$job->keyIdx".".log";
+			$logName = "$logFolder/$job->session"."_$job->id"."_$job->keyIdx".".log";
 			{
 				$cmdLine = 'php -r "';
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
-				/********************************************************
-				 * The bellow includes to be removed for production
-				 ********************************************************
 				 
-				{
-					$cmdLine.= 'require_once \'/opt/kaltura/app/alpha/scripts/bootstrap.php\';';
-					$cmdLine.= 'require_once \'/opt/kaltura/app/batch/client/KalturaTypes.php\';';
-					$dirName = "/opt/kaltura/app/infra/chunkedEncode";
-					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
-					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncode.php\';';
-					$cmdLine.= 'require_once \''.$dirName.'/KBaseChunkedEncodeSessionManager.php\';';
-					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeSessionManager.php\';';
-					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeDistrExecInterface.php\';';
-					$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
-				}
-				*/
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';
 				$cmdLine.= '\''.($this->memcacheConfig['port']).'\',';
 				$cmdLine.= '\''.($this->storeToken).'\',';
-				$cmdLine.= $job->keyIdx.');';
+				$cmdLine.= $job->keyIdx.',';
+				$cmdLine.= '\''.($this->tmpFolder).'\');';
 				$cmdLine.= 'if(\$rv==false) exit(1);';
 				$cmdLine.= '"';
 			}
-			$tmp_ce_process_file = $this->tmpFolder."/tmp_ce_".$job->session."_".$job->keyIdx.".log";
-			$cmdLine.= " > $logName 2>&1 & echo $! > $tmp_ce_process_file";
+			$chunk_job_pid_file = $this->tmpFolder."/chunk_job_pid_".$job->session."_".$job->keyIdx.".log";
+			$cmdLine.= " > $logName 2>&1 & echo $! > $chunk_job_pid_file";
 
 			KalturaLog::log($cmdLine);
+
 			$output = system($cmdLine, $rv);
 			if($rv!=0) {
 				$job->state = $job::STATE_FAIL;
 				$this->SaveJob($job);
 			}
 			else {
-				$job->process = (int)file_get_contents($tmp_ce_process_file);
-				unlink($tmp_ce_process_file);
+				$job->process = (int)file_get_contents($chunk_job_pid_file);
+				unlink($chunk_job_pid_file);
 			}
 			KalturaLog::log("id:$job->id,keyIdx:$job->keyIdx,rv:$rv,process:$job->process,cmdLine:$cmdLine");
 			return true;
@@ -611,11 +624,11 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 *
 		 */
-		public static function ExecuteJobCommand($host, $port, $token, $jobIndex)
+		public static function ExecuteJobCommand($host, $port, $token, $jobIndex, $tmpPromptFolder="/tmp")
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, jobIndex:$jobIndex");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
-				// 'flags=1' stands for 'compress stored data'			
+				// 'flags=1' stands for 'compress stored data'
 			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
 			$storeManager->Setup($config);
 			
@@ -650,7 +663,7 @@ ini_set("memory_limit","512M");
 			}
 			else {
 				if(isset($outFilename)) {
-					$stat = new KChunkFramesStat($outFilename/*,ffmpegBin,ffprobeBin*/);
+					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
 				}
 
@@ -683,5 +696,4 @@ ini_set("memory_limit","512M");
 	/*****************************
 	 * End of KChunkedEncodeMemcacheScheduler
 	 *****************************/
-
 

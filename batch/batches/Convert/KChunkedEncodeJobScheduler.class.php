@@ -66,8 +66,20 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 				$chunkedEncodeMaxConcurrent = 5;
 			}
 
+			/*
+			 * For AWS/Cloud deployments 'localTmpFolder' should be placed on the same cloud storage, 
+			 * in order to reduce redundant egress.
+			 * It should NOT be placed on the on premise isilons
+			 */
+                        if(isset(KBatchBase::$taskConfig->params->localTmpFolder)){
+                                $localTmpFolder = KBatchBase::$taskConfig->params->localTmpFolder;
+                        }
+                        else {
+                                $localTmpFolder = '/tmp';
+                        }
+
 				// Allocate the manager object
-			$manager = new KChunkedEncodeMemcacheScheduler($token);
+			$manager = new KChunkedEncodeMemcacheScheduler($token, $localTmpFolder);
 
 			$config = array('host'=>$host, 'port'=>$port);//, 'flags'=>1);
 			$manager->Setup($config);
@@ -75,7 +87,7 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 				// List of per scheduler instance currently processed jobs.
 				// Required in order to manage correctly the max concurrent active jobs 
 				// (aka 'chunkedEncodeMaxConcurrent')
-			$jobs = array();
+			$jobs = $manager->GetRunningJobs();
 			$attempts = 5;
 			while(1) {
 				$rv = $manager->RefreshJobs($chunkedEncodeMaxConcurrent, $jobs);
