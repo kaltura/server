@@ -5,8 +5,6 @@
  */
 class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 {
-	const MAX_FILESYNCS_PER_CHUNK = 100;
-
 	/**
 	 * @var KalturaNullableBoolean
 	 */
@@ -43,23 +41,5 @@ class KalturaFileSyncFilter extends KalturaFileSyncBaseFilter
 		}
 		
 		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-
-	public function buildFileSyncNotLinkedCriteria($orderByColumn)
-	{
-		$baseCriteria = new Criteria();
-
-		// Filter
-		$fileSyncFilter = new FileSyncFilter();
-		$this->toObject($fileSyncFilter);
-		$fileSyncFilter->attachToCriteria($baseCriteria);
-
-		// More
-		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
-
-		$baseCriteria->addAscendingOrderByColumn($orderByColumn);
-		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
-
-		return $baseCriteria;
 	}
 }

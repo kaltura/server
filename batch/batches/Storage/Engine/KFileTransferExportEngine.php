@@ -107,12 +107,6 @@ class KFileTransferExportEngine extends KExportEngine
     {
         $engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
         $engineOptions['passiveMode'] = $this->data->ftpPassiveMode;
-
-        if($this->data instanceof KalturaAmazonS3StorageExportJobData)
-        {
-            $engineOptions['s3Region'] = $this->data->s3Region;
-        }
-
         $engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
         
         try{
@@ -166,11 +160,6 @@ class KFileTransferExportEngine extends KExportEngine
 
 	protected function fillStorageExportJobData($storageExportData, $externalStorage, $fileSync, $force = false)
 	{
-		if($externalStorage->protocol == StorageProfileProtocol::KALTURA_DC)
-		{
-			$externalStorage->storageBaseDir = $externalStorage->storageUrl;
-		}
-
 		$storageExportData->serverUrl = $externalStorage->storageUrl;
 		$storageExportData->serverUsername = $externalStorage->storageUsername;
 		$storageExportData->serverPassword = $externalStorage->storagePassword;

@@ -55,5 +55,4 @@ interface BatchJobType extends BaseEnum
 	const LIVE_ENTRY_ARCHIVE = 51;
 	const STORAGE_UPDATE = 52;
 	const STORAGE_PERIODIC_EXPORT = 53;
-	const STORAGE_PERIODIC_PURGE = 54;
 }
