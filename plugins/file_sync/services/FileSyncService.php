@@ -8,8 +8,6 @@
  */
 class FileSyncService extends KalturaBaseService
 {
-	const LOCK_KEY_PREFIX = 'fileSync_fileSyncLock:id=';
-
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -67,87 +65,18 @@ class FileSyncService extends KalturaBaseService
 	 */
 	function updateAction($id, KalturaFileSync $fileSync)
 	{
-		$filterByStatus = ($fileSync->status !== null);
-
-		if($filterByStatus)
-		{
-			FileSyncPeer::setUseCriteriaFilter(false);
-		}
-
 		$dbFileSync = FileSyncPeer::retrieveByPK($id);
-
-		if($filterByStatus)
-		{
-			FileSyncPeer::setUseCriteriaFilter(true);
-		}
-
 		if (!$dbFileSync)
 		{
 			throw new KalturaAPIException(FileSyncErrors::FILESYNC_ID_NOT_FOUND, $id);
 		}
 
 		$fileSync->toUpdatableObject($dbFileSync);
-
 		$dbFileSync->save();
-
 		$dbFileSync->encrypt();
-
+		
 		$fileSync = new KalturaFileSync();
-
 		$fileSync->fromObject($dbFileSync, $this->getResponseProfile());
-
 		return $fileSync;
-	}
-
-	/**
-	 * lockFileSyncs action locks file syncs for the file sync periodic worker
-	 *
-	 * @action lockFileSyncs
-	 * @param KalturaFileSyncFilter $filter
-	 * @param int $maxCount The maximum number of file syncs that should be returned
-	 * @param int $lockExpiryTimeOut The expiry timeout of the lock
-	 * @return KalturaLockFileSyncsResponse
-	 */
-	function lockFileSyncsAction(KalturaFileSyncFilter $filter, $maxCount, $lockExpiryTimeOut)
-	{
-		// need to explicitly disable the cache since this action may not perform any queries
-		kApiCache::disableConditionalCache();
-
-		$lockCache = self::getLockCache();
-
-		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::UPDATED_AT);
-
-		$maxSize = PHP_INT_MAX;
-		$lockedFileSyncs = array();
-		$limitReached = false;
-
-		// Get file syncs
-		$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria);
-
-		if ($fileSyncs)
-		{
-			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeOut,
-				$maxCount, $maxSize, $lockedFileSyncs, $limitReached);
-
-			FileSync::createFileSyncsPath($lockedFileSyncs);
-		}
-
-		// build the response object
-		$result = new KalturaLockFileSyncsResponse;
-		$result->fileSyncs = KalturaFileSyncArray::fromDbArray($lockedFileSyncs, $this->getResponseProfile());
-		$result->limitReached = $limitReached;
-
-		return $result;
-	}
-
-	protected static function getLockCache()
-	{
-		$lockCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
-		if (!$lockCache)
-		{
-			throw new KalturaAPIException(MultiCentersErrors::GET_LOCK_CACHE_FAILED);
-		}
-
-		return $lockCache;
 	}
 }
