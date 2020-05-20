@@ -366,10 +366,16 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $this->getId() . "]");
 
-		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
+		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 		if(!$kalturaFileSync) // no local copy to export from
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
+			return false;
+		}
+
+		if(!$local && in_array($kalturaFileSync->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] was found but in a different DC");
 			return false;
 		}
 

@@ -20,7 +20,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_READY = 2;
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
-	
+
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
 		self::FILE_SYNC_STATUS_PENDING => "Pending", 
@@ -41,6 +41,107 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$file_sync->setVersion ( $key->version );
 		if ( $key->partner_id ) $file_sync->setPartnerId ( $key->partner_id );
 		return $file_sync;
+	}
+
+	public static function createFileSyncsPath(&$fileSyncs)
+	{
+		// make sure all file syncs have a path
+		foreach ($fileSyncs as $fileSync)
+		{
+			$fileSync->createPath();
+		}
+	}
+
+	public function createPath()
+	{
+		if ($this->getFileRoot() && $this->getFilePath())
+		{
+			return;
+		}
+
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
+		list($fileRoot, $realPath) = kPathManager::getFilePathArr($fileSyncKey);
+
+		$this->setFileRoot($fileRoot);
+		$this->setFilePath($realPath);
+	}
+
+	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId = 0, $toId = 0)
+	{
+		$c = clone $baseCriteria;
+
+		if($fromId)
+		{
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+		}
+		if($toId)
+		{
+			$c->add(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL);
+		}
+
+		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
+		// once that bug is fixed, this can be removed
+		FileSyncPeer::setUseCriteriaFilter(false);
+		$fileSyncs = FileSyncPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		FileSyncPeer::setUseCriteriaFilter(true);
+
+		return $fileSyncs;
+	}
+
+	protected static function getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix)
+	{
+		// get locked file syncs with multi get
+		$lockKeys = array();
+		foreach ($fileSyncs as $fileSync)
+		{
+			$lockKeys[] = $lockKeyPrefix . $fileSync->getId();
+		}
+
+		$lockKeys = $lockCache->get($lockKeys);
+		return $lockKeys;
+	}
+
+	public static function lockFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, $maxCount,
+	                                     &$maxSize, &$lockedFileSyncs, &$limitReached, &$lastId = null)
+	{
+		// Get lock file syncs
+		$lockKeys = self::getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix);
+
+		// try to lock file syncs
+		foreach ($fileSyncs as $fileSync)
+		{
+			$curKey = $lockKeyPrefix . $fileSync->getId();
+
+			if (isset($lockKeys[$curKey]))
+			{
+				KalturaLog::info('file sync '.$fileSync->getId().' already locked');
+				continue;
+			}
+
+			if (!$lockCache->add($curKey, true, $lockExpiryTimeOut))
+			{
+				KalturaLog::info('failed to lock file sync '.$fileSync->getId());
+				continue;
+			}
+
+			KalturaLog::info('locked file sync ' . $fileSync->getId());
+
+			// add to the result set
+			$lockedFileSyncs[] = $fileSync;
+			$maxSize -= $fileSync->getFileSize();
+
+			// check limit
+			if ((count($lockedFileSyncs) >= $maxCount) || ($maxSize < 0))
+			{
+				if($lastId !== null)
+				{
+					$lastId = min($lastId, $fileSync->getId() + 1);
+				}
+
+				$limitReached = true;
+				break;
+			}
+		}
 	}
 
 	private function generateKey()
@@ -276,6 +377,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getSrcEncKey () { return $this->getFromCustomData("srcEncKey"); }
 	public function setSrcEncKey ($v) { $this->putInCustomData("srcEncKey", $v);  }
 
+	public function getStorageClass () { return $this->getFromCustomData("storageClass"); }
+	public function setStorageClass ($v) { $this->putInCustomData("storageClass", $v);  }
+
  	/**
 	 * Create new fileSync With status pending and new storageId
 	 * @param $storageId
@@ -290,7 +394,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$newfileSync->setSrcEncKey($this->getSrcEncKey());
 		$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$newfileSync->setDc($storageId);
-
+    
 		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
 		list($root, $filePath) = kPathManager::getFilePathArr($fileSyncKey, $storageId);
 		$newfileSync->setFilePath($filePath);

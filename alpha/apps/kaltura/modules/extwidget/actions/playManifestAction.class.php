@@ -429,8 +429,8 @@ class playManifestAction extends kalturaAction
 				
 		if(!$key)
 			$key = $this->entry->getSyncKey(kEntryFileSyncSubType::ISM);
-			
-		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+
+		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key, $isRemote);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		
 		//To Remove - Until the migration process from asset sub type 3 to asset sub type 1 will be completed we need to support both formats
@@ -441,13 +441,20 @@ class playManifestAction extends kalturaAction
 			{
 				return false;
 			}
-			$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+			$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key,$isRemote);
 			$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		}
 		
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
 		{
-			$this->deliveryAttributes->setStorageId(null);
+			if($isRemote)
+			{
+				$this->deliveryAttributes->setStorageId($localFileSync->getDc());
+			}
+			else
+			{
+				$this->deliveryAttributes->setStorageId(null);
+			}
 			$this->deliveryAttributes->setManifestFileSync($localFileSync);
 		}
 		else
@@ -456,7 +463,7 @@ class playManifestAction extends kalturaAction
 				$this->deliveryAttributes->setStorageId($remoteFileSync->getDc());
 			$this->deliveryAttributes->setManifestFileSync($remoteFileSync);
 		}
-		
+
 		if (!$this->deliveryAttributes->getManifestFileSync())
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		
@@ -469,11 +476,18 @@ class playManifestAction extends kalturaAction
 		if (!$key)
 			return false;
 
-		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);
+		$localFileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key, $isRemote);
 		$remoteFileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key);
 		if ($this->shouldUseLocalFlavors($localFileSync, $remoteFileSync))
 		{
-			$this->deliveryAttributes->setStorageId(null);
+			if($isRemote)
+			{
+				$this->deliveryAttributes->setStorageId($localFileSync->getDc());
+			}
+			else
+			{
+				$this->deliveryAttributes->setStorageId(null);
+			}
 			$this->deliveryAttributes->setManifestFileSync($localFileSync);
 		}
 		else
@@ -668,7 +682,8 @@ class playManifestAction extends kalturaAction
 		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
-		
+		$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
 		$remoteFileSyncs = array();
@@ -681,34 +696,8 @@ class playManifestAction extends kalturaAction
 			$flavorId = $flavorAsset->getId();
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-			$c = new Criteria();
-			$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-			$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
+			$fileSyncs = kFileSyncUtils::getFileSyncsByStoragePriority($key,$servePriority, $cloudStorageIds, $this->deliveryAttributes->getStorageId());
 
-			$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
-
-			switch ($servePriority)
-			{
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				if(!$cloudStorageIds)
-				{
-					$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-				}
-				break;
-				
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-				$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-				if($cloudStorageIds)
-				{
-					$c->add(FileSyncPeer::DC, $cloudStorageIds, Criteria::NOT_IN);
-				}
-				break;
-			}
-			
-			if ($this->deliveryAttributes->getStorageId())
-				$c->addAnd ( FileSyncPeer::DC , $this->deliveryAttributes->getStorageId() );
-			
-			$fileSyncs = FileSyncPeer::doSelect($c);
 			foreach ($fileSyncs as $fileSync)
 			{
 				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
@@ -760,7 +749,7 @@ class playManifestAction extends kalturaAction
 		// choose the storage profile with the highest number of flavors
 		list ($maxDc, $remoteFlavors) = $this->getMaxDcFlavors($remoteFlavorsByDc);
 
-		if($cloudFileSyncs && count($localFlavors) == 0)
+		if($cloudFileSyncs)
 		{
 			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
 			foreach ($cloudStorageProfiles as $cloudProfile)
@@ -781,7 +770,7 @@ class playManifestAction extends kalturaAction
 			$storageId = null;
 			$deliveryFlavors = $localFlavors;
 
-			if($cloudMaxDc && (count($localFlavors) == 0))
+			if($cloudMaxDc)
 			{
 				$storageId = $cloudMaxDc;
 				$deliveryFlavors = $cloudRemoteFlavors;

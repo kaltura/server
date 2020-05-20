@@ -1080,63 +1080,44 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return myContentStorage::getGeneralEntityPath("entry/thumbnail", $this->getIntId(), $this->getId(), $this->getThumbnail() , $version );
 	}
 
+	/**
+	 * @param null $version
+	 * @param null $protocol
+	 * @return string|string[]|null
+	 * @throws FileSyncException
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
 	public function getThumbnailUrl($version = null, $protocol = null)
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_KMC_DRILL_DOWN_THUMB_RESIZE, $this->getPartnerId()))
 		{
 			$subType = kEntryFileSyncSubType::DATA;
-			if($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
+			if ($this->getType() == entryType::MEDIA_CLIP && $this->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
 				$subType = kEntryFileSyncSubType::THUMB;
-			
+
 			$syncKey = $this->getSyncKey($subType);
-			
-			$fileSync = null;
-			$serveRemote = false;
-			$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-			
-			switch($partner->getStorageServePriority())
+			try
 			{
-				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-					$serveRemote = true;
-					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-					if(!$fileSync)
-						return null;
-					
-					break;
-				
-				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-					if($fileSync)
-						$serveRemote = true;
-					
-					break;
-				
-				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-					$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-					if($fileSync)
-						break;
-						
-					$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-					if(!$fileSync)
-						return null;
-					
-					$serveRemote = true;
-					break;
-				
-				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-					$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-					if(!$fileSync)
-						return null;
-					
-					break;
+				list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey);
 			}
-			
-			if($serveRemote && $fileSync)
+			catch (kCoreException $ex)
+			{
+				switch ($ex->getCode())
+				{
+					case kCoreException::FILE_NOT_FOUND:
+						return null;
+						break;
+					default:
+						throw $ex;
+				}
+			}
+			if ($serveRemote && $fileSync)
 			{
 				$url = $fileSync->getExternalUrl($this->getId());
 				if (!is_null($protocol))
 					$url = preg_replace('/^https?/', $protocol, $url);
-		
+
 				return $url;
 			}
 		}
