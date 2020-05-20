@@ -204,6 +204,10 @@ class KAsyncConvert extends KJobHandlerWorker
 		);
 		$this->startMonitor($monitorFiles);
 		
+		if(isset($job->urgency)){	
+			$data->urgency = $job->urgency;
+			KalturaLog::log("Urgency:".$job->urgency);
+		}
 		$operator = $this->getOperator($data);
 		try
 		{
