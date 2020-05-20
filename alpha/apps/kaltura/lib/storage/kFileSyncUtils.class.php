@@ -1864,23 +1864,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getPathByFileSync($fileSync, $preferredStorageId)
 	{
+		$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
+		$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
+
 		// if the dc is the preferred return the file path
-		if($fileSync->getDC() == $preferredStorageId)
+		if($fileSync->getDc() == $preferredStorageId)
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($preferredStorageId);
-			$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
 			return $prefix . kFileSyncUtils::getFileSyncFullPath($fileSync);
 		}
 
 		// if dc is local but not preferred generate serve file urls
-		$localDcIds = kDataCenterMgr::getDcIds();
-		if(in_array($fileSync->getDc(), $localDcIds))
-		{
-			$dcConfig = kDataCenterMgr::getDcById($fileSync->getDc());
-			return '/' . strtolower($dcConfig['name']) . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
-		}
-
-		return '';
+		return $prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
 	}
 
 	/**
@@ -2050,7 +2044,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true)
 	{
-		if($fileSync->getDc() !== kDataCenterMgr::getCurrentDcId())
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
 		{
 			return $fileSync->getFilePath();
 		}
