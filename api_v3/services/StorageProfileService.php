@@ -16,7 +16,6 @@ class StorageProfileService extends KalturaBaseService
 	const LAST_ID_LOOP_ADDITION = 'last_id_loop_addition';
 	const MAX_ID_DELAY = 'max_id_delay';
 	const DEFAULT_LOCK_EXPIRY = 36000;
-	const MAX_FILESYNCS_PER_CHUNK = 100;
 	const MAX_FILESYNC_QUERIES_PER_CALL = 100;
 	const MAX_FILESYNC_ID_RANGE = 20000;
 	const DEFAULT_MAX_ID_DELAY = 1000;
@@ -32,7 +31,7 @@ class StorageProfileService extends KalturaBaseService
 			
 		$this->applyPartnerFilterForClass('StorageProfile');
 	}
-	
+
 	/**
 	 * Adds a storage profile to the Kaltura DB.
 	 *
@@ -157,7 +156,7 @@ class StorageProfileService extends KalturaBaseService
 	 * @param int $maxSize The maximum total size of file syncs that should be returned, this limit may be exceeded by one file sync
 	 * @return KalturaLockFileSyncsResponse
 	 */
-	function lockPendingFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $storageProfileId, $maxCount, $maxSize = null)
+	function lockPendingFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $storageProfileId, $maxCount, $maxSize = PHP_INT_MAX)
 	{
 		// need to explicitly disable the cache since this action may not perform any queries
 		kApiCache::disableConditionalCache();
@@ -175,7 +174,7 @@ class StorageProfileService extends KalturaBaseService
 		$createdAtLessThanOrEqual = $filter->createdAtLessThanOrEqual;
 		$filter->createdAtLessThanOrEqual = null;
 
-		$baseCriteria = self::buildFileSyncCriteria($filter, $storageProfileId);
+		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::ID);
 
 		$lockedFileSyncs = array();
 		$lockedFileSyncsSize = 0;
@@ -184,7 +183,7 @@ class StorageProfileService extends KalturaBaseService
 		$done = false;
 
 		KalturaLog::info("lastId [$lastId] maxId [$maxId]");
-		while (!$done && $selectCount < self::MAX_FILESYNC_QUERIES_PER_CALL && $lastId + $lastIdLoopAddition < $maxId)
+		while ( !$done && !$limitReached && ($selectCount < self::MAX_FILESYNC_QUERIES_PER_CALL) && ($lastId + $lastIdLoopAddition < $maxId) )
 		{
 			// clear the instance pool every once in a while (not clearing every time since some objects repeat between selects)
 			$selectCount++;
@@ -193,22 +192,30 @@ class StorageProfileService extends KalturaBaseService
 				FileSyncPeer::clearInstancePool();
 			}
 			$idLimit = min($lastId + self::MAX_FILESYNC_ID_RANGE, $maxId);
-			$fileSyncs = self::getFileSyncsChunk($baseCriteria, $lastId, $idLimit);
-
-			$lastId = self::getLastId($fileSyncs, $idLimit);
-			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
+			$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria, $lastId, $idLimit);
 
 			if (!$fileSyncs)
 			{
-				continue;
+				break;
 			}
 
-			$lockKeys = self::getLockedFileSyncs($fileSyncs, $lockCache);
-			self::lockFileSyncs($fileSyncs, $lockKeys, $lockCache, $lockedFileSyncs, $lockedFileSyncsSize, $maxCount, $maxSize, $lastId, $limitReached, $done, $storageLockExpiry);
+			if (count($fileSyncs) < KalturaFileSyncFilter::MAX_FILESYNCS_PER_CHUNK)
+			{
+				$done = true;
+			}
+
+			$lastId = end($fileSyncs)->getId();
+
+			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
+
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry, $maxCount,
+				$maxSize, $lockedFileSyncs, $limitReached, $lastId);
+
+			KalturaLog::debug("Update lastId to [$lastId]");
 		}
 
 		self::setLastIdInCache($initialLastId, $lastId, $keysCache, $workerId);
-		self::fillMissingFileSyncsPath($lockedFileSyncs);
+		FileSync::createFileSyncsPath($lockedFileSyncs);
 
 		// build the response object
 		$result = new KalturaLockFileSyncsResponse;
@@ -258,59 +265,6 @@ class StorageProfileService extends KalturaBaseService
 		return $maxId;
 	}
 
-	protected static function buildFileSyncCriteria($filter, $storageProfileId)
-	{
-		// build the criteria
-		$fileSyncFilter = new FileSyncFilter();
-		$filter->toObject($fileSyncFilter);
-
-		$baseCriteria = new Criteria();
-		$fileSyncFilter->attachToCriteria($baseCriteria);
-
-		$baseCriteria->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_PENDING);
-		$baseCriteria->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$baseCriteria->add(FileSyncPeer::DC, $storageProfileId, Criteria::IN);
-		$baseCriteria->add(FileSyncPeer::LINKED_ID, NULL, Criteria::ISNULL);
-
-		$baseCriteria->addAscendingOrderByColumn(FileSyncPeer::ID);
-		$baseCriteria->setLimit(self::MAX_FILESYNCS_PER_CHUNK);
-
-		return $baseCriteria;
-	}
-
-	protected static function getFileSyncsChunk($baseCriteria, $lastId, $idLimit)
-	{
-		// get a chunk of file syncs
-		// Note: starting slightly before the last id, because the ids may arrive out of order in the mysql replication
-		$c = clone $baseCriteria;
-		$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $lastId, Criteria::GREATER_EQUAL);
-		$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $idLimit, Criteria::LESS_EQUAL));
-		$c->addAnd($idCriterion);
-
-		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
-		//		once that bug is fixed, this can be removed
-		FileSyncPeer::setUseCriteriaFilter(false);
-		$fileSyncs = FileSyncPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
-		FileSyncPeer::setUseCriteriaFilter(true);
-
-		return $fileSyncs;
-	}
-
-	protected static function getLastId($fileSyncs, $idLimit)
-	{
-		// if we got less than the limit no reason to perform any more queries
-		if (count($fileSyncs) < self::MAX_FILESYNCS_PER_CHUNK)
-		{
-			$lastId = $idLimit;
-		}
-		else
-		{
-			$lastFileSync = end($fileSyncs);
-			$lastId = $lastFileSync->getId() + 1;
-		}
-		return $lastId;
-	}
-
 	protected static function filterFileSyncs(&$fileSyncs, &$lastId, &$done, $createdAtLessThanOrEqual)
 	{
 		// filter by created at
@@ -328,55 +282,6 @@ class StorageProfileService extends KalturaBaseService
 		}
 	}
 
-	protected static function getLockedFileSyncs($fileSyncs, $lockCache)
-	{
-		// get locked file syncs with multi get
-		$lockKeys = array();
-		foreach ($fileSyncs as $fileSync)
-		{
-			$lockKeys[] = self::LOCK_KEY_PREFIX . $fileSync->getId();
-		}
-
-		$lockKeys = $lockCache->get($lockKeys);
-		return $lockKeys;
-	}
-
-	protected static function lockFileSyncs($fileSyncs, $lockKeys, $lockCache, &$lockedFileSyncs, &$lockedFileSyncsSize, $maxCount, $maxSize, &$lastId, &$limitReached, &$done, $storageLockExpiry)
-	{
-		// try to lock file syncs
-		foreach ($fileSyncs as $fileSync)
-		{
-			$curKey = self::LOCK_KEY_PREFIX . $fileSync->getId();
-
-			if (isset($lockKeys[$curKey]))
-			{
-				KalturaLog::info('file sync '.$fileSync->getId().' already locked');
-				continue;
-			}
-
-			if (!$lockCache->add($curKey, true, $storageLockExpiry))
-			{
-				KalturaLog::info('failed to lock file sync '.$fileSync->getId());
-				continue;
-			}
-
-			KalturaLog::info('locked file sync ' . $fileSync->getId());
-
-			// add to the result set
-			$lockedFileSyncs[] = $fileSync;
-			$lockedFileSyncsSize += $fileSync->getFileSize();
-
-			if (count($lockedFileSyncs) >= $maxCount ||
-				($maxSize && $lockedFileSyncsSize >= $maxSize))
-			{
-				$lastId = min($lastId, $fileSync->getId() + 1);
-				$limitReached = true;
-				$done = true;
-				break;
-			}
-		}
-	}
-
 	protected static function setLastIdInCache($initialLastId, $lastId, $keysCache, $workerId)
 	{
 		// update the last id
@@ -387,24 +292,6 @@ class StorageProfileService extends KalturaBaseService
 			KalturaLog::info("setting lastId to [$lastId] for worker [$workerId]");
 
 			$keysCache->set(self::LAST_FILESYNC_ID_PREFIX . $workerId, $lastId);
-		}
-	}
-
-	protected static function fillMissingFileSyncsPath(&$lockedFileSyncs)
-	{
-		// make sure all file syncs have a path
-		foreach ($lockedFileSyncs as $fileSync)
-		{
-			if ($fileSync->getFileRoot() && $fileSync->getFilePath())
-			{
-				continue;
-			}
-
-			$fileSyncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
-			list($fileRoot, $realPath) = kPathManager::getFilePathArr($fileSyncKey);
-
-			$fileSync->setFileRoot($fileRoot);
-			$fileSync->setFilePath($realPath);
 		}
 	}
 
