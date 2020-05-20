@@ -124,6 +124,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$cmdLine.= '\''.($port).'\',';
 			$cmdLine.= '\''.($token).'\',';
 			$cmdLine.= '\''.($concurrent).'\',';
+			$cmdLine.= '\''.($concurrentMin).'\',';
 			$cmdLine.= '\''.($sessionName).'\',';
 			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
 			$cmdLine.= 'if(\$rv==false) exit(1);';
