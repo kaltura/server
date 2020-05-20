@@ -30,7 +30,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	'executionMode' config field used to differntiate between the modes, 
 	 *	allowed values - 'standalone'/'memcache'
 	 */
-	protected function execute_conversion_cmdline($command, &$returnVar ,$jobId = null)
+	protected function execute_conversion_cmdline($command, &$returnVar, $urgency, $jobId = null)
 	{
 		KalturaLog::log($command);
 		if(strstr($command,"ffmpeg")===false)
@@ -47,7 +47,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$output=$this->execute_chunked_encode_standalone($command, $returnVar);
 		}
 		else if($executionMode=="memcache"){
-			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $jobId);
+			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $urgency, $jobId);
 		}
 		else {
 			$returnVar = -1;
@@ -68,7 +68,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	- chunkedEncodeMemcacheToken - token to differentiate between general/global Kaltura jobs and per customer dedicated servers (optional, default:null)
 	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
 	 */
-	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $jobId = null)
+	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $urgency, $jobId = null)
 	{
 		KalturaLog::log("Original cmdLine:$cmdLine");
 		
@@ -104,6 +104,15 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			else 
 				$concurrent = 5;
 
+			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent)) {
+				$concurrentMin = KBatchBase::$taskConfig->params->chunkedEncodeMinConcurrent;
+			}
+/*			else if(isset($urgency)){
+				$concurrentMin = self::adjustConcurrencyToUrgency($urgency);
+			} */
+			else
+				$concurrentMin = 2;
+
 			$sessionName = null;
 		}
 		{
@@ -123,18 +132,48 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		$cmdLine.= " >> ".$this->logFilePath." 2>&1";
 		KalturaLog::log("Final cmdLine:$cmdLine");
 
-		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
-		{
+		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1) {
 			$output = parent::execute_conversion_cmdline($cmdLine, $returnVar, $jobId);
 		}
-		else
-		{
+		else {
 			$output = system($cmdLine, $returnVar);
 		}
 		KalturaLog::log("rv($returnVar),".print_r($output,1));
 		return $output;
 	}
 
+	/**
+	 * adjustConcurrencyToUrgency
+	 */
+	protected static function adjustConcurrencyToUrgency($urgency)
+	{
+		KalturaLog::log("Urgency: $urgency");
+		switch($urgency) {
+		case TOP_URGENCY: 				// 0;
+			$concurrentMin = 5;
+			break;
+		case REQUIRED_REGULAR_UPLOAD: 	// 1;
+		case REQUIRED_BULK_UPLOAD: 		// 2;
+			$concurrentMin = 3;
+			break;
+		case OPTIONAL_REGULAR_UPLOAD: 	// 3;
+		case OPTIONAL_BULK_UPLOAD: 		// 4;
+		case DEFAULT_URGENCY: 			// 5;	
+			$concurrentMin = 2;
+			break;
+		case MIGRATION_URGENCY: 		// 10;
+			$concurrentMin = 1;
+			break;
+		default:
+			$concurrentMin = 2;
+			break;
+		}
+		return $concurrentMin;
+	}
+	
+	/**
+	 * isConversionProgressing
+	 */
 	protected function isConversionProgressing($currentModificationTime)
 	{
 		$dir = $this->inFilePath .'_'.self::CHUNKED_DIR.'/';
