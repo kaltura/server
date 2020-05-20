@@ -1,6 +1,6 @@
 <?php
 chdir(dirname(__FILE__));
-
+return;
 require_once(__DIR__ . '/../../bootstrap.php');
 
 

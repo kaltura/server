@@ -2,6 +2,8 @@
 
 class kFileBase 
 {
+	protected static $storageTypeMap = null;
+	
     /**
      * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
      * @param string $fileContent
@@ -24,7 +26,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($filename))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filename);
 			return $kSharedFsMgr->putFileContent($filename, $data, $flags, $context);
 		}
 		
@@ -53,7 +55,7 @@ class kFileBase
     {
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->chmod($filePath, $mode);
 		}
     	
@@ -64,7 +66,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->chown($filePath,  $user, $group);
 		}
 		
@@ -118,7 +120,7 @@ class kFileBase
     {
 		if(kFile::isSharedPath($file_name))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
 			return $kSharedFsMgr->unlink($file_name);
 		}
     	
@@ -177,7 +179,7 @@ class kFileBase
     {
 		if(kFile::isSharedPath($path))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
 			return $kSharedFsMgr->fullMkdir($path, $rights, $recursive);
 		}
     	
@@ -190,11 +192,10 @@ class kFileBase
      */
     static public function fileSize($filename)
     {
-		KalturaLog::debug("Check file size for file [$filename]");
 		if(kFile::isSharedPath($filename))
 		{
 			KalturaLog::debug("Check file size for shared file [$filename]");
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filename);
 			return $kSharedFsMgr->fileSize($filename);
 		}
 	
@@ -260,7 +261,7 @@ class kFileBase
     {
 		if(kFile::isSharedPath($file_name))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
 			return $kSharedFsMgr->getFileContent($file_name, $from_byte, $to_byte);
 		}
     	
@@ -375,7 +376,7 @@ class kFileBase
 		
 		if(kFile::isSharedPath($destFilePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($destFilePath);
 			return $kSharedFsMgr->getFileFromResource($src, $destFilePath, $allowInternalUrl);
 		}
 		
@@ -397,15 +398,13 @@ class kFileBase
 	
 	public static function checkFileExists($path)
 	{
-		KalturaLog::debug("Check file exists for file [$path]");
+		KalturaLog::debug("Check file exists [$path]");
 		if(kFile::isSharedPath($path))
 		{
-			KalturaLog::debug("Check file exists for shared file [$path]");
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
 			return $kSharedFsMgr->checkFileExists($path);
 		}
 		
-		KalturaLog::debug("Check file exists for local file [$path]");
 		return file_exists($path);
 	}
 	
@@ -413,7 +412,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->isFile($filePath);
 		}
 		
@@ -429,7 +428,7 @@ class kFileBase
 		
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->realPath($filePath, $getRemote);
 		}
 		
@@ -440,7 +439,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($file_name))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
 			return $kSharedFsMgr->dumpFilePart($file_name, $range_from, $range_length);
 		}
 
@@ -462,7 +461,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->chgrp($filePath, $contentGroup);
 		}
 
@@ -473,7 +472,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->unlink($filePath);
 		}
 		
@@ -484,7 +483,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($filePath))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->filemtime($filePath);
 		}
 		
@@ -516,7 +515,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($to))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
 			return $kSharedFsMgr->rename($from, $to);
 		}
 		
@@ -527,7 +526,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($to))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
 			return $kSharedFsMgr->copy($from, $to);
 		}
 		
@@ -538,7 +537,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($path))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
 			return $kSharedFsMgr->mkdir($path, $mode, $recursive);
 		}
 
@@ -549,7 +548,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($path))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
 			return $kSharedFsMgr->rmdir($path);
 		}
 
@@ -560,7 +559,7 @@ class kFileBase
 	{
 		if(kFile::isSharedPath($src))
 		{
-			$kSharedFsMgr = kSharedFileSystemMgr::getInstance();
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($src);
 			return $kSharedFsMgr->copyDir($src, $dest, $deleteSrc);
 		}
 
@@ -587,13 +586,31 @@ class kFileBase
 		}
 		return true;
 	}
+	
+	public static function getStorageTypeMap()
+	{
+		if(self::$storageTypeMap)
+			return self::$storageTypeMap;
+		
+		$dc_config = kConf::getMap("dc_config");
+		self::$storageTypeMap = isset($dc_config['storage_type_map']) ? $dc_config['storage_type_map'] : null;
+		return self::$storageTypeMap;
+	}
 
 	public static function isSharedPath($path)
 	{
-		if(kString::beginsWith($path, kSharedFileSystemMgr::getSharedRootPath()))
+		$storageTypeMap = self::getStorageTypeMap();
+		if(!$storageTypeMap)
+			return false;
+		
+		foreach ( array_keys($storageTypeMap) as $pathPrefix)
 		{
-			return true;
+			if(kString::beginsWith($path, $pathPrefix))
+			{
+				return true;
+			}
 		}
+		
 		return false;
 	}
 

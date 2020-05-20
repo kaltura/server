@@ -446,7 +446,7 @@ class MediaService extends KalturaEntryService
 		try
 		{
 		    // check that the uploaded file exists
-		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+		    $entryFullPath = kBaseUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
 		    
 		    // Make sure that the uploads path is not modified by $uploadTokenId (with the value of "../" for example )
 		    $entryRootDir = realpath( dirname( $entryFullPath ) );
@@ -471,7 +471,7 @@ class MediaService extends KalturaEntryService
 			// Backward compatability - support case in which the required file exist in the other DC
 			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			/*
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+			$remoteDCHost = kBaseUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
 			if($remoteDCHost)
 			{
 				kFileUtils::dumpApiRequest($remoteDCHost);
@@ -501,8 +501,8 @@ class MediaService extends KalturaEntryService
 		$insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 		$insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 		$dbEntry = $insert_entry_helper->getEntry();
-
-		kUploadTokenMgr::closeUploadTokenById($uploadTokenId);
+		
+		kBaseUploadTokenMgr::closeUploadTokenById($uploadTokenId);
 
 		$ret = new KalturaMediaEntry();
 		if($dbEntry)

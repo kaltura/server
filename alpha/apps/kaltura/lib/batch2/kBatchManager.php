@@ -55,6 +55,7 @@ class kBatchManager
 			$flavorAsset->setPartnerId($partnerId);
 			$flavorAsset->setEntryId($entryId);
 			$flavorAsset->setDescription($description);
+			$flavorAsset->setVersion(0);
 		}
 		
 		$flavorAsset->setTags($flavor->getTags());

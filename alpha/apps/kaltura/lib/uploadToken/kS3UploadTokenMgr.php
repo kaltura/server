@@ -41,7 +41,7 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	public function __construct(UploadToken $uploadToken, $finalChunk = true)
 	{
 		KalturaLog::info("Init for upload token id [{$uploadToken->getId()}]");
-		self::$sharedFsMgr = kSharedFileSystemMgr::getInstance();
+		self::$sharedFsMgr = kSharedFileSystemMgr::getInstance(kSharedFileSystemMgrType::S3);
 		parent::__construct($uploadToken, $finalChunk);
 		$this->initMultipartMemcache();
 	}
@@ -83,12 +83,17 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 	 */
 	protected function getUploadPath($uploadTokenId, $extension = '')
 	{
+		$dc_config = kConf::getMap("dc_config");
+		$s3Config = $dc_config['storage'];
+		
+		$uploadPath = $s3Config['root'] . DIRECTORY_SEPARATOR . kCurrentContext::getCurrentPartnerId() . "/content/tmp/uploads/";
+		
 		if (!$extension)
 		{
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		}
-
-		return kFile::createUniqueFilePath(myContentStorage::getFSTempUploadsPath(), true) . '0.' .$extension;
+		
+		return kFile::createUniqueFilePath($uploadPath, true) . '0.' .$extension;
 	}
 
 	/**
@@ -582,8 +587,18 @@ class kS3UploadTokenMgr extends kBaseUploadTokenMgr
 		{
 			return $finalPath;
 		}
-
-		return kFile::createUniqueFilePath(myContentStorage::getFSUploadsPath()) . $this->getFileExtension($this->_uploadToken->getFileName());
+		
+		$dc_config = kConf::getMap("dc_config");
+		$s3Config = $dc_config['storage'];
+		
+		$uploadPath = $s3Config['root'] . DIRECTORY_SEPARATOR . kCurrentContext::getCurrentPartnerId() . "/content/uploads/";
+		
+		if (!$extension)
+		{
+			$extension = self::NO_EXTENSION_IDENTIFIER;
+		}
+		
+		return kFile::createUniqueFilePath($uploadPath) . $this->getFileExtension($this->_uploadToken->getFileName());
 	}
 
 	/**

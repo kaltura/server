@@ -13,6 +13,11 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	/**
 	 * @var string
 	 */
+	public $destFileSyncSharedPath;
+	
+	/**
+	 * @var string
+	 */
 	public $destFileSyncRemoteUrl;
 	
 	/**
@@ -55,6 +60,7 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	private static $map_between_objects = array
 	(
 		"destFileSyncLocalPath" ,
+		"destFileSyncSharedPath",
 		"destFileSyncRemoteUrl" ,
 		"logFileSyncLocalPath" ,
 		"logFileSyncRemoteUrl" ,

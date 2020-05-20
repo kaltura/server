@@ -93,26 +93,46 @@
 
 			$videoCmdLines = array();
 			for($chunkIdx=0;$chunkIdx<$chunker->GetMaxChunks();$chunkIdx++) {
+				KalturaLog::debug("TTT::: building chunk data for chunk index id [$chunkIdx]");
+				
 				$chunkData = $chunker->GetChunk($chunkIdx);
 				$start = $chunkData->start;
 				$cmdLine = $chunker->BuildVideoCommandLine($start, $chunkIdx);
 				$logFilename = $chunker->getChunkName($chunkIdx,".log");
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$outFilenames[] = $chunker->getChunkName($chunkIdx);
-				$outFileNames[] = substr($outFilenames[0], 0, -1) . (substr($outFilenames[0], -1)+1);
-				$sharedOutFilenames[] = $chunker->getChunkName($chunkIdx, "shared");
-				$sharedOutFilenames[] = $sharedOutFilenames[0] ? substr($sharedOutFilenames[0], 0, -1) . (substr($sharedOutFilenames[0], -1)+1) : null;
-				$videoCmdLines[$chunkIdx] = array($cmdLine, $outFileNames, $sharedOutFilenames);
+				
+				$outFileNames = array();
+				$outFileNames[] = $chunker->getChunkName($chunkIdx);
+				$outFileNames[] = substr($outFileNames[0], 0, -1) . (substr($outFileNames[0], -1)+1);
+				$currVideoCmdLine = array($cmdLine, $outFileNames);
+				
+				$sharedOutFilenames = array();
+				$sharedChunkName = $chunker->getChunkName($chunkIdx, "shared");
+				if($sharedChunkName)
+				{
+					$sharedOutFilenames[] = $sharedChunkName;
+					$sharedOutFilenames[] = substr($sharedChunkName, 0, -1) . (substr($sharedChunkName, -1)+1);
+					$currVideoCmdLine[] = $sharedOutFilenames;
+				}
+				
+				$videoCmdLines[$chunkIdx] = $currVideoCmdLine;
 				KalturaLog::log($cmdLine);
 			}
 			$this->videoCmdLines = $videoCmdLines;
+			KalturaLog::debug("TTT::: videoCmdLines [" . print_r($videoCmdLines, true) . "]");
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
 				$outFilename = $chunker->getSessionName("audio");
 				$logFilename = $outFilename.".log";
-				$sharedOutFilename = $chunker->getSessionName("shared_audio");
-				$this->audioCmdLines[] = array("time $cmdLine > $logFilename 2>&1", array($outFilename), array($sharedOutFilename));;
+				$currAudioCmdLine = array("time $cmdLine > $logFilename 2>&1", array($outFilename));
+				
+				$sharedAudioChunkName = $chunker->getSessionName("shared_audio");;
+				if($sharedAudioChunkName)
+				{
+					$currAudioCmdLine[] = array($sharedAudioChunkName);
+				}
+				$this->audioCmdLines[] = $currAudioCmdLine;
 			}
 			$this->SerializeSession();
 			return true;

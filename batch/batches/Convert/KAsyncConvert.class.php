@@ -273,7 +273,16 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
-		$sharedFile = kFile::createUniqueFilePath($this->sharedTempPath);
+		// aws comment: Commented for now wince it breaks onPrem env when running with user kaltura and NFS
+		//$sharedFile = kFile::createUniqueFilePath($this->sharedTempPath);
+		
+		$sharedFile = $data->destFileSyncSharedPath;
+		if(!$sharedFile)
+		{
+			$uniqid = uniqid("convert_{$job->entryId}_");
+			$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
+		}
+		KalturaLog::debug("TTT: shared file [$sharedFile]");
 				
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
