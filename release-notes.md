@@ -1,12 +1,4 @@
-# Propus 16.2.0  #
-## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
-Issue Type: Task
-Issue ID: PLAT-10890
-
-### Configuration ###
-Modify cloud_storage.ini:
-add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
-
+# Propus 16.3.0  #
 ## Add periodic storage delete local batch ##
 Issue Type: Task
 Issue ID : PLAT-10894
@@ -25,29 +17,16 @@ Add the following to batch.ini:
     params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
     params.sleepInterval                                = @SLEEP_INTERVAL@
     params.gap                                          = @GAP@
+    params.range                                        = @RANGE@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
     filter.statusEqual                                  = 2
     filter.dcEqual                                      = @DC@
     filter.fileTypeEqual                                = 3
 
 #### Deployment Scripts ####
     php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
-    
-## Support export captions to remote storage ##
-- Issue Type: Task
-- Issue ID: PLAT-10846
 
-### Deployment scripts ###
-Run:
-	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
-
-## Add Reach Profile to Audit Trail ##
-Issue Type: Task
-Issue ID: REACH2-845
-
-#### Deployment Scripts ####
-mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
-
-## Add periodic storage delete batch ##
+## Add periodic storage purge batch ##
 Issue Type: Task
 Issue ID : PLAT-10769
 
@@ -79,6 +58,31 @@ Add the following to batch.ini:
     
 #### Deployment Scripts ####
     php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
+
+
+# Propus 16.2.0  #
+## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
+Issue Type: Task
+Issue ID: PLAT-10890
+
+### Configuration ###
+Modify cloud_storage.ini:
+add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
+    
+## Support export captions to remote storage ##
+- Issue Type: Task
+- Issue ID: PLAT-10846
+
+### Deployment scripts ###
+Run:
+	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
+
+## Add Reach Profile to Audit Trail ##
+Issue Type: Task
+Issue ID: REACH2-845
+
+#### Deployment Scripts ####
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
 
 ## Support volume map and thumb serving ##
 Issue Type: Task
