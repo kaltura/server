@@ -5,7 +5,7 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 	const MAX_EXECUTION_TIME = 'maxExecutionTime';
 	const SLEEP_INTERVAL = 'sleepInterval';
 	const MAX_COUNT = 'maxCount';
-	const FILE_SYNC_RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey,dc';
+	const FILE_SYNC_RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey,dc,storageClass';
 
 	protected $storageProfiles;
 	protected $fileSyncsToUpdate;
