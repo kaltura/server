@@ -26,28 +26,6 @@ class serveFlavorAction extends kalturaAction
 		}
 		return json_encode($obj, $options);
 	}
-	
-	public function getFileSyncFullPath(FileSync $fileSync)
-	{
-		$fullPath = $fileSync->getFullPath();
-		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local', array());
-		
-		if(count($serveFlavorPathSearchReplace) && $this->pathOnly)
-		{
-			foreach ($serveFlavorPathSearchReplace as $pathSearchReplace)
-			{
-				$pathSearch = $pathSearchReplace['search'];
-				if(kString::beginsWith($fullPath, $pathSearch))
-				{
-					$pathReplace = $pathSearchReplace['replace'];
-					$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
-					$fullPath = $newPrefix . substr($fullPath, strlen($pathSearch));
-					break;
-				}
-			}
-		}
-		return $fullPath;
-	}
 
 	protected function storeCache($renderer, $partnerId)
 	{
@@ -284,7 +262,7 @@ class serveFlavorAction extends kalturaAction
 					if ($fileSync)
 					{
 						$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
-						$path = $this->getFileSyncFullPath($resolvedFileSync);
+						$path = kFileSyncUtils::getFileSyncFullPath($resolvedFileSync, $this->pathOnly);
 					}
 					else
 					{
@@ -483,13 +461,13 @@ class serveFlavorAction extends kalturaAction
 			$path = '';
 			$parent_file_sync = null;
 
-			if($preferredStorageId)
+			if(!is_null($preferredStorageId))
 			{
-				$file_sync = kFileSyncUtils::getFileSyncByPreferredOrder($syncKey, $flavorAsset, $preferredStorageId);
+				$file_sync = kFileSyncUtils::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId);
 				if($file_sync)
 				{
 					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-					$path = kFileSyncUtils::getPathByFileSync($file_sync);
+					$path = kFileSyncUtils::getPathByFileSync($parent_file_sync, $preferredStorageId);
 				}
 			}
 			else
@@ -498,7 +476,7 @@ class serveFlavorAction extends kalturaAction
 				if ( $file_sync )
 				{
 					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-					$path = $this->getFileSyncFullPath($parent_file_sync);
+					$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync);
 					if ($fileParam && is_dir($path))
 					{
 						$path .= "/$fileParam";

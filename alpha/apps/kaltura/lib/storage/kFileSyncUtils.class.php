@@ -17,8 +17,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
-	const CLOUD_S3_PREFIX = '/s3';
-
 	/**
 	 * Contain all object types and sub types that should not be synced
 	 * @var array
@@ -1837,57 +1835,60 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @return FileSync|null
 	 * @throws PropelException
 	 */
-	public static function getFileSyncByPreferredOrder($syncKey, $flavorAsset, $preferredStorageId)
+	public static function getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId)
 	{
-		// if the entry fully exist locally return empty fileSync and path
-		// to make the request redirected for local serving
-		if(self::entryFullyExistLocally($flavorAsset->getEntryId()))
+		// if at least one flavor exists in the remote storage, generate remote serve paths
+		if(self::doesEntryFlavorExistInStorage($preferredStorageId, $flavorAsset->getEntryId()))
 		{
-			return null;
-		}
+			$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
+			if($fileSync)
+			{
+				return $fileSync;
+			}
 
-		$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
-		if($fileSync)
-		{
+			list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, false, false);
 			return $fileSync;
 		}
 
-		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, false, false);
-		return $fileSync;
+		// all flavors exist locally so return empty file sync and empty path
+		return null;
 	}
 
 	/**
 	 * get the object path in remote location or the serveFile path for local location
 	 *
 	 * @param $fileSync
+	 * @param $preferredStorageId
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function getPathByFileSync($fileSync)
+	public static function getPathByFileSync($fileSync, $preferredStorageId)
 	{
+		// if the dc is the preferred return the file path
+		if($fileSync->getDC() == $preferredStorageId)
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($preferredStorageId);
+			$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
+			return $prefix . kFileSyncUtils::getFileSyncFullPath($fileSync);
+		}
+
+		// if dc is local but not preferred generate serve file urls
 		$localDcIds = kDataCenterMgr::getDcIds();
 		if(in_array($fileSync->getDc(), $localDcIds))
 		{
-			// use serve file local url
 			$dcConfig = kDataCenterMgr::getDcById($fileSync->getDc());
-			$path = '/' . strtolower($dcConfig['name']) . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
+			return '/' . strtolower($dcConfig['name']) . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
 		}
-		else
-		{
-			// use cloud file location
-			$path = self::CLOUD_S3_PREFIX . $fileSync->getFilePath();
-		}
-		return $path;
+
+		return '';
 	}
 
 	/**
-	 * check if all the flavors of an entry exist in the current dc
-	 *
+	 * @param $preferredStorageId
 	 * @param $entryId
 	 * @return bool
-	 * @throws PropelException
 	 */
-	public static function entryFullyExistLocally($entryId)
+	public static function doesEntryFlavorExistInStorage($preferredStorageId, $entryId)
 	{
 		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($entryId, $flavorTypes);
@@ -1895,15 +1896,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		foreach ($flavorAssets as $flavorAsset)
 		{
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
-			if(!$fileSync)
+			$fileSync = self::getReadyFileSyncForKeyAndDc($key, $preferredStorageId);
+			if($fileSync)
 			{
-				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was not found locally");
-				return false;
+				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was found in DC [$preferredStorageId]");
+				return true;
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 
@@ -2045,5 +2046,32 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		return FileSyncPeer::doSelect($c);
+	}
+
+	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true)
+	{
+		if($fileSync->getDc() !== kDataCenterMgr::getCurrentDcId())
+		{
+			return $fileSync->getFilePath();
+		}
+
+		$fullPath = $fileSync->getFullPath();
+		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local', array());
+
+		if(count($serveFlavorPathSearchReplace) && $pathOnly)
+		{
+			foreach ($serveFlavorPathSearchReplace as $pathSearchReplace)
+			{
+				$pathSearch = $pathSearchReplace['search'];
+				if(kString::beginsWith($fullPath, $pathSearch))
+				{
+					$pathReplace = $pathSearchReplace['replace'];
+					$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
+					$fullPath = $newPrefix . substr($fullPath, strlen($pathSearch));
+					break;
+				}
+			}
+		}
+		return $fullPath;
 	}
 }
