@@ -363,10 +363,12 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 * @throws KalturaErrors::INVALID_OTP
 	 * @throws KalturaErrors::MISSING_OTP
-	 */
+ */
 	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
 	{
-		self::validateLoginParams(array('id'=>$newLoginId,'firstName'=>$newFirstName,'lastName'=>$newLastName));
+		self::validateLoginParams(array('id' => $newLoginId,
+										'firstName' => $newFirstName,
+										'lastName' => $newLastName));
 
 		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName, $otp);
 	}
