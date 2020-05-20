@@ -51,3 +51,8 @@ alpha/.settings/
 .idea
 .DS_Store
 admin_console/lib/Kaltura/Client/
+configurations/cache.ini
+deployment/base/scripts/init_data/
+plugins/monitor/nagios/
+configurations/
+var_console/

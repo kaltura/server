@@ -12,12 +12,13 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 	const IDLE_SLEEP_INTERVAL = 'sleepInterval';
 	const MAX_COUNT = 'maxCount';
 	const MAX_SIZE = 'maxSize';
-	const STORAGE_PROFILE_IDS = 'profileIdsIn';
+	const STORAGE_PROFILE_IDS = 'periodic_storage_ids';
 	const FILE_SYNC_RESPONSE_PROFILE_FIELDS = 'id,originalId,fileSize,fileRoot,filePath,isDir,srcPath,srcEncKey';
 
 	protected $storageProfiles;
 	protected $currentIndex;
 	protected $fileSyncsToUpdate;
+	protected $storageProfileIdsArray;
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -36,7 +37,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 		$maxCount = $this->getAdditionalParams(self::MAX_COUNT);
 		$maxSize = $this->getAdditionalParams(self::MAX_SIZE);
 		$sleepInterval = $this->getAdditionalParams(self::IDLE_SLEEP_INTERVAL);
-		$this->storageProfileIdsArray = explode(',', $this->getAdditionalParams(self::STORAGE_PROFILE_IDS));
+		$this->storageProfileIdsArray = self::getConfigParam(self::STORAGE_PROFILE_IDS, 'cloud_storage', null);
 		if(!$this->storageProfileIdsArray)
 		{
 			KalturaLog::debug('Storage Profile Ids are missing from config');
@@ -159,7 +160,7 @@ class KAsyncStoragePeriodicExport extends KPeriodicWorker
 
 	protected function getStorageProfile()
 	{
-		$storageProfileIdsArray = explode(',', $this->getAdditionalParams(self::STORAGE_PROFILE_IDS));
+		$storageProfileIdsArray = $this->storageProfileIdsArray;
 		if($this->currentIndex >= count($storageProfileIdsArray))
 		{
 			$this->currentIndex = 0;

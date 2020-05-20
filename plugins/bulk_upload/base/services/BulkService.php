@@ -246,8 +246,7 @@ class BulkService extends KalturaBaseService
 		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
 		
 		return $bulkUpload;
-	}	
-	
+	}
 	/**
 	 * Get bulk upload batch job by id
 	 *

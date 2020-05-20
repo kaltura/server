@@ -522,7 +522,7 @@ class kJobsManager
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
 		{
-			$pathMgr = new kS3PathManager();
+			$pathMgr = new kS3SharedPathManager();
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
 			$sharedPath = kFile::fixPath($root.$path);
 			
@@ -596,8 +596,8 @@ class kJobsManager
 		}
 		
 		if($isLocal && !$local)
-		{		
-			if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner && $partner->getImportRemoteSourceForConvert())
+		{
+			if(StorageProfile::shouldImportFile($fileSync, $partner))
 				$addImportJob = true;
 			else	
 				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);

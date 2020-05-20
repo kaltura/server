@@ -38,7 +38,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_REGULAR_PACKAGER_URL = 'regular_packager_url';
 	const CUSTOM_DATA_MAPPED_PACKAGER_URL = 'mapped_packager_url';
 	const CUSTOM_DATA_EXPORT_PERIODICALLY = 'export_periodically';
-
+	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS = 'excluded_flavor_params_ids';
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -47,7 +47,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	/**
 	 * @return kPathManager
 	 */
-	
 	public function getPathManager()
 	{
 		$class = $this->getPathManagerClass();
@@ -333,29 +332,21 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		$configuredForExport = null;
 
-	    // check if flavor params id is in the list to export
-	    $flavorParamsIdsToExport = $this->getFlavorParamsIds();
-	    KalturaLog::log(__METHOD__ . " flavorParamsIds [$flavorParamsIdsToExport]");
-	    
-	    if (is_null($flavorParamsIdsToExport) || strlen(trim($flavorParamsIdsToExport)) == 0)
-	    {
-	        // all flavor assets should be exported
-	        $configuredForExport = true;
-	    }
-	    else
-	    {
-	        $flavorParamsIdsToExport = array_map('trim', explode(',', $flavorParamsIdsToExport));
-	        if (in_array($flavorAsset->getFlavorParamsId(), $flavorParamsIdsToExport))
-	        {
-	            // flavor set to export
-	            $configuredForExport = true;
-	        }
-	        else
-	        {
-	            // flavor not set to export
-	            $configuredForExport = false;
-	        }
-	    }
+		//get this flavorId
+		$id = $flavorAsset->getFlavorParamsId();
+		//get Ids to include
+		$idsToInclude = kString::explode($this->getFlavorParamsIds());
+		//get ids to exclude
+		$idsToExclude = kString::explode($this->getExcludedFlavorParamsIds());
+
+		//include if in list or list is empty
+		$configuredForExport = $idsToInclude ? in_array($id, $idsToInclude) : true;
+
+		//exclude if in black list
+		$configuredForExport &= !($idsToExclude && in_array($id, $idsToExclude));
+
+		KalturaLog::log("Flavor ID {$id} include list {" . $this->getFlavorParamsIds() . "} exclude list {" .
+						$this->getExcludedFlavorParamsIds()."}, should export {$configuredForExport}");
 
 	    return $configuredForExport;
 	}
@@ -475,6 +466,17 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function setExportPeriodically($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_EXPORT_PERIODICALLY, $v);
+	}
+
+	public function getExcludedFlavorParamsIds()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS);
+	}
+
+
+	public function setExcludedFlavorParamsIds($flavorParamIds)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS, $flavorParamIds);
 	}
 
 	/**

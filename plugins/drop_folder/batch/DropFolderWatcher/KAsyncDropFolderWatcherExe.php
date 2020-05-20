@@ -25,3 +25,4 @@ pcntl_signal(SIGTERM, 'gracefullyKill');
 $instance = new KAsyncDropFolderWatcher();
 $instance->run(); 
 $instance->done();
+k

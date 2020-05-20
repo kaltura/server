@@ -50,11 +50,12 @@ class kBatchManager
 		}	
 		else
 		{
-			// creates the flavor asset 
+			// creates the flavor asset
 			$flavorAsset = flavorAsset::getInstance($flavor->getType());
 			$flavorAsset->setPartnerId($partnerId);
 			$flavorAsset->setEntryId($entryId);
 			$flavorAsset->setDescription($description);
+			//Always set version to 0 to avoid it set to null by default
 			$flavorAsset->setVersion(0);
 		}
 		

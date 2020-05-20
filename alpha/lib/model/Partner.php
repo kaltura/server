@@ -2142,7 +2142,7 @@ class Partner extends BasePartner
 	
 	public function getSharedStorageType()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATE_STORAGE_STOORGAE_TYPE, null, kSharedFileSystemMgrType::NFS);
+		return $this->getFromCustomData(self::CUSTOM_DATE_STORAGE_STOORGAE_TYPE, null, null);
 	}
 	
 	public function setSharedStorageType($v)
