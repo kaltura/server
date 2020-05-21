@@ -45,41 +45,41 @@
                     <td><?php echo $auditTrail->entryPoint; ?></td>
                     <td><?php echo $auditTrail->userId; ?></td>
                     <td><?php if (isset($auditTrail->data))
+                            {
+                                if (isset($auditTrail->data->info))
                                 {
-									if (isset($auditTrail->data->info))
-                                    {
-										echo $auditTrail->data->info;
-                                    }
-									else if (isset($auditTrail->data->changedItems))
-                                    {
-										foreach ($auditTrail->data->changedItems as $changedItem)
-										{
-											if ($changedItem->descriptor === 'vendor_credit')
-                                            {
-                                                $pattern = '/([a-zA-Z]{1}:(\d)+:)/';    //pattern example S:2:
-												echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
-                                                echo 'Old value: ' . preg_replace($pattern, "\n" ,$changedItem->oldValue ) . "<br/><br/>";
-												echo 'New value: ' . preg_replace($pattern, "\n" ,$changedItem->newValue ) . "<br/><br/>";
-												echo "<br/><br/>";
-                                            }
-                                            else
-                                            {
-												echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
-												echo 'Old value: ' . $changedItem->oldValue . "<br/><br/>";
-												echo 'New value: ' . $changedItem->newValue . "<br/><br/>";
-												echo "<br/><br/>";
-                                            }
-										}
-                                    }
-                                    else
-                                    {
-										echo 'Version: ' . $auditTrail->data->version . "<br/>";
-										echo 'Object Sub Type: ' . $auditTrail->data->objectSubType . "<br/>";
-										echo 'Dc: ' . $auditTrail->data->dc . "<br/>";
-										echo 'Original: ' . $auditTrail->data->original . "<br/>";
-										echo $this->enumTranslate('Kaltura_Client_Enum_AuditTrailFileSyncType', $auditTrail->data->fileType) . "<br/>";
-									}
+                                    echo $auditTrail->data->info;
                                 }
+                                else if (isset($auditTrail->data->changedItems))
+                                {
+                                    foreach ($auditTrail->data->changedItems as $changedItem)
+                                    {
+                                        if ($changedItem->descriptor === 'vendor_credit')
+                                        {
+                                            $pattern = '/([a-zA-Z]{1}:(\d)+:)/';    //pattern example S:2:
+                                            echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
+                                            echo 'Old value: ' . preg_replace($pattern, "\n" ,$changedItem->oldValue ) . "<br/><br/>";
+                                            echo 'New value: ' . preg_replace($pattern, "\n" ,$changedItem->newValue ) . "<br/><br/>";
+                                            echo "<br/><br/>";
+                                        }
+                                        else
+                                        {
+                                            echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
+                                            echo 'Old value: ' . $changedItem->oldValue . "<br/><br/>";
+                                            echo 'New value: ' . $changedItem->newValue . "<br/><br/>";
+                                            echo "<br/><br/>";
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    echo 'Version: ' . $auditTrail->data->version . "<br/>";
+                                    echo 'Object Sub Type: ' . $auditTrail->data->objectSubType . "<br/>";
+                                    echo 'Dc: ' . $auditTrail->data->dc . "<br/>";
+                                    echo 'Original: ' . $auditTrail->data->original . "<br/>";
+                                    echo $this->enumTranslate('Kaltura_Client_Enum_AuditTrailFileSyncType', $auditTrail->data->fileType) . "<br/>";
+                                }
+                            }
 						?>
                     </td>
 				</tr>
