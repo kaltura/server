@@ -69,14 +69,12 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId = 0, $toId = 0)
 	{
 		$c = clone $baseCriteria;
-
-		if($fromId)
-		{
-			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
-		}
+		
 		if($toId)
 		{
-			$c->add(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL);
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
+			$c->addAnd($idCriterion);
 		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
@@ -138,7 +136,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 				{
 					if($lastId !== null)
 					{
-						$lastId = min($lastId, $fileSync->getId() + 1);
+						$lastId = $fileSync->getId();
 					}
 
 					$limitReached = true;
@@ -152,8 +150,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		KalturaLog::info("Delete siblings for file sync [{$this->getObjectId()}] with ID [{$this->getId()}]");
 
-		$fileSYncKey = kFileSyncUtils::getKeyForFileSync($this);
-		kFileSyncUtils::deleteSyncFileForKey($fileSYncKey, false, true);
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
+		kFileSyncUtils::deleteSyncFileForKey($fileSyncKey, false, true);
 	}
 
 	private function generateKey()

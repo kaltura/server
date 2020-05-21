@@ -63,19 +63,19 @@ class FileSyncService extends KalturaBaseService
 	 * @action deleteLocalFileSyncs
 	 * @param KalturaFileSyncFilter $filter
 	 * @param int $workerId The id of the file sync import worker
-	 * @param int $gap Seconds from now that will be ignored
-	 * @param int $range Seconds of the query
+	 * @param int $relativeTimeDeletionLimit Seconds from now that will be ignored
+	 * @param int $relativeTimeRange Seconds of the query
 	 * @param int $lockExpiryTimeout The expiry timeout of the lock
 	 * @return KalturaFileSyncListResponse
 	 */
-	function deleteLocalFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $gap, $range, $lockExpiryTimeout)
+	function deleteLocalFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $relativeTimeDeletionLimit, $relativeTimeRange, $lockExpiryTimeout)
 	{
 		// Get last updatedAt
 		$keysCache = self::getCache();
 		$lastUpdatedAt = $keysCache->get(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId);
 
 		// Set range on filter
-		self::setRange($filter, $lastUpdatedAt, $gap, $range);
+		self::setRange($filter, $lastUpdatedAt, $relativeTimeDeletionLimit, $relativeTimeRange);
 
 		// Get and lock file syncs
 		$lockedFileSyncs = self::getAndLockFileSyncs($filter, $lockExpiryTimeout);
@@ -105,28 +105,21 @@ class FileSyncService extends KalturaBaseService
 		return $keysCache;
 	}
 
-	protected static function setRange($filter, $lastUpdatedAt, $gap, $range)
+	protected static function setRange($filter, $lastUpdatedAt, $relativeTimeDeletionLimit, $relativeTimeRange)
 	{
-		$noDeletionStartTime = time() - $gap;
+		$absoluteDeletionTimeLimit = time() - $relativeTimeDeletionLimit;
 
 		if($lastUpdatedAt)
 		{
 			KalturaLog::info("Last updatedAt is [{$lastUpdatedAt}]");
-
 			$filter->updatedAtGreaterThanOrEqual = $lastUpdatedAt + 1;
-			$filter->updatedAtLessThanOrEqual = $filter->updatedAtGreaterThanOrEqual + $range;
-
-			if($filter->updatedAtLessThanOrEqual > $noDeletionStartTime)
-			{
-				KalturaLog::info('Set to noDeletionStartTime');
-				$filter->updatedAtLessThanOrEqual = $noDeletionStartTime;
-			}
+			$filter->updatedAtLessThanOrEqual = min($filter->updatedAtGreaterThanOrEqual + $relativeTimeRange, $absoluteDeletionTimeLimit);
 		}
 		else
 		{
 			KalturaLog::info('Use default updatedAt');
-			$filter->updatedAtLessThanOrEqual = $noDeletionStartTime;
-			$filter->updatedAtGreaterThanOrEqual = $filter->updatedAtLessThanOrEqual - $range;
+			$filter->updatedAtLessThanOrEqual = $absoluteDeletionTimeLimit;
+			$filter->updatedAtGreaterThanOrEqual = $filter->updatedAtLessThanOrEqual - $relativeTimeRange;
 		}
 
 	}

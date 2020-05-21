@@ -11,8 +11,8 @@ class KAsyncStoragePeriodicDeleteLocal extends KPeriodicWorker
 	const MAX_EXECUTION_TIME = 'maxExecutionTime';        // can be exceeded by one file sync
 	const IDLE_SLEEP_INTERVAL = 'sleepInterval';
 	const LOCK_EXPIRY_TIMEOUT = 'lockExpiryTimeout';
-	const GAP = 'gap';
-	const RANGE = 'range';
+	const RELATIVE_TIME_DELETION_LIMIT = 'relativeTimeDeletionLimit';
+	const RELATIVE_TIME_RANGE = 'relativeTimeRange';
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -29,15 +29,15 @@ class KAsyncStoragePeriodicDeleteLocal extends KPeriodicWorker
 	{
 		$filter = $this->getFilter();
 		$sleepInterval = $this->getAdditionalParams(self::IDLE_SLEEP_INTERVAL);
-		$gap = $this->getAdditionalParams(self::GAP);
-		$range = $this->getAdditionalParams(self::RANGE);
+		$relativeTimeDeletionLimit = $this->getAdditionalParams(self::RELATIVE_TIME_DELETION_LIMIT);
+		$relativeTimeRange = $this->getAdditionalParams(self::RELATIVE_TIME_RANGE);
 		$lockExpiryTimeout = $this->getAdditionalParams(self::LOCK_EXPIRY_TIMEOUT);
 
 		$timeLimit = time() + $this->getAdditionalParams(self::MAX_EXECUTION_TIME);
 		while (time() < $timeLimit)
 		{
 			$this->setDeleteLocalFileSyncsResponseProfile();
-			self::$kClient->fileSync->deleteLocalFileSyncs($filter, $this->getId(), $gap, $range, $lockExpiryTimeout);
+			self::$kClient->fileSync->deleteLocalFileSyncs($filter, $this->getId(), $relativeTimeDeletionLimit, $relativeTimeRange, $lockExpiryTimeout);
 
 			sleep($sleepInterval);
 		}
