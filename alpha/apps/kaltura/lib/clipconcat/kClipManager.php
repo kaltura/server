@@ -280,8 +280,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry);
 
-		kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,false);
+		KalturaLog::debug("Locking Concat Job for temp entry "  . $batchJob->getId());
+		$lockKey = "kclipManager_add_concat_job" . $batchJob->getId();
+		kLock::runLocked($lockKey, array('kClipManager', 'addConcatJobImpl'), array($batchJob, $flavorAsset, $files, false));
+	}
 
+	public static function addConcatJobImpl($batchJob, $flavorAsset, $files, $shouldSort)
+	{
+		kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,$shouldSort);
 	}
 
 	/**
