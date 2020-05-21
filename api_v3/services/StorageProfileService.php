@@ -177,7 +177,6 @@ class StorageProfileService extends KalturaBaseService
 		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::ID);
 
 		$lockedFileSyncs = array();
-		$lockedFileSyncsSize = 0;
 		$limitReached = false;
 		$selectCount = 0;
 		$done = false;
@@ -208,8 +207,8 @@ class StorageProfileService extends KalturaBaseService
 
 			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
 
-			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry, $maxCount,
-				$maxSize, $lockedFileSyncs, $limitReached, $lastId);
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $storageLockExpiry,$lockedFileSyncs,
+				$limitReached, $maxCount, $maxSize, $lastId);
 
 			KalturaLog::debug("Update lastId to [$lastId]");
 		}

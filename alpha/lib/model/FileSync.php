@@ -70,13 +70,15 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		$c = clone $baseCriteria;
 
-		if($fromId)
-		{
-			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
-		}
 		if($toId)
 		{
-			$c->add(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL);
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
+			$c->addAnd($idCriterion);
+		}
+		else if($fromId)
+		{
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
 		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
@@ -101,8 +103,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $lockKeys;
 	}
 
-	public static function lockFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, $maxCount,
-	                                     &$maxSize, &$lockedFileSyncs, &$limitReached, &$lastId = null)
+	public static function lockFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, &$lockedFileSyncs,
+	                                     &$limitReached = null, $maxCount = PHP_INT_MAX, &$maxSize = PHP_INT_MAX, &$lastId = null)
 	{
 		// Get lock file syncs
 		$lockKeys = self::getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix);
@@ -128,20 +130,32 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 			// add to the result set
 			$lockedFileSyncs[] = $fileSync;
-			$maxSize -= $fileSync->getFileSize();
 
-			// check limit
-			if ((count($lockedFileSyncs) >= $maxCount) || ($maxSize < 0))
+			if($limitReached !== null)
 			{
-				if($lastId !== null)
-				{
-					$lastId = min($lastId, $fileSync->getId() + 1);
-				}
+				$maxSize -= $fileSync->getFileSize();
 
-				$limitReached = true;
-				break;
+				// check limit
+				if ((count($lockedFileSyncs) >= $maxCount) || ($maxSize < 0))
+				{
+					if($lastId !== null)
+					{
+						$lastId = $fileSync->getId();
+					}
+
+					$limitReached = true;
+					break;
+				}
 			}
 		}
+	}
+
+	public function deleteLocalSiblings()
+	{
+		KalturaLog::info("Delete siblings for file sync [{$this->getObjectId()}] with ID [{$this->getId()}]");
+
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
+		kFileSyncUtils::deleteSyncFileForKey($fileSyncKey, false, true);
 	}
 
 	private function generateKey()
