@@ -773,7 +773,7 @@ class playManifestAction extends kalturaAction
 			if($cloudMaxDc)
 			{
 				$storageId = $cloudMaxDc;
-				$deliveryFlavors = $cloudRemoteFlavors;
+				$deliveryFlavors = $this->getKalturaStorageFlavors($localFlavors, $cloudRemoteFlavors);
 				$this->deliveryAttributes->setRemoteFileSyncs($cloudFileSyncs[$cloudMaxDc]);
 			}
 
@@ -1489,5 +1489,26 @@ class playManifestAction extends kalturaAction
 		}
 
 		return array($maxDc, $remoteFlavors);
+	}
+
+	protected function getKalturaStorageFlavors($localFlavors, $cloudRemoteFlavors)
+	{
+		$cloudFlavorParams = array();
+		$kalturaFlavors = $cloudRemoteFlavors;
+
+		foreach ($cloudRemoteFlavors as $cloudFlavor)
+		{
+			$cloudFlavorParams[] = $cloudFlavor->getFlavorParamsId();
+		}
+
+		foreach ($localFlavors as $localFlavor)
+		{
+			if(!in_array($localFlavor->getFlavorParamsId(), $cloudFlavorParams))
+			{
+				$kalturaFlavors[$localFlavor->getId()] = $localFlavor;
+			}
+		}
+
+		return $kalturaFlavors;
 	}
 }
