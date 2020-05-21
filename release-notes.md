@@ -46,6 +46,7 @@ Add the following to batch.ini:
     params.sleepInterval                                = @SLEEP_INTERVAL@
     params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
     params.gap                                          = @GAP@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
     filter.statusEqual                                  = 3
     filter.dcIn                                         = @DC@
     filter.fileTypeIn                                   = 1,3
