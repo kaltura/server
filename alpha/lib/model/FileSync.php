@@ -69,12 +69,16 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId = 0, $toId = 0)
 	{
 		$c = clone $baseCriteria;
-		
+
 		if($toId)
 		{
 			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
 			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
 			$c->addAnd($idCriterion);
+		}
+		else if($fromId)
+		{
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
 		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
