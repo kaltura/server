@@ -183,7 +183,7 @@ class kDataCenterMgr
 		return DIRECTORY_SEPARATOR . "tmp" . DIRECTORY_SEPARATOR . "file_sync-" .  $fileSync->getId();
 	}
 	
-	public static function getInternalRemoteUrl(FileSync $file_sync)
+	public static function getInternalRemoteUrl(FileSync $file_sync, $addBaseUrl = true)
 	{
 		KalturaLog::log("File Sync [{$file_sync->getId()}]");
 		// LOG retrieval
@@ -195,8 +195,11 @@ class kDataCenterMgr
 		
 		$filename = 'f.' . $file_sync->getFileExt();
 		
-		$build_remote_url = $dc["url"] . "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/f/$filename"; // or something similar 
-		
+		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/f/$filename"; // or something similar
+		if($addBaseUrl)
+		{
+			$build_remote_url = $dc["url"] . $build_remote_url;
+		}
 		return $build_remote_url;
 	}
 		

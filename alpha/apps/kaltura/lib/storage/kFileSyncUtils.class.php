@@ -1808,6 +1808,100 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fileSync;
 	}
 
+
+	public static function getReadyFileSyncForKeyAndDc($key, $dcId)
+	{
+		KalturaLog::debug("key [$key], DC Id [$dcId]");
+		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
+		$c->addAnd (FileSyncPeer::DC , $dcId);
+		$c->addAnd (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
+		$c->addAscendingOrderByColumn(FileSyncPeer::DC);
+		$fileSync = FileSyncPeer::doSelectOne($c);
+		if (!$fileSync)
+		{
+			KalturaLog::notice("FileSync was not found");
+			return null;
+		}
+		return $fileSync;
+	}
+
+	/**
+	 * return file sync to serve if at least one of the entry flavors doesnt exist locally
+	 * prefer provided dc over the local dc
+	 *
+	 * @param $syncKey
+	 * @param $flavorAsset
+	 * @param $preferredStorageId
+	 * @return FileSync|null
+	 * @throws PropelException
+	 */
+	public static function getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId)
+	{
+		// if at least one flavor exists in the remote storage, generate remote serve paths
+		if(self::doesEntryFlavorExistInStorage($preferredStorageId, $flavorAsset->getEntryId()))
+		{
+			$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
+			if($fileSync)
+			{
+				return $fileSync;
+			}
+
+			list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, false, false);
+			return $fileSync;
+		}
+
+		// all flavors exist locally so return empty file sync and empty path
+		return null;
+	}
+
+	/**
+	 * get the object path in remote location or the serveFile path for local location
+	 *
+	 * @param $fileSync
+	 * @param $preferredStorageId
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function getPathByFileSync($fileSync, $preferredStorageId)
+	{
+		$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
+		$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
+
+		// if the dc is the preferred return the file path
+		if($fileSync->getDc() == $preferredStorageId)
+		{
+			return $prefix . kFileSyncUtils::getFileSyncFullPath($fileSync);
+		}
+
+		// if dc is local but not preferred generate serve file urls
+		return $prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
+	}
+
+	/**
+	 * @param $preferredStorageId
+	 * @param $entryId
+	 * @return bool
+	 */
+	public static function doesEntryFlavorExistInStorage($preferredStorageId, $entryId)
+	{
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($entryId, $flavorTypes);
+
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$fileSync = self::getReadyFileSyncForKeyAndDc($key, $preferredStorageId);
+			if($fileSync)
+			{
+				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was found in DC [$preferredStorageId]");
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
 	/**
 	 * Get the internal from kaltura data centers only FileSync object by its key
 	 * @param FileSyncKey $syncKey
@@ -1946,5 +2040,32 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		return FileSyncPeer::doSelect($c);
+	}
+
+	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true)
+	{
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			return $fileSync->getFilePath();
+		}
+
+		$fullPath = $fileSync->getFullPath();
+		$serveFlavorPathSearchReplace = kConf::get('serve_flavor_path_search_replace', 'local', array());
+
+		if(count($serveFlavorPathSearchReplace) && $pathOnly)
+		{
+			foreach ($serveFlavorPathSearchReplace as $pathSearchReplace)
+			{
+				$pathSearch = $pathSearchReplace['search'];
+				if(kString::beginsWith($fullPath, $pathSearch))
+				{
+					$pathReplace = $pathSearchReplace['replace'];
+					$newPrefix = $pathReplace[mt_rand(0, count($pathReplace) - 1)];
+					$fullPath = $newPrefix . substr($fullPath, strlen($pathSearch));
+					break;
+				}
+			}
+		}
+		return $fullPath;
 	}
 }
