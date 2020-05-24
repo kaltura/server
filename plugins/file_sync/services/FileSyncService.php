@@ -105,20 +105,20 @@ class FileSyncService extends KalturaBaseService
 		return $keysCache;
 	}
 
-	protected static function setRange($filter, $lastUpdatedAt, $relativeTimeDeletionLimit, $relativeTimeRange)
+	protected static function setRange($filter, $lastUpdatedAt, $relativeTimeLimit, $relativeTimeRange)
 	{
-		$absoluteDeletionTimeLimit = time() - $relativeTimeDeletionLimit;
+		$absoluteTimeLimit = time() - $relativeTimeLimit;
 
 		if($lastUpdatedAt)
 		{
 			KalturaLog::info("Last updatedAt is [{$lastUpdatedAt}]");
 			$filter->updatedAtGreaterThanOrEqual = $lastUpdatedAt + 1;
-			$filter->updatedAtLessThanOrEqual = min($filter->updatedAtGreaterThanOrEqual + $relativeTimeRange, $absoluteDeletionTimeLimit);
+			$filter->updatedAtLessThanOrEqual = min($filter->updatedAtGreaterThanOrEqual + $relativeTimeRange, $absoluteTimeLimit);
 		}
 		else
 		{
 			KalturaLog::info('Use default updatedAt');
-			$filter->updatedAtLessThanOrEqual = $absoluteDeletionTimeLimit;
+			$filter->updatedAtLessThanOrEqual = $absoluteTimeLimit;
 			$filter->updatedAtGreaterThanOrEqual = $filter->updatedAtLessThanOrEqual - $relativeTimeRange;
 		}
 
@@ -199,14 +199,24 @@ class FileSyncService extends KalturaBaseService
 	 *
 	 * @action lockFileSyncs
 	 * @param KalturaFileSyncFilter $filter
+	 * @param int $workerId The id of the file sync import worker
+	 * @param int $relativeTimeLimit Seconds from now that will be ignored
+	 * @param int $relativeTimeRange Seconds of the query
+	 * @param int $lockExpiryTimeout The expiry timeout of the lock
 	 * @param int $maxCount The maximum number of file syncs that should be returned
-	 * @param int $lockExpiryTimeOut The expiry timeout of the lock
 	 * @return KalturaLockFileSyncsResponse
 	 */
-	function lockFileSyncsAction(KalturaFileSyncFilter $filter, $maxCount, $lockExpiryTimeOut)
+	function lockFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $relativeTimeLimit, $relativeTimeRange, $lockExpiryTimeout, $maxCount)
 	{
 		// need to explicitly disable the cache since this action may not perform any queries
 		kApiCache::disableConditionalCache();
+
+		// Get last updatedAt
+		$keysCache = self::getCache();
+		$lastUpdatedAt = $keysCache->get(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId);
+
+		// Set range on filter
+		self::setRange($filter, $lastUpdatedAt, $relativeTimeLimit, $relativeTimeRange);
 
 		$lockCache = self::getLockCache();
 
@@ -220,11 +230,14 @@ class FileSyncService extends KalturaBaseService
 
 		if ($fileSyncs)
 		{
-			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeOut,
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeout,
 				$lockedFileSyncs, $limitReached, $maxCount);
 
 			FileSync::createFileSyncsPath($lockedFileSyncs);
 		}
+
+		// Set last updatedAt
+		$keysCache->set(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId, $filter->updatedAtLessThanOrEqual);
 
 		// build the response object
 		$result = new KalturaLockFileSyncsResponse;

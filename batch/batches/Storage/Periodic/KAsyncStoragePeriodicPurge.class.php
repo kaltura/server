@@ -8,13 +8,13 @@
  */
 class KAsyncStoragePeriodicPurge extends KStorageFileSyncsBase
 {
-	const GAP = 'gap';
-	const RELATIVE_TIME_RANGE = 'relativeTimeRange';
 	const LOCK_EXPIRY_TIMEOUT = 'lockExpiryTimeout';
+	const RELATIVE_TIME_RANGE = 'relativeTimeRange';
+	const RELATIVE_TIME_DELETION_LIMIT = 'relativeTimeDeletionLimit';
 
-	protected $gap;
-	protected $relativeTimeRange;
 	protected $lockExpiryTimeout;
+	protected $relativeTimeRange;
+	protected $relativeTimeDeletionLimit;
 
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -26,16 +26,15 @@ class KAsyncStoragePeriodicPurge extends KStorageFileSyncsBase
 
 	protected function getParamsOperation()
 	{
-		$this->gap = $this->getAdditionalParams(self::GAP);
-		$this->relativeTimeRange = $this->getAdditionalParams(self::RELATIVE_TIME_RANGE);
 		$this->lockExpiryTimeout = $this->getAdditionalParams(self::LOCK_EXPIRY_TIMEOUT);
+		$this->relativeTimeRange = $this->getAdditionalParams(self::RELATIVE_TIME_RANGE);
+		$this->relativeTimeDeletionLimit = $this->getAdditionalParams(self::RELATIVE_TIME_DELETION_LIMIT);
 	}
 
 	protected function lockFileSyncs($filter)
 	{
-		$filter->updatedAtLessThanOrEqual = time() - $this->gap;
-		$filter->updatedAtGreaterThanOrEqual = $filter->updatedAtLessThanOrEqual - $this->relativeTimeRange;
-		return self::$kClient->fileSync->lockFileSyncs($filter, $this->maxCount, $this->lockExpiryTimeout);
+		return self::$kClient->fileSync->lockFileSyncs($filter, $this->getId(), $this->relativeTimeDeletionLimit,
+			$this->relativeTimeRange, $this->lockExpiryTimeout, $this->maxCount);
 	}
 
 	protected function processOperation($engine)
