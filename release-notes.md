@@ -45,7 +45,7 @@ Add the following to batch.ini:
     params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
     params.sleepInterval                                = @SLEEP_INTERVAL@
     params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
-    params.gap                                          = @GAP@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
     params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
     filter.statusEqual                                  = 3
     filter.dcIn                                         = @DC@
