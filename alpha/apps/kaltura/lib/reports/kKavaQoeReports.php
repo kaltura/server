@@ -158,12 +158,9 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 		self::ERROR_TRACKING_BASE => array(
 			self::REPORT_METRICS => array(
+				self::METRIC_VIEW_UNIQUE_SESSIONS,
 				self::EVENT_TYPE_ERROR,
 				self::METRIC_ERROR_SESSION_COUNT,
-			),
-			self::REPORT_FILTER => array(
-				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array(self::EVENT_TYPE_ERROR)
 			),
 		),
 
