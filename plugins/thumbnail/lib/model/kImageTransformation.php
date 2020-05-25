@@ -9,9 +9,26 @@ class kImageTransformation
 	/** @var kImageTransformationStep[] */
 	protected $imageSteps = array();
 
+	protected $partnerId;
+
+	public function setPartnerId($partnerId)
+	{
+		$this->partnerId = $partnerId;
+	}
+
+	public function getPartnerId()
+	{
+		if($this->partnerId)
+		{
+			return $this->partnerId;
+		}
+
+		return kCurrentContext::getCurrentPartnerId();
+	}
+
 	public function validate()
 	{
-		myPartnerUtils::blockInactivePartner(kCurrentContext::getCurrentPartnerId());
+		myPartnerUtils::blockInactivePartner($this->getPartnerId());
 		$stepsCount = count($this->imageSteps);
 		if(!$stepsCount)
 		{

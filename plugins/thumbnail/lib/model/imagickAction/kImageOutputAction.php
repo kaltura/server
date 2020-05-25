@@ -13,6 +13,9 @@ class kImageOutputAction extends kImagickAction
 	protected $format;
 	protected $quality;
 
+	/**
+	 * @throws kThumbnailException
+	 */
 	protected function validateFormat()
 	{
 		$validFormats = $this->image->queryFormats();
@@ -24,6 +27,9 @@ class kImageOutputAction extends kImagickAction
 		}
 	}
 
+	/**
+	 * @throws kThumbnailException
+	 */
 	protected function validateQuality()
 	{
 		if (($this->quality < self::MIN_QUALITY) || $this->quality > self::MAX_QUALITY)
@@ -49,6 +55,9 @@ class kImageOutputAction extends kImagickAction
 		$this->quality = $this->getIntActionParameter(kThumbnailParameterName::QUALITY, self::DEFAULT_QUALITY);
 	}
 
+	/**
+	 * @throws kThumbnailException
+	 */
 	protected function validateInput()
 	{
 		$this->validateFormat();

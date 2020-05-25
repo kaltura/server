@@ -19,4 +19,5 @@ class kThumbnailException extends kCoreException
 	const MUST_HAVE_VIDEO_SOURCE = 'The following transformation must have video source';
 	const MISSING_S3_CONFIGURATION = 'Missing S3 configuration';
 	const CACHE_ERROR = 'Cache error';
+	const ENTRY_NOT_FOUND = 'Entry not found';
 }

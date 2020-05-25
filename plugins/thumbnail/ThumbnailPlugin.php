@@ -2,7 +2,7 @@
 /**
  * @package plugins.thumbnail
  */
-class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaExceptionHandler
+class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaPending, IKalturaExceptionHandler, IKalturaImageTransformationExecutor
 {
 	const PLUGIN_NAME = 'thumbnail';
 	const THUMBNAIL_CORE_EXCEPTION = 'kThumbnailException';
@@ -35,6 +35,11 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 		return $map;
 	}
 
+	/**
+	 * @param kThumbnailException $exception
+	 * @return KalturaAPIException
+	 * @throws Exception
+	 */
 	public static function handleThumbnailException($exception)
 	{
 		$code = $exception->getCode();
@@ -80,6 +85,9 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 			case kThumbnailException::CACHE_ERROR:
 				$object = new KalturaAPIException(KalturaThumbnailErrors::CACHE_ERROR);
 				break;
+			case kThumbnailException::ENTRY_NOT_FOUND:
+				$object = new KalturaAPIException(KalturaThumbnailErrors::ENTRY_ID_NOT_FOUND, $data[kThumbnailErrorMessages::ENTRY_ID]);
+				break;
 			default:
 				$object = null;
 		}
@@ -92,5 +100,38 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 		return array(
 			self::THUMBNAIL_CORE_EXCEPTION => array('ThumbnailPlugin', 'handleThumbnailException'),
 		);
+	}
+
+
+	/**
+	 * @param entry $entry
+	 * @param $version
+	 * @param $width
+	 * @param $height
+	 * @param $type
+	 * @param $bgcolor
+	 * @param $quality
+	 * @param $src_x
+	 * @param $src_y
+	 * @param $src_w
+	 * @param $src_h
+	 * @param $vid_sec
+	 * @param $vid_slice
+	 * @param $vid_slices
+	 * @param $density
+	 * @param $stripProfiles
+	 * @param $format
+	 * @param $start_sec
+	 * @param $end_sec
+	 * @return string
+	 * @throws kThumbnailException
+	 */
+	public function getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec)
+	{
+		$adapter = kThumbnailAdapterFactory::getAdapter($entry);
+		$params = kThumbnailAdapterFactory::getThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+			$vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec);
+
+		return $adapter->resizeEntryImage($params);
 	}
 }
