@@ -3612,13 +3612,15 @@ class kKavaReportsMgr extends kKavaBase
 			$context['columns'] = array();
 		$context['columns'][] = 'SOURCE';
 		$context['columns'][] = 'ADMIN_TAGS';
+		$context['columns'][] = 'CUSTOM_DATA';
 
 		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
 		foreach ($enrichedResult as $id => $row)
 		{
+			$customData = array_pop($row);
 			$adminTags = array_pop($row);
 			$sourceType = array_pop($row);
-			$source = self::getEntrySourceType($sourceType, $adminTags);
+			$source = self::getEntrySourceType($sourceType, $adminTags, $customData);
 			$result[$id] = $row;
 			$result[$id][] = $source;
 		}

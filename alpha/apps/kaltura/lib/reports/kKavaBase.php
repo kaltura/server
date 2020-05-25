@@ -366,7 +366,11 @@ class kKavaBase extends kDruidBase
 		37 => 'Classroom Capture',
 	);
 
-	public static function getEntrySourceType($sourceType, $adminTags)
+	protected static $externalSources = array(
+		'YouTube' => 'External Youtube',
+	);
+
+	public static function getEntrySourceType($sourceType, $adminTags, $customData)
 	{
 		// check for specific admin tags
 		$adminTags = explode(',', strtolower($adminTags));
@@ -379,8 +383,29 @@ class kKavaBase extends kDruidBase
 			}
 		}
 
+		// check for external source
+		if (!is_null($customData))
+		{
+			$externalSource = self::getExternalSourceType($customData);
+			if (isset($externalSource) && isset(self::$externalSources[$externalSource]))
+			{
+				return self::$externalSources[$externalSource];
+			}
+		}
+
 		// use the source type
 		return self::$sourceTypes[$sourceType];
+	}
+
+	protected static function getExternalSourceType($customData)
+	{
+		$pattern = '/"externalSource";s:\d+:"(\w+)";/';
+		if (preg_match($pattern, $customData, $matches))
+		{
+			return $matches[1];
+		}
+
+		return null;
 	}
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {
