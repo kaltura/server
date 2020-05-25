@@ -773,7 +773,7 @@ class playManifestAction extends kalturaAction
 			if($cloudMaxDc)
 			{
 				$storageId = $cloudMaxDc;
-				$deliveryFlavors = $cloudRemoteFlavors;
+				$deliveryFlavors = array_merge($localFlavors, $cloudRemoteFlavors);
 				$this->deliveryAttributes->setRemoteFileSyncs($cloudFileSyncs[$cloudMaxDc]);
 			}
 

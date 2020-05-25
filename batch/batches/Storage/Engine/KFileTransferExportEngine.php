@@ -51,6 +51,7 @@ class KFileTransferExportEngine extends KExportEngine
 			$engineOptions['sseKmsKeyId'] = $this->data->sseKmsKeyId;
 			$engineOptions['signatureType'] = $this->data->signatureType;
 			$engineOptions['endPoint'] = $this->data->endPoint;
+			$engineOptions['storageClass'] = $this->data->storageClass;
 		}
 
 		$engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
@@ -104,7 +105,6 @@ class KFileTransferExportEngine extends KExportEngine
 		}
 
 		$this->unlinkFileIfNeeded($srcTempFile);
-
 		return true;
 	}
 
@@ -205,19 +205,20 @@ class KFileTransferExportEngine extends KExportEngine
 
 		if($externalStorage->protocol == StorageProfileProtocol::S3)
 		{
-			$storageExportData = $this->addS3FieldsToStorageData($storageExportData, $externalStorage);
+			$storageExportData = $this->addS3FieldsToStorageData($storageExportData, $externalStorage, $fileSync);
 		}
 
 		return $storageExportData;
 	}
 
-	protected function addS3FieldsToStorageData($storageExportData, $externalStorage)
+	protected function addS3FieldsToStorageData($storageExportData, $externalStorage, $fileSync)
 	{
 		$storageExportData->filesPermissionInS3 = $externalStorage->filesPermissionInS3;
 		$storageExportData->s3Region = $externalStorage->s3Region;
 		$storageExportData->sseType = $externalStorage->sseType;
 		$storageExportData->sseKmsKeyId = $externalStorage->sseKmsKeyId;
 		$storageExportData->signatureType = $externalStorage->signatureType;
+		$storageExportData->storageClass = $fileSync->storageClass;
 		return $storageExportData;
 	}
 
@@ -270,5 +271,6 @@ class KFileTransferExportEngine extends KExportEngine
 			unlink($tempFile);
 		}
 	}
+
 }
 

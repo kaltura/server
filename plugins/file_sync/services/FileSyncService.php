@@ -9,6 +9,8 @@
 class FileSyncService extends KalturaBaseService
 {
 	const LOCK_KEY_PREFIX = 'fileSync_fileSyncLock:id=';
+	const LOCK_KEY_PREFIX_DELETE_LOCAL = 'fileSync_fileSyncDeleteLocal:id=';
+	const LAST_FILESYNC_UPDATE_AT_PREFIX = 'fileSync-fileSyncLastUpdatedAt-worker-';
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -55,6 +57,99 @@ class FileSyncService extends KalturaBaseService
 		return $response;
 	}
 
+	/**
+	 * Delete local file syncs by filter
+	 *
+	 * @action deleteLocalFileSyncs
+	 * @param KalturaFileSyncFilter $filter
+	 * @param int $workerId The id of the file sync import worker
+	 * @param int $relativeTimeDeletionLimit Seconds from now that will be ignored
+	 * @param int $relativeTimeRange Seconds of the query
+	 * @param int $lockExpiryTimeout The expiry timeout of the lock
+	 * @return KalturaFileSyncListResponse
+	 */
+	function deleteLocalFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $relativeTimeDeletionLimit, $relativeTimeRange, $lockExpiryTimeout)
+	{
+		// Get last updatedAt
+		$keysCache = self::getCache();
+		$lastUpdatedAt = $keysCache->get(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId);
+
+		// Set range on filter
+		self::setRange($filter, $lastUpdatedAt, $relativeTimeDeletionLimit, $relativeTimeRange);
+
+		// Get and lock file syncs
+		$lockedFileSyncs = self::getAndLockFileSyncs($filter, $lockExpiryTimeout);
+
+		// Delete siblings
+		foreach ($lockedFileSyncs as $fileSync)
+		{
+			$fileSync->deleteLocalSiblings();
+		}
+
+		// Set last updatedAt
+		$keysCache->set(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId, $filter->updatedAtLessThanOrEqual);
+
+		// Response
+		$response = new KalturaFileSyncListResponse();
+		$response->objects = KalturaFileSyncArray::fromDbArray($lockedFileSyncs, $this->getResponseProfile());
+		return $response;
+	}
+
+	protected static function getCache()
+	{
+		$keysCache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		if (!$keysCache)
+		{
+			throw new KalturaAPIException(MultiCentersErrors::GET_KEYS_CACHE_FAILED);
+		}
+		return $keysCache;
+	}
+
+	protected static function setRange($filter, $lastUpdatedAt, $relativeTimeLimit, $relativeTimeRange)
+	{
+		$absoluteTimeLimit = time() - $relativeTimeLimit;
+
+		if($lastUpdatedAt)
+		{
+			KalturaLog::info("Last updatedAt is [{$lastUpdatedAt}]");
+			$filter->updatedAtGreaterThanOrEqual = $lastUpdatedAt + 1;
+			$filter->updatedAtLessThanOrEqual = min($filter->updatedAtGreaterThanOrEqual + $relativeTimeRange, $absoluteTimeLimit);
+		}
+		else
+		{
+			KalturaLog::info('Use default updatedAt');
+			$filter->updatedAtLessThanOrEqual = $absoluteTimeLimit;
+			$filter->updatedAtGreaterThanOrEqual = $filter->updatedAtLessThanOrEqual - $relativeTimeRange;
+		}
+
+	}
+
+	protected static function getAndLockFileSyncs($filter, $lockExpiryTimeout)
+	{
+		$lockCache = self::getLockCache();
+
+		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::UPDATED_AT);
+
+		$offset = 0;
+		$lockedFileSyncs = array();
+
+		do
+		{
+			$baseCriteria->setOffset($offset);
+			$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria);
+			if(!$fileSyncs)
+			{
+				break;
+			}
+
+			$offset += KalturaFileSyncFilter::MAX_FILESYNCS_PER_CHUNK;
+
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX_DELETE_LOCAL, $lockExpiryTimeout, $lockedFileSyncs);
+
+		}while(count($fileSyncs) == KalturaFileSyncFilter::MAX_FILESYNCS_PER_CHUNK);
+
+		return $lockedFileSyncs;
+	}
 	/**
 	 * Update file sync by id
 	 * 
@@ -104,20 +199,29 @@ class FileSyncService extends KalturaBaseService
 	 *
 	 * @action lockFileSyncs
 	 * @param KalturaFileSyncFilter $filter
+	 * @param int $workerId The id of the file sync import worker
+	 * @param int $relativeTimeLimit Seconds from now that will be ignored
+	 * @param int $relativeTimeRange Seconds of the query
+	 * @param int $lockExpiryTimeout The expiry timeout of the lock
 	 * @param int $maxCount The maximum number of file syncs that should be returned
-	 * @param int $lockExpiryTimeOut The expiry timeout of the lock
 	 * @return KalturaLockFileSyncsResponse
 	 */
-	function lockFileSyncsAction(KalturaFileSyncFilter $filter, $maxCount, $lockExpiryTimeOut)
+	function lockFileSyncsAction(KalturaFileSyncFilter $filter, $workerId, $relativeTimeLimit, $relativeTimeRange, $lockExpiryTimeout, $maxCount)
 	{
 		// need to explicitly disable the cache since this action may not perform any queries
 		kApiCache::disableConditionalCache();
+
+		// Get last updatedAt
+		$keysCache = self::getCache();
+		$lastUpdatedAt = $keysCache->get(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId);
+
+		// Set range on filter
+		self::setRange($filter, $lastUpdatedAt, $relativeTimeLimit, $relativeTimeRange);
 
 		$lockCache = self::getLockCache();
 
 		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::UPDATED_AT);
 
-		$maxSize = PHP_INT_MAX;
 		$lockedFileSyncs = array();
 		$limitReached = false;
 
@@ -126,11 +230,14 @@ class FileSyncService extends KalturaBaseService
 
 		if ($fileSyncs)
 		{
-			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeOut,
-				$maxCount, $maxSize, $lockedFileSyncs, $limitReached);
+			FileSync::lockFileSyncs($fileSyncs, $lockCache, self::LOCK_KEY_PREFIX, $lockExpiryTimeout,
+				$lockedFileSyncs, $limitReached, $maxCount);
 
 			FileSync::createFileSyncsPath($lockedFileSyncs);
 		}
+
+		// Set last updatedAt
+		$keysCache->set(self::LAST_FILESYNC_UPDATE_AT_PREFIX . $workerId, $filter->updatedAtLessThanOrEqual);
 
 		// build the response object
 		$result = new KalturaLockFileSyncsResponse;

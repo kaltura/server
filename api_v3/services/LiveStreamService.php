@@ -196,16 +196,16 @@ class LiveStreamService extends KalturaLiveEntryService
 	
 	private function validateMaxStreamsNotReached(LiveEntry $liveEntry)
 	{
+		$liveEntryPartner = $liveEntry->getPartner();
 		//Fetch all entries currently being streamed by partner
-		$liveEntries = $this->getLiveEntriesForPartner($liveEntry);
-		
-		$maxPassthroughStreams = $this->getPartner()->getMaxLiveStreamInputs();
+		$liveEntries = $this->getLiveEntriesForPartner($liveEntryPartner->getId(), $liveEntry->getId());
+		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
 		
 		$maxTranscodedStreams = 0;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $this->getPartnerId()))
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $liveEntryPartner->getId()))
 		{
-			$maxTranscodedStreams = $this->getPartner()->getMaxLiveStreamOutputs();
+			$maxTranscodedStreams = $liveEntryPartner->getMaxLiveStreamOutputs();
 		}
 		KalturaLog::debug("Max transcoded streams [$maxTranscodedStreams]");
 		
@@ -248,10 +248,10 @@ class LiveStreamService extends KalturaLiveEntryService
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $liveEntry->getId());
 	}
 	
-	private function getLiveEntriesForPartner(LiveEntry $liveEntry)
+	private function getLiveEntriesForPartner($partnerId, $excludeEntryId)
 	{
 		//Fetch all entries currently being streamed by partner
-		$connectedEntryServerNodes  = EntryServerNodePeer::retrieveConnectedEntryServerNodesByPartner($liveEntry->getPartnerId(), $liveEntry->getId());
+		$connectedEntryServerNodes  = EntryServerNodePeer::retrieveConnectedEntryServerNodesByPartner($partnerId, $excludeEntryId);
 		
 		if(!count($connectedEntryServerNodes))
 			return array();

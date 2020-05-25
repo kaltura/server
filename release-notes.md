@@ -1,28 +1,32 @@
-# Propus 16.2.0  #
-## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
+# Propus 16.3.0  #
+## Add periodic storage delete local batch ##
 Issue Type: Task
-Issue ID: PLAT-10890
+Issue ID : PLAT-10894
 
 ### Configuration ###
-Modify cloud_storage.ini:
-add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
+Add the following to batch.ini:
 
-## Support export captions to remote storage ##
-- Issue Type: Task
-- Issue ID: PLAT-10846
+    enabledWorkers.KAsyncStoragePeriodicDeleteLocal     = 1
 
-### Deployment scripts ###
-Run:
-	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
-
-## Add Reach Profile to Audit Trail ##
-Issue Type: Task
-Issue ID: REACH2-845
+    [KAsyncStoragePeriodicDeleteLocal : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Delete Local
+    type                                                = KAsyncStoragePeriodicDeleteLocal
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteLocalExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+    filter.statusEqual                                  = 2
+    filter.dcEqual                                      = @DC@
+    filter.fileTypeEqual                                = 3
 
 #### Deployment Scripts ####
-mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
+    php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
 
-## Add periodic storage delete batch ##
+## Add periodic storage purge batch ##
 Issue Type: Task
 Issue ID : PLAT-10769
 
@@ -41,7 +45,8 @@ Add the following to batch.ini:
     params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
     params.sleepInterval                                = @SLEEP_INTERVAL@
     params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
-    params.gap                                          = @GAP@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
     filter.statusEqual                                  = 3
     filter.dcIn                                         = @DC@
     filter.fileTypeIn                                   = 1,3
@@ -54,6 +59,31 @@ Add the following to batch.ini:
     
 #### Deployment Scripts ####
     php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
+
+
+# Propus 16.2.0  #
+## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
+Issue Type: Task
+Issue ID: PLAT-10890
+
+### Configuration ###
+Modify cloud_storage.ini:
+add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
+    
+## Support export captions to remote storage ##
+- Issue Type: Task
+- Issue ID: PLAT-10846
+
+### Deployment scripts ###
+Run:
+	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
+
+## Add Reach Profile to Audit Trail ##
+Issue Type: Task
+Issue ID: REACH2-845
+
+#### Deployment Scripts ####
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
 
 ## Support volume map and thumb serving ##
 Issue Type: Task
