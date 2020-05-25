@@ -336,6 +336,12 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 					self::REPORT_METRICS => array(self::METRIC_DYNAMIC_VIEWERS),
 					self::REPORT_TABLE_FINALIZE_FUNC => 'self::getPeakViewers'
 				),
+			),
+			self::REPORT_TABLE_MAP => array(
+				'viewers' => self::METRIC_DYNAMIC_VIEWERS,
+				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
+				'avg_view_downstream_bandwidth' => self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 			)
 		),
 	);
