@@ -48,6 +48,17 @@ class kThumbStorageLocal extends kThumbStorageBase implements kThumbStorageInter
 		return true;
 	}
 
+	public function loadFileIntoPath($url, $lastModified, $path)
+	{
+		if($this->loadFile($url, $lastModified))
+		{
+			kFile::moveFile($this->fileName, $path, false, true);
+			return true;
+		}
+
+		return false;
+	}
+
 	public function deleteFile($url)
 	{
 		KalturaLog::debug('deleting file to:' . $url);

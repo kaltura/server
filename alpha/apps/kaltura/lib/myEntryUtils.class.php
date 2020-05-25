@@ -689,10 +689,18 @@ class myEntryUtils
 	}
 	
 	
-	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
+	public static function resizeEntryImage( entry $entry, $version, $width, $height, $type, $bgcolor = "ffffff", $crop_provider = null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
 		$start_sec = -1, $end_sec = -1)
 	{
+		$result = self::getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+			$vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec);
+
+		if($result)
+		{
+			return $result;
+		}
+
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
 
@@ -2141,4 +2149,32 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return  (kCurrentContext::$multiRequest_index <= 1);
 	}
 
+	protected static function getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+																  $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec)
+	{
+		$result = null;
+		try
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImageTransformationExecutor');
+			foreach ($pluginInstances as $KalturaTransformationExecutor)
+			{
+				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
+				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
+				$result =$KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+					$vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec);
+
+				if ($result)
+				{
+					break;
+				}
+
+			}
+		}
+		catch (Exception $e)
+		{
+			kalturaLog::warning('Could not execute image transformation');
+		}
+
+		return $result;
+	}
 }

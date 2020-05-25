@@ -23,6 +23,11 @@ class kThumbStorageNone extends kThumbStorageBase implements kThumbStorageInterf
 		return false;
 	}
 
+	public function loadFileIntoPath($url, $lastModified, $path)
+	{
+		return false;
+	}
+
 	public function deleteFile($url)
 	{
 		return false;

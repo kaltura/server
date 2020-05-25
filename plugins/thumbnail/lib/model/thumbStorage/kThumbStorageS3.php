@@ -95,6 +95,24 @@ class kThumbStorageS3 extends kThumbStorageBase implements kThumbStorageInterfac
 		return false;
 	}
 
+	/**
+	 * @param $url
+	 * @param $lastModified
+	 * @param $path
+	 * @return bool
+	 * @throws kThumbnailException
+	 */
+	public function loadFileIntoPath($url, $lastModified, $path)
+	{
+		if($this->loadFile($url, $lastModified))
+		{
+			kFile::safeFilePutContents($path, $this->content);
+			return true;
+		}
+
+		return false;
+	}
+
 	public function deleteFile($url)
 	{
 		KalturaLog::debug('deleting file from s3:' . $url);
