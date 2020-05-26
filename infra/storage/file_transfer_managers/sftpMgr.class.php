@@ -247,6 +247,7 @@ class sftpMgr extends kFileTransferMgr
 			if($stream)
 			{
 				// Writes the file in chunks (for large files bug)
+				$localFile = kFile::realPath($localFile);
 				$fileToReadHandle = fopen($localFile, "r");
 				$ret = $this->writeFileInChunks($fileToReadHandle, $stream);
 				@fclose($fileToReadHandle);

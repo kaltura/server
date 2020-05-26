@@ -755,7 +755,7 @@ class kFlowHelper
 		if($shouldSave)
 			$flavorAsset->save();
 		
-		if(count($data->getExtraDestFileSyncs()))
+		if($data->getExtraDestFileSyncs() && count($data->getExtraDestFileSyncs()))
 		{
 			//operation engine creating only file assets should be the last one in the operations chain
 			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
@@ -822,9 +822,22 @@ class kFlowHelper
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
-			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			if($partnerSharedStorageProfileId)
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if($storageProfile)
+					kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $partnerSharedStorageProfileId);
+			}
+			else
+			{
+				kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			}
 		}
 		elseif($flavorParamsOutput->getRemoteStorageProfileIds())
 		{
@@ -837,11 +850,22 @@ class kFlowHelper
 		}
 		
 		// creats the file sync
-		if(file_exists($data->getLogFileSyncLocalPath()))
+		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-			try{
-				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			try
+			{
+				if($partnerSharedStorageProfileId)
+				{
+					KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+					$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+					if($storageProfile)
+						kFileSyncUtils::createReadySyncFileForKey($logSyncKey, $data->getLogFileSyncLocalPath(), $partnerSharedStorageProfileId);
+				}
+				else
+				{
+					kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+				}
 			}
 			catch(Exception $e){
 				$err = 'Saving conversion log: ' . $e->getMessage();

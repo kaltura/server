@@ -51,6 +51,11 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	 * @var string
 	 */
 	public $engineMessage;
+	
+	/**
+	 * @var string
+	 */
+	public $destFileSyncSharedPath;
     
 	private static $map_between_objects = array
 	(
@@ -63,6 +68,7 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 		"customData" ,
 		"extraDestFileSyncs",
 		"engineMessage",
+		"destFileSyncSharedPath"
 	);
 
 	public function getMapBetweenObjects ( )

@@ -366,7 +366,7 @@ abstract class kFileTransferMgr
 		if (!$this->connection_id) {
 			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
 		}
-		if (!file_exists($local_file)) {
+		if (!kFile::checkFileExists($local_file)) {
 			throw new kFileTransferMgrException("Can't find local file [$local_file]", kFileTransferMgrException::localFileNotExists);
 		}
 

@@ -439,6 +439,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $extendedFreeTrailEndsWarning;
+	
+	/**
+	 * @var KalturaSharedFileSystemType
+	 */
+	public $sharedStorageType;
+	
+	/**
+	 * @var int
+	 */
+	public $sharedStorageProfileId;
 
 
 	private static $map_between_objects = array
@@ -525,7 +535,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"eightyPercentWarning",
 		"usageLimitWarning",
 		"lastFreeTrialNotificationDay",
-		"extendedFreeTrailEndsWarning"
+		"extendedFreeTrailEndsWarning",
+		"sharedStorageType",
+		"sharedStorageProfileId"
 	);
 
 	public function getMapBetweenObjects()

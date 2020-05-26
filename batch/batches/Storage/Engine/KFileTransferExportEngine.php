@@ -27,11 +27,18 @@ class KFileTransferExportEngine extends KExportEngine
 	function export() 
 	{
 		$srcTempFile = null;
-
-		if(!KBatchBase::pollingFileExists($this->srcFile))
+		
+		$srcFile = kFile::realPath($this->srcFile);
+		$realPathRemote = strpos($srcFile, "http") !== false && kFile::checkFileExists($this->srcFile);
+		if($realPathRemote || !KBatchBase::pollingFileExists($this->srcFile))
 		{
-			$srcTempFile = $this->getAssetFile($this->data->assetId, $this->data->externalUrl);
-
+			$externalUrl = $realPathRemote ? $srcFile : $this->data->externalUrl;
+			if($externalUrl == null)
+			{
+				throw new kTemporaryException("Source file {$this->srcFile} does not exist, and no external URL provided");
+			}
+			
+			$srcTempFile = $this->getAssetFile($externalUrl, $this->data->flavorAssetId);
 			if(!$srcTempFile)
 			{
 				throw new kTemporaryException("Source file {$this->srcFile} does not exist");
@@ -79,11 +86,11 @@ class KFileTransferExportEngine extends KExportEngine
 
 		try
 		{
-			if (is_file($this->srcFile))
+			if (kFile::isFile($this->srcFile))
 			{
 				$this->putFile($engine, $this->destFile, $this->srcFile, $this->data->force);
 			}
-			else if (is_dir($this->srcFile))
+			else if (kFile::isDir($this->srcFile))
 			{
 				$filesPaths = kFile::dirList($this->srcFile);
 				$destDir = $this->destFile;
@@ -222,23 +229,28 @@ class KFileTransferExportEngine extends KExportEngine
 		return $storageExportData;
 	}
 
-	protected function getAssetFile($assetId, $externalUrl)
+	protected function getAssetFile($externalUrl, $uniqueDownloadId = null)
 	{
 		// Needed arguments
-		if( ($assetId === null) || ($externalUrl === null) )
+		if($externalUrl === null)
 		{
-			KalturaLog::info("Received NULL as assetId / externalUrl");
+			KalturaLog::info("No external url provided,");
 			return null;
 		}
 
 		// Create the temporary file path
 		$tempDirectoryPath = sys_get_temp_dir();
-		if (!is_dir($tempDirectoryPath))
+		if (!kFile::isDir($tempDirectoryPath))
 		{
 			kFile::fullMkfileDir($tempDirectoryPath, 0700, true);
 		}
-
-		$filePath = $tempDirectoryPath . '/asset_'.$assetId;
+		
+		if(!$uniqueDownloadId)
+		{
+			$uniqueDownloadId = uniqid(rand(),true);
+		}
+		
+		$filePath = $tempDirectoryPath . "/asset_$uniqueDownloadId";
 
 		// Retrieve the file
 		$res = null;

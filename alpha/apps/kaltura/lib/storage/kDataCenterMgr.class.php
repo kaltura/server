@@ -78,6 +78,12 @@ class kDataCenterMgr
 			return self::getDcById( self::$s_current_dc );
 		return self::getDcById( $dc_config["current"] );
 	}
+	
+	public static function getDcSharedStorage()
+	{
+		$dc_config = kConf::getMap("dc_config");
+		return isset($dc_config['dcSharedStorage']) ? $dc_config['dcSharedStorage'] : null;
+	}
 
 	// returns a tupple with the id and the DC's properties
 	public static function getDcById ( $dc_id , $partnerId = null)
@@ -200,6 +206,7 @@ class kDataCenterMgr
 		{
 			$build_remote_url = $dc["url"] . $build_remote_url;
 		}
+		
 		return $build_remote_url;
 	}
 		
@@ -217,13 +224,13 @@ class kDataCenterMgr
 		$cmd_line = self::createCmdForRemoteDataCenter($file_sync);
 		$local_file_path = self::getLocalTempPathForFileSync($file_sync);
 		
-		if (!file_exists($local_file_path)) // don't need to fetch twice 
+		if (!kFile::checkFileExists($local_file_path)) // don't need to fetch twice
 		{ 
 			KalturaLog::log("Executing " . $cmd_line);
 			exec($cmd_line);
 			
 			clearstatcache();
-			if (!file_exists($local_file_path))
+			if (!kFile::checkFileExists($local_file_path))
 			{
 				KalturaLog::err("Temp file not retrieved [$local_file_path]");
 				return false;
@@ -263,12 +270,12 @@ class kDataCenterMgr
 		
 		// check if file sync path leads to a file or a directory
 		$resolvedPath = $file_sync_resolved->getFullPath();
-		$fileSyncIsDir = is_dir($resolvedPath);
+		$fileSyncIsDir = kFile::isDir($resolvedPath);
 		if ($fileSyncIsDir && $file_name) {
 			$resolvedPath .= '/'.$file_name;
 		}
 		
-		if (!file_exists($resolvedPath))
+		if (!kFile::checkFileExists($resolvedPath))
 		{
 			$file_name_msg = $file_name ? "file name [$file_name] " : '';
 			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist, resolved path [$resolvedPath]";
@@ -285,7 +292,7 @@ class kDataCenterMgr
 			KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
 		}
 				
-		if ($fileSyncIsDir && is_dir($resolvedPath))
+		if ($fileSyncIsDir && kFile::isDir($resolvedPath))
 		{
 			KalturaLog::log("Serving directory content from [".$resolvedPath."]");
 			$contents = kFile::listDir($resolvedPath);

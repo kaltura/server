@@ -106,6 +106,9 @@ return array(
 	'Kaltura_Client_Enum_PartnerStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_PartnerStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK' => 'Removed',
+	
+	'Kaltura_Client_Enum_SharedFileSystemType::NFS' => 'NFS',
+	'Kaltura_Client_Enum_SharedFileSystemType::S3' => 'S3',
 
 	'Kaltura_Client_Enum_UserStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_UserStatus::ACTIVE' => 'Active',

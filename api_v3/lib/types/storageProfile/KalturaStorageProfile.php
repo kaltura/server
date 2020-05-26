@@ -74,6 +74,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	/**
 	 * @var string
 	 */
+	public $pathPrefix;
+	
+	/**
+	 * @var string
+	 */
 	public $storageUsername;
 	
 	/**
@@ -221,6 +226,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'protocol',
 		'storageUrl',
 		'storageBaseDir',
+		'pathPrefix',
 		'storageUsername',
 		'storagePassword',
 		'storageFtpPassiveMode',

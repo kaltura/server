@@ -104,6 +104,18 @@ class Form_PartnerConfiguration extends Infra_Form
 			'value'			=> 'en',
 		));
 		
+		//--------------------------- Storage Information ---------------------------
+		$partnerSharedStorageType = new Kaltura_Form_Element_EnumSelect('shared_storage_type', array('enum' => 'Kaltura_Client_Enum_SharedFileSystemType'), array( null => "default kaltura storage"));
+		$partnerSharedStorageType->setLabel('Shared Storage Type:');
+		$partnerSharedStorageType->setValue('default kaltura storage');
+		$this->addElements(array($partnerSharedStorageType));
+		
+		$this->addElement('text', 'shared_storage_profile_id', array(
+			'label'			=> 'Shared storage profile ID:',
+			'filters'		=> array('StringTrim'),
+			'ignore' 		=> true,
+		));
+		
 		$arr = array();
 		foreach(Zend_Registry::get('config')->languages as $language)
 			$arr[$language->id] = $language->name;
@@ -941,6 +953,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		//adding display groups
 		
 		$this->addDisplayGroup(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), 'generalInformation', array('legend' => 'General Information'));
+		$this->addDisplayGroup(array('shared_storage_type', 'shared_storage_profile_id', 'crossLine'), 'storagelInformation', array('legend' => 'Storage Information'));
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','reference_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		
 		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'live_delivery_profile_ids', 'deliveryFormat', 'delivery_profile_type', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
