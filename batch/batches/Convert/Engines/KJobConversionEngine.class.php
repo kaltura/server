@@ -125,10 +125,15 @@ abstract class KJobConversionEngine extends KConversionEngine
 			$this->addToLogFile ( $log_file , $conversion_str ) ;
 				
 			KalturaLog::info ( $execution_command_str );
+
+                        if(isset($data->urgency))
+                                $urgency = $data->urgency;
+                        else
+                                $urgency = null;
 	
 			$start = microtime(true);
 			// TODO add BatchEvent - before conversion + conversion engine
-			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $data->urgency, $jobId);
+			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $urgency, $jobId);
 			// TODO add BatchEvent - after conversion + conversion engine		
 			$end = microtime(true);
 	
