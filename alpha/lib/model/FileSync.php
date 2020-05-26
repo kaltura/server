@@ -282,7 +282,18 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
-	
+
+	protected function getServeUrl($entryId)
+	{
+		$dynamicAttributes = DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol());
+		$flavorAsset = assetPeer::retrieveById($this->getObjectId());
+		$dynamicAttributes->setFlavorAssets(array($flavorAsset));
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($dynamicAttributes);
+		$urlManager->setDynamicAttributes($dynamicAttributes);
+		$url = $urlManager->buildServeFlavors();
+		return ($url[0]['urlPrefix'] . $url[0]['url']);
+	}
+
 	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
@@ -292,6 +303,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if(is_null($storage->getProtocol()))
 		{
 			return null;
+		}
+
+		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
+		{
+			return $this->getServeUrl($entryId);
 		}
 
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
