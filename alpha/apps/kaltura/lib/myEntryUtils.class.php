@@ -1498,7 +1498,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		}
  		
 		$kuserForNewEntry = null;
-		if ($copyUsers)
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			$kuserForNewEntry = $toPartner->getAdminUser();
+		}
+		else if ($copyUsers)
 		{
 			// copy the kuser (if the same puser id exists its kuser will be used)
 			kuserPeer::setUseCriteriaFilter(false);
@@ -1507,7 +1511,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			kuserPeer::setUseCriteriaFilter(true);
 		}
 		else
+		{
 			$kuserForNewEntry = kCurrentContext::getCurrentKsKuser();
+		}
 
 		if($kuserForNewEntry)
 		{

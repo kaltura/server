@@ -1595,11 +1595,8 @@ class Partner extends BasePartner
 	{
 		return $this->getFromCustomData('account_owner_kuser_id');
 	}
-	
-	/**
-	 * @return puserId of the kuser currently set as the account owner
-	 */
-	public function getAdminUserId()
+
+	public function getAdminUser()
 	{
 		$ownerKuserId = $this->getAccountOwnerKuserId();
 		if (!$ownerKuserId) {
@@ -1610,6 +1607,15 @@ class Partner extends BasePartner
 			KalturaLog::err('Cannot find kuser with id ['.$ownerKuserId.'] set as account of partner id ['.$this->getId().']');
 			return null;
 		}
+		return $ownerKuser;
+	}
+
+	/**
+	 * @return puserId of the kuser currently set as the account owner
+	 */
+	public function getAdminUserId()
+	{
+		$ownerKuser = $this->getAdminUser();
 		return $ownerKuser->getPuserId();
 	}
 	
