@@ -126,11 +126,11 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 	 * @return string
 	 * @throws kThumbnailException
 	 */
-	public function getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec)
+	public function getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
 	{
 		$adapter = kThumbnailAdapterFactory::getAdapter($entry);
 		$params = kThumbnailAdapterFactory::getThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-			$vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec);
+			$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
 
 		return $adapter->resizeEntryImage($params);
 	}

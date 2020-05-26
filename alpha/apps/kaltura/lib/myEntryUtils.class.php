@@ -694,7 +694,7 @@ class myEntryUtils
 		$start_sec = -1, $end_sec = -1)
 	{
 		$result = self::getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-			$vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec);
+			$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
 
 		if($result)
 		{
@@ -2150,7 +2150,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	}
 
 	protected static function getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-																  $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec)
+																  $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
 	{
 		$result = null;
 		try
@@ -2161,7 +2161,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
 				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
 				$result =$KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-					$vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $format, $start_sec, $end_sec);
+					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
 
 				if ($result)
 				{
