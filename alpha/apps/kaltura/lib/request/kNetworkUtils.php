@@ -55,8 +55,8 @@ class kNetworkUtils
 			KalturaLog::warning("Missing authentication_secret in configuration");
 			return '';
 		}
+
+		KalturaLog::debug("Calculating signature for version [$version], time [$timestamp], url [$url]");
 		return base64_encode(hash_hmac('sha256', "$version,$timestamp,$url", $secret, true));
 	}
-}
-
 }

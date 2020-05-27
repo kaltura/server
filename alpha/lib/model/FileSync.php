@@ -307,16 +307,18 @@ class FileSync extends BaseFileSync implements IBaseObject
 		
 		$url = $urlManager->getFileSyncUrl($this);
 		$baseUrl = $urlManager->getUrl();
-		
-		$url = ltrim($url, "/");
-		if (strpos($url, "://") === false){
-			$url = rtrim($baseUrl, "/") . "/".$url ;
-		}
 
-		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
+		if($kalturaPeriodicStorage)
 		{
+			$url = $storage->getPathPrefix() . $url;
 			$authParams = $this->addKalturaAuthParams($url);
 			$url .= $authParams;
+		}
+
+		$url = ltrim($url, "/");
+		if (strpos($url, "://") === false)
+		{
+			$url = rtrim($baseUrl, "/") . "/".$url ;
 		}
 
 		return $url;
