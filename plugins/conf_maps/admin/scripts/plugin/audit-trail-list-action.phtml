@@ -54,21 +54,10 @@
                                 {
                                     foreach ($auditTrail->data->changedItems as $changedItem)
                                     {
-                                        if ($changedItem->descriptor === 'vendor_credit')
-                                        {
-                                            $pattern = '/([a-zA-Z]{1}:(\d)+:)/';    //pattern example S:2:
-                                            echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
-                                            echo 'Old value: ' . preg_replace($pattern, "\n" ,$changedItem->oldValue ) . "<br/><br/>";
-                                            echo 'New value: ' . preg_replace($pattern, "\n" ,$changedItem->newValue ) . "<br/><br/>";
-                                            echo "<br/><br/>";
-                                        }
-                                        else
-                                        {
-                                            echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
-                                            echo 'Old value: ' . $changedItem->oldValue . "<br/><br/>";
-                                            echo 'New value: ' . $changedItem->newValue . "<br/><br/>";
-                                            echo "<br/><br/>";
-                                        }
+                                        echo 'Descriptor: ' . $changedItem->descriptor . "<br/><br/>";
+                                        echo 'Old value: ' . $changedItem->oldValue . "<br/><br/>";
+                                        echo 'New value: ' . $changedItem->newValue . "<br/><br/>";
+                                        echo "<br/><br/>";
                                     }
                                 }
                                 else

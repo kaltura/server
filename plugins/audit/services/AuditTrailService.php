@@ -91,7 +91,39 @@ class AuditTrailService extends KalturaBaseService
 			
 		if (!$pager)
 			$pager = new KalturaFilterPager();
-			
-		return $filter->getListResponse($pager, $this->getResponseProfile());
+
+		$response =  $filter->getListResponse($pager, $this->getResponseProfile());
+
+		$params = infraRequestUtils::getRequestParams();
+		$clientsTags = isset($params[infraRequestUtils::CLIENT_TAG]) ? $params[infraRequestUtils::CLIENT_TAG] : null;
+		if ($clientsTags && $clientsTags === 'Kaltura-admin')
+		{
+			$response =  self::handleResponse($response);
+		}
+		return $response;
+	}
+
+	public function handleResponse($response)
+	{
+		$descriptors = array('vendor_credit');
+		foreach ($response->objects as $auditTrail)
+		{
+			if (isset($auditTrail->data) && isset($auditTrail->data->changedItems))
+			{
+				foreach ($auditTrail->data->changedItems as $changedItem)
+				{
+					if (in_array($changedItem->descriptor, $descriptors))
+					{
+						$oldValue = unserialize($changedItem->oldValue);
+						$newValue = unserialize($changedItem->newValue);
+						$resultOldValue = $oldValue->getObjectAsArray();
+						$resultNewValue = $newValue->getObjectAsArray();
+						$changedItem->oldValue =  str_replace ( ',' , ",\n" , json_encode($resultOldValue));
+						$changedItem->newValue = str_replace ( ',' , ",\n" , json_encode($resultNewValue));
+					}
+				}
+			}
+		}
+		return $response;
 	}
 }
