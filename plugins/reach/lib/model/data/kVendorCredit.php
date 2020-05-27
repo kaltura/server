@@ -241,15 +241,4 @@ class kVendorCredit
 			$this->syncedCredit = $sourceCredit->getSyncedCredit();
 		}
 	}
-
-	public function getObjectAsArray()
-	{
-		$obj = $this;
-		$result = array();
-		foreach ($obj as $key => $val)
-		{
-			$result[$key] = $val;
-		}
-		return $result;
-	}
 }

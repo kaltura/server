@@ -98,32 +98,57 @@ class AuditTrailService extends KalturaBaseService
 		$clientsTags = isset($params[infraRequestUtils::CLIENT_TAG]) ? $params[infraRequestUtils::CLIENT_TAG] : null;
 		if ($clientsTags && $clientsTags === 'Kaltura-admin')
 		{
-			$response =  self::handleResponse($response);
+			$response =  self::responseAsJson($response);
 		}
 		return $response;
 	}
 
-	public function handleResponse($response)
+	//There are clients that can't get Json format as response - we should convert the data to json.
+	protected function responseAsJson($response)
 	{
-		$descriptors = array('vendor_credit');
 		foreach ($response->objects as $auditTrail)
 		{
 			if (isset($auditTrail->data) && isset($auditTrail->data->changedItems))
 			{
 				foreach ($auditTrail->data->changedItems as $changedItem)
 				{
-					if (in_array($changedItem->descriptor, $descriptors))
+					$oldValue = unserialize($changedItem->oldValue);
+					$newValue = unserialize($changedItem->newValue);
+					if ($oldValue)
 					{
-						$oldValue = unserialize($changedItem->oldValue);
-						$newValue = unserialize($changedItem->newValue);
-						$resultOldValue = $oldValue->getObjectAsArray();
-						$resultNewValue = $newValue->getObjectAsArray();
-						$changedItem->oldValue =  str_replace ( ',' , ",\n" , json_encode($resultOldValue));
-						$changedItem->newValue = str_replace ( ',' , ",\n" , json_encode($resultNewValue));
+						$resultOldValue = self::json_encode_private($oldValue);
 					}
+					else
+					{
+						$resultOldValue = $changedItem->oldValue;
+					}
+					if ($newValue)
+					{
+						$resultNewValue = self::json_encode_private($newValue);
+					}
+					else
+					{
+						$resultNewValue = $changedItem->newValue;
+					}
+
+					$changedItem->oldValue =  $resultOldValue;
+					$changedItem->newValue = $resultNewValue;
 				}
 			}
 		}
 		return $response;
 	}
+
+	protected static function json_encode_private($object)
+	{
+		$public = [];
+		$reflection = new ReflectionObject($object);
+		foreach ($reflection->getProperties() as $property)
+		{
+			$property->setAccessible(true);
+			$public[$property->getName()] = $property->getValue($object);
+		}
+		return json_encode($public);
+	}
+
 }
