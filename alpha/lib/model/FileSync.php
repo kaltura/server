@@ -283,17 +283,6 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
 
-	protected function getServeUrl($entryId)
-	{
-		$dynamicAttributes = DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol());
-		$flavorAsset = assetPeer::retrieveById($this->getObjectId());
-		$dynamicAttributes->setFlavorAssets(array($flavorAsset));
-		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($dynamicAttributes);
-		$urlManager->setDynamicAttributes($dynamicAttributes);
-		$url = $urlManager->buildServeFlavors();
-		return ($url[0]['urlPrefix'] . $url[0]['url']);
-	}
-
 	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
@@ -304,14 +293,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 		{
 			return null;
 		}
-
+		$kalturaPeriodicStorage = false;
 		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
 		{
-			return $this->getServeUrl($entryId);
+			$kalturaPeriodicStorage = true;
 		}
 
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
-		if(is_null($urlManager) && infraRequestUtils::getProtocol() != 'http')
+		if(is_null($urlManager) && infraRequestUtils::getProtocol() != 'http' && !$kalturaPeriodicStorage)
 			$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId));
 		if(is_null($urlManager))
 			return null;
@@ -323,9 +312,25 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if (strpos($url, "://") === false){
 			$url = rtrim($baseUrl, "/") . "/".$url ;
 		}
+
+		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
+		{
+			$authParams = $this->addKalturaAuthParams($url);
+			$url .= $authParams;
+		}
+
 		return $url;
 	}
-	
+
+	protected function addKalturaAuthParams($url)
+	{
+		$version = kNetworkUtils::DEFAULT_AUTH_HEADER_VERSION;
+		$timestamp = time();
+		$signature = kNetworkUtils::calculateSignature($version, $timestamp, $url);
+
+		return '?version=' . $version . '&time=' . $timestamp . '&kalSigning=' . $signature;
+	}
+
 	/* (non-PHPdoc)
 	 * @see BaseFileSync::preUpdate()
 	 */

@@ -6,6 +6,7 @@
 class kNetworkUtils
 {
 	const KALTURA_AUTH_HEADER = 'HTTP_X_KALTURA_AUTH';
+	const DEFAULT_AUTH_HEADER_VERSION = 1;
 	/**
 	 * @return bool
 	 * @throws Exception
@@ -28,15 +29,13 @@ class kNetworkUtils
 		$version = $parts[0];
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
-		$url = $_SERVER['REQUEST_URI'];
-		$secret = kConf::get('authentication_secret','local', null);
-		if (!$secret)
+		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');;
+
+		$actualSignature = self::calculateSignature($version, $timestamp, $url);
+		if(!$actualSignature)
 		{
-			KalturaLog::warning("Missing authentication_secret in configuration");
 			return false;
 		}
-
-		$actualSignature = base64_encode(hash_hmac('sha256', "$version,$timestamp,$url", $secret, true));
 		KalturaLog::debug("Actual Signature [$actualSignature] - Expected Signature [$expectedSignature]" );
 		if ( $actualSignature !== $expectedSignature)
 		{
@@ -45,5 +44,16 @@ class kNetworkUtils
 		}
 
 		return true;
+	}
+
+	public static function calculateSignature($version, $timestamp, $url)
+	{
+		$secret = kConf::get('vod_packager_authentication_secret','local', null);
+		if (!$secret)
+		{
+			KalturaLog::warning("Missing authentication_secret in configuration");
+			return '';
+		}
+		return base64_encode(hash_hmac('sha256', "$version,$timestamp,$url", $secret, true));
 	}
 }
