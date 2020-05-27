@@ -518,7 +518,7 @@ class embedPlaykitJsAction extends sfAction
 		$isLatestVersionRequired = array_search(self::LATEST, $this->bundleConfig) !== false;
 		$isBetaVersionRequired = array_search(self::BETA, $this->bundleConfig) !== false;
 		$isCanaryVersionRequired = array_search(self::CANARY, $this->bundleConfig) !== false;
-		
+
 		$isAllPackagesSameVersion = true;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
@@ -539,7 +539,7 @@ class embedPlaykitJsAction extends sfAction
 				if ($val == self::BETA && $betaVersionMap != null && isset($betaVersionMap[$key])) {
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
-				
+
 				if ($val == self::CANARY && $canaryVersionMap != null && isset($canaryVersionMap[$key])) {
 					$this->bundleConfig[$key] = $canaryVersionMap[$key];
 				}
@@ -649,7 +649,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
-    $this->setFixVersionsNumber();
+        $this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
 
@@ -667,11 +667,11 @@ class embedPlaykitJsAction extends sfAction
 		}
 		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
 	}
-	
+
 	public function getRequestParameter($name, $default = null)
 	{
 		$returnValue = parent::getRequestParameter($name, $default);
 		return $returnValue ? $returnValue : $default;
 	}
-	
+
 }
