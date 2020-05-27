@@ -141,7 +141,7 @@ class AuditTrailService extends KalturaBaseService
 
 	protected static function json_encode_private($object)
 	{
-		$public = [];
+		$public = array();
 		$reflection = new ReflectionObject($object);
 		foreach ($reflection->getProperties() as $property)
 		{
