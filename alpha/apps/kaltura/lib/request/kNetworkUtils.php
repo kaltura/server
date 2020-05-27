@@ -28,7 +28,7 @@ class kNetworkUtils
 		$version = $parts[0];
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
-		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), "/");
+		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');
 		$secret = kConf::get('vod_packager_secure_token','local', null);
 		if (!$secret)
 		{
