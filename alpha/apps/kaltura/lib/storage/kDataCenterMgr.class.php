@@ -79,15 +79,33 @@ class kDataCenterMgr
 		return self::getDcById( $dc_config["current"] );
 	}
 	
-	public static function getDcSharedStorage()
+	public static function getSharedStorageProfileIds()
 	{
 		$dc_config = kConf::getMap("dc_config");
-		return isset($dc_config['dcSharedStorage']) ? $dc_config['dcSharedStorage'] : null;
+		$sharedStorageProfileIdsStr = isset($dc_config['sharedStorageProfileIds']) ? $dc_config['sharedStorageProfileIds'] : null;
+		
+		$sharedStorageProfileIds = array();
+		if($sharedStorageProfileIdsStr)
+		{
+			$sharedStorageProfileIds = explode(",", $sharedStorageProfileIdsStr);
+		}
+		
+		return $sharedStorageProfileIds;
+	}
+	
+	
+	public static function isDcIdShared($dcId)
+	{
+		$sharedStorageProfileIds = self::getSharedStorageProfileIds();
+		return in_array($dcId, $sharedStorageProfileIds);
 	}
 
 	// returns a tupple with the id and the DC's properties
 	public static function getDcById ( $dc_id , $partnerId = null)
 	{
+		if(self::isDcIdShared($dc_id))
+			$dc_id = kDataCenterMgr::getCurrentDcId();
+		
 		$dc_config = kConf::getMap("dc_config");
 		// find the dc with the desired id
 		$dc_list = $dc_config["list"];
@@ -256,7 +274,7 @@ class kDataCenterMgr
 		$current_dc = self::getCurrentDc();
 		$current_dc_id = $current_dc["id"];
 
-		if ( $file_sync->getDc() != $current_dc_id )
+		if ( $file_sync->getDc() != $current_dc_id && !kDataCenterMgr::isDcIdShared($file_sync->getDc()))
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] does not belong to this DC";
 			KalturaLog::err($error); 

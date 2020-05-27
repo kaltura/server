@@ -55,14 +55,13 @@ class FileSyncPeer extends BaseFileSyncPeer
 		if($current_dc_only)
 		{
 			$currentDcIds[] = kDataCenterMgr::getCurrentDcId();
-			$sharedDcId = kDataCenterMgr::getDcSharedStorage();
-			if($sharedDcId)
-				$currentDcIds[] = $sharedDcId;
+			$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+			foreach ($sharedStorageIds as $sharedStorageId)
+			{
+				$currentDcIds[] = $sharedStorageId;
+			}
 			$c->add(self::DC, $currentDcIds, Criteria::IN);
 		}
-		
-//		if($current_dc_only)
-//			$c->add(self::DC, kDataCenterMgr::getCurrentDcId());
 		
 		return self::doSelectOne($c);
 	}
