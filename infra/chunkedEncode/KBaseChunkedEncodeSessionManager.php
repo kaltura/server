@@ -183,6 +183,16 @@
 		 */
 		public function Merge()
 		{
+			$videoFilename = $this->chunker->getSessionName("video");
+			$oFh=fopen($videoFilename,"wb");
+			if($oFh===false){
+				return false;
+			}
+			$rv=$this->chunker->ConcatChunks();
+			fclose(oFh);
+			if($rv===false) {
+				return false;
+			}
 			$concatFilenameLog = $this->chunker->getSessionName("concat");
 
 			$mergeCmd = $this->chunker->BuildMergeCommandLine();
