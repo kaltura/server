@@ -21,6 +21,11 @@ class ZoomVendorService extends KalturaBaseService
 		return in_array ($actionName, self::$PARTNER_NOT_REQUIRED_ACTIONS);
 	}
 
+	/**
+	 * @return array
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
 	public static function getZoomConfiguration()
 	{
 		if(!kConf::hasMap(self::MAP_NAME))
@@ -120,13 +125,14 @@ class ZoomVendorService extends KalturaBaseService
 		return true;
 	}
 
-    /**
-     * @action fetchRegistrationPage
-     * @param string $tokensData
-     * @param string $iv
-     * @throws KalturaAPIException
-     * @throws PropelException
-     */
+	/**
+	 * @action fetchRegistrationPage
+	 * @param string $tokensData
+	 * @param string $iv
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 * @throws Exception
+	 */
 	public function fetchRegistrationPageAction($tokensData, $iv)
 	{
 		KalturaResponseCacher::disableCache();
@@ -155,14 +161,18 @@ class ZoomVendorService extends KalturaBaseService
 	 * @param string $tokensData
 	 * @param string $iv
 	 * @param array $zoomConfiguration
-	 * @return array|mixed|null|string
+	 * @return array
+	 * @throws Exception
 	 */
 	protected function handleEncryptTokens($tokensData, $iv, $zoomConfiguration)
 	{
 		$verificationToken = $zoomConfiguration[kZoomOauth::VERIFICATION_TOKEN];
-		$tokens = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
-		$tokens = json_decode($tokens, true);
-		$tokens = kZoomOauth::parseTokens($tokens);
+		$tokensResponse = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
+		$tokens = kZoomOauth::parseTokensResponse($tokensResponse);
+		kZoomOauth::validateToken($tokens);
+		$tokens = kZoomOauth::extractTokensFromData($tokens);
+		$expiresIn = $tokens[kZoomOauth::EXPIRES_IN];
+		$tokens[kZoomOauth::EXPIRES_IN] = kZoomOauth::getTokenExpiryAbsoluteTime($expiresIn);
 		if(!$tokens)
 		{
 			KExternalErrors::dieGracefully();
@@ -171,25 +181,18 @@ class ZoomVendorService extends KalturaBaseService
 		return $tokens;
 	}
 
-    /**
-     * @action submitRegistration
-     * @param string $defaultUserId
-     * @param string $zoomCategory
-     * @param string $accountId
-     * @param bool $enableRecordingUpload
-     * @param bool $createUserIfNotExist
-     * @param int $handleParticipantMode
-     * @param int $zoomUserMatchingMode
-     * @param string $zoomUserPostfix
-     * @return string
-     * @throws KalturaAPIException
-     * @throws PropelException
-     */
-	public function submitRegistrationAction($defaultUserId, $zoomCategory, $accountId, $enableRecordingUpload, $createUserIfNotExist, $handleParticipantMode, $zoomUserMatchingMode, $zoomUserPostfix = "")
+	/**
+	 * @action submitRegistration
+	 * @param string $accountId
+	 * @param KalturaZoomIntegrationSetting $integrationSetting
+	 * @return string
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public function submitRegistrationAction($accountId, $integrationSetting)
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		kuserPeer::createKuserForPartner($partnerId, $defaultUserId);
 
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
@@ -198,38 +201,50 @@ class ZoomVendorService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
 
-		$zoomIntegration->setCreateUserIfNotExist($createUserIfNotExist);
-		if($enableRecordingUpload)
+		kuserPeer::createKuserForPartner($partnerId, $integrationSetting->defaultUserId);
+		$status = $integrationSetting->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED;
+		$zoomIntegration->setStatus($status);
+		$this->configureZoomCategories($integrationSetting, $zoomIntegration);
+		$zoomIntegration->setDefaultUserEMail($integrationSetting->defaultUserId);
+		$zoomIntegration->setCreateUserIfNotExist($integrationSetting->createUserIfNotExist);
+		$zoomIntegration->setHandleParticipantsMode($integrationSetting->handleParticipantMode);
+		$zoomIntegration->setUserMatching($integrationSetting->zoomUserMatchingMode);
+		$zoomIntegration->setUserPostfix($integrationSetting->zoomUserPostfix);
+		$zoomIntegration->setEnableWebinarUploads($integrationSetting->enableWebinarUploads);
+		$zoomIntegration->save();
+		return true;
+	}
+
+	/**
+	 * @param KalturaZoomIntegrationSetting $integrationSetting
+	 * @param ZoomVendorIntegration $zoomIntegration
+	 * @throws PropelException
+	 */
+	protected function configureZoomCategories($integrationSetting, &$zoomIntegration)
+	{
+		if($integrationSetting->zoomCategory)
 		{
-			$zoomIntegration->setStatus(VendorStatus::ACTIVE);
+			if(ZoomHelper::createCategoryForZoom($zoomIntegration->getPartnerId(), $integrationSetting->zoomCategory))
+			{
+				$zoomIntegration->setZoomCategory($integrationSetting->zoomCategory);
+			}
 		}
 		else
 		{
-			$zoomIntegration->setStatus(VendorStatus::DISABLED);
+			$zoomIntegration->unsetCategory();
 		}
 
-		$zoomIntegration->setDefaultUserEMail($defaultUserId);
-		if($zoomCategory)
+		if($integrationSetting->zoomWebinarCategory)
 		{
-			$zoomIntegration->setZoomCategory($zoomCategory);
-			$categoryId = ZoomHelper::createCategoryForZoom($partnerId, $zoomCategory);
-			if($categoryId)
+			if(ZoomHelper::createCategoryForZoom($zoomIntegration->getPartnerId(), $integrationSetting->zoomWebinarCategory))
 			{
-				$zoomIntegration->setZoomCategoryId($categoryId);
+				$zoomIntegration->setZoomWebinarCategory($integrationSetting->zoomWebinarCategory);
 			}
 		}
-
-		if(!$zoomCategory && $zoomIntegration->getZoomCategory() && $zoomIntegration->getZoomCategoryId())
+		else
 		{
-			$zoomIntegration->unsetCategory();
-			$zoomIntegration->unsetCategoryId();
+			$zoomIntegration->unsetWebinarCategory();
 		}
-
-		$zoomIntegration->setHandleParticipantsMode($handleParticipantMode);
-		$zoomIntegration->setUserMatching($zoomUserMatchingMode);
-		$zoomIntegration->setUserPostfix($zoomUserPostfix);
-		$zoomIntegration->save();
-		return true;
 	}
 
 	/**
@@ -240,11 +255,11 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		myPartnerUtils::resetAllFilters();
-		$kZoomEngine = new kZoomEngine(self::getZoomConfiguration());
-		$event = $kZoomEngine->parseEvent();
+		$kZoomEventHandler = new kZoomEventHanlder(self::getZoomConfiguration());
+		$event = $kZoomEventHandler->parseEvent();
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($event->accountId);
 		ZoomHelper::verifyZoomIntegration($zoomIntegration);
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());
-		$kZoomEngine->processEvent($event);
+		$kZoomEventHandler->processEvent($event);
 	}
 }

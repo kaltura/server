@@ -15,7 +15,7 @@
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
-		protected $maxExecutionTime = 6000;	// In seconds. Represents trascoding ratio x100, that should suit 4K/H265
+		protected $maxExecutionTime = 6000;	// In seconds. Represents transcoding ratio x100, that should suit 4K/H265
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();
@@ -106,9 +106,11 @@
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
-				$logFilename = $chunker->getSessionName("audio").".log";
+				$outFilename = $chunker->getSessionName("audio");
+				$logFilename = "$outFilename.log";
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
 				$this->audioCmdLines = array($cmdLine);
+				KalturaLog::log($cmdLine);
 			}
 			$this->SerializeSession();
 			return true;

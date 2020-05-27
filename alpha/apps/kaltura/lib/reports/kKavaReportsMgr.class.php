@@ -23,6 +23,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DROPPED_FRAMES_RATIO_SUM = 'droppedFramesRatioSum';
 	const METRIC_UNIQUE_PERSISTENT_SESSION_ID = 'uniquePersistentSessionId';
 	const METRIC_UNIQUE_SESSION_ID = 'uniqueSessionId';
+	const METRIC_BUFFER_STARTS = 'bufferStarts';
+	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -59,6 +61,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_MB = 'origin_bandwidth_consumption';
 	const METRIC_UNIQUE_CONTRIBUTORS = 'unique_contributors';
+	const METRIC_UNIQUE_OWNERS = 'unique_owners';
 	const METRIC_ENGAGEMENT_RANKING = 'engagement_ranking';
 	const METRIC_PLAYS_RANKING = 'plays_ranking';
 	const METRIC_ENTRIES_RANKING = 'entries_ranking';
@@ -71,6 +74,14 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_EBVS = 'count_ebvs';
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
+	const METRIC_VOD_PLAYS_COUNT = 'vod_plays_count';
+	const METRIC_VOD_UNIQUE_PERCENTILES_RATIO = 'avg_vod_completion_rate';
+	const METRIC_EBVS_RATIO = 'ebvs_ratio';
+	const METRIC_VIEW_PERIOD_UNIQUE_SESSIONS = 'view_period_unique_sessions';
+	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
+	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
+	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
+	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -136,7 +147,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_VIEW_LIVE_LATENCY = 'avg_view_live_latency';
 	const METRIC_AVG_VIEW_DVR = 'avg_view_dvr';
 	const METRIC_VIEW_BUFFER_TIME_RATIO = 'view_buffer_time_ratio';
-	const METRIC_AVG_SESSION_ERROR_RATE = 'avg_session_error_rate';
+	const METRIC_AVG_VIEW_SESSION_ERROR_RATE = 'avg_view_session_error_rate';
 	const METRIC_AVG_VIEW_PLAY_TIME_SEC = 'avg_view_play_time_sec';
 
 	const METRIC_DYNAMIC_VIEWERS = 'viewers';
@@ -186,6 +197,8 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
+	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
+	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -291,6 +304,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAY_REQUESTED,
 		self::EVENT_TYPE_NODE_PLAY,
 		self::EVENT_TYPE_PLAYMANIFEST,
+		self::EVENT_TYPE_REGISTERED,
+		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
+		self::EVENT_TYPE_HOTSPOT_CLICKED,
+		self::EVENT_TYPE_NODE_SWITCH,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -339,6 +356,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_FLAVOR_SWITCH => 'count_flavor_switch',
 		self::EVENT_TYPE_PLAY_REQUESTED => 'count_play_requested',
 		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
+		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
+		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 	);
 
 	//global transform
@@ -353,6 +372,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
+		self::METRIC_UNIQUE_OWNERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -390,6 +410,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VIEWERS => true,
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => true,
+		self::METRIC_EBVS_RATIO => true,
+		self::METRIC_AVG_VIEW_SESSION_ERROR_RATE => true,
+		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
+		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
+		self::METRIC_UNIQUE_OWNERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -721,6 +746,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::METRIC_UNIQUE_CONTRIBUTORS,
 			array(self::DIMENSION_KUSER_ID));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_OWNERS] = self::getCardinalityAggregator(
+			self::METRIC_UNIQUE_OWNERS,
+			array(self::DIMENSION_ENTRY_OWNER_ID));
+
+
 		self::$aggregations_def[self::METRIC_UNIQUE_SESSIONS] = self::getHyperUniqueAggregator(
 			self::METRIC_UNIQUE_SESSIONS,
 			self::METRIC_UNIQUE_SESSION_ID);
@@ -749,6 +779,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_SESSIONS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSION_ID));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSION_ID));
 
 		self::$aggregations_def[self::METRIC_UNIQUE_VIEWERS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
@@ -863,14 +897,28 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_ERROR_POSITION_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
-				self::getNotFilter(self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN)))),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO))))),
 			self::getLongSumAggregator(self::METRIC_ERROR_POSITION_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_ERROR_UNKNOWN_POSITION_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_ERROR),
-				self::getSelectorFilter(self::DIMENSION_POSITION, self::VALUE_UNKNOWN))),
+				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
+
+    		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_STARTS, self::METRIC_BUFFER_STARTS));
+
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_FLAVOR_SWITCHES, self::METRIC_FLAVOR_SWITCHES));
+
+		self::$aggregations_def[self::METRIC_VOD_PLAYS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -1072,6 +1120,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_PLAY));
 
+		self::$metrics_def[self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::METRIC_VOD_PLAYS_COUNT));
+
 		self::$metrics_def[self::METRIC_VIEW_BUFFER_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_VIEW, self::METRIC_VIEW_BUFFER_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
@@ -1087,11 +1142,18 @@ class kKavaReportsMgr extends kKavaBase
 				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY))));
 
 		self::$metrics_def[self::METRIC_AVG_SESSION_ERROR_RATE] = array(
-			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_UNIQUE_SESSIONS),
+			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_AVG_SESSION_ERROR_RATE, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
-				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_SESSIONS, self::METRIC_UNIQUE_SESSIONS))));
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS, self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS))));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_SESSION_ERROR_RATE] = array(
+			self::DRUID_AGGR => array(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_VIEW_UNIQUE_SESSIONS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_AVG_VIEW_SESSION_ERROR_RATE, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_ERROR_SESSION_COUNT, self::METRIC_ERROR_SESSION_COUNT),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_VIEW_UNIQUE_SESSIONS, self::METRIC_VIEW_UNIQUE_SESSIONS))));
 
 		self::$metrics_def[self::METRIC_COUNT_EBVS] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY_REQUESTED, self::EVENT_TYPE_PLAY, self::METRIC_ERROR_UNKNOWN_POSITION_COUNT),
@@ -1102,12 +1164,31 @@ class kKavaReportsMgr extends kKavaBase
 						self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY),
 						self::getFieldAccessPostAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT))))));
 
+		self::$metrics_def[self::METRIC_EBVS_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY_REQUESTED, self::EVENT_TYPE_PLAY, self::METRIC_ERROR_UNKNOWN_POSITION_COUNT),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_EBVS_RATIO, '/', array(
+				self::getArithmeticPostAggregator(
+					self::METRIC_COUNT_EBVS, "-", array(
+					self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY_REQUESTED),
+					self::getArithmeticPostAggregator("subPlaysAndErrors", "+", array(
+						self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY),
+						self::getFieldAccessPostAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT))))),
+				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY_REQUESTED))));
+
 		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
 				self::METRIC_UNIQUE_PERCENTILES_SUM,
 				self::EVENT_TYPE_NODE_PLAY));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::EVENT_TYPE_PLAY));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
@@ -1591,15 +1672,15 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getReportDefFromReportClass($report_type)
+	protected static function getReportDefFromReportClass($report_type, $input_filter = null)
 	{
 		$report_class = self::getReportClassName($report_type);
-		return $report_class ? $report_class::getReportDef($report_type) : null;
+		return $report_class ? $report_class::getReportDef($report_type, $input_filter) : null;
 	}
 
-	protected static function getReportDefinition($report_type)
+	protected static function getReportDefinition($report_type, $input_filter = null)
 	{
-		$report_def = self::getReportDefFromReportClass($report_type);
+		$report_def = self::getReportDefFromReportClass($report_type, $input_filter);
 		return $report_def ? self::buildReportDef($report_def) : null;
 	}
 
@@ -1924,7 +2005,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
-			if (isset($report_filter[self::DRUID_DIMENSION]))
+			if (isset($report_filter[self::DRUID_DIMENSION]) || isset($report_filter[self::DRUID_TYPE]))
 			{
 				$report_filter = array($report_filter);
 			}
@@ -1962,7 +2043,9 @@ class kKavaReportsMgr extends kKavaBase
 			'devices' => array(self::DRUID_DIMENSION => self::DIMENSION_DEVICE),
 			'regions' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_REGION),
 			'os_families' => array(self::DRUID_DIMENSION => self::DIMENSION_OS_FAMILY),
+			'os' => array(self::DRUID_DIMENSION => self::DIMENSION_OS),
 			'browsers_families' => array(self::DRUID_DIMENSION => self::DIMENSION_BROWSER_FAMILY),
+			'browsers' => array(self::DRUID_DIMENSION => self::DIMENSION_BROWSER),
 			'cities' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_CITY),
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
@@ -1970,6 +2053,11 @@ class kKavaReportsMgr extends kKavaBase
 			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
+			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
+			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
+			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
+			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
+			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -2000,6 +2088,28 @@ class kKavaReportsMgr extends kKavaBase
 		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
 		{
 			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $input_filter->gte_entry_created_at, $input_filter->lte_entry_created_at, self::DRUID_ORDER_NUMERIC);
+		}
+
+		if ($input_filter->categories_ancestor_ids)
+		{
+			$category_filter = new categoryFilter();
+
+			$category_filter->set('_in_ancestor_id', explode($response_options->getDelimiter(), $input_filter->categories_ancestor_ids));
+
+			$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
+			$category_filter->attachToCriteria($c);
+			$category_filter->setPartnerSearchScope($partner_id);
+			$c->applyFilters();
+
+			$category_ids_from_db = $c->getFetchedIds();
+			if (!count($category_ids_from_db))
+			{
+				$category_ids_from_db = array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
+			}
+
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES,
+				self::DRUID_VALUES => $category_ids_from_db);
 		}
 
 		$entry_ids_from_db = array();
@@ -2368,7 +2478,31 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_GROUP_BY;
-		$report_def[self::DRUID_DIMENSIONS] = $dimensions;
+
+		$group_by_dimensions = array();
+		foreach ($dimensions as $dimension)
+		{
+			if (in_array($dimension, self::$multi_value_dimensions))
+			{
+				$values = self::getFilterValues($filter, $dimension);
+				if ($values)
+				{
+					// use a list filtered dimension, otherwise we may get values that don't match the filter
+					$dimension = array(
+						self::DRUID_TYPE => self::DRUID_LIST_FILTERED,
+						self::DRUID_DELEGATE => array(
+							self::DRUID_TYPE => self::DRUID_DEFAULT,
+							self::DRUID_DIMENSION => $dimension,
+							self::DRUID_OUTPUT_NAME => $dimension,
+						),
+						self::DRUID_VALUES => $values,
+					);
+				}
+			}
+			$group_by_dimensions[] = $dimension;
+
+		}
+		$report_def[self::DRUID_DIMENSIONS] = $group_by_dimensions;
 		return $report_def;
 	}
 
@@ -2773,7 +2907,6 @@ class kKavaReportsMgr extends kKavaBase
 			$granularity = self::getGranularityFromFilterInterval($input_filter->interval);
 		}
 
-
 		// zero fill
 		list($from_day, $to_day) = self::getFromToDay($input_filter);
 		if ($granularity == self::GRANULARITY_MONTH)
@@ -3013,7 +3146,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 		
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -3479,13 +3612,15 @@ class kKavaReportsMgr extends kKavaBase
 			$context['columns'] = array();
 		$context['columns'][] = 'SOURCE';
 		$context['columns'][] = 'ADMIN_TAGS';
+		$context['columns'][] = 'CUSTOM_DATA';
 
 		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
 		foreach ($enrichedResult as $id => $row)
 		{
+			$customData = array_pop($row);
 			$adminTags = array_pop($row);
 			$sourceType = array_pop($row);
-			$source = self::getEntrySourceType($sourceType, $adminTags);
+			$source = self::getEntrySourceType($sourceType, $adminTags, $customData);
 			$result[$id] = $row;
 			$result[$id][] = $source;
 		}
@@ -3936,7 +4071,7 @@ class kKavaReportsMgr extends kKavaBase
 				{
 					list($enrich_func, $enrich_context, $enriched_indexes) = $enrich_spec;
 					$entities = call_user_func($enrich_func, array_keys($dimension_ids), $partner_id, $enrich_context);
-			
+
 					for ($current_row = $start; $current_row < $limit; $current_row++) 
 					{
 						$key = self::arrayGetElements($data[$current_row], $dim_indexes);
@@ -4914,7 +5049,7 @@ class kKavaReportsMgr extends kKavaBase
 			$page_index = 1;
 		
 		// run the query
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
 			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
@@ -5280,7 +5415,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -5373,11 +5508,6 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			if ($key != 'value')		// currently, limiting var replacement only for keys called 'value'
-			{
-				continue;
-			}
-
 			if (!is_string($value) || !$value || $value[0] != ':')
 			{
 				continue;
@@ -5390,6 +5520,55 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$value = $params[$param_name];
 		}
+	}
+
+
+	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
+	{
+		$headers = explode(",", $context['headers']);
+		$metadata_xpath = explode(",", $context['xpath_patterns']);
+		$metadata_profile_id = $context['metadata_profile_id'];
+		$entries_ids = $context['entry_ids'];
+
+		$dimensions = array();
+		$dimension_headers = array();
+		$dimension_map = array();
+
+		foreach($headers as $header)
+		{
+			$dimensions[] = $field;
+			$dimension_headers[] = $header;
+			$dimension_map[$header] = $field;
+		}
+
+		$dimensions = array_unique($dimensions);
+		$report_dimensions = $report_def[self::REPORT_DIMENSION];
+		$curr_dimensions = is_array($report_dimensions) ? $report_dimensions : array($report_dimensions);
+		$dimensions = array_unique(array_merge($curr_dimensions, $dimensions));
+
+		$enrich_def = array();
+		$enrich_def[self::REPORT_ENRICH_OUTPUT] = $dimension_headers;
+		$enrich_def[self::REPORT_ENRICH_FUNC] = "kMetadataKavaUtils::metadataEnrich";
+		$enrich_def[self::REPORT_ENRICH_INPUT] = $field;
+		$context = array();
+		$context["metadata_profile_id"] = $metadata_profile_id;
+		$context["xpath_patterns"] = $metadata_xpath;
+		$context["entries_ids"] = $entries_ids;
+		$enrich_def[self::REPORT_ENRICH_CONTEXT] = $context;
+
+		$report_def[self::REPORT_DIMENSION] = array_values($dimensions);
+		$report_def[self::REPORT_DIMENSION_HEADERS] = array_merge($report_def[self::REPORT_DIMENSION_HEADERS], $dimension_headers);
+		if (isset($report_def[self::REPORT_DIMENSION_MAP]))
+		{
+			$report_def[self::REPORT_DIMENSION_MAP] = array_replace($report_def[self::REPORT_DIMENSION_MAP], $dimension_map);
+		}
+
+		if (!isset($report_def[self::REPORT_ENRICH_DEF]))
+		{
+			$report_def[self::REPORT_ENRICH_DEF] = array();
+		}
+		$report_def[self::REPORT_ENRICH_DEF][] = $enrich_def;
+		return $report_def;
 	}
 
 	protected static function addEntryDescendants($partner_id, $ids)
@@ -5491,6 +5670,19 @@ class kKavaReportsMgr extends kKavaBase
 			self::replaceCustomParams($report_def[self::REPORT_ENRICH_DEF], $params);
 		}
 
+		if (isset($report_def[self::REPORT_DYNAMIC_HEADERS]))
+		{
+			self::replaceCustomParams($report_def[self::REPORT_DYNAMIC_HEADERS], $params);
+			$dynamic_enrich = $report_def[self::REPORT_DYNAMIC_HEADERS];
+			foreach ($dynamic_enrich as $dynamic_enrich_def)
+			{
+				$func = $dynamic_enrich_def[self::REPORT_ENRICH_FUNC];
+				$field = $dynamic_enrich_def['field'];
+				$context = $dynamic_enrich_def[self::REPORT_ENRICH_CONTEXT];
+				$report_def = call_user_func($func, $report_def, $field, $context);
+			}
+		}
+
 		$object_ids = isset($input_filter->object_ids) ? $input_filter->object_ids : null; 
 
 		if (isset($report_def[self::REPORT_GRAPH_METRICS]))
@@ -5528,6 +5720,26 @@ class kKavaReportsMgr extends kKavaBase
 				$object_ids,
 				self::GET_TABLE_FLAG_IS_CSV,
 				$response_options);
+
+			if (isset($report_def[self::REPORT_HEADERS_TO_REMOVE]))
+			{
+				$indexes_to_remove = array();
+				$headers_to_remove = $report_def[self::REPORT_HEADERS_TO_REMOVE];
+				foreach ($headers_to_remove as $header_to_remove)
+				{
+					$field_index = array_search($header_to_remove, $header);
+					unset($header[$field_index]);
+					$indexes_to_remove[] = $field_index;
+				}
+
+				foreach($data as &$row)
+				{
+					foreach ($indexes_to_remove as $field_index)
+					{
+						unset($row[$field_index]);
+					}
+				}
+			}
 		}
 		else
 		{
@@ -5605,7 +5817,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		list($headers_for_total, $headers_for_table) = explode(';', $headers);
 
-		$report_def = self::getReportDefinition($report_type);
+		$report_def = self::getReportDefinition($report_type, $input_filter);
 
 		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{

@@ -21,6 +21,11 @@ class KGenericScheduler
 	 * @var bool
 	 */
 	private $keepRunning = true;
+	
+	/**
+	 * @var bool
+	 */
+	private $spawnNewTasks = true;
 
 	private $logDir = "opt/kaltura/log";
 	private $phpPath = null;
@@ -73,6 +78,12 @@ class KGenericScheduler
 	public function __destruct()
 	{
 		$this->_cleanup();
+	}
+	
+	public function preKill($signal)
+	{
+		KalturaLog::debug("Got signal [$signal] from batchMgr, setting spawnNewTasks to false");
+		$this->spawnNewTasks = false;
 	}
 	
 	/**
@@ -200,6 +211,11 @@ class KGenericScheduler
 		while($this->keepRunning)
 		{
 			$this->loop();
+			//Windows machines by default do not have the pcntl installed, so check if function exists before calling it
+			if(function_exists("pcntl_signal_dispatch"))
+			{
+				pcntl_signal_dispatch();
+			}
 		}
 
 		KalturaLog::debug("Ended after [" . (time() - $startTime) . "] seconds");
@@ -319,7 +335,7 @@ class KGenericScheduler
 				$statuses[] = $this->createStatus($taskConfig, KalturaSchedulerStatusType::RUNNING_BATCHES_IS_RUNNING, 1);
 			}
 		
-			if($this->shouldExecute($taskConfig))
+			if($this->spawnNewTasks && $this->shouldExecute($taskConfig))
 			{
 				$this->spawn($taskConfig);
 				if ($lastRunTime)

@@ -65,7 +65,8 @@ class KalturaMonitorClient
 
 	public static function prettyPrintCounters()
 	{
-		$str='';
+		$serviceInfo = kCurrentContext::$isInMultiRequest ?  ' S:multiRequest A:null' : ' S:' . kCurrentContext::$service . ' A:' . kCurrentContext::$action;
+		$str='pid:' . kCurrentContext::getCurrentPartnerId() . $serviceInfo . ' ';
 		foreach (self::$sessionCounters as $key => $value)
 		{
 			$str .= $key . ':' . $value . ' ';
@@ -75,7 +76,7 @@ class KalturaMonitorClient
 
 	public static function monitorRequestEnd()
 	{
-		KalturaLog::info('Session data source counters ' . self::prettyPrintCounters());
+		KalturaLog::info('Session counters ' . self::prettyPrintCounters());
 
 		if(!isset ($_SERVER[self::SESSION_COUNTERS_SECRET_HEADER]))
 		{
@@ -435,7 +436,7 @@ class KalturaMonitorClient
 		self::writeEvent($data);
 	}
 
-	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null)
+	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorType = '')
 	{
 		if (!self::$stream)
 			return;
@@ -447,6 +448,7 @@ class KalturaMonitorClient
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_LENGTH		=> $querySize ? $querySize : 0,
+			self::FIELD_ERROR_CODE		=> $errorType,
 		));
 
 		self::writeDeferredEvent($data);

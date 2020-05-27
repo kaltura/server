@@ -493,6 +493,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
+		if($entry->getParentEntryId())
+		{
+			KalturaLog::log("Entry [{$entry->getId()}] is a child entry, entry vendor task object wont be created for it");
+			return true;
+		}
+
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
 		if($entryVendorTask)
 		{
@@ -533,6 +539,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
+		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
 
 		if ($context)
 			$entryVendorTask->setContext($context);

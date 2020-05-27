@@ -109,11 +109,15 @@
             event.preventDefault();
             var $defaultUserId = $('#defaultUserId');
             var $zoomCategory  = $('#zoomCategory');
+            var $zoomWebinarCategory  = $('#zoomWebinarCategory');
             var defaultUserId = $defaultUserId.val().trim();
             var zoomCategory = $zoomCategory.val().trim();
+            var zoomWebinarCategory = $zoomWebinarCategory.val().trim();
             var enableRecordingUploadObj = $(".enableRecordingUpload");
+            var enableWebinarUploadObj = $(".enableWebinarUpload");
             var createUserIfNotExistObj = $(".createUserIfNotExist");
             var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
+            var enableWebinarUpload = enableWebinarUploadObj.is(":checked");
             var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
             var handleParticipantMode = $('[name=participantHandler]:checked').val();
             var zoomUserMatchingMode = $('[name=userMatchingHandler]:checked').val();
@@ -121,12 +125,18 @@
 
             $.ajax({
                 url : url,
-                type : "post",
-                data: {"ks": ks, "defaultUserId": defaultUserId, "zoomCategory" : zoomCategory,
-                    "accountId" : accountId, "enableRecordingUpload":enableRecordingUpload,
-                    "createUserIfNotExist":createUserIfNotExist, "handleParticipantMode":handleParticipantMode,
-                    "zoomUserMatchingMode":zoomUserMatchingMode, "zoomUserPostfix":zoomUserPostfix,
-                    "format": 1 },
+                type : 'post',
+                data: {"ks": ks, 'accountId' : accountId,
+                    'integrationSetting:objectType' : 'KalturaZoomIntegrationSetting',
+                    'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
+                    'integrationSetting:enableRecordingUpload':enableRecordingUpload,
+                    'integrationSetting:createUserIfNotExist':createUserIfNotExist,
+                    'integrationSetting:handleParticipantMode':handleParticipantMode,
+                    'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
+                    'integrationSetting:zoomUserPostfix':zoomUserPostfix,
+                    'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
+                    'integrationSetting:enableWebinarUploads':enableWebinarUpload,
+                    'format': 1 },
                 success : function(res) {
                     $("body").css("cursor", "default");
                     console.log(res);
@@ -185,12 +195,18 @@
         <a class="big"><label for="zoomCategory"><b>Zoom Category</b></label></a>
         <input type="text" value="@zoomCategory@" id="zoomCategory" name="zoomCategory" required>
     </p>
+    <p>
+        <a class="big"><label for="zoomWebinarCategory"><b>Zoom Webinar Category</b></label></a>
+        <input type="text" value="@zoomWebinarCategory@" id="zoomWebinarCategory" name="zoomWebinarCategory" required>
+    </p>
 
     <p>
         <input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>
         <label class="small">Enable recording upload</label>
         <input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>
         <label class="small">Create users automatically if not exist</label>
+        <input type="checkbox" class="enableWebinarUpload" @enableWebinarUpload@>
+        <label class="small">Enable webinar upload</label>
     </p>
 
     <div class="margin-top">

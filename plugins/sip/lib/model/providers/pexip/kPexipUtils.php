@@ -13,6 +13,7 @@ class kPexipUtils
 	const CONFIG_PASSWORD = 'password';
 	const CONFIG_PRIMARY_LOCATION_ID = 'primaryLocationId';
 	const CONFIG_SECONDARY_LOCATION_ID = 'secondaryLocationId';
+	const FORCE_NON_SECURE_STREAMING = 'forceNonSecureStreaming';
 	const SIP_URL_DELIMITER = '@';
 	const PARAM_META = 'meta';
 	const PARAM_TOTAL_COUNT = 'total_count';

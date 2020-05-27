@@ -195,11 +195,23 @@ class kContextDataHelper
 	
 	private function setContextDataFlavorAssets($flavorTags)
 	{
-		if ($this->entry->getType() == entryType::PLAYLIST &&
-			$this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		$playlist = null;
+
+		if ($this->entry->getType() == entryType::LIVE_CHANNEL)
 		{
+			$playlist = entryPeer::retrieveByPK($this->entry->getPlaylistId());
+		}
+		elseif ($this->entry->getType() == entryType::PLAYLIST && $this->entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_TEXT)
+		{
+			$playlist = $this->entry;
+		}
+
+		if ( !is_null($playlist) )
+		{
+
 			list($entryIds, $durations, $mediaEntry, $captionFiles) =
-				myPlaylistUtils::executeStitchedPlaylist($this->entry);
+				myPlaylistUtils::executeStitchedPlaylist($playlist);
+
 			if (!$mediaEntry)
 			{
 				return;

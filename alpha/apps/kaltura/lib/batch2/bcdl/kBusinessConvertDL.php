@@ -22,12 +22,26 @@ class kBusinessConvertDL
 			return;
 		}
 
+		$lockName = 'replacement_' . $replacedEntry->getId() . '_' . $replacingEntry->getId();
+		$lock = kLock::create($lockName);
+		if ($lock && !$lock->lock())
+		{
+			KalturaLog::debug('Could not lock ' . $lockName);
+			return;
+		}
+
+		if($replacingEntry->getSyncFlavorsOnceReady())
+		{
+			KalturaLog::debug('Function already ran from a different process for replacedEntry: ' . $replacedEntry->getId() . ' replacing Entry: ' . $replacingEntry->getId());
+			return;
+		}
+
 		//copy and relink all the ready assets on the replacing entry to the replaced entry and change the status of the existing params that are not ready
 		$oldAssets = assetPeer::retrieveByEntryId($replacedEntry->getId());
 		$tempReadyAssets = assetPeer::retrieveByEntryId($replacingEntry->getId(), null, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		$newReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($tempReadyAssets);
 		list($existingReadyAssetIds, $existingNonReadyAssetIds) = kReplacementHelper::relinkReplacingEntryAssetsToReplacedEntryAssets($oldAssets, $newReadyAssetsMap, $defaultThumbAssetOld, $defaultThumbAssetNew, $replacingEntry->getId());
-		$nonExistingReadyAssets = kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
+		$nonExistingReadyAssetIds = kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newReadyAssetsMap, $defaultThumbAssetNew);
 
 		// add flag in order to copy later and update the info of non ready assets from replacing entry to the replaced entry
 		$replacingEntry->setSyncFlavorsOnceReady(true);
@@ -35,8 +49,16 @@ class kBusinessConvertDL
 
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry);
 		kReplacementHelper::createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry);
-		$nonExistingNonReadyAssets = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
+		$nonExistingNonReadyAssetIds = kReplacementHelper::handleReplacingEntryNonReadyAssetsForNewParams($replacedEntry, $replacingEntry, $defaultThumbAssetNew);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
+
+		$allReadyAssets = assetPeer::retrieveByIds(array_merge($existingReadyAssetIds, $nonExistingReadyAssetIds));
+		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $allReadyAssets);
+
+		if($lock)
+		{
+			$lock->unlock();
+		}
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
@@ -46,7 +68,7 @@ class kBusinessConvertDL
 
 		myEntryUtils::deleteEntry($replacingEntry,null,true);
 
-		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry, $existingReadyAssetIds, $existingNonReadyAssetIds, $nonExistingReadyAssets, $nonExistingNonReadyAssets);
+		kReplacementHelper::addTrackEntryReplacedEntryEvent($replacedEntry, $replacingEntry, $existingReadyAssetIds, $existingNonReadyAssetIds, $nonExistingReadyAssetIds, $nonExistingNonReadyAssetIds);
 	}
 
 	public static function checkForPendingLiveClips(entry $entry)
@@ -141,7 +163,7 @@ class kBusinessConvertDL
 		$entry->save();
 
 		$thumbSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entrySyncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$entrySyncKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($entrySyncKey, $thumbSyncKey);
 	}
 

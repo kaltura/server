@@ -20,7 +20,7 @@ abstract class KCollectionConversionEngine extends KConversionEngine
 		return  ''; //TODO
 	}
 	
-	public function convert ( KalturaConvartableJobData &$data )
+	public function convert ( KalturaConvartableJobData &$data, $jobId = null )
 	{
 		return  $this->convertCollection ( $data );
 	}	

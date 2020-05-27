@@ -3,6 +3,8 @@
 
 class kReplacementHelper
 {
+	const KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT = 5;
+	const KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT = 0.5;
 
 	/**
 	 * creates a mapping between the new replacing entry assets paramsId and their type to the asset itself
@@ -214,14 +216,14 @@ class kReplacementHelper
 	 */
 	public static function createIsmManifestFileSyncLinkFromReplacingEntry($replacingEntry, $replacedEntry)
 	{
-		$tempEntryIsmSyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM);
-		$tempEntryIsmcSyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC);
+		$tempEntryIsmSyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::ISM);
+		$tempEntryIsmcSyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::ISMC);
 		if(kFileSyncUtils::fileSync_exists($tempEntryIsmSyncKey) && kFileSyncUtils::fileSync_exists($tempEntryIsmcSyncKey))
 		{
 			$ismVersion = $replacedEntry->incrementIsmVersion();
-			$realEntryIsmSyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISM, $ismVersion);
+			$realEntryIsmSyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::ISM, $ismVersion);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmSyncKey, $tempEntryIsmSyncKey);
-			$realEntryIsmcSyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_ISMC, $ismVersion);
+			$realEntryIsmcSyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::ISMC, $ismVersion);
 			kFileSyncUtils::createSyncFileLinkForKey($realEntryIsmcSyncKey, $tempEntryIsmcSyncKey);
 		}
 	}
@@ -302,6 +304,7 @@ class kReplacementHelper
 		kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newAssets, $defaultThumbAssetNew);
 		kReplacementHelper::handleThumbReplacement($defaultThumbAssetOld, $defaultThumbAssetNew, $replacedEntry, $replacingEntry, false);
 		kReplacementHelper::updateReplacedEntryFields($replacedEntry, $replacingEntry);
+		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $oldAssets);
 	}
 
 	/**
@@ -389,8 +392,8 @@ class kReplacementHelper
 		KalturaLog::info("No default ThumbAsset found for replacing entry [". $replacingEntry->getId() ."]");
 		$replacedEntry->setThumbnail(".jpg"); // thumbnailversion++
 		$replacedEntry->save();
-		$tempEntrySyncKey = $replacingEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
-		$realEntrySyncKey = $replacedEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_THUMB);
+		$tempEntrySyncKey = $replacingEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
+		$realEntrySyncKey = $replacedEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
 		kFileSyncUtils::createSyncFileLinkForKey($realEntrySyncKey, $tempEntrySyncKey);
 	}
 
@@ -398,19 +401,38 @@ class kReplacementHelper
 	 * check if the current flavor is a flavor remaining from the replacement and need to be synced on the replaced entry
 	 *
 	 * @param $flavorAsset
-	 * @param $entry
+	 * @param $entryId
 	 * @return bool
 	 */
-	public static function shouldSyncFlavorInfo($flavorAsset, $entry)
+	public static function shouldSyncFlavorInfo($flavorAsset, $entryId)
 	{
-		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED)
+		$entry = entryPeer::retrieveByPkWithoutInstancePooling($entryId);
+
+		if($flavorAsset->getStatus() == asset::ASSET_STATUS_DELETED || !$entry || !$entry->getReplacedEntryId())
 		{
 			return false;
 		}
 
-		if($entry && $entry->getReplacedEntryId() && $entry->getSyncFlavorsOnceReady())
+		if($entry->getSyncFlavorsOnceReady())
 		{
 			return true;
+		}
+		else
+		{
+			$lock = kLock::create('replacement_' . $entry->getReplacedEntryId() . '_' . $entry->getId());
+			if ($lock)
+			{
+				if(!$lock->lock(self::KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT, self::KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT))
+				{
+					return false;
+				}
+				$entry = entryPeer::retrieveByPkWithoutInstancePooling($entryId);
+				$lock->unlock();
+				if($entry->getSyncFlavorsOnceReady())
+				{
+					return true;
+				}
+			}
 		}
 
 		return false;
@@ -484,6 +506,29 @@ class kReplacementHelper
 		$newNonReadyAssets = kReplacementHelper::getNonReadyAssetsFromReplacingEntry($replacingEntry->getId(), $replacedEntry->getId());
 		$newNonReadyAssetsMap = kReplacementHelper::buildAssetsToCopyMap($newNonReadyAssets);
 		return kReplacementHelper::copyReplacingAssetsToReplacedEntry($replacedEntry, $newNonReadyAssetsMap, $defaultThumbAssetNew);
+	}
+
+	public static function exportReadyReplacedFlavors($partnerId, $replacingEntryId, $assets)
+	{
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+		if(!$periodicStorageIds)
+		{
+			return;
+		}
+
+		KalturaLog::info("Found periodic storage profiles, exporting ready flavors");
+		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($partnerId);
+		if(!$externalStorages)
+		{
+			$externalStorages = kStorageExporter::getPeriodicStorageProfiles($partnerId);
+		}
+		foreach($externalStorages as $externalStorage)
+		{
+			if ($externalStorage->triggerFitsReadyAsset($replacingEntryId))
+			{
+				kStorageExporter::exportMultipleFlavors($assets, $externalStorage);
+			}
+		}
 	}
 
 }

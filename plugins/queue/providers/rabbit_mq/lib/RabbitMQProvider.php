@@ -32,9 +32,15 @@ class RabbitMQProvider extends QueueProvider
 	const MAX_RETRIES = 3;
 
 	const RABBIT_ACTION_SEND_MESSAGE = 'send_message';
-	const RABBIT_ACTION_OPEN_CONNECTION = 'connect';
-	const RABBIT_ACTION_TIMEOUT = 'timeout';
-	const RABBIT_CONNECTION_ERROR = 'connection_error';
+	const RABBIT_ACTION_OPEN_CONNECTION = 'open_connection';
+	const RABBIT_ACTION_CLOSE_CONNECTION = 'close_connection';
+	const RABBIT_ACTION_OPEN_CHANNEL = 'open_channel';
+	const RABBIT_ACTION_CLOSE_CHANNEL = 'close_channel';
+
+	const DEFAULT_CONNECTION_TIMEOUT = 2;
+	const DEFAULT_READ_WRITE_TIMEOUT = 3;
+	const DEFAULT_CHANNEL_RPC_TIMEOUT = 2;
+
 
 	public function __construct(array $rabbitConfig, $constructorArgs)
 	{
@@ -45,9 +51,9 @@ class RabbitMQProvider extends QueueProvider
 		$this->curlPort = $rabbitConfig['curl_port'];
 		$this->timeout = $rabbitConfig['timeout'];
 		$this->dataSourceUrl = $this->username . ':' . $this->password . '@' . $this->MQserver . ':' . $this->port;
-		$this->connectionTimeout = isset($rabbitConfig['connection_timeout']) ? $rabbitConfig['connection_timeout'] : 1;
-		$this->readWriteTimeout = isset($rabbitConfig['read_write_timeout']) ? $rabbitConfig['read_write_timeout'] : 2;
-		$this->channelRpcTimeout = isset($rabbitConfig['channel_rpc_timeout']) ? $rabbitConfig['channel_rpc_timeout'] : 1 ;
+		$this->connectionTimeout = isset($rabbitConfig['connection_timeout']) ? $rabbitConfig['connection_timeout'] : self::DEFAULT_CONNECTION_TIMEOUT;
+		$this->readWriteTimeout = isset($rabbitConfig['read_write_timeout']) ? $rabbitConfig['read_write_timeout'] : self::DEFAULT_READ_WRITE_TIMEOUT;
+		$this->channelRpcTimeout = isset($rabbitConfig['channel_rpc_timeout']) ? $rabbitConfig['channel_rpc_timeout'] : self::DEFAULT_CHANNEL_RPC_TIMEOUT ;
 		
 		$exchangeName = kConf::get("push_server_exchange");
 		if(isset($constructorArgs['exchangeName']))
@@ -118,22 +124,22 @@ class RabbitMQProvider extends QueueProvider
 				$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_OPEN_CONNECTION, $connTook);
 				break;
 			}
-			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
+			catch (Exception $e)
 			{
+				$connTook = microtime(true) - $connStart;
+				$logStr = "Failed to connect to MQserver [{$this->MQserver}] after [$connTook] with error [" . $e->getMessage() . "]";
+				$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_OPEN_CONNECTION, $connTook, $this->exchangeName . ":" . $queueName, strlen($data), $e->getCode());
 				if($retry == self::MAX_RETRIES)
 				{
-					$connTook = microtime(true) - $connStart;
-					$logStr = "Failed to connect to MQserver [{$this->MQserver}] with error [" . $e->getMessage() . "]";
-					$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_CONNECTION_ERROR, $connTook, $this->exchangeName . ":" . $queueName, strlen($data));
 					throw $e;
 				}
 			}
 		}
 
-		$channel = $connection->channel();
+		$channel = $this->connectChannel($connection);
 		$this->publishMessage($channel, $data, $queueName);
-		$channel->close();
-		$connection->close();
+		$this->closeChannel($channel);
+		$this->closeConnection($connection);
 	}
 
 	protected function publishMessage($channel, $data, $queueName)
@@ -148,11 +154,11 @@ class RabbitMQProvider extends QueueProvider
 		{
 			$channel->basic_publish($msg, $this->exchangeName, $queueName);
 		}
-		catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+		catch (Exception $e)
 		{
-			$logStr = "Connection timed out while sending message [$data] to [$queueName] with error [" . $e->getMessage() . "]";
 			$sendMessageEnd = microtime(true) - $sendMessageStart;
-			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_TIMEOUT, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
+			$logStr = "Failed to send message after [$sendMessageEnd] with data [$data] to [$queueName] with error [" . $e->getMessage() . "]";
+			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_SEND_MESSAGE, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data), $e->getCode());
 			throw $e;
 		}
 
@@ -161,7 +167,7 @@ class RabbitMQProvider extends QueueProvider
 		$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_SEND_MESSAGE, $sendMessageEnd, $this->exchangeName . ":" . $queueName, strlen($data));
 	}
 
-	protected function writeToMonitor($logStr, $dataSource, $queryType, $queryTook, $tableName = null, $querySize = null)
+	protected function writeToMonitor($logStr, $dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorType = '')
 	{
 		if(class_exists('KalturaLog'))
 		{
@@ -170,7 +176,57 @@ class RabbitMQProvider extends QueueProvider
 
 		if(class_exists('KalturaMonitorClient'))
 		{
-			KalturaMonitorClient::monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName, $querySize);
+			KalturaMonitorClient::monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName, $querySize, $errorType);
+		}
+	}
+
+	protected function connectChannel($connection)
+	{
+		$connStart = microtime(true);
+		try
+		{
+			$channel = $connection->channel();
+			return $channel;
+		}
+		catch (Exception $e)
+		{
+			$connTook = microtime(true) - $connStart;
+			$logStr = "Connection to channel failed";
+			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_OPEN_CHANNEL, $connTook, null, null, $e->getCode());
+			throw $e;
+		}
+	}
+
+	protected function closeChannel($channel)
+	{
+		$connStart = microtime(true);
+		try
+		{
+			$channel->close();
+		}
+		catch (Exception $e)
+		{
+			$connTook = microtime(true) - $connStart;
+			$logStr = "Failed to close channel";
+			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_CLOSE_CHANNEL, $connTook, null, null, $e->getCode());
+			throw $e;
+		}
+
+	}
+
+	protected function closeConnection($connection)
+	{
+		$closeStart = microtime(true);
+		try
+		{
+			$connection->close();
+		}
+		catch (Exception $e)
+		{
+			$closeTook = microtime(true) - $closeStart;
+			$logStr = 'Failed to close connection';
+			$this->writeToMonitor($logStr, $this->dataSourceUrl, self::RABBIT_ACTION_CLOSE_CONNECTION, $closeTook, null, null, $e->getCode());
+			throw $e;
 		}
 	}
 }

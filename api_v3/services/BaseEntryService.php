@@ -278,8 +278,6 @@ class BaseEntryService extends KalturaEntryService
 	    $dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId, $entry->templateEntryId, self::getCoreEntry($entry->type));
 	    $dbEntry = $entry->toInsertableObject($dbEntry);
 	    
-
-	    
 	    $dbEntry->setType($type);
 	    $dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);
 	        
@@ -301,9 +299,6 @@ class BaseEntryService extends KalturaEntryService
 		
 	    $dbEntry->save();
 	    
-	    $kshow = $this->createDummyKShow();
-	    $kshowId = $kshow->getId();
-	    
 	    // setup the needed params for my insert entry helper
 	    $paramsArray = array (
 		    "entry_media_source" => KalturaSourceType::FILE,
@@ -316,7 +311,7 @@ class BaseEntryService extends KalturaEntryService
 	    );
 			
 	    $token = $this->getKsUniqueString();
-	    $insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $kshowId, $paramsArray);
+	    $insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 	    $insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 	    $insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 	    $dbEntry = $insert_entry_helper->getEntry();
@@ -503,10 +498,10 @@ class BaseEntryService extends KalturaEntryService
 			foreach ($pluginInstances as $KalturaFilterExecutor)
 			{
 				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter, $this->getResponseProfile()))
+				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter))
 				{
 					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
-					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager);
+					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager, $this->getResponseProfile());
 					break;
 				}
 			}

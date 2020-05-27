@@ -251,7 +251,10 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			$auditTrail->setObjectType($objectType);
 			$auditTrail->setStatus(AuditTrail::AUDIT_TRAIL_STATUS_READY);
 			$auditTrail->setObjectId($object->getId());
-			$auditTrail->setEntryId($this->getEntryId($object));
+			if ($objectType != KalturaAuditTrailObjectType::REACH_PROFILE)
+			{
+				$auditTrail->setEntryId($this->getEntryId($object));
+			}
 			
 			self::setRelatedObject($auditTrail, $object);
 		}
@@ -457,7 +460,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					KalturaLog::info("Old and new values are identical [$descriptor]");
 					continue;
 				}
-				
+
 				$changedItem = new kAuditTrailChangeItem();
 				$changedItem->setDescriptor($descriptor);
 				$changedItem->setOldValue($oldValue);

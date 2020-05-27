@@ -96,6 +96,14 @@ class languageCodeManager
 		$obj = self::getObjectFromThreeCode($code);
 		return !is_null($obj) ? $obj[self::ISO639] : null;
 	}
+	
+	public static function getTwoCodeLowerFromUpperCaseTwoCode($code)
+	{
+		if(!self::isAlreadyLoaded())
+			self::loadLanguageCodeMap();
+		$obj = self::getObjectFromTwoCode($code);
+		return !is_null($obj) ? $obj[self::ISO639] : null;
+	}
 
     /**
      * @param $language - the language to search

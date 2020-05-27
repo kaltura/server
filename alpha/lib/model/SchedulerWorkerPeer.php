@@ -17,4 +17,8 @@ class SchedulerWorkerPeer extends BaseSchedulerWorkerPeer
 
 		SchedulerWorkerPeer::doDelete($criteria);
 	}
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("schedulerWorker:schedulerConfiguredId=%s", self::SCHEDULER_CONFIGURED_ID));		
+	}
 }

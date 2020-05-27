@@ -233,7 +233,7 @@ class flavorAsset extends exportableAsset
 			$fileName = str_replace("\n", ' ', $fileName);
 			$fileName = kString::keepOnlyValidUrlChars($fileName);
 	
-			if ($extension)
+			if ($extension && $extension !== kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
 			{
 				$fileName .= ".$extension";
 			}
@@ -387,6 +387,15 @@ class flavorAsset extends exportableAsset
 	public function getFrameSize()
 	{
 		return $this->height * $this->width;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getTypeFolderName()
+	 */
+	public function getTypeFolderName()
+	{
+		return 'flavors';
 	}
 
 }

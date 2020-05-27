@@ -24,6 +24,7 @@ class LiveEntryServerNode extends EntryServerNode
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry)
 		{
+			/** @var LiveEntry $liveEntry */
 			$shouldIndex = true;
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 			{
@@ -37,6 +38,7 @@ class LiveEntryServerNode extends EntryServerNode
 					$shouldIndex = true;
 				}
 			}
+			
 			if ($shouldIndex)
 			{
 				$liveEntry->indexToSearchIndex();

@@ -51,7 +51,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
 	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
-	
+	array('table' => "scheduler_worker", 				'keys' => array(array("'schedulerWorker:schedulerConfiguredId='", '@OBJ@.scheduler_configured_id'))),
 	);
 
 $setFunc = 'memc_set';
@@ -60,7 +60,7 @@ $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
 
 $SPECIAL_TRIGGERS = array(
 	"invalid_session/INSERT" => "DO $setFunc(concat('invalid_session_', IF(NEW.ks IS NULL, '', NEW.ks)), 1, IF(NEW.ks_valid_until IS NULL, 0, UNIX_TIMESTAMP(NEW.ks_valid_until) + 600));",
-	"file_sync/INSERT" => "IF (NEW.original) THEN DO $setFunc(concat('fileSyncMaxId-dc', NEW.dc), NEW.id, 0); END IF;",
+	"file_sync/INSERT" => "IF (NEW.original) THEN DO $setFunc(concat('fileSyncMaxId-dc', NEW.dc), NEW.id, 0); END IF; DO $setFunc(concat('lastCreatedFileSyncId-dc', NEW.dc), NEW.id, 0);",
 );
 
 function generateInvalidationKeyCode($invalidationKey)

@@ -22,6 +22,8 @@ class kPlaybackContextDataHelper
 	private $playbackCaptions = array();
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
+	private $kalturaStoragePlaybackSources = array();
+	private $storageIds = array();
 
 	public function getPlaybackContext()
 	{
@@ -46,6 +48,8 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
+		$this->storageIds = kConf::get('periodic_storage_ids', 'cloud_storage', array());
+
 		$this->generateRestrictedMessages($contextDataHelper);
 
 		if ($this->hasBlockAction($contextDataHelper))
@@ -230,23 +234,7 @@ class kPlaybackContextDataHelper
 			$flavorId = $flavorAsset->getId();
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-			$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
-			$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-
-			switch($servePriority)
-			{
-				case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-					$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-					break;
-
-				case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-					$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-					break;
-				default:
-					break;
-			}
-
-			$fileSyncs = FileSyncPeer::doSelect($c);
+			$fileSyncs = kFileSyncUtils::getFileSyncsByStoragePriority($key,$servePriority, $this->storageIds );
 
 			foreach ($fileSyncs as $fileSync)
 			{
@@ -413,7 +401,7 @@ class kPlaybackContextDataHelper
 		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $this->remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
-		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
+		if (!empty($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
 			$this->filterDeliveryProfiles($remoteDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn, $contextDataHelper);
 
 		$this->filterDeliveryProfilesByStreamerType($remoteDeliveryProfiles, $contextDataHelper);
@@ -442,12 +430,21 @@ class kPlaybackContextDataHelper
 					if (!empty($protocols))
 					{
 						$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
-						$this->remotePlaybackSources[] = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+						$playbackSource = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
+						if (in_array($dcId, $this->storageIds))
+						{
+							$this->kalturaStoragePlaybackSources[] = $playbackSource;
+						}
+						else
+						{
+							$this->remotePlaybackSources[] = $playbackSource;
+						}
 					}
 				}
 			}
 		}
 	}
+
 	/**
 	 * @param entry $dbEntry
 	 */
@@ -664,21 +661,29 @@ class kPlaybackContextDataHelper
 		switch ($servePriority)
 		{
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$this->playbackContext->setSources($this->localPlaybackSources);
+				$this->playbackContext->setSources($this->getPlaybackSourcesForKalturOnlyPriority());
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$this->playbackContext->setSources(array_merge($this->localPlaybackSources, $this->remotePlaybackSources));
+				$this->playbackContext->setSources(array_merge($this->getPlaybackSourcesForKalturOnlyPriority(), $this->remotePlaybackSources));
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
 				$this->playbackContext->setSources($this->remotePlaybackSources);
 				break;
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				$this->playbackContext->setSources(array_merge($this->remotePlaybackSources, $this->localPlaybackSources));
+				$this->playbackContext->setSources(array_merge($this->remotePlaybackSources, $this->getPlaybackSourcesForKalturOnlyPriority()));
 				break;
 			default:
 				$this->playbackContext->setSources(array());
 				break;
 		}
+	}
+
+	private function getPlaybackSourcesForKalturOnlyPriority()
+	{
+		/** Since Kaltura only can now have remote source (when starting use S3 storage as kaltura local storage)
+		 *  we need to prioritize storage sources over local sources.
+		 */
+		return array_merge($this->kalturaStoragePlaybackSources, $this->localPlaybackSources);
 	}
 
 	private function filterFlavorsBySources()
@@ -742,4 +747,5 @@ class kPlaybackContextDataHelper
 		$deliveryProfiles = array_merge($deliveryProfiles, $defaultDeliveryProfiles);
 		return $deliveryProfiles;
 	}
+
 }

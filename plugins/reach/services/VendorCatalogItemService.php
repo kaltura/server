@@ -10,7 +10,6 @@
 
 class VendorCatalogItemService extends KalturaBaseService
 {
-	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -167,4 +166,107 @@ class VendorCatalogItemService extends KalturaBaseService
 		$dbVendorCatalogItem->setStatus(KalturaVendorCatalogItemStatus::DELETED);
 		$dbVendorCatalogItem->save();
 	}
+
+	/**
+	 * @action serve
+	 * @param int $vendorPartnerId
+	 * @return file
+	 */
+	public function serveAction($vendorPartnerId = null)
+	{
+		$filter = new KalturaVendorCatalogItemFilter();
+		if($vendorPartnerId)
+		{
+			$filter->vendorPartnerIdEqual = $vendorPartnerId;
+		}
+
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
+
+		$content = implode(',', kReachUtils::getVendorCatalogItemsCsvHeaders()) . PHP_EOL;
+		$res =  $filter->getTypeListResponse($pager, $this->getResponseProfile());
+		$totalCount = $res->totalCount;
+		while ($totalCount > 0)
+		{
+			foreach ($res->objects as $vendorCatalogItem)
+			{
+				$catalogItemValues = kReachUtils::getObejctValues($vendorCatalogItem);
+				$csvRowData = kReachUtils::createCatalogItemCsvRowData($catalogItemValues);
+				$content .= $csvRowData . PHP_EOL;
+			}
+
+			$pager->pageIndex++;
+			$totalCount = $totalCount - $pager->pageSize;
+			$res = $filter->getTypeListResponse($pager, $this->getResponseProfile());
+		}
+		$fileName = "export.csv";
+		header('Content-Disposition: attachment; filename="'.$fileName.'"');
+		return new kRendererString($content, 'text/csv');
+	}
+
+	/**
+	 * @action getServeUrl
+	 * @param int $vendorPartnerId
+	 * @return string $url
+	 */
+	public function getServeUrlAction($vendorPartnerId = null)
+	{
+		$finalPath = '/api_v3/service/reach_vendorcatalogitem/action/serve/';
+		if ($vendorPartnerId)
+		{
+			$finalPath .= "vendorPartnerId/$vendorPartnerId";
+		}
+		$finalPath .= '/ks/' . kCurrentContext::$ks;
+		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $finalPath;
+		return $url;
+	}
+
+
+	/**
+	 * @action addFromBulkUpload
+	 * Action adds vendor catalog items from a bulkupload CSV file
+	 * @param file $fileData
+	 * @param KalturaBulkUploadJobData $bulkUploadData
+	 * @param KalturaBulkUploadVendorCatalogItemData $bulkUploadVendorCatalogItemData
+	 * @return KalturaBulkUpload
+	 */
+	public function addFromBulkUploadAction ($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadVendorCatalogItemData $bulkUploadVendorCatalogItemData = null)
+	{
+		if (!$bulkUploadData)
+		{
+			$bulkUploadData = KalturaPluginManager::loadObject('KalturaBulkUploadJobData', null);
+		}
+
+		if (!$bulkUploadVendorCatalogItemData)
+		{
+			$bulkUploadVendorCatalogItemData = new KalturaBulkUploadVendorCatalogItemData();
+		}
+
+		if(!$bulkUploadData->fileName)
+			$bulkUploadData->fileName = $fileData['name'];
+
+		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
+		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadData->type);
+
+		$dbBulkUploadJobData->setBulkUploadObjectType(BulkUploadObjectType::VENDOR_CATALOG_ITEM);
+		$dbBulkUploadJobData->setUserId($this->getKuser()->getPuserId());
+		$dbObjectData = $bulkUploadVendorCatalogItemData->toInsertableObject();
+		$dbBulkUploadJobData->setObjectData($dbObjectData);
+		$dbBulkUploadJobData->setFilePath($fileData['tmp_name']);
+
+		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $dbBulkUploadJobData, $bulkUploadCoreType);
+		$dbJobLog = BatchJobLogPeer::retrieveByBatchJobId($dbJob->getId());
+		if(!$dbJobLog)
+		{
+			return null;
+		}
+
+		$bulkUpload = new KalturaBulkUpload();
+		$bulkUpload->fromObject($dbJobLog, $this->getResponseProfile());
+
+		return $bulkUpload;
+	}
+
+
 }

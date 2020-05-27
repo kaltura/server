@@ -539,7 +539,69 @@ class kFile extends kFileBase
 		return shell_exec('file -b '.$realPath);
 	}
 
-	
+	public static function getFilesByPattern($pattern)
+	{
+		return glob($pattern);
+	}
+
+	public static function doDeleteFile($file)
+	{
+		return @unlink($file);
+	}
+	public static function removeDir($dir)
+	{
+		return @rmdir($dir);
+	}
+
+	public static function getFileLastUpdatedTime($file)
+	{
+		return filemtime($file);
+	}
+
+	public static function checkIsDir($path)
+	{
+		return is_dir($path);
+	}
+
+	public static function getLinesFromFileTail($file, $numberOfLines = 1, $ignoreEmptyEnds = true)
+	{
+		$eol = self::getArrEndOfLine();
+		$f = fopen($file, 'r');
+		$index = -1;
+		fseek($f, $index, SEEK_END);
+		$char = fgetc($f);	//get the last char in the file
+
+		while ($ignoreEmptyEnds && in_array($char, $eol))
+		{
+			fseek($f, $index--, SEEK_END);
+			$char = fgetc($f);
+		}
+
+		$lines = '';
+		while ($char !== false &&
+			($numberOfLines > 1 || ($numberOfLines == 1 && !in_array($char, $eol))))
+		{
+			$lines = $char . $lines;
+			fseek($f, $index--, SEEK_END);
+			$char = fgetc($f);
+
+			while ($numberOfLines > 1 && in_array($char, $eol))
+			{
+				$numberOfLines--;
+				$lines = $char . $lines;
+				fseek($f, $index--, SEEK_END);
+				$char = fgetc($f);
+			}
+		}
+		return $lines;
+	}
+
+	public static function getArrEndOfLine()
+	{
+		return array("\n", "\r");
+	}
+
+
 }
 
 /**

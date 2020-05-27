@@ -188,17 +188,23 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	}
 	
 	public function postInsert(PropelPDO $con = null) {
-	
+
 		if((!$this->root_job_id && $this->id) || ($this->useNewRoot))
 		{
 			// set the root to point to itself
 			$this->setRootJobId($this->id);
-			$res = parent::save($con);
 		}
 	
 		if(BatchJobLockPeer::shouldCreateLockObject($this,true, $con)) 
+		{
 			BatchJobLockPeer::createLockObject($this);
-	
+		}
+
+		if ($this->isModified())
+		{
+			parent::save($con);
+		}
+
 		return parent::postInsert($con);
 	}
 	
@@ -377,11 +383,19 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr( $sub_type, $version = null)
+	public function generateFilePathArr( $sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType ( $sub_type );
-		
-		$path = '/content/batchfiles/' . $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
+
+		if($externalPath)
+		{
+			$path = '/batchfiles/';
+		}
+		else
+		{
+			$path = '/content/batchfiles/';
+		}
+		$path .= $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

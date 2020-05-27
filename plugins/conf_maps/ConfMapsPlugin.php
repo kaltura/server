@@ -36,6 +36,7 @@ class ConfMapsPlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		$pages = array();
 		$pages[] = new ConfigurationMapListAction();
 		$pages[] = new ConfigurationMapConfigureAction();
+		$pages[] = new AuditTrailListAction();
 		return $pages;
 	}
 }

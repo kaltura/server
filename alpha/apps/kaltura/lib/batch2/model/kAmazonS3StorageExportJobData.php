@@ -34,6 +34,11 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	* $var string
 	*/
 	private $endPoint;
+
+	/**
+	 * $var string
+	 */
+	private $storageClass;
 	
 	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false)
 	{
@@ -139,5 +144,21 @@ class kAmazonS3StorageExportJobData extends kStorageExportJobData
 	public function setEndPoint($endPoint)
 	{
 		$this->endPoint = $endPoint;	
-	}	
+	}
+
+	/**
+	 * @return the storageClass
+	 */
+	public function getStorageClass()
+	{
+		return $this->storageClass;
+	}
+
+	/**
+	 * @param $storageClass the storageClass to set
+	 */
+	public function setStorageClass($storageClass)
+	{
+		$this->storageClass = $storageClass;
+	}
 }

@@ -12,7 +12,7 @@
  */
 class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 {
-	const ENTRY_SERVER_NODE_MIN_CREATION_TIMEE = 120;
+	const ENTRY_SERVER_NODE_MIN_CREATION_TIME = 120;
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -21,19 +21,57 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	{
 		return KalturaBatchJobType::CLEANUP;
 	}
+
+    protected function getFilter()
+    {
+        $entryServerNodeMinCreationTime = $this->getAdditionalParams("minCreationTime");
+        if(!$entryServerNodeMinCreationTime)
+            $entryServerNodeMinCreationTime = self::ENTRY_SERVER_NODE_MIN_CREATION_TIME;
+
+        $entryServerNodeFilter = new KalturaEntryServerNodeFilter();
+        $entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
+        $entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
+
+        $excludeServerIds = $this->getExcludeServerIds();
+        if ($excludeServerIds)
+        {
+            $entryServerNodeFilter->serverNodeIdNotIn = implode(',', $excludeServerIds);
+        }
+        return $entryServerNodeFilter;
+    }
+
+    public static function getExcludeServerNodesFromAPI($serverTypesNotIn)
+    {
+        $serverNodeFilter = new KalturaServerNodeFilter();
+        $serverNodeFilter->typeIn = $serverTypesNotIn;
+        return self::$kClient->serverNode->listAction($serverNodeFilter);
+    }
+
+
+    protected function getExcludeServerIds()
+    {
+        $excludeServerIds = array();
+        $serverTypesNotIn = $this->getAdditionalParams('serverTypesNotIn');
+        if ($serverTypesNotIn)
+        {
+            $serverNodes = KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers','getExcludeServerNodesFromAPI'), array($serverTypesNotIn));
+            if ($serverNodes && $serverNodes->objects)
+            {
+                foreach($serverNodes->objects as $serverNode)
+                {
+                    $excludeServerIds[] = $serverNode->id;
+                }
+            }
+        }
+        return $excludeServerIds;
+    }
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::run()
 	*/
 	public function run($jobs = null)
 	{
-		$entryServerNodeMinCreationTime = $this->getAdditionalParams("minCreationTime");
-		if(!$entryServerNodeMinCreationTime)
-			$entryServerNodeMinCreationTime = self::ENTRY_SERVER_NODE_MIN_CREATION_TIMEE;
-		
-		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
-		$entryServerNodeFilter->orderBy = KalturaEntryServerNodeOrderBy::CREATED_AT_ASC;
-		$entryServerNodeFilter->createdAtLessThanOrEqual = time() - $entryServerNodeMinCreationTime;
+		$entryServerNodeFilter = $this->getFilter();
 		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;

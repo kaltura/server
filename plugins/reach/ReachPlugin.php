@@ -123,7 +123,11 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 			return true;
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		if ($partner)
+		{
+			return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		}
+		return false;
 	}
 	
 	
@@ -156,6 +160,8 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new CatalogItemListAction();
 		$pages[] = new CatalogItemConfigureAction();
 		$pages[] = new CatalogItemSetStatusAction();
+		$pages[] = new CatalogItemExportAction();
+		$pages[] = new CatalogItemImportAction();
 		$pages[] = new PartnerCatalogItemListAction();
 		$pages[] = new PartnerCatalogItemConfigureAction();
 		$pages[] = new PartnerCatalogItemSetStatusAction();
@@ -176,7 +182,8 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	public static function dependsOn()
 	{
 		$eventNotificationDependency = new KalturaDependency(EventNotificationPlugin::getPluginName());
-		return array($eventNotificationDependency);
+		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::getPluginName());
+		return array($eventNotificationDependency, $bulkUploadDependency);
 	}
 	
 	/**

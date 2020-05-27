@@ -79,5 +79,14 @@ class thumbAsset extends exportableAsset
 	{
 		return array($this->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET));
 	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getTypeFolderName()
+	 */
+	public function getTypeFolderName()
+	{
+		return 'thumbnails';
+	}
 	
 }

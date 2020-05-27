@@ -2,6 +2,9 @@ from optparse import OptionParser
 from threading import Thread
 from gzip import GzipFile
 from math import isnan
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
+from datetime import datetime
 import SocketServer
 import operator
 import socket
@@ -27,6 +30,8 @@ class ReaderThread(Thread):
 
     def run(self):
         global eventsBuffer
+        if options.kafkaAddress is not None and options.kafkaTopic is not None:
+            producer = KafkaProducer(bootstrap_servers=options.kafkaAddress, linger_ms=100, batch_size=16384)
         
         curSlot = []
         lastSlotIndex = 0
@@ -57,11 +62,26 @@ class ReaderThread(Thread):
                 self.outputFile = GzipFile(outputFilename, 'a')
             self.outputFile.write(curMessage.replace('\0', '\n') + '\n')
 
+            try:
+                if options.kafkaAddress is not None and options.kafkaTopic is not None:
+                    sendMessageToKafka(producer, curMessage)
+            except KafkaError as error:
+                print(str(error))
+                pass
+
+
 def safeFloat(num):
     try:
         return float(num)
     except ValueError:
         return float('nan')
+
+def sendMessageToKafka(producer, curMessage):
+    permittedFields = {"s", "p", "a", "e", "d", "x", "r", "c", "l", "q"}
+    filteredMsg = {}
+    filteredMsg["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    filteredMsg.update((key, val) for (key, val) in json.loads(curMessage).items() if key in permittedFields)
+    producer.send(options.kafkaTopic, json.dumps(filteredMsg)).get(timeout=3)
                 
 class CommandHandler(SocketServer.BaseRequestHandler):
     AGGREGATED_FIELDS = 'xn'
@@ -229,6 +249,10 @@ if __name__ == '__main__':
                       help="determines the interval in seconds for reopening the output file", metavar="SECS")
     parser.add_option("-f", "--output-format", dest="outputFileFormat",default='/var/log/apimon/apimon-%Y-%m-%d-%H.log.gz',
                       help="sets the output file naming format", metavar="FMT")
+    parser.add_option("-k", "--kafka-address", dest="kafkaAddress",default=None,
+                      help="the kafka server address to send data", metavar="ADDR")
+    parser.add_option("-q", "--kafka-topic", dest="kafkaTopic",default=None,
+                          help="the kafka topic to send data", metavar="string")
     (options, args) = parser.parse_args()
 
     # start the worker threads

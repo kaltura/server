@@ -121,8 +121,16 @@ class KProcessWrapper
 	 */
 	public function isRunning()
 	{
-		if($this->dieTime < time())
-			return false;
+		$usingSmartJobTimeout = (isset($this->taskConfig->params->usingSmartJobTimeout) &&
+			$this->taskConfig->params->usingSmartJobTimeout == 1);
+
+		if (!$usingSmartJobTimeout)
+		{
+			if ($this->dieTime < time())
+			{
+				return false;
+			}
+		}
 		
 		if($this->isMockedProcess) {
 			$res = $this->checkMockedProcessRunning();	

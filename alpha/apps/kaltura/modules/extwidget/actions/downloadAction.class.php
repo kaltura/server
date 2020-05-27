@@ -173,7 +173,7 @@ class downloadAction extends sfAction
 				switch ($entryMediaType)
 				{
 					case entry::ENTRY_MEDIA_TYPE_IMAGE:
-						$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+						$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 						break;
 				}
 				break;

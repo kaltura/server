@@ -456,18 +456,29 @@
 
 			/*
 			 * Adjust dynamically the new concurrency level to the current chunk Q status/backlog
+			 * There are 3 levels that much various chunk job Q states
+			 * - low load (job Q < 100) - keep predefined max concurrency (setup::concurrent)
+			 * - med load (job Q < 500) - concurrency 10 
+			 * - hi  load (job Q < 1000) - concurrency 2
+			 *
+			 * Make sure that final concurrency match at least the setup::concurrentMin value
 			 */
 			{
 				$globalChunkQueueSize = $writeIndex-$readIndex;
+				$setup = $this->chunker->setup;
 				if($globalChunkQueueSize<100)
-					$newConcurrency = $this->chunker->setup->concurrent;
+					$newConcurrency = $setup->concurrent;
 				else if($globalChunkQueueSize<500)
-					$newConcurrency = min(10,$this->chunker->setup->concurrent);
+					$newConcurrency = min(10,$setup->concurrent);
 				else if($globalChunkQueueSize<1000)
-					$newConcurrency = min(5,$this->chunker->setup->concurrent);
+					$newConcurrency = min(5,$setup->concurrent);
 				else 
-					$newConcurrency = min(2,$this->chunker->setup->concurrent);
-				KalturaLog::log("Session($this->name)-chkQu: Q:$globalChunkQueueSize,maxConcurr:".$this->chunker->setup->concurrent.",newConcurr:$newConcurrency, rdIdx:$readIndex, wrIdx:$writeIndex");
+					$newConcurrency = min(2,$setup->concurrent);
+
+				if(isset($setup->concurrentMin) && $setup->concurrentMin>0)
+					$newConcurrency = max($newConcurrency,$setup->concurrentMin);
+
+				KalturaLog::log("Session($this->name)-chkQu: Q:$globalChunkQueueSize,maxConcurr:$setup->concurrent,minConcurr:$setup->concurrentMin,newConcurr:$newConcurrency");
 			}
 			
 			while($loaded<count($this->videoCmdLines)) {
@@ -529,14 +540,16 @@
 				$this->audioCmdLines = $cmdLines;
 			else if(isset($this->audioCmdLines))
 				$cmdLines = $this->audioCmdLines;
-			foreach($cmdLines as $idx=>$cmdLine) {
-				$jobIdx = $idx;
-				$job = $this->addJob($jobIdx, $cmdLine);
-				if($job===false) {
-					KalturaLog::log("Session($this->name) - Failed to add job($jobIdx)");
-					return false;
+			if(isset($cmdLines)) {
+				foreach($cmdLines as $idx=>$cmdLine) {
+					$jobIdx = $idx;
+					$job = $this->addJob($jobIdx, $cmdLine);
+					if($job===false) {
+						KalturaLog::log("Session($this->name) - Failed to add job($jobIdx)");
+						return false;
+					}
+					$this->audioJobs->jobs[$idx] = $job;
 				}
-				$this->audioJobs->jobs[$idx] = $job;
 			}
 			return count($cmdLines);
 		}

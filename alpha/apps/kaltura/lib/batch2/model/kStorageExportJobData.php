@@ -14,7 +14,17 @@ class kStorageExportJobData extends kStorageJobData
 	 * @var bool
 	 */
     private $createLink;
-    
+
+	/**
+	 * @var string
+	 */
+	private $assetId;
+
+	/**
+	 * @var string
+	 */
+	private $externalUrl;
+
 	public static function getInstance($protocol)
 	{
 		$data = null;
@@ -48,6 +58,15 @@ class kStorageExportJobData extends kStorageJobData
 		$this->setForce($force);
 		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		$this->setCreateLink($externalStorage->getCreateFileLink());
+
+		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$assetId = $srcFileSync->getObjectId();
+			$asset = assetPeer::retrieveById($assetId);
+
+			$this->setAssetId($assetId);
+			$this->setExternalUrl($srcFileSync->getExternalUrl($asset->getEntryId()));
+		}
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
@@ -89,5 +108,37 @@ class kStorageExportJobData extends kStorageJobData
 	{
 		$this->createLink = $createLink;
 	}
-	
+
+	/**
+	 * @return the $assetId
+	 */
+	public function getAssetId()
+	{
+		return $this->assetId;
+	}
+
+	/**
+	 * @param assetId the $assetId to set
+	 */
+	public function setAssetId($assetId)
+	{
+		$this->assetId = $assetId;
+	}
+
+	/**
+	 * @return the $externalUrl
+	 */
+	public function getExternalUrl()
+	{
+		return $this->externalUrl;
+	}
+
+	/**
+	 * @param externalUrl the $externalUrl to set
+	 */
+	public function setExternalUrl($externalUrl)
+	{
+		$this->externalUrl = $externalUrl;
+	}
+
 }

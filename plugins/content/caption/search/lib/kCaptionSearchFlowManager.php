@@ -50,7 +50,7 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	{
 		// updated in the entry in the indexing server
 		$entry = $object->getentry();
-		if($entry)
+		if($entry && $entry->getStatus() != entryStatus::DELETED)
 		{
 			$entry->setUpdatedAt(time());
 			$entry->save();
@@ -69,15 +69,20 @@ class kCaptionSearchFlowManager implements kObjectDataChangedEventConsumer, kObj
 	public function addParseCaptionAssetJob(CaptionAsset $captionAsset, BatchJob $parentJob = null)
 	{
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-		if(!$fileSync)
+		$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey, $isRemote);
+		if(!$fileSync || $isRemote)
 		{
 			if(!PermissionPeer::isValidForPartner(CaptionPermissionName::IMPORT_REMOTE_CAPTION_FOR_INDEXING, $captionAsset->getPartnerId()))
 				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
 			
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-			if(!$fileSync)
-				throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
+			if (!$fileSync)
+			{
+				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
+				if (!$fileSync)
+				{
+					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
+				}
+			}
 			
 	    	$fullPath = myContentStorage::getFSUploadsPath() . '/' . $captionAsset->getId() . '.tmp';
 			if(!KCurlWrapper::getDataFromFile($fileSync->getExternalUrl($captionAsset->getEntryId()), $fullPath, null, true))

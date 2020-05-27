@@ -13,13 +13,17 @@ class KalturaExternalMediaEntryFilter extends KalturaExternalMediaEntryBaseFilte
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::toObject()
 	 */
-	public function toObject($coreFilter = null, $skip = array())
+	public function toObject($object_to_fill = null, $skip = array())
 	{
-		/* @var $coreFilter entryFilter */
-		
+		/* @var $object_to_fill entryFilter */
+		if(is_null($object_to_fill))
+		{
+			$object_to_fill = $this->getCoreFilter();
+		}
+
 		if($this->externalSourceTypeEqual)
 		{
-			$coreFilter->fields['_like_plugins_data'] = ExternalMediaPlugin::getExternalSourceSearchData($this->externalSourceTypeEqual);
+			$object_to_fill->fields['_like_plugins_data'] = ExternalMediaPlugin::getExternalSourceSearchData($this->externalSourceTypeEqual);
 			$this->externalSourceTypeEqual = null;
 		}
 	
@@ -33,12 +37,12 @@ class KalturaExternalMediaEntryFilter extends KalturaExternalMediaEntryBaseFilte
 				$coreExternalSourceTypes[] = ExternalMediaPlugin::getExternalSourceSearchData($coreExternalSourceType);
 			}
 			$externalSourceTypeIn = implode(',', $coreExternalSourceTypes);
-			
-			$coreFilter->fields['_mlikeor_plugins_data'] = $externalSourceTypeIn;
+
+			$object_to_fill->fields['_mlikeor_plugins_data'] = $externalSourceTypeIn;
 			$this->externalSourceTypeIn = null;
 		}
 		
-		return parent::toObject($coreFilter, $skip);
+		return parent::toObject($object_to_fill, $skip);
 	}
 	
 	/* (non-PHPdoc)

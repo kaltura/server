@@ -210,6 +210,10 @@ class kBeacon
 			//Don't fail the request retry it again while going via the API layer
 			return false;
 		}
+		catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+		{
+			return false;
+		}
 		
 		$this->deleteItemsFromOldIndex($docId, $queueProvider);
 
@@ -224,6 +228,10 @@ class kBeacon
 			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
 			{
 				//Don't fail the request retry it again while going via the API layer
+				return false;
+			}
+			catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+			{
 				return false;
 			}
 		}
@@ -248,6 +256,10 @@ class kBeacon
 			catch (PhpAmqpLib\Exception\AMQPRuntimeException $e)
 			{
 				//Don't fail the request retry it again while going via the API layer
+				return false;
+			}
+			catch (PhpAmqpLib\Exception\AMQPTimeoutException $e)
+			{
 				return false;
 			}
 		}

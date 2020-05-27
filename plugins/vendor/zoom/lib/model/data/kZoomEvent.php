@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.venodr
+ * @package plugins.vendor
  * @subpackage model.zoom
  */
 class kZoomEvent implements iZoomObject
@@ -37,16 +37,16 @@ class kZoomEvent implements iZoomObject
 		switch ($this->eventType)
 		{
 			case kEventType::RECORDING_VIDEO_COMPLETED:
-				$this->object = new kZoomMeeting();
-				$this->object->parseData($data[kZoomMeeting::MEETING_OBJECT]);
+				$this->object = new kZoomRecording();
+				$this->object->parseData($data[kZoomRecording::MEETING_OBJECT]);
 				break;
 			case kEventType::RECORDING_TRANSCRIPT_COMPLETED:
 				$this->object = new kZoomTranscriptCompleted();
 				$this->object->parseData($data[kZoomTranscriptCompleted::TRANSCRIPT_OBJECT]);
 				break;
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
-				$this->object = new kZoomMeeting();
-				$this->object->parseData($data[kZoomMeeting::OBJECT]);
+				$this->object = new kZoomRecording();
+				$this->object->parseData($data[kZoomRecording::OBJECT]);
 				break;
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
 				$this->object = new kZoomTranscriptCompleted();

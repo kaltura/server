@@ -8,7 +8,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 {
 
 	const CLIP_NUMBER = 'clipNumber';
-
+	const LOCK_EXPIRY = 10;
 	/**
 	 * @param string $sourceEntryId
 	 * @param entry $clipEntry
@@ -280,8 +280,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry);
 
-		kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,false);
-
+		//calling addConcatJob only if lock succeeds
+		$store = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		$lockKey = "kclipManager_add_concat_job" . $batchJob->getId();
+		if (!$store || $store->add($lockKey, true, self::LOCK_EXPIRY))
+		{
+			kJobsManager::addConcatJob($batchJob, $flavorAsset, $files,false);
+		}
 	}
 
 	/**
@@ -334,7 +339,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					$errDesc = '';
 					$this->addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc,
 						$jobData->getPartnerId(),
-						$jobData->getOperationAttributes(), $jobData->getPriority());
+						$jobData->getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY);
 					kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 				}
 				break;

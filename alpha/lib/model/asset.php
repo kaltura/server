@@ -399,19 +399,37 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false)
 	{
-		static::validateFileSyncSubType ( $sub_type );
+		static::validateFileSyncSubType($sub_type);
 		$version = (is_null($version) ? $this->getVersionForSubType($sub_type) : $version);
-		
-		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
-		if(!$entry)
-			throw new Exception("Could not find entry [" . $this->getEntryId() . "] for asset [" . $this->getId() . "]");
-		
-		$dir = (intval($entry->getIntId() / 1000000)).'/'.	(intval($entry->getIntId() / 1000) % 1000);
-		$path =  "/content/entry/data/$dir/" . $this->generateFileName($sub_type, $version);
 
-		return array(myContentStorage::getFSContentRootPath(), $path); 
+		$entry = entryPeer::retrieveByPKNoFilter($this->getEntryId());
+		if (!$entry)
+			throw new Exception("Could not find entry [" . $this->getEntryId() . "] for asset [" . $this->getId() . "]");
+
+		if ($externalPath)
+		{
+			$dir = myContentStorage::getPathFromId($this->getEntryId());
+			$path = '/entry/' . $this->getTypeFolderName() . "/$dir/" . $this->generateFileName($sub_type, $version);;
+		}
+		else
+		{
+			$path = '/content/entry/data/';
+			$dir = myContentStorage::getPathFromIntId($entry->getIntId());
+			$path .= "/$dir/" . $this->generateFileName($sub_type, $version);
+		}
+
+		return array(myContentStorage::getFSContentRootPath(), $path);
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getTypeFolderName()
+	 */
+	public function getTypeFolderName()
+	{
+		return 'assets';
 	}
 	
 	/**
@@ -504,57 +522,21 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		
 		return $url;
 	}
-	
+
+	/**
+	 * @param bool $useCdn
+	 * @param bool $forceProxy
+	 * @param null $preview
+	 * @param null $fileName
+	 * @param bool $includeKs
+	 * @return string
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
 	public function getDownloadUrl($useCdn = false, $forceProxy = false, $preview = null, $fileName = null, $includeKs = true)
 	{
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		
-		$fileSync = null;
-		$serveRemote = false;
-		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		
-		switch($partner->getStorageServePriority())
-		{
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-				$serveRemote = true;
-				$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($syncKey);
-				if(!$fileSync)
-				{
-					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				} 
-				else if ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-				{
-					throw new kCoreException("File sync is pending: $syncKey",kCoreException::FILE_PENDING);
-				}
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
-				{
-					$serveRemote = true;
-					break;
-				}
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if(!$fileSync)
-				    throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if($fileSync)
-					break;
-					
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-					throw new kCoreException("File sync not found: $syncKey", kCoreException::FILE_NOT_FOUND);
-				
-				$serveRemote = true;
-				break;
-		}
+		list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey, true);
 		
 		if($serveRemote && $fileSync) {
 			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
@@ -799,5 +781,4 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	{
 		return true;
 	}
-		
 }

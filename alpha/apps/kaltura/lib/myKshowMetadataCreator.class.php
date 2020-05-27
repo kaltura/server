@@ -317,7 +317,7 @@ class myKshowMetadataCreator
 		$extended_entry_type = new extendedEntryMediaType();
 		$entry_type = $entry->getMediaType(); // this is assumed to be correct 
 
-		$data = kFileSyncUtils::getReadyLocalFilePathForKey($entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA)); // replaced__getDataPath
+		$data = kFileSyncUtils::getReadyLocalFilePathForKey($entry->getSyncKey(kEntryFileSyncSubType::DATA)); // replaced__getDataPath
 		
 		$ext = pathinfo($data, PATHINFO_EXTENSION );
 
@@ -377,7 +377,7 @@ class myKshowMetadataCreator
 	
 	private static function getUrlAndName ( $entry )
 	{
-		$data = kFileSyncUtils::getReadyLocalFilePathForKey($entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA)); // replaced__getDataPath
+		$data = kFileSyncUtils::getReadyLocalFilePathForKey($entry->getSyncKey(kEntryFileSyncSubType::DATA)); // replaced__getDataPath
 		$entry_type = self::getEntryType ( $entry );
 		if ( $entry_type->type == self::TYPE_RTMP )
 		{

@@ -1,10 +1,336 @@
+# Propus 16.3.0  #
+## Add periodic storage delete local batch ##
+Issue Type: Task
+Issue ID : PLAT-10894
+
+### Configuration ###
+Add the following to batch.ini:
+
+    enabledWorkers.KAsyncStoragePeriodicDeleteLocal     = 1
+
+    [KAsyncStoragePeriodicDeleteLocal : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Delete Local
+    type                                                = KAsyncStoragePeriodicDeleteLocal
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteLocalExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+    filter.statusEqual                                  = 2
+    filter.dcEqual                                      = @DC@
+    filter.fileTypeEqual                                = 3
+
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
+
+## Add periodic storage purge batch ##
+Issue Type: Task
+Issue ID : PLAT-10769
+
+### Configuration ###
+Add the following to batch.ini:
+
+    enabledWorkers.KAsyncStoragePeriodicPurge            = 1
+
+    [KAsyncStoragePeriodicPurge : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Purge
+    type                                                = KAsyncStoragePeriodicPurge
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicPurgeExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxCount                                     = @MAX_COUNT@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+    filter.statusEqual                                  = 3
+    filter.dcIn                                         = @DC@
+    filter.fileTypeIn                                   = 1,3
+    
+    [KAsyncStoragePeriodicExport : PeriodicWorker]
+    ....
+    filter.statusEqual                                  = 1
+    filter.dcIn                                         = @DC@
+    filter.fileTypeEqual                                = 3
+    
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
+
+
+# Propus 16.2.0  #
+## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
+Issue Type: Task
+Issue ID: PLAT-10890
+
+### Configuration ###
+Modify cloud_storage.ini:
+add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
+    
+## Support export captions to remote storage ##
+- Issue Type: Task
+- Issue ID: PLAT-10846
+
+### Deployment scripts ###
+Run:
+	php deployment/updates/scripts/add_permissions/2020_05_07_add_caption_asset_export_action.php
+
+## Add Reach Profile to Audit Trail ##
+Issue Type: Task
+Issue ID: REACH2-845
+
+#### Deployment Scripts ####
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2020_05_17_audit_trail_config_reach_profile.sql
+
+## Support volume map and thumb serving ##
+Issue Type: Task
+Issue ID: PLAT-10835
+
+### Configuration ###
+Modify local.ini:
+add new param packager_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@ and replace placeholders
+Remove VOD_PACKAGER_HOST and VOD_PACKAGER_PORT from previously define params 
+packager_local_thumb_capture_url, packager_mapped_thumb_capture_url, packager_local_volume_map_url, packager_mapped_volume_map_url and packager_local_live_thumb_capture_url. 
+example: 
+Old value:
+packager_mapped_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedvolume/{url}/volume_map.csv
+New value:
+packager_mapped_volume_map_url = /mappedvolume/{url}/volume_map.csv
+
+# Propus 16.1.0 #
+
+## import vendor catalog items from csv ##
+Issue Type: Task
+Issue ID : REACH2-840
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_05_03_add_vendorCatalogItemActionInBulk_addPermissionsVendorCatalogItem.php
+
+## Interactivity plugin ##
+Issue Type: sub task
+Issue ID: PLAT-10793
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
+
+## Add periodic storage export batch ##
+Issue Type: Task
+Issue ID : PLAT-10735
+
+### Configuration ###
+    - Add FEATURE_REMOTE_STORAGE permission to partner -1
+    - Add configuration map with the name 'cloud_storage' with following config:
+
+        storage_lock_expiry = @TIME_TO_ACQUIRE_LOCK@
+        last_id_loop_addition = @INT_NUM_ADDED_TO_LAST_ID_LOOP@
+        max_id_delay = @INT_NUM_TO_SUBSTRACT_FROM_MAX_ID@
+        [periodic_storage_ids]
+	0 = @STORAGE_ID@
+	1 = @STORAGE_ID@
+
+       [export_to_cloud]
+        0 = @PARTNER_ID_0@
+        1 = @PARTNER_ID_1@
+
+    - Add the following to batch.ini:
+
+        enabledWorkers.KAsyncStoragePeriodicExport            = 1
+
+        [KAsyncStoragePeriodicExport : PeriodicWorker]
+        id                                                  = @ID@
+        friendlyName                                        = Storage Periodic Export
+        type                                                = KAsyncStoragePeriodicExport
+        scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicExportExe.php
+        params.maxCount                                     = @MAX_COUNT@
+        params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+        params.sleepInterval                                = @SLEEP_INTERVAL@
+      
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+# Propus 16.0.1 #
+
+## Interactivity plugin ##
+Issue Type: Story
+Issue ID: PLAT-10652
+
+### Configuration ###
+add Interactivity to plugins.ini
+
+#### Deployment Scripts ####
+run: php /opt/kaltura/app/deployment/base/scripts/installPlugins.php     
+run: php deployment/updates/scripts/add_permissions/2020_04_12_interactivityServices.php
+
+## export catalog items to CSV ##
+Issue Type: Task
+Issue ID : REACH-836
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_06_04_add_permission_vendor_catalog_items.php
+
+## Add new permission to new action extendLockExpiration in batchService ##
+Issue Type: Task
+Issue ID : PLAT-10653
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_25_add_action_extend_batch_job_lock_expiration.php
+
+# Orion 15.20.0 #
+
+## Update permissions for systemPartner and job services ##
+Issue Type: Task
+Issue ID : PLAT-10740
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_03_17_update_permissions_systemPartner_jobs.php
+
+# Orion 15.19.0 #
+
+## Changing storageUpdate script to run as a batch ##
+Issue Type: Task
+Issue ID : PLAT-10320
+
+### Configuration ###
+Add the following to batch.ini:
+
+enabledWorkers.KAsyncStorageUpdate = xxx (number of workers)
+
+[KAsyncStorageUpdate : PeriodicWorker]
+id                                                  = 800
+friendlyName                                        = STORAGE UPDATE
+type                                                = KAsyncStorageUpdate
+scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
+sleepBetweenStopStart                               = 86400
+params.debugMode				    = @1 for debuging mode, 0 for real run mode@
+
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2020_01_19_add_permissions_to_systempartner_jobs_partner.php
+
+## ecdn monitoring allow listTemplates ##
+Issue Type: Task
+Issue ID : PLAT-10625
+
+### Configuration ###
+  None
+
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
+
+## Add Live NG plugin ##
+Issue Type: Task
+Issue ID : PLAT-10358
+
+### Configuration ###
+  Add LiveCluster plugin in: configurations/plugins.ini 
+	
+
+#### Deployment Scripts ####
+  install plugins: 
+  
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+
+# Orion 15.18.0 #
+
+## Support sphinx sticky connection for read operations ##
+Issue Type: Task
+Issue ID : PLAT-10713
+
+### Configuration ###
+	* Make sure "sphinx_dynamic_config" exists in your configuration maps 
+ 
+	* To enable the feature for specific partner ids add the following section to the map:
+    [sphinx_sticky_partners]
+    0 = XXXX
+    1 = YYYY
+    where XXXX and YYYY are the partner ids you want to enable the feature for.
+	
+
+#### Deployment Scripts ####
+None.
+
+## Add support of documents conversion on Linux machine ##
+Issue Type: Task
+Issue ID : PLAT-10694
+
+### Configuration ###
+- Add a worker (follow 'KAsyncConvertPdfLinux' in 'batch.ini.template).
+- Make sure that 'lowriter' is installed by running 'lowriter --version'.
+
+#### Deployment Scripts ####
+none.
+
+# Orion 15.17.0 #
+
+## Allow catalog item pricing view from KMC ##
+Issue Type: Task
+Issue ID : REACH-779
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_02_03_add_reach_catalog_item_kmc_permissions.php'
+
+## Add partner package to audit trail config ##
+Issue Type: Task
+Issue ID : No-Plat
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/sql/2020_02_03_audit_trail_config_admin_console_partner_updates.sql'
+
+# Orion 15.16.0 #
+
+## Add liveStream->getDetails API action ##
+Issue Type: Task
+Issue ID : FEV-426
+
+### Configuration ###
+none.
+
+#### Deployment Scripts ####
+Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_23_01_live_stream_get_details_action.php'
+
+## New notification template Item_Pending_Moderation_Extended ##
+- Issue Type: Task
+- Issue ID: PLAT-10546
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+/opt/kaltura/app/deployment/updates/scripts/xml/2020_02_02_mediaspaceNotificationtTemplate.template.xml
+
+#### Deployment scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_02_02_deploy_mediaspace_notification.php
+
+## SIP - Use rtmps as default streaming ##
+ - Issue Type: Task
+ - Issue ID: PLAT-10575
+
+### Installation ###
+None.
+### Configuration ###
+None.
+To force non secure rtmp streaming set forceNonSecureStreaming = true in sip.ini 
+#### Known Issues & Limitations ####
+None.
+#### Deployment scripts ####
+ - php deployment\updates\scripts\add_permissions\2020_01_19_add_rtmps_permissions_KalturaLiveEntry.php
+ 
+
 # Orion 15.15.0 #
 
 ## Enabling auto archive when using live with recording ##
 Issue Type: Task
 Issue ID : WEBC-1574
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -14,7 +340,7 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/2019_12_10_update_archive_p
 - Issue Type: Task
 - Issue ID : PLAT-10432
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -28,7 +354,7 @@ Run:
 ## Modify confMaps content column ##
 - Issue Type: Task
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -38,7 +364,7 @@ mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deploy
 - Issue Type: Task
 - Issue ID : PLAT-10432
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -52,7 +378,7 @@ Run:
 - Issue Type: Task
 - Issue ID : PLAT-10269
 
-### Configuration ##
+### Configuration ###
     To support sharding sphinx category table add the follwoing to you db.ini file:
         [sphinx_split_index]
         enabled = true
@@ -120,7 +446,7 @@ Run:
 - Issue Type: Task
 - Issue ID : REACH2-737
 
-### Configuration ##
+### Configuration ###
 First replace all tokens from the XML files below and remove ".template" from the file name:
 /opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryAddedPrivacyContextsBooleanNotification.template.xml
 /opt/kaltura/app/deployment/updates/scripts/xml/2019_12_22_categoryEntryChangedPrivacyContextsBooleanNotification.template.xml
@@ -134,7 +460,7 @@ php /opt/kaltura/app/deployment/updates/scripts/2019_12_22_deploy_category_entry
 - Issue Type: Task
 - Issue ID : PLAT-10357
 
-### Configuration ##
+### Configuration ###
 none.
 
 #### Deployment Scripts ####
@@ -146,7 +472,7 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_04_
 - Issue Type: Task
 - Issue ID : PLAT-10347
 
-### Configuration ##
+### Configuration ###
 
 1) Make sure "elasticDynamicMap" exists in your configuration maps 
 2) Add the following section "filterExecutionTags" with following values:
@@ -166,7 +492,7 @@ None.
 - Issue Type: Task
 - Issue ID : PLAT-10351
 
-### Configuration ##
+### Configuration ###
 
 Only after the deployment script is executed, one can add this permission to user-roles via admin console
 
@@ -2902,7 +3228,7 @@ None.
 - Issue Type: Task
 - Issue ID: SUP-12069
 
-### Configuration ####
+### Configuration ###
 
 - Add upload domain in dc_config.ini 
 example:

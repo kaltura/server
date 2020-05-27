@@ -37,7 +37,7 @@ class myContentStorage
 	 * @param int $fileName = random obfuscator followed by the file extension (.jpg, .flv, .txt, etc...)
 	 * @return string the content path
 	 */
-	public static function getGeneralEntityPath($entityName, $int_id, $id, $fileName , $version = null )
+	public static function getGeneralEntityPath($entityName, $int_id, $id, $fileName , $version = null, $externalStorageMode = false )
 	{
 		if( $version != null )
 		{
@@ -55,7 +55,7 @@ class myContentStorage
 		}
 		else
 		{
-			$res = '/content/'.$entityName.'/'. self::dirForId ( $int_id, $id ) .'_'.$fileName;
+			$res = '/content/'.$entityName.'/'. self::dirForId ( $int_id, $id, null, $externalStorageMode ) .'_'.$fileName;
 		}
 		
 		if( $version != null )
@@ -72,9 +72,27 @@ class myContentStorage
 		return (intval($id / 1048576)).'/'.	(intval($id / 1024) % 1024).'/'.$id;
 	}
 */
-	public static function dirForId ( $int_id, $id , $file_name = NULL )
+	public static function dirForId ( $int_id, $id , $file_name = NULL, $externalStorageMode = false )
 	{
-		return (intval($int_id / 1000000)).'/'.	(intval($int_id / 1000) % 1000).'/'. ( $file_name !== NULL ? $file_name : $id ) ;
+		if ($externalStorageMode && $id)
+		{
+			$dir = self::getPathFromId($id);
+		}
+		else
+		{
+			$dir = self::getPathFromIntId($int_id);
+		}
+		return $dir .'/'. ( $file_name !== NULL ? $file_name : $id ) ;
+	}
+
+	public static function getPathFromId($id)
+	{
+		return substr($id, -4, 2) . '/' . substr($id, -2);
+	}
+
+	public static function getPathFromIntId($intId)
+	{
+		return  (intval($intId / 1000000)).'/'.	(intval($intId / 1000) % 1000);
 	}
 
 	public static function getVersion ($fileName)

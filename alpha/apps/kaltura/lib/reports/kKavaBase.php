@@ -67,6 +67,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EXTRACT_TIME = 'extract_time';
 	const DIMENSION_ROOT_ENTRY_ID = 'rootEntryId';
 	const DIMENSION_NODE_ID = 'nodeId';
+	const DIMENSION_APPLICATION_VER = 'applicationVer';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -113,6 +114,10 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VIEW_PERIOD = 'viewPeriod';
 	const EVENT_TYPE_NODE_PLAY = 'nodePlay';
 	const EVENT_TYPE_PLAYMANIFEST = 'playManifest';
+	const EVENT_TYPE_REGISTERED = 'registered';
+	const EVENT_TYPE_REGISTRATION_IMPRESSION = 'registrationImpression';
+	const EVENT_TYPE_HOTSPOT_CLICKED = 'hotspotClicked';
+	const EVENT_TYPE_NODE_SWITCH = 'nodeSwitch';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -155,6 +160,7 @@ class kKavaBase extends kDruidBase
 
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
+	const VALUE_ZERO = '0';
 
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
@@ -172,6 +178,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -186,8 +193,13 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_CUSTOM_VAR2 => 1,
 			self::DIMENSION_CUSTOM_VAR3 => 1,
 			self::DIMENSION_EVENT_PROPERTIES => 1,
+			self::DIMENSION_PLAYER_VERSION => 1,
 			self::DIMENSION_ROOT_ENTRY_ID => 1,
 			self::DIMENSION_NODE_ID => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+			self::DIMENSION_EVENT_VAR3 => 1,
+			self::DIMENSION_APPLICATION_VER => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -221,6 +233,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -255,6 +268,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 		),
 		self::DATASOURCE_REACH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
@@ -284,6 +298,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
@@ -302,6 +317,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PLAYER_VERSION => 1,
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_APPLICATION_VER => 1,
 		),
 	);
 
@@ -314,6 +330,9 @@ class kKavaBase extends kDruidBase
 		'webexentry' => 'Webex',
 		'zoomentry' => 'Zoom',
 		'expressrecorder' => 'Express Recorder',
+		'kmsnativeandroid' => 'KMS GO Android',
+		'kmsnativeios' => 'KMS GO iOS',
+		'kalturameeting' => 'Kaltura Meeting',
 	);
 
 	protected static $sourceTypes = array(
@@ -347,7 +366,11 @@ class kKavaBase extends kDruidBase
 		37 => 'Classroom Capture',
 	);
 
-	public static function getEntrySourceType($sourceType, $adminTags)
+	protected static $externalSources = array(
+		'YouTube' => 'External Youtube',
+	);
+
+	public static function getEntrySourceType($sourceType, $adminTags, $customData)
 	{
 		// check for specific admin tags
 		$adminTags = explode(',', strtolower($adminTags));
@@ -360,8 +383,29 @@ class kKavaBase extends kDruidBase
 			}
 		}
 
+		// check for external source
+		if (!is_null($customData))
+		{
+			$externalSource = self::getExternalSourceType($customData);
+			if (isset($externalSource) && isset(self::$externalSources[$externalSource]))
+			{
+				return self::$externalSources[$externalSource];
+			}
+		}
+
 		// use the source type
 		return self::$sourceTypes[$sourceType];
+	}
+
+	protected static function getExternalSourceType($customData)
+	{
+		$pattern = '/"externalSource";s:\d+:"(\w+)";/';
+		if (preg_match($pattern, $customData, $matches))
+		{
+			return $matches[1];
+		}
+
+		return null;
 	}
 
 	public static function isPartnerAllowed($partnerId, $serviceType) {

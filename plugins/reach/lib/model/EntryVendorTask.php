@@ -33,8 +33,14 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_EXPECTED_FINISH_TIME ='expectedFinishTime';
 	const CUSTOM_DATA_SERVICE_TYPE =	'serviceType';
 	const CUSTOM_DATA_SERVICE_FEATURE =	'serviceFeature';
+	const CUSTOM_DATA_TURN_AROUND_TIME =	'turnAroundTime';
 	const SEVEN_DAYS =			 604800;
-	
+	const BUSINESS_DAY_FRIDAY = 5;      //Monday is 1
+	const BUSINESS_DAY_NEXT_MONDAY = 8;
+	const BUSINESS_DAY_START_HOUR = 6;  //06:00:00
+	const BUSINESS_DAY_END_HOUR = 18;   //18:00:00
+	const BUSINESS_DAY_TIME_NORMALIZATION_FACTOR = 10000;
+
 	//setters
 	
 	public function setNotes($v)
@@ -125,6 +131,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function setServiceFeature($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_SERVICE_FEATURE, $v);
+	}
+
+	public function setTurnAroundTime($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME, $v);
 	}
 
 
@@ -235,9 +246,88 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_SERVICE_FEATURE);
 	}
 
-	/* (non-PHPdoc)
- 	 * @see BaseEntryVendorTask::preSave()
- 	 */
+	public function getTurnAroundTime()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME);
+	}
+
+	protected function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
+	{
+
+		$endDayString = sprintf("Y-m-d %s:00:00", self::BUSINESS_DAY_END_HOUR);
+
+		if( $currentDay > self::BUSINESS_DAY_FRIDAY )
+		{
+			//Weekend
+			$daysToSkip = self::BUSINESS_DAY_NEXT_MONDAY - $currentDay;
+			$expTime = date($endDayString, strtotime("+$daysToSkip days", $currentDateTime));
+		}
+		else
+		{
+			$endDayTime = self::BUSINESS_DAY_END_HOUR * self::BUSINESS_DAY_TIME_NORMALIZATION_FACTOR;
+			$startDayTime = self::BUSINESS_DAY_START_HOUR * self::BUSINESS_DAY_TIME_NORMALIZATION_FACTOR;
+
+			//Middle of a business day - expiration time: add 24 hours
+			if( ($startDayTime <= $currentTime) && ($currentTime <= $endDayTime) )
+			{
+				$expTime = date("Y-m-d H:i:s", strtotime('+1 days', $currentDateTime));
+			}
+			//Before work hours - expiration time: End Day today
+			elseif ($currentTime < $startDayTime)
+			{
+				$expTime = date($endDayString, $currentDateTime);
+			}
+			//After work hours - expiration time: End Day tomorrow
+			else
+			{
+				$expTime = date($endDayString, strtotime('+1 days', $currentDateTime));
+			}
+
+			//if expiration time falls on the weekend, jump 2 days
+			$expTimeDay = date("N", strtotime($expTime));
+			if ($expTimeDay > self::BUSINESS_DAY_FRIDAY)
+			{
+				$expTime = date("Y-m-d H:i:s", strtotime($expTime . ' +2 days'));
+			}
+		}
+
+		return strtotime($expTime) - $currentDateTime;
+	}
+
+	protected function calculateBusinessDays($numBusinessDays, $currentUnixTime)
+	{
+		//Get Local TZ
+		$localTimeZone = date_default_timezone_get();
+
+		//Set to EST Time
+		date_default_timezone_set('America/New_York');
+
+		$turnAroundTime = 0;
+
+		//Calculate the business days
+		do
+		{
+			$expTime = $turnAroundTime + $currentUnixTime;
+
+			$day = date("N", $expTime);
+			$time = date("His", $expTime);
+
+			$turnAroundTime += $this->calculateSecondsToNextBusinessDay($expTime, $day, $time);
+			$numBusinessDays--;
+
+		}while($numBusinessDays);
+
+		//Restore
+		date_default_timezone_set($localTimeZone);
+
+		KalturaLog::info("Seconds To Expiration Time: $turnAroundTime");
+
+		return $turnAroundTime;
+	}
+
+/* (non-PHPdoc)
+  * @see BaseEntryVendorTask::preSave()
+  */
 	public function preSave(PropelPDO $con = null)
 	{
 		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && $this->getStatus() == EntryVendorTaskStatus::PENDING)
@@ -252,6 +342,12 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				{
 					$turnAroundTime = self::SEVEN_DAYS;
 				}
+				elseif( (VendorServiceTurnAroundTime::ONE_BUSINESS_DAY <= $turnAroundTime) &&
+					($turnAroundTime <= VendorServiceTurnAroundTime::SEVEN_BUSINESS_DAYS) )
+				{
+					$turnAroundTime = $this->calculateBusinessDays($turnAroundTime, $time);
+				}
+
 				$this->setExpectedFinishTime($turnAroundTime + $time);
 			}
 		}
@@ -327,5 +423,5 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		parent::postSave($con);
 		$this->indexToSearchIndex();
 	}
-	
+
 } // EntryVendorTask

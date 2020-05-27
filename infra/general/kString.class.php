@@ -264,6 +264,11 @@ class kString
 	  	}
 	  }
 
+	public static function removeHttp($url)
+	{
+		return preg_replace('(https?://)', '', $url);
+	}
+
 	public static function xmlEncode($str)
 	{
 		return str_replace ( array ( "&", '"' , '<', '>', "'" ) , array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ), $str );
@@ -466,5 +471,21 @@ class kString
 		else
 			return $str;
 	}
+
+	public static function explode($string, $delimiter=',')
+	{
+		$output = array();
+		$values = explode($delimiter, $string);
+		foreach ($values as $value)
+		{
+			$value = trim($value);
+			if($value !== '')
+			{
+				$output[] = $value;
+			}
+		}
+		return $output;
+	}
+
 
 }

@@ -135,7 +135,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$streams = $liveEntryServerNode->getStreams();
 		$this->sanitizeAndFilterStreamIdsByBitrate($streams);
 		
-		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
+		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes);
@@ -145,7 +145,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$streams = array_merge($streams, $liveEntryServerNode->getStreams());
 			$this->sanitizeAndFilterStreamIdsByBitrate($streams);
 			
-			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode->serverNode));
+			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode));
 			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
 	}
@@ -300,7 +300,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $queryString;
 	}
 	
-	protected function getHttpUrl($serverNode)
+	protected function getHttpUrl($entryServerNode)
 	{
 		return "";
 	}
@@ -318,9 +318,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $baseUrl;
 	}
 	
-	protected function getLivePackagerUrl($serverNode, $streamFormat = null)
+	protected function getLivePackagerUrl($entryServerNode, $streamFormat = null)
 	{
 		/* @var $serverNode MediaServerNode */
+		$serverNode = $entryServerNode->serverNode;
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
 		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
 		
@@ -354,7 +355,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$entryId = $this->getDynamicAttributes()->getEntryId();
 		}
 		
-		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/sd/$segmentDuration/";
+		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
+		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
+		$livePackagerUrl .= $serverNode->getSessionIdUrlString($entryServerNode);
+
 		$entry = $this->getDynamicAttributes()->getEntry();
 		if ($entry->getExplicitLive())
 		{

@@ -317,8 +317,24 @@ class UserService extends KalturaBaseUserService
 		// exceptions might be thrown
 		return parent::loginImpl(null, $loginId, $password, $partnerId, $expiry, $privileges, $otp);
 	}
-	
-	
+
+	protected static function validateLoginDataParams($paramsArray)
+	{
+		kCurrentContext::$HTMLPurifierBehaviour = HTMLPurifierBehaviourType::BLOCK;
+		foreach ($paramsArray as $paramName => $paramValue)
+		{
+			try
+			{
+				kHtmlPurifier::purify('kuser', $paramName, $paramValue);
+			}
+			catch (Exception $e)
+			{
+				throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, 'UserLoginData', $paramName);
+			}
+		}
+	}
+
+
 	/**
 	 * Updates a user's login data: email, password, name.
 	 * 
@@ -343,7 +359,11 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::MISSING_OTP
 	 */
 	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
-	{	
+	{
+		self::validateLoginDataParams(array('id' => $newLoginId,
+										'firstName' => $newFirstName,
+										'lastName' => $newLastName));
+
 		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName, $otp);
 	}
 	

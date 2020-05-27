@@ -59,7 +59,7 @@ class kAssetUtils
 		}
 		else
 		{
-			$syncKey = $entry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA);
+			$syncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 			if ($fileSync)
 				$fileExt = $fileSync->getFileExt();
@@ -119,9 +119,14 @@ class kAssetUtils
 			return null;
 			
 		if(is_null($storageId) && $partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST)
-			if(kFileSyncUtils::getReadyInternalFileSyncForKey($key)) // check if having file sync on kaltura dcs
+		{
+			$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($key);// check if having file sync on kaltura dcs
+			if ($fileSync)
+			{
 				return null;
-				
+			}
+		}
+
 		$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageId);
 		if(!$fileSync)
 			return null;

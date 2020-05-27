@@ -799,7 +799,15 @@ abstract class KBatchBase implements IKalturaLogger
 		return self::getConfigParam('encryption_iv');
 	}
 
-	public static function tryExecuteApiCall($callback, $params, $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
+	/**
+	 * @param $callback
+	 * @param $params
+	 * @param int $numOfRetries
+	 * @param int $apiIntervalInSec
+	 * @param array $ignoredApiErrors
+	 * @return bool|mixed|null
+	 */
+	public static function tryExecuteApiCall($callback, $params,  $ignoredApiErrors = array(), $numOfRetries = self::DEFUALT_API_RETRIES_ATTEMPS, $apiIntervalInSec = self::DEFAULT_SLEEP_INTERVAL)
 	{
 		while ($numOfRetries-- > 0)
 		{
@@ -811,7 +819,12 @@ abstract class KBatchBase implements IKalturaLogger
 				return $res;
 			}
 			catch  (Exception $ex) {
-				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed number of retires $numOfRetries");
+				KalturaLog::warning("API Call for " . print_r($callback, true) . " failed with code [" . $ex->getCode() . "] number of retires $numOfRetries");
+				if (in_array($ex->getCode(), $ignoredApiErrors))
+				{
+					//Not retring on specific errors that retrying is not needed anyhow
+					return null;
+				}
 				KalturaLog::err($ex->getMessage());
 				sleep($apiIntervalInSec);
 			}

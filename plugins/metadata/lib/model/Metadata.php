@@ -112,15 +112,25 @@ class Metadata extends BaseMetadata implements IIndexable, ISyncableFile, IRelat
 	 * (non-PHPdoc)
 	 * @see lib/model/ISyncableFile#generateFilePathArr()
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
 		self::validateFileSyncSubType ( $sub_type );
 		
 		if(!$version)
 			$version = $this->getVersion();
-		
-		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
-		$path =  "/content/metadata/data/$dir/" . $this->generateFileName($sub_type, $version);
+
+		if ($externalPath)
+		{
+			$path = "/metadata/data/";
+			$dir = myContentStorage::getPathFromId($this->getEntryId());
+		}
+		else
+		{
+			$path = "/content/metadata/data/";
+			$dir = myContentStorage::getPathFromIntId($this->getId());
+		}
+		$path .= "/$dir/" .$this->generateFileName($sub_type, $version);
+
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}

@@ -26,6 +26,7 @@ enabledWorkers.KAsyncNotifier						= 1
 enabledWorkers.KAsyncMailer							= 1
 enabledWorkers.KAsyncExtractMedia					= 1
 enabledWorkers.KAsyncConvert						= 1
+enabledWorkers.KAsyncConvertPdfLinux				= 1
 enabledWorkers.KAsyncPostConvert					= 1
 enabledWorkers.KAsyncBulkUpload						= 1
 enabledWorkers.KAsyncProvisionProvide				= 1
@@ -69,6 +70,7 @@ enabledWorkers.KAsyncCopyCuePoints                   = 1
 enabledWorkers.KSyncReachCreditTaskRunner	    = 0
 enabledWorkers.KAsyncExportCsv                      = 0
 enabledWorkers.KAsyncLiveEntryArchive               = 0
+enabledWorkers.KAsyncStorageUpdate                  = 1
 
 
 [mainTemplate : template]
@@ -249,7 +251,7 @@ params.sharedTempPath 								= @WEB_DIR@/tmp/convert
 [KAsyncConvert : KAsyncConvertWorker]
 id													= 70
 friendlyName										= Convert
-filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,202,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
+filter.jobSubTypeIn	= 1,2,99,3,fastStart.FastStart,segmenter.Segmenter,mp4box.Mp4box,vlc.Vlc,document.ImageMagick,201,quickTimeTools.QuickTimeTools,ismIndex.IsmIndex,ismIndex.IsmManifest
 ;affinity											= 
 
 ;params.minFileSize									= 
@@ -294,6 +296,13 @@ params.localFileRoot								= @TMP_DIR@/convert
 
 ;The remote URL, replacing params.localFileRoot
 params.remoteUrlDirectory							= /mypath
+
+[KAsyncConvertPdfLinux : KAsyncConvertWorker]
+id                                                  = 73
+friendlyName                                        = ConvertPdfLinux
+filter.jobSubTypeIn                                 = 202
+params.pdfCreatorCmd                                = lowriter
+params.osType                                       = linux
 
 [KAsyncConvertCollection : KAsyncDistributedConvert]
 id													= 77
@@ -855,3 +864,11 @@ id                                                  = 790
 type                                                = KAsyncLiveEntryArchive
 scriptPath                                          = batches/Archive/KAsyncLiveEntryArchiveExe.php
 friendlyName                                        = Live Entry Archive
+
+[KAsyncStorageUpdate : PeriodicWorker]
+id                                                  = 800
+friendlyName                                        = STORAGE UPDATE
+type                                                = KAsyncStorageUpdate
+scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
+sleepBetweenStopStart                               = 86400
+params.debugMode                                    = 1

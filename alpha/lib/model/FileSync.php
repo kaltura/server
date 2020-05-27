@@ -20,7 +20,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_READY = 2;
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
-	
+
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
 		self::FILE_SYNC_STATUS_PENDING => "Pending", 
@@ -41,6 +41,121 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$file_sync->setVersion ( $key->version );
 		if ( $key->partner_id ) $file_sync->setPartnerId ( $key->partner_id );
 		return $file_sync;
+	}
+
+	public static function createFileSyncsPath(&$fileSyncs)
+	{
+		// make sure all file syncs have a path
+		foreach ($fileSyncs as $fileSync)
+		{
+			$fileSync->createPath();
+		}
+	}
+
+	public function createPath()
+	{
+		if ($this->getFileRoot() && $this->getFilePath())
+		{
+			return;
+		}
+
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
+		list($fileRoot, $realPath) = kPathManager::getFilePathArr($fileSyncKey);
+
+		$this->setFileRoot($fileRoot);
+		$this->setFilePath($realPath);
+	}
+
+	public static function getFileSyncsChunkNoCriteria($baseCriteria, $fromId = 0, $toId = 0)
+	{
+		$c = clone $baseCriteria;
+
+		if($toId)
+		{
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
+			$c->addAnd($idCriterion);
+		}
+		else if($fromId)
+		{
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+		}
+
+		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
+		// once that bug is fixed, this can be removed
+		FileSyncPeer::setUseCriteriaFilter(false);
+		$fileSyncs = FileSyncPeer::doSelect($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		FileSyncPeer::setUseCriteriaFilter(true);
+
+		return $fileSyncs;
+	}
+
+	protected static function getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix)
+	{
+		// get locked file syncs with multi get
+		$lockKeys = array();
+		foreach ($fileSyncs as $fileSync)
+		{
+			$lockKeys[] = $lockKeyPrefix . $fileSync->getId();
+		}
+
+		$lockKeys = $lockCache->get($lockKeys);
+		return $lockKeys;
+	}
+
+	public static function lockFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix, $lockExpiryTimeOut, &$lockedFileSyncs,
+	                                     &$limitReached = null, $maxCount = PHP_INT_MAX, &$maxSize = PHP_INT_MAX, &$lastId = null)
+	{
+		// Get lock file syncs
+		$lockKeys = self::getLockedFileSyncs($fileSyncs, $lockCache, $lockKeyPrefix);
+
+		// try to lock file syncs
+		foreach ($fileSyncs as $fileSync)
+		{
+			$curKey = $lockKeyPrefix . $fileSync->getId();
+
+			if (isset($lockKeys[$curKey]))
+			{
+				KalturaLog::info('file sync '.$fileSync->getId().' already locked');
+				continue;
+			}
+
+			if (!$lockCache->add($curKey, true, $lockExpiryTimeOut))
+			{
+				KalturaLog::info('failed to lock file sync '.$fileSync->getId());
+				continue;
+			}
+
+			KalturaLog::info('locked file sync ' . $fileSync->getId());
+
+			// add to the result set
+			$lockedFileSyncs[] = $fileSync;
+
+			if($limitReached !== null)
+			{
+				$maxSize -= $fileSync->getFileSize();
+
+				// check limit
+				if ((count($lockedFileSyncs) >= $maxCount) || ($maxSize < 0))
+				{
+					if($lastId !== null)
+					{
+						$lastId = $fileSync->getId();
+					}
+
+					$limitReached = true;
+					break;
+				}
+			}
+		}
+	}
+
+	public function deleteLocalSiblings()
+	{
+		KalturaLog::info("Delete siblings for file sync [{$this->getObjectId()}] with ID [{$this->getId()}]");
+
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
+		kFileSyncUtils::deleteSyncFileForKey($fileSyncKey, false, true);
 	}
 
 	private function generateKey()
@@ -167,7 +282,18 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
-	
+
+	protected function getServeUrl($entryId)
+	{
+		$dynamicAttributes = DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol());
+		$flavorAsset = assetPeer::retrieveById($this->getObjectId());
+		$dynamicAttributes->setFlavorAssets(array($flavorAsset));
+		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId($dynamicAttributes);
+		$urlManager->setDynamicAttributes($dynamicAttributes);
+		$url = $urlManager->buildServeFlavors();
+		return ($url[0]['urlPrefix'] . $url[0]['url']);
+	}
+
 	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
@@ -177,6 +303,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		if(is_null($storage->getProtocol()))
 		{
 			return null;
+		}
+
+		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
+		{
+			return $this->getServeUrl($entryId);
 		}
 
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
@@ -271,9 +402,35 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function isEncrypted () { return ($this->getFromCustomData("encryptionKey"))? true : false ; }
 	public function getIv() {return kConf::get("encryption_iv");}
 
+	public function getSrcPath () { return $this->getFromCustomData("srcPath"); }
+	public function setSrcPath ($v) { $this->putInCustomData("srcPath", $v);  }
+	public function getSrcEncKey () { return $this->getFromCustomData("srcEncKey"); }
+	public function setSrcEncKey ($v) { $this->putInCustomData("srcEncKey", $v);  }
 
+	public function getStorageClass () { return $this->getFromCustomData("storageClass"); }
+	public function setStorageClass ($v) { $this->putInCustomData("storageClass", $v);  }
+
+ 	/**
+	 * Create new fileSync With status pending and new storageId
+	 * @param $storageId
+	 * @return FileSync
+	 * @throws PropelException
+	 */
+	public function cloneToAnotherStorage($storageId)
+	{
+		$newfileSync = $this->copy(true);
+		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
+		$newfileSync->setSrcPath($this->getFullPath());
+		$newfileSync->setSrcEncKey($this->getSrcEncKey());
+		$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$newfileSync->setDc($storageId);
+    
+		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
+		list($root, $filePath) = kPathManager::getFilePathArr($fileSyncKey, $storageId);
+		$newfileSync->setFilePath($filePath);
+		return $newfileSync;
+	}
 }
-
 
 class FileSyncKey 
 {

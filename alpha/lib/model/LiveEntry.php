@@ -21,6 +21,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_EXPLICIT_LIVE = "explicit_live";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
+	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -51,7 +52,7 @@ abstract class LiveEntry extends entry
 		if ($liveThumbEntry && $liveThumbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
 			$fileSyncVersion = $partner->getLiveThumbEntryVersion();
-			$liveEntryKey = $liveThumbEntry->getSyncKey(entry::FILE_SYNC_ENTRY_SUB_TYPE_DATA,$fileSyncVersion);
+			$liveEntryKey = $liveThumbEntry->getSyncKey(kEntryFileSyncSubType::DATA,$fileSyncVersion);
 			$contentPath = kFileSyncUtils::getLocalFilePathForKey($liveEntryKey);
 			if ($contentPath)
 			{
@@ -73,15 +74,15 @@ abstract class LiveEntry extends entry
 	 */
 	protected static function validateFileSyncSubType($sub_type)
 	{
-		if(	$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || 
-			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY || 
-			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_THUMB || 
-			$sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_OFFLINE_THUMB )
+		if(	$sub_type == kEntryFileSyncSubType::LIVE_PRIMARY ||
+			$sub_type == kEntryFileSyncSubType::LIVE_SECONDARY ||
+			$sub_type == kEntryFileSyncSubType::THUMB ||
+			$sub_type ==kEntryFileSyncSubType::OFFLINE_THUMB )
 			{
 				return true;
 			}
 			
-			KalturaLog::log("Sub type provided [$sub_type] is not one of knowen LiveEntry sub types validating from parent");
+			KalturaLog::log("Sub type provided [$sub_type] is not one of known LiveEntry sub types validating from parent");
 			return parent::validateFileSyncSubType($sub_type);
 		
 	}
@@ -95,7 +96,7 @@ abstract class LiveEntry extends entry
 	 */
 	protected function getVersionForSubType($sub_type, $version = null)
 	{
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY && $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY && $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 			return 1;
 			
 		return parent::getVersionForSubType($sub_type, $version);
@@ -104,17 +105,17 @@ abstract class LiveEntry extends entry
 	/* (non-PHPdoc)
 	 * @see entry::generateFilePathArr($sub_type, $version)
 	 */
-	public function generateFilePathArr($sub_type, $version = null)
+	public function generateFilePathArr($sub_type, $version = null, $externalStorageMode = false )
 	{
 		static::validateFileSyncSubType($sub_type);
 		
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY || $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 		{
-			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type);
+			$res = myContentStorage::getGeneralEntityPath('entry/data', $this->getIntId(), $this->getId(), $sub_type, null, $externalStorageMode);
 			return array(myContentStorage::getFSContentRootPath(), $res);
 		}
 		
-		return parent::generateFilePathArr($sub_type, $version);
+		return parent::generateFilePathArr($sub_type, $version, $externalStorageMode);
 	}
 	
 	/* (non-PHPdoc)
@@ -122,7 +123,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function generateFileName( $sub_type, $version = null)
 	{
-		if($sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_PRIMARY || $sub_type == self::FILE_SYNC_ENTRY_SUB_TYPE_LIVE_SECONDARY)
+		if($sub_type == kEntryFileSyncSubType::LIVE_PRIMARY || $sub_type == kEntryFileSyncSubType::LIVE_SECONDARY)
 		{
 			return $this->getId() . '_' . $sub_type;
 		}
@@ -143,6 +144,15 @@ abstract class LiveEntry extends entry
 			$this->setRecordedEntryId(null);
 			$this->setRedirectEntryId(null);
 			$this->setCustomDataObj();
+		}
+		if (!$this->getBroadcastTime() && $this->isCustomDataModified(LiveEntry::CUSTOM_DATA_VIEW_MODE) && $this->getViewMode() == ViewMode::ALLOW_ALL)
+		{
+			$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
+			if (count($liveEntryServerNodes) > 0)
+			{
+				$this->setBroadcastTime(time());
+				$this->setCustomDataObj();
+			}
 		}
 		return parent::preUpdate($con);
 	}
@@ -295,6 +305,10 @@ abstract class LiveEntry extends entry
 	
 	public function setLastCuePointSyncTime ( $v )	{	$this->putInCustomData ( "last_cue_point_sync_time" , $v );	}
 	public function getLastCuePointSyncTime (  )	{	return (int) $this->getFromCustomData("last_cue_point_sync_time");	}
+
+	public function setBroadcastTime($v )	{	$this->putInCustomData ( self::CUSTOM_DATA_BROADCAST_TIME , $v );	}
+	public function getBroadcastTime (  )	{	return $this->getFromCustomData( self::CUSTOM_DATA_BROADCAST_TIME);	}
+
 
 	public function getPushPublishEnabled()
 	{
@@ -543,7 +557,10 @@ abstract class LiveEntry extends entry
 
 	/**
 	 * @param EntryServerNodeType $mediaServerIndex
-	 * @param $hostname
+	 * @param string $hostname
+	 * @param KalturaEntryServerNodeStatus $liveEntryStatus
+	 * @param string $applicationName
+	 * @return LiveEntryServerNode
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 * @throws PropelException
@@ -564,10 +581,9 @@ abstract class LiveEntry extends entry
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
 			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
-			if($this->storeInCache($key) && $this->isMediaServerRegistered($mediaServerIndex, $hostname))
+			if($this->storeInCache($key))
 			{
 				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
-				return;
 			}
 		}
 		
@@ -647,16 +663,6 @@ abstract class LiveEntry extends entry
 	private function getEntryServerNodeCacheKey(EntryServerNode $entryServerNode)
 	{
 		return $entryServerNode->getEntryId()."_".$entryServerNode->getServerNodeId()."_".$entryServerNode->getServerType();
-	}
-
-	protected function isMediaServerRegistered($index, $hostname)
-	{
-		/* @var $dbLiveEntryServerNode LiveEntryServerNode*/
-		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $index);
-		if ($dbLiveEntryServerNode)
-			return true;
-		KalturaLog::info("mediaServer is not registered. hostname: $hostname , index: $index ");
-		return false;
 	}
 	
 	/**
