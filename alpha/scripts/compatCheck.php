@@ -63,7 +63,6 @@ $APIV3_TESTED_ACTIONS = array(
 		'syndicationFeed.execute',			// api_v3/getFeed.php
 		'playlist.execute',
 		'*.is',
-		'*.getplaybackcontext',
 		'*.get',
 		'*.list',
 		'*.count',

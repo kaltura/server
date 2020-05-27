@@ -29,7 +29,8 @@ class kNetworkUtils
 		$version = $parts[0];
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
-		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');;
+
+		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');
 
 		$actualSignature = self::calculateSignature($version, $timestamp, $url);
 		if(!$actualSignature)
@@ -56,4 +57,6 @@ class kNetworkUtils
 		}
 		return base64_encode(hash_hmac('sha256', "$version,$timestamp,$url", $secret, true));
 	}
+}
+
 }
