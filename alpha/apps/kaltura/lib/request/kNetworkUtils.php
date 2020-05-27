@@ -28,8 +28,8 @@ class kNetworkUtils
 		$version = $parts[0];
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
-		$url = $_SERVER['REQUEST_URI'];
-		$secret = kConf::get('authentication_secret','local', null);
+		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), "/");
+		$secret = kConf::get('vod_packager_secure_token','local', null);
 		if (!$secret)
 		{
 			KalturaLog::warning("Missing authentication_secret in configuration");
