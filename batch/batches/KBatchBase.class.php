@@ -658,12 +658,12 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function createDir($path, $rights = 0777)
 	{
-		if(!is_dir($path))
+		if(!kFile::isDir($path))
 		{
-			if(!file_exists($path))
+			if(!kFile::checkFileExists($path))
 			{
 				KalturaLog::info("Creating temp directory [$path]");
-				mkdir($path, $rights, true);
+				kFile::mkdir($path, $rights, true);
 			}
 			else
 			{
