@@ -208,7 +208,7 @@ class KGenericProcessor
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
 		$pager->pageSize = 500;
-		while (true)
+		do
 		{
 			$retries = 0;
 			do
@@ -250,6 +250,8 @@ class KGenericProcessor
 			}
 			$this->handlePager($pager);
 		}
+		while ($result->objects->count == $pager->pageSize);
+
 		return $objectsData;
 	}
 
