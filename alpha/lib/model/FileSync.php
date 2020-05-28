@@ -310,7 +310,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 		if($kalturaPeriodicStorage)
 		{
-			$url = $storage->getPathPrefix() . $url;
+			$url = '/direct' . $url;
 			$authParams = $this->addKalturaAuthParams($url);
 			$url .= $authParams;
 		}
@@ -330,7 +330,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$timestamp = time();
 		$signature = kNetworkUtils::calculateSignature($version, $timestamp, $url);
 
-		return '?version=' . $version . '&time=' . $timestamp . '&kalSigning=' . $signature;
+		return '?kaltura_auth=' . $version . ',' . $timestamp . ',' . $signature;
 	}
 
 	/* (non-PHPdoc)
