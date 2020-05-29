@@ -231,7 +231,7 @@ class uiConfDeployment
 	public static function deprecateOldUiConfs($tag)
 	{
 		//Selects all the ui confs with the given $newTag
-		$con = Propel::getConnection();
+		$con = Propel::getConnection("propel");
 		$oldConfCriteria = new Criteria();
 		$oldConfCriteria->add(uiConfPeer::TAGS, "%{$tag}%", Criteria::LIKE);
 		$oldConfCriteria->add(uiConfPeer::PARTNER_ID, self::$partnerId, Criteria::EQUAL);
@@ -239,42 +239,38 @@ class uiConfDeployment
 		$oldConfCriteria->addSelectColumn(uiConfPeer::TAGS);
 
 		$retries = 3;
-		do
+		//Select ID, tags from ui_conf where tags like %$newTag%;
+		$uiConfs = BasePeer::doSelect($oldConfCriteria, $con);
+
+		$totalDepractedCount = 0;
+		//For each uiconf:
+		foreach ($uiConfs as $oldUiConf)
 		{
-			//Select ID, tags from ui_conf where tags like %$newTag%;
-			$uiConfs = BasePeer::doSelect($oldConfCriteria, $con);
+			$newTag = $oldUiConf[1];
+			$deprecatedTag = $newTag;
+			$deprecatedTag = str_replace("autodeploy", "deprecated", $deprecatedTag);
 
-			$totalDepractedCount = 0;
-			//For each uiconf:
-			foreach ($uiConfs as $oldUiConf)
-			{
-				$newTag = $oldUiConf[1];
-				$deprecatedTag = $newTag;
-				$deprecatedTag = str_replace("autodeploy", "deprecated", $deprecatedTag);
+			KalturaLog::debug("newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner " . self::$partnerId);
 
-				KalturaLog::debug("newTag is:         {$newTag} \nDeprecatedTag is : {$deprecatedTag} for partner " . self::$partnerId);
+			$confCriteria = new Criteria();
+			$confCriteria->add(uiConfPeer::ID, $oldUiConf[0]);
 
-				$confCriteria = new Criteria();
-				$confCriteria->add(uiConfPeer::ID, $oldUiConf[0]);
+			$deprecatedConfValues = new Criteria();
+			$deprecatedConfValues->add(uiConfPeer::TAGS, $deprecatedTag);
 
-				$deprecatedConfValues = new Criteria();
-				$deprecatedConfValues->add(uiConfPeer::TAGS, $deprecatedTag);
+			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID
+			$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
 
-				//Update set tags = $deprecatedTag where ID = $oldUiConf->ID
-				$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
+			KalturaLog::debug("uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag}");
 
-				KalturaLog::debug("uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag}");
+			$totalDepractedCount += $deprecatedCount;
+		}
 
-				$totalDepractedCount += $deprecatedCount;
-			}
+		//Add the status check to the select factor
+		KalturaLog::debug("{$totalDepractedCount} uiConfs were updated");
 
-			//Add the status check to the select factor
-			KalturaLog::debug("{$totalDepractedCount} uiConfs were updated");
-
-			sleep(3);
-			$count = uiConfPeer::doCount($oldConfCriteria);
-			$retries--;
-		}while($count > 0 && $retries > 0);
+		sleep(3);
+		$count = uiConfPeer::doCount($oldConfCriteria);
 
 		if ($count > 0)
 		{
