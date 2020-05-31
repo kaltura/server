@@ -917,7 +917,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$externalFileSyncs)
 			throw new KalturaAPIException(KalturaErrors::NO_EXTERNAL_CONTENT_EXISTS);
 
-		$fileSyncs = kFileSyncUtils::getReadyInternalFileSyncsForKey($srcSyncKey);
+		$fileSyncs = kFileSyncUtils::getReadyKalturaInternalFileSyncsForKey($srcSyncKey);
 		foreach ($fileSyncs as $fileSync){
 			/* @var $fileSync FileSync*/
 			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);

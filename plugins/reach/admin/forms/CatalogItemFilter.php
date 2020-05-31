@@ -80,5 +80,17 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 			'onclick' => "exportToCsv($('#filter_input').val())",
 			'decorators' => array('ViewHelper'),
 		));
+
+		$this->addElement('file', 'importCSV', array(
+			'label' => 'Import CSV:'
+		));
+
+		$this->addElement('button', 'import', array(
+			'ignore' => true,
+			'label' => 'import',
+			'onclick' => "importFromCsv()",
+			'decorators' => array('ViewHelper'),
+		));
+
 	}
 }

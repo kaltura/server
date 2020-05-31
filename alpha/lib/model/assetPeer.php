@@ -809,4 +809,14 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->addDescendingOrderByColumn(assetPeer::INT_ID);
 		return self::doSelect($c);
 	}
+
+	public static function retrieveReadyFlavorsByEntryIdAndType($entryId, $flavorTypes = array())
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::STATUS, asset::ASSET_STATUS_READY);
+		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
+		$c->addDescendingOrderByColumn(assetPeer::INT_ID);
+		return self::doSelect($c);
+	}
 }

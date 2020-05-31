@@ -247,6 +247,12 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $srcEncKey;
+
+	/**
+	 *
+	 * @var string
+	 */
+	public $storageClass;
 	
 	private static $map_between_objects = array
 	(
@@ -273,6 +279,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 		"originalId",
 		"srcPath",
 		"srcEncKey",
+		"storageClass",
 	);
 	
 	public function getMapBetweenObjects()

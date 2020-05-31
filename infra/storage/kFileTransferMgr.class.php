@@ -252,8 +252,9 @@ abstract class kFileTransferMgr
 
 			case kFileTransferMgrType::S3:
 				return new s3Mgr($options);
-				
+
 			case kFileTransferMgrType::LOCAL:
+			case kFileTransferMgrType::KALTURA_DC:
 			    return new localMgr($options);
 			    
 			case kFileTransferMgrType::ASPERA:
