@@ -193,17 +193,19 @@ class StorageProfileService extends KalturaBaseService
 			$idLimit = min($lastId + self::MAX_FILESYNC_ID_RANGE, $maxId);
 			$fileSyncs = FileSync::getFileSyncsChunkNoCriteria($baseCriteria, $lastId, $idLimit);
 
-			if (!$fileSyncs)
-			{
-				break;
-			}
-
 			if (count($fileSyncs) < KalturaFileSyncFilter::MAX_FILESYNCS_PER_CHUNK)
 			{
-				$done = true;
+				$lastId = $idLimit;
+			}
+			else
+			{
+				$lastId = end($fileSyncs)->getId();
 			}
 
-			$lastId = end($fileSyncs)->getId();
+			if (!$fileSyncs)
+			{
+				continue;
+			}
 
 			self::filterFileSyncs($fileSyncs, $lastId, $done, $createdAtLessThanOrEqual);
 
