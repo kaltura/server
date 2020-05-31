@@ -1,11 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage live.liveStream
- *
- * Create live dash delivery profile
- *
- * No need to re-run after server code deploy
+ * Add permissions to user validateHashKey
  */
 //require_once (__DIR__ . '/../../bootstrap.php');
 
