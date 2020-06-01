@@ -238,7 +238,6 @@ class uiConfDeployment
 		$oldConfCriteria->addSelectColumn(uiConfPeer::ID);
 		$oldConfCriteria->addSelectColumn(uiConfPeer::TAGS);
 
-		$retries = 3;
 		//Select ID, tags from ui_conf where tags like %$newTag%;
 		$uiConfs = BasePeer::doSelect($oldConfCriteria, $con);
 
