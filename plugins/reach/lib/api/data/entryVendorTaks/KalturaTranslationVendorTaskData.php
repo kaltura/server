@@ -7,7 +7,7 @@
 class KalturaTranslationVendorTaskData extends KalturaVendorTaskData
 {
 	/**
-	 * The id of the caption asset object
+	 * Optional - The id of the caption asset object
 	 * @insertonly
 	 * @var string
 	 */
@@ -60,17 +60,6 @@ class KalturaTranslationVendorTaskData extends KalturaVendorTaskData
 		}
 
 		return parent::validateForInsert($propertiesToSkip);
-	}
-
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		/* @var $sourceObject kTranslationVendorTaskData */
-		if(isset($this->captionAssetId) && $sourceObject->getCaptionAssetId() != $this->captionAssetId)
-		{
-			$this->validateCaptionAsset($this->captionAssetId);
-		}
-
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
 }
