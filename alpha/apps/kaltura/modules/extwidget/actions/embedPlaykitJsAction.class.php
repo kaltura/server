@@ -18,6 +18,7 @@ class embedPlaykitJsAction extends sfAction
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
+	const CANARY = "{canary}";
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
 
@@ -511,17 +512,20 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
-	private function setLatestOrBetaVersionNumber()
+	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
 		$isLatestVersionRequired = array_search(self::LATEST, $this->bundleConfig) !== false;
 		$isBetaVersionRequired = array_search(self::BETA, $this->bundleConfig) !== false;
+		$isCanaryVersionRequired = array_search(self::CANARY, $this->bundleConfig) !== false;
+
 		$isAllPackagesSameVersion = true;
 
-		if ($isLatestVersionRequired || $isBetaVersionRequired) {
+		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
 
 			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
+			list($canaryVersionMap, $canaryProductVersion) = $this->getConfigByVersion("canary");
 
 			//package version to compare, product version will save jut if all the versions in uiConf similar
 			$packageVersion = reset( $this->bundleConfig );
@@ -536,6 +540,10 @@ class embedPlaykitJsAction extends sfAction
 					$this->bundleConfig[$key] = $betaVersionMap[$key];
 				}
 
+				if ($val == self::CANARY && $canaryVersionMap != null && isset($canaryVersionMap[$key])) {
+					$this->bundleConfig[$key] = $canaryVersionMap[$key];
+				}
+
 				if($packageVersion !== $val) {
 					$isAllPackagesSameVersion = false;
 				}
@@ -547,6 +555,9 @@ class embedPlaykitJsAction extends sfAction
 				}
 				if($packageVersion === self::BETA) {
 					$this->setProductVersion($this->playerConfig, $betaProductVersion);
+				}
+				if($packageVersion === self::CANARY) {
+					$this->setProductVersion($this->playerConfig, $canaryProductVersion);
 				}
 			}
 
@@ -637,8 +648,8 @@ class embedPlaykitJsAction extends sfAction
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
-		$this->setLatestOrBetaVersionNumber();
 
+        $this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
 
@@ -656,11 +667,11 @@ class embedPlaykitJsAction extends sfAction
 		}
 		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
 	}
-	
+
 	public function getRequestParameter($name, $default = null)
 	{
 		$returnValue = parent::getRequestParameter($name, $default);
 		return $returnValue ? $returnValue : $default;
 	}
-	
+
 }
