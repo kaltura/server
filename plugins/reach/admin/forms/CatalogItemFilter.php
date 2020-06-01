@@ -82,7 +82,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		));
 
 		$this->addElement('file', 'importCSV', array(
-			'label' => 'Import CSV:',
+			'label' => 'Import CSV:'
 		));
 
 		$this->addElement('button', 'import', array(
@@ -98,7 +98,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		));
 
 		$this->addElement('button', 'getBulkUplodaResult', array(
-			'ignore' => true,
+			'ignore' 	=> true,
 			'label'		=> 'Get import result',
 			'onclick'	=> "getBulkUploadResult($('#bulkUploadId').val())",
 			'decorators' => array('ViewHelper')
