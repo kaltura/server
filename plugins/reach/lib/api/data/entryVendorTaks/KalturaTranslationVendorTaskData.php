@@ -19,7 +19,7 @@ class KalturaTranslationVendorTaskData extends KalturaVendorTaskData
 	);
 
 	/* (non-PHPdoc)
-	 * @see KalturaCuePoint::getMapBetweenObjects()
+	 * @see KalturaObject::getMapBetweenObjects()
 	 */
 	public function getMapBetweenObjects()
 	{
