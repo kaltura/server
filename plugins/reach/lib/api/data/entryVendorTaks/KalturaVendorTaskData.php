@@ -18,6 +18,10 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			case 'kAlignmentVendorTaskData':
 				$taskData = new KalturaAlignmentVendorTaskData();
 				break;
+
+			case 'kTranslationVendorTaskData':
+				$taskData = new KalturaTranslationVendorTaskData();
+				break;
 		}
 		
 		if ($taskData)
@@ -25,5 +29,14 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			$taskData->fromObject($sourceObject, $responseProfile);
 		
 		return $taskData;
+	}
+
+	protected function validateCaptionAsset($captionAssetId)
+	{
+		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
+		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
+		{
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+		}
 	}
 }

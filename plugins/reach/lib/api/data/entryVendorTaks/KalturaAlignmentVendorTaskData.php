@@ -122,13 +122,4 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_FORMAT_MISMATCH, $transcriptAssetId, $expectedType);
 		}
 	}
-	
-	protected function validateCaptionAsset($captionAssetId)
-	{
-		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
-		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
-		{
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-		}
-	}
 }
