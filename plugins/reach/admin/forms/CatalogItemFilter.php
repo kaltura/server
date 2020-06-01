@@ -82,7 +82,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		));
 
 		$this->addElement('file', 'importCSV', array(
-			'label' => 'Import CSV:'
+			'label' => 'Import CSV:',
 		));
 
 		$this->addElement('button', 'import', array(
@@ -92,5 +92,16 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 			'decorators' => array('ViewHelper'),
 		));
 
+		$this->addElement('text', 'bulkUploadId', array(
+			'label' => 'Bulk Upload Result:',
+			'decorators' => array('ViewHelper'),
+		));
+
+		$this->addElement('button', 'getBulkUplodaResult', array(
+			'ignore' => true,
+			'label'		=> 'Get import result',
+			'onclick'	=> "getBulkUploadResult($('#bulkUploadId').val())",
+			'decorators' => array('ViewHelper')
+		));
 	}
 }
