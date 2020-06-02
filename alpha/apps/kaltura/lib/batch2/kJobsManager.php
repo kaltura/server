@@ -523,7 +523,7 @@ class kJobsManager
 			
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
 			$root = $sharedStorageProfile->getStorageBaseDir();
-			$sharedPath = kFile::fixPath($root . DIRECTORY_SEPARATOR . $path);
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			
 			$convertData->setDestFileSyncSharedPath($sharedPath);
 		}
