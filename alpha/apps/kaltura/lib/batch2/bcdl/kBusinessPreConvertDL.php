@@ -204,7 +204,7 @@ class kBusinessPreConvertDL
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 
-		if(file_exists($capturedPath))
+		if(kFile::checkFileExists($capturedPath))
 		{
 			list($width, $height, $type, $attr) = getimagesize($capturedPath);
 			$thumbAsset->setWidth($width);
@@ -213,7 +213,7 @@ class kBusinessPreConvertDL
 		}
 
 		$logPath = $capturedPath . '.log';
-		if(file_exists($logPath))
+		if(kFile::checkFileExists($logPath))
 		{
 			$thumbAsset->incLogFileVersion();
 			$thumbAsset->save();
