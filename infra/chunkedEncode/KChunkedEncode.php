@@ -643,7 +643,7 @@
 				if(($rv=self::concatChunk($oFh, $chunkFileName))===false)
 					break;
 			}
-			fclose(oFh);
+			fclose($oFh);
 			return $rv;
 		}
 		
