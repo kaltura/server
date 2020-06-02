@@ -30,7 +30,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	'executionMode' config field used to differntiate between the modes, 
 	 *	allowed values - 'standalone'/'memcache'
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var, $urgency, $jobId = null, $sharedChunkPath = null)
+	protected function execute_conversion_cmdline($command, &$returnVar, $urgency, $jobId = null, $sharedChunkPath = null)
 	{
 		KalturaLog::log($command);
 		if(strstr($command,"ffmpeg")===false)
