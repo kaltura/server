@@ -72,14 +72,30 @@
 				 */
 			$pInfo = pathinfo($params->output);
 			$setup->output = realpath($pInfo['dirname'])."/".$pInfo['basename'];
+			
+			//Build remote shared path to follow same setting as output path
+			if($setup->sharedChunkPath)
+			{
+				$setup->sharedChunkPath .= $pInfo['basename'];
+			}
 
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
 				$setup->output.= "_".$this->chunkEncodeToken."/";
-				if(!file_exists($setup->output)) {
+				if(!kFile::checkFileExists($setup->output)) {
 					KalturaLog::log("Create tmp folder:".$setup->output);
-					mkdir($setup->output);
+					kFile::mkdir($setup->output);
 				}
 				$setup->output.= $pInfo['filename'];
+				
+				if($setup->sharedChunkPath)
+				{
+					$setup->sharedChunkPath .= "_".$this->chunkEncodeToken."/";
+					if(!kFile::checkFileExists($setup->sharedChunkPath)) {
+						KalturaLog::log("Create tmp folder:".$setup->sharedChunkPath);
+						kFile::fullMkdir($setup->sharedChunkPath);
+					}
+					$setup->sharedChunkPath.= $pInfo['filename'];
+				}
 			}
 			
 				/*
@@ -597,6 +613,69 @@
 			KalturaLog::log($cmdLine);
 			return $cmdLine;
 		}
+		
+		/********************
+		 *
+		 */
+		private static function concatChunk($fhd, $fileName, $rdSz=10000000)
+		{
+			$fileName = kFile::realPath($fileName);
+			if(($ifhd=fopen($fileName,"rb"))===false){
+				return false;
+			}
+			
+			$wrSz=0;
+			while(!feof($ifhd)){
+				$iBuf=fread($ifhd, $rdSz);
+				if($iBuf===false){
+					return false;
+				}
+				if(($sz=fwrite($fhd, $iBuf, $rdSz))===false){
+					return false;
+				}
+				$wrSz+=$sz;
+			}
+			fclose($ifhd);
+			KalturaLog::log("sz:$wrSz  ".$fileName);
+			return true;
+		}
+		
+		/********************
+		 *
+		 */
+		public function ConcatChunks()
+		{
+			$videoFilename = $this->getSessionName("video");
+			
+			$oFh=fopen($videoFilename,"wb");
+			if($oFh===false){
+				return false;
+			}
+			
+			stream_wrapper_restore('http');
+			stream_wrapper_restore('https');
+			
+			foreach($this->chunkDataArr as $idx=>$chunkData){
+				if(isset($chunkData->toFix))
+					$chunkFileName = $this->getChunkName($idx,"fix");
+				elseif($this->setup->sharedChunkPath)
+				{
+					$chunkFileName = $this->getChunkName($idx, "shared");
+				}
+				else
+				{
+					$chunkFileName = $this->getChunkName($idx);
+				}
+				if(($rv=self::concatChunk($oFh, $chunkFileName))===false)
+					break;
+			}
+			fclose($oFh);
+			
+			stream_wrapper_unregister('https');
+			stream_wrapper_unregister('http');
+			
+			return $rv;
+		}
 
 		/********************
 		 *
@@ -604,17 +683,21 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
+			$videoFilename = $this->getSessionName("video");
+			$sharedMode = $this->setup->sharedChunkPath ? "shared" : null;
 			
+			/*
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				if(isset($chunkData->toFix))
-					$vidConcatStr.= $this->getChunkName($idx,"fix").'|';
+					$chunkFileName = $this->getChunkName($idx,"fix");
 				else 
 					$vidConcatStr.= $this->getChunkName($idx).'|';
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
-
+			*/
+			
 			$setup = $this->setup;
 			$params = $this->params;
 			$audioInputParams = null;
@@ -642,7 +725,7 @@
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
-			$mergeCmd.= " -i $vidConcatStr";
+			$mergeCmd.= " -i $videoFilename";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
 				$mergeCmd.= " ".$params->formatParams;
@@ -885,6 +968,11 @@
 			case "audio":
 				$name = $this->setup->output."_audio";
 				break;
+			case "shared_audio":
+				if(!$this->setup->sharedChunkPath)
+					return null;
+				$name = $this->setup->sharedChunkPath . "_audio";
+				break;
 			case "qpfile":
 				$name = $this->setup->output."_qpfile";
 				break;
@@ -898,7 +986,7 @@
 				$name = $this->setup->output."_concat.log";
 				break;
 			default:
-				$name.= $mode;
+				$name = $this->setup->output."_$mode";
 				break;
 			}
 			return $name;
@@ -912,6 +1000,13 @@
 			$name = $this->setup->output."_$this->chunkEncodeToken"."_$chunkIdx.";
 			switch($mode){
 			case null:
+				$name.= "$this->videoChunkPostfix".$chunkIdx;
+				break;
+			case "shared":
+				if(!$this->setup->sharedChunkPath)
+					return null;
+					
+				$name = $this->setup->sharedChunkPath . "_$this->chunkEncodeToken"."_$chunkIdx.";
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
 			case "fix":

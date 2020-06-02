@@ -580,7 +580,7 @@
 			$this->storeManager->SaveJob($job);
 	
 			$job->state = $job::STATE_PENDING;
-			$job->attempt++;
+			$job->attempt = isset($job->attempt) ? ($job->attempt + 1) : 1;
 			if($this->storeManager->AddJob($job)===false) {
 				KalturaLog::log("FAILED to retry job($job->id)");
 				return false;
