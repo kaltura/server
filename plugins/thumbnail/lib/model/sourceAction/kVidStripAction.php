@@ -6,13 +6,11 @@
 
 class kVidStripAction extends kVidAction
 {
-	const DEFAULT_BGC = "none";
 	protected $numberOfSlices;
 	protected $startSec;
 	protected $endSec;
 	protected $newWidth;
 	protected $newHeight;
-	protected $videoLength;
 
 	protected function initParameterAlias()
 	{
@@ -58,6 +56,10 @@ class kVidStripAction extends kVidAction
 		}
 	}
 
+	/**
+	 * @return kThumbnailSource
+	 * @throws kThumbnailException|ImagickException
+	 */
 	protected function doAction()
 	{
 		$sizeInitialized = false;
@@ -110,6 +112,10 @@ class kVidStripAction extends kVidAction
 		return $strip;
 	}
 
+	/**
+	 * @return float|int
+	 * @throws kThumbnailException
+	 */
 	protected function calculateInterval()
 	{
 		/** @var entry $entry*/
@@ -125,7 +131,6 @@ class kVidStripAction extends kVidAction
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
-		$interval = ($this->endSec - $this->startSec) / $this->numberOfSlices;
-		return $interval;
+		return ($this->endSec - $this->startSec) / $this->numberOfSlices;
 	}
 }
