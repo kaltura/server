@@ -1,4 +1,20 @@
+# Propus 16.4.0  #
+## Adding permission to interactivity get ##
+Issue Type: Bug
+Issue ID : PATH-837
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_02_update_interactivity_get_action_permissions.php
+
 # Propus 16.3.0  #
+## Adding permission to tag search ##
+Issue Type: Task
+Issue ID : PLAT-10930
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_05_28_add_permission_analytics_base_to_tag_search.php
+
+
 ## Add periodic storage delete local batch ##
 Issue Type: Task
 Issue ID : PLAT-10894

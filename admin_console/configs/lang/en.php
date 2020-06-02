@@ -392,8 +392,56 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::KSR' => 'Kaltura Screen Recorder',
 	'Kaltura_Client_Enum_UiConfObjType::WEBCASTING' => 'Kaltura Webcasting Studio',
 	'Kaltura_Client_Enum_UiConfObjType::CLIPPER' => 'KMC Clipper',
-	 
-    
+
+	//audit trail
+	'Kaltura_Client_Enum_AuditTrailObjectType::ACCESS_CONTROL' => 'ACCESS_CONTROL',
+	'Kaltura_Client_Enum_AuditTrailObjectType::BATCH_JOB' => 'BATCH_JOB',
+	'Kaltura_Client_Enum_AuditTrailObjectType::CATEGORY' => 'CATEGORY',
+	'Kaltura_Client_Enum_AuditTrailObjectType::CONVERSION_PROFILE_2' => 'CONVERSION_PROFILE_2',
+	'Kaltura_Client_Enum_AuditTrailObjectType::EMAIL_INGESTION_PROFILE' => 'EMAIL_INGESTION_PROFILE',
+	'Kaltura_Client_Enum_AuditTrailObjectType::ENTRY' => 'ENTRY',
+	'Kaltura_Client_Enum_AuditTrailObjectType::FILE_SYNC' => 'FILE_SYNC',
+	'Kaltura_Client_Enum_AuditTrailObjectType::FLAVOR_ASSET' => 'FLAVOR_ASSET',
+	'Kaltura_Client_Enum_AuditTrailObjectType::THUMBNAIL_ASSET' => 'THUMBNAIL_ASSET',
+	'Kaltura_Client_Enum_AuditTrailObjectType::FLAVOR_PARAMS' => 'FLAVOR_PARAMS',
+	'Kaltura_Client_Enum_AuditTrailObjectType::THUMBNAIL_PARAMS' => 'THUMBNAIL_PARAMS',
+	'Kaltura_Client_Enum_AuditTrailObjectType::FLAVOR_PARAMS_CONVERSION_PROFILE' => 'FLAVOR_PARAMS_CONVERSION_PROFILE',
+	'Kaltura_Client_Enum_AuditTrailObjectType::FLAVOR_PARAMS_OUTPUT' => 'FLAVOR_PARAMS_OUTPUT',
+	'Kaltura_Client_Enum_AuditTrailObjectType::THUMBNAIL_PARAMS_OUTPUT' => 'THUMBNAIL_PARAMS_OUTPUT',
+	'Kaltura_Client_Enum_AuditTrailObjectType::KSHOW' => 'KSHOW',
+	'Kaltura_Client_Enum_AuditTrailObjectType::KSHOW_KUSER' => 'KSHOW_KUSER',
+	'Kaltura_Client_Enum_AuditTrailObjectType::KUSER' => 'KUSER',
+	'Kaltura_Client_Enum_AuditTrailObjectType::MEDIA_INFO' => 'MEDIA_INFO',
+	'Kaltura_Client_Enum_AuditTrailObjectType::MODERATION' => 'MODERATION',
+	'Kaltura_Client_Enum_AuditTrailObjectType::PARTNER' => 'PARTNER',
+	'Kaltura_Client_Enum_AuditTrailObjectType::ROUGHCUT' => 'ROUGHCUT',
+	'Kaltura_Client_Enum_AuditTrailObjectType::SYNDICATION' => 'SYNDICATION',
+	'Kaltura_Client_Enum_AuditTrailObjectType::UI_CONF' => 'UI_CONF',
+	'Kaltura_Client_Enum_AuditTrailObjectType::UPLOAD_TOKEN' => 'UPLOAD_TOKEN',
+	'Kaltura_Client_Enum_AuditTrailObjectType::WIDGET' => 'WIDGET',
+	'Kaltura_Client_Enum_AuditTrailObjectType::METADATA' => 'METADATA',
+	'Kaltura_Client_Enum_AuditTrailObjectType::METADATA_PROFILE' => 'METADATA_PROFILE',
+	'Kaltura_Client_Enum_AuditTrailObjectType::USER_LOGIN_DATA' => 'USER_LOGIN_DATA',
+	'Kaltura_Client_Enum_AuditTrailObjectType::USER_ROLE' => 'USER_ROLE',
+	'Kaltura_Client_Enum_AuditTrailObjectType::PERMISSION' => 'PERMISSION',
+	'Kaltura_Client_Enum_AuditTrailObjectType::REACH_PROFILE' => 'REACH_PROFILE',
+
+
+	'Kaltura_Client_Enum_AuditTrailAction::CREATED' => 'CREATED',
+	'Kaltura_Client_Enum_AuditTrailAction::COPIED' => 'COPIED',
+	'Kaltura_Client_Enum_AuditTrailAction::CHANGED' => 'CHANGED',
+	'Kaltura_Client_Enum_AuditTrailAction::DELETED' => 'DELETED',
+	'Kaltura_Client_Enum_AuditTrailAction::VIEWED' => 'VIEWED',
+	'Kaltura_Client_Enum_AuditTrailAction::CONTENT_VIEWED' => 'CONTENT_VIEWED',
+	'Kaltura_Client_Enum_AuditTrailAction::FILE_SYNC_CREATED' => 'FILE_SYNC_CREATED',
+	'Kaltura_Client_Enum_AuditTrailAction::RELATION_ADDED' => 'RELATION_ADDED',
+	'Kaltura_Client_Enum_AuditTrailAction::RELATION_REMOVED' => 'RELATION_REMOVED',
+
+	'Kaltura_Client_Enum_AuditTrailFileSyncType::FILE' => 'FILE',
+	'Kaltura_Client_Enum_AuditTrailFileSyncType::LINK' => 'LINK',
+	'Kaltura_Client_Enum_AuditTrailFileSyncType::URL' => 'URL',
+
+
 	//batch index
 	'batch intro text' => 'In this page you can manage the tasks of your online entries.',
 
