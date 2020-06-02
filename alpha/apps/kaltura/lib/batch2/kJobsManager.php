@@ -516,15 +516,29 @@ class kJobsManager
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
 		
-		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
+		if($partner->getSharedStorageProfileId())
 		{
-			$pathMgr = new kS3SharedPathManager();
-			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-			$sharedPath = kFile::fixPath($root . $path);
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
 			
-			KalturaLog::debug("TTT:: shared path $sharedPath");
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+			$root = $sharedStorageProfile->getStorageBaseDir();
+			$sharedPath = kFile::fixPath($root . DIRECTORY_SEPARATOR . $path);
+			
 			$convertData->setDestFileSyncSharedPath($sharedPath);
 		}
+		
+//		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
+//		{
+//			$pathMgr = new kS3SharedPathManager();
+//			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+//			$sharedPath = kFile::fixPath($root . $path);
+//
+//			KalturaLog::debug("TTT:: shared path $sharedPath");
+//			$convertData->setDestFileSyncSharedPath($sharedPath);
+//
+//			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+//		}
 
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
@@ -1442,7 +1456,7 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
 
-		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || !in_array($srcFileSync->getDc(), kDataCenterMgr::getDcIds()))
+		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || in_array($srcFileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
 		}
