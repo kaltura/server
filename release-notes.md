@@ -1,3 +1,11 @@
+# Propus 16.4.0  #
+## Adding permission to interactivity get ##
+Issue Type: Bug
+Issue ID : PATH-837
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_02_update_interactivity_get_action_permissions.php
+
 # Propus 16.3.0  #
 ## Adding permission to tag search ##
 Issue Type: Task
