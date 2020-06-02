@@ -43,6 +43,11 @@ class kEntrySource extends kThumbnailSource
 		return $this->dbEntry;
 	}
 
+	/**
+	 * @return Imagick
+	 * @throws ImagickException
+	 * @throws kThumbnailException
+	 */
 	public function getImage()
 	{
 		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)

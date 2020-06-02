@@ -29,6 +29,7 @@ class kImageTransformationStep
 	/**
 	 * @param array $transformationParameters
 	 * @return Imagick
+	 * @throws kThumbnailException
 	 */
 	public function execute(&$transformationParameters)
 	{

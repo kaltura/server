@@ -11,15 +11,15 @@ abstract class kSourceAction extends kThumbnailAction
 
 	/**
 	 * @return kThumbnailSource
-	 * @throws KalturaAPIException
+	 * @throws kThumbnailException
 	 */
 	protected abstract function doAction();
 
 	/**
 	 * @param kThumbnailSource $source
 	 * @param array $transformationParameters
-	 * @return kThumbnailSource $source
-	 * @throws KalturaAPIException
+	 * @return kThumbnailSource
+	 * @throws kThumbnailException
 	 */
 	public function execute($source, &$transformationParameters)
 	{

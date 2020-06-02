@@ -37,6 +37,10 @@ class kCompositeAction extends kImagickAction
 		$this->opacity = $this->getIntActionParameter(kThumbnailParameterName::OPACITY);
 	}
 
+	/**
+	 * @return void
+	 * @throws kThumbnailException
+	 */
 	protected function validateInput()
 	{
 		if($this->opacity && ($this->opacity < self::MIN_OPACITY || $this->opacity > self::MAX_OPACITY))
