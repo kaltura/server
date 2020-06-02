@@ -268,7 +268,6 @@ class uiConfDeployment
 		//Add the status check to the select factor
 		KalturaLog::debug("{$totalDepractedCount} uiConfs were updated");
 
-		sleep(3);
 		$count = uiConfPeer::doCount($oldConfCriteria);
 
 		if ($count > 0)
