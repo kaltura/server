@@ -11,10 +11,10 @@
 <?php if($this->logFileUrl): ?>
     <var> <?php
 		echo '<b> logFileUrl: </b> <br>';
-        $ch = curl_init();
+		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $this->logFileUrl);
 		$response =  curl_exec ($ch);
-        curl_close ($ch);  ?>
+		curl_close ($ch);  ?>
     </var>
 <?php endif; ?>
 

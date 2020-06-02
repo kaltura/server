@@ -109,7 +109,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 			'import_group',
 			array(
 				'decorators' => array('FormElements', 'Fieldset'),
-
-			));
+				)
+		);
 	}
 }
