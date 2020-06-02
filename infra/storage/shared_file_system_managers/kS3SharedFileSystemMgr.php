@@ -23,8 +23,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	//This works only for SDK V3 for V2 need to use ‌NoSuchKey && getAwsErrorCode
 	//const AWS_404_ERROR = 'NotFound';
 	
-	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getExceptionCode";
-	const AWS_404_ERROR = '‌NoSuchKey';
+	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getStatusCode";
+	const AWS_404_ERROR = 404;
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -339,7 +339,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		list($bucket, $key) = $this->getBucketAndFilePath($path);
-		$dirList = explode($key, "/");
+		$dirList = explode("/", $key);
 		$fullDir = "/$bucket/";
 		
 		while($currDir = array_shift($dirList))
