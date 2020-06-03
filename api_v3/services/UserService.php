@@ -447,12 +447,7 @@ class UserService extends KalturaBaseUserService
 					throw $e;
 			}
 		}
-
-		if (!$loginData)
-		{
-			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
-		}
-
+		
 		if ($this->getKs() && $this->getKs()->partner_id != $loginData->getConfigPartnerId())
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ACCESS_TO_PARTNER_SPECIFIC_SEARCH, $this->getKs()->partner_id);
