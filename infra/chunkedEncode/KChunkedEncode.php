@@ -76,7 +76,7 @@
 			//Build remote shared path to follow same setting as output path
 			if($setup->sharedChunkPath)
 			{
-				$setup->sharedChunkPath .= $pInfo['basename'];
+				$setup->sharedChunkPath = kFile::fixPath($setup->sharedChunkPath . "/" . $pInfo['basename']);
 			}
 
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
@@ -646,7 +646,6 @@
 		public function ConcatChunks()
 		{
 			$videoFilename = $this->getSessionName("video");
-			
 			$oFh=fopen($videoFilename,"wb");
 			if($oFh===false){
 				return false;
@@ -656,16 +655,14 @@
 			stream_wrapper_restore('https');
 			
 			foreach($this->chunkDataArr as $idx=>$chunkData){
-				if(isset($chunkData->toFix))
+				if(isset($chunkData->toFix)) {
 					$chunkFileName = $this->getChunkName($idx,"fix");
-				elseif($this->setup->sharedChunkPath)
-				{
-					$chunkFileName = $this->getChunkName($idx, "shared");
 				}
-				else
-				{
-					$chunkFileName = $this->getChunkName($idx);
+				else {
+					$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
+					$chunkFileName = $this->getChunkName($idx, $mode);
 				}
+				
 				if(($rv=self::concatChunk($oFh, $chunkFileName))===false)
 					break;
 			}
@@ -684,7 +681,6 @@
 		{
 			$mergedFilename= $this->getSessionName();
 			$videoFilename = $this->getSessionName("video");
-			$sharedMode = $this->setup->sharedChunkPath ? "shared" : null;
 			
 			/*
 			$vidConcatStr = "concat:'";
@@ -702,7 +698,8 @@
 			$params = $this->params;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
-				$audioFilename = $this->getSessionName("audio");
+				$mode = $this->setup->sharedChunkPath ? "shared_audio" : "audio";
+				$audioFilename = $this->getSessionName($mode);
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
@@ -712,7 +709,7 @@
 				}
 				if($this->chunkFileFormat=="mpegts")
 					$audioInputParams.= " -itsoffset -1.4";
-				$audioInputParams.= " -i $audioFilename";
+				$audioInputParams.= " -i '" . kfile::realPath($audioFilename) . "'";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
 					$audioCopyParams.= " -bsf:a aac_adtstoasc";
@@ -969,8 +966,6 @@
 				$name = $this->setup->output."_audio";
 				break;
 			case "shared_audio":
-				if(!$this->setup->sharedChunkPath)
-					return null;
 				$name = $this->setup->sharedChunkPath . "_audio";
 				break;
 			case "qpfile":
@@ -1003,9 +998,6 @@
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;
 			case "shared":
-				if(!$this->setup->sharedChunkPath)
-					return null;
-					
 				$name = $this->setup->sharedChunkPath . "_$this->chunkEncodeToken"."_$chunkIdx.";
 				$name.= "$this->videoChunkPostfix".$chunkIdx;
 				break;

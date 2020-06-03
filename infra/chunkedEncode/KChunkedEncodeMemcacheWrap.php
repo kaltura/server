@@ -652,6 +652,7 @@ ini_set("memory_limit","512M");
 				$cmdLine = $job->cmdLine[0];
 				$outFilenames = isset($job->cmdLine[1]) ? $job->cmdLine[1] : null;;
 				$outFilename = is_array($outFilenames) ? $outFilenames[0] : $outFilenames;
+				//Added to support use cases where the shared file system is not NFS but rather a remote object storage.
 				$sharedChunkPaths = isset($job->cmdLine[2]) ? $job->cmdLine[2] : null;
 			}
 			else

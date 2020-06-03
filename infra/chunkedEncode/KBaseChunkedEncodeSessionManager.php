@@ -92,6 +92,8 @@
 				$this->name = basename($chunker->params->output);
 
 			$videoCmdLines = array();
+			$sharedMode = $chunker->setup->sharedChunkPath;
+			
 			for($chunkIdx=0;$chunkIdx<$chunker->GetMaxChunks();$chunkIdx++) {
 				$chunkData = $chunker->GetChunk($chunkIdx);
 				$start = $chunkData->start;
@@ -104,20 +106,22 @@
 				$outFileNames[] = substr($outFileNames[0], 0, -1) . (substr($outFileNames[0], -1)+1);
 				$currVideoCmdLine = array($cmdLine, $outFileNames);
 				
-				$sharedOutFilenames = array();
-				$sharedChunkName = $chunker->getChunkName($chunkIdx, "shared");
-				KalturaLog::debug("XXX: $sharedChunkName = [$sharedChunkName]");
-				if($sharedChunkName)
+				if($sharedMode)
 				{
-					$sharedOutFilenames[] = $sharedChunkName;
-					$sharedOutFilenames[] = substr($sharedChunkName, 0, -1) . (substr($sharedChunkName, -1)+1);
-					$currVideoCmdLine[] = $sharedOutFilenames;
+					$sharedOutFilenames = array();
+					$sharedChunkName = $chunker->getChunkName($chunkIdx, "shared");
+					if($sharedChunkName)
+					{
+						$sharedOutFilenames[] = $sharedChunkName;
+						$sharedOutFilenames[] = substr($sharedChunkName, 0, -1) . (substr($sharedChunkName, -1)+1);
+						$currVideoCmdLine[] = $sharedOutFilenames;
+					}
 				}
 				
 				$videoCmdLines[$chunkIdx] = $currVideoCmdLine;
 				KalturaLog::log($cmdLine);
 			}
-			KalturaLog::debug("XXXX::: Video cmd lines = " . print_r($videoCmdLines, true));
+			
 			$this->videoCmdLines = $videoCmdLines;
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
@@ -126,11 +130,11 @@
 				$logFilename = $outFilename.".log";
 				$currAudioCmdLine = array("time $cmdLine > $logFilename 2>&1", array($outFilename));
 				
-				$sharedAudioChunkName = $chunker->getSessionName("shared_audio");;
-				if($sharedAudioChunkName)
-				{
+				if($sharedMode) {
+					$sharedAudioChunkName = $chunker->getSessionName("shared_audio");;
 					$currAudioCmdLine[] = array($sharedAudioChunkName);
 				}
+				
 				$this->audioCmdLines[] = $currAudioCmdLine;
 			}
 			$this->SerializeSession();
