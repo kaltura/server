@@ -1,7 +1,8 @@
 
-<?php if($this->bulkUploadResultId): ?>
-    <p>Bulk upload id: <var> <?php echo $this->bulkUploadResultId; ?> </var> </p>
-    <a target="_blank" rel="noopener noreferrer" href="<?php echo $this->bulkGetUrl;?>"> Get bulk upload result </a>
+<?php if($this->bulkUploadId): ?>
+    <p>Bulk upload id: <var> <?php echo $this->bulkUploadId; ?> </var>
+    <br> Copy the id to get the import result
+    </p>
 <?php endif; ?>
 <?php if($this->errMessage): ?>
     <p>Error occurred: <var> <?php echo $this->errMessage; ?> </var> </p>
