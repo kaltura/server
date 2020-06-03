@@ -599,22 +599,76 @@
 		}
 
 		/********************
-		 *
+		 * concatChunk
+		 */
+		private static function concatChunk($fhd, $fileName, $rdSz=10000000)
+		{
+			if(($ifhd=fopen($fileName,"rb"))===false){
+				return false;
+			}
+			
+			$wrSz=0;
+			while(!feof($ifhd)){
+				$iBuf=fread($ifhd, $rdSz);
+				if($iBuf===false){
+					return false;
+				}
+				if(($sz=fwrite($fhd, $iBuf, $rdSz))===false){
+					return false;
+				}
+				$wrSz+=$sz;
+			}
+			fclose($ifhd);
+			KalturaLog::log("sz:$wrSz  ".$fileName);
+			return true;
+		}
+		
+		/********************
+		 * ConcatChunks
+		 */
+		public function ConcatChunks()
+		{
+			$videoFilename = $this->getSessionName("video");
+			
+			$oFh=fopen($videoFilename,"wb");
+			if($oFh===false){
+				return false;
+			}
+			
+			foreach($this->chunkDataArr as $idx=>$chunkData){
+				if(isset($chunkData->toFix))
+					$chunkFileName = $this->getChunkName($idx,"fix");
+				else 
+					$chunkFileName = $this->getChunkName($idx);
+				if(($rv=self::concatChunk($oFh, $chunkFileName))===false)
+					break;
+			}
+			fclose($oFh);
+			return $rv;
+		}
+		
+		/********************
+		 * BuildMergeCommandLine
 		 */
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
 			
+			$videoFilename = $this->getSessionName("video");
+/*
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				if(isset($chunkData->toFix))
-					$vidConcatStr.= $this->getChunkName($idx,"fix").'|';
+					$chunkFileName = $this->getChunkName($idx,"fix");
 				else 
-					$vidConcatStr.= $this->getChunkName($idx).'|';
+					$chunkFileName = $this->getChunkName($idx);
+				$vidConcatStr.= $chunkFileName.'|';
+				if(self::concatChunk($oFh, $chunkFileName)===false)
+					break;
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
-
+*/
 			$setup = $this->setup;
 			$params = $this->params;
 			$audioInputParams = null;
@@ -642,7 +696,7 @@
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
-			$mergeCmd.= " -i $vidConcatStr";
+			$mergeCmd.= " -i $videoFilename";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
 				$mergeCmd.= " ".$params->formatParams;
@@ -898,7 +952,7 @@
 				$name = $this->setup->output."_concat.log";
 				break;
 			default:
-				$name.= $mode;
+				$name = $this->setup->output."_$mode";
 				break;
 			}
 			return $name;
