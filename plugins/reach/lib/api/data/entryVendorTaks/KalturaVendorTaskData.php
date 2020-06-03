@@ -30,13 +30,4 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 		
 		return $taskData;
 	}
-
-	protected function validateCaptionAsset($captionAssetId)
-	{
-		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
-		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
-		{
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
-		}
-	}
 }
