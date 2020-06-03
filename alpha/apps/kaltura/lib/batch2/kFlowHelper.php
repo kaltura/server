@@ -750,7 +750,12 @@ class kFlowHelper
 		if($data->getDestFileSyncLocalPath()) {
 			$flavorAsset->incrementVersion();
 			$shouldSave = true;
-		}		
+		}
+		
+		if($data->getLogFileSyncLocalPath()) {
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
 		
 		if($shouldSave)
 			$flavorAsset->save();
@@ -758,6 +763,7 @@ class kFlowHelper
 		if($data->getExtraDestFileSyncs() && count($data->getExtraDestFileSyncs()))
 		{
 			//operation engine creating only file assets should be the last one in the operations chain
+			//AWS-TODO:: handle files saved directly to object stroarge
 			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
 		}			
 		if($data->getDestFileSyncLocalPath())
