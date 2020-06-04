@@ -4,8 +4,19 @@
 require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));
 
 use Aws\S3\S3Client;
+use Aws\Sts\StsClient;
+
 use Aws\S3\Exception\S3Exception;
+use Aws\Exception\AwsException;
 use Aws\S3\Enum\CannedAcl;
+
+use Aws\Common\Credentials\Credentials;
+use Aws\Common\Credentials\RefreshableInstanceProfileCredentials;
+use Aws\Common\Credentials\AbstractRefreshableCredentials;
+use Aws\Common\Credentials\CacheableCredentials;
+
+use Doctrine\Common\Cache\FilesystemCache;
+use Guzzle\Cache\DoctrineCacheAdapter;
 
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the Amazon S3 protocol with Authentication Version 4.
@@ -100,7 +111,18 @@ class s3Mgr extends kFileTransferMgr
 			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
-
+		
+		if(getenv("S3_ARN_ROLE") && !isset($sftp_user) && !isset($sftp_pass))
+		{
+			if(!class_exists('Aws\S3\StsClient'))
+			{
+				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				return false;
+			}
+			
+			return $this->generateS3Client();
+		}
+		
 		$config = array(
 					'credentials' => array(
 							'key'    => $sftp_user,
@@ -122,6 +144,24 @@ class s3Mgr extends kFileTransferMgr
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
 		 * code elsewhere if the permissions are not sufficient.
 		 **/
+		return true;
+	}
+	
+	private function generateS3Client()
+	{
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		
+		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
+		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
+		
+		$this->s3 = S3Client::factory(array(
+			'credentials' => $roleCreds,
+			'region' => $this->s3Region,
+			'signature' => 'v4',
+			'version' => '2006-03-01'
+		));
+		
 		return true;
 	}
 
@@ -175,7 +215,7 @@ class s3Mgr extends kFileTransferMgr
 		$fp = null;
 		try
 		{
-			$size = filesize($local_file);
+			$size = kFile::fileSize($local_file);
 			KalturaLog::debug("file size is : " . $size);
 
 			if ($size > self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE)
@@ -332,5 +372,43 @@ class s3Mgr extends kFileTransferMgr
 	public function registerStreamWrapper()
 	{
 		$this->s3->registerStreamWrapper();
+	}
+}
+
+class RefreshableRole extends AbstractRefreshableCredentials
+{
+	public function refresh()
+	{
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		
+		$credentials = new Credentials('', '');
+		$ipRefresh = new RefreshableInstanceProfileCredentials(new Credentials('', '', '', 1));
+		$ipCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/instanceProfileCache"));
+		
+		$ipCreds = new CacheableCredentials($ipRefresh, $ipCache, 'refresh_role_creds_key');
+		$sts = StsClient::factory(array(
+			'credentials' => $ipCreds,
+		));
+		
+		$call = $sts->assumeRole(array(
+			'RoleArn' => getenv("S3_ARN_ROLE"),
+			'RoleSessionName' => 'kaltura_s3_access',
+			'SessionDuration' => 3600
+		));
+		
+		$creds = $call['Credentials'];
+		$result = new Credentials(
+			$creds['AccessKeyId'],
+			$creds['SecretAccessKey'],
+			$creds['SessionToken'],
+			strtotime($creds['Expiration'])
+		);
+		
+		$this->credentials->setAccessKeyId($result->getAccessKeyId())
+			->setSecretKey($result->getSecretKey())
+			->setSecurityToken($result->getSecurityToken())
+			->setExpiration($result->getExpiration());
+		
+		return $credentials;
 	}
 }
