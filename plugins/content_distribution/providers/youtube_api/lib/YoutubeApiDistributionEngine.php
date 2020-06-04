@@ -216,7 +216,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			$videoPath = $data->providerData->videoAssetFilePath;
 			if (!$videoPath)
 				throw new KalturaException('No video asset to distribute, the job will fail');
-			if (!file_exists($videoPath))
+			if (!kFile::checkFileExists($videoPath))
 				throw new KalturaDistributionException("The file [$videoPath] was not found (probably not synced yet), the job will retry");
 
 			$needDel = false;
@@ -224,9 +224,9 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 			{
 				$videoPathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
 
-				if (!file_exists($videoPathNew))
+				if (!kFile::checkFileExists($videoPathNew))
 				{
-					copy($videoPath,$videoPathNew);
+					kFile::copy($videoPath,$videoPathNew);
 					$needDel = true;
 				}
 				$videoPath = $videoPathNew;

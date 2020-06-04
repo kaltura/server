@@ -362,3 +362,24 @@
 			return $lines;
 		}
 	}
+
+	/********************
+	 * Session Report stat data
+	 */
+	class KChunkedEncodeSessionReportStats {
+		public $num = 0;
+		public $lasted = 0;
+		public $elapsedCpu = 0;
+		public $userCpu = 0;
+		public $systemCpu = 0;
+		public $concurrency = 0;
+		public $concurrencyMax = 0;
+		public $concurrencyMaxTime = 0;
+		public $concurrencyIdleTime = 0;
+		
+		public function ToString()
+		{
+			return ("chunks($this->num),lasted:$this->lasted"."s,accum(elapsed:$this->elapsedCpu,user:$this->userCpu,system:$this->systemCpu),concurrency:$this->concurrency(max:$this->concurrencyMax,".$this->concurrencyMaxTime."s,idle:$this->concurrencyIdleTime"."s)");
+		}
+	}
+

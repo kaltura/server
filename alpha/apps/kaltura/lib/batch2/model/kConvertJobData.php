@@ -66,6 +66,11 @@ class kConvertJobData extends kConvartableJobData
 	private $destFileSyncSharedPath;
 	
 	/**
+	 * @var int
+	 */
+	private $userCpu;
+	
+	/**
 	 * @return the $destFileSyncLocalPath
 	 */
 	public function getDestFileSyncLocalPath()
@@ -367,4 +372,17 @@ class kConvertJobData extends kConvartableJobData
 		$this->destFileSyncSharedPath = $destFileSyncSharedPath;
 	}
 	
+	/**
+	 * @return the $userCpu
+	 */
+	public function getUserCpu() {
+		return $this->userCpu;
+	}
+
+	/**
+	 * @param string $userCpu
+	 */
+	public function setUserCpu($userCpu) {
+		$this->userCpu = $userCpu;
+	}
 }

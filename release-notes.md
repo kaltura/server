@@ -1,4 +1,11 @@
 # Propus 16.4.0  #
+## Adding permission to user validateHashKeyAction ##
+Issue Type: Task
+Issue ID : PLAT-10916
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_05_31_user_validateHashKey.php
+
 ## Adding permission to interactivity get ##
 Issue Type: Bug
 Issue ID : PATH-837

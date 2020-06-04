@@ -157,6 +157,10 @@ abstract class KJobConversionEngine extends KConversionEngine
 		// add media info of target
 		$this->logMediaInfo ( $log_file , $data->destFileSyncLocalPath );
 		
+		// Export job CPU metrics 
+		$obj=KChunkedEncodeSessionManager::GetSessionStatsJSON($log_file);
+		if(isset($obj->userCpu))
+			$data->userCpu = round($obj->userCpu);
 		
 		return array ( true , $error_message );// indicate all was converted properly
 	}

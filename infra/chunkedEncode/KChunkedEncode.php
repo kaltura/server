@@ -673,9 +673,8 @@
 			
 			return $rv;
 		}
-
 		/********************
-		 *
+		 * BuildMergeCommandLine
 		 */
 		public function BuildMergeCommandLine()
 		{

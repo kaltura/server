@@ -17,6 +17,11 @@ class CatalogItemImportAction extends KalturaApplicationPlugin
 	{
 		$action->getHelper('layout')->disableLayout();
 		$csvPath = self::getFile();
+		if (!$csvPath)
+		{
+			$action->view->errMessage = 'File is missing';
+			return;
+		}
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
@@ -26,11 +31,9 @@ class CatalogItemImportAction extends KalturaApplicationPlugin
 			$bulkUploadId = $bulkUploadResult->id;
 			if ($bulkUploadId)
 			{
-				$action->view->bulkUploadResultId = $bulkUploadId;
-
-				$bulkGetUrl = Infra_ClientHelper::getServiceUrl() . '/api_v3/service/bulkupload_bulk/action/get/id/' . $bulkUploadId . '/ks/' . Infra_ClientHelper::getKs();
-				$action->view->bulkGetUrl = $bulkGetUrl;
+				$action->view->bulkUploadId = $bulkUploadId;
 			}
+
 			unlink($csvPath);
 		}
 		catch (Exception $e)
@@ -49,11 +52,12 @@ class CatalogItemImportAction extends KalturaApplicationPlugin
 		if(isset($files['csvFile']))
 		{
 			$fileData = self::getFileContent($files['csvFile']);
+			$csvPath = tempnam(sys_get_temp_dir(), 'csv');
+			file_put_contents ($csvPath, $fileData);
+			return $csvPath;
 		}
 
-		$csvPath = tempnam(sys_get_temp_dir(), 'csv');
-		file_put_contents ($csvPath, $fileData);
-		return $csvPath;
+		return null;
 	}
 
 	protected static function getFileContent(array $file)

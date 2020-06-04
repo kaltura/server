@@ -982,6 +982,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
 		$periodicFileSyncs = array();
+		$periodicStorageIds = array();
 
 		if($fetch_from_remote_if_no_local)
 		{
