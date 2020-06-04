@@ -84,7 +84,7 @@ class kmcngAction extends kalturaAction
 
 		$this->previewUIConfV7 = uiConfPeer::getUiconfByTagAndVersion('KMCngV7', $kmcngParams["kmcng_version"]);
 		$this->contentUiconfsPreviewV7 = isset($this->previewUIConfV7) ? array_values($this->previewUIConfV7) : null;
-		$this->contentUiconfPreviewV7 = (is_array($this->contentUiconfsPreviewV7) && reset($this->contentUiconfsPreviewV7)) ? reset($this->contentUiconfsPreviewV7) : null;
+		$this->contentUiconfPreviewV7 = (is_array($this->contentUiconfsPreviewV7)) ? reset($this->contentUiconfsPreviewV7) : null;
 
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
 		if (!$enforceSecureProtocol && !$requestSecureProtocol)
