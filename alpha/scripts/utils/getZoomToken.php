@@ -3,7 +3,7 @@
 if($argc != 2)
 {
 	echo "Arguments missing.\n\n";
-	echo "Usage: php getZoomToken.php {vendor account id}\n";
+	echo "Usage: php {$argv[0]} <vendor account id>\n";
 	exit;
 }
 
