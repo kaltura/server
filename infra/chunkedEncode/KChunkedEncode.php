@@ -615,7 +615,7 @@
 		}
 		
 		/********************
-		 *
+		 * concatChunk
 		 */
 		private static function concatChunk($fhd, $fileName, $rdSz=10000000)
 		{
@@ -641,7 +641,7 @@
 		}
 		
 		/********************
-		 *
+		 * ConcatChunks
 		 */
 		public function ConcatChunks()
 		{
