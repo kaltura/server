@@ -112,9 +112,9 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 		
-		if(getenv("S3_ARN_ROLE") && !isset($sftp_user) && !isset($sftp_pass))
+		if(getenv("S3_ARN_ROLE") && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
-			if(!class_exists('Aws\S3\StsClient'))
+			if(!class_exists('Aws\Sts\StsClient'))
 			{
 				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
 				return false;
