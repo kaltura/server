@@ -663,8 +663,6 @@
 				else 
 					$chunkFileName = $this->getChunkName($idx);
 				$vidConcatStr.= $chunkFileName.'|';
-				if(self::concatChunk($oFh, $chunkFileName)===false)
-					break;
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
