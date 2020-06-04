@@ -29,7 +29,7 @@ class s3Mgr extends kFileTransferMgr
 {
 	/* @var S3Client $s3 */
 	private $s3;
-	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	
 	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
 	protected $sseType = '';
@@ -37,6 +37,9 @@ class s3Mgr extends kFileTransferMgr
 	protected $signatureType = null;
 	protected $endPoint = null;
 	protected $storageClass = null;
+	
+	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
@@ -112,7 +115,7 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 		
-		if(getenv("S3_ARN_ROLE") && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		if(getenv(self::S3_ARN_ROLE_ENV_NAME) && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
@@ -377,6 +380,9 @@ class s3Mgr extends kFileTransferMgr
 
 class RefreshableRole extends AbstractRefreshableCredentials
 {
+	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
+	const SESSION_DURATION = 3600;
+	
 	public function refresh()
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
@@ -391,9 +397,9 @@ class RefreshableRole extends AbstractRefreshableCredentials
 		));
 		
 		$call = $sts->assumeRole(array(
-			'RoleArn' => getenv("S3_ARN_ROLE"),
-			'RoleSessionName' => 'kaltura_s3_access',
-			'SessionDuration' => 3600
+			'RoleArn' => getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME),
+			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
+			'SessionDuration' => self::SESSION_DURATION,
 		));
 		
 		$creds = $call['Credentials'];
