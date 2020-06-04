@@ -46,7 +46,7 @@ class KalturaEntryResource extends KalturaContentResource
 			$fileSync = kFileSyncUtils::resolve($fileSync);
 			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_LINK)
 			{
-				if (!$local || file_exists($fileSync->getFullPath()))
+				if (!$local || kFile::checkFileExists($fileSync->getFullPath()))
 				{
 					return true;
 				}
@@ -79,7 +79,13 @@ class KalturaEntryResource extends KalturaContentResource
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
 		if ($local)
 		{
-			$c->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
+			$dcIds[] = kDataCenterMgr::getCurrentDcId();
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			foreach ($sharedDcIds as $dcId)
+			{
+				$dcIds[] = $dcId;
+			}
+			$c->add(FileSyncPeer::DC, $dcIds, Criteria::IN);
 		}
 		return FileSyncPeer::doSelect($c);
 	}
