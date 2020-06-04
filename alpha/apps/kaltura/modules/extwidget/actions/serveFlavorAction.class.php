@@ -540,7 +540,7 @@ class serveFlavorAction extends kalturaAction
 			$seekFromBytes = -1;
 		
 		
-		if($fileParam && is_dir($path)) {
+		if($fileParam && kFile::isDir($path)) {
 			$path .= "/$fileParam";
 			kFileUtils::dumpFile($path, null, null);
 			KExternalErrors::dieGracefully();
