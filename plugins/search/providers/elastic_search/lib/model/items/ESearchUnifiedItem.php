@@ -85,7 +85,7 @@ class ESearchUnifiedItem extends ESearchItem
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
 		//Start handling entry fields
-		self::handleExcludedGroups($entryAllowedFields);
+		self::unsetExcludedGroupsParams($entryAllowedFields);
 		foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
@@ -115,7 +115,7 @@ class ESearchUnifiedItem extends ESearchItem
 	/**
 	 * @param $entryAllowedFields
 	 */
-	private static function handleExcludedGroups(&$entryAllowedFields)
+	protected static function unsetExcludedGroupsParams(&$entryAllowedFields)
 	{
 		foreach (self::$excludedUnifiedQueryGroups as $excludedGroup)
 		{
