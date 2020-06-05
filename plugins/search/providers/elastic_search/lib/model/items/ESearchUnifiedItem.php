@@ -59,7 +59,7 @@ class ESearchUnifiedItem extends ESearchItem
 				switch ($unifiedQueryGroup)
 				{
 					case self::ENTRY_QUERY_GROUP:
-						self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes, self::$excludedUnifiedQueryGroups);
+						self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
 						break;
 					case self::CATEGORY_ENTRY_QUERY_GROUP:
 						self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
@@ -80,7 +80,7 @@ class ESearchUnifiedItem extends ESearchItem
 		return $outQuery;
 	}
 
-	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes, $excludedQueryGroups)
+	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
