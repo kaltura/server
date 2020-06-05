@@ -59,7 +59,7 @@ class ESearchUnifiedItem extends ESearchItem
 				switch ($unifiedQueryGroup)
 				{
 					case self::ENTRY_QUERY_GROUP:
-						self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+						self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes, self::$excludedUnifiedQueryGroups);
 						break;
 					case self::CATEGORY_ENTRY_QUERY_GROUP:
 						self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
@@ -80,11 +80,12 @@ class ESearchUnifiedItem extends ESearchItem
 		return $outQuery;
 	}
 
-	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
+	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes, $excludedQueryGroups)
 	{
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
 		//Start handling entry fields
+		self::handleExcludedGroups($entryAllowedFields);
 		foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
@@ -109,6 +110,24 @@ class ESearchUnifiedItem extends ESearchItem
 			}
 		}
 
+	}
+
+	/**
+	 * @param $entryAllowedFields
+	 */
+	private static function handleExcludedGroups(&$entryAllowedFields)
+	{
+		foreach (self::$excludedUnifiedQueryGroups as $excludedGroup)
+		{
+			switch ($excludedGroup)
+			{
+				case self::CAPTIONS_QUERY_GROUP:
+					unset($entryAllowedFields['captions_content']);
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	private static function addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
