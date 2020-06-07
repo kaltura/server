@@ -7,5 +7,4 @@ interface kActionType extends BaseEnum
 {
 	const IMAGICK = 0;
 	const SOURCE = 1;
-	const OUTPUT = 2;
 }

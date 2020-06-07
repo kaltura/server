@@ -300,6 +300,11 @@ class kImageTransformationAdapter
 			$outputAction->setActionParameter(kThumbnailParameterName::IMAGE_FORMAT, $this->parameters->get(kThumbFactoryFieldName::IMAGE_FORMAT));
 		}
 
+		if($this->parameters->get(kThumbFactoryFieldName::DENSITY))
+		{
+			$outputAction->setActionParameter(kThumbnailParameterName::DENSITY, $this->parameters->get(kThumbFactoryFieldName::DENSITY));
+		}
+
 		$step->addAction($outputAction);
 	}
 
