@@ -27,10 +27,10 @@ class kImageTransformationAdapter
 		$this->prepareInput();
 		switch($this->parameters->get(kThumbFactoryFieldName::TYPE))
 		{
-			case kThumbnailActionType::RESIZE:
+			case kExtwidgetThumbnailActionType::RESIZE:
 				$this->handleResize(true, $step);
 				break;
-			case kThumbnailActionType::RESIZE_WITH_PADDING:
+			case kExtwidgetThumbnailActionType::RESIZE_WITH_PADDING:
 				if($this->parameters->get(kThumbFactoryFieldName::WIDTH) && $this->parameters->get(kThumbFactoryFieldName::HEIGHT))
 				{
 					$this->handleResizeWithPadding($step);
@@ -41,16 +41,16 @@ class kImageTransformationAdapter
 				}
 
 				break;
-			case kThumbnailActionType::CROP:
+			case kExtwidgetThumbnailActionType::CROP:
 				$this->handleCrop(Imagick::GRAVITY_CENTER, $step);
 				break;
-			case kThumbnailActionType::CROP_FROM_TOP:
+			case kExtwidgetThumbnailActionType::CROP_FROM_TOP:
 				$this->handleCrop(Imagick::GRAVITY_NORTH, $step);
 				break;
-			case kThumbnailActionType::RESIZE_WITH_FORCE:
+			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
 				$this->handleResize(false, $step);
 				break;
-			case kThumbnailActionType::CROP_AFTER_RESIZE:
+			case kExtwidgetThumbnailActionType::CROP_AFTER_RESIZE:
 				$this->handleCropAfterResize($step);
 				break;
 			default:
