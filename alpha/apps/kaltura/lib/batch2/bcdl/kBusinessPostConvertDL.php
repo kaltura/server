@@ -315,7 +315,14 @@ class kBusinessPostConvertDL
 			}
 			else
 			{
-			    // mark the context root job as finished only if all conversion jobs are completed
+    			// Export the source
+    			$srcFlavors = assetPeer::retrieveLocalReadyByEntryIdAndFlavorParams($entry->getEntryId(), array(flavorParams::SOURCE_FLAVOR_ID));
+    			if($srcFlavors && count($srcFlavors))
+    			{
+    				kStorageExporter::handleAssetStorageExports($srcFlavors[0]);
+    			}
+
+    			// mark the context root job as finished only if all conversion jobs are completed
     			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
 				
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
