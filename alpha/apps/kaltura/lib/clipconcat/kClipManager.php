@@ -548,7 +548,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		$this->addDestinationEntryAsset($clipConcatJobData->getDestEntryId(), $concatAsset);
+		try {
+			$this->addDestinationEntryAsset($clipConcatJobData->getDestEntryId(), $concatAsset);
+		}
+		catch (Exception $e)
+		{
+			if( $e->getCode() == APIErrors::getCode(KalturaErrors::ENTRY_ID_NOT_FOUND) )
+			{
+				KalturaLog::debug("Destination entry [" . $clipConcatJobData->getDestEntryId() . "] was not found, deleting temp entry [" . $clipConcatJobData->getTempEntryId() . "], so it wont be a zombie");
+				$this->deleteEntry($clipConcatJobData->getTempEntryId());
+			}
+			
+			throw $e;
+		}
 		$this->deleteEntry($clipConcatJobData->getTempEntryId());
 		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 	}
