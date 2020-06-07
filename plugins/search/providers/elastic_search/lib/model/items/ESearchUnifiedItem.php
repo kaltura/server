@@ -85,6 +85,7 @@ class ESearchUnifiedItem extends ESearchItem
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
 		//Start handling entry fields
+		self::unsetExcludedGroupsParams($entryAllowedFields);
 		foreach($entryAllowedFields as $fieldName => $fieldAllowedTypes)
 		{
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
@@ -109,6 +110,24 @@ class ESearchUnifiedItem extends ESearchItem
 			}
 		}
 
+	}
+
+	/**
+	 * @param $entryAllowedFields
+	 */
+	protected static function unsetExcludedGroupsParams(&$entryAllowedFields)
+	{
+		foreach (self::$excludedUnifiedQueryGroups as $excludedGroup)
+		{
+			switch ($excludedGroup)
+			{
+				case self::CAPTIONS_QUERY_GROUP:
+					unset($entryAllowedFields['captions_content']);
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	private static function addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
