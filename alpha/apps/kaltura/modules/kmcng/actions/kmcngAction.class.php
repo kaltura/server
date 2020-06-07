@@ -78,9 +78,17 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfsLivea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->contentUiconfLivea = (is_array($this->contentUiconfsLivea) && reset($this->contentUiconfsLivea)) ? reset($this->contentUiconfsLivea) : null;
 
-		$this->previewUIConf = uiConfPeer::getUiconfByTagAndVersion('KMCng', $kmcngParams["kmcng_version"]);
+		$this->previewUIConf = uiConfPeer::getUiconfByTagAndVersion('KMCngV2', $kmcngParams["kmcng_version"]);
+		if (empty($this->previewUIConf))
+		{
+			$this->previewUIConf = uiConfPeer::getUiconfByTagAndVersion('KMCng', $kmcngParams["kmcng_version"]);
+		}
 		$this->contentUiconfsPreview = isset($this->previewUIConf) ? array_values($this->previewUIConf) : null;
 		$this->contentUiconfPreview = (is_array($this->contentUiconfsPreview) && reset($this->contentUiconfsPreview)) ? reset($this->contentUiconfsPreview) : null;
+
+		$this->previewUIConfV7 = uiConfPeer::getUiconfByTagAndVersion('KMCngV7', $kmcngParams["kmcng_version"]);
+		$this->contentUiconfsPreviewV7 = isset($this->previewUIConfV7) ? array_values($this->previewUIConfV7) : null;
+		$this->contentUiconfPreviewV7 = (is_array($this->contentUiconfsPreviewV7)) ? reset($this->contentUiconfsPreviewV7) : null;
 
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
 		if (!$enforceSecureProtocol && !$requestSecureProtocol)
@@ -172,7 +180,8 @@ class kmcngAction extends kalturaAction
 				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
 				'resetPasswordUri'=> "/index.php/kmcng/resetpassword/setpasshashkey/{hash}",
-				'previewUIConf' => $this->contentUiconfPreview->getId(),
+				'previewUIConf' => ($this->contentUiconfPreview) ? $this->contentUiconfPreview->getId() : '',
+				'previewUIConfV7' => ($this->contentUiconfPreviewV7) ? $this->contentUiconfPreviewV7->getId() : '',
 				),
 			'cdnServers' => array(
 				'serverUri' => "http://" . kConf::get("cdn_api_host"),
