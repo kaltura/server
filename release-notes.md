@@ -1,11 +1,4 @@
 # Propus 16.4.0  #
-## Add V7 player UIConf to KMC wrapper ##
-Issue Type: Task
-Issue ID : PLAT-10934
-
-### Configuration ###
-update kmc version to the latest version
-
 ## Adding permission to user validateHashKeyAction ##
 Issue Type: Task
 Issue ID : PLAT-10916
