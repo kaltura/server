@@ -32,6 +32,8 @@
 		public $process = 0;		// Linux process id
 		public $hostname = 0;
 		
+		public $attempt = 0; //Job execution attempt
+		
 		/* ---------------------------
 		 *
 		 */
@@ -580,7 +582,7 @@
 			$this->storeManager->SaveJob($job);
 	
 			$job->state = $job::STATE_PENDING;
-			$job->attempt = isset($job->attempt) ? ($job->attempt + 1) : 1;
+			$job->attempt++;
 			if($this->storeManager->AddJob($job)===false) {
 				KalturaLog::log("FAILED to retry job($job->id)");
 				return false;
