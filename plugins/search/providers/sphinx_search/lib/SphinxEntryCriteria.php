@@ -302,7 +302,9 @@ class SphinxEntryCriteria extends SphinxCriteria
 			$this->addFreeTextToMatchClauseByMatchFields($freeTexts, entryFilter::FREE_TEXT_FIELDS, $additionalConditions);
 		}
 		$filter->unsetByName('_free_text');
-		
+
+		$filter->unsetByName('_excluded_free_text_groups');
+
 		return parent::applyFilterFields($filter);
 	}
 
