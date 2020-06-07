@@ -8,6 +8,14 @@ class ESearchUnifiedItem extends ESearchItem
 
 	const UNIFIED = 'unified';
 
+	const ENTRY_QUERY_GROUP = 'entry';
+	const CATEGORY_ENTRY_QUERY_GROUP = 'category_entry';
+	const CUE_POINT_QUERY_GROUP = 'cue_point';
+	const CAPTIONS_QUERY_GROUP = 'captions';
+	const METADATA_QUERY_GROUP = 'metadata';
+
+	public static $unifiedQueryGroups = array(self::ENTRY_QUERY_GROUP, self::CATEGORY_ENTRY_QUERY_GROUP, self::CUE_POINT_QUERY_GROUP, self::CAPTIONS_QUERY_GROUP, self::METADATA_QUERY_GROUP);
+	public static $excludedUnifiedQueryGroups = array();
 	/**
 	 * @var string
 	 */
@@ -19,6 +27,12 @@ class ESearchUnifiedItem extends ESearchItem
 	public function getSearchTerm()
 	{
 		return $this->searchTerm;
+	}
+
+	public static function setExcludedUnifiedQueryGroups($excludedUnifiedQueryGroups)
+	{
+		$excludedUnifiedQueryGroups = preg_replace('/\s+/','',$excludedUnifiedQueryGroups);
+		self::$excludedUnifiedQueryGroups = explode(',', $excludedUnifiedQueryGroups);
 	}
 
 	/**
@@ -33,20 +47,36 @@ class ESearchUnifiedItem extends ESearchItem
 	{
 		$outQuery = array();
 
-		foreach($eSearchItemsArr as $eSearchUnifiedItem)
+		$allowedUnifiedGroups = array_diff(self::$unifiedQueryGroups, self::$excludedUnifiedQueryGroups);
+
+		foreach ($eSearchItemsArr as $eSearchUnifiedItem)
 		{
 			self::validateUnifiedAllowedTypes($eSearchUnifiedItem);
 			$subQuery = new kESearchBoolQuery();
 
-			self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
-			self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
-			self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
-			self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
-			self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
-
+			foreach ($allowedUnifiedGroups as $unifiedQueryGroup)
+			{
+				switch ($unifiedQueryGroup)
+				{
+					case self::ENTRY_QUERY_GROUP:
+						self::addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+						break;
+					case self::CATEGORY_ENTRY_QUERY_GROUP:
+						self::addCategoryEntryFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+						break;
+					case self::CUE_POINT_QUERY_GROUP:
+						self::addCuePointFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+						break;
+					case self::CAPTIONS_QUERY_GROUP:
+						self::addCaptionFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+						break;
+					case self::METADATA_QUERY_GROUP:
+						self::addMetadataFieldsToUnifiedQuery($eSearchUnifiedItem, $subQuery, $queryAttributes);
+						break;
+				}
+			}
 			$outQuery[] = $subQuery;
 		}
-
 		return $outQuery;
 	}
 
