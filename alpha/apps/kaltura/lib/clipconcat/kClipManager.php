@@ -548,7 +548,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		try {
+		try 
+		{
 			$this->addDestinationEntryAsset($clipConcatJobData->getDestEntryId(), $concatAsset);
 		}
 		catch (Exception $e)
