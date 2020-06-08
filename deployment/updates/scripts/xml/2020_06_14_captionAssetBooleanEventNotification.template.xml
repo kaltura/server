@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaBooleanNotificationTemplate">
+                <name>Caption Ready With Conditions</name>
+                <systemName>CAPTION_READY_WITH_CONDITIONS</systemName>
+                <description>Boolean notification template to be sent when caption is ready and all the conditions are fulfilled</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType> <!-- EventNotificationEventObjectType::CAPTION_ASSET -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Catpion status changed to ready</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof CaptionAsset &amp;&amp; in_array(assetPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == asset::ASSET_STATUS_READY</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Format SRT</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getContainerFormat() == CaptionType::SRT</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Accuracy >= 99</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getAccuracy() >= 99</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Caption language equals to inserted language</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>strtolower($scope->getObject()->getLanguage()) === strtolower(trim($scope->getDynamicValueByKey("language")))</code>
+                        </field>
+                    </item>
+                </eventConditions>
+                <format>1</format>
+                <userParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>language</key>
+                        <description>Enter language</description>
+                        <value objectType="KalturaStringValue">
+                        </value>
+                    </item>
+                </userParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>
