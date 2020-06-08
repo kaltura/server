@@ -115,6 +115,18 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 			/** @var EntryServerNode $entryServerNode */
 			$entryServerNode->delete();
 		}
+		
+		//If deleting an entry which has a replacing entry id associated to it we should delete it as well
+		if($entry->getReplacingEntryId())
+		{
+			$replacingEntry = entryPeer::retrieveByPK($entry->getReplacingEntryId());
+			if($replacingEntry)
+			{
+				KalturaLog::debug("Replacing entry found for entry being deleted, will delete replacing entry as well");
+				myEntryUtils::deleteEntry($replacingEntry);
+			}
+			
+		}
 
 		$filter = new categoryEntryFilter();
 		$filter->setEntryIdEqual($entry->getId());

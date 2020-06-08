@@ -39,7 +39,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setTempEntryId($clipEntry->getEntryId());
 
 		//if it is replace(Trim flow) active the copy to destination consumers
-		$this->fillDestEntry($destEntry, $sourceEntryId, $operationAttributes);
+		$this->fillDestEntry($destEntry, $sourceEntryId, $operationAttributes, $clipEntry->getEntryId());
 
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
@@ -647,12 +647,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $sourceEntryId
 	 * @param array $operationAttributes
 	 */
-	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
+	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes, $replacingEntryId)
 	{
 		if ($destEntry->getIsTemporary())
 			$destEntry->setFlowType(EntryFlowType::TRIM_CONCAT);
 		else 
 			$destEntry->setFlowType(EntryFlowType::CLIP_CONCAT);
+		
+		$destEntry->setReplacingEntryId($replacingEntryId);
 		$destEntry->setSourceEntryId($sourceEntryId);
 		$destEntry->setOperationAttributes($operationAttributes);
 		$destEntry->setStatus(entryStatus::PENDING);
