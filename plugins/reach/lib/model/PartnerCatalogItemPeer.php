@@ -50,10 +50,8 @@ class PartnerCatalogItemPeer extends BasePartnerCatalogItemPeer {
 	
 	public static function retrieveActiveCatalogItemIds($catalogItemIds, $partnerId)
 	{
-		$catalogItemIdsArr = array_map('trim', explode(',', $catalogItemIds));
-
 		$c = new Criteria(PartnerCatalogItemPeer::DATABASE_NAME);
-		$c->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $catalogItemIdsArr, Criteria::IN);
+		$c->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $catalogItemIds, Criteria::IN);
 		$c->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerId);
 		$c->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
 		$c->addSelectColumn(PartnerCatalogItemPeer::CATALOG_ITEM_ID);

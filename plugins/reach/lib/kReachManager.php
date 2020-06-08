@@ -65,7 +65,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			$profileId = $booleanNotificationTemplate[self::PROFILE_ID];
 			$fullFieldCatalogItemIds = $booleanNotificationTemplate[self::ACTION][0]->getCatalogItemIds();
-			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $partnerId);
+			$fullFieldCatalogItemIdsArr = array_map('trim', explode(',', $fullFieldCatalogItemIds));
+			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
 			{
 				KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
@@ -349,6 +350,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			$this->consumeEvent($event);
+
 		}
 
 		return true;
