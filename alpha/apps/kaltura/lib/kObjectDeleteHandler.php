@@ -125,7 +125,6 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 				KalturaLog::debug("Replacing entry found for entry being deleted, will delete replacing entry as well");
 				myEntryUtils::deleteEntry($replacingEntry);
 			}
-			
 		}
 
 		$filter = new categoryEntryFilter();
