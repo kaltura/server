@@ -511,7 +511,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFilePath()))
+		if(!kFile::checkFileExists($data->getDestFilePath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFilePath());
 
 		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
@@ -530,7 +530,28 @@ class kFlowHelper
 		$flavorAsset->save();
 
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		
 		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+		
+		/*
+		 * TODO - AWS - Handle shared concat flow
+		 * kFileSyncUtils::moveFromFile should be replaced with this code to support saving concat result to shared storage based on partner config
+		 * This could be done only once convert flow code is changed to support remote file input
+		 *
+		$partner = PartnerPeer::retrieveByPK($dbBatchJob->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		if($partnerSharedStorageProfileId)
+		{
+			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+			if($storageProfile)
+				kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFilePath(), $partnerSharedStorageProfileId);
+		}
+		else
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+		}
+		*/
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
