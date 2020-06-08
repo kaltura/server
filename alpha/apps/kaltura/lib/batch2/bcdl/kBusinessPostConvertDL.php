@@ -317,9 +317,13 @@ class kBusinessPostConvertDL
 			{
     			// Export the source
     			$srcFlavors = assetPeer::retrieveLocalReadyByEntryIdAndFlavorParams($entry->getEntryId(), array(flavorParams::SOURCE_FLAVOR_ID));
-    			if($srcFlavors && count($srcFlavors))
+    			foreach($srcFlavors as $srcFlavor)
     			{
-    				kStorageExporter::handleAssetStorageExports($srcFlavors[0]);
+    				if($srcFlavor->getType() == assetType::FLAVOR)
+    				{
+    					kStorageExporter::handleAssetStorageExports($srcFlavor);
+    					break;
+    				}
     			}
 
     			// mark the context root job as finished only if all conversion jobs are completed
