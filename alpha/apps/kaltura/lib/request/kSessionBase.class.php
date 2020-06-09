@@ -400,11 +400,12 @@ class kSessionBase
 	
 	protected function isValidUriRestrict()
 	{
-		$requestUri = $_SERVER["REQUEST_URI"];
+		$requestUri = ltrim($_SERVER["REQUEST_URI"], '/');
 		$value = implode(self::PRIVILEGES_DELIMITER, $this->parsedPrivileges[self::PRIVILEGE_URI_RESTRICTION]);
 		$uris = explode('|', $value);
 		foreach ($uris as $uri)
 		{
+			$uri = ltrim($uri, '/');
 			if ($requestUri == $uri ||			// exact match
 				(substr($uri, -1) == '*' && 	// prefix match
 				substr($requestUri, 0, strlen($uri) - 1) == substr($uri, 0, -1)))
