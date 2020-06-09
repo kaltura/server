@@ -23,7 +23,7 @@
                 <eventObjectType>captionAssetEventNotifications.CaptionAsset</eventObjectType> <!-- EventNotificationEventObjectType::CAPTION_ASSET -->
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventFieldCondition">
-                        <description>Catpion status changed to ready</description>
+                        <description>Caption status changed to ready</description>
                         <field objectType="KalturaEvalBooleanField">
                             <code>$scope->getObject() instanceof CaptionAsset &amp;&amp; in_array(assetPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == asset::ASSET_STATUS_READY</code>
                         </field>
@@ -35,9 +35,9 @@
                         </field>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
-                        <description>Accuracy >= 99</description>
+                        <description>Accuracy >= 99 or accuracy inserted</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject()->getAccuracy() >= 99</code>
+                            <code>is_numeric(trim($scope->getDynamicValueByKey("accuracy"))) ? $scope->getObject()->getAccuracy() >= trim($scope->getDynamicValueByKey("accuracy")) : $scope->getObject()->getAccuracy() >= 99 </code>
                         </field>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
@@ -52,6 +52,12 @@
                     <item objectType="KalturaEventNotificationParameter">
                         <key>language</key>
                         <description>Enter language</description>
+                        <value objectType="KalturaStringValue">
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>accuracy</key>
+                        <description>Enter accuracy, by default accuracy will be 99</description>
                         <value objectType="KalturaStringValue">
                         </value>
                     </item>
