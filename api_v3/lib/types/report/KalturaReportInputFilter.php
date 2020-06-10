@@ -235,6 +235,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 * @var string
 	 */
 	public $categoriesAncestorIdIn;
+
+	/**
+	 * filter by hotspot id
+	 *
+	 * @var string
+	 */
+	public $hotspotIdIn;
 	 
 	private static $map_between_objects = array
 	(
@@ -271,6 +278,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'applicationVersionIn' => 'application_versions',
 		'nodeIdsIn' => 'node_ids',
 		'categoriesAncestorIdIn'=> 'categories_ancestor_ids',
+		'hotspotIdIn' => 'hotspot_ids'
 	);
 
 	protected function getMapBetweenObjects()
