@@ -633,15 +633,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getLocalFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
-		$dc = kDataCenterMgr::getCurrentDc();
-		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
-		
-//      AWS: In case you want to revert the kflow helper handleConverFionished to create remote file sync this need to be added
-		$dc_ids[] = $dc["id"];
-		foreach ($sharedStorageIds as $sharedStorageId)
-		{
-			$dc_ids[] = $sharedStorageId;
-		}
+		$dc_ids = kDataCenterMgr::getSharedStorageProfileIds();
+		$dc_ids[] = kDataCenterMgr::getCurrentDcId();
 		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
@@ -910,12 +903,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		
 		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds();
 		$currentDcIds[] = $currentDcId;
-		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
-		foreach ($sharedStorageIds as $sharedStorageId)
-		{
-			$currentDcIds[] = $sharedStorageId;
-		}
 		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
