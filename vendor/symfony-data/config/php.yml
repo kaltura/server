@@ -1,5 +1,4 @@
 set:
-  log_errors:                  on
   arg_separator.output:        |
     &amp;
 
