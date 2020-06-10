@@ -13,7 +13,7 @@
  */
 class KAsyncLiveToVod extends KJobHandlerWorker
 {
-	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 500;
+	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 10;
 	const MAX_CHUNK_DURATION_IN_SEC = 12;
 	
 	/* (non-PHPdoc)
