@@ -79,12 +79,8 @@ class KalturaEntryResource extends KalturaContentResource
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
 		if ($local)
 		{
+			$dcIds = kDataCenterMgr::getSharedStorageProfileIds();
 			$dcIds[] = kDataCenterMgr::getCurrentDcId();
-			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
-			foreach ($sharedDcIds as $dcId)
-			{
-				$dcIds[] = $dcId;
-			}
 			$c->add(FileSyncPeer::DC, $dcIds, Criteria::IN);
 		}
 		return FileSyncPeer::doSelect($c);
