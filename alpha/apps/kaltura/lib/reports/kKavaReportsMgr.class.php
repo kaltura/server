@@ -5731,6 +5731,7 @@ class kKavaReportsMgr extends kKavaBase
 					unset($header[$field_index]);
 					$indexes_to_remove[] = $field_index;
 				}
+				$header = array_values($header);
 
 				foreach($data as &$row)
 				{
@@ -5738,6 +5739,7 @@ class kKavaReportsMgr extends kKavaBase
 					{
 						unset($row[$field_index]);
 					}
+					$row = array_values($row);
 				}
 			}
 		}
@@ -5755,6 +5757,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (isset($report_def['header']))
 		{
+			self::adjustCsvTableUnits(";" . $report_def['header'], $header, $data);
 			$header = explode(',', $report_def['header']);
 		}
 		else
