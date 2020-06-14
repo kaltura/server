@@ -399,7 +399,7 @@ class KalturaMonitorClient
 			return null;		// ignore multibyte range
 	
 		$end = $size - 1;
-		if ($range[0] == '-')
+		if ($range{0} == '-')
 		{
 			// The n-number of the last bytes is requested
 			$start = $size - substr($range, 1);
