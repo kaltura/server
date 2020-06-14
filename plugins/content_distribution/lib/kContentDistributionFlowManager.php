@@ -1583,7 +1583,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				case EntryDistributionStatus::REMOVED:
 				
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
-					continue;
+					break;
 				
 				case EntryDistributionStatus::PENDING:
 				case EntryDistributionStatus::ERROR_SUBMITTING:	
@@ -1623,19 +1623,19 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					if(!$distributionProvider)
 					{
 						KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
-						continue;
+						break;
 					}
 						
 					if(!$distributionProvider->isUpdateEnabled())
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
-						continue;
+						break;
 					}
 					
 					if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
-						continue;
+						break;
 					}
 					
 					$updateRequiredEntryFields = $distributionProvider->getUpdateRequiredEntryFields($distributionProfileId);
