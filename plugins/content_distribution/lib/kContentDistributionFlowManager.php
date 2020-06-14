@@ -1682,7 +1682,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					if(!$updateRequired)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
-						continue;	
+						break;	
 					}
 					
 					if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
@@ -1690,7 +1690,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 						$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 						$entryDistribution->save();
-						continue;
+						break;
 					}
 					
 					KalturaLog::log("Updating entry distribution [" . $entryDistribution->getId() . "]");
