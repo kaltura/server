@@ -475,7 +475,7 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			if (!array_key_exists($key['value'], $params))
+			if (is_array($key) && !array_key_exists($key['value'], $params))
 			{
 				$params[$key['value']] = $value['value'];
 			}
