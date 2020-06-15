@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
+class KalturaAlignmentVendorTaskData extends KalturaVendorTaskDataCaptionAsset
 {
 	/**
 	 * The id of the text transcript object the vendor should use while runing the alignment task
@@ -19,18 +19,10 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 	 */
 	public $jsonTranscriptAssetId;
 	
-	/**
-	 * Optional - The id of the caption asset object the vendor should update once alignment task processing is done
-	 * @insertonly
-	 * @var string
-	 */
-	public $captionAssetId;
-	
 	private static $map_between_objects = array
 	(
 		'textTranscriptAssetId',
 		'jsonTranscriptAssetId',
-		'captionAssetId',
 	);
 	
 	/* (non-PHPdoc)
@@ -120,15 +112,6 @@ class KalturaAlignmentVendorTaskData extends KalturaVendorTaskData
 		if($transcriptAssetDb->getContainerFormat() != $expectedType)
 		{
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_FORMAT_MISMATCH, $transcriptAssetId, $expectedType);
-		}
-	}
-	
-	protected function validateCaptionAsset($captionAssetId)
-	{
-		$captionAssetDb = assetPeer::retrieveById($captionAssetId);
-		if (!$captionAssetDb || !($captionAssetDb instanceof CaptionAsset))
-		{
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
 		}
 	}
 }

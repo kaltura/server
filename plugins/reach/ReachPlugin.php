@@ -162,6 +162,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new CatalogItemSetStatusAction();
 		$pages[] = new CatalogItemExportAction();
 		$pages[] = new CatalogItemImportAction();
+		$pages[] = new CatalogItemImportResultAction();
 		$pages[] = new PartnerCatalogItemListAction();
 		$pages[] = new PartnerCatalogItemConfigureAction();
 		$pages[] = new PartnerCatalogItemSetStatusAction();

@@ -87,10 +87,21 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 
 		$this->addElement('button', 'import', array(
 			'ignore' => true,
-			'label' => 'import',
+			'label' => 'Import',
 			'onclick' => "importFromCsv()",
 			'decorators' => array('ViewHelper'),
 		));
 
+		$this->addElement('text', 'bulkUploadId', array(
+			'label' => 'Bulk Upload Result:',
+			'decorators' => array('ViewHelper'),
+		));
+
+		$this->addElement('button', 'getBulkUplodaResult', array(
+			'ignore' 	=> true,
+			'label'		=> 'Get Import Result',
+			'onclick'	=> "getBulkUploadResult($('#bulkUploadId').val())",
+			'decorators' => array('ViewHelper')
+		));
 	}
 }

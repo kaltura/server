@@ -46,7 +46,7 @@ class ESearchQueryFromFilter
 		$emptyFilter = true;
 		foreach($filter->fields as $field => $fieldValue)
 		{
-			if($field === entryFilter::ORDER || $field === ESearchEntryFilterFields::FREE_TEXT)
+			if($field === entryFilter::ORDER || $field === ESearchEntryFilterFields::FREE_TEXT || $field === ESearchEntryFilterFields::EXCLUDED_FREE_TEXT_GROUPS)
 			{
 				continue;
 			}

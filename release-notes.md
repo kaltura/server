@@ -1,4 +1,38 @@
+# Propus 16.4.0  #
+## New Boolean notification template: Caption Ready With Conditions ##
+Issue Type: Task
+Issue ID : REACH2-849
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+deployment/updates/scripts/xml/2020_06_14_captionAssetBooleanEventNotification.template.xml
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_06_14_deploy_caption_asset_boolean_notification.php
+
+## Adding permission to user validateHashKeyAction ##
+Issue Type: Task
+Issue ID : PLAT-10916
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_05_31_user_validateHashKey.php
+
+## Adding permission to interactivity get ##
+Issue Type: Bug
+Issue ID : PATH-837
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_02_update_interactivity_get_action_permissions.php
+
 # Propus 16.3.0  #
+## Adding permission to tag search ##
+Issue Type: Task
+Issue ID : PLAT-10930
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_05_28_add_permission_analytics_base_to_tag_search.php
+
+
 ## Add periodic storage delete local batch ##
 Issue Type: Task
 Issue ID : PLAT-10894

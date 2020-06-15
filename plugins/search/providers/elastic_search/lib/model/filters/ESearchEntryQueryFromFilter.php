@@ -234,6 +234,11 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		$kEsearchOrderBy = null;
 		$this->prepareEntriesCriteriaFilter($filter);
+		if ($filter->_excluded_free_text_groups)
+		{
+			ESearchUnifiedItem::setExcludedUnifiedQueryGroups($filter->_excluded_free_text_groups);
+		}
+
 		foreach($filter->fields as $field => $fieldValue)
 		{
 			if(in_array($field, self::getSpecialFields()))

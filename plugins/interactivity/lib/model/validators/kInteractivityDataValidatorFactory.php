@@ -21,7 +21,7 @@ class kInteractivityDataValidatorFactory
 
 		if($entry->getType() == entryType::PLAYLIST)
 		{
-			if ($entry->getMediaType() == PlaylistType::PATH) 
+			if ($entry->getMediaType() == PlaylistType::PATH || $entry->getMediaType() == PlaylistType::STATIC_LIST)
 			{
 				return new kInteractivityDataValidator($entry);
 			}
