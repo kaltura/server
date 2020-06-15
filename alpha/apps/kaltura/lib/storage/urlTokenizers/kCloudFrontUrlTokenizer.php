@@ -64,13 +64,16 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 			}
 		}
 
-		//due to Itunes limitations removing unneccesry fields
-		$flavorIdPos = strpos($acl,"/flavorId/");
-		if ($flavorIdPos !== false )
+		//due to Itunes limitations removing unnecessary fields
+		if(strpos($acl,"/clipTo/") === false)
 		{
-			$acl = substr($acl, 0, $flavorIdPos);
+			$flavorIdPos = strpos($acl,"/flavorId/");
+			if ($flavorIdPos !== false )
+			{
+				$acl = substr($acl, 0, $flavorIdPos);
+			}
 		}
-		
+
 		$acl = $baseUrl . $acl . '*';
 	
 		return $acl;
