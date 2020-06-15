@@ -26,6 +26,14 @@ abstract class kInteractivityDataFieldsFilter extends BaseObject
 	 */
 	public function setFields($fields)
 	{
-		$this->fields = explode(self::FIELDS_DELIMITER, $fields);
+		$this->fields = array_map('trim', explode(self::FIELDS_DELIMITER, $fields));
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getFieldsAsArray()
+	{
+		return $this->fields;
 	}
 }

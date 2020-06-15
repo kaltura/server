@@ -4,6 +4,6 @@
  * @subpackage model
  */
 
-class kNodeFieldsFilter extends kInteractivityDataFieldsFilter
+class kInteractivityRootFilter extends kInteractivityDataFieldsFilter
 {
 }

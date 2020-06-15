@@ -12,7 +12,7 @@ class InteractivityService extends KalturaBaseService
 	 *
 	 * @action get
 	 * @param string $entryId
-	 * @param KalturaInteractivityDataFieldsFilterArray $dataFilter
+	 * @param KalturaInteractivityDataFilter $dataFilter
 	 * @return KalturaInteractivity
 	 * @throws kCoreException
 	 * @throws KalturaAPIException
@@ -25,7 +25,9 @@ class InteractivityService extends KalturaBaseService
 		$kalturaInteractivity->fromObject($kInteractivity, $this->getResponseProfile());
 		if($dataFilter)
 		{
-			$filtersArray = $dataFilter->toObjectsArray();
+			$kDataFilter = $dataFilter->toObject();
+			/* @var $kDataFilter kInteractivityDataFilter */
+			$kalturaInteractivity->data = $kDataFilter->filterData($kalturaInteractivity->data);
 		}
 
 		return $kalturaInteractivity;
