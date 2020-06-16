@@ -90,31 +90,62 @@ class CaptionAsset extends asset
 			($this->isCustomDataModified(self::CUSTOM_DATA_FIELD_LANGUAGE)))
 		)
 		{
-			//Check if we have duplication in language in this case only the one with the highest accuracy should be marked as displayOnPlayer = true
 			$captionAssets = assetPeer::retrieveByEntryId($this->getEntryId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 			foreach ($captionAssets as $captionAsset)
 			{
 				/* @var $captionAsset CaptionAsset */
-				if($captionAsset->getLanguage() != $this->getLanguage())
-					continue;
-				
-				//If current captionAsset has no accuracy or has higher accuracy than an existing one consider it as the one that should be displayed
-				if( !$captionAsset->getAccuracy() || $this->getAccuracy() > $captionAsset->getAccuracy() )
+				if( ($this->getId() === $captionAsset->getId()) ||
+					($captionAsset->getLanguage() != $this->getLanguage()) ||
+					!$captionAsset->getDisplayOnPlayer() ||
+					!$this->getDisplayOnPlayer() )
 				{
-					$this->setDisplayOnPlayer(true);
-					if($captionAsset->getDisplayOnPlayer())
+					continue;
+				}
+
+				if(!$captionAsset->getAccuracy())
+				{
+					if ($this->getAccuracy() >= 99)
 					{
 						$captionAsset->setDisplayOnPlayer(false);
-						$captionAsset->save();
+						$this->decideDefaultCaption($captionAsset);
+					}
+					else
+					{
+						$this->setDisplayOnPlayer(false);
+					}
+
+				}
+				else
+				{
+					if ( ($captionAsset->getAccuracy() >= 99 && $this->getAccuracy() >= 99) ||
+						($this->getAccuracy() >= $captionAsset->getAccuracy()) )
+					{
+						$captionAsset->setDisplayOnPlayer(false);
+						$this->decideDefaultCaption($captionAsset);
+					}
+					elseif ($this->getAccuracy() < $captionAsset->getAccuracy())
+					{
+						$this->setDisplayOnPlayer(false);
 					}
 				}
+				$this->save();
+				$captionAsset->save();
 			}
 		}
 		
 		return $ret;
 	}
-	
+
 	public function shouldCopyOnReplacement() {return false;}
+
+	protected function decideDefaultCaption($captionAsset)
+	{
+		if ($captionAsset->getDefault())
+		{
+			$this->setDefault(true);
+			$captionAsset->setDefault(false);
+		}
+	}
 
 	/**
 	 * (non-PHPdoc)
