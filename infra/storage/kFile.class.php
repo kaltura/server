@@ -3,6 +3,9 @@
  * @package infra
  * @subpackage Storage
  */
+
+require_once(dirname(__FILE__) . '/shared_file_system_managers/kSharedFileSystemMgr.php');
+
 class kFile extends kFileBase
 {
 	const MO_PATTERN = "GNU message catalog";

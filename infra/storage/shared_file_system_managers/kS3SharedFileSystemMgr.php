@@ -7,7 +7,7 @@
  */
 
 // AWS SDK PHP Client Library
-require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));
+require_once(dirname(__FILE__) . '/../../../vendor/aws/aws-autoloader.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 
 use Aws\S3\S3Client;
