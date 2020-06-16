@@ -167,15 +167,22 @@ class kKavaVpaasReports extends kKavaReports
 				'object_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
 				'status' => self::DIMENSION_ENTRY_ID,
+				'entry_source' => self::DIMENSION_ENTRY_ID,
 				'partner_id' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'partner_id'),
-				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::genericVpaasQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'peer' => 'entryPeer',
-					'columns' => array('NAME', 'STATUS', 'PARTNER_ID'),
-				)
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'entry_source','partner_id'),
+					self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::genericVpaasQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'entryPeer',
+						'columns' => array('NAME', 'STATUS', 'ID', 'PARTNER_ID'),
+					),
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('entry_source'),
+					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+				),
 			),
 		),
 
