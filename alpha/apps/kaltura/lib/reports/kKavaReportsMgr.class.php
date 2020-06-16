@@ -3949,7 +3949,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$transform = self::getTransformTimeDimensions($granularity);
 		$tz_offset = isset($context['timezone_offset']) ? $context['timezone_offset']['value'] : 0;
-		$tz = self::getPhpTimezone($tz_offset);
+		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($tz_offset));
 
 		foreach ($dates as $date)
 		{
