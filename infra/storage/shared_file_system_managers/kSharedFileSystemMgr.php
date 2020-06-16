@@ -390,8 +390,19 @@ abstract class kSharedFileSystemMgr
 		$fromFilePath = kFileBase::fixPath($fromFilePath);
 		$toFilePath = kFileBase::fixPath($toFilePath);
 		
-		if (!kString::beginsWith($fromFilePath, self::$kSharedRootPath)) {
+		if(kFile::isSharedPath($from) && !kFile::isSharedPath($to))
+		{
+			return kFile::getExternalFile(kFile::realPath($from), dirname($to), basename($to));
+		}
+		
+		if(!kFile::isSharedPath($from) && kFile::isSharedPath($to))
+		{
 			return $this->doMoveLocalToShared($fromFilePath, $toFilePath, true);
+		}
+		
+		if(kFile::isSharedPath($from) && kFile::isSharedPath($to))
+		{
+			return $this->doCopy($fromFilePath, $toFilePath);
 		}
 		
 		return $this->doCopy($fromFilePath, $toFilePath);
