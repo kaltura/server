@@ -1,3 +1,11 @@
+# Propus 16.5.0  #
+## Adding permission to mediaServer partner for partner:get ##
+Issue Type: Task
+Issue ID : LIV-145
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_20_add_permission_partner_get.php
+
 # Propus 16.4.0  #
 ## New Boolean notification template: Caption Ready With Conditions ##
 Issue Type: Task
