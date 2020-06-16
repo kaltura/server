@@ -534,7 +534,7 @@ class kFileBase
 	
 	public static function copy($from, $to)
 	{
-		if(kFile::isSharedPath($to))
+		if(kFile::isSharedPath($to) || kFile::isSharedPath($to))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
 			return $kSharedFsMgr->copy($from, $to);
@@ -656,5 +656,54 @@ class kFileBase
 		}
 		
 		throw new Exception("Could not calculate unique path for file");
+	}
+	
+	public static function resolveFilePath($filePath)
+	{
+		$isRemote = false;
+		$realFilePath = kFile::realPath($filePath);
+		
+		if(strpos($realFilePath, "http") !== false)// && kFile::checkFileExists($filePath))
+		{
+			$isRemote = true;
+		}
+		
+		return array($isRemote, $realFilePath);
+	}
+	
+	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)
+	{
+		if(!$dirName)
+		{
+			$dirName = sys_get_temp_dir();
+		}
+		
+		if(!$baseName)
+		{
+			$baseName = md5(microtime(true) . getmypid() . uniqid(rand(), true));;
+		}
+		
+		$tmpFilePath = kFile::fixPath($dirName() . DIRECTORY_SEPARATOR . $baseName);
+		
+		$res = null;
+		try
+		{
+			$res = kFile::getDataFromFile($externalUrl, $tmpFilePath, null, true);
+			if ($res)
+			{
+				$res = $tmpFilePath;
+				KalturaLog::info("Succeeded to retrieve asset content from [$externalUrl] to [$localFilePath]");
+			}
+			else
+			{
+				KalturaLog::info("Failed to retrieve asset content from [$externalUrl] to [$localFilePath]");
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Can't serve asset id [$assetId] from [$externalUrl] " . $e->getMessage());
+		}
+		
+		return $res;
 	}
 }
