@@ -1526,20 +1526,20 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format('YmdH');
 	}
 
-	protected static function timestampToDateId($timestamp, $tz)
+	protected static function timestampToDateId($timestamp, $tz, $format = 'Ymd')
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
 		$date->setTimezone($tz);
-		return $date->format('Ymd');
+		return $date->format($format);
 	}
 
-	protected static function timestampToMonthId($timestamp, $tz)
+	protected static function timestampToMonthId($timestamp, $tz, $format = 'Ym')
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
 		$date->setTimezone($tz);
-		return $date->format('Ym');
+		return $date->format($format);
 	}
 
 	protected static function getDateIdRange($from_day, $to_day)
@@ -3936,6 +3936,28 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		return $result;
 	}
+
+
+	protected static function convertTime($dates, $partner_id, $context)
+	{
+		$granularity = self::GRANULARITY_DAY;
+		$format = 'Y-m-d';
+		if ($context['interval']['value'] === self::INTERVAL_MONTHS) {
+			$granularity = self::GRANULARITY_MONTH;
+			$format = 'Y-m';
+		}
+
+		$transform = self::getTransformTimeDimensions($granularity);
+		$tz_offset = isset($context['timezone_offset']) ? $context['timezone_offset']['value'] : 0;
+		$tz = self::getPhpTimezone($tz_offset);
+
+		foreach ($dates as $date)
+		{
+			$result[$date] = call_user_func($transform, $date, $tz, $format);
+		}
+		return $result;
+	}
+
 
 	protected static function getEnrichDefs($report_def)
 	{
