@@ -876,7 +876,7 @@ class kFlowHelper
 			}
 		}
 		
-		// creats the file sync
+		// Creates the file sync
 		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
