@@ -87,35 +87,33 @@ class VodPackagerDeliveryUtils
 		return array('url' => $url, 'urlPrefix' => $urlPrefix);
 	}
 	
-	public static function getExtraParams(DeliveryProfileDynamicAttributes $params) {
-	
-		$result = '';
-		
+	public static function addExtraParams($url, DeliveryProfileDynamicAttributes $params)
+	{
 		$seekStart = $params->getSeekFromTime();
 		if($seekStart > 0) 
 		{
-			$result .= '/clipFrom/' . $seekStart;
+			$url .= '/clipFrom/' . $seekStart;
 		}
 			
 		$seekEnd = $params->getClipTo();
 		if($seekEnd) 
 		{
-			$result .= '/clipTo/' . $seekEnd;
+			$url = DeliveryProfileVod::insertClipTo($url, $seekEnd);
 		}
 		
 		$playbackRate = $params->getPlaybackRate();
 		if($playbackRate) 
 		{
-			$result .= '/speed/' . $playbackRate;
+			$url .= '/speed/' . $playbackRate;
 		}
 
 		$trackSelection = $params->getTrackSelection();
 		if ($trackSelection)
 		{
-			$result .= '/tracks/' . $trackSelection;
+			$url .= '/tracks/' . $trackSelection;
 		}
 	
-		return $result;
+		return $url;
 	}
 
 	/**

@@ -76,10 +76,66 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		if (($entry->getType() == entryType::PLAYLIST) && ($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
 			$url .= '/captions/' . $flavorAsset->getLanguage();
 
-		$url .= $this->params->getUrlParams();
+		$urlParams = $this->params->getUrlParams();
+
+		$clipTo = $this->extractClipTo($urlParams);
+		if($clipTo)
+		{
+			$url = self::insertClipTo($url, $clipTo);
+		}
+
+		$url .= $urlParams;
+
+
 		return $url;
 	}
-	
+
+	protected function extractClipTo(&$urlParams)
+	{
+		list($clipToPos, $endClipToValPos) = self::getKeyValPositions($urlParams, 'clipTo');
+
+		if($clipToPos === false)
+		{
+			return false;
+		}
+
+		$clipToValPos = $clipToPos + strlen('/clipTo/');
+		$clipTo = substr($urlParams, $clipToValPos, $endClipToValPos - $clipToValPos);
+
+		$urlParams = substr($urlParams, 0, $clipToPos) . substr($urlParams, $endClipToValPos);
+
+		return $clipTo;
+	}
+
+	protected static function getKeyValPositions($url, $key)
+	{
+		$startKeyPos = strpos($url,"/{$key}/");
+		if ($startKeyPos === false )
+		{
+			return array(false, false);
+		}
+
+		$endValPos = strpos($url, '/', $startKeyPos + strlen("/{$key}/"));
+		if ($endValPos === false)
+		{
+			$endValPos = strlen($url);
+		}
+
+		return array($startKeyPos, $endValPos);
+	}
+
+	public static function insertClipTo($url, $clipTo)
+	{
+		list($entryIdPos, $endEntryIdValPos) = self::getKeyValPositions($url, 'entryId');
+
+		if ($entryIdPos !== false )
+		{
+			$url = substr($url, 0, $endEntryIdValPos) . '/clipTo/' . $clipTo . substr($url, $endEntryIdValPos);
+		}
+
+		return $url;
+	}
+
 	/**
 	 * @param asset $flavorAsset
 	 * @return string representing the version string
@@ -102,7 +158,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
-			$url .= "/clipTo/" . $this->params->getClipTo();
+		{
+			$url = self::insertClipTo($url, $this->params->getClipTo());
+		}
 		return $url;
 	}
 	

@@ -9,7 +9,10 @@ class DeliveryProfileEdgeCastHttp extends DeliveryProfileHttp
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
-			$url .= "/clipTo/" . $this->params->getClipTo();
+		{
+			$url = self::insertClipTo($url, $this->params->getClipTo());
+		}
+
 		if($this->params->getFileExtension())
 			$url .= "/name/a.".$this->params->getFileExtension();
 		
