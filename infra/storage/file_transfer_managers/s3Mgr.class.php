@@ -4,8 +4,19 @@
 require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));
 
 use Aws\S3\S3Client;
+use Aws\Sts\StsClient;
+
 use Aws\S3\Exception\S3Exception;
+use Aws\Exception\AwsException;
 use Aws\S3\Enum\CannedAcl;
+
+use Aws\Common\Credentials\Credentials;
+use Aws\Common\Credentials\RefreshableInstanceProfileCredentials;
+use Aws\Common\Credentials\AbstractRefreshableCredentials;
+use Aws\Common\Credentials\CacheableCredentials;
+
+use Doctrine\Common\Cache\FilesystemCache;
+use Guzzle\Cache\DoctrineCacheAdapter;
 
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the Amazon S3 protocol with Authentication Version 4.
@@ -18,13 +29,17 @@ class s3Mgr extends kFileTransferMgr
 {
 	/* @var S3Client $s3 */
 	private $s3;
-	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	
 	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
 	protected $sseType = '';
 	protected $sseKmsKeyId = '';
 	protected $signatureType = null;
 	protected $endPoint = null;
+	protected $storageClass = null;
+	
+	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
@@ -60,6 +75,11 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$this->endPoint = $options['endPoint'];
 		}
+
+		if($options && isset($options['storageClass']))
+		{
+			$this->storageClass = $options['storageClass'];
+		}
 		
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
@@ -94,7 +114,18 @@ class s3Mgr extends kFileTransferMgr
 			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
-
+		
+		if(getenv(self::S3_ARN_ROLE_ENV_NAME) && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		{
+			if(!class_exists('Aws\Sts\StsClient'))
+			{
+				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				return false;
+			}
+			
+			return $this->generateS3Client();
+		}
+		
 		$config = array(
 					'credentials' => array(
 							'key'    => $sftp_user,
@@ -116,6 +147,24 @@ class s3Mgr extends kFileTransferMgr
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
 		 * code elsewhere if the permissions are not sufficient.
 		 **/
+		return true;
+	}
+	
+	private function generateS3Client()
+	{
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		
+		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
+		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
+		
+		$this->s3 = S3Client::factory(array(
+			'credentials' => $roleCreds,
+			'region' => $this->s3Region,
+			'signature' => 'v4',
+			'version' => '2006-03-01'
+		));
+		
 		return true;
 	}
 
@@ -144,6 +193,11 @@ class s3Mgr extends kFileTransferMgr
 			$params['ServerSideEncryption'] = "AES256";
 		}
 
+		if ($this->storageClass)
+		{
+			$params['StorageClass'] = $this->storageClass;
+		}
+
 		while ($retries)
 		{
 			list($success, $message) = @($this->doPutFileHelper($remote_file, $local_file, $params));
@@ -164,7 +218,7 @@ class s3Mgr extends kFileTransferMgr
 		$fp = null;
 		try
 		{
-			$size = filesize($local_file);
+			$size = kFile::fileSize($local_file);
 			KalturaLog::debug("file size is : " . $size);
 
 			if ($size > self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE)
@@ -321,5 +375,46 @@ class s3Mgr extends kFileTransferMgr
 	public function registerStreamWrapper()
 	{
 		$this->s3->registerStreamWrapper();
+	}
+}
+
+class RefreshableRole extends AbstractRefreshableCredentials
+{
+	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
+	const SESSION_DURATION = 3600;
+	
+	public function refresh()
+	{
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		
+		$credentials = new Credentials('', '');
+		$ipRefresh = new RefreshableInstanceProfileCredentials(new Credentials('', '', '', 1));
+		$ipCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/instanceProfileCache"));
+		
+		$ipCreds = new CacheableCredentials($ipRefresh, $ipCache, 'refresh_role_creds_key');
+		$sts = StsClient::factory(array(
+			'credentials' => $ipCreds,
+		));
+		
+		$call = $sts->assumeRole(array(
+			'RoleArn' => getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME),
+			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
+			'SessionDuration' => self::SESSION_DURATION,
+		));
+		
+		$creds = $call['Credentials'];
+		$result = new Credentials(
+			$creds['AccessKeyId'],
+			$creds['SecretAccessKey'],
+			$creds['SessionToken'],
+			strtotime($creds['Expiration'])
+		);
+		
+		$this->credentials->setAccessKeyId($result->getAccessKeyId())
+			->setSecretKey($result->getSecretKey())
+			->setSecurityToken($result->getSecurityToken())
+			->setExpiration($result->getExpiration());
+		
+		return $credentials;
 	}
 }

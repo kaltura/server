@@ -23,13 +23,14 @@
 	 * Session setup values
 	 */
 	class KChunkedEncodeSetup {
+
 				// DefaultChunkDuration for frame height>1280 (basically 4K and QHD). 
 				// Chunk dur's for smaller frames evaluated from that value.
 		const	DefaultChunkDuration = 30;  // secs
 		const	DefaultChunkOverlap =  0.5; // secs
 		const	DefaultConcurrentChunks = 1;// secs
 		
-		public $ffmpegBin = "ffmpeg";
+		public $ffmpegBin = "ffmpeg"; 
 		public $ffprobeBin = "ffprobe";
 
 		public $commandExecitionScript = null;
@@ -104,7 +105,6 @@
 			else
 				return self::DefaultChunkDuration*6;
 		}
-
 	}
 
 	/********************
@@ -116,10 +116,10 @@
 		public $finish = null;
 		public $type = null;
 		
-		public function __construct($chunkFileName=null, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
+		public function __construct($chunkFileName=null, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg",$tmpPromptFolder="/tmp")
 		{
 			if(isset($chunkFileName)){
-				$rv = $this->getData($chunkFileName, $ffprobeBin, $ffmpegBin);
+				$rv = $this->getData($chunkFileName, $ffprobeBin, $ffmpegBin, $tmpPromptFolder);
 				if(!isset($rv))
 					return null;
 			}
@@ -129,55 +129,7 @@
 		 * getData
 		 *	Retrieve following chunk stat data - 
 		 */
-		public function getData($chunkFileName, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
-		{
-			KChunkFramesStat::getData2($chunkFileName, $this, $ffprobeBin, $ffmpegBin);
-		}
-		
-		/********************
-		 * getData
-		 *	Retrieve following chunk stat data - 
-		 */
-		protected static function getData1($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
-		{
-				/*
-				 * Retrieve data for first frame and for last 10
-				 */
-			$cmdLine = "$ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet $chunkFileName | (head -n1 && tail -n10)";
-			KalturaLog::log($cmdLine);
-			$lastLine=exec($cmdLine , $outputArr, $rv);
-			if($rv!=0) {
-				KalturaLog::log("ERROR: failed to extract frame data from chunk ($chunkFileName).");
-				return null;
-			}
-			KalturaLog::log("rv($rv), output:\n".print_r($outputArr,1));
-			$outputLine = array_shift($outputArr);
-			list($stam,$pts,$type,$frame) = explode(",",$outputLine);
-			$framesStat->start = $pts;
-			
-			$framesStat->frame = 0;
-			$frame = 0;
-			foreach($outputArr as $outputLine){
-				list($stam,$pts,$type,$frame) = explode(",",$outputLine);
-				if($framesStat->frame<$frame) {
-					$framesStat->frame = $frame;
-				}
-			}
-			$framesStat->frame++;
-			$framesStat->finish = $pts;
-			$framesStat->type = $type;
-			
-			$jsonStr = json_encode($framesStat);
-			KalturaLog::log("$jsonStr");
-			
-			return $framesStat;
-		}
-		
-		/********************
-		 * getData
-		 *	Retrieve following chunk stat data - 
-		 */
-		protected static function getData2($chunkFileName, KChunkFramesStat $framesStat, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
+		public function getData($chunkFileName, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg", $tmpPromptFolder="/tmp")
 		{
 			KalturaLog::log("$chunkFileName");
 				/*
@@ -185,7 +137,7 @@
 				 * store the tmp MP4 file in th local /tmp folder
 				 */
 //			$mp4TmpFile = "$chunkFileName.mp4";
-			$mp4TmpFile = "/tmp/".basename($chunkFileName).".mp4";
+			$mp4TmpFile = "$tmpPromptFolder/".basename($chunkFileName).".mp4";
 			$cmdLine = "$ffmpegBin -i $chunkFileName -c copy -f mp4 -v quiet -y $mp4TmpFile;$ffprobeBin -show_streams -select_streams v -v quiet -show_entries stream=duration,nb_frames -print_format csv $mp4TmpFile; unlink $mp4TmpFile";
 			KalturaLog::log("copy:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
@@ -229,20 +181,20 @@
 				}
 			}
 			KalturaLog::log("trimmed:output:\n".print_r($outputArr,1));
-
+			
 			$outputLine = array_shift($outputArr);
 			list($stam,$pts,$size,$type,$frame) = explode(",",$outputLine);
-			$framesStat->start = $pts;
-			$framesStat->size = $size;
+			$this->start = $pts;
+			$this->size = $size;
 			$outputLine = end($outputArr);
 			list($stam,$pts,$size,$type,$frame) = explode(",",$outputLine);
-			$framesStat->finish = $pts;
-			$framesStat->type = $type;
-			$framesStat->frame = $frames;
+			$this->finish = $pts;
+			$this->type = $type;
+			$this->frame = $frames;
 			
-			$jsonStr = json_encode($framesStat);
+			$jsonStr = json_encode($this);
 			KalturaLog::log("$jsonStr");
-			return $framesStat;
+
 		}
 		
 		/********************
@@ -272,7 +224,7 @@
 			}
 			return $statsArr;
 		}
-
+	
 	}
 	
 	/********************
@@ -410,4 +362,23 @@
 		}
 	}
 
+	/********************
+	 * Session Report stat data
+	 */
+	class KChunkedEncodeSessionReportStats {
+		public $num = 0;
+		public $lasted = 0;
+		public $elapsedCpu = 0;
+		public $userCpu = 0;
+		public $systemCpu = 0;
+		public $concurrency = 0;
+		public $concurrencyMax = 0;
+		public $concurrencyMaxTime = 0;
+		public $concurrencyIdleTime = 0;
+		
+		public function ToString()
+		{
+			return ("chunks($this->num),lasted:$this->lasted"."s,accum(elapsed:$this->elapsedCpu,user:$this->userCpu,system:$this->systemCpu),concurrency:$this->concurrency(max:$this->concurrencyMax,".$this->concurrencyMaxTime."s,idle:$this->concurrencyIdleTime"."s)");
+		}
+	}
 

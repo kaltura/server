@@ -10,12 +10,14 @@
 	 */
 	abstract class KBaseChunkedEncodeSessionManager
 	{
+		const 	SessionStatsJSONLogPrefix = "SessionStatsJSON";
+		
 		protected $name = null;	
 		protected $chunker = null;
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
-		protected $maxExecutionTime = 6000;	// In seconds. Represents trascoding ratio x100, that should suit 4K/H265
+		protected $maxExecutionTime = 6000;	// In seconds. Represents transcoding ratio x100, that should suit 4K/H265
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();
@@ -106,9 +108,11 @@
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
-				$logFilename = $chunker->getSessionName("audio").".log";
+				$outFilename = $chunker->getSessionName("audio");
+				$logFilename = "$outFilename.log";
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
 				$this->audioCmdLines = array($cmdLine);
+				KalturaLog::log($cmdLine);
 			}
 			$this->SerializeSession();
 			return true;
@@ -181,6 +185,13 @@
 		 */
 		public function Merge()
 		{
+			$rv=$this->chunker->ConcatChunks();
+			if($rv===false) {
+				KalturaLog::log($msgStr="FAILED to merge - missing concat'ed chunk video file, leaving!");
+				$this->returnMessages[] = $msgStr;
+				$this->returnStatus = KChunkedEncodeReturnStatus::MergeError;
+				return false;
+			}
 			$concatFilenameLog = $this->chunker->getSessionName("concat");
 
 			$mergeCmd = $this->chunker->BuildMergeCommandLine();
@@ -252,27 +263,19 @@
 				KalturaLog::log("source:".print_r($fileDtSrc,1));
 			}
 			
+			$sessionStats = new KChunkedEncodeSessionReportStats();
+			$sessionStats->num = $chunker->GetMaxChunks();
+			$sessionStats->lasted = $this->finishTime - $this->createTime;
 			{
 				KalturaLog::log("CSV,idx,startedAt,user,system,elapsed,cpu");
-				$userAcc = $systemAcc = $elapsedAcc = $cpuAcc = 0;
 				foreach($this->chunkExecutionDataArr as $idx=>$execData){
-					$userAcc+= $execData->user;
-					$systemAcc+= $execData->system;
-					$elapsedAcc+= $execData->elapsed;
-					$cpuAcc+= $execData->cpu;
+					$sessionStats->userCpu +=    $execData->user;
+					$sessionStats->systemCpu +=  $execData->system;
+					$sessionStats->elapsedCpu += $execData->elapsed;
 					
 					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
 				}
 				$cnt = $chunker->GetMaxChunks();
-				if($cnt>0) {
-					$userAvg 	= round($userAcc/$cnt,3);
-					$systemAvg 	= round($systemAcc/$cnt,3);
-					$elapsedAvg = round($elapsedAcc/$cnt,3);
-					$cpuAvg 	= round($cpuAcc/$cnt,3);
-				}
-				else
-					$userAvg = $systemAvg = $elapsedAvg = $cpuAvg = 0;
-
 			}
 			
 //			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
@@ -297,7 +300,19 @@
 			KalturaLog::log("***********************************************************");
 			KalturaLog::log("* Session Summary (".date("Y-m-d H:i:s").")");
 			KalturaLog::log("* ");
-			KalturaLog::log("ExecutionStats:chunks($cnt),accum(elapsed:$elapsedAcc,user:$userAcc,system:$systemAcc),average(elapsed:$elapsedAvg,user:$userAvg,system:$systemAvg,cpu:$cpuAvg)");
+			if(isset($concurrencyLevel)) {
+				$val = round(end($this->concurrencyHistogram)/1000,2);
+				$idle = round($this->concurrencyHistogram[0]/1000,2);
+				$sessionStats->concurrency = $concurrencyLevel;
+				$sessionStats->concurrencyMax = key($this->concurrencyHistogram);
+				$sessionStats->concurrencyMaxTime = $val;
+				$sessionStats->concurrencyIdleTime = $idle;
+			}
+
+			KalturaLog::log("SessionStats:".$sessionStats->ToString());
+			$sessionStatsJson = json_encode($sessionStats);
+			KalturaLog::log("SessionStatsJSON $sessionStatsJson");
+			
 			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::AnalyzeError){
 				$msgStr.= ",analyze:BAD";
 			}
@@ -438,20 +453,61 @@
 		/********************
 		 * 
 		 */
-		protected static function getLogTail($logFilename, $size=5000)
+		public static function GetLogTail($logFilename, $size=5000)
 		{
 			$logTail = null;
-			if(file_exists($logFilename)) {
-				$fHd = fopen($logFilename,"r");
-				$fileSz = filesize($logFilename);
-				if($fileSz>$size)
-					fseek($fHd,$fileSz-$size);
-				$logTail = fread($fHd, $size);
-				fclose($fHd);
+			if(file_exists($logFilename)==false) 
+				return null;
+
+			$fHd=fopen($logFilename,"r");
+			if($fHd===false){
+				return null;
 			}
+			if(fseek($fHd , -$size, SEEK_END)!==0){
+				fclose($fHd);
+				return null;
+			}
+			if(($logTail=fread($fHd, $size))===false){
+				fclose($fHd);
+				return null;
+			}
+			fclose($fHd);
 			return $logTail;
 		}
-	
+
+		/********************
+		 * 
+		 */
+		public static function GetLogTailLines($logFilename, $size=5000)
+		{
+			$logTail = self::GetLogTail($logFilename, $size);
+			if($logTail==null)
+				return null;
+			$lines=preg_split("/\r\n|\n|\r/", $logTail);
+			return $lines;
+		}
+
+		/********************
+		 * 
+		 */
+		public static function GetSessionStatsJSON($logFilename, $size=10000)
+		{
+			KalturaLog::log("$logFilename, $size");
+			if($lines=self::GetLogTailLines($logFilename, $size)) {
+				foreach($lines as $idx=>$line) {
+					$prefix=self::SessionStatsJSONLogPrefix;
+					if(($pos=strpos($line,$prefix))===false)
+						continue;
+					KalturaLog::log("$line");
+					$jsonStr = substr($line, $pos+strlen($prefix));
+					$obj = json_decode($jsonStr);
+					KalturaLog::log("JSON:$jsonStr, object:".print_r($obj,1));
+					return $obj;
+				}
+			}
+			return null;
+		}
+
 		/********************
 		 *
 		 */

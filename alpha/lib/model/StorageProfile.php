@@ -40,6 +40,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_EXPORT_PERIODICALLY = 'export_periodically';
 	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS = 'excluded_flavor_params_ids';
 	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
+	const CUSTOM_DATA_PATH_PREFIX = 'path_prefix';
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -366,10 +367,16 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		KalturaLog::log(__METHOD__ . " - key [$key], externalStorage id[" . $this->getId() . "]");
 
-		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, false, false);
+		list($kalturaFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 		if(!$kalturaFileSync) // no local copy to export from
 		{
 			KalturaLog::log(__METHOD__ . " key [$key] not found localy");
+			return false;
+		}
+
+		if(!$local && in_array($kalturaFileSync->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			KalturaLog::log(__METHOD__ . " key [$key] was found but in a different DC");
 			return false;
 		}
 
@@ -512,4 +519,15 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS, $v);
 	}
+
+	public function getPathPrefix()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PATH_PREFIX,null, '');
+	}
+
+	public function setPathPrefix($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PATH_PREFIX, $v);
+	}
+
 }

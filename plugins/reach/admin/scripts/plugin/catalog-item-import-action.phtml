@@ -1,0 +1,14 @@
+
+<?php if($this->bulkUploadId): ?>
+    <p>Bulk upload id: <var> <?php echo $this->bulkUploadId; ?> </var>
+    <br> Copy the id to get the import result
+    </p>
+<?php endif; ?>
+<?php if($this->errMessage): ?>
+    <p>Error occurred: <var> <?php echo $this->errMessage; ?> </var> </p>
+<?php endif; ?>
+
+
+<style type="text/css">
+	#catalog-item-import-dialog { width:auto ; left: auto; word-wrap: break-word}
+</style>

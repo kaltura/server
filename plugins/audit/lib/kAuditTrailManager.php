@@ -460,11 +460,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 					KalturaLog::info("Old and new values are identical [$descriptor]");
 					continue;
 				}
-				if ($auditTrail->getObjectType() == KalturaAuditTrailObjectType::REACH_PROFILE)
-				{
-					$oldValue = preg_replace('/[[:cntrl:]]/', '', $oldValue);
-					$newValue = preg_replace('/[[:cntrl:]]/', '', $newValue);
-				}
 
 				$changedItem = new kAuditTrailChangeItem();
 				$changedItem->setDescriptor($descriptor);

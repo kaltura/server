@@ -158,12 +158,9 @@ class kKavaQoeReports extends kKavaReportsMgr
 
 		self::ERROR_TRACKING_BASE => array(
 			self::REPORT_METRICS => array(
+				self::METRIC_VIEW_UNIQUE_SESSIONS,
 				self::EVENT_TYPE_ERROR,
 				self::METRIC_ERROR_SESSION_COUNT,
-			),
-			self::REPORT_FILTER => array(
-				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-				self::DRUID_VALUES => array(self::EVENT_TYPE_ERROR)
 			),
 		),
 
@@ -212,13 +209,13 @@ class kKavaQoeReports extends kKavaReportsMgr
 				self::METRIC_AVG_JOIN_TIME,
 				self::EVENT_TYPE_BUFFER_START,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_UNIQUE_SESSIONS
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_AVG_JOIN_TIME,
 				self::EVENT_TYPE_BUFFER_START,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
-				self::METRIC_AVG_VIEW_BITRATE,
+				self::METRIC_VIEW_UNIQUE_SESSIONS
 			)
 		),
 

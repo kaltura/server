@@ -125,10 +125,15 @@ abstract class KJobConversionEngine extends KConversionEngine
 			$this->addToLogFile ( $log_file , $conversion_str ) ;
 				
 			KalturaLog::info ( $execution_command_str );
+
+                        if(isset($data->urgency))
+                                $urgency = $data->urgency;
+                        else
+                                $urgency = null;
 	
 			$start = microtime(true);
 			// TODO add BatchEvent - before conversion + conversion engine
-			$output = $this->execute_conversion_cmdline($execution_command_str , $return_value , $jobId);
+			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $urgency, $jobId);
 			// TODO add BatchEvent - after conversion + conversion engine		
 			$end = microtime(true);
 	
@@ -145,6 +150,10 @@ abstract class KJobConversionEngine extends KConversionEngine
 		// add media info of target
 		$this->logMediaInfo ( $log_file , $data->destFileSyncLocalPath );
 		
+		// Export job CPU metrics 
+		$obj=KChunkedEncodeSessionManager::GetSessionStatsJSON($log_file);
+		if(isset($obj->userCpu))
+			$data->userCpu = round($obj->userCpu);
 		
 		return array ( true , $error_message );// indicate all was converted properly
 	}
@@ -182,7 +191,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 	/**
 	 *
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var, $jobId = null)
+	protected function execute_conversion_cmdline($command, &$return_var, $urgency, $jobId = null)
 	{
 		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
 		{

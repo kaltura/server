@@ -211,6 +211,81 @@
         );
     }
 
+      function importFromCsv() {
+
+          dialogDiv = jQuery('<div id="catalog-item-import-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+          dialogDiv.dialog({
+              bgiframe: true,
+              modal: true,
+              resizable: true,
+              wordWrap: "break-word",
+              wordwrap: "breakword",
+              width: 500,
+              title: '<?php echo $this->translate('CSV Import'); ?>',
+              buttons: {
+                  '<?php echo $this->translate('Close'); ?>': function () {
+                      jQuery(this).dialog('close');
+                  }
+              },
+              close: function () {
+                  jQuery(this).dialog('destroy').remove();
+              }
+          });
+
+        var formData = new FormData();
+        formData.append('csvFile', $('input[type=file]')[0].files[0]);
+
+        var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemImportAction')); ?>';
+
+        $.ajax({
+            url: url,
+            data: formData,
+            type: 'POST',
+            contentType: false,
+            processData: false ,
+            success: function (result) {
+                $('#catalog-item-import-dialog').html(result);
+            },
+            error: function (result) {
+                $('#catalog-item-import-dialog').html(result);
+            }
+        });
+    }
+
+    function getBulkUploadResult(bulkUploadId) {
+
+        var paramsStr = '/bulk_upload_id/' + bulkUploadId;
+        var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemImportResultAction')); ?>' + paramsStr;
+
+        jQuery('#catalog-item-import-result-dialog').remove();
+        dialogDiv = jQuery('<div id="catalog-item-import-result-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+        dialogDiv.dialog({
+            bgiframe: true,
+            modal: true,
+            resizable: true,
+            wordWrap: "break-word",
+            wordwrap: "breakword",
+            width: 500,
+            title: '<?php echo $this->translate('Bulk Upload Result'); ?>',
+            buttons: {
+                '<?php echo $this->translate('Close'); ?>': function () {
+                    jQuery(this).dialog('close');
+                }
+            },
+            close: function () {
+                jQuery(this).dialog('destroy').remove();
+            }
+        });
+
+        dialogDiv.load(
+            url,
+            null,
+            null
+        );
+    }
+
 	function configureCatalogItem(catalogItemId, partnerId) {
 		if (typeof catalogItemId == 'undefined') {
 			alert('<?php echo $this->translate('Catalog Item ID not supplied'); ?>');

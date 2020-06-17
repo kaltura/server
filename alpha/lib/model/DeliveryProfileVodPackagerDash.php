@@ -14,15 +14,14 @@ class DeliveryProfileVodPackagerDash extends DeliveryProfileDash {
 		// using mp4 hardcoded, to prevent ugly urls when there are captions, 
 		//	the vod packager does not care anyway...
 		$url .= "/name/a.mp4";
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		$url = VodPackagerDeliveryUtils::addExtraParams($url, $this->params);
 		return $url;
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
 		$url = parent::doGetFileSyncUrl($fileSync);
-		
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		$url = VodPackagerDeliveryUtils::addExtraParams($url, $this->params);
 		return $url;
 	}
 	

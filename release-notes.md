@@ -1,5 +1,117 @@
-# Propus 16.2.0  #
+# Propus 16.5.0  #
+## Adding permission to mediaServer partner for partner:get ##
+Issue Type: Task
+Issue ID : LIV-145
 
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_20_add_permission_partner_get.php
+
+# Propus 16.4.0  #
+## New Boolean notification template: Caption Ready With Conditions ##
+Issue Type: Task
+Issue ID : REACH2-849
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+deployment/updates/scripts/xml/2020_06_14_captionAssetBooleanEventNotification.template.xml
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_06_14_deploy_caption_asset_boolean_notification.php
+
+## Adding permission to user validateHashKeyAction ##
+Issue Type: Task
+Issue ID : PLAT-10916
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_05_31_user_validateHashKey.php
+
+## Adding permission to interactivity get ##
+Issue Type: Bug
+Issue ID : PATH-837
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_02_update_interactivity_get_action_permissions.php
+
+# Propus 16.3.0  #
+## Adding permission to tag search ##
+Issue Type: Task
+Issue ID : PLAT-10930
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_05_28_add_permission_analytics_base_to_tag_search.php
+
+
+## Add periodic storage delete local batch ##
+Issue Type: Task
+Issue ID : PLAT-10894
+
+### Configuration ###
+Add the following to batch.ini:
+
+    enabledWorkers.KAsyncStoragePeriodicDeleteLocal     = 1
+
+    [KAsyncStoragePeriodicDeleteLocal : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Delete Local
+    type                                                = KAsyncStoragePeriodicDeleteLocal
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteLocalExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+    filter.statusEqual                                  = 2
+    filter.dcEqual                                      = @DC@
+    filter.fileTypeEqual                                = 3
+
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
+
+## Add periodic storage purge batch ##
+Issue Type: Task
+Issue ID : PLAT-10769
+
+### Configuration ###
+Add the following to batch.ini:
+
+    enabledWorkers.KAsyncStoragePeriodicPurge            = 1
+
+    [KAsyncStoragePeriodicPurge : PeriodicWorker]
+    id                                                  = @ID@
+    friendlyName                                        = Storage Periodic Purge
+    type                                                = KAsyncStoragePeriodicPurge
+    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicPurgeExe.php
+    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+    params.maxCount                                     = @MAX_COUNT@
+    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+    params.sleepInterval                                = @SLEEP_INTERVAL@
+    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+    filter.statusEqual                                  = 3
+    filter.dcIn                                         = @DC@
+    filter.fileTypeIn                                   = 1,3
+    
+    [KAsyncStoragePeriodicExport : PeriodicWorker]
+    ....
+    filter.statusEqual                                  = 1
+    filter.dcIn                                         = @DC@
+    filter.fileTypeEqual                                = 3
+    
+#### Deployment Scripts ####
+    php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
+
+
+# Propus 16.2.0  #
+## Retrieve last fileSync Id for storage export from db in case it is not in cache ##
+Issue Type: Task
+Issue ID: PLAT-10890
+
+### Configuration ###
+Modify cloud_storage.ini:
+add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
+    
 ## Support export captions to remote storage ##
 - Issue Type: Task
 - Issue ID: PLAT-10846

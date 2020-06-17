@@ -41,63 +41,35 @@ abstract class KalturaAssetService extends KalturaBaseService
 	 * @return KalturaAsset
 	 */
 	abstract public function getAction($id);
-	
+
 	/**
-	* @param asset $asset
-	* @param string $fileName
-	* @param bool $forceProxy
-	* @param int $version
-	* @throws KalturaErrors::FILE_DOESNT_EXIST
-	*/
+	 * @param asset $asset
+	 * @param $fileName
+	 * @param bool $forceProxy
+	 * @param null $version
+	 * @return kRendererDumpFile
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
 	protected function serveAsset(asset $asset, $fileName, $forceProxy = false, $version = null)
 	{
 		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET, $version);
-		
-		$fileSync = null;
-		$serveRemote = false;
-		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
-		
-		switch($partner->getStorageServePriority())
+		try
 		{
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY:
-				$serveRemote = true;
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-				
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if($fileSync && $fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
-					$serveRemote = true;
-				
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
-				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if($fileSync)
-					break;
-					
-				$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($syncKey);
-				if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
-					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-				
-				$serveRemote = true;
-				break;
-			
-			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_ONLY:
-				$fileSync = kFileSyncUtils::getReadyInternalFileSyncForKey($syncKey);
-				if($fileSync)
-				{
-					break;
-				}
-
-				$fileSync = kFileSyncUtils::getFileSyncFromPeriodicStorage($asset, $syncKey);
-				$serveRemote = true;
-				break;
+			list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey);
 		}
-		
+		catch (kCoreException $ex)
+		{
+			switch ($ex->getCode())
+			{
+				case kCoreException::FILE_NOT_FOUND:
+					throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
+					break;
+				default:
+					throw $ex;
+			}
+		}
+
 		if($serveRemote && $fileSync)
 		{
 			header("Location: " . $fileSync->getExternalUrl($asset->getEntryId()));

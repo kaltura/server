@@ -555,9 +555,13 @@ class kJobsManager
 		$isLocal = ($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC);
 		
 		if($isLocal)
+		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+		}
 		else 
-			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey, $flavor->getSourceRemoteStorageProfileId());		
+		{
+			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey, $flavor->getSourceRemoteStorageProfileId());
+		}
 		
 		if(!$fileSync)
 		{
@@ -1427,7 +1431,16 @@ class kJobsManager
 		$batchJob->setObjectId($fileSync->getId());
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
-		$batchJob->setDc($dc);
+
+		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}
+		else
+		{
+			$batchJob->setDc($dc);
+		}
+
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
 	}

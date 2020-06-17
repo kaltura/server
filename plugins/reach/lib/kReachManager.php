@@ -30,7 +30,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"permission" => objectType::PERMISSION,
 			"permissionItem" => objectType::PERMISSIONITEM,
 			"userRole" => objectType::USERROLE,
-			"categoryEntry" => objectType::CATEGORY_ENTRY );
+			"categoryEntry" => objectType::CATEGORY_ENTRY,
+			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue('CaptionAsset'),);
+
 		if (isset($mapObjectType[$eventObjectClassName]))
 		{
 			return $mapObjectType[$eventObjectClassName];
@@ -42,11 +44,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
 		$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
-
+		$taskJobData = self::getTaskJobData($object);
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
 			//Pass the object Id as the context of the task
-			self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profileId, $this->getContextByObjectType($object));
+			self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profileId, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
 
@@ -63,7 +65,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			$profileId = $booleanNotificationTemplate[self::PROFILE_ID];
 			$fullFieldCatalogItemIds = $booleanNotificationTemplate[self::ACTION][0]->getCatalogItemIds();
-			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $partnerId);
+			$fullFieldCatalogItemIdsArr = array_map('trim', explode(',', $fullFieldCatalogItemIds));
+			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
 			{
 				KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
@@ -235,6 +238,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
+		if ($object instanceof CaptionAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			return $this->shouldConsumeEvent($event);
+		}
+
 		return false;
 	}
 	
@@ -335,6 +344,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				$this->consumeEvent($event);
 			}
 			return $this->checkAutomaticRules($object);
+		}
+
+		if ($object instanceof CaptionAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			$this->consumeEvent($event);
+
 		}
 
 		return true;
@@ -453,7 +469,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $context = null)
+	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $context = null, $taskJobData = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($reachProfileId);
@@ -502,6 +518,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
 		if($entryVendorTask)
 		{
+			if ($taskJobData)
+			{
+				$entryVendorTask->setTaskJobData($taskJobData);
+			}
 			$entryVendorTask->save();
 		}
 		return $entryVendorTask;
@@ -662,6 +682,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		if ($object instanceof categoryEntry)
 			return $object->getCategoryId();
+
+		return null;
+	}
+
+	protected static function getTaskJobData($object)
+	{
+		if($object instanceof CaptionAsset)
+		{
+			$taskJobData = new kTranslationVendorTaskData();
+			$taskJobData->captionAssetId = $object->getId();
+			return $taskJobData;
+		}
 
 		return null;
 	}

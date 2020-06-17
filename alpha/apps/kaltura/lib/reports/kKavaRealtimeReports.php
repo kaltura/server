@@ -104,6 +104,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_BUFFERING_USERS,
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_BITRATE,
 			),
 		),
 

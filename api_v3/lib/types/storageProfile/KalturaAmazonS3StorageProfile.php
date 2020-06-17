@@ -58,5 +58,14 @@ class KalturaAmazonS3StorageProfile extends KalturaStorageProfile
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
+	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		// Validate user name and password were provided to distinguish between external stoarge to internal
+		$this->validatePropertyNotNull("storageUsername");
+		$this->validatePropertyNotNull("storagePassword");
 		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
 }

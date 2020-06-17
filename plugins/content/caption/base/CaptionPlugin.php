@@ -658,6 +658,11 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			foreach ($captionAssets as $assetDb)
 			{
 				/** @var CaptionAsset $assetDb */
+				if(!$assetDb->getDisplayOnPlayer())
+				{
+					continue;
+				}
+
 				$url = null;
 				$webVttUrl = null;
 

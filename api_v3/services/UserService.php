@@ -317,8 +317,24 @@ class UserService extends KalturaBaseUserService
 		// exceptions might be thrown
 		return parent::loginImpl(null, $loginId, $password, $partnerId, $expiry, $privileges, $otp);
 	}
-	
-	
+
+	protected static function validateLoginDataParams($paramsArray)
+	{
+		kCurrentContext::$HTMLPurifierBehaviour = HTMLPurifierBehaviourType::BLOCK;
+		foreach ($paramsArray as $paramName => $paramValue)
+		{
+			try
+			{
+				kHtmlPurifier::purify('kuser', $paramName, $paramValue);
+			}
+			catch (Exception $e)
+			{
+				throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, 'UserLoginData', $paramName);
+			}
+		}
+	}
+
+
 	/**
 	 * Updates a user's login data: email, password, name.
 	 * 
@@ -343,7 +359,11 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::MISSING_OTP
 	 */
 	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
-	{	
+	{
+		self::validateLoginDataParams(array('id' => $newLoginId,
+										'firstName' => $newFirstName,
+										'lastName' => $newLastName));
+
 		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName, $otp);
 	}
 	
@@ -387,7 +407,55 @@ class UserService extends KalturaBaseUserService
 	{
 		return parent::setInitialPasswordImpl($hashKey, $newPassword);
 	}
-	
+
+	/**
+	 * Validate hash key
+	 *
+	 * @action validateHashKey
+	 *
+	 * @param string $hashKey The hash key used to identify the user (retrieved by email)
+	 * @return KalturaAuthentication The authentication response
+	 *
+	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
+	 * @throws KalturaErrors::NEW_PASSWORD_HASH_KEY_INVALID
+	 * @throws KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED
+	 * @throws KalturaErrors::INVALID_ACCESS_TO_PARTNER_SPECIFIC_SEARCH
+	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
+	 */
+	public function validateHashKeyAction($hashKey)
+	{
+		KalturaResponseCacher::disableCache();
+
+		try
+		{
+			$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
+		}
+		catch (kUserException $e)
+		{
+			switch($e->getCode())
+			{
+				case kUserException::LOGIN_DATA_NOT_FOUND:
+					throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
+
+				case kUserException::NEW_PASSWORD_HASH_KEY_INVALID:
+					throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_INVALID);
+
+				case kUserException::NEW_PASSWORD_HASH_KEY_EXPIRED:
+					throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED);
+
+				default:
+					throw $e;
+			}
+		}
+		
+		if ($this->getKs() && $this->getKs()->partner_id != $loginData->getConfigPartnerId())
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_ACCESS_TO_PARTNER_SPECIFIC_SEARCH, $this->getKs()->partner_id);
+		}
+
+		return new KalturaAuthentication();
+	}
+
 	/**
 	 * Enables a user to log into a partner account using an email address and a password
 	 * 

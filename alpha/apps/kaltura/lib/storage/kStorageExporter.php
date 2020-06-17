@@ -74,19 +74,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if (self::shouldHandleFileSyncObjectChanged($object, $modifiedColumns))
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
-			if($storageProfile)
+			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() !== self::NULL_STR)
 			{
-				if($storageProfile->getExportPeriodically())
+				$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
+				if($storageProfiles)
 				{
-					self::handlePeriodicFileExportFinished($object, $storageProfile);
-				}
-				else if($object->getLinkedId() !== self::NULL_STR)
-				{
-					$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
-					if($storageProfiles)
-					{
-						self::exportToPeriodicStorage($object, $storageProfiles);
-					}
+					self::exportToPeriodicStorage($object, $storageProfiles);
 				}
 			}
 		}
@@ -160,7 +153,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	static protected function export(entry $entry, StorageProfile $externalStorage, FileSyncKey $key, $force = false)
 	{
-
 		$partner = $entry->getPartner();
 
 		// all export jobs for replacing entry that has periodic storage will happen on the original replaced entry
@@ -178,7 +170,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key,true,false);
-		if (!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL) {
+		if (!$fileSync)
+		{
 			KalturaLog::info("no ready fileSync was found for key [$key]");
 			return;
 		}
@@ -195,7 +188,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 		else
 		{
-			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(), $externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(),
+				$externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
 		}
 		return true;
 	}
@@ -512,54 +506,30 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
 
-
-	public static function handlePeriodicFileExportFinished($fileSync, StorageProfile $storageProfile)
-	{
-		$keysArray = array();
-		$object = assetPeer::retrieveById($fileSync->getObjectId());
-		if(!$object)
-		{
-			return;
-		}
-		$entryId = $object->getEntryId();
-		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
-		$flavorTypes[] = CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION);
-		$flavorAssets = assetPeer::retrieveDscFlavorsByEntryIdAndStatus($entryId, array(asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE, asset::ASSET_STATUS_DELETED), $flavorTypes);
-		$fileSyncSubTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$flavorsToExport = array();
-
-		foreach ($flavorAssets as $flavorAsset)
-		{
-			if(!$storageProfile->shouldExportFlavorAsset($flavorAsset))
-			{
-				continue;
-			}
-			$flavorsToExport[] = $flavorAsset;
-			foreach ($fileSyncSubTypes as $subType)
-			{
-				$key = $flavorAsset->getSyncKey($subType);
-				if(!kFileSyncUtils::getReadyExternalFileSyncForKey($key, $storageProfile->getId()))
-				{
-					KalturaLog::debug("Required file for flavor asset [{$flavorAsset->getId()}] was not exported yet");
-					return;
-				}
-				$keysArray[$flavorAsset->getId()] = $key->getVersion();
-			}
-		}
-
-		foreach ($flavorsToExport as $flavorAsset)
-		{
-			kFlowHelper::deleteAssetLocalFileSyncs($keysArray[$flavorAsset->getId()], $flavorAsset);
-		}
-	}
-
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
+		$isPartnerValid = false;
+
 		$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
 		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
 		{
+			$isPartnerValid = true;
+		}
+		else
+		{
+			$partnerPackages = kConf::get('export_to_cloud_partner_package', 'cloud_storage', array());
+			$partner = PartnerPeer::retrieveActiveByPK($partnerId);
+			if ( $partner && in_array($partner->getPartnerPackage(), $partnerPackages) )
+			{
+				$isPartnerValid = true;
+			}
+		}
+
+		if($isPartnerValid)
+		{
 			return kConf::get('periodic_storage_ids','cloud_storage', array());
 		}
+
 		return array();
 	}
 
@@ -606,7 +576,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 	}
 
-	protected static function handleAssetStorageExports($object)
+	public static function handleAssetStorageExports($object)
 	{
 		$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
 		if(!$externalStorageProfiles)
@@ -624,7 +594,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	protected static function shouldHandleAssetObjectChanged($object, $modifiedColumns)
 	{
-		if($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset)
+		if( ($object instanceof flavorAsset && ($object->getFlavorParamsId() != flavorParams::SOURCE_FLAVOR_ID))
+			|| $object instanceof thumbAsset || $object instanceof captionAsset)
 		{
 			if(in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			{
