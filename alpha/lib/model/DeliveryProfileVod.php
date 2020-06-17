@@ -78,10 +78,10 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 
 		$urlParams = $this->params->getUrlParams();
 
-		$clipTo = $this->extractClipTo($urlParams);
+		$clipTo = self::extractClipTo($urlParams);
 		if($clipTo)
 		{
-			$url = self::insertClipTo($url, $clipTo);
+			$url = self::insertAfter($url, 'entryId', 'clipTo', $clipTo);
 		}
 
 		$url .= $urlParams;
@@ -90,7 +90,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return $url;
 	}
 
-	protected function extractClipTo(&$urlParams)
+	protected static function extractClipTo(&$urlParams)
 	{
 		list($clipToPos, $endClipToValPos) = self::getKeyValPositions($urlParams, 'clipTo');
 
@@ -124,13 +124,13 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return array($startKeyPos, $endValPos);
 	}
 
-	public static function insertClipTo($url, $clipTo)
+	public static function insertAfter($url, $afterKey, $key, $val)
 	{
-		list($entryIdPos, $endEntryIdValPos) = self::getKeyValPositions($url, 'entryId');
+		list($keyPos, $endValPos) = self::getKeyValPositions($url, $afterKey);
 
-		if ($entryIdPos !== false )
+		if ($keyPos !== false )
 		{
-			$url = substr($url, 0, $endEntryIdValPos) . '/clipTo/' . $clipTo . substr($url, $endEntryIdValPos);
+			$url = substr($url, 0, $endValPos) . "/{$key}/" . $val . substr($url, $endValPos);
 		}
 
 		return $url;
@@ -159,7 +159,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
 		{
-			$url = self::insertClipTo($url, $this->params->getClipTo());
+			$url = self::insertAfter($url, 'entryId', 'clipTo', $this->params->getClipTo());
 		}
 		return $url;
 	}

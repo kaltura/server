@@ -92,13 +92,13 @@ class VodPackagerDeliveryUtils
 		$seekStart = $params->getSeekFromTime();
 		if($seekStart > 0) 
 		{
-			$url .= '/clipFrom/' . $seekStart;
+			$url = DeliveryProfileVod::insertAfter($url, 'entryId', 'clipFrom', $seekStart);
 		}
 			
 		$seekEnd = $params->getClipTo();
 		if($seekEnd) 
 		{
-			$url = DeliveryProfileVod::insertClipTo($url, $seekEnd);
+			$url = DeliveryProfileVod::insertAfter($url, 'entryId', 'clipTo', $seekEnd);
 		}
 		
 		$playbackRate = $params->getPlaybackRate();
