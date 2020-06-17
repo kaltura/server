@@ -1091,19 +1091,41 @@ HTML;
 	 */
 	protected static function getCaptionFilePath($captionAsset, &$localFilePath)
 	{
+		$local = false;
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, true, false);
-		if (!$captionFileSync)
+		list ($captionFileSync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($captionFileSyncKey, $captionAsset);
+
+		if(serveFlavorAction::$preferredStorageId)
 		{
-			return false;
+			if(!$captionFileSync)
+			{
+				return false;
+			}
+			$localFilePath = $path;
+			return true;
 		}
 
-		if($local)
+		if(!$captionFileSync)
 		{
+			list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, true, false);
+			if(!$captionFileSync)
+			{
+				return false;
+			}
+
+			if($local)
+			{
+				$localFilePath = $captionFileSync->getFullPath();
+			}
+
+			return true;
+		}
+		else
+		{
+			// we already found a local file sync in getFileSyncAndPathForFlavor
 			$localFilePath = $captionFileSync->getFullPath();
+			return true;
 		}
-
-		return true;
 	}
 
 	/**
