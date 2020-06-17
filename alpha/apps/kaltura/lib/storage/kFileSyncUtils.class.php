@@ -2224,15 +2224,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fullPath;
 	}
 
-	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset)
+	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset, $preferredStorageId)
 	{
 		$path = '';
 		$parent_file_sync = null;
-		$preferredStorageId = serveFlavorAction::$preferredStorageId;
 
 		if(!is_null($preferredStorageId))
 		{
-			$file_sync = kFileSyncUtils::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId);
+			$file_sync = self::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId);
 			if($file_sync)
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);

@@ -1091,11 +1091,11 @@ HTML;
 	 */
 	protected static function getCaptionFilePath($captionAsset, &$localFilePath)
 	{
-		$local = false;
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		list ($captionFileSync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($captionFileSyncKey, $captionAsset);
+		$preferredStorageId = serveFlavorAction::getPreferredStorageProfileId();
+		list ($captionFileSync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($captionFileSyncKey, $captionAsset, $preferredStorageId);
 
-		if(serveFlavorAction::$preferredStorageId)
+		if(!is_null($preferredStorageId))
 		{
 			if(!$captionFileSync)
 			{

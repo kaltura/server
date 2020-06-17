@@ -16,7 +16,7 @@ class serveFlavorAction extends kalturaAction
 	const DVR_WINDOW_SIZE = 100000; // LIVE_CHANNEL_SEGMENT_DURATION * 10 segments;
 
 	protected $pathOnly = false;
-	public static $preferredStorageId = null;
+	protected static $preferredStorageId = null;
 
 	protected static function jsonEncode($obj)
 	{
@@ -261,7 +261,7 @@ class serveFlavorAction extends kalturaAction
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor);
+					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::$preferredStorageId);
 
 					if(!$file_sync)
 					{
@@ -458,7 +458,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || kNetworkUtils::isAuthenticatedURI() ))
 		{
-			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset);
+			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::$preferredStorageId);
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -896,5 +896,10 @@ class serveFlavorAction extends kalturaAction
 			$captionFiles, null, true,
 			$playlistStartTime, $firstClipStartTime,
 			$initialClipIndex, $initialSegmentIndex);
+	}
+
+	public static function getPreferredStorageProfileId()
+	{
+		return self::$preferredStorageId;
 	}
 }
