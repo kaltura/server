@@ -464,7 +464,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 					break;
 				default:
 					KalturaLog::debug("Undefined duration type {$durationType}.");
-					continue;
+					break;
 			}
 
 			$item->setRange($range);

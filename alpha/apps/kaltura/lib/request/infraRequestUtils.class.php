@@ -67,7 +67,7 @@ class infraRequestUtils
 			// If the range starts with an '-' we start from the beginning
 			// If not, we forward the file pointer
 			// And make sure to get the end byte if spesified
-			if ($range{0} == '-')
+			if ($range[0] == '-')
 			{
 				// The n-number of the last bytes is requested
 				$c_start = $size - substr($range, 1);
@@ -475,7 +475,7 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			if (!array_key_exists($key['value'], $params))
+			if (is_array($key) && !array_key_exists($key['value'], $params))
 			{
 				$params[$key['value']] = $value['value'];
 			}
