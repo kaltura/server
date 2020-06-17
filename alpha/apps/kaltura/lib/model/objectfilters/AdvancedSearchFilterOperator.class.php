@@ -88,13 +88,32 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 				$queryDestination = $this;
 				if($this->type == self::SEARCH_AND)
 					$queryDestination = $query;
-					
-				foreach($this->items as $item)
+
+				$conditionOr = '';
+				foreach($this->items as $key => $item)
 				{
 					KalturaLog::debug("item type: " . get_class($item));
 					if($item instanceof AdvancedSearchFilterItem)
 					{
-						$item->applyCondition($queryDestination);
+						if ($item instanceof AdvancedSearchFilterComparableCondition && $this->type == self::SEARCH_OR)
+						{
+							if ($key == 0)
+							{
+								$conditionOr .= '( ' . $item->getCondition() .' )';
+							}
+							else
+							{
+								$conditionOr .= ' + ( ' . $item->getCondition() .' )';
+							}
+							if ($key == count($this->items) - 1)
+							{
+								$queryDestination->addCondition($conditionOr);
+							}
+						}
+						else
+						{
+							$item->applyCondition($queryDestination);
+						}
 					}
 				}
 				

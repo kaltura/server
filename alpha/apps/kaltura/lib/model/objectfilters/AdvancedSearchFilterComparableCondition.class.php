@@ -16,6 +16,15 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 	 */
 	public function applyCondition(IKalturaDbQuery $query)
 	{
+		$newCondition = $this->getCondition();
+		if ($newCondition)
+		{
+			$query->addCondition($newCondition);
+		}
+	}
+
+	public function getCondition()
+	{
 		switch ($this->getComparison())
 		{
 			case KalturaSearchConditionComparison::EQUAL:
@@ -52,8 +61,9 @@ class AdvancedSearchFilterComparableCondition extends AdvancedSearchFilterCondit
 
 		$newCondition = $fieldValue . $comparison . KalturaCriteria::escapeString($value);
 
-		$query->addCondition($newCondition);
+		return $newCondition;
 	}
+
 
 	protected function getFieldValue($field)
 	{
