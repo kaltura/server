@@ -895,6 +895,6 @@ class serveFlavorAction extends kalturaAction
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null,
 			$captionFiles, null, true,
 			$playlistStartTime, $firstClipStartTime,
-			$initialClipIndex, $initialSegmentIndex, null);
+			$initialClipIndex, $initialSegmentIndex);
 	}
 }
