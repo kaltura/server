@@ -106,7 +106,7 @@ class CaptionAsset extends asset
 				}
 
 				if ($this->getAccuracy() >= 99 ||
-					($captionAsset->getAccuracy() && $this->getAccuracy() >= $captionAsset->getAccuracy()) )
+					($captionAsset->getAccuracy() && ($this->getAccuracy() >= $captionAsset->getAccuracy())) )
 				{
 					$captionAsset->setDisplayOnPlayer(false);
 					$this->decideDefaultCaption($captionAsset);
@@ -123,7 +123,7 @@ class CaptionAsset extends asset
 		
 		return $ret;
 	}
-
+	
 	public function shouldCopyOnReplacement() {return false;}
 
 	protected function decideDefaultCaption($captionAsset)
