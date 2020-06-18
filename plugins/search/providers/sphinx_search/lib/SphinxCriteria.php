@@ -38,7 +38,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	 * Sphinx condition clauses
 	 * @var array
 	 */
-	protected $conditionClause = array();
+	public $conditionClause = array();
 
 	/**
 	 * Sphinx condition clauses equal to Zero
@@ -1004,7 +1004,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$this->applyFilterFields($filter);
-		
+
 		// attach all unhandled fields
 		$filter->attachToFinalCriteria($this);
 	}

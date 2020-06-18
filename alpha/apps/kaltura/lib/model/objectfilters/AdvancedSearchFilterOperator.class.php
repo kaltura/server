@@ -88,39 +88,29 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 				$queryDestination = $this;
 				if($this->type == self::SEARCH_AND)
 					$queryDestination = $query;
-
-				$conditionOr = '';
-				foreach($this->items as $key => $item)
+					
+				foreach($this->items as $item)
 				{
 					KalturaLog::debug("item type: " . get_class($item));
 					if($item instanceof AdvancedSearchFilterItem)
 					{
-						if ($item instanceof AdvancedSearchFilterComparableCondition && $this->type == self::SEARCH_OR)
-						{
-							if ($key == 0)
-							{
-								$conditionOr .= '( ' . $item->getCondition() .' )';
-							}
-							else
-							{
-								$conditionOr .= ' + ( ' . $item->getCondition() .' )';
-							}
-							if ($key == count($this->items) - 1)
-							{
-								$queryDestination->addCondition($conditionOr);
-							}
-						}
-						else
-						{
-							$item->applyCondition($queryDestination);
-						}
+						$item->applyCondition($queryDestination);
 					}
 				}
 				
-				if($this->type == self::SEARCH_OR && count($this->matchClause))
+				if($this->type == self::SEARCH_OR)
 				{
-					$matchClause = array_unique($this->matchClause);
-					$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
+					if (count($this->matchClause))
+					{
+						$matchClause = array_unique($this->matchClause);
+						$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
+					}
+					if (property_exists($this->parentQuery, 'conditionClause'))
+					{
+						$conditionClause = $this->parentQuery->conditionClause;
+						$this->parentQuery->conditionClause = array();	//remove the old conditions
+						$this->addCondition('( ' . implode(' ) + ( ' , $conditionClause) . ' )');
+					}
 				}
 			}
 		}
