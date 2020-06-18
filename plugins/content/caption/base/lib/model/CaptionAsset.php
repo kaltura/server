@@ -90,6 +90,9 @@ class CaptionAsset extends asset
 			($this->isCustomDataModified(self::CUSTOM_DATA_FIELD_LANGUAGE)))
 		)
 		{
+			//Check if we have duplication in language in this case the one that should be marked as displayOnPlayer = true is:
+			// The newest caption - if it has accuracy >= 99 OR if the oldest caption had accuracy and his accuracy is smaller than the newest.
+			// otherwise - The oldest caption will remain marked.
 			$captionAssets = assetPeer::retrieveByEntryId($this->getEntryId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 			foreach ($captionAssets as $captionAsset)
 			{
@@ -102,32 +105,17 @@ class CaptionAsset extends asset
 					continue;
 				}
 
-				if(!$captionAsset->getAccuracy())
+				if ($this->getAccuracy() >= 99 ||
+					($captionAsset->getAccuracy() && $this->getAccuracy() >= $captionAsset->getAccuracy()) )
 				{
-					if ($this->getAccuracy() >= 99)
-					{
-						$captionAsset->setDisplayOnPlayer(false);
-						$this->decideDefaultCaption($captionAsset);
-					}
-					else
-					{
-						$this->setDisplayOnPlayer(false);
-					}
-
+					$captionAsset->setDisplayOnPlayer(false);
+					$this->decideDefaultCaption($captionAsset);
 				}
 				else
 				{
-					if ( ($captionAsset->getAccuracy() >= 99 && $this->getAccuracy() >= 99) ||
-						($this->getAccuracy() >= $captionAsset->getAccuracy()) )
-					{
-						$captionAsset->setDisplayOnPlayer(false);
-						$this->decideDefaultCaption($captionAsset);
-					}
-					elseif ($this->getAccuracy() < $captionAsset->getAccuracy())
-					{
-						$this->setDisplayOnPlayer(false);
-					}
+					$this->setDisplayOnPlayer(false);
 				}
+
 				$this->save();
 				$captionAsset->save();
 			}
