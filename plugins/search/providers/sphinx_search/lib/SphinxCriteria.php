@@ -1004,7 +1004,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		
 		$this->applyFilterFields($filter);
-
+		
 		// attach all unhandled fields
 		$filter->attachToFinalCriteria($this);
 	}
