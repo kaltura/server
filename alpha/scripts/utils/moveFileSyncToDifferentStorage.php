@@ -41,7 +41,7 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 {
 	KalturaLog::debug("Running for PartnerId [$partnerId] and storageId [$storageId]");
 	$externalStorage = StorageProfilePeer::retrieveByPK($storageId);
-	if(!$externalStorage)
+	if (!$externalStorage)
 	{
 		KalturaLog::warning("Storage [$storageId] does not exists");
 		exit(0);
@@ -67,8 +67,10 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 		$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$criteria->add(FileSyncPeer::FILE_PATH, 'NULL', Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(FileSyncPeer::ID);
-		if($lastHandledId == 0)
+		if ($lastHandledId == 0)
+		{
 			$criteria->setLimit(1);
+		}
 		else
 		{
 			$criteria->setLimit(100);
@@ -76,17 +78,18 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 
 		$fileSyncs = FileSyncPeer::doSelect($criteria);
 		KalturaLog::debug("Found: " . count($fileSyncs) . " file syncs to copy");
-		foreach ($fileSyncs as /** @var FileSync $fileSync **/ $fileSync)
+		foreach ($fileSyncs as /** @var FileSync $fileSync * */ $fileSync)
 		{
 			try
 			{
 				KalturaLog::debug('Handling asset with id ' . $fileSync->getObjectId() . ' with fileSync id ' . $fileSync->getId());
 				$asset = assetPeer::retrieveByPK($fileSync->getObjectId());
-				if(!$asset)
+				if (!$asset)
 				{
-					KalturaLog::debug('Skipping file sync with id ' . $fileSync->getId() . ' and object id '. $fileSync->getObjectId() . ' . Asset not found.');
+					KalturaLog::debug('Skipping file sync with id ' . $fileSync->getId() . ' and object id ' . $fileSync->getObjectId() . ' . Asset not found.');
 				}
-				else{
+				else
+				{
 					if ($externalStorage->shouldExportFlavorAsset($asset))
 					{
 						$newfileSync = $fileSync->cloneToAnotherStorage($storageId);
@@ -95,13 +98,13 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 					}
 					else
 					{
-						KalturaLog::debug('Skipping exporting file sync with id ' . $fileSync->getId() . ' and object id '. $fileSync->getObjectId());
+						KalturaLog::debug('Skipping exporting file sync with id ' . $fileSync->getId() . ' and object id ' . $fileSync->getObjectId());
 					}
 				}
 			}
 			catch (Exception $e)
 			{
-				KalturaLog::warning("Could not create newFileSync for fileSync [".$fileSync->getId()."]" . $e->getMessage());
+				KalturaLog::warning("Could not create newFileSync for fileSync [" . $fileSync->getId() . "]" . $e->getMessage());
 			}
 			$lastHandledId = $fileSync->getId();
 		}
