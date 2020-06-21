@@ -105,12 +105,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 						$matchClause = array_unique($this->matchClause);
 						$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
 					}
-					if (property_exists($this->parentQuery, 'conditionClause'))
-					{
-						$conditionClause = $this->parentQuery->conditionClause;
-						$this->parentQuery->conditionClause = array();	//remove the old conditions
-						$this->addCondition('( ' . implode(' ) + ( ' , $conditionClause) . ' )');
-					}
+					$this->parentQuery->handleConditionClause();
 				}
 			}
 		}
@@ -227,5 +222,10 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 	{
 		if($this->parentQuery)
 			$this->parentQuery->addNumericOrderBy($column, $orderByType);
+	}
+
+	public function handleConditionClause()
+	{
+
 	}
 }

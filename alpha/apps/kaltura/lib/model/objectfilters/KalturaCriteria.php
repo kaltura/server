@@ -334,4 +334,9 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 			return $str;
 		}
 	}
+
+	public function handleConditionClause()
+	{
+
+	}
 }
