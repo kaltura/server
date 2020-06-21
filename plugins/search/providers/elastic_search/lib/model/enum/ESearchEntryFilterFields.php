@@ -51,6 +51,7 @@ class ESearchEntryFilterFields extends KalturaEnum
 	const SEARCH_TEXT = 'search_text';
 	const FREE_TEXT	= '_free_text';
 	const EXCLUDED_FREE_TEXT_GROUPS	= '_excluded_free_text_groups';
+	const DESCRIPTION = 'description';
 	const TOTAL_RANK = 'total_rank';
 	const RANK = 'rank';
 	const VOTES = 'votes';

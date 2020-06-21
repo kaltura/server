@@ -108,7 +108,7 @@ class ESearchQueryFromFilter
 			$elasticFieldName = $this->getSphinxToElasticFieldName($fieldName);
 			if($elasticFieldName && $searchItemType)
 			{
-				$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
+				$this->addFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
 			}
 		}
 
@@ -165,7 +165,7 @@ class ESearchQueryFromFilter
 		return array ($coreResults, $objectCount, $entrySearch);
 	}
 
-	protected function AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
+	protected function addFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
 	{
 		if(in_array($elasticFieldName, $this->getTimeFields()))
 		{

@@ -52,6 +52,7 @@ class elasticClient
 	{
 		if (!$host)
 			$host = kConf::get('elasticHost', 'elastic', null);
+		KalturaLog::debug("Setting elastic host $host");
 		$this->elasticHost = $host;
 		
 		if (!$port)
