@@ -786,7 +786,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
 				if ($periodicStorageIds)
 				{
-					$partnerIds = PartnerPeer::GLOBAL_PARTNER;
+					$partnerIds = array(PartnerPeer::GLOBAL_PARTNER);
 				}
 				break;
 			case self::EXTERNAL_AND_CLOUD_STORAGE:
