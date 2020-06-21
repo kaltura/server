@@ -26,11 +26,12 @@ class PexipService extends KalturaBaseService
 	/**
 	 * @action generateSipUrl
 	 * @param string $entryId
+	 * @param int $sourceType
 	 * @param bool $regenerate
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateSipUrlAction($entryId, $regenerate = false)
+	public function generateSipUrlAction($entryId, $regenerate = false, $sourceType = KalturaSipSourceType::PICTURE_IN_PICTURE)
 	{
 		kApiCache::disableCache();
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $this->getPartnerId()))
@@ -47,14 +48,21 @@ class PexipService extends KalturaBaseService
 			kPexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
 		}
 
+		$dualStreamLiveEntry = kPexipUtils::validateAndRetrieveDualStreamEntry($dbLiveEntry, $sourceType);
+
 		$sipToken = kPexipUtils::generateSipToken($dbLiveEntry, $pexipConfig, $regenerate);
-		list ($roomId, $primaryAdpId, $secondaryAdpId) = kPexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken);
+		list ($roomId, $primaryAdpId, $secondaryAdpId) = kPexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken, $dualStreamLiveEntry, $sourceType);
 
 		$dbLiveEntry->setSipToken($sipToken);
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
 		$dbLiveEntry->setIsSipEnabled(true);
+		$dbLiveEntry->setSipSourceType($sourceType);
+		if($dualStreamLiveEntry)
+		{
+			$dbLiveEntry->setSipDualStreamEntryId($dualStreamLiveEntry->getId());
+		}
 		$dbLiveEntry->save();
 
 		return $sipToken;
@@ -151,5 +159,4 @@ class PexipService extends KalturaBaseService
 		$res = kPexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly);
 		return KalturaStringValueArray::fromDbArray(array(json_encode($res)));
 	}
-
 }

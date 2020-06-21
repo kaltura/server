@@ -80,6 +80,47 @@ class kPexipUtils
 		return $dbEntry;
 	}
 
+
+	/**
+	 * @param $sourceType
+	 * @param LiveStreamEntry $dbLiveEntry
+	 * @return entry|LiveStreamEntry|null
+	 * @throws PropelException
+	 */
+	public static function validateAndRetrieveDualStreamEntry(LiveStreamEntry $dbLiveEntry, $sourceType = KalturaSipSourceType::PICTURE_IN_PICTURE)
+	{
+		$dualStreamLiveEntry = null;
+		if ($sourceType != KalturaSipSourceType::PICTURE_IN_PICTURE)
+		{
+			$dualStreamLiveEntryId = $dbLiveEntry->getSipDualStreamEntryId();
+			if ($dualStreamLiveEntryId)
+			{
+				$dualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamLiveEntryId);
+			}
+			if (!$dualStreamLiveEntry)
+			{
+				$dualStreamLiveEntry = new LiveStreamEntry();
+				$dualStreamLiveEntry->setDisplayInSearch(false);
+			}
+
+			switch ($sourceType)
+			{
+				case KalturaSipSourceType::TALKING_HEADS:
+				{
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Talking Heads');
+					break;
+				}
+				case KalturaSipSourceType::SCREEN_SHARE:
+				{
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Screenshare');
+					break;
+				}
+			}
+			$dualStreamLiveEntry->save();
+		}
+		return $dualStreamLiveEntry;
+	}
+
 	/**
 	 * @param $queryParams
 	 * @param $pexipConfig
@@ -161,6 +202,27 @@ class kPexipUtils
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
+		}
+
+		if ($dbLiveEntry->getSipSourceType() && $dbLiveEntry->getSipSourceType() != KalturaSipSourceType::PICTURE_IN_PICTURE)
+		{
+			$dualStreamEntryId = $dbLiveEntry->getSipDualStreamEntryId();
+			if (!$dualStreamEntryId)
+			{
+				$msg = 'Dual Stream Entry is not defined on entry ' . $dbLiveEntry->getId() . ' while trying source type is '. $dbLiveEntry->getSipSourceType();
+				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+				KalturaLog::warning($msg);
+				return false;
+			}
+
+			$dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
+			if(!$dbDualStreamLiveEntry)
+			{
+				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry ". $dbLiveEntry->getId() . 'with source type ' . $dbLiveEntry->getSipSourceType();
+				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+				KalturaLog::warning($msg);
+				return false;
+			}
 		}
 
 		return $dbLiveEntry;
