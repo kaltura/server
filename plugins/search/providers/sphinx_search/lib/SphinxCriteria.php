@@ -1361,5 +1361,12 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		}
 		return false;
 	}
+
+	public function handleConditionClause()
+	{
+		$conditionClause = $this->conditionClause;
+		$this->conditionClause = array();	//remove the old conditions
+		$this->addCondition('( ' . implode(' ) + ( ' , $conditionClause) . ' )');
+	}
 }
 
