@@ -10,10 +10,10 @@ interface kThumbFactoryFieldName extends BaseEnum
 	const WIDTH = 'width';
 	const HEIGHT = 'height';
 	const TYPE = 'type';
-	const BG_COLOR= 'bgColor';
+	const BG_COLOR = 'bgColor';
 	const CROP_WIDTH = 'cropWidth';
 	const CROP_HEIGHT = 'cropHeight';
-	const CROP_X= 'cropX';
+	const CROP_X = 'cropX';
 	const CROP_Y = 'cropY';
 	const VID_SEC = 'vidSec';
 	const VID_SLICE = 'vidSlice';

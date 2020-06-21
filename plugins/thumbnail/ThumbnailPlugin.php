@@ -6,6 +6,10 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 {
 	const PLUGIN_NAME = 'thumbnail';
 	const THUMBNAIL_CORE_EXCEPTION = 'kThumbnailException';
+	const THUMBNAIL_ADAPTER_PARTNERS = 'adapter_partners';
+	const THUMBNAIL_ADAPTER_PARTNER_PACKAGES = 'adapter_partner_packages';
+	const THUMBNAIL_MAP_NAME = 'thumbnail';
+	const ALL_PARTNERS_WILD_CHAR = '*';
 
 	public static function getPluginName()
 	{
@@ -119,6 +123,7 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 	 * @param $vid_slice
 	 * @param $vid_slices
 	 * @param $density
+	 * @param $orig_image_path
 	 * @param $stripProfiles
 	 * @param $format
 	 * @param $start_sec
@@ -128,10 +133,36 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 	 */
 	public function getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
 	{
-		$adapter = kThumbnailAdapterFactory::getAdapter($entry);
-		$params = kThumbnailAdapterFactory::getThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-			$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+		$result = false;
+		if($this->shouldUseThumbnailAdapter($entry->getPartnerId()))
+		{
+			$adapter = kThumbnailAdapterFactory::getAdapter($entry);
+			$params = kThumbnailAdapterFactory::getThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+				$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+			$result = $adapter->resizeEntryImage($params);
+		}
 
-		return $adapter->resizeEntryImage($params);
+		return $result;
+	}
+
+	public function shouldUseThumbnailAdapter($partnerId)
+	{
+		$result = false;
+		$partnerIds = kConf::get(self::THUMBNAIL_ADAPTER_PARTNERS, self::THUMBNAIL_MAP_NAME, array());
+		if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
+		{
+			$result = true;
+		}
+		else
+		{
+			$partnerPackages = kConf::get(self::THUMBNAIL_ADAPTER_PARTNER_PACKAGES, self::THUMBNAIL_MAP_NAME, array());
+			$partner = PartnerPeer::retrieveActiveByPK($partnerId);
+			if ( $partner && in_array($partner->getPartnerPackage(), $partnerPackages) )
+			{
+				$result = true;
+			}
+		}
+
+		return $result;
 	}
 }

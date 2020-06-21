@@ -9,13 +9,14 @@ class kBaseResizeAdapter
 	const DEFAULT_FILE_NAME = '0.jpg';
 	const THUMB_FILE_NO_CACHE_PREFIX = '&';
 	const THUMB_NAME_NO_CACHE_POSTFIX = '_NOCACHE_';
-	const MAP_NAME = 'local';
+	const LOCAL_MAP_NAME = 'local';
 	const CONFIGURATION_PARAM_NAME = 'thumb_path';
 	const DEFAULT_THUMB_DIR = 'tempthumb';
 	const ENTITY_NAME_PREFIX = 'entry/';
 	const CACHED_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 	const THUMB_PROCESSING_LOCK_DURATION = 300; //5 minutes
 	const LOCK_KEY_PREFIX = 'thumb-processing-resize';
+	const THUMBNAIL_CLOUD_PATH = 'thumbnail_cloud_path';
 
 	/**
 	 * @var kThumbAdapterParameters
@@ -25,8 +26,6 @@ class kBaseResizeAdapter
 	protected $thumbName;
 
 	protected $entryThumbFilename;
-
-	protected $processingThumbPath;
 
 	protected $finalThumbPath;
 
@@ -78,9 +77,6 @@ class kBaseResizeAdapter
 		}
 	}
 
-	/**
-	 * @return string
-	 */
 	protected function calculateThumbName()
 	{
 		$this->calculateBaseThumbName();
@@ -120,21 +116,14 @@ class kBaseResizeAdapter
 	{
 		$entry = $this->getEntry();
 		$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
-		$format = $this->parameters->get(kThumbFactoryFieldName::VERSION);
-
+		$format = $this->parameters->get(kThumbFactoryFieldName::IMAGE_FORMAT);
+		$cloudPath = kConf::get(self::THUMBNAIL_CLOUD_PATH, ThumbnailPlugin::THUMBNAIL_MAP_NAME, null);
+		$thumbDir = $cloudPath ? $cloudPath : $thumbDirs[0];
 		//create final path for thumbnail created
-		$this->finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version );
-
-		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
-		$uniqueThumbName = $this->thumbName . '_' . uniqid() . '_';
-
-		//create path for processing thumbnail request
-		$this->processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $this->entryThumbFilename , $version );
-
+		$this->finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $entry->getId(), $this->entryThumbFilename , $version, true );
 		if($format)
 		{
 			$this->finalThumbPath = kFile::replaceExt($this->finalThumbPath, $format);
-			$this->processingThumbPath = kFile::replaceExt($this->processingThumbPath, $format);
 		}
 	}
 
@@ -143,22 +132,11 @@ class kBaseResizeAdapter
 		foreach ($thumbDirs as $thumbDir)
 		{
 			$entry = $this->getEntry();
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $this->version );
+			$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				if($currPath != $this->finalThumbPath)
-				{
-					$moveFileSuccess = kFile::moveFile($currPath, $this->finalThumbPath);
-					if(!$moveFileSuccess)
-					{
-						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
-						header(self::CACHED_EXISTS_HEADER . md5($currPath));
-						return array(true, $currPath);
-					}
-				}
-
-				header(self::CACHED_EXISTS_HEADER . md5($this->finalThumbPath));
-				return array (true, $this->finalThumbPath);
+				return array (true, $currPath);
 			}
 		}
 
@@ -184,12 +162,17 @@ class kBaseResizeAdapter
 		$contentPath = myContentStorage::getFSContentRootPath();
 		$this->calculateThumbName();
 		$this->calculateThumbFileName();
-		$thumbDirs = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME, array(self::DEFAULT_THUMB_DIR));
+		$thumbDirs = kConf::get(self::CONFIGURATION_PARAM_NAME, self::LOCAL_MAP_NAME, array(self::DEFAULT_THUMB_DIR));
 		$this->calculateThumbPaths($contentPath, $thumbDirs);
+		if(kFile::checkFileExists($this->finalThumbPath))
+		{
+			return $this->returnCachedVersion($this->finalThumbPath);
+		}
+
 		list($cacheExists, $filePath) = $this->checkIfOldApiCachedExists($contentPath, $thumbDirs);
 		if($cacheExists)
 		{
-			return $filePath;
+			return $this->returnCachedVersion($filePath);
 		}
 
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
@@ -209,14 +192,8 @@ class kBaseResizeAdapter
 
 		$adapter = new kImageTransformationAdapter();
 		$imageTransformation = $adapter->getImageTransformation($this->parameters);
-		$storage = kThumbStorageBase::getInstance();
-		if(!$storage->loadFileIntoPath($this->thumbName, $imageTransformation->getLastModified(), $this->finalThumbPath))
-		{
-			$imagick = $imageTransformation->execute();
-			$storage->saveFile($this->thumbName, $imagick, $imageTransformation->getLastModified());
-			$storage->loadFileIntoPath($this->thumbName, $imageTransformation->getLastModified(), $this->finalThumbPath);
-		}
-
+		$imagick = $imageTransformation->execute();
+		kFile::filePutContents($this->finalThumbPath, $imagick);
 		if ($cache)
 		{
 			$cache->delete($cacheLockKey);
@@ -225,4 +202,9 @@ class kBaseResizeAdapter
 		return $this->finalThumbPath;
 	}
 
+	protected function returnCachedVersion($filePath)
+	{
+		header(self::CACHED_EXISTS_HEADER . md5($filePath));
+		return $filePath;
+	}
 }
