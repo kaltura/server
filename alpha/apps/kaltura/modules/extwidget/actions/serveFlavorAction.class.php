@@ -261,7 +261,7 @@ class serveFlavorAction extends kalturaAction
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::$preferredStorageId);
+					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::$preferredStorageId, $this->pathOnly);
 
 					if(!$file_sync)
 					{
