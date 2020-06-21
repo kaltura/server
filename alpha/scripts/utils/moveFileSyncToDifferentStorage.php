@@ -40,6 +40,12 @@ main($partnerId, $storageId, $lastUpdatedAt);
 function main($partnerId, $storageId, $lastUpdatedAt)
 {
 	KalturaLog::debug("Running for PartnerId [$partnerId] and storageId [$storageId]");
+	$externalStorage = StorageProfilePeer::retrieveByPK($storageId);
+	if(!$externalStorage)
+	{
+		KalturaLog::warning("Storage [$storageId] does not exists");
+		exit(0);
+	}
 	$partner = PartnerPeer::retrieveByPK($partnerId);
 	if (!$partner)
 	{
@@ -65,14 +71,33 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 
 		$fileSyncs = FileSyncPeer::doSelect($criteria);
 		KalturaLog::debug("Found: " . count($fileSyncs) . " file syncs to copy");
+
+		$assetIds = array();
+		$assetIdtoFileSync = array();
 		foreach ($fileSyncs as /** @var FileSync $fileSync **/ $fileSync)
+		{
+			$assetIdtoFileSync[$fileSync->getObjectId()] = $fileSync;
+			$assetIds[] = $fileSync->getObjectId();
+		}
+		$assets = assetPeer::retrieveByPKs($assetIds);
+
+		foreach ($assets as /** @var asset $asset **/ $asset)
 		{
 			try
 			{
-				KalturaLog::debug('Handling file sync with id ' . $fileSync->getId());
-				$newfileSync = $fileSync->cloneToAnotherStorage($storageId);
-				$newfileSync->save();
-				KalturaLog::debug('New FileSync created ' . $newfileSync->getId());
+				$fileSync = $assetIdtoFileSync[$asset->getId()];
+				/** @var FileSync $fileSync **/
+				KalturaLog::debug('Handling asset with id ' . $asset->getId() . ' with fileSync id ' . $fileSync->getId());
+				if ($externalStorage->shouldExportFlavorAsset($asset))
+				{
+					$newfileSync = $fileSync->cloneToAnotherStorage($storageId);
+					$newfileSync->save();
+					KalturaLog::debug('New FileSync created ' . $newfileSync->getId());
+				}
+				else
+				{
+					KalturaLog::debug('Skipping exporting file sync with id ' . $fileSync->getId() . ' and object id '. $fileSync->getObjectId());
+				}
 			}
 			catch (Exception $e)
 			{
