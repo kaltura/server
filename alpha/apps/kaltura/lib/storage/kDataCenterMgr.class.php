@@ -64,7 +64,7 @@ class kDataCenterMgr
 	{
 		if (is_null(self::$is_multi_dc))
 		{
-			$ids = self::getDcIds();
+			$ids = self::getDcIds(false);
 			self::$is_multi_dc = count($ids) > 1;
 		}
 		return self::$is_multi_dc;
@@ -136,11 +136,20 @@ class kDataCenterMgr
 //		return array ( $dc_id , $dc );
 	}
 
-	public static function getDcIds()
+	public static function getDcIds($includeShared = true)
 	{
 		$dc_config = kConf::getMap("dc_config");
 		$dc_list = $dc_config["list"];
-		return array_keys($dc_list);
+		
+		$dcIds = array_keys($dc_list);
+		
+		if($includeShared)
+		{
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$dcIds = array_merge($dcIds, $sharedDcIds);
+		}
+		
+		return $dcIds;
 	}
 		
 	public static function getAllDcs( $include_current = false )
