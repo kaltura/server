@@ -16,7 +16,7 @@ if($argc < 8){
 	die("Not enough parameters" . "\n");
 }
 
-$webexServiceUrl = $argv[1];
+$webexServiceUrl = $argv[1];	//insert dropFolder->webexServiceUrl . '/' . dropFolder->path
 $webexUserName = $argv[2];
 $webexPass = $argv[3];
 $webexSiteId = $argv[4];
