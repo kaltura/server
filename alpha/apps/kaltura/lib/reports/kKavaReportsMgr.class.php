@@ -263,6 +263,7 @@ class kKavaReportsMgr extends kKavaBase
 	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
 	const MAX_ESEARCH_RESULTS = 1000;
+	const MAX_SPHINX_RESULTS = 1000;
 	const DYNAMIC_GRANULARITY_VIEW_MAX_BUCKETS = 1000;
 
 	const ENRICH_CHUNK_SIZE = 10000;
@@ -373,6 +374,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
+		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -2050,6 +2052,7 @@ class kKavaReportsMgr extends kKavaBase
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
 			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
+			'entries_ids_not_in' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID, self::DRUID_TYPE => self::DRUID_NOT),
 			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
@@ -2404,9 +2407,10 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null)
+	protected static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null, $granularity = null)
 	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
+		$granularity = $granularity ? $granularity : self::DRUID_GRANULARITY_ALL;
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics);
 
 		if (in_array($dimensions, self::$multi_value_dimensions))
 		{
@@ -4338,6 +4342,7 @@ class kKavaReportsMgr extends kKavaBase
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options);
 		$dimension = self::getDimension($report_def, $object_ids);
 		$metrics = self::getMetrics($report_def);
+		$granularity = isset($report_def[self::REPORT_GRANULARITY]) ? $report_def[self::REPORT_GRANULARITY] : self::DRUID_GRANULARITY_ALL;
 
 		if (!$metrics)
 		{
@@ -4438,6 +4443,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// Note: using a larger threshold since topN is approximate
 		$intervalDays = intval(($input_filter->to_date - $input_filter->from_date) / 86400) + 1;
+
 		$threshold = max($intervalDays * 30, $page_size * $page_index * 2);		// 30 ~ 10000 / 365, i.e. an interval of 1Y gets a minimum threshold of 10000
 		$threshold = max(self::MIN_THRESHOLD, min($max_result_size, $threshold));
 
@@ -4487,7 +4493,8 @@ class kKavaReportsMgr extends kKavaBase
 		else if (!$object_ids &&
 			!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) &&
 			!self::getFilterValues($druid_filter, $dimension) &&
-			($flags & self::GET_TABLE_FLAG_IS_CSV) == 0)
+			($flags & self::GET_TABLE_FLAG_IS_CSV) == 0 &&
+			$granularity == self::DRUID_GRANULARITY_ALL)
 		{
 			// get the topN objects first, otherwise the returned metrics can be inaccurate
 			$query = self::getTopReport($data_source, $partner_id, $intervals, array($order_by), 
@@ -4544,8 +4551,9 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else
 		{
+			$granularity_def = self::getGranularityDef($granularity, $input_filter);
 			$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, 
-				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold, null, $granularity_def);
 		}
 
 		// use lowest priority for csv queries
@@ -4560,7 +4568,7 @@ class kKavaReportsMgr extends kKavaBase
 			return array(array(), array(), 0);
 		}
 
-		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+		if (($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY) || ($granularity != self::DRUID_GRANULARITY_ALL))
 		{
 			$rows = $result;
 		}
@@ -4575,7 +4583,11 @@ class kKavaReportsMgr extends kKavaBase
 		$rows_count = count($rows);
 		KalturaLog::log("Druid returned [$rows_count] rows");
 
-		$rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
+		// don't remove rows by pager if using topN with granularity different than ALL
+		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY || $granularity == self::DRUID_GRANULARITY_ALL)
+		{
+			$rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
+		}
 		if (!$rows)
 		{
 			return array(array(), array(), $rows_count);
@@ -4656,10 +4668,28 @@ class kKavaReportsMgr extends kKavaBase
 
 		$row_mapping = array_merge($row_mapping, $metrics);
 
+		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_TOPN && $granularity != self::DRUID_GRANULARITY_ALL)
+		{
+			$data = array();
+			foreach ($rows as $index => $row)
+			{
+				$timestamp = $row[self::DRUID_TIMESTAMP];
+				$bucket_rows = $row[self::DRUID_RESULT];
+				foreach ($bucket_rows as $bucket_row)
+				{
+					$row_data[self::DRUID_TIMESTAMP] = $timestamp;
+					$row_data[self::DRUID_EVENT] = $bucket_row;
+					$data[] = $row_data;
+				}
+			}
+			$rows = $data;
+			$row_mapping[] = self::DIMENSION_TIME;
+
+		}
 		// map the rows
 		foreach ($rows as $index => $row)
 		{
-			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY || $granularity != self::DRUID_GRANULARITY_ALL)
 			{
 				$timestamp = $row[self::DRUID_TIMESTAMP];
 				$row = $row[self::DRUID_EVENT];
@@ -4901,7 +4931,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
 		{
-			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter);
+			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter, $partner_id, $response_options);
 		}
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
@@ -4942,6 +4972,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::orderTableByMetric($report_def, $order_by, $result[0], $result[1]);
 		}
 		unset($result[3]);
+		if ($page_size && count($result[1]) > $page_size)
+		{
+			$result[1] = array_slice($result[1], ($page_index - 1) * $page_size, $page_size);
+		}
 		return $result;
 	}
 		
@@ -5094,7 +5128,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 	
-	protected static function partnerUsageEditFilter($input_filter)
+	protected static function partnerUsageEditFilter($input_filter, $partner_id, $response_options)
 	{
 		$current_date_id = date('Ymd');
 		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($input_filter->timeZoneOffset));
@@ -5112,7 +5146,33 @@ class kKavaReportsMgr extends kKavaBase
 		$input_filter->to_day = $month_end;
 		$input_filter->interval = reportInterval::MONTHS;
 	}
+
+	protected static function excludeLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options)
+	{
+		$live_now_entries = self::getLiveNowEntries($partner_id);
+		if (count($live_now_entries))
+		{
+			$input_filter->entries_ids_not_in = implode($response_options->getDelimiter(), $live_now_entries);
+		}
+	}
 	
+	protected static function getLiveNowEntries($partner_id)
+	{
+		$filter = new entryFilter();
+		$filter->setTypeEquel(entryType::LIVE_STREAM);
+		$filter->setPartnerSearchScope($partner_id);
+		$filter->setIsLive(true);
+
+		$criteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$criteria->addAscendingOrderByColumn(entryPeer::NAME);		// Note: don't really care about order here, this is a hack to force the query to go to sphinx
+		$criteria->setLimit(self::MAX_SPHINX_RESULTS);
+		$filter->attachToCriteria($criteria);
+
+		$criteria->applyFilters();
+		return $criteria->getFetchedIds();
+	}
+
+
 	protected static function addCombinedUsageColumn(&$result)
 	{
 		$headers = $result[0];
@@ -5244,6 +5304,20 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$row[] = self::getFlavorParamsValue($flavorHeaders, $row);
 		}
+	}
+
+	protected static function getPeakViewers(&$result)
+	{
+		$data = array();
+		foreach ($result[1] as $row)
+		{
+			list($entry_id, $curr_viewers_count) = $row;
+			$prev_viewers_count = isset($data[$entry_id][1]) ? $data[$entry_id][1] : 0;
+			$data[$entry_id] = array($entry_id, max($prev_viewers_count, $curr_viewers_count));
+		}
+		$result[1] = $data;
+		$result[2] = count($data);
+		$result[3] = false;
 	}
 
 	/// total functions
