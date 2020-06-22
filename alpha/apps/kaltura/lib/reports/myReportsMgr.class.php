@@ -1546,11 +1546,14 @@ class reportsInputFilter
 	public $playback_context_ids;
 	public $root_entries_ids;
 	public $event_var1;
+	public $event_var2;
+	public $event_var3;
 	public $player_versions;
 	public $isp;
 	public $application_versions;
 	public $node_ids;
 	public $categories_ancestor_ids;
+	public $hotspot_ids;
 
 	public function getFilterBy() {
 		return "";

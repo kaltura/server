@@ -1607,6 +1607,33 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
 		),
 
+		ReportType::INTERACTIVE_VIDEO_HOTSPOT_CLICKED_PERCENTILES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'percentile' => self::DIMENSION_PERCENTILES
+			),
+			self::REPORT_EDIT_FILTER_FUNC => 'self::mapFieldsEditFilter',
+			self::REPORT_EDIT_FILTER_CONTEXT => array('hotspot_ids', 'event_var1'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
+		),
+
+		ReportType::INTERACTIVE_VIDEO_NODE_SWITCH_HOTSPOT_CLICKED_PERCENTILES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'percentile' => self::DIMENSION_PERCENTILES
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN)
+				)
+			),
+			self::REPORT_EDIT_FILTER_FUNC => 'self::mapFieldsEditFilter',
+			self::REPORT_EDIT_FILTER_CONTEXT => array('hotspot_ids', 'event_var3'),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)

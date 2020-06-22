@@ -195,6 +195,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
+	const REPORT_EDIT_FILTER_CONTEXT = 'report_edit_filter_context';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
 	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
@@ -908,7 +909,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
 
-    		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_STARTS, self::METRIC_BUFFER_STARTS));
 
@@ -2057,6 +2058,8 @@ class kKavaReportsMgr extends kKavaBase
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
 			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
+			'event_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR2),
+			'event_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3),
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
@@ -4953,7 +4956,9 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
 		{
-			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter, $partner_id, $response_options);
+			$edit_filter_context = isset($report_def[self::REPORT_EDIT_FILTER_CONTEXT]) ?
+				$report_def[self::REPORT_EDIT_FILTER_CONTEXT] : null;
+			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter, $partner_id, $response_options, $edit_filter_context);
 		}
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
@@ -5149,8 +5154,20 @@ class kKavaReportsMgr extends kKavaBase
 
 		return $result;
 	}
-	
-	protected static function partnerUsageEditFilter($input_filter, $partner_id, $response_options)
+
+	protected static function mapFieldsEditFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		$from_field = $context[0];
+		$to_field = $context[1];
+
+		if (isset($input_filter->$from_field))
+		{
+			$input_filter->$to_field = $input_filter->$from_field;
+
+		}
+	}
+
+	protected static function partnerUsageEditFilter($input_filter, $partner_id, $response_options, $context)
 	{
 		$current_date_id = date('Ymd');
 		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($input_filter->timeZoneOffset));
@@ -5169,7 +5186,7 @@ class kKavaReportsMgr extends kKavaBase
 		$input_filter->interval = reportInterval::MONTHS;
 	}
 
-	protected static function excludeLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options)
+	protected static function excludeLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options, $context)
 	{
 		$live_now_entries = self::getLiveNowEntries($partner_id);
 		if (count($live_now_entries))
