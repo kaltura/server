@@ -85,9 +85,13 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 				KalturaLog::debug('Handling asset with id ' . $fileSync->getObjectId() . ' with fileSync id ' . $fileSync->getId());
 
 				$asset = assetPeer::retrieveById($fileSync->getObjectId());
-				if (!$asset || $asset->getIsOriginal())
+				if (!$asset)
 				{
 					KalturaLog::debug('Skipping file sync with id ' . $fileSync->getId() . ' and object id ' . $fileSync->getObjectId() . ' . Asset not found.');
+				}
+				elseif ($asset->getIsOriginal())
+				{
+					KalturaLog::debug('Skipping file sync with id ' . $fileSync->getId() . ' and object id ' . $fileSync->getObjectId() . ' . skipping source asset.');
 				}
 				else
 				{
