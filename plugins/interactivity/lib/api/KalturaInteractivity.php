@@ -16,7 +16,7 @@ class KalturaInteractivity extends KalturaBaseInteractivity
 	{
 		if (!$object_to_fill)
 		{
-			$object_to_fill = new  kInteractivity();
+			$object_to_fill = new kInteractivity();
 		}
 
 		return parent::toObject($object_to_fill, $propsToSkip);

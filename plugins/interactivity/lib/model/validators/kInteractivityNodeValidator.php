@@ -6,13 +6,7 @@
 
 class kInteractivityNodeValidator extends kInteractivityBaseValidator
 {
-	const ID = 'id';
-	const NAME = 'name';
-	const ENTRY_ID = 'entryId';
 	const OBJECT_NAME = 'node';
-	const INTERACTIONS = 'interactions';
-	const TAGS = 'tags';
-
 	protected $interactionValidator;
 	protected $interactionsIds;
 
@@ -33,18 +27,18 @@ class kInteractivityNodeValidator extends kInteractivityBaseValidator
 	public function validate($data)
 	{
 		$this->interactionsIds = array();
-		$this->validateMandatoryStringField($data, self::OBJECT_NAME, self::ID);
-		$this->validateMandatoryStringField($data, self::OBJECT_NAME, self::NAME);
-		$this->validateOptionalStringField($data, self::OBJECT_NAME, self::ENTRY_ID);
-		$this->validateOptionalStringField($data, self::OBJECT_NAME, self::TAGS);
+		$this->validateMandatoryStringField($data, self::OBJECT_NAME, kInteractivityDataFieldsName::INTERACTION_ID);
+		$this->validateMandatoryStringField($data, self::OBJECT_NAME, kInteractivityDataFieldsName::NAME);
+		$this->validateOptionalStringField($data, self::OBJECT_NAME, kInteractivityDataFieldsName::ENTRY_ID);
+		$this->validateOptionalStringField($data, self::OBJECT_NAME, kInteractivityDataFieldsName::TAGS);
 
-		if(isset($data[self::INTERACTIONS]))
+		if(isset($data[kInteractivityDataFieldsName::INTERACTIONS]))
 		{
-			$this->validateArrayField($data, self::OBJECT_NAME, self::INTERACTIONS);
-			foreach ($data[self::INTERACTIONS] as $interaction)
+			$this->validateArrayField($data, self::OBJECT_NAME, kInteractivityDataFieldsName::INTERACTIONS);
+			foreach ($data[kInteractivityDataFieldsName::INTERACTIONS] as $interaction)
 			{
 				$this->interactionValidator->validate($interaction);
-				$this->interactionsIds[] = $interaction[kInteractivityInteractionValidator::ID];
+				$this->interactionsIds[] = $interaction[kInteractivityDataFieldsName::INTERACTION_ID];
 			}
 		}
 	}

@@ -103,13 +103,5 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 			'onclick'	=> "getBulkUploadResult($('#bulkUploadId').val())",
 			'decorators' => array('ViewHelper')
 		));
-
-		$this->addDisplayGroup(
-			array('importCSV', 'import', 'bulkUploadId', 'getBulkUplodaResult'),
-			'import_group',
-			array(
-				'decorators' => array('FormElements', 'Fieldset'),
-				)
-		);
 	}
 }

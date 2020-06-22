@@ -184,7 +184,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				if(in_array($stream->codec_name, array('mjpeg','png'))
 				&& (in_array($mediaInfo->containerFormat, array('mp3','mpeg audio','isom','mp4','mpeg4','mpeg-4','m4a'))
 				||  in_array($mediaInfo->containerId, array('mp3','mpeg audio','isom','mp4','mpeg4','mpeg-4','m4a'))) ){
-					continue;
+					break;
 				}
 				$this->parseVideoStream($stream, $mAux);
 				if($vidCnt==0)

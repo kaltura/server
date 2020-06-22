@@ -8,6 +8,8 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	static private $map_between_objects = array
 	(
 		"freeText" => "_free_text",
+		"excludedFreeTextGroups" => "_excluded_free_text_groups",
+		"descriptionLike" => "_like_description",
 		"isRoot" => "_is_root",
 		"categoriesFullNameIn" => "_in_categories_full_name", 
 		"categoryAncestorIdIn" => "_in_category_ancestor_id",
@@ -39,6 +41,16 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var string
 	 */
 	public $freeText;
+
+	/**
+	 * @var string
+	 */
+	public $excludedFreeTextGroups;
+
+	/**
+	 * @var string
+	 */
+	public $descriptionLike;
 
 	/**
 	 * @var KalturaNullableBoolean

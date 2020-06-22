@@ -1,4 +1,23 @@
+# Propus 16.5.0  #
+## Adding permission to mediaServer partner for partner:get ##
+Issue Type: Task
+Issue ID : LIV-145
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_20_add_permission_partner_get.php
+
 # Propus 16.4.0  #
+## New Boolean notification template: Caption Ready With Conditions ##
+Issue Type: Task
+Issue ID : REACH2-849
+
+### Configuration ###
+First replace all tokens from the XML file below and remove ".template" from the file name:
+deployment/updates/scripts/xml/2020_06_14_captionAssetBooleanEventNotification.template.xml
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/2020_06_14_deploy_caption_asset_boolean_notification.php
+
 ## Adding permission to user validateHashKeyAction ##
 Issue Type: Task
 Issue ID : PLAT-10916

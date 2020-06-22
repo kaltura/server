@@ -808,7 +808,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
 				if ($periodicStorageIds)
 				{
-					$partnerIds = PartnerPeer::GLOBAL_PARTNER;
+					$partnerIds = array(PartnerPeer::GLOBAL_PARTNER);
 				}
 				break;
 			case self::EXTERNAL_AND_CLOUD_STORAGE:
@@ -2222,5 +2222,31 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 		return $fullPath;
+	}
+
+	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset, $preferredStorageId, $pathOnly = true)
+	{
+		$path = '';
+		$parent_file_sync = null;
+
+		if(!is_null($preferredStorageId))
+		{
+			$file_sync = self::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId);
+			if($file_sync)
+			{
+				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
+				$path = kFileSyncUtils::getPathByFileSync($parent_file_sync, $preferredStorageId);
+			}
+		}
+		else
+		{
+			list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
+			if ( $file_sync )
+			{
+				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
+				$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync, $pathOnly);
+			}
+		}
+		return array ($parent_file_sync, $path);
 	}
 }

@@ -924,7 +924,7 @@ class myFlvHandler
 				case myFlvHandler::TAG_TYPE_METADATA:
 					break;
 				default:
-					continue;
+					break;
 			}
 			if ($size == self::TAG_WRAPPER_SIZE){ // dont write tag with no actual data
 				continue;

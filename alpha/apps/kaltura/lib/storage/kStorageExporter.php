@@ -576,7 +576,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 	}
 
-	protected static function handleAssetStorageExports($object)
+	public static function handleAssetStorageExports($object)
 	{
 		$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
 		if(!$externalStorageProfiles)
@@ -594,7 +594,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	protected static function shouldHandleAssetObjectChanged($object, $modifiedColumns)
 	{
-		if($object instanceof flavorAsset || $object instanceof thumbAsset || $object instanceof captionAsset)
+		if( ($object instanceof flavorAsset && ($object->getFlavorParamsId() != flavorParams::SOURCE_FLAVOR_ID))
+			|| $object instanceof thumbAsset || $object instanceof captionAsset)
 		{
 			if(in_array(assetPeer::STATUS, $modifiedColumns) && $object->isLocalReadyStatus())
 			{

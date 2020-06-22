@@ -126,7 +126,7 @@ class kUploadTokenMgr
 		if ($this->_finalChunk)
 		{
 			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId())
-				&& !$this->checkIfFileIsAllowed())
+				&& $fileSize && !$this->checkIfFileIsAllowed())
 			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
 				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
@@ -290,7 +290,7 @@ class kUploadTokenMgr
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
 			
-			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize) && $succeeded)
+			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize))
 			{
 				$verifyFinalChunk = true;
 				$expectedFileSize = $this->_uploadToken->getFileSize();

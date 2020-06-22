@@ -116,6 +116,8 @@ class entryFilter extends baseObjectFilter
 			"_eq_access_control_id",
 			"_in_access_control_id",
 			"_free_text",
+			"_excluded_free_text_groups",
+			"_like_description",
 			"_eq_reference_id",
 			"_in_reference_id",
 			"_eq_replacing_entry_id",

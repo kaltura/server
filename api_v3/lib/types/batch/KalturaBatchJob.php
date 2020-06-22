@@ -477,7 +477,16 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 		$this->schedulerId = $dbBatchJobLock->getSchedulerId();
 		$this->workerId = $dbBatchJobLock->getWorkerId();
 	}
-	
+
+	protected function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$lockInfo = $srcObj->getLockInfo();
+		if($lockInfo)
+		{
+			$this->urgency = $lockInfo->getUrgency();
+		}
+	}
+
 	public function fromBatchJob($dbBatchJob, BatchJobLock $dbBatchJobLock = null) 
 	{
 		parent::fromObject($dbBatchJob);

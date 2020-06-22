@@ -46,7 +46,7 @@ class ESearchQueryFromFilter
 		$emptyFilter = true;
 		foreach($filter->fields as $field => $fieldValue)
 		{
-			if($field === entryFilter::ORDER || $field === ESearchEntryFilterFields::FREE_TEXT)
+			if($field === entryFilter::ORDER || $field === ESearchEntryFilterFields::FREE_TEXT || $field === ESearchEntryFilterFields::EXCLUDED_FREE_TEXT_GROUPS)
 			{
 				continue;
 			}
@@ -108,7 +108,7 @@ class ESearchQueryFromFilter
 			$elasticFieldName = $this->getSphinxToElasticFieldName($fieldName);
 			if($elasticFieldName && $searchItemType)
 			{
-				$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
+				$this->addFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
 			}
 		}
 
@@ -165,7 +165,7 @@ class ESearchQueryFromFilter
 		return array ($coreResults, $objectCount, $entrySearch);
 	}
 
-	protected function AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
+	protected function addFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue)
 	{
 		if(in_array($elasticFieldName, $this->getTimeFields()))
 		{
