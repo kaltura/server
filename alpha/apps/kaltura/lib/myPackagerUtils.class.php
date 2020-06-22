@@ -225,39 +225,35 @@ class myPackagerUtils
 		{
 			throw new kFileSyncException("partner id not defined for key [$fileSyncKey]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
 		}
-
-		$fileSyncs = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey, true, false);
+		
 		$localDcs = kDataCenterMgr::getDcIds();
-		foreach($fileSyncs as $fileSync)
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey, true, false);
+		
+		if(!$fileSync)
 		{
-			if(!$fileSync)
-			{
-				continue;
-			}
+			return null;
+		}
 			
-			/* @var $fileSync fileSync */
-			$fileDc = $fileSync->getDc();
-			if(in_array ($fileDc, $localDcs))
-			{
-				return self::getPackagerUrlFromConf($packagerUrlType);
-			}
+		/* @var $fileSync fileSync */
+		$fileDc = $fileSync->getDc();
+		if(in_array ($fileDc, $localDcs))
+		{
+			return self::getPackagerUrlFromConf($packagerUrlType);
+		}
 
-			$storageProfiles = self::loadStorageProfiles($fileSyncKey->partner_id);
-			if(array_key_exists($fileDc, $storageProfiles))
+		$storageProfiles = self::loadStorageProfiles($fileSyncKey->partner_id);
+		if(array_key_exists($fileDc, $storageProfiles))
+		{
+			$storageProfile = $storageProfiles[$fileDc];
+			if ($storageProfile)
 			{
-				$storageProfile = $storageProfiles[$fileDc];
-				if ($storageProfile)
+				$result = self::getPackagerUrlFromConf($packagerUrlType, $storageProfile->getPackagerUrl());
+				if ($result)
 				{
-					$result = self::getPackagerUrlFromConf($packagerUrlType, $storageProfile->getPackagerUrl());
-					if ($result)
-					{
-						return $result;
-					}
+					return $result;
 				}
 			}
 		}
-
-		return null;
 	}
 
 	/**
