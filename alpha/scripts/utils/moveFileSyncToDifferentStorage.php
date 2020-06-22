@@ -89,6 +89,10 @@ function main($partnerId, $storageId, $lastUpdatedAt)
 				{
 					KalturaLog::debug('Skipping file sync with id ' . $fileSync->getId() . ' and object id ' . $fileSync->getObjectId() . ' . Asset not found.');
 				}
+				elseif ($asset->getIsOriginal())
+				{
+					KalturaLog::debug('Skipping file sync with id ' . $fileSync->getId() . ' and object id ' . $fileSync->getObjectId() . ' . skipping source asset.');
+				}
 				else
 				{
 					if ($externalStorage->shouldExportFlavorAsset($asset))
