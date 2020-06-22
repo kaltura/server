@@ -165,7 +165,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		// dont export to periodic local storage if partner configured delete local content
 		if($externalStorage->getExportPeriodically() && $partner && $partner->getStorageDeleteFromKaltura())
 		{
-			return;
+			$partnerStorageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partner->getId());
+			if($partnerStorageProfiles)
+			{
+				return;
+			}
 		}
 
 		/* @var $fileSync FileSync */
