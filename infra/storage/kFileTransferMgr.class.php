@@ -407,7 +407,7 @@ abstract class kFileTransferMgr
 		//Before trying to upload the file first we will resolve the path to check if its remote
 		//In such case we will import it to a local location before uploading it to the destination
 		list($isRemote, $remoteUrl) = kFile::resolveFilePath($local_file);
-		$local_file = !$isRemote ? $local_file : kFile::getExternalFile($videoRemoteUrl, null, basename($local_file));
+		$local_file = !$isRemote ? $local_file : kFile::getExternalFile($remoteUrl, null, basename($local_file));
 		
 		// try to upload file
 		$res = @($this->doPutFile($remote_file, $local_file));

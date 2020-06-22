@@ -341,32 +341,6 @@ class kFileBase
 	
 	public static function getDataFromFile($src, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
 	{
-		if(!is_null($maxFileSize))
-		{
-			$curlWrapper = new KCurlWrapper();
-			$curlHeaderResponse = $curlWrapper->getHeader($src, true);
-			$curlWrapper->close();
-			
-			if(!$curlHeaderResponse || $curlWrapper->getError())
-				throw new Exception("Failed to retrive Curl header response from file path [$src] with Error " . $curlWrapper->getError());
-			
-			if(!$curlHeaderResponse->isGoodCode())
-				throw new Exception("Non Valid Error: $curlHeaderResponse->code" . " " . $curlHeaderResponse->codeName);
-			
-			if(isset($curlHeaderResponse->headers['content-length']))
-			{
-				$fileSize = $curlHeaderResponse->headers['content-length'];
-				if($fileSize > $maxFileSize)
-					throw new Exception("File size [$fileSize] Exceeded Max Siae Allowed [$maxFileSize]");
-				
-				KalturaLog::info("File size [$fileSize] validated");
-			}
-			else
-			{
-				KalturaLog::info("File size validation skipped");
-			}
-		}
-		
 		if(!$destFilePath)
 		{
 			$curlWrapper = new KCurlWrapper();
@@ -390,20 +364,7 @@ class kFileBase
 			return $kSharedFsMgr->getFileFromResource($src, $destFilePath, $allowInternalUrl);
 		}
 		
-		//DestFile is local, use curl to download the file locally
-		$curlWrapper = new KCurlWrapper();
-		$res = $curlWrapper->exec($src, null, null, $allowInternalUrl);
-		$httpCode = $curlWrapper->getHttpCode();
-		if (KCurlHeaderResponse::isError($httpCode))
-		{
-			KalturaLog::info("curl request [$src] return with http-code of [$httpCode]");
-			if ($destFilePath && file_exists($destFilePath))
-				unlink($destFilePath);
-			$res = false;
-		}
-		
-		$curlWrapper->close();
-		return $res;
+		return KCurlWrapper::getDataFromFile($src, $destFilePath, $maxFileSize, $allowInternalUrl);
 	}
 	
 	public static function checkFileExists($path)
@@ -683,7 +644,7 @@ class kFileBase
 			$baseName = md5(microtime(true) . getmypid() . uniqid(rand(), true));;
 		}
 		
-		$tmpFilePath = kFile::fixPath($dirName() . DIRECTORY_SEPARATOR . $baseName);
+		$tmpFilePath = kFile::fixPath($dirName . DIRECTORY_SEPARATOR . $baseName);
 		
 		$res = null;
 		try
