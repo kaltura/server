@@ -285,7 +285,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 		),
 
-		ReportType::TOP_ENTRIES_LIVE_NOW => array(
+		ReportType::TOP_LIVE_NOW_ENTRIES => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
@@ -312,14 +312,18 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW, self::METRIC_AVG_VIEW_ENGAGEMENT, self::METRIC_AVG_VIEW_BUFFERING, self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH)
 		),
 
-		ReportType::TOP_ENTRIES_ENDED_BROADCAST => array(
+		ReportType::TOP_ENDED_BROADCAST_ENTRIES => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('NAME'),
+					'peer' => 'entryPeer',
+				)
 			),
 			self::REPORT_EDIT_FILTER_FUNC => 'self::excludeLiveNowEntriesEditFilter',
 			self::REPORT_JOIN_REPORTS => array(

@@ -2409,10 +2409,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null, $granularity = null)
 	{
-		if (!isset($granularity))
-		{
-			$granularity = self::DRUID_GRANULARITY_ALL;
-		}
+		$granularity = $granularity ? $granularity : self::DRUID_GRANULARITY_ALL;
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics);
 
 		if (in_array($dimensions, self::$multi_value_dimensions))
@@ -5312,15 +5309,9 @@ class kKavaReportsMgr extends kKavaBase
 		$data = array();
 		foreach ($result[1] as $row)
 		{
-			$entry_id = $row[0];
-			if (!array_key_exists($entry_id, $data))
-			{
-				$data[$entry_id] = array($entry_id, $row[1]);
-			}
-			if ($data[$entry_id][1] < $row[1])
-			{
-				$data[$entry_id][1] = $row[1];
-			}
+			list($entry_id, $curr_viewers_count) = $row;
+			$prev_viewers_count = isset($data[$entry_id][1]) ? $data[$entry_id][1] : 0;
+			$data[$entry_id] = array($entry_id, max($prev_viewers_count, $curr_viewers_count));
 		}
 		$result[1] = $data;
 		$result[2] = count($data);
