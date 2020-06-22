@@ -54,6 +54,7 @@ class KalturaAttachmentAsset extends KalturaAsset
 
 		if (isset($this->filename))
 		{
+			$this->filename = preg_replace('/%0d\s*%0a/i','',$this->filename);
 			$this->filename = trim(str_replace (array("\r\n", "\n", "\r"), ' ', $this->filename));
 		}
 		return parent::toObject($object_to_fill, $props_to_skip);

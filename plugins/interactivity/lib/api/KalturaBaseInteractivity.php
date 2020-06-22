@@ -4,6 +4,7 @@
  * @package plugins.interactivity
  * @subpackage api.objects
  */
+
 abstract class KalturaBaseInteractivity extends KalturaObject
 {
 	/**

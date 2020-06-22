@@ -98,10 +98,14 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 					}
 				}
 				
-				if($this->type == self::SEARCH_OR && count($this->matchClause))
+				if($this->type == self::SEARCH_OR)
 				{
-					$matchClause = array_unique($this->matchClause);
-					$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
+					if (count($this->matchClause))
+					{
+						$matchClause = array_unique($this->matchClause);
+						$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
+					}
+					$this->parentQuery->handleConditionClause();
 				}
 			}
 		}
@@ -218,5 +222,10 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 	{
 		if($this->parentQuery)
 			$this->parentQuery->addNumericOrderBy($column, $orderByType);
+	}
+
+	public function handleConditionClause()
+	{
+
 	}
 }

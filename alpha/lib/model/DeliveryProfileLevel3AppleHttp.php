@@ -6,10 +6,15 @@ class DeliveryProfileLevel3AppleHttp extends DeliveryProfileAppleHttp {
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
-			$url .= "/clipTo/" . $this->params->getClipTo();
+		{
+			$url = self::insertAfter($url, 'entryId', 'clipTo', $this->params->getClipTo());
+		}
+
 		if($this->params->getExtension())
+		{
 			$url .= "/name/a." . $this->params->getExtension();
-		
+		}
+
 //		Trying to remove this code, based on the compat check. @_!!		
 // 		$entry = $flavorAsset->getentry();
 // 		if ($entry->getSecurityPolicy())

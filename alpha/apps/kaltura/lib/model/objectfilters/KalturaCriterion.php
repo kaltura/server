@@ -198,4 +198,9 @@ abstract class KalturaCriterion extends Criterion implements IKalturaDbQuery
 		else
 			$this->addAnd($criterion);
 	}
+
+	public function handleConditionClause()
+	{
+
+	}
 }
