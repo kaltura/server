@@ -5202,7 +5202,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$live_now_entries = array(entry::ENTRY_ID_THAT_DOES_NOT_EXIST);
 		}
-		$input_filter->entries_id = implode($response_options->getDelimiter(), $live_now_entries);
+		$input_filter->entries_ids = implode($response_options->getDelimiter(), $live_now_entries);
 
 	}
 
