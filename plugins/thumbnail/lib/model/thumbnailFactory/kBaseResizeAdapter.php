@@ -117,10 +117,8 @@ class kBaseResizeAdapter
 		$entry = $this->getEntry();
 		$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
 		$format = $this->parameters->get(kThumbFactoryFieldName::IMAGE_FORMAT);
-		$cloudPath = kConf::get(self::THUMBNAIL_CLOUD_PATH, ThumbnailPlugin::THUMBNAIL_MAP_NAME, null);
-		$thumbDir = $cloudPath ? $cloudPath : $thumbDirs[0];
 		//create final path for thumbnail created
-		$this->finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $entry->getId(), $this->entryThumbFilename , $version, true );
+		$this->finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
 		if($format)
 		{
 			$this->finalThumbPath = kFile::replaceExt($this->finalThumbPath, $format);
@@ -136,6 +134,20 @@ class kBaseResizeAdapter
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
 			{
+				if($currPath != $this->finalThumbPath)
+				{
+					$moveFileSuccess = kFile::moveFile($currPath, $this->finalThumbPath);
+					if($moveFileSuccess)
+					{
+						return array (true, $this->finalThumbPath);
+					}
+					else
+					{
+						KalturaLog::Error("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
+					}
+
+
+				}
 				return array (true, $currPath);
 			}
 		}
