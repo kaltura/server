@@ -5194,7 +5194,18 @@ class kKavaReportsMgr extends kKavaBase
 			$input_filter->entries_ids_not_in = implode($response_options->getDelimiter(), $live_now_entries);
 		}
 	}
-	
+
+	protected static function includeOnlyLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		$live_now_entries = self::getLiveNowEntries($partner_id);
+		if (!count($live_now_entries))
+		{
+			$live_now_entries = array(entry::ENTRY_ID_THAT_DOES_NOT_EXIST);
+		}
+		$input_filter->entries_ids = implode($response_options->getDelimiter(), $live_now_entries);
+
+	}
+
 	protected static function getLiveNowEntries($partner_id)
 	{
 		$filter = new entryFilter();

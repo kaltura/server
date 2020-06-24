@@ -310,6 +310,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 					)
 				),
 			),
+			self::REPORT_EDIT_FILTER_FUNC => 'self::includeOnlyLiveNowEntriesEditFilter',
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW, self::METRIC_AVG_VIEW_ENGAGEMENT, self::METRIC_AVG_VIEW_BUFFERING, self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH)
 		),
 
