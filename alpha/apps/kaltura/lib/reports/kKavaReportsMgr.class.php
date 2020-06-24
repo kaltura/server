@@ -4519,7 +4519,7 @@ class kKavaReportsMgr extends kKavaBase
 			!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) &&
 			!self::getFilterValues($druid_filter, $dimension) &&
 			($flags & self::GET_TABLE_FLAG_IS_CSV) == 0 &&
-			$granularity == self::DRUID_GRANULARITY_ALL)
+			$granularity != self::GRANULARITY_DYNAMIC)
 		{
 			// get the topN objects first, otherwise the returned metrics can be inaccurate
 			$query = self::getTopReport($data_source, $partner_id, $intervals, array($order_by), 
