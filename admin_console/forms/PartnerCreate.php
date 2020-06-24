@@ -13,7 +13,7 @@ class Form_PartnerCreate extends Infra_Form
 		$this->setMethod('post');
 		$this->setName('new_account'); // form id
 		$this->setAttrib('class', 'inline-form');
-		
+
 		$this->addElement('text', 'name', array(
 			'label' => 'partner-create form name',
 			'required' => true,
@@ -58,7 +58,27 @@ class Form_PartnerCreate extends Infra_Form
 			'label' => 'partner-create form url',
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		$this->addElement('text', 'additional_param_1_key', array(
+			'label'			=> 'partner-create form key 1',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'additional_param_1_val', array(
+			'label'			=> 'partner-create form val 1',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'additional_param_2_key', array(
+			'label'			=> 'partner-create form key 2',
+			'filters'		=> array('StringTrim'),
+		));
+
+		$this->addElement('text', 'additional_param_2_val', array(
+			'label'			=> 'partner-create form val 2',
+			'filters'		=> array('StringTrim'),
+		));
+
 		$this->addElement('select', 'partner_template_id', array(		
 			'label'			=> 'Select Template Partner ID:',
 			'filters'		=> array('StringTrim'),
@@ -86,7 +106,25 @@ class Form_PartnerCreate extends Infra_Form
 				array('Fieldset'),
 			)
 		));
-		
+
+		$this->addDisplayGroup(array('additional_param_1_key', 'additional_param_1_val'), 'additional_param_1', array(
+			'legend' => 'Additional Param 1',
+			'decorators' => array(
+				'Description',
+				'FormElements',
+				array('Fieldset'),
+			)
+		));
+
+		$this->addDisplayGroup(array('additional_param_2_key', 'additional_param_2_val'), 'additional_param_2', array(
+			'legend' => 'Additional Param 2',
+			'decorators' => array(
+				'Description',
+				'FormElements',
+				array('Fieldset'),
+			)
+		));
+
 		$this->addElement('button', 'submit', array(
 			'label' => 'partner-create form create',
 			'type' => 'submit',

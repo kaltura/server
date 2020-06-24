@@ -1023,6 +1023,11 @@ return array(
 	'partner-create form package' => 'Service Edition Type:',
 
 	'partner-create form url' => 'Website Url:',
+	'partner-create form key 1' => 'Key',
+	'partner-create form val 1' => 'Value',
+	'partner-create form key 2' => 'Key',
+	'partner-create form val 2' => 'Value',
+
 	'partner-create form content' => 'Website Content:',
 	'partner-create form adult' => 'Includes adult content?',
 	'partner-create form create' => 'Create',
