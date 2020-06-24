@@ -131,7 +131,7 @@ class kBaseResizeAdapter
 		{
 			$entry = $this->getEntry();
 			$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version );
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
 			if (file_exists($currPath) && @filesize($currPath))
 			{
 				if($currPath != $this->finalThumbPath)
@@ -143,11 +143,10 @@ class kBaseResizeAdapter
 					}
 					else
 					{
-						KalturaLog::Error("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
+						KalturaLog::warning("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
 					}
-
-
 				}
+
 				return array (true, $currPath);
 			}
 		}
