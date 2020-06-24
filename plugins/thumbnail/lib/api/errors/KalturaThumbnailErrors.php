@@ -13,7 +13,7 @@ class KalturaThumbnailErrors extends KalturaErrors
 	const MISSING_COMPOSITE_ACTION = 'MISSING_COMPOSITE_ACTION;;Missing composite action for multiply steps transformation';
 	const TRANSFORMATION_RUNTIME_ERROR = 'TRANSFORMATION_RUNTIME_ERROR;;There was an error running the image transformation';
 	const BAD_QUERY = "BAD_QUERY;errorString;Bad query \"@errorString@\"";
-	const ACTION_FAILED = 'ACTION_FAILED;;Action failed';
+	const ACTION_FAILED = "ACTION_FAILED;errorString;Action failed \"@errorString@\"";
 	const NOT_ALLOWED_PARAMETER = 'NOT_ALLOWED_PARAMETER;;The provided parameter is not allowed';
 	const MUST_HAVE_VIDEO_SOURCE = 'MUST_HAVE_VIDEO_SOURCE;;The following transformation must have video source';
 	const MISSING_S3_CONFIGURATION = 'MISSING_S3_CONFIGURATION;;Missing S3 configuration';
