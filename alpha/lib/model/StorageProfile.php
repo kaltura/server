@@ -39,6 +39,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_PACKAGER_URL = 'regular_packager_url';
 	const CUSTOM_DATA_EXPORT_PERIODICALLY = 'export_periodically';
 	const CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS = 'excluded_flavor_params_ids';
+	const CUSTOM_DATA_EXCLUDED_ENTRY_TYPE = 'excluded_entry_types';
 	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 	const CUSTOM_DATA_PATH_PREFIX = 'path_prefix';
 	/**
@@ -68,7 +69,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 				$class = self::STORAGE_DEFAULT_EXTERNAL_PATH_MANAGER;
 			}
 		}
-
 		return new $class();
 	}
 
@@ -208,6 +208,14 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 
 		$scopeEntryId = $flavorAsset->getEntryId();
 		$entry = entryPeer::retrieveByPK($scopeEntryId);
+
+		//check that entry type is not in the list of the excluded entry types
+		if(in_array($entry->getType(),kString::explode($this->getExcludedEntryTypes())))
+		{
+			return false;
+		}
+
+
 		if($entry && $entry->getReplacedEntryId())
 			$scopeEntryId = $entry->getReplacedEntryId();
 
@@ -482,10 +490,19 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS);
 	}
 
-
 	public function setExcludedFlavorParamsIds($flavorParamIds)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_FLAVOR_PARAMS_IDS, $flavorParamIds);
+	}
+
+	public function getExcludedEntryTypes()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXCLUDED_ENTRY_TYPE);
+	}
+
+	public function setExcludedEntryTypes($entryTypes)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXCLUDED_ENTRY_TYPE, $entryTypes);
 	}
 
 	/**
