@@ -92,6 +92,9 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 			case kThumbnailException::ENTRY_NOT_FOUND:
 				$object = new KalturaAPIException(KalturaThumbnailErrors::ENTRY_ID_NOT_FOUND, $data[kThumbnailErrorMessages::ENTRY_ID]);
 				break;
+			case kThumbnailException::PLAYLIST_ENTRY_NOT_FOUND:
+				$object = new KalturaAPIException(KalturaThumbnailErrors::PLAYLIST_ENTRY_NOT_FOUND);
+				break;
 			default:
 				$object = null;
 		}

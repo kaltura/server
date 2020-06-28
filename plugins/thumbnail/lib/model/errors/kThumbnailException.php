@@ -20,4 +20,5 @@ class kThumbnailException extends kCoreException
 	const MISSING_S3_CONFIGURATION = 'Missing S3 configuration';
 	const CACHE_ERROR = 'Cache error';
 	const ENTRY_NOT_FOUND = 'Entry not found';
+	const PLAYLIST_ENTRY_NOT_FOUND = 'playlist entry not found';
 }

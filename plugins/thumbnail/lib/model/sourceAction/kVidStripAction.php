@@ -70,13 +70,7 @@ class kVidStripAction extends kVidAction
 		{
 			$destPath = $this->getTempThumbnailPath();
 			$second = $this->startSec + ($interval * $i);
-			$success = myPackagerUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
-			if(!$success)
-			{
-				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::VID_STRIP_FAILED);
-				throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
-			}
-
+			$this->captureThumb($this->source->getEntry(), $destPath, $second);
 			$sliceToAdd = new Imagick(KThumbnailCapture::getCapturePath($destPath));
 			if(!$sizeInitialized)
 			{
@@ -97,13 +91,13 @@ class kVidStripAction extends kVidAction
 	/**
 	 * @param Imagick $strip
 	 * @param Imagick $sliceToAdd
-	 * @param int $x
+	 * @param int $xCoordinateToAddImage
 	 * @return Imagick
 	 * @throws kThumbnailException
 	 */
-	protected function concatImages($strip, $sliceToAdd, $x)
+	protected function concatImages($strip, $sliceToAdd, $xCoordinateToAddImage)
 	{
-		if(!$strip->compositeImage($sliceToAdd, Imagick::COMPOSITE_DEFAULT, $x, 0))
+		if(!$strip->compositeImage($sliceToAdd, Imagick::COMPOSITE_DEFAULT, $xCoordinateToAddImage, 0))
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::COMPOSE_FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);

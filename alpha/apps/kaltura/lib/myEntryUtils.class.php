@@ -1079,7 +1079,7 @@ class myEntryUtils
 		return $entryServerNode->getDCId();
 	}
 
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -1134,7 +1134,7 @@ class myEntryUtils
 		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
 		kFile::closeDbConnections();
 		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
-		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1, false, $decryptionKey);
+		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath . 'temp_', $calc_vid_sec, $width, $height, false, $decryptionKey);
 		return true;
 	}
 

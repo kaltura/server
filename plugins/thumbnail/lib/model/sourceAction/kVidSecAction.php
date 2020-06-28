@@ -39,13 +39,7 @@ class kVidSecAction extends kVidAction
 	{
 		$destPath = $this->getTempThumbnailPath();
 		$entry = $this->source->getEntry();
-		$success = myPackagerUtils::captureThumbUsingPackager($entry, $destPath, $this->second, $flavorAssetId, $this->newWidth, $this->newHeight);
-		if(!$success)
-		{
-			$data = array(kThumbnailErrorMessages::ERROR_STRING => self::$action_name . kThumbnailErrorMessages::FAILED);
-			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
-		}
-
+		$this->captureThumb($entry, $destPath, $this->second);
 		return new kFileSource(KThumbnailCapture::getCapturePath($destPath));
 	}
 }

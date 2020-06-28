@@ -18,4 +18,5 @@ class KalturaThumbnailErrors extends KalturaErrors
 	const MUST_HAVE_VIDEO_SOURCE = 'MUST_HAVE_VIDEO_SOURCE;;The following transformation must have video source';
 	const MISSING_S3_CONFIGURATION = 'MISSING_S3_CONFIGURATION;;Missing S3 configuration';
 	const CACHE_ERROR = 'CACHE_ERROR;;Cache error';
+	const PLAYLIST_ENTRY_NOT_FOUND = 'PLAYLIST_ENTRY_NOT_FOUND;;playlist entry not found';
 }
