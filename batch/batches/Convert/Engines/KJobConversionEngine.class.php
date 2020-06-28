@@ -163,10 +163,15 @@ abstract class KJobConversionEngine extends KConversionEngine
 		if (kFile::checkFileExists($this->inFilePath))
 		{
 			$newModificationTime = kFile::getFileLastUpdatedTime($this->inFilePath);
-			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
-			{
-				return $newModificationTime;
-			}
+		}
+		else
+		{
+			$newModificationTime = kFileUtils::getMostRecentModificationTimeFromDir($this->inFilePath);
+		}
+
+		if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+		{
+			return $newModificationTime;
 		}
 		return false;
 	}
@@ -238,7 +243,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				}
 				$currentModificationTime = $newModificationTime;
 			}
-			sleep(1);
+			sleep(10);
 			if(self::isReachedTimeout($timeout))
 			{
 				pclose($handle);
@@ -270,7 +275,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected static function isReachedTimeout(&$timeout)
 	{
-		$timeout--;
+		$timeout = $timeout - 10;
 		if($timeout <= 0)
 		{
 			KalturaLog::debug("Reached to TIMEOUT");
