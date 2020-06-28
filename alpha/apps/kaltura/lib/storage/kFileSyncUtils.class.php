@@ -2199,7 +2199,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true)
 	{
-		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds(false)))
 		{
 			return $fileSync->getFilePath();
 		}
