@@ -1,4 +1,11 @@
 # Propus 16.6.0  #
+## Adding permission to mediaServer partner for livereports ##
+Issue Type: Task
+Issue ID : LIV-156
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_28_add_permission_livereports.php
+
 ## Adding permission to capture apps to add code cue point ##
 Issue Type: Task
 Issue ID : KMS-20244
