@@ -29,8 +29,8 @@
 	<multirequest>
 		<request service="conversionProfile" action="add">
 			<conversionProfile objectType="KalturaConversionProfile">
-				<name>Ingested Falvors</name>
-				<systemName>INGESTED_FALVORS</systemName>
+				<name>Ingested Flavors</name>
+				<systemName>INGESTED_FLAVORS</systemName>
 				<description>Light set of flavors to be ingested</description>
 				<flavorParamsIds>0,1,2,3</flavorParamsIds>
 			</conversionProfile>
