@@ -248,6 +248,12 @@ class myPackagerUtils
 				}
 			}
 		}
+
+		$localDcs = kDataCenterMgr::getDcIds();
+		if(in_array ($fileDc, $localDcs))
+		{
+			return self::getPackagerUrlFromConf($packagerUrlType);
+		}
 	}
 
 	/**
