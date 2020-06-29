@@ -71,7 +71,8 @@ class kPexipHandler
 	{
 		/** @var LiveStreamEntry $dbLiveEntry **/
 		$streamUrl = null;
-		if (isset($pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING]) && $pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING])
+		if ((isset($pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING]) && $pexipConfig[kPexipUtils::FORCE_NON_SECURE_STREAMING])
+			|| (isset($pexipConfig[kPexipUtils::RTMP_EXPLICIT_PARTNERS]) && in_array( $dbLiveEntry->getPartnerId(), $pexipConfig[kPexipUtils::RTMP_EXPLICIT_PARTNERS])))
 		{
 			KalturaLog::info('Retrieving RTMP Stream Url For Entry ' . $dbLiveEntry->getId());
 			$streamUrl = $isPrimaryStream ? $dbLiveEntry->getPrimaryBroadcastingUrl() : $dbLiveEntry->getSecondaryBroadcastingUrl();

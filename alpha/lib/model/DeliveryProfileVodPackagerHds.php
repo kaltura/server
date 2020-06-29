@@ -8,15 +8,14 @@ class DeliveryProfileVodPackagerHds extends DeliveryProfileHds {
 		$url .= '/forceproxy/true';
 		if($this->params->getFileExtension())
 			$url .= "/name/a." . $this->params->getFileExtension();
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		$url = VodPackagerDeliveryUtils::addExtraParams($url, $this->params);
 		return $url;
 	}
 	
 	protected function doGetFileSyncUrl(FileSync $fileSync)
 	{
 		$url = parent::doGetFileSyncUrl($fileSync);
-		
-		$url .= VodPackagerDeliveryUtils::getExtraParams($this->params);
+		$url = VodPackagerDeliveryUtils::addExtraParams($url, $this->params);
 		return $url;
 	}
 	

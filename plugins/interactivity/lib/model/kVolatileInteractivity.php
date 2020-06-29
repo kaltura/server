@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.interactivity
- * @subpackage model.items
+ * @subpackage model
  */
 
 class kVolatileInteractivity extends kBaseInteractivity

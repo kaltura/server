@@ -104,6 +104,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_UNIQUE_BUFFERING_USERS,
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_BITRATE,
 			),
 		),
 
@@ -285,6 +286,70 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 		),
 
+		ReportType::TOP_LIVE_NOW_ENTRIES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'entry_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+				'creator_name' => self::DIMENSION_ENTRY_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('NAME', 'KUSER_ID'),
+						'peer' => 'entryPeer',
+					)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
+					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
+						'peer' => 'kuserPeer',
+					)
+				),
+			),
+			self::REPORT_EDIT_FILTER_FUNC => 'self::includeOnlyLiveNowEntriesEditFilter',
+			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW, self::METRIC_AVG_VIEW_ENGAGEMENT, self::METRIC_AVG_VIEW_BUFFERING, self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH)
+		),
+
+		ReportType::TOP_ENDED_BROADCAST_ENTRIES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'entry_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('NAME'),
+					'peer' => 'entryPeer',
+				)
+			),
+			self::REPORT_EDIT_FILTER_FUNC => 'self::excludeLiveNowEntriesEditFilter',
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_REALTIME,
+					self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
+					self::REPORT_METRICS => array(self::METRIC_AVG_VIEW_ENGAGEMENT, self::METRIC_AVG_VIEW_BUFFERING, self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH),
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_REALTIME,
+					self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
+					self::REPORT_GRANULARITY => self::GRANULARITY_DYNAMIC,
+					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
+					self::REPORT_METRICS => array(self::METRIC_DYNAMIC_VIEWERS),
+					self::REPORT_TABLE_FINALIZE_FUNC => 'self::getPeakViewers'
+				),
+			),
+			self::REPORT_TABLE_MAP => array(
+				'viewers' => self::METRIC_DYNAMIC_VIEWERS,
+				'avg_view_engagement' => self::METRIC_AVG_VIEW_ENGAGEMENT,
+				'avg_view_buffering' => self::METRIC_AVG_VIEW_BUFFERING,
+				'avg_view_downstream_bandwidth' => self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
+			)
+		),
 	);
 
 	protected static function initTransformTimeDimensions()

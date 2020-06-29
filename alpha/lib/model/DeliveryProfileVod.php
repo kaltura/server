@@ -76,10 +76,66 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		if (($entry->getType() == entryType::PLAYLIST) && ($flavorAsset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)))
 			$url .= '/captions/' . $flavorAsset->getLanguage();
 
-		$url .= $this->params->getUrlParams();
+		$urlParams = $this->params->getUrlParams();
+
+		$clipTo = self::extractClipTo($urlParams);
+		if($clipTo)
+		{
+			$url = self::insertAfter($url, 'entryId', 'clipTo', $clipTo);
+		}
+
+		$url .= $urlParams;
+
+
 		return $url;
 	}
-	
+
+	protected static function extractClipTo(&$urlParams)
+	{
+		list($clipToPos, $endClipToValPos) = self::getKeyValPositions($urlParams, 'clipTo');
+
+		if($clipToPos === false)
+		{
+			return false;
+		}
+
+		$clipToValPos = $clipToPos + strlen('/clipTo/');
+		$clipTo = substr($urlParams, $clipToValPos, $endClipToValPos - $clipToValPos);
+
+		$urlParams = substr($urlParams, 0, $clipToPos) . substr($urlParams, $endClipToValPos);
+
+		return $clipTo;
+	}
+
+	protected static function getKeyValPositions($url, $key)
+	{
+		$startKeyPos = strpos($url,"/{$key}/");
+		if ($startKeyPos === false )
+		{
+			return array(false, false);
+		}
+
+		$endValPos = strpos($url, '/', $startKeyPos + strlen("/{$key}/"));
+		if ($endValPos === false)
+		{
+			$endValPos = strlen($url);
+		}
+
+		return array($startKeyPos, $endValPos);
+	}
+
+	public static function insertAfter($url, $afterKey, $key, $val)
+	{
+		list($keyPos, $endValPos) = self::getKeyValPositions($url, $afterKey);
+
+		if ($keyPos !== false )
+		{
+			$url = substr($url, 0, $endValPos) . "/{$key}/" . $val . substr($url, $endValPos);
+		}
+
+		return $url;
+	}
+
 	/**
 	 * @param asset $flavorAsset
 	 * @return string representing the version string
@@ -102,7 +158,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
-			$url .= "/clipTo/" . $this->params->getClipTo();
+		{
+			$url = self::insertAfter($url, 'entryId', 'clipTo', $this->params->getClipTo());
+		}
 		return $url;
 	}
 	

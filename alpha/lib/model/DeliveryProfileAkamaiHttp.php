@@ -17,10 +17,14 @@ class DeliveryProfileAkamaiHttp extends DeliveryProfileHttp {
 	{
 		$url = $this->getBaseUrl($flavorAsset);
 		if($this->params->getClipTo())
-			$url .= "/clipTo/" . $this->params->getClipTo();
-		else 
+		{
+			$url = self::insertAfter($url, 'entryId', 'clipTo', $this->params->getClipTo());
+		}
+		else
+		{
 			$url .= '/forceproxy/true';
-		
+		}
+
 		if($this->params->getFileExtension())
 			$url .= self::NAME_A . $this->params->getFileExtension();
 		else

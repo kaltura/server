@@ -13,7 +13,34 @@ class PartnerController extends Zend_Controller_Action
 	{
 		$this->_helper->redirector('list');
 	}
-	
+
+	protected function addAdditionalParam($form, $paramNum, &$pairs)
+	{
+		$pair = new Kaltura_Client_Type_KeyValue();
+		$pair->key = $form->getValue("additional_param_{$paramNum}_key");
+		$pair->value = $form->getValue("additional_param_{$paramNum}_val");;
+
+		if($pair->key && $pair->value)
+		{
+			$pairs[] = $pair;
+		}
+	}
+
+	protected function getAdditionalParams($form)
+	{
+		$pairs = array();
+
+		$this->addAdditionalParam($form, 1, $pairs);
+		$this->addAdditionalParam($form, 2, $pairs);
+
+		if(count($pairs))
+		{
+			return $pairs;
+		}
+
+		return null;
+	}
+
 	public function createAction()
 	{
 		$request = $this->getRequest();
@@ -64,6 +91,7 @@ class PartnerController extends Zend_Controller_Action
 				$partner->adminName = $partner->name;
 				$partner->description = "Admin Console";
 				$partner->type = Kaltura_Client_Enum_PartnerType::ADMIN_CONSOLE;
+				$partner->additionalParams = $this->getAdditionalParams($form);
 				$templatePartnerId = $form->getValue('partner_template_id');
 				$client->startMultiRequest();
 				$client->partner->register($partner, null, $templatePartnerId);

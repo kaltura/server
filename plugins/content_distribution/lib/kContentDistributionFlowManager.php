@@ -1583,7 +1583,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 				case EntryDistributionStatus::REMOVED:
 				
 					KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] status [" . $entryDistribution->getStatus() . "] no update required");
-					continue;
+					break;
 				
 				case EntryDistributionStatus::PENDING:
 				case EntryDistributionStatus::ERROR_SUBMITTING:	
@@ -1623,19 +1623,19 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					if(!$distributionProvider)
 					{
 						KalturaLog::err("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProfile->getProviderType() . "] not found");
-						continue;
+						break;
 					}
 						
 					if(!$distributionProvider->isUpdateEnabled())
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] provider [" . $distributionProvider->getName() . "] does not support update");
-						continue;
+						break;
 					}
 					
 					if($distributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] profile id  [" . $distributionProfile->getId() . "] update not enabled");
-						continue;
+						break;
 					}
 					
 					$updateRequiredEntryFields = $distributionProvider->getUpdateRequiredEntryFields($distributionProfileId);
@@ -1682,7 +1682,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 					if(!$updateRequired)
 					{
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] update not required");
-						continue;	
+						break;	
 					}
 					
 					if($distributionProfile->getUpdateEnabled() != DistributionProfileActionStatus::AUTOMATIC)
@@ -1690,7 +1690,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 						KalturaLog::log("Entry distribution [" . $entryDistribution->getId() . "] should not be updated automatically");
 						$entryDistribution->setDirtyStatus(EntryDistributionDirtyStatus::UPDATE_REQUIRED);
 						$entryDistribution->save();
-						continue;
+						break;
 					}
 					
 					KalturaLog::log("Updating entry distribution [" . $entryDistribution->getId() . "]");

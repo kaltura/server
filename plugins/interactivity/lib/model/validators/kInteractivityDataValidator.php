@@ -6,9 +6,7 @@
 
 class kInteractivityDataValidator extends kInteractivityBaseValidator
 {
-	const NODES = 'nodes';
 	const OBJECT_NAME = 'InteractivityData';
-	const NODE_ID = 'id';
 
 	/** @var kInteractivityNodeValidator*/
 	protected $nodeValidator;
@@ -49,15 +47,15 @@ class kInteractivityDataValidator extends kInteractivityBaseValidator
 	 */
 	protected function validateNodes($data)
 	{
-		if(isset($data[self::NODES]))
+		if(isset($data[kInteractivityDataFieldsName::NODES]))
 		{
 			$nodesIds = array();
 			$interactionsIds = array();
-			$this->validateArrayField($data, self::OBJECT_NAME, self::NODES);
-			foreach ($data[self::NODES] as $node)
+			$this->validateArrayField($data, self::OBJECT_NAME, kInteractivityDataFieldsName::NODES);
+			foreach ($data[kInteractivityDataFieldsName::NODES] as $node)
 			{
 				$this->nodeValidator->validate($node);
-				$nodesIds[] = $node[self::NODE_ID];
+				$nodesIds[] = $node[kInteractivityDataFieldsName::NODE_ID];
 				$interactionsIds = array_merge($interactionsIds, $this->nodeValidator->getInteractionIds());
 			}
 
