@@ -39,7 +39,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setTempEntryId($clipEntry->getEntryId());
 
 		//if it is replace(Trim flow) active the copy to destination consumers
-		$this->fillDestEntry($destEntry, $sourceEntryId, $operationAttributes);
+		$this->fillDestEntry($destEntry, $sourceEntryId, $operationAttributes, $clipEntry->getEntryId());
 
 		$jobData->setSourceEntryId($sourceEntryId);
 		$jobData->setPartnerId($partnerId);
@@ -548,7 +548,20 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		$this->addDestinationEntryAsset($clipConcatJobData->getDestEntryId(), $concatAsset);
+		try 
+		{
+			$this->addDestinationEntryAsset($clipConcatJobData->getDestEntryId(), $concatAsset);
+		}
+		catch (Exception $e)
+		{
+			if( $e->getCode() == APIErrors::getCode(KalturaErrors::ENTRY_ID_NOT_FOUND) )
+			{
+				KalturaLog::debug("Destination entry [" . $clipConcatJobData->getDestEntryId() . "] was not found, deleting temp entry [" . $clipConcatJobData->getTempEntryId() . "], so it wont be a zombie");
+				$this->deleteEntry($clipConcatJobData->getTempEntryId());
+			}
+			
+			throw $e;
+		}
 		$this->deleteEntry($clipConcatJobData->getTempEntryId());
 		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 	}
@@ -635,12 +648,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $sourceEntryId
 	 * @param array $operationAttributes
 	 */
-	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
+	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes, $replacingEntryId)
 	{
 		if ($destEntry->getIsTemporary())
 			$destEntry->setFlowType(EntryFlowType::TRIM_CONCAT);
 		else 
 			$destEntry->setFlowType(EntryFlowType::CLIP_CONCAT);
+		
+		$destEntry->setReplacingEntryId($replacingEntryId);
 		$destEntry->setSourceEntryId($sourceEntryId);
 		$destEntry->setOperationAttributes($operationAttributes);
 		$destEntry->setStatus(entryStatus::PENDING);
