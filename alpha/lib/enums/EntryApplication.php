@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.enum
  */
-interface EntrySourceApplication extends BaseEnum
+interface EntryApplication extends BaseEnum
 {
 	const KMC = 0;
 	const KMS = 1;
