@@ -105,7 +105,7 @@ class AdvancedSearchFilterOperator extends AdvancedSearchFilterItem implements I
 						$matchClause = array_unique($this->matchClause);
 						$this->condition = '( ' . implode(' | ', $matchClause) . ' )';
 					}
-					$this->parentQuery->handleConditionClause();
+					//$this->parentQuery->handleConditionClause();
 				}
 			}
 		}
