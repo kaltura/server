@@ -84,7 +84,8 @@ class thumbnailStringParser
 		switch($sourceType)
 		{
 			case kSourceType::ID:
-				$source = new kEntrySource($sourceParameters[self::SOURCE_VALUE_INDEX]);
+				$source = new kEntrySource();
+				$source->setEntryId($sourceParameters[self::SOURCE_VALUE_INDEX]);
 				break;
 			default:
 				$data = array(kThumbnailErrorMessages::SOURCE_STRING => $sourceString);

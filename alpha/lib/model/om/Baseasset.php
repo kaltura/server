@@ -182,7 +182,7 @@ abstract class Baseasset extends BaseObject  implements Persistent {
 	/**
 	 * @var        Criteria The criteria used to select the current contents of collassetParamsOutputs.
 	 */
-	private $lastassetParamsOutputCriteria = null;
+	protected $lastassetParamsOutputCriteria = null;
 
 	/**
 	 * Flag to prevent endless save loop, if this object is referenced

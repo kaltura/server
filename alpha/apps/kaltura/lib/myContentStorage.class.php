@@ -15,8 +15,8 @@ class myContentStorage
 	{
 		return ( strstr ( $file_name, "&") !== FALSE );
 	}
-	
-	
+
+
 	/**
 	 * This function returns the file system path for a requested content entity.
 	 * The given file name is of the form last_ugc_version.ext&kaltua_template
@@ -33,8 +33,11 @@ class myContentStorage
 	 * The path is composed from the entity name (kshow, entry, kuser),
 	 * the entity id and it's random obfuscator (which is used also for versioning)
 	 * @param string $entityName = the entity object name
+	 * @param $int_id
 	 * @param int $id = the entity id
 	 * @param int $fileName = random obfuscator followed by the file extension (.jpg, .flv, .txt, etc...)
+	 * @param int $version
+	 * @param bool $externalStorageMode
 	 * @return string the content path
 	 */
 	public static function getGeneralEntityPath($entityName, $int_id, $id, $fileName , $version = null, $externalStorageMode = false )

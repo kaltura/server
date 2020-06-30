@@ -10,7 +10,6 @@ class KalturaAPIException extends Exception
 	
 	/**
 	 * @param string $errorString A string in the format: "ERR_CODE;PARAMS;MSG_STRING"
-	 * @throws Exception
 	 */
 	function __construct( $errorString )
 	{
