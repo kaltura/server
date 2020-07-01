@@ -3681,7 +3681,14 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			$c->addSelectColumn("kuser.$column");
+			if (strpos($column, '(') !== false)
+			{
+				$c->addSelectColumn($column);
+			}
+			else
+			{
+				$c->addSelectColumn("kuser.$column");
+			}
 		}
 
 		if (!$skip_partner_filter && $partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
