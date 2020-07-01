@@ -21,6 +21,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
 
+	const ONE_DAY = 86400;
+
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
 		self::FILE_SYNC_STATUS_PENDING => "Pending", 
@@ -327,7 +329,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	protected function addKalturaAuthParams($url)
 	{
 		$version = kNetworkUtils::DEFAULT_AUTH_HEADER_VERSION;
-		$timestamp = time();
+		$timestamp = time() + self::ONE_DAY;
 		$signature = kNetworkUtils::calculateSignature($version, $timestamp, $url);
 
 		return '?kaltura_auth=' . $version . ',' . $timestamp . ',' . $signature;

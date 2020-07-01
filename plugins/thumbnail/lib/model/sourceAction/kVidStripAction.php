@@ -6,13 +6,11 @@
 
 class kVidStripAction extends kVidAction
 {
-	const DEFAULT_BGC = "none";
 	protected $numberOfSlices;
 	protected $startSec;
 	protected $endSec;
 	protected $newWidth;
 	protected $newHeight;
-	protected $videoLength;
 
 	protected function initParameterAlias()
 	{
@@ -58,6 +56,10 @@ class kVidStripAction extends kVidAction
 		}
 	}
 
+	/**
+	 * @return kThumbnailSource
+	 * @throws kThumbnailException|ImagickException
+	 */
 	protected function doAction()
 	{
 		$sizeInitialized = false;
@@ -68,13 +70,7 @@ class kVidStripAction extends kVidAction
 		{
 			$destPath = $this->getTempThumbnailPath();
 			$second = $this->startSec + ($interval * $i);
-			$success = myPackagerUtils::captureThumbUsingPackager($this->source->getEntry(), $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
-			if(!$success)
-			{
-				$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::VID_STRIP_FAILED);
-				throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
-			}
-
+			$this->captureThumb($this->source->getEntry(), $destPath, $second);
 			$sliceToAdd = new Imagick(KThumbnailCapture::getCapturePath($destPath));
 			if(!$sizeInitialized)
 			{
@@ -95,13 +91,13 @@ class kVidStripAction extends kVidAction
 	/**
 	 * @param Imagick $strip
 	 * @param Imagick $sliceToAdd
-	 * @param int $x
+	 * @param int $xCoordinateToAddImage
 	 * @return Imagick
 	 * @throws kThumbnailException
 	 */
-	protected function concatImages($strip, $sliceToAdd, $x)
+	protected function concatImages($strip, $sliceToAdd, $xCoordinateToAddImage)
 	{
-		if(!$strip->compositeImage($sliceToAdd, Imagick::COMPOSITE_DEFAULT, $x, 0))
+		if(!$strip->compositeImage($sliceToAdd, Imagick::COMPOSITE_DEFAULT, $xCoordinateToAddImage, 0))
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::COMPOSE_FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
@@ -110,6 +106,10 @@ class kVidStripAction extends kVidAction
 		return $strip;
 	}
 
+	/**
+	 * @return float|int
+	 * @throws kThumbnailException
+	 */
 	protected function calculateInterval()
 	{
 		/** @var entry $entry*/
@@ -125,7 +125,6 @@ class kVidStripAction extends kVidAction
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
-		$interval = ($this->endSec - $this->startSec) / $this->numberOfSlices;
-		return $interval;
+		return ($this->endSec - $this->startSec) / $this->numberOfSlices;
 	}
 }

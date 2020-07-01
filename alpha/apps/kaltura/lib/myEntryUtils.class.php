@@ -689,10 +689,18 @@ class myEntryUtils
 	}
 	
 	
-	public static function resizeEntryImage( entry $entry, $version , $width , $height , $type , $bgcolor ="ffffff" , $crop_provider=null, $quality = 0,
+	public static function resizeEntryImage( entry $entry, $version, $width, $height, $type, $bgcolor = "ffffff", $crop_provider = null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
 		$start_sec = -1, $end_sec = -1)
 	{
+		$result = self::getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+			$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+
+		if($result)
+		{
+			return $result;
+		}
+
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
 
@@ -1071,7 +1079,7 @@ class myEntryUtils
 		return $entryServerNode->getDCId();
 	}
 
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId)
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -1126,7 +1134,7 @@ class myEntryUtils
 		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
 		kFile::closeDbConnections();
 		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
-		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath."temp_", $calc_vid_sec, -1, -1, false, $decryptionKey);
+		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath . 'temp_', $calc_vid_sec, $width, $height, false, $decryptionKey);
 		return true;
 	}
 
@@ -2147,4 +2155,32 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return  (kCurrentContext::$multiRequest_index <= 1);
 	}
 
+	protected static function getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+																  $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
+	{
+		$result = null;
+		try
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaImageTransformationExecutor');
+			foreach ($pluginInstances as $KalturaTransformationExecutor)
+			{
+				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
+				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
+				$result =$KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+
+				if ($result)
+				{
+					break;
+				}
+
+			}
+		}
+		catch (Exception $e)
+		{
+			kalturaLog::warning('Could not execute image transformation');
+		}
+
+		return $result;
+	}
 }

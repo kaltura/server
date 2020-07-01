@@ -15,7 +15,13 @@ abstract class kThumbnailAction
 	}
 
 	abstract protected function initParameterAlias();
+
+	/**
+	 * @return void
+	 * @throws kThumbnailException
+	 */
 	abstract protected function validateInput();
+
 	abstract protected function extractActionParameters();
 
 	protected $actionParameters = array();

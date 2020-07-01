@@ -6,7 +6,6 @@
 
 abstract class kThumbnailSource
 {
-
 	public abstract function getImage();
 
 	public function getLastModified()

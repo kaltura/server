@@ -4519,7 +4519,7 @@ class kKavaReportsMgr extends kKavaBase
 			!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) &&
 			!self::getFilterValues($druid_filter, $dimension) &&
 			($flags & self::GET_TABLE_FLAG_IS_CSV) == 0 &&
-			$granularity == self::DRUID_GRANULARITY_ALL)
+			$granularity != self::GRANULARITY_DYNAMIC)
 		{
 			// get the topN objects first, otherwise the returned metrics can be inaccurate
 			$query = self::getTopReport($data_source, $partner_id, $intervals, array($order_by), 
@@ -4576,7 +4576,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else
 		{
-			$granularity_def = self::getGranularityDef($granularity, $input_filter);
+			$granularity_def = $granularity == self::GRANULARITY_DYNAMIC ? self::getGranularityDef($granularity, $input_filter) : null;
 			$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, 
 				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold, null, $granularity_def);
 		}
@@ -4593,7 +4593,7 @@ class kKavaReportsMgr extends kKavaBase
 			return array(array(), array(), 0);
 		}
 
-		if (($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY) || ($granularity != self::DRUID_GRANULARITY_ALL))
+		if (($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY) || ($granularity == self::GRANULARITY_DYNAMIC))
 		{
 			$rows = $result;
 		}
@@ -4609,7 +4609,7 @@ class kKavaReportsMgr extends kKavaBase
 		KalturaLog::log("Druid returned [$rows_count] rows");
 
 		// don't remove rows by pager if using topN with granularity different than ALL
-		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY || $granularity == self::DRUID_GRANULARITY_ALL)
+		if ($granularity != self::GRANULARITY_DYNAMIC)
 		{
 			$rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
 		}
@@ -4693,7 +4693,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$row_mapping = array_merge($row_mapping, $metrics);
 
-		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_TOPN && $granularity != self::DRUID_GRANULARITY_ALL)
+		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_TOPN && $granularity == self::GRANULARITY_DYNAMIC)
 		{
 			$data = array();
 			foreach ($rows as $index => $row)
@@ -4714,7 +4714,7 @@ class kKavaReportsMgr extends kKavaBase
 		// map the rows
 		foreach ($rows as $index => $row)
 		{
-			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY || $granularity != self::DRUID_GRANULARITY_ALL)
+			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY || $granularity == self::GRANULARITY_DYNAMIC)
 			{
 				$timestamp = $row[self::DRUID_TIMESTAMP];
 				$row = $row[self::DRUID_EVENT];
@@ -5194,7 +5194,18 @@ class kKavaReportsMgr extends kKavaBase
 			$input_filter->entries_ids_not_in = implode($response_options->getDelimiter(), $live_now_entries);
 		}
 	}
-	
+
+	protected static function includeOnlyLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		$live_now_entries = self::getLiveNowEntries($partner_id);
+		if (!count($live_now_entries))
+		{
+			$live_now_entries = array(entry::ENTRY_ID_THAT_DOES_NOT_EXIST);
+		}
+		$input_filter->entries_ids = implode($response_options->getDelimiter(), $live_now_entries);
+
+	}
+
 	protected static function getLiveNowEntries($partner_id)
 	{
 		$filter = new entryFilter();
