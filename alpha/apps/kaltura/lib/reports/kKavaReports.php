@@ -1634,6 +1634,20 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
 		),
 
+		ReportType::TOP_CUSTOM_VAR2 => array(
+			self::REPORT_DIMENSION_MAP => array('custom_var2' => self::DIMENSION_CUSTOM_VAR2),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_CUSTOM_VAR2,
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		),
+
+		ReportType::TOP_CUSTOM_VAR3 => array(
+			self::REPORT_DIMENSION_MAP => array('custom_var3' => self::DIMENSION_CUSTOM_VAR3),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_CUSTOM_VAR3,
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
