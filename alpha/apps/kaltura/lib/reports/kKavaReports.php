@@ -112,11 +112,15 @@ class kKavaReports extends kKavaReportsMgr
 
 		ReportType::USER_TOP_CONTENT => array(
 			self::REPORT_DIMENSION_MAP => array(
-				'name' => self::DIMENSION_KUSER_ID
+				'name' => self::DIMENSION_KUSER_ID,
+				'full_name' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name'),
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
+				)
 			),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED, self::METRIC_TOTAL_UNIQUE_PERCENTILES),
