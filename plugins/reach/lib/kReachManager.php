@@ -184,6 +184,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
+		if ($object instanceof entry && $object->getType() == ExternalMediaPlugin::getApiValue(ExternalMediaEntryType::EXTERNAL_MEDIA))
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -272,6 +276,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				$event = new kObjectAddedEvent($object);
 				$this->consumeEvent($event);
 			}
+			$this->checkAutomaticRules($object);
+		}
+		if ($object instanceof entry && $object->getType() == ExternalMediaPlugin::getApiValue(ExternalMediaEntryType::EXTERNAL_MEDIA))
+		{
 			$this->checkAutomaticRules($object);
 		}
 
