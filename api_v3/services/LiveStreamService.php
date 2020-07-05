@@ -719,4 +719,9 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 	}
 
+	public function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill = null)
+	{
+		return parent::duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill);
+	}
+
 }
