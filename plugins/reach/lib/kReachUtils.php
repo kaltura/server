@@ -4,10 +4,24 @@
  */
 class kReachUtils
 {
-	static private $dateFields = array('createdAt', 'updatedAt');
+	static private $catalogItemDateFields = array('createdAt', 'updatedAt');
 	static private $catalogItemTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime','outputFormat');
 
-	static private $statusEnumTranslate = array(
+	static private $entryVendorTaskDateFields = array('createdAt', 'expectedFinishTime');
+	static private $entryVendorTaskTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime');
+
+	static private $statusEntryVendorTaskEnumTranslate = array(
+		1 => 'PENDING',
+		2 => 'READY',
+		3 => 'PROCESSING',
+		4 => 'PENDING_MODERATION',
+		5 => 'REJECTED',
+		6 => 'ERROR',
+		7 => 'ABORTED',
+		8 => 'PENDING_ENTRY_READY'
+	);
+
+	static private $statusCatalogItemEnumTranslate = array(
 		1 => "DEPRECATED",
 		2 => "ACTIVE",
 		3 => "DELETED",
@@ -21,6 +35,13 @@ class kReachUtils
 	static private $turnAroundTimeEnumTranslate = array(
 		-1 => "BEST_EFFORT",
 		0 => "IMMEDIATE",
+		1 => "ONE_BUSINESS_DAY",
+		2 => "TWO_BUSINESS_DAYS",
+		3 => "THREE_BUSINESS_DAYS",
+		4 => "FOUR_BUSINESS_DAYS",
+		5 => "FIVE_BUSINESS_DAYS",
+		6 => "SIX_BUSINESS_DAYS",
+		7 => "SEVEN_BUSINESS_DAYS",
 		1800 => "THIRTY_MINUTES",
 		7200 => "TWO_HOURS",
 		10800 => "THREE_HOURS",
@@ -225,39 +246,81 @@ class kReachUtils
 	/**
 	 * @return array
 	 */
+	public static function getEntryVendorTaskCsvHeaders()
+	{
+		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription');
+	}
+
+	/**
+	 * @return array
+	 */
 	public static function getVendorCatalogItemsCsvHeaders()
 	{
 		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId');
 	}
 
+
+	protected static function getTranslationFunctionsByType($type)
+	{
+		switch ($type)
+		{
+			case 'vendorCatalogItem':
+				return array('catalogItemDateFields', 'catalogItemTranslateableFields', 'getVendorCatalogItemsCsvHeaders');
+
+			case 'entryVendorTask':
+				return array('entryVendorTaskDateFields', 'entryVendorTaskTranslateableFields', 'getEntryVendorTaskCsvHeaders');
+		}
+	}
+
+	protected static function getTranslatableFieldByType($type, $translateableField)
+	{
+		if ($translateableField === 'status')
+		{
+			switch ($type)
+			{
+				case 'vendorCatalogItem':
+					return 'statusCatalogItem';
+
+				case 'entryVendorTask':
+					return 'statusEntryVendorTask';
+			}
+		}
+
+		return $translateableField;
+	}
+
 	/**
-	 * @param $catalogItemValues
+	 * @param $values
+	 * @param string $type
 	 * @return string
 	 */
-	public static function createCatalogItemCsvRowData($catalogItemValues)
+	public static function createCsvRowData($values, $type)
 	{
+		list($dateFields, $translateableFields, $getCsvHeaders) = self::getTranslationFunctionsByType($type);
+
 		$csvData = array();
-		foreach (self::$dateFields as $dateField)
+		foreach (self::$$dateFields as $dateField)
 		{
-			if (isset($catalogItemValues[$dateField]))
+			if (isset($values[$dateField]))
 			{
-				$catalogItemValues[$dateField] = self::getHumanReadbaleDate($catalogItemValues[$dateField]);
+				$values[$dateField] = self::getHumanReadbaleDate($values[$dateField]);
 			}
 		}
 
-		foreach (self::$catalogItemTranslateableFields as $catalogItemTranslateableField)
+		foreach (self::$$translateableFields as $translateableField)
 		{
-			if (isset($catalogItemValues[$catalogItemTranslateableField]))
+			if (isset($values[$translateableField]))
 			{
-				$catalogItemValues[$catalogItemTranslateableField] = self::translateEnumsToHumanReadable($catalogItemTranslateableField, $catalogItemValues[$catalogItemTranslateableField]);
+				$translateableFieldName = self::getTranslatableFieldByType($type, $translateableField);
+				$values[$translateableField] = self::translateEnumsToHumanReadable($translateableFieldName, $values[$translateableField]);
 			}
 		}
 
-		foreach (self::getVendorCatalogItemsCsvHeaders() as $field)
+		foreach (self::$getCsvHeaders() as $field)
 		{
-			if (isset($catalogItemValues[$field]))
+			if (isset($values[$field]))
 			{
-				$csvData[$field] = $catalogItemValues[$field];
+				$csvData[$field] = $values[$field];
 			}
 			else
 			{

@@ -421,4 +421,96 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
 	}
+
+	/**
+	 * @action serve
+	 * @param int $vendorPartnerId
+	 * @param int $partnerId
+	 * @param int $status
+	 * @param string $dueDate
+	 * @return file
+	 */
+	public function serveAction($vendorPartnerId = null, $partnerId = null, $status = null, $dueDate = null)
+	{
+		$filter = new KalturaEntryVendorTaskFilter();
+		if($vendorPartnerId)
+		{
+			$filter->vendorPartnerIdEqual = $vendorPartnerId;
+		}
+		if ($partnerId)
+		{
+			kCurrentContext::$partner_id = $partnerId;
+		}
+		if ($status)
+		{
+			$filter->statusEqual = $status;
+		}
+		else
+		{
+			$filter->statusIn = EntryVendorTaskStatus::PENDING .','. EntryVendorTaskStatus::PROCESSING.','.EntryVendorTaskStatus::ERROR;
+		}
+
+		ReachRequestsListAction::setSelectedRelativeTime($dueDate, $filter);
+		$filter->createdAtGreaterThanOrEqual = time() - (VendorServiceTurnAroundTime::TEN_DAYS * 4);
+		$filter->orderBy = '-createdAt';
+
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
+
+		$content = implode(',', kReachUtils::getEntryVendorTaskCsvHeaders()) . PHP_EOL;
+		$res =  $filter->getListResponse($pager, $this->getResponseProfile());
+		$totalCount = $res->totalCount;
+		while ($totalCount > 0)
+		{
+			foreach ($res->objects as $entryVendorTask)
+			{
+				$entryVendorTaskValues = kReachUtils::getObejctValues($entryVendorTask);
+				$csvRowData = kReachUtils::createCsvRowData($entryVendorTaskValues, 'entryVendorTask');
+				$content .= $csvRowData . PHP_EOL;
+			}
+
+			$pager->pageIndex++;
+			$totalCount = $totalCount - $pager->pageSize;
+			$res = $filter->getListResponse($pager, $this->getResponseProfile());
+		}
+		$fileName = "export.csv";
+		header('Content-Disposition: attachment; filename="'.$fileName.'"');
+		return new kRendererString($content, 'text/csv');
+	}
+
+	/**
+	 * @action getServeUrl
+	 * @param string $filterType
+	 * @param int $filterInput
+	 * @param int $status
+	 * @param string $dueDate
+	 * @return string $url
+	 */
+	public function getServeUrlAction($filterType = null, $filterInput = null, $status = null, $dueDate = null)
+	{
+		$finalPath = '/api_v3/service/reach_entryvendortask/action/serve/';
+		if ($filterType && $filterInput && is_numeric($filterInput))
+		{
+			if ($filterType === 'vendorPartnerIdEqual')
+			{
+				$finalPath .= "vendorPartnerId/$filterInput/";
+			}
+			else if($filterType === 'partnerIdEqual')
+			{
+				$finalPath .= "partnerId/$filterInput/";
+			}
+		}
+		if ($status)
+		{
+			$finalPath .= "status/$status/";
+		}
+		if ($dueDate)
+		{
+			$finalPath .= "dueDate/$dueDate/";
+		}
+		$finalPath .= 'ks/' . kCurrentContext::$ks;
+		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $finalPath;
+		return $url;
+	}
 }

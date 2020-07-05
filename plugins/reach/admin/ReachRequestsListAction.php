@@ -45,7 +45,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
 		$this->setCreatedAtFilter($entryVendorTaskFilter);
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
-		$this->setSelectedRelativeTime($request, $entryVendorTaskFilter);
+		$this->setSelectedRelativeTime($request->getParam('from_time'), $entryVendorTaskFilter);
 		return $entryVendorTaskFilter;
 
 	}
@@ -111,11 +111,10 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		}
 	}
 
-	protected function setSelectedRelativeTime($request, $entryVendorTaskFilter)
+	public static function setSelectedRelativeTime($filterDateInput, $entryVendorTaskFilter)
 	{
 		$startTime = 0;
 		$endTime = 0;
-		$filterDateInput = $request->getParam('from_time');
 		if (!preg_match('/^(\-|\+)(\d+$)/', $filterDateInput, $matches))
 		{
 			return;
