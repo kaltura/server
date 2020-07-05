@@ -653,16 +653,16 @@ class kFileBase
 			if ($res)
 			{
 				$res = $tmpFilePath;
-				KalturaLog::info("Succeeded to retrieve asset content from [$externalUrl] to [$localFilePath]");
+				KalturaLog::info("Succeeded to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 			else
 			{
-				KalturaLog::info("Failed to retrieve asset content from [$externalUrl] to [$localFilePath]");
+				KalturaLog::info("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::info("Can't serve asset id [$assetId] from [$externalUrl] " . $e->getMessage());
+			KalturaLog::info("Can't serve fetch from [$externalUrl] " . $e->getMessage());
 		}
 		
 		return $res;
