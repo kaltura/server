@@ -14,6 +14,7 @@ class kPexipUtils
 	const CONFIG_PRIMARY_LOCATION_ID = 'primaryLocationId';
 	const CONFIG_SECONDARY_LOCATION_ID = 'secondaryLocationId';
 	const FORCE_NON_SECURE_STREAMING = 'forceNonSecureStreaming';
+	const RTMP_EXPLICIT_PARTNERS = 'rtmpExplicitPartners';
 	const SIP_URL_DELIMITER = '@';
 	const PARAM_META = 'meta';
 	const PARAM_TOTAL_COUNT = 'total_count';
@@ -99,20 +100,27 @@ class kPexipUtils
 			}
 			if (!$dualStreamLiveEntry)
 			{
-				$dualStreamLiveEntry = new LiveStreamEntry();
+				$liveEntryService = new LiveStreamService();
+				$dualStreamLiveEntry = $liveEntryService->duplicateTemplateEntry($dbLiveEntry->getConversionProfileId(), $dbLiveEntry->getId(), new LiveStreamEntry());
+				$liveEntryService->setBroadcastinUrlsAndStreamPassword($dualStreamLiveEntry);
 				$dualStreamLiveEntry->setDisplayInSearch(false);
+				$dualStreamLiveEntry->setIsSipEnabled(true);
+				$dualStreamLiveEntry->setParentEntryId($dbLiveEntry->getId());
+				$dualStreamLiveEntry->setStatus(entryStatus::READY);
+				$dualStreamLiveEntry->save();
+				$liveEntryService->setFlavorsAsReady($dualStreamLiveEntry);
 			}
 
 			switch ($sourceType)
 			{
 				case KalturaSipSourceType::TALKING_HEADS:
 				{
-					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Talking Heads');
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Screenshare');
 					break;
 				}
 				case KalturaSipSourceType::SCREEN_SHARE:
 				{
-					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Screenshare');
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Talking Heads');
 					break;
 				}
 			}

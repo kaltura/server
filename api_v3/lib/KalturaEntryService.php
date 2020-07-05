@@ -1015,7 +1015,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $this->prepareEntryForInsert($entry, $dbEntry);
 	}
 	
-	protected function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill = null)
+	public function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill = null)
 	{
 		$templateEntry = $this->getTemplateEntry($conversionProfileId, $templateEntryId);
 		if (!$object_to_fill)
