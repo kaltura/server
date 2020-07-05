@@ -19,8 +19,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($ffmpegBin)){
 			$this->cmdPath = $ffmpegBin;
 		}
-		else if(kConf::hasParam('bin_path_ffmpeg')) {
-			$this->cmdPath = kConf::get('bin_path_ffmpeg');
+		else if(kConf::hasParam(kFfmpegUtils::FFMPEG_PATH_CONF_NAME)) {
+			$this->cmdPath = kConf::get(kFfmpegUtils::FFMPEG_PATH_CONF_NAME);
 		}
 		else{
 			$this->cmdPath = "ffmpeg";
