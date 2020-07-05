@@ -115,7 +115,7 @@ class kPexipUtils
 			{
 				case KalturaSipSourceType::TALKING_HEADS:
 				{
-					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Screenshare');
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Screen Share');
 					break;
 				}
 				case KalturaSipSourceType::SCREEN_SHARE:

@@ -70,7 +70,6 @@ class PexipService extends KalturaBaseService
 
 	/**
 	 * @action handleIncomingCall
-	 * @return bool
 	 */
 	public function handleIncomingCallAction()
 	{
@@ -87,12 +86,14 @@ class PexipService extends KalturaBaseService
 		catch(Exception $e)
 		{
 			KalturaLog::err($e->getMessage());
+			$response->msg = $e->getMessage();
 			return $response;
 		}
 
 		$queryParams = kPexipUtils::validateAndGetQueryParams();
 		if(!$queryParams)
 		{
+			$response->msg = 'could not validate query params';
 			return $response;
 		}
 
@@ -110,14 +111,18 @@ class PexipService extends KalturaBaseService
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Error validating and retrieving Entry for sip Call');
+			$msg = 'Error validating and retrieving Entry for sip Call';
+			KalturaLog::err($msg);
+			$response->msg = $msg;
 			return $response;
 		}
 
 		/** @var LiveStreamEntry $dbLiveEntry */
 		if (!$dbLiveEntry)
 		{
-			KalturaLog::err('Live entry for call not Validated!');
+			$msg = 'Live entry for call not Validated!';
+			KalturaLog::err($msg);
+			$response->msg = $msg;
 			return $response;
 		}
 
@@ -125,6 +130,7 @@ class PexipService extends KalturaBaseService
 		{
 			$msg = 'Max number of active rooms reached. Please try again shortly.';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+			$response->msg = $msg;
 			return $response;
 		}
 
@@ -134,6 +140,7 @@ class PexipService extends KalturaBaseService
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is Live and Active. can\'t connect call.';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+			$response->msg = $msg;
 			return $response;
 		}
 
