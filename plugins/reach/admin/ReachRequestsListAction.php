@@ -45,7 +45,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
 		$this->setCreatedAtFilter($entryVendorTaskFilter);
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
-		$this->setSelectedRelativeTime($request->getParam('from_time'), $entryVendorTaskFilter);
+		self::setSelectedRelativeTime($request->getParam('from_time'), $entryVendorTaskFilter);
 		return $entryVendorTaskFilter;
 
 	}
