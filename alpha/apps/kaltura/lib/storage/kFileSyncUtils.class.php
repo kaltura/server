@@ -1062,13 +1062,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			$parent_file_sync = self::resolve($file_sync);
 			$path = $parent_file_sync->getFilePath();
-
-			$storageProfile = StorageProfilePeer::retrieveByPK($parent_file_sync->getDc());
-			if($storageProfile && kDataCenterMgr::isDcIdShared($storageProfile->getId()))
-			{
-				$path = $storageProfile->getPathPrefix() . $path;
-			}
-
 			KalturaLog::info("path [$path]");
 			return $path;
 		}
