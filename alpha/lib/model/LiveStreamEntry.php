@@ -117,6 +117,15 @@ class LiveStreamEntry extends LiveEntry
 		return $configurations;
 	}
 
+	public function copyTemplate($copyPartnerId = false, $template)
+	{
+		if ($template instanceof LiveStreamEntry)
+		{
+			$this->setExplicitLive($template->getExplicitLive());
+		}
+		return parent::copyTemplate($copyPartnerId, $template);
+	}
+
 	public function setIsSipEnabled ( $v )	{	$this->putInCustomData ( "isSipEnabled" , $v );	}
 	public function getIsSipEnabled (  )	{	return $this->getFromCustomData( "isSipEnabled", null, false );	}
 	public function setSipRoomId ( $v )	{	$this->putInCustomData ( "sipRoomId" , $v );	}
