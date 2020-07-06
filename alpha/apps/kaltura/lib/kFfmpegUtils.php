@@ -23,7 +23,7 @@ class kFfmpegUtils
 	 */
 	public static function getSlowCaptureFrameCmd($source_file, $target_file, $position, $width, $height, $frame_count, $target_type, $decryptionKey = null)
 	{
-		$position_str = $position ? ' -ss $position ' : '';
+		$position_str = $position ? " -ss $position " : '';
 		$dimensions = ($width == -1 || $height == -1) ? '' : ('-s '. $width . 'x' . $height);
 		$source_file = kFile::realPath($source_file);
 		$cmd = " -noautorotate -i \"$source_file\"". $position_str  . ' -an -y -r 1 ' . $dimensions .
@@ -53,7 +53,7 @@ class kFfmpegUtils
 	 */
 	public static function getCaptureFrameCmd($source_file, $target_file, $position, $width, $height, $frame_count, $target_type, $decryptionKey = null)
 	{
-		$position_str = $position ? ' -ss $position ' : '';
+		$position_str = $position ? " -ss $position " : '';
 		$dimensions = ($width == -1 || $height == -1) ? '' : ('-s '. $width . 'x' . $height);
 		$source_file = kFile::realPath($source_file);
 		$position_str_suffix = $position ? ' -ss 0.01 ' : '';
