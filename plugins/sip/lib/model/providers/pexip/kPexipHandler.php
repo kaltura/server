@@ -39,11 +39,7 @@ class kPexipHandler
 		{
 			$locationId = $pexipConfig[kPexipUtils::CONFIG_PRIMARY_LOCATION_ID];
 			$locationId = is_numeric($locationId) ? $locationId : null;
-			$dualLiveEntryPrimaryUrl = null;
-			if($sourceType != KalturaSipSourceType::PICTURE_IN_PICTURE)
-			{
-				$dualLiveEntryPrimaryUrl = self::getStreamUrl($dualLiveEntry, $pexipConfig, true);
-			}
+			$dualLiveEntryPrimaryUrl = self::getDualLiveEntryStreamUrl($pexipConfig, $dualLiveEntry, $sourceType);
 			$primaryAdpId = self::addADP($dbLiveEntry, $roomId, $primaryUrl, 'Primary', $pexipConfig, $locationId, $sourceType, $dualLiveEntryPrimaryUrl);
 			if (!$primaryAdpId)
 			{
@@ -56,11 +52,7 @@ class kPexipHandler
 		{
 			$locationId = $pexipConfig[kPexipUtils::CONFIG_SECONDARY_LOCATION_ID];
 			$locationId = is_numeric($locationId) ? $locationId : null;
-			$dualLiveEntrySecondaryUrl = null;
-			if($sourceType != KalturaSipSourceType::PICTURE_IN_PICTURE)
-			{
-				$dualLiveEntrySecondaryUrl = self::getStreamUrl($dualLiveEntry, $pexipConfig, false);
-			}
+			$dualLiveEntrySecondaryUrl = self::getDualLiveEntryStreamUrl($pexipConfig, $dualLiveEntry, $sourceType, false);
 			$secondaryAdpId = self::addADP($dbLiveEntry, $roomId, $secondaryUrl, 'Secondary', $pexipConfig, $locationId, $sourceType, $dualLiveEntrySecondaryUrl);
 
 			if (!$secondaryAdpId)
@@ -332,7 +324,10 @@ class kPexipHandler
 				$adpData["presentation_url"] = $dualStreamUrl;
 				break;
 			}
-
+			default:
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_SIP_SOURCE_TYPE);
+			}
 		}
 
 		$url = $pexipConfig[kPexipUtils::CONFIG_API_ADDRESS] . self::ADP_PREFIX;
@@ -552,5 +547,23 @@ class kPexipHandler
 		}
 
 		return $curlWrapper;
+	}
+
+	/**
+	 * @param $pexipConfig
+	 * @param $dualLiveEntry
+	 * @param $sourceType
+	 * @param $isPrimaryStream
+	 * @return string|string[]|null
+	 * @throws Exception
+	 */
+	protected static function getDualLiveEntryStreamUrl($pexipConfig, $dualLiveEntry, $sourceType, $isPrimaryStream = true)
+	{
+		$dualLiveEntryUrl = null;
+		if ($sourceType != KalturaSipSourceType::PICTURE_IN_PICTURE)
+		{
+			$dualLiveEntryUrl = self::getStreamUrl($dualLiveEntry, $pexipConfig, $isPrimaryStream);
+		}
+		return $dualLiveEntryUrl;
 	}
 }

@@ -20,6 +20,11 @@ class kPexipUtils
 	const PARAM_TOTAL_COUNT = 'total_count';
 	const PARAM_LOCAL_ALIAS = 'local_alias';
 	const LICENSES_PER_CALL = 3;
+	const SCREEN_SHARE = 'Screen Share';
+	const TALKING_HEADS = 'Talking Heads';
+
+	protected static $allowedSourceTypes = array( KalturaSipSourceType::PICTURE_IN_PICTURE, KalturaSipSourceType::SCREEN_SHARE, KalturaSipSourceType::TALKING_HEADS );
+
 	/**
 	 * @return bool|null
 	 * @throws Exception
@@ -91,6 +96,11 @@ class kPexipUtils
 	public static function validateAndRetrieveDualStreamEntry(LiveStreamEntry $dbLiveEntry, $sourceType = KalturaSipSourceType::PICTURE_IN_PICTURE)
 	{
 		$dualStreamLiveEntry = null;
+		if (!in_array($sourceType, self::$allowedSourceTypes))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SIP_SOURCE_TYPE);
+		}
+
 		if ($sourceType != KalturaSipSourceType::PICTURE_IN_PICTURE)
 		{
 			$dualStreamLiveEntryId = $dbLiveEntry->getSipDualStreamEntryId();
@@ -115,13 +125,17 @@ class kPexipUtils
 			{
 				case KalturaSipSourceType::TALKING_HEADS:
 				{
-					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Screen Share');
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . ' - ' . self::SCREEN_SHARE);
 					break;
 				}
 				case KalturaSipSourceType::SCREEN_SHARE:
 				{
-					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . '- Talking Heads');
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . ' - ' . self::TALKING_HEADS);
 					break;
+				}
+				default:
+				{
+					throw new KalturaAPIException(KalturaErrors::INVALID_SIP_SOURCE_TYPE);
 				}
 			}
 			$dualStreamLiveEntry->save();
