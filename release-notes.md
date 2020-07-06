@@ -1,4 +1,12 @@
 # Propus 16.6.0  #
+## Export Reach Requests in admin console to csv ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_12_add_permission_entry_vendor_task.php
+
+
 ## Adding permission to mediaServer partner for livereports ##
 Issue Type: Task
 Issue ID : LIV-156
