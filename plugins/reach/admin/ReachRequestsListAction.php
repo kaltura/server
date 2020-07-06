@@ -45,7 +45,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
 		$this->setCreatedAtFilter($entryVendorTaskFilter);
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
-		self::setSelectedRelativeTime($request->getParam('from_time'), $entryVendorTaskFilter);
+		kReachUtils::setSelectedRelativeTime($request->getParam('from_time'), $entryVendorTaskFilter);
 		return $entryVendorTaskFilter;
 
 	}
@@ -93,8 +93,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 
 	protected function setCreatedAtFilter($entryVendorTaskFilter)
 	{
-		$createdAtStart = VendorServiceTurnAroundTime::TEN_DAYS + VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS;
-		$entryVendorTaskFilter->createdAtGreaterThanOrEqual = time() - $createdAtStart;
+		$entryVendorTaskFilter->updatedAtGreaterThanOrEqual = time() - (VendorServiceTurnAroundTime::TEN_DAYS + VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS);
 		$entryVendorTaskFilter->orderBy = '-createdAt';
 	}
 
@@ -109,32 +108,6 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		{
 			$entryVendorTaskFilter->statusIn = EntryVendorTaskStatus::PENDING .','. EntryVendorTaskStatus::PROCESSING.','.EntryVendorTaskStatus::ERROR;
 		}
-	}
-
-	public static function setSelectedRelativeTime($filterDateInput, $entryVendorTaskFilter)
-	{
-		$startTime = 0;
-		$endTime = 0;
-		if (!preg_match('/^(\-|\+)(\d+$)/', $filterDateInput, $matches))
-		{
-			return;
-		}
-		$sign = $matches[1];
-		$hours = (int)$matches[2];
-		$timeFromHourToSec = $hours * 60 * 60;
-		if ($sign === '-')
-		{
-			$startTime = time() - $timeFromHourToSec;
-			$endTime = time();
-		}
-		else if ($sign === '+')
-		{
-			$startTime = time();
-			$endTime = time() + $timeFromHourToSec;
-		}
-		
-		$entryVendorTaskFilter->expectedFinishTimeGreaterThanOrEqual = $startTime;
-		$entryVendorTaskFilter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
 
 	public function isAllowedForPartner($partnerId)

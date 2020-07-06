@@ -10,64 +10,13 @@ class kReachUtils
 	static private $entryVendorTaskDateFields = array('createdAt', 'expectedFinishTime');
 	static private $entryVendorTaskTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime');
 
-	static private $statusEntryVendorTaskEnumTranslate = array(
-		1 => 'PENDING',
-		2 => 'READY',
-		3 => 'PROCESSING',
-		4 => 'PENDING_MODERATION',
-		5 => 'REJECTED',
-		6 => 'ERROR',
-		7 => 'ABORTED',
-		8 => 'PENDING_ENTRY_READY'
-	);
-
-	static private $statusCatalogItemEnumTranslate = array(
-		1 => "DEPRECATED",
-		2 => "ACTIVE",
-		3 => "DELETED",
-	);
-
-	static private $outputFormatEnumTranslate = array(
-		1 => "SRT",
-		2 => "DFXP",
-	);
-
-	static private $turnAroundTimeEnumTranslate = array(
-		-1 => "BEST_EFFORT",
-		0 => "IMMEDIATE",
-		1 => "ONE_BUSINESS_DAY",
-		2 => "TWO_BUSINESS_DAYS",
-		3 => "THREE_BUSINESS_DAYS",
-		4 => "FOUR_BUSINESS_DAYS",
-		5 => "FIVE_BUSINESS_DAYS",
-		6 => "SIX_BUSINESS_DAYS",
-		7 => "SEVEN_BUSINESS_DAYS",
-		1800 => "THIRTY_MINUTES",
-		7200 => "TWO_HOURS",
-		10800 => "THREE_HOURS",
-		21600 => "SIX_HOURS",
-		28800 => "EIGHT_HOURS",
-		43200 => "TWELVE_HOURS",
-		86400 => "TWENTY_FOUR_HOURS",
-		172800 => "FORTY_EIGHT_HOURS",
-		345600 => "FOUR_DAYS",
-		432000 => "FIVE_DAYS",
-		864000 => "TEN_DAYS",
-	);
-
-	static private $serviceFeatureEnumTranslate = array(
-		1 => "CAPTIONS",
-		2 => "TRANSLATION",
-		3 => "ALIGNMENT",
-		4 => "AUDIO_DESCRIPTION",
-		5 => "CHAPTERING",
-		"N/A" => "N/A",
-	);
-
-	static private $serviceTypeEnumTranslate = array(
-		1 => "HUMAN",
-		2 => "MACHINE",
-		"N/A" => "N/A",
+	static private $enumTranslateInterface = array(
+		'statusEntryVendorTaskEnumTranslate' => 'EntryVendorTaskStatus',
+		'statusCatalogItemEnumTranslate'	=> 'VendorCatalogItemStatus',
+		'outputFormatEnumTranslate'	=> 'VendorCatalogItemOutputFormat',
+		'turnAroundTimeEnumTranslate'	=> 'VendorServiceTurnAroundTime',
+		'serviceFeatureEnumTranslate'	=> 'VendorServiceFeature',
+		'serviceTypeEnumTranslate'	=> 'VendorServiceType'
 	);
 
 	/**
@@ -365,17 +314,20 @@ class kReachUtils
 	 */
 	protected static function translateEnumsToHumanReadable($enumName, $enumValue)
 	{
-		if (!self::${$enumName . "EnumTranslate"})
+		$interfaceConstants = self::$enumTranslateInterface[$enumName . "EnumTranslate"];
+		if (!isset($interfaceConstants))
 		{
 			return 'N\A';
 		}
 
-		if (!isset(self::${$enumName . "EnumTranslate"}[$enumValue]))
+		$iClass = new ReflectionClass($interfaceConstants);
+		$constants = array_flip($iClass->getConstants());
+		if (!isset($constants[$enumValue]))
 		{
 			return 'N\A';
 		}
 
-		return self::${$enumName . "EnumTranslate"}[$enumValue];
+		return $constants[$enumValue];
 	}
 
 	/**
@@ -390,5 +342,31 @@ class kReachUtils
 		}
 
 		return date("Y-m-d H:i", $unixTimeStamp);
+	}
+
+	public static function setSelectedRelativeTime($filterDateInput, $filter)
+	{
+		$startTime = 0;
+		$endTime = 0;
+		if (!preg_match('/^(\-|\+)(\d+$)/', $filterDateInput, $matches))
+		{
+			return;
+		}
+		$sign = $matches[1];
+		$hours = (int)$matches[2];
+		$timeFromHourToSec = $hours * 60 * 60;
+		if ($sign === '-')
+		{
+			$startTime = time() - $timeFromHourToSec;
+			$endTime = time();
+		}
+		else if ($sign === '+')
+		{
+			$startTime = time();
+			$endTime = time() + $timeFromHourToSec;
+		}
+
+		$filter->expectedFinishTimeGreaterThanOrEqual = $startTime;
+		$filter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
 }

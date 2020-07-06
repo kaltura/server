@@ -450,8 +450,8 @@ class EntryVendorTaskService extends KalturaBaseService
 			$filter->statusIn = EntryVendorTaskStatus::PENDING .','. EntryVendorTaskStatus::PROCESSING.','.EntryVendorTaskStatus::ERROR;
 		}
 
-		ReachRequestsListAction::setSelectedRelativeTime($dueDate, $filter);
-		$filter->createdAtGreaterThanOrEqual = time() - (VendorServiceTurnAroundTime::TEN_DAYS * 4);
+		kReachUtils::setSelectedRelativeTime($dueDate, $filter);
+		$filter->updatedAtGreaterThanOrEqual = time() - (VendorServiceTurnAroundTime::TEN_DAYS * 4);
 		$filter->orderBy = '-createdAt';
 
 		$pager = new KalturaFilterPager();
@@ -461,7 +461,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$content = implode(',', kReachUtils::getEntryVendorTaskCsvHeaders()) . PHP_EOL;
 		$res =  $filter->getListResponse($pager, $this->getResponseProfile());
 		$totalCount = $res->totalCount;
-		while ($totalCount > 0)
+		while ($totalCount > 0 && $pager->pageIndex <= 20)
 		{
 			foreach ($res->objects as $entryVendorTask)
 			{
