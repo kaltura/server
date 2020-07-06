@@ -225,8 +225,8 @@ class myPackagerUtils
 		{
 			throw new kFileSyncException("partner id not defined for key [$fileSyncKey]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
 		}
-
-		$localDcs = kDataCenterMgr::getDcIds(false);
+		
+		$localDcs = kDataCenterMgr::getDcIds();
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey, true, false);
 		if(!$fileSync)
 		{
@@ -237,7 +237,13 @@ class myPackagerUtils
 		$fileDc = $fileSync->getDc();
 		if(in_array ($fileDc, $localDcs))
 		{
-			return self::getPackagerUrlFromConf($packagerUrlType);
+			$packagerUrl = null;
+			if(in_array($fileDc, kDataCenterMgr::getSharedStorageProfileIds()))
+			{
+				$sharedStorageProfile = StorageProfilePeer::retrieveByPK($fileDc);
+				$packagerUrl = $sharedStorageProfile->getPackagerUrl();
+			}
+			return self::getPackagerUrlFromConf($packagerUrlType, $packagerUrl);
 		}
 
 		$storageProfiles = self::loadStorageProfiles($fileSyncKey->partner_id);
@@ -269,14 +275,6 @@ class myPackagerUtils
 		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(StorageProfilePeer::ID);
 		$results = StorageProfilePeer::doSelect($criteria);
-
-		$sharedProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
-		if($sharedProfileIds)
-		{
-			$sharedStorageProfiles = StorageProfilePeer::retrieveByPKs($sharedProfileIds);
-			$results = array_merge($results, $sharedStorageProfiles);
-		}
-
 		$storageProfiles = array();
 		foreach ($results as $result)
 		{
