@@ -209,12 +209,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$scopeEntryId = $flavorAsset->getEntryId();
 		$entry = entryPeer::retrieveByPK($scopeEntryId);
 
-		//check that entry type is not in the list of the excluded entry types
-		if(in_array($entry->getType(),kString::explode($this->getExcludedEntryTypes())))
-		{
-			return false;
-		}
-
 
 		if($entry && $entry->getReplacedEntryId())
 			$scopeEntryId = $entry->getReplacedEntryId();
@@ -223,6 +217,12 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		if(!$this->fulfillsRules($scope))
 		{
 			KalturaLog::log('Storage profile export rules are not fulfilled');
+			return false;
+		}
+
+		//check that entry type is not in the list of the excluded entry types
+		if(!$entry || in_array($entry->getType(),kString::explode($this->getExcludedEntryTypes())))
+		{
 			return false;
 		}
 
