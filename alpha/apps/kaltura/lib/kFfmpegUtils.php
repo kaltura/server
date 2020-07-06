@@ -26,7 +26,6 @@ class kFfmpegUtils
 		$position_str = $position ? ' -ss $position ' : '';
 		$dimensions = ($width == -1 || $height == -1) ? '' : ('-s '. $width . 'x' . $height);
 		$source_file = kFile::realPath($source_file);
-		$target_file = kFile::realPath($target_file);
 		$cmd = " -noautorotate -i \"$source_file\"". $position_str  . ' -an -y -r 1 ' . $dimensions .
 				' ' . " -vframes $frame_count -f \"" . $target_type . "\" " . "\"$target_file\"" . ' 2>&1';
 		if ($decryptionKey)
@@ -57,7 +56,6 @@ class kFfmpegUtils
 		$position_str = $position ? ' -ss $position ' : '';
 		$dimensions = ($width == -1 || $height == -1) ? '' : ('-s '. $width . 'x' . $height);
 		$source_file = kFile::realPath($source_file);
-		$target_file = kFile::realPath($target_file);
 		$position_str_suffix = $position ? ' -ss 0.01 ' : '';
 		$cmd = $position_str . ' -noautorotate -i ' . "\"$source_file\"" . ' -an -y -r 1 ' . $dimensions .
 			' ' . " -vframes $frame_count -f \"" . $target_type . "\" " . $position_str_suffix . "\"$target_file\"" . ' 2>&1';
@@ -72,7 +70,6 @@ class kFfmpegUtils
 	public static function getCopyCmd($source, $clipToSec, $target)
 	{
 		$source = kFile::realPath($source);
-		$target = kFile::realPath($target);
 		return " -i {$source} -vcodec copy -acodec copy -f mp4 -t {$clipToSec} -y {$target} 2>&1";
 	}
 
@@ -102,7 +99,7 @@ class kFfmpegUtils
 		$filePath = kFile::realPath($filePath);
 		if ($filePath === FALSE)
 		{
-			throw new Exception("Illegal input was supplied");
+			throw new Exception('Illegal input was supplied');
 		}
 
 		$baseCmd = kConf::get(self::FFMPEG_PATH_CONF_NAME);
