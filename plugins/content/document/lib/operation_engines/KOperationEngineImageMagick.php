@@ -30,7 +30,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 	
 	// List of errors in case of corrupted file
 	private $SUSPECTED_AS_FAILURE = array(
-			"/typecheck in --run-",
+			"/typecheck in --run—",
 			"/undefinedresult in --run--",
 			"/VMerror in --showpage--GPL",
 			"Cannot find a 'startxref'",
