@@ -1,26 +1,12 @@
 <?php
 require_once (dirname(__FILE__) . '/../bootstrap.php');
-//define('KALTURA_ROOT_PATH', '/opt/kaltura/app'); // this is already defined at bootstrap.php
-require_once(KALTURA_ROOT_PATH . '/infra/KAutoloader.php');
-define("KALTURA_API_PATH", KALTURA_ROOT_PATH . "/api_v3");
-require_once(KALTURA_ROOT_PATH . '/alpha/config/kConf.php');
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "vendor", "propel", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "lib", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_API_PATH, "services", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "alpha", "plugins", "*")); // needed for testmeDoc
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "plugins", "*"));
-KAutoloader::addClassPath(KAutoloader::buildPath(KALTURA_ROOT_PATH, "generator")); // needed for testmeDoc
-KAutoloader::setClassMapFilePath(kConf::get("cache_root_path") . '/plugins/' . basename(__FILE__) . '.cache');
-KAutoloader::register();
-
-
 
 const UNIX_LINE_END = "\n";
 
 if ($argc < 2)
 {
 	echo UNIX_LINE_END . ' ---- Delete Entry From Elastic ---- ' . UNIX_LINE_END;
-	echo ' Execute: php ' . $argv[0] . ' [ /path/to/entries_id.log || csv,entries,ids ] [realrun / dryrun]' . UNIX_LINE_END;
+	echo ' Execute: php ' . $argv[0] . ' [ /path/to/entries_id.log || entryId_1,entryId_2,entryId_3,.. ] [realrun / dryrun]' . UNIX_LINE_END;
 	die(' Error: missing entry_id file or csv list ' . UNIX_LINE_END . UNIX_LINE_END);
 }
 
