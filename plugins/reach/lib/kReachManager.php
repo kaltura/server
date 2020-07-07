@@ -221,7 +221,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return true;
 
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		if($object instanceof entry && ($object->getType() == entryType::MEDIA_CLIP || $object->getExternalSourceType() == KalturaExternalMediaSourceType::YOUTUBE))
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
@@ -321,7 +321,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return $this->invalidateAccessKey($object);
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		if ($object instanceof entry && ($object->getType() == entryType::MEDIA_CLIP || $object->getExternalSourceType() == KalturaExternalMediaSourceType::YOUTUBE))
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))
