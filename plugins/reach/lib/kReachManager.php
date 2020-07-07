@@ -184,7 +184,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
-		if ($object instanceof entry && $object->getExternalSourceType() == KalturaExternalMediaSourceType::YOUTUBE)
+		if ($object instanceof entry && $object->getExternalSourceType() == KalturaExternalMediaSourceType::YOUTUBE
+			&& $object->getStatus() == entryStatus::READY && !empty($object->getLengthInMsecs()))
 		{
 			return true;
 		}
@@ -278,7 +279,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 			$this->checkAutomaticRules($object);
 		}
-		if ($object instanceof entry && $object->getExternalSourceType() == KalturaExternalMediaSourceType::YOUTUBE)
+		if ($object instanceof entry && $object->getExternalSourceType() == KalturaExternalMediaSourceType::YOUTUBE
+			&& $object->getStatus() == entryStatus::READY && !empty($object->getLengthInMsecs()))
 		{
 			$this->checkAutomaticRules($object, true);
 		}
