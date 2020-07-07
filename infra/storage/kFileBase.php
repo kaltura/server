@@ -386,8 +386,30 @@ class kFileBase
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
 			return $kSharedFsMgr->isFile($filePath);
 		}
-		
+
 		return is_file($filePath);
+	}
+
+	public static function isLink($filePath)
+	{
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->isLink($filePath);
+		}
+
+		return is_link($filePath);
+	}
+
+	public static function symlink($from, $to)
+	{
+		if(kFile::isSharedPath($to) || kFile::isSharedPath($to))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
+			return $kSharedFsMgr->symlink($from, $to);
+		}
+
+		return symlink($from, $to);
 	}
 	
 	public static function realPath($filePath, $getRemote = true)

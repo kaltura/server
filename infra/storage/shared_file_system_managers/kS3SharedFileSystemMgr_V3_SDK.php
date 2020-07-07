@@ -578,7 +578,17 @@ class kS3SharedFileSystemMgr_V3_SDK extends kSharedFileSystemMgr
 		
 		return ($contentLength != 0 && substr($effectiveUrl, -1) != "/") ? true : false;
 	}
-	
+
+	protected function doIsLink($filePath)
+	{
+		return false;
+	}
+
+	protected function doSymlink($from, $to)
+	{
+		return false;
+	}
+
 	protected function doRealPath($filePath, $getRemote = true)
 	{
 		if(!$getRemote)

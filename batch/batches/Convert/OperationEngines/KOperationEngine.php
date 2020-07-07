@@ -237,7 +237,7 @@ abstract class KOperationEngine
 		$output = null;
 		$matches = null;
 		
-		if(realpath($this->inFilePath) === FALSE)
+		if(kFile::realpath($this->inFilePath) === FALSE)
 			throw new KOperationEngineException("Illegal input file was supplied.");
 		
 		$command = "file '{$this->inFilePath}'";

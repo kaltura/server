@@ -267,7 +267,27 @@ abstract class kSharedFileSystemMgr
 	 * @return int
 	 */
 	abstract protected function doIsFile($filePath);
-	
+
+	/**
+	 * returns true/false whether the filename is a symbolic link
+	 *
+	 * @param $filePath file path to check
+	 *
+	 * @return int
+	 */
+	abstract protected function doIsLink($filePath);
+
+	/**
+	 * returns true/false whether the filename is a symbolic link
+	 *
+	 * @param $from from file path
+	 * @param $to to file path
+	 *
+	 * @return int
+	 */
+	abstract protected function doSymlink($from, $to);
+
+
 	/**
 	 * Returns the canonicalized absolute pathname on success.
 	 *
@@ -511,6 +531,19 @@ abstract class kSharedFileSystemMgr
 	{
 		$filePath = kFileBase::fixPath($filePath);
 		return $this->doIsFile($filePath);
+	}
+
+	public function isLink($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doIsLink($filePath);
+	}
+
+	public function symlink($from, $to)
+	{
+		$from = kFileBase::fixPath($from);
+		$to = kFileBase::fixPath($to);
+		return $this->doSymlink($from, $to);
 	}
 	
 	public function realPath($filePath, $getRemote = true)

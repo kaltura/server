@@ -583,6 +583,16 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$contentLength = $res->get('ContentLength');
 		return ($contentLength != 0 && substr($filePath, -1) != "/") ? true : false;
 	}
+
+	protected function doIsLink($filePath)
+	{
+		return false;
+	}
+
+	protected function doSymlink($from, $to)
+	{
+		return false;
+	}
 	
 	protected function doRealPath($filePath, $getRemote = true)
 	{

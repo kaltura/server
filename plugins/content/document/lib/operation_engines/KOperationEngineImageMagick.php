@@ -30,7 +30,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 	
 	// List of errors in case of corrupted file
 	private $SUSPECTED_AS_FAILURE = array(
-			"/typecheck in --run—",
+			"/typecheck in --runï¿½",
 			"/undefinedresult in --run--",
 			"/VMerror in --showpage--GPL",
 			"Cannot find a 'startxref'",
@@ -77,7 +77,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		if($inputFormat == self::JPG_FORMAT && $ext != 'jpg' && kFile::linkFile($inFilePath, "$inFilePath.jpg"))
 			$inFilePath = "$inFilePath.jpg";
 		
-		$realInFilePath = realpath($inFilePath);
+		$realInFilePath = kFile::realpath($inFilePath);
 		// Test input
 		// - Test file type
 		$errorMsg = $this->checkFileType($realInFilePath, $this->SUPPORTED_FILE_TYPES);

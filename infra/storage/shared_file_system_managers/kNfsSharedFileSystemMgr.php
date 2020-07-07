@@ -256,6 +256,16 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return is_file($filePath);
 	}
+
+	protected function doIsLink($filePath)
+	{
+		return is_link($filePath);
+	}
+
+	protected function doSymlink($from, $to)
+	{
+		return symlink($from, $to);
+	}
 	
 	protected function doRealPath($filePath, $getRemote = true)
 	{
