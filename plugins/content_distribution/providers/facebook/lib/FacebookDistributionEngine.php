@@ -59,7 +59,7 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		$videoPath = $data->providerData->videoAssetFilePath;
 		if (!$videoPath)
 			throw new Exception('No video asset to distribute, the job will fail');
-		if (!file_exists($videoPath))
+		if (!kFile::checkFileExists($videoPath))
 			throw new KalturaDistributionException("The file [$videoPath] was not found (probably not synced yet), the job will retry");
 
 		$facebookMetadata = $this->convertToFacebookData($data->providerData->fieldValues, true);
@@ -76,15 +76,15 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				$data->distributionProfile->pageAccessToken,
 				$videoPath,
 				$tempThumbFile,
-				filesize($videoPath),
+				kFile::fileSize($videoPath),
 				$this->tempDirectory,
 				$facebookMetadata);
 			unlink($tempThumbFile);
 		}
 		catch (Exception $e)
 		{
-			if (file_exists($tempThumbFile))
-				unlink($tempThumbFile);
+			if (kFile::checkFileExists($tempThumbFile))
+				kFile::unlink($tempThumbFile);
 			throw new Exception("Failed to submit facebook video , reason:".$e->getMessage());
 		}
 
