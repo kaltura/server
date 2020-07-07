@@ -34,12 +34,19 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 			'filters' => array('StringTrim'),
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')))
 		));
-		$this->setDefault('from_time', 'Due Date');
+		$this->setDefault('from_time', 'Due_Date');
 
 		// submit button
 		$this->addElement('button', 'cmdSubmit', array(
 			'type' => 'submit',
 			'label'		=> 'Search',
+			'decorators' => array('ViewHelper'),
+		));
+
+		$this->addElement('button', 'exportCsv', array(
+			'ignore' => true,
+			'label' => 'Export to CSV',
+			'onclick' => "exportToCsv($('#filter_type').val(), $('#filter_input').val(), $('#filter_status').val(), $('#from_time').val())",
 			'decorators' => array('ViewHelper'),
 		));
 	}
