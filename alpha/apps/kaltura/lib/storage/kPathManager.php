@@ -49,7 +49,9 @@ class kPathManager
 			return array($root, self::$sessionCache[$path]);
 			
 		$volumes = kConf::get('volumes');
-		$volume = $volumes[rand(0, count($volumes) - 1)];
+		$partnerId = $object->getPartnerId();
+		$volume = isset($volumes[$partnerId]) ? $volumes[$partnerId] : $volumes[rand(0, count($volumes) - 1)];
+		
 		$newPath = str_replace('/content/', "/content/$volume/", $path);
 		self::$sessionCache[$path] = $newPath;
 		$path = $newPath;
