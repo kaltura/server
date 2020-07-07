@@ -5,7 +5,7 @@ require_once (dirname(__FILE__) . '/../bootstrap.php');
 if ($argc < 2)
 {
 	echo "\n ========= Revert KMC admin to 'regular' user (not admin) ========= \n";
-	die (" Missing required parameters:\n php " . $argv[0] . " {kuser_id || kuser,id,csv || path/to/kuser_id_list.txt} [realrun / dryrun]\n\n");
+	die (" Missing required parameters:\n php " . $argv[0] . " {kuser_id || kuserId_1,kuserId_2,kuserId_3,... || path/to/kuser_id_list.txt} [realrun / dryrun]\n\n");
 }
 
 const UNIX_LINE_END = "\n";
