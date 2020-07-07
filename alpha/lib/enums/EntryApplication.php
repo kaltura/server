@@ -12,5 +12,5 @@ interface EntryApplication extends BaseEnum
 	const KMS_GO = 4;
 	const WEBCAST_APP = 5;
 	const PERSONAL_CAPTURE = 6;
-	const NEWROW = 7;
+	const KALTURA_MEETING = 7;
 }
