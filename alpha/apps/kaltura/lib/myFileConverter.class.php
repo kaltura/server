@@ -105,7 +105,7 @@ class myFileConverter
 		$validInput &= is_numeric($height);
 		$validInput &= is_numeric($frame_count);
 		$validInput &= is_numeric($position);
-		$validInput &= (realpath($source_file) !== FALSE);
+		$validInput &= (kFile::realpath($source_file) !== FALSE);
 
 		if(!$validInput)
 		{

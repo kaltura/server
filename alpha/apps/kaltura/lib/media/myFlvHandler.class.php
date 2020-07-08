@@ -32,12 +32,19 @@ class myFlvHandler
 
 	public function __construct($flv_file_name)
 	{
+		$realPath = kFile::realPath($flv_file_name);
+		if($realPath !== false)
+		{
+			$flv_file_name = $realPath;
+		}
+
 		$this->flv_file_name = $flv_file_name;
-		
-		$this->status = file_exists($this->flv_file_name);
+		$this->status = kfile::checkFileExists($this->flv_file_name);
 		
 		if ($this->status)
+		{
 			$this->fh = fopen($this->flv_file_name, "rb");
+		}
 	}
 	
 	public function __destruct()

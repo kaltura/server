@@ -151,7 +151,7 @@ class kBaseResizeAdapter
 			}
 		}
 
-		return array(false);
+		return array(false, null);
 	}
 
 	/**
