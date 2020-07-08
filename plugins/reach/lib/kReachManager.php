@@ -184,6 +184,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
+		if ($object instanceof entry
+			&& in_array($object->getType(), $this->getAllowedMediaTypesArray())
+			&& $object->getStatus() == entryStatus::READY && !empty($object->getLengthInMsecs()))
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -273,6 +279,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				$this->consumeEvent($event);
 			}
 			$this->checkAutomaticRules($object);
+		}
+
+		if ($object instanceof entry
+			&& in_array($object->getType(), $this->getAllowedMediaTypesArray())
+			&& $object->getStatus() == entryStatus::READY && !empty($object->getLengthInMsecs()))
+		{
+			$this->checkAutomaticRules($object, true);
 		}
 
 		return true;
@@ -696,5 +709,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 		return null;
+	}
+
+	private function getAllowedMediaTypesArray()
+	{
+		$allowedMediaTypes = ExternalMediaPlugin::getExtendedTypes(entry::class, entryType::MEDIA_CLIP);
+		$allowedMediaTypes[] = entryType::MEDIA_CLIP;
+		return $allowedMediaTypes;
 	}
 }
