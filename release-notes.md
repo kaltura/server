@@ -1,4 +1,11 @@
 # Propus 16.6.0  #
+## Adding permissions to base-playback-role ##
+- Issue Type: Task
+- Issue ID: PLAT-11034
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_07_08_base_playback_role_add_metadata_cuepoint_permission.php
+
 ## Adding permission to mediaServer partner for livereports ##
 Issue Type: Task
 Issue ID : LIV-156
