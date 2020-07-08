@@ -4380,4 +4380,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return $this->getFromCustomData( self::CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION ,null, null);
 	}
+
+	public function shouldAddEntryVendorTask()
+	{
+		if ($this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE || $this->getType() == entryType::MEDIA_CLIP)
+		{
+			return true;
+		}
+		return false;
+	}
 }
