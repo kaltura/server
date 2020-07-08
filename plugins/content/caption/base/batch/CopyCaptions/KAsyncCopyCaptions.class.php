@@ -108,7 +108,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	{
 		KalturaLog::info("Start copying properties from caption asset: [{$originalCaptionAsset->id}] to new caption asset on entryId: [$targetEntryId]");
 		$captionAsset = new KalturaCaptionAsset();
-		$propertiesToCopy = array("tags", "fileExt", "language", "label", "format","isDefault");
+		$propertiesToCopy = array("tags", "fileExt", "language", "label", "format", "isDefault", "displayOnPlayer", "accuracy");
 		foreach ($propertiesToCopy as $property)
 			$captionAsset->$property = $originalCaptionAsset->$property;
 		try
