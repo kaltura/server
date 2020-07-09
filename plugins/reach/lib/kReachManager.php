@@ -258,7 +258,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	*/
 	public function shouldConsumeReplacedEvent(BaseObject $object)
 	{
-		if($object && $object instanceof entry && $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+		if($object && $object instanceof entry && $object->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			return true;
 		
 		return false;
