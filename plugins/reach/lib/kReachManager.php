@@ -184,7 +184,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
-		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach()
+			&& $object->getStatus() == entryStatus::READY
+			&& !empty($object->getLengthInMsecs()))
 		{
 			return true;
 		}
@@ -279,7 +281,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->checkAutomaticRules($object);
 		}
 
-		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach()
+			&& $object->getStatus() == entryStatus::READY
+			&& !empty($object->getLengthInMsecs()))
 		{
 			$this->checkAutomaticRules($object, true);
 		}
