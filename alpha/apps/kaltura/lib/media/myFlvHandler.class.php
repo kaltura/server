@@ -32,13 +32,7 @@ class myFlvHandler
 
 	public function __construct($flv_file_name)
 	{
-		$realPath = kFile::realPath($flv_file_name);
-		if($realPath !== false)
-		{
-			$flv_file_name = $realPath;
-		}
-
-		$this->flv_file_name = $flv_file_name;
+		$this->flv_file_name = kFile::realPath($flv_file_name);
 		$this->status = kfile::checkFileExists($this->flv_file_name);
 		
 		if ($this->status)
@@ -973,7 +967,7 @@ class myFlvStaticHandler
 	public static function isMultiFlavor ( $file_name )
 	{
 		$edit_file_name = self::getFileNameEdit( $file_name );
-		return ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 ) ;
+		return ( kFile::checkFileExists($edit_file_name) && kFile::fileSize ( $edit_file_name ) > 0 ) ;
 	}
 
 
@@ -983,7 +977,7 @@ class myFlvStaticHandler
 	public static function getBestFileFlavor ( $file_name  )
 	{
 		$edit_file_name = self::getFileNameEdit( $file_name );
-		if ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 )
+		if ( kFile::checkFileExists($edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 )
 		{
 			return $edit_file_name;
 		}
@@ -1098,7 +1092,7 @@ abstract class FlvInfo
 	
 	public function exists()
 	{
-		return file_exists($this->info_file_name);
+		return kFile::checkFileExists($this->info_file_name);
 	}
 
 	public function close()
@@ -1319,7 +1313,7 @@ class FlvMetadataVideo extends FlvInfo
 	
 	public function dump()
 	{
-		return file_get_contents($this->info_file_name);
+		return kFile::getFileContent($this->info_file_name);
 	}
 	
 	public function write()
