@@ -1968,11 +1968,20 @@ class kJobsManager
 
 	protected static function shouldUseSharedStorageForEngine($conversionEngine)
 	{
-		$nonSharedEngines = array(KalturaConversionEngineType::PDF_CREATOR);
-		if(in_array($conversionEngine, $nonSharedEngines))
+		$SharedSupportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
+										KalturaConversionEngineType::ON2,
+										KalturaConversionEngineType::FFMPEG,
+										KalturaConversionEngineType::MENCODER,
+										KalturaConversionEngineType::ENCODING_COM,
+										KalturaConversionEngineType::EXPRESSION_ENCODER3,
+										KalturaConversionEngineType::CHUNKED_FFMPEG,
+										KalturaConversionEngineType::FFMPEG_VP8,
+										KalturaConversionEngineType::FFMPEG_AUX);
+
+		if(in_array($conversionEngine, $SharedSupportedEngines))
 		{
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 }
