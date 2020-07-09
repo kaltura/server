@@ -5,6 +5,8 @@
  * Add permissions to PLAYBACK BASE ROLE user role:
  * Metadata - add
  * MetadataProfile - list
+ * Annotation - add
+ * Annotation - update
  */
 
  
@@ -14,4 +16,7 @@ $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.metadata.
 passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.metadata.metadataprofile.ini';
+passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.annotation.annotation.ini';
 passthru("php $script $config");
