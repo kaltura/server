@@ -184,7 +184,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
-		if ($object instanceof entry && $object->shouldAddEntryVendorTask())
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
 			return true;
 		}
@@ -220,7 +220,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return true;
 
-		if($object instanceof entry && $object->shouldAddEntryVendorTask())
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
@@ -256,7 +256,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	*/
 	public function shouldConsumeReplacedEvent(BaseObject $object)
 	{
-		if($object && $object instanceof entry && $object->shouldAddEntryVendorTask())
+		if($object && $object instanceof entry && $this->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			return true;
 		
 		return false;
@@ -279,7 +279,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->checkAutomaticRules($object);
 		}
 
-		if ($object instanceof entry && $object->shouldAddEntryVendorTask())
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
 			$this->checkAutomaticRules($object, true);
 		}
@@ -320,7 +320,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return $this->invalidateAccessKey($object);
 
-		if ($object instanceof entry && $object->shouldAddEntryVendorTask())
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))

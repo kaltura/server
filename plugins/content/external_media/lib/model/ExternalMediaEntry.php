@@ -84,11 +84,9 @@ class ExternalMediaEntry extends entry
 		return array_merge(parent::getObjectParams($params), $body);
 	}
 
-	public function shouldAddEntryVendorTask()
+	public function isEntryTypeSupportedForReach()
 	{
-		if (in_array($this->getType(), $this->getAllowedMediaTypesArray())
-			&& $this->getStatus() == entryStatus::READY
-			&& !empty($this->getLengthInMsecs()))
+		if (in_array($this->getType(), $this->getAllowedMediaTypesArray()))
 		{
 			return true;
 		}
