@@ -20,3 +20,6 @@ passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.annotation.annotation.ini';
 passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/object.KalturaAnnotationCuePoint.ini';
+passthru("php $script $config");
