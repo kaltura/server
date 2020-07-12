@@ -234,9 +234,9 @@ class thumbnailAction extends sfAction
 				
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
 				kFile::fullMkdir($thumb_full_path);
-				if (file_exists($upload_token->getUploadTempPath()))
+				if (kfile::checkFileExists($upload_token->getUploadTempPath()))
 				{
-					$src_full_path = $upload_token->getUploadTempPath();
+					$src_full_path = kFile::realPath($upload_token->getUploadTempPath());
 					$valid_image_types = array(
 						IMAGETYPE_GIF,
 						IMAGETYPE_JPEG,
@@ -250,8 +250,10 @@ class thumbnailAction extends sfAction
 					{
 						// capture full frame
 						myFileConverter::captureFrame($src_full_path, $thumb_full_path, 1, "image2", -1, -1, 3 );
-						if (!file_exists($thumb_full_path))
+						if (!kfile::checkFileExists($thumb_full_path))
+						{
 							myFileConverter::captureFrame($src_full_path, $thumb_full_path, 1, "image2", -1, -1, 0);
+						}
 						
 						$src_full_path = $thumb_full_path;
 					}

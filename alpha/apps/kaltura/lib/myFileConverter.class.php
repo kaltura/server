@@ -240,7 +240,7 @@ class myFileConverter
 		{
 			$output = array();
 			$cmd = kConf::get ( 'bin_path_imagemagick');
-			$jpeg_file = myContentStorage::getFSUploadsPath(true).pathinfo($source_file, PATHINFO_FILENAME) . '.jpg';
+			$jpeg_file = myContentStorage::getFSUploadsPath(true) . pathinfo($source_file, PATHINFO_FILENAME) . '.jpg';
 			$source_file = kFile::realPath($source_file);
 			if($source_file === FALSE)
 			{
@@ -283,7 +283,6 @@ class myFileConverter
 			KalturaLog::log ( __CLASS__ . " Cannot create image from directory [$source_file]" );
 			return;
 		}
-		//$text_output_file = self::createLogFileName ($source_file );
 
 		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
 		if (!$srcIm || !$sourcewidth || !$sourceheight)
@@ -379,13 +378,18 @@ class myFileConverter
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $forceRotation = null)
 	{
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
+		{
 			$thumbParams = new kThumbnailParameters();
+		}
 
 		if (is_string($bgcolor) && strpos($bgcolor, '0x') === false)
+		{
 			$bgcolor = hexdec('0x' . $bgcolor);
-		
+		}
+
+		$source_file = kFile::realPath($source_file);
 		// check if the source file is not an image file
-		if (!file_exists($source_file) || filesize($source_file) === 0 || getimagesize($source_file) === false)
+		if (!kFile::checkFileExists($source_file) || kFile::fileSize($source_file) === 0 || getimagesize($source_file) === false)
 		{
         	KalturaLog::log("convertImage - failed to get image size [$source_file] while creating [$target_file]");
         		return null;
@@ -394,7 +398,10 @@ class myFileConverter
 		// change target file extension if needed
 		list($source_width, $source_height, $type, $attr) = getimagesize($source_file);
 		if ($type == IMAGETYPE_BMP) // convert bmp to jpeg
+		{
 			$type = IMAGETYPE_JPEG;
+		}
+
 		if ($force_jpeg)
 		{
 			$ext = self::imageExtByType($type);
@@ -405,23 +412,32 @@ class myFileConverter
 			else
 			{
 				$target_file = kFile::replaceExt($target_file, "jpg");
-				$type = IMAGETYPE_JPEG;
 			}
 		}
 		else
+		{
 			$target_file = kFile::replaceExt($target_file, self::imageExtByType($type));
+		}
 		
 		if(!is_null($format))
+		{
 			$target_file = kFile::replaceExt($target_file, $format);
+		}
 		
 		// do convertion
-		if (file_exists($target_file))
-			unlink($target_file); // remove target file before converting in order to avoid imagemagick security wrapper script from detetcing irrelevant errors  
+		if (kFile::checkFileExists($target_file))
+		{
+			kFile::unlink($target_file); // remove target file before converting in order to avoid imagemagick security wrapper script from detetcing irrelevant errors
+		}
+
 		$status = null;
 		$imageCropper = new KImageMagickCropper($source_file, $target_file, kConf::get('bin_path_imagemagick'));
 		$status = $imageCropper->crop($quality, $crop_type, $width, $height, $src_x, $src_y, $src_w, $src_h, null, null, $bgcolor, $density, $forceRotation, $stripProfiles);
 		if (!$status)
+		{
 			return null;
+		}
+
 		return $target_file;
 	}
 
@@ -476,7 +492,7 @@ class myFileConverter
 		$class_name = implode('', $new_array);
 		$include_cp_path = SF_ROOT_DIR.DIRECTORY_SEPARATOR.'apps'.DIRECTORY_SEPARATOR.SF_APP.DIRECTORY_SEPARATOR.'lib/crop_providers/'.$class_name.".class.php";
 
-		if (!file_exists($include_cp_path))
+		if (!kFile::checkFileExists($include_cp_path))
 			die();				
 
 		require_once($include_cp_path);
@@ -491,11 +507,4 @@ class myFileConverter
 		imagedestroy($image);
 		return array($width, $height);
 	}
-	
-	public static function createLogFileName ( $source_file , $plain_log_file_name = false )
-	{
-		$add_on = $plain_log_file_name ? "" :  "-" . time() ;
-		return $source_file . $add_on . ".txt";
-	}
-
 }

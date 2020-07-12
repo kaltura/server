@@ -1060,8 +1060,11 @@ abstract class FlvInfo
 	public function create()
 	{
 		$this->close();
-		if ($this->exists()) // enfore the creation of a new file by deleting the current one
-			@unlink($this->info_file_name);
+		if ($this->exists()) // enforce the creation of a new file by deleting the current one
+		{
+			@kfile::unlink($this->info_file_name);
+		}
+
 		$this->fh = fopen($this->info_file_name, "wb");
 	}
 	
