@@ -515,8 +515,12 @@ class kJobsManager
 		$convertData->setFlavorAssetId($flavorAssetId);
 		$convertData->setConversionProfileId($conversionProfileId);
 		$convertData->setPriority($priority);
-		
-		if($partner->getSharedStorageProfileId())
+
+		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
+		if(!$dbCurrentConversionEngine)
+			return null;
+
+		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 			$pathMgr = $sharedStorageProfile->getPathManager();
@@ -539,10 +543,6 @@ class kJobsManager
 //
 //			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 //		}
-
-		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
-		if(!$dbCurrentConversionEngine)
-			return null;
 		
 		// creats a child convert job
 		if($parentJob)
@@ -1964,5 +1964,24 @@ class kJobsManager
 		$batchJob->setEntryId($destEntryID);
 		$batchJob->setPartnerId($partnerId);
 		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::MULTI_CLIP);
+	}
+
+	protected static function shouldUseSharedStorageForEngine($conversionEngine)
+	{
+		$SharedSupportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
+						KalturaConversionEngineType::ON2,
+						KalturaConversionEngineType::FFMPEG,
+						KalturaConversionEngineType::MENCODER,
+						KalturaConversionEngineType::ENCODING_COM,
+						KalturaConversionEngineType::EXPRESSION_ENCODER3,
+						KalturaConversionEngineType::CHUNKED_FFMPEG,
+						KalturaConversionEngineType::FFMPEG_VP8,
+						KalturaConversionEngineType::FFMPEG_AUX);
+
+		if(in_array($conversionEngine, $SharedSupportedEngines))
+		{
+			return true;
+		}
+		return false;
 	}
 }

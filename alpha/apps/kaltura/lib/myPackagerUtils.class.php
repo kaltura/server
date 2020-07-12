@@ -228,7 +228,6 @@ class myPackagerUtils
 		
 		$localDcs = kDataCenterMgr::getDcIds();
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey, true, false);
-		
 		if(!$fileSync)
 		{
 			return null;
@@ -238,7 +237,13 @@ class myPackagerUtils
 		$fileDc = $fileSync->getDc();
 		if(in_array ($fileDc, $localDcs))
 		{
-			return self::getPackagerUrlFromConf($packagerUrlType);
+			$packagerUrl = null;
+			if(in_array($fileDc, kDataCenterMgr::getSharedStorageProfileIds()))
+			{
+				$sharedStorageProfile = StorageProfilePeer::retrieveByPK($fileDc);
+				$packagerUrl = $sharedStorageProfile->getPackagerUrl();
+			}
+			return self::getPackagerUrlFromConf($packagerUrlType, $packagerUrl);
 		}
 
 		$storageProfiles = self::loadStorageProfiles($fileSyncKey->partner_id);
