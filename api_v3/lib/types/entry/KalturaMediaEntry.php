@@ -30,7 +30,15 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 * @filter eq,not,in,notin
 	 */
 	public $sourceType;
-	
+
+	/**
+	 * The source version of the entry
+	 *
+	 * @var string
+	 * @insertonly
+	 */
+	public $sourceVersion;
+
 	/**
 	 * The search provider type used to import this entry
 	 *
@@ -101,7 +109,7 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public $streams;
 
-	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "searchProviderType", // see special logic for this field below
+	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "sourceVersion", "searchProviderType", // see special logic for this field below
 	//"searchProviderType", // see special logic for this field below
 	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled", "streams" );
 	
