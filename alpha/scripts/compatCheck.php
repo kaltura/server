@@ -624,12 +624,17 @@ function compareResults($resultNew, $resultOld)
 
 	if (!$resultNew)
 	{
-		return array('failed to parse new XML');
+		return array('#ERROR - failed to parse new XML');
 	}
 
 	if (!$resultOld)
 	{
 		return array('failed to parse old XML');
+	}
+
+	if (isset($resultNew['result']) && isset($resultNew['result']['error']) && !isset($resultOld['result']['error']))
+	{
+		return array("#ERROR - in new result and not in old result");
 	}
 
 	return compareArrays($resultNew, $resultOld, "");
@@ -764,6 +769,11 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 		{
 			print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
 			return;
+		}
+
+		if( !trim($resultNew) && $resultOld )
+		{
+			print "#ERROR - Empty/False result was recieved from new server\n";
 		}
 
 		if ($compareMode == CM_BINARY &&
