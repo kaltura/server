@@ -460,7 +460,7 @@ class EntryVendorTaskService extends KalturaBaseService
 
 		$content = implode(',', kReachUtils::getEntryVendorTaskCsvHeaders()) . PHP_EOL;
 		$res =  $filter->getListResponse($pager, $this->getResponseProfile());
-		$totalCount = $res->totalCount;
+		$totalCount = min($res->totalCount, 9999);
 		while ($totalCount > 0 && $pager->pageIndex <= 20)
 		{
 			foreach ($res->objects as $entryVendorTask)
@@ -472,6 +472,7 @@ class EntryVendorTaskService extends KalturaBaseService
 
 			$pager->pageIndex++;
 			$totalCount = $totalCount - $pager->pageSize;
+			$pager->pageSize = min(500, $totalCount);
 			$res = $filter->getListResponse($pager, $this->getResponseProfile());
 		}
 		$fileName = "export.csv";
