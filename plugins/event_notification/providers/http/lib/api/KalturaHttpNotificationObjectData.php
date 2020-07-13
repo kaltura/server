@@ -162,10 +162,6 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 			case KalturaResponseType::RESPONSE_TYPE_XML:
 				$contentType = 'application/xml';
 				break;
-
-			case KalturaResponseType::RESPONSE_TYPE_PHP:
-				//if content-type is not given, curl will set it to 'application/x-www-form-urlencoded' by default
-				break;
 		}
 
 		return $contentType;
