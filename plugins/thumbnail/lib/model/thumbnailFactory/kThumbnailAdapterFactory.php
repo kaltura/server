@@ -17,9 +17,14 @@ class kThumbnailAdapterFactory
 			return new kResizeLiveEntryAdapter();
 		}
 
-		if($entry->getType() == entryType::PLAYLIST && $entry->getMediaType() == PlaylistType::STATIC_LIST)
+		if($entry->getType() == entryType::PLAYLIST)
 		{
-			return new kResizeStitchedPlaylistAdapter();
+			if($entry->getMediaType() == PlaylistType::STATIC_LIST)
+			{
+				return new kResizeStitchedPlaylistAdapter();
+			}
+
+			return new kResizePlaylistAdapter();
 		}
 
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -31,7 +36,7 @@ class kThumbnailAdapterFactory
 	}
 
 	public static function getThumbAdapterParameters(entry $entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-													 $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
+													 $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec)
 	{
 		$params = new kThumbAdapterParameters();
 		$params->set(kThumbFactoryFieldName::ENTRY, $entry);
@@ -54,6 +59,7 @@ class kThumbnailAdapterFactory
 		$params->set(kThumbFactoryFieldName::IMAGE_FORMAT, $format);
 		$params->set(kThumbFactoryFieldName::START_SEC, $start_sec);
 		$params->set(kThumbFactoryFieldName::END_SEC, $end_sec);
+		$params->set(kThumbFactoryFieldName::FILE_SYNC, $fileSync);
 		return $params;
 	}
 }

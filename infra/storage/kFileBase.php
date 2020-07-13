@@ -333,12 +333,7 @@ class kFileBase
         $mode = substr(decoct(fileperms($srcFile)), -4);
         self::chmod($destFile,intval($mode,8));
     }
-	
-	public static function checkIsFile($path)
-	{
-		return is_file($path);
-	}
-	
+
 	public static function getDataFromFile($src, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
 	{
 		if(!$destFilePath)

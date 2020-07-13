@@ -445,8 +445,8 @@ class myFileConverter
 	 *
 	 *  convert an image to a desired size while maintaining its aspect ratio.
 	 *  use a provided crop to load the image onto it
-	 * @param unknown_type $source_file - see myFileConverter::converImage
-	 * @param unknown_type $target_file - see myFileConverter::converImage
+	 * @param string $source_file - see myFileConverter::converImage
+	 * @param string $target_file - see myFileConverter::converImage
 	 * @param int $width - see myFileConverter::converImage
 	 * @param int $height - see myFileConverter::converImage
 	 * @param int $crop_type - see myFileConverter::converImage

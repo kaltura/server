@@ -694,7 +694,7 @@ class myEntryUtils
 		$start_sec = -1, $end_sec = -1)
 	{
 		$result = self::getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-			$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+			$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);
 
 		if($result)
 		{
@@ -855,14 +855,10 @@ class myEntryUtils
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
 			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
-			if (
-				// need to create a thumb if either:
-				// 1. entry is a video and a specific second was requested OR a slices were requested
-				// 3. the actual thumbnail doesnt exist on disk
-				(($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getType() == entryType::PLAYLIST) && ($vid_sec != -1 || $vid_slices != -1))
-				||
-				(!file_exists($orig_image_path))
-				)
+			// need to create a thumb if either:
+			// 1. entry is a video and a specific second was requested OR a slices were requested
+			// 3. the actual thumbnail doesnt exist on disk
+			if( ( ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getType() == entryType::PLAYLIST) && ($vid_sec != -1 || $vid_slices != -1) ) || !file_exists($orig_image_path))
 			{
 				if ($vid_sec != -1) // a specific second was requested
 				{
@@ -2156,7 +2152,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	}
 
 	protected static function getImageFileWithImageTransformation($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-																  $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
+																  $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec)
 	{
 		$result = null;
 		try
@@ -2166,8 +2162,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
 				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
-				$result =$KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+				$result = $KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);
 
 				if ($result)
 				{

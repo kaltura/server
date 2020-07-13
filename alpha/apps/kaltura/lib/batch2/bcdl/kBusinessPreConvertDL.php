@@ -307,7 +307,7 @@ class kBusinessPreConvertDL
 			return false;
 		}
 
-		if(!kFile::checkIsFile($srcPath))
+		if(!kFile::isFile($srcPath))
 		{
 			$errDescription = "Source file [$srcPath] is not a file";
 			return false;
