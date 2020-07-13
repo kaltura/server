@@ -44,4 +44,9 @@ abstract class KalturaHttpNotificationData extends KalturaObject
 	 * @return string the data to be sent
 	 */
 	abstract public function getData(kHttpNotificationDispatchJobData $jobData = null);
+
+	public function getContentType()
+	{
+		return null;
+	}
 }
