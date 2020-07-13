@@ -5,6 +5,7 @@
  */
 class kWebVTTGenerator
 {
+	const HTML_ALLOWED_UNDECODED_CHARS = '/&lt;(i|b|u)&gt;/';
 	const WEBVTT_CUE_PAYLOAD_ENCODED_CHARS = '/(&amp;)|(&gt;)|(&lt;)|(&lrm;)|(&rlm;)|(&nbsp;)/';
 	const WEBVTT_CUE_PAYLOAD_DECODED_CHARS = '/[&<>]/';
 
@@ -192,6 +193,14 @@ class kWebVTTGenerator
 			if ($shouldEncode)
 			{
 				$textLine = htmlspecialchars($textLine, ENT_NOQUOTES);
+
+				$shouldDecodeStyleTags = preg_match(self::HTML_ALLOWED_UNDECODED_CHARS, $textLine);
+				if($shouldDecodeStyleTags)
+				{
+					$find = array('&lt;i&gt;', '&lt;/i&gt;', '&lt;b&gt;', '&lt;/b&gt;', '&lt;u&gt;', '&lt;/u&gt;');
+					$replace = array('<i>', '</i>', '<b>', '</b>', '<u>', '</u>');
+					$textLine = str_replace($find, $replace, $textLine);
+				}
 			}
 		}
 		return $textLine;

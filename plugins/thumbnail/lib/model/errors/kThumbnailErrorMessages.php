@@ -37,9 +37,11 @@ class kThumbnailErrorMessages
 	const END_SEC_START_SEC = 'End sec must be greater then start sec';
 	const VID_STRIP_FAILED = 'Vid strip failed';
 	const ENTRY_TYPE = 'entryType';
+	const ENTRY_ID = 'entryId';
 	const TEXT_DOES_NOT_FIT_ERR = 'text does not fit the bounding box';
 	const ILLEGAL_ENUM_VALUE = 'Illegal enum value';
 	const NOT_VALID_IMAGE_FORMAT = 'Not valid image format';
 	const DENSITY_POSITIVE = 'Density must be positive';
 	const QUALITY_NOT_IN_RANGE = 'Quality must be between 20 and 100';
+	const WIDTH_AND_HEIGHT_ARE_ZERO = 'Width and height cannot both be equal zero';
 }

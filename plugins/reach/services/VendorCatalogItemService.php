@@ -192,7 +192,7 @@ class VendorCatalogItemService extends KalturaBaseService
 			foreach ($res->objects as $vendorCatalogItem)
 			{
 				$catalogItemValues = kReachUtils::getObejctValues($vendorCatalogItem);
-				$csvRowData = kReachUtils::createCatalogItemCsvRowData($catalogItemValues);
+				$csvRowData = kReachUtils::createCsvRowData($catalogItemValues, 'vendorCatalogItem');
 				$content .= $csvRowData . PHP_EOL;
 			}
 

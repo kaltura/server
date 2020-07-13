@@ -80,6 +80,40 @@
 
     jQuery('#filter_type').change();
 
+    function exportToCsv(filterType, filterInput, status, dueDate){
+        dueDate =  dueDate.replace('+','%2B');
+        var paramsStr =  '/filter_type/' + filterType + '/filter_input/' + filterInput + '/filter_status/' + status + '/due_date/' +  dueDate;
+        var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ReachRequestsExportAction')); ?>' + paramsStr;
+
+        jQuery('#reach-requests-export-dialog').remove();
+        dialogDiv = jQuery('<div id="reach-requests-export-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+        dialogDiv.dialog({
+            bgiframe: true,
+            modal: true,
+            resizable: true,
+            wordWrap: "break-word",
+            wordwrap: "breakword",
+            width: 500,
+            title: '<?php echo $this->translate('CSV Export Link'); ?>',
+            buttons: {
+                '<?php echo $this->translate('Close'); ?>': function () {
+                    jQuery(this).dialog('close');
+                }
+            },
+            close: function () {
+                jQuery(this).dialog('destroy').remove();
+            }
+        });
+
+        dialogDiv.load(
+            url,
+            null,
+            null
+        );
+    }
+
+
     function refreshPage()
     {
         pauseRefresh();

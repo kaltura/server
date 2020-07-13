@@ -1,3 +1,32 @@
+# Propus 16.6.0  #
+## Adding permissions to base-playback-role ##
+Issue Type: Task
+Issue ID: PLAT-11034
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_07_08_base_playback_role_add_metadata_cuepoint_permission.php
+
+## Export Reach Requests in admin console to csv ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_12_add_permission_entry_vendor_task.php
+
+## Adding permission to mediaServer partner for livereports ##
+Issue Type: Task
+Issue ID : LIV-156
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_28_add_permission_livereports.php
+
+## Adding permission to capture apps to add code cue point ##
+Issue Type: Task
+Issue ID : KMS-20244
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_25_add_capture_codeCuePoint_permission.php
+
 # Propus 16.5.0  #
 ## Adding permission to mediaServer partner for partner:get ##
 Issue Type: Task

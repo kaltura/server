@@ -9,6 +9,8 @@ require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/dateUtils.class.php');
 require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/storage/kFileUtils.php');
 abstract class KJobConversionEngine extends KConversionEngine
 {
+	const SEC_TIMEOUT = 10;
+	
 	/**
 	 * @param KalturaConvertJobData $data
 	 * @return array<KConversioEngineResult>
@@ -160,13 +162,18 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected function isConversionProgressing($currentModificationTime)
 	{
-		if (kFile::checkFileExists($this->inFilePath))
+		if (kFile::checkFileExists($this->inFilePath) && !kFile::checkIsDir($this->inFilePath))
 		{
 			$newModificationTime = kFile::getFileLastUpdatedTime($this->inFilePath);
-			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
-			{
-				return $newModificationTime;
-			}
+		}
+		else
+		{
+			$newModificationTime = kFileUtils::getMostRecentModificationTimeFromDir($this->inFilePath);
+		}
+
+		if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+		{
+			return $newModificationTime;
 		}
 		return false;
 	}
@@ -238,7 +245,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				}
 				$currentModificationTime = $newModificationTime;
 			}
-			sleep(1);
+			sleep(self::SEC_TIMEOUT);
 			if(self::isReachedTimeout($timeout))
 			{
 				pclose($handle);
@@ -270,7 +277,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected static function isReachedTimeout(&$timeout)
 	{
-		$timeout--;
+		$timeout -= self::SEC_TIMEOUT;
 		if($timeout <= 0)
 		{
 			KalturaLog::debug("Reached to TIMEOUT");

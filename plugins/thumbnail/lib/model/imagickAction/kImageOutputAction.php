@@ -12,7 +12,11 @@ class kImageOutputAction extends kImagickAction
 	const MAX_QUALITY = 100;
 	protected $format;
 	protected $quality;
+	protected $density;
 
+	/**
+	 * @throws kThumbnailException
+	 */
 	protected function validateFormat()
 	{
 		$validFormats = $this->image->queryFormats();
@@ -24,6 +28,9 @@ class kImageOutputAction extends kImagickAction
 		}
 	}
 
+	/**
+	 * @throws kThumbnailException
+	 */
 	protected function validateQuality()
 	{
 		if (($this->quality < self::MIN_QUALITY) || $this->quality > self::MAX_QUALITY)
@@ -38,6 +45,7 @@ class kImageOutputAction extends kImagickAction
 		$cropParameterAlias = array(
 			'f' => kThumbnailParameterName::IMAGE_FORMAT,
 			'q' => kThumbnailParameterName::QUALITY,
+			'd' => kThumbnailParameterName::DENSITY,
 		);
 
 		$this->parameterAlias = array_merge($this->parameterAlias, $cropParameterAlias);
@@ -47,8 +55,12 @@ class kImageOutputAction extends kImagickAction
 	{
 		$this->format = $this->getActionParameter(kThumbnailParameterName::IMAGE_FORMAT, self::DEFAULT_FORMAT);
 		$this->quality = $this->getIntActionParameter(kThumbnailParameterName::QUALITY, self::DEFAULT_QUALITY);
+		$this->density = $this->getIntActionParameter(kThumbnailParameterName::DENSITY);
 	}
 
+	/**
+	 * @throws kThumbnailException
+	 */
 	protected function validateInput()
 	{
 		$this->validateFormat();
@@ -60,8 +72,14 @@ class kImageOutputAction extends kImagickAction
 	 */
 	protected function doAction()
 	{
+		if($this->density)
+		{
+			$this->image->resampleImage($this->density, $this->density, Imagick::FILTER_UNDEFINED, 0);
+		}
+
 		$this->image->setFormat($this->format);
 		$this->image->setImageCompressionQuality($this->quality);
+
 		return $this->image;
 	}
 }

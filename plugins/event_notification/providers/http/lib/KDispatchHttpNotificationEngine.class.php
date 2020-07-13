@@ -81,7 +81,12 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 				$headers[] = "$key: $value";
 			}
 		}
-		
+
+		if($data->contentType)
+		{
+			$headers[] = "Content-Type: " . $data->contentType;
+		}
+
 		$curlWrapper = new KCurlWrapper();
 
 		if(count($headers))
