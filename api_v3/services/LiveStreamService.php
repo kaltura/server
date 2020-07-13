@@ -87,13 +87,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		{
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();
-		
-			$liveAssets = assetPeer::retrieveByEntryId($dbEntry->getId(),array(assetType::LIVE));
-			foreach ($liveAssets as $liveAsset){
-				/* @var $liveAsset liveAsset */
-				$liveAsset->setStatus(asset::ASSET_STATUS_READY);
-				$liveAsset->save();
-			}
+			$this->setFlavorsAsReady($dbEntry);
 		}
 		
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $this->getPartnerId(), null, null, null, $dbEntry->getId());
@@ -561,13 +555,8 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		if (!in_array($liveEntry->getSourceType(), LiveEntry::$kalturaLiveSourceTypes))
 			throw new KalturaAPIException(KalturaErrors::CANNOT_REGENERATE_STREAM_TOKEN_FOR_EXTERNAL_LIVE_STREAMS, $liveEntry->getSourceType());
-		
-		$password = sha1(md5(uniqid(rand(), true)));
-		$password = substr($password, rand(0, strlen($password) - 8), 8);
-		$liveEntry->setStreamPassword($password);
 
-		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
-		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
+		$this->setBroadcastinUrlsAndStreamPassword($liveEntry);
 
 		$liveEntry->save();
 
@@ -700,6 +689,39 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 		return $res;
+	}
+
+	/**
+	 * @param entry $liveEntry
+	 */
+	public function setBroadcastinUrlsAndStreamPassword(LiveStreamEntry $liveEntry)
+	{
+		$password = sha1(md5(uniqid(rand(), true)));
+		$password = substr($password, rand(0, strlen($password) - 8), 8);
+		$liveEntry->setStreamPassword($password);
+
+		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
+		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
+	}
+
+	/**
+	 * @param $dbEntry
+	 * @throws PropelException
+	 */
+	public function setFlavorsAsReady($dbEntry)
+	{
+		$liveAssets = assetPeer::retrieveByEntryId($dbEntry->getId(), array(assetType::LIVE));
+		foreach ($liveAssets as $liveAsset)
+		{
+			/* @var $liveAsset liveAsset */
+			$liveAsset->setStatus(asset::ASSET_STATUS_READY);
+			$liveAsset->save();
+		}
+	}
+
+	public function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill = null)
+	{
+		return parent::duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill);
 	}
 
 }
