@@ -632,7 +632,7 @@ function compareResults($resultNew, $resultOld)
 		return array('failed to parse old XML');
 	}
 
-	if (isset($resultNew['result']) && isset($resultNew['result']['error']) && !isset($resultOld['result']['error']))
+	if (isset($resultNew['result']['error']) && !isset($resultOld['result']['error']))
 	{
 		return array("#ERROR - in new result and not in old result");
 	}
@@ -771,7 +771,7 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 			return;
 		}
 
-		if( !trim($resultNew) && $resultOld )
+		if( !trim($resultNew) && trim($resultOld) )
 		{
 			print "#ERROR - Empty/False result was recieved from new server\n";
 		}
