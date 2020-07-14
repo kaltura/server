@@ -22,7 +22,7 @@ class kConversionInfo
 	}
 
 	/**
-	 * Will parse the metadata of the file and try and figure out the paramters
+	 * Will parse the metadata of the file and try and figure out the parameters
 	 *  either by analyzing flv tags or by using ffmpeg -i
 	 *
 	 * @param string $source_file
