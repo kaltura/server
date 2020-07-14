@@ -33,11 +33,12 @@ class myFlvHandler
 	public function __construct($flv_file_name)
 	{
 		$this->flv_file_name = $flv_file_name;
-		$this->status = kfile::checkFileExists($this->flv_file_name);
+		$this->status = kFile::checkFileExists($this->flv_file_name);
 		
 		if ($this->status)
 		{
-			$this->fh = fopen(kFile::realPath($this->flv_file_name), "rb");
+			$realPath = kFile::realPath($flv_file_name);
+			$this->fh = fopen($realPath, "rb");
 		}
 	}
 	
@@ -1062,7 +1063,7 @@ abstract class FlvInfo
 		$this->close();
 		if ($this->exists()) // enforce the creation of a new file by deleting the current one
 		{
-			@kfile::unlink($this->info_file_name);
+			@kFile::unlink($this->info_file_name);
 		}
 
 		$this->fh = fopen($this->info_file_name, "wb");
