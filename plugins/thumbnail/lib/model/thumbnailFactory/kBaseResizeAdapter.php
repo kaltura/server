@@ -194,17 +194,31 @@ class kBaseResizeAdapter
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 		}
 
-		$flavorAssetId = null;
-		$entry = $this->getEntry();
-		if ($entry->getType() == entryType::PLAYLIST)
+		try
 		{
-			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
+			$flavorAssetId = null;
+			$entry = $this->getEntry();
+			if ($entry->getType() == entryType::PLAYLIST)
+			{
+				myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
+			}
+
+			$adapter = new kImageTransformationAdapter();
+			$imageTransformation = $adapter->getImageTransformation($this->parameters);
+
+			$imagick = $imageTransformation->execute();
+			kFile::filePutContents($this->finalThumbPath, $imagick);
+		}
+		catch (Exception $ex)
+		{
+			if ($cache)
+			{
+				$cache->delete($cacheLockKey);
+			}
+
+			throw $ex;
 		}
 
-		$adapter = new kImageTransformationAdapter();
-		$imageTransformation = $adapter->getImageTransformation($this->parameters);
-		$imagick = $imageTransformation->execute();
-		kFile::filePutContents($this->finalThumbPath, $imagick);
 		if ($cache)
 		{
 			$cache->delete($cacheLockKey);
