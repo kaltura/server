@@ -192,13 +192,13 @@ class kBaseResizeAdapter
 		{
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 		}
-
-		$this->preTransformationExtraActions();
-		$adapter = new kImageTransformationAdapter();
-		$imageTransformation = $adapter->getImageTransformation($this->parameters);
 		try
 		{
+			$this->preTransformationExtraActions();
+			$adapter = new kImageTransformationAdapter();
+			$imageTransformation = $adapter->getImageTransformation($this->parameters);
 			$imagick = $imageTransformation->execute();
+			kFile::filePutContents($this->finalThumbPath, $imagick);
 		}
 		catch (Exception $ex)
 		{
@@ -210,7 +210,6 @@ class kBaseResizeAdapter
 			throw $ex;
 		}
 
-		kFile::filePutContents($this->finalThumbPath, $imagick);
 		if ($cache)
 		{
 			$cache->delete($cacheLockKey);
