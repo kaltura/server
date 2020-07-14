@@ -272,7 +272,7 @@ class uiConfDeployment
 
 		if ($count > 0)
 		{
-			KalturaLog::debug("Exiting, Tag: {$newTag} already found in the DB");
+			KalturaLog::debug("Exiting, Tag: {$tag} already found in the DB");
 			exit;
 		}
 	}
