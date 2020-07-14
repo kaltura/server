@@ -202,7 +202,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 			$dataObject = KalturaHttpNotificationData::getInstance($srcObj->getDataObject());
 			if($dataObject)
 			{
-				$this->contentType = $dataObject->getContentType();
+		//		$this->contentType = $dataObject->getContentType();
 				$this->data = $dataObject->getData($srcObj);
 			}
 		}
