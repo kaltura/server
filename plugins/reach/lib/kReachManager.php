@@ -491,7 +491,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 		//check if credit has expired
-		if (kReachUtils::hasCreditExpired($reachProfile) && $vendorCatalogItem->getPricing()->getPricePerUnit())
+		if (kReachUtils::hasCreditExpired($reachProfile) && $vendorCatalogItem->getPricing() && $vendorCatalogItem->getPricing()->getPricePerUnit())
 		{
 			KalturaLog::log("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
