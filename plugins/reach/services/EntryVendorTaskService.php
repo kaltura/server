@@ -455,12 +455,12 @@ class EntryVendorTaskService extends KalturaBaseService
 		$filter->orderBy = '-createdAt';
 
 		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
+		$pager->pageSize = KalturaPager::MAX_PAGE_SIZE;
 		$pager->pageIndex = 1;
 
 		$content = implode(',', kReachUtils::getEntryVendorTaskCsvHeaders()) . PHP_EOL;
 		$res =  $filter->getListResponse($pager, $this->getResponseProfile());
-		$totalCount = min($res->totalCount, 9999);
+		$totalCount = min($res->totalCount, SphinxCriteria::MAX_MATCHES - 1);
 		while ($totalCount > 0 && $pager->pageIndex <= 20)
 		{
 			foreach ($res->objects as $entryVendorTask)
@@ -472,8 +472,11 @@ class EntryVendorTaskService extends KalturaBaseService
 
 			$pager->pageIndex++;
 			$totalCount = $totalCount - $pager->pageSize;
-			$pager->pageSize = min(500, $totalCount);
-			$res = $filter->getListResponse($pager, $this->getResponseProfile());
+			$pager->pageSize = min(KalturaPager::MAX_PAGE_SIZE, $totalCount);
+			if ($pager->pageSize > 0)
+			{
+				$res = $filter->getListResponse($pager, $this->getResponseProfile());
+			}
 		}
 		$fileName = "export.csv";
 		header('Content-Disposition: attachment; filename="'.$fileName.'"');
