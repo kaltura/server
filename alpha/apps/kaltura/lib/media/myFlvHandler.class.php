@@ -34,10 +34,11 @@ class myFlvHandler
 	{
 		$this->flv_file_name = $flv_file_name;
 		$this->status = kFile::checkFileExists($this->flv_file_name);
-		
 		if ($this->status)
 		{
 			$realPath = kFile::realPath($flv_file_name);
+			stream_wrapper_restore('http');
+			stream_wrapper_restore('https');
 			$this->fh = fopen($realPath, "rb");
 		}
 	}
@@ -48,6 +49,8 @@ class myFlvHandler
 		{
 			fclose($this->fh);
 			$this->fh = null;
+			stream_wrapper_unregister('https');
+			stream_wrapper_unregister('http');
 		}
 	}
 	
