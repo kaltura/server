@@ -684,7 +684,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$this->maybeAddAnalyticsPlugins($confVarsArr);
-        $this->setFixVersionsNumber();
+		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
 
