@@ -21,6 +21,11 @@ class embedPlaykitJsAction extends sfAction
 	const CANARY = "{canary}";
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
+	const PLAYKIT_KAVA = 'playkit-kava';
+	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
+	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
+	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
+	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -512,6 +517,35 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
+	private function maybeAddAnalyticsPlugins($confVarsArr)
+	{
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : "";
+		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : "";
+		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig)) {
+			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
+			if ($playerVersion == self::LATEST || $playerVersion == self::BETA || $playerVersion == self::CANARY) {
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
+				if ($tvPlayerConfig) {
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
+				}
+			} else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) {
+				$latestVersionMap = $this->getConfigByVersion("latest")[0];
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
+				if ($tvPlayerConfig) {
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
+				}
+			}
+
+			if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
+				$confVarsArr[self::VERSIONS_PARAM_NAME] = $this->bundleConfig;
+			} else {
+				$confVarsArr = $this->bundleConfig;
+			}
+			$this->uiConf->setConfVars(json_encode($confVarsArr));
+			$this->uiConf->save();
+		}
+	}
+
 	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -649,6 +683,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
+		$this->maybeAddAnalyticsPlugins($confVarsArr);
         $this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
