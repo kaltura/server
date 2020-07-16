@@ -563,8 +563,7 @@ class kFileBase
 		if(self::$storageTypeMap)
 			return self::$storageTypeMap;
 		
-		$dc_config = kConf::getMap("dc_config");
-		self::$storageTypeMap = isset($dc_config['storage_type_map']) ? $dc_config['storage_type_map'] : array();
+		self::$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
 		return self::$storageTypeMap;
 	}
 	

@@ -11,7 +11,10 @@ require_once(dirname(__FILE__) . '/../../../vendor/aws/aws-autoloader.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 
 use Aws\S3\S3Client;
+use Aws\Sts\StsClient;
+
 use Aws\S3\Exception\S3Exception;
+use Aws\Exception\AwsException;
 use Aws\S3\Enum\CannedAcl;
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
@@ -25,6 +28,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getStatusCode";
 	const AWS_404_ERROR = 404;
+	
+	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -43,52 +48,24 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	// instances of this class should be created usign the 'getInstance' of the 'kLocalFileSystemManger' class
 	public function __construct(array $options = null)
 	{
-		$dc_config = kConf::getMap("dc_config");
-		if(!$options)
-		{
-			$options = isset($dc_config['storage']) ? $dc_config['storage'] : null;
-		}
-		
 		parent::__construct($options);
 		
-		if($options && isset($options['filesAcl']))
+		if(!$options)
 		{
-			$this->filesAcl = $options['filesAcl'];
+			$options = kConf::get('storage_options', 'cloud_storage', null);
 		}
 		
-		if($options && isset($options['s3Region']))
+		if($options)
 		{
-			$this->s3Region = $options['s3Region'];
-		}
-		
-		if($options && isset($options['sseType']))
-		{
-			$this->sseType = $options['sseType'];
-		}
-		
-		if($options && isset($options['sseKmsKeyId']))
-		{
-			$this->sseKmsKeyId = $options['sseKmsKeyId'];
-		}
-		
-		if($options && isset($options['signatureType']))
-		{
-			$this->signatureType = $options['signatureType'];
-		}
-		
-		if($options && isset($options['endPoint']))
-		{
-			$this->endPoint = $options['endPoint'];
-		}
-		
-		if($options && isset($options['accessKeySecret']))
-		{
-			$this->accessKeySecret = $options['accessKeySecret'];
-		}
-		
-		if($options && isset($options['accessKeyId']))
-		{
-			$this->accessKeyId = $options['accessKeyId'];
+			$this->filesAcl = isset($options['filesAcl']) ? $options['filesAcl'] : null;
+			$this->s3Region = isset($options['s3Region']) ? $options['s3Region'] : null;
+			$this->sseType = isset($options['sseType']) ? $options['sseType'] : null;
+			$this->sseKmsKeyId = isset($options['sseKmsKeyId']) ? $options['sseKmsKeyId'] : null;
+			$this->signatureType = isset($options['signatureType']) ? $options['signatureType'] : null;
+			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
+			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
+			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
+			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
 		}
 		
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
@@ -101,6 +78,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
+		}
+		
+		if(getenv(self::S3_ARN_ROLE_ENV_NAME) && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		{
+			if(!class_exists('Aws\Sts\StsClient'))
+			{
+				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				return false;
+			}
+			
+			return $this->generateS3Client();
 		}
 		
 		$config = array(
@@ -125,6 +113,24 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
 		 * code elsewhere if the permissions are not sufficient.
 		 **/
+		return true;
+	}
+	
+	private function generateS3Client()
+	{
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		
+		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
+		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
+		
+		$this->s3 = S3Client::factory(array(
+			'credentials' => $roleCreds,
+			'region' => $this->s3Region,
+			'signature' => 'v4',
+			'version' => '2006-03-01'
+		));
+		
 		return true;
 	}
 	
@@ -548,7 +554,14 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doListFiles($filePath, $pathPrefix = '')
 	{
-		$results = $this->s3Call('listObjects', null, $filePath);
+		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
+		
+		$params = array(
+			'Bucket' => $bucket,
+			'Prefix'    => $filePath,
+		);
+		
+		$results = $this->s3Call('listObjects', $params, $filePath);
 		
 		if(!$results)
 		{
@@ -682,8 +695,15 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		$fp = fopen($src, 'r');
+		if(!$fp)
+		{
+			KalturaLog::err("Failed to open file: [$src]");
+			return false;
+		}
+		
 		list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
-		fclose($fp);
+		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
+		@fclose($fp);
 		if (!$success)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");

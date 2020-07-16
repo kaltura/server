@@ -602,6 +602,7 @@ abstract class kSharedFileSystemMgr
 		
 		foreach (array_keys($storageTypeMap) as $pathPrefix) {
 			if (kString::beginsWith($path, $pathPrefix)) {
+				self::$kSharedRootPath = $pathPrefix;
 				return self::getInstance($storageTypeMap[$pathPrefix]);
 			}
 		}
