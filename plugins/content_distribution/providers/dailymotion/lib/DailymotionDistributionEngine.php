@@ -166,7 +166,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	
 		if ($needDel == true)
 		{
-			unlink($videoFilePath);
+			kFile::unlink($videoFilePath);
 		}
 		if($isRemote)
 		{
