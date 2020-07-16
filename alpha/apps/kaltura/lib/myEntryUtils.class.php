@@ -2183,6 +2183,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				throw $e;
 			}
+			else
+			{
+				kalturaLog::warning("transformations failed with error {$e->getMessage()}");
+			}
 		}
 
 		return $result;
