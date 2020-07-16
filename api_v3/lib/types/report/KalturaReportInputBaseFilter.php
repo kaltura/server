@@ -59,7 +59,7 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		if ($partner)
 		{
 			$partnerCreatedAt = $partner->getCreatedAt(null);
-			$partnerCreatedAt = $partnerCreatedAt - 86400 * 30;
+			$partnerCreatedAt -= 86400 * 30;
 			if ($this->fromDay)
 			{
 				$this->fromDay = max($this->fromDay, date("Ymd", $partnerCreatedAt));
