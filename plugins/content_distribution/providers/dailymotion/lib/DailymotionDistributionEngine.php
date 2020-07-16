@@ -137,18 +137,26 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		if (!$videoFilePath)
 			throw new KalturaException('No video asset to distribute, the job will fail');
 			
-		if (!file_exists($videoFilePath))
+		if (!kFile::checkFileExists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
+		
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($videoFilePath);
+		$tempVideoFilePath = !$isRemote ? null : kFile::getExternalFile($remoteUrl, null, basename($videoFilePath));
 		
 		if (FALSE === strstr($videoFilePath, "."))
 		{
 			$videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
-			if (!file_exists($videoFilePathNew))
+			if (!kFile::checkFileExists($videoFilePathNew))
 			{
-				copy($videoFilePath,$videoFilePathNew);
+				$copyFrom = $tempVideoFilePath ? $tempVideoFilePath : $videoFilePath;
+				kFile::copy($copyFrom,$videoFilePathNew);
 				$needDel = true;
 			}
 			$videoFilePath = $videoFilePathNew;
+		}
+		elseif($isRemote)
+		{
+			$videoFilePath = $tempVideoFilePath;
 		}
 		
 		$dailyMotionImpl = new DailyMotionImpl($distributionProfile->user, $distributionProfile->password);
@@ -158,14 +166,20 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	
 		if ($needDel == true)
 		{
-			unlink($videoFilePath);
+			kFile::unlink($videoFilePath);
+		}
+		if($isRemote)
+		{
+			kFile::unlink($tempVideoFilePath);
 		}
 		
 		$data->remoteId = $remoteId;
 		$captionsInfo = $data->providerData->captionsInfo;
 		/* @var $captionInfo KalturaDailymotionDistributionCaptionInfo */
-		foreach ($captionsInfo as $captionInfo){
-			if ($captionInfo->action == KalturaDailymotionDistributionCaptionAction::SUBMIT_ACTION){
+		foreach ($captionsInfo as $captionInfo)
+		{
+			if ($captionInfo->action == KalturaDailymotionDistributionCaptionAction::SUBMIT_ACTION)
+			{
 				$data->mediaFiles[] = $this->submitCaption($dailyMotionImpl, $captionInfo, $data->remoteId);
 			}
 		}
@@ -244,18 +258,19 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$dailyMotionImpl->update($data->remoteId, $props);
 		
 		$captionsInfo = $data->providerData->captionsInfo;
-		/* @var $captionInfo KalturaYouTubeApiCaptionDistributionInfo */
-		foreach ($captionsInfo as $captionInfo){
-			switch ($captionInfo->action){
+		/* @var $captionInfo KalturaDailymotionDistributionCaptionInfo */
+		foreach ($captionsInfo as $captionInfo)
+		{
+			switch ($captionInfo->action)
+			{
 				case KalturaDailymotionDistributionCaptionAction::SUBMIT_ACTION:
 					$data->mediaFiles[] = $this->submitCaption($dailyMotionImpl,$captionInfo, $data->remoteId);
 					break;
+					
 				case KalturaDailymotionDistributionCaptionAction::UPDATE_ACTION:
-					if (!file_exists($captionInfo->filePath ))
-						throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
-					$dailyMotionImpl->updateSubtitle($captionInfo->remoteId, $captionInfo);
-					$this->updateRemoteMediaFileVersion($data,$captionInfo);
+					$this->updateCaption($dailyMotionImpl, $data->mediaFiles, $captionInfo->remoteId, $captionInfo);
 					break;
+					
 				case KalturaDailymotionDistributionCaptionAction::DELETE_ACTION:
 					$dailyMotionImpl->deleteSubtitle($captionInfo->remoteId);
 					break;
@@ -336,19 +351,65 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		return $geoBlocking;
 	}
 	
-	private function submitCaption(DailymotionImpl $dailymotionImpl, $captionInfo, $remoteId) {
-		if (!file_exists($captionInfo->filePath ))
+	private function submitCaption(DailymotionImpl $dailymotionImpl, $captionInfo, $remoteId)
+	{
+		if (!kFile::checkFileExists($captionInfo->filePath))
 			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
 		KalturaLog::info ( 'Submitting caption [' . $captionInfo->assetId . ']' );
+		
+		list($isRemote, $captionInfo->filePath) = $this->fetchIfRemote($captionInfo->filePath);
 		$captionRemoteId = $dailymotionImpl->uploadSubtitle($remoteId, $captionInfo);
+		
+		if($isRemote)
+		{
+			kFile::unlink($captionInfo->filePath);
+		}
+		
 		return $this->getNewRemoteMediaFile ( $captionRemoteId, $captionInfo );
 	}
 	
-	private function getNewRemoteMediaFile($captionRemoteId , $captionInfo) {
+	private function updateCaption(DailymotionImpl $dailymotionImpl, KalturaDistributionRemoteMediaFileArray &$remoteMediaFile, $remoteCaptionId, $captionInfo)
+	{
+		if (!kFile::checkFileExists($captionInfo->filePath))
+			throw new KalturaDistributionException('The caption file ['.$captionInfo->filePath.'] was not found (probably not synced yet), the job will retry');
+		KalturaLog::info ( 'Updating caption [' . $captionInfo->assetId . ']' );
+		
+		list($isRemote, $captionInfo->filePath) = $this->fetchIfRemote($captionInfo->filePath);
+		$dailymotionImpl->updateSubtitle($captionInfo->remoteId, $captionInfo);
+		
+		if($isRemote)
+		{
+			kFile::unlink($captionInfo->filePath);
+		}
+		
+		$this->updateRemoteMediaFileVersion($remoteMediaFile, $captionInfo);
+	}
+	
+	private function fetchIfRemote($filePath)
+	{
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($filePath);
+		$filePath = !$isRemote ? $filePath : kFile::getExternalFile($remoteUrl, __CLASS__ . '/' . basename($filePath));
+		return array($isRemote, $filePath);
+	}
+	
+	private function getNewRemoteMediaFile(KalturaDistributionRemoteMediaFileArray &$remoteMediaFile, $captionRemoteId , $captionInfo)
+	{
 		$remoteMediaFile = new KalturaDistributionRemoteMediaFile ();
 		$remoteMediaFile->remoteId = $captionRemoteId;
 		$remoteMediaFile->version = $captionInfo->version;
 		$remoteMediaFile->assetId = $captionInfo->assetId;
 		return $remoteMediaFile;
+	}
+	
+	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFile, KalturaDailymotionDistributionCaptionInfo $captionInfo){
+		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
+		foreach ($remoteMediaFiles as $remoteMediaFile)
+		{
+			if ($remoteMediaFile->assetId == $captionInfo->assetId)
+			{
+				$remoteMediaFile->version = $captionInfo->version;
+				break;
+			}
+		}
 	}
 }

@@ -56,15 +56,31 @@ class HuluDistributionEngine extends DistributionEngine implements
 		$feed = new HuluFeedHelper('hulu_template.xml', $distributionProfile, $providerData);
 		$xml = $feed->getXml();
 		
-		$videoFilePath = $providerData->videoAssetFilePath;
-		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
-		$captionsFilesPaths = $providerData->captionLocalPaths;
-		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP;
+		//If file is remote fetch it first to local
+		list($isRemoteVideo, $videoRemoteUrl) = kFile::resolveFilePath($providerData->videoAssetFilePath);
+		$videoFilePath = !$isRemoteVideo ? $providerData->videoAssetFilePath : kFile::getExternalFile($thumbRemoteUrl, null, basename($providerData->videoAssetFilePath));
 		
-		$remoteVideoFileName = $providerData->fileBaseName.'.'.pathinfo($videoFilePath, PATHINFO_EXTENSION);
-		$remoteThumbFileName = $providerData->fileBaseName.'.'.pathinfo($thumbAssetFilePath, PATHINFO_EXTENSION);
+		$thumbAssetFilePath = $providerData->thumbAssetFilePath;
+		if($thumbAssetFilePath)
+		{
+			list($isRemoteThumb, $thumbRemoteUrl) = kFile::resolveFilePath($thumbAssetFilePath);
+			$thumbAssetFilePath = !$isRemoteThumb ? $thumbAssetFilePath : kFile::getExternalFile($thumbRemoteUrl, null, basename($thumbAssetFilePath));
+		}
+		
+		$captionsFilesPaths = $providerData->captionLocalPaths;
+		foreach ($captionsFilesPaths as &$captionFilePath)
+		{
+			list($isRemoteCaption, $captionRemoteUrl) = kFile::resolveFilePath($captionFilePath->value);
+			$captionFilePath->localFilePath = !$isRemoteCaption ? $captionFilePath->value : kFile::getExternalFile($thumbRemoteUrl, null, basename($captionRemoteUrl));
+			$captionFilePath->isRemoteCaption = $isRemoteCaption;
+		}
+		
+		$protocol = $distributionProfile->protocol ? $distributionProfile->protocol : KalturaDistributionProtocol::SFTP;
+		$remoteVideoFileName = $providerData->fileBaseName.'.'.pathinfo($providerData->videoAssetFilePath, PATHINFO_EXTENSION);
+		$remoteThumbFileName = $providerData->fileBaseName.'.'.pathinfo($providerData->thumbAssetFilePath, PATHINFO_EXTENSION);
 		$remoteXmlFileName = $providerData->fileBaseName.'.xml';
-		switch ($protocol){
+		switch ($protocol)
+		{
 			case KalturaDistributionProtocol::SFTP:
 				$sftpBasePath = '/home/' . $distributionProfile->sftpLogin . '/upload';
 				$videoSFTPPath = $sftpBasePath.'/'.$remoteVideoFileName;
@@ -76,19 +92,22 @@ class HuluDistributionEngine extends DistributionEngine implements
 				KalturaLog::info('XML:' . $xml);
 				$fileManager = $this->getSFTPManager($distributionProfile);
 				$fileManager->putFile($videoSFTPPath, $videoFilePath);
-				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
+				if($thumbAssetFilePath && kFile::checkFileExists($thumbAssetFilePath))
 					$fileManager->putFile($thumbSFTPPath, $thumbAssetFilePath);
 					
-				foreach ($captionsFilesPaths as $captionFilePath){
-					if(file_exists($captionFilePath->value)){
+				foreach ($captionsFilesPaths as $captionFilePath)
+				{
+					if(kFile::checkFileExists($captionFilePath->value))
+					{
 						$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
 						$captionSFTPPath = $sftpBasePath.'/'.$remoteCaptionFileName;
 						KalturaLog::info('$captionSFTPPath:' . $captionSFTPPath);
-						$fileManager->putFile($captionSFTPPath, $captionFilePath->value);
+						$fileManager->putFile($captionSFTPPath, $captionFilePath->localFilePath);
 					}
 				}
 				$fileManager->filePutContents($xmlSFTPPath, $xml);
 				break;
+				
 			case KalturaDistributionProtocol::ASPERA:
 				$xmlTempPath = $this->getFileLocation($distributionProfile->id, $xml, $providerData->fileBaseName.'.xml');
 				$host = $distributionProfile->asperaHost;
@@ -98,36 +117,48 @@ class HuluDistributionEngine extends DistributionEngine implements
 				$passphrase = $distributionProfile->passphrase;
 				$port = $distributionProfile->port;
 				$privateKeyTempPath = null;
-				if (trim($privateKey)){
+				if (trim($privateKey))
+				{
 					$privateKeyTempPath = $this->getFileLocation($distributionProfile->id, $privateKey, 'privatekey');
 				}
-				if ($videoFilePath && file_exists($videoFilePath))
+				if ($videoFilePath && kFile::checkFileExists($videoFilePath))
+				{
 					$this->uploadFileWithAspera($host, $username, $videoFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteVideoFileName);
-				else{
+				}
+				else
+				{
 					throw new kFileTransferMgrException("video file [$videoFilePath] not exists", kFileTransferMgrException::localFileNotExists);
 				}
-				if($thumbAssetFilePath && file_exists($thumbAssetFilePath))
+				if($thumbAssetFilePath && kFile::checkFileExists($thumbAssetFilePath))
+				{
 					$this->uploadFileWithAspera($host, $username, $thumbAssetFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteThumbFileName );
-				foreach ($captionsFilesPaths as $captionFilePath){
-					if(file_exists($captionFilePath->value)){
+				}
+				foreach ($captionsFilesPaths as $captionFilePath)
+				{
+					if(kFile::checkFileExists($captionFilePath->localFilePath))
+					{
 						$remoteCaptionFileName = $providerData->fileBaseName.'.'.pathinfo($captionFilePath->value, PATHINFO_EXTENSION);
-						$this->uploadFileWithAspera($host, $username, $captionFilePath->value, $password, $privateKeyTempPath, $passphrase, $port, $remoteCaptionFileName);
+						$this->uploadFileWithAspera($host, $username, $captionFilePath->localFilePath, $password, $privateKeyTempPath, $passphrase, $port, $remoteCaptionFileName);
 					}
 				}
-				if($xmlTempPath && file_exists($xmlTempPath))
+				if($xmlTempPath && kFile::checkFileExists($xmlTempPath))
+				{
 					$this->uploadFileWithAspera($host, $username, $xmlTempPath, $password, $privateKeyTempPath, $passphrase, $port, $remoteXmlFileName);
+				}
 				break;
 		}
+		
+		$this->deleteTempFiles($isRemoteVideo, $videoFilePath, $isRemoteThumb, $thumbAssetFilePath, $captionsFilesPaths);
 	}
 	
 	private function getFileLocation($distributionProfileId, $content, $fileName) 
 	{
 		$tempDirectory = $this->getTempDirectoryForProfile($distributionProfileId);
 		$fileLocation = $tempDirectory . $fileName;
-		if (!file_exists($fileLocation) || (file_get_contents($fileLocation) !== $content))
+		if (!kFile::checkFileExists($fileLocation) || (kFile::getFileContent($fileLocation) !== $content))
 		{
-			file_put_contents($fileLocation, $content);
-			chmod($fileLocation, 0600);
+			kFile::filePutContents($fileLocation, $content);
+			kFile::chmod($fileLocation, 0600);
 		}
 		
 		return $fileLocation;
@@ -136,8 +167,8 @@ class HuluDistributionEngine extends DistributionEngine implements
 	private function getTempDirectoryForProfile($distributionProfileId)
 	{
 		$tempFilePath = $this->tempDirectory . '/' . self::TEMP_DIRECTORY . '/' . $distributionProfileId . '/';
-		if (!file_exists($tempFilePath))
-			mkdir($tempFilePath, 0777, true);
+		if (!kFile::checkFileExists($tempFilePath))
+			kFile::mkdir($tempFilePath, 0777, true);
 		return $tempFilePath;
 	}
 	
@@ -222,4 +253,24 @@ class HuluDistributionEngine extends DistributionEngine implements
 		return false;
 	}
 
+	private function deleteTempFiles($isRemoteVideo, $videoFilePath, $isRemoteThumb, $thumbAssetFilePath, $captionsFilesPaths)
+	{
+		if($isRemoteVideo)
+		{
+			kFile::unlink($videoFilePath);
+		}
+		
+		if($isRemoteThumb)
+		{
+			kFile::unlink($thumbAssetFilePath);
+		}
+		
+		foreach ($captionsFilesPaths as $captionsFilesPath)
+		{
+			if(isset($captionsFilesPaths->isRemoteCaption) && $captionsFilesPaths->isRemoteCaption)
+			{
+				kFile::unlink($captionFilePath->localFilePath);
+			}
+		}
+	}
 }
