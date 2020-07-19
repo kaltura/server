@@ -20,11 +20,17 @@ class KalturaSipResponse extends KalturaObject{
 	 */
 	public $hostName;
 
+	/**
+	 * @var string
+	 */
+	public $msg;
+
 	private static $mapBetweenObjects = array
 	(
 		'action',
 		'hostName',
-		'sessionId'
+		'sessionId',
+		'msg'
 	);
 
 	/* (non-PHPdoc)

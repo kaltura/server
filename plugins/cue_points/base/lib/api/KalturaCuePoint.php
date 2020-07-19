@@ -85,7 +85,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	/**
 	 * @var string
 	 * @filter eq,in
-	 * @readonly
+	 * @requiresPermission read,insert
 	 */
 	public $userId;
 	
