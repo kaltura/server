@@ -528,7 +528,8 @@ class embedPlaykitJsAction extends sfAction
 			if ($playerVersion == self::LATEST || $playerVersion == self::BETA || $playerVersion == self::CANARY)
 			{
 				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
-				if ($tvPlayerConfig) {
+				if ($tvPlayerConfig)
+				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
 				}
 			}
@@ -537,7 +538,8 @@ class embedPlaykitJsAction extends sfAction
 			{
 				$latestVersionMap = $this->getConfigByVersion("latest")[0];
 				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
-				if ($tvPlayerConfig) {
+				if ($tvPlayerConfig)
+				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
 				}
 			}
