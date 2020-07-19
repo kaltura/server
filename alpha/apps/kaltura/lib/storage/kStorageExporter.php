@@ -73,15 +73,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		// if changed object is file sync
 		if (self::shouldHandleFileSyncObjectChanged($object, $modifiedColumns))
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
-			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() !== self::NULL_STR)
-			{
-				$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
-				if($storageProfiles)
-				{
-					self::exportToPeriodicStorage($object, $storageProfiles);
-				}
-			}
+			self::handleFileSyncStorageExports($object);
 		}
 
 		return true;
@@ -92,10 +84,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if( ($object instanceof thumbAsset || $object instanceof captionAsset) && $object->isLocalReadyStatus())
 			return true;
 
-		if ($object instanceof FileSync
-			&& $object->getStatus() == FileSync::FILE_SYNC_STATUS_READY
-			&& !in_array($object->getDc(), kDataCenterMgr::getDcIds()))
+
+		if( ($object instanceof FileSync) && ($object->getStatus() == FileSync::FILE_SYNC_STATUS_READY) )
+		{
 			return true;
+		}
+
+		return false;
 	}
 
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
@@ -107,27 +102,51 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		if ($object instanceof FileSync)
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
-			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() != 'NULL')
+			self::handleFileSyncStorageExports($object);
+		}
+	}
+
+	static protected function shouldExportToPeriodicStorage(FileSync $object)
+	{
+		$exportToPeriodicStorage = false;
+		$dataCenters = kDataCenterMgr::getDcIds();
+
+		KalturaLog::info("FileSync ID [{$object->getId()}] DC [{$object->getDc()}]");
+
+		if(in_array($object->getDc(), $dataCenters))
+		{
+			$currentDcId = kDataCenterMgr::getCurrentDcId();
+			$sufficientDc = kConf::get('sufficient_local_dc_for_export', 'cloud_storage', $currentDcId);
+
+			if( $sufficientDc ==  $currentDcId)
 			{
-				$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
-				if($storageProfiles)
+				$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+				if(!$externalStorageProfiles)
 				{
-					self::exportToPeriodicStorage($object, $storageProfiles);
+					$exportToPeriodicStorage = true;
 				}
 			}
 		}
-		return true;
+		else
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
+			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() != 'NULL')
+			{
+				$exportToPeriodicStorage = true;
+			}
+		}
+
+		KalturaLog::info("Should export to periodic storage is [$exportToPeriodicStorage]");
+		return $exportToPeriodicStorage;
 	}
-
-
 	/**
 	 * @param flavorAsset $flavor
 	 * @param StorageProfile $externalStorage
+	 * @param boolean $skipFlavorAssetStatusValidation
 	 */
-	static public function exportFlavorAsset(asset $flavor, StorageProfile $externalStorage)
+	static public function exportFlavorAsset(asset $flavor, StorageProfile $externalStorage, $skipFlavorAssetStatusValidation = false)
 	{
-	    if (!$externalStorage->shouldExportFlavorAsset($flavor)) {
+	    if (!$externalStorage->shouldExportFlavorAsset($flavor, $skipFlavorAssetStatusValidation)) {
 		    return;
 		}
 			
@@ -583,15 +602,29 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	public static function handleAssetStorageExports($object)
 	{
 		$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-		if(!$externalStorageProfiles)
-		{
-			$externalStorageProfiles = self::getPeriodicStorageProfiles($object->getPartnerId());
-		}
 		foreach($externalStorageProfiles as $externalStorage)
 		{
 			if ($externalStorage->triggerFitsReadyAsset($object->getEntryId()))
 			{
 				self::exportFlavorAsset($object, $externalStorage);
+			}
+		}
+	}
+
+	protected static function handleFileSyncStorageExports($object)
+	{
+		if(self::shouldExportToPeriodicStorage($object))
+		{
+			$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
+			$asset = assetPeer::retrieveById($object->getObjectId());
+			if($asset)
+			{
+				foreach($storageProfiles as $storageProfile)
+				{
+					$exported = kStorageExporter::exportFlavorAsset($asset, $storageProfile, true);
+					KalturaLog::debug("assetId [{$asset->getId()}] exported is [$exported]");
+				}
+
 			}
 		}
 	}
@@ -612,12 +645,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	protected static function shouldHandleFileSyncObjectChanged($object, $modifiedColumns)
 	{
 		if(!($object instanceof FileSync))
-		{
-			return false;
-		}
-
-		// handle only file syncs from remote dc's (external storage)
-		if(in_array($object->getDc(), kDataCenterMgr::getDcIds()))
 		{
 			return false;
 		}
