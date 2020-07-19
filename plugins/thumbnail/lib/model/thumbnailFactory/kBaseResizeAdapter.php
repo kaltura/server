@@ -16,7 +16,7 @@ class kBaseResizeAdapter
 	const CACHED_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 	const THUMB_PROCESSING_LOCK_DURATION = 300; //5 minutes
 	const LOCK_KEY_PREFIX = 'thumb-processing-resize';
-	const THUMBNAIL_CLOUD_PATH = 'thumbnail_cloud_path';
+	const DEFAULT_THUMB_SEC = 3;
 
 	/**
 	 * @var kThumbAdapterParameters
@@ -151,7 +151,7 @@ class kBaseResizeAdapter
 			}
 		}
 
-		return array(false);
+		return array(false, null);
 	}
 
 	/**
@@ -196,16 +196,9 @@ class kBaseResizeAdapter
 
 		try
 		{
-			$flavorAssetId = null;
-			$entry = $this->getEntry();
-			if ($entry->getType() == entryType::PLAYLIST)
-			{
-				myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
-			}
-
+			$this->preTransformationExtraActions();
 			$adapter = new kImageTransformationAdapter();
 			$imageTransformation = $adapter->getImageTransformation($this->parameters);
-
 			$imagick = $imageTransformation->execute();
 			kFile::filePutContents($this->finalThumbPath, $imagick);
 		}
@@ -225,6 +218,53 @@ class kBaseResizeAdapter
 		}
 
 		return $this->finalThumbPath;
+	}
+
+	protected function initOrigImagePath()
+	{
+		$entry = $this->getEntry();
+		/* @var  $fileSync FileSync*/
+		$fileSync = $this->parameters->get(kThumbFactoryFieldName::FILE_SYNC);
+		if ($fileSync)
+		{
+			$orig_image_path = $fileSync->getFullPath();
+		}
+		else
+		{
+			$orig_image_path = $this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH);
+		}
+
+		if (empty($orig_image_path) || !kFile::checkFileExists($orig_image_path))
+		{
+			$fileSync = myEntryUtils::getEntryLocalImageFileSync($entry, $this->parameters->get(kThumbFactoryFieldName::VERSION));
+			$orig_image_path = myEntryUtils::getLocalImageFilePathByEntry($entry, $this->parameters->get(kThumbFactoryFieldName::VERSION));
+			$this->parameters->set(kThumbFactoryFieldName::ORIG_IMAGE_PATH, $orig_image_path);
+			$this->parameters->set(kThumbFactoryFieldName::FILE_SYNC, $fileSync);
+		}
+		else
+		{
+			$this->parameters->set(kThumbFactoryFieldName::ORIG_IMAGE_PATH, $orig_image_path);
+		}
+
+	}
+
+	protected function preTransformationExtraActions()
+	{
+		$this->initOrigImagePath();
+		$entry = $this->getEntry();
+		if(!kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) !== kThumbAdapterParameters::UNSET_PARAMETER &&
+			$this->parameters->get(kThumbFactoryFieldName::VID_SLICES) !== kThumbAdapterParameters::UNSET_PARAMETER)
+		{
+			if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
+			{
+				$calc_vid_sec = ($entry->getPartner() && $entry->getPartner()->getDefThumbOffset()) ? $entry->getPartner()->getDefThumbOffset() : self::DEFAULT_THUMB_SEC;
+				$this->parameters->set(kThumbFactoryFieldName::VID_SEC, $calc_vid_sec);
+			}
+			else
+			{
+				$this->parameters->set(kThumbFactoryFieldName::VID_SEC, $entry->getBestThumbOffset());
+			}
+		}
 	}
 
 	protected function returnCachedVersion($filePath)

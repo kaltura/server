@@ -4,7 +4,7 @@
  * @subpackage model
  */
 
-class kResizeStitchedPlaylistAdapter extends kBaseResizeAdapter
+class kResizeStitchedPlaylistAdapter extends kResizePlaylistAdapter
 {
 	protected function getEntryLengthInMS()
 	{
