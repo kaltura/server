@@ -186,7 +186,7 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
-		if (!file_exists($videoFilePath))
+		if (!kFile::checkFileExists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 
 		$sftpManager = $this->getSFTPManager($distributionProfile);
@@ -199,7 +199,7 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 		$sftpManager->putFile($videoSFTPPath, $videoFilePath);
 
 		// upload the thumbnail if exists
-		if (file_exists($thumbnailFilePath))
+		if (kFile::checkFileExists($thumbnailFilePath))
 		{
 			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
@@ -240,7 +240,7 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 		$data->results = 'none'; // otherwise kContentDistributionFlowManager won't save sentData
 
 		// upload the thumbnail if exists
-		if (file_exists($thumbnailFilePath))
+		if (kFile::checkFileExists($thumbnailFilePath))
 		{
 			$thumbnailSFTPPath = $providerData->sftpDirectory.'/'.pathinfo($thumbnailFilePath, PATHINFO_BASENAME);
 			$sftpManager->putFile($thumbnailSFTPPath, $thumbnailFilePath);
@@ -310,13 +310,13 @@ class YouTubeDistributionRightsFeedEngine extends PublicPrivateKeysDistributionE
 					$captionFilePath = $this->getFilePath($asset, $entryId);
 					$captionSFTPPath = $providerData->sftpDirectory . '/' . pathinfo($captionFilePath, PATHINFO_BASENAME);
 					$sftpManager->putFile($captionSFTPPath, $filePath);
-					unlink($filePath);
+					kfile::unlink($filePath);
 				}
 				catch(Exception $e)
 				{
 					KalturaLog::info("Can't serve caption asset id [$asset->id] " . $e->getMessage());
-					if ($filePath && file_exists($filePath))
-						unlink($filePath);
+					if ($filePath && kFile::checkFileExists($filePath))
+						kfile::unlink($filePath);
 				}
 			}
 		}

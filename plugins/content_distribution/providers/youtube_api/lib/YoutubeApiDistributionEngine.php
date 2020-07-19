@@ -52,8 +52,8 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 		if(KBatchBase::$taskConfig->params->tempXmlPath)
 		{
 			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
-			if(!is_dir($this->tempXmlPath))
-				mkdir($this->tempXmlPath, 0777, true);
+			if(!kFile::isDir($this->tempXmlPath))
+				kFile::mkdir($this->tempXmlPath, 0777, true);
 		}
 		else
 		{
@@ -277,7 +277,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 
 			if ($needDel == true)
 			{
-				unlink($videoPath);
+				kFile::unlink($videoPath);
 			}
 		}
 
@@ -497,7 +497,7 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	protected function submitCaption(Google_Service_YouTube $youtube, KalturaYouTubeApiCaptionDistributionInfo $captionInfo, $remoteId)
 	{
 		$tempPath = $this->getAssetFile($captionInfo->assetId, $this->tempDirectory);
-		if (!file_exists($tempPath))
+		if (!kFile::checkFileExists($tempPath))
 			throw new KalturaDistributionException("The caption file [$tempPath] was not found (probably not synced yet), the job will retry");
 
 		$captionSnippet = new Google_Service_YouTube_CaptionSnippet();
@@ -525,14 +525,14 @@ class YoutubeApiDistributionEngine extends DistributionEngine implements
 	{
 		try
 		{
-			$media->setFileSize(filesize($tempPath));
+			$media->setFileSize(kFile::fileSize($tempPath));
 			$ingestedCaption = self::uploadInChunks($media, $tempPath, self::DEFAULT_CHUNK_SIZE_BYTE);
-			unlink($tempPath);
+			kFile::unlink($tempPath);
 		}
 		catch (Exception $e)
 		{
 			if($tempPath)
-				unlink($tempPath);
+				kFile::unlink($tempPath);
 
 			throw $e;
 		}

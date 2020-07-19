@@ -81,9 +81,7 @@ class kDataCenterMgr
 	
 	public static function getSharedStorageProfileIds()
 	{
-		$dc_config = kConf::getMap("dc_config");
-		$sharedStorageProfileIdsStr = isset($dc_config['sharedStorageProfileIds']) ? $dc_config['sharedStorageProfileIds'] : null;
-		
+		$sharedStorageProfileIdsStr = kConf::get('sharedStorageProfileIds', 'cloud_storage', null);
 		$sharedStorageProfileIds = array();
 		if($sharedStorageProfileIdsStr)
 		{

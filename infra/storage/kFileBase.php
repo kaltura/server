@@ -558,8 +558,7 @@ class kFileBase
 		if(self::$storageTypeMap)
 			return self::$storageTypeMap;
 		
-		$dc_config = kConf::getMap("dc_config");
-		self::$storageTypeMap = isset($dc_config['storage_type_map']) ? $dc_config['storage_type_map'] : array();
+		self::$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
 		return self::$storageTypeMap;
 	}
 	
@@ -648,16 +647,18 @@ class kFileBase
 			if ($res)
 			{
 				$res = $tmpFilePath;
-				KalturaLog::info("Succeeded to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				KalturaLog::debug("Succeeded to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 			else
 			{
-				KalturaLog::info("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				KalturaLog::err("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				throw new KalturaException("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::info("Can't serve fetch from [$externalUrl] " . $e->getMessage());
+			KalturaLog::err("Failed to fetch from [$externalUrl] " . $e->getMessage());
+			throw $e;
 		}
 		
 		return $res;

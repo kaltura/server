@@ -19,7 +19,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
-		if (!file_exists($videoFilePath))
+		if (!kFile::checkFileExists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 
 		$csvMap = unserialize($providerData->submitCsvMap);
