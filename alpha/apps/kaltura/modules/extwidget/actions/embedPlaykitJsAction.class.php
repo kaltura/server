@@ -519,18 +519,22 @@ class embedPlaykitJsAction extends sfAction
 
 	private function maybeAddAnalyticsPlugins($confVarsArr)
 	{
-		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : "";
-		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : "";
-		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig)) {
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
+		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
+		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig))
+		{
 			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
 			// For player latest/beta/canary
-			if ($playerVersion == self::LATEST || $playerVersion == self::BETA || $playerVersion == self::CANARY) {
+			if ($playerVersion == self::LATEST || $playerVersion == self::BETA || $playerVersion == self::CANARY)
+			{
 				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
 				if ($tvPlayerConfig) {
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
 				}
+			}
 			// For specific version >= 0.56.0
-			} else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) {
+			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
+			{
 				$latestVersionMap = $this->getConfigByVersion("latest")[0];
 				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
 				if ($tvPlayerConfig) {
@@ -539,9 +543,12 @@ class embedPlaykitJsAction extends sfAction
 			}
 
 			// Save to the uiconf
-			if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
+			if (isset($confVarsArr[self::VERSIONS_PARAM_NAME]))
+			{
 				$confVarsArr[self::VERSIONS_PARAM_NAME] = $this->bundleConfig;
-			} else {
+			}
+		 	else
+		 	{
 				$confVarsArr = $this->bundleConfig;
 			}
 			$this->uiConf->setConfVars(json_encode($confVarsArr));
