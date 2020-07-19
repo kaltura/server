@@ -321,7 +321,9 @@ class kBusinessPostConvertDL
     			{
     				if($srcFlavor->getType() == assetType::FLAVOR)
     				{
-    					kStorageExporter::handleAssetStorageExports($srcFlavor);
+    					KalturaLog::info('Export source asset to periodic storage');
+    					$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+    					kStorageExporter::exportToPeriodicStorage($srcFlavor, $periodicStorageProfiles);
     					break;
     				}
     			}

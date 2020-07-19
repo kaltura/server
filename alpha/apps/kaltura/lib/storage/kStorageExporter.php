@@ -595,13 +595,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return kStorageExporter::getPeriodicStorageProfiles($object->getPartnerId());
 	}
 
-	protected static function exportToPeriodicStorage($object, $periodicStorageProfiles)
+	public static function exportToPeriodicStorage($asset, $periodicStorageProfiles)
 	{
-		$asset = assetPeer::retrieveById($object->getObjectId());
-		if($asset)
+		foreach($periodicStorageProfiles as $periodicStorageProfile)
 		{
-			$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
-			kFlowHelper::addPeriodicStorageExports($asset->getEntryId(), $partner, $periodicStorageProfiles);
+			$exported = kStorageExporter::exportFlavorAsset($asset, $periodicStorageProfile, true);
+			KalturaLog::debug("assetId [{$asset->getId()}] exported is [$exported]");
 		}
 	}
 
@@ -617,21 +616,22 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		}
 	}
 
+	protected static function isSourceFlavorAsset($asset)
+	{
+		if( ($asset->getType() == assetType::FLAVOR) && ($asset->getFlavorParamsId() == flavorParams::SOURCE_FLAVOR_ID) )
+		{
+			return true;
+		}
+		return false;
+	}
+
 	protected static function handleFileSyncStorageExports($object)
 	{
-		if(self::shouldExportToPeriodicStorage($object))
+		$asset = assetPeer::retrieveById($object->getObjectId());
+		if( ($asset) && (!self::isSourceFlavorAsset($asset)) && (self::shouldExportToPeriodicStorage($object)) )
 		{
 			$storageProfiles = self::getPeriodicStorageProfilesForExport($object);
-			$asset = assetPeer::retrieveById($object->getObjectId());
-			if($asset)
-			{
-				foreach($storageProfiles as $storageProfile)
-				{
-					$exported = kStorageExporter::exportFlavorAsset($asset, $storageProfile, true);
-					KalturaLog::debug("assetId [{$asset->getId()}] exported is [$exported]");
-				}
-
-			}
+			self::exportToPeriodicStorage($asset, $storageProfiles);
 		}
 	}
 
