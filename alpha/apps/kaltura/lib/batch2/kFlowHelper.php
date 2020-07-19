@@ -3279,7 +3279,7 @@ class kFlowHelper
 
 		// if all exports that are not periodic finished add pending file sync to each flavor
 		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId);
-		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner, $assetsIds);
+		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner->getId(), $assetsIds);
 		if(!$nonPeriodicFinished)
 		{
 			return;
@@ -3293,16 +3293,16 @@ class kFlowHelper
 		}
 	}
 
-	protected static function checkNonPeriodicExportsFinished($partner, $assetsIds)
+	public static function checkNonPeriodicExportsFinished($partnerId, $assetsIds)
 	{
-		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partner->getId());
+		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partnerId);
 		$status = array(FileSync::FILE_SYNC_STATUS_PENDING, FileSync::FILE_SYNC_STATUS_ERROR);
 		$types = array(FileSyncObjectType::ASSET);
 		$subTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$allFinished = true;
 		foreach($storageProfiles as $profile)
 		{
-			$fileSyncs = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partner->getId(), $status, $assetsIds, $types, $subTypes);
+			$fileSyncs = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partnerId, $status, $assetsIds, $types, $subTypes);
 			if(count($fileSyncs))
 			{
 				KalturaLog::debug("found unfinished file syncs for profile [{$profile->getId()}]");

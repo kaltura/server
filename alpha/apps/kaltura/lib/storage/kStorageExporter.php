@@ -130,7 +130,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		else
 		{
 			$storageProfile = StorageProfilePeer::retrieveByPK($object->getDc());
-			if($storageProfile && !$storageProfile->getExportPeriodically() && $object->getLinkedId() != 'NULL')
+			if($storageProfile && !$storageProfile->getExportPeriodically() && ($object->getLinkedId() != 'NULL')
+				&& kFlowHelper::checkNonPeriodicExportsFinished($object->getPartnerId(), array($object->getObjectId())) )
 			{
 				$exportToPeriodicStorage = true;
 			}
