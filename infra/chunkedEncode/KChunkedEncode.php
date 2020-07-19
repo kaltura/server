@@ -347,7 +347,7 @@
 				$cmdLineArr[$key]='-an';
 			}
 
-			$toRemove = array("-ac","-ar", "-b:a","-ab","-async","-filter_complex","-flags","-f");
+			$toRemove = array("-ac","-ar", "-b:a","-ab","-async","-filter_complex","-flags","-f","-bsf:v");
 			foreach($cmdLineArr as $idx=>$opt){
 				if(in_array($opt, array("-rc_eq"))){
 					if($cmdLineArr[$idx+1][0]!="'")
@@ -734,9 +734,13 @@
 				$ffmpegVerStr = self::getFFMpegVersion($setup->ffmpegBin);
 				/*
 				 * This fix is required for uDRM support. 
-				 * FFmpeg 3.2 got Kaltura patch. FFMpeg 4 comes with native solution that includes H265 as well. 
+				 * FFmpeg 3.2 got Kaltura patch. FFMpeg 4 comes with native solution that includes H265 as well.
+				 * Manually set 'bsf' will override the auto stiing. Needed for CAE caps passthrough support
 				 */
-				if($params->vcodec=="libx264")
+				if(isset($params->bsf)) {
+					$mergeCmd.= " -bsf:v $params->bsf";
+				}
+				else if($params->vcodec=="libx264")
 					$mergeCmd.= ((int)$ffmpegVerStr<4)?" -nal_types_mask 0x3e":" -bsf:v filter_units=pass_types=1-5";
 				else if($params->vcodec=="libx265")
 					$mergeCmd.= ((int)$ffmpegVerStr<4)?" -nal_types_mask 0xffffffff":" -bsf:v filter_units=pass_types=0-31";
@@ -1445,6 +1449,9 @@
 				case "-force_key_frames":
 					$val = ltrim($val,'-');
 					$this->$val = $cmdLineArr[$idx+1];
+					break;
+				case "-bsf:v":
+					$this->bsf = $cmdLineArr[$idx+1];
 					break;
 				}
 			}

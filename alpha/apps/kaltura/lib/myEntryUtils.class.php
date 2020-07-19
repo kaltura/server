@@ -855,10 +855,14 @@ class myEntryUtils
 			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
 			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
-			// need to create a thumb if either:
-			// 1. entry is a video and a specific second was requested OR a slices were requested
-			// 3. the actual thumbnail doesnt exist on disk
-			if( ( ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getType() == entryType::PLAYLIST) && ($vid_sec != -1 || $vid_slices != -1) ) || !file_exists($orig_image_path))
+			if (
+				// need to create a thumb if either:
+				// 1. entry is a video and a specific second was requested OR a slices were requested
+				// 3. the actual thumbnail doesnt exist on disk
+				(($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_VIDEO || $entry->getType() == entryType::PLAYLIST) && ($vid_sec != -1 || $vid_slices != -1))
+				||
+				(!file_exists($orig_image_path))
+				)
 			{
 				if ($vid_sec != -1) // a specific second was requested
 				{
@@ -2175,6 +2179,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		catch (Exception $e)
 		{
 			kalturaLog::warning('Could not execute image transformation');
+			if(kConf::get('throw_on_failure', 'thumbnail', false))
+			{
+				throw $e;
+			}
+			else
+			{
+				kalturaLog::warning("transformations failed with error {$e->getMessage()}");
+			}
 		}
 
 		return $result;

@@ -138,13 +138,32 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 					if(!empty($patterns))
 						$data = preg_replace($patterns, $replacements, $data);
 				}
+
 				if (!$httpNotificationTemplate->getUrlEncode())
 					return $data;
-				
+
 				$data = urlencode($data);
 				break;
 		}
 		
 		return "data=$data";
+	}
+
+	public function getContentType()
+	{
+		$contentType = null;
+
+		switch ($this->format)
+		{
+			case KalturaResponseType::RESPONSE_TYPE_JSON:
+				$contentType = 'application/json';
+				break;
+
+			case KalturaResponseType::RESPONSE_TYPE_XML:
+				$contentType = 'application/xml';
+				break;
+		}
+
+		return $contentType;
 	}
 }

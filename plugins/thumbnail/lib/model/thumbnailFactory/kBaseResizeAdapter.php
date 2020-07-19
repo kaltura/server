@@ -16,6 +16,7 @@ class kBaseResizeAdapter
 	const CACHED_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 	const THUMB_PROCESSING_LOCK_DURATION = 300; //5 minutes
 	const LOCK_KEY_PREFIX = 'thumb-processing-resize';
+	const DEFAULT_THUMB_SEC = 3;
 
 	/**
 	 * @var kThumbAdapterParameters
@@ -232,7 +233,7 @@ class kBaseResizeAdapter
 			$orig_image_path = $this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH);
 		}
 
-		if ($orig_image_path === null || !kFile::checkFileExists($orig_image_path))
+		if (empty($orig_image_path) || !kFile::checkFileExists($orig_image_path))
 		{
 			$fileSync = myEntryUtils::getEntryLocalImageFileSync($entry, $this->parameters->get(kThumbFactoryFieldName::VERSION));
 			$orig_image_path = myEntryUtils::getLocalImageFilePathByEntry($entry, $this->parameters->get(kThumbFactoryFieldName::VERSION));

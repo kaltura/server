@@ -291,7 +291,7 @@ function getPendingJobsCount($jobType, $jobSubType, $maxJobsPerPartner)
 	return $countByDcPartner;
 }
 
-function autoMoveJobs($jobType, $jobSubType)
+function autoMoveJobs($jobType, $jobSubType, $excludePartnerIds)
 {
 	/*
 	 * Automatic balancing logic
@@ -370,6 +370,11 @@ function autoMoveJobs($jobType, $jobSubType)
 	$movedJobsCount = 0;
 	foreach ($countByDcPartner[$sourceDc] as $partnerId => $srcCount)
 	{
+		if (in_array($partnerId, $excludePartnerIds))
+		{
+			continue;
+		}
+
 		$targetCount = isset($countByDcPartner[$targetDc][$partnerId]) ?
 			$countByDcPartner[$targetDc][$partnerId] : 0;
 		
@@ -406,7 +411,7 @@ if ($argc < 3 ||
 {
 	echo "Usage:\n";
 	echo "\t" . basename(__FILE__) . " manual <max number of jobs to move> <source dc> <target dc> [<job sub type> [<partner id>]]\n";
-	echo "\t" . basename(__FILE__) . " auto <job sub type>\n";
+	echo "\t" . basename(__FILE__) . " auto <job sub type> [<exclude partner ids>]\n";
 	die;
 }
 
@@ -450,9 +455,11 @@ if ($argv[1] == 'manual')
 else
 {
 	$jobSubTypes = $argv[2];
+	$excludePartnerIds = $argc > 3 ? explode(',', $argv[3]) : array();
+
 	foreach (explode(',', $jobSubTypes) as $jobSubType)
 	{
-		$movedJobsCount = autoMoveJobs($jobType, $jobSubType);
+		$movedJobsCount = autoMoveJobs($jobType, $jobSubType, $excludePartnerIds);
 		KalturaLog::log("Moved jobs, subtype=$jobSubType count={$movedJobsCount}");
 	}
 }

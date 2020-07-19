@@ -194,6 +194,8 @@ class KalturaErrors extends APIErrors
 
 	const PEXIP_MAP_NOT_CONFIGURED = "PEXIP_MAP_NOT_CONFIGURED;;Need to add pexip map support to configuration";
 
+	const INVALID_SIP_SOURCE_TYPE = "INVALID_SIP_SOURCE_TYPE;;Invalid Sip source type";
+
 	const PEXIP_ROOM_CREATION_FAILED = "PEXIP_ROOM_CREATION_FAILED;ENTRY;Can't create virtual room for entry \"@ENTRY@\" ";
 
 	const PEXIP_ADP_CREATION_FAILED = "PEXIP_ADP_CREATION_FAILED;ENTRY;Can't create virtual ADP for entry \"@ENTRY@\" ";

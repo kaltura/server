@@ -16,7 +16,14 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 	 * @var KalturaHttpNotificationMethod
 	 */
 	public $method;
-	
+
+	/**
+	 * The type of the data to send.
+	 *
+	 * @var string
+	 */
+	public $contentType;
+
 	/**
 	 * Data to send.
 	 * 
@@ -194,7 +201,11 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		{
 			$dataObject = KalturaHttpNotificationData::getInstance($srcObj->getDataObject());
 			if($dataObject)
+			{
+				//Temporary disable setting content type.
+				//$this->contentType = $dataObject->getContentType();
 				$this->data = $dataObject->getData($srcObj);
+			}
 		}
 	}
 }

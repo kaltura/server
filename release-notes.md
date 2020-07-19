@@ -1,4 +1,26 @@
+# Propus 16.7.0  #
+## Adding permission to serve and getServeUrl in entryVendorTask ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permissions_entry_vendor_task.php
+
 # Propus 16.6.0  #
+## Adding permissions to base-playback-role ##
+Issue Type: Task
+Issue ID: PLAT-11034
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_07_08_base_playback_role_add_metadata_cuepoint_permission.php
+
+## Export Reach Requests in admin console to csv ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_12_add_permission_entry_vendor_task.php
+
 ## Adding permission to mediaServer partner for livereports ##
 Issue Type: Task
 Issue ID : LIV-156

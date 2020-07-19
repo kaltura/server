@@ -1570,7 +1570,6 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$date = self::dateIdToDateTime($from_day);
 		$end_month = substr($to_day, 0, 6);
-		$interval = new DateInterval('P1M');
 
 		$result = array();
 		for (;;)
@@ -1582,7 +1581,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 
 			$result[] = $cur;
-			$date->add($interval);
+			$date->modify('first day of next month');
 		}
 
 		return $result;
@@ -3681,7 +3680,14 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			$c->addSelectColumn("kuser.$column");
+			if (strpos($column, '(') !== false)
+			{
+				$c->addSelectColumn($column);
+			}
+			else
+			{
+				$c->addSelectColumn("kuser.$column");
+			}
 		}
 
 		if (!$skip_partner_filter && $partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)

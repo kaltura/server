@@ -55,8 +55,8 @@ class kBorderImageAction extends kImagickAction
 
 	protected function extractActionParameters()
 	{
-		$this->height = $this->getFloatActionParameter(kThumbnailParameterName::HEIGHT);
-		$this->width = $this->getFloatActionParameter(kThumbnailParameterName::WIDTH);
+		$this->height = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+		$this->width = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
 		$this->backgroundColor = $this->getColorActionParameter(kThumbnailParameterName::BACKGROUND_COLOR);
 	}
 }

@@ -30,13 +30,14 @@ class kKavaVpaasReports extends kKavaReports
 			self::REPORT_BASE_DEF => ReportType::USER_TOP_CONTENT,
 			self::REPORT_DIMENSION_MAP => array(
 				'name' => self::DIMENSION_KUSER_ID,
+				'full_name' => self::DIMENSION_KUSER_ID,
 				'partner_id' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('name', 'partner_id'),
+				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name', 'partner_id'),
 				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::getUsersInfoVpaas',
 				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID', 'PARTNER_ID'),
+					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))', 'PARTNER_ID'),
 				)
 			),
 		),
