@@ -115,7 +115,7 @@ abstract class kCompareCondition extends kCondition
 		$field = $this->getFieldValue($scope);
 		$value = $this->getIntegerValue($scope);
 		
-		KalturaLog::debug("Copares field [$field] to value [$value]");
+		KalturaLog::debug('Compares field [ ' . print_r($field, true) . " ] to value [$value]");
 		if (is_null($value))
 		{
 			KalturaLog::debug("Value is null, condition is true");

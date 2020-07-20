@@ -1,3 +1,22 @@
+# Propus 16.7.0  #
+## Add more user details name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1925
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2020_07_16_updateQandAResponseProfile_addMoreUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2020_07_16_updateQandAResponseProfile_addMoreUserData.php
+
+## Adding permission to serve and getServeUrl in entryVendorTask ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permissions_entry_vendor_task.php
+
 # Propus 16.6.0  #
 ## Adding permissions to base-playback-role ##
 Issue Type: Task
