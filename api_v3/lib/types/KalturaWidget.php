@@ -109,6 +109,11 @@ class KalturaWidget extends KalturaObject implements IFilterable
 	 */
 	public $roles;
 
+	/**
+	 * @var string
+	 */
+	public $privileges;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -126,7 +131,8 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		"enforceEntitlement",
 		"privacyContext",
 		"addEmbedHtml5Support",
-		"roles"
+		"roles",
+		"privileges"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -146,6 +152,22 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		$widget = new widget();
 		$skip_props = array ( "widgetHTML" );
 		return parent::toUpdatableObject( $widget , $skip_props );
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if($this->privileges && !kCurrentContext::$is_admin_session)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_OR_UPDATE_PRIVILEGES_FIELD);
+		}
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if($this->privileges && !kCurrentContext::$is_admin_session)
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_OR_UPDATE_PRIVILEGES_FIELD);
+		}
 	}
 
 	public function getExtraFilters()

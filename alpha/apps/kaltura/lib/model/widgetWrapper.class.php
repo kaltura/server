@@ -16,7 +16,7 @@ class widgetWrapper extends objectWrapperBase
 
 	protected $objs_cache = array ( "kshow" => "kshow,kshowId" , "entry" => "entry,entryId" ,  "uiConf" => "uiConf,uiConfId" );
 
-	protected $updateable_fields = array ( "kshowId" , "entryId" , "sourceWidgetId" , "uiConfId" , "customData" , "partnerData" , "securityType");
+	protected $updateable_fields = array ( "kshowId" , "entryId" , "sourceWidgetId" , "uiConfId" , "customData" , "partnerData" , "securityType", "privileges");
 	
 	public function describe() 
 	{
