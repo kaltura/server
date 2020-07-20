@@ -111,6 +111,7 @@ class KalturaWidget extends KalturaObject implements IFilterable
 
 	/**
 	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $privileges;
 
@@ -152,22 +153,6 @@ class KalturaWidget extends KalturaObject implements IFilterable
 		$widget = new widget();
 		$skip_props = array ( "widgetHTML" );
 		return parent::toUpdatableObject( $widget , $skip_props );
-	}
-
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		if($this->privileges && !kCurrentContext::$is_admin_session)
-		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_OR_UPDATE_PRIVILEGES_FIELD);
-		}
-	}
-
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		if($this->privileges && !kCurrentContext::$is_admin_session)
-		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_OR_UPDATE_PRIVILEGES_FIELD);
-		}
 	}
 
 	public function getExtraFilters()

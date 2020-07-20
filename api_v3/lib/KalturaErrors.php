@@ -216,8 +216,6 @@ class KalturaErrors extends APIErrors
 
 	const CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE = "CANNOT_DISABLE_ENTITLEMENT_FOR_WIDGET_WHEN_ENTITLEMENT_ENFORCEMENT_ENABLE;;Cannot create widget with no entitlement enforcement when current session is with entitlement enabled";
 
-	const CANNOT_ADD_OR_UPDATE_PRIVILEGES_FIELD = "CANNOT_ADD_OR_UPDATE_PRIVILEGES_FIELD;;Cannot add or update privileges field";
-
 	/**
 	 * UiConf Service
 	 */
