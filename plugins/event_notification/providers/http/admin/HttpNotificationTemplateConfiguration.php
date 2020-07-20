@@ -37,6 +37,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					$object->data->content = $stringField;
 					break;
 			}
+			$object->data->contentType = $properties['contentType'];
 		}
 		
 		return $object;
@@ -71,6 +72,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			$this->getElement('objectFormat')->setValue($object->data->format);
 			$this->getElement('object')->setValue($object->data->code);
 		}
+		$this->getElement('contentType')->setValue($object->data->contentType);
 	}
 	
 	/* (non-PHPdoc)
@@ -123,7 +125,17 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				Kaltura_Client_Enum_ResponseType::RESPONSE_TYPE_PHP => 'PHP',
 			),
 		));
-			
+
+		$this->addElement('select', 'contentType', array(
+			'label'			=> 'Content type:',
+			'multiOptions' 	=> array(
+				null => "Default Content Type",
+				Kaltura_Client_Enum_ResponseType::RESPONSE_TYPE_JSON => 'JSON',
+				Kaltura_Client_Enum_ResponseType::RESPONSE_TYPE_XML => 'XML',
+			),
+		));
+
+
 		$this->addDisplayGroup(array('object', 'objectType', 'objectFormat'), 
 			'frmObject', 
 			array(

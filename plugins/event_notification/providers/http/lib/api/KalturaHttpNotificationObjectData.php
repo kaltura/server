@@ -152,8 +152,8 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	public function getContentType()
 	{
 		$contentType = null;
-
-		switch ($this->format)
+		$value = $this->contentType ? $this->contentType : $this->format;
+		switch ($value)
 		{
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
 				$contentType = 'application/json';

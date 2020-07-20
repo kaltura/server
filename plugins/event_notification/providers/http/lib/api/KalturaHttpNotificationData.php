@@ -6,6 +6,26 @@
  */
 abstract class KalturaHttpNotificationData extends KalturaObject
 {
+	//TODO - ask about the defulat type - should this be int and allow null or enum and have a default value???
+	/**
+	 * Content Type
+	 * @var KalturaResponseType
+	 */
+	public $contentType = KalturaResponseType::RESPONSE_TYPE_XML;
+
+	private static $map_between_objects = array
+	(
+		'contentType',
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
+
 	/**
 	 * @param kHttpNotificationData $coreObject
 	 * @return KalturaHttpNotificationData
@@ -47,7 +67,6 @@ abstract class KalturaHttpNotificationData extends KalturaObject
 
 	public function getContentType()
 	{
-		return null;
+		return $this->contentType;
 	}
-
 }
