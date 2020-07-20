@@ -1120,7 +1120,7 @@ class myEntryUtils
 
 		// limit creation of more than XX ffmpeg image extraction processes
 		if (kConf::hasParam("resize_thumb_max_processes_ffmpeg") &&
-			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_ffmpeg") )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
+			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get(kFfmpegUtils::FFMPEG_PATH_CONF_NAME) )) > kConf::get("resize_thumb_max_processes_ffmpeg"))
 		{
 			if ($cache)
 			{
@@ -1134,7 +1134,7 @@ class myEntryUtils
 		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
 		kFile::closeDbConnections();
 		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
-		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath . 'temp_', $calc_vid_sec, $width, $height, false, $decryptionKey);
+		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath . 'temp_', $calc_vid_sec, $width, $height, $decryptionKey);
 		return true;
 	}
 
@@ -2166,7 +2166,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
 				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
-				$result =$KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+				$result = $KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
 					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);
 
 				if ($result)
