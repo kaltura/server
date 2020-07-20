@@ -111,8 +111,6 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		$exportToPeriodicStorage = false;
 		$dataCenters = kDataCenterMgr::getDcIds();
 
-		KalturaLog::info("FileSync ID [{$object->getId()}] DC [{$object->getDc()}]");
-
 		if(in_array($object->getDc(), $dataCenters))
 		{
 			$currentDcId = kDataCenterMgr::getCurrentDcId();
@@ -137,9 +135,30 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			}
 		}
 
-		KalturaLog::info("Should export to periodic storage is [$exportToPeriodicStorage]");
+		KalturaLog::info("FileSync ID [{$object->getId()}] DC [{$object->getDc()}] Should Export To Periodic [$exportToPeriodicStorage]");
 		return $exportToPeriodicStorage;
 	}
+
+	public static function exportSourceFlavorAsset($entryId)
+	{
+		$srcFlavors = assetPeer::retrieveLocalReadyByEntryIdAndFlavorParams($entryId, array(flavorParams::SOURCE_FLAVOR_ID));
+		foreach($srcFlavors as $srcFlavor)
+		{
+			if($srcFlavor->getType() == assetType::FLAVOR)
+			{
+				KalturaLog::info('Export source asset to private and periodic storages');
+
+				//Private storage
+				self::handleAssetStorageExports($srcFlavor);
+
+				//Periodic storage
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+				self::exportToPeriodicStorage($srcFlavor, $periodicStorageProfiles);
+				break;
+			}
+		}
+	}
+
 	/**
 	 * @param flavorAsset $flavor
 	 * @param StorageProfile $externalStorage

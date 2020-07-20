@@ -3302,10 +3302,15 @@ class kFlowHelper
 		$allFinished = true;
 		foreach($storageProfiles as $profile)
 		{
-			$fileSyncs = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partnerId, $status, $assetsIds, $types, $subTypes);
-			if(count($fileSyncs))
+			$fileSync = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partnerId, $status, $assetsIds, $types, $subTypes);
+			if($fileSync)
 			{
-				KalturaLog::debug("found unfinished file syncs for profile [{$profile->getId()}]");
+				if($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_ERROR)
+				{
+					KalturaLog::warning("Found file sync ID [{$fileSync->getId()}] profile [{$profile->getId()}] with status ERROR");
+				}
+
+				KalturaLog::debug("found unfinished file sync ID [{$fileSync->getId()}] for profile [{$profile->getId()}]");
 				$allFinished = false;
 				break;
 			}
