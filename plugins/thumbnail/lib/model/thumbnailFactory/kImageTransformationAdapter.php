@@ -12,6 +12,7 @@ class kImageTransformationAdapter
 	 * @var kThumbAdapterParameters
 	 */
 	protected $parameters;
+	protected $fileSource = false;
 
 	/**
 	 * @param kThumbAdapterParameters $parameters
@@ -28,7 +29,8 @@ class kImageTransformationAdapter
 		switch($this->parameters->get(kThumbFactoryFieldName::TYPE))
 		{
 			case kExtwidgetThumbnailActionType::RESIZE:
-				$this->handleResize(true, $step);
+			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
+				$this->handleResize(false, $step);
 				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_PADDING:
 				if($this->parameters->get(kThumbFactoryFieldName::WIDTH) && $this->parameters->get(kThumbFactoryFieldName::HEIGHT))
@@ -46,9 +48,6 @@ class kImageTransformationAdapter
 				break;
 			case kExtwidgetThumbnailActionType::CROP_FROM_TOP:
 				$this->handleCrop(Imagick::GRAVITY_NORTH, $step);
-				break;
-			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
-				$this->handleResize(false, $step);
 				break;
 			case kExtwidgetThumbnailActionType::CROP_AFTER_RESIZE:
 				$this->handleCropAfterResize($step);
@@ -313,7 +312,11 @@ class kImageTransformationAdapter
 	 */
 	protected function handleSourceActions($step)
 	{
-		if($this->parameters->get(kThumbFactoryFieldName::VID_SEC) != kThumbAdapterParameters::UNSET_PARAMETER)
+		if($this->fileSource)
+		{
+			return;
+		}
+		else if($this->parameters->get(kThumbFactoryFieldName::VID_SEC) != kThumbAdapterParameters::UNSET_PARAMETER)
 		{
 			$sourceAction = new kVidSecAction();
 			$sourceAction->setActionParameter(kThumbnailParameterName::SECOND, $this->parameters->get(kThumbFactoryFieldName::VID_SEC));
@@ -343,12 +346,22 @@ class kImageTransformationAdapter
 
 	/**
 	 * @param kImageTransformationStep $step
+	 * @throws ImagickException
 	 */
 	protected function createEntrySource($step)
 	{
-		$source = new kEntrySource();
-		$source->setEntry($this->parameters->get(kThumbFactoryFieldName::ENTRY));
-		$step->setSource($source);
+		if(kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)))
+		{
+			$source = new kFileSource($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH));
+			$step->setSource($source);
+			$this->fileSource = true;
+		}
+		else
+		{
+			$source = new kEntrySource();
+			$source->setEntry($this->parameters->get(kThumbFactoryFieldName::ENTRY));
+			$step->setSource($source);
+		}
 	}
 
 	/**
