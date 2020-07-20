@@ -116,7 +116,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if(in_array($object->getDc(), $dataCenters))
 		{
 			$currentDcId = kDataCenterMgr::getCurrentDcId();
-			$sufficientDc = kConf::get('sufficient_local_dc_for_export', 'cloud_storage', $currentDcId);
+			$sufficientDc = kConf::get('source_dc_for_export', 'cloud_storage', $currentDcId);
 
 			if( $sufficientDc ==  $currentDcId)
 			{
@@ -147,8 +147,9 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	 */
 	static public function exportFlavorAsset(asset $flavor, StorageProfile $externalStorage, $skipFlavorAssetStatusValidation = false)
 	{
-	    if (!$externalStorage->shouldExportFlavorAsset($flavor, $skipFlavorAssetStatusValidation)) {
-		    return;
+		if (!$externalStorage->shouldExportFlavorAsset($flavor, $skipFlavorAssetStatusValidation))
+		{
+			return;
 		}
 			
 		$exporting = false;
@@ -160,8 +161,8 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		{
 			if($externalStorage->shoudlExportFileSync($key))
 			{		
-                $exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
-			}			
+				$exporting = self::export($flavor->getentry(), $externalStorage, $key, !$flavor->getIsOriginal());
+			}
 		}
 				
 		return $exporting;
@@ -586,7 +587,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	}
 
 
-	protected static function getPeriodicStorageProfilesForExport($object)
+	protected static function getPeriodicStorageProfilesForExport(FileSync $object)
 	{
 		if($object->getObjectType() != FileSyncObjectType::ASSET || $object->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
 		{
@@ -626,7 +627,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return false;
 	}
 
-	protected static function handleFileSyncStorageExports($object)
+	protected static function handleFileSyncStorageExports(FileSync $object)
 	{
 		$asset = assetPeer::retrieveById($object->getObjectId());
 		if( ($asset) && (!self::isSourceFlavorAsset($asset)) && (self::shouldExportToPeriodicStorage($object)) )
