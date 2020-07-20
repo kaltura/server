@@ -83,7 +83,11 @@ class FileSyncService extends KalturaBaseService
 		// Delete siblings
 		foreach ($lockedFileSyncs as $fileSync)
 		{
-			$fileSync->deleteLocalSiblings();
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($fileSync->getPartnerId());
+			if(count($periodicStorageIds))
+			{
+				$fileSync->deleteLocalSiblings();
+			}
 		}
 
 		// Set last updatedAt
