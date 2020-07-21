@@ -7,7 +7,7 @@
 class kImageTransformationAdapter
 {
 	const COLOR_FORMAT = '%06x';
-	const STRIP_BG_COLOR = 'black';
+	const HEX_PREFIX = '0x';
 	const MILLISECONDS_IN_SECOND = 1000;
 
 	/**
@@ -93,14 +93,6 @@ class kImageTransformationAdapter
 		$concatAction = new kCompositeAction();
 		$concatAction->setActionParameter(kThumbnailParameterName::X, $slideNum * $this->parameters->get(kThumbFactoryFieldName::WIDTH));
 		$step->addAction($concatAction);
-	}
-
-	protected function getStripSource()
-	{
-		$stripWide = $this->parameters->get(kThumbFactoryFieldName::VID_SLICES) * $this->parameters->get(kThumbFactoryFieldName::WIDTH);
-		$image = new Imagick();
-		$image->newImage($stripWide, $this->parameters->get(kThumbFactoryFieldName::HEIGHT), new ImagickPixel(self::STRIP_BG_COLOR));
-		return new kImagickSource($image);
 	}
 
 	protected function handleActionType($step)
@@ -278,7 +270,14 @@ class kImageTransformationAdapter
 
 	protected function prepareInput()
 	{
-		$this->parameters->set(kThumbFactoryFieldName::BG_COLOR, sprintf(self::COLOR_FORMAT, $this->parameters->get(kThumbFactoryFieldName::BG_COLOR)));
+		$bgColor = $this->parameters->get(kThumbFactoryFieldName::BG_COLOR);
+		if(is_string($bgColor) && strpos($bgColor, self::HEX_PREFIX) === false)
+		{
+			$bgColor = hexdec(self::HEX_PREFIX . $bgColor);
+		}
+
+		$bgColor = sprintf(self::COLOR_FORMAT, $bgColor);
+		$this->parameters->set(kThumbFactoryFieldName::BG_COLOR, $bgColor);
 		/* @var $entry entry */
 		$entry = $this->parameters->get(kThumbFactoryFieldName::ENTRY);
 		if (!$this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH))
@@ -288,7 +287,7 @@ class kImageTransformationAdapter
 
 		if (!$this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT))
 		{
-			$this->parameters->set(kThumbFactoryFieldName::SRC_HEIGHT , $entry->getHeight());
+			$this->parameters->set(kThumbFactoryFieldName::SRC_HEIGHT, $entry->getHeight());
 		}
 	}
 
@@ -314,10 +313,10 @@ class kImageTransformationAdapter
 		$borderWidth = 0;
 		$borderHeight = 0;
 
-		if($this->parameters->get(kThumbFactoryFieldName::WIDTH) * $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT) < $this->parameters->get(kThumbFactoryFieldName::HEIGHT) * $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH))
+		if($this->parameters->get(kThumbFactoryFieldName::WIDTH) * $this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT) < $this->parameters->get(kThumbFactoryFieldName::HEIGHT) * $this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH))
 		{
 			$w = $this->parameters->get(kThumbFactoryFieldName::WIDTH);
-			$h = ceil($this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT) * ($this->parameters->get(kThumbFactoryFieldName::WIDTH) / $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH)));
+			$h = ceil($this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT) * ($this->parameters->get(kThumbFactoryFieldName::WIDTH) / $this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH)));
 			$borderHeight = ceil(($this->parameters->get(kThumbFactoryFieldName::HEIGHT) - $h) / 2);
 			if ($borderHeight * 2 + $h > $this->parameters->get(kThumbFactoryFieldName::HEIGHT))
 			{
@@ -327,7 +326,7 @@ class kImageTransformationAdapter
 		else
 		{
 			$h = $this->parameters->get(kThumbFactoryFieldName::HEIGHT);
-			$w = ceil($this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH) * ($this->parameters->get(kThumbFactoryFieldName::HEIGHT) / $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT)));
+			$w = ceil($this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH) * ($this->parameters->get(kThumbFactoryFieldName::HEIGHT) / $this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT)));
 			$borderWidth = ceil(($this->parameters->get(kThumbFactoryFieldName::WIDTH) - $w) / 2);
 			if ($borderWidth * 2 + $w > $this->parameters->get(kThumbFactoryFieldName::WIDTH))
 			{
