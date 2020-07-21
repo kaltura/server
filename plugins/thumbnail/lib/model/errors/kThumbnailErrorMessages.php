@@ -28,7 +28,7 @@ class kThumbnailErrorMessages
 	const MISSING_TEXT = 'You must supply a text for this action';
 	const ENTRY_SOURCE_ONLY = ' can only work on entry source';
 	const FAILED = ' failed';
-	const SECOND =  'Second cant be negative';
+	const SECOND = 'Second cant be negative';
 	const VID_SLICE_FAILED = 'Vid slice failed';
 	const SLICE_NUMBER = 'Slice number must be positive and can not be greater then number of slices';
 	const NUMBER_OF_SLICE = 'Number of slices must be positive';
@@ -44,4 +44,6 @@ class kThumbnailErrorMessages
 	const DENSITY_POSITIVE = 'Density must be positive';
 	const QUALITY_NOT_IN_RANGE = 'Quality must be between 20 and 100';
 	const WIDTH_AND_HEIGHT_ARE_ZERO = 'Width and height cannot both be equal zero';
+	const ILLEGAL_EXTEND_VECTOR = 'extened vector need to be width or height';
+	const X_MUST_BE_NATURAL = 'x must be natural number';
 }

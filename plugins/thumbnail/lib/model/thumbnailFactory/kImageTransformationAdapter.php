@@ -7,6 +7,8 @@
 class kImageTransformationAdapter
 {
 	const COLOR_FORMAT = '%06x';
+	const STRIP_BG_COLOR = 'black';
+	const MILLISECONDS_IN_SECOND = 1000;
 
 	/**
 	 * @var kThumbAdapterParameters
@@ -17,18 +19,104 @@ class kImageTransformationAdapter
 	/**
 	 * @param kThumbAdapterParameters $parameters
 	 * @return kImageTransformation
-	 * @throws kThumbnailException
+	 * @throws ImagickException
 	 */
 	public function getImageTransformation($parameters)
 	{
 		$this->parameters = $parameters;
-		$step = new kImageTransformationStep();
-		$this->createEntrySource($step);
-		$this->handleSourceActions($step);
 		$this->prepareInput();
+		if($this->parameters->get(kThumbFactoryFieldName::VID_SLICES) !== kThumbAdapterParameters::UNSET_PARAMETER && $this->parameters->get(kThumbFactoryFieldName::VID_SLICE) !== kThumbAdapterParameters::UNSET_PARAMETER)
+		{
+			return $this->getStripTransformation();
+		}
+
+		$step = new kImageTransformationStep();
+		$this->addSource($step);
+		$this->handleSourceActions($step);
+		$this->handleActionType($step);
+		$this->handleStripProfile($step);
+		$this->handleImageOutputAction($step);
+		$transformation = new kImageTransformation();
+		$transformation->addImageTransformationStep($step);
+		return $transformation;
+	}
+
+	protected function getStripTransformation()
+	{
+		$transformation = new kImageTransformation();
+		$vidSlices = $this->parameters->get(kThumbFactoryFieldName::VID_SLICES);
+		$startSec = $this->parameters->get(kThumbFactoryFieldName::START_SEC);
+		$interval = $this->getStripInterval();
+		$startSec = max($startSec, 0);
+		$step = $this->getFirstStripTransofmrationStep($startSec, $vidSlices);
+		$transformation->addImageTransformationStep($step);
+		for($i = 1; $i <= $vidSlices; $i++)
+		{
+			$step = new kImageTransformationStep();
+			$this->addEntrySource($step);
+			$this->addVidSecAction($step, $startSec + ($i * $interval));
+			$this->handleActionType($step);
+			$this->addStripConcat($step, $i);
+			$transformation->addImageTransformationStep($step);
+		}
+
+		$this->handleStripProfile($step);
+		$this->handleImageOutputAction($step);
+		return $transformation;
+	}
+
+	protected function getStripInterval()
+	{
+		$entry = $this->parameters->get(kThumbFactoryFieldName::ENTRY);
+		$videoLength = $entry->getLengthInMsecs();
+		$startSec = $this->parameters->get(kThumbFactoryFieldName::START_SEC);
+		$endSec =  $this->parameters->get(kThumbFactoryFieldName::END_SEC);
+		$vidSlices = $this->parameters->get(kThumbFactoryFieldName::VID_SLICES);
+		if($startSec !==  kThumbAdapterParameters::UNSET_PARAMETER && $endSec !==  kThumbAdapterParameters::UNSET_PARAMETER)
+		{
+			$interVal = $this->endSec - $this->startSec / $vidSlices;
+		}
+		else
+		{
+			$interVal = $videoLength / self::MILLISECONDS_IN_SECOND / $vidSlices;
+		}
+
+		return $interVal;
+	}
+
+	/**
+	 * @param kImageTransformationStep $step
+	 * @param int $slideNum
+	 */
+	protected function addStripConcat($step, $slideNum)
+	{
+		$concatAction = new kCompositeAction();
+		$concatAction->setActionParameter(kThumbnailParameterName::X, $slideNum * $this->parameters->get(kThumbFactoryFieldName::WIDTH));
+		$step->addAction($concatAction);
+	}
+
+	protected function getStripSource()
+	{
+		$stripWide = $this->parameters->get(kThumbFactoryFieldName::VID_SLICES) * $this->parameters->get(kThumbFactoryFieldName::WIDTH);
+		$image = new Imagick();
+		$image->newImage($stripWide, $this->parameters->get(kThumbFactoryFieldName::HEIGHT), new ImagickPixel(self::STRIP_BG_COLOR));
+		return new kImagickSource($image);
+	}
+
+	protected function handleActionType($step)
+	{
 		switch($this->parameters->get(kThumbFactoryFieldName::TYPE))
 		{
 			case kExtwidgetThumbnailActionType::RESIZE:
+				if($this->parameters->get(kThumbFactoryFieldName::WIDTH)  > kResizeAction::BEST_FIT_MIN && $this->parameters->get(kThumbFactoryFieldName::HEIGHT) > kResizeAction::BEST_FIT_MIN)
+				{
+					$this->handleResize(true, $step);
+				}
+				else
+				{
+					$this->handleResize(false, $step);
+				}
+				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
 				$this->handleResize(false, $step);
 				break;
@@ -52,15 +140,7 @@ class kImageTransformationAdapter
 			case kExtwidgetThumbnailActionType::CROP_AFTER_RESIZE:
 				$this->handleCropAfterResize($step);
 				break;
-			default:
-				//throw exception;
 		}
-
-		$this->handleStrip($step);
-		$this->handleImageOutputAction($step);
-		$transformation = new kImageTransformation();
-		$transformation->addImageTransformationStep($step);
-		return $transformation;
 	}
 
 	protected function handleCropAfterResize($step)
@@ -159,8 +239,9 @@ class kImageTransformationAdapter
 	 */
 	protected function calculateResizeAndCropDimensions(&$gravityPoint, &$resizeWidth, &$resizeHeight)
 	{
+		$cropHeight = null;
+		$cropWidth = null;
 		$this->initResizeAndCropCalculationVariables($gravityPoint, $resizeWidth, $resizeHeight, $cropHeight, $cropWidth);
-
 		if ($resizeWidth < $resizeHeight)
 		{
 			$ratio = round($resizeHeight / $resizeWidth, 3);
@@ -261,7 +342,7 @@ class kImageTransformationAdapter
 	/**
 	 * @param kImageTransformationStep $step
 	 */
-	protected function handleStrip($step)
+	protected function handleStripProfile($step)
 	{
 		if($this->parameters->get(kThumbFactoryFieldName::STRIP_PROFILES))
 		{
@@ -316,41 +397,35 @@ class kImageTransformationAdapter
 		{
 			return;
 		}
-		else if($this->parameters->get(kThumbFactoryFieldName::VID_SEC) != kThumbAdapterParameters::UNSET_PARAMETER)
+		else if($this->parameters->get(kThumbFactoryFieldName::VID_SEC) !== kThumbAdapterParameters::UNSET_PARAMETER)
 		{
-			$sourceAction = new kVidSecAction();
-			$sourceAction->setActionParameter(kThumbnailParameterName::SECOND, $this->parameters->get(kThumbFactoryFieldName::VID_SEC));
+			$this->addVidSecAction($step, $this->parameters->get(kThumbFactoryFieldName::VID_SEC));
+		}
+		else if($this->parameters->get(kThumbFactoryFieldName::VID_SLICE) !== kThumbAdapterParameters::UNSET_PARAMETER)
+		{
+			$sourceAction = new kVidSliceAction();
+			$sourceAction->setActionParameter(kThumbnailParameterName::SLICE_NUMBER, $this->parameters->get(kThumbFactoryFieldName::VID_SLICE));
+			$sourceAction->setActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES, $this->parameters->get(kThumbFactoryFieldName::VID_SLICES));
+			$sourceAction->setActionParameter(kThumbnailParameterName::START_SEC, $this->parameters->get(kThumbFactoryFieldName::START_SEC));
+			$sourceAction->setActionParameter(kThumbnailParameterName::END_SEC, $this->parameters->get(kThumbFactoryFieldName::END_SEC));
 			$step->addAction($sourceAction);
 		}
-		else if($this->parameters->get(kThumbFactoryFieldName::VID_SLICES) != kThumbAdapterParameters::UNSET_PARAMETER)
-		{
-			if($this->parameters->get(kThumbFactoryFieldName::VID_SLICE) != kThumbAdapterParameters::UNSET_PARAMETER)
-			{
-				$sourceAction = new kVidSliceAction();
-				$sourceAction->setActionParameter(kThumbnailParameterName::SLICE_NUMBER, $this->parameters->get(kThumbFactoryFieldName::VID_SLICE));
-				$sourceAction->setActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES, $this->parameters->get(kThumbFactoryFieldName::VID_SLICES));
-				$sourceAction->setActionParameter(kThumbnailParameterName::START_SEC, $this->parameters->get(kThumbFactoryFieldName::START_SEC));
-				$sourceAction->setActionParameter(kThumbnailParameterName::END_SEC, $this->parameters->get(kThumbFactoryFieldName::END_SEC));
-				$step->addAction($sourceAction);
-			}
-			else
-			{
-				$sourceAction = new kVidStripAction();
-				$sourceAction->setActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES, $this->parameters->get(kThumbFactoryFieldName::VID_SLICES));
-				$sourceAction->setActionParameter(kThumbnailParameterName::START_SEC, $this->parameters->get(kThumbFactoryFieldName::START_SEC));
-				$sourceAction->setActionParameter(kThumbnailParameterName::END_SEC, $this->parameters->get(kThumbFactoryFieldName::END_SEC));
-				$step->addAction($sourceAction);
-			}
-		}
+	}
+
+	protected function addVidSecAction($step, $sec)
+	{
+		$sourceAction = new kVidSecAction();
+		$sourceAction->setActionParameter(kThumbnailParameterName::SECOND, $sec);
+		$step->addAction($sourceAction);
 	}
 
 	/**
 	 * @param kImageTransformationStep $step
 	 * @throws ImagickException
 	 */
-	protected function createEntrySource($step)
+	protected function addSource($step)
 	{
-		if(kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)))
+		if(!kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) === kThumbAdapterParameters::UNSET_PARAMETER)
 		{
 			$source = new kFileSource($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH));
 			$step->setSource($source);
@@ -358,10 +433,15 @@ class kImageTransformationAdapter
 		}
 		else
 		{
-			$source = new kEntrySource();
-			$source->setEntry($this->parameters->get(kThumbFactoryFieldName::ENTRY));
-			$step->setSource($source);
+			$this->addEntrySource($step);
 		}
+	}
+
+	protected function addEntrySource($step)
+	{
+		$source = new kEntrySource();
+		$source->setEntry($this->parameters->get(kThumbFactoryFieldName::ENTRY));
+		$step->setSource($source);
 	}
 
 	/**
@@ -403,5 +483,23 @@ class kImageTransformationAdapter
 		{
 			$cropWidth = $this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH);
 		}
+	}
+
+	/**
+	 * @param $startSec
+	 * @param $vidSlices
+	 * @return kImageTransformationStep
+	 */
+	protected function getFirstStripTransofmrationStep($startSec, $vidSlices): kImageTransformationStep
+	{
+		$step = new kImageTransformationStep();
+		$this->addEntrySource($step);
+		$this->addVidSecAction($step, $startSec);
+		$this->handleActionType($step);
+		$extendAction = new kExtendImageAction();
+		$extendAction->setActionParameter(kThumbnailParameterName::X, $vidSlices);
+		$extendAction->setActionParameter(kThumbnailParameterName::EXTEND_VECTOR, kThumbnailParameterName::WIDTH);
+		$step->addAction($extendAction);
+		return $step;
 	}
 }
