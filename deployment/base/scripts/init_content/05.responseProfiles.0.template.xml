@@ -69,7 +69,7 @@
 					<item objectType="KalturaDetachedResponseProfile">
 						<name>QandA_ResponseProfile_user</name>
 						<type>1</type>
-						<fields>id,screenName,email,firstName,lastName,country,state,city,zip</fields>
+						<fields>id,screenName,email,firstName,lastName,country,state,city,zip,description</fields>
 						<filter objectType="KalturaUserFilter">
 						</filter>
 						<mappings objectType="array">
