@@ -151,10 +151,9 @@ function main($sourceDc, $storageIdDest, $filePath)
 
 		kMemoryManager::clearMemory();
 		$count++;
-		if ($count == 1000)
+		if ($count % 1000 == 0 )
 		{
-			KalturaLog::debug('Sleeping 60 Seconds...');
-			$count = 0;
+			KalturaLog::debug("Sleeping 60 Seconds... count is $count");
 			sleep(60);
 		}
 	}
