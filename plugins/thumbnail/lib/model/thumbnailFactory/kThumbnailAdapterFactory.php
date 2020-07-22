@@ -35,8 +35,8 @@ class kThumbnailAdapterFactory
 		return new kBaseResizeAdapter();
 	}
 
-	public static function getThumbAdapterParameters(entry $entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-													 $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $fileSync, $format, $start_sec, $end_sec)
+	public static function getResizeThumbAdapterParameters(entry $entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+														   $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $fileSync, $format, $start_sec, $end_sec)
 	{
 		$params = new kThumbAdapterParameters();
 		$params->set(kThumbFactoryFieldName::ENTRY, $entry);
@@ -60,6 +60,19 @@ class kThumbnailAdapterFactory
 		$params->set(kThumbFactoryFieldName::START_SEC, $start_sec);
 		$params->set(kThumbFactoryFieldName::END_SEC, $end_sec);
 		$params->set(kThumbFactoryFieldName::FILE_SYNC, $fileSync);
+		self::validateResizeThumbAdapterParameters($params);
 		return $params;
+	}
+
+	/**
+	 * @param kThumbAdapterParameters $kThumbAdapterParameters
+	 */
+	protected static function validateResizeThumbAdapterParameters($kThumbAdapterParameters)
+	{
+		$vidSlices = $kThumbAdapterParameters->get(kThumbFactoryFieldName::VID_SLICES);
+		if($vidSlices !== $kThumbAdapterParameters::UNSET_PARAMETER && $vidSlices <= 0)
+		{
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, kThumbnailErrorMessages::NUMBER_OF_SLICE);
+		}
 	}
 }

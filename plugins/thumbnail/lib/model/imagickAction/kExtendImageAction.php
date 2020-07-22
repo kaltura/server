@@ -51,7 +51,7 @@ class kExtendImageAction extends kImagickAction
 
 		if($this->extendVector != kThumbnailParameterName::HEIGHT && $this->extendVector != kThumbnailParameterName::WIDTH)
 		{
-			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::HEIGHT_DIMENSIONS);
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::ILLEGAL_EXTEND_VECTOR);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
