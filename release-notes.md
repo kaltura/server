@@ -1,4 +1,12 @@
 # Propus 16.7.0  #
+## New KMS user reset password link  ##
+- Issue Type: Task
+- Issue ID: PLAT-10876
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links':
+    kms = http://%s.mediaspace.kaltura.com/auth/set-account-password/
+
 ## Add more user details name to Q&A response profile  ##
 - Issue Type: Feature
 - Issue ID: WEBC-1925

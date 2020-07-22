@@ -194,7 +194,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 
 	
-	public static function resetUserPassword($email)
+	public static function resetUserPassword($email, $linkType = KalturaResetPassLinkType::KMC)
 	{
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
@@ -216,7 +216,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 				
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey()));
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType));
 		return true;
 	}
 	
@@ -338,7 +338,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return true;
 	}
 	
-	public static function getPassResetLink($hashKey)
+	public static function getPassResetLink($hashKey, $linkType = KalturaResetPassLinkType::KMC)
 	{
 		if (!$hashKey) {
 			return null;
@@ -347,12 +347,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$loginData) {
 			throw new Exception('Hash key not valid');
 		}
-		
-		$resetLinksArray = kConf::get('password_reset_links');
-		$resetLinkPrefix = $resetLinksArray['default'];		
-		
+
 		$partnerId = $loginData->getConfigPartnerId();
-		
+
+		$resetLinksArray = kConf::get('password_reset_links');
+		if($linkType == KalturaResetPassLinkType::KMS)
+		{
+			$resetLinkPrefix = $resetLinksArray['kms'];
+			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
+		}
+		else
+		{
+			$resetLinkPrefix = $resetLinksArray['default'];
+		}
+
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner) {
 			// partner may define a custom reset password url (admin console for example)
