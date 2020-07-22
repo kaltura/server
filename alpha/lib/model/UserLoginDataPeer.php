@@ -194,7 +194,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 
 	
-	public static function resetUserPassword($email, $linkType = KalturaResetPassLinkType::KMC)
+	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
 	{
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
@@ -338,7 +338,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return true;
 	}
 	
-	public static function getPassResetLink($hashKey, $linkType = KalturaResetPassLinkType::KMC)
+	public static function getPassResetLink($hashKey, $linkType = resetPassLinkType::KMC)
 	{
 		if (!$hashKey) {
 			return null;
@@ -351,7 +351,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$partnerId = $loginData->getConfigPartnerId();
 
 		$resetLinksArray = kConf::get('password_reset_links');
-		if($linkType == KalturaResetPassLinkType::KMS)
+		if($linkType == resetPassLinkType::KMS)
 		{
 			$resetLinkPrefix = $resetLinksArray['kms'];
 			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
