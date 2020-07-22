@@ -39,4 +39,5 @@ interface kThumbnailParameterName extends BaseEnum
 	const IMAGE_FORMAT = 'format';
 	const QUALITY = 'quality';
 	const DENSITY = 'density';
+	const EXTEND_VECTOR = 'extendVector';
 }
