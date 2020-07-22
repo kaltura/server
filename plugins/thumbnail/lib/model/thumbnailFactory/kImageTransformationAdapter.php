@@ -74,7 +74,7 @@ class kImageTransformationAdapter
 		$vidSlices = $this->parameters->get(kThumbFactoryFieldName::VID_SLICES);
 		if($startSec !==  kThumbAdapterParameters::UNSET_PARAMETER && $endSec !==  kThumbAdapterParameters::UNSET_PARAMETER)
 		{
-			$interVal = $this->endSec - $this->startSec / $vidSlices;
+			$interVal = ($endSec - $startSec) / $vidSlices;
 		}
 		else
 		{
