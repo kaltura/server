@@ -420,7 +420,19 @@ class kImageTransformationAdapter
 	{
 		if(kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) === kThumbAdapterParameters::UNSET_PARAMETER)
 		{
-			$source = new kFileSource($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH));
+			/* @var $file_sync FileSync */
+			$file_sync = $this->parameters->get(kThumbFactoryFieldName::FILE_SYNC);
+			if($file_sync && $file_sync->isEncrypted())
+			{
+				$path = $file_sync->createTempClear();
+				$source = new kFileSource($path);
+				$file_sync->deleteTempClear();
+			}
+			else
+			{
+				$source = new kFileSource($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH));
+			}
+
 			$step->setSource($source);
 			$this->fileSource = true;
 		}
