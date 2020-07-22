@@ -25,7 +25,7 @@ class kImageTransformationAdapter
 	{
 		$this->parameters = $parameters;
 		$this->prepareInput();
-		if($this->parameters->get(kThumbFactoryFieldName::VID_SLICES) !== kThumbAdapterParameters::UNSET_PARAMETER && $this->parameters->get(kThumbFactoryFieldName::VID_SLICE) !== kThumbAdapterParameters::UNSET_PARAMETER)
+		if($this->parameters->get(kThumbFactoryFieldName::VID_SLICES) !== kThumbAdapterParameters::UNSET_PARAMETER && $this->parameters->get(kThumbFactoryFieldName::VID_SLICE) === kThumbAdapterParameters::UNSET_PARAMETER)
 		{
 			return $this->getStripTransformation();
 		}
@@ -100,14 +100,8 @@ class kImageTransformationAdapter
 		switch($this->parameters->get(kThumbFactoryFieldName::TYPE))
 		{
 			case kExtwidgetThumbnailActionType::RESIZE:
-				if($this->parameters->get(kThumbFactoryFieldName::WIDTH)  > kResizeAction::BEST_FIT_MIN && $this->parameters->get(kThumbFactoryFieldName::HEIGHT) > kResizeAction::BEST_FIT_MIN)
-				{
-					$this->handleResize(true, $step);
-				}
-				else
-				{
-					$this->handleResize(false, $step);
-				}
+				$bestFit = ($this->parameters->get(kThumbFactoryFieldName::WIDTH)  > kResizeAction::BEST_FIT_MIN && $this->parameters->get(kThumbFactoryFieldName::HEIGHT) > kResizeAction::BEST_FIT_MIN);
+				$this->handleResize($bestFit, $step);
 				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
 				$this->handleResize(false, $step);
@@ -424,7 +418,7 @@ class kImageTransformationAdapter
 	 */
 	protected function addSource($step)
 	{
-		if(!kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) === kThumbAdapterParameters::UNSET_PARAMETER)
+		if(kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) === kThumbAdapterParameters::UNSET_PARAMETER)
 		{
 			$source = new kFileSource($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH));
 			$step->setSource($source);
