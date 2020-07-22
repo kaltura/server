@@ -557,16 +557,19 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		do
 		{
-			$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
-			if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
+			if($partner && !$partner->getStorageDeleteFromKaltura())
 			{
-				break;
-			}
+				$partnerIds = kConf::get('export_to_cloud_partner_ids', 'cloud_storage', array());
+				if (in_array($partnerId, $partnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $partnerIds))
+				{
+					break;
+				}
 
-			$partnerPackages = kConf::get('export_to_cloud_partner_package', 'cloud_storage', array());
-			if ( $partner && in_array($partner->getPartnerPackage(), $partnerPackages) )
-			{
-				break;
+				$partnerPackages = kConf::get('export_to_cloud_partner_package', 'cloud_storage', array());
+				if (in_array($partner->getPartnerPackage(), $partnerPackages))
+				{
+					break;
+				}
 			}
 
 			$isPartnerValid = false;
@@ -574,11 +577,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		if($isPartnerValid)
 		{
-			$externalStorageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partnerId);
-			if($partner && (!$partner->getStorageDeleteFromKaltura() || !count($externalStorageProfiles)))
-			{
-				return kConf::get('periodic_storage_ids','cloud_storage', array());
-			}
+			return kConf::get('periodic_storage_ids','cloud_storage', array());
 		}
 
 		return array();
