@@ -422,6 +422,7 @@ class kImageTransformationAdapter
 		{
 			/* @var $file_sync FileSync */
 			$file_sync = $this->parameters->get(kThumbFactoryFieldName::FILE_SYNC);
+			$source = null;
 			if($file_sync && $file_sync->isEncrypted())
 			{
 				$path = $file_sync->createTempClear();
