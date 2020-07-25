@@ -2,6 +2,7 @@
 /**
  * @package plugins.dropFolder
  * @subpackage api.objects
+ * @requiresPermission update
  */
 class KalturaDropFolder extends KalturaObject implements IFilterable
 {	
@@ -29,7 +30,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $description;
-	
+
 	/**
 	 * @var KalturaDropFolderType
 	 * @filter eq,in

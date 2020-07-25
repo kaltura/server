@@ -287,5 +287,42 @@ class DropFolderService extends KalturaBaseService
 
 		return true;
 	}
+
+    /**
+     * @action updateStatus
+     * @param int $dropFolderId
+     * @param KalturaDropFolderStatus $status
+     */
+    public function updateStatusAction($dropFolderId, $status)
+    {
+        $dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
+        if (!$dbDropFolder)
+            throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
+
+        $dbDropFolder->setStatus($status);
+        $dbDropFolder->save();
+    }
+
+    /**
+     * @action updateNonAdmin
+     * @param int $dropFolderId
+     * @param KalturaNonAdminDropFolder $dropFolder
+     *
+     * @return KalturaDropFolder
+     */
+    public function updateNonAdminAction($dropFolderId, KalturaNonAdminDropFolder $dropFolder)
+    {
+        $dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
+        if (!$dbDropFolder)
+            throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderId);
+
+        $dbDropFolder = $dropFolder->toUpdatableObject($dbDropFolder);
+        $dbDropFolder->save();
+
+        $dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
+        $dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
+
+        return $dropFolder;
+    }
 	
 }
