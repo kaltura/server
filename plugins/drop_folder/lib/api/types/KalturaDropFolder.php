@@ -2,7 +2,6 @@
 /**
  * @package plugins.dropFolder
  * @subpackage api.objects
- * @requiresPermission update
  */
 class KalturaDropFolder extends KalturaObject implements IFilterable
 {	
