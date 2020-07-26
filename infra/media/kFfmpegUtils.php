@@ -56,7 +56,7 @@ class kFfmpegUtils
 		$dimensions = ($width == -1 || $height == -1) ? '' : ('-s '. $width . 'x' . $height);
 		$source_file = kFile::realPath($source_file);
 		$position_str_suffix = $position ? ' -ss 0.01 ' : '';
-		$cmd = "{$position_str} -noautorotate -\"{$source_file}\" -an -y -r 1 {$dimensions} -vframes {$frame_count} -f \"{$target_type}\" {$position_str_suffix} \"{$target_file}\" 2>&1";
+		$cmd = "{$position_str} -noautorotate -i \"{$source_file}\" -an -y -r 1 {$dimensions} -vframes {$frame_count} -f \"{$target_type}\" {$position_str_suffix} \"{$target_file}\" 2>&1";
 		if ($decryptionKey)
 		{
 			$cmd = ' -decryption_key ' . $decryptionKey . $cmd;
