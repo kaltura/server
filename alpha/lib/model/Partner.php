@@ -85,7 +85,6 @@ class Partner extends BasePartner
 	const ANALYTICS_HOST = "analytics_host";
 
 	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
-	const CUSTOM_DATE_SHARED_STORAGE_STORAGE_TYPE = 'shared_storage_type';
 	const CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID = 'shared_storage_profile_id';
 	
 	private $cdnWhiteListCache = array();
@@ -2165,16 +2164,6 @@ class Partner extends BasePartner
 	public function setAvoidIndexingSearchHistory($v)
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
-	}
-	
-	public function getSharedStorageType()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_TYPE, null, null);
-	}
-	
-	public function setSharedStorageType($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_TYPE, $v);
 	}
 	
 	public function getSharedStorageProfileId()

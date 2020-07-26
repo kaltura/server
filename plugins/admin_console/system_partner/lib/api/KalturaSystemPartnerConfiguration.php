@@ -441,11 +441,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $extendedFreeTrailEndsWarning;
 	
 	/**
-	 * @var KalturaSharedFileSystemType
-	 */
-	public $sharedStorageType;
-	
-	/**
 	 * @var int
 	 */
 	public $sharedStorageProfileId;
@@ -536,7 +531,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"usageLimitWarning",
 		"lastFreeTrialNotificationDay",
 		"extendedFreeTrailEndsWarning",
-		"sharedStorageType",
 		"sharedStorageProfileId"
 	);
 
