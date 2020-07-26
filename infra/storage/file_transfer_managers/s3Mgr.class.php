@@ -114,8 +114,9 @@ class s3Mgr extends kFileTransferMgr
 			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
-		
-		if(getenv(self::S3_ARN_ROLE_ENV_NAME) && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+
+		$arnRole = getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) ? getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) : KBatchBase::$taskConfig->s3Arn;
+		if(!$arnRole && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
@@ -395,9 +396,10 @@ class RefreshableRole extends AbstractRefreshableCredentials
 		$sts = StsClient::factory(array(
 			'credentials' => $ipCreds,
 		));
-		
+
+		$arnRole = getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) ? getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) : KBatchBase::$taskConfig->s3Arn;
 		$call = $sts->assumeRole(array(
-			'RoleArn' => getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME),
+			'RoleArn' => $arnRole,
 			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
 			'SessionDuration' => self::SESSION_DURATION,
 		));

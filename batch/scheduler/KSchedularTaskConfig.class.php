@@ -4,7 +4,6 @@
  */
 class KSchedularTaskConfig extends Zend_Config_Ini
 {
-	
 	protected $queueSize = 0;
 	
 	public function __construct($configFileName, $workerName, $maxInstances)
@@ -256,5 +255,13 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	
 	public function setQueueSize($queueSize) {
 		$this->queueSize = $queueSize;
+	}
+
+	public function getS3Arn() {
+		return $this->s3Arn;
+	}
+
+	public function setS3Arn($s3Arn) {
+		$this->s3Arn = $s3Arn;
 	}
 }
