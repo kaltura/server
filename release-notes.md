@@ -1,4 +1,4 @@
-# Propus 16.7.0  #
+# Propus 16.8.0  #
 ## New KMS user reset password link  ##
 - Issue Type: Task
 - Issue ID: PLAT-10876
@@ -6,6 +6,14 @@
 ### Configuration ###
 add the following to 'local.ini' under 'password_reset_links':
     kms = http://%s.mediaspace.kaltura.com/auth/set-account-password/
+
+# Propus 16.7.0  #
+## Adding privileges field on widget object ##
+Issue Type: Task
+Issue ID : PLAT-10953
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permission_widget_object_privileges_field.php
 
 ## Add more user details name to Q&A response profile  ##
 - Issue Type: Feature
