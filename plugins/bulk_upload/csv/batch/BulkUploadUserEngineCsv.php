@@ -34,11 +34,20 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 		// sets the result values
 		$dateOfBirth = null;
+		$foundUnknownEncoding = false;
 
 		foreach($columns as $index => $column)
 		{
 			if(!is_numeric($index))
 				continue;
+
+			if(!mb_detect_encoding($values[$index]))
+			{
+				KalturaLog::info("encoding cannot be detected for value $column");
+				$values[$index] = "encoding cannot be detected for value $column";
+				$foundUnknownEncoding = true;
+				continue;
+			}
 
 			if ($column == 'dateOfBirth')
 			{
@@ -54,6 +63,11 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			{
 				KalturaLog::info("Value $column is empty");
 			}
+		}
+
+		if($foundUnknownEncoding)
+		{
+			$bulkUploadResult->rowData = implode(",", $values);
 		}
 
 		if(isset($columns['plugins']))
@@ -81,12 +95,12 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    $bulkUploadResult->action = KalturaBulkUploadAction::ADD;
 		}
 
-		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult, $dateOfBirth);
+		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult, $dateOfBirth, $foundUnknownEncoding);
 		if($bulkUploadResult)
 			$this->bulkUploadResults[] = $bulkUploadResult;
 	}
 
-	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth = null)
+	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth, $foundUnknownEncoding)
 	{
 	    /* @var $bulkUploadResult KalturaBulkUploadResultUser */
 		if (!$bulkUploadResult->userId)
@@ -110,7 +124,14 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Wrong value passed for property gender [$bulkUploadResult->gender]";
 		}
 
-	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
+		if ($foundUnknownEncoding)
+		{
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "value with unknown encoding was passed";
+		}
+
+		if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
 		    KBatchBase::impersonate($this->currentPartnerId);;
 		    try
