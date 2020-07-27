@@ -43,7 +43,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 			if(!mb_detect_encoding($values[$index]))
 			{
-				KalturaLog::info("encoding cannot be detected for value $column");
+				KalturaLog::warning("encoding cannot be detected for value $column");
 				$values[$index] = "encoding cannot be detected for value $column";
 				$foundUnknownEncoding = true;
 				continue;
@@ -107,7 +107,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-			$bulkUploadResult->errorDescription = "Mandatory Column [userId] missing from CSV.";
+			$bulkUploadResult->errorDescription = 'Mandatory Column [userId] missing from CSV.';
 		}
 
 		if ($dateOfBirth && !self::isFormatedDate($dateOfBirth, true))
@@ -128,7 +128,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		{
 			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-			$bulkUploadResult->errorDescription = "value with unknown encoding was passed";
+			$bulkUploadResult->errorDescription = 'value with unknown encoding was passed';
 		}
 
 		if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
