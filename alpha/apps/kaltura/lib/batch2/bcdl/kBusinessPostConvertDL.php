@@ -316,15 +316,7 @@ class kBusinessPostConvertDL
 			else
 			{
     			// Export the source
-    			$srcFlavors = assetPeer::retrieveLocalReadyByEntryIdAndFlavorParams($entry->getEntryId(), array(flavorParams::SOURCE_FLAVOR_ID));
-    			foreach($srcFlavors as $srcFlavor)
-    			{
-    				if($srcFlavor->getType() == assetType::FLAVOR)
-    				{
-    					kStorageExporter::handleAssetStorageExports($srcFlavor);
-    					break;
-    				}
-    			}
+    			kStorageExporter::exportSourceFlavorAsset($entry->getEntryId());
 
     			// mark the context root job as finished only if all conversion jobs are completed
     			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);

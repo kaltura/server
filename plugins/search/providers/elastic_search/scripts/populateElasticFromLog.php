@@ -46,6 +46,7 @@ $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
+$shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
 
 if (!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -88,7 +89,7 @@ $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the ser
 
 while (true)
 {
-	if (!elasticSearchUtils::isMaster($elasticClient, $hostname))
+	if ($shouldUseMaster && !elasticSearchUtils::isMaster($elasticClient, $hostname))
 	{
 		KalturaLog::log('elastic server [' . $hostname . '] is not the master , sleeping for 30 seconds');
 		sleep(30);
