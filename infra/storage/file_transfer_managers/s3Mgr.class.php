@@ -39,8 +39,7 @@ class s3Mgr extends kFileTransferMgr
 	protected $storageClass = null;
 	
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
-	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
-	
+
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
@@ -115,8 +114,7 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 
-		$arnRole = getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) ? getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) : KBatchBase::$taskConfig->s3Arn;
-		if(!$arnRole && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		if(!KBatchBase::$taskConfig->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
@@ -397,9 +395,8 @@ class RefreshableRole extends AbstractRefreshableCredentials
 			'credentials' => $ipCreds,
 		));
 
-		$arnRole = getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) ? getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME) : KBatchBase::$taskConfig->s3Arn;
 		$call = $sts->assumeRole(array(
-			'RoleArn' => $arnRole,
+			'RoleArn' => KBatchBase::$taskConfig->s3Arn,
 			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
 			'SessionDuration' => self::SESSION_DURATION,
 		));
