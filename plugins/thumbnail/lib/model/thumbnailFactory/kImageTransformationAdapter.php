@@ -48,7 +48,7 @@ class kImageTransformationAdapter
 		$startSec = $this->parameters->get(kThumbFactoryFieldName::START_SEC);
 		$interval = $this->getStripInterval();
 		$startSec = max($startSec, 0);
-		$step = $this->getFirstStripTransofmrationStep($startSec, $vidSlices);
+		$step = $this->getFirstStripTransformationStep($startSec, $vidSlices);
 		$transformation->addImageTransformationStep($step);
 		for($i = 1; $i <= $vidSlices; $i++)
 		{
@@ -496,7 +496,7 @@ class kImageTransformationAdapter
 	 * @param $vidSlices
 	 * @return kImageTransformationStep
 	 */
-	protected function getFirstStripTransofmrationStep($startSec, $vidSlices): kImageTransformationStep
+	protected function getFirstStripTransformationStep($startSec, $vidSlices)
 	{
 		$step = new kImageTransformationStep();
 		$this->addEntrySource($step);
