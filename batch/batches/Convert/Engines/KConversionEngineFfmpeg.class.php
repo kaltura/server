@@ -435,7 +435,8 @@ $stub=null;
 		if(strstr($data->flavorParamsOutput->tags,KConversionEngineFfmpeg::TAG_NGS_STUB)!=false)
 			$stub="--stub";
 	
-		$digSignStub = "-f rawvideo -s %dx%d -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
+//		$digSignStub = "-f rawvideo -s %dx%d -pix_fmt yuv420p - | %s -w %d -h %d -f %s %s --%s| %s -f rawvideo -s %dx%d -r %s -i -";
+		$digSignStub = "-f rawvideo -s %dx%d -pix_fmt yuv420p - 2>>$data->logFileSyncLocalPath | %s -w %d -h %d -f %s %s --%s 2>>$data->logFileSyncLocalPath | %s -f rawvideo -s %dx%d -r %s -i -";
 		$digSignStr = sprintf($digSignStub, $srcWid, $srcHgt, $ngsBin, $srcWid, $srcHgt, $srcFps, 
 				      		$stub, $prepMode,KDLCmdlinePlaceholders::BinaryName, $srcWid, $srcHgt, $srcFps);
 

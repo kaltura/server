@@ -604,6 +604,14 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 			@chown($destFile, $chown_name);
 		}
 		
+		// set file group
+		$chown_group = self::$taskConfig->params->fileGroup;
+		if ($chown_group)
+		{
+			KalturaLog::info("Changing group of file [$destFile] to [$chown_group]");
+			@chgrp($destFile, $chown_group);
+		}
+		
 		// set file mode
 		$chmod_perm = octdec(self::$taskConfig->params->fileChmod);
 		if (!$chmod_perm) 
