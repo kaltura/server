@@ -62,7 +62,7 @@ class DropFolder extends BaseDropFolder implements IBaseObject
         $before = $this->getUpdatedAt();
         $ret = parent::preUpdate($con);
         if (count($this->modifiedColumns) == 2 && $this->isColumnModified(DropFolderPeer::CUSTOM_DATA)
-         && !$this>$this->checkNonEssentialFieldsUpdate())
+         && !$this->checkNonEssentialFieldsUpdate())
         {
             $this->setUpdatedAt($before);
         }
