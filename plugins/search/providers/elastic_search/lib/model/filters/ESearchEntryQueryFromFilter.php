@@ -379,7 +379,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		if (isset($values[1]) && trim($values[1]))
 		{
-			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->fcreateUnifiedSearchItem(trim($values[1])));
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createUnifiedSearchItem(trim($values[1])));
 			$freeTextValue = trim($values[0]);
 			if ($freeTextValue)
 			{
