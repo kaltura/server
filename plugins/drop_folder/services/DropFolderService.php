@@ -304,13 +304,13 @@ class DropFolderService extends KalturaBaseService
     }
 
     /**
-     * @action updateNonAdmin
+     * @action updateBasicFields
      * @param int $dropFolderId
-     * @param KalturaNonAdminDropFolder $dropFolder
+     * @param KalturaBasicFieldsDropFolder $dropFolder
      *
      * @return KalturaDropFolder
      */
-    public function updateNonAdminAction($dropFolderId, KalturaNonAdminDropFolder $dropFolder)
+    public function updateBasicFieldsAction($dropFolderId, KalturaBasicFieldsDropFolder $dropFolder)
     {
         $dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
         if (!$dbDropFolder)

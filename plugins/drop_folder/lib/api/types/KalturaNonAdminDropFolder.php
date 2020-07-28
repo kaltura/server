@@ -4,7 +4,7 @@
  * @subpackage api.objects
  */
 
-class KalturaNonAdminDropFolder extends KalturaObject
+class KalturaBasicFieldsDropFolder extends KalturaObject
 {
     /**
      * @var string
