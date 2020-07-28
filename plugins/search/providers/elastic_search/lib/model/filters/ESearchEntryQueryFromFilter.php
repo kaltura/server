@@ -379,13 +379,13 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		if (isset($values[1]) && trim($values[1]))
 		{
-			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->createUnifiedSearchItem(trim($values[1])));
+			$searchItemNot = ESearchQueryFromAdvancedSearch::createNegativeQuery($this->fcreateUnifiedSearchItem(trim($values[1])));
 			$freeTextValue = trim($values[0]);
 			if ($freeTextValue)
 			{
 				$searchItem = new ESearchOperator();
 				$searchItem->setOperator(ESearchOperatorType::AND_OP);
-				$freeTextSearchItem = $this->createUnifiedSearchItem($freeTextValue, true);
+				$freeTextSearchItem = $this->createUnifiedSearchItem($freeTextValue, true, false);
 				$searchItem->setSearchItems(array($freeTextSearchItem, $searchItemNot));
 			}
 			else
@@ -396,7 +396,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		elseif (isset($values[0]) && trim($values[0]))
 		{
-			$searchItem = $this->createUnifiedSearchItem(trim($values[0]), true);
+			$searchItem = $this->createUnifiedSearchItem(trim($values[0]), true, false);
 		}
 
 		if ($searchItem)
@@ -405,7 +405,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function createUnifiedSearchItem($value, $removeWildCard = false)
+	protected function createUnifiedSearchItem($value, $removeWildCard = false, $ignoreDisplayInSearch = true)
 	{
 		if ($removeWildCard)
 		{
@@ -413,6 +413,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 
 		$freeTextSearchExact = new ESearchUnifiedItem();
+		$freeTextSearchExact->setIgnoreDisplayInSearch($ignoreDisplayInSearch);
 		$freeTextSearchExact->setItemType(ESearchItemType::EXACT_MATCH);
 		$freeTextSearchExact->setSearchTerm($value);
 
@@ -431,7 +432,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				$item = trim($item);
 				if ($item)
 				{
-					$commaSeparetedSearchItems[] = $this->createUnifiedSearchItem($item);
+					$commaSeparetedSearchItems[] = $this->createUnifiedSearchItem($item, $removeWildCard, $ignoreDisplayInSearch);
 				}
 			}
 		}
