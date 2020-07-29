@@ -209,6 +209,9 @@ abstract class kManifestRenderer
 			'playSessionId' => 'sessionId',
 			'clientTag' => 'clientTag', 
 			'playbackType' => 'playbackType',
+			'customVar1' => 'customVar1',
+			'customVar2' => 'customVar2',
+			'customVar3' => 'customVar3',
 		);
 		foreach ($mapping as $src => $dest)
 		{
