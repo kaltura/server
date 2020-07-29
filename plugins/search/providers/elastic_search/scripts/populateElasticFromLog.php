@@ -32,12 +32,6 @@ error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-
-kConf::get('elasticCluster', 'elastic_populate', null);
-kConf::get('elasticCluster', 'elastic_populate', null);
-kConf::get('elasticCluster', 'elastic_populate', 9200);
-kConf::get('elasticCluster', 'elastic_populate', null);
-
 $config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
 if (empty($config))
 {
