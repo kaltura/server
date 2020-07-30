@@ -25,6 +25,8 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
 	const ENFORCE_ENTITLEMENT = 'enforce_entitlement';
 	const SHOULD_VALIDATE_KS = 'should_validate_ks';
+
+	protected static $nonEssentialCustomDataFields = array('last_file_timestamp', 'last_accessed_at');
 	
 	// -------------------------------------
 	// -- Default values -------------------
@@ -55,6 +57,32 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 		return $ret;
 	}
 
+    public function preUpdate(PropelPDO $con = null)
+    {
+        $before = $this->getUpdatedAt();
+        $ret = parent::preUpdate($con);
+        if (count($this->modifiedColumns) == 2 && $this->isColumnModified(DropFolderPeer::CUSTOM_DATA)
+         && !$this->checkNonEssentialFieldsUpdate())
+        {
+            $this->setUpdatedAt($before);
+        }
+        
+        return $ret;
+    }
+
+    protected function checkNonEssentialFieldsUpdate ()
+    {
+        //All of the custom data fields irrelevant to updatedAt propagation are under the '' namepsace
+        $modifiedCustomDataFields = array_keys($this->getCustomDataOldValues()['']);
+
+        $diff = array_diff($modifiedCustomDataFields, self::$nonEssentialCustomDataFields);
+        if (!count($diff))
+        {
+            return false;
+        }
+
+        return true;
+    }
 	
 	// -------------------------------------
 	// -- Override base methods ------------
