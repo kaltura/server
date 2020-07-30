@@ -16,8 +16,7 @@ class kJobsCacher
 	private static function getCacheKeyForWorkerJobs($workerId)
 	{
 		$batchVersion = BatchJobLockPeer::getBatchVersion();
-		$includeBatchVersionInKey = kConf::get('include_batch_version_in_cache_key');
-		return $includeBatchVersionInKey ? "jobs_cache_jobs_worker_$workerId" : "jobs_cache_jobs_worker_$workerId-$batchVersion";
+		return "jobs_cache_jobs_worker_$workerId-$batchVersion";
 	}
 
 	/**
@@ -28,8 +27,7 @@ class kJobsCacher
 	private static function getCacheKeyForWorkerQueue($workerId)
 	{
 		$batchVersion = BatchJobLockPeer::getBatchVersion();
-		$includeBatchVersionInKey = kConf::get('include_batch_version_in_cache_key');
-		return $includeBatchVersionInKey ? "jobs_cache_queue_worker_$workerId" : "jobs_cache_queue_worker_$workerId-$batchVersion";
+		return "jobs_cache_queue_worker_$workerId-$batchVersion";
 	}
 
 	/**
@@ -40,8 +38,7 @@ class kJobsCacher
 	private static function getCacheKeyForIndex($workerId)
 	{
 		$batchVersion = BatchJobLockPeer::getBatchVersion();
-		$includeBatchVersionInKey = kConf::get('include_batch_version_in_cache_key');
-		return $includeBatchVersionInKey ? "jobs_cache_worker_$workerId-Lock" : "jobs_cache_worker_$workerId-$batchVersion-Lock";
+		return "jobs_cache_worker_$workerId-$batchVersion-index";
 	}
 
 	/**
@@ -52,7 +49,6 @@ class kJobsCacher
 	private static function getCacheKeyForDBLock($workerId)
 	{
 		$batchVersion = BatchJobLockPeer::getBatchVersion();
-		$includeBatchVersionInKey = kConf::get('include_batch_version_in_cache_key');
 		return "jobs_cache_worker_$workerId-$batchVersion-Lock";
 	}
 
