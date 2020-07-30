@@ -15,7 +15,7 @@ require_once('/opt/kaltura/app/alpha/lib/interfaces/IRelatedObject.php');
 
 class KAsyncReachJobCleaner extends KPeriodicWorker
 {
-	const SEVEN_DAYS =	604800;
+	const SEVEN_DAYS = 604800;
 	const JOB_DUE_DATE_EXCEEDED = 'Job Due Date was exceeded in ';
 	const MAX_PAGE_SIZE = 500;
 

@@ -251,7 +251,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME);
 	}
 
-	protected function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
+	protected static function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
 	{
 
 		$endDayString = sprintf("Y-m-d %s:00:00", self::BUSINESS_DAY_END_HOUR);
