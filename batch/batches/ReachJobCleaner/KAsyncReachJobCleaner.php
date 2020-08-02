@@ -15,8 +15,7 @@ require_once('/opt/kaltura/app/alpha/lib/interfaces/IRelatedObject.php');
 
 class KAsyncReachJobCleaner extends KPeriodicWorker
 {
-	const SEVEN_DAYS = 604800;
-	const JOB_DUE_DATE_EXCEEDED = 'Job Due Date was exceeded in ';
+	const JOB_DUE_DATE_EXCEEDED_MESSAGE = 'Job Due Date was exceeded in ';
 	const MAX_PAGE_SIZE = 500;
 
 	/*
@@ -71,16 +70,15 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 			try
 			{
 				$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
-				$tasksCount = count($entryVendorTaskList->objects);
 			}
 			catch (Exception $e)
 			{
-				KalturaLog::debug("Couldn't list entry Vendor Tasks " . $e->getMessage());
+				KalturaLog::debug('Could not list Entry Vendor Tasks ' . $e->getMessage());
 				return;
 			}
 
 			$this->updateStuckJobs($entryVendorTaskList);
-
+			$tasksCount = count($entryVendorTaskList->objects);
 			$totalCount += $tasksCount;
 			KalturaLog::debug("Handled More tasks - $tasksCount totalCount - " . $totalCount);
 			if ($tasksCount)
@@ -94,7 +92,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 			{
 				gc_collect_cycles();
 			}
-		} while ($pager->pageSize == $tasksCount);
+		} while ($tasksCount > 0);
 
 		KalturaLog::debug('Done');
 	}
@@ -107,17 +105,14 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 				$this->isDueDatePassed($entryVendorTask))
 			{
 				KalturaLog::debug('Going to update EntryVendorTask id ' . $entryVendorTask->id . ' to status ERROR. '
-					. self::JOB_DUE_DATE_EXCEEDED . $this->overdueTimePercentage . '%');
+					. self::JOB_DUE_DATE_EXCEEDED_MESSAGE . $this->overdueTimePercentage . '%');
 
 				$kEntryVendorTask = new KalturaEntryVendorTask();
 				$kEntryVendorTask->status = KalturaEntryVendorTaskStatus::ERROR;
-				$kEntryVendorTask->errDescription = self::JOB_DUE_DATE_EXCEEDED . $this->overdueTimePercentage . '%';
+				$kEntryVendorTask->errDescription = self::JOB_DUE_DATE_EXCEEDED_MESSAGE . $this->overdueTimePercentage . '%';
 				try
 				{
-					KBatchBase::impersonate($entryVendorTask->partnerId);
 					$this->reachClientPlugin->entryVendorTask->update($entryVendorTask->id, $kEntryVendorTask);
-					KBatchBase::unimpersonate();
-
 				}
 				catch (Exception $e)
 				{
@@ -137,7 +132,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		{
 			if ($turnAroundTime == VendorServiceTurnAroundTime::BEST_EFFORT)
 			{
-				$turnAroundTime = self::SEVEN_DAYS;
+				$turnAroundTime = EntryVendorTask::SEVEN_DAYS;
 			}
 			elseif( (VendorServiceTurnAroundTime::ONE_BUSINESS_DAY <= $turnAroundTime) &&
 				($turnAroundTime <= VendorServiceTurnAroundTime::SEVEN_BUSINESS_DAYS) )
