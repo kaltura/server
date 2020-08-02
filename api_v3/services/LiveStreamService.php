@@ -223,7 +223,6 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 		}
 		
-		
 		$passthroughEntriesCount = 0;
 		$transcodedEntriesCount = 0;
 		foreach($entryConversionProfiles as $conversionProfileId => $entriesArray)

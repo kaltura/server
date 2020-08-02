@@ -937,7 +937,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
 		{
 			$limitSubForm = new Form_PartnerConfigurationLimitByAdminTagSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG."_$limit->adminTag", $limit->label, $limit->adminTag);
-			$this->addLimitSubForm($limitSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG."_$limit->adminTag");
+			$this->addLimitSubForm($limitSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag");
 		}
 
 	}
@@ -996,7 +996,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$dynamicLimitTypes = [];
 		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
 		{
-			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG."_$limit->adminTag".'_max';
+			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG."_$limit->adminTag" . '_max';
 		}
 
 		$this->addDisplayGroup(array_merge(array(
