@@ -52,7 +52,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		KalturaLog::debug('Getting all the entry vendor task items');
 		$filter = new KalturaEntryVendorTaskFilter();
 		$filter->statusIn = KalturaEntryVendorTaskStatus::PENDING . ',' . KalturaEntryVendorTaskStatus::PROCESSING;
-		$filter->updatedAtLessThanOrEqual = time();
+		$filter->expectedFinishTimeLessThanOrEqual = time();
 		$filter->updatedAtGreaterThanOrEqual = time() -  (VendorServiceTurnAroundTime::TEN_DAYS + VendorServiceTurnAroundTime::FOUR_DAYS);
 		$filter->orderBy = KalturaEntryVendorTaskOrderBy::UPDATED_AT_ASC;
 
