@@ -53,18 +53,20 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		KalturaLog::info('Getting all the entry vendor task items');
 		$filter = new KalturaEntryVendorTaskFilter();
 		$filter->statusIn = KalturaEntryVendorTaskStatus::PENDING . ',' . KalturaEntryVendorTaskStatus::PROCESSING;
-		$filter->orderBy = KalturaEntryVendorTaskOrderBy::CREATED_AT_ASC;
+		$filter->updatedAtLessThanOrEqual = time();
+		$filter->updatedAtGreaterThanOrEqual = time() -  (VendorServiceTurnAroundTime::TEN_DAYS + VendorServiceTurnAroundTime::FOUR_DAYS);
+		$filter->orderBy = KalturaEntryVendorTaskOrderBy::UPDATED_AT_ASC;
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::MAX_PAGE_SIZE;
 		$pager->pageIndex = 1;
 
-		$lastCreatedAt = 0;
+		$lastUpdatedAt = 0;
 		$totalCount = 0;
 		do {
-			if ($lastCreatedAt)
+			if ($lastUpdatedAt)
 			{
-				$filter->createdAtGreaterThanOrEqual = $lastCreatedAt;
+				$filter->updatedAtGreaterThanOrEqual = $lastUpdatedAt;
 			}
 			try
 			{
@@ -73,16 +75,20 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 			}
 			catch (Exception $e)
 			{
-				KalturaLog::debug("Couldn't list entry Vendor Tasks on page: [$pager->pageIndex]" . $e->getMessage());
+				KalturaLog::debug("Couldn't list entry Vendor Tasks " . $e->getMessage());
 				return;
 			}
 
 			$this->updateStuckJobs($entryVendorTaskList);
 
 			$totalCount += $tasksCount;
-			$lastObject = end($entryVendorTaskList->objects);
-			$lastCreatedAt = $lastObject->createdAt + 1;
 			KalturaLog::debug("Handled More tasks - $tasksCount totalCount - " . $totalCount);
+			if ($tasksCount)
+			{
+				$lastObject = end($entryVendorTaskList->objects);
+				$lastUpdatedAt = $lastObject->updatedAt + 1;
+			}
+
 			unset($entryVendorTaskList);
 			if (function_exists('gc_collect_cycles')) // php 5.3 and above
 			{
