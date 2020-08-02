@@ -15,11 +15,20 @@ class KalturaSystemPartnerLimitArray extends KalturaTypedArray
 		$reflector = KalturaTypeReflectorCacher::get('KalturaSystemPartnerLimitType');
 		$types = $reflector->getConstants();
 		foreach($types as $typeInfo) {
-		    $typeValue = $typeInfo->getDefaultValue();
-		    $arr[] = KalturaSystemPartnerOveragedLimit::fromPartner($typeValue, $partner);
+			$typeValue = $typeInfo->getDefaultValue();
+			if ($typeValue == KalturaSystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG)
+			{
+				$adminTagLimits =  KalturaSystemPartnerLiveAdminTagLimit::getArrayFromPartner($partner);
+				foreach ($adminTagLimits as $adminTagLimit)
+				{
+					$arr[] = $adminTagLimit;
+				}
+			} 
+			else
+			{
+				$arr[] = KalturaSystemPartnerOveragedLimit::fromPartner($typeValue, $partner);
+			}
 		}
-			
-			
 		return $arr;
 	} 
 	
