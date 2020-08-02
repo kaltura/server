@@ -4,7 +4,7 @@
 class LiveClusterMediaServerNode extends MediaServerNode
 {
     const ENVIRONMENT = 'env';
-    const SESSION_ID = 'sid';
+    const SESSION_TYPE = 'st';
 
     /**
      * Applies default values to this object.
@@ -45,8 +45,8 @@ class LiveClusterMediaServerNode extends MediaServerNode
         return self::ENVIRONMENT . '/' . $this->getEnvironment();
     }
 
-    public function getSessionIdUrlString($entryServerNode)
+    public function getSessionType($entryServerNode)
     {
-        return self::SESSION_ID . '/' . $entryServerNode->getId() . '/';
+        return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() .'/';
     }
 }
