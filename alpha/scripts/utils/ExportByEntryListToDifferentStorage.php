@@ -14,6 +14,19 @@ $storageIdDest = $argv[2];
 $filePath = $argv[3];
 $dryRun = $argv[4] != 'realrun';
 
+if (!is_numeric($sourceDc))
+{
+	KalturaLog::warning("Source DC Id Destination id should be numeric");
+	exit(0);
+}
+
+
+if (!is_numeric($storageIdDest))
+{
+	KalturaLog::warning("Destination Storage id should be numeric");
+	exit(0);
+}
+
 if (!file_exists($filePath))
 {
 	KalturaLog::warning("File $filePath Does not exists. Exiting...");
@@ -87,7 +100,7 @@ function main($sourceDc, $storageIdDest, $filePath)
 				$criteria->add(FileSyncPeer::OBJECT_ID, $asset->getId(), Criteria::EQUAL);
 				$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
 				$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$criteria->add(FileSyncPeer::DELETED_ID, null, Criteria::ISNULL);
+				$criteria->add(FileSyncPeer::DELETED_ID, 0, Criteria::EQUAL);
 				$criteria->add(FileSyncPeer::DC, array($sourceDc, $storageIdDest), Criteria::IN);
 				$criteria->add(FileSyncPeer::PARTNER_ID, $asset->getPartnerId(), Criteria::EQUAL);
 				$criteria->addDescendingOrderByColumn(FileSyncPeer::VERSION);
@@ -102,6 +115,7 @@ function main($sourceDc, $storageIdDest, $filePath)
 				{
 					if ($fileSync->getDc() == $sourceDc && $fileSync->getFileSize() > 0 && $fileSync->getVersion() > $maxVersion)
 					{
+						$maxVersion = $fileSync->getVersion();
 						$fileSyncToHandle = $fileSync;
 					}
 				}
@@ -114,7 +128,7 @@ function main($sourceDc, $storageIdDest, $filePath)
 				// look for a sibling with same version on the remote storage
 				foreach ($fileSyncs as /** @var FileSync $fileSync * */ $fileSync)
 				{
-					if ($fileSync->getDc() === $storageIdDest && $fileSync->getVersion() == $fileSyncToHandle->getVersion())
+					if ($fileSync->getDc() == $storageIdDest && $fileSync->getVersion() == $fileSyncToHandle->getVersion())
 					{
 						$remoteDcFileSyncFound = true;
 					}

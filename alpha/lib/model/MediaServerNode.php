@@ -85,7 +85,7 @@ abstract class MediaServerNode extends DeliveryServerNode {
         return '';
     }
 
-	public function getSessionIdUrlString($entryServerNode)
+	public function getSessionType($entryServerNode)
 	{
 		return '';
 	}
