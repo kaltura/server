@@ -50,7 +50,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 	*/
 	public function run($jobs = null)
 	{
-		KalturaLog::info('Getting all the entry vendor task items');
+		KalturaLog::debug('Getting all the entry vendor task items');
 		$filter = new KalturaEntryVendorTaskFilter();
 		$filter->statusIn = KalturaEntryVendorTaskStatus::PENDING . ',' . KalturaEntryVendorTaskStatus::PROCESSING;
 		$filter->updatedAtLessThanOrEqual = time();
