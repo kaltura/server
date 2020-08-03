@@ -12,6 +12,11 @@ class ESearchEntryItem extends ESearchItem
 	protected $fieldName;
 
 	/**
+	 * @var bool
+	 */
+	protected $ignoreDisplayInSearch = true;
+
+	/**
 	 * @var string
 	 */
 	protected $searchTerm;
@@ -110,6 +115,22 @@ class ESearchEntryItem extends ESearchItem
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getIgnoreDisplayInSearch()
+	{
+		return $this->ignoreDisplayInSearch;
+	}
+
+	/**
+	 * @param bool $ignoreDisplayInSearch
+	 */
+	public function setIgnoreDisplayInSearch($ignoreDisplayInSearch)
+	{
+		$this->ignoreDisplayInSearch = $ignoreDisplayInSearch;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getSearchTerm()
@@ -177,13 +198,16 @@ class ESearchEntryItem extends ESearchItem
 				$subQuery = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
+				KalturaLog::log("Undefined item type[" . $this->getItemType() . "]");
 		}
 
-		if ($this->getItemType() == ESearchItemType::EXACT_MATCH && in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
+		if ($this->getItemType() == ESearchItemType::EXACT_MATCH
+			&& in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields)
+			&& $this->getIgnoreDisplayInSearch())
+		{
 			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
-
-		if($subQuery)
+		}
+		if ($subQuery)
 			$entryQuery[] = $subQuery;
 	}
 

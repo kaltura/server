@@ -12,6 +12,14 @@ class KalturaDeliveryProfileCondition extends KalturaCondition
 	 */
 	public $deliveryProfileIds;
 	
+	/**
+         * Init object type
+         */
+        public function __construct()
+        {
+                $this->type = ConditionType::DELIVERY_PROFILE;
+        }
+	
 	private static $mapBetweenObjects = array
 	(
 		'deliveryProfileIds',

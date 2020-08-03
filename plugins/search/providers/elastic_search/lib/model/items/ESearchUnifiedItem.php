@@ -5,9 +5,7 @@
  */
 class ESearchUnifiedItem extends ESearchItem
 {
-
 	const UNIFIED = 'unified';
-
 	const ENTRY_QUERY_GROUP = 'entry';
 	const CATEGORY_ENTRY_QUERY_GROUP = 'category_entry';
 	const CUE_POINT_QUERY_GROUP = 'cue_point';
@@ -16,6 +14,28 @@ class ESearchUnifiedItem extends ESearchItem
 
 	public static $unifiedQueryGroups = array(self::ENTRY_QUERY_GROUP, self::CATEGORY_ENTRY_QUERY_GROUP, self::CUE_POINT_QUERY_GROUP, self::CAPTIONS_QUERY_GROUP, self::METADATA_QUERY_GROUP);
 	public static $excludedUnifiedQueryGroups = array();
+
+	/**
+	 * @var bool
+	 */
+	protected $ignoreDisplayInSearch = true;
+
+	/**
+	 * @return bool
+	 */
+	public function getIgnoreDisplayInSearch()
+	{
+		return $this->ignoreDisplayInSearch;
+	}
+
+	/**
+	 * @param bool $ignoreDisplayInSearch
+	 */
+	public function setIgnoreDisplayInSearch($ignoreDisplayInSearch)
+	{
+		$this->ignoreDisplayInSearch = $ignoreDisplayInSearch;
+	}
+
 	/**
 	 * @var string
 	 */
@@ -80,7 +100,7 @@ class ESearchUnifiedItem extends ESearchItem
 		return $outQuery;
 	}
 
-	private static function addEntryFieldsToUnifiedQuery($eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
+	private static function addEntryFieldsToUnifiedQuery(ESearchUnifiedItem $eSearchUnifiedItem, &$entryUnifiedQuery, &$queryAttributes)
 	{
 		$entryItems = array();
 		$entryAllowedFields = ESearchEntryItem::getAllowedSearchTypesForField();
@@ -91,6 +111,7 @@ class ESearchUnifiedItem extends ESearchItem
 			if (in_array($eSearchUnifiedItem->getItemType(), $fieldAllowedTypes) && in_array(self::UNIFIED, $fieldAllowedTypes))
 			{
 				$entryItem = new ESearchEntryItem();
+				$entryItem->setIgnoreDisplayInSearch($eSearchUnifiedItem->getIgnoreDisplayInSearch());
 				$entryItem->setFieldName($fieldName);
 				$entryItem->setSearchTerm($eSearchUnifiedItem->getSearchTerm());
 				$entryItem->setItemType($eSearchUnifiedItem->getItemType());

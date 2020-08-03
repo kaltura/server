@@ -29,7 +29,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $description;
-	
+
 	/**
 	 * @var KalturaDropFolderType
 	 * @filter eq,in
