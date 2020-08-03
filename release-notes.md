@@ -1,4 +1,12 @@
 # Propus 16.8.0  #
+
+## Adding permission to entryVendorTask object and to entryVendorTask service ##
+Issue Type: Task
+Issue ID : REACH2-911
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_09_add_permissions_entry_vendor_task.php
+
 ## New KMS user reset password link  ##
 - Issue Type: Task
 - Issue ID: PLAT-10876
