@@ -211,7 +211,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaKeyValueArray
-	 * @insertonly
 	 */
 	public $additionalParams;
 	
@@ -449,8 +448,25 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			$this->monitorUsage = null;
 		}
 	}
-	
-	
+
+	public function toObject($dbObject = null, $propsToSkip = array())
+	{
+		parent::toObject($dbObject, $propsToSkip);
+
+		/* @var $dbObject Partner */
+		if($this->additionalParams)
+		{
+			$additionalParamsArray = array();
+			foreach($this->additionalParams as $pairObject)
+			{
+				$additionalParamsArray[$pairObject->key] = $pairObject->value;
+			}
+			$dbObject->setAdditionalParams($additionalParamsArray);
+		}
+
+		return $dbObject;
+	}
+
 	/**
 	 * Function runs required validations on the current KalturaPartner object and 
 	 * if all validations are successful, creates a new DB object for it and returns it.
@@ -492,20 +508,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validateForInsert();
 
 		$partner = new Partner();
-		$partner = parent::toObject( $partner );
-		/* @var $partner Partner */
-		
-		if($this->additionalParams)
-		{
-			$additionalParamsArray = array();
-			foreach($this->additionalParams as $pairObject)
-			{
-				$additionalParamsArray[$pairObject->key] = $pairObject->value;
-			}
-			$partner->setAdditionalParams($additionalParamsArray);
-		}
-		
-		return $partner;
+		return parent::toObject($partner);
 	}
 
 	public function getExtraFilters()
