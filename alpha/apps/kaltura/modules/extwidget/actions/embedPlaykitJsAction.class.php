@@ -47,6 +47,8 @@ class embedPlaykitJsAction extends sfAction
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
+	private $bundleConfigUpdated = false;
+	private $confVarsArr = null;
 
 	public function execute()
 	{
@@ -75,6 +77,21 @@ class embedPlaykitJsAction extends sfAction
 
 	public static function buildBundleLocked($context)
 	{
+		// Save to the uiconf if the bundle config has been updated with the analytics plugins
+		if ($context->bundleConfigUpdated)
+		{
+			if (isset($context->confVarsArr[self::VERSIONS_PARAM_NAME]))
+			{
+				$context->confVarsArr[self::VERSIONS_PARAM_NAME] = $context->bundleConfig;
+			}
+			else
+			{
+				$context->confVarsArr = $context->bundleConfig;
+			}
+			$context->uiConf->setConfVars(json_encode($context->confVarsArr));
+			$context->uiConf->save();
+		}
+		
 		//if bundle not exists or explicitly should be regenerated build it
 		if(!$context->regenerate)
 		{
@@ -517,7 +534,7 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
-	private function maybeAddAnalyticsPlugins($confVarsArr)
+	private function maybeAddAnalyticsPlugins()
 	{
 		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
 		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
@@ -528,7 +545,6 @@ class embedPlaykitJsAction extends sfAction
 			$betaVersionMap = $this->getConfigByVersion("beta")[0];
 			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
 			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
-			$bundleConfigUpdated = false;
 
 			// For player latest/beta >= 0.56.0 or canary
 			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
@@ -540,7 +556,7 @@ class embedPlaykitJsAction extends sfAction
 				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
 				}
-				$bundleConfigUpdated = true;
+				$this->bundleConfigUpdated = true;
 			}
 			// For specific version >= 0.56.0
 			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
@@ -550,22 +566,7 @@ class embedPlaykitJsAction extends sfAction
 				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
 				}
-				$bundleConfigUpdated = true;
-			}
-
-			// Save to the uiconf if updated
-			if ($bundleConfigUpdated)
-			{
-				if (isset($confVarsArr[self::VERSIONS_PARAM_NAME]))
-				{
-					$confVarsArr[self::VERSIONS_PARAM_NAME] = $this->bundleConfig;
-				}
-				else
-				{
-					$confVarsArr = $this->bundleConfig;
-				}
-				$this->uiConf->setConfVars(json_encode($confVarsArr));
-				$this->uiConf->save();
+				$this->bundleConfigUpdated = true;
 			}
 		}
 	}
@@ -694,20 +695,20 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 
-		$confVarsArr = json_decode($confVars, true);
-		$this->bundleConfig = $confVarsArr;
-		if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
-			$this->bundleConfig = $confVarsArr[self::VERSIONS_PARAM_NAME];
+		$this->confVarsArr = json_decode($confVars, true);
+		$this->bundleConfig = $this->confVarsArr;
+		if (isset($this->confVarsArr[self::VERSIONS_PARAM_NAME])) {
+			$this->bundleConfig = $this->confVarsArr[self::VERSIONS_PARAM_NAME];
 		}
-		if (isset($confVarsArr[self::LANGS_PARAM_NAME])) {
-			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
+		if (isset($this->confVarsArr[self::LANGS_PARAM_NAME])) {
+			$this->uiConfLangs = $this->confVarsArr[self::LANGS_PARAM_NAME];
 		}
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
-		$this->maybeAddAnalyticsPlugins($confVarsArr);
+		$this->maybeAddAnalyticsPlugins();
 		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
