@@ -2179,13 +2179,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		catch (Exception $e)
 		{
 			kalturaLog::warning('Could not execute image transformation');
-			if(kConf::get('throw_on_failure', 'thumbnail', false))
+			if(kConf::get('throw_on_failure', 'thumbnail', null))
 			{
 				throw $e;
 			}
 			else
 			{
-				kalturaLog::warning("transformations failed with error {$e->getMessage()}");
+				kalturaLog::warning("transformations failed with error {$e->getMessage()} {$e->getTraceAsString()}");
 			}
 		}
 
