@@ -433,7 +433,7 @@ class ReportService extends KalturaBaseService
 
 		if (strlen($params->reportsItemsGroup) > self::MAX_EXPORT_GROUP_NAME_LENGTH)
 		{
-			substr($params->reportsItemsGroup, self::MAX_EXPORT_GROUP_NAME_LENGTH);
+			$params->reportsItemsGroup = substr($params->reportsItemsGroup,0, self::MAX_EXPORT_GROUP_NAME_LENGTH);
 		}
 
 		$dbBatchJob = kJobsManager::addExportReportJob($params);
