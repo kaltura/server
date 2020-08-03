@@ -47,7 +47,7 @@ class embedPlaykitJsAction extends sfAction
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
-	private $bundleConfigUpdated = false;
+	private $bundleConfigToSave = null;
 	private $confVarsArr = null;
 
 	public function execute()
@@ -78,15 +78,15 @@ class embedPlaykitJsAction extends sfAction
 	public static function buildBundleLocked($context)
 	{
 		// Save to the uiconf if the bundle config has been updated with the analytics plugins
-		if ($context->bundleConfigUpdated)
+		if ($context->bundleConfigToSave)
 		{
 			if (isset($context->confVarsArr[self::VERSIONS_PARAM_NAME]))
 			{
-				$context->confVarsArr[self::VERSIONS_PARAM_NAME] = $context->bundleConfig;
+				$context->confVarsArr[self::VERSIONS_PARAM_NAME] = $context->bundleConfigToSave;
 			}
 			else
 			{
-				$context->confVarsArr = $context->bundleConfig;
+				$context->confVarsArr = $context->bundleConfigToSave;
 			}
 			$context->uiConf->setConfVars(json_encode($context->confVarsArr));
 			$context->uiConf->save();
@@ -556,7 +556,7 @@ class embedPlaykitJsAction extends sfAction
 				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
 				}
-				$this->bundleConfigUpdated = true;
+				$this->bundleConfigToSave = $this->bundleConfig;
 			}
 			// For specific version >= 0.56.0
 			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
@@ -566,7 +566,7 @@ class embedPlaykitJsAction extends sfAction
 				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
 				}
-				$this->bundleConfigUpdated = true;
+				$this->bundleConfigToSave = $this->bundleConfig;
 			}
 		}
 	}
