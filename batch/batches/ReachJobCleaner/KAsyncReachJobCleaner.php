@@ -17,6 +17,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 {
 	const JOB_DUE_DATE_EXCEEDED_MESSAGE = 'Job Due Date was exceeded in ';
 	const MAX_PAGE_SIZE = 500;
+	const MAX_MATCHES = 10000;
 
 	/*
 	* @var KalturaReachClientPlugin
@@ -60,39 +61,37 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		$pager->pageSize = self::MAX_PAGE_SIZE;
 		$pager->pageIndex = 1;
 
-		$lastUpdatedAt = 0;
-		$totalCount = 0;
-		do {
-			if ($lastUpdatedAt)
-			{
-				$filter->updatedAtGreaterThanOrEqual = $lastUpdatedAt;
-			}
-			try
-			{
-				$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::debug('Could not list Entry Vendor Tasks ' . $e->getMessage());
-				return;
-			}
+		try
+		{
+			$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::debug('Could not list Entry Vendor Tasks ' . $e->getMessage());
+			return;
+		}
 
+		$totalCount = min($entryVendorTaskList->totalCount, self::MAX_MATCHES - 1);
+		while ($totalCount > 0 && $pager->pageIndex <= 20)
+		{
 			$this->updateStuckJobs($entryVendorTaskList);
-			$tasksCount = count($entryVendorTaskList->objects);
-			$totalCount += $tasksCount;
-			KalturaLog::debug("Handled More tasks - $tasksCount totalCount - " . $totalCount);
-			if ($tasksCount)
-			{
-				$lastObject = end($entryVendorTaskList->objects);
-				$lastUpdatedAt = $lastObject->updatedAt + 1;
-			}
 
-			unset($entryVendorTaskList);
-			if (function_exists('gc_collect_cycles')) // php 5.3 and above
+			$pager->pageIndex++;
+			$totalCount = $totalCount - $pager->pageSize;
+			$pager->pageSize = min(self::MAX_PAGE_SIZE, $totalCount);
+			if ($pager->pageSize > 0)
 			{
-				gc_collect_cycles();
+				try
+				{
+					$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::debug('Could not list Entry Vendor Tasks ' . $e->getMessage());
+					return;
+				}
 			}
-		} while ($tasksCount > 0);
+		}
 
 		KalturaLog::debug('Done');
 	}
