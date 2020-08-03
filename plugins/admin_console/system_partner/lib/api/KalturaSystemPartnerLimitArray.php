@@ -19,7 +19,7 @@ class KalturaSystemPartnerLimitArray extends KalturaTypedArray
 			$limits = array();
 			if ($typeValue == KalturaSystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG)
 			{
-				$limits =  KalturaSystemPartnerLiveAdminTagLimit::getArrayFromPartner($partner);
+				$limits =  KalturaSystemPartnerLiveAdminTagLimit::getArrayFromPartner($typeValue, $partner);
 			} 
 			else
 			{

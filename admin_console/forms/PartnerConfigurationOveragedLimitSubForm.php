@@ -47,7 +47,7 @@ class Form_PartnerConfigurationOveragedLimitSubForm extends Form_PartnerConfigur
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		return parent::getObject("Kaltura_Client_SystemPartner_Type_SystemPartnerOveragedLimit", $properties, $add_underscore, $include_empty_fields);
+		return parent::getObject('Kaltura_Client_SystemPartner_Type_SystemPartnerOveragedLimit', $properties, $add_underscore, $include_empty_fields);
 	}
 
 }

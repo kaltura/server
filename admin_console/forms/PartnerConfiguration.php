@@ -936,8 +936,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		//Add dynamic limits from admin.ini
 		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
 		{
-			$limitSubForm = new Form_PartnerConfigurationLimitByAdminTagSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG."_$limit->adminTag", $limit->label, $limit->adminTag);
-			$this->addLimitSubForm($limitSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag");
+			$limitType = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag";
+			$limitSubForm = new Form_PartnerConfigurationLimitByAdminTagSubForm($limitType, $limit->label, $limit->adminTag);
+			$this->addLimitSubForm($limitSubForm, $limitType);
 		}
 
 	}
@@ -996,7 +997,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$dynamicLimitTypes = [];
 		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
 		{
-			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG."_$limit->adminTag" . '_max';
+			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag" . '_max';
 		}
 
 		$this->addDisplayGroup(array_merge(array(
@@ -1016,7 +1017,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max')
-									, $dynamicLimitTypes, array('crossLine')),'includedUsageSecondPart');
+									, $dynamicLimitTypes, array('crossLine')), 'includedUsageSecondPart');
 
 		$this->addDisplayGroup(
 			array_merge(
@@ -1073,7 +1074,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	 * @param  $limit
 	 * @return string
 	 */
-	private function getLimitTypeKey($limit)
+	protected function getLimitTypeKey($limit)
 	{
 		return $limit instanceof Kaltura_Client_SystemPartner_Type_SystemPartnerLiveAdminTagLimit ? $limit->type . '_' . $limit->adminTag : $limit->type;
 	}

@@ -217,7 +217,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		foreach (explode(',', $liveEntry->getAdminTags()) as $adminTag)
 		{
-			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] == 0)
+			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
 			{
 				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $liveEntry->getId(), $adminTag, $adminTagsOrigLimits[$adminTag]);
 			}
@@ -744,7 +744,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @param array $adminTagsCounters
 	 * @return boolean
 	 */
-	private function updateAdminTagsCounters(LiveEntry $entry, &$adminTagsCounters)
+	protected function updateAdminTagsCounters(LiveEntry $entry, &$adminTagsCounters)
 	{
 		$counterChanged = false;
 		foreach (array_keys($adminTagsCounters) as $adminTag)
