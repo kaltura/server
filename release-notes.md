@@ -10,7 +10,7 @@ add the following to 'local.ini' under 'password_reset_links':
 
 ## DropFolder Enhancements - allow publisher admin KS to set description and status of drop folders  ##
 Issue Type: Task
-Issue ID : PLAT-14576
+Issue ID : PSVAMB-14576
 
 #### Deployment Scripts ####
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_25_addNewDropFolderServiceActions.php
