@@ -5,7 +5,7 @@
 
 ### Configuration ###
 add the following to 'local.ini' under 'password_reset_links':
-    kms = http://%s.mediaspace.kaltura.com/auth/set-account-password/
+    kms = https://%s.mediaspace.kaltura.com/auth/set-account-password/
 
 # Propus 16.7.0  #
 ## Adding privileges field on widget object ##
