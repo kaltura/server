@@ -21,6 +21,11 @@ class embedPlaykitJsAction extends sfAction
 	const CANARY = "{canary}";
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
+	const PLAYKIT_KAVA = 'playkit-kava';
+	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
+	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
+	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
+	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -42,6 +47,8 @@ class embedPlaykitJsAction extends sfAction
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
+	private $bundleConfigToSave = null;
+	private $confVarsArr = null;
 
 	public function execute()
 	{
@@ -70,6 +77,21 @@ class embedPlaykitJsAction extends sfAction
 
 	public static function buildBundleLocked($context)
 	{
+		// Save to the uiconf if the bundle config has been updated with the analytics plugins
+		if ($context->bundleConfigToSave)
+		{
+			if (isset($context->confVarsArr[self::VERSIONS_PARAM_NAME]))
+			{
+				$context->confVarsArr[self::VERSIONS_PARAM_NAME] = $context->bundleConfigToSave;
+			}
+			else
+			{
+				$context->confVarsArr = $context->bundleConfigToSave;
+			}
+			$context->uiConf->setConfVars(json_encode($context->confVarsArr));
+			$context->uiConf->save();
+		}
+		
 		//if bundle not exists or explicitly should be regenerated build it
 		if(!$context->regenerate)
 		{
@@ -512,6 +534,43 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
+	private function maybeAddAnalyticsPlugins()
+	{
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
+		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
+		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig))
+		{
+			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
+			$latestVersionMap = $this->getConfigByVersion("latest")[0];
+			$betaVersionMap = $this->getConfigByVersion("beta")[0];
+			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
+			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+
+			// For player latest/beta >= 0.56.0 or canary
+			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
+				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
+				$playerVersion == self::CANARY)
+			{
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
+				if ($tvPlayerConfig)
+				{
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
+				}
+				$this->bundleConfigToSave = $this->bundleConfig;
+			}
+			// For specific version >= 0.56.0
+			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
+			{
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
+				if ($tvPlayerConfig)
+				{
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
+				}
+				$this->bundleConfigToSave = $this->bundleConfig;
+			}
+		}
+	}
+
 	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -636,20 +695,21 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 
-		$confVarsArr = json_decode($confVars, true);
-		$this->bundleConfig = $confVarsArr;
-		if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
-			$this->bundleConfig = $confVarsArr[self::VERSIONS_PARAM_NAME];
+		$this->confVarsArr = json_decode($confVars, true);
+		$this->bundleConfig = $this->confVarsArr;
+		if (isset($this->confVarsArr[self::VERSIONS_PARAM_NAME])) {
+			$this->bundleConfig = $this->confVarsArr[self::VERSIONS_PARAM_NAME];
 		}
-		if (isset($confVarsArr[self::LANGS_PARAM_NAME])) {
-			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
+		if (isset($this->confVarsArr[self::LANGS_PARAM_NAME])) {
+			$this->uiConfLangs = $this->confVarsArr[self::LANGS_PARAM_NAME];
 		}
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
-        $this->setFixVersionsNumber();
+		$this->maybeAddAnalyticsPlugins();
+		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
 
