@@ -3,9 +3,7 @@
  * @package plugins.sip
  * @subpackage api.enum
  */
-class KalturaSipSourceType extends KalturaEnum
+class KalturaSipSourceType extends KalturaEnum implements SipSourceType
 {
-	const PICTURE_IN_PICTURE = 1;
-	const TALKING_HEADS = 2;
-	const SCREEN_SHARE = 3;
+
 }
