@@ -737,18 +737,6 @@ class LiveStreamService extends KalturaLiveEntryService
 	}
 
 	/**
-	 * Check if entry contains adminTag
-	 *
-	 * @param LiveEntry $entry
-	 * @param string $adminTag
-	 * @return boolean
-	 */
-	private function entryContainsAdminTag(LiveEntry $entry, $adminTag)
-	{
-		return in_array($adminTag, explode(',', $entry->getAdminTags()));
-	}
-
-	/**
 	 * updating the adminTagCounter of the entry admin tags. If entry contains one (or more) of adminTagsCounters tags
 	 * the method will decrease its counter(s) by 1 and return true, otherwise - return false.
 	 *

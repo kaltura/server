@@ -16,7 +16,7 @@ class KalturaSystemPartnerLimitArray extends KalturaTypedArray
 		$types = $reflector->getConstants();
 		foreach($types as $typeInfo) {
 			$typeValue = $typeInfo->getDefaultValue();
-			$limits = null;
+			$limits = array();
 			if ($typeValue == KalturaSystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG)
 			{
 				$limits =  KalturaSystemPartnerLiveAdminTagLimit::getArrayFromPartner($partner);
