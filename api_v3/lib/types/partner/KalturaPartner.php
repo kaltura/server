@@ -407,7 +407,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
-		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage'
+		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -447,24 +447,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			$this->lastFreeTrialNotificationDay = null;
 			$this->monitorUsage = null;
 		}
-	}
-
-	public function toObject($dbObject = null, $propsToSkip = array())
-	{
-		parent::toObject($dbObject, $propsToSkip);
-
-		/* @var $dbObject Partner */
-		if($this->additionalParams)
-		{
-			$additionalParamsArray = array();
-			foreach($this->additionalParams as $pairObject)
-			{
-				$additionalParamsArray[$pairObject->key] = $pairObject->value;
-			}
-			$dbObject->setAdditionalParams($additionalParamsArray);
-		}
-
-		return $dbObject;
 	}
 
 	/**
