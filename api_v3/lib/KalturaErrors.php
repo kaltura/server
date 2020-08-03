@@ -528,6 +528,8 @@ class KalturaErrors extends APIErrors
 
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL;;Unable to create report. Query produced too many results";
 
+	const INVALID_REPORT_ITEMS_GROUP = "INVALID_REPORT_ITEMS_GROUP;;Invalid report items group";
+
 
 	/**
 	 * user service

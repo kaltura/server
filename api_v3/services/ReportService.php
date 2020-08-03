@@ -8,6 +8,7 @@
 class ReportService extends KalturaBaseService
 {
 	const MAX_CSV_FILE_NAME_LENGTH = 200;
+	const MAX_EXPORT_GROUP_NAME_LENGTH = 100;
 	protected static $crossPartnerReports = array(
 		ReportType::PARTNER_USAGE,
 		ReportType::VAR_USAGE,
@@ -430,6 +431,11 @@ class ReportService extends KalturaBaseService
 			}
 		}
 
+		if (strlen($params->reportsItemsGroup) > self::MAX_EXPORT_GROUP_NAME_LENGTH)
+		{
+			substr($params->reportsItemsGroup, self::MAX_EXPORT_GROUP_NAME_LENGTH);
+		}
+
 		$dbBatchJob = kJobsManager::addExportReportJob($params);
 
 		$response = new KalturaReportExportResponse();
@@ -455,6 +461,12 @@ class ReportService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER);
 			}
 		}
+
+		if ($params->reportsItemsGroup && !preg_match('/^[\w]+([\s][\w]+)*$/', $params->reportsItemsGroup))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_REPORT_ITEMS_GROUP);
+		}
+
 	}
 
 	protected function parseParamsStr($paramsStr)
