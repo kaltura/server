@@ -10,7 +10,7 @@ class KalturaSystemPartnerLiveAdminTagLimit extends KalturaSystemPartnerLimit
 	 */
 	public $adminTag;
 
-	public static function buildFrom($adminTag, $value)
+	public static function createLiveAdminTagLimit($adminTag, $value)
 	{
 		$res = new KalturaSystemPartnerLiveAdminTagLimit();
 		$res->type = KalturaSystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG;
@@ -29,7 +29,7 @@ class KalturaSystemPartnerLiveAdminTagLimit extends KalturaSystemPartnerLimit
 		$limits = $partner->getMaxConcurrentLiveByAdminTag();
 		foreach ($limits as $adminTag => $value)
 		{
-			$res[] = self::buildFrom($adminTag, $value);
+			$res[] = self::createLiveAdminTagLimit($adminTag, $value);
 		}
 		return $res;
 	}

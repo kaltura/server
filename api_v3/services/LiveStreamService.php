@@ -761,7 +761,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$counterChanged = false;
 		foreach (array_keys($adminTagsCounters) as $adminTag)
 		{
-			if($this->entryContainsAdminTag($entry, $adminTag))
+			if($entry->isContainsAdminTag($adminTag))
 			{
 				$adminTagsCounters[$adminTag]--;
 				$counterChanged = true;

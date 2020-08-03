@@ -16,17 +16,18 @@ class KalturaSystemPartnerLimitArray extends KalturaTypedArray
 		$types = $reflector->getConstants();
 		foreach($types as $typeInfo) {
 			$typeValue = $typeInfo->getDefaultValue();
+			$limits = null;
 			if ($typeValue == KalturaSystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG)
 			{
-				$adminTagLimits =  KalturaSystemPartnerLiveAdminTagLimit::getArrayFromPartner($partner);
-				foreach ($adminTagLimits as $adminTagLimit)
-				{
-					$arr[] = $adminTagLimit;
-				}
+				$limits =  KalturaSystemPartnerLiveAdminTagLimit::getArrayFromPartner($partner);
 			} 
 			else
 			{
-				$arr[] = KalturaSystemPartnerOveragedLimit::fromPartner($typeValue, $partner);
+				$limits = KalturaSystemPartnerOveragedLimit::getArrayFromPartner($typeValue, $partner);
+			}
+			foreach ($limits as $limit)
+			{
+				$arr[] = $limit;
 			}
 		}
 		return $arr;

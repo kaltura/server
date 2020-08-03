@@ -96,17 +96,8 @@ class Form_PartnerConfigurationLimitSubForm extends Zend_Form_SubForm
 	
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)
 	{
-		$object = null;
+		$object = ($objectType && $objectType != '') ? new $objectType() : new Kaltura_Client_SystemPartner_Type_SystemPartnerLimit();
 
-		if($objectType && $objectType != '')
-		{
-			$object = new $objectType();
-		} 
-		else 
-		{
-			$object = new Kaltura_Client_SystemPartner_Type_SystemPartnerLimit();
-		}
-		
 		foreach($properties as $prop => $value)
 		{
 			if($add_underscore)
