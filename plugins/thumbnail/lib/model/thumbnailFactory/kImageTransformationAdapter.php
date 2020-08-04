@@ -100,10 +100,10 @@ class kImageTransformationAdapter
 		switch($this->parameters->get(kThumbFactoryFieldName::TYPE))
 		{
 			case kExtwidgetThumbnailActionType::RESIZE:
-				$this->AddResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT), true);
+				$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT), true);
 				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
-				$this->AddResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
+				$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
 				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_PADDING:
 				if($this->parameters->get(kThumbFactoryFieldName::WIDTH) && $this->parameters->get(kThumbFactoryFieldName::HEIGHT))
@@ -112,7 +112,7 @@ class kImageTransformationAdapter
 				}
 				else
 				{
-					$this->AddResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
+					$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
 				}
 
 				break;
@@ -133,7 +133,7 @@ class kImageTransformationAdapter
 		$resizeWidth = $this->parameters->get(kThumbFactoryFieldName::WIDTH) ? $this->parameters->get(kThumbFactoryFieldName::WIDTH) : $this->parameters->get(kThumbFactoryFieldName::HEIGHT);
 		$resizeHeight = $this->parameters->get(kThumbFactoryFieldName::HEIGHT) ? $this->parameters->get(kThumbFactoryFieldName::HEIGHT) : $this->parameters->get(kThumbFactoryFieldName::WIDTH);
 		$gravityPoint = $this->getGravityByXY();
-		$this->AddResizeAction($step, $resizeWidth, $resizeHeight, true);
+		$this->addResizeAction($step, $resizeWidth, $resizeHeight, true);
 		$cropAction = new kCropAction();
 		$cropAction->setActionParameter(kThumbnailParameterName::GRAVITY_POINT, $gravityPoint);
 		$cropAction->setActionParameter(kThumbnailParameterName::WIDTH, $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH));
@@ -205,7 +205,7 @@ class kImageTransformationAdapter
 		$cropAction->setActionParameter(kThumbnailParameterName::WIDTH, $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH));
 		$cropAction->setActionParameter(kThumbnailParameterName::HEIGHT, $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT));
 		$step->addAction($cropAction);
-		$this->AddResizeAction($step, $resizeWidth, $resizeHeight, true);
+		$this->addResizeAction($step, $resizeWidth, $resizeHeight, true);
 	}
 
 	/**
@@ -282,7 +282,7 @@ class kImageTransformationAdapter
 	protected function handleResizeWithPadding($step)
 	{
 		$this->calculatePadding($borderHeight, $borderWidth);
-		$this->AddResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
+		$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
 		$borderAction = new kBorderImageAction();
 		$borderAction->setActionParameter(kThumbnailParameterName::BACKGROUND_COLOR, $this->parameters->get(kThumbFactoryFieldName::BG_COLOR));
 		$borderAction->setActionParameter(kThumbnailParameterName::WIDTH, $borderWidth);
@@ -338,7 +338,7 @@ class kImageTransformationAdapter
 	 * @param $height
 	 * @param bool $bestFit
 	 */
-	protected function AddResizeAction($step, $width, $height, $bestFit = false)
+	protected function addResizeAction($step, $width, $height, $bestFit = false)
 	{
 		$action = new kResizeAction();
 		$bestFit = $bestFit && ($this->parameters->get(kThumbFactoryFieldName::WIDTH) > kResizeAction::BEST_FIT_MIN && $this->parameters->get(kThumbFactoryFieldName::HEIGHT) > kResizeAction::BEST_FIT_MIN);

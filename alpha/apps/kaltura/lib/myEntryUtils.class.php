@@ -2185,7 +2185,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			}
 			else
 			{
-				kalturaLog::warning("transformations failed with error {$e->getMessage()} {$e->getTraceAsString()}");
+				kalturaLog::err("transformations failed with error {$e->getMessage()}");
 			}
 		}
 
