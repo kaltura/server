@@ -69,7 +69,7 @@ class kAssetUtils
 	}
 	
 
-	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null)
+	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '')
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
@@ -100,14 +100,7 @@ class kAssetUtils
 
 			$protocol = infraRequestUtils::getProtocol();
 			$profileAttributes->setMediaProtocol($protocol);
-			if ($cdnUrl)
-			{
-				$url = $cdnUrl . $urlManager->getAssetUrl($asset);
-			}
-			else
-			{
-				$url = $urlManager->getFullAssetUrl($asset);
-			}
+			$url = $urlManager->getFullAssetUrl($asset);
 
 			$url = preg_replace('/^https?:\/\//', '', $url);
 
