@@ -11,12 +11,7 @@ class serveFlavorAction extends kalturaAction
 	const JSON_CONTENT_TYPE = 'application/json';
 
 	const SECOND_IN_MILLISECONDS = 1000;
-	const LIVE_CHANNEL_SEGMENT_DURATION = 10000; // 10 seconds in milliseconds
 	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
-	const DVR_WINDOW_SIZE = 100000; // LIVE_CHANNEL_SEGMENT_DURATION * 10 segments;
-
-	const LIVE_HLS = 'hls';
-	const LIVE_HLSS = 'hlss';
 
 	protected $pathOnly = false;
 	protected static $preferredStorageId = null;
@@ -854,25 +849,26 @@ class serveFlavorAction extends kalturaAction
 		return strstr($_SERVER['REQUEST_URI'],'/' . $param . '/');
 	}
 
+
 	protected function getLiveParams()
 	{
-		$section = 'defaults';
+		$segmentDuration = null;
+		$dvrWindowSize = null;
 
-		if(self::hasParamInRequestUri(self::LIVE_HLS))
+		$liveMap = kConf::getMap('live');
+		foreach ($liveMap as $section => $params)
 		{
-			$section = self::LIVE_HLS;
+			if(self::hasParamInRequestUri($section))
+			{
+				$segmentDuration = $params['segDuration'];
+				$dvrWindowSize = $params['dvrWindowSize'];
+				break;
+			}
 		}
-		else if(self::hasParamInRequestUri(self::LIVE_HLSS))
-		{
-			$section = self::LIVE_HLSS;
-		}
 
-		$segmentDuration = kConf::getArrayValue('segDuration', $section, 'live', self::LIVE_CHANNEL_SEGMENT_DURATION);
-		$dvrWindowSize = kConf::getArrayValue('dvrWindowSize', $section, 'live', self::DVR_WINDOW_SIZE);
-
-		if(!$segmentDuration)
+		if(is_null($segmentDuration) || is_null($dvrWindowSize))
 		{
-			KExternalErrors::dieError(KExternalErrors::LIVE_SEGMENT_DURATION_IS_ZERO);
+			KExternalErrors::dieError(KExternalErrors::MISSING_LIVE_CONFIGURATION);
 		}
 
 		return array($segmentDuration, $dvrWindowSize);
