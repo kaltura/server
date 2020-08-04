@@ -195,6 +195,8 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveEntries = $this->getLiveEntriesForPartner($liveEntryPartner->getId(), $liveEntry->getId());
 		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
+		$adminTagsOrigLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
+		$adminTagsCounters = $adminTagsOrigLimits;
 		
 		$maxTranscodedStreams = 0;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $liveEntryPartner->getId()))
@@ -207,8 +209,18 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entryConversionProfiles[$liveEntry->getConversionProfileId()][] = $liveEntry->getId();
 		foreach($liveEntries as $entry)
 		{
-			/* @var $entry LiveEntry */
-			$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
+			if(!$this->updateAdminTagsCounters($entry, $adminTagsCounters))
+			{
+				/* @var $entry LiveEntry */
+				$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
+			}
+		}
+		foreach (explode(',', $liveEntry->getAdminTags()) as $adminTag)
+		{
+			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
+			{
+				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $liveEntry->getId(), $adminTag, $adminTagsOrigLimits[$adminTag]);
+			}
 		}
 		
 		$passthroughEntriesCount = 0;
@@ -722,6 +734,28 @@ class LiveStreamService extends KalturaLiveEntryService
 	public function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill = null)
 	{
 		return parent::duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill);
+	}
+
+	/**
+	 * updating the adminTagCounter of the entry admin tags. If entry contains one (or more) of adminTagsCounters tags
+	 * the method will decrease its counter(s) by 1 and return true, otherwise - return false.
+	 *
+	 * @param LiveEntry $entry
+	 * @param array $adminTagsCounters
+	 * @return boolean
+	 */
+	protected function updateAdminTagsCounters(LiveEntry $entry, &$adminTagsCounters)
+	{
+		$counterChanged = false;
+		foreach (array_keys($adminTagsCounters) as $adminTag)
+		{
+			if($entry->isContainsAdminTag($adminTag))
+			{
+				$adminTagsCounters[$adminTag]--;
+				$counterChanged = true;
+			}
+		}
+		return $counterChanged;
 	}
 
 }
