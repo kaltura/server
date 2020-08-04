@@ -74,6 +74,10 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		$totalCount = min($entryVendorTaskList->totalCount, self::MAX_MATCHES - 1);
 		while ($totalCount > 0 && $pager->pageIndex <= 20)
 		{
+			if (count($entryVendorTaskList->objects) == 0)
+			{
+				break;
+			}
 			$this->updateStuckJobs($entryVendorTaskList);
 
 			$pager->pageIndex++;
