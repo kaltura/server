@@ -872,7 +872,7 @@ class serveFlavorAction extends kalturaAction
 
 		if(!$segmentDuration)
 		{
-			KExternalErrors::dieError(KExternalErrors::LIVE_SEGMENT_DURATION);
+			KExternalErrors::dieError(KExternalErrors::LIVE_SEGMENT_DURATION_IS_ZERO);
 		}
 
 		return array($segmentDuration, $dvrWindowSize);
