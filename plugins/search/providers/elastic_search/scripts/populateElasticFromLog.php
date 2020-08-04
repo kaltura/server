@@ -36,6 +36,7 @@ $config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
 if (empty($config))
 {
 	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
+	
 	if (!file_exists($configFile))
 	{
 		KalturaLog::err("Configuration file [$configFile] not found.");
