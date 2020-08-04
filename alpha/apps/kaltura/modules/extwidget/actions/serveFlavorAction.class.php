@@ -870,6 +870,11 @@ class serveFlavorAction extends kalturaAction
 		$segmentDuration = kConf::getArrayValue('segDuration', $section, 'live', self::LIVE_CHANNEL_SEGMENT_DURATION);
 		$dvrWindowSize = kConf::getArrayValue('dvrWindowSize', $section, 'live', self::DVR_WINDOW_SIZE);
 
+		if(!$segmentDuration)
+		{
+			KExternalErrors::dieError(KExternalErrors::LIVE_SEGMENT_DURATION);
+		}
+
 		return array($segmentDuration, $dvrWindowSize);
 	}
 
