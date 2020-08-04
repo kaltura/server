@@ -93,6 +93,12 @@ abstract class kReportExportEngine
 			$this->writeRow("Filtered categories: $categoriesIds");
 		}
 
+		if ($filter->userIds)
+		{
+			$userIds = $filter->userIds;
+			$this->writeRow("Filtered users: $userIds");
+		}
+
 		if (isset($filter->playbackContext))
 		{
 			$playbackContextIds = $filter->playbackContext;
