@@ -47,8 +47,6 @@ class embedPlaykitJsAction extends sfAction
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
-	private $bundleConfigToSave = null;
-	private $confVarsArr = null;
 
 	public function execute()
 	{
@@ -77,21 +75,6 @@ class embedPlaykitJsAction extends sfAction
 
 	public static function buildBundleLocked($context)
 	{
-		// Save to the uiconf if the bundle config has been updated with the analytics plugins
-		if ($context->bundleConfigToSave)
-		{
-			if (isset($context->confVarsArr[self::VERSIONS_PARAM_NAME]))
-			{
-				$context->confVarsArr[self::VERSIONS_PARAM_NAME] = $context->bundleConfigToSave;
-			}
-			else
-			{
-				$context->confVarsArr = $context->bundleConfigToSave;
-			}
-			$context->uiConf->setConfVars(json_encode($context->confVarsArr));
-			$context->uiConf->save();
-		}
-		
 		//if bundle not exists or explicitly should be regenerated build it
 		if(!$context->regenerate)
 		{
@@ -556,7 +539,6 @@ class embedPlaykitJsAction extends sfAction
 				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
 				}
-				$this->bundleConfigToSave = $this->bundleConfig;
 			}
 			// For specific version >= 0.56.0
 			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
@@ -566,7 +548,6 @@ class embedPlaykitJsAction extends sfAction
 				{
 					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
 				}
-				$this->bundleConfigToSave = $this->bundleConfig;
 			}
 		}
 	}
@@ -695,13 +676,13 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
 
-		$this->confVarsArr = json_decode($confVars, true);
-		$this->bundleConfig = $this->confVarsArr;
-		if (isset($this->confVarsArr[self::VERSIONS_PARAM_NAME])) {
-			$this->bundleConfig = $this->confVarsArr[self::VERSIONS_PARAM_NAME];
+		$confVarsArr = json_decode($confVars, true);
+		$this->bundleConfig = $confVarsArr;
+		if (isset($confVarsArr[self::VERSIONS_PARAM_NAME])) {
+			$this->bundleConfig = $confVarsArr[self::VERSIONS_PARAM_NAME];
 		}
-		if (isset($this->confVarsArr[self::LANGS_PARAM_NAME])) {
-			$this->uiConfLangs = $this->confVarsArr[self::LANGS_PARAM_NAME];
+		if (isset($confVarsArr[self::LANGS_PARAM_NAME])) {
+			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
 		}
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
