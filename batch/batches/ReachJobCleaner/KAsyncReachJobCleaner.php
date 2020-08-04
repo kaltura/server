@@ -26,6 +26,8 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 
 	private $overdueTimePercentage = 100;
 
+	private $excludeTurnAroundTimes = '';
+
 	/**
 	 * @param KSchedularTaskConfig $taskConfig
 	 */
@@ -35,6 +37,8 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		$this->reachClientPlugin = KalturaReachClientPlugin::get(self::$kClient);
 		$overdueTimePercentage = $this->getAdditionalParams('overdueTimePercentage');
 		$this->overdueTimePercentage = $overdueTimePercentage ? $overdueTimePercentage : 100;
+		$excludeTurnAroundTimes = $this->getAdditionalParams('excludeTurnAroundTimes');
+		$this->excludeTurnAroundTimes = $excludeTurnAroundTimes ? $excludeTurnAroundTimes : '';
 	}
 
 	/* (non-PHPdoc)
@@ -133,6 +137,11 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 
 		if ($dueDate && $turnAroundTime)
 		{
+			$excludeTurnAroundTimes = explode(',', $this->excludeTurnAroundTimes);
+			if (in_array($turnAroundTime, $excludeTurnAroundTimes))
+			{
+				return false;
+			}
 			if ($turnAroundTime == VendorServiceTurnAroundTime::BEST_EFFORT)
 			{
 				$turnAroundTime = EntryVendorTask::SEVEN_DAYS;
