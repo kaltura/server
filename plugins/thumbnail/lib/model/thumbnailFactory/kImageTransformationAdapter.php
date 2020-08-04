@@ -341,7 +341,7 @@ class kImageTransformationAdapter
 	protected function addResizeAction($step, $width, $height, $bestFit = false)
 	{
 		$action = new kResizeAction();
-		$bestFit = $bestFit && ($this->parameters->get(kThumbFactoryFieldName::WIDTH) > kResizeAction::BEST_FIT_MIN && $this->parameters->get(kThumbFactoryFieldName::HEIGHT) > kResizeAction::BEST_FIT_MIN);
+		$bestFit = $bestFit && $width > kResizeAction::BEST_FIT_MIN && $height > kResizeAction::BEST_FIT_MIN;
 		if($width || $height)
 		{
 			$action->setActionParameter(kThumbnailParameterName::WIDTH, $width);
