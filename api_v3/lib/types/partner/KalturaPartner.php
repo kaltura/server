@@ -211,6 +211,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaKeyValueArray
+	 * @insertonly
 	 */
 	public $additionalParams;
 	
@@ -407,7 +408,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
-		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams'
+		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -448,7 +449,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			$this->monitorUsage = null;
 		}
 	}
-
+	
+	
 	/**
 	 * Function runs required validations on the current KalturaPartner object and 
 	 * if all validations are successful, creates a new DB object for it and returns it.
@@ -490,7 +492,20 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validateForInsert();
 
 		$partner = new Partner();
-		return parent::toObject($partner);
+		$partner = parent::toObject( $partner );
+		/* @var $partner Partner */
+		
+		if($this->additionalParams)
+		{
+			$additionalParamsArray = array();
+			foreach($this->additionalParams as $pairObject)
+			{
+				$additionalParamsArray[$pairObject->key] = $pairObject->value;
+			}
+			$partner->setAdditionalParams($additionalParamsArray);
+		}
+		
+		return $partner;
 	}
 
 	public function getExtraFilters()
