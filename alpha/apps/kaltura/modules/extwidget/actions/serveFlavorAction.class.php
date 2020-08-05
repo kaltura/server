@@ -844,12 +844,6 @@ class serveFlavorAction extends kalturaAction
 		}
 	}
 
-	protected static function hasParamInRequestUri($param)
-	{
-		return strstr($_SERVER['REQUEST_URI'],'/' . $param . '/');
-	}
-
-
 	protected function getLiveParams()
 	{
 		$segmentDuration = null;
@@ -858,7 +852,7 @@ class serveFlavorAction extends kalturaAction
 		$liveMap = kConf::getMap('live');
 		foreach ($liveMap as $section => $params)
 		{
-			if(self::hasParamInRequestUri($section))
+			if(strstr($_SERVER['REQUEST_URI'],"/$section/"))
 			{
 				$segmentDuration = $params['segDuration'];
 				$dvrWindowSize = $params['dvrWindowSize'];
