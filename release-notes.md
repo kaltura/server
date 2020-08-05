@@ -5,7 +5,7 @@
 
 ### Configuration ###
 add the following to 'local.ini' under 'password_reset_links':
-    kms = https://%s.mediaspace.kaltura.com/auth/set-account-password/
+    kms = "https://%s.mediaspace.kaltura.com/user/set-initial-passsord?hashKey="
     
 
 ## DropFolder Enhancements - allow publisher admin KS to set description and status of drop folders  ##
