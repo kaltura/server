@@ -524,8 +524,8 @@ class embedPlaykitJsAction extends sfAction
 		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig))
 		{
 			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
-			$latestVersionMap = $this->getConfigByVersion("latest")[0];
-			$betaVersionMap = $this->getConfigByVersion("beta")[0];
+			list($latestVersionMap) = $this->getConfigByVersion("latest");
+			list($betaVersionMap) = $this->getConfigByVersion("beta");
 			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
 			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
 
