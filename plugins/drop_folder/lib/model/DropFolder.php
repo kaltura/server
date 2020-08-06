@@ -72,8 +72,10 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 
     protected function checkNonEssentialFieldsUpdate ()
     {
-        //All of the custom data fields irrelevant to updatedAt propagation are under the '' namepsace
-        $modifiedCustomDataFields = array_keys($this->getCustomDataOldValues()['']);
+        //All of the custom data fields irrelevant to updatedAt propagation are under the '' namespace
+        $allOldCustomMetadataValues = $this->getCustomDataOldValues();
+
+        $modifiedCustomDataFields = array_keys($allOldCustomMetadataValues['']);
 
         $diff = array_diff($modifiedCustomDataFields, self::$nonEssentialCustomDataFields);
         if (!count($diff))
