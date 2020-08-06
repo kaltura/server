@@ -994,7 +994,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit'
 									), 'configureKmcUsers');
 
-		$dynamicLimitTypes = [];
+		$dynamicLimitTypes = array();
 		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
 		{
 			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag" . '_max';
