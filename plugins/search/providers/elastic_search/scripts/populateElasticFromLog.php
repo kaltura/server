@@ -70,10 +70,10 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
-$limit = kConf::get('limit','elastic_populate',1000);
-$gap = kConf::get('gap','elastic_populate',500);
-$maxIndexHistory = kConf::get('maxIndexHistory','elastic_populate',2000);
-$partnerIgnoreList =  kConf::get('$partnerIgnoreList','elastic_populate',array());
+$limit = kConf::get('populateLimit','elasticDynamicMap',1000);
+$gap = kConf::get('populateGap','elasticDynamicMap',500);
+$maxIndexHistory = kConf::get('populateMaxIndexHistory','elasticDynamicMap',2000);
+$partnerIgnoreList =  kConf::get('populatePartnerIgnoreList','elasticDynamicMap',array());
 
 $sphinxLogReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
