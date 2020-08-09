@@ -70,7 +70,7 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
-$limit = 1000;
+$limit = 5000;
 $gap = 500;
 $maxIndexHistory = 2000; //The maximum array size to save unique object ids update and their elastic log id
 
