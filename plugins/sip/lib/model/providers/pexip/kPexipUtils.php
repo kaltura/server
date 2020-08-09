@@ -237,10 +237,13 @@ class kPexipUtils
 				return false;
 			}
 
-			$dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
+			$currentEntitlementEnforcement = kEntitlementUtils::getEntitlementEnforcement();
+                        kEntitlementUtils::initEntitlementEnforcement( $dbLiveEntry->getPartnerId() , false);
+                        $dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
+                        kEntitlementUtils::initEntitlementEnforcement( $dbLiveEntry->getPartnerId() , $currentEntitlementEnforcement);
 			if(!$dbDualStreamLiveEntry)
 			{
-				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry ". $dbLiveEntry->getId() . 'with source type ' . $dbLiveEntry->getSipSourceType();
+				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry ". $dbLiveEntry->getId() . ' with source type ' . $dbLiveEntry->getSipSourceType();
 				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 				KalturaLog::warning($msg);
 				return false;
