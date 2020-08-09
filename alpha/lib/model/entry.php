@@ -4380,4 +4380,15 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return $this->getFromCustomData( self::CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION ,null, null);
 	}
+
+	/**
+	 * Check if entry contains adminTag
+	 *
+	 * @param string $adminTag
+	 * @return boolean
+	 */
+	public function isContainsAdminTag($adminTag)
+	{
+		return in_array($adminTag, explode(',', $this->getAdminTags()));
+	}
 }

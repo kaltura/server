@@ -314,14 +314,14 @@ class kPexipHandler
 			}
 			case KalturaSipSourceType::TALKING_HEADS:
 			{
-				$adpData["alias"] = $dualStreamUrl;
-				$adpData["presentation_url"] = $participantAddress;
+				$adpData["alias"] = $participantAddress;
+				$adpData["presentation_url"] = $dualStreamUrl;				
 				break;
 			}
 			case KalturaSipSourceType::SCREEN_SHARE:
 			{
-				$adpData["alias"] = $participantAddress;
-				$adpData["presentation_url"] = $dualStreamUrl;
+				$adpData["alias"] = $dualStreamUrl;
+				$adpData["presentation_url"] = $participantAddress;
 				break;
 			}
 			default:

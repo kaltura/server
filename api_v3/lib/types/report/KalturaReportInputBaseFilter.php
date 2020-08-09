@@ -75,13 +75,10 @@ class KalturaReportInputBaseFilter extends KalturaObject
 			$this->fromDate = strtotime(date('Y-m-d 00:00:00', strtotime($this->fromDay)));
 			$this->toDate = strtotime(date('Y-m-d 23:59:59', strtotime($this->toDay)));
 		}
-		else if ($this->fromDate && $this->toDate)
+		else if ($this->fromDate && $this->toDate && $this->fromDate >= $this->toDate)
 		{
-			if ($this->shouldRoundDate())
-			{
-				$this->fromDay = date("Ymd", $this->fromDate);
-				$this->toDay = date("Ymd", $this->toDate);
-			}
+			$this->fromDay = date("Ymd", $this->fromDate);
+			$this->toDay = date("Ymd", $this->toDate);
 		}
 
 		foreach ($this->getMapBetweenObjects() as $apiName => $memberName)
@@ -93,22 +90,4 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		}
 		return $reportInputFilter;
 	}
-
-	protected function shouldRoundDate()
-	{
-		if (kConf::hasParam('kava_skip_date_rounding_client_tags'))
-		{
-			$skipDateRoundingClientTags = kConf::get('kava_skip_date_rounding_client_tags');
-			$clientTag = kCurrentContext::$client_lang;
-			foreach ($skipDateRoundingClientTags as $skipDateRoundingClientTag)
-			{
-				if (strpos($clientTag, $skipDateRoundingClientTag) === 0)
-				{
-					return false;
-				}
-			}
-		}
-		return kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID;
-	}
-
 }

@@ -11,9 +11,7 @@ class serveFlavorAction extends kalturaAction
 	const JSON_CONTENT_TYPE = 'application/json';
 
 	const SECOND_IN_MILLISECONDS = 1000;
-	const LIVE_CHANNEL_SEGMENT_DURATION = 10000; // 10 seconds in milliseconds
 	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
-	const DVR_WINDOW_SIZE = 100000; // LIVE_CHANNEL_SEGMENT_DURATION * 10 segments;
 
 	protected $pathOnly = false;
 	protected static $preferredStorageId = null;
@@ -795,7 +793,7 @@ class serveFlavorAction extends kalturaAction
 		return $firstEntryIndex;
 	}
 
-	protected function getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex,
+	protected function getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex, $segmentDuration,
 	                                                  &$firstClipStartTime, &$initialClipIndex, &$initialSegmentIndex)
 	{
 		//Get supporting information
@@ -810,7 +808,7 @@ class serveFlavorAction extends kalturaAction
 			$durationsSum += $duration;
 
 			$accumulateCycleSegmentsCount[] = $cycleSegmentsCount;
-			$cycleSegmentsCount += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
+			$cycleSegmentsCount += ceil($duration / $segmentDuration);
 		}
 
 		// Set the values
@@ -846,6 +844,30 @@ class serveFlavorAction extends kalturaAction
 		}
 	}
 
+	protected function getLiveParams()
+	{
+		$segmentDuration = null;
+		$dvrWindowSize = null;
+
+		$liveMap = kConf::getMap('live');
+		foreach ($liveMap as $section => $params)
+		{
+			if(strstr($_SERVER['REQUEST_URI'],"/$section/"))
+			{
+				$segmentDuration = $params['segDuration'];
+				$dvrWindowSize = $params['dvrWindowSize'];
+				break;
+			}
+		}
+
+		if(is_null($segmentDuration) || is_null($dvrWindowSize))
+		{
+			KExternalErrors::dieError(KExternalErrors::MISSING_LIVE_CONFIGURATION);
+		}
+
+		return array($segmentDuration, $dvrWindowSize);
+	}
+
 	protected function servePlaylistAsLiveChannel(LiveChannel $entry)
 	{
 		// get cycle info
@@ -861,12 +883,14 @@ class serveFlavorAction extends kalturaAction
 				"Entry [$entry->getId()] has a playlist with duration zero");
 		}
 
+		list($segmentDuration, $dvrWindowSize) = $this->getLiveParams();
+
 		// Start time of the first run
 		$playlistStartTime = $entry->getStartDate('U') * self::SECOND_IN_MILLISECONDS;
 
 		// start window time and current time (which is the end time)
 		$currentTime = time() * self::SECOND_IN_MILLISECONDS;
-		$startTime = $currentTime - self::TIME_MARGIN - self::DVR_WINDOW_SIZE;
+		$startTime = $currentTime - self::TIME_MARGIN - $dvrWindowSize;
 
 		// Current cycle number
 		$cycleNumber = floor(($startTime - $playlistStartTime) / $cycleDuration);
@@ -879,7 +903,7 @@ class serveFlavorAction extends kalturaAction
 		$firstEntryIndex = $this->getCurrentLiveChannelEntryIndex($cycleDurations, $currentCycleStartTime, $startTime);
 
 		// Get Info about the first entry that should be played now
-		$this->getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex,
+		$this->getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex, $segmentDuration,
 			$firstClipStartTime, $initialClipIndex, $initialSegmentIndex);
 
 		// Get Entries & Durations for the current window
