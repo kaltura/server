@@ -142,11 +142,11 @@ while (true)
 	
 	foreach ($elasticLogs as $elasticLog)
 	{
-        /* @var $elasticLog SphinxLog */
-        if( in_array($elasticLog->getPartnerId(),$partnerIgnoreList))
-        {
-            continue;
-        }
+		/* @var $elasticLog SphinxLog */
+		if( in_array($elasticLog->getPartnerId(),$partnerIgnoreList))
+		{
+			continue;
+		}
 		$dc = $elasticLog->getDc();
 		$executedServerId = $elasticLog->getExecutedServerId();
 		$elasticLogId = $elasticLog->getId();
