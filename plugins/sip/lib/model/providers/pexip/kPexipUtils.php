@@ -245,7 +245,7 @@ class kPexipUtils
 			$dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
 			if ($currentEntitlementEnforcement)
 			{
-				kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), $currentEntitlementEnforcement);
+				kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), true);
 			}
 			if (!$dbDualStreamLiveEntry)
 			{
