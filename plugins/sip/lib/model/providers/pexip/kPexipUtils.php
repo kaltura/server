@@ -231,19 +231,25 @@ class kPexipUtils
 			$dualStreamEntryId = $dbLiveEntry->getSipDualStreamEntryId();
 			if (!$dualStreamEntryId)
 			{
-				$msg = 'Dual Stream Entry is not defined on entry ' . $dbLiveEntry->getId() . ' while trying source type is '. $dbLiveEntry->getSipSourceType();
+				$msg = 'Dual Stream Entry is not defined on entry ' . $dbLiveEntry->getId() . ' while trying source type is ' . $dbLiveEntry->getSipSourceType();
 				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 				KalturaLog::warning($msg);
 				return false;
 			}
 
 			$currentEntitlementEnforcement = kEntitlementUtils::getEntitlementEnforcement();
-                        kEntitlementUtils::initEntitlementEnforcement( $dbLiveEntry->getPartnerId() , false);
-                        $dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
-                        kEntitlementUtils::initEntitlementEnforcement( $dbLiveEntry->getPartnerId() , $currentEntitlementEnforcement);
-			if(!$dbDualStreamLiveEntry)
+			if ($currentEntitlementEnforcement)
 			{
-				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry ". $dbLiveEntry->getId() . ' with source type ' . $dbLiveEntry->getSipSourceType();
+				kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), false);
+			}
+			$dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
+			if ($currentEntitlementEnforcement)
+			{
+				kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), $currentEntitlementEnforcement);
+			}
+			if (!$dbDualStreamLiveEntry)
+			{
+				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry " . $dbLiveEntry->getId() . ' with source type ' . $dbLiveEntry->getSipSourceType();
 				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 				KalturaLog::warning($msg);
 				return false;
