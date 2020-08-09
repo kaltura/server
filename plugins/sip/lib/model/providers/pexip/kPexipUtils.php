@@ -237,16 +237,8 @@ class kPexipUtils
 				return false;
 			}
 
-			$currentEntitlementEnforcement = kEntitlementUtils::getEntitlementEnforcement();
-			if ($currentEntitlementEnforcement)
-			{
-				kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), false);
-			}
+			kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), false);
 			$dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
-			if ($currentEntitlementEnforcement)
-			{
-				kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), true);
-			}
 			if (!$dbDualStreamLiveEntry)
 			{
 				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry " . $dbLiveEntry->getId() . ' with source type ' . $dbLiveEntry->getSipSourceType();
