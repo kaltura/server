@@ -237,9 +237,8 @@ class kPexipUtils
 				return false;
 			}
 
-			kEntitlementUtils::initEntitlementEnforcement($dbLiveEntry->getPartnerId(), false);
-			$dbDualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamEntryId);
-			if (!$dbDualStreamLiveEntry)
+			$dbDualStreamLiveEntry = entryPeer::retrieveByPKNoFilter($dualStreamEntryId, null, false);
+			if (!$dbDualStreamLiveEntry || $dbDualStreamLiveEntry->getStatus() != entryStatus::READY)
 			{
 				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry " . $dbLiveEntry->getId() . ' with source type ' . $dbLiveEntry->getSipSourceType();
 				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
