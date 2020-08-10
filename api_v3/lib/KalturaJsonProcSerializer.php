@@ -7,15 +7,14 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 {
 	public function __construct()
 	{
-		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
-		if (is_null($callback))
+		if (!isset($_GET["callback"]))
 		{
 			throw new KalturaAPIException(APIErrors::MANDATORY_PARAMETER_MISSING, 'callback');
 		}
 
 		// check for a valid callback, prevent xss
 		$ALLOWED_REGEX = "/^[0-9_a-zA-Z.]*$/";
-		if(!preg_match($ALLOWED_REGEX, $callback))
+		if (!preg_match($ALLOWED_REGEX, $_GET["callback"]))
 		{
 			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'callback');
 		}
