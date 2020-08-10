@@ -397,10 +397,11 @@ class kPlaybackContextDataHelper
 		if (!count($this->remoteFlavorsByDc))
 			return;
 
+		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
+
 		$partner = $dbEntry->getPartner();
 		if ($partner->getEnforceDelivery())
 		{
-			$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 			$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $partner, $deliveryAttributes);
 			if (count($customDeliveryProfilesIds))
 			{
@@ -409,7 +410,6 @@ class kPlaybackContextDataHelper
 			}
 		}
 
-		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $this->remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
