@@ -397,6 +397,18 @@ class kPlaybackContextDataHelper
 		if (!count($this->remoteFlavorsByDc))
 			return;
 
+		$partner = $dbEntry->getPartner();
+		if ($partner->getEnforceDelivery())
+		{
+			$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
+			$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $partner, $deliveryAttributes);
+			if (count($customDeliveryProfilesIds))
+			{
+				$customDeliveryProfilesIds = call_user_func_array('array_merge', $customDeliveryProfilesIds);
+				$this->remoteDeliveryProfileIds = array_intersect($this->remoteDeliveryProfileIds, $customDeliveryProfilesIds);
+			}
+		}
+
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $this->remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
