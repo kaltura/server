@@ -170,6 +170,16 @@ class ElasticIndexRotationWorker
 			return $this->createIndexFromScratch();
 		}
 
+		$now = new DateTime();
+		$yearMonth = $now->format($this->indexDateFormat);
+		$newIndex = $this->indexPattern . '-' . $yearMonth;
+		$indexInfo = $this->client->getIndexInfo($newIndex);
+		if(!empty($indexInfo))
+		{
+			KalturaLog::log("$newIndex already exists - ending script");
+			return;
+		}
+
 		list($currentIndexingIndices, $currentSearchingIndices) = $this->getCurrentStateMap();
 		//remove old index aliases
 		foreach ($currentIndexingIndices as $indexName)
@@ -179,9 +189,6 @@ class ElasticIndexRotationWorker
 
 		$this->handleCurrentSearchIndices($currentSearchingIndices, $aliasesToRemove, $aliasesToAdd);
 		//add latest to aliases
-		$now = new DateTime();
-		$yearMonth = $now->format($this->indexDateFormat);
-		$newIndex = $this->indexPattern . '-' . $yearMonth;
 		if (!$this->dryRun)
 		{
 			$this->createNewIndex($newIndex);
