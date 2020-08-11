@@ -253,7 +253,7 @@ class kMrssManager
 		$thumbnail = $mrss->addChild('thumbnail');
 
 		$cdnUrlPartners = kConf::get(self::CDN_URL, self::THUMBNAIL_MAP, array());
-		if (is_array($cdnUrlPartners) && in_array($thumbAsset->getPartnerId(), array_keys($cdnUrlPartners)))
+		if (in_array($thumbAsset->getPartnerId(), array_keys($cdnUrlPartners)))
 		{
 			$cdnUrl = $cdnUrlPartners[$thumbAsset->getPartnerId()];
 			$assetUrl = kAssetUtils::getAssetUrl($thumbAsset, false, null, null, '', $cdnUrl);
