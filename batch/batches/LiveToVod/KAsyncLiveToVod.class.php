@@ -46,7 +46,8 @@ class KAsyncLiveToVod extends KJobHandlerWorker
 	private function copyCuePoint(KalturaBatchJob $job, KalturaLiveToVodJobData $data)
 	{
 		$amfArray = json_decode($data->amfArray);
-		if ($data->lastSegmentDuration < (self::MAX_CHUNK_DURATION_IN_SEC * 1000)) { 
+		if ($data->lastSegmentDuration < (self::MAX_CHUNK_DURATION_IN_SEC * 1000))
+		{ 
 			$data->lastSegmentDuration = $data->totalVodDuration;
 		}
 		$currentSegmentStartTime = self::getSegmentStartTime($amfArray);
