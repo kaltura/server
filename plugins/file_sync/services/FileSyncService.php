@@ -79,8 +79,7 @@ class FileSyncService extends KalturaBaseService
 
 		// Get and lock file syncs
 		$lockedFileSyncs = self::getAndLockFileSyncs($filter, $lockExpiryTimeout);
-
-
+		
 		// Delete siblings
 		foreach ($lockedFileSyncs as $fileSync)
 		{
