@@ -85,6 +85,16 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
 	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
+	const METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC = 'live_high_eng_view_period_play_time_sum';
+	const METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC = 'live_good_eng_view_period_play_time_sum';
+	const METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC = 'live_fair_eng_view_period_play_time_sum';
+	const METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC = 'live_low_eng_view_period_play_time_sum';
+	const METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC = 'live_no_eng_view_period_play_time_sum';
+	const METRIC_LIVE_HIGH_ENGAGEMENT_RATIO = 'live_high_eng_view_period_play_time_rate';
+	const METRIC_LIVE_GOOD_ENGAGEMENT_RATIO = 'live_good_eng_view_period_play_time_rate';
+	const METRIC_LIVE_FAIR_ENGAGEMENT_RATIO = 'live_fair_eng_view_period_play_time_rate';
+	const METRIC_LIVE_LOW_ENGAGEMENT_RATIO = 'live_low_eng_view_period_play_time_rate';
+	const METRIC_LIVE_NO_ENGAGEMENT_RATIO = 'live_no_eng_view_period_play_time_rate';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -948,6 +958,42 @@ class kKavaReportsMgr extends kKavaBase
 				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
 			self::getLongSumAggregator(self::METRIC_LIVE_PLAYS_COUNT, self::METRIC_COUNT));
 
+		self::$aggregations_def[self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::HIGH_ENGAGEMENT))),
+			self::getLongSumAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$good_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$fair_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$low_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$non_engaged))),
+			self::getLongSumAggregator(self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1130,6 +1176,42 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_JOIN_TIME,
 				self::METRIC_JOIN_TIME_SUM,
 				self::METRIC_JOIN_TIME_COUNT));
+
+		self::$metrics_def[self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_GOOD_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_GOOD_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_FAIR_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_FAIR_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_LOW_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_LOW_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_NO_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_NO_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(

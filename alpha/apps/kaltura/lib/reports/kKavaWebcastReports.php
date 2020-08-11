@@ -170,6 +170,28 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 		),
 
+		ReportType::ENGAGEMENT_BREAKDOWN_WEBCAST => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_LIVE_NO_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_LOW_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_FAIR_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_GOOD_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO,
+			),
+		),
+
+		ReportType::ENGAGMENT_TIMELINE_WEBCAST => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'position' => self::DIMENSION_POSITION,
+			),
+			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_USER_ENGAGEMENT,
+				self::DRUID_VALUES => array("SoundOnTabFocusedFullScreen", "SoundOnTabFocusedFullScreenOff", "SoundOnTabFocused"),
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD)
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
