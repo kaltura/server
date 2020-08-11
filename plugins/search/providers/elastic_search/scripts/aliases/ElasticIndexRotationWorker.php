@@ -5,7 +5,6 @@
  */
 class ElasticIndexRotationWorker
 {
-
 	const ACTIONS = 'actions';
 	const ADD = 'add';
 	const REMOVE = 'remove';
@@ -165,9 +164,13 @@ class ElasticIndexRotationWorker
 	{
 		$aliasesToRemove = array();
 		$aliasesToAdd = array();
+		$indexInfo = $this->client->getIndexInfo($this->indexPattern . '*');
+		if (empty($indexInfo))
+		{
+			return $this->createIndexFromScratch();
+		}
 
 		list($currentIndexingIndices, $currentSearchingIndices) = $this->getCurrentStateMap();
-
 		//remove old index aliases
 		foreach ($currentIndexingIndices as $indexName)
 		{
@@ -175,7 +178,6 @@ class ElasticIndexRotationWorker
 		}
 
 		$this->handleCurrentSearchIndices($currentSearchingIndices, $aliasesToRemove, $aliasesToAdd);
-
 		//add latest to aliases
 		$now = new DateTime();
 		$yearMonth = $now->format($this->indexDateFormat);
@@ -284,4 +286,25 @@ class ElasticIndexRotationWorker
 		}
 	}
 
+	protected function createIndexFromScratch()
+	{
+		KalturaLog::debug('Creating new index from scratch mode');
+		$aliasesToRemove = array();
+		$aliasesToAdd = array();
+		$now = new DateTime();
+		$yearMonth = $now->format($this->indexDateFormat);
+		$newIndex = $this->indexPattern . '-' . $yearMonth;
+		if (!$this->dryRun)
+		{
+			$this->createNewIndex($newIndex);
+		}
+		else
+		{
+			KalturaLog::debug("Dry run - creating index $newIndex");
+		}
+
+		$aliasesToAdd[] = new ElasticIndexAlias($newIndex, $this->searchAlias);
+		$aliasesToAdd[] = new ElasticIndexAlias($newIndex, $this->indexAlias);
+		$this->changeAliases($aliasesToAdd, $aliasesToRemove);
+	}
 }
