@@ -1,0 +1,23 @@
+<?php if($this->errMessage): ?>
+	<div class="error"><?php echo $this->errMessage ?></div><br/>
+<?php endif; ?>
+
+<style type="text/css">
+	#configuration-map-configure-inner-dialog{ width:auto ; left: auto }
+	p { margin-top: 0;}
+	ins { color: green; background: #dfd; text-decoration: none;}
+	del { color: red; background: #fdd; text-decoration: none;}
+	code {font-size: smaller;}
+	#params {margin: 1em 0; font: 14px sans-serif;}
+	.code {margin-left: 2em;font: 12px monospace;}
+	.ins {background:#dfd;}
+	.del {background:#fdd;}
+	.rep {color: #008; background: #eef;}
+	.panecontainer {display: inline-block; width: 49.5%;vertical-align: top; }
+	.panecontainer > p { margin: 0; border: 1px solid #bcd; border-bottom: none;  padding: 1px 3px;
+		background: #def; font: 14px sans-serif	}
+	.panecontainer > p + div { margin: 0; padding: 2px 0 2px 2px; border: 1px solid #bcd; border-top: none;	}
+	.pane { margin: 0; padding: 0; border: 0; width: 100%; min-height: 20em; overflow:auto; font: 12px monospace;}
+</style>
+
+<?php echo $this->form ?>
