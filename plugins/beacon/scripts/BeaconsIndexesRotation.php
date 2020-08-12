@@ -6,31 +6,23 @@ if ($argc > 1 && in_array($argv[1], array('--help', '-help', '-h', '-?')))
 	die;
 }
 
+$dryRun = false;
+$sectionPrefix = null;
+$handleUnusedIndices = false;
+
 if($argc > 1)
 {
 	$dryRun = $argv[1];
-}
-else
-{
-	$dryRun = false;
 }
 
 if($argc > 2)
 {
 	$handleUnusedIndices = $argv[2];
 }
-else
-{
-	$handleUnusedIndices = false;
-}
 
 if($argc > 3)
 {
 	$sectionPrefix = $argv[3];
-}
-else
-{
-	$sectionPrefix = null;
 }
 
 chdir(dirname(__FILE__));
