@@ -82,6 +82,7 @@ class s3Mgr extends kFileTransferMgr
 		
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
+
 	}
 
 
@@ -116,6 +117,7 @@ class s3Mgr extends kFileTransferMgr
 
 		if(KBatchBase::$taskConfig->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
+			KalturaLog::debug('Found env VAR from config- ' . KBatchBase::$taskConfig->s3Arn);
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
 				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
