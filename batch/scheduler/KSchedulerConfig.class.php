@@ -130,6 +130,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setSchedulerId($this->getId());
 			$task->setSchedulerName($this->getName());
 			$task->setServiceUrl($this->getServiceUrl());
+			$task->setS3Arn($this->getS3Arn());
 			$task->setDwhPath($this->getDwhPath());
 			$task->setDirectoryChmod($this->getDirectoryChmod());
 			$task->setChmod($this->getChmod());
@@ -355,6 +356,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function getSecret()
 	{
 		return $this->secret;
+	}
+
+	public function getS3Arn()
+	{
+		return $this->s3Arn;
 	}
 
 	/**
