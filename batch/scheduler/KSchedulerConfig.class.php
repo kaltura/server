@@ -113,6 +113,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			}
 		}
 
+		parent::__construct($configFileName, $hostname, true);
 		$this->name = $hostname;
 		$this->hostName = $hostname;
 
