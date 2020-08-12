@@ -550,6 +550,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
 
+	public static function getPeriodicStorageIds()
+	{
+		return kConf::get('periodic_storage_ids','cloud_storage', array());
+	}
+
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
 		$isPartnerValid = true;
@@ -577,7 +582,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		if($isPartnerValid)
 		{
-			return kConf::get('periodic_storage_ids','cloud_storage', array());
+			return self::getPeriodicStorageIds();
 		}
 
 		return array();

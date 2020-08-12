@@ -296,7 +296,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 			return null;
 		}
 		$kalturaPeriodicStorage = false;
-		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
+		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
 			$kalturaPeriodicStorage = true;
 		}
