@@ -114,7 +114,7 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 
-		if(!KBatchBase::$taskConfig->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		if(KBatchBase::$taskConfig->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
