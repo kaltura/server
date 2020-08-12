@@ -443,6 +443,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				break;
 
 			case null:
+				$resultIsLive = null;
 				$configurations = $liveStreamEntry->getLiveStreamConfigurations(requestUtils::getProtocol());
 				foreach ($configurations as $config)
 				{
@@ -459,7 +460,10 @@ class LiveStreamService extends KalturaLiveEntryService
 						}
 					}
 				}
-				return $resultIsLive;
+				if ($resultIsLive !== null)
+				{
+					return $resultIsLive;
+				}
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
