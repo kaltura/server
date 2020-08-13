@@ -36,11 +36,22 @@ class KAsyncStoragePeriodicExport extends KStorageFileSyncsBase
 			reset($this->storageProfiles);
 		}
 
-		// Update filter
-		$filter->dcIn = null;
-		$filter->dcEqual = $storageProfile->id;
+		if($filter->createdAt && $filter->createdAt <0)
+        {
+            $filter->createdAt = now() + $filter->createdAt;
+        }
 
-		KalturaLog::debug("lock pending file syncs with dc [$storageProfile->id]");
+        // Update filter
+        $filter->dcIn = null;
+        $filter->dcEqual = $storageProfile->id;
+
+        if(isset($filter->createdAt) && $filter->createdAt <0)
+        {
+            $filter->createdAt = time() + $filter->createdAt;
+        }
+
+
+        KalturaLog::debug("lock pending file syncs with dc [$storageProfile->id]");
 
 		return self::$kClient->storageProfile->lockPendingFileSyncs($filter, $this->getId(), $storageProfile->id, $this->maxCount, $this->maxSize);
 	}
