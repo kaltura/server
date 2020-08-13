@@ -36,11 +36,6 @@ class KAsyncStoragePeriodicExport extends KStorageFileSyncsBase
 			reset($this->storageProfiles);
 		}
 
-		if($filter->createdAt && $filter->createdAt <0)
-		{
-			$filter->createdAt = now() + $filter->createdAt;
-		}
-
 		// Update filter
 		$filter->dcIn = null;
 		$filter->dcEqual = $storageProfile->id;
