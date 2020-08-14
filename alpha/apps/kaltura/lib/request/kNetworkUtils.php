@@ -30,7 +30,7 @@ class kNetworkUtils
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
 
-		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');
+		$url = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
 
 		$actualSignature = self::calculateSignature($version, $timestamp, $url);
 		if(!$actualSignature)
