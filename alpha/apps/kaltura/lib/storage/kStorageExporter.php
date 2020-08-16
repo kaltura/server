@@ -152,7 +152,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				self::handleAssetStorageExports($srcFlavor);
 
 				//Periodic storage
-				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfilesByFlag();
+				if(!$periodicStorageProfiles)
+				{
+					$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+				}
 				self::exportToPeriodicStorage($srcFlavor, $periodicStorageProfiles);
 				break;
 			}
@@ -588,19 +592,24 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return array();
 	}
 
-	public static function getPeriodicStorageProfiles($partnerId)
+	public static function getPeriodicStorageProfilesByFlag()
 	{
-		$externalStorages = array();
-
+		$storageProfiles = array();
 		if( kConf::get('copy_all_content_to_cloud', 'cloud_storage', 0) )
 		{
 			$storageIds = self::getPeriodicStorageIds();
+			if($storageIds)
+			{
+				$storageProfiles = StorageProfilePeer::retrieveByPKs($storageIds);
+			}
 		}
-		else
-		{
-			$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
-		}
+		return $storageProfiles;
+	}
 
+	public static function getPeriodicStorageProfiles($partnerId)
+	{
+		$externalStorages = array();
+		$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
 		if($storageIds)
 		{
 			$externalStorages = StorageProfilePeer::retrieveByPKs($storageIds);
@@ -623,6 +632,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($object->getObjectType() != FileSyncObjectType::ASSET || $object->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
 		{
 			return null;
+		}
+
+		$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfilesByFlag();
+		if($periodicStorageProfiles)
+		{
+			return $periodicStorageProfiles;
 		}
 
 		return kStorageExporter::getPeriodicStorageProfiles($object->getPartnerId());
