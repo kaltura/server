@@ -35,7 +35,7 @@ class kNetworkUtils
 		$currentTimestamp = time();
 		if( !is_numeric($timestamp) || abs($currentTimestamp - $timestamp) > self::AUTH_HEADER_TIMESTAMP_MARGIN )
 		{
-			KalturaLog::warning("Failed to validate signature time stamp timestamp [$timestamp] currentTimestamp [$currentTimestamp]");
+			KalturaLog::warning("Failed to validate signature, timestamp [$timestamp] currentTimestamp [$currentTimestamp]");
 			return false;
 		}
     
