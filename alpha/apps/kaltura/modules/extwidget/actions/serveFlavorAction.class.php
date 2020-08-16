@@ -454,7 +454,8 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || kNetworkUtils::isAuthenticatedURI() ))
+		$isAuthenticatedUri = kNetworkUtils::isAuthenticatedURI();
+		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || $isAuthenticatedUri ))
 		{
 			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::$preferredStorageId);
 			if ($file_sync && is_null(self::$preferredStorageId))
@@ -477,6 +478,10 @@ class serveFlavorAction extends kalturaAction
 		if (kConf::hasParam('serve_flavor_allowed_partners') && 
 			!in_array($flavorAsset->getPartnerId(), kConf::get('serve_flavor_allowed_partners')))
 		{
+			if(!$isAuthenticatedUri)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_AUTH_HEADER);
+			}
 			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
