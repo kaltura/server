@@ -15,6 +15,7 @@ class serveFlavorAction extends kalturaAction
 
 	protected $pathOnly = false;
 	protected static $preferredStorageId = null;
+	protected static $fallbackStorageId = null;
 
 	protected static function jsonEncode($obj)
 	{
@@ -148,6 +149,7 @@ class serveFlavorAction extends kalturaAction
 
 		$version = $this->getRequestParameter("v");
 		self::$preferredStorageId = $this->getRequestParameter('preferredStorageId');
+		self::$fallbackStorageId = $this->getRequestParameter('fallbackStorageId');
 
 		// execute the playlist
 		if ($version)
@@ -259,7 +261,7 @@ class serveFlavorAction extends kalturaAction
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::$preferredStorageId, $this->pathOnly);
+					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
 
 					if(!$file_sync)
 					{
@@ -366,6 +368,7 @@ class serveFlavorAction extends kalturaAction
 		$captionLanguages = $this->getRequestParameter('captions', '');
 		$this->pathOnly = $this->getRequestParameter('pathOnly', false);
 		self::$preferredStorageId = $this->getRequestParameter('preferredStorageId');
+		self::$fallbackStorageId = $this->getRequestParameter('fallbackStorageId');
 
 		if ($entryId)
 		{
@@ -454,9 +457,10 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || kNetworkUtils::isAuthenticatedURI() ))
+		$isAuthenticatedUri = kNetworkUtils::isAuthenticatedURI();
+		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || $isAuthenticatedUri ))
 		{
-			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::$preferredStorageId);
+			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -477,6 +481,10 @@ class serveFlavorAction extends kalturaAction
 		if (kConf::hasParam('serve_flavor_allowed_partners') && 
 			!in_array($flavorAsset->getPartnerId(), kConf::get('serve_flavor_allowed_partners')))
 		{
+			if(!$isAuthenticatedUri)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_AUTH_HEADER);
+			}
 			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
@@ -926,4 +934,10 @@ class serveFlavorAction extends kalturaAction
 	{
 		return self::$preferredStorageId;
 	}
+
+	public static function getFallbackStorageProfileId()
+	{
+		return self::$fallbackStorageId;
+	}
+
 }
