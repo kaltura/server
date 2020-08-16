@@ -189,7 +189,8 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::DRUID_DIMENSION => self::DIMENSION_USER_ENGAGEMENT,
 				self::DRUID_VALUES => array("SoundOnTabFocusedFullScreen", "SoundOnTabFocusedFullScreenOff", "SoundOnTabFocused"),
 			),
-			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD)
+			self::REPORT_METRICS => array(self::METRIC_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
 		),
 
 	);
