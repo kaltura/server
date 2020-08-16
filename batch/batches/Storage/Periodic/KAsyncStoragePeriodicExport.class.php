@@ -40,12 +40,6 @@ class KAsyncStoragePeriodicExport extends KStorageFileSyncsBase
 		$filter->dcIn = null;
 		$filter->dcEqual = $storageProfile->id;
 
-		if(isset($filter->createdAt) && $filter->createdAt <0)
-		{
-			$filter->createdAt = time() + $filter->createdAt;
-		}
-
-
 		KalturaLog::debug("lock pending file syncs with dc [$storageProfile->id]");
 
 		return self::$kClient->storageProfile->lockPendingFileSyncs($filter, $this->getId(), $storageProfile->id, $this->maxCount, $this->maxSize);
