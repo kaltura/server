@@ -14,6 +14,7 @@ class serveFlavorAction extends kalturaAction
 	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
 
 	protected $pathOnly = false;
+	protected static $requestAuthorized = false;
 	protected static $preferredStorageId = null;
 	protected static $fallbackStorageId = null;
 
@@ -106,7 +107,7 @@ class serveFlavorAction extends kalturaAction
 	 */
 	protected function renderEmptySimpleMapping()
 	{
-		if (!$this->pathOnly || (!kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) && !kNetworkUtils::isAuthenticatedURI()))
+		if (!$this->pathOnly || (!self::$requestAuthorized))
 			return;
 
 		$renderer = $this->getSimpleMappingRenderer('', null);
@@ -370,11 +371,10 @@ class serveFlavorAction extends kalturaAction
 		self::$preferredStorageId = $this->getRequestParameter('preferredStorageId');
 		self::$fallbackStorageId = $this->getRequestParameter('fallbackStorageId');
 
-		$requestAuthorized = false;
 		$isAuthenticatedUri = kNetworkUtils::isAuthenticatedURI();
 		if(kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || $isAuthenticatedUri)
 		{
-			$requestAuthorized = true;
+			self::$requestAuthorized = true;
 		}
 
 		if ($entryId)
@@ -396,13 +396,13 @@ class serveFlavorAction extends kalturaAction
 				$this->servePlaylistAsLiveChannel($entry);
 			}
 
-			if ($entry->getType() == entryType::PLAYLIST && $requestAuthorized)
+			if ($entry->getType() == entryType::PLAYLIST && self::$requestAuthorized)
 			{
 				list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
 				myPartnerUtils::enforceDelivery($entry, $asset);
 				$this->servePlaylist($entry, $captionLanguages);
 			}
-			if ($sequence  && $requestAuthorized)
+			if ($sequence  && self::$requestAuthorized)
 			{
 				$sequenceArr = explode(',', $sequence);
 				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
@@ -463,7 +463,7 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($this->pathOnly && $requestAuthorized)
+		if ($this->pathOnly && self::$requestAuthorized)
 		{
 			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if ($file_sync && is_null(self::$preferredStorageId))
