@@ -772,31 +772,19 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	protected static function prepareStorageProfilesForSort($partnerId, $retrieveMode = self::EXTERNAL_STORAGE_ONLY)
 	{
-		if(!is_null(self::$storageProfilesOrder))
+		$partnerIds = array();
+
+		if( ($retrieveMode == self::EXTERNAL_STORAGE_ONLY) || ($retrieveMode == self::EXTERNAL_AND_CLOUD_STORAGE) )
 		{
-			return;
+			$partnerIds[] = $partnerId;
 		}
 
-		switch($retrieveMode)
+		if( ($retrieveMode == self::EXTERNAL_AND_CLOUD_STORAGE) || ($retrieveMode == self::KALTURA_CLOUD_STORAGE_ONLY) )
 		{
-			case self::EXTERNAL_STORAGE_ONLY:
-				$partnerIds = array($partnerId);
-				break;
-			case self::KALTURA_CLOUD_STORAGE_ONLY:
-				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
-				if ($periodicStorageIds)
-				{
-					$partnerIds = array(PartnerPeer::GLOBAL_PARTNER);
-				}
-				break;
-			case self::EXTERNAL_AND_CLOUD_STORAGE:
-				$partnerIds = array($partnerId);
-				$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
-				if ($periodicStorageIds)
-				{
-					$partnerIds []= PartnerPeer::GLOBAL_PARTNER;
-				}
-				break;
+			if (kStorageExporter::getPeriodicStorageIds())
+			{
+				$partnerIds[]= PartnerPeer::GLOBAL_PARTNER;
+			}
 		}
 
 		$criteria = new Criteria();
@@ -804,7 +792,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$criteria->add(StorageProfilePeer::DELIVERY_STATUS, StorageProfileDeliveryStatus::BLOCKED, Criteria::NOT_EQUAL);
 		$criteria->addAscendingOrderByColumn(StorageProfilePeer::DELIVERY_PRIORITY);
 
-		// Using doSelect instead of doSelectStmt for the ID column so that we can take adavntage of the query cache
+		// Using doSelect instead of doSelectStmt for the ID column so that we can take advantage of the query cache
 		self::$storageProfilesOrder = array();
 		$results = StorageProfilePeer::doSelect($criteria);
 		foreach ($results as $result)
@@ -1760,13 +1748,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getFileSyncFromPeriodicStorage(FileSyncKey $syncKey)
 	{
-		$fileSync = null;
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($syncKey->getPartnerId());
-		if($periodicStorageIds)
+		if(kStorageExporter::getPeriodicStorageIds())
 		{
-			$fileSync = self::getReadyExternalFileSyncForKey($syncKey, null, self::KALTURA_CLOUD_STORAGE_ONLY);
+			return self::getReadyExternalFileSyncForKey($syncKey, null, self::KALTURA_CLOUD_STORAGE_ONLY);
 		}
-		return $fileSync;
+		return null;
 	}
 
 	/**
@@ -1806,6 +1792,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
 			$fileSync = FileSyncPeer::doSelectOne( $c );
 		}
+
 		return $fileSync;
 	}
 
