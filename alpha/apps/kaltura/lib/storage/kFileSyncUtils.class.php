@@ -1845,11 +1845,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, true, false);
-		if(in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		if(!$fileSync || !in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
 		{
-			return $fileSync;
+			return null;
 		}
-		return null;
+		return $fileSync;
 	}
 
 	/**
