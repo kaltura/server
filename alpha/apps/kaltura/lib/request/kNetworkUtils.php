@@ -33,7 +33,7 @@ class kNetworkUtils
 		$expectedSignature = $parts[2];
 		
 		$currentTimestamp = time();
-		if( !$timestamp || ($timestamp < $currentTimestamp - self::MAX_TIMESTAMP_DIFF_ALLOWED) || ($timestamp > $currentTimestamp + self::MAX_TIMESTAMP_DIFF_ALLOWED ) )
+		if( !is_numeric($timestamp) || abs($currentTimestamp - $timestamp) > self::MAX_TIMESTAMP_DIFF_ALLOWED )
 		{
 			KalturaLog::warning("Failed to validate signature time stamp timestamp [$timestamp] currentTimestamp [$currentTimestamp]");
 			return false;
