@@ -1827,32 +1827,39 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	}
 
 	/**
-	 * return file sync to serve if at least one of the entry flavors doesnt exist locally
-	 * prefer provided dc over the local dc
+	 * return file sync to serve using the following logic:
+	 * if no file sync exist in preferred storage and all exist in fallback -> use fallback
+	 * else use return file sync for each flavor, give preference to preferred storage before other dc's
 	 *
 	 * @param $syncKey
 	 * @param $flavorAsset
 	 * @param $preferredStorageId
+	 * @param $fallbackStorageId
 	 * @return FileSync|null
 	 * @throws PropelException
 	 */
-	public static function getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId)
+	public static function getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId)
 	{
-		// if at least one flavor exists in the remote storage, generate remote serve paths
-		if(self::doesEntryFlavorExistInStorage($preferredStorageId, $flavorAsset->getEntryId()))
-		{
-			$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
-			if($fileSync)
-			{
-				return $fileSync;
-			}
+		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
+		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($flavorAsset->getEntryId(), $flavorTypes);
 
-			list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, false, false);
+		if(!self::doesEntryFlavorExistInStorage($preferredStorageId, $flavorAssets))
+		{
+			if(self::doesAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
+			{
+				KalturaLog::debug("Request will be directed to fallback storage [$fallbackStorageId]");
+				return null;
+			}
+		}
+
+		$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
+		if($fileSync)
+		{
 			return $fileSync;
 		}
 
-		// all flavors exist locally so return empty file sync and empty path
-		return null;
+		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, false, false);
+		return $fileSync;
 	}
 
 	/**
@@ -1880,14 +1887,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	/**
 	 * @param $preferredStorageId
-	 * @param $entryId
+	 * @param $flavorAssets
 	 * @return bool
 	 */
-	public static function doesEntryFlavorExistInStorage($preferredStorageId, $entryId)
+	public static function doesEntryFlavorExistInStorage($preferredStorageId, $flavorAssets)
 	{
-		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
-		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($entryId, $flavorTypes);
-
 		foreach ($flavorAssets as $flavorAsset)
 		{
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -1902,6 +1906,26 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return false;
 	}
 
+	public static function doesAllEntryFlavorsExistInStorage($storageId, $flavorAssets, $ignoreSource = true)
+	{
+		foreach ($flavorAssets as $flavorAsset)
+		{
+			if($ignoreSource && $flavorAsset->getIsOriginal())
+			{
+				continue;
+			}
+
+			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$fileSync = self::getReadyFileSyncForKeyAndDc($key, $storageId);
+			if(!$fileSync)
+			{
+				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was not found in DC [$storageId]");
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 * Get the internal from kaltura data centers only FileSync object by its key
@@ -2070,14 +2094,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fullPath;
 	}
 
-	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset, $preferredStorageId, $pathOnly = true)
+	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true)
 	{
 		$path = '';
 		$parent_file_sync = null;
 
 		if(!is_null($preferredStorageId))
 		{
-			$file_sync = self::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId);
+			$file_sync = self::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId);
 			if($file_sync)
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
