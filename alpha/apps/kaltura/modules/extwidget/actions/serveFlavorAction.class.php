@@ -261,7 +261,7 @@ class serveFlavorAction extends kalturaAction
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, serveFlavorAction::getPreferredStorageProfileId(), serveFlavorAction::getFallbackStorageProfileId(), $this->pathOnly);
+					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
 
 					if(!$file_sync)
 					{
@@ -459,7 +459,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || kNetworkUtils::isAuthenticatedURI() ))
 		{
-			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, serveFlavorAction::getPreferredStorageProfileId(), serveFlavorAction::getFallbackStorageProfileId());
+			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))

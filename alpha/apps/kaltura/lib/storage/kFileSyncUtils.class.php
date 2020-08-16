@@ -1829,7 +1829,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	/**
 	 * return file sync to serve using the following logic:
 	 * if no file sync exist in preferred storage and all exist in fallback -> use fallback
-	 * else use return file sync for each flavor, give preference to preferred storage before other dc's
+	 * else return file sync for each flavor, give preference to preferred storage before other dc's
 	 *
 	 * @param $syncKey
 	 * @param $flavorAsset
@@ -1843,9 +1843,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($flavorAsset->getEntryId(), $flavorTypes);
 
-		if(!self::doesEntryFlavorExistInStorage($preferredStorageId, $flavorAssets))
+		if(!self::doesAnyEntryFlavorExistInStorage($preferredStorageId, $flavorAssets))
 		{
-			if(!is_null($fallbackStorageId) && self::doesAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
+			if(!is_null($fallbackStorageId) && self::doAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
 			{
 				KalturaLog::debug("Request will be directed to fallback storage [$fallbackStorageId]");
 				return null;
@@ -1890,7 +1890,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param $flavorAssets
 	 * @return bool
 	 */
-	public static function doesEntryFlavorExistInStorage($preferredStorageId, $flavorAssets)
+	public static function doesAnyEntryFlavorExistInStorage($preferredStorageId, $flavorAssets)
 	{
 		foreach ($flavorAssets as $flavorAsset)
 		{
@@ -1906,7 +1906,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return false;
 	}
 
-	public static function doesAllEntryFlavorsExistInStorage($storageId, $flavorAssets, $ignoreSource = true)
+	public static function doAllEntryFlavorsExistInStorage($storageId, $flavorAssets, $ignoreSource = true)
 	{
 		foreach ($flavorAssets as $flavorAsset)
 		{
