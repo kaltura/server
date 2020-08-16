@@ -7,6 +7,8 @@ class kNetworkUtils
 {
 	const KALTURA_AUTH_HEADER = 'HTTP_X_KALTURA_AUTH';
 	const DEFAULT_AUTH_HEADER_VERSION = 1;
+	const MAX_TIMESTAMP_DIFF_ALLOWED = 60; //we allow 60 seconds diff in authentication time stamp value to overcome any clock sync issues
+	
 	/**
 	 * @return bool
 	 * @throws Exception
@@ -29,7 +31,14 @@ class kNetworkUtils
 		$version = $parts[0];
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
-
+		
+		$currentTimestamp = time();
+		if( !$timestamp || ($timestamp < $currentTimestamp - self::MAX_TIMESTAMP_DIFF_ALLOWED) || ($timestamp > $currentTimestamp + self::MAX_TIMESTAMP_DIFF_ALLOWED ) )
+		{
+			KalturaLog::warning("Failed to validate signature time stamp timestamp [$timestamp] currentTimestamp [$currentTimestamp]");
+			return false;
+		}
+		
 		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');
 
 		$actualSignature = self::calculateSignature($version, $timestamp, $url);
