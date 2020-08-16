@@ -1845,7 +1845,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if(!self::doesEntryFlavorExistInStorage($preferredStorageId, $flavorAssets))
 		{
-			if(self::doesAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
+			if(!is_null($fallbackStorageId) && self::doesAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
 			{
 				KalturaLog::debug("Request will be directed to fallback storage [$fallbackStorageId]");
 				return null;
