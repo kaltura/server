@@ -480,7 +480,7 @@ class serveFlavorAction extends kalturaAction
 		{
 			if(!$isAuthenticatedUri)
 			{
-				KExternalErrors::dieError(KExternalErrors::FAILED_TO_VALIDATE_AUTH_HEADER);
+				KExternalErrors::dieError(KExternalErrors::INVALID_AUTH_HEADER);
 			}
 			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}

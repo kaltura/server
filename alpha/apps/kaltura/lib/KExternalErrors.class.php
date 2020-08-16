@@ -62,7 +62,7 @@ class KExternalErrors
 	const INVALID_PARAMETER = 50;
 	const PLAYLIST_DURATION_IS_ZERO = 51;
 	const MISSING_LIVE_CONFIGURATION = 52;
-	const FAILED_TO_VALIDATE_AUTH_HEADER = 53;
+	const INVALID_AUTH_HEADER = 53;
 
 	const HTTP_STATUS_NOT_FOUND = 404;
 
@@ -157,7 +157,7 @@ class KExternalErrors
 
 		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED &&
 			$errorCode != self::IP_COUNTRY_BLOCKED &&
-			$errorCode != self::FAILED_TO_VALIDATE_AUTH_HEADER &&
+			$errorCode != self::INVALID_AUTH_HEADER &&
 			$_SERVER["REQUEST_METHOD"] == "GET"
 		) {
 			infraRequestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
