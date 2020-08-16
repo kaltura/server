@@ -1830,13 +1830,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$flavorTypes = assetPeer::retrieveAllFlavorsTypes();
 		$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryIdAndType($flavorAsset->getEntryId(), $flavorTypes);
 
-		if(!self::doesAnyEntryFlavorExistInStorage($preferredStorageId, $flavorAssets))
+		if(!self::doesAnyEntryFlavorExistInStorage($preferredStorageId, $flavorAssets)
+			&& !is_null($fallbackStorageId)
+			&& self::doAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
 		{
-			if(!is_null($fallbackStorageId) && self::doAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
-			{
-				KalturaLog::debug("Request will be directed to fallback storage [$fallbackStorageId]");
-				return null;
-			}
+			KalturaLog::debug("Request will be directed to fallback storage [$fallbackStorageId]");
+			return null;
 		}
 
 		$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
