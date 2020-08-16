@@ -585,9 +585,17 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function getPeriodicStorageProfiles($partnerId)
 	{
-		// check if should export to periodically only if we dont have existing storage profiles, if we do add export only after they finish
 		$externalStorages = array();
-		$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
+
+		if( kConf::get('copy_all_content_to_cloud', 'cloud_storage', 0) )
+		{
+			$storageIds = self::getPeriodicStorageIds();
+		}
+		else
+		{
+			$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
+		}
+
 		if($storageIds)
 		{
 			$externalStorages = StorageProfilePeer::retrieveByPKs($storageIds);
