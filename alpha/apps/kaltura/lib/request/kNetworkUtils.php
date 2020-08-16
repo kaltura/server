@@ -38,8 +38,8 @@ class kNetworkUtils
 			KalturaLog::warning("Failed to validate signature time stamp timestamp [$timestamp] currentTimestamp [$currentTimestamp]");
 			return false;
 		}
-		
-		$url = ltrim(substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')), '/');
+    
+		$url = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
 
 		$actualSignature = self::calculateSignature($version, $timestamp, $url);
 		if(!$actualSignature)
