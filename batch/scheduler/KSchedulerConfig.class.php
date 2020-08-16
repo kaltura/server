@@ -8,6 +8,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 {
 	const EXTENSION_SEPARATOR = '@';
 	const DEFAULT_CONFIG_RELOAD_INTVERAL = 30;
+	const HOSTNAME_WILDCARD = '#';
 
 	/**
 	 * @var host name as initiated by self::getHostname()
@@ -113,11 +114,21 @@ class KSchedulerConfig extends Zend_Config_Ini
 			}
 		}
 
-		parent::__construct($configFileName, $hostname, true);
+		try
+		{
+			parent::__construct($configFileName, $hostname, true);
+		}
+		catch (Exception $e)
+		{
+			$hostNamePrefix = preg_replace('/\d+$/', self::HOSTNAME_WILDCARD , $hostname);
+			parent::__construct($configFileName, $hostNamePrefix, true);
+		}
+
 		$this->name = $hostname;
 		$this->hostName = $hostname;
 
 		$this->taskConfigList = array();
+		$schedulerId = $this->getSchedulerId($hostname);
 		foreach ($this->enabledWorkers as $workerName => $maxInstances)
 		{
 			if (!$maxInstances)
@@ -127,7 +138,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setPartnerId($this->getPartnerId());
 			$task->setSecret($this->getSecret());
 			$task->setCurlTimeout($this->getCurlTimeout());
-			$task->setSchedulerId($this->getId());
+			$task->setSchedulerId($schedulerId);
 			$task->setSchedulerName($this->getName());
 			$task->setServiceUrl($this->getServiceUrl());
 			$task->setS3Arn($this->getS3Arn());
@@ -502,6 +513,19 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$d->close();
 
 		return $configFilePaths;
+	}
+
+	protected function getSchedulerId($hostname)
+	{
+		if (!is_null($this->getId()))
+		{
+			return $this->getId();
+		}
+		$kalturaScheduler = new KalturaScheduler();
+		$kalturaScheduler->host = $hostname;
+		$kalturaScheduler->name = $hostname;
+		$scheulder = $this->kClient->batchcontrol->getOrCreateScheduler($kalturaScheduler);
+		return $scheulder->configuredId;
 	}
 }
 

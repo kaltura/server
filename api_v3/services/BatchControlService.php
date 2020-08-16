@@ -18,6 +18,8 @@
  */
 class BatchControlService extends KalturaBaseService 
 {
+	const SCHEDULER_BASE_ID = 1000000;
+
 	// use initService to add a peer to the partner filter
 	/**
 	 * @ignore
@@ -130,8 +132,20 @@ class BatchControlService extends KalturaBaseService
 		
 		return $schedulerStatusResponse;
 	}
-	
-	
+
+	/**
+	 * @action getOrCreateScheduler
+	 * @param KalturaScheduler $scheduler
+	 * @return KalturaScheduler
+	 * @throws KalturaAPIException
+	 */
+	public function getOrCreateSchedulerAction(KalturaScheduler $scheduler)
+	{
+		$dbScheduler = $this->getOrCreateSchedulerByHostAndName($scheduler);
+		$scheduler->fromObject($dbScheduler, $this->getResponseProfile());
+		return $scheduler;
+	}
+
 	/**
 	 * batch getOrCreateScheduler returns a scheduler by name, create it if doesn't exist
 	 * 
@@ -168,6 +182,38 @@ class BatchControlService extends KalturaBaseService
 		
 		$schedulerDb->save();
 		
+		return $schedulerDb;
+	}
+
+
+	/**
+	 * batch getOrCreateScheduler returns a scheduler by name, create it if doesn't exist
+	 *
+	 * @param KalturaScheduler $scheduler
+	 * @return Scheduler
+	 */
+	private function getOrCreateSchedulerByHostAndName(KalturaScheduler $scheduler)
+	{
+		$c = new Criteria();
+		$c->add ( SchedulerPeer::CONFIGURED_ID, null , criteria::ISNOTNULL);
+		$c->add ( SchedulerPeer::HOST, $scheduler->host);
+		$c->add ( SchedulerPeer::NAME, $scheduler->name);
+		$schedulerDb = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+
+		if($schedulerDb)
+		{
+			return $schedulerDb;
+		}
+
+		$schedulerDb = new Scheduler();
+		$schedulerDb->setLastStatus(time());
+		$schedulerDb->setName($scheduler->name);
+		$schedulerDb->setHost($scheduler->host);
+		$schedulerDb->setDescription('');
+		$schedulerDb->save();
+
+		$schedulerDb->setConfiguredId($schedulerDb->getId() + self::SCHEDULER_BASE_ID);
+		$schedulerDb->save();
 		return $schedulerDb;
 	}
 	
