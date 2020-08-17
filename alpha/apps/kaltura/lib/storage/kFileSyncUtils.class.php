@@ -2016,12 +2016,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	/**
 	 * @param FileSyncKey $syncKey
 	 * @param $servePriority
-	 * @param array $storageIds
+	 * @param array $cloudStorageIds
 	 * @param null $explicitStorageId
 	 * @return array
 	 * @throws PropelException
 	 */
-	public static function getFileSyncsByStoragePriority(FileSyncKey $syncKey, $servePriority, $storageIds = array(), $explicitStorageId = null)
+	public static function getFileSyncsByStoragePriority(FileSyncKey $syncKey, $servePriority, $cloudStorageIds = array(), $explicitStorageId = null)
 	{
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
 		$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
@@ -2034,7 +2034,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				 * and retrieve file syncs from our dedicated cloud storages
 				 */
 				$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-				$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, $storageIds, Criteria::IN));
+				$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, $cloudStorageIds, Criteria::IN));
 				$c->addAnd($c1);
 				break;
 
@@ -2044,8 +2044,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				 * so we need to make sure not to retrieve them.
 				 */
 				$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-				$c->addAnd(FileSyncPeer::DC, $storageIds, Criteria::NOT_IN);
+				$c->addAnd(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::NOT_IN);
 				break;
+
+			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
+			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
+				if(!$cloudStorageIds)
+				{
+					$c->addAnd(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::NOT_IN);
+				}
+				break;
+
 			default:
 				break;
 		}
