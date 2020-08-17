@@ -98,6 +98,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LIVE_VIEW_PERIOD_COUNT = 'live_view_period_count';
 	const METRIC_LIVE_ENGAGED_USERS_COUNT = 'live_engaged_users_count';
 	const METRIC_LIVE_ENGAGED_USERS_RATIO = 'live_engaged_users_ratio';
+	const METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'live_engaged_users_play_time_ratio';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1236,7 +1237,19 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_LIVE_ENGAGED_USERS_COUNT,
 				self::METRIC_LIVE_VIEW_PERIOD_COUNT));
 
+		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::EVENT_TYPE_NODE_PLAY));
 
+		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::EVENT_TYPE_PLAY));
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
@@ -1323,19 +1336,14 @@ class kKavaReportsMgr extends kKavaBase
 						self::getFieldAccessPostAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT))))),
 				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY_REQUESTED))));
 
-		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
-			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
-			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
-				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
-				self::METRIC_UNIQUE_PERCENTILES_SUM,
-				self::EVENT_TYPE_NODE_PLAY));
-
-		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
-			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
-				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
-				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
-				self::EVENT_TYPE_PLAY));
+		self::$metrics_def[self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, '/', array(
+					self::getArithmeticPostAggregator("subHighAndGood", "+", array(
+						self::getFieldAccessPostAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
+						self::getFieldAccessPostAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC))),
+					self::getFieldAccessPostAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}

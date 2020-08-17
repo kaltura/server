@@ -188,8 +188,6 @@ class kKavaBase extends kDruidBase
 	const VALUE_UNKNOWN = 'Unknown';
 	const VALUE_ZERO = '0';
 
-
-
 	protected static $datasources_dimensions = array(
 		self::DATASOURCE_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
