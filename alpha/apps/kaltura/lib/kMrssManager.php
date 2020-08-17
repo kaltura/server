@@ -2,7 +2,9 @@
 class kMrssManager
 {
 	const FORMAT_DATETIME = 'Y-m-d\TH:i:s';
-	
+	const CDN_URL = 'cdn_url';
+	const THUMBNAIL_MAP = 'thumbnail';
+
 	/**
 	 * @var array<IKalturaMrssContributor>
 	 */
@@ -249,7 +251,18 @@ class kMrssManager
 			$mrss = new SimpleXMLElement('<item/>');
 			
 		$thumbnail = $mrss->addChild('thumbnail');
-		$thumbnail->addAttribute('url', kAssetUtils::getAssetUrl($thumbAsset));
+
+		$cdnUrlPartners = kConf::get(self::CDN_URL, self::THUMBNAIL_MAP, array());
+		if (in_array($thumbAsset->getPartnerId(), array_keys($cdnUrlPartners)))
+		{
+			$cdnUrl = $cdnUrlPartners[$thumbAsset->getPartnerId()];
+			$assetUrl = kAssetUtils::getAssetUrl($thumbAsset, false, null, null, '', $cdnUrl);
+			$thumbnail->addAttribute('url', $assetUrl);
+		}
+		else
+		{
+			$thumbnail->addAttribute('url', kAssetUtils::getAssetUrl($thumbAsset));
+		}
 		$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
 		$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');
 		$thumbnail->addAttribute('format', $thumbAsset->getContainerFormat());

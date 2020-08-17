@@ -32,20 +32,25 @@ error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
-
-if (!file_exists($configFile))
+$config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
+if (empty($config))
 {
-	KalturaLog::err("Configuration file [$configFile] not found.");
-	exit(-1);
+	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
+
+	if (!file_exists($configFile))
+	{
+		KalturaLog::err("Configuration file [$configFile] not found.");
+		exit(-1);
+	}
+	$config = parse_ini_file($configFile);
 }
 
-$config = parse_ini_file($configFile);
 $elasticCluster = $config['elasticCluster'];
 $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
+$shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
 
 if (!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -88,7 +93,7 @@ $elasticClient = new elasticClient($elasticServer, $elasticPort); //take the ser
 
 while (true)
 {
-	if (!elasticSearchUtils::isMaster($elasticClient, $hostname))
+	if ($shouldUseMaster && !elasticSearchUtils::isMaster($elasticClient, $hostname))
 	{
 		KalturaLog::log('elastic server [' . $hostname . '] is not the master , sleeping for 30 seconds');
 		sleep(30);

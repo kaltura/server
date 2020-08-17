@@ -195,10 +195,12 @@ class KDLWrap
 						$command .= '-map v:0 ';
 
 					$command .= '-map a ';
+					$streamIdx=0;
 					foreach ($contentStreams['audio'] as $audioStream)
 					{
 						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
-							$command .= "-metadata:s:0:{$audioStream['id']} language={$audioStream['audioLanguage']} ";
+							$command .= "-metadata:s:a:$streamIdx language={$audioStream['audioLanguage']} ";
+							$streamIdx++;
 					}
 				}
 				

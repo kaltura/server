@@ -84,7 +84,7 @@ class kDataCenterMgr
 	{
 		$dc_config = kConf::getMap("dc_config");
 		// find the dc with the desired id
-		$dc_list = $dc_config["list"];
+		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		if ( isset( $dc_list[$dc_id] ) )		
 			$dc = $dc_list[$dc_id];
 		else if ($partnerId)
@@ -115,7 +115,7 @@ class kDataCenterMgr
 	public static function getDcIds()
 	{
 		$dc_config = kConf::getMap("dc_config");
-		$dc_list = $dc_config["list"];
+		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		return array_keys($dc_list);
 	}
 		
@@ -123,7 +123,7 @@ class kDataCenterMgr
 	{
 		$dc_config = kConf::getMap("dc_config");
 		
-		$dc_list = $dc_config["list"];
+		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		
 		if ( $include_current == false )
 		{

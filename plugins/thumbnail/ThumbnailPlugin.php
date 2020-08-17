@@ -125,23 +125,24 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 	 * @param $vid_sec
 	 * @param $vid_slice
 	 * @param $vid_slices
-	 * @param $density
 	 * @param $orig_image_path
+	 * @param $density
 	 * @param $stripProfiles
 	 * @param $format
+	 * @param $fileSync
 	 * @param $start_sec
 	 * @param $end_sec
 	 * @return string
 	 * @throws kThumbnailException
 	 */
-	public function getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec)
+	public function getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec)
 	{
 		$result = false;
 		if($this->shouldUseThumbnailAdapter($entry->getPartnerId()))
 		{
 			$adapter = kThumbnailAdapterFactory::getAdapter($entry);
-			$params = kThumbnailAdapterFactory::getThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-				$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $start_sec, $end_sec);
+			$params = kThumbnailAdapterFactory::getResizeThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
+				$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);
 			$result = $adapter->resizeEntryImage($params);
 		}
 

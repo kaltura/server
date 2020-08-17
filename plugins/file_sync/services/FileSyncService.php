@@ -79,11 +79,22 @@ class FileSyncService extends KalturaBaseService
 
 		// Get and lock file syncs
 		$lockedFileSyncs = self::getAndLockFileSyncs($filter, $lockExpiryTimeout);
-
+		
 		// Delete siblings
 		foreach ($lockedFileSyncs as $fileSync)
 		{
-			$fileSync->deleteLocalSiblings();
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($fileSync->getPartnerId());
+			if(count($periodicStorageIds))
+			{
+				//Retrieve all batch jobs associated to the entry
+				$flavorAsset = assetPeer::retrieveById($fileSync->getObjectId());
+				$batchJobs = BatchJobLockPeer::retrieveByEntryId($flavorAsset->getEntryId());
+
+				if(empty($batchJobs))
+				{
+					$fileSync->deleteLocalSiblings();
+				}
+			}
 		}
 
 		// Set last updatedAt
