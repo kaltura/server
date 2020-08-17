@@ -1117,6 +1117,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$currentDCFileSync->setIsDir($isDir);
 		$currentDCFileSync->save();
 
+		if ($currentDCFileSync->getObjectType() == FileSyncObjectType::ASSET && $currentDCFileSync->getObjectSubType() == asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
+		{
+			self::setActualFileSizeOnAsset($currentDCFileSync);
+		}
+
 		if($cacheOnly)
 			return $currentDCFileSync;
 
@@ -1161,6 +1166,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		return $currentDCFileSync;
+	}
+
+	public static function setActualFileSizeOnAsset($currentDCFileSync)
+	{
+		$asset = assetPeer::retrieveById($currentDCFileSync->getObjectId());
+		if ($asset && $asset->getType() == assetType::FLAVOR && $currentDCFileSync->getFileSize())
+		{
+			$asset->setActualFileSizeOnDisk((int) ($currentDCFileSync->getFileSize() / 1024));
+			$asset->save();
+		}
 	}
 
 	/**

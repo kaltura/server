@@ -16,6 +16,7 @@ class flavorAsset extends exportableAsset
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 	const CUSTOM_DATA_FIELD_LABEL = "label";
 	const CUSTOM_DATA_FIELD_DEFAULT = "default";
+	const CUSTOM_DATA_ACTUAL_FILE_SIZE_ON_DISK = "actualFileSizeOnDisk";
 	
 	/**
 	 * Applies default values to this object.
@@ -194,6 +195,9 @@ class flavorAsset extends exportableAsset
 	
 	public function getDefault()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, null, false);}
 	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
+
+	public function getActualFileSizeOnDisk()	{return $this->getFromCustomData(self::CUSTOM_DATA_ACTUAL_FILE_SIZE_ON_DISK, null, 0);}
+	public function setActualFileSizeOnDisk($v)	{$this->putInCustomData(self::CUSTOM_DATA_ACTUAL_FILE_SIZE_ON_DISK, $v);}
 
 	/**
 	 * @param int $type
