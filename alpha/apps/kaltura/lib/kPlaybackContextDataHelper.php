@@ -48,7 +48,7 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
-		$this->storageIds = kConf::get('periodic_storage_ids', 'cloud_storage', array());
+		$this->storageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$this->generateRestrictedMessages($contextDataHelper);
 
