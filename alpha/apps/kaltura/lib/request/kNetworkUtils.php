@@ -31,14 +31,14 @@ class kNetworkUtils
 		$version = $parts[0];
 		$timestamp = $parts[1];
 		$expectedSignature = $parts[2];
-		
+
 		$currentTimestamp = time();
 		if( !is_numeric($timestamp) || abs($currentTimestamp - $timestamp) > self::AUTH_HEADER_TIMESTAMP_MARGIN )
 		{
 			KalturaLog::warning("Failed to validate signature, timestamp [$timestamp] currentTimestamp [$currentTimestamp]");
 			return false;
 		}
-    
+
 		$url = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
 
 		$actualSignature = self::calculateSignature($version, $timestamp, $url);
