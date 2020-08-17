@@ -5,6 +5,21 @@
  */
 class KalturaJsonProcSerializer extends KalturaJsonSerializer
 {
+	public function __construct()
+	{
+		if (!isset($_GET["callback"]))
+		{
+			throw new KalturaAPIException(APIErrors::MANDATORY_PARAMETER_MISSING, 'callback');
+		}
+
+		// check for a valid callback, prevent xss
+		$ALLOWED_REGEX = "/^[0-9_a-zA-Z.]*$/";
+		if (!preg_match($ALLOWED_REGEX, $_GET["callback"]))
+		{
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'callback');
+		}
+	}
+
 	public function setHttpHeaders()
 	{
 		header("Content-Type: application/javascript");
@@ -12,13 +27,7 @@ class KalturaJsonProcSerializer extends KalturaJsonSerializer
 	
 	public function getHeader()
 	{
-		$ALLOWED_REGEX = "/^[0-9_a-zA-Z.]*$/";
-		$callback = isset($_GET["callback"]) ? $_GET["callback"] : null;
-		// check for a valid callback, prevent xss
-		if (is_null($callback) || !preg_match($ALLOWED_REGEX, $callback))
-			die("Expecting \"callback\" parameter for jsonp format");
-			
-		return $callback .  "(";
+		return $_GET["callback"] .  "(";
 	}
 	
 	public function getFooter($execTime = null)
