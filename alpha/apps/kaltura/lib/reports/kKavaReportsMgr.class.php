@@ -338,7 +338,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::MEDIA_TYPE_IMAGE,
 		self::MEDIA_TYPE_SHOW,
 	);
-	
+
 	protected static $playthrough_event_types = array(
 		self::EVENT_TYPE_PLAYTHROUGH_25,
 		self::EVENT_TYPE_PLAYTHROUGH_50,
@@ -5483,28 +5483,21 @@ class kKavaReportsMgr extends kKavaBase
 		$from_minute = round($input_filter->from_date/60) * 60;
 		$to_minute =  round($input_filter->to_date/60) * 60;
 		$minutes_count = ($to_minute - $from_minute)/60 + 1;
-		$metrics_count = count($result[0]) - 1;
-		$empty_values = array_fill(0, $metrics_count, 0);
+		$values_count = count($result[0]);
 
-		$data = $result[1];
-		foreach ($data as $minute_data)
-		{
-			$minute = array_shift($minute_data);
-			$minutes[$minute] = $minute_data;
-		}
+		$existing_minutes = array_combine(array_map('reset', $result[1]), $result[1]);
+		$minutes = range($from_minute, $to_minute, 60);
 		$data = array();
-		for ($curr_minute = $from_minute; $curr_minute <= $to_minute; $curr_minute+=60)
+		foreach($minutes as $minute)
 		{
-			$metrics = isset($minutes[$curr_minute]) ? $minutes[$curr_minute] : $empty_values;
-			array_unshift($metrics, $curr_minute);
-			$data[] = array_values($metrics);
+			$data[] = isset($existing_minutes[$minute]) ? $existing_minutes[$minute] : array_pad(array($minute), $values_count, 0);
 		}
 
 		$result[1] = $data;
 		$result[2] = $minutes_count;
 		unset($result[3]);
 	}
-
+	
 	protected static function getFlavorParamsHeadersArray($headers)
 	{
 		$flavorHeaders = array();

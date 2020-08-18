@@ -166,6 +166,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 		),
