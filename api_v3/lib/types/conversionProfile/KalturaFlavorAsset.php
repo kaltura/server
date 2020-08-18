@@ -108,14 +108,6 @@ class KalturaFlavorAsset extends KalturaAsset
 	 * @var KalturaNullableBoolean
 	 */
 	public $isDefault;
-
-	/**
-	 * The size (in KBytes) of the Flavor Asset
-	 *
-	 * @var int
-	 * @readonly
-	 */
-	public $actualFileSizeOnDisk;
 	
 	private static $map_between_objects = array
 	(
@@ -132,7 +124,6 @@ class KalturaFlavorAsset extends KalturaAsset
 		"language",
 		"label",
 		"isDefault" => "default",
-		"actualFileSizeOnDisk"
 	);
 	
 	public function getMapBetweenObjects ( )
