@@ -52,6 +52,11 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 	public function handleThumbUpload($thumbAssetId, $providerData, $sftpManager, $thumbnailFilePath = null)
 	{
+		if(empty($thumbAssetId))
+		{
+			return;
+		}
+
 		$thumbAssetPath = $this->getAssetFile($thumbAssetId, sys_get_temp_dir(), pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 
 		if ($thumbAssetPath && file_exists($thumbAssetPath))

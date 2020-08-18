@@ -75,54 +75,92 @@
 	}
 
 	function configureConfigurationMap(configurationMapName, configurationMapHost, configurationMapVersion) {
-		if (typeof configurationMapName == 'undefined') {
-			alert('<?php echo $this->translate('Configuration Map Name not supplied'); ?>');
-			return;
-		}
+        if (typeof configurationMapName == 'undefined') {
+            alert('<?php echo $this->translate('Configuration Map Name not supplied'); ?>');
+            return;
+        }
 
-		var configurationMapStr= '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost)  + '/configuration_map_version/' + configurationMapVersion + '/is_new/' + false;
+        var configurationMapStr = '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/configuration_map_version/' + configurationMapVersion + '/is_new/' + false;
+        var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapConfigureAction')); ?>' + configurationMapStr;
 
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapConfigureAction')); ?>' + configurationMapStr;
+        jQuery('#configuration-map-configure-dialog').remove();
+        dialogDiv = jQuery('<div id="configuration-map-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
 
-		jQuery('#configuration-map-configure-dialog').remove();
-		dialogDiv = jQuery('<div id="configuration-map-configure-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+        dialogDiv.dialog({
+            bgiframe: true,
+            modal: true,
+            resizable: true,
+            width: 600,
+            height: 600,
+            title: '<?php echo $this->translate('Configuration Map'); ?>',
+            buttons: {
+                "SaveButton": {
+                    text: '<?php echo $this->translate('Save'); ?>',
+                    id: "saveButton",
+                    click: function () {
+                        var configurationMapStr = '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/configuration_map_version/' + configurationMapVersion + '/is_new/' + false;
+                        var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ConfigurationMapDiffAction')); ?>' + configurationMapStr;
+                        jQuery('#configuration-map-configure-inner-dialog').remove();
+                        innerdialogDiv = jQuery('<div id="configuration-map-configure-inner-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+                        innerdialogDiv.dialog({
+                            bgiframe: true,
+                            modal: true,
+                            resizable: true,
+                            width: 600,
+                            height: 600,
+                            title: '<?php echo $this->translate('Please approve Diffs:'); ?>',
+                            buttons: {
+                                "innerSaveButton": {
+                                    text: '<?php echo $this->translate('Approve'); ?>',
+                                    id: "innerSaveButton",
+                                    click: function () {
+                                        var res = confirm("Are you sure?");
+                                        if (res) {
+                                            jQuery('.ui-widget-overlay').css('z-index', 1003);
+                                            jQuery('#loader').show();
+                                            jQuery('#frmConfigurationMapConfigure').submit();
+                                            jQuery(this).dialog('close');
+                                        }
+                                    }
+                                },
+                                "innerCloseButton": {
+                                    text: '<?php echo $this->translate('Close'); ?>',
+                                    id: "innerCloseButton",
+                                    click: function () {
+                                        jQuery(this).dialog('close');
+                                    }
+                                }
+                            },
+                            close: function () {
+                                jQuery(this).dialog('destroy').remove();
+                            }
+                        });
+                        innerdialogDiv.load(
+                            url,
+                            {myContent: $('#rawData').val()},
+                        );
+                    }
+                },
+                '<?php echo $this->translate('Close'); ?>': function () {
+                    jQuery(this).dialog('close');
+                }
+            },
+            close: function () {
+                jQuery(this).dialog('destroy').remove();
+            }
+        });
 
-		dialogDiv.dialog({
-			bgiframe: true,
-			modal: true,
-			resizable: true,
-			width: 600,
-			height: 600,
-			title: '<?php echo $this->translate('Configuration Map'); ?>',
-			buttons: {
-				"SaveButton":{
-					text:'<?php echo $this->translate('Save'); ?>',
-					id: "saveButton",
-					click: function () {
-						jQuery('.ui-widget-overlay').css('z-index', 1003);
-						jQuery('#loader').show();
-						jQuery(this).find('#frmConfigurationMapConfigure').submit();
-					}},
-				'<?php echo $this->translate('Close'); ?>': function () {
-					jQuery(this).dialog('close');
-				}
-			},
-			close: function () {
-				jQuery(this).dialog('destroy').remove();
-			}
-		});
-
-		dialogDiv.load(
-			url,
-			null,
-			function () {
-				jQuery(this).find('#frmConfigurationMapConfigure').ajaxForm({
-					success: loadConfigurationMapSuccess,
-					iframe: true
-				});
-			}
-		);
-	}
+        dialogDiv.load(
+            url,
+            null,
+            function () {
+                jQuery(this).find('#frmConfigurationMapConfigure').ajaxForm({
+                    success: loadConfigurationMapSuccess,
+                    iframe: true
+                });
+            }
+        );
+    }
 
 	function viewConfigurationMap(configurationMapName, configurationMapHost, configurationMapVersion) {
 		var configurationMapStr = '/configuration_map_name/' + encodeURIComponent(configurationMapName) + '/configuration_map_host/' + encodeURIComponent(configurationMapHost) + '/is_new/' + false + '/is_view/' + true;

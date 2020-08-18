@@ -34,6 +34,11 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 			}
 			else
 			{
+				$shouldCopyAllRules = false;
+				if ($partnerId == $reachProfile->partnerId)
+				{
+					$shouldCopyAllRules = true;
+				}
 				$reachProfile->id = null;
 				$reachProfile->partnerId = null;
 				$reachProfile->name = "[$partnerId] $reachProfile->name";
@@ -43,12 +48,15 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 				$reachProfile->usedCredit = null;
 				$reachProfile->status = null;
 
-				foreach ( $reachProfile->rules as $key => $rule )
+				if (!$shouldCopyAllRules)
 				{
-					if (empty($rule->description)
-						|| substr($rule->description, 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX)
+					foreach ( $reachProfile->rules as $key => $rule )
 					{
-						unset($reachProfile->rules[$key]);
+						if (empty($rule->description)
+							|| substr($rule->description, 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX)
+						{
+							unset($reachProfile->rules[$key]);
+						}
 					}
 				}
 

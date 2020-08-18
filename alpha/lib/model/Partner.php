@@ -86,6 +86,8 @@ class Partner extends BasePartner
 
 	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
 
+	const LIVE_CONCURRENT_BY_ADMIN_TAG = 'live_concurrent_by_admin_tag';
+
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -1137,6 +1139,16 @@ class Partner extends BasePartner
 			$liveRtcStreamInputs = kConf::get('live_rtc_concurrent_streams', 'local', 2);
 		return $liveRtcStreamInputs;
 	}
+
+	public function setMaxConcurrentLiveByAdminTag($limitsArray)			{
+		$this->putInCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG, $limitsArray);
+	}
+
+	public function getMaxConcurrentLiveByAdminTag()			{
+		$defaultValues = kConf::get('ConcurrentLiveLimitByAdminTag_DefaultValues', 'local', array());
+		return array_replace($defaultValues, (array)$this->getFromCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG));
+	}
+
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
 	public function getPublishersOveragePrice()			{return $this->getFromCustomData('publishers_overage_price');}

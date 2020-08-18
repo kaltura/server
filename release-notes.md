@@ -1,3 +1,56 @@
+# Propus 16.8.0  #
+
+## Adding permission to entryVendorTask object and to entryVendorTask service ##
+Issue Type: Task
+Issue ID : REACH2-911
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_09_add_permissions_entry_vendor_task.php
+
+## New KMS user reset password link  ##
+- Issue Type: Task
+- Issue ID: PLAT-10876
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links':
+    kms = "https://%s.mediaspace.kaltura.com/user/set-initial-password?hashKey="
+    
+
+## DropFolder Enhancements - allow publisher admin KS to set description and status of drop folders  ##
+Issue Type: Task
+Issue ID : PSVAMB-14576
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_25_addNewDropFolderServiceActions.php
+
+
+# Propus 16.7.0  #
+
+## Adding privileges field on widget object ##
+Issue Type: Task
+Issue ID : PLAT-10953
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permission_widget_object_privileges_field.php
+
+## Add more user details name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1925
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2020_07_16_updateQandAResponseProfile_addMoreUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2020_07_16_updateQandAResponseProfile_addMoreUserData.php
+
+## Adding permission to serve and getServeUrl in entryVendorTask ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permissions_entry_vendor_task.php
+
 # Propus 16.6.0  #
 ## Adding permissions to base-playback-role ##
 Issue Type: Task

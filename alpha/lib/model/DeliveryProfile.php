@@ -466,12 +466,12 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 	public function applyFlavorsDomainPrefix(&$flavors)
 	{
+		$domainPrefix = $this->getDeliveryServerNodeUrl();
 		foreach ($flavors as &$flavor)
 		{
 			if(isset($flavor['domainPrefix']))
 				continue;
 
-			$domainPrefix = $this->getDeliveryServerNodeUrl();
 			if($domainPrefix)
 				$flavor['domainPrefix'] = $domainPrefix;
 		}

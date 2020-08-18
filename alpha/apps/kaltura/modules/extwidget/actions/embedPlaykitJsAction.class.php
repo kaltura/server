@@ -21,6 +21,11 @@ class embedPlaykitJsAction extends sfAction
 	const CANARY = "{canary}";
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
+	const PLAYKIT_KAVA = 'playkit-kava';
+	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
+	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
+	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
+	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -512,6 +517,41 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
+	private function maybeAddAnalyticsPlugins()
+	{
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
+		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
+		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig))
+		{
+			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
+			list($latestVersionMap) = $this->getConfigByVersion("latest");
+			list($betaVersionMap) = $this->getConfigByVersion("beta");
+			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
+			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+
+			// For player latest/beta >= 0.56.0 or canary
+			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
+				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
+				$playerVersion == self::CANARY)
+			{
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
+				if ($tvPlayerConfig)
+				{
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
+				}
+			}
+			// For specific version >= 0.56.0
+			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
+			{
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
+				if ($tvPlayerConfig)
+				{
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
+				}
+			}
+		}
+	}
+
 	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -649,7 +689,8 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
-        $this->setFixVersionsNumber();
+		$this->maybeAddAnalyticsPlugins();
+		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
 

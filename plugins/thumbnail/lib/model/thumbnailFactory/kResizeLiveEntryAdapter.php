@@ -33,4 +33,9 @@ class kResizeLiveEntryAdapter extends kBaseResizeAdapter
 
 		parent::calculateThumbNamePostfix();
 	}
+
+	protected function initOrigImagePath()
+	{
+		$this->parameters->set(kThumbFactoryFieldName::ORIG_IMAGE_PATH, null);
+	}
 }
