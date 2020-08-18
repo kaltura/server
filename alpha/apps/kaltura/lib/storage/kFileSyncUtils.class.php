@@ -1832,7 +1832,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if(!self::doesAnyEntryFlavorExistInStorage($preferredStorageId, $flavorAssets)
 			&& !is_null($fallbackStorageId)
-			&& self::doAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets))
+			&& self::doAllEntryFlavorsExistInStorage($fallbackStorageId, $flavorAssets, !$flavorAsset->getIsOriginal()))
 		{
 			KalturaLog::debug("Request will be directed to fallback storage [$fallbackStorageId]");
 			return null;
@@ -1848,6 +1848,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if(!$fileSync || !in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
 		{
 			return null;
+		}
+
+		if(!$fileSync->getFilePath())
+		{
+			$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, 1 - kDataCenterMgr::getCurrentDcId());
 		}
 		return $fileSync;
 	}
@@ -1886,7 +1891,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSync = self::getReadyFileSyncForKeyAndDc($key, $preferredStorageId);
-			if($fileSync)
+			if($fileSync && $fileSync->getFilePath())
 			{
 				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was found in DC [$preferredStorageId]");
 				return true;
@@ -1907,7 +1912,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSync = self::getReadyFileSyncForKeyAndDc($key, $storageId);
-			if(!$fileSync)
+			if(!$fileSync || !$fileSync->getFilePath())
 			{
 				KalturaLog::debug("File sync for flavor asset [{$flavorAsset->getId()}] was not found in DC [$storageId]");
 				return false;
