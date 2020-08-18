@@ -5497,7 +5497,7 @@ class kKavaReportsMgr extends kKavaBase
 		$result[2] = $minutes_count;
 		unset($result[3]);
 	}
-	
+
 	protected static function getFlavorParamsHeadersArray($headers)
 	{
 		$flavorHeaders = array();
