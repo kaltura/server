@@ -196,6 +196,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
 		$adminTagsOrigLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
+		KalturaLog::debug('Current AdminTags: [' . $liveEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsOrigLimits, true) . ']');
 		$adminTagsCounters = $adminTagsOrigLimits;
 		
 		$maxTranscodedStreams = 0;
@@ -219,6 +220,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		{
 			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
 			{
+				KalturaLog::debug('AdminTag exceeded : [' . $adminTag . '] limits left [' . print_r($adminTagsCounters, true) . ']');
 				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $liveEntry->getId(), $adminTag, $adminTagsOrigLimits[$adminTag]);
 			}
 		}
