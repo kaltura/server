@@ -24,14 +24,15 @@ class kImageTransformationAdapter
 	public function getImageTransformation($parameters)
 	{
 		$this->parameters = $parameters;
-		$this->prepareInput();
 		if($this->parameters->get(kThumbFactoryFieldName::VID_SLICES) !== kThumbAdapterParameters::UNSET_PARAMETER && $this->parameters->get(kThumbFactoryFieldName::VID_SLICE) === kThumbAdapterParameters::UNSET_PARAMETER)
 		{
+			$this->prepareInput();
 			return $this->getStripTransformation();
 		}
 
 		$step = new kImageTransformationStep();
 		$this->addSource($step);
+		$this->prepareInput();
 		$this->handleSourceActions($step);
 		$this->handleActionType($step);
 		$this->handleStripProfile($step);
@@ -265,14 +266,43 @@ class kImageTransformationAdapter
 		$this->parameters->set(kThumbFactoryFieldName::BG_COLOR, $bgColor);
 		/* @var $entry entry */
 		$entry = $this->parameters->get(kThumbFactoryFieldName::ENTRY);
-		if (!$this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH))
+		if (!$this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH))
 		{
-			$this->parameters->set(kThumbFactoryFieldName::SRC_WIDTH, $entry->getWidth());
+			if($entry->getWidth())
+			{
+				$this->parameters->set(kThumbFactoryFieldName::SRC_WIDTH, $entry->getWidth());
+			}
+			else
+			{
+				$this->setSrcSizeFromFlavor();
+			}
+
 		}
 
-		if (!$this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT))
+		if (!$this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT))
 		{
-			$this->parameters->set(kThumbFactoryFieldName::SRC_HEIGHT, $entry->getHeight());
+			if($entry->getHeight())
+			{
+				$this->parameters->set(kThumbFactoryFieldName::SRC_HEIGHT, $entry->getHeight());
+			}
+			else
+			{
+				$this->setSrcSizeFromFlavor();
+			}
+		}
+	}
+
+	protected function setSrcSizeFromFlavor()
+	{
+		$flavorAsset = myEntryUtils::getFlavorAssetForLocalCapture($this->parameters->get(kThumbFactoryFieldName::ENTRY));
+		if (!$this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH))
+		{
+				$this->parameters->set(kThumbFactoryFieldName::SRC_WIDTH, $flavorAsset->getWidth());
+		}
+
+		if (!$this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT))
+		{
+			$this->parameters->set(kThumbFactoryFieldName::SRC_HEIGHT, $flavorAsset->getHeight());
 		}
 	}
 
@@ -426,6 +456,17 @@ class kImageTransformationAdapter
 			else
 			{
 				$source = new kFileSource($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH));
+			}
+
+			$image = $source->getImage();
+			if(!$this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH))
+			{
+				$this->parameters->set(kThumbFactoryFieldName::SRC_WIDTH, $image->getImageWidth());
+			}
+
+			if(!$this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT))
+			{
+				$this->parameters->set(kThumbFactoryFieldName::SRC_HEIGHT, $image->getImageHeight());
 			}
 
 			$step->setSource($source);
