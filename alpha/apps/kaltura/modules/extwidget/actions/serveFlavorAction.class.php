@@ -44,11 +44,12 @@ class serveFlavorAction extends kalturaAction
 		header("X-Kaltura:cache-key");
 	}
 	
-	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null)
+	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)
 	{
 		$source = array(
 			'type' => 'source',
 			'path' => $path,
+			'sourceType' => $sourceType,
 		);
 
 		if ($asset && $asset->getEncryptionKey())
@@ -262,7 +263,7 @@ class serveFlavorAction extends kalturaAction
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
+					list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
 
 					if(!$file_sync)
 					{
@@ -271,7 +272,7 @@ class serveFlavorAction extends kalturaAction
 						$storeCache = false;
 					}
 
-					$clips[] = $this->getClipData($path,$flavor);
+					$clips[] = $this->getClipData($path,$flavor, $sourceType);
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
@@ -465,7 +466,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -474,7 +475,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 
-			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $file_sync);
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $file_sync, $sourceType);
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
@@ -663,11 +664,11 @@ class serveFlavorAction extends kalturaAction
 				{
 					$hasCaptions = true;
 					$labelEntryId = $entryId;
-					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH]);
+					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH], 'sourceType' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_SOURCE_TYPE]);
 				}
 				else
 				{
-					$captionClips[] = array('type' => 'source', 'path' => 'empty');
+					$captionClips[] = array('type' => 'source', 'path' => 'empty', 'sourceType' => kFileSyncUtils::SOURCE_TYPE_FILE);
 				}
 			}
 			if ($hasCaptions)
@@ -773,9 +774,10 @@ class serveFlavorAction extends kalturaAction
 	/**
 	 * @param string $path
 	 * @param flavorAsset $flavor
+	 * @param $sourceType
 	 * @return array
 	 */
-	private function getClipData($path, $flavor)
+	private function getClipData($path, $flavor, $sourceType)
 	{
 		$flavorId = $flavor->getId();
 		$hasAudio = $flavor->getContainsAudio();
@@ -784,7 +786,7 @@ class serveFlavorAction extends kalturaAction
 			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
 			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
 		}
-		$clipDesc = array('type' => 'source', 'path' => $path);
+		$clipDesc = array('type' => 'source', 'path' => $path, 'sourceType' => $sourceType);
 		if (!$hasAudio)
 		{
 			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
