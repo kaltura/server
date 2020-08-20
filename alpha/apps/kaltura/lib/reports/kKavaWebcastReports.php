@@ -16,6 +16,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 
 		ReportType::ENGAGEMENT_WEBCAST => array(
 			self::REPORT_TOTAL_METRICS => array(
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
 				self::EVENT_TYPE_REGISTERED,
 			),
@@ -41,6 +42,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
@@ -68,6 +70,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
@@ -89,6 +92,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
@@ -107,6 +111,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DEVICE,
@@ -123,6 +128,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_DOMAIN,
 			self::REPORT_DRILLDOWN_DIMENSION_MAP => array(
@@ -151,6 +157,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
 				self::METRIC_TOTAL_UNIQUE_PERCENTILES,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_TOTAL_METRICS => array(
 				self::EVENT_TYPE_REGISTERED,
@@ -159,8 +166,28 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_BUFFER_TIME_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
+		),
+
+		ReportType::ENGAGEMENT_BREAKDOWN_WEBCAST => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_LIVE_NO_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_LOW_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_FAIR_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_GOOD_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO,
+			),
+		),
+
+		ReportType::ENGAGMENT_TIMELINE_WEBCAST => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'position' => self::DIMENSION_POSITION,
+			),
+			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
+			self::REPORT_METRICS => array(self::METRIC_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
 		),
 
 	);
