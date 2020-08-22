@@ -13,8 +13,15 @@ class KalturaFileSyncArray extends KalturaTypedArray
 
 		foreach ($arr as $obj)
 		{
-    		$nObj = new KalturaFileSync();
-			$nObj->fromObject($obj, $responseProfile);
+			$nObj = new KalturaFileSync();
+			try
+			{
+				$nObj->fromObject($obj, $responseProfile);
+			}
+			catch(kFileSyncException $e)
+			{
+				continue;
+			}
 			$newArr[] = $nObj;
 		}
 		
