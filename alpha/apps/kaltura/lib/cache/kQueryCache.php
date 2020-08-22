@@ -89,6 +89,13 @@ class kQueryCache
 		self::$s_memcacheQueries = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_QUERIES);
 	}
 	
+	public static function close()
+	{
+		self::$s_memcacheInited = false;
+		self::$s_memcacheKeys = null;
+		self::$s_memcacheQueries = null;
+	}
+
 	protected static function replaceVariable($formatString, $variableValue)
 	{
 		$firstVarPos = strpos($formatString, '%s');

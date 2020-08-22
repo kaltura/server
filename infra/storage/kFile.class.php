@@ -491,6 +491,10 @@ class kFile extends kFileBase
 	
 	public static function closeDbConnections()
 	{
+		kQueryCache::close();
+		kCacheManager::close();
+		kCacheConfFactory::close();
+
 		// close all opened db connetion while we end an action with a long executing operation such as dumping a file.
 		// this will limit the number of concurrent db connections as dumping a file make take a long time
 
