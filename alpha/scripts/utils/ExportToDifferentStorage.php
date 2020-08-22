@@ -1,8 +1,8 @@
 <?php
 
-if (count($argv) != 6)
+if (count($argv) != 7)
 {
-	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <realrun-dryrun>\n";
+	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <partner ids/all> <realrun-dryrun>\n";
 	exit(0);
 }
 
@@ -13,7 +13,8 @@ $sourceDcIds = explode(',', $argv[1]);
 $targetDcId = $argv[2];
 $filePath = $argv[3];
 $fileType = $argv[4];
-$dryRun = $argv[5] != 'realrun';
+$partnerIds = $argv[5] != 'all' ? explode(',', $argv[5]) : null;
+$dryRun = $argv[6] != 'realrun';
 
 if (!is_numeric($targetDcId))
 {
@@ -37,7 +38,7 @@ else
 }
 KalturaStatement::setDryRun($dryRun);
 
-main($sourceDcIds, $targetDcId, $filePath, $fileType);
+main($sourceDcIds, $targetDcId, $filePath, $fileType, $partnerIds);
 
 
 function handleAsset($asset, $sourceDcIds, $targetStorage)
@@ -94,13 +95,13 @@ function handleAsset($asset, $sourceDcIds, $targetStorage)
 
 	if ($sourceDcFileSync->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 	{
-		KalturaLog::info(">>> $assetId: NOT_READY - File sync " . $sourceDcFileSync->getId() . " is not ready " . $sourceDcFileSync->getStatus() . " skipping");
+		KalturaLog::info(">>> $assetId: NOT_READY_" . $sourceDcFileSync->getStatus() . " - File sync " . $sourceDcFileSync->getId() . " is not ready skipping");
 		return;
 	}
 
 	if ($targetDcFileSync)
 	{
-		KalturaLog::info(">>> $assetId: ALREADY_EXISTS - Found file sync " . $targetDcFileSync->getId() . " status " . $targetDcFileSync->getStatus() . " in target dc [$targetDcId] skipping");
+		KalturaLog::info(">>> $assetId: ALREADY_EXISTS_" . $targetDcFileSync->getStatus() . " - Found file sync " . $targetDcFileSync->getId() . " in target dc skipping");
 		return;
 	}
 
@@ -117,7 +118,7 @@ function handleAsset($asset, $sourceDcIds, $targetStorage)
 	}
 }
 
-function handleAssets($assetIds, $sourceDcIds, $targetStorage)
+function handleAssets($assetIds, $sourceDcIds, $targetStorage, $partnerIds)
 {
 	$count = 0;
 
@@ -138,6 +139,12 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage)
 
 		if (!$asset)
 		{
+			KalturaLog::debug("Asset not found (or not READY) $assetId - skipping");
+			continue;
+		}
+
+		if ($partnerIds && !in_array($asset->getPartnerId(), $partnerIds))
+		{
 			continue;
 		}
 
@@ -153,7 +160,7 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage)
 	}
 }
 
-function handleEntries($entryIds, $sourceDcIds, $targetStorage)
+function handleEntries($entryIds, $sourceDcIds, $targetStorage, $partnerIds)
 {
 	$count = 0;
 
@@ -172,6 +179,11 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage)
 		if (!$entry)
 		{
 			KalturaLog::debug("Entry not found (or not READY) $entryId - skipping");
+			continue;
+		}
+
+		if ($partnerIds && !in_array($entry->getPartnerId(), $partnerIds))
+		{
 			continue;
 		}
 
@@ -205,7 +217,7 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage)
  * @param $filePath
  * @throws PropelException
  */
-function main($sourceDcIds, $targetDcId, $filePath, $fileType)
+function main($sourceDcIds, $targetDcId, $filePath, $fileType, $partnerIds)
 {
 	KalturaLog::debug("Running for file [$filePath] and targetDcId [$targetDcId]");
 
@@ -226,11 +238,11 @@ function main($sourceDcIds, $targetDcId, $filePath, $fileType)
 	switch ($fileType)
 	{
 	case 'entry':
-		handleEntries($ids, $sourceDcIds, $targetStorage);
+		handleEntries($ids, $sourceDcIds, $targetStorage, $partnerIds);
 		break;
 
 	case 'asset':
-		handleAssets($ids, $sourceDcIds, $targetStorage);
+		handleAssets($ids, $sourceDcIds, $targetStorage, $partnerIds);
 		break;
 
 	default:
