@@ -114,7 +114,7 @@ function handleAssets($assetIds, $externalStorage)
 		KalturaLog::debug('Retrieving non-source assets for entry ' . $entry->getId());
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
-		$c->add(assetPeer::TYPE, array(assetType::FLAVOR), Criteria::IN);
+		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY, Criteria::IN);
 		$asset = assetPeer::doSelectOne($c);
 
@@ -154,7 +154,7 @@ function handleEntries($entryIds, $externalStorage)
 		KalturaLog::debug('Retrieving non-source assets for entry ' . $entry->getId());
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entry->getId());
-		$c->add(assetPeer::TYPE, array(assetType::FLAVOR), Criteria::IN);
+		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY, Criteria::IN);
 		$c->addAnd(assetPeer::IS_ORIGINAL, false);
 		$assets = assetPeer::doSelect($c);
