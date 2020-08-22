@@ -41,11 +41,14 @@ main($storageIdDest, $filePath, $fileType);
 
 function handleAsset($asset, $externalStorage)
 {
-	KalturaLog::debug('Handling asset with id ' . $asset->getId());
+	$assetId = $asset->getId();
+
+	$storageIdDest = $externalStorage->getId();
+	KalturaLog::debug('Handling asset ' . $assetId);
 
 	if (!$externalStorage->shouldExportFlavorAsset($asset))
 	{
-		KalturaLog::debug('Asset ' . $asset->getId() . ' should not be Exported to remote storge ' . $storageIdDest);
+		KalturaLog::info(">>> $assetId: NO_EXPORT - Asset should not be exported to remote storage " . $storageIdDest);
 		return;
 	}
 
@@ -57,7 +60,7 @@ function handleAsset($asset, $externalStorage)
 	$criteria->add(FileSyncPeer::DELETED_ID, 0, Criteria::EQUAL);
 	$fileSyncs = FileSyncPeer::doSelect($criteria);
 
-	$remoteDcFileSyncFound = false;
+	$remoteDcFileSync = null;
 	$fileSyncToHandle = null;
 
 	//Get the Local fileSync to handle
@@ -70,38 +73,38 @@ function handleAsset($asset, $externalStorage)
 
 		if ($fileSync->getDc() == $storageIdDest)
 		{
-			$remoteDcFileSyncFound = true;
+			$remoteDcFileSync = $fileSync;
 		}
 	}
 
 	if (!$fileSyncToHandle)
 	{
-		KalturaLog::debug('No filesync to handle for flavor asset ' . $asset->getId());
+		KalturaLog::info(">>> $assetId: NO_FILESYNC - No file sync to handle");
 		return;
 	}
 
 	if ($fileSyncToHandle->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 	{
-		KalturaLog::debug("Filesync " . $fileSyncToHandle->getId() . " in not ready " . $fileSyncToHandle->getStatus() . " - skipping asset");
+		KalturaLog::info(">>> $assetId: NOT_READY - File sync " . $fileSyncToHandle->getId() . " is not ready " . $fileSyncToHandle->getStatus() . " skipping");
 		return;
 	}
 
-	if ($remoteDcFileSyncFound)
+	if ($remoteDcFileSync)
 	{
-		KalturaLog::debug("Found file sync in remote dc [$storageIdDest] for assetId " . $asset->getId() . " . skipping exporting asset");
+		KalturaLog::info(">>> $assetId: ALREADY_EXISTS - Found file sync " . $remoteDcFileSync->getId() . " status " . $remoteDcFileSync->getStatus() . " in target dc [$storageIdDest] skipping");
 		return;
 	}
 
 	try
 	{
-		KalturaLog::debug("Handling filesync " . $fileSyncToHandle->getId());
+		KalturaLog::debug("Handling file sync " . $fileSyncToHandle->getId());
 		$newfileSync = $fileSyncToHandle->cloneToAnotherStorage($storageIdDest);
 		$newfileSync->save();
-		KalturaLog::debug('New FileSync created ' . $newfileSync->getId());
+		KalturaLog::info(">>> $assetId: CREATED - New file sync created " . $newfileSync->getId());
 	}
 	catch (Exception $e)
 	{
-		KalturaLog::warning("Could not create newFileSync for fileSync [" . $fileSync->getId() . "]" . $e->getMessage());
+		KalturaLog::info(">>> $assetId: FAILED - Could not create new file sync for [" . $fileSync->getId() . "] " . $e->getMessage());
 	}
 }
 
@@ -111,7 +114,13 @@ function handleAssets($assetIds, $externalStorage)
 
 	foreach ($assetIds as $assetId)
 	{
-		KalturaLog::debug('Retrieving non-source assets for entry ' . $entry->getId());
+		$assetId = trim($assetId);
+		if (!$assetId)
+		{
+			continue;
+		}
+
+		KalturaLog::debug('Retrieving asset ' . $assetId);
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
@@ -129,8 +138,8 @@ function handleAssets($assetIds, $externalStorage)
 		$count++;
 		if ($count % 1000 == 0 )
 		{
-			KalturaLog::debug("Sleeping 60 Seconds... count is $count");
-			sleep(60);
+			KalturaLog::debug("Sleeping 10 Seconds... count is $count");
+			sleep(10);
 		}
 	}
 }
@@ -141,6 +150,12 @@ function handleEntries($entryIds, $externalStorage)
 
 	foreach ($entryIds as $entryId)
 	{
+		$entryId = trim($entryId);
+		if (!$entryId)
+		{
+			continue;
+		}
+
 		$c = new Criteria();
 		$c->add(entryPeer::ID, trim($entryId));
 		$c->add(entryPeer::STATUS, entryStatus::READY);
@@ -170,8 +185,8 @@ function handleEntries($entryIds, $externalStorage)
 		$count++;
 		if ($count % 1000 == 0 )
 		{
-			KalturaLog::debug("Sleeping 60 Seconds... count is $count");
-			sleep(60);
+			KalturaLog::debug("Sleeping 20 Seconds... count is $count");
+			sleep(20);
 		}
 	}
 }
@@ -202,11 +217,11 @@ function main($storageIdDest, $filePath, $fileType)
 	switch ($fileType)
 	{
 	case 'entry':
-		handleEntries($ids, $externalStorage)
+		handleEntries($ids, $externalStorage);
 		break;
 
 	case 'asset':
-		handleAssets($ids, $externalStorage)
+		handleAssets($ids, $externalStorage);
 		break;
 
 	default:
