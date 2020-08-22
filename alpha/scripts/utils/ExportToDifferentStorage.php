@@ -1,20 +1,21 @@
 <?php
 
-if (count($argv) != 5)
+if (count($argv) != 6)
 {
-	echo "USAGE: <storageId> <fileName> <type - entry/asset> <realrun-dryrun>\n";
+	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <realrun-dryrun>\n";
 	exit(0);
 }
 
 define("BASE_DIR", dirname(__FILE__));
 require_once(BASE_DIR.'/../../../alpha/scripts/bootstrap.php');
 
-$storageIdDest = $argv[1];
-$filePath = $argv[2];
-$fileType = $argv[3];
-$dryRun = $argv[4] != 'realrun';
+$sourceDcIds = explode(',', $argv[1]);
+$targetDcId = $argv[2];
+$filePath = $argv[3];
+$fileType = $argv[4];
+$dryRun = $argv[5] != 'realrun';
 
-if (!is_numeric($storageIdDest))
+if (!is_numeric($targetDcId))
 {
 	KalturaLog::warning("Destination Storage id should be numeric");
 	exit(0);
@@ -36,19 +37,19 @@ else
 }
 KalturaStatement::setDryRun($dryRun);
 
-main($storageIdDest, $filePath, $fileType);
+main($sourceDcIds, $targetDcId, $filePath, $fileType);
 
 
-function handleAsset($asset, $externalStorage)
+function handleAsset($asset, $sourceDcIds, $targetStorage)
 {
 	$assetId = $asset->getId();
 
-	$storageIdDest = $externalStorage->getId();
+	$targetDcId = $targetStorage->getId();
 	KalturaLog::debug('Handling asset ' . $assetId);
 
-	if (!$externalStorage->shouldExportFlavorAsset($asset))
+	if (!$targetStorage->shouldExportFlavorAsset($asset))
 	{
-		KalturaLog::info(">>> $assetId: NO_EXPORT - Asset should not be exported to remote storage " . $storageIdDest);
+		KalturaLog::info(">>> $assetId: NO_EXPORT - Asset should not be exported to target storage " . $targetDcId);
 		return;
 	}
 
@@ -60,45 +61,53 @@ function handleAsset($asset, $externalStorage)
 	$criteria->add(FileSyncPeer::DELETED_ID, 0, Criteria::EQUAL);
 	$fileSyncs = FileSyncPeer::doSelect($criteria);
 
-	$remoteDcFileSync = null;
-	$fileSyncToHandle = null;
+	$targetDcFileSync = null;
+	$sourceDcFileSync = null;
 
-	//Get the Local fileSync to handle
+	// Get the Local fileSync to handle
 	foreach ($fileSyncs as /** @var FileSync $fileSync * */ $fileSync)
 	{
-		if ($fileSync->getOriginal() && $fileSync->getFileSize() > 0)
+		if ($fileSync->getDc() == $targetDcId)
 		{
-			$fileSyncToHandle = $fileSync;
+			$targetDcFileSync = $fileSync;
+			continue;
 		}
 
-		if ($fileSync->getDc() == $storageIdDest)
+		if (!in_array($fileSync->getDc(), $sourceDcIds) || !$fileSync->getFileSize())
 		{
-			$remoteDcFileSync = $fileSync;
+			continue;
 		}
+
+		if ($sourceDcFileSync && $sourceDcFileSync->getOriginal())
+		{
+			continue;
+		}
+
+		$sourceDcFileSync = $fileSync;
 	}
 
-	if (!$fileSyncToHandle)
+	if (!$sourceDcFileSync)
 	{
 		KalturaLog::info(">>> $assetId: NO_FILESYNC - No file sync to handle");
 		return;
 	}
 
-	if ($fileSyncToHandle->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
+	if ($sourceDcFileSync->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
 	{
-		KalturaLog::info(">>> $assetId: NOT_READY - File sync " . $fileSyncToHandle->getId() . " is not ready " . $fileSyncToHandle->getStatus() . " skipping");
+		KalturaLog::info(">>> $assetId: NOT_READY - File sync " . $sourceDcFileSync->getId() . " is not ready " . $sourceDcFileSync->getStatus() . " skipping");
 		return;
 	}
 
-	if ($remoteDcFileSync)
+	if ($targetDcFileSync)
 	{
-		KalturaLog::info(">>> $assetId: ALREADY_EXISTS - Found file sync " . $remoteDcFileSync->getId() . " status " . $remoteDcFileSync->getStatus() . " in target dc [$storageIdDest] skipping");
+		KalturaLog::info(">>> $assetId: ALREADY_EXISTS - Found file sync " . $targetDcFileSync->getId() . " status " . $targetDcFileSync->getStatus() . " in target dc [$targetDcId] skipping");
 		return;
 	}
 
 	try
 	{
-		KalturaLog::debug("Handling file sync " . $fileSyncToHandle->getId());
-		$newfileSync = $fileSyncToHandle->cloneToAnotherStorage($storageIdDest);
+		KalturaLog::debug("Handling file sync " . $sourceDcFileSync->getId());
+		$newfileSync = $sourceDcFileSync->cloneToAnotherStorage($targetDcId);
 		$newfileSync->save();
 		KalturaLog::info(">>> $assetId: CREATED - New file sync created " . $newfileSync->getId());
 	}
@@ -108,7 +117,7 @@ function handleAsset($asset, $externalStorage)
 	}
 }
 
-function handleAssets($assetIds, $externalStorage)
+function handleAssets($assetIds, $sourceDcIds, $targetStorage)
 {
 	$count = 0;
 
@@ -132,7 +141,7 @@ function handleAssets($assetIds, $externalStorage)
 			continue;
 		}
 
-		handleAsset($asset, $externalStorage);
+		handleAsset($asset, $sourceDcIds, $targetStorage);
 
 		kMemoryManager::clearMemory();
 		$count++;
@@ -144,7 +153,7 @@ function handleAssets($assetIds, $externalStorage)
 	}
 }
 
-function handleEntries($entryIds, $externalStorage)
+function handleEntries($entryIds, $sourceDcIds, $targetStorage)
 {
 	$count = 0;
 
@@ -178,7 +187,7 @@ function handleEntries($entryIds, $externalStorage)
 
 		foreach ($assets as /** @var flavorAsset $asset * */ $asset)
 		{
-			handleAsset($asset, $externalStorage);
+			handleAsset($asset, $sourceDcIds, $targetStorage);
 		}
 
 		kMemoryManager::clearMemory();
@@ -192,13 +201,13 @@ function handleEntries($entryIds, $externalStorage)
 }
 
 /**
- * @param $storageIdDest
+ * @param $targetDcId
  * @param $filePath
  * @throws PropelException
  */
-function main($storageIdDest, $filePath, $fileType)
+function main($sourceDcIds, $targetDcId, $filePath, $fileType)
 {
-	KalturaLog::debug("Running for file [$filePath] and storageIdDest [$storageIdDest]");
+	KalturaLog::debug("Running for file [$filePath] and targetDcId [$targetDcId]");
 
 	$ids = file($filePath);
 	if (empty($ids))
@@ -207,21 +216,21 @@ function main($storageIdDest, $filePath, $fileType)
 		exit(0);
 	}
 
-	$externalStorage = StorageProfilePeer::retrieveByPK($storageIdDest);
-	if (!$externalStorage)
+	$targetStorage = StorageProfilePeer::retrieveByPK($targetDcId);
+	if (!$targetStorage)
 	{
-		KalturaLog::warning("Storage [$storageIdDest] does not exists");
+		KalturaLog::warning("Storage [$targetDcId] does not exists");
 		exit(0);
 	}
 
 	switch ($fileType)
 	{
 	case 'entry':
-		handleEntries($ids, $externalStorage);
+		handleEntries($ids, $sourceDcIds, $targetStorage);
 		break;
 
 	case 'asset':
-		handleAssets($ids, $externalStorage);
+		handleAssets($ids, $sourceDcIds, $targetStorage);
 		break;
 
 	default:
