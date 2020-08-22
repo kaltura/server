@@ -17,14 +17,14 @@ $dryRun = $argv[5] != 'realrun';
 
 if (!is_numeric($targetDcId))
 {
-	KalturaLog::warning("Destination Storage id should be numeric");
-	exit(0);
+	KalturaLog::warning("Destination storage id should be numeric");
+	exit(1);
 }
 
 if (!file_exists($filePath))
 {
-	KalturaLog::warning("File $filePath Does not exists. Exiting...");
-	exit(0);
+	KalturaLog::warning("File $filePath does not exist");
+	exit(1);
 }
 
 if ($dryRun)
@@ -171,7 +171,7 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage)
 		$entry = entryPeer::doSelectOne($c);
 		if (!$entry)
 		{
-			KalturaLog::debug("Entry not found (Or not in status READY) $entryId - skipping");
+			KalturaLog::debug("Entry not found (or not READY) $entryId - skipping");
 			continue;
 		}
 
@@ -213,14 +213,14 @@ function main($sourceDcIds, $targetDcId, $filePath, $fileType)
 	if (empty($ids))
 	{
 		KalturaLog::warning("File is empty - Exiting.");
-		exit(0);
+		exit(1);
 	}
 
 	$targetStorage = StorageProfilePeer::retrieveByPK($targetDcId);
 	if (!$targetStorage)
 	{
-		KalturaLog::warning("Storage [$targetDcId] does not exists");
-		exit(0);
+		KalturaLog::warning("Storage [$targetDcId] does not exist");
+		exit(1);
 	}
 
 	switch ($fileType)
@@ -235,7 +235,7 @@ function main($sourceDcIds, $targetDcId, $filePath, $fileType)
 
 	default:
 		echo "Invalid file type $fileType, must be entry/asset\n";
-		exit(0);
+		exit(1);
 	}
 
 	KalturaLog::debug("DONE!");
