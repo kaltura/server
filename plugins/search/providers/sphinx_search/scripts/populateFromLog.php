@@ -30,14 +30,19 @@ error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $hostname = (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
-$configFile = ROOT_DIR . "/configurations/sphinx/populate/$hostname.ini";
-if(!file_exists($configFile))
+$config = kConf::get('sphinxPopulateSettings', 'sphinx_populate', array());
+if (empty($config))
 {
-	KalturaLog::err("Configuration file [$configFile] not found.");
-	exit(-1);
+	$configFile = ROOT_DIR . "/configurations/sphinx/populate/$hostname.ini";
+	if(!file_exists($configFile))
+	{
+		KalturaLog::err("Configuration file [$configFile] not found.");
+		exit(-1);
+	}
+	$config = parse_ini_file($configFile);
 }
-$config = parse_ini_file($configFile);
-$sphinxServer = $config['sphinxServer'];
+
+$sphinxServer = isset($config['sphinxServer']) ? $config['sphinxServer'] : $hostname;
 $sphinxPort = (isset($config['sphinxPort']) ? $config['sphinxPort'] : 9312);
 $isSharded = isset($config['sharded']) ? $config['sharded'] : false;
 $processSqlUpdates = (isset($config['processSqlUpdates']) ? $config['processSqlUpdates'] : false);
