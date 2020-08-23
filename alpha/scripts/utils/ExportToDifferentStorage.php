@@ -48,12 +48,6 @@ function handleAsset($asset, $sourceDcIds, $targetStorage)
 	$targetDcId = $targetStorage->getId();
 	KalturaLog::debug('Handling asset ' . $assetId);
 
-	if (!$targetStorage->shouldExportFlavorAsset($asset))
-	{
-		KalturaLog::info(">>> $assetId: NO_EXPORT - Asset should not be exported to target storage " . $targetDcId);
-		return;
-	}
-
 	$criteria = new Criteria(FileSyncPeer::DATABASE_NAME);
 	$criteria->add(FileSyncPeer::OBJECT_ID, $asset->getId(), Criteria::EQUAL);
 	$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
