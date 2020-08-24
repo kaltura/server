@@ -6,7 +6,7 @@
  */
 class elasticClient
 {
-	
+	const ELASTIC_ACTION_KEY = 'action';
 	const ELASTIC_INDEX_KEY = 'index';
 	const ELASTIC_TYPE_KEY = 'type';
 	const ELASTIC_SIZE_KEY = 'size';
@@ -38,9 +38,15 @@ class elasticClient
 
 	const MONITOR_NO_INDEX = 'no_index';
 
+	const ELASTIC_ACTION_BULK = 'bulk';
+	const DEFAULT_BULK_SIZE = 500;
+
 	protected $elasticHost;
 	protected $elasticPort;
 	protected $ch;
+	protected $bulkBuffer;
+	protected $bulkBufferSize;
+	protected $bulkSize;
 
 	/**
 	 * elasticClient constructor.
@@ -67,8 +73,17 @@ class elasticClient
 		if (!$curlTimeout)
 			$curlTimeout = kConf::get('elasticClientCurlTimeout', 'elastic', 10);
 		$this->setTimeout($curlTimeout);
+
+		$this->bulkSize = kConf::get('bulkSize', 'elastic', self::DEFAULT_BULK_SIZE);
+		$this->initBulkBuffer();
 	}
-	
+
+	private function initBulkBuffer()
+	{
+		$this->bulkBuffer = '';
+		$this->bulkBufferSize = 0;
+	}
+
 	public function __destruct()
 	{
 		$this->close();
@@ -143,7 +158,8 @@ class elasticClient
 		$jsonEncodedBody = null;
 		if ($body)
 		{
-			$jsonEncodedBody = json_encode($body);
+			//bulk body is already in json
+			$jsonEncodedBody = (strpos($cmd, self::ELASTIC_ACTION_BULK) === false) ?  json_encode($body) : $body;
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $jsonEncodedBody);
 			if ($logQuery)
 				KalturaLog::debug("Elastic client request: ".$jsonEncodedBody);
@@ -178,7 +194,28 @@ class elasticClient
 		
 		return $response;
 	}
-	
+
+	public function addToBulk(array $params)
+	{
+		$this->bulkBuffer .= $this->getJsonForBulk($params);
+		$this->bulkBufferSize++;
+		if($this->bulkBufferSize % $this->bulkSize == 0)
+		{
+			$this->flushBulk();
+		}
+	}
+
+	public function flushBulk()
+	{
+		if($this->bulkBuffer == '')
+			return null;
+
+		$cmd = $this->buildElasticCommandUrl(array(), '', self::ELASTIC_ACTION_BULK);
+		$response = $this->sendRequest($cmd, self::POST, $this->bulkBuffer);
+		$this->initBulkBuffer();
+		return $response;
+	}
+
 	/**
 	 * @return bool|string
 	 */
@@ -415,7 +452,9 @@ class elasticClient
 	private function buildElasticCommandUrl(array $params, $queryParams = '', $action = null)
 	{
 		$cmd = $this->elasticHost;
-		$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
+
+		if (isset($params[self::ELASTIC_INDEX_KEY]))
+			$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
 
 		if (isset($params[self::ELASTIC_TYPE_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_TYPE_KEY];
@@ -430,5 +469,32 @@ class elasticClient
 			$cmd .= $queryParams;
 		
 		return $cmd;
+	}
+
+	protected function getJsonForBulk($params)
+	{
+		$actionMetadata = $this->getBulkActionAndMetadata($params);
+		return $actionMetadata . "\n" . json_encode($params[self::ELASTIC_BODY_KEY]) . "\n";
+	}
+
+	protected function getBulkActionAndMetadata(&$params)
+	{
+		$actionArr = array (
+			'_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY],
+			'_'.self::ELASTIC_TYPE_KEY => $params[self::ELASTIC_TYPE_KEY],
+		);
+		if (isset($params[self::ELASTIC_ID_KEY]))
+		{
+			$actionArr['_'.self::ELASTIC_ID_KEY] = $params[self::ELASTIC_ID_KEY];
+		}
+
+		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]))
+		{
+			$actionArr['_'.self::ELASTIC_RETRY_ON_CONFLICT_KEY] = $params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY];
+			unset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]);
+		}
+
+		$cmd = array ($params[self::ELASTIC_ACTION_KEY] => $actionArr);
+		return json_encode($cmd);
 	}
 }

@@ -184,7 +184,7 @@ while (true)
 				
 				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
 				{
-					$response = $elasticClient->$action($command);
+					$response = $elasticClient->addToBulk($command);
 				}
 				
 				unset($objectIdElasticLog[$objectId]);
@@ -218,6 +218,16 @@ while (true)
 			KalturaLog::err($e->getMessage());
 		}
 	}
+
+	try
+	{
+		$response = $elasticClient->flushBulk();
+	}
+	catch(Exception $e)
+	{
+		KalturaLog::err($e->getMessage());
+	}
+
 	
 	foreach ($lastLogs as $serverLastLog)
 	{
