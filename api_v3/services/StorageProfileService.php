@@ -268,16 +268,23 @@ class StorageProfileService extends KalturaBaseService
 
 	protected static function filterFileSyncs(&$fileSyncs, &$lastId, &$done, $createdAtLessThanOrEqual)
 	{
-		// filter by created at
-		if ($createdAtLessThanOrEqual)
+		foreach ($fileSyncs as $index => $fileSync)
 		{
-			foreach ($fileSyncs as $index => $fileSync)
+			// filter by created at
+			if( ($createdAtLessThanOrEqual) && ($fileSync->getCreatedAt(null) > $createdAtLessThanOrEqual) )
 			{
-				if ($fileSync->getCreatedAt(null) > $createdAtLessThanOrEqual)
+				$done = true;
+				unset($fileSyncs[$index]);
+				$lastId = min($lastId, $fileSync->getId());
+			}
+			// filter by local is original
+			else
+			{
+				$fileSyncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+				$localFileSync = FileSyncPeer::retrieveByFileSyncKey($fileSyncKey, true);
+				if( (!$localFileSync) || (!$localFileSync->getOriginal()) )
 				{
-					$done = true;
 					unset($fileSyncs[$index]);
-					$lastId = min($lastId, $fileSync->getId());
 				}
 			}
 		}
