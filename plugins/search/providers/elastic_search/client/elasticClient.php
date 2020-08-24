@@ -6,7 +6,8 @@
  */
 class elasticClient
 {
-	
+
+	const ELASTIC_ACTION_KEY = 'action';
 	const ELASTIC_INDEX_KEY = 'index';
 	const ELASTIC_TYPE_KEY = 'type';
 	const ELASTIC_SIZE_KEY = 'size';
@@ -19,14 +20,25 @@ class elasticClient
 	const POST = 'POST';
 	const PUT = 'PUT';
 	const DELETE = 'DELETE';
-	
+
+	const ELASTIC_ACTION_INDEX = 'index';
 	const ELASTIC_ACTION_UPDATE = 'update';
 	const ELASTIC_ACTION_SEARCH = 'search';
+	const ELASTIC_ACTION_DELETE = 'delete';
+	const ELASTIC_ACTION_PING = 'ping';
+	const ELASTIC_GET_MASTER_INFO = 'get_master_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
-	
+	const ELASTIC_ACTION_BULK = 'bulk';
+	const DEFAULT_BULK_SIZE = 500;
+	const ELASTIC_ACTION_GET = 'get';
+	const MONITOR_NO_INDEX = 'no_index';
+
 	protected $elasticHost;
 	protected $elasticPort;
 	protected $ch;
+	protected $bulkBuffer;
+	protected $bulkBufferSize;
+	protected $bulkSize;
 	
 	/**
 	 * elasticClient constructor.
@@ -52,6 +64,8 @@ class elasticClient
 		if (!$curlTimeout)
 			$curlTimeout = kConf::get('elasticClientCurlTimeout', 'elastic', 10);
 		$this->setTimeout($curlTimeout);
+		$this->bulkSize = kConf::get('bulkSize', 'elastic', self::DEFAULT_BULK_SIZE);
+		$this->initBulkBuffer();
 	}
 	
 	public function __destruct()
@@ -62,6 +76,12 @@ class elasticClient
 	private function close()
 	{
 		curl_close($this->ch);
+	}
+
+	private function initBulkBuffer()
+	{
+		$this->bulkBuffer = '';
+		$this->bulkBufferSize = 0;
 	}
 	
 	/**
@@ -97,24 +117,34 @@ class elasticClient
 	 * @param $method
 	 * @param null $body
 	 * @param $logQuery bool
+	 * @param $monitorActionName string
+	 * @param $monitorIndexName string
 	 * @return mixed
 	 * @throws kESearchException
 	 */
-	protected function sendRequest($cmd, $method, $body = null, $logQuery = false)
+	protected function sendRequest($cmd, $method, $body = null, $logQuery = false, $monitorActionName, $monitorIndexName)
 	{
 		curl_setopt($this->ch, CURLOPT_URL, $cmd);
 		curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true); //TRUE to return the transfer as a string of the return value of curl_exec() instead of outputting it out directly
 		curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method); // PUT/GET/POST/DELETE
 		curl_setopt($this->ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+		$jsonEncodedBody = null;
 		if ($body)
 		{
-			$jsonEncodedBody = json_encode($body);
+			//bulk body is already in json
+			$jsonEncodedBody = (strpos($cmd, self::ELASTIC_ACTION_BULK) === false) ?  json_encode($body) : $body;
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $jsonEncodedBody);
 			if ($logQuery)
 				KalturaLog::debug("Elastic client request: ".$jsonEncodedBody);
 		}
-		
+
+		$requestStart = microtime(true);
 		$response = curl_exec($this->ch);
+		$requestTook = microtime(true) - $requestStart;
+		KalturaLog::debug("Elastic took - " . $requestTook . " seconds");
+
+		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost);
+
 		if (!$response)
 		{
 			$code = $this->getErrorNumber();
@@ -174,8 +204,9 @@ class elasticClient
 		
 		if (isset($params[self::ELASTIC_FROM_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_FROM_KEY] = $params[self::ELASTIC_FROM_KEY];
-		
-		$val = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], $logQuery);
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$val = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], $logQuery, self::ELASTIC_ACTION_SEARCH, $monitorIndexName);
 		return $val;
 	}
 	
@@ -188,8 +219,9 @@ class elasticClient
 	{
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams);
-		
-		$response = $this->sendRequest($cmd, self::PUT, $params[self::ELASTIC_BODY_KEY]);
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$response = $this->sendRequest($cmd, self::PUT, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_INDEX, $monitorIndexName);
 		return $response;
 	}
 	
@@ -202,8 +234,9 @@ class elasticClient
 	{
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_UPDATE);
-		
-		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY]);
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_UPDATE, $monitorIndexName);
 		return $response;
 	}
 	
@@ -221,8 +254,9 @@ class elasticClient
 		
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams);
-		
-		$response = $this->sendRequest($cmd, self::DELETE);
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$response = $this->sendRequest($cmd, self::DELETE, null, false, self::ELASTIC_ACTION_DELETE, $monitorIndexName);
 		return $response;
 	}
 	
@@ -235,8 +269,9 @@ class elasticClient
 	{
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_DELETE_BY_QUERY);
-		
-		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY]);
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$response = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], false, self::ELASTIC_ACTION_DELETE_BY_QUERY, $monitorIndexName);
 		return $response;
 	}
 	
@@ -249,11 +284,33 @@ class elasticClient
 	{
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams);
-		
-		$response = $this->sendRequest($cmd, self::GET);
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_GET, $monitorIndexName);
 		return $response;
 	}
-	
+
+	public function addToBulk(array $params)
+	{
+		$this->bulkBuffer .= $this->getJsonForBulk($params);
+		$this->bulkBufferSize++;
+		if($this->bulkBufferSize % $this->bulkSize == 0)
+		{
+			$this->flushBulk();
+		}
+	}
+
+	public function flushBulk()
+	{
+		if($this->bulkBuffer == '')
+			return null;
+
+		$cmd = $this->buildElasticCommandUrl(array(), '', self::ELASTIC_ACTION_BULK);
+		$response = $this->sendRequest($cmd, self::POST, $this->bulkBuffer);
+		$this->initBulkBuffer();
+		return $response;
+	}
+
 	/**
 	 * ping to check connectivity to elastic cluster
 	 * @return mixed
@@ -261,7 +318,7 @@ class elasticClient
 	public function ping()
 	{
 		$cmd = $this->elasticHost;
-		$response = $this->sendRequest($cmd, self::GET);
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_PING, self::MONITOR_NO_INDEX);
 		return $response;
 	}
 	
@@ -271,7 +328,7 @@ class elasticClient
 	public function getMasterInfo()
 	{
 		$cmd = $this->elasticHost . '/_cat/master?format=json';
-		$response = $this->sendRequest($cmd, self::GET);
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_GET_MASTER_INFO, self::MONITOR_NO_INDEX);
 		return $response;
 	}
 	
@@ -294,7 +351,9 @@ class elasticClient
 	private function buildElasticCommandUrl(array $params, $queryParams = '', $action = null)
 	{
 		$cmd = $this->elasticHost;
-		$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
+
+		if (isset($params[self::ELASTIC_INDEX_KEY]))
+			$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
 		
 		if (isset($params[self::ELASTIC_TYPE_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_TYPE_KEY];
@@ -310,4 +369,32 @@ class elasticClient
 		
 		return $cmd;
 	}
+
+	protected function getJsonForBulk($params)
+	{
+		$actionMetadata = $this->getBulkActionAndMetadata($params);
+		return $actionMetadata . "\n" . json_encode($params[self::ELASTIC_BODY_KEY]) . "\n";
+	}
+
+	protected function getBulkActionAndMetadata(&$params)
+	{
+		$actionArr = array (
+			'_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY],
+			'_'.self::ELASTIC_TYPE_KEY => $params[self::ELASTIC_TYPE_KEY],
+		);
+		if (isset($params[self::ELASTIC_ID_KEY]))
+		{
+			$actionArr['_'.self::ELASTIC_ID_KEY] = $params[self::ELASTIC_ID_KEY];
+		}
+
+		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]))
+		{
+			$actionArr['_'.self::ELASTIC_RETRY_ON_CONFLICT_KEY] = $params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY];
+			unset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]);
+		}
+
+		$cmd = array ($params[self::ELASTIC_ACTION_KEY] => $actionArr);
+		return json_encode($cmd);
+	}
+
 }

@@ -173,28 +173,40 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $context = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
-		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
+		$reachProfile = ReachProfilePeer::retrieveActiveByPk($reachProfileId);
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
+		
+		if(!$entry || !$reachProfile || !$vendorCatalogItem)
+		{
+			KalturaLog::log("Not all mandatory objects were found, task will not be added");
+			return true;
+		}
 
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
 		if (kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
 		{
-			KalturaLog::err("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
+			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
 			return true;
 		}
 
 		//check if credit has expired
 		if (kReachUtils::hasCreditExpired($reachProfile))
 		{
-			KalturaLog::err("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			KalturaLog::log("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
 
 		if (!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile))
 		{
-			KalturaLog::err("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+			return true;
+		}
+		
+		if(!kReachUtils::isEntryTypeSupported($entry->getType()))
+		{
+			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
 			return true;
 		}
 

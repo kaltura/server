@@ -596,6 +596,15 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$content)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
 
+		$content = str_replace(
+			array(
+				kCaptionsContentManager::WINDOWS_LINE_ENDING,
+				kCaptionsContentManager::MAC_LINE_ENDING,
+			),
+			kCaptionsContentManager::UNIX_LINE_ENDING,
+			$content
+		);
+
 		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
 		if (!$captionsContentManager)
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);

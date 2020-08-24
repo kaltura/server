@@ -169,7 +169,8 @@ function IP2Location_initialize ($ip) {
 	$ip->databaseday = IP2Location_read8($ip, 5);
 	$ip->databasecount = IP2Location_read32($ip, 6);
 	$ip->databaseaddr = IP2Location_read32($ip, 10);
-	$ip->ipversion = IP2Location_read32($ip, 14);
+	$ip->ipv6databasecount = IP2Location_read32($ip, 14);
+	$ip->ipv6databaseaddr = IP2Location_read32($ip, 18);
 	return $ip;
 }
 
@@ -178,7 +179,7 @@ function IP2Location_get_module_version () {
 }
 
 function IP2Location_get_country_short ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, COUNTRYSHORT);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, COUNTRYSHORT);
@@ -187,7 +188,7 @@ function IP2Location_get_country_short ($ip, $ipaddr) {
 }
 
 function IP2Location_get_country_long ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, COUNTRYLONG);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, COUNTRYLONG);
@@ -196,7 +197,7 @@ function IP2Location_get_country_long ($ip, $ipaddr) {
 }
 
 function IP2Location_get_region ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, REGION);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, REGION);
@@ -205,7 +206,7 @@ function IP2Location_get_region ($ip, $ipaddr) {
 }
 
 function IP2Location_get_city ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, CITY);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, CITY);
@@ -214,7 +215,7 @@ function IP2Location_get_city ($ip, $ipaddr) {
 }
 
 function IP2Location_get_isp ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, ISP);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, ISP);
@@ -223,7 +224,7 @@ function IP2Location_get_isp ($ip, $ipaddr) {
 }
 
 function IP2Location_get_latitude ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, LATITUDE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, LATITUDE);
@@ -232,7 +233,7 @@ function IP2Location_get_latitude ($ip, $ipaddr) {
 }
 
 function IP2Location_get_longitude ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, LONGITUDE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, LONGITUDE);
@@ -241,7 +242,7 @@ function IP2Location_get_longitude ($ip, $ipaddr) {
 }
 
 function IP2Location_get_zipcode ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, ZIPCODE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, ZIPCODE);
@@ -250,7 +251,7 @@ function IP2Location_get_zipcode ($ip, $ipaddr) {
 }
 
 function IP2Location_get_domain ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, DOMAIN);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, DOMAIN);
@@ -259,7 +260,7 @@ function IP2Location_get_domain ($ip, $ipaddr) {
 }
 
 function IP2Location_get_timezone ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, TIMZONE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, TIMEZONE);
@@ -268,7 +269,7 @@ function IP2Location_get_timezone ($ip, $ipaddr) {
 }
 
 function IP2Location_get_netspeed ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, NETSPEED);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, NETSPEED);
@@ -277,7 +278,7 @@ function IP2Location_get_netspeed ($ip, $ipaddr) {
 }
 
 function IP2Location_get_idd_code ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, IDDCODE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, IDDCODE);
@@ -286,7 +287,7 @@ function IP2Location_get_idd_code ($ip, $ipaddr) {
 }
 
 function IP2Location_get_area_code ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, AREACODE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, AREACODE);
@@ -295,7 +296,7 @@ function IP2Location_get_area_code ($ip, $ipaddr) {
 }
 
 function IP2Location_get_weather_code ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, WEATHERCODE);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, WEATHERCODE);
@@ -304,7 +305,7 @@ function IP2Location_get_weather_code ($ip, $ipaddr) {
 }
 
 function IP2Location_get_weather_name ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, WEATHERNAME);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, WEATHERNAME);
@@ -417,16 +418,25 @@ function IP2Location_name2ip ($name) {
 }
 
 function IP2Location_get_ipv6_record ($ip, $ipaddr, $mode) {
-	$IPV6_COUNTRY_POSITION =   array(0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2);
-	$IPV6_REGION_POSITION =    array(0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3);
-	$IPV6_CITY_POSITION =      array(0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4);
-	$IPV6_ISP_POSITION =       array(0, 0, 3, 0, 5, 0, 7, 5, 7, 0, 8, 0, 9, 0, 9);
-	$IPV6_LATITUDE_POSITION =  array(0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5);
-	$IPV6_LONGITUDE_POSITION = array(0, 0, 0, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6);
-	$IPV6_DOMAIN_POSITION =    array(0, 0, 0, 0, 0, 0, 0, 6, 8, 0, 9, 0, 10,0, 10);
-	$IPV6_ZIPCODE_POSITION =   array(0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 7);
-	$IPV6_TIMEZONE_POSITION =  array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 8);
-	$IPV6_NETSPEED_POSITION =  array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 11);
+	$IPV6_COUNTRY_POSITION             = array(0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2);
+	$IPV6_REGION_POSITION              = array(0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3);
+	$IPV6_CITY_POSITION                = array(0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4);
+	$IPV6_ISP_POSITION                 = array(0, 0, 3, 0, 5, 0, 7, 5, 7, 0, 8, 0, 9, 0, 9, 0, 9, 0, 9, 7, 9, 0, 9, 7, 9);
+	$IPV6_LATITUDE_POSITION            = array(0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5);
+	$IPV6_LONGITUDE_POSITION           = array(0, 0, 0, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6);
+	$IPV6_DOMAIN_POSITION              = array(0, 0, 0, 0, 0, 0, 0, 6, 8, 0, 9, 0, 10,0, 10, 0, 10, 0, 10, 8, 10, 0, 10, 8, 10);
+	$IPV6_ZIPCODE_POSITION             = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 7, 0, 7, 7, 7, 0, 7, 0, 7, 7, 7, 0, 7);
+	$IPV6_TIMEZONE_POSITION            = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 7, 8, 8, 8, 7, 8, 0, 8, 8, 8, 0, 8);
+	$IPV6_NETSPEED_POSITION            = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 11,0, 11,8, 11, 0, 11, 0, 11, 0, 11);
+	$IPV6_IDDCODE_POSITION             = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 12, 0, 12, 0, 12, 9, 12, 0, 12);
+	$IPV6_AREACODE_POSITION            = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10 ,13 ,0, 13, 0, 13, 10, 13, 0, 13);
+	$IPV6_WEATHERCODE_POSITION         = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 14, 0, 14, 0, 14, 0, 14);
+	$IPV6_WEATHERNAME_POSITION         = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 15, 0, 15, 0, 15, 0, 15);
+	$IPV6_MCC_POSITION                 = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 16, 0, 16, 9, 16);
+	$IPV6_MNC_POSITION                 = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10,17, 0, 17, 10, 17);
+	$IPV6_MOBILEBRAND_POSITION         = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11,18, 0, 18, 11, 18);
+	$IPV6_ELEVATION_POSITION           = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 19, 0, 19);
+	$IPV6_USAGETYPE_POSITION           = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 20);
 	$dbtype = $ip->databasetype;
 
 	if ($ipaddr == "") {
@@ -520,8 +530,8 @@ function IP2Location_get_ipv6_record ($ip, $ipaddr, $mode) {
 	$realipno = IP2Location_ipv6_to_no($ipaddr);
 
 	$handle = $ip->filehandle;
-	$baseaddr = $ip->databaseaddr;
-	$dbcount = $ip->databasecount;
+	$baseaddr = $ip->ipv6databaseaddr;
+	$dbcount = $ip->ipv6databasecount;
 	$dbcolumn = $ip->databasecolumn;
 
 	$low = 0;
@@ -950,7 +960,7 @@ function IP2Location_get_record ($ip, $ipaddr, $mode) {
 }
 
 function IP2Location_get_all ($ip, $ipaddr) {
-	if ($ip->{"ipversion"} == IPV6) {
+	if (!IP2Location_ip_is_ipv4($ipaddr)) {
 		return IP2Location_get_ipv6_record($ip, $ipaddr, ALL);
 	} else {
 		return IP2Location_get_record($ip, $ipaddr, ALL);

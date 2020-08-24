@@ -46,10 +46,7 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		$objectIds = $this->validateObjectIdFiltered();
 		if(!count($objectIds) && $this->metadataObjectTypeEqual != MetadataObjectType::DYNAMIC_OBJECT && $this->shouldBlockEmptyObjectIdsFiltering())
 		{
-			$response = new KalturaMetadataListResponse();
-			$response->objects = new KalturaMetadataArray();
-			$response->totalCount = 0;
-			return $response;
+			return $this->getEmptyListResponse();
 		}
 		
 		$this->objectIdEqual = null;
@@ -147,5 +144,13 @@ class KalturaMetadataFilter extends KalturaMetadataBaseFilter
 		}
 		
 		return $objectIds;
+	}
+	
+	public function getEmptyListResponse()
+	{
+		$response = new KalturaMetadataListResponse();
+		$response->objects = new KalturaMetadataArray();
+		$response->totalCount = 0;
+		return $response;
 	}
 }

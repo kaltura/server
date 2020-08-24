@@ -10,7 +10,7 @@
 class kVendorCatalogItemPricing
 {
 	/**
-	 * @var int
+	 * @var float
 	 */
 	protected $pricePerUnit;
 	
@@ -28,7 +28,7 @@ class kVendorCatalogItemPricing
 	}
 	
 	/**
-	 * @param int $pricePerUnit
+	 * @param float $pricePerUnit
 	 */
 	public function setPricePerUnit($pricePerUnit)
 	{

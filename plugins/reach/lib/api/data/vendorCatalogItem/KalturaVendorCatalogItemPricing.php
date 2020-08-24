@@ -6,7 +6,7 @@
 class KalturaVendorCatalogItemPricing extends KalturaObject
 {
 	/**
-	 * @var int
+	 * @var float
 	 */
 	public $pricePerUnit;
 	

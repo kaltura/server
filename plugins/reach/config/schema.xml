@@ -49,7 +49,7 @@
 		<column primaryKey="false" required="true"	autoIncrement="false" lazyLoad="false" name="partner_id" 			type="integer" />
 		<column primaryKey="false" required="true"	autoIncrement="false" lazyLoad="false" name="type" 					type="tinyint" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="status" 				type="tinyint" />
-		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="used_credit"			type="integer" default="0"/>
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="used_credit"			type="float" default="0"/>
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="rules" 				type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dictionary" 			type="longvarchar" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" 			type="longvarchar" />
@@ -73,7 +73,7 @@
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="vendor_partner_id"		type="integer" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="entry_id"				type="varchar" size="31" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="status" 				type="tinyint" />
-		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="price" 				type="integer" />
+		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="price" 				type="float" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="catalog_item_id"		type="integer" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="reach_profile_id"		type="integer" />
 		<column primaryKey="false" required="true" 	autoIncrement="false" lazyLoad="false" name="kuser_id"				type="integer" />

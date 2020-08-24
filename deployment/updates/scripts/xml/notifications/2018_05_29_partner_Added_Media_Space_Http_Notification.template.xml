@@ -18,7 +18,7 @@
                 <name>Partner Added MediaSpace</name>
                 <systemName>PARTNER_ADDED_MEDIASPACE</systemName>
                 <description>HTTP notification template to be sent to mediaSpace and partner will be created</description>
-                <eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
                 <eventObjectType>20</eventObjectType> <!-- EventNotificationEventObjectType::PARTNER -->
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventConditions objectType="array">

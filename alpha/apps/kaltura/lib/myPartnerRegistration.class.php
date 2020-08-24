@@ -343,8 +343,9 @@ class myPartnerRegistration
 				$this->markExistingEmailRegisterFailure($existingLoginData, SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL);
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
-
-			$this->allowOnlyOneActiveFreeTrialAccountCreation($partner, $email);
+			
+			// for now allow multiple accounts using the same user
+			//$this->allowOnlyOneActiveFreeTrialAccountCreation($partner, $email);
 		}
 
 

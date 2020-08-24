@@ -98,8 +98,8 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 */
 	protected function fireEventWithoutPartnerCheck($event, $partnerId)
 	{
-		/** event kObjectCreatedEvent with partner object -> create new partner  */
-		if($event instanceof kObjectCreatedEvent && $event->getObject() instanceof Partner &&  $partnerId > 0)
+		/** event kObjectAddedEvent with partner object -> create new partner  */
+		if($event instanceof kObjectAddedEvent && $event->getObject() instanceof Partner &&  $partnerId > 0)
 			return true;
 
 		return false;

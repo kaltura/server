@@ -39,6 +39,7 @@ $config = parse_ini_file($configFile);
 $elasticCluster = $config['elasticCluster'];
 $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
+$processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 if(!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -144,9 +145,13 @@ while(true)
                 //we save the elastic command as serialized object in the sql field
                 $command = $elasticLog->getSql();
                 $command = unserialize($command);
+                $index = $command['index'];
                 $action = $command['action'];
 
-                $response = $elasticClient->$action($command);
+                if ($processScriptUpdates || !($index == ElasticIndexMap::ELASTIC_ENTRY_INDEX && $action == ElasticMethodType::UPDATE))
+                {
+                    $response = $elasticClient->addToBulk($command);
+                }
             }
 
             // If the record is an historical record, don't take back the last log id
@@ -165,6 +170,15 @@ while(true)
         {
             KalturaLog::err($e->getMessage());
         }
+    }
+
+    try
+    {
+        $response = $elasticClient->flushBulk();
+    }
+    catch(Exception $e)
+    {
+        KalturaLog::err($e->getMessage());
     }
 
     foreach ($lastLogs as $serverLastLog)

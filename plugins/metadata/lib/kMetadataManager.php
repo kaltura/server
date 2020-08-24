@@ -194,6 +194,11 @@ class kMetadataManager
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
+			
+			if(isset($xPathData['matchType']))
+				$profileField->setMatchType(intval($xPathData['matchType']));
+			else
+				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
 
 			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
 
@@ -223,7 +228,7 @@ class kMetadataManager
 				$profileField->setExplodeChars($xPathData['explodeChars']);
 			
 			if(isset($xPathData['matchType']))
-				$profileField->setMatchType($xPathData['matchType']);
+				$profileField->setMatchType(intval($xPathData['matchType']));
 			else
 				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
 			
@@ -772,10 +777,7 @@ class kMetadataManager
 			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = $metaDataSearchValues;
 		else
 		{
-			if($objectType == MetadataObjectType::CATEGORY)
-				$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
-			else
-				$searchValues = null;
+			$searchValues = null;
 		}
 
 		return $searchValues; //return an array(metadata => array(...)) or null if no values

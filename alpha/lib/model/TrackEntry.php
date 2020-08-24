@@ -21,7 +21,8 @@ class TrackEntry extends BaseTrackEntry
 	const TRACK_ENTRY_EVENT_TYPE_UPDATE_MEDIA_SERVER = 9;
 	const TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER = 10;
 	const TRACK_ENTRY_EVENT_TYPE_UPDATE_ENTRY_SERVER_NODE_TASK = 11;
-	
+	const TRACK_ENTRY_EVENT_TYPE_ENTRY_SREVER_NODE_CONFERENCE = 12;
+
 	const CUSTOM_DATA_FIELD_SESSION_ID = 'sessionId';
 	
 	public static function addTrackEntry ( TrackEntry $te )

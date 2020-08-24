@@ -378,7 +378,7 @@ class myEntryUtils
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
-			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false))
+			if($entry->isInsideDeleteGracePeriod() && myEntryUtils::shouldServeVodFromLive($entry, false) && !$entry->getIsTemporary())
 			{
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
@@ -704,6 +704,12 @@ class myEntryUtils
 		$entry_status = $entry->getStatus();
 
 		$servingVODfromLive = self::shouldServeVodFromLive($entry);
+		if ($servingVODfromLive)
+		{
+			$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+			if ($dc != kDataCenterMgr::getCurrentDcId ())
+				kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( $dc ) );
+		}
 		$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
@@ -1015,10 +1021,10 @@ class myEntryUtils
 		if (!$packagerCaptureUrl)
 			return false;
 
-		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
 		$dc = self::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
 		if (is_null($dc))
 			return false;
+		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
 		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
 		if (!$calc_vid_sec) //Temp until packager support time 0
 			$calc_vid_sec = self::DEFAULT_THUMB_SEC_LIVE;
@@ -1585,7 +1591,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$newEntry->setCategoriesIds(null);
 
 	    if (!$copyFlavors)
-		    $newEntry->setStatus(entryStatus::NO_CONTENT);
+		{
+			$newEntry->setStatus(entryStatus::NO_CONTENT);
+			$newEntry->setLengthInMsecs(0);
+		}
+
 
 	    if ($toPartner instanceof Partner)
  		{
@@ -1910,7 +1920,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		//check if entry is in append mode and currently streaming
 		$liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
-		if ($liveEntry && $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
+		if ($liveEntry && $liveEntry instanceof LiveEntry && $liveEntry->getSource() == EntrySourceType::LIVE_STREAM
+			&& $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
 			return !is_null(EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), EntryServerNodeType::LIVE_PRIMARY));
 
 		return false;

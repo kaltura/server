@@ -11,7 +11,7 @@ class Form_PartnerVendorCatalogItemPricing extends ConfigureSubForm
 		$this->addElement('text', 'pricePerUnit', array(
 			'label'			=> 'Price Per Unit*:',
 			'required'		=> true,
-			'validators'	=> array('Int'),
+			'validators'	=> array('Float'),
 		));
 		
 		$priceFunction = new Kaltura_Form_Element_EnumSelect('priceFunction', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction'));

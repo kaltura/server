@@ -111,24 +111,20 @@ class FacebookGraphSdkUtils
 	/**
 	 *
 	 * Get facebook login url
-	 * @param string $appId
-	 * @param string $appSecret
+	 * @param Facebook\Helpers\FacebookRedirectLoginHelper $loginHelper
 	 * @param string $redirectUrl
 	 * @param string $permissions
-	 * @param Facebook\PersistentData\PersistentDataInterface|string $dataHandler
 	 * @param bool $reRequestPermissions
 	 * @return null|string
 	 */
-	public static function getLoginUrl($appId, $appSecret, $redirectUrl, $permissions, $dataHandler, $reRequestPermissions = false)
+	public static function getLoginUrl($loginHelper, $redirectUrl, $permissions, $reRequestPermissions = false)
 	{
-		$fb = self::createFacebookInstance($appId, $appSecret, $dataHandler);
-		$loginHelper = $fb->getRedirectLoginHelper();
 		$loginUrl = null;
-		if($reRequestPermissions) {
+		if($reRequestPermissions)
 			$loginUrl = $loginHelper->getReRequestUrl($redirectUrl, $permissions);
-		} else {
+		else
 			$loginUrl = $loginHelper->getLoginUrl($redirectUrl, $permissions);
-		}
+
 		return $loginUrl;
 	}
 
@@ -283,6 +279,13 @@ class FacebookGraphSdkUtils
 
 	}
 
+	public static function getKalturaRedirectUrl()
+	{
+		return kDataCenterMgr::getCurrentDcUrl()."/index.php/extservices/facebookoauth2?".
+			http_build_query(array(FacebookConstants::FACEBOOK_NEXT_ACTION_REQUEST_PARAM =>  base64_encode(FacebookConstants::SUB_ACTION_PROCESS_OAUTH2_RESPONSE)),
+				null, '&');
+	}
+
 	/**
 	 * Get user access token
 	 * @param Facebook/Facebook $fb facebook client
@@ -294,7 +297,7 @@ class FacebookGraphSdkUtils
 	private static function doGetUserAccessToken($fb, $appId, $permissions = array())
 	{
 		$loginHelper = $fb->getRedirectLoginHelper();
-		$accessToken = $loginHelper->getAccessToken();
+		$accessToken = $loginHelper->getAccessToken(self::getKalturaRedirectUrl());
 		if (! isset($accessToken))
 		{
 			$errorMessage = 'Failed to get access token';
@@ -302,7 +305,6 @@ class FacebookGraphSdkUtils
 			{
 				$errorMessage = "Error: ".$loginHelper->getError()." Error Code: ".$loginHelper->getErrorCode() .
 					" Error Reason: ".$loginHelper->getErrorReason()." Error Description: ".$loginHelper->getErrorDescription();
-				KalturaLog::err($errorMessage);
 				throw new Exception($errorMessage);
 			}
 			else
@@ -488,8 +490,12 @@ class FacebookConstants
 	const FACEBOOK_PROVIDER_ID_REQUEST_PARAM = 'provider_id';
 	const FACEBOOK_PARTNER_ID_REQUEST_PARAM = 'partner_id';
 	const FACEBOOK_NEXT_ACTION_REQUEST_PARAM = 'next_action';
+	const SUB_ACTION_PROCESS_OAUTH2_RESPONSE = 'process-oauth2-response';
+	const SUB_ACTION_REDIRECT_SCREEN = 'redirect-screen';
+	const SUB_ACTION_LOGIN_SCREEN = 'login-screen';
 	const FACEBOOK_KS_REQUEST_PARAM = 'ks';
 	const FACEBOOK_USER_ALREADY_TAGGED_ERROR = 355;
+	const FACEBOOK_LOGIN_STATE = "state";
 }
 
 class FacebookCaptionsFile extends \Facebook\FileUpload\FacebookFile
