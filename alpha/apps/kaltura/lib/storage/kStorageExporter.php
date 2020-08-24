@@ -113,16 +113,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		if(in_array($object->getDc(), $dataCenters))
 		{
-			$currentDcId = kDataCenterMgr::getCurrentDcId();
-			$sufficientDc = kConf::get('source_dc_for_export', 'cloud_storage', $currentDcId);
-
-			if( $sufficientDc ==  $currentDcId)
+			$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+			if(!$externalStorageProfiles)
 			{
-				$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-				if(!$externalStorageProfiles)
-				{
-					$exportToPeriodicStorage = true;
-				}
+				$exportToPeriodicStorage = true;
 			}
 		}
 		else
