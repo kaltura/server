@@ -75,7 +75,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 
 	/**
 	 * The value for the price field.
-	 * @var        int
+	 * @var        double
 	 */
 	protected $price;
 
@@ -373,7 +373,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	/**
 	 * Get the [price] column value.
 	 * 
-	 * @return     int
+	 * @return     double
 	 */
 	public function getPrice()
 	{
@@ -760,7 +760,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 	/**
 	 * Set the value of [price] column.
 	 * 
-	 * @param      int $v new value
+	 * @param      double $v new value
 	 * @return     EntryVendorTask The current object (for fluent API support)
 	 */
 	public function setPrice($v)
@@ -769,7 +769,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$this->oldColumnsValues[EntryVendorTaskPeer::PRICE] = $this->price;
 
 		if ($v !== null) {
-			$v = (int) $v;
+			$v = (double) $v;
 		}
 
 		if ($this->price !== $v) {
@@ -959,7 +959,7 @@ abstract class BaseEntryVendorTask extends BaseObject  implements Persistent {
 			$this->vendor_partner_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->entry_id = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-			$this->price = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+			$this->price = ($row[$startcol + 9] !== null) ? (double) $row[$startcol + 9] : null;
 			$this->catalog_item_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
 			$this->reach_profile_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
 			$this->kuser_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;

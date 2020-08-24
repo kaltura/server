@@ -115,7 +115,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($this->getDynamicAttributes()->getEntryId(), $status);
 		if(!count($liveEntryServerNodes))
 			return;
-		
+
+		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
+		$serverType = (is_null($requestedServerType)) ? EntryServerNodeType::LIVE_PRIMARY : intval($requestedServerType);
 		foreach($liveEntryServerNodes as $key => $liveEntryServerNode)
 		{
 			/* @var $liveEntryServerNode LiveEntryServerNode */
@@ -128,7 +130,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				
 				//Order by primary DC first
 				KalturaLog::debug("liveEntryServerNode->getServerType [" . $liveEntryServerNode->getServerType() . "]");
-				if($liveEntryServerNode->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
+				if($liveEntryServerNode->getServerType() === $serverType)
 				{
 					$this->liveStreamConfig->setUrl($this->getHttpUrl($serverNode));
 					$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
@@ -137,7 +139,16 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 				}
 			}
 		}
-		
+
+		if (!is_null($requestedServerType))
+		{ //is request for specific serverType: we return it if exist but if not throw exception
+			if ($this->liveStreamConfig->getUrl())
+				return;
+			$entryId = $this->getDynamicAttributes()->getEntryId();
+			KalturaLog::err("Request stream type of [$requestedServerType] but not entryServerNode for that type on entry: $entryId");
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
+		}
+
 		if(!$this->liveStreamConfig->getUrl() && count($liveEntryServerNodes))
 		{
 			$liveEntryServerNode = array_shift($liveEntryServerNodes);
@@ -317,7 +328,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if($this->getDynamicAttributes()->getServeVodFromLive())
 		{
 			$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-			$livePackagerUrl = str_replace("/live/", "/recording/", $livePackagerUrl);
+			$liveType = "/recording/";
+			$entry = entryPeer::retrieveByPK($entryId);
+			if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
+				$liveType = "/clip/";
+			$livePackagerUrl = str_replace("/live/", $liveType, $livePackagerUrl);
 		}
 		else
 		{

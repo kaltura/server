@@ -153,9 +153,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             if(kConf::get('disableElastic', 'elastic', true))
                 return true;
 
-            $this->saveToSphinxLog($object, $params);
+            $shouldSyncElastic = $this->shouldSyncElastic($object);
+            $this->saveToSphinxLog($object, $params, $shouldSyncElastic);
 
-            if(!kConf::get('exec_elastic', 'local', 0))
+            if(!$shouldSyncElastic)
                 return true;
 
             $client = new elasticClient();
@@ -174,7 +175,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         return true;
     }
 
-    private function saveToSphinxLog($object, $params)
+    private function saveToSphinxLog($object, $params, $shouldSyncElastic)
     {
         $command = serialize($params);
         $skipSave = $this->shouldSkipSaveToSphinxLog($object, $command);
@@ -183,13 +184,43 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         $elasticLog = new SphinxLog();
         $elasticLog->setSql($command);
-        $elasticLog->setExecutedServerId($this->retrieveElasticClusterId());
+        $clusterId = $shouldSyncElastic ? $this->retrieveElasticClusterId() : null;
+        $elasticLog->setExecutedServerId($clusterId);
         $elasticLog->setObjectId($object->getId());
         $elasticLog->setObjectType($object->getElasticObjectName());
         $elasticLog->setEntryId($object->getElasticEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
         $elasticLog->setType(SphinxLogType::ELASTIC);
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
+    }
+
+    private function shouldSyncElastic($object)
+    {
+        $key = kCurrentContext::$ks_partner_id . "_" . kCurrentContext::$service . "_" . kCurrentContext::$action . "_" . $object->getElasticIndexName();
+        $map = kConf::get('partner_actions_to_skip_elastic_map', 'local', array());
+        if (isset($map[$key]))
+        {
+            KalturaLog::log("Specific partner action to skip elastic detected $key. skipping elastic sync.");
+            return false;
+        }
+
+        if (kConf::get('exec_elastic', 'local', 0))
+            return true;
+
+        if (kConf::hasParam('exec_elastic_client_tags'))
+        {
+            $execElasticTags = kConf::get('exec_elastic_client_tags');
+            $clientTag = kCurrentContext::$client_lang;
+            foreach ($execElasticTags as $execElasticTag)
+            {
+                if (strpos($clientTag, $execElasticTag) === 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function shouldSkipSaveToSphinxLog($object, &$command)
@@ -211,23 +242,20 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     private function retrieveElasticClusterId()
     {
         $elasticClusterId = null;
-        if(kConf::hasParam('exec_elastic') && kConf::get('exec_elastic'))
+        $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+        $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+        if ($elasticClusterCacheStore)
         {
-            $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
-            $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+            $elasticClusterId = $elasticClusterCacheStore->get(self::CACHE_PREFIX . $elasticClusterName);
+            if ($elasticClusterId)
+                return $elasticClusterId;
+        }
+        $elasticCluster = SphinxLogServerPeer::retrieveByLocalServer($elasticClusterName);
+        if($elasticCluster)
+        {
+            $elasticClusterId = $elasticCluster->getId();
             if ($elasticClusterCacheStore)
-            {
-                $elasticClusterId = $elasticClusterCacheStore->get(self::CACHE_PREFIX . $elasticClusterName);
-                if ($elasticClusterId)
-                    return $elasticClusterId;
-            }
-            $elasticCluster = SphinxLogServerPeer::retrieveByLocalServer($elasticClusterName);
-            if($elasticCluster)
-            {
-                $elasticClusterId = $elasticCluster->getId();
-                if ($elasticClusterCacheStore)
-                    $elasticClusterCacheStore->set(self::CACHE_PREFIX . $elasticClusterName, $elasticClusterId);
-            }
+                $elasticClusterCacheStore->set(self::CACHE_PREFIX . $elasticClusterName, $elasticClusterId);
         }
 
         return $elasticClusterId;

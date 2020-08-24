@@ -44,7 +44,7 @@ class ReachProfileTableMap extends TableMap {
 		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', true, null, null);
 		$this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
 		$this->addColumn('STATUS', 'Status', 'TINYINT', true, null, null);
-		$this->addColumn('USED_CREDIT', 'UsedCredit', 'INTEGER', false, null, 0);
+		$this->addColumn('USED_CREDIT', 'UsedCredit', 'FLOAT', false, null, 0);
 		$this->addColumn('RULES', 'Rules', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('DICTIONARY', 'Dictionary', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);

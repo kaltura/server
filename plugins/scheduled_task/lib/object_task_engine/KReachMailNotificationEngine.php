@@ -51,7 +51,7 @@ class KReachMailNotificationEngine extends KObjectTaskMailNotificationEngine
 			$turnAroundTime = array_search($catalogItem->turnAroundTime, $constantsMap[self::VENDOR_SERVICE_TURN_AROUND_TIME]);
 			$serviceFeature = array_search($catalogItem->serviceFeature, $constantsMap[self::VENDOR_SERVICE_FEATURE]);
 
-			$body .= "\tTask Ud: $entryVendorTaskId - Video Name:$name - Video Id: $id - requester: $requester - Requested date: $requestDate - $serviceType $serviceFeature with turn around time of: $turnAroundTime" . PHP_EOL;
+			$body .= "\tTask Id: $entryVendorTaskId - Video Name:$name - Video Id: $id - requester: $requester - Requested date: $requestDate - $serviceType $serviceFeature with turn around time of: $turnAroundTime" . PHP_EOL;
 		}
 		$body.= "\n\tTotal count of awaiting tasks for approval: $cnt";
 		return $body;

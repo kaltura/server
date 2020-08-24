@@ -17,9 +17,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		if (count($dynamicAttributes) <= 1)
 		{
+			$dynamicAttribute = reset($dynamicAttributes);
+			if ($dynamicAttribute instanceof kClipAttributes )
+			{
+				$effects = $dynamicAttribute->getEffectArray();
+				if (!empty($effects))
+					return true;
+			}
 			return false;
 		}
-
 		foreach ($dynamicAttributes as $value)
 		{
 			if ($value instanceof kClipAttributes)

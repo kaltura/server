@@ -12,6 +12,7 @@
 			<th><?php echo $this->translate('Profile Type'); ?></th>
 			<th><?php echo $this->translate('Publisher ID'); ?></th>
 			<th><?php echo $this->translate('Credit Type'); ?></th>
+			<th><?php echo $this->translate('Remaining Credit'); ?></th>
 			<th><?php echo $this->translate('Creation Date'); ?></th>
 			<th><?php echo $this->translate('Last Updated Date'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
@@ -19,7 +20,7 @@
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="8">
+			<td colspan="10">
 				<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -34,6 +35,12 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Reach_Enum_ReachProfileType', $reachProfile->profileType); ?></td>
 				<td><?php echo $reachProfile->partnerId; ?></td>
 				<td><?php echo (is_null($reachProfile->credit) ? "-" : $this->translate(get_class($reachProfile->credit))); ?></td>
+				<td><?php
+					if(get_class($reachProfile->credit) == "Kaltura_Client_Reach_Type_UnlimitedVendorCredit")
+					    echo "Unlimited";
+					else
+					    echo ($reachProfile->credit->credit - $reachProfile->usedCredit); ?>
+				</td>
 				<td><?php echo date($this->translate('time format'), $reachProfile->createdAt); ?></td>
 				<td><?php echo date($this->translate('time format'), $reachProfile->updatedAt); ?></td>
 				<td>

@@ -18,4 +18,6 @@ class KalturaBatchJobStatus extends KalturaEnum
 	const FATAL = 10; // done
 	const DONT_PROCESS = 11; // done
 	const FINISHED_PARTIALLY = 12;
+	const SUSPEND = 13;
+	const SUSPEND_ALMOST_DONE = 14;	
 }

@@ -225,7 +225,7 @@ class KCurlWrapper
 		if(!$params || !isset($params->curlVerifySSL) || !$params->curlVerifySSL)
 		{
 			curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, 1);
+			curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, self::getSslVerifyHostValue());
 		}
 	}
 
@@ -308,7 +308,7 @@ class KCurlWrapper
 	/**
 	 * @return string
 	 */
-	public function getInfo($opt)
+	public function getInfo($opt = null)
 	{
 		return curl_getinfo($this->ch, $opt);
 	}
@@ -491,13 +491,17 @@ class KCurlWrapper
 	}
 
 	/**
-	 * @param string $sourceUrl
-	 * @param string $destFile
-	 * @param function $progressCallBack
-	 * @return boolean
+	 * @param $sourceUrl
+	 * @param null $destFile
+	 * @param null $progressCallBack
+	 * @return mixed
+	 * @throws Exception
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null)
 	{
+		if ($this->isInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found Internal url: " . $sourceUrl);
+
 		$this->setSourceUrlAndprotocol($sourceUrl);
 		
 		$returnTransfer = is_null($destFile);
@@ -525,6 +529,63 @@ class KCurlWrapper
 	}
 
 
+	/**
+	 * @param $sourceUrl
+	 * @return mixed
+	 */
+	public function doExec($sourceUrl)
+	{
+		if ($this->isInternalUrl($sourceUrl))
+			KalturaLog::debug("Exec Curl - Found Internal url: " . $sourceUrl);
+
+		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
+
+		return curl_exec($this->ch);
+	}
+
+	/**
+	 * @param $opts
+	 */
+	public function setOpts($opts)
+	{
+		foreach ($opts as $key => $value)
+		{
+			$this->setOpt($key, $value);
+		}
+	}
+
+	private function isInternalUrl($url = null)
+	{
+		$host = $this->getUrlHost($url);
+		if (!$host)
+			return true;
+		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
+			return $this->IsIpPrivateOrReserved($host);
+
+		$res = gethostbyname($host);
+		if ($res == $host) // in case of local machine name
+			return true;
+		return $this->IsIpPrivateOrReserved($res);
+	}
+
+	private function IsIpPrivateOrReserved($host)
+	{
+		return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE); // checks if host is NOT in a private or reserved range
+	}
+	private function getUrlHost($url = null)
+	{
+		$host = null;
+		$url = trim($url);
+		if (strpos($url, "://") === false && substr($url, 0, 1) != "/")
+			$url = "http://" . $url;
+		$url_parts = parse_url($url);
+		if ($url_parts === false)
+			return false;
+		if (isset ($url_parts["host"]))
+			$host = $url_parts["host"];
+		return $host;
+	}
+	
 	public function getSourceUrlProtocol($sourceUrl)
 	{
 		$protocol = null;
@@ -551,8 +612,6 @@ class KCurlWrapper
 		return $protocol;
 	}
 
-
-	
 	public function setSourceUrlAndprotocol($sourceUrl)
 	{
 		$sourceUrl = trim($sourceUrl);
@@ -612,6 +671,17 @@ class KCurlWrapper
 		curl_close($ch);
 		
 		return $content;
+	}
+
+	public static function getSslVerifyHostValue()
+	{
+		$curl_version = curl_version();
+		if($curl_version['version_number'] >= 0x071c01 ) // check if curl version is 7.28.1 or higher
+		{
+			return 2;
+		}
+
+		return 1;
 	}
 }
 

@@ -21,16 +21,25 @@ class ReachProfilePeer extends BaseReachProfilePeer
 			self::$s_criteria_filter = new criteriaFilter ();
 		
 		$c = KalturaCriteria::create(VendorCatalogItemPeer::OM_CLASS);
-		$c->addAnd ( ReachProfilePeer::STATUS, VendorCatalogItemStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd ( ReachProfilePeer::STATUS, ReachProfileStatus::DELETED, Criteria::NOT_EQUAL);
 		
 		self::$s_criteria_filter->setFilter($c);
+	}
+	
+	public static function retrieveActiveByPk($pk)
+	{
+		$c = new Criteria();
+		$c->add(ReachProfilePeer::ID, $pk);
+		$c->add(ReachProfilePeer::STATUS, ReachProfileStatus::ACTIVE);
+		
+		return ReachProfilePeer::doSelectOne($c);
 	}
 	
 	public static function retrieveByPartnerId($partnerId)
 	{
 		$c = new Criteria();
 		$c->add(ReachProfilePeer::PARTNER_ID, $partnerId);
-		$c->add(ReachProfilePeer::STATUS, VendorCatalogItemStatus::ACTIVE);
+		$c->add(ReachProfilePeer::STATUS, ReachProfileStatus::ACTIVE);
 		
 		return ReachProfilePeer::doSelect($c);
 	}

@@ -70,6 +70,14 @@ class Partner extends BasePartner
 
 	private $partnerUsagePercent;
 
+	const CUSTOM_DATA_LIVE_STREAM_INPUTS = 'live_stream_inputs';
+
+	const CUSTOM_DATA_LIVE_STREAM_OUTPUTS = 'live_stream_outputs';
+
+	const PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT = 10;
+
+	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -983,8 +991,9 @@ class Partner extends BasePartner
 	public function setMonthlyStorageAndBandwidth($v)	{$this->putInCustomData('monthly_storage_and_bandwidth', $v);}
 	public function setEndUsers($v)						{$this->putInCustomData('end_users', $v);}
 	public function setAccessControls($v)				{$this->putInCustomData('access_controls', $v);}
-	public function setMaxLiveStreamInputs($v)			{$this->putInCustomData('live_stream_inputs', $v);}
-	public function setMaxLiveStreamOutputs($v)			{$this->putInCustomData('live_stream_outputs', $v);}
+	public function setMaxLiveStreamInputs($v)			{$this->putInCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS, $v);}
+	public function setMaxLiveStreamOutputs($v)			{$this->putInCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS, $v);}
+	public function setMaxLiveRtcStreamInputs($v)		{$this->putInCustomData('live_rtc_stream_inputs', $v);}
 	
 	public function setLoginUsersOveragePrice($v)		{$this->putInCustomData('login_users_overage_price', $v);}
 	public function setAdminLoginUsersOveragePrice($v)	{$this->putInCustomData('admin_login_users_overage_price', $v);}
@@ -1020,8 +1029,8 @@ class Partner extends BasePartner
 	public function setTemplateEntriesNum($v)			{$this->putInCustomData('template_entries_num', $v);}
 	public function setTemplateCategoriesNum($v)		{$this->putInCustomData('template_categories_num', $v);}
 	public function setTemplateCustomMetadataNum($v)	{$this->putInCustomData('template_custom_metadata_num', $v);}
-	public function setSubPartnerRequestCampaign($v)	{$this->putInCustomData('sub_partner_request_campaign', $v);}
 	public function setInitialPasswordSet($v)			{$this->putInCustomData('initial_password_set', $v);}
+	public function setAdditionalAccountFailureReason($v)			{$this->putInCustomData('additional_account_failure_reason', $v);}
 
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
@@ -1033,9 +1042,28 @@ class Partner extends BasePartner
 	public function getMonthlyStorageAndBandwidth()		{return $this->getFromCustomData('monthly_storage_and_bandwidth');}
 	public function getEndUsers()						{return $this->getFromCustomData('end_users');}
 	public function getAccessControls()					{return $this->getFromCustomData('access_controls', null, self::MAX_ACCESS_CONTROLS);}
-	public function getMaxLiveStreamInputs()			{return $this->getFromCustomData('live_stream_inputs');}
-	public function getMaxLiveStreamOutputs()			{return $this->getFromCustomData('live_stream_outputs');}
-	
+	public function getMaxLiveStreamInputs()
+	{
+		$live_stream_inputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_INPUTS);
+		if (!$live_stream_inputs)
+			$live_stream_inputs = self::PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT;
+
+		return $live_stream_inputs;
+	}
+	public function getMaxLiveStreamOutputs()
+	{
+		$live_stream_outputs = $this->getFromCustomData(self::CUSTOM_DATA_LIVE_STREAM_OUTPUTS);
+		if (!$live_stream_outputs)
+			$live_stream_outputs = self::PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT;
+
+		return $live_stream_outputs;
+	}
+	public function getMaxLiveRtcStreamInputs()			{
+		$liveRtcStreamInputs = $this->getFromCustomData('live_rtc_stream_inputs');
+		if ($liveRtcStreamInputs === null)
+			$liveRtcStreamInputs = kConf::get('live_rtc_concurrent_streams', 'local', 2);
+		return $liveRtcStreamInputs;
+	}
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
 	public function getPublishersOveragePrice()			{return $this->getFromCustomData('publishers_overage_price');}
@@ -1070,8 +1098,8 @@ class Partner extends BasePartner
 	public function getTemplateEntriesNum()				{return $this->getFromCustomData('template_entries_num', null, 0);}
 	public function getTemplateCategoriesNum()			{return $this->getFromCustomData('template_categories_num', null, 0);}
 	public function getTemplateCustomMetadataNum()		{return $this->getFromCustomData('template_custom_metadata_num', null, 0);}
-	public function getSubPartnerRequestCampaign()		{return $this->getFromCustomData('sub_partner_request_campaign', null, 0);}
 	public function getInitialPasswordSet()				{return $this->getFromCustomData('initial_password_set', null, 0);}
+	public function getAdditionalAccountFailureReason()				{return $this->getFromCustomData('additional_account_failure_reason', null, 0);}
 
 
     public function setLiveStreamBroadcastUrlConfigurations($key, $value)
@@ -1903,19 +1931,20 @@ class Partner extends BasePartner
 		return $this->putInCustomData( self::OTT_ENVIRONMENT_URL, $v );
 	}
 
-	public function getEnableSelfServe()
-	{
-		return $this->getFromCustomData("enable_self_serve", null, false);
-	}
-
-	public function setEnableSelfServe($v)
-	{
-		$this->putInCustomData( "enable_self_serve", $v );
-	}
-
 	public function getPartnerId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getFreeTrialAccountType()
+	{
+		$additionalParams = $this->getAdditionalParams();
+		if (isset($additionalParams['freeTrialAccountType']))
+			return $additionalParams['freeTrialAccountType'];
+		return null;
 	}
 
 }

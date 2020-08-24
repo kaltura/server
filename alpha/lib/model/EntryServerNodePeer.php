@@ -66,7 +66,25 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 
 		return EntryServerNodePeer::doSelectOne($criteria, $con);
 	}
-
+	
+	/**
+	 * Retrieve a count of all EntryServerNodeType associated with a partner.
+	 *
+	 * @param      string $partnerId .
+	 * @param      EntryServerNodeType $serverType .
+	 * @param      PropelPDO $con the connection to use
+	 * @return 	   int of EntryServerNodes under partnerId
+	 * @throws     kCoreException
+	 */
+	public static function retrieveByPartnerIdAndServerType($partnerId, $serverType, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(EntryServerNodePeer::PARTNER_ID, $partnerId);
+		$criteria->add(EntryServerNodePeer::SERVER_TYPE, $serverType);
+		
+		return EntryServerNodePeer::doCount($criteria, $con);
+	}
+	
 	/**
 	 * Retrieve an array of a objects by EntryId
 	 *

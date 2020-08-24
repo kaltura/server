@@ -144,6 +144,7 @@ class ServerNodePeer extends BaseServerNodePeer {
 		$c->add(EntryServerNodePeer::SERVER_NODE_ID, null);
 		$c->addJoin(ServerNodePeer::ID, EntryServerNodePeer::SERVER_NODE_ID, Criteria::LEFT_JOIN);
 		$c->setLimit(3);
+		$c->addAscendingOrderByColumn('LENGTH('. ServerNodePeer::HOST_NAME.'),'.ServerNodePeer::HOST_NAME);
 		$objs = ServerNodePeer::doSelect($c, $con);
 
 		return $objs;

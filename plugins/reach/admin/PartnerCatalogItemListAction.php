@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage Admin
  */
-class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements IKalturaAdminConsolePublisherAction
+class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_PARTNER = "-2";
 
@@ -117,29 +117,5 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin implements I
 
 		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
 		return $isAllowed;
-	}
-
-	/**
-	 * @return array<string, string> - array of <label, jsActionFunctionName>
-	 */
-	public function getPublisherAdminActionOptions($partner, $permissions)
-	{
-		$options = array();
-		$options[] = array(0 => 'Reach', 1 => 'listPartnerCatalogItems');
-		return $options;
-	}
-
-	/**
-	 * @return string javascript code to add to publisher list view
-	 */
-	public function getPublisherAdminActionJavascript()
-	{
-		$functionStr = 'function listPartnerCatalogItems(partnerId)
-		    {
-					var url = pluginControllerUrl + \'/' . get_class($this) . '/filter_type/partnerIdEqual/filter_input/\' + partnerId;
-	                document.location = url;
-	        }';
-
-		return $functionStr;
 	}
 }

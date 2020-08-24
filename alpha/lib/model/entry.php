@@ -126,7 +126,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const ENTRY_CATEGORY_ESCAPE = "_";
 	const ENTRY_CATEGORY_SEPARATOR = ",";
 	
-	const ENTRY_ID_THAT_DOES_NOT_EXIST = 0;
+	const ENTRY_ID_THAT_DOES_NOT_EXIST = 'nonExistingId';
 	
 	const CATEGORY_SEARCH_PERFIX = 'c';
 	const CATEGORY_PARENT_SEARCH_PERFIX = 'p';
@@ -1122,24 +1122,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$path =  myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/thumbnail/entry_id/" . $this->getId() ;
 
 		$partner = $this->getPartner();
-				
+
+		$current_version = $this->getThumbnailVersion();
 		if ($partner && $this->getMediaType() == entry::ENTRY_MEDIA_TYPE_AUDIO && $partner->getAudioThumbEntryId()  && $partner->getAudioThumbEntryVersion())
 		{
 			$thumbEntryId = $partner->getAudioThumbEntryId();
 			$thumbVersion = $partner->getAudioThumbEntryVersion();
-
-			$current_version = "$thumbVersion/thumb_entry_id/$thumbEntryId";
+			$current_version .= "/thumb_entry_id/$thumbEntryId/thumb_entry_version/$thumbVersion";
 		}
 		elseif  ($partner && in_array($this->getType(), array(entryType::LIVE_STREAM , entryType::LIVE_CHANNEL)) && $partner->getLiveThumbEntryId()  && $partner->getLiveThumbEntryVersion())
 		{
 			$thumbEntryId = $partner->getLiveThumbEntryId();
 			$thumbVersion = $partner->getLiveThumbEntryVersion();
-
-			$current_version = "$thumbVersion/thumb_entry_id/$thumbEntryId";
+			$current_version .= "/thumb_entry_id/$thumbEntryId/thumb_entry_version/$thumbVersion";
 		}
-		else
-			$current_version = $this->getThumbnailVersion();
-		
+
 		if ( $version )
 			$path .= "/version/$version";
 		else
@@ -2709,9 +2706,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function setLengthInMsecs($v)
 	{
-		if(!$v || $v < 0) // null ot negative
+		if(is_null($v) || $v < 0) // null ot negative
 			return;
-			
+
 		if(is_string($v) && !is_numeric($v)) // not numeric
 			return;
 

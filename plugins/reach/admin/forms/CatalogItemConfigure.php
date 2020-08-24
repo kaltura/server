@@ -103,11 +103,10 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$targetLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 			$this->addElement($targetLanguage);
 		}
-
-		$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'));
+		
+		$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
 		$outputFormat->setLabel('Output Format:');
-		$outputFormat->setRequired(true);
-		$outputFormat->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT);
+		$outputFormat->setValue(null);
 		$this->addElement($outputFormat);
 
 		$enableSpeakerId = new Kaltura_Form_Element_EnumSelect('enableSpeakerId', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
@@ -177,6 +176,9 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$catalogItem->partnerId = null;
 		$catalogItem->createdAt = null;
 		$catalogItem->updatedAt = null;
+		
+		if($catalogItem->outputFormat == "")
+			$catalogItem->outputFormat = null;
 	}
 
 	public function getObject($objectType, array $properties, $add_underscore = true, $include_empty_fields = false)

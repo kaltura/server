@@ -194,6 +194,11 @@ class kMetadataManager
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
+			
+			if(isset($xPathData['matchType']))
+				$profileField->setMatchType(intval($xPathData['matchType']));
+			else
+				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
 
 			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
 
@@ -223,7 +228,7 @@ class kMetadataManager
 				$profileField->setExplodeChars($xPathData['explodeChars']);
 			
 			if(isset($xPathData['matchType']))
-				$profileField->setMatchType($xPathData['matchType']);
+				$profileField->setMatchType(intval($xPathData['matchType']));
 			else
 				$profileField->setMatchType(MetadataProfileFieldMatchType::TEXT);
 			
@@ -772,10 +777,7 @@ class kMetadataManager
 			$searchValues[self::ELASTIC_DATA_FIELD_NAME] = $metaDataSearchValues;
 		else
 		{
-			if($objectType == MetadataObjectType::CATEGORY)
-				$searchValues[self::ELASTIC_DATA_FIELD_NAME] = null;
-			else
-				$searchValues = null;
+			$searchValues = null;
 		}
 
 		return $searchValues; //return an array(metadata => array(...)) or null if no values
@@ -790,16 +792,16 @@ class kMetadataManager
 	public static function getDataElasticSearchValues(Metadata $metadata, array &$metaDataSearchValues)
 	{
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlPath = kFileSyncUtils::getLocalFilePathForKey($key);
+		$xmlString = kFileSyncUtils::file_get_contents($key);
 
 		try{
 			$xml = new KDOMDocument();
-			$xml->load($xmlPath);
+			$xml->loadXML($xmlString);
 			$xPath = new DOMXPath($xml);
 		}
 		catch (Exception $ex)
 		{
-			KalturaLog::err('Could not load metadata xml [' . $xmlPath . '] - ' . $ex->getMessage());
+			KalturaLog::err('Could not load metadata xml [' . $xmlString . '] - ' . $ex->getMessage());
 			return;
 		}
 

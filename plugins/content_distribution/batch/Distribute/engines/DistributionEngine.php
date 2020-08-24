@@ -191,12 +191,17 @@ abstract class DistributionEngine implements IDistributionEngine
 		}
 	}
 
-	protected function getAssetFile($assetId, $directory)
+	protected function getAssetFile($assetId, $directory, $fileName = null)
 	{
 		KalturaLog::info("Retrieve asset content for assetId: [$assetId]");
 		try
 		{
-			$filePath = $directory . '/asset_'. $assetId;
+			$filePath = $directory;
+			if ($fileName)
+				 $filePath .= '/'.$fileName;
+			else
+				$filePath .= '/asset_'.$assetId;
+
 			$assetContentUrl = self::getAssetUrl($assetId);
 			$res = KCurlWrapper::getDataFromFile($assetContentUrl, $filePath);
 			if ($res)

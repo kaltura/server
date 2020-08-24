@@ -11,11 +11,16 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	 *  @readonly
 	 */
 	public $credit = ReachProfileCreditValues::UNLIMITED_CREDIT;
-
+	
 	/**
 	 *  @var time
 	 */
 	public $fromDate;
+	
+	/**
+	 *  @var time
+	 */
+	public $toDate;
 
 	public function getMapBetweenObjects()
 	{
@@ -23,7 +28,9 @@ class KalturaUnlimitedVendorCredit extends KalturaBaseVendorCredit
 	}
 
 	private static $map_between_objects = array (
-		'fromDate','credit',
+		'fromDate',
+		'credit',
+		'toDate',
 	);
 
 	/* (non-PHPdoc)

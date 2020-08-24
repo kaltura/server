@@ -6,6 +6,10 @@
 setlocale(LC_ALL, 'en_US.UTF-8');
 libxml_disable_entity_loader(true);
 
+// to make sure stream calls to localhost machine
+stream_wrapper_unregister ('http');
+stream_wrapper_unregister ('https');
+
 $include_path = realpath(__DIR__ . '/../../vendor/ZendFramework/library') . PATH_SEPARATOR . get_include_path();
 set_include_path($include_path);
 
@@ -229,7 +233,24 @@ class kConf extends kEnvironment
 		}
 		return $result;
 	}
-		
+
+	/**
+	 * Adds the ability to get an element from array(Section) of configuration directly instead of the Entire array
+	 * @param string $sectionName
+	 * @param string $paramName
+	 * @param string $mapName
+	 * @param mixed $defaultValue
+	 * @return bool|mixed
+	 * @throws Exception
+	 */
+	public static function getArrayValue($paramName, $sectionName, $mapName = 'local', $defaultValue = false)
+	{
+		$result = kConf::get($sectionName,$mapName,$defaultValue);
+		if (is_array($result) && isset($result[$paramName]))
+			return $result[$paramName];
+		return $defaultValue;
+	}
+
 	public static function getCachedVersionId()
 	{
 		self::init();
