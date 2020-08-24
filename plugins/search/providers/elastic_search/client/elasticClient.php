@@ -211,7 +211,7 @@ class elasticClient
 			return null;
 
 		$cmd = $this->buildElasticCommandUrl(array(), '', self::ELASTIC_ACTION_BULK);
-		$response = $this->sendRequest($cmd, self::POST, $this->bulkBuffer);
+		$response = $this->sendRequest($cmd, self::POST, $this->bulkBuffer, false, self::ELASTIC_ACTION_BULK, self::MONITOR_NO_INDEX);
 		$this->initBulkBuffer();
 		return $response;
 	}
@@ -473,8 +473,12 @@ class elasticClient
 
 	protected function getJsonForBulk($params)
 	{
-		$actionMetadata = $this->getBulkActionAndMetadata($params);
-		return $actionMetadata . "\n" . json_encode($params[self::ELASTIC_BODY_KEY]) . "\n";
+		$res = $this->getBulkActionAndMetadata($params) . "\n";
+		if(isset($params[self::ELASTIC_BODY_KEY]))
+		{
+			$res .= json_encode($params[self::ELASTIC_BODY_KEY]) . "\n";
+		}
+		return $res;
 	}
 
 	protected function getBulkActionAndMetadata(&$params)
