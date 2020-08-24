@@ -44,6 +44,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const FJ = 'Fiji';
 	const FI = 'Finnish';
 	const FR = 'French';
+	const FR_CA = 'French (Canada)';
 	const FY = 'Frisian';
 	const GL = 'Galician';
 	const GD = 'Gaelic (Scottish)';
