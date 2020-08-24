@@ -546,13 +546,22 @@ abstract class LiveEntry extends entry
 	private function storeInCache($key)
 	{
 		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore) {
-			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
-			return false;
+		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
+		
+		$res = false;
+		foreach ($cacheLayers as $cacheLayer)
+		{
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if(!$cacheStore) {
+				KalturaLog::debug("cacheStore is null. cacheType: $cacheType . skip to next one");
+				continue;
+			}
+			
+			KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
+			$res = $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 		}
-		KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
-		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+		
+		return $res;
 	}
 
 	/**
