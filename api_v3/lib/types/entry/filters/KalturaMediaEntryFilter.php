@@ -35,7 +35,7 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 	
 	public function __construct()
 	{
-		$typeArray = array (entryType::MEDIA_CLIP, entryType::LIVE_STREAM);
+		$typeArray = array (entryType::MEDIA_CLIP, entryType::LIVE_STREAM, entryType::LIVE_CHANNEL);
 		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP));
 		$typeArray = array_merge($typeArray, KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::LIVE_STREAM));
 		
