@@ -74,13 +74,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 		if($toId)
 		{
-			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_EQUAL);
 			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
 			$c->addAnd($idCriterion);
 		}
 		else if($fromId)
 		{
-			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_EQUAL);
 		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
