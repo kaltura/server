@@ -34,7 +34,7 @@ abstract class kVidAction extends kSourceAction
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
 		}
 
-		if($this->source->getEntryMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO)
+		if($this->source->getEntryMediaType() != entry::ENTRY_MEDIA_TYPE_VIDEO && $this->source->getEntryType() != entryType::PLAYLIST)
 		{
 			throw new kThumbnailException(kThumbnailException::MUST_HAVE_VIDEO_SOURCE, kThumbnailException::MUST_HAVE_VIDEO_SOURCE);
 		}

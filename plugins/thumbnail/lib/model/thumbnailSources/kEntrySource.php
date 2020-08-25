@@ -27,6 +27,11 @@ class kEntrySource extends kThumbnailSource
 		return $this->dbEntry->getMediaType();
 	}
 
+	public function getEntryType()
+	{
+		return $this->dbEntry->getType();
+	}
+
 	/**
 	 * @param entry $dbEntry
 	 */
