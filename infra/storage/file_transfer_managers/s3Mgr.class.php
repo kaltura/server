@@ -38,8 +38,6 @@ class s3Mgr extends kFileTransferMgr
 	protected $endPoint = null;
 	protected $storageClass = null;
 	
-	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
-
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
@@ -221,28 +219,15 @@ class s3Mgr extends kFileTransferMgr
 			$size = kFile::fileSize($local_file);
 			KalturaLog::debug("file size is : " . $size);
 
-			if ($size > self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE)
-			{
-				KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
-				$fp = fopen($local_file, 'r');
-				$res = $this->s3->upload($bucket,
-					$remote_file,
-					$fp,
-					$this->filesAcl,
-					array('params' => $params)
-				);
-				fclose($fp);
-			}
-			else
-			{
-				KalturaLog::debug("Executing Single-part upload to S3: for " . $local_file);
-				$params['Bucket'] = $bucket;
-				$params['Key'] = $remote_file;
-				$params['SourceFile'] = $local_file;
-				$params['ACL'] = $this->filesAcl;
-
-				$res = $this->s3->putObject($params);
-			}
+			KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
+			$fp = fopen($local_file, 'r');
+			$res = $this->s3->upload($bucket,
+				$remote_file,
+				$fp,
+				$this->filesAcl,
+				array('params' => $params)
+			);
+			fclose($fp);
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return array(true, null);
