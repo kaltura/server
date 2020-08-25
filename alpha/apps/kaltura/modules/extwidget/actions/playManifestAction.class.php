@@ -855,7 +855,7 @@ class playManifestAction extends kalturaAction
 	
 	protected function initDeliveryProfile()
 	{
-		if ($this->deliveryAttributes->getStorageId())
+		if ($this->deliveryAttributes->getStorageId() && (!in_array($this->deliveryAttributes->getStorageId(), kStorageExporter::getPeriodicStorageIds())))
 		{
 			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
