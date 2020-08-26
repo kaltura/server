@@ -48,7 +48,7 @@ class serveFlavorAction extends kalturaAction
 	
 	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)
 	{
-		$source = self::getAssetFieldsArray('source', $path, $sourceType);
+		$source = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
 
 		if ($asset && $asset->getEncryptionKey())
 		{
