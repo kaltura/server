@@ -109,12 +109,6 @@ class s3Mgr extends kFileTransferMgr
 		return 1;
 	}
 
-
-	function test()
-	{
-
-	}
-
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	//
 	// S3 Signature is required to be V4 for SSE-KMS support. Newer S3 regions also require V4.
