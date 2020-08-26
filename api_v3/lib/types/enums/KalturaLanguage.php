@@ -155,6 +155,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const JI = 'Yiddish';
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
+	const ZH_TW = 'Taiwanese Mandarin';
 	const ZXX = 'No linguistic content';
 	const MU = 'Multilingual';
 
