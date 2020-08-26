@@ -377,7 +377,7 @@ class RefreshableRole extends AbstractRefreshableCredentials
 {
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const SESSION_DURATION = 3600;
-	public $s3Arn= null;
+	public $s3Arn = null;
 
 	public function refresh()
 	{
