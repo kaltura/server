@@ -521,20 +521,24 @@ abstract class LiveEntry extends entry
 			return false;
 		
 		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore)
+		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
+		foreach ($cacheLayers as $cacheLayer)
 		{
-			KalturaLog::warning("Cache store [$cacheType] not found");
-			$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
-			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
-			
-			return $lastUpdate <= $expiry;
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if($cacheStore)
+			{
+				$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
+				$ans = $cacheStore->get($key);
+				KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
+				return $ans;
+			}
 		}
 		
-		$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
-		$ans = $cacheStore->get($key);
-		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
-		return $ans;
+		KalturaLog::warning("Cache store [$cacheType] not found");
+		$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
+		$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
+		
+		return $lastUpdate <= $expiry;
 	}
 
 	/**
