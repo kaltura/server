@@ -5,6 +5,7 @@ elasticClientCurlTimeout = @CURL_TIMEOUT_IN_SEC@
 disableElastic = false
 ngramPercentage = 80
 maxUserCategories = 1024
+bulkSize = 500
 
 [innerHits]
 captionInnerHitsSize = 5
