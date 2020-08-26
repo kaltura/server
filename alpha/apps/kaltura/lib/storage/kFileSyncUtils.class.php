@@ -1848,10 +1848,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, true, false);
-		if(!$fileSync || !in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
-		{
-			return null;
-		}
 		return $fileSync;
 	}
 
@@ -1870,7 +1866,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		if (!$prefix)
 		{
 			return array(null, self::SOURCE_TYPE_FILE);
-        }
+		}
 
 		// handle remote dc
 		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
