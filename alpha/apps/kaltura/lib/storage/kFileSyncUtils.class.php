@@ -1869,7 +1869,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
 		if (!$prefix)
 		{
-			return null;
+			return array(null, self::SOURCE_TYPE_FILE);
         }
 
 		// handle remote dc

@@ -9,6 +9,8 @@ class serveFlavorAction extends kalturaAction
 	const NO_CLIP_TO = 2147483647;
 	
 	const JSON_CONTENT_TYPE = 'application/json';
+	const TYPE_SOURCE = 'source';
+	const PATH_EMPTY = 'empty';
 
 	const SECOND_IN_MILLISECONDS = 1000;
 	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
@@ -46,11 +48,7 @@ class serveFlavorAction extends kalturaAction
 	
 	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)
 	{
-		$source = array(
-			'type' => 'source',
-			'path' => $path,
-			'sourceType' => $sourceType,
-		);
+		$source = self::getAssetFieldsArray('source', $path, $sourceType);
 
 		if ($asset && $asset->getEncryptionKey())
 		{
@@ -664,11 +662,11 @@ class serveFlavorAction extends kalturaAction
 				{
 					$hasCaptions = true;
 					$labelEntryId = $entryId;
-					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH], 'sourceType' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_SOURCE_TYPE]);
+					$captionClips[] = self::getAssetFieldsArray(self::TYPE_SOURCE, $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH], $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_SOURCE_TYPE]);
 				}
 				else
 				{
-					$captionClips[] = array('type' => 'source', 'path' => 'empty', 'sourceType' => kFileSyncUtils::SOURCE_TYPE_FILE);
+					$captionClips[] = self::getAssetFieldsArray(self::TYPE_SOURCE, self::PATH_EMPTY, kFileSyncUtils::SOURCE_TYPE_FILE);
 				}
 			}
 			if ($hasCaptions)
@@ -786,7 +784,7 @@ class serveFlavorAction extends kalturaAction
 			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
 			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
 		}
-		$clipDesc = array('type' => 'source', 'path' => $path, 'sourceType' => $sourceType);
+		$clipDesc = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
 		if (!$hasAudio)
 		{
 			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
@@ -945,6 +943,15 @@ class serveFlavorAction extends kalturaAction
 	public static function getFallbackStorageProfileId()
 	{
 		return self::$fallbackStorageId;
+	}
+
+	public static function getAssetFieldsArray($type, $path, $sourceType)
+	{
+		return array(
+			'type' => $type,
+			'path' => $path,
+			'sourceType' => $sourceType,
+		);
 	}
 
 }
