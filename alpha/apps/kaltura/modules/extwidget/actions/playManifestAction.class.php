@@ -682,7 +682,7 @@ class playManifestAction extends kalturaAction
 		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
-		$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+		$cloudStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
