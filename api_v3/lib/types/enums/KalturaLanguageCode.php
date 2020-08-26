@@ -157,7 +157,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const JI = 'ji';
 	const YO = 'yo';
 	const ZU = 'zu';
-	const ZH_TW = 'Taiwanese Mandarin';
+	const ZH_TW = 'zh_tw';
 	const ZXX = 'zxx';
 	const MU = 'mu';
 	const CRG = 'crg';
