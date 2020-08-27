@@ -14,6 +14,7 @@ class myPlaylistUtils
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
+	const CAPTION_SOURCE_TYPE = "sourceType";
 
 	private static $user_cache = null;
 	
@@ -1086,15 +1087,16 @@ HTML;
 	/**
 	 * @param $captionAsset
 	 * @param &$localFilePath
+	 * @param $sourceType
 	 * @return boolean
-	 * @throws Exception
+	 * @throws PropelException
 	 */
-	protected static function getCaptionFilePath($captionAsset, &$localFilePath)
+	protected static function getCaptionFilePath($captionAsset, &$localFilePath, &$sourceType)
 	{
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$preferredStorageId = serveFlavorAction::getPreferredStorageProfileId();
 		$fallbackStorageId = serveFlavorAction::getFallbackStorageProfileId();
-		list ($captionFileSync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($captionFileSyncKey, $captionAsset, $preferredStorageId, $fallbackStorageId);
+		list ($captionFileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($captionFileSyncKey, $captionAsset, $preferredStorageId, $fallbackStorageId);
 
 		if(!is_null($preferredStorageId))
 		{
@@ -1442,7 +1444,8 @@ HTML;
 			//Try getting caption
 			//if exist but no local - return empty path
 			$localFilePath = '';
-			$fileSyncExist = self::getCaptionFilePath($captionAsset, $localFilePath);
+			$sourceType = kFileSyncUtils::SOURCE_TYPE_FILE;
+			$fileSyncExist = self::getCaptionFilePath($captionAsset, $localFilePath, $sourceType);
 			if ($fileSyncExist)
 			{
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
@@ -1450,7 +1453,7 @@ HTML;
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
 				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] =
-					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $localFilePath, self::CAPTION_FILES_ID => $captionAsset->getId());
+					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $localFilePath, self::CAPTION_FILES_ID => $captionAsset->getId(), self::CAPTION_SOURCE_TYPE => $sourceType);
 			}
 		}
 		return $filteredCaptionAssets;
