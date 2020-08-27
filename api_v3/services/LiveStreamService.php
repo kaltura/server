@@ -196,6 +196,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
 		$adminTagsLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
+		KalturaLog::debug('Current AdminTags: [' . $liveEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsLimits, true) . ']');
 		$isCloudTranscode = $this->isCloudTranscode($liveEntry->getConversionProfileId());
 		
 		// If the entry is limited by adminTag, no other limit will be checked
@@ -791,7 +792,6 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function validateAdminTagLimits(LiveEntry $currentEntry, $liveEntries, $adminTagsLimits)
 	{
-		KalturaLog::debug('Current AdminTags: [' . $currentEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsLimits, true) . ']');
 		$adminTagsCounters = $adminTagsLimits;
 		foreach($liveEntries as $entry)
 		{
