@@ -316,7 +316,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			return null;
 		}
 
-		$fieldValue = self::translateFieldValue($fieldName, $filter, $fieldValue);
+		$fieldValue = self::translateFieldValue($operator, $fieldName, $fieldValue);
 		return array($operator, $fieldName, $fieldValue);
 	}
 
@@ -491,21 +491,45 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected static function translateFieldValue($fieldName, $filter, $fieldValue)
+	/**
+	 * @param string $fieldName
+	 * @param string $operator
+	 * @param string $fieldValue
+	 * @return int
+	 * @throws KalturaAPIException
+	 */
+	protected static function translateFieldValue($operator, $fieldName, $fieldValue)
 	{
 		if(in_array($fieldName, self::$puserFields))
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($filter->getPartnerSearchScope(), $fieldValue);
-			if (!$kuser)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $fieldValue);
-			}
-
-			$fieldValue = $kuser->getId();
+			$fieldValue = self::translatePuserFieldValue($operator, $fieldValue);
 		}
 		else if ($fieldName === ESearchEntryFilterFields::DURATION)
 		{
 			$fieldValue = $fieldValue * 1000;
+		}
+
+		return $fieldValue;
+	}
+
+
+	protected static function translatePuserFieldValue($operator, $fieldValue)
+	{
+		if($operator === baseObjectFilter::IN || $operator === baseObjectFilter::NOT_IN || $operator === baseObjectFilter::MATCH_AND || $operator === baseObjectFilter::MATCH_OR)
+		{
+			$fieldValue = myKuserUtils::preparePusersToKusersFilter($fieldValue);
+		}
+		else
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $fieldValue);
+			if ($kuser)
+			{
+				$fieldValue = $kuser->getId();
+			}
+			else
+			{
+				$fieldValue = myKuserUtils::NON_EXISTING_USER_ID;
+			}
 		}
 
 		return $fieldValue;

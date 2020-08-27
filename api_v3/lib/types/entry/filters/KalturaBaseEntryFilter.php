@@ -124,47 +124,47 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 			if ($kuser)
 				$this->userIdEqual = $kuser->getId();
 			else 
-				$this->userIdEqual = -1; // no result will be returned when the user is missing
+				$this->userIdEqual = myKuserUtils::NON_EXISTING_USER_ID; // no result will be returned when the user is missing
 		}
 
 		if(!empty($this->userIdIn))
 		{
-			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
+			$this->userIdIn = myKuserUtils::preparePusersToKusersFilter( $this->userIdIn );
 		}
 
 		if(!empty($this->userIdNotIn))
 		{
-			$this->userIdNotIn = $this->preparePusersToKusersFilter($this->userIdNotIn);
+			$this->userIdNotIn = myKuserUtils::preparePusersToKusersFilter($this->userIdNotIn);
 		}
 		
 		if(!empty($this->entitledUsersEditMatchAnd))
 		{
-			$this->entitledUsersEditMatchAnd = $this->preparePusersToKusersFilter( $this->entitledUsersEditMatchAnd );
+			$this->entitledUsersEditMatchAnd = myKuserUtils::preparePusersToKusersFilter( $this->entitledUsersEditMatchAnd );
 		}
 
 		if(!empty($this->entitledUsersPublishMatchAnd))
 		{
-			$this->entitledUsersPublishMatchAnd = $this->preparePusersToKusersFilter( $this->entitledUsersPublishMatchAnd );
+			$this->entitledUsersPublishMatchAnd = myKuserUtils::preparePusersToKusersFilter( $this->entitledUsersPublishMatchAnd );
 		}
 		
 		if(!empty($this->entitledUsersEditMatchOr))
 		{
-			$this->entitledUsersEditMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersEditMatchOr );
+			$this->entitledUsersEditMatchOr = myKuserUtils::preparePusersToKusersFilter( $this->entitledUsersEditMatchOr );
 		}
 
 		if(!empty($this->entitledUsersPublishMatchOr))
 		{
-			$this->entitledUsersPublishMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersPublishMatchOr );
+			$this->entitledUsersPublishMatchOr = myKuserUtils::preparePusersToKusersFilter( $this->entitledUsersPublishMatchOr );
 		}
 		
 		if(!empty($this->entitledUsersViewMatchOr))
 		{
-			$this->entitledUsersViewMatchOr = $this->preparePusersToKusersFilter( $this->entitledUsersViewMatchOr );
+			$this->entitledUsersViewMatchOr = myKuserUtils::preparePusersToKusersFilter( $this->entitledUsersViewMatchOr );
 		}
 
 		if(!empty($this->entitledUsersViewMatchAnd))
 		{
-			$this->entitledUsersViewMatchAnd = $this->preparePusersToKusersFilter( $this->entitledUsersViewMatchAnd );
+			$this->entitledUsersViewMatchAnd = myKuserUtils::preparePusersToKusersFilter( $this->entitledUsersViewMatchAnd );
 		}
 	}
 	

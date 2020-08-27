@@ -170,11 +170,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 
 		if(!empty($this->userIdIn))
 		{
-			$this->userIdIn = $this->preparePusersToKusersFilter( $this->userIdIn );
+			$this->userIdIn = myKuserUtils::preparePusersToKusersFilter( $this->userIdIn );
 		}
 		if(!empty($this->userIdNotIn))
 		{
-			$this->userIdNotIn = $this->preparePusersToKusersFilter( $this->userIdNotIn );
+			$this->userIdNotIn = myKuserUtils::preparePusersToKusersFilter( $this->userIdNotIn );
 		}
 
 		if(!is_null($this->isAnonymous))
