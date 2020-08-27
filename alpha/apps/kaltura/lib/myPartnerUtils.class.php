@@ -1486,6 +1486,10 @@ class myPartnerUtils
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
  		{
+ 			if ($role->getName() == 'cielo24')
+			{
+				continue;
+			}
  			$newRole = $role->copyToPartner($toPartner->getId());
  			$newRole->save();
  		}
