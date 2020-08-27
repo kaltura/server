@@ -195,13 +195,13 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveEntries = $this->getLiveEntriesForPartner($liveEntryPartner->getId(), $liveEntry->getId());
 		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
-		$adminTagsOrigLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
+		$adminTagsLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
 		$isCloudTranscode = $this->isCloudTranscode($liveEntry->getConversionProfileId());
 		
-		$isAdminTagLimited = $this->isAdminTagLimited($liveEntry, array_keys($adminTagsOrigLimits));
-		if($isAdminTagLimited)
+		// If the entry is limited by adminTag, no other limit will be checked
+		if($this->isAdminTagLimited($liveEntry, array_keys($adminTagsLimits)))
 		{
-			return $this->validateAdminTagLimits($liveEntry, $liveEntries, $adminTagsOrigLimits);
+			return $this->validateAdminTagLimits($liveEntry, $liveEntries, $adminTagsLimits);
 		}
 		$maxTranscodedStreams = 0;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $liveEntryPartner->getId()))
@@ -214,7 +214,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entryConversionProfiles[$liveEntry->getConversionProfileId()][] = $liveEntry->getId();
 		foreach($liveEntries as $entry)
 		{
-			if(!$this->isAdminTagLimited($entry, array_keys($adminTagsOrigLimits)))
+			if(!$this->isAdminTagLimited($entry, array_keys($adminTagsLimits)))
 			{
 				/* @var $entry LiveEntry */
 				$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
@@ -786,13 +786,13 @@ class LiveStreamService extends KalturaLiveEntryService
 	 *
 	 * @param LiveEntry $currentEntry
 	 * @param array $liveEntries
-	 * @param array $adminTagsOrigLimits
+	 * @param array $adminTagsLimits
 	 * @throws KalturaAPIException
 	 */
-	protected function validateAdminTagLimits(LiveEntry $currentEntry, $liveEntries, $adminTagsOrigLimits)
+	protected function validateAdminTagLimits(LiveEntry $currentEntry, $liveEntries, $adminTagsLimits)
 	{
-		KalturaLog::debug('Current AdminTags: [' . $currentEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsOrigLimits, true) . ']');
-		$adminTagsCounters = $adminTagsOrigLimits;
+		KalturaLog::debug('Current AdminTags: [' . $currentEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsLimits, true) . ']');
+		$adminTagsCounters = $adminTagsLimits;
 		foreach($liveEntries as $entry)
 		{
 			$this->updateAdminTagsCounters($entry, $adminTagsCounters);
@@ -804,7 +804,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
 			{
 				KalturaLog::debug('AdminTag exceeded : [' . $adminTag . '] limits left [' . print_r($adminTagsCounters, true) . ']');
-				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $currentEntry->getId(), $adminTag, $adminTagsOrigLimits[$adminTag]);
+				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $currentEntry->getId(), $adminTag, $adminTagsLimits[$adminTag]);
 			}
 		}
 	}
