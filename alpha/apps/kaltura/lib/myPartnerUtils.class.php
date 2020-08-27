@@ -1486,7 +1486,7 @@ class myPartnerUtils
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
  		{
- 			if ($role->getName() == 'cielo24')
+ 			if ($role->getName() === 'cielo24')
 			{
 				continue;
 			}
