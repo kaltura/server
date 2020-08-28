@@ -1095,8 +1095,7 @@ HTML;
 	{
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$preferredStorageId = serveFlavorAction::getPreferredStorageProfileId();
-		$fallbackStorageId = serveFlavorAction::getFallbackStorageProfileId();
-		list ($captionFileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($captionFileSyncKey, $captionAsset, $preferredStorageId, $fallbackStorageId);
+		list ($captionFileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($captionFileSyncKey, $captionAsset, $preferredStorageId, null);
 
 		if(!is_null($preferredStorageId))
 		{
