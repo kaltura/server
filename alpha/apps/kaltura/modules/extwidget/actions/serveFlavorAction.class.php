@@ -266,7 +266,7 @@ class serveFlavorAction extends kalturaAction
 
 					if(!$file_sync)
 					{
-						error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+						KalturaLog::debug('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
 						$path = '';
 						$storeCache = false;
 					}
