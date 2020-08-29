@@ -17,6 +17,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
+	const SOURCE_TYPE_FILE = 'file';
+	const SOURCE_TYPE_HTTP = 'http';
+
 	/**
 	 * Contain all object types and sub types that should not be synced
 	 * @var array
@@ -1845,10 +1848,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, true, false);
-		if(!$fileSync || !in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
-		{
-			return null;
-		}
 		return $fileSync;
 	}
 
@@ -1860,19 +1859,30 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function getPathByFileSync($fileSync, $preferredStorageId)
+	public static function getPathAndSourceTypeByFileSync($fileSync, $preferredStorageId)
 	{
 		$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 		$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
-
-		// if the dc is the preferred return the file path
-		if($fileSync->getDc() == $preferredStorageId)
+		if (!$prefix)
 		{
-			return $prefix . kFileSyncUtils::getFileSyncFullPath($fileSync);
+			return array(null, self::SOURCE_TYPE_FILE);
 		}
 
+		// handle remote dc
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_HTTP);
+		}
+		// handle local preferred dc
+		else if($fileSync->getDc() == $preferredStorageId)
+		{
+			return array(kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_FILE);
+		}
 		// if dc is local but not preferred generate serve file urls
-		return $prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
+		else
+		{
+			return array ($prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false), self::SOURCE_TYPE_HTTP);
+		}
 	}
 
 	/**
@@ -2094,10 +2104,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fullPath;
 	}
 
-	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true)
+	public static function getFileSyncServeFlavorFields($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true)
 	{
 		$path = '';
 		$parent_file_sync = null;
+		$sourceType = self::SOURCE_TYPE_FILE;
 
 		if(!is_null($preferredStorageId))
 		{
@@ -2105,7 +2116,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			if($file_sync)
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				$path = kFileSyncUtils::getPathByFileSync($parent_file_sync, $preferredStorageId);
+				list($path, $sourceType) = kFileSyncUtils::getPathAndSourceTypeByFileSync($parent_file_sync, $preferredStorageId);
+				if(!$path)
+				{
+					$parent_file_sync = null;
+				}
 			}
 		}
 		else
@@ -2117,6 +2132,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync, $pathOnly);
 			}
 		}
-		return array ($parent_file_sync, $path);
+		return array ($parent_file_sync, $path, $sourceType);
 	}
 }
