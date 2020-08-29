@@ -74,23 +74,6 @@ function partnerIdAllowed($partnerId)
 	}
 }
 
-function partnerIdAllowed($partnerId)
-{
-	global $partnerIdsType, $partnerIds;
-
-	switch ($partnerIdsType)
-	{
-		case 'exclude':
-			return !in_array($partnerId, $partnerIds);
-
-		case 'include':
-			return in_array($partnerId, $partnerIds);
-
-		default:		// all
-			return true;
-	}
-}
-
 function handleAsset($asset, $sourceDcIds, $targetStorage)
 {
 	$assetId = $asset->getId();
