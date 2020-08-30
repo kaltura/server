@@ -6,6 +6,7 @@
 class ReachProfileCloneAction extends KalturaApplicationPlugin
 {
 	const ADMIN_CONSOLE_RULE_PREFIX = "AutomaticAdminConsoleRule_";
+	const EMPTY_STRING = 'N/A';
 
 	/**
 	 * @return string - absolute file path of the phtml template
@@ -53,7 +54,8 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 					foreach ( $reachProfile->rules as $key => $rule )
 					{
 						if (empty($rule->description)
-							|| substr($rule->description, 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX)
+							|| substr($rule->description, 0, strlen(self::ADMIN_CONSOLE_RULE_PREFIX)) !== self::ADMIN_CONSOLE_RULE_PREFIX
+							|| self::gotBooleanEventNotificationCondition($rule))
 						{
 							unset($reachProfile->rules[$key]);
 						}
@@ -71,5 +73,18 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 			echo $action->getHelper('json')->sendJson($e->getMessage(), false);
 		}
 		Infra_ClientHelper::unimpersonate();
+	}
+
+	protected function gotBooleanEventNotificationCondition($rule)
+	{
+
+		foreach ($rule->conditions as $condition)
+		{
+			if (isset($condition->booleanEventNotificationIds) && $condition->booleanEventNotificationIds && $condition->booleanEventNotificationIds !== self::EMPTY_STRING)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
