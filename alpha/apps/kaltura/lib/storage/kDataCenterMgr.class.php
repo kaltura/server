@@ -89,7 +89,7 @@ class kDataCenterMgr
 			$dc = $dc_list[$dc_id];
 		else if ($partnerId)
 		{
-			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageProfileIdsByFlag();
 			if(in_array($dc_id, $cloudStorageProfileIds))
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);

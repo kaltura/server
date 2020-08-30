@@ -510,7 +510,7 @@ class kReplacementHelper
 
 	public static function exportReadyReplacedFlavors($partnerId, $replacingEntryId, $assets)
 	{
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageProfileIdsByFlag();
 		if(!$periodicStorageIds)
 		{
 			return;
@@ -520,7 +520,7 @@ class kReplacementHelper
 		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($partnerId);
 		if(!$externalStorages)
 		{
-			$externalStorages = kStorageExporter::getPeriodicStorageProfiles($partnerId);
+			$externalStorages = kStorageExporter::getPeriodicStorageProfiles();
 		}
 		foreach($externalStorages as $externalStorage)
 		{

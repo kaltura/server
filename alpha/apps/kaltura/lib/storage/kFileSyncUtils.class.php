@@ -941,7 +941,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if($fetch_from_remote_if_no_local)
 		{
-			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner_id);
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageProfileIdsByFlag();
 		}
 
 		foreach ($file_sync_list as $file_sync)
@@ -1767,7 +1767,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getFileSyncsFromPeriodicStorage($partnerId, $syncKey)
 	{
 		$fileSyncs = array();
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageProfileIdsByFlag();
 		if($periodicStorageIds)
 		{
 			$fileSyncs = self::getAllReadyExternalFileSyncsForKey($syncKey, self::KALTURA_CLOUD_STORAGE_ONLY);

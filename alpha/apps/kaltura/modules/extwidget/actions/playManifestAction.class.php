@@ -751,7 +751,7 @@ class playManifestAction extends kalturaAction
 
 		if($cloudFileSyncs)
 		{
-			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
+			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles();
 			foreach ($cloudStorageProfiles as $cloudProfile)
 			{
 				if(!$this->shouldIncludeStorageProfile($cloudProfile))

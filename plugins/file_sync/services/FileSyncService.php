@@ -83,7 +83,7 @@ class FileSyncService extends KalturaBaseService
 		// Delete siblings
 		foreach ($lockedFileSyncs as $fileSync)
 		{
-			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($fileSync->getPartnerId());
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageProfileIdsByFlag();
 			if(count($periodicStorageIds))
 			{
 				//Retrieve all batch jobs associated to the entry
