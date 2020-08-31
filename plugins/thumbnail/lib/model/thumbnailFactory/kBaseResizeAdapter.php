@@ -252,8 +252,8 @@ class kBaseResizeAdapter
 	{
 		$this->initOrigImagePath();
 		$entry = $this->getEntry();
-		if(!kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) !== kThumbAdapterParameters::UNSET_PARAMETER &&
-			$this->parameters->get(kThumbFactoryFieldName::VID_SLICES) !== kThumbAdapterParameters::UNSET_PARAMETER)
+		if(!kFile::checkFileExists($this->parameters->get(kThumbFactoryFieldName::ORIG_IMAGE_PATH)) && $this->parameters->get(kThumbFactoryFieldName::VID_SEC) === kThumbAdapterParameters::UNSET_PARAMETER &&
+			$this->parameters->get(kThumbFactoryFieldName::VID_SLICES) === kThumbAdapterParameters::UNSET_PARAMETER)
 		{
 			if ($entry->getStatus() != entryStatus::READY && $entry->getLengthInMsecs() == 0) // when entry is not ready and we don't know its duration
 			{
