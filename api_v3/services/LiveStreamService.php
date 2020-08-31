@@ -466,6 +466,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				{
 					return $resultIsLive;
 				}
+				break;
 		}
 		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
