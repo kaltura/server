@@ -1486,7 +1486,8 @@ class myPartnerUtils
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
  		{
- 			if ($role->getName() === 'cielo24')
+			$UserRolesNamesToIgnore = kConf::get('partner_copy_user_roles_ignore_list', 'local', array());
+ 			if (in_array($role->getName(), $UserRolesNamesToIgnore))
 			{
 				continue;
 			}
