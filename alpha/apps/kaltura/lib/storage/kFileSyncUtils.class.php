@@ -1342,9 +1342,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @param bool $strict
 	 * @param bool $fromKalturaDcsOnly
+	 * @param bool $keepBackup
 	 * @return string
+	 * @throws Exception
 	 */
-	public static function deleteSyncFileForKey( FileSyncKey $key , $strict = false , $fromKalturaDcsOnly = false)
+	public static function deleteSyncFileForKey( FileSyncKey $key , $strict = false , $fromKalturaDcsOnly = false, $keepBackup = false)
 	{
 		if ( !$key )
 		{
@@ -1353,13 +1355,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return null;
 		}
 
-		//Retrieve all file sync for key
-		$c = new Criteria();
-		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-		if($fromKalturaDcsOnly)
-			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-		$file_sync_list = FileSyncPeer::doSelect( $c );
-		
+		$file_sync_list = self::getFileSyncsToDelete($key, $fromKalturaDcsOnly, $keepBackup);
+
+		KalturaLog::debug("Starting delete of [" . count($file_sync_list) . "] file syncs");
 		foreach($file_sync_list as $file_sync)
 		{
 			/* @var $fileSync FileSync */
@@ -1389,6 +1387,45 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$file_sync->setStatus($newStatus);
 			$file_sync->save();
 		}
+	}
+
+	protected static function getFileSyncsToDelete($key, $fromKalturaDcsOnly, $keepBackup)
+	{
+		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
+		if($fromKalturaDcsOnly)
+		{
+			$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+		}
+		$file_sync_list = FileSyncPeer::doSelect($c);
+
+		KalturaLog::debug("Found [" . count($file_sync_list) . "] potential file syncs to delete. keepBackup [$keepBackup]");
+
+		if($fromKalturaDcsOnly && $keepBackup)
+		{
+			// delete only if we will be able to keep at least one local file sync for back up
+			if(count($file_sync_list) < 2)
+			{
+				$file_sync_list = array();
+			}
+			else
+			{
+				$nonOriginalFileSyncs = array();
+				foreach($file_sync_list as $file_sync)
+				{
+					if(!$file_sync->getOriginal())
+					{
+						$nonOriginalFileSyncs[] = $file_sync;
+					}
+				}
+
+				if(count($nonOriginalFileSyncs) < count($file_sync_list))
+				{
+					$file_sync_list = $nonOriginalFileSyncs;
+				}
+			}
+		}
+
+		return $file_sync_list;
 	}
 
 	/**

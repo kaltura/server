@@ -157,7 +157,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		KalturaLog::info("Delete siblings for file sync [{$this->getObjectId()}] with ID [{$this->getId()}]");
 
 		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($this);
-		kFileSyncUtils::deleteSyncFileForKey($fileSyncKey, false, true);
+		kFileSyncUtils::deleteSyncFileForKey($fileSyncKey, false, true, true);
 	}
 
 	private function generateKey()
