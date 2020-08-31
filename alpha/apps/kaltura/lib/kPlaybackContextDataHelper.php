@@ -48,7 +48,7 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
-		$this->storageIds = kStorageExporter::getPeriodicStorageIdsByPartner($dbEntry->getPartnerId());
+		$this->storageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$this->generateRestrictedMessages($contextDataHelper);
 
@@ -234,7 +234,7 @@ class kPlaybackContextDataHelper
 			$flavorId = $flavorAsset->getId();
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-			$fileSyncs = kFileSyncUtils::getFileSyncsByStoragePriority($key,$servePriority, $this->storageIds );
+			$fileSyncs = kFileSyncUtils::getFileSyncsByStoragePriority($key, $servePriority);
 
 			foreach ($fileSyncs as $fileSync)
 			{

@@ -1921,7 +1921,7 @@ class kFlowHelper
 			}
 			else
 			{
-				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($partner->getId());
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles();
 				if(!$periodicStorageProfiles)
 				{
 					return $dbBatchJob;
