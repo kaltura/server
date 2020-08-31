@@ -63,7 +63,6 @@ class KExternalErrors
 	const PLAYLIST_DURATION_IS_ZERO = 51;
 	const MISSING_LIVE_CONFIGURATION = 52;
 	const INVALID_AUTH_HEADER = 53;
-	
 	const HTTP_STATUS_NOT_FOUND = 404;
 
 	private static $errorCodeMap = array(

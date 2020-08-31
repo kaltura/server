@@ -45,7 +45,6 @@ class serveFlavorAction extends kalturaAction
 		apc_store($cacheKey, $renderer, 86400);
 		header("X-Kaltura:cache-key");
 	}
-
 	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)
 	{
 		$source = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
@@ -489,7 +488,6 @@ class serveFlavorAction extends kalturaAction
 			{
 				KExternalErrors::dieError(KExternalErrors::INVALID_AUTH_HEADER);
 			}
-			
 			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
