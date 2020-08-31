@@ -50,7 +50,7 @@ class embedPlaykitJsAction extends sfAction
 
 	public function execute()
 	{
-	    // Return 404 in case of error to avoid CDN caching
+		// Return 404 in case of error to avoid CDN caching
 		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 
 		$this->initMembers();
