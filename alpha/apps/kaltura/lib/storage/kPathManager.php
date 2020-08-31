@@ -39,7 +39,7 @@ class kPathManager
 		$root = str_replace('//', '/', $root);
 		$path = str_replace('//', '/', $path);
 		
-		if(!kConf::hasParam('volumes'))
+		if(!kConf::hasParam('volumes') && !kConf::hasParam('local_volumes'))
 		{
 			KalturaLog::debug("Path [{$root}{$path}]");
 			return array($root, $path);
@@ -49,7 +49,7 @@ class kPathManager
 			return array($root, self::$sessionCache[$path]);
 			
 		$partnerId = $object->getPartnerId();
-		$volumes = kConf::get('volumes');
+		$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
 		$partnerVolumes = kConf::get('partner_volumes', 'local', array());
 		$volume = isset($partnerVolumes[$partnerId]) ? $partnerVolumes[$partnerId] : $volumes[rand(0, count($volumes) - 1)];
 		

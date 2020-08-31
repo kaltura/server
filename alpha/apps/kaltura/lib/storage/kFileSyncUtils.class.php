@@ -1927,9 +1927,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return true;
 	}
 
-
-
-
 	/**
 	 * Get the internal from kaltura data centers only FileSync object by its key
 	 * @param FileSyncKey $syncKey

@@ -57,7 +57,6 @@ KalturaStatement::setDryRun($dryRun);
 
 main($sourceDcIds, $targetDcId, $filePath, $fileType);
 
-
 function partnerIdAllowed($partnerId)
 {
 	global $partnerIdsType, $partnerIds;
@@ -265,17 +264,17 @@ function main($sourceDcIds, $targetDcId, $filePath, $fileType)
 
 	switch ($fileType)
 	{
-	case 'entry':
-		handleEntries($ids, $sourceDcIds, $targetStorage);
-		break;
+		case 'entry':
+			handleEntries($ids, $sourceDcIds, $targetStorage);
+			break;
 
-	case 'asset':
-		handleAssets($ids, $sourceDcIds, $targetStorage);
-		break;
+		case 'asset':
+			handleAssets($ids, $sourceDcIds, $targetStorage);
+			break;
 
-	default:
-		echo "Invalid file type $fileType, must be entry/asset\n";
-		exit(1);
+		default:
+			echo "Invalid file type $fileType, must be entry/asset\n";
+			exit(1);
 	}
 
 	KalturaLog::debug("DONE!");

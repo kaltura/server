@@ -195,7 +195,11 @@ class kDataCenterMgr
 		
 		$filename = 'f.' . $file_sync->getFileExt();
 		$objectId = $file_sync->getObjectId();
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> f34176cd87ac03cf2830ad933c2e2a93ea42ca29
 		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/objectid/$objectId/f/$filename"; // or something similar
 		if($addBaseUrl)
 		{
