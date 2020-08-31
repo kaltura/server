@@ -65,19 +65,25 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 		$pager->pageSize = self::MAX_PAGE_SIZE;
 		$pager->pageIndex = 1;
 
-		try
+		$isFirstLoop = true;
+		do
 		{
-			$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::debug('Could not list Entry Vendor Tasks ' . $e->getMessage());
-			return;
-		}
+			try
+			{
+				$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::warning('Could not list Entry Vendor Tasks ' . $e->getMessage());
+				return;
+			}
 
-		$totalCount = min($entryVendorTaskList->totalCount, self::MAX_MATCHES - 1);
-		while ($totalCount > 0 && $pager->pageIndex <= 20)
-		{
+			if ($isFirstLoop)
+			{
+				$totalCount = min($entryVendorTaskList->totalCount, self::MAX_MATCHES - 1);
+				$isFirstLoop = false;
+			}
+
 			if (count($entryVendorTaskList->objects) == 0)
 			{
 				break;
@@ -87,19 +93,8 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 			$pager->pageIndex++;
 			$totalCount = $totalCount - $pager->pageSize;
 			$pager->pageSize = min(self::MAX_PAGE_SIZE, $totalCount);
-			if ($pager->pageSize > 0)
-			{
-				try
-				{
-					$entryVendorTaskList = $this->reachClientPlugin->entryVendorTask->listAction($filter, $pager);
-				}
-				catch (Exception $e)
-				{
-					KalturaLog::debug('Could not list Entry Vendor Tasks ' . $e->getMessage());
-					return;
-				}
-			}
-		}
+
+		} while ($totalCount > 0 && $pager->pageIndex <= 20);
 
 		KalturaLog::debug('Done');
 	}
@@ -123,7 +118,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 				}
 				catch (Exception $e)
 				{
-					KalturaLog::debug("Couldn't update entry Vendor Task id: [$entryVendorTask->id] " . $e->getMessage());
+					KalturaLog::warning("Couldn't update entry Vendor Task id: [$entryVendorTask->id] " . $e->getMessage());
 					continue;
 				}
 			}
