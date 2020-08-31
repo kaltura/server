@@ -158,6 +158,32 @@ class kKavaBase extends kDruidBase
 	//user engagement values
 	const USER_ENGAGED = 'SoundOnTabFocused';
 
+	const HIGH_ENGAGEMENT = "SoundOnTabFocusedFullScreen";
+
+	protected static $good_engagement = array(
+		"SoundOnTabFocused",
+		"SoundOnTabFocusedFullScreenOff"
+	);
+
+	protected static $fair_engagement = array(
+		"SoundOnTabNotFocused",
+		"SoundOnTabNotFocusedFullScreenOff",
+		"SoundOnTabNotFocusedFullScreen",
+	);
+
+	protected static $low_engagement = array(
+		"SoundOffTabFocused",
+		"SoundOffTabFocusedFullScreenOff",
+		"SoundOffTabFocusedFullScreen",
+	);
+
+	protected static $non_engaged = array(
+		"SoundOffTabNotFocused",
+		"SoundOffTabNotFocusedFullScreenOff",
+		"SoundOffTabNotFocusedFullScreen",
+	);
+
+
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
 	const VALUE_ZERO = '0';
@@ -200,6 +226,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR2 => 1,
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
+			self::DIMENSION_USER_ENGAGEMENT => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,

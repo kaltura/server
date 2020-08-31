@@ -188,10 +188,14 @@ class kBatchManager
 		$flavorAsset = assetPeer::retrieveById($mediaInfoDb->getFlavorAssetId());
 		if(!$flavorAsset)
 			return $mediaInfoDb;
+		
+		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+		if(!$entry)
+			return $mediaInfoDb;
 
 		if($flavorAsset->getIsOriginal())
 		{
-			kBusinessPreConvertDL::checkConditionalProfiles($flavorAsset->getentry(), $mediaInfoDb);
+			kBusinessPreConvertDL::checkConditionalProfiles($entry, $mediaInfoDb);
 		
 			KalturaLog::log("Media info is for the original flavor asset");
 			$tags = null;
@@ -270,10 +274,6 @@ class kBatchManager
 
 //		if(!$flavorAsset->hasTag(flavorParams::TAG_MBR))
 //			return $mediaInfoDb;
-			
-		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-		if(!$entry)
-			return $mediaInfoDb;
 		
 		$contentDuration = $mediaInfoDb->getContainerDuration();
 		if (!$contentDuration)

@@ -682,7 +682,7 @@ class playManifestAction extends kalturaAction
 		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
-		$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+		$cloudStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
@@ -855,7 +855,7 @@ class playManifestAction extends kalturaAction
 	
 	protected function initDeliveryProfile()
 	{
-		if ($this->deliveryAttributes->getStorageId())
+		if ($this->deliveryAttributes->getStorageId() && (!in_array($this->deliveryAttributes->getStorageId(), kStorageExporter::getPeriodicStorageIds())))
 		{
 			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
