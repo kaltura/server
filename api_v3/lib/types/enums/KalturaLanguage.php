@@ -44,6 +44,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const FJ = 'Fiji';
 	const FI = 'Finnish';
 	const FR = 'French';
+	const FR_CA = 'French (Canada)';
 	const FY = 'Frisian';
 	const GL = 'Galician';
 	const GD = 'Gaelic (Scottish)';
@@ -154,6 +155,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const JI = 'Yiddish';
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
+	const ZH_TW = 'Taiwanese Mandarin';
 	const ZXX = 'No linguistic content';
 	const MU = 'Multilingual';
 
