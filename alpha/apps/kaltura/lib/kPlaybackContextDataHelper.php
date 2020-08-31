@@ -22,8 +22,6 @@ class kPlaybackContextDataHelper
 	private $playbackCaptions = array();
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
-	private $kalturaStoragePlaybackSources = array();
-	private $storageIds = array();
 
 	public function getPlaybackContext()
 	{
@@ -48,7 +46,6 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
-		$this->storageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$this->generateRestrictedMessages($contextDataHelper);
 
@@ -442,14 +439,7 @@ class kPlaybackContextDataHelper
 					{
 						$manifestUrl = myEntryUtils::buildManifestUrl($dbEntry, $protocols, $deliveryProfile->getStreamerType(), $filteredDeliveryProfileFlavorsForDc, $deliveryProfile->getId());
 						$playbackSource = new kPlaybackSource($deliveryProfile->getId(), $deliveryProfile->getStreamerType(), implode(",", $protocols), implode(",", array_values($dcFlavorIds)), $manifestUrl, $flavorToDrmData);
-						if (in_array($dcId, $this->storageIds))
-						{
-							$this->kalturaStoragePlaybackSources[] = $playbackSource;
-						}
-						else
-						{
-							$this->remotePlaybackSources[] = $playbackSource;
-						}
+						$this->remotePlaybackSources[] = $playbackSource;
 					}
 				}
 			}
@@ -691,10 +681,7 @@ class kPlaybackContextDataHelper
 
 	private function getPlaybackSourcesForKalturOnlyPriority()
 	{
-		/** Since Kaltura only can now have remote source (when starting use S3 storage as kaltura local storage)
-		 *  we need to prioritize storage sources over local sources.
-		 */
-		return array_merge($this->kalturaStoragePlaybackSources, $this->localPlaybackSources);
+		return array_merge($this->localPlaybackSources);
 	}
 
 	private function filterFlavorsBySources()
