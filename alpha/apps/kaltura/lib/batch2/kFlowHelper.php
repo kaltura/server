@@ -750,7 +750,12 @@ class kFlowHelper
 		if($data->getDestFileSyncLocalPath()) {
 			$flavorAsset->incrementVersion();
 			$shouldSave = true;
-		}		
+		}
+		
+		if($data->getLogFileSyncLocalPath()) {
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
 		
 		if($shouldSave)
 			$flavorAsset->save();
