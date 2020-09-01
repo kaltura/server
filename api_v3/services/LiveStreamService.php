@@ -371,7 +371,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
-	public function isLiveAction ($id, $protocol)
+	public function isLiveAction ($id, $protocol = null)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -441,6 +441,30 @@ class LiveStreamService extends KalturaLiveEntryService
 					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 					if($urlManager)
 						return $this->responseHandlingIsLive($urlManager->isLive($url));
+				}
+				break;
+
+			case null:
+				$resultIsLive = null;
+				$configurations = $liveStreamEntry->getLiveStreamConfigurations(requestUtils::getProtocol());
+				foreach ($configurations as $config)
+				{
+					$dpda->setFormat($config->getProtocol());
+					$url = $config->getUrl();
+					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
+					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+					if($urlManager)
+					{
+						$resultIsLive = $this->responseHandlingIsLive($urlManager->isLive($url));
+						if ($resultIsLive)
+						{
+							return $resultIsLive;
+						}
+					}
+				}
+				if ($resultIsLive !== null)
+				{
+					return $resultIsLive;
 				}
 				break;
 		}
