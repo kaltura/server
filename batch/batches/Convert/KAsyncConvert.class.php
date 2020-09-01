@@ -295,8 +295,16 @@ class KAsyncConvert extends KJobHandlerWorker
 					$fileSize=KBatchBase::foldersize($data->destFileSyncLocalPath);
 				else
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
-			
-				kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
+
+				if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+				{
+					self::$kClient->batch->putFile($data->destFileSyncLocalPath,$sharedFile);
+				}
+				else
+				{
+					kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
+				}
+
 
 				// directory sizes may differ on different devices
 				if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
