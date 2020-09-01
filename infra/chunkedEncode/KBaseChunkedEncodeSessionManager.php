@@ -17,7 +17,8 @@
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
-		protected $maxExecutionTime = 6000;	// In seconds. Represents transcoding ratio x100, that should suit 4K/H265
+		protected $maxExecutionTime = 3000;	// In seconds. Suits FHD, represents transcoding ratio of x50,
+							// other resolutions will be adjusted accordingly (aka 360p, 4K/H265, ..)
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();

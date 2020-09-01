@@ -26,7 +26,7 @@ class PexipService extends KalturaBaseService
 	/**
 	 * @action generateSipUrl
 	 * @param string $entryId
-	 * @param int $sourceType
+	 * @param KalturaSipSourceType $sourceType
 	 * @param bool $regenerate
 	 * @return string
 	 * @throws Exception

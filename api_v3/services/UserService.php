@@ -373,6 +373,7 @@ class UserService extends KalturaBaseUserService
 	 * @action resetPassword
 	 * 
 	 * @param string $email The user's email address (login email)
+	 * @param KalturaResetPassLinkType $linkType kmc or kms
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -381,9 +382,9 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */	
-	public function resetPasswordAction($email)
+	public function resetPasswordAction($email, $linkType = KalturaResetPassLinkType::KMC)
 	{
-		return parent::resetPasswordImpl($email);
+		return parent::resetPasswordImpl($email, $linkType);
 	}
 	
 	/**

@@ -614,12 +614,12 @@ class thumbnailAction extends sfAction
 
 	private function getDimensions()
 	{
-		$width = $this->getFloatRequestParameter("width", self::DEFAULT_DIMENSION, -1, 10000);
-		$height = $this->getFloatRequestParameter("height", self::DEFAULT_DIMENSION, -1, 10000);
+		$width = $this->getIntRequestParameter('width', self::DEFAULT_DIMENSION, -1, 10000);
+		$height = $this->getIntRequestParameter('height', self::DEFAULT_DIMENSION, -1, 10000);
 		if ($width != self::DEFAULT_DIMENSION || $height != self::DEFAULT_DIMENSION)
 			return array($width, $height);
 
-		$flavorParamsId = $this->getRequestParameter("flavor_params_id");
+		$flavorParamsId = $this->getRequestParameter('flavor_params_id');
 		$flavorPrams = assetParamsPeer::retrieveByPK($flavorParamsId);
 
 		if ($flavorPrams)

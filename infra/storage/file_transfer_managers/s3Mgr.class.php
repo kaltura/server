@@ -21,7 +21,7 @@ class s3Mgr extends kFileTransferMgr
 {
 	/* @var S3Client $s3 */
 	private $s3;
-	
+
 	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
 	protected $sseType = '';
@@ -29,40 +29,38 @@ class s3Mgr extends kFileTransferMgr
 	protected $signatureType = null;
 	protected $endPoint = null;
 	protected $storageClass = null;
-	
-	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
-	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
-	
+	protected $s3Arn = null;
+
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
 		parent::__construct($options);
-	
+
 		if($options && isset($options['filesAcl']))
 		{
 			$this->filesAcl = $options['filesAcl'];
 		}
-		
+
 		if($options && isset($options['s3Region']))
 		{
 			$this->s3Region = $options['s3Region'];
 		}
-		
+
 		if($options && isset($options['sseType']))
 		{
 			$this->sseType = $options['sseType'];
 		}
-		
+
 		if($options && isset($options['sseKmsKeyId']))
 		{
 			$this->sseKmsKeyId = $options['sseKmsKeyId'];
 		}
-		
+
 		if($options && isset($options['signatureType']))
 		{
 			$this->signatureType = $options['signatureType'];
 		}
-		
+
 		if($options && isset($options['endPoint']))
 		{
 			$this->endPoint = $options['endPoint'];
@@ -72,7 +70,16 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$this->storageClass = $options['storageClass'];
 		}
-		
+
+		if (class_exists('KBatchBase'))
+		{
+			$this->s3Arn = KBatchBase::$taskConfig->s3Arn;
+		}
+		else
+		{
+			$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+		}
+
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
 	}
@@ -94,46 +101,46 @@ class s3Mgr extends kFileTransferMgr
 		return 1;
 	}
 
-
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	//
 	// S3 Signature is required to be V4 for SSE-KMS support. Newer S3 regions also require V4.
 	//
 	protected function doLogin($sftp_user, $sftp_pass)
 	{
-		if(!class_exists('Aws\S3\S3Client')) 
+		if(!class_exists('Aws\S3\S3Client'))
 		{
 			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
-		
-		if(getenv(self::S3_ARN_ROLE_ENV_NAME) && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+
+		if($this->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
+			KalturaLog::debug('Found env VAR from config- ' . $this->s3Arn);
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
 				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
 				return false;
 			}
-			
+
 			return $this->generateS3Client();
 		}
-		
+
 		$config = array(
-					'credentials' => array(
-							'key'    => $sftp_user,
-							'secret' => $sftp_pass,
-					),
-					'region' => $this->s3Region,
-					'signature' => $this->signatureType ? $this->signatureType : 'v4',
-					'version' => '2006-03-01',
-			);
-		
+			'credentials' => array(
+				'key'    => $sftp_user,
+				'secret' => $sftp_pass,
+			),
+			'region' => $this->s3Region,
+			'signature' => $this->signatureType ? $this->signatureType : 'v4',
+			'version' => '2006-03-01',
+		);
+
 		if ($this->endPoint)
 			$config['endpoint'] = $this->endPoint;
-		 
+
 		$this->s3 = S3Client::factory($config);
-		
-		/** 
+
+		/**
 		 * There is no way of "checking the credentials" on s3.
 		 * Doing a ListBuckets would only check that the user has the s3:ListAllMyBuckets permission
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
@@ -141,22 +148,23 @@ class s3Mgr extends kFileTransferMgr
 		 **/
 		return true;
 	}
-	
+
 	private function generateS3Client()
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
-		
+
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleRefresh->s3Arn = $this->s3Arn;
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
-		
+
 		$this->s3 = S3Client::factory(array(
 			'credentials' => $roleCreds,
 			'region' => $this->s3Region,
 			'signature' => 'v4',
 			'version' => '2006-03-01'
 		));
-		
+
 		return true;
 	}
 
@@ -213,28 +221,15 @@ class s3Mgr extends kFileTransferMgr
 			$size = kFile::fileSize($local_file);
 			KalturaLog::debug("file size is : " . $size);
 
-			if ($size > self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE)
-			{
-				KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
-				$fp = fopen($local_file, 'r');
-				$res = $this->s3->upload($bucket,
-					$remote_file,
-					$fp,
-					$this->filesAcl,
-					array('params' => $params)
-				);
-				fclose($fp);
-			}
-			else
-			{
-				KalturaLog::debug("Executing Single-part upload to S3: for " . $local_file);
-				$params['Bucket'] = $bucket;
-				$params['Key'] = $remote_file;
-				$params['SourceFile'] = $local_file;
-				$params['ACL'] = $this->filesAcl;
-
-				$res = $this->s3->putObject($params);
-			}
+			KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
+			$fp = fopen($local_file, 'r');
+			$res = $this->s3->upload($bucket,
+				$remote_file,
+				$fp,
+				$this->filesAcl,
+				array('params' => $params)
+			);
+			fclose($fp);
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return array(true, null);
@@ -257,9 +252,9 @@ class s3Mgr extends kFileTransferMgr
 		KalturaLog::debug("remote_file: ".$remote_file);
 
 		$params = array(
-				'Bucket' => $bucket,
-				'Key'    => $remote_file,
-			);		
+			'Bucket' => $bucket,
+			'Key'    => $remote_file,
+		);
 
 		if($local_file)
 		{
@@ -271,7 +266,7 @@ class s3Mgr extends kFileTransferMgr
 		{
 			return $response['Body'];
 		}
-			
+
 		return $response;
 	}
 
@@ -305,7 +300,7 @@ class s3Mgr extends kFileTransferMgr
 		if(strpos($file_name,'.') === false) return TRUE;
 		return false;
 	}
-	
+
 	// return the current working directory
 	protected function doPwd ()
 	{
@@ -322,9 +317,9 @@ class s3Mgr extends kFileTransferMgr
 		try
 		{
 			$this->s3->deleteObject(array(
-					'Bucket' => $bucket,
-					'Key' => $remote_file,
-				));
+				'Bucket' => $bucket,
+				'Key' => $remote_file,
+			));
 
 			$deleted = true;
 		}
@@ -332,7 +327,7 @@ class s3Mgr extends kFileTransferMgr
 		{
 			KalturaLog::err("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
 		}
-		
+
 		return $deleted;
 	}
 

@@ -76,8 +76,6 @@ class kQuizPdf
 	private function initPDF()
 	{
 		$this->pdf = new PdfGenerator('Thank You', 'Questionnaire', '','Questionnaire','Questionnaire', '');
-		$this->pdf->Footer();
-		$this->pdf->Header();
 		$this->pdf->SetMargins(10,15,10);
 		$this->pdf->AliasNbPages();
 		$this->pdf->AddPage();

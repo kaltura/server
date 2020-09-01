@@ -110,6 +110,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * Reset admin user password and send it to the users email address
 	 * 
 	 * @param string $email
+	 * @param KalturaResetPassLinkType $linkType kmc or kms
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -117,7 +118,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */	
-	protected function resetPasswordImpl($email)
+	protected function resetPasswordImpl($email, $linkType = KalturaResetPassLinkType::KMC)
 	{
 		KalturaResponseCacher::disableCache();
 		
@@ -125,7 +126,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		$this->validateRequestsAmount($email);
 		
 		try {
-			$new_password = UserLoginDataPeer::resetUserPassword($email);
+			$new_password = UserLoginDataPeer::resetUserPassword($email, $linkType);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
