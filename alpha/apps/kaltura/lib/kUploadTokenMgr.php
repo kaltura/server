@@ -83,7 +83,9 @@ class kUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $resumeAt = -1)
 	{
+		$start = microtime(true);
 		$this->_autoFinalize = $this->_uploadToken->getAutoFinalize();
+		KalturaLog::debug(">>> Memcache get took: " . microtime(true) - $start );
 		if($this->_autoFinalize)
 			$this->initUploadTokenMemcache();
 		
@@ -180,14 +182,18 @@ class kUploadTokenMgr
 		
 		// check if is a real uploaded file
 		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null;
+		$start = microtime(true);
 		if (!is_uploaded_file($tempPath))
 		{
 			$msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
+		KalturaLog::debug(">>> isUploadedFile took: " . microtime(true) - $start );
 		
+		$start = microtime(true);
 		$tempFileSize = kFile::fileSize($tempPath);
+		KalturaLog::debug(">>> FileSize took: " . microtime(true) - $start );
 		if($tempFileSize == 0 && !$finalChunk && $resumeAt > 0)
 		{
 			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
@@ -275,8 +281,10 @@ class kUploadTokenMgr
 	protected function handleResume($fileData, $resumeAt)
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
+		$start = microtime(true);
 		if (!file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
+		KalturaLog::debug(">>> file_exists took: " . microtime(true) - $start );
 		
 		$sourceFilePath = $fileData['tmp_name'];
 		
@@ -286,7 +294,9 @@ class kUploadTokenMgr
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
+			$start = microtime(true);
 			$chunkSize = filesize($sourceFilePath);
+			KalturaLog::debug(">>> filesize took: " . microtime(true) - $start );
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
 			
