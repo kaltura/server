@@ -605,8 +605,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$params = $this->initBasicS3Params($filePath);
 		
 		$cmd = $this->s3Client->getCommand('GetObject', $params);
-		
-		$preSignedUrl = $cmd->createPresignedUrl('+120 minutes');
+
+		$expiry = time() + 5 * 86400;
+		$preSignedUrl = $cmd->createPresignedUrl($expiry);
 		return $preSignedUrl;
 	}
 	
