@@ -899,7 +899,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$desired_file_sync = null;
 		$local = false;
-		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $dc_id);
+		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $resolve, $dc_id);
 		if($sortedFileSync)
 		{
 			$desired_file_sync = $sortedFileSync[0];
@@ -932,17 +932,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
-	public static function getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $partner_id, $dc_id)
+	public static function getSortedFileSyncs($file_sync_list, $resolve, $dc_id)
 	{
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
-		$periodicFileSyncs = array();
-		$periodicStorageIds = array();
-
-		if($fetch_from_remote_if_no_local)
-		{
-			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner_id);
-		}
 
 		foreach ($file_sync_list as $file_sync)
 		{
@@ -968,10 +961,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$dcFileSyncs[] = $tmp_file_sync;
 			}
-			else if(in_array($tmp_file_sync->getDc(), $periodicStorageIds))
-			{
-				$periodicFileSyncs[] = $tmp_file_sync;
-			}
 			else
 			{
 				$remoteFileSyncs[] = $tmp_file_sync;
@@ -979,7 +968,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		// always prefer local file syncs, then periodic and lastly remote
-		return array_merge($dcFileSyncs, $periodicFileSyncs, $remoteFileSyncs);
+		return array_merge($dcFileSyncs, $remoteFileSyncs);
 	}
 
 	/**
@@ -1776,23 +1765,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	}
 
 	/**
-	 * @param $partnerId
-	 * @param $syncKey
-	 * @return array
-	 * @throws KalturaAPIException
-	 */
-	public static function getFileSyncsFromPeriodicStorage($partnerId, $syncKey)
-	{
-		$fileSyncs = array();
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
-		if($periodicStorageIds)
-		{
-			$fileSyncs = self::getAllReadyExternalFileSyncsForKey($syncKey, self::KALTURA_CLOUD_STORAGE_ONLY);
-		}
-		return $fileSyncs;
-	}
-
-	/**
 	 * @param FileSyncKey $syncKey
 	 * @param $isRemote
 	 * @return FileSync|null
@@ -1945,24 +1917,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	}
 
 	/**
-	 * Get the internal from kaltura data centers only FileSync object by its key
-	 * @param FileSyncKey $syncKey
-	 * @return array
-	 * @throws KalturaAPIException
-	 */
-	public static function getReadyInternalFileSyncsForKey(FileSyncKey $syncKey)
-	{
-		$peridoicStorageFileSyncs = self::getFileSyncsFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
-
-		$c = FileSyncPeer::getCriteriaForFileSyncKey( $syncKey );
-		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
-		$localfileSyncs = FileSyncPeer::doSelect( $c );
-
-		return array_merge($peridoicStorageFileSyncs, $localfileSyncs);
-	}
-
-	/**
 	 * @param $partnerId
 	 * @param FileSyncKey $syncKey
 	 * @param bool $includePending
@@ -2042,12 +1996,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	/**
 	 * @param FileSyncKey $syncKey
 	 * @param $servePriority
-	 * @param array $cloudStorageIds
 	 * @param null $explicitStorageId
 	 * @return array
 	 * @throws PropelException
 	 */
-	public static function getFileSyncsByStoragePriority(FileSyncKey $syncKey, $servePriority, $cloudStorageIds = array(), $explicitStorageId = null)
+	public static function getFileSyncsByStoragePriority(FileSyncKey $syncKey, $servePriority, $explicitStorageId = null)
 	{
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
 		$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
@@ -2060,7 +2013,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				 * and retrieve file syncs from our dedicated cloud storages
 				 */
 				$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-				$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, $cloudStorageIds, Criteria::IN));
+				$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::IN));
 				$c->addAnd($c1);
 				break;
 
@@ -2075,11 +2028,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:
 			case StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_FIRST:
-				if(!$cloudStorageIds)
-				{
-					$c->addAnd(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::NOT_IN);
-				}
-				break;
 
 			default:
 				break;

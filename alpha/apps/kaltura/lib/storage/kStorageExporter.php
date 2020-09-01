@@ -146,10 +146,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				self::handleAssetStorageExports($srcFlavor);
 
 				//Periodic storage
-				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfilesByFlag();
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles();
 				if(!$periodicStorageProfiles)
 				{
-					$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+					$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles();
 				}
 				self::exportToPeriodicStorage($srcFlavor, $periodicStorageProfiles);
 				break;
@@ -195,7 +195,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		// all export jobs for replacing entry that has periodic storage will happen on the original replaced entry
 		// after we will copy the matching file sync
-		if($entry->getReplacedEntryId() && $partner && kStorageExporter::getPeriodicStorageIdsByPartner($partner->getId()))
+		if($entry->getReplacedEntryId() && in_array($externalStorage->getId(), kStorageExporter::getPeriodicStorageIds()))
 		{
 			return;
 		}
@@ -586,24 +586,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		return array();
 	}
 
-	public static function getPeriodicStorageProfilesByFlag()
-	{
-		$storageProfiles = array();
-		if( kConf::get('copy_all_content_to_cloud', 'cloud_storage', 0) )
-		{
-			$storageIds = self::getPeriodicStorageIds();
-			if($storageIds)
-			{
-				$storageProfiles = StorageProfilePeer::retrieveByPKs($storageIds);
-			}
-		}
-		return $storageProfiles;
-	}
-
-	public static function getPeriodicStorageProfiles($partnerId)
+	public static function getPeriodicStorageProfiles()
 	{
 		$externalStorages = array();
-		$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
+		$storageIds = self::getPeriodicStorageIds();
 		if($storageIds)
 		{
 			$externalStorages = StorageProfilePeer::retrieveByPKs($storageIds);
@@ -628,13 +614,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 			return null;
 		}
 
-		$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfilesByFlag();
+		$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles();
 		if($periodicStorageProfiles)
 		{
 			return $periodicStorageProfiles;
 		}
 
-		return kStorageExporter::getPeriodicStorageProfiles($object->getPartnerId());
+		return kStorageExporter::getPeriodicStorageProfiles();
 	}
 
 	public static function exportToPeriodicStorage($asset, $periodicStorageProfiles)

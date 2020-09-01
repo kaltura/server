@@ -510,17 +510,10 @@ class kReplacementHelper
 
 	public static function exportReadyReplacedFlavors($partnerId, $replacingEntryId, $assets)
 	{
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
-		if(!$periodicStorageIds)
-		{
-			return;
-		}
-
-		KalturaLog::info("Found periodic storage profiles, exporting ready flavors");
 		$externalStorages = StorageProfilePeer::retrieveAutomaticByPartnerId($partnerId);
 		if(!$externalStorages)
 		{
-			$externalStorages = kStorageExporter::getPeriodicStorageProfiles($partnerId);
+			$externalStorages = kStorageExporter::getPeriodicStorageProfiles();
 		}
 		foreach($externalStorages as $externalStorage)
 		{
