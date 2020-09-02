@@ -665,7 +665,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getLogFileVersion()
 	{
-		return $this->getFromCustomData("logFileVersion", null, kDataCenterMgr::incrementVersion());
+		return $this->getFromCustomData("logFileVersion", null, 0);
 	}
 	
 	public function incLogFileVersion()

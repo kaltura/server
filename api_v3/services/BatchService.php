@@ -548,7 +548,7 @@ class BatchService extends KalturaBatchService
 		kApiCache::disableConditionalCache();
 		
 		$ret = new KalturaFileExistsResponse();
-		$ret->exists = file_exists($localPath);
+		$ret->exists = kFile::checkFileExists($localPath);
 		$ret->sizeOk = false;
 
 		if($ret->exists)

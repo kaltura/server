@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage storage
  */
-class kS3PathManager extends kPathManager
+class kS3SharedPathManager extends kPathManager
 {
 	/**
 	 * will return a pair of file_root and file_path
@@ -17,9 +17,8 @@ class kS3PathManager extends kPathManager
 	{
 		list($root, $filePath) = $object->generateFilePathArr($subType, $version, true);
 		$filePath = str_replace('/content/', '/', $filePath);
-		$filePath = kFile::fixPath($filePath);
-		$root = '/';
-
+		$root = kSharedFileSystemMgr::getSharedRootByType(kSharedFileSystemMgrType::S3);
+		
 		KalturaLog::debug("S3 Path [{$root}{$filePath}]");
 		return array($root, $filePath);
 	}

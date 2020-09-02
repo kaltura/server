@@ -86,8 +86,10 @@ class Partner extends BasePartner
 
 	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
 
-	const LIVE_CONCURRENT_BY_ADMIN_TAG = 'live_concurrent_by_admin_tag';
+	const CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID = 'shared_storage_profile_id';
 
+	const LIVE_CONCURRENT_BY_ADMIN_TAG = 'live_concurrent_by_admin_tag';
+  
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2176,7 +2178,14 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
-
-
-
+	
+	public function getSharedStorageProfileId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID, null, null);
+	}
+	
+	public function setSharedStorageProfileId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID, $v);
+	}
 }

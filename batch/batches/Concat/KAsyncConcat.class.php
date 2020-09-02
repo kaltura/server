@@ -91,7 +91,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$sharedTempFilePath = $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 		
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
@@ -204,6 +204,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				 * - no duration delta validity tests
 				 * - pack the final concat string and finish the loop
 				 */
+			$fileName = kFile::realPath($fileName);
 			if($i==$filesArrCnt){
 				$concateStr = "concat:\"$concateStr$fileName\"";
 				break;
@@ -296,7 +297,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 		else */
 		{
-			$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i $concateStr $videoParamStr $audioParamStr";
+			$cmdStr = "$ffmpegBin -protocol_whitelist \"concat,file,subfile,https,http,tcp,file\" -probesize 15M -analyzeduration 25M -i $concateStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	

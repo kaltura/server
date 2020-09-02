@@ -1,5 +1,41 @@
 # Propus 16.8.0  #
 
+## Support using S3 as shared storage instead of NFS##
+Issue Type: Feature
+Issue ID : S3
+
+#### Configuration ####
+* Create a new storage profile with the following configurations by running the following script:
+            
+           php /opt/kaltura/app/deployment/updates/scripts/2020_09_02_create_s3_shared_storage_profile.php
+           
+           Params:
+           @name@ 
+           @description@ 
+           @system_name@ 
+           @storage_url@ 
+           @bucket_name@ 
+           @packager_url@ 
+           @ID (optional to set to id of the profile without lettign mysql set it for you)@  
+
+* Add/Update a configuration map called 'cloud_storage' with following config:
+    - sharedStorageProfileIds = @id of the s3 shared storage profile@
+    
+    - Storage options:
+    
+            [storage_options]
+            s3Region = @AWS_REGION@
+            accessKeySecret = @ACCESS_KEY_TOKEN@
+            accessKeyId = @ACCESS_KEY_ID@
+            *** The code also supports definineg arn_role_name and using that for the authentication flow
+            
+    - Storage type mype (Defines the base path of your bucket in aws and the which should also corrolate to the storage profile defined in step 1)
+            
+            [storage_type_map]
+            /@bucket_name@/ = S3 
+
+# Propus 16.8.0  #
+
 ## Adding permission to entryVendorTask object and to entryVendorTask service ##
 Issue Type: Task
 Issue ID : REACH2-911

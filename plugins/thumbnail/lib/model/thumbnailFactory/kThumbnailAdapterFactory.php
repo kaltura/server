@@ -19,7 +19,7 @@ class kThumbnailAdapterFactory
 
 		if($entry->getType() == entryType::PLAYLIST)
 		{
-			if( $entry->getMediaType() == PlaylistType::STATIC_LIST)
+			if($entry->getMediaType() == PlaylistType::STATIC_LIST)
 			{
 				return new kResizeStitchedPlaylistAdapter();
 			}
@@ -34,9 +34,9 @@ class kThumbnailAdapterFactory
 
 		return new kBaseResizeAdapter();
 	}
-
+	
 	public static function getResizeThumbAdapterParameters(entry $entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-														   $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $fileSync, $format, $start_sec, $end_sec)
+	                                                       $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $fileSync, $format, $start_sec, $end_sec)
 	{
 		$params = new kThumbAdapterParameters();
 		$params->set(kThumbFactoryFieldName::ENTRY, $entry);
@@ -63,7 +63,7 @@ class kThumbnailAdapterFactory
 		self::validateResizeThumbAdapterParameters($params);
 		return $params;
 	}
-
+	
 	/**
 	 * @param kThumbAdapterParameters $kThumbAdapterParameters
 	 */

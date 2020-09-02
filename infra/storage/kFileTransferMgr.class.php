@@ -366,7 +366,7 @@ abstract class kFileTransferMgr
 		if (!$this->connection_id) {
 			throw new kFileTransferMgrException("No connection established yet.", kFileTransferMgrException::notYetConnected);
 		}
-		if (!file_exists($local_file)) {
+		if (!kFile::checkFileExists($local_file)) {
 			throw new kFileTransferMgrException("Can't find local file [$local_file]", kFileTransferMgrException::localFileNotExists);
 		}
 
@@ -404,17 +404,31 @@ abstract class kFileTransferMgr
 			}
 		}
 
+		//Before trying to upload the file first we will resolve the path to check if its remote
+		//In such case we will import it to a local location before uploading it to the destination
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($local_file);
+		$local_file = !$isRemote ? $local_file : kFile::getExternalFile($remoteUrl, null, basename($local_file));
+		
 		// try to upload file
 		$res = @($this->doPutFile($remote_file, $local_file));
 
 		$this->results = $res;
 		
 		// check response
-		if ( !$res ) {
+		if ( !$res )
+		{
+			if($isRemote)
+			{
+				kFile::unlink($local_file);
+			}
 			$last_error = error_get_last();
 			throw new kFileTransferMgrException("Can't put file [$remote_file] - " . $last_error['message'], kFileTransferMgrException::otherError);
 		}
 		
+		if($isRemote)
+		{
+			kFile::unlink($local_file);
+		}
 		KalturaLog::debug("File uploaded successfully");
 		return self::FILETRANSFERMGR_RES_OK;
 	}

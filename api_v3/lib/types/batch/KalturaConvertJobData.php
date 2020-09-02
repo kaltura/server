@@ -51,6 +51,11 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	 * @var string
 	 */
 	public $engineMessage;
+	
+	/**
+	 * @var string
+	 */
+	public $destFileSyncSharedPath;
     
 	/**
 	 * @var int
@@ -68,7 +73,8 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 		"customData" ,
 		"extraDestFileSyncs",
 		"engineMessage",
-		"userCpu",
+		"destFileSyncSharedPath",
+		"userCpu"
 	);
 
 	public function getMapBetweenObjects ( )
