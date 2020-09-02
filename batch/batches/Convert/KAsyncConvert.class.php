@@ -298,7 +298,7 @@ class KAsyncConvert extends KJobHandlerWorker
 
 				if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 				{
-					self::$kClient->batch->putFile($data->destFileSyncLocalPath,$sharedFile);
+					self::$kClient->batch->putFile($sharedFile,$data->destFileSyncLocalPath);
 				}
 				else
 				{
