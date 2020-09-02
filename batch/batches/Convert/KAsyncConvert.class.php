@@ -292,13 +292,18 @@ class KAsyncConvert extends KJobHandlerWorker
 				clearstatcache();
 				$directorySync = is_dir($data->destFileSyncLocalPath);
 				if($directorySync)
-					$fileSize=KBatchBase::foldersize($data->destFileSyncLocalPath);
-				else
-					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
-
-				if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 				{
-					self::$kClient->batch->putFile($sharedFile,$data->destFileSyncLocalPath);
+					$fileSize = KBatchBase::foldersize($data->destFileSyncLocalPath);
+				}
+				else
+				{
+					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
+				}
+
+				KalturaLog::info("Dest file local path is {$data->destFileSyncLocalPath} with is dir {$directorySync} and shared file is {$sharedFile}");
+				if(!$directorySync && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
+				{
+					self::$kClient->batch->putFile($sharedFile, $data->destFileSyncLocalPath);
 				}
 				else
 				{

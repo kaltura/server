@@ -640,7 +640,7 @@ class BatchService extends KalturaBatchService
 	 * @param string $path
 	 * @param file $data
 	 */
-	public function putFileAction($path,$data)
+	public function putFileAction($path, $data)
 	{
 		$maxDataSize = kConf::get('maxPutFileSize','batchServices', self::DEFAULT_MAX_DATA_SIZE);
 		$allowedPathPrefixArr = kConf::get('allowedPutFilePrefix','batchServices', array());
