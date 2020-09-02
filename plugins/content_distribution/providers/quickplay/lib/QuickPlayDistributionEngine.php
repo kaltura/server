@@ -62,7 +62,7 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		foreach($providerData->thumbnailFilePaths as $thumbnailFilePath)
 		{
 			/* @var $thumbnailFilePath KalturaString */
-			if (!file_exists($thumbnailFilePath->value))
+			if (!kFile::checkFileExists($thumbnailFilePath->value))
 				throw new KalturaDistributionException('Thumbnail file path ['.$thumbnailFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
 
 			$thumbnailUploadPath = '/'.$distributionProfile->sftpBasePath.'/'.pathinfo($thumbnailFilePath->value, PATHINFO_BASENAME);
@@ -76,7 +76,7 @@ class QuickPlayDistributionEngine extends DistributionEngine implements
 		foreach($providerData->videoFilePaths as $videoFilePath)
 		{
 			/* @var $videoFilePath KalturaString */
-			if (!file_exists($videoFilePath->value))
+			if (!kFile::checkFileExists($videoFilePath->value))
 				throw new KalturaDistributionException('Video file path ['.$videoFilePath.'] not found, assuming it wasn\'t synced and the job will retry');
 
 			$videoUploadPath = '/'.$distributionProfile->sftpBasePath.'/'.pathinfo($videoFilePath->value, PATHINFO_BASENAME);

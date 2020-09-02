@@ -32,6 +32,8 @@
 		public $process = 0;		// Linux process id
 		public $hostname = 0;
 		
+		public $attempt = 0; //Job execution attempt
+		
 		/* ---------------------------
 		 *
 		 */

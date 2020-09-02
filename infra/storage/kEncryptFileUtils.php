@@ -72,6 +72,7 @@ class kEncryptFileUtils
         try
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
+	        $srcFilePath = kFile::realPath($srcFilePath);
             $fd1 = fopen($srcFilePath, "rb");
             $fd2 = fopen($tempPath, "w");
             while (!feof($fd1))
@@ -84,7 +85,7 @@ class kEncryptFileUtils
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
             // adding @ to avoid valid case which in 2 process creating clear file at the same time
-            return @rename($tempPath, $dstFilePath);
+            return @kFile::rename($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
@@ -100,7 +101,7 @@ class kEncryptFileUtils
     {
         $tempPath = self::getClearTempPath($filePath);
         self::decryptFile($filePath, $key, $iv, $tempPath);
-        infraRequestUtils::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
+        kFile::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
         unlink($tempPath);
         return;
     }
