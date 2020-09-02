@@ -41,3 +41,5 @@ if(isset($id))
 {
 	$storageProfile->setId();
 }
+
+$storageProfile->save();
