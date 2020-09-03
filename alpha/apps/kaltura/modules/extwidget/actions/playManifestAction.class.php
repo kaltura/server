@@ -682,25 +682,37 @@ class playManifestAction extends kalturaAction
 		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
+		$cloudStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
 		$remoteFileSyncs = array();
+
+		$cloudFlavorsByDc = array();
+		$cloudFileSyncs = array();
 		
 		foreach($flavorAssets as $flavorAsset)
 		{
 			$flavorId = $flavorAsset->getId();
 			$key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-			$fileSyncs = kFileSyncUtils::getFileSyncsByStoragePriority($key,$servePriority, $this->deliveryAttributes->getStorageId());
+			$fileSyncs = kFileSyncUtils::getFileSyncsByStoragePriority($key,$servePriority, $cloudStorageIds, $this->deliveryAttributes->getStorageId());
 
 			foreach ($fileSyncs as $fileSync)
 			{
 				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 				{
 					$dc = $fileSync->getDc();
-					$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
-					$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+					if(!in_array($dc, $cloudStorageIds))
+					{
+						$remoteFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+						$remoteFileSyncs[$dc][$flavorId] = $fileSync;
+					}
+					else
+					{
+						$cloudFlavorsByDc[$dc][$flavorId] = $flavorAsset;
+						$cloudFileSyncs[$dc][$flavorId] = $fileSync;
+					}
 				}
 				else
 				{
@@ -736,12 +748,34 @@ class playManifestAction extends kalturaAction
 
 		// choose the storage profile with the highest number of flavors
 		list ($maxDc, $remoteFlavors) = $this->getMaxDcFlavors($remoteFlavorsByDc);
+
+		if($cloudFileSyncs)
+		{
+			$cloudStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($this->entry->getPartnerId());
+			foreach ($cloudStorageProfiles as $cloudProfile)
+			{
+				if(!$this->shouldIncludeStorageProfile($cloudProfile))
+				{
+					$profileId = $cloudProfile->getId();
+					unset($cloudFlavorsByDc[$profileId]);
+					unset($cloudFileSyncs[$profileId]);
+				}
+			}
+		}
+		list ($cloudMaxDc, $cloudRemoteFlavors) = $this->getMaxDcFlavors($cloudFlavorsByDc);
 				
 		// choose the flavor set according to the serve priority
-		if ($this->shouldUseLocalFlavors($localFlavors, $remoteFlavors))
+		if ($this->shouldUseLocalFlavors(array_merge($localFlavors, $cloudRemoteFlavors), $remoteFlavors))
 		{
 			$storageId = null;
 			$deliveryFlavors = $localFlavors;
+
+			if($cloudMaxDc)
+			{
+				$storageId = $cloudMaxDc;
+				$deliveryFlavors = array_merge($localFlavors, $cloudRemoteFlavors);
+				$this->deliveryAttributes->setRemoteFileSyncs($cloudFileSyncs[$cloudMaxDc]);
+			}
 
 			$this->deliveryAttributes->setStorageId($storageId);
 			$this->deliveryAttributes->setFlavorAssets($deliveryFlavors);
