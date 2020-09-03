@@ -80,13 +80,30 @@ class kDataCenterMgr
 	}
 
 	// returns a tupple with the id and the DC's properties
-	public static function getDcById ( $dc_id )
+	public static function getDcById ( $dc_id , $partnerId = null)
 	{
 		$dc_config = kConf::getMap("dc_config");
 		// find the dc with the desired id
 		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		if ( isset( $dc_list[$dc_id] ) )		
 			$dc = $dc_list[$dc_id];
+		else if ($partnerId)
+		{
+			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+			if(in_array($dc_id, $cloudStorageProfileIds))
+			{
+				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);
+				if($storageProfile->getPackagerUrl())
+				{
+					$dc["url"] = $storageProfile->getPackagerUrl();
+				}
+			}
+
+			if(!isset($dc["url"]))
+			{
+				throw new Exception ( "Cannot find DC with id [$dc_id]" );
+			}
+		}
 		else
 			throw new Exception ( "Cannot find DC with id [$dc_id]" );
 		
@@ -126,7 +143,7 @@ class kDataCenterMgr
 	{
 		KalturaLog::log("File Sync [{$file_sync->getId()}]");
 		$dc_id = $file_sync->getDc();		
-		$dc = self::getDcById ( $dc_id );
+		$dc = self::getDcById ( $dc_id , $file_sync->getPartnerId());
 		$url = $dc["url"];
 		return $url;
 	}
