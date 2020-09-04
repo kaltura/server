@@ -110,6 +110,13 @@ function moveJob(BatchJob $job, BatchJobLock $jobLock, $sourceDc, $targetDc)
 	// update batch job lock
 	$jobLock->setStatus($jobStatus);
 	$jobLock->setDc($targetDc);
+
+	$targetDcInfo = kDataCenterMgr::getDcById($targetDc);
+	if (isset($targetDcInfo['batchVersion']))
+	{
+		$jobLock->setBatchVersion($targetDcInfo['batchVersion']);
+	}
+
 	$jobLock->save();
 	
 	return true;
