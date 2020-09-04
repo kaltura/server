@@ -12,6 +12,8 @@ class servefileAction extends sfAction
 	{
 		try
 		{
+			KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+
 			requestUtils::handleConditionalGet();
 			
 			$file_sync_id = $this->getRequestParameter( "id" );
