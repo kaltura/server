@@ -25,6 +25,7 @@ foreach ($entries as $deletedEntryId){
 	KalturaLog::debug('undeleting entry id ['. $deletedEntry->getID().']');
 	if ($deletedEntry->getStatus() == entryStatus::DELETED){		
 		$deletedEntry->setStatus(entryStatus::READY);
+		$deletedEntry->setDefaultModerationStatus();
 	}
 	
 	$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);

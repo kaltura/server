@@ -10,6 +10,11 @@ class kCacheConfFactory
 
 	protected static $cacheInstanceList;
 
+	static function close()
+	{
+		self::$cacheInstanceList = array();
+	}
+
 	static function register($name, $instance)
 	{
 		self::$cacheInstanceList[$name]=$instance;

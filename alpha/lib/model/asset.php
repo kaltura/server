@@ -99,6 +99,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	const CUSTOM_DATA_FILE_SYNC_VERSIONS_TO_DELETE = "fileSyncVersionsToDelete";
 	const CUSTOM_DATA_PREVIOUS_VERSION = "previousVersion";
 	const CUSTOM_DATA_ENCRYPTION_KEY = "encryptionKey";
+	const CUSTOM_DATA_SIZE_IN_BYTES = "sizeInBytes";
 	
 	const MAX_ASSETS_PER_ENTRY = 500;
 
@@ -665,7 +666,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getLogFileVersion()
 	{
-		return $this->getFromCustomData("logFileVersion", null, kDataCenterMgr::incrementVersion());
+		return $this->getFromCustomData("logFileVersion", null, 0);
 	}
 	
 	public function incLogFileVersion()
@@ -721,7 +722,11 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	{
 	    parent::setStatus(asset::ASSET_STATUS_READY);
 	}
-	
+
+	public function getSizeInBytes()	{return $this->getFromCustomData(self::CUSTOM_DATA_SIZE_IN_BYTES, null, 0);}
+	public function setSizeInBytes($v)	{$this->putInCustomData(self::CUSTOM_DATA_SIZE_IN_BYTES, $v);}
+
+
 	public function getActualSourceAssetParamsIds()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS);}
 	public function setActualSourceAssetParamsIds($v)	{$this->putInCustomData(self::CUSTOM_DATA_FIELD_ACTUAL_SOURCE_ASSET_PARAMS_IDS, $v);}
 

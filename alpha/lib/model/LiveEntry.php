@@ -521,20 +521,24 @@ abstract class LiveEntry extends entry
 			return false;
 		
 		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore)
+		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
+		foreach ($cacheLayers as $cacheLayer)
 		{
-			KalturaLog::warning("Cache store [$cacheType] not found");
-			$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
-			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
-			
-			return $lastUpdate <= $expiry;
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if($cacheStore)
+			{
+				$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
+				$ans = $cacheStore->get($key);
+				KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
+				return $ans;
+			}
 		}
 		
-		$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
-		$ans = $cacheStore->get($key);
-		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
-		return $ans;
+		KalturaLog::warning("Cache store [$cacheType] not found");
+		$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
+		$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
+		
+		return $lastUpdate <= $expiry;
 	}
 
 	/**
@@ -546,13 +550,22 @@ abstract class LiveEntry extends entry
 	private function storeInCache($key)
 	{
 		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore) {
-			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
-			return false;
+		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
+		
+		$res = false;
+		foreach ($cacheLayers as $cacheLayer)
+		{
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if(!$cacheStore) {
+				KalturaLog::debug("cacheStore is null. cacheType: $cacheType . skip to next one");
+				continue;
+			}
+			
+			KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
+			$res = $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 		}
-		KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
-		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+		
+		return $res;
 	}
 
 	/**

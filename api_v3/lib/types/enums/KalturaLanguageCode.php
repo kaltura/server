@@ -44,6 +44,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const FJ = 'fj';
 	const FI = 'fi';
 	const FR = 'fr';
+	const FR_CA = 'fr_ca';
 	const FY = 'fy';
 	const GL = 'gl';
 	const GD = 'gd';
@@ -156,6 +157,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const JI = 'ji';
 	const YO = 'yo';
 	const ZU = 'zu';
+	const ZH_TW = 'zh_tw';
 	const ZXX = 'zxx';
 	const MU = 'mu';
 	const CRG = 'crg';

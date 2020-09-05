@@ -1,28 +1,28 @@
 <?php
 
-
 if ($argc > 1 && in_array($argv[1], array('--help', '-help', '-h', '-?')))
 {
-	echo "Usage:\n\t" . basename(__file__) . " <dryRun> <handleUnusedIndices>\n";
+	echo "Usage:\n\t" . basename(__file__) . " <dryRun> <handleUnusedIndices> <sectionPrefix>\n";
 	die;
 }
+
+$dryRun = false;
+$sectionPrefix = null;
+$handleUnusedIndices = false;
 
 if($argc > 1)
 {
 	$dryRun = $argv[1];
-}
-else
-{
-	$dryRun = false;
 }
 
 if($argc > 2)
 {
 	$handleUnusedIndices = $argv[2];
 }
-else
+
+if($argc > 3)
 {
-	$handleUnusedIndices = false;
+	$sectionPrefix = $argv[3];
 }
 
 chdir(dirname(__FILE__));
@@ -36,8 +36,14 @@ error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $beaconElasticConfig = kConf::getMap('beacon_rotation');
-foreach ($beaconElasticConfig as $configSection)
+foreach ($beaconElasticConfig as $sectionName => $configSection)
 {
+	if($sectionPrefix && !kString::beginsWith($sectionName, $sectionPrefix))
+	{
+		KalturaLog::log("$sectionName does not start with $sectionPrefix, skipping");
+		continue;
+	}
+
 	$rotationWorker = new BeaconsIndexesRotationWorker($configSection, $dryRun, $handleUnusedIndices);
 	$rotationWorker->rotate();
 }

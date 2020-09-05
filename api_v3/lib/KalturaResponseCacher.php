@@ -514,6 +514,13 @@ class KalturaResponseCacher extends kApiCache
 		{
 			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
 			$fileName = $postProcessorClass->getFileName();
+			
+			$baseAppDir = kConf::get('kaltura_app_root_path', 'local', null);
+			if($baseAppDir)
+			{
+				$fileName = str_replace(realpath($baseAppDir), $baseAppDir, $fileName);
+			}
+			
 			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
 			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
 		}

@@ -195,6 +195,9 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveEntries = $this->getLiveEntriesForPartner($liveEntryPartner->getId(), $liveEntry->getId());
 		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
+		$adminTagsOrigLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
+		KalturaLog::debug('Current AdminTags: [' . $liveEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsOrigLimits, true) . ']');
+		$adminTagsCounters = $adminTagsOrigLimits;
 		
 		$maxTranscodedStreams = 0;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $liveEntryPartner->getId()))
@@ -207,8 +210,19 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entryConversionProfiles[$liveEntry->getConversionProfileId()][] = $liveEntry->getId();
 		foreach($liveEntries as $entry)
 		{
-			/* @var $entry LiveEntry */
-			$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
+			if(!$this->updateAdminTagsCounters($entry, $adminTagsCounters))
+			{
+				/* @var $entry LiveEntry */
+				$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
+			}
+		}
+		foreach (explode(',', $liveEntry->getAdminTags()) as $adminTag)
+		{
+			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
+			{
+				KalturaLog::debug('AdminTag exceeded : [' . $adminTag . '] limits left [' . print_r($adminTagsCounters, true) . ']');
+				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $liveEntry->getId(), $adminTag, $adminTagsOrigLimits[$adminTag]);
+			}
 		}
 		
 		$passthroughEntriesCount = 0;
@@ -357,7 +371,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
-	public function isLiveAction ($id, $protocol)
+	public function isLiveAction ($id, $protocol = null)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -427,6 +441,30 @@ class LiveStreamService extends KalturaLiveEntryService
 					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 					if($urlManager)
 						return $this->responseHandlingIsLive($urlManager->isLive($url));
+				}
+				break;
+
+			case null:
+				$resultIsLive = null;
+				$configurations = $liveStreamEntry->getLiveStreamConfigurations(requestUtils::getProtocol());
+				foreach ($configurations as $config)
+				{
+					$dpda->setFormat($config->getProtocol());
+					$url = $config->getUrl();
+					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
+					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+					if($urlManager)
+					{
+						$resultIsLive = $this->responseHandlingIsLive($urlManager->isLive($url));
+						if ($resultIsLive)
+						{
+							return $resultIsLive;
+						}
+					}
+				}
+				if ($resultIsLive !== null)
+				{
+					return $resultIsLive;
 				}
 				break;
 		}
@@ -722,6 +760,28 @@ class LiveStreamService extends KalturaLiveEntryService
 	public function duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill = null)
 	{
 		return parent::duplicateTemplateEntry($conversionProfileId, $templateEntryId, $object_to_fill);
+	}
+
+	/**
+	 * updating the adminTagCounter of the entry admin tags. If entry contains one (or more) of adminTagsCounters tags
+	 * the method will decrease its counter(s) by 1 and return true, otherwise - return false.
+	 *
+	 * @param LiveEntry $entry
+	 * @param array $adminTagsCounters
+	 * @return boolean
+	 */
+	protected function updateAdminTagsCounters(LiveEntry $entry, &$adminTagsCounters)
+	{
+		$counterChanged = false;
+		foreach (array_keys($adminTagsCounters) as $adminTag)
+		{
+			if($entry->isContainsAdminTag($adminTag))
+			{
+				$adminTagsCounters[$adminTag]--;
+				$counterChanged = true;
+			}
+		}
+		return $counterChanged;
 	}
 
 }

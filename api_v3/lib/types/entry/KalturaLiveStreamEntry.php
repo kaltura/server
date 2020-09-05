@@ -130,7 +130,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	public $sipToken;
 
 	/**
-	 * @var int
+	 * @var KalturaSipSourceType
 	 * @readonly
 	 */
 	public $sipSourceType;

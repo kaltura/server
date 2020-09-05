@@ -241,4 +241,16 @@ class KalturaSystemPartnerOveragedLimit extends KalturaSystemPartnerLimit
 		}
 		parent::apply($partner);
 	} 
+
+	/**
+	 * @param KalturaSystemPartnerLimitType $type
+	 * @param Partner $partner
+	 * @return KalturaSystemPartnerLimitArray
+	 */
+	public static function getArrayFromPartner($type, Partner $partner)
+	{
+		$res = new KalturaSystemPartnerLimitArray();
+		$res[] = self::fromPartner($type, $partner);
+		return $res;
+	}
 }

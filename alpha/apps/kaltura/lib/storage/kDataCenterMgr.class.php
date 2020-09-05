@@ -84,7 +84,7 @@ class kDataCenterMgr
 	{
 		$dc_config = kConf::getMap("dc_config");
 		// find the dc with the desired id
-		$dc_list = $dc_config["list"];
+		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		if ( isset( $dc_list[$dc_id] ) )		
 			$dc = $dc_list[$dc_id];
 		else if ($partnerId)
@@ -115,7 +115,7 @@ class kDataCenterMgr
 	public static function getDcIds()
 	{
 		$dc_config = kConf::getMap("dc_config");
-		$dc_list = $dc_config["list"];
+		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		return array_keys($dc_list);
 	}
 		
@@ -123,7 +123,7 @@ class kDataCenterMgr
 	{
 		$dc_config = kConf::getMap("dc_config");
 		
-		$dc_list = $dc_config["list"];
+		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
 		
 		if ( $include_current == false )
 		{
@@ -194,8 +194,8 @@ class kDataCenterMgr
 		$file_hash = md5( $dc["secret" ] .  $file_sync_id );	// will be verified on the other side to make sure not some attack or external invalid request  
 		
 		$filename = 'f.' . $file_sync->getFileExt();
-		
-		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/f/$filename"; // or something similar
+		$objectId = $file_sync->getObjectId();
+		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/objectid/$objectId/f/$filename"; // or something similar
 		if($addBaseUrl)
 		{
 			$build_remote_url = $dc["url"] . $build_remote_url;

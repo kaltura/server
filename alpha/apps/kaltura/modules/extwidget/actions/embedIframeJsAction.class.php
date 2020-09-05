@@ -10,6 +10,22 @@ class embedIframeJsAction extends sfAction
 	 */
 	public function execute()
 	{
+		$partner_id = $this->getRequestParameter('partner_id');
+		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
+		
+		$optimizedPlayback = kConf::getMap("optimized_playback");
+		if ($partner_id && array_key_exists($partner_id, $optimizedPlayback))
+		{
+			$params = $optimizedPlayback[$partner_id];
+			if (array_key_exists('redirect_host', $params))
+			{
+				$redirectUrl = "$protocol://" . $params['redirect_host'] . $_SERVER["REQUEST_URI"];
+				kFile::cacheRedirect($redirectUrl);
+				header("Location:$redirectUrl");
+				KExternalErrors::dieGracefully();
+			}
+		}
+		
 		$uiconf_id = $this->getRequestParameter('uiconf_id');
 		if(!$uiconf_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');
@@ -24,22 +40,18 @@ class embedIframeJsAction extends sfAction
 
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 		
-		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		$host = myPartnerUtils::getCdnHost($partner_id, $protocol, 'api');
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
-		if (kConf::hasMap("optimized_playback"))
+		
+		if (array_key_exists($partner_id, $optimizedPlayback))
 		{
-			$optimizedPlayback = kConf::getMap("optimized_playback");
-			if (array_key_exists($partner_id, $optimizedPlayback))
+			// force a specific kdp for the partner
+			$params = $optimizedPlayback[$partner_id];
+			if (array_key_exists('html5_url', $params))
 			{
-				// force a specific kdp for the partner
-				$params = $optimizedPlayback[$partner_id];
-				if (array_key_exists('html5_url', $params))
-				{
-					$ui_conf_html5_url = $params['html5_url'];
-				}
+				$ui_conf_html5_url = $params['html5_url'];
 			}
 		}
 
@@ -62,7 +74,6 @@ class embedIframeJsAction extends sfAction
 		{
 			if (!$iframeEmbed)
 				$host = "$protocol://". kConf::get('html5lib_host') ."/";
-			
 			$html5_version = kConf::get('html5_version');
 			if ($ui_conf_html5_url)
 			{
