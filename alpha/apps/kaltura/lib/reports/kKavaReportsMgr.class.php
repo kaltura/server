@@ -396,6 +396,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
+		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -6243,4 +6245,11 @@ class kKavaReportsMgr extends kKavaBase
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
 	}
+
+	// transform functions
+	protected function limitPercentages($value)
+	{
+		return min($value, 100);
+	}
+
 }
