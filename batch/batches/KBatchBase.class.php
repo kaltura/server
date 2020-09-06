@@ -541,13 +541,7 @@ abstract class KBatchBase implements IKalturaLogger
 			$result = false;
 		}
 
-		$maxAccessTime = self::MAX_FILE_ACCESS_TIME;
-		$workerAccessTime = $this->getAdditionalParams('accessTime');
-		if ($workerAccessTime)
-		{
-			$maxAccessTime = $workerAccessTime;
-		}
-
+		$maxAccessTime = $this->getAdditionalParams('accessTime') ? $this->getAdditionalParams('accessTime') : self::MAX_FILE_ACCESS_TIME;
 		if($result && $time_elapsed_secs > $maxAccessTime)
 		{
 			KalturaLog::crit("No write access in reasonable time to directory {$dir} took {$time_elapsed_secs} seconds");
@@ -573,13 +567,7 @@ abstract class KBatchBase implements IKalturaLogger
 			return false;
 		}
 
-		$maxAccessTime = self::MAX_FILE_ACCESS_TIME;
-		$workerAccessTime = $this->getAdditionalParams('accessTime');
-		if ($workerAccessTime)
-		{
-			$maxAccessTime = $workerAccessTime;
-		}
-
+		$maxAccessTime = $this->getAdditionalParams('accessTime') ? $this->getAdditionalParams('accessTime') : self::MAX_FILE_ACCESS_TIME;
 		if($time_elapsed_secs > $maxAccessTime)
 		{
 			KalturaLog::crit("No read access in reasonable time to file {$file}, took {$time_elapsed_secs} seconds");
