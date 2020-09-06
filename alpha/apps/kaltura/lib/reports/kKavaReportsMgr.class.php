@@ -6247,7 +6247,7 @@ class kKavaReportsMgr extends kKavaBase
 	}
 
 	// transform functions
-	protected function limitPercentages($value)
+	protected static function limitPercentages($value)
 	{
 		return min($value, 100);
 	}
