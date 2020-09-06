@@ -56,7 +56,7 @@ function main ($dc, $startTime, $endTime, $timeFrameSize, $partnerId)
 	$results = array();
 	try
 	{
-		$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+		$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 		if (!$con)
 		{
 			KalturaLog::debug('Could not create propel connection');
@@ -83,7 +83,7 @@ function main ($dc, $startTime, $endTime, $timeFrameSize, $partnerId)
 				$c->add(FileSyncPeer::PARTNER_ID, $partnerId);
 
 			}
-			$fileSyncs = FileSyncPeer::doSelect($c);
+			$fileSyncs = FileSyncPeer::doSelect($c, $con);
 
 			if (!$fileSyncs)
 			{
