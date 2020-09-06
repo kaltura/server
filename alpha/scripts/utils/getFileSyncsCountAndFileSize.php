@@ -70,7 +70,6 @@ function main ($dc, $startTime, $endTime, $timeFrameSize, $partnerId)
 				$currEndTime = $endTime;
 			}
 
-			//$query = "SELECT count(*) , sum(file_size), status FROM `file_sync` WHERE file_sync.OBJECT_TYPE=4 AND file_sync.OBJECT_SUB_TYPE=1 AND dc = $dc and updated_at >= '$startTime' and updated_at <= '$currEndTime' group by status;";
 			FileSyncPeer::setUseCriteriaFilter(false);
 			$c = new Criteria();
 			$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
