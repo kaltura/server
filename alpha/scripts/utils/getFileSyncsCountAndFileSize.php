@@ -69,41 +69,40 @@ function main ($dc, $startTime, $endTime, $timeFrameSize, $partnerId)
 			{
 				$currEndTime = $endTime;
 			}
-			if (is_null($partnerId))
+
+			//$query = "SELECT count(*) , sum(file_size), status FROM `file_sync` WHERE file_sync.OBJECT_TYPE=4 AND file_sync.OBJECT_SUB_TYPE=1 AND dc = $dc and updated_at >= '$startTime' and updated_at <= '$currEndTime' group by status;";
+			FileSyncPeer::setUseCriteriaFilter(false);
+			$c = new Criteria();
+			$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
+			$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$c->add(FileSyncPeer::DC, $dc, Criteria::EQUAL);
+			$criterion = $c->getNewCriterion(FileSyncPeer::UPDATED_AT, $startTime, Criteria::GREATER_EQUAL);
+			$criterion->addAnd($c->getNewCriterion(FileSyncPeer::UPDATED_AT, $currEndTime, Criteria::LESS_EQUAL));
+			$c->addAnd($criterion);
+			if (!is_null($partnerId))
 			{
-				$query = "SELECT count(*) , sum(file_size), status FROM `file_sync` WHERE file_sync.OBJECT_TYPE=4 AND file_sync.OBJECT_SUB_TYPE=1 AND dc = $dc and updated_at >= '$startTime' and updated_at <= '$currEndTime' group by status;";
+				$c->add(FileSyncPeer::PARTNER_ID, $partnerId);
+
+			}
+			$fileSyncs = FileSyncPeer::doSelect($c);
+
+			if (!$fileSyncs)
+			{
+				$startTime = date("Y-m-d H:i:s", (strtotime(date($currEndTime)) + 1));
+				continue;
 			}
 			else
 			{
-				$query = "SELECT count(*) , sum(file_size), status FROM `file_sync` WHERE file_sync.OBJECT_TYPE=4 AND file_sync.OBJECT_SUB_TYPE=1 AND partner_id = $partnerId AND dc = $dc and updated_at >= '$startTime' and updated_at <= '$currEndTime' group by status;";
-			}
-			try
-			{
-				$stmt = $con->query($query);
-				$data = $stmt->fetchAll();
-				if (empty($data))
+				foreach ($fileSyncs as /** @var FileSync $fileSync **/ $fileSync)
 				{
-					$startTime = date("Y-m-d H:i:s", (strtotime(date($currEndTime)) + 1));
-					continue;
-				}
-				else
-				{
-					foreach ($data as $item)
+					$status = $fileSync->getStatus();
+					if (!isset($results[$status]))
 					{
-						$status = $item[2];
-						if (!isset($results[$status]))
-						{
-							$results[$status]= array('count' => 0, 'size' => 0, 'status' => $status);
-						}
-						$results[$status]['count'] += $item[0];
-						$results[$status]['size'] += $item[1];
-
+						$results[$fileSync->getStatus()] = array('count' => 0, 'size' => 0, 'status' => $status);
 					}
+					$results[$status]['count'] ++;
+					$results[$status]['size'] += $fileSync->getFileSize();
 				}
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::debug("Error running query " . $e->getMessage());
 			}
 			$startTime = date("Y-m-d H:i:s", (strtotime(date($currEndTime)) + 1));
 			kMemoryManager::clearMemory();
