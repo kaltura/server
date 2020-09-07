@@ -519,6 +519,30 @@ class kJobsManager
 		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
 		if(!$dbCurrentConversionEngine)
 			return null;
+
+		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+			$root = $sharedStorageProfile->getStorageBaseDir();
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+			
+			$convertData->setDestFileSyncSharedPath($sharedPath);
+		}
+		
+//		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
+//		{
+//			$pathMgr = new kS3SharedPathManager();
+//			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+//			$sharedPath = kFile::fixPath($root . $path);
+//
+//			KalturaLog::debug("TTT:: shared path $sharedPath");
+//			$convertData->setDestFileSyncSharedPath($sharedPath);
+//
+//			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+//		}
 		
 		// creats a child convert job
 		if($parentJob)
@@ -1073,7 +1097,24 @@ class kJobsManager
 			$entry->setStatus(entryStatus::PRECONVERT);
 			$entry->save();
 		}
- 		
+ 	
+		/*
+		* TODO - AWS - Handle shared concat flow
+		* Add shared file destination when genrating the concat to stoareg output file to shared stoarge defined on the partner
+		*
+		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
+		if($partner->getSharedStorageProfileId())
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
+			$root = $sharedStorageProfile->getStorageBaseDir();
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+		 
+			$jobData->setDestFilePath($sharedPath);
+		}
+		*/
+ 	
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -1254,7 +1295,7 @@ class kJobsManager
 			$inputFileSyncLocalPath = $fileSync->getFilePath();
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
-		if (!file_exists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
+		if (!kFile::checkFileExists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
 		{
 			KalturaLog::info("Input file [$inputFileSyncLocalPath] does not exist");
 			
@@ -1432,7 +1473,7 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
 
-		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || in_array($srcFileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
 		}
@@ -1924,5 +1965,24 @@ class kJobsManager
 		$batchJob->setEntryId($destEntryID);
 		$batchJob->setPartnerId($partnerId);
 		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CUE_POINTS, CopyCuePointJobType::MULTI_CLIP);
+	}
+
+	protected static function shouldUseSharedStorageForEngine($conversionEngine)
+	{
+		$SharedSupportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
+						KalturaConversionEngineType::ON2,
+						KalturaConversionEngineType::FFMPEG,
+						KalturaConversionEngineType::MENCODER,
+						KalturaConversionEngineType::ENCODING_COM,
+						KalturaConversionEngineType::EXPRESSION_ENCODER3,
+						KalturaConversionEngineType::CHUNKED_FFMPEG,
+						KalturaConversionEngineType::FFMPEG_VP8,
+						KalturaConversionEngineType::FFMPEG_AUX);
+
+		if(in_array($conversionEngine, $SharedSupportedEngines))
+		{
+			return true;
+		}
+		return false;
 	}
 }

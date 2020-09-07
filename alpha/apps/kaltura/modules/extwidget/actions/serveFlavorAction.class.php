@@ -532,7 +532,7 @@ class serveFlavorAction extends kalturaAction
 			$seekFromBytes = -1;
 		
 		
-		if($fileParam && is_dir($path)) {
+		if($fileParam && kFile::isDir($path)) {
 			$path .= "/$fileParam";
 			kFileUtils::dumpFile($path, null, null);
 			KExternalErrors::dieGracefully();
@@ -552,15 +552,12 @@ class serveFlavorAction extends kalturaAction
 					{
 						kFile::fullMkdir($tempClipPath);
 						$clipToSec = round($clipTo / 1000, 3);
-						$cmdLine = kConf::get ( "bin_path_ffmpeg" ) . " -i {$path} -vcodec copy -acodec copy -f mp4 -t {$clipToSec} -y {$tempClipPath} 2>&1";
-						KalturaLog::log("Executing {$cmdLine}");
-						$output = array ();
-						$return_value = "";
-						exec($cmdLine, $output, $return_value);
+						$cmd = kFfmpegUtils::getCopyCmd($path, $clipToSec, $tempClipPath);
+						list($output, $return_value) = kFfmpegUtils::executeCmd($cmd, 0);
 						KalturaLog::log("ffmpeg returned {$return_value}, output:".implode("\n", $output));
 					}
 					
-					if (file_exists($tempClipPath))
+					if (kFile::checkFileExists($tempClipPath))
 					{
 						KalturaLog::log("Dumping {$tempClipPath}");
 						kFileUtils::dumpFile($tempClipPath);

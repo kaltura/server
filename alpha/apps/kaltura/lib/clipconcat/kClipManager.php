@@ -477,6 +477,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset->setStatus(asset::ASSET_STATUS_QUEUED);
 		$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorAsset->setIsOriginal(false);
+		/*
+		 * TODO - AWS - Handle shared concat flow
+		 * When using shared storage based on partner we need to set file ext and version so that the shared file paths will be created correctly
+		 *
+		$flavorAsset->setFileExt("mp4");
+		$flavorAsset->setVersion(0);
+		*/
 		$flavorAsset->save();
 		return $flavorAsset;
 	}

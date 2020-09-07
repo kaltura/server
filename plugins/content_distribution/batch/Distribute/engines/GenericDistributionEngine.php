@@ -71,7 +71,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 			
 		$destFile = str_replace('{REMOTE_ID}', $data->remoteId, $destFile);
 		
-		file_put_contents($srcFile, $providerData->xml);
+		kFile::filePutContents($srcFile, $providerData->xml);
 		KalturaLog::log("XML written to file [$srcFile]");
 		
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
@@ -232,7 +232,7 @@ class GenericDistributionEngine extends DistributionEngine implements
 		$srcFile = str_replace('{REMOTE_ID}', $data->remoteId, $distributionProfileAction->serverPath);
 		
 		KalturaLog::log("Fetch report from url [$srcFile]");
-		$results = file_get_contents($srcFile);
+		$results = kFile::getFileContent($srcFile);
 	
 		if($results && is_string($results))
 		{
