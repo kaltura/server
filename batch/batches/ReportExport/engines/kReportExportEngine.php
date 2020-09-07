@@ -27,7 +27,7 @@ abstract class kReportExportEngine
 	public function getEmailFileName()
 	{
 		$emailFile = trim($this->reportItem->reportTitle);
-		if ($emailFile && preg_match('/^[\w]+([\s][\w]+)*$/', $emailFile))
+		if ($emailFile && preg_match('/^\w[\w\s]*$/', $emailFile))
 		{
 			return $emailFile;
 		}

@@ -462,7 +462,7 @@ class ReportService extends KalturaBaseService
 			}
 		}
 
-		if ($params->reportsItemsGroup && !preg_match('/^[\w]+([\s][\w]+)*$/', $params->reportsItemsGroup))
+		if ($params->reportsItemsGroup && !preg_match('/^\w[\w\s]*$/', $params->reportsItemsGroup))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_REPORT_ITEMS_GROUP);
 		}
