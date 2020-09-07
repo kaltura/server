@@ -1895,6 +1895,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			return array(kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_FILE);
 		}
+		// use direct serve if configured
+		else if (kConf::hasParam('vod_packager_direct_serve_secret'))
+		{
+			$path = str_replace('//', '/', $fileSync->getFullPath());
+			$secret = kConf::get('vod_packager_direct_serve_secret');
+			$sig = base64_encode(hash_hmac('sha256', $path, $secret, true));
+			$sig = rtrim(strtr($sig, '+/', '-_'), '=');
+			return array ("{$prefix}/direct/sig/{$sig}{$path}", self::SOURCE_TYPE_HTTP);
+		}
 		// if dc is local but not preferred generate serve file urls
 		else
 		{
@@ -1943,7 +1952,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		return true;
 	}
-
 	/**
 	 * Get the internal from kaltura data centers only FileSync object by its key
 	 * @param FileSyncKey $syncKey
@@ -2080,7 +2088,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					$c->addAnd(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::NOT_IN);
 				}
 				break;
-
 			default:
 				break;
 		}
