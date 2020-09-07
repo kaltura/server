@@ -271,7 +271,7 @@ class MetroPcsDistributionEngine extends DistributionEngine implements
 		$thumbAssetIds = $entryDistribution->thumbAssetIds;
 		$partnerId = $entryDistribution->partnerId;
 		
-		return parent::getThumbAssets($partnerId, $thumbAssetIds);
+		return parent::getThumbAssets($partnerId, $thumbAssetIds, $entryDistribution->entryId);
 	}
 	
 	protected function getFlavorAsset(KalturaEntryDistribution $entryDistribution, $flavorAssetId)

@@ -22,7 +22,7 @@ class FtpDistributionEngine extends PublicPrivateKeysDistributionEngine implemen
 		if(KBatchBase::$taskConfig->params->tempFilePath)
 		{
 			$this->tempFilePath = KBatchBase::$taskConfig->params->tempFilePath;
-			if(!is_dir($this->tempFilePath))
+			if(!kFile::isDir($this->tempFilePath))
 				kFile::fullMkfileDir($this->tempFilePath, 0777, true);
 		}
 		else

@@ -134,9 +134,16 @@ abstract class KJobConversionEngine extends KConversionEngine
                                 $urgency = null;
 	
 			$start = microtime(true);
+			
+			$sharedChunkPath = null;
+			if(isset($data->destFileSyncSharedPath) && isset(KBatchBase::$taskConfig->params->sharedChunkPath))
+			{
+				$sharedChunkPath = KBatchBase::$taskConfig->params->sharedChunkPath;
+			}
+			
 			// TODO add BatchEvent - before conversion + conversion engine
-			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $urgency, $jobId);
-			// TODO add BatchEvent - after conversion + conversion engine		
+			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $urgency, $jobId, $sharedChunkPath);
+			// TODO add BatchEvent - after conversion + conversion engine
 			$end = microtime(true);
 	
 			// 	TODO - find some place in the DB for the duration
@@ -198,7 +205,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 	/**
 	 *
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var, $urgency, $jobId = null)
+	protected function execute_conversion_cmdline($command, &$return_var, $urgency, $jobId = null, $sharedChunkPath = null)
 	{
 		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
 		{

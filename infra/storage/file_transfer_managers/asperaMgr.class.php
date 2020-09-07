@@ -38,13 +38,24 @@ class asperaMgr extends kFileTransferMgr
 		$linkPath =  $this->asperaTempFolder . '/' .$remoteFileName;
 		if (!file_exists(dirname( $linkPath )))
 			mkdir(dirname( $linkPath ), 0750, true);
+		
+		//Before trying to upload the file first we will resolve the path to check if its remote
+		//In such case we will import it to a local location before uploading it to the destination
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($local_file);
+		$local_file = !$isRemote ? $local_file : kFile::getExternalFile($videoRemoteUrl);
+		
 		symlink($local_file, $linkPath);
 		
 		$this->validateParameters($remotePath);
 		$cmd= $this->getCmdPrefix();
 		$cmd.=" $linkPath \"$this->user@$this->server:'$remotePath'\"";
 		$res = $this->executeCmd($cmd);
+		
 		unlink($linkPath);
+		if($isRemote)
+		{
+			kFile::unlink($local_file);
+		}
 		return $res;
 	}
 	// upload a file to the server ising Aspera connection (ftp_mode is irrelevant)

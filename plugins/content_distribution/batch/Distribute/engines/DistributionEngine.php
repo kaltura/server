@@ -101,10 +101,11 @@ abstract class DistributionEngine implements IDistributionEngine
 	 * @param string $thumbAssetIds comma seperated
 	 * @return array<KalturaThumbAsset>
 	 */
-	protected function getThumbAssets($partnerId, $thumbAssetIds)
+	protected function getThumbAssets($partnerId, $thumbAssetIds, $entryId)
 	{
 		$filter = new KalturaAssetFilter();
 		$filter->idIn = $thumbAssetIds;
+		$filter->entryIdEqual = $entryId;
 		
 		try
 		{

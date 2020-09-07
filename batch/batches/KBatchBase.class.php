@@ -429,14 +429,16 @@ abstract class KBatchBase implements IKalturaLogger
 
 	protected function setFilePermissions($filePath)
 	{
-		if(is_dir($filePath))
+		if(kFile::isDir($filePath))
 		{
 			$chmod = 0750;
 			if(self::$taskConfig->getDirectoryChmod())
 				$chmod = octdec(self::$taskConfig->getDirectoryChmod());
 				
 			KalturaLog::debug("chmod($filePath, $chmod)");
-			@chmod($filePath, $chmod);
+			@kFile::chmod($filePath, $chmod);
+			
+			//TODO - AWS - fix dir listing
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -452,7 +454,7 @@ abstract class KBatchBase implements IKalturaLogger
 				$chmod = octdec(self::$taskConfig->getChmod());
 		
 			KalturaLog::debug("chmod($filePath, $chmod)");
-			@chmod($filePath, $chmod);
+			@kFile::chmod($filePath, $chmod);
 		}
 	}
 
@@ -597,7 +599,7 @@ abstract class KBatchBase implements IKalturaLogger
 			// - size calcultions
 			// - the response from the client (to check the client size beaviour)
 		if(is_null($directorySync))
-			$directorySync = is_dir($file);
+			$directorySync = kFile::isDir($file);
 		KalturaLog::info("Check File Exists[$file] size[$size] isDir[$directorySync]");
 		if(is_null($size))
 		{
@@ -658,12 +660,12 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function createDir($path, $rights = 0777)
 	{
-		if(!is_dir($path))
+		if(!kFile::isDir($path))
 		{
-			if(!file_exists($path))
+			if(!kFile::checkFileExists($path))
 			{
 				KalturaLog::info("Creating temp directory [$path]");
-				mkdir($path, $rights, true);
+				kFile::mkdir($path, $rights, true);
 			}
 			else
 			{
@@ -759,7 +761,7 @@ abstract class KBatchBase implements IKalturaLogger
 	 * @param string $fileName
 	 * @return boolean
 	 */
-	public static function pollingFileExists($fileName)
+	public static function pollingFileExists($fileName, $checkIsLocalOnly = false)
 	{
 		$retries = (self::$taskConfig->inputFileExistRetries ? self::$taskConfig->inputFileExistRetries : 10);
 		$interval = (self::$taskConfig->inputFileExistInterval ? self::$taskConfig->inputFileExistInterval : self::DEFAULT_SLEEP_INTERVAL);
@@ -767,7 +769,8 @@ abstract class KBatchBase implements IKalturaLogger
 		for ($retry = 0; $retry < $retries; $retry++)
 		{
 			clearstatcache();
-			if (file_exists($fileName))
+			$fileExists = $checkIsLocalOnly ? file_exists($fileName) : kFile::checkFileExists($fileName);
+			if($fileExists)
 				return true;
 
 			KalturaLog::log("File $fileName does not exist, try $retry, waiting $interval seconds");
