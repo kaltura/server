@@ -4,6 +4,7 @@ require_once (dirname(__FILE__).'/../bootstrap.php');
 
 $f = fopen("php://stdin", "r");
 $count = 0;
+KalturaLog::log('Script Started');
 $sphinxMgr = new kSphinxSearchManager();
 $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
@@ -50,8 +51,8 @@ while($s = trim(fgets($f)))
 		$plays = $views;
 	}
 
-	// update mysql if no playsviews cache and plays/views changed
-	if (!$playsViewsCache && ($entryViews != $views || $entryPlays != $plays))
+	// update mysql if plays/views changed
+	if ($entryViews != $views || $entryPlays != $plays)
 	{
 		try
 		{
@@ -77,6 +78,7 @@ while($s = trim(fgets($f)))
 			$entry->getViewsLast30Days() != $views30days || $entry->getViewsLast7Days() != $views7days ||
 			$entry->getViewsLastDay() != $views1day))
 	{
+		KalturaLog::debug('Updating playsViewsCache');
 		try
 		{
 			$key = entry::PLAYSVIEWS_CACHE_KEY_PREFIX . $entryId;
@@ -103,6 +105,7 @@ while($s = trim(fgets($f)))
 	// update sphinx
 	if ($entryViews != $views || $entryPlays != $plays)
 	{
+		KalturaLog::debug('Updating sphinx');
 		$entry->setViews($views);
 		$entry->setPlays($plays);
 		$entry->setLastPlayedAt($lastPlayedAt);
@@ -132,6 +135,7 @@ while($s = trim(fgets($f)))
 			$entry->getViewsLast30Days() != $views30days || $entry->getViewsLast7Days() != $views7days ||
 			$entry->getViewsLastDay() != $views1day)))
 	{
+		KalturaLog::debug('Updating elastic');
 		try
 		{
 			$doc = array(
@@ -187,3 +191,4 @@ while($s = trim(fgets($f)))
 		entryPeer::clearInstancePool();
 	}
 }
+KalturaLog::log('Script Finished, Handled ' . $count . ' entries');
