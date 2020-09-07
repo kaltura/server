@@ -19,7 +19,17 @@ class KalturaReportExportJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $filePaths;
-	
+
+	/**
+	 * @var string
+	 */
+	public $reportsGroup;
+
+	/**
+	 * @var KalturaReportExportFileArray
+	 */
+	public $files;
+
 	public $timeZoneOffset;
 	
 	public $timeReference;
@@ -29,6 +39,8 @@ class KalturaReportExportJobData extends KalturaJobData
 		"recipientEmail",
 		"reportItems",
 		"filePaths",
+		"reportsGroup",
+		"files",
 		"timeZoneOffset",
 		"timeReference",
 	);

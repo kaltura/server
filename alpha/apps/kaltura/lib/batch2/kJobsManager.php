@@ -1831,6 +1831,7 @@ class kJobsManager
 		$offset = $timeOffsetSeconds - ($params->timeZoneOffset * 60);// Convert minutes to seconds
 		$jobData->setTimeZoneOffset($offset);
 		$jobData->setTimeReference(time());
+		$jobData->setReportsGroup($coreParams->getReportsItemsGroup());
 
 		$job = new BatchJob();
 		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());

@@ -1,37 +1,24 @@
 <?php
-
 /**
  * @package api
  * @subpackage objects
  */
-class KalturaReportExportParams extends KalturaObject
+class KalturaReportExportFile extends KalturaObject
 {
 	/**
 	 * @var string
 	 */
-	public $recipientEmail;
-
-	/**
-	 * Time zone offset in minutes (between client to UTC)
-	 * @var int
-	 */
-	public $timeZoneOffset = 0;
-
-	/**
-	 *  @var KalturaReportExportItemArray
-	 */
-	public $reportItems;
+	public $fileId;
 
 	/**
 	 * @var string
 	 */
-	public $reportsItemsGroup;
+	public $fileName;
 
 	private static $map_between_objects = array
 	(
-		"recipientEmail",
-		"reportItems",
-		"reportsItemsGroup",
+		"fileId",
+		"fileName",
 	);
 
 	public function getMapBetweenObjects()
@@ -43,10 +30,9 @@ class KalturaReportExportParams extends KalturaObject
 	{
 		if (!$object_to_fill)
 		{
-			$object_to_fill = new kReportExportParams();
+			$object_to_fill = new kReportExportFile();
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
-
 }

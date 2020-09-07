@@ -1,3 +1,13 @@
+# Propus 16.9.0  #
+## Modify report export to csv  ##
+- Issue Type: Task
+- Issue ID: AN-1409
+
+### Configuration ###
+edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
+    update ids 136, 137 and 138 as described in emails_en.template.ini
+
+
 # Propus 16.8.0  #
 ## New KMS user reset password link  ##
 - Issue Type: Task
