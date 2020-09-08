@@ -2183,12 +2183,18 @@ class Partner extends BasePartner
 	
 	public function getSharedStorageProfileId()
 	{
-		$sharedStorageId = $this->getFromCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID, null, null);;
+		$sharedStorageId = null;
+		$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+
+		$sharedIncludePartnerIds = kConf::get('shared_include_partner_ids', 'cloud_storage', array());
+		if (in_array($this->getId(), $sharedIncludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedIncludePartnerIds))
+		{
+			$sharedStorageId = reset($allSharedStorageIds);
+		}
 
 		$sharedPartnerPackages = kConf::get('shared_partner_package_types', 'cloud_storage', array());
 		if (in_array($this->getPartnerPackage(), $sharedPartnerPackages) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedPartnerPackages))
 		{
-			$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
 			$sharedStorageId = reset($allSharedStorageIds);
 		}
 
