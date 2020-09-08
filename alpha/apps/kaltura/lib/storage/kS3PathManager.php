@@ -37,9 +37,9 @@ class kS3PathManager extends kPathManager
 		if($partner && $partner->getSharedStorageProfileId())
 		{
 			$sharedStorage = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-			if($sharedStorage && $sharedStorage->getStorageRoot())
+			if($sharedStorage && $sharedStorage->getStorageBaseDir())
 			{
-				$root = $sharedStorage->getStorageRoot();
+				$root = $sharedStorage->getStorageBaseDir();
 			}
 		}
 		return $root;

@@ -218,11 +218,6 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 */
 	public $excludedEntryTypes;
 
-	/**
-	 * @var string
-	 */
-	public $storageRoot;
-
 	private static $map_between_objects = array
 	(
 		'id',
@@ -262,8 +257,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'exportPeriodically',
 		'excludedFlavorParamsIds',
 		'shouldExportCaptions',
-		'excludedEntryTypes',
-		'storageRoot',
+		'excludedEntryTypes'
 	);
 	
 	/* (non-PHPdoc)

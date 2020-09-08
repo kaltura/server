@@ -42,7 +42,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_EXCLUDED_ENTRY_TYPE = 'excluded_entry_types';
 	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 	const CUSTOM_DATA_PATH_PREFIX = 'path_prefix';
-	const CUSTOM_DATA_STORAGE_ROOT = 'storage_root';
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -546,16 +545,6 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function setPathPrefix($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_PATH_PREFIX, $v);
-	}
-
-	public function getStorageRoot()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_STORAGE_ROOT,null, '');
-	}
-
-	public function setStorageRoot($v)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_STORAGE_ROOT, $v);
 	}
 
 }
