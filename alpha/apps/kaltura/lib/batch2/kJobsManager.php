@@ -526,23 +526,10 @@ class kJobsManager
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-			$root = $sharedStorageProfile->getStorageBaseDir();
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			
 			$convertData->setDestFileSyncSharedPath($sharedPath);
 		}
-		
-//		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
-//		{
-//			$pathMgr = new kS3SharedPathManager();
-//			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-//			$sharedPath = kFile::fixPath($root . $path);
-//
-//			KalturaLog::debug("TTT:: shared path $sharedPath");
-//			$convertData->setDestFileSyncSharedPath($sharedPath);
-//
-//			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-//		}
 		
 		// creats a child convert job
 		if($parentJob)
@@ -1097,23 +1084,6 @@ class kJobsManager
 			$entry->setStatus(entryStatus::PRECONVERT);
 			$entry->save();
 		}
- 	
-		/*
-		* TODO - AWS - Handle shared concat flow
-		* Add shared file destination when genrating the concat to stoareg output file to shared stoarge defined on the partner
-		*
-		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
-		if($partner->getSharedStorageProfileId())
-		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-			$pathMgr = $sharedStorageProfile->getPathManager();
-			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
-			$root = $sharedStorageProfile->getStorageBaseDir();
-			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-		 
-			$jobData->setDestFilePath($sharedPath);
-		}
-		*/
  	
 		$batchJob = null;
 		if($parentJob)

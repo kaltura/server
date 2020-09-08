@@ -18,9 +18,30 @@ class kS3PathManager extends kPathManager
 		list($root, $filePath) = $object->generateFilePathArr($subType, $version, true);
 		$filePath = str_replace('/content/', '/', $filePath);
 		$filePath = kFile::fixPath($filePath);
-		$root = '/';
+		$root = $this->getRootPath($object);
 
 		KalturaLog::debug("S3 Path [{$root}{$filePath}]");
 		return array($root, $filePath);
+	}
+
+	protected function getRootPath(ISyncableFile $object)
+	{
+		$root = '/';
+		$partnerId = $object->getPartnerId();
+		if(!$partnerId)
+		{
+			return $root;
+		}
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSharedStorageProfileId())
+		{
+			$sharedStorage = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			if($sharedStorage && $sharedStorage->getStorageRoot())
+			{
+				$root = $sharedStorage->getStorageRoot();
+			}
+		}
+		return $root;
 	}
 }
