@@ -526,23 +526,10 @@ class kJobsManager
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-			$root = $sharedStorageProfile->getStorageBaseDir();
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			
 			$convertData->setDestFileSyncSharedPath($sharedPath);
 		}
-		
-//		if($partner->getSharedStorageType() == kSharedFileSystemMgrType::S3)
-//		{
-//			$pathMgr = new kS3SharedPathManager();
-//			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-//			$sharedPath = kFile::fixPath($root . $path);
-//
-//			KalturaLog::debug("TTT:: shared path $sharedPath");
-//			$convertData->setDestFileSyncSharedPath($sharedPath);
-//
-//			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-//		}
 		
 		// creats a child convert job
 		if($parentJob)
