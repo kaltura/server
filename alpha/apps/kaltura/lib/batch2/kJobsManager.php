@@ -1097,11 +1097,11 @@ class kJobsManager
 			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
 			$root = $sharedStorageProfile->getStorageBaseDir();
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-
+		 
 			$jobData->setDestFilePath($sharedPath);
 		}
 		*/
-
+ 	
 		$batchJob = null;
 		if($parentJob)
 		{
