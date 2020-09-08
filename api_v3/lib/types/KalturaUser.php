@@ -74,6 +74,16 @@ class KalturaUser extends KalturaBaseUser
 	 */
 	public $loginEnabled;
 
+	/**
+	 * @var string
+	 */
+	public $registrationInfo;
+
+	/**
+	 * @var string
+	 */
+	public $attendanceInfo;
+
 	private static $map_between_objects = array (
 		"type",
 		"dateOfBirth",
@@ -83,7 +93,9 @@ class KalturaUser extends KalturaBaseUser
 		"isAdmin",
 		"roleIds",
 		"roleNames" => "userRoleNames",
-		"isAccountOwner"
+		"isAccountOwner",
+		"registrationInfo",
+		"attendanceInfo"
 	);
 
 	public function getMapBetweenObjects ( )
