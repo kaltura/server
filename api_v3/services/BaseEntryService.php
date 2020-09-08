@@ -492,23 +492,16 @@ class BaseEntryService extends KalturaEntryService
 	{
 		$result = null;
 		$coreFilter = $filter->toObject();
-		try
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
+		foreach ($pluginInstances as $KalturaFilterExecutor)
 		{
-			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaFilterExecutor');
-			foreach ($pluginInstances as $KalturaFilterExecutor)
+			/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
+			if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter))
 			{
-				/* @var $KalturaFilterExecutor IKalturaFilterExecutor */
-				if ($KalturaFilterExecutor->canExecuteFilter($filter, $coreFilter))
-				{
-					KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
-					$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager, $this->getResponseProfile());
-					break;
-				}
+				KalturaLog::info('Executing filter on ' . get_class($KalturaFilterExecutor));
+				$result = $KalturaFilterExecutor->executeFilter($filter, $coreFilter, $pager, $this->getResponseProfile());
+				break;
 			}
-		}
-		catch (Exception $e)
-		{
-			kalturaLog::warning('Could not execute filter');
 		}
 
 		return $result;
