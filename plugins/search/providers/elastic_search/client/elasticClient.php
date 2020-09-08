@@ -177,6 +177,10 @@ class elasticClient
 			$code = $this->getErrorNumber();
 			$message = $this->getError();
 			KalturaLog::err("Elastic client curl error code[" . $code . "] message[" . $message . "]");
+			$data = array();
+			$data['errorMsg'] = $message;
+			$data['status'] = $code;
+			throw new kESearchException('Elastic search engine error [' . print_r($message, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
 		}
 		else
 		{
