@@ -32,6 +32,7 @@ KalturaLog::info(' ========= Script Started ========= ');
 
 myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 $sphinx = new kSphinxSearchManager();
+$counter = 0;
 
 foreach ($entryVendorTaskList as $entryVendorTaskId)
 {
@@ -43,6 +44,12 @@ foreach ($entryVendorTaskList as $entryVendorTaskId)
 	if (!$dryRun)
 	{
 		$sphinx->saveToSphinx($entryVendorTask, false, false);
+		if ($counter % 100 == 0)
+		{
+			KalturaLog::info(" Sleeping for 5 seconds");
+			sleep(5);
+		}
+		$counter++;
 	}
 	else
 	{
