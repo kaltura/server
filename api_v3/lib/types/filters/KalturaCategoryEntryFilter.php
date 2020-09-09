@@ -179,7 +179,7 @@ class KalturaCategoryEntryFilter extends KalturaCategoryEntryBaseFilter
 
 		if(!empty($this->creatorUserIdIn))
 		{
-			$this->creatorUserIdIn = $this->preparePusersToKusersFilter( $this->creatorUserIdIn );
+			$this->creatorUserIdIn = myKuserUtils::preparePusersToKusersFilter( $this->creatorUserIdIn );
 		}
 	}
 }
