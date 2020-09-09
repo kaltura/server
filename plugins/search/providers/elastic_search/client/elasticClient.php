@@ -393,6 +393,25 @@ class elasticClient
 		return $response;
 	}
 
+	public function isIndexExists($indexName)
+	{
+		$url = "{$this->elasticHost}:{$this->elasticPort}/$indexName";
+		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_NOBODY, true);
+		curl_exec($ch);
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if($httpCode === 200)
+		{
+			return true;
+		}
+		else if($httpCode === 404)
+		{
+			return false;
+		}
+
+		throw new kESearchException("Error determine if {$indexName} exists", kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $httpCode);
+	}
+
 	/**
 	 * creates a new index
 	 * @param $indexName
