@@ -173,10 +173,9 @@ class ElasticIndexRotationWorker
 		$now = new DateTime();
 		$yearMonth = $now->format($this->indexDateFormat);
 		$newIndex = $this->indexPattern . '-' . $yearMonth;
-		$indexInfo = $this->client->getIndexInfo($newIndex);
-		if(!empty($indexInfo))
+		if($this->client->isIndexExists($newIndex))
 		{
-			KalturaLog::log("$newIndex already exists - ending script");
+			KalturaLog::log("{$newIndex} already exists - ending script");
 			return;
 		}
 
