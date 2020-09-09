@@ -1079,7 +1079,12 @@ class myEntryUtils
 		return $entryServerNode->getDCId();
 	}
 
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
+	/**
+	 * @param entry $entry
+	 * @return flavorAsset
+	 * @throws PropelException
+	 */
+	public static function getFlavorAssetForLocalCapture($entry)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -1109,8 +1114,16 @@ class myEntryUtils
 		}
 
 		if (is_null($flavorAsset))
+		{
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+		}
 
+		return $flavorAsset;
+	}
+
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
+	{
+		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
@@ -1494,6 +1507,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			$newEntry->setStatus(entryStatus::NO_CONTENT);
 			$newEntry->setLengthInMsecs(0);
+		}
+	    else
+		{
+			$newEntry->setDimensions($entry->getWidth(), $entry->getHeight());
 		}
 
 
