@@ -32,7 +32,7 @@ KalturaLog::info(' ========= Script Started ========= ');
 
 myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 $sphinx = new kSphinxSearchManager();
-$counter = 0;
+$counter = 1;
 
 foreach ($entryVendorTaskList as $entryVendorTaskId)
 {
