@@ -402,7 +402,7 @@ class kUploadTokenMgr
 			return array(kFile::moveFile($nextChunk, $lockedFile), $lockedFile);
 		}
 		
-		return array($cache->add($nextChunk,"locked"), $nextChunk, 3600);
+		return array($cache->add($nextChunk,"locked", 3600), $nextChunk);
 	}
 	
 	private static function isLocked($chunkOffset, $nextChunk)
