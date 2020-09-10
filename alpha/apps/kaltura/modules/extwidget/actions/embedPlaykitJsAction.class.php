@@ -394,14 +394,14 @@ class embedPlaykitJsAction extends sfAction
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
         $playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
-		if ($entry_id) {
-		    $loadMediaContent = "entryId: \"" . $entry_id . "\""
-		} elseif ($playlist_id) {
-            $loadMediaContent = "playlist_id: \"" . $playlist_id . "\""
+        $loadContentMethod = null;
+		if (!is_null($entry_id)) {
+		    $loadContentMethod = "loadMedia({" . "entryId: \"" . $entry_id . "\"" . "});";
+		} elseif (!is_null($playlist_id)) {
+		    $loadContentMethod = "loadPlaylist({" . "playlistId: \"" . $playlist_id . "\"" . "});";
 		} else {
 		    KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID and Playlist ID not defined");
 		}
-
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
@@ -435,7 +435,7 @@ class embedPlaykitJsAction extends sfAction
 		$autoEmbedCode = "
 		try {
 			var kalturaPlayer = KalturaPlayer.setup($config);
-			kalturaPlayer.loadMedia(" . $loadMediaContent . "});
+			kalturaPlayer." . $loadContentMethod . "
 		} catch (e) {
 			console.error(e.message);
 		}
