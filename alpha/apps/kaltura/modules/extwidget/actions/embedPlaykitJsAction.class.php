@@ -16,6 +16,8 @@ class embedPlaykitJsAction extends sfAction
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
+	const PRODUCT_VERSION_UI_CONF = "productVersion";
+	const BUNDLE_VERSION_UI_CONF = "bundleVersions";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
 	const CANARY = "{canary}";
@@ -241,14 +243,14 @@ class embedPlaykitJsAction extends sfAction
 		return $arr1;
 	}
 
-	private function setProductVersion($uiConf, $productVersion)
+	private function addValueToUiConf($uiConf, $propertyValue, $propertyName)
 	{
-		if(isset($productVersion)){
-			if (!property_exists($uiConf, "productVersion"))
+		if(isset($propertyValue)){
+			if (!property_exists($uiConf, $propertyName))
 			{
-				$uiConf->productVersion = new stdClass();
+				$uiConf->{$propertyName} = new stdClass();
 			}
-			$uiConf->productVersion = $productVersion;
+			$uiConf->{$propertyName} = $propertyValue;
 		}
 	}
 
@@ -594,17 +596,24 @@ class embedPlaykitJsAction extends sfAction
 
 			if($isAllPackagesSameVersion === true) {
 				if($packageVersion === self::LATEST) {
-					$this->setProductVersion($this->playerConfig, $latestProductVersion);
+					$this->addValueToUiConf($this->playerConfig, $latestProductVersion, self::PRODUCT_VERSION_UI_CONF);
 				}
 				if($packageVersion === self::BETA) {
-					$this->setProductVersion($this->playerConfig, $betaProductVersion);
+					$this->addValueToUiConf($this->playerConfig, $betaProductVersion, self::PRODUCT_VERSION_UI_CONF);
 				}
 				if($packageVersion === self::CANARY) {
-					$this->setProductVersion($this->playerConfig, $canaryProductVersion);
+					$this->addValueToUiConf($this->playerConfig, $canaryProductVersion, self::PRODUCT_VERSION_UI_CONF);
 				}
 			}
 
 		}
+
+        function addColon($a,$b){
+           return $a.':'.$b;
+        }
+
+        $bundleContentAsString = implode(', ',array_map('addColon',array_keys($this->bundleConfig),$this->bundleConfig));
+        $this->addValueToUiConf($this->playerConfig, md5($bundleContentAsString), self::BUNDLE_VERSION_UI_CONF);
 	}
 
 	private function initMembers()
