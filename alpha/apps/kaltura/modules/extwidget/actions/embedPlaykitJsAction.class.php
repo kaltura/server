@@ -11,6 +11,7 @@ class embedPlaykitJsAction extends sfAction
 	const VERSIONS_PARAM_NAME = "versions";
 	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
+	const PLAYLIST_ID_PARAM_NAME = "playlist_id";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -392,9 +393,13 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
-		if (!$entry_id)
-		{
-			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
+        $playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+		if ($entry_id) {
+		    $loadMediaContent = "entryId: \"" . $entry_id . "\""
+		} elseif ($playlist_id) {
+            $loadMediaContent = "playlist_id: \"" . $playlist_id . "\""
+		} else {
+		    KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID and Playlist ID not defined");
 		}
 
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
@@ -430,7 +435,7 @@ class embedPlaykitJsAction extends sfAction
 		$autoEmbedCode = "
 		try {
 			var kalturaPlayer = KalturaPlayer.setup($config);
-			kalturaPlayer.loadMedia({entryId: \"" . $entry_id . "\"});
+			kalturaPlayer.loadMedia(" . $loadMediaContent . "});
 		} catch (e) {
 			console.error(e.message);
 		}
