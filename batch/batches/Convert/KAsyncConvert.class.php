@@ -125,11 +125,16 @@ class KAsyncConvert extends KJobHandlerWorker
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
 			
 			list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
-			$fileSyncLocalPath = !$isRemote ? $fileSyncLocalPath : kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", basename($fileSyncLocalPath));
+			if($isRemote)
+			{
+				$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", basename($fileSyncLocalPath));
+				$srcFileSyncDescriptor->isRemote = $isRemote;
+			}
+			
 			$srcFileSyncDescriptor->actualFileSyncLocalPath = $fileSyncLocalPath;
-			$srcFileSyncDescriptor->isRemote = $isRemote;
 		}
-		$updateData = new KalturaConvartableJobData();		
+		
+		$updateData = new KalturaConvartableJobData();
 		$updateData->srcFileSyncs = $data->srcFileSyncs;
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
 
