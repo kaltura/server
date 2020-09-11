@@ -296,14 +296,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				else
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 
-				if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
-				{
-					self::$kClient->batch->putFile($data->destFileSyncLocalPath,$sharedFile);
-				}
-				else
-				{
-					kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
-				}
+				$this->doMove($data->destFileSyncLocalPath, $sharedFile);
 
 				// directory sizes may differ on different devices
 				if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
@@ -340,7 +333,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
 		{
-			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
+			$this->doMove($data->destFileSyncLocalPath, "$sharedFile.log");
 			$this->setFilePermissions("$sharedFile.log");
 			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
 		
@@ -375,6 +368,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				$newName = $sharedFile.'.'.$i;
 				
 			kFile::moveFile($destFileSync->fileSyncLocalPath, $newName);
+			$this->doMove($destFileSync->fileSyncLocalPath, $newName);
 			
 			// directory sizes may differ on different devices
 			if(!file_exists($newName) || (is_file($newName) && kFile::fileSize($newName) != $fileSize))
@@ -417,5 +411,17 @@ class KAsyncConvert extends KJobHandlerWorker
 			unlink($tempClearPath);
 		}
 		return $res;
+	}
+
+	protected function doMove($destFileSyncLocalPath, $sharedFile)
+	{
+		if (self::$taskConfig->params->moveThroughBatch)
+		{
+			self::$kClient->batch->putFile($destFileSyncLocalPath, $sharedFile);
+		}
+		else
+		{
+			kFile::moveFile($destFileSyncLocalPath, $sharedFile);
+		}
 	}
 }
