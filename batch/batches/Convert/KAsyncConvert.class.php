@@ -147,6 +147,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		if ( $this->operationEngine == null )
 		{
+			$this->deleteTempFiles($data->srcFileSyncs);
 			$err = "Cannot find operation engine [{$job->jobSubType}] for job id [{$job->id}]";
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
 		}
@@ -154,16 +155,20 @@ class KAsyncConvert extends KJobHandlerWorker
 		KalturaLog::info( "Using engine: " . get_class($this->operationEngine) );
 		
 		$res = $this->convertImpl($job, $data);
+		$this->deleteTempFiles($data->srcFileSyncs);
 		
-		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor)
+		return $res;
+	}
+	
+	protected function deleteTempFiles($srcFileSyncs)
+	{
+		foreach ($srcFileSyncs as $srcFileSyncDescriptor)
 		{
 			if($srcFileSyncDescriptor->isRemote)
 			{
 				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
 			}
 		}
-		
-		return $res;
 	}
 	
 	protected function convertImpl(KalturaBatchJob $job, KalturaConvartableJobData $data)
