@@ -122,7 +122,12 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
-			$srcFileSyncDescriptor->actualFileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);			
+			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
+			
+			list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+			$fileSyncLocalPath = !$isRemote ? $fileSyncLocalPath : kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", basename($fileSyncLocalPath));
+			$srcFileSyncDescriptor->actualFileSyncLocalPath = $fileSyncLocalPath;
+			$srcFileSyncDescriptor->isRemote = $isRemote;
 		}
 		$updateData = new KalturaConvartableJobData();		
 		$updateData->srcFileSyncs = $data->srcFileSyncs;
@@ -143,7 +148,17 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		KalturaLog::info( "Using engine: " . get_class($this->operationEngine) );
 		
-		return $this->convertImpl($job, $data);
+		$res = $this->convertImpl($job, $data);
+		
+		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor)
+		{
+			if($srcFileSyncDescriptor->isRemote)
+			{
+				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath)''
+			}
+		}
+		
+		return $res;
 	}
 	
 	protected function convertImpl(KalturaBatchJob $job, KalturaConvartableJobData $data)
