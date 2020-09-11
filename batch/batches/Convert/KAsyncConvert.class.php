@@ -154,7 +154,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			if($srcFileSyncDescriptor->isRemote)
 			{
-				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath)''
+				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
 			}
 		}
 		
