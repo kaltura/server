@@ -665,68 +665,6 @@ class BatchService extends KalturaBatchService
 			throw new KalturaAPIException(KalturaErrors::FILE_SIZE_EXCEEDED, $size);
 		}
 
-		$ret = self::putFileRecursively($path, $data['tmp_name']);
-		return $ret;
-	}
-
-	protected static function putFileRecursively($src, $dest)
-	{
-		if (is_dir($src))
-		{
-			// Generate target directory
-			if (kFile::checkFileExists($dest))
-			{
-				if (!is_dir($dest))
-				{
-					KalturaLog::err("Can't override a file with a directory [$dest]");
-					return false;
-				}
-			}
-			else
-				{
-				if (!mkdir($dest))
-				{
-					KalturaLog::err("Failed to create directory [$dest]");
-					return false;
-				}
-			}
-
-			// Copy files
-			$dir = dir($src);
-			while ( false !== $entry = $dir->read () )
-			{
-				if ($entry == '.' || $entry == '..')
-				{
-					continue;
-				}
-
-				$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
-				if(is_dir($newSrc))
-				{
-					KalturaLog::err("Copying of non-flat directories is illegal");
-					return false;
-				}
-
-				$res =  self::putSingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry);
-				if (!$res)
-				{
-					return false;
-				}
-			}
-		}
-		else
-		{
-			$res = self::putSingleFile($src, $dest);
-			if (!$res)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	protected static function putSingleFile($path, $data)
-	{
 		KalturaLog::debug("Going to save file in path - $path");
 		if(kFile::checkFileExists($path))
 		{
@@ -736,5 +674,4 @@ class BatchService extends KalturaBatchService
 		$ret = file_put_contents($path, $fileContent);
 		return $ret;
 	}
-
 }
