@@ -232,7 +232,15 @@ class KAsyncConvert extends KJobHandlerWorker
 			else
 			{
 				$job = $this->updateJob($job, $jobMessage, KalturaBatchJobStatus::MOVEFILE, $data);
-				return $this->moveFile($job, $data);
+
+				if(self::$taskConfig->params->moveThroughApi)
+				{
+					return $this->moveThroughApi($job, $data);
+				}
+				else
+				{
+					return $this->moveFile($job, $data);
+				}
 			}
 		}
 		catch (Exception $e)
@@ -279,7 +287,6 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		$uniqid = uniqid("convert_{$job->entryId}_");
 		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
-		$moveThroughApi = self::$taskConfig->params->moveThroughApi;
 				
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
@@ -296,26 +303,18 @@ class KAsyncConvert extends KJobHandlerWorker
 					$fileSize=KBatchBase::foldersize($data->destFileSyncLocalPath);
 				else
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
-
-				$this->doMove($data->destFileSyncLocalPath, $sharedFile);
+			
+				kFile::moveFile($data->destFileSyncLocalPath, $sharedFile);
 
 				// directory sizes may differ on different devices
-				if(!$moveThroughApi)
+				if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
 				{
-					if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
-					{
-						return $this->closeJob($job, null, null, ' moving file ' . $sharedFile . ' failed ' , KalturaBatchJobStatus::RETRY);
-					}
-				}
-				else
-				{
-					$destFileExists = true;
-				}
-
+					return $this->closeJob($job, null, null, ' moving file ' . $sharedFile . ' failed ' , KalturaBatchJobStatus::RETRY);
+				}			
 				$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
 				if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 					$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
-				else if (!$moveThroughApi && $this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
+				else if ($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
 					$destFileExists = true;
 			}
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
@@ -342,13 +341,10 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
 		{
-			$this->doMove($data->destFileSyncLocalPath, "$sharedFile.log");
-			if(!$moveThroughApi)
-			{
-				$this->setFilePermissions("$sharedFile.log");
-			}
+			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
+			$this->setFilePermissions("$sharedFile.log");
 			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
-
+		
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
 		}
@@ -378,19 +374,16 @@ class KAsyncConvert extends KJobHandlerWorker
 				$newName = $sharedFile.'.'.$ext;
 			else
 				$newName = $sharedFile.'.'.$i;
-
-			$this->doMove($destFileSync->fileSyncLocalPath, $newName);
+				
+			kFile::moveFile($destFileSync->fileSyncLocalPath, $newName);
 			
 			// directory sizes may differ on different devices
-			if(!self::$taskConfig->params->moveThroughApi)
+			if(!file_exists($newName) || (is_file($newName) && kFile::fileSize($newName) != $fileSize))
 			{
-				if(!file_exists($newName) || (is_file($newName) && kFile::fileSize($newName) != $fileSize))
-				{
-					KalturaLog::err("Error: moving file failed");
-					die();
-				}
+				KalturaLog::err("Error: moving file failed");
+				die();
 			}
-
+			
 			$destFileSync->fileSyncLocalPath = $this->translateLocalPath2Shared($newName);
 			
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
@@ -427,30 +420,23 @@ class KAsyncConvert extends KJobHandlerWorker
 		return $res;
 	}
 
-	protected function doMove($srcPath, $destPath)
+	protected function doApiMove($srcPath, $destPath)
 	{
-		if (self::$taskConfig->params->moveThroughApi)
+		if (kFile::checkIsDir($srcPath))
 		{
-			if (kFile::checkIsDir($srcPath))
+			$this->handleDirMove($srcPath, $destPath);
+			if (!rmdir($srcPath))
 			{
-				$this->handleDirMove($srcPath, $destPath);
-				if (!rmdir($srcPath))
-				{
-					throw new kTemporaryException("Failed to delete src folder [$srcPath]");
-				}
-			}
-			else
-			{
-				$this->handleSingleFileMove($srcPath, $destPath);
-				if (!unlink($srcPath))
-				{
-					throw new kTemporaryException("Failed to delete source file [$srcPath]");
-				}
+				throw new kTemporaryException("Failed to delete src folder [$srcPath]");
 			}
 		}
 		else
 		{
-			kFile::moveFile($srcPath, $destPath);
+			$this->handleSingleFileMove($srcPath, $destPath);
+			if (!unlink($srcPath))
+			{
+				throw new kTemporaryException("Failed to delete source file [$srcPath]");
+			}
 		}
 	}
 
@@ -474,6 +460,91 @@ class KAsyncConvert extends KJobHandlerWorker
 				continue;
 			}
 			$this->handleSingleFileMove($srcPath . DIRECTORY_SEPARATOR . $entry, $destPath . DIRECTORY_SEPARATOR . $entry);
+		}
+	}
+
+	protected function moveThroughApi(KalturaBatchJob $job, KalturaConvertJobData $data)
+	{
+		$uniqid = uniqid("convert_{$job->entryId}_");
+		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
+
+		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
+		{
+			$destFileExists = false;
+			if(is_array($data->extraDestFileSyncs) && count($data->extraDestFileSyncs))
+			{
+				$this->moveExtraFilesThroughApi($data, $sharedFile);
+			}
+			if($data->destFileSyncLocalPath)
+			{
+				clearstatcache();
+				$this->doApiMove($data->destFileSyncLocalPath, $sharedFile);
+				$destFileExists = true;
+
+				$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
+				if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+					$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
+			}
+
+			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+			{
+				$job->status = KalturaBatchJobStatus::ALMOST_DONE;
+				$job->message = "File ready for download";
+			}
+			elseif(!$data->destFileSyncLocalPath || $destFileExists)
+			{
+				$job->status = KalturaBatchJobStatus::FINISHED;
+				$job->message = "File moved to shared";
+			}
+			else
+			{
+				$job->status = KalturaBatchJobStatus::RETRY;
+				$job->message = "File not moved correctly";
+			}
+		}
+		else
+		{
+			$job->status = KalturaBatchJobStatus::FINISHED;
+			$job->message = "File is ready in the remote storage";
+		}
+
+		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
+		{
+			$this->doApiMove($data->logFileSyncLocalPath, "$sharedFile.log");
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+
+			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
+		}
+		else
+		{
+			$data->logFileSyncLocalPath = '';
+		}
+
+		return $this->closeJob($job, null, null, $job->message, $job->status, $data);
+	}
+
+	protected function moveExtraFilesThroughApi(KalturaConvertJobData &$data, $sharedFile)
+	{
+		$i=0;
+		foreach ($data->extraDestFileSyncs as $destFileSync)
+		{
+			$i++;
+			clearstatcache();
+			$ext = pathinfo($destFileSync->fileSyncLocalPath, PATHINFO_EXTENSION);
+			if($ext)
+				$newName = $sharedFile.'.'.$ext;
+			else
+				$newName = $sharedFile.'.'.$i;
+
+			$this->doApiMove($destFileSync->fileSyncLocalPath, $newName);
+
+			$destFileSync->fileSyncLocalPath = $this->translateLocalPath2Shared($newName);
+
+			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+			{
+				$destFileSync->fileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($destFileSync->fileSyncLocalPath);
+			}
 		}
 	}
 }

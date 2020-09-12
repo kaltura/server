@@ -641,6 +641,7 @@ class BatchService extends KalturaBatchService
 	 * @action putFile
 	 * @param string $destPath
 	 * @param file $data
+	 * @return int Number of bytes
 	 */
 	public function putFileAction($destPath, $data)
 	{
