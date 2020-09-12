@@ -403,7 +403,7 @@ class kUploadTokenMgr
 			return array(kFile::moveFile($nextChunk, $lockedFile), $lockedFile);
 		}
 		
-		return array($cache->add($nextChunk,"locked", 3600), $nextChunk);
+		return array($cache->add($nextChunk,"true", 3600), $nextChunk);
 	}
 	
 	private static function releaseLock($key)
@@ -415,21 +415,6 @@ class kUploadTokenMgr
 		}
 		
 		$cache->delete($key);
-	}
-	
-	private static function isLocked($chunkOffset, $nextChunk)
-	{
-		if($chunkOffset == "locked")
-		{
-			return true;
-		}
-		
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
-		if(!$cache)
-			return false;
-		
-		return $cache->get($nextChunk);
-		
 	}
 	
 	private function checkIsFinalChunk($currentFileSize)
@@ -543,7 +528,7 @@ class kUploadTokenMgr
 				if (count($parts))
 				{
 					$chunkOffset = $parts[count($parts) - 1];
-					if ( self::isLocked($chunkOffset, $nextChunk)) // don't touch chunks that were locked and may have failed appending half way
+					if ($chunkOffset == "locked") // don't touch chunks that were locked and may have failed appending half way
 						continue;
 					
 					// dismiss chunks which won't enlarge the file or which are starting after the end of the file
