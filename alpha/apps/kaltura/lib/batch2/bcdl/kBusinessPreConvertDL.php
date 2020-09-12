@@ -2107,14 +2107,16 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			if($flavorParamsConversionProfile->getTags()!==null) 
 				$flavorParams->setTags($flavorParamsConversionProfile->getTags());
 			
-			$chunkEncoderMode = $flavorParams->getChunkedEncodeMode() || $flavorParamsConversionProfile->getChunkedEncodeMode()!==null;
-			if($chunkEncoderMode)
+			$chunkEncoderMode = $flavorParams->getChunkedEncodeMode();
+			if ($flavorParamsConversionProfile->getChunkedEncodeMode() !== null)
 			{
-				$chunkedConvertMinDuration = kConf::get('chunked_convert_min_duration', 'runtime_config', 0);
-				if($chunkedConvertMinDuration && isset($entryDuration) && $entryDuration < $chunkedConvertMinDuration)
-				{
-					$chunkEncoderMode = false;
-				}
+				$chunkEncoderMode = $flavorParamsConversionProfile->getChunkedEncodeMode();
+			}
+
+			$chunkedConvertMinDuration = kConf::get('chunked_convert_min_duration', 'runtime_config', 0);
+			if (isset($entryDuration) && $entryDuration < $chunkedConvertMinDuration)
+			{
+				$chunkEncoderMode = false;
 			}
 			
 			$flavorParams->setChunkedEncodeMode($chunkEncoderMode);
