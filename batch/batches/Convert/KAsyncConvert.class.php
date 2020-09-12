@@ -279,6 +279,7 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		$uniqid = uniqid("convert_{$job->entryId}_");
 		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
+		$moveThroughApi = self::$taskConfig->params->moveThroughApi;
 				
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
@@ -299,19 +300,23 @@ class KAsyncConvert extends KJobHandlerWorker
 				$this->doMove($data->destFileSyncLocalPath, $sharedFile);
 
 				// directory sizes may differ on different devices
-				if(!self::$taskConfig->params->moveThroughApi)
+				if(!$moveThroughApi)
 				{
 					if(!file_exists($sharedFile) || (is_file($sharedFile) && kFile::fileSize($sharedFile) != $fileSize))
 					{
 						return $this->closeJob($job, null, null, ' moving file ' . $sharedFile . ' failed ' , KalturaBatchJobStatus::RETRY);
 					}
-
-					$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
-					if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
-						$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
-					else if ($this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
-						$destFileExists = true;
 				}
+				else
+				{
+					$destFileExists = true;
+				}
+
+				$data->destFileSyncLocalPath = $this->translateLocalPath2Shared($sharedFile);
+				if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
+					$data->destFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->destFileSyncLocalPath);
+				else if (!$moveThroughApi && $this->checkFileExists($data->destFileSyncLocalPath, $fileSize, $directorySync))
+					$destFileExists = true;
 			}
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 			{
@@ -338,7 +343,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
 		{
 			$this->doMove($data->destFileSyncLocalPath, "$sharedFile.log");
-			if(!self::$taskConfig->params->moveThroughApi)
+			if(!$moveThroughApi)
 			{
 				$this->setFilePermissions("$sharedFile.log");
 			}
