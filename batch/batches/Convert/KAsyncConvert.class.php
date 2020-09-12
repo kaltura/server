@@ -127,7 +127,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
 			if($isRemote)
 			{
-				$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", basename($fileSyncLocalPath));
+				$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 			}
 			
 			$srcFileSyncDescriptor->isRemote = $isRemote;
