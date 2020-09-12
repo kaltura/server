@@ -360,7 +360,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 */
 	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
-	                             array $operationAttributes, $priority = 0)
+								 array $operationAttributes, $priority = 0)
 	{
 		$batchArray = array();
 		$order = 0;
@@ -499,6 +499,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$tempEntry->setSourceType(EntrySourceType::CLIP);
 		$tempEntry->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$tempEntry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($partnerId)->getId());
+		$tempEntry->setIsTemporary(true);
 		$tempEntry->save();
 		KalturaLog::info('Temp ClipConcat Entry Created, Entry ID:  ' . $tempEntry->getId());
 		return $tempEntry;
