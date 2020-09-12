@@ -368,7 +368,7 @@ class kUploadTokenMgr
 		fseek($targetFileResource, 0, SEEK_END);
 		$targetFileSize = ftell($targetFileResource);
 		
-		for ($maxSyncedConcat = 10; $maxSyncedConcat > 0; $maxSyncedConcat--)
+		for ($maxSyncedConcat = 15; $maxSyncedConcat > 0; $maxSyncedConcat--)
 		{
 			$nextChunkPath = "$targetFilePath.chunk.$targetFileSize";
 			if(!kFile::checkFileExists($nextChunkPath))
