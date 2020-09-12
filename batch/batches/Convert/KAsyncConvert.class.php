@@ -412,85 +412,53 @@ class KAsyncConvert extends KJobHandlerWorker
 		return $res;
 	}
 
-	protected function doMove($destFileSyncLocalPath, $sharedFile)
+	protected function doMove($srcPath, $destPath)
 	{
-		if (self::$taskConfig->params->moveThroughBatch)
+		if (self::$taskConfig->params->moveThroughApi)
 		{
-			if (is_dir($destFileSyncLocalPath))
+			if (kFile::checkIsDir($srcPath))
 			{
-				$this->handleDirMove($destFileSyncLocalPath, $sharedFile);
-				if (!rmdir($destFileSyncLocalPath))
+				$this->handleDirMove($srcPath, $destPath);
+				if (!rmdir($srcPath))
 				{
-					throw new Exception("Failed to delete src folder [$destFileSyncLocalPath]", -1);
+					throw new kTemporaryException("Failed to delete src folder [$srcPath]");
 				}
 			}
 			else
 			{
-				$this->handleSingleFileMove($destFileSyncLocalPath, $sharedFile);
-				if (!unlink($destFileSyncLocalPath))
+				$this->handleSingleFileMove($srcPath, $destPath);
+				if (!unlink($srcPath))
 				{
-					throw new Exception("Failed to delete source file [$destFileSyncLocalPath]", -1);
+					throw new kTemporaryException("Failed to delete source file [$srcPath]");
 				}
 			}
 		}
 		else
 		{
-			kFile::moveFile($destFileSyncLocalPath, $sharedFile);
+			kFile::moveFile($srcPath, $destPath);
 		}
 	}
 
-	protected function handleSingleFileMove($destFileSyncLocalPath, $sharedFile)
+	protected function handleSingleFileMove($srcPath, $destPath)
 	{
-		$res = self::$kClient->batch->putFile($destFileSyncLocalPath, $sharedFile);
+		$res = self::$kClient->batch->putFile($destPath, $srcPath);
 		if (!$res)
 		{
-			$sharedFileName = $sharedFile['tmp_name'];
-			throw new Exception("Failed to copy file from [$destFileSyncLocalPath] to [$sharedFileName]", -1);
+			$sharedFileName = $destPath['tmp_name'];
+			throw new kTemporaryException("Failed to copy file from [$srcPath] to [$sharedFileName]");
 		}
 	}
 
-	protected function validateDestPath($sharedFileName)
+	protected function handleDirMove($srcPath, $destPath)
 	{
-		if (kFile::checkFileExists($sharedFileName))
-		{
-			if (!is_dir($sharedFileName))
-			{
-				throw new Exception("Can't override a file with a directory [$sharedFileName]", -1);
-			}
-		}
-		else
-		{
-			if (!mkdir($sharedFileName))
-			{
-				throw new Exception("Failed to create directory [$sharedFileName]", -1);
-			}
-		}
-	}
-
-	protected function handleDirMove($destFileSyncLocalPath, $sharedFile)
-	{
-		$sharedFileName = $sharedFile['tmp_name'];
-		$this->validateDestPath($sharedFileName);
-		$this->copyDirFiles($destFileSyncLocalPath, $sharedFile);
-	}
-
-	protected function copyDirFiles($destFileSyncLocalPath, $sharedFile)
-	{
-		$dir = dir($destFileSyncLocalPath);
+		$dir = dir($srcPath);
 		while (false !== $entry = $dir->read())
 		{
 			if ($entry == '.' || $entry == '..')
 			{
 				continue;
 			}
-
-			$newSrc = $destFileSyncLocalPath . DIRECTORY_SEPARATOR . $entry;
-			if (is_dir($newSrc))
-			{
-				throw new Exception("Copying of non-flat directories is illegal", -1);
-			}
-
-			$this->handleSingleFileMove($newSrc, $sharedFile);
+			$this->handleSingleFileMove($srcPath . DIRECTORY_SEPARATOR . $entry, $destPath . DIRECTORY_SEPARATOR . $entry);
 		}
 	}
 }
