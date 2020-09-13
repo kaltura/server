@@ -233,7 +233,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			{
 				$job = $this->updateJob($job, $jobMessage, KalturaBatchJobStatus::MOVEFILE, $data);
 
-				if(self::$taskConfig->params->moveThroughApi)
+				if(isset(self::$taskConfig->params->moveThroughApi) && self::$taskConfig->params->moveThroughApi)
 				{
 					return $this->moveThroughApi($job, $data);
 				}
