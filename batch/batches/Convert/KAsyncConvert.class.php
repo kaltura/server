@@ -438,6 +438,7 @@ class KAsyncConvert extends KJobHandlerWorker
 
 	protected function handleSingleFileMove($srcPath, $destPath)
 	{
+		$destPath = $this->translateLocalPath2Shared($destPath);
 		$res = self::$kClient->batch->putFile($destPath, $srcPath);
 		if (!$res)
 		{
