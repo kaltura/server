@@ -640,6 +640,11 @@ class kFileBase
 		
 		$tmpFilePath = kFile::fixPath($dirName . DIRECTORY_SEPARATOR . $baseName);
 		
+		if(!kFile::checkFileExists(dirname($tmpFilePath)))
+		{
+			kFile::fullMkfileDir(dirname($tmpFilePath));
+		}
+		
 		$res = null;
 		try
 		{
