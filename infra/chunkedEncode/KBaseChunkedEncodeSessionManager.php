@@ -68,9 +68,7 @@
 				return false;
 			}
 			
-			if(isset($this->chunker->setup->cleanUp) && $this->chunker->setup->cleanUp){
-				$this->CleanUp();
-			}
+			$this->CleanUp();
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
 			if(file_exists($this->chunker->getSessionName())) {
@@ -395,6 +393,20 @@
 		public function CleanUp()
 		{
 			$setup = $this->chunker->setup;
+			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
+				$chunkName_wc = $this->chunker->getChunkName($idx,"fix");
+				if(file_exists($chunkName_wc)){
+					$cmd = "rm -f $chunkName_wc*";
+					KalturaLog::log("cleanup cmd:$cmd");
+					$rv = null; $op = null;
+					$output = exec($cmd, $op, $rv);
+				}
+			}
+
+			if(!(isset($setup->cleanUp) && $setup->cleanUp)){
+				return;
+			}
+
 			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
 				$chunkName_wc = $this->chunker->getChunkName($idx,"*");
 				$cmd = "rm -f $chunkName_wc";
