@@ -433,10 +433,6 @@ class KAsyncConvert extends KJobHandlerWorker
 		else
 		{
 			$this->handleSingleFileMove($srcPath, $destPath);
-			if (!unlink($srcPath))
-			{
-				throw new kTemporaryException("Failed to delete source file [$srcPath]");
-			}
 		}
 	}
 
@@ -447,6 +443,10 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$sharedFileName = $destPath['tmp_name'];
 			throw new kTemporaryException("Failed to copy file from [$srcPath] to [$sharedFileName]");
+		}
+		if (!unlink($srcPath))
+		{
+			throw new kTemporaryException("Failed to delete source file [$srcPath]");
 		}
 	}
 

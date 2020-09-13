@@ -671,8 +671,7 @@ class BatchService extends KalturaBatchService
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_ALREADY_EXISTS, $destPath);
 		}
-		$fileContent = file_get_contents($data['tmp_name']);
-		$ret = file_put_contents($destPath, $fileContent);
+		$ret = kFile::moveFile($data['tmp_name'], $destPath);
 		return $ret;
 	}
 }
