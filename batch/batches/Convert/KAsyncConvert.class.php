@@ -122,9 +122,19 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
-			$srcFileSyncDescriptor->actualFileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);			
+			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
+			
+			list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+			if($isRemote)
+			{
+				$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+			}
+			
+			$srcFileSyncDescriptor->isRemote = $isRemote;
+			$srcFileSyncDescriptor->actualFileSyncLocalPath = $fileSyncLocalPath;
 		}
-		$updateData = new KalturaConvartableJobData();		
+		
+		$updateData = new KalturaConvartableJobData();
 		$updateData->srcFileSyncs = $data->srcFileSyncs;
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
 
@@ -137,13 +147,28 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		if ( $this->operationEngine == null )
 		{
+			$this->deleteTempFiles($data->srcFileSyncs);
 			$err = "Cannot find operation engine [{$job->jobSubType}] for job id [{$job->id}]";
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, $err, KalturaBatchJobStatus::FAILED);
 		}
 		
 		KalturaLog::info( "Using engine: " . get_class($this->operationEngine) );
 		
-		return $this->convertImpl($job, $data);
+		$res = $this->convertImpl($job, $data);
+		$this->deleteTempFiles($data->srcFileSyncs);
+		
+		return $res;
+	}
+	
+	protected function deleteTempFiles($srcFileSyncs)
+	{
+		foreach ($srcFileSyncs as $srcFileSyncDescriptor)
+		{
+			if($srcFileSyncDescriptor->isRemote)
+			{
+				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
+			}
+		}
 	}
 	
 	protected function convertImpl(KalturaBatchJob $job, KalturaConvartableJobData $data)
