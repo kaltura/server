@@ -589,6 +589,7 @@ class kBusinessPreConvertDL
 	protected static function validateConversionProfile($partnerId, $entryId, mediaInfo $mediaInfo = null, array $flavors, array $conversionProfileFlavorParams, &$errDescription)
 	{
 		// if there is no media info, the entire profile returned as is, decision layer ignored
+		$entryDuration = null;
 		if(!$mediaInfo)
 		{
 			KalturaLog::log("Validate Conversion Profile, no media info supplied");
@@ -602,9 +603,16 @@ class kBusinessPreConvertDL
 		}
 		else
 		{
+			$entryDuration = $mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration()/1000 : $mediaInfo->getContainerDuration()/1000;
 			KalturaLog::log("Validate Conversion Profile, media info [" . $mediaInfo->getId() . "]");
 		}
 
+		if(!$entryDuration)
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			$entryDuration = $entry->getDuration();
+		}
+		
 		self::adjustAssetParams($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
@@ -613,7 +621,7 @@ class kBusinessPreConvertDL
 		 */
 		foreach($flavors as $flavor) {
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
-			self::overrideFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile);
+			self::overrideFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile, $entryDuration);
 			self::overrideFlavorParamsWithMultistreamData($flavor, $entryId);
 		}
 
@@ -2081,7 +2089,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 * @param unknown_type $flavorParams
 	 * @param unknown_type $flavorParamsConversionProfile
 	 */
-	private static function overrideFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile)
+	private static function overrideFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile, $entryDuration = null)
 	{
 		if($flavorParamsConversionProfile){
 			/*
@@ -2098,8 +2106,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$flavorParams->setTwoPass($overrideParam);
 			if($flavorParamsConversionProfile->getTags()!==null) 
 				$flavorParams->setTags($flavorParamsConversionProfile->getTags());
-			if($flavorParamsConversionProfile->getChunkedEncodeMode()!==null)
-				$flavorParams->setChunkedEncodeMode($flavorParamsConversionProfile->getChunkedEncodeMode());
+			
+			$chunkEncoderMode = $flavorParams->getChunkedEncodeMode();
+			if ($flavorParamsConversionProfile->getChunkedEncodeMode() !== null)
+			{
+				$chunkEncoderMode = $flavorParamsConversionProfile->getChunkedEncodeMode();
+			}
+
+			$chunkedConvertMinDuration = kConf::get('chunked_convert_min_duration', 'runtime_config', 0);
+			if (isset($entryDuration) && $entryDuration < $chunkedConvertMinDuration)
+			{
+				$chunkEncoderMode = false;
+			}
+			
+			$flavorParams->setChunkedEncodeMode($chunkEncoderMode);
 			$overloadParamsJsonStr = $flavorParamsConversionProfile->getOverloadParams();
 				/*
 				 * OverloadParams is JSON string containing an array of flavotParams field-value pairs. 
