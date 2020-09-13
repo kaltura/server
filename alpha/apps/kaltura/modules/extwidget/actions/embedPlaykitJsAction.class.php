@@ -393,8 +393,8 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
-        $playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
-        $loadContentMethod = "";
+		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
 		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
