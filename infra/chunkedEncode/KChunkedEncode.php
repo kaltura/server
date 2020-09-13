@@ -1006,6 +1006,7 @@
 				break;
 			case "fix":
 				$name.= "$this->videoChunkPostfix".$chunkIdx.".fix";
+				$name='/tmp/'.basename($name);
 				break;
 			case "base":
 				$name.= "$this->videoChunkPostfix";
