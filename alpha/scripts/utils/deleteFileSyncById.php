@@ -32,6 +32,7 @@ KalturaLog::info(' ========= Script Started ========= ');
 
 $fileSyncDeletedCounter = 0;
 $fileSyncIdNotFound = array();
+$counter = 1;
 
 foreach ($fileSyncIds as $fileSyncId)
 {
@@ -45,6 +46,12 @@ foreach ($fileSyncIds as $fileSyncId)
 		{
 			$fileSync->save();
 			kEventsManager::flushEvents();
+			if ($counter % 100 == 0)
+			{
+				KalturaLog::info(" Sleeping for 5 seconds");
+				sleep(5);
+			}
+			$counter++;
 		}
 		else
 		{
