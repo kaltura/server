@@ -518,7 +518,7 @@ class kUploadTokenMgr
 				//return null;
 			}
 						
-			if (!appendChunks($targetFileResource, $chunks))
+			if (!self::appendChunks($targetFileResource, $chunks))
 			{
 				break;
 			}
