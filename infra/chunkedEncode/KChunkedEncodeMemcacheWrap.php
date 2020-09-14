@@ -650,6 +650,18 @@ ini_set("memory_limit","512M");
 			if(is_array($job->cmdLine)) {
 				$cmdLine = $job->cmdLine[0];
 				$outFilename = $job->cmdLine[1];
+					/*
+					 * Switch chunk generation to local disk folder (tmpPromptFolder)
+					 * - replace the out file in tha cmdline to '/tmp' flolder
+					 * - move all generated files back to the 'normal' tmp path
+					 */
+				$outFilenameInfo = null;
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+				if(isset($tmpPromptFolder) && true) {
+					$outFilenameInfo = pathinfo($outFilename);
+					$outFilename=$tmpPromptFolder.'/'.$outFilenameInfo['basename'];
+					$cmdLine=str_replace($outFilenameInfo['dirname'], $tmpPromptFolder, $cmdLine);
+				}
 			}
 			else
 				$cmdLine = $job->cmdLine;
@@ -670,6 +682,19 @@ ini_set("memory_limit","512M");
 				$job->state = $job::STATE_SUCCESS;
 				$storeManager->SaveJob($job);
 				$rvStr = "SUCCESS -";
+
+			}
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+			if(isset($tmpPromptFolder) && isset($outFilename) && true){
+				$scanFolder=$tmpPromptFolder.'/'.$outFilenameInfo['filename'].'*';
+				$scanOutputfiles = glob($scanFolder);
+				foreach($scanOutputfiles as $tmpFilename){
+					$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
+					if(rename($tmpFilename, $moveToName)==false){
+						$rv=-1;
+						$rvStr = "FAILED - to mov file to $moveToName,";
+					}
+				}
 			}
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);
