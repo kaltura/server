@@ -402,7 +402,6 @@ class kUploadTokenMgr
 			$nextChunkPath = "$targetFilePath.chunk.$targetFileSize";
 			if(!kFile::checkFileExists($nextChunkPath))
 			{
-				KalturaLog::debug("next chunk path not found [$nextChunkPath]");
 				break;
 			}
 			
