@@ -485,7 +485,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		
 		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-		$serveFlavorPathSearchReplace = kConf::get('keep_original_file_location', 'runtime_config', 0);
+		$keepFileInOriginalMount = kConf::get('keep_original_file_location', 'runtime_config', 0);
 		if($keepFileInOriginalMount)
 		{
 			$fileRealPath = realpath($temp_file_path);
