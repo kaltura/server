@@ -252,7 +252,14 @@ class kUploadTokenMgr
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		
-		return myContentStorage::getFSUploadsPath().
+		$fsRootUploadPath = myContentStorage::getFSUploadsPath();
+		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
+		if(count($uploadVolumes))
+		{
+			$fsRootUploadPath = $uploadVolumes[rand(0, count($uploadVolumes) - 1)] . "content/uploads/";
+		}
+		
+		return $fsRootUploadPath.
 			substr($uploadTokenId, -2).'/'.
 			substr($uploadTokenId, -4, 2).'/'.
 			$uploadTokenId.'.'.$extension;
@@ -395,6 +402,7 @@ class kUploadTokenMgr
 			$nextChunkPath = "$targetFilePath.chunk.$targetFileSize";
 			if(!kFile::checkFileExists($nextChunkPath))
 			{
+				KalturaLog::debug("next chunk path not found [$nextChunkPath]");
 				break;
 			}
 			
