@@ -277,6 +277,18 @@ class kFileUtils extends kFile
 		return (($pos+$PrefixLen) == strlen($fileName));
 	}
 
+	public static function getMimeType($filePath)
+	{
+		$fileType = kFile::mimeType($filePath);
+		if ($fileType == 'application/octet-stream')//stream of byte - can be media or executable
+		{
+			$fileType = kFile::getMediaInfoFormat($filePath);
+			if (empty($fileType))
+				$fileType = kFile::findFileTypeByFileCmd($filePath);
+		}
+		return $fileType;
+	}
+
 	public static function getMostRecentModificationTimeFromDir($dir)
 	{
 		$mostRecentModificationTime = 0;

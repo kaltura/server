@@ -605,17 +605,7 @@ class kFile extends kFileBase
 		return array("\n", "\r");
 	}
 
-	public static function getMimeType($filePath)
-	{
-		$fileType = kFile::mimeType($filePath);
-		if ($fileType == 'application/octet-stream')//stream of byte - can be media or executable
-		{
-			$fileType = kFile::getMediaInfoFormat($filePath);
-			if (empty($fileType))
-				$fileType = kFile::findFileTypeByFileCmd($filePath);
-		}
-		return $fileType;
-	}
+
 }
 
 /**

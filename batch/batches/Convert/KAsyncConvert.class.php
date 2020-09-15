@@ -433,7 +433,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$fileTypesBlackList = isset(self::$taskConfig->params->fileTypeBlackList) ? self::$taskConfig->params->fileTypeBlackList : null;
 		if ($fileTypesBlackList)
 		{
-			$fileType = kFile::getMimeType($filePath);
+			$fileType = kFile::mimeType($filePath);
 			KalturaLog::debug("Validating file type $fileType");
 			$fileTypesBlackListArr = explode(',', $fileTypesBlackList);
 			if (in_array($fileType, $fileTypesBlackListArr))
