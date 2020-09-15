@@ -524,7 +524,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 		
-		KalturaLog::debug("filePath [$filePath] targetFilePath [$targetFullPath]");
+		KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
 		
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
