@@ -485,7 +485,47 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		
 		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-
+		$keepFileInOriginalMount = kConf::get('keep_original_file_location', 'runtime_config', 0);
+		if($keepFileInOriginalMount)
+		{
+			$fileRealPath = realpath($temp_file_path);
+			
+			$partnerVolumes = kConf::get('partner_volumes', 'local', array());
+			if(isset($partnerVolumes[$target_key->getPartnerId()]))
+			{
+				$volumes = $partnerVolumes[$target_key->getPartnerId()];
+			}
+			else
+			{
+				$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
+			}
+			
+			$mountPrefixTranslate = kConf::get('mount_prefix_translate', 'runtime_config', array());
+			foreach ($mountPrefixTranslate as $mount => $destination)
+			{
+				if(!kString::beginsWith($fileRealPath ,$mount))
+				{
+					continue;
+				}
+				
+				foreach ($volumes as $volume)
+				{
+					if(!strpos($targetFullPath, $volume))
+					{
+						continue;
+					}
+					
+					$targetFullPath = str_replace($volume, $destination, $targetFullPath);
+					$filePath = str_replace($volume, $destination, $filePath);
+					break;
+				}
+				
+				break;
+			}
+		}
+		
+		KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
+		
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
 			self::fullMkdir($targetFullPath);
