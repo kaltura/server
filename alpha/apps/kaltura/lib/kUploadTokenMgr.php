@@ -252,11 +252,15 @@ class kUploadTokenMgr
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		
-		$fsRootUploadPath = myContentStorage::getFSUploadsPath();
 		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
 		if(count($uploadVolumes))
 		{
-			$fsRootUploadPath = $uploadVolumes[rand(0, count($uploadVolumes) - 1)] . "content/uploads/";
+			$lastChar = substr($uploadTokenId, -1);
+			$fsRootUploadPath = $uploadVolumes[ord($lastChar) % count($uploadVolumes)] . "content/uploads/";
+		}
+		else
+		{
+			$fsRootUploadPath = myContentStorage::getFSUploadsPath();
 		}
 		
 		return $fsRootUploadPath.
