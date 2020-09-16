@@ -411,6 +411,7 @@ class kUploadTokenMgr
 				break;
 			}
 			
+			$lockedFile = "$nextChunkPath.".microtime(true).".locked";
 			list ($locked, $lockedFile) = self::lockFile($nextChunkPath, $lockedFile);
 			if (!$locked) // another process is already appending this file
 			{
