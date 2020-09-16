@@ -661,18 +661,18 @@ class kUploadTokenMgr
 	
 	public static function isValidUploadDir($uploadDir)
 	{
-		$fstUploadPaths = array();
-		$fstUploadPaths[] = realpath(myContentStorage::getFSUploadsPath());
+		$fsUploadPaths = array();
+		$fsUploadPaths[] = realpath(myContentStorage::getFSUploadsPath());
 		
 		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
 		foreach ($uploadVolumes as $uploadVolume)
 		{
-			$fstUploadPaths[] = realpath($uploadVolume . "content/uploads/");
+			$fsUploadPaths[] = realpath($uploadVolume . "content/uploads/");
 		}
 		
-		foreach ($fstUploadPaths as $fstUploadPath)
+		foreach ($fsUploadPaths as $fsUploadPath)
 		{
-			if ( strpos( $uploadDir, $fstUploadPath ) === 0 ) // Composed path doesn't begin with $uploadPathBase?
+			if ( strpos( $uploadDir, $fsUploadPath ) === 0 ) // Composed path doesn't begin with $uploadPathBase?
 			{
 				return true;
 			}
