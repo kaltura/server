@@ -1881,14 +1881,62 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return null;
 		}
 
-		$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
-		if($fileSync)
+		$c = new Criteria();
+		$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+		$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->addAscendingOrderByColumn(FileSyncPeer::DC);
+
+		$fileSyncs = FileSyncPeer::doSelect($c);
+		if (!$fileSyncs)
 		{
-			return $fileSync;
+			KalturaLog::notice("no file sync found");
+			return null;
 		}
 
-		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, true, false);
-		return $fileSync;
+		$priorityList = kConf::get('serve_priority', 'local', array());
+		if (isset($priorityList[$preferredStorageId]))
+		{
+			$priorityList = $priorityList[$preferredStorageId];
+		}
+		else
+		{
+			$priorityList = array(0 => array('dc' => $preferredStorageId));
+		}
+
+		$best = null;
+		foreach ($fileSyncs as $fileSync)
+		{
+			$fileSync = self::resolve($fileSync);
+			if ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+			{
+				continue;
+			}
+
+			$priority = count($priorityList);
+			foreach ($priorityList as $curPrio => $rules)
+			{
+				if ($rules['dc'] != $fileSync->getDc())
+				{
+					continue;
+				}
+
+				if (isset($rules['exclude']) && preg_match($rules['exclude'], $fileSync->getFilePath()))
+				{
+					continue;
+				}
+
+				$priority = $curPrio;
+				break;
+			}
+
+			if (!$best || $priority < $bestPrio)
+			{
+				$best = $fileSync;
+				$bestPrio = $priority;
+			}
+		}
+
+		return $best;
 	}
 
 	/**
@@ -1908,13 +1956,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return array(null, self::SOURCE_TYPE_FILE);
 		}
 
+		$forceRemoteServePattern = kConf::get('force_remote_serve_pattern', 'local', '');
+
 		// handle remote dc
 		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
 		{
 			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_HTTP);
 		}
 		// handle local preferred dc
-		else if($fileSync->getDc() == $preferredStorageId)
+		else if($fileSync->getDc() == $preferredStorageId &&
+			(!$forceRemoteServePattern || !preg_match($forceRemoteServePattern, $fileSync->getFilePath())))
 		{
 			return array(kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_FILE);
 		}
