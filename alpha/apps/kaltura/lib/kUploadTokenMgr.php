@@ -314,8 +314,7 @@ class kUploadTokenMgr
 			{
 				KalturaLog::debug("This is not the final chunk trying to append available chunks");
 				$currentFileSize = $this->syncAppendAvailableChunks($uploadFilePath);
-				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize " .
-					intval($resumeAt <= $currentFileSize) . " " . intval($resumeAt + $chunkSize > $currentFileSize));
+				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize $currentFileSize");
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
 					KalturaLog::debug("Appending current chunk [$sourceFilePath] to final file [$uploadFilePath]");
