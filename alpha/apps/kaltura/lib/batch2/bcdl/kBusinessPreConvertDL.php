@@ -2112,7 +2112,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			{
 				$chunkEncoderMode = $flavorParamsConversionProfile->getChunkedEncodeMode();
 			}
-
 			$chunkedConvertMinDuration = kConf::get('chunked_convert_min_duration', 'runtime_config', 0);
 			if (isset($entryDuration) && $entryDuration < $chunkedConvertMinDuration)
 			{

@@ -20,6 +20,8 @@ class BatchService extends KalturaBatchService
 {
     const DEFAULT_MAX_DATA_SIZE = 20000000;
 
+	const DEFAULT_MAX_DATA_SIZE = 20000000;
+
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
 
 	/**
@@ -637,17 +639,18 @@ class BatchService extends KalturaBatchService
 	 * batch putFileAction action allows put file on server via http
 	 *
 	 * @action putFile
-	 * @param string $path
+	 * @param string $destPath
 	 * @param file $data
+	 * @return int Number of bytes
 	 */
-	public function putFileAction($path,$data)
+	public function putFileAction($destPath, $data)
 	{
 		$maxDataSize = kConf::get('maxPutFileSize','batchServices', self::DEFAULT_MAX_DATA_SIZE);
 		$allowedPathPrefixArr = kConf::get('allowedPutFilePrefix','batchServices', array());
 		$found = false;
 		foreach ($allowedPathPrefixArr as $allowedPathPrefix)
 		{
-			if (strpos($path, $allowedPathPrefix) === 0)
+			if (strpos($destPath, $allowedPathPrefix) === 0)
 			{
 				$found = true;
 				break;
@@ -655,7 +658,7 @@ class BatchService extends KalturaBatchService
 		}
 		if (!$found)
 		{
-			throw new KalturaAPIException(KalturaErrors::PATH_NOT_ALLOWED, $path);
+			throw new KalturaAPIException(KalturaErrors::PATH_NOT_ALLOWED, $destPath);
 		}
 		$size = kFile::fileSize($data['tmp_name']);
 		if ( $size > $maxDataSize )
@@ -663,14 +666,12 @@ class BatchService extends KalturaBatchService
 			throw new KalturaAPIException(KalturaErrors::FILE_SIZE_EXCEEDED, $size);
 		}
 
-		KalturaLog::debug("Going to save file in path - $path");
-		if(kFile::checkFileExists($path))
+		KalturaLog::debug("Going to save file in path - $destPath");
+		if(kFile::checkFileExists($destPath))
 		{
-			throw new KalturaAPIException(KalturaErrors::FILE_ALREADY_EXISTS, $path);
+			throw new KalturaAPIException(KalturaErrors::FILE_ALREADY_EXISTS, $destPath);
 		}
-		$fileContent = file_get_contents($data['tmp_name']);
-		$ret = file_put_contents($path,$fileContent);
+		$ret = kFile::moveFile($data['tmp_name'], $destPath);
 		return $ret;
 	}
-
 }

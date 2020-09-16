@@ -506,10 +506,10 @@ class BaseEntryService extends KalturaEntryService
 				}
 			}
 		}
-		catch (KalturaApiException $e)
+		catch (KalturaAPIException $e)
 		{
 			kalturaLog::warning('Could not execute filter');
-			kalturaLog::debug($e);
+			KalturaLog::debug($e);
 		}
 
 		return $result;
