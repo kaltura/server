@@ -176,6 +176,14 @@ class StorageProfileService extends KalturaBaseService
 
 		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::ID);
 
+		$pathByWorkerId = kConf::get('pathByWorkerId' , 'batchServices', array());
+		$key = 'worker_' . $workerId;
+		$path = isset($pathByWorkerId[$key])? trim($pathByWorkerId[$key]) : null;
+		if ($path)
+		{
+			$baseCriteria->add(FileSyncPeer::CUSTOM_DATA, $path, Criteria::LIKE);
+		}
+
 		$lockedFileSyncs = array();
 		$limitReached = false;
 		$selectCount = 0;
