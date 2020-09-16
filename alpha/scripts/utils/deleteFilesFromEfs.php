@@ -19,7 +19,7 @@ class deleteFilesWorker
 	const AWS_DC = 2;
 	const MAX_UPDATED_AT_PARAM = 'min_updated_at';
 	const ITERATION_FILESYNC_LIMIT = 'iteration_filesync_limit';
-	const SCRIPT_MS_RUNNING_TIME_THRESHOLD = 30000;
+	const SCRIPT_MS_RUNNING_TIME_THRESHOLD = 1000;
 	const SLEEP_BETWEEN_FAST_ITERATIONS = 120;
 	const MIN_FILE_SYNC_ID_TIME_WINDOW = 600;
 
@@ -39,40 +39,18 @@ class deleteFilesWorker
 			KalturaLog::info("Starting new deletion iteration");
 			$iterationStartTime = microtime(true);
 			$minFileSyncId = $this->getMinFileSyncId();
-			$bytesDeleted = 0;
 			if($minFileSyncId)
 			{
 				$candidatesFilesSync = $this->getCandidatesForDelete($minFileSyncId);
-				$efsFilesSyncObjects = $this->transformFileSyncToObjectsArray($candidatesFilesSync);
-				$efsFilesSyncObjects = $this->filterEfsFileObjects($efsFilesSyncObjects);
-				foreach ($efsFilesSyncObjects as $objectId => $fileSync)
-				{
-					$bytesDeleted += $this->deleteFile($fileSync);
-				}
+				$this->filterAndDeleteFileSyncs($candidatesFilesSync);
 			}
 
 			kMemoryManager::clearMemory();
 			$execution_time = (microtime(true) - $iterationStartTime);
-			KalturaLog::info("Finished a deletion iteration in {$execution_time} ms, {$bytesDeleted} bytes were deleted");
-			if($execution_time < self::SCRIPT_MS_RUNNING_TIME_THRESHOLD)
-			{
-				sleep(self::SLEEP_BETWEEN_FAST_ITERATIONS);
-			}
+			KalturaLog::info("Finished a deletion iteration in {$execution_time} ms");
 		}
 
 		KalturaLog::warning('Found stop file, finishing delete script');
-	}
-
-	protected function transformFileSyncToObjectsArray($fileSyncs)
-	{
-		$object_ids = array();
-		foreach ($fileSyncs as $fileSync)
-		{
-			/* @var $fileSync fileSync */
-			$object_ids[$fileSync->getObjectId()] = $fileSync;
-		}
-
-		return $object_ids;
 	}
 
 	protected function getCandidatesForDelete($minFileSyncId)
@@ -178,11 +156,7 @@ class deleteFilesWorker
 			$efsSize = kFile::fileSize($efsFilePath);
 			if ($efsSize == $S3Size)
 			{
-				if($this->dryRun)
-				{
-					KalturaLog::info("{$efsFilePath} size {$efsSize} and {$s3Location} size {$S3Size} match");
-				}
-
+				KalturaLog::info("{$efsFilePath} size {$efsSize} and {$s3Location} size {$S3Size} match");
 				return true;
 			}
 		}
@@ -212,8 +186,8 @@ class deleteFilesWorker
 		else
 		{
 			KalturaLog::info("Deleting file {$efsFilePath}, fileSync ID:{$efsFileSync->getId()}, size {$efsFileSize}");
-			$last_line = system("rm -rf {$efsFilePath}", $retval);
-			if($last_line)
+			system("rm -rf {$efsFilePath}", $retval);
+			if(!kFile::checkFileExists($efsFilePath))
 			{
 				$efsFileSync->setStatus(self::FILE_SYNC_PURGE_STATUS);
 				try
@@ -227,7 +201,6 @@ class deleteFilesWorker
 					return 0;
 				}
 
-				KalturaLog::info("Delete command output: {$last_line} ");
 				return $efsFileSize;
 			}
 			else
@@ -257,17 +230,21 @@ class deleteFilesWorker
 		return true;
 	}
 
-	protected function getAwsFileSync($efsFileSyncObjectIds)
+	/**
+	 * @param FileSync $efsFileSync
+	 * @return FileSync|null
+	 */
+	protected function getAwsFileSync($efsFileSync)
 	{
-		KalturaLog::info("Getting AWS file syncs");
 		$result = null;
 		$criteria = new Criteria();
 		$criteria->add(FileSyncPeer::DC, self::AWS_DC, Criteria::EQUAL);
 		$criteria->add(FileSyncPeer::STATUS, self::FILE_SYNC_READY_STATUS, Criteria::EQUAL);
-		$criteria->add(FileSyncPeer::OBJECT_ID, $efsFileSyncObjectIds, Criteria::IN);
+		$criteria->add(FileSyncPeer::OBJECT_ID, $efsFileSync->getObjectId(), Criteria::EQUAL);
+		$criteria->add(FileSyncPeer::VERSION, $efsFileSync->getVersion(), Criteria::EQUAL);
 		try
 		{
-			$result = FileSyncPeer::doSelect($criteria, $this->con);
+			$result = FileSyncPeer::doSelectOne($criteria, $this->con);
 		}
 		catch(PropelException $ex)
 		{
@@ -278,35 +255,39 @@ class deleteFilesWorker
 		return $result;
 	}
 
-	protected function filterEfsFileObjects($efsFileSyncObjects)
+	protected function filterAndDeleteFileSyncs($efsFileSyncs)
 	{
-		$result = array();
-		$s3FileSyncs = $this->getAwsFileSync(array_keys($efsFileSyncObjects));
+		$bytesDeleted =0;
 		//Now that we found siblings in DC 2
-		foreach ($s3FileSyncs as $s3FileSync)
+		foreach ($efsFileSyncs as $efsFileSync)
 		{
-			/* @var $s3FileSync fileSync */
-			$objectId = $s3FileSync->getObjectId();
-			if($this->verifyFlavorAsset($objectId) && isset($efsFileSyncObjects[$objectId]))
+			/* @var FileSync $efsFileSync */
+			$awsFileSync = $this->getAwsFileSync($efsFileSync);
+			if($awsFileSync)
 			{
-				if($this->verifyFileSize($efsFileSyncObjects[$objectId]->getFullPath(), $s3FileSync->getFullPath()))
+				if($this->verifyFlavorAsset($awsFileSync->getObjectId()))
 				{
-					$result[$objectId] = $efsFileSyncObjects[$objectId];
+					KalturaLog::info("FlavorAsset verification passed");
+					if($this->verifyFileSize($efsFileSync->getFullPath(), $awsFileSync->getFullPath()))
+					{
+						$bytesDeleted += $this->deleteFile($efsFileSync);
+					}
 				}
+			}
+			else
+			{
+				KalturaLog::info("Couldnt find aws file sync for {$efsFileSync->getObjectId()}");
 			}
 		}
 
-		if($result)
+		if($bytesDeleted)
 		{
-			$numberOfObjects = count($result);
-			KalturaLog::info("There are {$numberOfObjects} objects for deletion after filtering");
+			KalturaLog::info("{$bytesDeleted} bytes were deleted");
 		}
 		else
 		{
-			KalturaLog::info("Not file sync to delete after filtering");
+			KalturaLog::info("No files sync to delete after filtering");
 		}
-
-			return $result;
 	}
 }
 
@@ -318,9 +299,8 @@ if($argc < 4)
 	die;
 }
 
-
-$minFileSize = $argv[1];
-$efsFilePath = $argv[2];
+$efsFilePath = $argv[1];
+$minFileSize = $argv[2];
 $minUpdatedAtTime = $argv[3];
 
 $dryRun = true;
