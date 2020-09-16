@@ -410,14 +410,37 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		$this->operationEngine->setEncryptionKey($key);
 		if (!$key || is_dir($filePath))
+		{
+			$this->validateFileType($filePath);
 			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
+		}
 		else
 		{
 			$tempClearPath = self::createTempClearFile($filePath, $key);
+			$this->validateFileType($tempClearPath);
 			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
 			unlink($tempClearPath);
 		}
 		return $res;
+	}
+
+	/**
+	 * @param $filePath
+	 * @throws KOperationEngineException
+	 */
+	protected function validateFileType($filePath)
+	{
+		$fileTypesBlackList = isset(self::$taskConfig->params->fileTypeBlackList) ? self::$taskConfig->params->fileTypeBlackList : null;
+		if ($fileTypesBlackList)
+		{
+			$fileType = kFile::mimeType($filePath);
+			KalturaLog::debug("Validating file type $fileType");
+			$fileTypesBlackListArr = explode(',', $fileTypesBlackList);
+			if (in_array($fileType, $fileTypesBlackListArr))
+			{
+				throw new KOperationEngineException("File type $fileType not allowed  ");
+			}
+		}
 	}
 
 	protected function doApiMove($srcPath, $destPath)

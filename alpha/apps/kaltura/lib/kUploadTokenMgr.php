@@ -668,8 +668,8 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
-	
-	private static function lockFile($nextChunk, $lockedFile)
+ 
+  private static function lockFile($nextChunk, $lockedFile)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
 		if (!$cache)
@@ -690,4 +690,27 @@ class kUploadTokenMgr
 		
 		$cache->delete($key);
 	}
+	
+	public static function isValidUploadDir($uploadDir)
+	{
+		$fsUploadPaths = array();
+		$fsUploadPaths[] = realpath(myContentStorage::getFSUploadsPath());
+		
+		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
+		foreach ($uploadVolumes as $uploadVolume) 
+		{
+			$fsUploadPaths[] = realpath($uploadVolume . "content/uploads/");
+		}
+		
+		foreach ($fsUploadPaths as $fsUploadPath) 
+		{
+			if (strpos($uploadDir, $fsUploadPath) === 0) // Composed path doesn't begin with $uploadPathBase?
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+  
 }

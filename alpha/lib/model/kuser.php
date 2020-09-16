@@ -21,6 +21,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const MEMBERS_COUNT = 'members_count';
 	const PROCESS_STATUS = 'process_status';
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
+	const REGISTRATION_INFO = "registration_info";
+	const ATTENDANCE_INFO = "attendance_info";
 
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
@@ -1419,5 +1421,25 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function getProcessStatus()
 	{
 		return $this->getFromCustomData(self::PROCESS_STATUS, null,GroupProcessStatus::NONE);
+	}
+
+	public function setRegistrationInfo($v)
+	{
+		$this->putInCustomData(self::REGISTRATION_INFO, $v);
+	}
+
+	public function getRegistrationInfo()
+	{
+		return $this->getFromCustomData(self::REGISTRATION_INFO);
+	}
+
+	public function setAttendanceInfo($v)
+	{
+		$this->putInCustomData(self::ATTENDANCE_INFO, $v);
+	}
+
+	public function getAttendanceInfo()
+	{
+		return $this->getFromCustomData(self::ATTENDANCE_INFO);
 	}
 }
