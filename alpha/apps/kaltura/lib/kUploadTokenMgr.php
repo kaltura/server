@@ -51,7 +51,7 @@ class kUploadTokenMgr
 			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
 		
 		$this->_autoFinalizeCache = $cache;
-		$this->_autoFinalizeCache->add($this->_uploadToken->getId() . ".retries", self::MAX_AUTO_FINALIZE_RETIRES);
+		$this->_autoFinalizeCache->add($this->_uploadToken->getId() . ".retries", self::MAX_AUTO_FINALIZE_RETIRES, 86400);
 	}
 	
 	/**
@@ -678,7 +678,7 @@ class kUploadTokenMgr
 			return array(kFile::moveFile($nextChunk, $lockedFile), $lockedFile);
 		}
 		
-		return array($cache->add($nextChunk,"true", 3600), $nextChunk);
+		return array($cache->add($nextChunk, true, 3600), $nextChunk);
 	}
 	
 	private static function releaseLock($key)
