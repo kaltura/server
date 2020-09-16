@@ -19,7 +19,6 @@ class deleteFilesWorker
 	const AWS_DC = 2;
 	const MAX_UPDATED_AT_PARAM = 'min_updated_at';
 	const ITERATION_FILESYNC_LIMIT = 'iteration_filesync_limit';
-	const SCRIPT_MS_RUNNING_TIME_THRESHOLD = 1000;
 	const SLEEP_BETWEEN_FAST_ITERATIONS = 120;
 	const MIN_FILE_SYNC_ID_TIME_WINDOW = 600;
 
@@ -34,11 +33,17 @@ class deleteFilesWorker
 
 	public function doWork()
 	{
+		$minFileSyncId = null;
+		$candidatesFilesSync = null;
 		while(!kFile::checkFileExists(self::STOP_FILE_PATH))
 		{
 			KalturaLog::info("Starting new deletion iteration");
+			if(!$minFileSyncId)
+			{
+				$minFileSyncId = $this->getMinFileSyncId();
+			}
+
 			$iterationStartTime = microtime(true);
-			$minFileSyncId = $this->getMinFileSyncId();
 			if($minFileSyncId)
 			{
 				$candidatesFilesSync = $this->getCandidatesForDelete($minFileSyncId);
@@ -47,6 +52,17 @@ class deleteFilesWorker
 
 			kMemoryManager::clearMemory();
 			$execution_time = (microtime(true) - $iterationStartTime);
+			if($candidatesFilesSync)
+			{
+				$lastFileSync = end($candidatesFilesSync);
+				$minFileSyncId = $lastFileSync->getId();
+			}
+			else
+			{
+				KalturaLog::warning('No file sync candidates were found reseting minFileSyncId');
+				$minFileSyncId = null;
+			}
+
 			KalturaLog::info("Finished a deletion iteration in {$execution_time} ms");
 		}
 
@@ -186,21 +202,21 @@ class deleteFilesWorker
 		else
 		{
 			KalturaLog::info("Deleting file {$efsFilePath}, fileSync ID:{$efsFileSync->getId()}, size {$efsFileSize}");
+			$efsFileSync->setStatus(self::FILE_SYNC_PURGE_STATUS);
+			try
+			{
+				$efsFileSync->save();
+			}
+			catch(PropelException $ex)
+			{
+				KalturaLog::err("Error updating fileSync {$efsFileSync->getId()} to status purged");
+				KalturaLog::err($ex);
+				return 0;
+			}
+
 			system("rm -rf {$efsFilePath}", $retval);
 			if(!kFile::checkFileExists($efsFilePath))
 			{
-				$efsFileSync->setStatus(self::FILE_SYNC_PURGE_STATUS);
-				try
-				{
-					$efsFileSync->save();
-				}
-				catch(PropelException $ex)
-				{
-					KalturaLog::err("Error updating fileSync {$efsFileSync->getId()} to status purged");
-					KalturaLog::err($ex);
-					return 0;
-				}
-
 				return $efsFileSize;
 			}
 			else
