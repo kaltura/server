@@ -313,7 +313,7 @@ class kUploadTokenMgr
 			if(!$verifyFinalChunk)
 			{
 				KalturaLog::debug("This is not the final chunk trying to append available chunks");
-				$currentFileSize = $this->syncAppendAvailableChunks($uploadFilePath);
+				$currentFileSize = self::syncAppendAvailableChunks($uploadFilePath);
 				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize $currentFileSize");
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
@@ -397,7 +397,7 @@ class kUploadTokenMgr
 		return $targetFileSize;
 	}
 	
-	private function syncAppendAvailableChunks($targetFilePath, $maxSyncedConcat = 10)
+	private static function syncAppendAvailableChunks($targetFilePath, $maxSyncedConcat = 10)
 	{
 		$targetFileResource = self::openFile($targetFilePath, 'r+b');
 		fseek($targetFileResource, 0, SEEK_END);
@@ -411,10 +411,11 @@ class kUploadTokenMgr
 				break;
 			}
 			
+			$lockedFile = "$nextChunkPath.".microtime(true).".locked";
 			list ($locked, $lockedFile) = self::lockFile($nextChunkPath, $lockedFile);
 			if (!$locked) // another process is already appending this file
 			{
-				KalturaLog::log("rename ($nextChunk, $lockedFile) failed");
+				KalturaLog::log("rename ($nextChunkPath, $lockedFile) failed");
 				break;
 			}
 			
