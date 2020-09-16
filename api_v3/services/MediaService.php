@@ -450,8 +450,7 @@ class MediaService extends KalturaEntryService
 		    
 		    // Make sure that the uploads path is not modified by $uploadTokenId (with the value of "../" for example )
 		    $entryRootDir = realpath( dirname( $entryFullPath ) );
-			$uploadPathBase = realpath( myContentStorage::getFSUploadsPath() );
-			if ( strpos( $entryRootDir, $uploadPathBase ) !== 0 ) // Composed path doesn't begin with $uploadPathBase?  
+			if ( !kUploadTokenMgr::isValidUploadDir($entryRootDir) ) // Composed path doesn't begin with $uploadPathBase?
 			{
 				KalturaLog::err( "uploadTokenId [$uploadTokenId] points outside of uploads directory" );
 				throw new KalturaAPIException( KalturaErrors::INVALID_UPLOAD_TOKEN_ID );			

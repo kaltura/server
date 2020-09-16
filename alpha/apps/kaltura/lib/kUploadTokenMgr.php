@@ -658,4 +658,26 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
+	
+	public static function isValidUploadDir($uploadDir)
+	{
+		$fstUploadPaths = array();
+		$fstUploadPaths[] = realpath(myContentStorage::getFSUploadsPath());
+		
+		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
+		foreach ($uploadVolumes as $uploadVolume)
+		{
+			$fstUploadPaths[] = realpath($uploadVolume . "content/uploads/");
+		}
+		
+		foreach ($fstUploadPaths as $fstUploadPath)
+		{
+			if ( strpos( $uploadDir, $fstUploadPath ) === 0 ) // Composed path doesn't begin with $uploadPathBase?
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }
