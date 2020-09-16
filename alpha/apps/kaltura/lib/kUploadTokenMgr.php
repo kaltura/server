@@ -314,8 +314,8 @@ class kUploadTokenMgr
 			{
 				KalturaLog::debug("This is not the final chunk trying to append available chunks");
 				$currentFileSize = $this->syncAppendAvailableChunks($uploadFilePath);
-				KalturaLog::debug(">>> resumeAt [$resumeAt] chunkSize [$chunkSize] resumeAt<=currentFileSize [" .
-					($resumeAt <= $currentFileSize) . "] resumeAt+chunkSize>currentFileSize [" . ($resumeAt + $chunkSize > $currentFileSize) . "]");
+				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize " .
+					intval($resumeAt <= $currentFileSize) . " " . intval($resumeAt + $chunkSize > $currentFileSize));
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
 					KalturaLog::debug("Appending current chunk [$sourceFilePath] to final file [$uploadFilePath]");
@@ -420,9 +420,9 @@ class kUploadTokenMgr
 			}
 			
 			KalturaLog::debug("Appending chunk $lockedFile to target file $targetFilePath");
-			$bytesRead = self::appendChunk($lockedFile, $targetFileResource);
+			$bytesWritten = self::appendChunk($lockedFile, $targetFileResource);
 			self::releaseLock($nextChunkPath);
-			$targetFileSize += $bytesRead;
+			$targetFileSize += $bytesWritten;
 		}
 		
 		fclose($targetFileResource);
@@ -487,7 +487,7 @@ class kUploadTokenMgr
 
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
-		$bytesRead = 0;
+		$bytesWritten = 0;
 		$sourceFileResource = self::openFile($sourceFilePath, 'rb');
 		if(!$sourceFileResource)
 		{
@@ -498,14 +498,14 @@ class kUploadTokenMgr
 		$start = microtime(true);
 		while (! feof($sourceFileResource)) {
 			$data = fread($sourceFileResource, self::CHUNK_SIZE);
-			$bytesRead += strlen($data);
+			$bytesWritten += strlen($data);
 			fwrite($targetFileResource, $data);
 		}
 		KalturaLog::debug("took " . (microtime(true) - $start) . " seconds");
 
 		fclose($sourceFileResource);
 		unlink($sourceFilePath);
-		return $bytesRead;
+		return $bytesWritten;
 	}
 
 	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk, $uploadTokenId)
