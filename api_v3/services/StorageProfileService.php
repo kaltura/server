@@ -181,7 +181,7 @@ class StorageProfileService extends KalturaBaseService
 		$path = isset($pathByWorkerId[$key])? trim($pathByWorkerId[$key]) : null;
 		if ($path)
 		{
-			$baseCriteria->add(FileSyncPeer::CUSTOM_DATA, $path, Criteria::LIKE);
+			$baseCriteria->add(FileSyncPeer::CUSTOM_DATA, "%$path%", Criteria::LIKE);
 		}
 
 		$lockedFileSyncs = array();
