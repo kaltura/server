@@ -415,7 +415,7 @@ class kUploadTokenMgr
 			list ($locked, $lockedFile) = self::lockFile($nextChunkPath, $lockedFile);
 			if (!$locked) // another process is already appending this file
 			{
-				KalturaLog::log("rename ($nextChunk, $lockedFile) failed");
+				KalturaLog::log("rename ($nextChunkPath, $lockedFile) failed");
 				break;
 			}
 			
