@@ -446,7 +446,7 @@ class MediaService extends KalturaEntryService
 		try
 		{
 		    // check that the uploaded file exists
-		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
 		    
 		    // Make sure that the uploads path is not modified by $uploadTokenId (with the value of "../" for example )
 		    $entryRootDir = realpath( dirname( $entryFullPath ) );
