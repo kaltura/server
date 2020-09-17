@@ -99,7 +99,12 @@ class LiveEntryServerNode extends EntryServerNode
 		parent::postDelete($con);
 		
 		$this->addTrackEntryInfo(TrackEntry::TRACK_ENTRY_EVENT_TYPE_DELETE_MEDIA_SERVER, __METHOD__.":: serverType=".$this->getServerType().":serverNodeId=".$this->getServerNodeId().":dc=".$this->getDc());
-		
+
+		kLock::runLocked('post_delete_entryServerNode_' . $this->getEntryId(), array($this, 'updateLiveEntryPostDelete'));
+	}
+
+	public function updateLiveEntryPostDelete()
+    {
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
@@ -107,14 +112,14 @@ class LiveEntryServerNode extends EntryServerNode
 			$entryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($liveEntry->getId());
 			if(!count($entryServerNodes))
 				$liveEntry->unsetMediaServer();
-			
+
 			if($this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
-					$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
-			
+				$liveEntry->setLastBroadcastEndTime(kApiCache::getTime());
+
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
-		}
-	}
+        }
+    }
 
 	public function setStreams(array $v) 
 	{ 
@@ -174,7 +179,7 @@ class LiveEntryServerNode extends EntryServerNode
 		
 		/* @var $liveEntry LiveEntry */
 		$timeFromLastUpdate = time() - $this->getUpdatedAt(null);
-		if($this->getDc() === kDataCenterMgr::getCurrentDcId() && !$liveEntry->isCacheValid($this) && $timeFromLastUpdate > LiveEntry::DEFAULT_CACHE_EXPIRY)
+		if($this->isDcValid() && !$liveEntry->isCacheValid($this) && $timeFromLastUpdate > LiveEntry::DEFAULT_CACHE_EXPIRY)
 		{
 			KalturaLog::info("Removing media server id [" . $this->getServerNodeId() . "] from liveEntry [" . $this->getEntryId() . "]");
 			$this->deleteOrMarkForDeletion($liveEntry);
@@ -271,4 +276,10 @@ class LiveEntryServerNode extends EntryServerNode
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_IS_PLAYABLE_USER, $v);
 	}
+
+	public function isDcValid()
+    {
+        $disableDcCheck = kConf::get('disable_dc_check_for_entryServerNode', 'runtime_config', false);
+        return $disableDcCheck || $this->getDc() === kDataCenterMgr::getCurrentDcId();
+    }
 }
