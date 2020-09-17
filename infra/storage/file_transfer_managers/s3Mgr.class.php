@@ -220,14 +220,19 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$size = kFile::fileSize($local_file);
 			KalturaLog::debug("file size is : " . $size);
-
+			$options = array('params' => $params);
+			$concurrency = $this->getConcurrency();
+			if($concurrency)
+			{
+				$options['concurrency'] = $concurrency;
+			}
 			KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
 			$fp = fopen($local_file, 'r');
 			$res = $this->s3->upload($bucket,
 				$remote_file,
 				$fp,
 				$this->filesAcl,
-				array('params' => $params)
+				$options
 			);
 			fclose($fp);
 
@@ -242,6 +247,26 @@ class s3Mgr extends kFileTransferMgr
 			}
 			KalturaLog::err("error uploading file " . $local_file . " s3 info: " . $e->getMessage());
 			return array(false, $e->getMessage());
+		}
+	}
+
+	/**
+	 * @return bool|mixed|null
+	 * @throws Exception
+	 */
+	private function getConcurrency()
+	{
+		if (class_exists('KBatchBase'))
+		{
+			if (isset(KBatchBase::$taskConfig->maxConcurrentUploadConnections))
+			{
+				return KBatchBase::$taskConfig->maxConcurrentUploadConnections;
+			}
+			return null;
+		}
+		else
+		{
+			return kConf::get('maxConcurrentUploadConnections', 'cloud_storage', null);
 		}
 	}
 
