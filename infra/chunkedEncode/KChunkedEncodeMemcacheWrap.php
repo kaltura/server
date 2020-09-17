@@ -650,10 +650,19 @@ ini_set("memory_limit","512M");
 			$outFilename = null;
 			if(is_array($job->cmdLine)) {
 				$cmdLine = $job->cmdLine[0];
-				$outFilenames = isset($job->cmdLine[1]) ? $job->cmdLine[1] : null;;
-				$outFilename = is_array($outFilenames) ? $outFilenames[0] : $outFilenames;
-				//Added to support use cases where the shared file system is not NFS but rather a remote object storage.
-				$sharedChunkPaths = isset($job->cmdLine[2]) ? $job->cmdLine[2] : null;
+				$outFilename = $job->cmdLine[1];
+					/*
+					 * Switch chunk generation to local disk folder (tmpPromptFolder)
+					 * - replace the out file in tha cmdline to '/tmp' flolder
+					 * - move all generated files back to the 'normal' tmp path
+					 */
+				$outFilenameInfo = null;
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+				if(isset($tmpPromptFolder) && true) {
+					$outFilenameInfo = pathinfo($outFilename);
+					$outFilename=$tmpPromptFolder.'/'.$outFilenameInfo['basename'];
+					$cmdLine=str_replace($outFilenameInfo['dirname'], $tmpPromptFolder, $cmdLine);
+				}
 			}
 			else
 				$cmdLine = $job->cmdLine;
@@ -696,6 +705,20 @@ ini_set("memory_limit","512M");
 				
 				KalturaLog::log("Done job state is [" . $job->state .  "]");
 				$storeManager->SaveJob($job);
+				$rvStr = "SUCCESS -";
+
+			}
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+			if(isset($tmpPromptFolder) && isset($outFilename) && true){
+				$scanFolder=$tmpPromptFolder.'/'.$outFilenameInfo['filename'].'*';
+				$scanOutputfiles = glob($scanFolder);
+				foreach($scanOutputfiles as $tmpFilename){
+					$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
+					if(rename($tmpFilename, $moveToName)==false){
+						$rv=-1;
+						$rvStr = "FAILED - to mov file to $moveToName,";
+					}
+				}
 			}
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);

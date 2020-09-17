@@ -360,7 +360,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 */
 	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
-	                             array $operationAttributes, $priority = 0)
+								 array $operationAttributes, $priority = 0)
 	{
 		$batchArray = array();
 		$order = 0;
