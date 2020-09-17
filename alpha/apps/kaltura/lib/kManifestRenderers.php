@@ -284,7 +284,7 @@ abstract class kManifestRenderer
 		$out .= "\r\n";
 
 		// send the request
-		$fp = fsockopen($host, $port, $errno, $errstr, 1);
+		$fp = fsockopen($host, $port, $errno, $errstr, 0.1);
 		if ($fp === false)
 		{
 			return;
