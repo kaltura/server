@@ -59,7 +59,7 @@ class deleteFilesWorker
 			}
 			else
 			{
-				KalturaLog::warning('No file sync candidates were found reseting minFileSyncId');
+				KalturaLog::warning('No file sync candidates were found resetting minFileSyncId');
 				$minFileSyncId = null;
 			}
 
@@ -277,6 +277,11 @@ class deleteFilesWorker
 		//Now that we found siblings in DC 2
 		foreach ($efsFileSyncs as $efsFileSync)
 		{
+			if(kFile::checkFileExists(self::STOP_FILE_PATH))
+			{
+				break;
+			}
+
 			/* @var FileSync $efsFileSync */
 			$awsFileSync = $this->getAwsFileSync($efsFileSync);
 			if($awsFileSync)
