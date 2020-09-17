@@ -322,9 +322,16 @@ class kUploadTokenMgr
 				}
 				else
 				{
-					self::lockFile($sourceFilePath, $chunkFilePath, $chunkFilePath);
-					kFile::moveFile($sourceFilePath, $chunkFilePath);
-					self::releaseLock($chunkFilePath);
+					$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+					if(!$cache)
+					{
+						kFile::moveFile($sourceFilePath, $chunkFilePath);
+					}
+					elseif($cache->add($chunkFilePath, true, 3600))
+					{
+						kFile::moveFile($sourceFilePath, $chunkFilePath);
+						$cache->delete($chunkFilePath);
+					}
 				}
 				
 				return $currentFileSize;
@@ -414,10 +421,10 @@ class kUploadTokenMgr
 			}
 			
 			$lockedFile = "$nextChunkPath.".microtime(true).".locked";
-			list ($locked, $lockedFile) = self::lockFile($nextChunkPath, $lockedFile, $nextChunkPath);
+			list ($locked, $lockedFile) = self::lockFile($nextChunkPath, $lockedFile);
 			if (!$locked) // another process is already appending this file
 			{
-				KalturaLog::log("Failed to lock chunk ($nextChunkPath, $lockedFile)");
+				KalturaLog::log("rename ($nextChunkPath, $lockedFile) failed");
 				break;
 			}
 			
@@ -596,7 +603,7 @@ class kUploadTokenMgr
 			}
 
 			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			list ($locked, $lockedFile) = self::lockFile($nextChunk, $lockedFile, $nextChunk);
+			list ($locked, $lockedFile) = self::lockFile($nextChunk, $lockedFile);
 			if (!$locked) // another process is already appending this file
 			{
 				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
@@ -671,8 +678,8 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
-	
-	private static function lockFile($nextChunk, $lockedFile, $lockKey)
+ 
+  private static function lockFile($nextChunk, $lockedFile)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
 		if (!$cache)
@@ -680,7 +687,7 @@ class kUploadTokenMgr
 			return array(kFile::moveFile($nextChunk, $lockedFile), $lockedFile);
 		}
 		
-		return array($cache->add($lockKey, true, 3600), $nextChunk);
+		return array($cache->add($nextChunk, true, 3600), $nextChunk);
 	}
 	
 	private static function releaseLock($key)
