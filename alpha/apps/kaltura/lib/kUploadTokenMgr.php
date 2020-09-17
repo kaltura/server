@@ -322,7 +322,16 @@ class kUploadTokenMgr
 				}
 				else
 				{
-					kFile::moveFile($sourceFilePath, $chunkFilePath);
+					$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+					if(!$cache)
+					{
+						kFile::moveFile($sourceFilePath, $chunkFilePath);
+					}
+					elseif($cache->add($chunkFilePath, true, 3600))
+					{
+						kFile::moveFile($sourceFilePath, $chunkFilePath);
+						$cache->delete($chunkFilePath);
+					}
 				}
 				
 				return $currentFileSize;
@@ -501,7 +510,7 @@ class kUploadTokenMgr
 			$bytesWritten += strlen($data);
 			fwrite($targetFileResource, $data);
 		}
-		KalturaLog::debug("took " . (microtime(true) - $start) . " seconds");
+		KalturaLog::debug("took " . (microtime(true) - $start) . " seconds, bytes written $bytesWritten");
 
 		fclose($sourceFileResource);
 		unlink($sourceFilePath);
