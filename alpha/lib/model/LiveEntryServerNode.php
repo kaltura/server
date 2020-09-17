@@ -118,8 +118,8 @@ class LiveEntryServerNode extends EntryServerNode
 
 			if(!$liveEntry->save())
 				$liveEntry->indexToSearchIndex();
-        }
-    }
+		}
+	}
 
 	public function setStreams(array $v) 
 	{ 
@@ -278,8 +278,8 @@ class LiveEntryServerNode extends EntryServerNode
 	}
 
 	public function isDcValid()
-    {
-        $disableDcCheck = kConf::get('disable_dc_check_for_entryServerNode', 'runtime_config', false);
-        return $disableDcCheck || $this->getDc() === kDataCenterMgr::getCurrentDcId();
-    }
+	{
+		$disableDcCheck = kConf::get('disable_dc_check_for_entryServerNode', 'runtime_config', false);
+		return $disableDcCheck || $this->getDc() === kDataCenterMgr::getCurrentDcId();
+	}
 }
