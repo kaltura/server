@@ -25,6 +25,10 @@ class previewAction extends kalturaAction
 		if( $this->entry_id ) {
 			$entry = entryPeer::retrieveByPK($this->entry_id);
 			if( $entry ) {
+				// access control validation
+                		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, array(ContextType::METADATA));
+                		$secureEntryHelper->validateAccessControl(true);
+				
 				$this->entry_name = $entry->getName();
 				$this->entry_description = $entry->getDescription();
 				$this->entry_thumbnail_url = $entry->getThumbnailUrl();
