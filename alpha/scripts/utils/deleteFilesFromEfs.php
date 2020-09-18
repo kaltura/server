@@ -20,7 +20,7 @@ class deleteFilesWorker
 	const MAX_UPDATED_AT_PARAM = 'min_updated_at';
 	const ITERATION_FILESYNC_LIMIT = 'iteration_filesync_limit';
 	const SLEEP_BETWEEN_FAST_ITERATIONS = 120;
-	const MIN_FILE_SYNC_ID_TIME_WINDOW = 600;
+	const MIN_FILE_SYNC_ID_TIME_WINDOW = 300;
 
     public function __construct($minFileSize, $efsFilePath, $minUpdatedAtTime, $dryRun)
 	{
@@ -73,7 +73,7 @@ class deleteFilesWorker
 	{
 		KalturaLog::info("Getting efs file syncs");
 		$maxUpdatedAt = kConf::get(self::MAX_UPDATED_AT_PARAM,self::MAP_NAME, 12*3600);
-		$iterationFileSyncLimit = kConf::get(self::ITERATION_FILESYNC_LIMIT,self::MAP_NAME, 1000);
+		$iterationFileSyncLimit = kConf::get(self::ITERATION_FILESYNC_LIMIT,self::MAP_NAME, 500);
 		$criteria = new Criteria();
 		$criteria->add(FileSyncPeer::ID, $minFileSyncId, Criteria::GREATER_EQUAL);
 		$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
@@ -92,8 +92,9 @@ class deleteFilesWorker
 		}
 		catch(PropelException $ex)
 		{
-			KalturaLog::err('Failed to get efs file syncs');
+			KalturaLog::err('Failed to get efs file syncs, resetting the connection');
 			KalturaLog::err($ex);
+			$this->con =myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 		}
 
 		if($result)
@@ -148,8 +149,9 @@ class deleteFilesWorker
 			}
 			catch (PropelException $ex)
 			{
-				KalturaLog::err('Failed to get efs file syncs');
+				KalturaLog::err('Failed to get min efs file sync, resetting the connection');
 				KalturaLog::err($ex);
+				$this->con =myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 			}
 		}
 
