@@ -161,7 +161,7 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage)
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY, Criteria::IN);
+		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$asset = assetPeer::doSelectOne($c);
 
 		if (!$asset)
@@ -218,7 +218,7 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage)
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entry->getId());
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY, Criteria::IN);
+		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$c->addAnd(assetPeer::IS_ORIGINAL, false);
 		$assets = assetPeer::doSelect($c);
 
