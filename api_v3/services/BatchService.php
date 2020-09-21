@@ -18,7 +18,8 @@
  */
 class BatchService extends KalturaBatchService
 {
-    const DEFAULT_MAX_DATA_SIZE = 20000000;
+	const DEFAULT_MAX_DATA_SIZE = 20000000;
+
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
 
 	/**
