@@ -24,7 +24,7 @@ class deleteFilesWorker
 
     public function __construct($minFileSize, $efsFilePath, $minUpdatedAtTime, $dryRun)
 	{
-		$this->con =myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+		$this->con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 		$this->minFileSize = $minFileSize;
 		$this->efsFilePath = $efsFilePath;
 		$this->minUpdatedAtTime = $minUpdatedAtTime;
@@ -75,7 +75,7 @@ class deleteFilesWorker
 		$maxUpdatedAt = kConf::get(self::MAX_UPDATED_AT_PARAM,self::MAP_NAME, 12*3600);
 		$iterationFileSyncLimit = kConf::get(self::ITERATION_FILESYNC_LIMIT,self::MAP_NAME, 500);
 		$criteria = new Criteria();
-		$criteria->add(FileSyncPeer::ID, $minFileSyncId, Criteria::GREATER_EQUAL);
+		$criteria->add(FileSyncPeer::ID, $minFileSyncId, Criteria::GREATER_THAN);
 		$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
 		$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$criteria->add(FileSyncPeer::STATUS, self::FILE_SYNC_READY_STATUS, Criteria::EQUAL);
@@ -94,7 +94,7 @@ class deleteFilesWorker
 		{
 			KalturaLog::err('Failed to get efs file syncs, resetting the connection');
 			KalturaLog::err($ex);
-			$this->con =myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+			$this->con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 		}
 
 		if($result)
@@ -132,7 +132,7 @@ class deleteFilesWorker
 		$minTime = time() - $this->minUpdatedAtTime;
 		$fileSync = null;
 		$maxUpdatedAt = kConf::get(self::MAX_UPDATED_AT_PARAM,self::MAP_NAME, 12*3600);
-		while($minTime < (time() - $maxUpdatedAt))
+		while($minTime < (time() - $maxUpdatedAt) && !kFile::checkFileExists(self::STOP_FILE_PATH))
 		{
 			try
 			{
@@ -142,7 +142,7 @@ class deleteFilesWorker
 				{
 					$fileSyncId = $fileSync->getId();
 					KalturaLog::info("found file sync with id {$fileSyncId}");
-					return $fileSyncId;
+					return $fileSyncId - 1;
 				}
 
 				$minTime = $minTime + self::MIN_FILE_SYNC_ID_TIME_WINDOW;
@@ -151,7 +151,8 @@ class deleteFilesWorker
 			{
 				KalturaLog::err('Failed to get min efs file sync, resetting the connection');
 				KalturaLog::err($ex);
-				$this->con =myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+				$this->con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+				break;
 			}
 		}
 
