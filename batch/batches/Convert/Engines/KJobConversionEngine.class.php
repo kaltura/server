@@ -48,7 +48,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 			
 				if($lastIndex > $index)
 				{
-					$uniqid = uniqid("tmp_convert_");
+					$uniqid = uniqid("tmp_convert_", true);
 					$this->outFilePath = $tempPath . DIRECTORY_SEPARATOR . $uniqid;
 				}
 				else
