@@ -669,9 +669,7 @@ ini_set("memory_limit","512M");
 			$job->finishTime = time();
 			if($rv!=0) {
 				$job->state = $job::STATE_FAIL;
-				$storeManager->SaveJob($job);
-					$storeManager->SaveJob($job);
-					$rvStr = "FAILED - rv($rv),";
+				$rvStr = "FAILED - rv($rv),";
 			}
 			else {
 				if(isset($outFilename)) {
@@ -680,7 +678,6 @@ ini_set("memory_limit","512M");
 				}
 
 				$job->state = $job::STATE_SUCCESS;
-				$storeManager->SaveJob($job);
 				$rvStr = "SUCCESS -";
 
 			}
@@ -696,6 +693,8 @@ ini_set("memory_limit","512M");
 					}
 				}
 			}
+			$storeManager->SaveJob($job);
+			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);
 		}
