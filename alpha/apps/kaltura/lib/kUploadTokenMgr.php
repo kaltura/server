@@ -511,7 +511,6 @@ class kUploadTokenMgr
 			fwrite($targetFileResource, $data);
 		}
 		KalturaLog::debug("took " . (microtime(true) - $start) . " seconds, bytes written $bytesWritten");
-		
 		fclose($sourceFileResource);
 		unlink($sourceFilePath);
 		return $bytesWritten;
@@ -678,7 +677,6 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
-
 	private static function lockFile($nextChunk, $lockedFile)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);

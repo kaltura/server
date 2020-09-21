@@ -670,9 +670,7 @@ ini_set("memory_limit","512M");
 			$job->finishTime = time();
 			if($rv!=0) {
 				$job->state = $job::STATE_FAIL;
-				$storeManager->SaveJob($job);
-					$storeManager->SaveJob($job);
-					$rvStr = "FAILED - rv($rv),";
+				$rvStr = "FAILED - rv($rv),";
 			}
 			else {
 				if(isset($outFilename)) {
@@ -720,6 +718,20 @@ ini_set("memory_limit","512M");
 					}
 				}
 			}
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+			if(isset($tmpPromptFolder) && isset($outFilename) && true){
+				$scanFolder=$tmpPromptFolder.'/'.$outFilenameInfo['filename'].'*';
+				$scanOutputfiles = glob($scanFolder);
+				foreach($scanOutputfiles as $tmpFilename){
+					$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
+					if(rename($tmpFilename, $moveToName)==false){
+						$rv=-1;
+						$rvStr = "FAILED - to mov file to $moveToName,";
+					}
+				}
+			}
+			$storeManager->SaveJob($job);
+			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);
 		}
