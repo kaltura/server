@@ -99,7 +99,7 @@ abstract class KJobHandlerWorker extends KBatchBase
 			try
 			{
 				self::setCurrentJob($job);
-				$this->validateFileAccess($job);
+				//$this->validateFileAccess($job);
 				$job = $this->exec($job);
 				self::unimpersonate();
 			}

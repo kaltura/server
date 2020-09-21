@@ -11,6 +11,8 @@ class kUploadTokenMgr
 	const EICAR_MAX_FILE_SIZE = 128;
 	const BAT_FILE_EXTENSION = 'bat';
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
+	const CHUNK_SIZE = 102400;
+
 	/**
 	 * @var UploadToken
 	 */
@@ -49,7 +51,7 @@ class kUploadTokenMgr
 			throw new kUploadTokenException("Cache instance required for AutoFinalize functionality Could not initiated", kUploadTokenException::UPLOAD_TOKEN_AUTO_FINALIZE_CACHE_NOT_INITIALIZED);
 		
 		$this->_autoFinalizeCache = $cache;
-		$this->_autoFinalizeCache->add($this->_uploadToken->getId() . ".retries", self::MAX_AUTO_FINALIZE_RETIRES);
+		$this->_autoFinalizeCache->add($this->_uploadToken->getId() . ".retries", self::MAX_AUTO_FINALIZE_RETIRES, 86400);
 	}
 	
 	/**
@@ -213,7 +215,8 @@ class kUploadTokenMgr
 			}
 			else
 			{
-				if ( filesize($uploadFilePath) >= self::EICAR_MIN_FILE_SIZE && filesize($uploadFilePath) <= self::EICAR_MAX_FILE_SIZE)
+				$fileSize = kFile::fileSize($uploadFilePath);
+				if ( $fileSize >= self::EICAR_MIN_FILE_SIZE && $fileSize <= self::EICAR_MAX_FILE_SIZE)
 				{
 					$content = file_get_contents($uploadFilePath);
 					if (md5(trim($content)) === self::EICAR_MD5)
@@ -250,7 +253,18 @@ class kUploadTokenMgr
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		
-		return myContentStorage::getFSUploadsPath().
+		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
+		if(count($uploadVolumes))
+		{
+			$lastChar = substr($uploadTokenId, -1);
+			$fsRootUploadPath = $uploadVolumes[ord($lastChar) % count($uploadVolumes)] . "content/uploads/";
+		}
+		else
+		{
+			$fsRootUploadPath = myContentStorage::getFSUploadsPath();
+		}
+		
+		return $fsRootUploadPath.
 			substr($uploadTokenId, -2).'/'.
 			substr($uploadTokenId, -4, 2).'/'.
 			$uploadTokenId.'.'.$extension;
@@ -299,7 +313,8 @@ class kUploadTokenMgr
 			if(!$verifyFinalChunk)
 			{
 				KalturaLog::debug("This is not the final chunk trying to append available chunks");
-				$currentFileSize = $this->syncAppendAvailableChunks($uploadFilePath);
+				$currentFileSize = self::syncAppendAvailableChunks($uploadFilePath);
+				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize $currentFileSize");
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
 					KalturaLog::debug("Appending current chunk [$sourceFilePath] to final file [$uploadFilePath]");
@@ -307,7 +322,16 @@ class kUploadTokenMgr
 				}
 				else
 				{
-					kFile::moveFile($sourceFilePath, $chunkFilePath);
+					$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+					if(!$cache)
+					{
+						kFile::moveFile($sourceFilePath, $chunkFilePath);
+					}
+					elseif($cache->add($chunkFilePath, true, 3600))
+					{
+						kFile::moveFile($sourceFilePath, $chunkFilePath);
+						$cache->delete($chunkFilePath);
+					}
 				}
 				
 				return $currentFileSize;
@@ -341,9 +365,29 @@ class kUploadTokenMgr
 		return $currentFileSize;
 	}
 	
+	static protected function openFile($name, $mode)
+	{
+		$start = microtime(true);
+		$fp = fopen($name, $mode);
+		KalturaLog::debug("fopen $name $mode took " . (microtime(true) - $start) . " seconds");
+
+		if (!$fp)
+		{
+			KalturaLog::err("fopen $name $mode failed");
+			return false;
+		}
+
+		if (function_exists('stream_set_chunk_size'))
+		{
+			stream_set_chunk_size($fp, self::CHUNK_SIZE);
+		}
+
+		return $fp;
+	}
+
 	private function appendCurrentChunk($targetFilePath, $chunkFilePath, $resumeAt)
 	{
-		$targetFileResource = fopen($targetFilePath, 'r+b');
+		$targetFileResource = self::openFile($targetFilePath, 'r+b');
 		if($resumeAt == -1)
 		{
 			fseek($targetFileResource, 0, SEEK_END);
@@ -362,13 +406,13 @@ class kUploadTokenMgr
 		return $targetFileSize;
 	}
 	
-	private function syncAppendAvailableChunks($targetFilePath)
+	private static function syncAppendAvailableChunks($targetFilePath, $maxSyncedConcat = 10)
 	{
-		$targetFileResource = fopen($targetFilePath, 'r+b');
+		$targetFileResource = self::openFile($targetFilePath, 'r+b');
 		fseek($targetFileResource, 0, SEEK_END);
 		$targetFileSize = ftell($targetFileResource);
 		
-		for ($maxSyncedConcat = 10; $maxSyncedConcat > 0; $maxSyncedConcat--)
+		for ($maxSyncedConcat; $maxSyncedConcat > 0; $maxSyncedConcat--)
 		{
 			$nextChunkPath = "$targetFilePath.chunk.$targetFileSize";
 			if(!kFile::checkFileExists($nextChunkPath))
@@ -377,16 +421,17 @@ class kUploadTokenMgr
 			}
 			
 			$lockedFile = "$nextChunkPath.".microtime(true).".locked";
-			if (! kFile::moveFile($nextChunkPath, $lockedFile)) // another process is already appending this file
+			list ($locked, $lockedFile) = self::lockFile($nextChunkPath, $lockedFile);
+			if (!$locked) // another process is already appending this file
 			{
-				KalturaLog::log("rename ($nextChunk, $lockedFile) failed");
+				KalturaLog::log("rename ($nextChunkPath, $lockedFile) failed");
 				break;
 			}
 			
 			KalturaLog::debug("Appending chunk $lockedFile to target file $targetFilePath");
-			$chunkSize = kfile::fileSize($lockedFile);
-			self::appendChunk($lockedFile, $targetFileResource);
-			$targetFileSize += $chunkSize;
+			$bytesWritten = self::appendChunk($lockedFile, $targetFileResource);
+			self::releaseLock($nextChunkPath);
+			$targetFileSize += $bytesWritten;
 		}
 		
 		fclose($targetFileResource);
@@ -451,26 +496,32 @@ class kUploadTokenMgr
 
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
-		$sourceFileResource = fopen($sourceFilePath, 'rb');
+		$bytesWritten = 0;
+		$sourceFileResource = self::openFile($sourceFilePath, 'rb');
 		if(!$sourceFileResource)
 		{
 			KalturaLog::err("Could not open file [{$sourceFilePath}] for read");
 			return;
 		}
-		
+
+		$start = microtime(true);
 		while (! feof($sourceFileResource)) {
-			$data = fread($sourceFileResource, 1024 * 100);
+			$data = fread($sourceFileResource, self::CHUNK_SIZE);
+			$bytesWritten += strlen($data);
 			fwrite($targetFileResource, $data);
 		}
-		
+		KalturaLog::debug("took " . (microtime(true) - $start) . " seconds, bytes written $bytesWritten");
+
 		fclose($sourceFileResource);
 		unlink($sourceFilePath);
+		return $bytesWritten;
 	}
 
 	static protected function appendAvailableChunks($targetFilePath, $verifyFinalChunk, $uploadTokenId)
 	{
-		$targetFileResource = fopen($targetFilePath, 'r+b');
+		$targetFileSize = self::syncAppendAvailableChunks($targetFilePath, 1000);
 		
+		$targetFileResource = self::openFile($targetFilePath, 'r+b');
 		fseek($targetFileResource, 0, SEEK_END);
 		
 		// use glob to find existing chunks and append ones which start within or at the end of the file and will increase its size
@@ -482,14 +533,10 @@ class kUploadTokenMgr
 		$appendStartTime = microtime(true);
 		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
 		{
-			$currentFileSize = ftell($targetFileResource);
-			
-			$validChunk = false;
-			
 			$globStart = microtime(true);
 			$chunks = glob("$targetFilePath.chunk.*", GLOB_NOSORT);
 			$globTook = (microtime(true) - $globStart);
-			KalturaLog::debug("glob took - " . $globTook . " seconds");
+			KalturaLog::debug("glob took - " . $globTook . " seconds count " . count($chunks));
 			
 			$chunkCount = count($chunks);
 			if($chunkCount > self::MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED && !$verifyFinalChunk)
@@ -498,46 +545,79 @@ class kUploadTokenMgr
 				//return null;
 			}
 						
-			foreach($chunks as $nextChunk)
+			if (!self::appendChunks($targetFileResource, $chunks))
+			{
+				break;
+			}
+		}
+
+		$currentFileSize = ftell($targetFileResource);
+
+		fclose($targetFileResource);
+
+		return $currentFileSize;
+	}
+
+	static protected function appendChunks($targetFileResource, $chunks)
+	{
+		$result = false;
+
+		for (;;)
+		{
+			$currentFileSize = ftell($targetFileResource);
+
+			$validChunk = false;
+
+			foreach($chunks as $key => $nextChunk)
 			{
 				$parts = explode(".", $nextChunk);
-				if (count($parts))
+				if (!count($parts))
 				{
-					$chunkOffset = $parts[count($parts) - 1];
-					if ($chunkOffset == "locked") // don't touch chunks that were locked and may have failed appending half way
-						continue;
-					
-					// dismiss chunks which won't enlarge the file or which are starting after the end of the file
-					// support backwards compatibility of overriding a final chunk at the offset zero
-					if ($chunkOffset == 0 || ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize))
-					{
-						fseek($targetFileResource, $chunkOffset, SEEK_SET);
-						$validChunk = true;
-						break;
-					}
-					else
-					{
-						KalturaLog::log("ignoring chunk: $nextChunk offset: $chunkOffset fileSize: $currentFileSize");
-					}
+					continue;
+				}
+
+				$chunkOffset = $parts[count($parts) - 1];
+				if ($chunkOffset == "locked") // don't touch chunks that were locked and may have failed appending half way
+				{
+					unset($chunks[$key]);
+					continue;
+				}
+
+				// dismiss chunks which won't enlarge the file or which are starting after the end of the file
+				// support backwards compatibility of overriding a final chunk at the offset zero
+				if ($chunkOffset == 0 || ($chunkOffset <= $currentFileSize && $chunkOffset + filesize($nextChunk) > $currentFileSize))
+				{
+					fseek($targetFileResource, $chunkOffset, SEEK_SET);
+					$validChunk = true;
+					break;
+				}
+				else
+				{
+					KalturaLog::log("ignoring chunk: $nextChunk offset: $chunkOffset fileSize: $currentFileSize");
 				}
 			}
-			
+
 			if (!$validChunk)
-				break;
-			
-			$lockedFile = "$nextChunk.".microtime(true).".locked";
-			if (! kFile::moveFile($nextChunk, $lockedFile)) // another process is already appending this file
 			{
-				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
 				break;
 			}
-			
+
+			$lockedFile = "$nextChunk.".microtime(true).".locked";
+			list ($locked, $lockedFile) = self::lockFile($nextChunk, $lockedFile);
+			if (!$locked) // another process is already appending this file
+			{
+				KalturaLog::log("rename($nextChunk, $lockedFile) failed");
+				unset($chunks[$key]);
+				break;
+			}
+
 			self::appendChunk($lockedFile, $targetFileResource);
+			self::releaseLock($nextChunk);
+			unset($chunks[$key]);
+			$result = true;
 		}
-		
-		fclose($targetFileResource);
-		
-		return $currentFileSize;
+
+		return $result;
 	}
 	
 	/**
@@ -598,4 +678,49 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
+ 
+  private static function lockFile($nextChunk, $lockedFile)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+		if (!$cache)
+		{
+			return array(kFile::moveFile($nextChunk, $lockedFile), $lockedFile);
+		}
+		
+		return array($cache->add($nextChunk, true, 3600), $nextChunk);
+	}
+	
+	private static function releaseLock($key)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
+		if (!$cache)
+		{
+			return;
+		}
+		
+		$cache->delete($key);
+	}
+	
+	public static function isValidUploadDir($uploadDir)
+	{
+		$fsUploadPaths = array();
+		$fsUploadPaths[] = realpath(myContentStorage::getFSUploadsPath());
+		
+		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
+		foreach ($uploadVolumes as $uploadVolume) 
+		{
+			$fsUploadPaths[] = realpath($uploadVolume . "content/uploads/");
+		}
+		
+		foreach ($fsUploadPaths as $fsUploadPath) 
+		{
+			if (strpos($uploadDir, $fsUploadPath) === 0) // Composed path doesn't begin with $uploadPathBase?
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+  
 }
