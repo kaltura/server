@@ -1675,7 +1675,12 @@ class kJobsManager
 				}
 			}
 		}
-		
+
+		if($batchJob->getDc() !== kDataCenterMgr::getCurrentDcId())
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}
+
 		$lockInfo = new kLockInfoData($batchJob);
 		$lockInfo->setEstimatedEffort($data->calculateEstimatedEffort($batchJob));
 		$lockInfo->setPriority($data->calculatePriority($batchJob));
