@@ -495,7 +495,7 @@ class S3Client extends AbstractClient
         $options = Collection::fromConfig(array_change_key_case($options), array(
             'min_part_size' => AbstractMulti::MIN_PART_SIZE,
             'params'        => array(),
-            'concurrency'   => $body->getWrapper() == 'plainfile' ? 3 : 1
+            'concurrency'   => $body->getWrapper() == 'plainfile' ? 1 : 1
         ));
 
         if ($body->getSize() < $options['min_part_size']) {

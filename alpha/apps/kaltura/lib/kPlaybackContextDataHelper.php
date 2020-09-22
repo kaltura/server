@@ -48,7 +48,7 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
-		$this->storageIds = kStorageExporter::getPeriodicStorageIdsByPartner($dbEntry->getPartnerId());
+		$this->storageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$this->generateRestrictedMessages($contextDataHelper);
 
@@ -223,7 +223,6 @@ class kPlaybackContextDataHelper
 	{
 		// get flavors availability
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
-
 		$remoteFileSyncs = array();
 
 		if($dbEntry->getType() == entryType::LIVE_STREAM)
@@ -238,7 +237,7 @@ class kPlaybackContextDataHelper
 
 			foreach ($fileSyncs as $fileSync)
 			{
-				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && !in_array($fileSync->getDc() , kStorageExporter::getPeriodicStorageIds()))
 				{
 					$dc = $fileSync->getDc();
 					$this->remoteFlavorsByDc[$dc] [] = $flavorAsset;
