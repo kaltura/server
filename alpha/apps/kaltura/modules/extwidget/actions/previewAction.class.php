@@ -26,7 +26,12 @@ class previewAction extends kalturaAction
 			$entry = entryPeer::retrieveByPK($this->entry_id);
 			if( $entry ) {
 				// access control validation
-                		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, array(ContextType::METADATA));
+                		$ks = null;
+                		if(isset($_GET['flashvars']) && is_array($_GET['flashvars']) && isset($_GET['flashvars']['ks']))
+                		{
+                    			$ks = $_GET['flashvars']['ks'];
+				}
+                		$secureEntryHelper = new KSecureEntryHelper($entry, $ks, null, array(ContextType::METADATA));
                 		$secureEntryHelper->validateAccessControl(true);
 				
 				$this->entry_name = $entry->getName();
