@@ -313,7 +313,12 @@ class KAsyncConvert extends KJobHandlerWorker
 		// aws comment: Commented for now wince it breaks onPrem env when running with user kaltura and NFS
 		//$sharedFile = kFile::createUniqueFilePath($this->sharedTempPath);
 		
-		$sharedFile = $data->destFileSyncSharedPath ? $data->destFileSyncSharedPath : $this->sharedTempPath . DIRECTORY_SEPARATOR . uniqid("convert_{$job->entryId}_");
+		$sharedFile = $data->destFileSyncSharedPath;
+		if(!$sharedFile)
+		{
+			$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . substr($job->entryId, -2) . DIRECTORY_SEPARATOR . $uniqid;
+			kFile::fullMkdir($sharedFile);
+		}
 		
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
