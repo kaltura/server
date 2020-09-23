@@ -104,7 +104,7 @@ class LiveEntryServerNode extends EntryServerNode
 	}
 
 	public function updateLiveEntryPostDelete()
-    {
+	{
 		$liveEntry = $this->getLiveEntry();
 		if($liveEntry && $this->getStatus() !== EntryServerNodeStatus::MARKED_FOR_DELETION)
 		{
