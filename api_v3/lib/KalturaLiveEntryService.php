@@ -49,7 +49,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	function dumpApiRequest($entryId, $onlyIfAvailable = true)
 	{
-		$disableDump = kConf::get('disable_dump_live_api_to_entry_dc', 'runtime_config', false);
+		$disableDump = kConf::get('disable_dump_live_api_to_entry_dc', 'runtime_config', 0);
 		$entryDc = substr($entryId, 0, 1);
 		if (!$disableDump && $entryDc != kDataCenterMgr::getCurrentDcId())
 		{
