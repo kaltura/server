@@ -90,7 +90,7 @@ function mergeNewDuplicatedUsers($lastRunFilePath)
 
 			KalturaLog::debug('Started handling puserId ['.$currentPuserId.'] for partnerId [' . $currentPartnerId .']');
 			$baseKuser = findKuserWithMaxEntries($kusersArray, $currentPartnerId);
-			$currentKuserId = $baseKuser->getId();
+			$currentKuserId = $kusersArray[0]->getId();
 			mergeUsersToBaseUser($kusersArray, $baseKuser, $currentPartnerId);
 			KalturaLog::debug('finished handling puserId ['.$currentPuserId.']');
 			kEventsManager::flushEvents();
