@@ -586,7 +586,7 @@ abstract class LiveEntry extends entry
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
 
-		$dbLiveEntryServerNode = $this->getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $mediaServerNode->getId(), $applicationName);
+		$dbLiveEntryServerNode = $this->getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $mediaServerNode, $applicationName);
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
@@ -603,8 +603,9 @@ abstract class LiveEntry extends entry
 		return $dbLiveEntryServerNode;
 	}
 	
-	private function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $serverNodeId, $applicationName = null)
+	private function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, MediaServerNode $serverNode, $applicationName = null)
 	{
+		$serverNodeId = $serverNode->getId();
 		$shouldSave = false;
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $mediaServerIndex);
@@ -619,7 +620,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setServerNodeId($serverNodeId);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
-			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
+			$dbLiveEntryServerNode->setDc($serverNode->getDc());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -629,12 +630,6 @@ abstract class LiveEntry extends entry
 		{
 			$shouldSave = true;
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);	
-		}
-		
-		if (kDataCenterMgr::getCurrentDcId() !== $dbLiveEntryServerNode->getDc())
-		{
-			$shouldSave = true;
-			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
 		}
 		
 		if ($dbLiveEntryServerNode->getServerNodeId() !== $serverNodeId)
@@ -687,7 +682,7 @@ abstract class LiveEntry extends entry
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		foreach($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if ($dbLiveEntryServerNode->getDc() === kDataCenterMgr::getCurrentDcId() && !$this->isCacheValid($dbLiveEntryServerNode))
+			if ($dbLiveEntryServerNode->isDcValid() && !$this->isCacheValid($dbLiveEntryServerNode))
 			{
 				KalturaLog::info("Removing media server id [" . $dbLiveEntryServerNode->getServerNodeId() . "]");
 				$dbLiveEntryServerNode->deleteOrMarkForDeletion();
