@@ -40,6 +40,7 @@ class kThumbnailAdapterFactory
 	{
 		$params = new kThumbAdapterParameters();
 		$params->set(kThumbFactoryFieldName::ENTRY, $entry);
+		$params->set(kThumbFactoryFieldName::SOURCE_ENTRY, $entry);
 		$params->set(kThumbFactoryFieldName::VERSION, $version);
 		$params->set(kThumbFactoryFieldName::WIDTH, $width);
 		$params->set(kThumbFactoryFieldName::HEIGHT, $height);
