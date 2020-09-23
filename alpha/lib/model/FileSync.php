@@ -315,6 +315,12 @@ class FileSync extends BaseFileSync implements IBaseObject
 			$url = '/direct' . $url;
 			$authParams = $this->addKalturaAuthParams($url);
 			$url .= $authParams;
+
+			if (infraRequestUtils::getProtocol() == 'http' && infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS
+				&& strpos($baseUrl,'http://') === 0)
+			{
+				$baseUrl =  preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+			}
 		}
 
 		$url = ltrim($url, "/");
