@@ -345,7 +345,7 @@ class kUploadTokenMgr
 			
 			kFile::moveFile($sourceFilePath, $chunkFilePath);
 			
-			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 60);
+			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 45);
 			
 			// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
 			$count = 0;
