@@ -181,8 +181,7 @@ class kUploadTokenMgr
 		}
 		
 		// check if is a real uploaded file
-		$tempFileSize = kFile::fileSize($tempPath);
-		KalturaLog::debug("kFile::FileSize $tempFileSize fileData::fileSize " . $fileData['size']);
+		$tempPath = isset($fileData['tmp_name']) ? $fileData['tmp_name'] : null;
 		if (!is_uploaded_file($tempPath))
 		{
 			$msg = "The uploaded file not valid for token id [{$this->_uploadToken->getId()}]";
@@ -190,7 +189,8 @@ class kUploadTokenMgr
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FILE_IS_NOT_VALID);
 		}
 		
-		$tempFileSize = isset($fileData['size']) ? $fileData['size'] : kFile::fileSize($tempPath);
+		$tempFileSize = kFile::fileSize($tempPath);
+		KalturaLog::debug("kFile::FileSize $tempFileSize fileData::fileSize " . $fileData['size']);
 		if($tempFileSize == 0 && !$finalChunk && $resumeAt > 0)
 		{
 			$msg = "The uploaded file has 0 bytes, file will be dismissed for token id [{$this->_uploadToken->getId()}]";
@@ -301,7 +301,7 @@ class kUploadTokenMgr
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$chunkSize = kFile::fileSize($sourceFilePath);
+			$chunkSize = filesize($sourceFilePath);
 			
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
