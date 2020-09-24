@@ -388,6 +388,12 @@ class KalturaErrors extends APIErrors
 	 * Batch Service
 	 */
 
+	const FILE_ALREADY_EXISTS = "FILE_ALREADY_EXISTS;PATH;File already exists \"@PATH@\" ";
+
+	const PATH_NOT_ALLOWED = "PATH_NOT_ALLOWED;PATH;Path not allowed \"@PATH@\" ";
+
+	const FILE_SIZE_EXCEEDED = "FILE_SIZE_EXCEEDED;FILE_SIZE;File size exceeded \"@FILE_SIZE@\" ";
+
 	const SCHEDULER_HOST_CONFLICT = "SCHEDULER_HOST_CONFLICT;SCHED_ID,HOST1,HOST2;Scheduler id \"@SCHED_ID@\" conflicts between hosts: \"@HOST1@\" and \"@HOST2@\"";
 
 	const SCHEDULER_NOT_FOUND = "SCHEDULER_NOT_FOUND;ID;Scheduler id \"@ID@\" not found";
@@ -527,6 +533,8 @@ class KalturaErrors extends APIErrors
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING;PARAM;Parameter \"@PARAM@\" is missing";
 
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL;;Unable to create report. Query produced too many results";
+
+	const INVALID_REPORT_ITEMS_GROUP = "INVALID_REPORT_ITEMS_GROUP;;Invalid report items group";
 
 
 	/**

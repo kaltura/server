@@ -525,7 +525,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"eightyPercentWarning",
 		"usageLimitWarning",
 		"lastFreeTrialNotificationDay",
-		"extendedFreeTrailEndsWarning"
+		"extendedFreeTrailEndsWarning",
 	);
 
 	public function getMapBetweenObjects()

@@ -33,11 +33,14 @@ class myFlvHandler
 	public function __construct($flv_file_name)
 	{
 		$this->flv_file_name = $flv_file_name;
-		
-		$this->status = file_exists($this->flv_file_name);
-		
+		$this->status = kFile::checkFileExists($this->flv_file_name);
 		if ($this->status)
-			$this->fh = fopen($this->flv_file_name, "rb");
+		{
+			$realPath = kFile::realPath($flv_file_name);
+			stream_wrapper_restore('http');
+			stream_wrapper_restore('https');
+			$this->fh = fopen($realPath, "rb");
+		}
 	}
 	
 	public function __destruct()
@@ -46,6 +49,8 @@ class myFlvHandler
 		{
 			fclose($this->fh);
 			$this->fh = null;
+			stream_wrapper_unregister('https');
+			stream_wrapper_unregister('http');
 		}
 	}
 	
@@ -966,7 +971,7 @@ class myFlvStaticHandler
 	public static function isMultiFlavor ( $file_name )
 	{
 		$edit_file_name = self::getFileNameEdit( $file_name );
-		return ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 ) ;
+		return ( kFile::checkFileExists($edit_file_name) && kFile::fileSize ( $edit_file_name ) > 0 ) ;
 	}
 
 
@@ -976,7 +981,7 @@ class myFlvStaticHandler
 	public static function getBestFileFlavor ( $file_name  )
 	{
 		$edit_file_name = self::getFileNameEdit( $file_name );
-		if ( file_exists ( $edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 )
+		if ( kFile::checkFileExists($edit_file_name ) && kFile::fileSize ( $edit_file_name ) > 0 )
 		{
 			return $edit_file_name;
 		}
@@ -1059,8 +1064,11 @@ abstract class FlvInfo
 	public function create()
 	{
 		$this->close();
-		if ($this->exists()) // enfore the creation of a new file by deleting the current one
-			@unlink($this->info_file_name);
+		if ($this->exists()) // enforce the creation of a new file by deleting the current one
+		{
+			@kFile::unlink($this->info_file_name);
+		}
+
 		$this->fh = fopen($this->info_file_name, "wb");
 	}
 	
@@ -1091,7 +1099,7 @@ abstract class FlvInfo
 	
 	public function exists()
 	{
-		return file_exists($this->info_file_name);
+		return kFile::checkFileExists($this->info_file_name);
 	}
 
 	public function close()
@@ -1312,7 +1320,7 @@ class FlvMetadataVideo extends FlvInfo
 	
 	public function dump()
 	{
-		return file_get_contents($this->info_file_name);
+		return kFile::getFileContent($this->info_file_name);
 	}
 	
 	public function write()

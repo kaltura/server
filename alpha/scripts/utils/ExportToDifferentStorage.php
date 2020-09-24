@@ -2,7 +2,7 @@
 
 if (count($argv) != 7)
 {
-	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <partner ids/all> <realrun-dryrun>\n";
+	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <partner ids/!partner ids/all> <realrun-dryrun>\n";
 	exit(0);
 }
 
@@ -13,7 +13,24 @@ $sourceDcIds = explode(',', $argv[1]);
 $targetDcId = $argv[2];
 $filePath = $argv[3];
 $fileType = $argv[4];
-$partnerIds = $argv[5] != 'all' ? explode(',', $argv[5]) : null;
+
+if ($argv[5] == 'all')
+{
+	$partnerIdsType = 'all';
+	$partnerIds = null;
+}
+else if (substr($argv[5], 0, 1) == '!')
+{
+	$partnerIdsType = 'exclude';
+	$partnerIds = explode(',', substr($argv[5], 1));
+}
+else
+{
+	$partnerIdsType = 'include';
+	$partnerIds = explode(',', $argv[5]);
+}
+
+
 $dryRun = $argv[6] != 'realrun';
 
 if (!is_numeric($targetDcId))
@@ -38,8 +55,24 @@ else
 }
 KalturaStatement::setDryRun($dryRun);
 
-main($sourceDcIds, $targetDcId, $filePath, $fileType, $partnerIds);
+main($sourceDcIds, $targetDcId, $filePath, $fileType);
 
+function partnerIdAllowed($partnerId)
+{
+	global $partnerIdsType, $partnerIds;
+
+	switch ($partnerIdsType)
+	{
+	case 'exclude':
+		return !in_array($partnerId, $partnerIds);
+
+	case 'include':
+		return in_array($partnerId, $partnerIds);
+
+	default:		// all
+		return true;
+	}
+}
 
 function handleAsset($asset, $sourceDcIds, $targetStorage)
 {
@@ -112,7 +145,7 @@ function handleAsset($asset, $sourceDcIds, $targetStorage)
 	}
 }
 
-function handleAssets($assetIds, $sourceDcIds, $targetStorage, $partnerIds)
+function handleAssets($assetIds, $sourceDcIds, $targetStorage)
 {
 	$count = 0;
 
@@ -128,7 +161,7 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage, $partnerIds)
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY, Criteria::IN);
+		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$asset = assetPeer::doSelectOne($c);
 
 		if (!$asset)
@@ -137,7 +170,7 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage, $partnerIds)
 			continue;
 		}
 
-		if ($partnerIds && !in_array($asset->getPartnerId(), $partnerIds))
+		if (!partnerIdAllowed($asset->getPartnerId()))
 		{
 			continue;
 		}
@@ -154,7 +187,7 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage, $partnerIds)
 	}
 }
 
-function handleEntries($entryIds, $sourceDcIds, $targetStorage, $partnerIds)
+function handleEntries($entryIds, $sourceDcIds, $targetStorage)
 {
 	$count = 0;
 
@@ -176,7 +209,7 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage, $partnerIds)
 			continue;
 		}
 
-		if ($partnerIds && !in_array($entry->getPartnerId(), $partnerIds))
+		if (!partnerIdAllowed($entry->getPartnerId()))
 		{
 			continue;
 		}
@@ -185,7 +218,7 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage, $partnerIds)
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entry->getId());
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
-		$c->add(assetPeer::STATUS, flavorAsset::FLAVOR_ASSET_STATUS_READY, Criteria::IN);
+		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$c->addAnd(assetPeer::IS_ORIGINAL, false);
 		$assets = assetPeer::doSelect($c);
 
@@ -211,7 +244,7 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage, $partnerIds)
  * @param $filePath
  * @throws PropelException
  */
-function main($sourceDcIds, $targetDcId, $filePath, $fileType, $partnerIds)
+function main($sourceDcIds, $targetDcId, $filePath, $fileType)
 {
 	KalturaLog::debug("Running for file [$filePath] and targetDcId [$targetDcId]");
 
@@ -231,17 +264,17 @@ function main($sourceDcIds, $targetDcId, $filePath, $fileType, $partnerIds)
 
 	switch ($fileType)
 	{
-	case 'entry':
-		handleEntries($ids, $sourceDcIds, $targetStorage, $partnerIds);
-		break;
+		case 'entry':
+			handleEntries($ids, $sourceDcIds, $targetStorage);
+			break;
 
-	case 'asset':
-		handleAssets($ids, $sourceDcIds, $targetStorage, $partnerIds);
-		break;
+		case 'asset':
+			handleAssets($ids, $sourceDcIds, $targetStorage);
+			break;
 
-	default:
-		echo "Invalid file type $fileType, must be entry/asset\n";
-		exit(1);
+		default:
+			echo "Invalid file type $fileType, must be entry/asset\n";
+			exit(1);
 	}
 
 	KalturaLog::debug("DONE!");

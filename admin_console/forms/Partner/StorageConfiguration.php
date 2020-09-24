@@ -14,7 +14,13 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'filters'		=> array('StringTrim'),
 		));
 		
+		$this->addElement('text', 'pathPrefix', array(
+			'label'			=> 'path prefix for serve flavor:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElementToDisplayGroup('storage_info', 'storageBaseDir');
+		$this->addElementToDisplayGroup('storage_info', 'pathPrefix');
 		
 		$this->addElement('select', 'pathManagerClass', array(
 			'label'			=> 'Path Manager:',

@@ -511,7 +511,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFilePath()))
+		if(!kFile::checkFileExists($data->getDestFilePath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFilePath());
 
 		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
@@ -530,7 +530,28 @@ class kFlowHelper
 		$flavorAsset->save();
 
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		
 		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+		
+		/*
+		 * TODO - AWS - Handle shared concat flow
+		 * kFileSyncUtils::moveFromFile should be replaced with this code to support saving concat result to shared storage based on partner config
+		 * This could be done only once convert flow code is changed to support remote file input
+		 *
+		$partner = PartnerPeer::retrieveByPK($dbBatchJob->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		if($partnerSharedStorageProfileId)
+		{
+			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+			if($storageProfile)
+				kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFilePath(), $partnerSharedStorageProfileId);
+		}
+		else
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+		}
+		*/
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
@@ -750,14 +771,25 @@ class kFlowHelper
 		if($data->getDestFileSyncLocalPath()) {
 			$flavorAsset->incrementVersion();
 			$shouldSave = true;
-		}		
+		}
+		
+		if($data->getLogFileSyncLocalPath()) {
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
+		
+		if($data->getLogFileSyncLocalPath()) {
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
 		
 		if($shouldSave)
 			$flavorAsset->save();
 		
-		if(count($data->getExtraDestFileSyncs()))
+		if($data->getExtraDestFileSyncs() && count($data->getExtraDestFileSyncs()))
 		{
 			//operation engine creating only file assets should be the last one in the operations chain
+			//AWS-TODO:: handle files saved directly to object stroarge
 			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
 		}			
 		if($data->getDestFileSyncLocalPath())
@@ -822,9 +854,22 @@ class kFlowHelper
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
-			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			if($partnerSharedStorageProfileId)
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if($storageProfile)
+					kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $partnerSharedStorageProfileId);
+			}
+			else
+			{
+				kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			}
 		}
 		elseif($flavorParamsOutput->getRemoteStorageProfileIds())
 		{
@@ -836,12 +881,23 @@ class kFlowHelper
 			}
 		}
 		
-		// creats the file sync
-		if(file_exists($data->getLogFileSyncLocalPath()))
+		// Creates the file sync
+		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-			try{
-				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			try
+			{
+				if($partnerSharedStorageProfileId)
+				{
+					KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+					$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+					if($storageProfile)
+						kFileSyncUtils::createReadySyncFileForKey($logSyncKey, $data->getLogFileSyncLocalPath(), $partnerSharedStorageProfileId);
+				}
+				else
+				{
+					kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+				}
 			}
 			catch(Exception $e){
 				$err = 'Saving conversion log: ' . $e->getMessage();
@@ -2948,23 +3004,24 @@ class kFlowHelper
 
 	public static function handleReportExportFinished(BatchJob $dbBatchJob, kReportExportJobData $data)
 	{
-		$finalPaths = array();
-		$filePaths = explode(',', $data->getFilePaths());
-		foreach ($filePaths as $filePath)
+		$finalFiles = array();
+		$exportFiles = $data->getFiles();
+		foreach ($exportFiles as $exportFile)
 		{
-			$fileName = basename($filePath);
+			$fileName = basename($exportFile->getFileId());
 			$directory = myContentStorage::getFSContentRootPath() . "/content/reports/" . $dbBatchJob->getPartnerId();
 			$finalPath = $directory . DIRECTORY_SEPARATOR . $fileName;
-			$finalPaths[] = $filePath;
-			$moveFile = kFile::moveFile($filePath, $finalPath);
+			$moveFile = kFile::moveFile($exportFile->getFileId(), $finalPath);
 			if (!$moveFile)
 			{
-				KalturaLog::err("Failed to move report file from: " . $filePath . " to: " . $finalPath);
+				KalturaLog::err("Failed to move report file from: " . $exportFile->getFileId() . " to: " . $finalPath);
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
+			$exportFile->setFileId($finalPath);
+			$finalFiles[] = $exportFile;
 		}
 
-		$data->setFilePaths(implode(',', $finalPaths));
+		$data->setFiles($finalFiles);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
@@ -2972,16 +3029,17 @@ class kFlowHelper
 
 		$links = array();
 		// Create download URL's
-		foreach ($finalPaths as $finalPath)
+		foreach ($finalFiles as $finalFile)
 		{
-			$fileName = basename($finalPath);
+			$fileName = basename($finalFile->getFileId());
 			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry);
 			if (!$url)
 			{
-				KalturaLog::err("Failed to create download URL for file - $finalPath");
+				KalturaLog::err("Failed to create download URL for file - {$finalFile->getFileId()}");
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
-			$links[] = '<a href="' . $url .'" target="_blank" >' . $fileName . '</a>';
+			$linkName = $finalFile->getFileName() ? $finalFile->getFileName() : $fileName;
+			$links[] = '<a href="' . $url .'" target="_blank" >' . $linkName . '</a>';
 		}
 
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
@@ -2989,7 +3047,7 @@ class kFlowHelper
 		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
 		$expiryInDays = $expiry / 60 / 60 / 24;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, $validUntil);
-		$titleParams = array($time);
+		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
 			null,
@@ -3012,7 +3070,7 @@ class kFlowHelper
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_FAILURE;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(),
 			$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
-		$titleParams = array($time);
+		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
 			null,
@@ -3034,7 +3092,7 @@ class kFlowHelper
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_ABORT;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
-		$titleParams = array($time);
+		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
 			null,

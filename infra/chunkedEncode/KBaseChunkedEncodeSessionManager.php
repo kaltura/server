@@ -12,7 +12,7 @@
 	{
 		const 	SessionStatsJSONLogPrefix = "SessionStatsJSON";
 		
-		protected $name = null;	
+		protected $name = null;
 		protected $chunker = null;
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
@@ -68,14 +68,12 @@
 				return false;
 			}
 			
-			if(isset($this->chunker->setup->cleanUp) && $this->chunker->setup->cleanUp){
-				$this->CleanUp();
-			}
+			$this->CleanUp();
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
 			if(file_exists($this->chunker->getSessionName())) {
 				copy($this->chunker->getSessionName(), $this->chunker->params->output);
-			}			
+			}
 			return true;
 		}
 		
@@ -95,32 +93,57 @@
 				$this->name = basename($chunker->params->output);
 
 			$videoCmdLines = array();
+			$sharedMode = $chunker->setup->sharedChunkPath;
+			
 			for($chunkIdx=0;$chunkIdx<$chunker->GetMaxChunks();$chunkIdx++) {
 				$chunkData = $chunker->GetChunk($chunkIdx);
 				$start = $chunkData->start;
 				$cmdLine = $chunker->BuildVideoCommandLine($start, $chunkIdx);
 				$logFilename = $chunker->getChunkName($chunkIdx,".log");
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$outFilename = $chunker->getChunkName($chunkIdx);
-				$videoCmdLines[$chunkIdx] = array($cmdLine, $outFilename);
+				
+				$outFileNames = array();
+				$outFileNames[] = $chunker->getChunkName($chunkIdx);
+				$outFileNames[] = substr($outFileNames[0], 0, -1) . (substr($outFileNames[0], -1)+1);
+				$currVideoCmdLine = array($cmdLine, $outFileNames);
+				
+				if($sharedMode)
+				{
+					$sharedOutFilenames = array();
+					$sharedChunkName = $chunker->getChunkName($chunkIdx, "shared");
+					if($sharedChunkName)
+					{
+						$sharedOutFilenames[] = $sharedChunkName;
+						$sharedOutFilenames[] = substr($sharedChunkName, 0, -1) . (substr($sharedChunkName, -1)+1);
+						$currVideoCmdLine[] = $sharedOutFilenames;
+					}
+				}
+				
+				$videoCmdLines[$chunkIdx] = $currVideoCmdLine;
 				KalturaLog::log($cmdLine);
 			}
+			
 			$this->videoCmdLines = $videoCmdLines;
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
 				$outFilename = $chunker->getSessionName("audio");
-				$logFilename = "$outFilename.log";
-				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$this->audioCmdLines = array($cmdLine);
-				KalturaLog::log($cmdLine);
+				$logFilename = $outFilename.".log";
+				$currAudioCmdLine = array("time $cmdLine > $logFilename 2>&1", array($outFilename));
+				
+				if($sharedMode) {
+					$sharedAudioChunkName = $chunker->getSessionName("shared_audio");;
+					$currAudioCmdLine[] = array($sharedAudioChunkName);
+				}
+				
+				$this->audioCmdLines[] = $currAudioCmdLine;
 			}
 			$this->SerializeSession();
 			return true;
 		}
 
 		/********************
-		 * Analyze 
+		 * Analyze
 		 */
 		public function Analyze()
 		{
@@ -128,7 +151,7 @@
 		}
 		
 		/* ---------------------------
-		 * 
+		 *
 		 */
 		public function FixChunks()
 		{
@@ -193,6 +216,7 @@
 				$this->returnStatus = KChunkedEncodeReturnStatus::MergeError;
 				return false;
 			}
+			
 			$concatFilenameLog = $this->chunker->getSessionName("concat");
 
 			$mergeCmd = $this->chunker->BuildMergeCommandLine();
@@ -370,7 +394,7 @@
 			
 			$errStr = null;
 			$lasted = $this->finishTime - $this->createTime;
-				
+			
 			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::OK) {
 				$msgStr = "RESULT:Success"."  Lasted:".gmdate('H:i:s',$lasted)."/".($lasted)."s";
 				if(isset($concurrencyLevel)) {
@@ -395,6 +419,20 @@
 		public function CleanUp()
 		{
 			$setup = $this->chunker->setup;
+			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
+				$chunkName_wc = $this->chunker->getChunkName($idx,"fix");
+				if(file_exists($chunkName_wc)){
+					$cmd = "rm -f $chunkName_wc*";
+					KalturaLog::log("cleanup cmd:$cmd");
+					$rv = null; $op = null;
+					$output = exec($cmd, $op, $rv);
+				}
+			}
+
+			if(!(isset($setup->cleanUp) && $setup->cleanUp)){
+				return;
+			}
+
 			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
 				$chunkName_wc = $this->chunker->getChunkName($idx,"*");
 				$cmd = "rm -f $chunkName_wc";
@@ -425,7 +463,7 @@
 		}
 
 		/********************
-		 * 
+		 *
 		 */
 		public function getErrorMessage()
 		{
@@ -452,7 +490,7 @@
 		}
 		
 		/********************
-		 * 
+		 *
 		 */
 		public static function GetLogTail($logFilename, $size=5000)
 		{

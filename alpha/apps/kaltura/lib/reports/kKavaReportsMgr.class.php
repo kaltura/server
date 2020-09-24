@@ -396,6 +396,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
+		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -828,7 +830,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$realtime_engagement))),
 			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_BUFFERING_USERS] = self::getFilteredAggregator(
@@ -909,7 +911,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_ENGAGED_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$realtime_engagement))),
 			self::getLongSumAggregator(self::METRIC_VIEW_ENGAGED_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
@@ -973,7 +975,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getAndFilter(array(
 				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::HIGH_ENGAGEMENT))),
+				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN))),
 			self::getLongSumAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 
 		self::$aggregations_def[self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
@@ -1008,7 +1010,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getAndFilter(array(
 				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$good_engagement, array(self::HIGH_ENGAGEMENT))))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$good_engagement, array(self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN))))),
 			self::getLongSumAggregator(self::METRIC_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COUNT));
 
 
@@ -6243,4 +6245,11 @@ class kKavaReportsMgr extends kKavaBase
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
 	}
+
+	// transform functions
+	protected static function limitPercentages($value)
+	{
+		return min($value, 100);
+	}
+
 }

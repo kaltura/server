@@ -366,20 +366,21 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * ExecuteSession
 		 */
-		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine)
+		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null)
 		{
-			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine");
+			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
 				// 'flags=1' stands for 'compress stored data'
 			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
 			$storeManager->Setup($config);
 			
-			$setup = new KChunkedEncodeSetup;
+			$setup = new KChunkedEncodeSetup();
 			$setup->concurrent = $concurrent;
 
 			$setup->concurrentMin = $concurrentMin;
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
+			$setup->sharedChunkPath = $sharedChunkPath;
 			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName);
 			
 			if(($rv=$session->Initialize())!=true) {
@@ -581,7 +582,7 @@ ini_set("memory_limit","512M");
 			$this->SaveJob($job);
 
 			if(is_array($job->cmdLine) && count($job->cmdLine)>1) {
-				$outFilename = $job->cmdLine[1];
+				$outFilename = $job->cmdLine[1][0];
 				$pInfo = pathinfo($outFilename);
 				$logFolder = realpath($pInfo['dirname']);
 			}
@@ -614,8 +615,8 @@ ini_set("memory_limit","512M");
 				$this->SaveJob($job);
 			}
 			else {
-				$job->process = (int)file_get_contents($chunk_job_pid_file);
-				unlink($chunk_job_pid_file);
+				$job->process = (int)kFile::getFileContent($chunk_job_pid_file);
+				kFile::unlink($chunk_job_pid_file);
 			}
 			KalturaLog::log("id:$job->id,keyIdx:$job->keyIdx,rv:$rv,process:$job->process,cmdLine:$cmdLine");
 			return true;
@@ -650,6 +651,18 @@ ini_set("memory_limit","512M");
 			if(is_array($job->cmdLine)) {
 				$cmdLine = $job->cmdLine[0];
 				$outFilename = $job->cmdLine[1];
+					/*
+					 * Switch chunk generation to local disk folder (tmpPromptFolder)
+					 * - replace the out file in tha cmdline to '/tmp' flolder
+					 * - move all generated files back to the 'normal' tmp path
+					 */
+				$outFilenameInfo = null;
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+				if(isset($tmpPromptFolder) && true) {
+					$outFilenameInfo = pathinfo($outFilename);
+					$outFilename=$tmpPromptFolder.'/'.$outFilenameInfo['basename'];
+					$cmdLine=str_replace($outFilenameInfo['dirname'], $tmpPromptFolder, $cmdLine);
+				}
 			}
 			else
 				$cmdLine = $job->cmdLine;
@@ -657,20 +670,68 @@ ini_set("memory_limit","512M");
 			$job->finishTime = time();
 			if($rv!=0) {
 				$job->state = $job::STATE_FAIL;
-				$storeManager->SaveJob($job);
-					$storeManager->SaveJob($job);
-					$rvStr = "FAILED - rv($rv),";
+				$rvStr = "FAILED - rv($rv),";
 			}
 			else {
 				if(isset($outFilename)) {
 					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
 				}
-
-				$job->state = $job::STATE_SUCCESS;
+				
+				//When working with remote (none nfs) shared stoarge we need to move the file to shared
+				KalturaLog::log("Done running cmd line,moving file from [" . print_r($outFilenames, true) . "] to [" . print_r($sharedChunkPaths, true) . "]");
+				if($sharedChunkPaths)
+				{
+					$keys = array_keys($outFilenames);
+					foreach ($keys as $key) {
+						KalturaLog::debug("Move file from [" . $outFilenames[$key] . "] to [" . $sharedChunkPaths[$key] . "]");
+						if(kFile::checkFileExists($outFilenames[$key]) && !kFile::moveFile($outFilenames[$key], $sharedChunkPaths[$key])) {
+							$job->state = $job::STATE_FAIL;
+							$rvStr = "FAILED - rv(999),";
+							break;
+						}
+						else {
+							$job->state = $job::STATE_SUCCESS;
+							$rvStr = "SUCCESS -";
+						}
+					}
+				}
+				else {
+					$job->state = $job::STATE_SUCCESS;
+					$rvStr = "SUCCESS -";
+				}
+				
+				KalturaLog::log("Done job state is [" . $job->state .  "]");
 				$storeManager->SaveJob($job);
 				$rvStr = "SUCCESS -";
+
 			}
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+			if(isset($tmpPromptFolder) && isset($outFilename) && true){
+				$scanFolder=$tmpPromptFolder.'/'.$outFilenameInfo['filename'].'*';
+				$scanOutputfiles = glob($scanFolder);
+				foreach($scanOutputfiles as $tmpFilename){
+					$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
+					if(rename($tmpFilename, $moveToName)==false){
+						$rv=-1;
+						$rvStr = "FAILED - to mov file to $moveToName,";
+					}
+				}
+			}
+					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
+			if(isset($tmpPromptFolder) && isset($outFilename) && true){
+				$scanFolder=$tmpPromptFolder.'/'.$outFilenameInfo['filename'].'*';
+				$scanOutputfiles = glob($scanFolder);
+				foreach($scanOutputfiles as $tmpFilename){
+					$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
+					if(rename($tmpFilename, $moveToName)==false){
+						$rv=-1;
+						$rvStr = "FAILED - to mov file to $moveToName,";
+					}
+				}
+			}
+			$storeManager->SaveJob($job);
+			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);
 		}

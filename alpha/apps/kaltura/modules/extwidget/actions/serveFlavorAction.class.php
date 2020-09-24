@@ -9,6 +9,8 @@ class serveFlavorAction extends kalturaAction
 	const NO_CLIP_TO = 2147483647;
 	
 	const JSON_CONTENT_TYPE = 'application/json';
+	const TYPE_SOURCE = 'source';
+	const PATH_EMPTY = 'empty';
 
 	const SECOND_IN_MILLISECONDS = 1000;
 	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
@@ -43,13 +45,9 @@ class serveFlavorAction extends kalturaAction
 		apc_store($cacheKey, $renderer, 86400);
 		header("X-Kaltura:cache-key");
 	}
-	
-	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null)
+	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)
 	{
-		$source = array(
-			'type' => 'source',
-			'path' => $path,
-		);
+		$source = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
 
 		if ($asset && $asset->getEncryptionKey())
 		{
@@ -262,16 +260,16 @@ class serveFlavorAction extends kalturaAction
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 
-					list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
+					list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
 
 					if(!$file_sync)
 					{
-						error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+						KalturaLog::debug('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
 						$path = '';
 						$storeCache = false;
 					}
 
-					$clips[] = $this->getClipData($path,$flavor);
+					$clips[] = $this->getClipData($path,$flavor, $sourceType);
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
@@ -465,7 +463,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path) = kFileSyncUtils::getFileSyncAndPathForFlavor($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -474,7 +472,7 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 
-			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $file_sync);
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $file_sync, $sourceType);
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
@@ -490,7 +488,6 @@ class serveFlavorAction extends kalturaAction
 			{
 				KExternalErrors::dieError(KExternalErrors::INVALID_AUTH_HEADER);
 			}
-			
 			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
@@ -535,7 +532,7 @@ class serveFlavorAction extends kalturaAction
 			$seekFromBytes = -1;
 		
 		
-		if($fileParam && is_dir($path)) {
+		if($fileParam && kFile::isDir($path)) {
 			$path .= "/$fileParam";
 			kFileUtils::dumpFile($path, null, null);
 			KExternalErrors::dieGracefully();
@@ -555,15 +552,12 @@ class serveFlavorAction extends kalturaAction
 					{
 						kFile::fullMkdir($tempClipPath);
 						$clipToSec = round($clipTo / 1000, 3);
-						$cmdLine = kConf::get ( "bin_path_ffmpeg" ) . " -i {$path} -vcodec copy -acodec copy -f mp4 -t {$clipToSec} -y {$tempClipPath} 2>&1";
-						KalturaLog::log("Executing {$cmdLine}");
-						$output = array ();
-						$return_value = "";
-						exec($cmdLine, $output, $return_value);
+						$cmd = kFfmpegUtils::getCopyCmd($path, $clipToSec, $tempClipPath);
+						list($output, $return_value) = kFfmpegUtils::executeCmd($cmd, 0);
 						KalturaLog::log("ffmpeg returned {$return_value}, output:".implode("\n", $output));
 					}
 					
-					if (file_exists($tempClipPath))
+					if (kFile::checkFileExists($tempClipPath))
 					{
 						KalturaLog::log("Dumping {$tempClipPath}");
 						kFileUtils::dumpFile($tempClipPath);
@@ -664,11 +658,11 @@ class serveFlavorAction extends kalturaAction
 				{
 					$hasCaptions = true;
 					$labelEntryId = $entryId;
-					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH]);
+					$captionClips[] = self::getAssetFieldsArray(self::TYPE_SOURCE, $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH], $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_SOURCE_TYPE]);
 				}
 				else
 				{
-					$captionClips[] = array('type' => 'source', 'path' => 'empty');
+					$captionClips[] = self::getAssetFieldsArray(self::TYPE_SOURCE, self::PATH_EMPTY, kFileSyncUtils::SOURCE_TYPE_FILE);
 				}
 			}
 			if ($hasCaptions)
@@ -774,9 +768,10 @@ class serveFlavorAction extends kalturaAction
 	/**
 	 * @param string $path
 	 * @param flavorAsset $flavor
+	 * @param $sourceType
 	 * @return array
 	 */
-	private function getClipData($path, $flavor)
+	private function getClipData($path, $flavor, $sourceType)
 	{
 		$flavorId = $flavor->getId();
 		$hasAudio = $flavor->getContainsAudio();
@@ -785,7 +780,7 @@ class serveFlavorAction extends kalturaAction
 			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
 			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
 		}
-		$clipDesc = array('type' => 'source', 'path' => $path);
+		$clipDesc = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
 		if (!$hasAudio)
 		{
 			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
@@ -944,5 +939,14 @@ class serveFlavorAction extends kalturaAction
 	public static function getFallbackStorageProfileId()
 	{
 		return self::$fallbackStorageId;
+	}
+
+	public static function getAssetFieldsArray($type, $path, $sourceType)
+	{
+		return array(
+			'type' => $type,
+			'path' => $path,
+			'sourceType' => $sourceType,
+		);
 	}
 }

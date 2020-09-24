@@ -227,9 +227,9 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	{
 	    $c = new Criteria();
 	    $c->add(self::ENTRY_ID, $entryId);
-	    if(count($jobTypes))
+	    if(isset($jobTypes) && count($jobTypes))
 	        $c->add(self::JOB_TYPE, $jobTypes, Criteria::IN);
-	    if(count($jobSubTypes))
+	    if(isset($jobSubTypes) && count($jobSubTypes))
 	        $c->add(self::JOB_SUB_TYPE, $jobSubTypes, Criteria::IN);
 	
 	    return self::doSelect($c);

@@ -13,8 +13,9 @@ class kFileSource extends kThumbnailSource
 	 * @param $filePath
 	 * @throws ImagickException
 	 */
-	public function  __construct($filePath)
+	public function __construct($filePath)
 	{
+		$filePath = kFile::realPath($filePath);
 		$this->imagick = new Imagick($filePath);
 	}
 

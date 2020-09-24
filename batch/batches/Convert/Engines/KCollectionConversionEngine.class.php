@@ -71,7 +71,7 @@ abstract class KCollectionConversionEngine extends KConversionEngine
 			
 				if($lastIndex > $index)
 				{
-					$uniqid = uniqid("tmp_convert_");
+					$uniqid = uniqid("tmp_convert_", true);
 					$this->outFilePath = $data->destDirLocalPath . DIRECTORY_SEPARATOR . $uniqid;
 				}
 				else

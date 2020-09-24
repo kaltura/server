@@ -17,6 +17,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	//File sync Insert limitation consts
 	const FILE_SYNC_MIN_VERSION_VALIDATE = 10000;
 
+	const SOURCE_TYPE_FILE = 'file';
+	const SOURCE_TYPE_HTTP = 'http';
+
 	/**
 	 * Contain all object types and sub types that should not be synced
 	 * @var array
@@ -48,7 +51,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$startTime = microtime(true);
 
-		$file_exists = file_exists ( $file_sync->getFullPath() );
+		$file_exists = kFile::checkFileExists($file_sync->getFullPath());
 
 		KalturaLog::info("file_exists? [$file_exists] took [".(microtime(true)-$startTime)."] path [".$file_sync->getFullPath()."]");
 
@@ -70,14 +73,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalContentsByFileSync(FileSync $file_sync, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
 	{
 		$full_path = $file_sync->getFullPath();
-		$real_path = realpath( $full_path );
-		if ( file_exists ( $real_path ) )
+		$real_path = kFile::realpath( $full_path, false );
+		if (kFile::checkFileExists($real_path))
 		{
 			$startTime = microtime(true);
 			if (!$maxlen)
-				$contents = file_get_contents( $real_path);
+				$contents = kFile::getFileContent($real_path);
 			else
-				$contents = file_get_contents( $real_path, $use_include_path, $context, $offset, $maxlen);
+				$contents = kFile::getFileContent( $real_path, $use_include_path, $context, $offset, $maxlen);
 			KalturaLog::info("file was found locally at [$real_path] fgc took [".(microtime(true) - $startTime)."]");
 			if ($file_sync->isEncrypted())
 			{
@@ -147,7 +150,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		$real_path = realpath($file_sync->getFullPath());
-		if(!is_dir($real_path))
+		if(!kFile::isDir($real_path))
 		{
 			KalturaLog::info("directory was not found locally [$real_path]");
 			throw new kFileSyncException("Cannot find directory on local disk [$real_path] for file sync [" . $file_sync->getId() . "]", kFileSyncException::FILE_DOES_NOT_EXIST_ON_DISK);
@@ -239,14 +242,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fullPath = $rootPath . $filePath; 
 		$fullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $fullPath);
 
-		if ( !file_exists( dirname( $fullPath )))
+		if ( !kFile::checkFileExists( dirname( $fullPath )))
 		{
 			self::fullMkdir($fullPath);
 		}
 
 		// create a file path for the current key - the fileSyncKey should already include the file path
 		// place the content there
-		file_put_contents ( $fullPath , $content );
+		kFile::filePutContents($fullPath , $content);
 		self::setPermissions($fullPath);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content));
 		self::encryptByFileSyncKey($key);
@@ -258,12 +261,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$contentGroup = kConf::get('content_group');
 		if(is_numeric($contentGroup))
 			$contentGroup = intval($contentGroup);
-			
-		@chgrp($filePath, $contentGroup);
 		
-		if(is_dir($filePath))
+		@kFile::chgrp($filePath, $contentGroup);
+		
+		if(kFile::isDir($filePath))
 		{
-			@chmod($filePath, 0770);
+			@kFile::chmod($filePath, 0770);
+			//AWS-TODO: need to handle dir listing
 			$dir = dir($filePath);
 			while (false !== ($file = $dir->read()))
 			{
@@ -274,7 +278,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		else
 		{
-			@chmod($filePath, 0640);
+			@kFile::chmod($filePath, 0640);
 		}
 	}
 
@@ -294,13 +298,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	    foreach ($dirs as $dir)
 	    {
 	        $path .= DIRECTORY_SEPARATOR . $dir;
-	        if (is_dir($path))
+		    if (kFile::isDir($path))
 	        	continue;
 	        	
 	        if(!kFile::fullMkfileDir($path, 0770))
 	        	return false;
-	        	
-	        chgrp($path, $contentGroup);
+
+		    kFile::chgrp($path, $contentGroup);
 	    }
 	    return true;
 	}
@@ -319,8 +323,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return false;
 		}
 		$file_path = $fileSync->getFullPath();
-
-		if(file_exists($target_file_path))
+		
+		if(kFile::checkFileExists($target_file_path))
 		{
 			KalturaLog::debug("Target file [$target_file_path] exists");
 			if(!$overwrite)
@@ -330,7 +334,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 			elseif($target_file_path != $fileSync->getFullPath())
 			{
-				@unlink($target_file_path);
+				@kFile::unlink($target_file_path);
 			}
 			else
 			{
@@ -345,8 +349,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		// make sure folder exists
 		self::fullMkdir($target_file_path);
-
-		$copyResult = copy($file_path, $target_file_path);
+		
+		$copyResult = kFile::copy($file_path, $target_file_path);
 		if($copyResult)
 		{
 			self::setPermissions($target_file_path);
@@ -369,7 +373,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			if($delete_source)
 			{
 				// delete the source file, if fails - do not output error
-				@unlink($file_path);
+				@kFile::unlink($file_path);
 			}
 			KalturaLog::info("successfully copied file to [$target_file_path] and updated fileSync");
 			return true;
@@ -406,8 +410,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 			
 			$dirFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $dirFullPath);
-	
-			if (file_exists($dirFullPath))
+
+			if (kFile::checkFileExists($dirFullPath))
 			{
 				$time = time(); 
 				$dirFullPath .= $time;
@@ -421,6 +425,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			self::createSyncFileForKey($rootPath, $filePath, $directory_key);
 		}
 		
+		//AWS-TODO:: implement glob wrapper function
 		$existing_files = glob($dirFullPath . DIRECTORY_SEPARATOR . '*');
 		if(count($existing_files) >= self::MAX_FILES_IN_CATEGORY)
 			throw new kFileSyncException("Exceeded max number of files [" . self::MAX_FILES_IN_CATEGORY . "] in category [$dirFullPath]");
@@ -443,7 +448,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$destination_file_path = $dirFullPath . DIRECTORY_SEPARATOR . $base_file_name;
 		$success = kFile::moveFile($temp_file_path, $destination_file_path);
 		self::setPermissions($dirFullPath);
-		KalturaLog::debug("temp_file_path [$temp_file_path](" . filesize($temp_file_path) . ") destination_file_path [$destination_file_path](" . filesize($destination_file_path) . ")");
+		KalturaLog::debug("temp_file_path [$temp_file_path](" . kFile::fileSize($temp_file_path) . ") destination_file_path [$destination_file_path](" . kFile::fileSize($destination_file_path) . ")");
 
 		if(!$success)
 			throw new kFileSyncException("Could not move file from [$temp_file_path] to [{$destination_file_path}]");
@@ -472,17 +477,49 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				KalturaLog::err("file already exists");
 			}
 		}
-
-		list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
-		$targetFullPath = $rootPath . $filePath; 
-		if(!$targetFullPath)
-		{
-			$targetFullPath = kPathManager::getFilePath($target_key);
-			KalturaLog::info("Generated new path [$targetFullPath]");
-		}
 		
 		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-
+		$keepFileInOriginalMount = kConf::get('keep_original_file_location', 'runtime_config', 0);
+		if($keepFileInOriginalMount)
+		{
+			$fileRealPath = realpath($temp_file_path);
+			
+			$partnerVolumes = kConf::get('partner_volumes', 'local', array());
+			if(isset($partnerVolumes[$target_key->getPartnerId()]))
+			{
+				$volumes = $partnerVolumes[$target_key->getPartnerId()];
+			}
+			else
+			{
+				$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
+			}
+			
+			$mountPrefixTranslate = kConf::get('mount_prefix_translate', 'runtime_config', array());
+			foreach ($mountPrefixTranslate as $mount => $destination)
+			{
+				if(!kString::beginsWith($fileRealPath ,$mount))
+				{
+					continue;
+				}
+				
+				foreach ($volumes as $volume)
+				{
+					if(!strpos($targetFullPath, $volume))
+					{
+						continue;
+					}
+					
+					$targetFullPath = str_replace($volume, $destination, $targetFullPath);
+					$filePath = str_replace($volume, $destination, $filePath);
+					break;
+				}
+				
+				break;
+			}
+		}
+		
+		KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
+		
 		if ( !file_exists( dirname( $targetFullPath )))
 		{
 			self::fullMkdir($targetFullPath);
@@ -494,25 +531,96 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 		else
 		{
-			KalturaLog::info("$temp_file_path file doesnt exist");
+			$fileRealPath = realpath($temp_file_path);
+			
+			$partnerVolumes = kConf::get('partner_volumes', 'local', array());
+			if(isset($partnerVolumes[$target_key->getPartnerId()]))
+			{
+				$volumes = $partnerVolumes[$target_key->getPartnerId()];
+			}
+			else
+			{
+				$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
+			}
+			
+			$mountPrefixTranslate = kConf::get('mount_prefix_translate', 'runtime_config', array());
+			foreach ($mountPrefixTranslate as $mount => $destination)
+			{
+				if(!kString::beginsWith($fileRealPath ,$mount))
+				{
+					continue;
+				}
+				
+				foreach ($volumes as $volume)
+				{
+					if(!strpos($targetFullPath, $volume))
+					{
+						continue;
+					}
+					
+					$targetFullPath = str_replace($volume, $destination, $targetFullPath);
+					$filePath = str_replace($volume, $destination, $filePath);
+					break;
+				}
+				
+				break;
+			}
 		}
 		
-		if (file_exists($targetFullPath))
+		KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
+		
+		if ( !file_exists( dirname( $targetFullPath )))
 		{
-			$time = time(); 
-			$targetFullPath .= $time;
-			$filePath .= $time; 
-		}
-
-		if($copyOnly)
-		{
-			$success = copy($temp_file_path, $targetFullPath);
+			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
+			$targetFullPath = $rootPath . $filePath;
+			if(!$targetFullPath)
+			{
+				$targetFullPath = kPathManager::getFilePath($target_key);
+				KalturaLog::info("Generated new path [$targetFullPath]");
+			}
+			
+			$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
+	
+			if ( !kFile::checkFileExists(dirname( $targetFullPath )))
+			{
+				self::fullMkdir($targetFullPath);
+			}
+	
+			if ( kFile::checkFileExists($temp_file_path))
+			{
+				KalturaLog::info("$temp_file_path file exists");
+			}
+			else
+			{
+				KalturaLog::info("$temp_file_path file doesnt exist");
+			}
+			
+			if (kFile::checkFileExists($targetFullPath))
+			{
+				$time = time();
+				$targetFullPath .= $time;
+				$filePath .= $time;
+			}
+	
+			if($copyOnly)
+			{
+				$success = kFile::copy($temp_file_path, $targetFullPath);
+			}
+			else
+			{
+				$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			}
 		}
 		else
 		{
-			$success = kFile::moveFile($temp_file_path, $targetFullPath);
+			// if temp file is shared we set the file path to be the temp path and don't move the file to new location
+			$targetFullPath = $temp_file_path;
+			list($rootPath, $filePath) = explode("/", ltrim($targetFullPath, "/"), 2);
+			$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
+			$filePath = DIRECTORY_SEPARATOR . $filePath;
+			$success = true;
 		}
-
+		
 		if($success)
 		{
 			self::setPermissions($targetFullPath);
@@ -619,13 +727,21 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getLocalFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
-		$dc = kDataCenterMgr::getCurrentDc();
-		$dc_id = $dc["id"];
+		$dc_ids = kDataCenterMgr::getSharedStorageProfileIds();
+		$dc_ids[] = kDataCenterMgr::getCurrentDcId();
+		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-		$c->addAnd ( FileSyncPeer::DC , $dc_id );
-
+		$c->addAnd ( FileSyncPeer::DC , $dc_ids, Criteria::IN );
 		$file_sync_list = FileSyncPeer::doSelect( $c );
+		
+//		$dc_id = $dc["id"];
+//		$c = new Criteria();
+//		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+//		$c->addAnd ( FileSyncPeer::DC , $dc_id );
+//
+//		$file_sync_list = FileSyncPeer::doSelect( $c );
+		
 		if ( $file_sync_list == null )
 		{
 			if ( $strict )
@@ -867,14 +983,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
-		$dc = kDataCenterMgr::getCurrentDc();
-		$dc_id = $dc["id"];
+		
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$currentDcIds[] = $currentDcId;
+		
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		if ( ! $fetch_from_remote_if_no_local )
 		{
 			// if $fetch_from_remote_if_no_local is true - don't restrict to the current DC - this will save an extra hit to the DB in case the file is not present
-			$c->addAnd ( FileSyncPeer::DC , $dc_id );
+			$c->addAnd ( FileSyncPeer::DC , $currentDcIds, Criteria::IN );
 		}
 		// search only for ready
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
@@ -896,11 +1015,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$desired_file_sync = null;
 		$local = false;
-		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $dc_id);
+		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $currentDcId);
 		if($sortedFileSync)
 		{
 			$desired_file_sync = $sortedFileSync[0];
-			if($desired_file_sync->getDc() == $dc_id)
+			if(in_array( $desired_file_sync->getDc(), $currentDcIds))
 			{
 				$local = true;
 			}
@@ -1042,7 +1161,128 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return $path;
 		}
 	}
-
+	
+	//	/**
+//	 * @param FileSyncKey $key
+//	 * @param string $url
+//	 * @param StorageProfile $externalStorage
+//	 * @return SyncFile
+//	 */
+//	public static function createReadySyncFileForKey(FileSyncKey $key, $targetFullPath, $storageProfileId)
+//	{
+//		list($rootPath, $filePath) = explode("/", ltrim($targetFullPath, "/"), 2);
+//		$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
+//		$filePath = DIRECTORY_SEPARATOR . $filePath;
+//		$isDir = kFile::isDir($targetFullPath);
+//
+//		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+//		$c->add(FileSyncPeer::DC, $storageProfileId);
+//		$fileSync = FileSyncPeer::doSelectOne($c);
+//		if(!$fileSync)
+//			$fileSync = FileSync::createForFileSyncKey($key);
+//
+//		$fileSync->setDc( $storageProfileId );
+//		$fileSync->setFileRoot ( $rootPath );
+//		$fileSync->setFilePath ( $filePath );
+//		$fileSync->setPartnerId ( $key->partner_id);
+//		$fileSync->setOriginal ( 1 );
+//		$fileSync->setStatus	( FileSync::FILE_SYNC_STATUS_READY );
+//		$fileSync->setFileType	( FileSync::FILE_SYNC_FILE_TYPE_URL );
+//		$fileSync->setIsDir($isDir);
+//		if ( kFile::checkFileExists($targetFullPath))
+//		{
+//			$fileSync->setFileSizeFromPath ( $targetFullPath );
+//		}
+//		else
+//		{
+//			$fileSync->setFileSize	( -1 );
+//		}
+//		$fileSync->save();
+//
+//		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
+//
+//		return $fileSync;
+//	}
+	
+	/**
+	 * @param FileSyncKey $key
+	 * @param string $url
+	 * @param StorageProfile $externalStorage
+	 * @return SyncFile
+	 */
+	public static function createReadySyncFileForKey(FileSyncKey $key, $targetFullPath, $storageProfileId, $strict = true)
+	{
+		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+		$c->add(FileSyncPeer::DC, $storageProfileId);
+		$fileSync = FileSyncPeer::doSelectOne($c);
+		if(!$fileSync)
+			$fileSync = FileSync::createForFileSyncKey($key);
+		
+		list($rootPath, $filePath) = explode("/", ltrim($targetFullPath, "/"), 2);
+		$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
+		$filePath = DIRECTORY_SEPARATOR . $filePath;
+		
+		$fileSync = FileSync::createForFileSyncKey( $key );
+		$fileSync->setDc( $storageProfileId );
+		$fileSync->setFileRoot ( $rootPath );
+		$fileSync->setFilePath ( $filePath );
+		$fileSync->setPartnerId ( $key->partner_id);
+		$fileSync->setOriginal ( 1 );
+		
+		$fullPath = $fileSync->getFullPath();
+		$isDir = kFile::isDir($fullPath);
+		
+		if (kFile::checkFileExists($fullPath))
+		{
+			$fileSync->setFileSizeFromPath ( $fullPath );
+			$fileSync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
+		}
+		else
+		{
+			$fileSync->setFileSize ( -1 );
+			if ($strict)
+				$fileSync->setStatus( FileSync::FILE_SYNC_STATUS_ERROR );
+			else
+				$fileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
+		}
+		
+		$fileSync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_FILE );
+		$fileSync->setIsDir($isDir);
+		$fileSync->save();
+		
+		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
+		return $fileSync;
+		
+//		$isDir = kFile::isDir($targetFullPath);
+//
+//		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
+//		$c->add(FileSyncPeer::DC, $storageProfileId);
+//		$fileSync = FileSyncPeer::doSelectOne($c);
+//		if(!$fileSync)
+//			$fileSync = FileSync::createForFileSyncKey($key);
+//
+//		$fileSync->setDc( $storageProfileId );
+//		$fileSync->setFileRoot ( $rootPath );
+//		$fileSync->setFilePath ( $filePath );
+//		$fileSync->setPartnerId ( $key->partner_id);
+//		$fileSync->setOriginal ( 1 );
+//		$fileSync->setStatus	( FileSync::FILE_SYNC_STATUS_READY );
+//		$fileSync->setFileType	( FileSync::FILE_SYNC_FILE_TYPE_URL );
+//		$fileSync->setIsDir($isDir);
+//		if ( kFile::checkFileExists($targetFullPath))
+//		{
+//			$fileSync->setFileSizeFromPath ( $targetFullPath );
+//		}
+//		else
+//		{
+//			$fileSync->setFileSize	( -1 );
+//		}
+//		$fileSync->save();
+//
+//		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
+//
+//		return $fileSync;
+	}
 
 	/**
 	 * @param FileSyncKey $key
@@ -1051,12 +1291,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param $strict
 	 * @return SyncFile
 	 */
-	public static function createSyncFileForKey ( $rootPath, $filePath, FileSyncKey $key , $strict = true , $alreadyExists = false, $cacheOnly = false, $md5 = null)
+	public static function createSyncFileForKey ( $rootPath, $filePath, FileSyncKey $key , $strict = true , $alreadyExists = false, $cacheOnly = false, $md5 = null, $dcId = null)
 	{
 		KalturaLog::debug("key [$key], strict[$strict], already_exists[$alreadyExists]");
 		// TODO - see that if in strict mode - there are no duplicate keys -> update existing records AND set the other DC's records to PENDING
-		$dc = kDataCenterMgr::getCurrentDc();
-		$dcId = $dc["id"];
+		if(!$dcId)
+		{
+			$dc = kDataCenterMgr::getCurrentDc();
+			$dcId = $dc["id"];
+		}
 
 		// create a FileSync for the current DC with status READY
 		if ( $alreadyExists )
@@ -1081,9 +1324,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		$fullPath = $currentDCFileSync->getFullPath();
-		$isDir = is_dir($fullPath);
+		$isDir = kFile::isDir($fullPath);
 		
-		if ( file_exists( $fullPath ) )
+		if (kFile::checkFileExists($fullPath))
 		{
 			$currentDCFileSync->setFileSizeFromPath ( $fullPath );
 			$currentDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_READY );
@@ -1104,6 +1347,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		$currentDCFileSync->setIsDir($isDir);
 		$currentDCFileSync->save();
+
+		if ($currentDCFileSync->getObjectType() == FileSyncObjectType::ASSET &&
+			$currentDCFileSync->getObjectSubType() == asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET &&
+			$currentDCFileSync->getFileSize())
+		{
+			self::setSizeInBytesOnAsset($currentDCFileSync);
+		}
 
 		if($cacheOnly)
 			return $currentDCFileSync;
@@ -1149,6 +1399,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		return $currentDCFileSync;
+	}
+
+	public static function setSizeInBytesOnAsset($currentDCFileSync)
+	{
+		$asset = assetPeer::retrieveById($currentDCFileSync->getObjectId());
+		if ($asset)
+		{
+			$asset->setSizeInBytes($currentDCFileSync->getFileSize());
+			$asset->save();
+		}
 	}
 
 	/**
@@ -1838,18 +2098,62 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return null;
 		}
 
-		$fileSync = self::getReadyFileSyncForKeyAndDc($syncKey, $preferredStorageId);
-		if($fileSync)
-		{
-			return $fileSync;
-		}
+		$c = new Criteria();
+		$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+		$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->addAscendingOrderByColumn(FileSyncPeer::DC);
 
-		list($fileSync, $local) = self::getReadyFileSyncForKey($syncKey, true, false);
-		if(!$fileSync || !in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		$fileSyncs = FileSyncPeer::doSelect($c);
+		if (!$fileSyncs)
 		{
+			KalturaLog::notice("no file sync found");
 			return null;
 		}
-		return $fileSync;
+
+		$priorityList = kConf::get('serve_priority', 'local', array());
+		if (isset($priorityList[$preferredStorageId]))
+		{
+			$priorityList = $priorityList[$preferredStorageId];
+		}
+		else
+		{
+			$priorityList = array(0 => array('dc' => $preferredStorageId));
+		}
+
+		$best = null;
+		foreach ($fileSyncs as $fileSync)
+		{
+			$fileSync = self::resolve($fileSync);
+			if ($fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+			{
+				continue;
+			}
+
+			$priority = count($priorityList);
+			foreach ($priorityList as $curPrio => $rules)
+			{
+				if ($rules['dc'] != $fileSync->getDc())
+				{
+					continue;
+				}
+
+				if (isset($rules['exclude']) && preg_match($rules['exclude'], $fileSync->getFilePath()))
+				{
+					continue;
+				}
+
+				$priority = $curPrio;
+				break;
+			}
+
+			if (!$best || $priority < $bestPrio)
+			{
+				$best = $fileSync;
+				$bestPrio = $priority;
+			}
+		}
+
+		return $best;
 	}
 
 	/**
@@ -1860,19 +2164,42 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function getPathByFileSync($fileSync, $preferredStorageId)
+	public static function getPathAndSourceTypeByFileSync($fileSync, $preferredStorageId)
 	{
 		$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 		$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
-
-		// if the dc is the preferred return the file path
-		if($fileSync->getDc() == $preferredStorageId)
+		if (!$prefix)
 		{
-			return $prefix . kFileSyncUtils::getFileSyncFullPath($fileSync);
+			return array(null, self::SOURCE_TYPE_FILE);
 		}
 
+		$forceRemoteServePattern = kConf::get('force_remote_serve_pattern', 'local', '');
+
+		// handle remote dc
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		{
+			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_HTTP);
+		}
+		// handle local preferred dc
+		else if($fileSync->getDc() == $preferredStorageId &&
+			(!$forceRemoteServePattern || !preg_match($forceRemoteServePattern, $fileSync->getFilePath())))
+		{
+			return array(kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_FILE);
+		}
+		// use direct serve if configured
+		else if (kConf::hasParam('vod_packager_direct_serve_secret'))
+		{
+			$path = str_replace('//', '/', $fileSync->getFullPath());
+			$secret = kConf::get('vod_packager_direct_serve_secret');
+			$sig = base64_encode(hash_hmac('sha256', $path, $secret, true));
+			$sig = rtrim(strtr($sig, '+/', '-_'), '=');
+			return array ("{$prefix}/direct/sig/{$sig}{$path}", self::SOURCE_TYPE_HTTP);
+		}
 		// if dc is local but not preferred generate serve file urls
-		return $prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false);
+		else
+		{
+			return array ($prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false), self::SOURCE_TYPE_HTTP);
+		}
 	}
 
 	/**
@@ -1916,10 +2243,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		return true;
 	}
-
-
-
-
 	/**
 	 * Get the internal from kaltura data centers only FileSync object by its key
 	 * @param FileSyncKey $syncKey
@@ -2056,7 +2379,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					$c->addAnd(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::NOT_IN);
 				}
 				break;
-
 			default:
 				break;
 		}
@@ -2071,7 +2393,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true)
 	{
-		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds(false)))
 		{
 			return $fileSync->getFilePath();
 		}
@@ -2096,10 +2418,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fullPath;
 	}
 
-	public static function getFileSyncAndPathForFlavor($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true)
+	public static function getFileSyncServeFlavorFields($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true)
 	{
 		$path = '';
 		$parent_file_sync = null;
+		$sourceType = self::SOURCE_TYPE_FILE;
 
 		if(!is_null($preferredStorageId))
 		{
@@ -2107,7 +2430,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			if($file_sync)
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				$path = kFileSyncUtils::getPathByFileSync($parent_file_sync, $preferredStorageId);
+				list($path, $sourceType) = kFileSyncUtils::getPathAndSourceTypeByFileSync($parent_file_sync, $preferredStorageId);
+				if(!$path)
+				{
+					$parent_file_sync = null;
+				}
 			}
 		}
 		else
@@ -2119,6 +2446,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync, $pathOnly);
 			}
 		}
-		return array ($parent_file_sync, $path);
+		return array ($parent_file_sync, $path, $sourceType);
 	}
 }
