@@ -678,8 +678,7 @@ ini_set("memory_limit","512M");
 				}
 					// Verify existance of chunk stat data.
 				if(isset($stat) && 
-					(is_null($stat->finish) || is_null($stat->finish) || is_null($stat->frame) 
-						|| $stat->start==0 || $stat->finish==0 || $stat->frame==0) ){
+					(is_null($stat->finish) || is_null($stat->frame) || $stat->finish==0 || $stat->frame==0) ){
 					$job->state = $job::STATE_FAIL;
 					$rvStr = "FAILED - missing chunk stat,";
 					$job->msg = "missing chunk stat";
