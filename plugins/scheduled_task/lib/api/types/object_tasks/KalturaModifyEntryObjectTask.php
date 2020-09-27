@@ -94,10 +94,6 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$this->inputUserId = $srcObj->getDataValue('inputUserId');
 		$this->inputEntitledUsersEdit = $srcObj->getDataValue('inputEntitledUsersEdit');
 		$this->inputEntitledUsersPublish = $srcObj->getDataValue('inputEntitledUsersPublish');
-		$this->resetMediaRepurposingProcess = $srcObj->getDataValue('resetMediaRepurposingProcess');
-		if($this->resetMediaRepurposingProcess === null)
-		{
-			$this->resetMediaRepurposingProcess = false;
-		}
+		$this->resetMediaRepurposingProcess = is_null($srcObj->getDataValue('resetMediaRepurposingProcess')) ? false : $srcObj->getDataValue('resetMediaRepurposingProcess');
 	}
 }
