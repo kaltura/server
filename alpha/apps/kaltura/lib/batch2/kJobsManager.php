@@ -790,7 +790,7 @@ class kJobsManager
 		$batchJob = null;
 		if($parentJob)
 		{
-			$batchJob = $parentJob->createChild(BatchJobType::CAPTURE_THUMB);
+			$batchJob = $parentJob->createChild(BatchJobType::CAPTURE_THUMB, null, null, kDataCenterMgr::getCurrentDcId());
 		}
 		else
 		{

@@ -669,20 +669,24 @@ ini_set("memory_limit","512M");
 			$job->finishTime = time();
 			if($rv!=0) {
 				$job->state = $job::STATE_FAIL;
-				$storeManager->SaveJob($job);
-					$storeManager->SaveJob($job);
-					$rvStr = "FAILED - rv($rv),";
+				$rvStr = "FAILED - rv($rv),";
 			}
 			else {
 				if(isset($outFilename)) {
 					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
 				}
-
-				$job->state = $job::STATE_SUCCESS;
-				$storeManager->SaveJob($job);
-				$rvStr = "SUCCESS -";
-
+					// Verify existance of chunk stat data.
+				if(isset($stat) && 
+					(is_null($stat->finish) || is_null($stat->frame) || $stat->finish==0 || $stat->frame==0) ){
+					$job->state = $job::STATE_FAIL;
+					$rvStr = "FAILED - missing chunk stat,";
+					$job->msg = "missing chunk stat";
+				}
+				else {
+					$job->state = $job::STATE_SUCCESS;
+					$rvStr = "SUCCESS -";
+				}
 			}
 					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
 			if(isset($tmpPromptFolder) && isset($outFilename) && true){
@@ -696,6 +700,8 @@ ini_set("memory_limit","512M");
 					}
 				}
 			}
+			$storeManager->SaveJob($job);
+			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
 			return ($rv==0? true: false);
 		}

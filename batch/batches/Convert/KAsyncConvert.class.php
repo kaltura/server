@@ -286,7 +286,8 @@ class KAsyncConvert extends KJobHandlerWorker
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
 		$uniqid = uniqid("convert_{$job->entryId}_");
-		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
+		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . substr($job->entryId, -2) . DIRECTORY_SEPARATOR . $uniqid;
+		kFile::fullMkdir($sharedFile);
 				
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)
 		{
