@@ -1,61 +1,7 @@
 <?php
 
-if (count($argv) != 7)
-{
-	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <partner ids/!partner ids/all> <realrun-dryrun>\n";
-	exit(0);
-}
+require_once(__DIR__ . '/../bootstrap.php');
 
-define("BASE_DIR", dirname(__FILE__));
-require_once(BASE_DIR.'/../../../alpha/scripts/bootstrap.php');
-
-$sourceDcIds = explode(',', $argv[1]);
-$targetDcId = $argv[2];
-$filePath = $argv[3];
-$fileType = $argv[4];
-
-if ($argv[5] == 'all')
-{
-	$partnerIdsType = 'all';
-	$partnerIds = null;
-}
-else if (substr($argv[5], 0, 1) == '!')
-{
-	$partnerIdsType = 'exclude';
-	$partnerIds = explode(',', substr($argv[5], 1));
-}
-else
-{
-	$partnerIdsType = 'include';
-	$partnerIds = explode(',', $argv[5]);
-}
-
-
-$dryRun = $argv[6] != 'realrun';
-
-if (!is_numeric($targetDcId))
-{
-	KalturaLog::warning("Destination storage id should be numeric");
-	exit(1);
-}
-
-if (!file_exists($filePath))
-{
-	KalturaLog::warning("File $filePath does not exist");
-	exit(1);
-}
-
-if ($dryRun)
-{
-	KalturaLog::debug('*************** In Dry run mode ***************');
-}
-else
-{
-	KalturaLog::debug('*************** In Real run mode ***************');
-}
-KalturaStatement::setDryRun($dryRun);
-
-main($sourceDcIds, $targetDcId, $filePath, $fileType);
 
 function partnerIdAllowed($partnerId)
 {
@@ -74,82 +20,286 @@ function partnerIdAllowed($partnerId)
 	}
 }
 
-function handleAsset($asset, $sourceDcIds, $targetStorage)
+function handleRegularFileSyncs($assetId, $fileSyncs)
 {
-	$assetId = $asset->getId();
+	global $targetDcId;
 
-	$targetDcId = $targetStorage->getId();
-	KalturaLog::debug('Handling asset ' . $assetId);
-
-	$criteria = new Criteria(FileSyncPeer::DATABASE_NAME);
-	$criteria->add(FileSyncPeer::OBJECT_ID, $asset->getId(), Criteria::EQUAL);
-	$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
-	$criteria->add(FileSyncPeer::VERSION, $asset->getVersion());
-	$criteria->add(FileSyncPeer::OBJECT_SUB_TYPE, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-	$criteria->add(FileSyncPeer::DELETED_ID, 0, Criteria::EQUAL);
-	$fileSyncs = FileSyncPeer::doSelect($criteria);
-
+	// find a ready file sync + target dc file sync
+	$readyFileSync = null;
 	$targetDcFileSync = null;
-	$sourceDcFileSync = null;
-
-	// Get the Local fileSync to handle
-	foreach ($fileSyncs as /** @var FileSync $fileSync * */ $fileSync)
+	foreach ($fileSyncs as $fileSync)
 	{
+		if (!in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL)))
+		{
+			KalturaLog::log("XXX $assetId: BAD_FILE_TYPE" . $fileSync->getFileType() . " - unexpected file type");
+			return;
+		}
+
 		if ($fileSync->getDc() == $targetDcId)
 		{
 			$targetDcFileSync = $fileSync;
 			continue;
 		}
 
-		if (!in_array($fileSync->getDc(), $sourceDcIds) || !$fileSync->getFileSize())
+		if ($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY && !$readyFileSync)
 		{
-			continue;
+			$readyFileSync = $fileSync;
 		}
-
-		if ($sourceDcFileSync && $sourceDcFileSync->getOriginal())
-		{
-			continue;
-		}
-
-		$sourceDcFileSync = $fileSync;
-	}
-
-	if (!$sourceDcFileSync)
-	{
-		KalturaLog::info(">>> $assetId: NO_FILESYNC - No file sync to handle");
-		return;
-	}
-
-	if ($sourceDcFileSync->getStatus() != flavorAsset::FLAVOR_ASSET_STATUS_READY)
-	{
-		KalturaLog::info(">>> $assetId: NOT_READY_" . $sourceDcFileSync->getStatus() . " - File sync " . $sourceDcFileSync->getId() . " is not ready skipping");
-		return;
 	}
 
 	if ($targetDcFileSync)
 	{
-		KalturaLog::info(">>> $assetId: ALREADY_EXISTS_" . $targetDcFileSync->getStatus() . " - Found file sync " . $targetDcFileSync->getId() . " in target dc skipping");
+		// target dc file sync exists, check the status
+		switch ($targetDcFileSync->getStatus())
+		{
+		case FileSync::FILE_SYNC_STATUS_READY:
+			break;
+
+		case FileSync::FILE_SYNC_STATUS_PENDING:
+			if (!$readyFileSync)
+			{
+				KalturaLog::log("XXX $assetId: PENDING_NO_PATH - pending file sync without src path");
+				break;
+			}
+
+			if ($fileSync->getSrcPath() == $readyFileSync->getFullPath() && $fileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
+			{
+				KalturaLog::log("XXX $assetId: PENDING_WITH_PATH - pending file sync with valid src path");
+			}
+			else
+			{
+				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $fileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
+				$targetDcFileSync->setSrcPath($readyFileSync->getFullPath());
+				$targetDcFileSync->setSrcEncKey($readyFileSync->getSrcEncKey());
+				$targetDcFileSync->putInCustomData('srcDc', $readyFileSync->getDc());
+				$targetDcFileSync->save();
+			}
+			break;
+
+		case FileSync::FILE_SYNC_STATUS_ERROR:
+			KalturaLog::log("XXX $assetId: ERROR_STATUS_FIXED - file sync has error status moving to pending");
+			$targetDcFileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
+			$targetDcFileSync->save();
+			break;
+
+		default:
+			KalturaLog::log("XXX $assetId: BAD_STATUS" . $fileSync->getStatus() . " - non ready file sync");
+			break;
+		}
+
 		return;
 	}
 
+	if (!$readyFileSync)
+	{
+		KalturaLog::log("XXX $assetId: NO_READY_FILE_SYNC - no ready file syncs, skipping");
+		return;
+	}
+
+	// create missing file sync
+	$newfileSync = $readyFileSync->cloneToAnotherStorage($targetDcId);
+	$newfileSync->setLinkCount(0);
+	$newfileSync->putInCustomData('srcDc', $readyFileSync->getDc());
+
 	try
 	{
-		KalturaLog::debug("Handling file sync " . $sourceDcFileSync->getId());
-		$newfileSync = $sourceDcFileSync->cloneToAnotherStorage($targetDcId);
+		$syncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
+
+		KalturaLog::log("XXX $assetId: CREATED - creating file sync in dc $targetDcId key $syncKey");
 		$newfileSync->save();
-		KalturaLog::info(">>> $assetId: CREATED - New file sync created " . $newfileSync->getId());
 	}
 	catch (Exception $e)
 	{
-		KalturaLog::info(">>> $assetId: FAILED - Could not create new file sync for [" . $fileSync->getId() . "] " . $e->getMessage());
+		KalturaLog::log("XXX $assetId: CREATE_FAILED - failed to create file sync");
+		return;
 	}
 }
 
-function handleAssets($assetIds, $sourceDcIds, $targetStorage)
+function handleSyncKey($assetId, $syncKey, $depth = 0)
+{
+	global $targetDcId, $allDcIds;
+
+	KalturaLog::log("$assetId - handling file sync key " . $syncKey);
+
+	// get the file syncs
+	$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+	$c->add(FileSyncPeer::DC, $allDcIds, Criteria::IN);
+	$c->addDescendingOrderByColumn(FileSyncPeer::ORIGINAL);
+	$c->addAscendingOrderByColumn(FileSyncPeer::DC);
+	$fileSyncs = FileSyncPeer::doSelect($c);
+	if (!$fileSyncs)
+	{
+		KalturaLog::log("XXX $assetId: NO_FILE_SYNCS - no file syncs");
+		return;
+	}
+
+	// resolve the file syncs
+	$resolvedFileSyncKeys = array();
+	$targetResolvedFileSyncKey = null;
+	$targetFileSync = null;
+	$resolvedKey = null;
+
+	foreach ($fileSyncs as $fileSync)
+	{
+		$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
+		if ($resolvedFileSync->getDc() != $fileSync->getDc())
+		{
+			if ($fileSync->getDc() == $targetDcId)
+			{
+				KalturaLog::log("XXX $assetId: CROSS_DC_LINK_DELETED - deleting cross dc link " . $fileSync->getDc() . ' -> ' . $resolvedFileSync->getDc());
+				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
+				$fileSync->save();
+				handleSyncKey($assetId, $syncKey);		// restart
+			}
+			else
+			{
+				KalturaLog::log("XXX $assetId: CROSS_DC_LINK - cross dc link " . $fileSync->getDc() . ' -> ' . $resolvedFileSync->getDc());
+			}
+			return;
+		}
+
+		$resolvedKey = kFileSyncUtils::getKeyForFileSync($resolvedFileSync);
+
+		if ($fileSync->getDc() == $targetDcId)
+		{
+			$targetFileSync = $fileSync;
+			$targetResolvedFileSyncKey = strval($resolvedKey);
+		}
+		else
+		{
+			$resolvedFileSyncKeys[] = strval($resolvedKey);
+		}
+	}
+
+	if (count(array_unique($resolvedFileSyncKeys)) > 1)
+	{
+		KalturaLog::log("XXX $assetId: MULTIPLE_KEYS - resolved to multiple keys");
+		return;
+	}
+
+	$resolvedSyncKey = reset($resolvedFileSyncKeys);
+
+	if ($targetFileSync)
+	{
+		if ($resolvedSyncKey != $targetResolvedFileSyncKey)
+		{
+			KalturaLog::log("XXX $assetId: LINK_DIFF_KEY_DELETED - target dc link resolves to different key $targetResolvedFileSyncKey");
+			$targetFileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
+			$targetFileSync->save();
+			handleSyncKey($assetId, $syncKey);		// restart
+			return;
+		}
+	}
+
+	if ($resolvedSyncKey == strval($syncKey))
+	{
+		// not using links
+		handleRegularFileSyncs($assetId, $fileSyncs);
+		return;
+	}
+
+	if ($depth)
+	{
+		KalturaLog::log("XXX $assetId: LINK_MULTI_LEVEL - two levels of links");
+		return;
+	}
+
+	// handle the linked key first
+	handleSyncKey($assetId, $resolvedKey, $depth + 1);
+
+	// look for a link in the target dc
+	foreach ($fileSyncs as $fileSync)
+	{
+		if ($fileSync->getDc() != $targetDcId)
+		{
+			continue;
+		}
+
+		$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
+
+		$status = $fileSync->getStatus();
+		$resolvedStatus = $resolvedFileSync->getStatus();
+		if ($status != $resolvedStatus)
+		{
+			if ($resolvedStatus == FileSync::FILE_SYNC_STATUS_READY && $status != FileSync::FILE_SYNC_STATUS_READY)
+			{
+				KalturaLog::log("XXX $assetId: NON_READY_LINK_FIXED - non ready link to ready file sync, setting link to ready");
+				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+				if (is_null($fileSync->getFileSize()))
+				{
+					$fileSync->setFileSize(-1);
+				}
+				$fileSync->save();
+			}
+			else
+			{
+				KalturaLog::log("XXX $assetId: LINK_STATUS_{$status}_{$resolvedStatus} - link status different than resolved status");
+			}
+		}
+
+		return;
+	}
+
+	// no link in target dc - create one
+
+	// get the file sync to link to
+	$c = FileSyncPeer::getCriteriaForFileSyncKey($resolvedKey);
+	$c->add(FileSyncPeer::DC, $targetDcId);
+	$fileSyncs = FileSyncPeer::doSelect($c);
+	if (!$fileSyncs)
+	{
+		KalturaLog::log("XXX $assetId: NO_LINK_TARGET - failed to get link target");
+		return;
+	}
+
+	if (count($fileSyncs) > 1)
+	{
+		KalturaLog::log("XXX $assetId: MULTIPLE_TARGETS - more than one file sync in dc $targetDcId for key " . $resolvedKey);
+		return;
+	}
+
+	$sourceFileSync = reset($fileSyncs);
+
+	$sourceFileSync = kFileSyncUtils::resolve($sourceFileSync);
+
+	// create the link
+	$linkFileSync = FileSync::createForFileSyncKey($syncKey);
+	$linkFileSync->setDc($sourceFileSync->getDc());
+	$linkFileSync->setStatus($sourceFileSync->getStatus());
+	$linkFileSync->setOriginal($sourceFileSync->getOriginal());
+	$linkFileSync->setLinkedId($sourceFileSync->getId());
+	$linkFileSync->setPartnerID($sourceFileSync->getPartnerID());
+	$linkFileSync->setFileSize(-1);
+
+	if($sourceFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+	{
+		$linkFileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$linkFileSync->setFileRoot($sourceFileSync->getFileRoot());
+		$linkFileSync->setFilePath($sourceFileSync->getFilePath());
+	}
+	else
+	{
+		$linkFileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_LINK);
+	}
+
+	kFileSyncUtils::incrementLinkCountForFileSync($sourceFileSync);
+
+	try
+	{
+		KalturaLog::log("XXX $assetId: CREATED_LINK - creating link $syncKey -> " . $sourceFileSync->getId());
+		$linkFileSync->save();
+	}
+	catch (Exception $e)
+	{
+		KalturaLog::log("XXX $assetId: CREATE_LINK_FAILED - failed to create link");
+		return;
+	}
+}
+
+function handleAssets($handle)
 {
 	$count = 0;
-
-	foreach ($assetIds as $assetId)
+	while($assetId = fgets($handle))
 	{
 		$assetId = trim($assetId);
 		if (!$assetId)
@@ -157,41 +307,40 @@ function handleAssets($assetIds, $sourceDcIds, $targetStorage)
 			continue;
 		}
 
-		KalturaLog::debug('Retrieving asset ' . $assetId);
+		$count++;
+		if ($count % 100 == 0)
+		{
+			kMemoryManager::clearMemory();
+		}
+
+		// get the asset
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$asset = assetPeer::doSelectOne($c);
-
 		if (!$asset)
 		{
-			KalturaLog::debug("Asset not found (or not READY) $assetId - skipping");
+			KalturaLog::log("XXX $assetId: LOAD_ASSET_FAILED - failed to load asset");
 			continue;
 		}
 
 		if (!partnerIdAllowed($asset->getPartnerId()))
 		{
+			KalturaLog::log("XXX $assetId: IGNORED_PID - ignored partner " . $asset->getPartnerId());
 			continue;
 		}
 
-		handleAsset($asset, $sourceDcIds, $targetStorage);
-
-		kMemoryManager::clearMemory();
-		$count++;
-		if ($count % 1000 == 0 )
-		{
-			KalturaLog::debug("Sleeping 10 Seconds... count is $count");
-			sleep(10);
-		}
+		// process
+		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		handleSyncKey($assetId, $syncKey);
 	}
 }
 
-function handleEntries($entryIds, $sourceDcIds, $targetStorage)
+function handleEntries($handle)
 {
 	$count = 0;
-
-	foreach ($entryIds as $entryId)
+	while($entryId = fgets($handle))
 	{
 		$entryId = trim($entryId);
 		if (!$entryId)
@@ -199,83 +348,106 @@ function handleEntries($entryIds, $sourceDcIds, $targetStorage)
 			continue;
 		}
 
-		$c = new Criteria();
-		$c->add(entryPeer::ID, trim($entryId));
-		$c->add(entryPeer::STATUS, entryStatus::READY);
-		$entry = entryPeer::doSelectOne($c);
-		if (!$entry)
+		$count++;
+		if ($count % 100 == 0)
 		{
-			KalturaLog::debug("Entry not found (or not READY) $entryId - skipping");
-			continue;
+			kMemoryManager::clearMemory();
 		}
 
-		if (!partnerIdAllowed($entry->getPartnerId()))
-		{
-			continue;
-		}
-
-		KalturaLog::debug('Retrieving non-source assets for entry ' . $entry->getId());
+		// get the assets
+		KalturaLog::debug('Retrieving assets for entry ' . $entryId);
 		$c = new Criteria();
-		$c->add(assetPeer::ENTRY_ID, $entry->getId());
+		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
-		$c->addAnd(assetPeer::IS_ORIGINAL, false);
 		$assets = assetPeer::doSelect($c);
 
-		KalturaLog::debug('Found ' . count($assets) . ' non-source assets for entry ' . $entry->getId());
-
-		foreach ($assets as /** @var flavorAsset $asset * */ $asset)
+		// process
+		foreach ($assets as $asset)
 		{
-			handleAsset($asset, $sourceDcIds, $targetStorage);
-		}
+			$assetId = $asset->getId();
 
-		kMemoryManager::clearMemory();
-		$count++;
-		if ($count % 1000 == 0 )
-		{
-			KalturaLog::debug("Sleeping 20 Seconds... count is $count");
-			sleep(20);
+			if (!partnerIdAllowed($asset->getPartnerId()))
+			{
+				KalturaLog::log("XXX $assetId: IGNORED_PID - ignored partner " . $asset->getPartnerId());
+				continue;
+			}
+
+			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			handleSyncKey($assetId, $syncKey);
 		}
 	}
 }
 
-/**
- * @param $targetDcId
- * @param $filePath
- * @throws PropelException
- */
-function main($sourceDcIds, $targetDcId, $filePath, $fileType)
+
+if ($argc != 7)
 {
-	KalturaLog::debug("Running for file [$filePath] and targetDcId [$targetDcId]");
-
-	$ids = file($filePath);
-	if (empty($ids))
-	{
-		KalturaLog::warning("File is empty - Exiting.");
-		exit(1);
-	}
-
-	$targetStorage = StorageProfilePeer::retrieveByPK($targetDcId);
-	if (!$targetStorage)
-	{
-		KalturaLog::warning("Storage [$targetDcId] does not exist");
-		exit(1);
-	}
-
-	switch ($fileType)
-	{
-		case 'entry':
-			handleEntries($ids, $sourceDcIds, $targetStorage);
-			break;
-
-		case 'asset':
-			handleAssets($ids, $sourceDcIds, $targetStorage);
-			break;
-
-		default:
-			echo "Invalid file type $fileType, must be entry/asset\n";
-			exit(1);
-	}
-
-	KalturaLog::debug("DONE!");
+	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <partner ids/!partner ids/all> <dryrun/realrun>\n";
+	exit(1);
 }
+
+$sourceDcIds = explode(',', $argv[1]);
+$targetDcId = $argv[2];
+$fileName = $argv[3];
+$fileType = $argv[4];
+
+if ($argv[5] == 'all')
+{
+	$partnerIdsType = 'all';
+	$partnerIds = null;
+}
+else if (substr($argv[5], 0, 1) == '!')
+{
+	$partnerIdsType = 'exclude';
+	$partnerIds = explode(',', substr($argv[5], 1));
+}
+else
+{
+	$partnerIdsType = 'include';
+	$partnerIds = explode(',', $argv[5]);
+}
+
+$dryRun = $argv[6] != 'realrun';
+
+if ($dryRun)
+{
+	KalturaLog::debug('*************** In Dry run mode ***************');
+}
+else
+{
+	KalturaLog::debug('*************** In Real run mode ***************');
+}
+KalturaStatement::setDryRun($dryRun);
+
+$allDcIds = array_merge($sourceDcIds, array($targetDcId));
+
+if ($fileName != '-')
+{
+	$handle = fopen($fileName, 'r');
+	if (!$handle)
+	{
+		echo 'Failed to open ' . $fileName . "\n";
+		exit(1);
+	}
+}
+else
+{
+	$handle = STDIN;
+}
+
+switch ($fileType)
+{
+	case 'entry':
+		handleEntries($handle);
+		break;
+
+	case 'asset':
+		handleAssets($handle);
+		break;
+
+	default:
+		echo "Invalid file type $fileType, must be entry/asset\n";
+		exit(1);
+}
+
+KalturaLog::debug("done!");
