@@ -207,7 +207,7 @@ class UploadTokenService extends KalturaBaseService
 		if($filter->fileNameEqual && $filter->statusEqual == KalturaUploadTokenStatus::PARTIAL_UPLOAD)
 		{
 			$maxUploadTokenResumeTime = kConf::get('upload_token_max_resume_time', 'runtime_config', self::DEFAULT_UPLOAD_TOKEN_MAX_RESUME_TIME);
-			$c->addAnd(UploadTokenPeer::UPDATED_AT, time()-$maxUploadTokenResumeTime, Criteria::GREATER_EQUAL);
+			$c->addAnd(UploadTokenPeer::UPDATED_AT, time() - $maxUploadTokenResumeTime, Criteria::GREATER_EQUAL);
 		}
 		
 		$totalCount = UploadTokenPeer::doCount($c);
