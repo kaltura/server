@@ -8,6 +8,8 @@
  */
 class UploadTokenService extends KalturaBaseService
 {
+	const DEFAULT_UPLOAD_TOKEN_MAK_RESUME_TIME = 172800; //2 days
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -94,6 +96,13 @@ class UploadTokenService extends KalturaBaseService
 		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_ERROR)
 		{
 			throw new KalturaAPIException(KalturaErrors::MAX_ALLOWED_CHUNK_COUNT_EXCEEDED);
+		}
+		
+		//If upload token is older than max resume time allowed block it
+		$maxUploadTokenResumeTime = kConf::get('upload_token_max_resume_time', 'runtime_config', self::DEFAULT_UPLOAD_TOKEN_MAK_RESUME_TIME);
+		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD && $uploadTokenDb->getCreatedAt(null) < (time()-$maxUploadTokenResumeTime))
+		{
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED, $maxUploadTokenResumeTime);
 		}
 
 		// dont dump an upload to the other DC if it's the first uploaded chunk
