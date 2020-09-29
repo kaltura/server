@@ -8,6 +8,8 @@
  */
 class UploadTokenService extends KalturaBaseService
 {
+	const DEFAULT_UPLOAD_TOKEN_MAK_RESUME_TIME = 172800; //2 days
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -191,15 +193,23 @@ class UploadTokenService extends KalturaBaseService
 				$filter->userIdEqual = -1; // no result will be returned when the user is missing
 		}
 
-                // in case a filename filter was passed enforce a statusIn filter in order to limit slow db queries
-                if ($filter->fileNameEqual && $filter->statusEqual == null && $filter->statusIn == null)
-                        $filter->statusIn = implode(",", array(KalturaUploadTokenStatus::PENDING, KalturaUploadTokenStatus::PARTIAL_UPLOAD, KalturaUploadTokenStatus::FULL_UPLOAD));
+		// in case a filename filter was passed enforce a statusIn filter in order to limit slow db queries
+		if ($filter->fileNameEqual && $filter->statusEqual == null && $filter->statusIn == null)
+			$filter->statusIn = implode(",", array(KalturaUploadTokenStatus::PENDING, KalturaUploadTokenStatus::PARTIAL_UPLOAD, KalturaUploadTokenStatus::FULL_UPLOAD));
  
 		// create the filter
 		$uploadTokenFilter = new UploadTokenFilter();
 		$filter->toObject($uploadTokenFilter);
 		$c = new Criteria();
 		$uploadTokenFilter->attachToCriteria($c);
+		
+		//In case fle name filter and status filter were provided add date filter as well to avoid returning uploadTokens which are no longer valid.
+		if($filter->fileNameEqual && $filter->statusEqual == KalturaUploadTokenStatus::PARTIAL_UPLOAD)
+		{
+			$maxUploadTokenResumeTime = kConf::get('upload_token_max_resume_time', 'runtime_config', self::DEFAULT_UPLOAD_TOKEN_MAK_RESUME_TIME);
+			$c->addAnd(UploadTokenPeer::UPDATED_AT, time()-$maxUploadTokenResumeTime, Criteria::GREATER_EQUAL);
+		}
+		
 		$totalCount = UploadTokenPeer::doCount($c);
 		$pager->attachToCriteria($c);
 		
