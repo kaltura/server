@@ -366,7 +366,6 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * ExecuteSession
 		 */
-// ZZZ_CLIP_CE
 		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null)
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
@@ -377,7 +376,6 @@ ini_set("memory_limit","512M");
 			
 			$setup = new KChunkedEncodeSetup();
 			$setup->concurrent = $concurrent;
-// ZZZ_CLIP_CE
 			$setup->concurrentMin = $concurrentMin;
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
