@@ -353,7 +353,6 @@ class kUploadTokenMgr
 			do {
 				if ($count ++)
 					Sleep(1);
-				
 				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $this->_uploadToken->getId());
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
@@ -395,7 +394,6 @@ class kUploadTokenMgr
 
 		return $fp;
 	}
-	
 	private function appendCurrentChunk($targetFileResource, $chunkFilePath, $resumeAt)
 	{
 		if($resumeAt == -1)
@@ -520,7 +518,6 @@ class kUploadTokenMgr
 		unlink($sourceFilePath);
 		return $bytesWritten;
 	}
-	
 	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId)
 	{
 		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000);
@@ -553,7 +550,6 @@ class kUploadTokenMgr
 				break;
 			}
 		}
-		
 		return ftell($targetFileResource);
 	}
 

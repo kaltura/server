@@ -223,7 +223,6 @@ class kPlaybackContextDataHelper
 	{
 		// get flavors availability
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
-
 		$remoteFileSyncs = array();
 
 		if($dbEntry->getType() == entryType::LIVE_STREAM)
