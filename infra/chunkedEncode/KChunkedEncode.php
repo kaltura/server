@@ -1011,6 +1011,10 @@
 			case "base":
 				$name.= "$this->videoChunkPostfix";
 				break;
+			case "shared_base":
+				$name = $this->setup->sharedChunkPath."_$this->chunkEncodeToken"."_$chunkIdx.";
+				$name.= "$this->videoChunkPostfix";
+				break;
 			case "srt":
 				$name.= "srt";
 				break;
