@@ -94,6 +94,12 @@ class serveFlavorAction extends kalturaAction
 			'sequences' => array($sequence)
 		);
 
+		$noCachePattern = kConf::get('serve_flavor_no_cache_pattern', 'local', '');
+		if ($asset && in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()) && $noCachePattern && preg_match($noCachePattern, $path))
+		{
+			$result['cache'] = false;
+		}
+
 		$json = str_replace('\/', '/', self::jsonEncode($result));
 
 		return new kRendererString(
