@@ -100,7 +100,7 @@ class UploadTokenService extends KalturaBaseService
 		
 		//If upload token is older than max resume time allowed block it
 		$maxUploadTokenResumeTime = kConf::get('upload_token_max_resume_time', 'runtime_config', self::DEFAULT_UPLOAD_TOKEN_MAK_RESUME_TIME);
-		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD && $uploadTokenDb->getCreatedAt(null) < (time()-$maxUploadTokenResumeTime))
+		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD && $uploadTokenDb->getUpdatedAt(null) < (time()-$maxUploadTokenResumeTime))
 		{
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED, $maxUploadTokenResumeTime);
 		}
