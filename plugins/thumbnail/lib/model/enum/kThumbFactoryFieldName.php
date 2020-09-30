@@ -6,6 +6,7 @@
 interface kThumbFactoryFieldName extends BaseEnum
 {
 	const ENTRY = 'entry';
+	const SOURCE_ENTRY = 'sourceEntry';
 	const VERSION = 'version';
 	const WIDTH = 'width';
 	const HEIGHT = 'height';
