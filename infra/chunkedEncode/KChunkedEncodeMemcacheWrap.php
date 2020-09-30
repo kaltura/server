@@ -720,8 +720,8 @@ ini_set("memory_limit","512M");
 				$keys = array_keys($outFilenames);
 				$movErrStr = null;
 				foreach ($keys as $key) {
-					KalturaLog::debug("Move file from [" . $outFilenames[$key] . "] to [" . $storageFilenames[$key] . "]");
-					if(kFile::checkFileExists($outFilenames[$key]) && !kFile::moveFile($outFilenames[$key], $storageFilenames[$key])) {
+					KalturaLog::debug("Move file from [" . $outFilenames[$key] . "] to [" . $moveToFilenames[$key] . "]");
+					if(kFile::checkFileExists($outFilenames[$key]) && !kFile::moveFile($outFilenames[$key], $moveToFilenames[$key])) {
 						$job->state = $job::STATE_FAIL;
 						$movErrStr.= ($storageFilenames[$key].",");
 					}
