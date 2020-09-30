@@ -441,6 +441,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 	
 	const MAX_ALLOWED_CHUNK_COUNT_EXCEEDED = "MAX_ALLOWED_CHUNK_COUNT_EXCEEDED;;Max allowed waiting chunks to be concatenated has exceeded allowed limit";
+	
+	const UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED = "UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED;MAX_RESUME_TIME;Max resume time of @MAX_RESUME_TIME@ seconds reached, cannot resume upload";
 
 	/*
 	 * Partenrs service
