@@ -285,7 +285,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
 
-	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
+	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP, $internalUrl=false )
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC)
@@ -312,15 +312,25 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 		if($kalturaPeriodicStorage)
 		{
-			$url = '/direct' . $url;
-			$authParams = $this->addKalturaAuthParams($url);
-			$url .= $authParams;
-			
-			if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl,'http://') === 0)
+			if($internalUrl)
 			{
-				$baseUrl =  preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+				$url = 's3://'.$storage->getStorageBaseDir().$url;
+				KalturaLog::debug("S3 internal import URL" . $url);
+				return $url;
+			}
+			else
+			{
+				$url = '/direct' . $url;
+				$authParams = $this->addKalturaAuthParams($url);
+				$url .= $authParams;
+
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0) {
+					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+				}
 			}
 		}
+
+
 
 		$url = ltrim($url, "/");
 		if (strpos($url, "://") === false)
