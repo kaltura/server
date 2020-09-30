@@ -251,7 +251,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME);
 	}
 
-	protected function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
+	protected static function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
 	{
 
 		$endDayString = sprintf("Y-m-d %s:00:00", self::BUSINESS_DAY_END_HOUR);
@@ -294,7 +294,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return strtotime($expTime) - $currentDateTime;
 	}
 
-	protected function calculateBusinessDays($numBusinessDays, $currentUnixTime)
+	public static function calculateBusinessDays($numBusinessDays, $currentUnixTime)
 	{
 		//Get Local TZ
 		$localTimeZone = date_default_timezone_get();
@@ -312,7 +312,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			$day = date("N", $expTime);
 			$time = date("His", $expTime);
 
-			$turnAroundTime += $this->calculateSecondsToNextBusinessDay($expTime, $day, $time);
+			$turnAroundTime += self::calculateSecondsToNextBusinessDay($expTime, $day, $time);
 			$numBusinessDays--;
 
 		}while($numBusinessDays);
@@ -345,7 +345,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				elseif( (VendorServiceTurnAroundTime::ONE_BUSINESS_DAY <= $turnAroundTime) &&
 					($turnAroundTime <= VendorServiceTurnAroundTime::SEVEN_BUSINESS_DAYS) )
 				{
-					$turnAroundTime = $this->calculateBusinessDays($turnAroundTime, $time);
+					$turnAroundTime = self::calculateBusinessDays($turnAroundTime, $time);
 				}
 
 				$this->setExpectedFinishTime($turnAroundTime + $time);

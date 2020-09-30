@@ -2446,6 +2446,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync, $pathOnly);
 			}
 		}
+
+		KalturaLog::log('flavor ' . $flavorAsset->getId() . ' entry ' . $flavorAsset->getEntryId() . ' partner ' . $flavorAsset->getPartnerId() . ' updated ' . $flavorAsset->getUpdatedAt() . ' path ' . $path);
 		return array ($parent_file_sync, $path, $sourceType);
 	}
 }

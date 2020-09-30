@@ -265,7 +265,7 @@ class kImageTransformationAdapter
 		$bgColor = sprintf(self::COLOR_FORMAT, $bgColor);
 		$this->parameters->set(kThumbFactoryFieldName::BG_COLOR, $bgColor);
 		/* @var $entry entry */
-		$entry = $this->parameters->get(kThumbFactoryFieldName::ENTRY);
+		$entry = $this->parameters->get(kThumbFactoryFieldName::SOURCE_ENTRY);
 		if (!$this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH))
 		{
 			if($entry->getWidth())
@@ -294,7 +294,8 @@ class kImageTransformationAdapter
 
 	protected function setSrcSizeFromFlavor()
 	{
-		$flavorAsset = myEntryUtils::getFlavorAssetForLocalCapture($this->parameters->get(kThumbFactoryFieldName::ENTRY));
+		$entry = $this->parameters->get(kThumbFactoryFieldName::SOURCE_ENTRY);
+		$flavorAsset = myEntryUtils::getFlavorAssetForLocalCapture($entry);
 		if (!$this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH))
 		{
 				$this->parameters->set(kThumbFactoryFieldName::SRC_WIDTH, $flavorAsset->getWidth());
@@ -495,7 +496,7 @@ class kImageTransformationAdapter
 	 */
 	protected function initResizeAndCropCalculationVariables(&$gravityPoint, &$resizeWidth, &$resizeHeight, &$cropHeight, &$cropWidth)
 	{
-		if(!$this->parameters->get(kThumbFactoryFieldName::HEIGHT) && !$$this->parameters->get(kThumbFactoryFieldName::WIDTH))
+		if(!$this->parameters->get(kThumbFactoryFieldName::HEIGHT) && !$this->parameters->get(kThumbFactoryFieldName::WIDTH))
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::WIDTH_AND_HEIGHT_ARE_ZERO);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);

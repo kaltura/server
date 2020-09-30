@@ -1,4 +1,12 @@
 # Propus 16.9.0  #
+## Remove automatic creation of Cielo Role ##
+- Issue Type: Task
+- Issue ID: REACH2-941
+
+### Configuration ###
+add the following to 'local.ini' under 'partner_copy_user_roles_ignore_list':
+	0 = 'cielo24'
+
 ## Modify report export to csv  ##
 - Issue Type: Task
 - Issue ID: AN-1409
@@ -47,7 +55,16 @@ Issue ID : S3
 Issue Type: Task
 Issue ID : REACH2-911
 
+
 # Propus 16.8.0  #
+## Adding permission to entryVendorTask object and to entryVendorTask service ##	
+Issue Type: Task	
+Issue ID : REACH2-911	
+
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_09_add_permissions_entry_vendor_task.php
+
+
 ## New KMS user reset password link  ##
 - Issue Type: Task
 - Issue ID: PLAT-10876
