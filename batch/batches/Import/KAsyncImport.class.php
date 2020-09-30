@@ -88,12 +88,34 @@ class KAsyncImport extends KJobHandlerWorker
 		return array($res,$responseStatusCode,$errorMessage,$errorNumber);
 	}
 
+
+	/*
+	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
+	 */
+	protected function fetchFromS3(KalturaBatchJob $job, KalturaImportJobData $data)
+	{
+		$s3Mgr = s3Mgr::getInstance(kFileTransferMgrType::S3);
+		$data->destFileLocalPath = $this->getTempFilePath($data->srcFileUrl);
+		$this->updateJob($job, "Downloading file - $data->srcFileUrl", KalturaBatchJobStatus::PROCESSING, $data);
+		$s3Mgr->login($data->srcFileUrl,null, null);
+
+		//Only the file path is needed to pull the remote file (extracting the S3 prefix)
+		$s3Mgr->getFile(substr($data->srcFileUrl,4),$data->destFileLocalPath);
+		$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+		return $this->moveFile($job, $data->destFileLocalPath);
+	}
+
 	/*
 	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
 	 */
 	private function fetchFile(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
 		$jobSubType = $job->jobSubType;
+
+		if($jobSubType==StorageProfileProtocol::S3)
+		{
+			return $this->fetchFromS3($job,$data);
+		}
 
 		$sshProtocols = array(
 			kFileTransferMgrType::SCP,
