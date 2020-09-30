@@ -636,6 +636,7 @@ class kUploadTokenMgr
 		}
 		else
 		{
+			KalturaLog::debug("Upload token [$uploadTokenId] not found, building file path");
 			$fileExtension = strtolower(pathinfo($uploadTokenId, PATHINFO_EXTENSION));
 			return myUploadUtils::getUploadPath($uploadTokenId, "", null , $fileExtension);
 		}
