@@ -480,7 +480,7 @@ class kJobsManager
 				$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_WAIT_FOR_CONVERT);
 				$flavorAsset->setDescription("Source file sync is importing: $srcSyncKey");
 				$flavorAsset->save();
-				$url = $fileSync->getExternalUrl($flavorAsset->getEntryId(),null,true);
+				$url = $fileSync->getExternalUrl($flavorAsset->getEntryId(), null, true);
 				return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $srcFlavorAsset, null, null, true);
 			}
 			else 
@@ -494,7 +494,7 @@ class kJobsManager
 				{
 					$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 				}
-				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId(),null,true));
+				$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($flavorAsset->getEntryId(), null, true));
 				$srcFileSyncDescriptor->setAssetId($srcSyncKey->getObjectId());
 				$srcFileSyncDescriptor->setAssetParamsId($srcFlavorAsset->getFlavorParamsId());
 				$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());
