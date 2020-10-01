@@ -668,4 +668,9 @@ class kFileBase
 		
 		return $res;
 	}
+	
+	public static function setStorageTypeMap($key, $value)
+	{
+		self::$storageTypeMap[$key] = $value;
+	}
 }
