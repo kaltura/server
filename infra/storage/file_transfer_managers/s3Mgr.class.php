@@ -371,6 +371,13 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$this->s3->registerStreamWrapper();
 	}
+
+	public function getFileUrl($remote_file, $expires = null)
+	{
+		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
+		KalturaLog::debug("remote_file: " . $remote_file);
+		return $this->s3->getObjectUrl($bucket, $remote_file, $expires);
+	}
 }
 
 class RefreshableRole extends AbstractRefreshableCredentials

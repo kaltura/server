@@ -1317,7 +1317,7 @@ class kJobsManager
 						list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($key, true, false);
 						if(StorageProfile::shouldImportFile($fileSync, $partner))
 						{
-							$url = $fileSync->getExternalUrl($entry->getId());
+							$url = $fileSync->getExternalUrl($entry->getId(), null, true);
 							kJobsManager::addImportJob($parentJob, $entry->getId(), $partner->getId(), $url, $flavorAsset, null, null, true);
 							$importingSources = true;
 							continue;
