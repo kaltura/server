@@ -69,6 +69,26 @@ class myContentStorage
 		return $res;
 		
 	}
+
+	public static function getThumbEntitySharedPath($entityName, $entryId, $thumbName, $fileName , $version = null)
+	{
+		if( $version != null )
+		{
+			$ext = pathinfo ($fileName , PATHINFO_EXTENSION);
+			$fileName = $version;
+		}
+
+		$dir = self::getPathFromId($entryId);
+		$res = '/content/'.$entityName.'/'. $dir .'/'.  $thumbName . '_'. $fileName;
+
+		if( $version != null )
+		{
+			$res .= "." . $ext;
+		}
+
+		return $res;
+	}
+
 /*
 	public static function dirForId ( $id )
 	{

@@ -755,11 +755,21 @@ class myEntryUtils
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
+
 		
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
 		//create final path for thumbnail created
-		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+		$finalThumbPath = null;
+		$sharedFilePath = kFileBase::getS3SharedPath();
+		if($sharedFilePath)
+		{
+			$finalThumbPath = $sharedFilePath . myContentStorage::getThumbEntitySharedPath("entry/" . $thumbDirs[0], $entry->getId(), $thumbName, $entryThumbFilename, $version);
+		}
+		else
+		{
+			$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/" . $thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename, $version);
+		}
 		
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
 		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
@@ -2182,7 +2192,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			foreach ($pluginInstances as $KalturaTransformationExecutor)
 			{
 				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
-				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
 				$result = $KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
 					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);
 
@@ -2196,14 +2205,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		catch (Exception $e)
 		{
 			kalturaLog::warning('Could not execute image transformation');
-			if(kConf::get('throw_on_failure', 'thumbnail', null))
-			{
-				throw $e;
-			}
-			else
-			{
-				kalturaLog::err("transformations failed with error {$e->getMessage()}");
-			}
+			throw $e;
 		}
 
 		return $result;

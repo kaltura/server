@@ -552,7 +552,18 @@ class kFileBase
 		}
 		return true;
 	}
-	
+
+	public static function getS3SharedPath()
+	{
+		$storageTypeMap = self::getStorageTypeMap();
+		if(!$storageTypeMap)
+		{
+			return false;
+		}
+
+		return array_search('S3', $storageTypeMap);
+	}
+
 	public static function getStorageTypeMap()
 	{
 		if(self::$storageTypeMap)
