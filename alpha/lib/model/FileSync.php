@@ -285,7 +285,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
 
-	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP, $internalUsage=false )
+	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP, $internalUsage = false)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC)
@@ -312,11 +312,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 		if($kalturaPeriodicStorage)
 		{
-			if($internalUsage)
+			if($internalUsage && $storage->getProtocol() === StorageProfile::STORAGE_PROTOCOL_S3)
 			{
-				$url = 's3://'.$storage->getStorageBaseDir().$url;
-				KalturaLog::debug("S3 internal import URL" . $url);
-				return $url;
+				return $this->getS3FileSyncUrl($storage, $url);
 			}
 			else
 			{
@@ -339,6 +337,22 @@ class FileSync extends BaseFileSync implements IBaseObject
 		}
 
 		return $url;
+	}
+
+	protected function getS3FileSyncUrl($storage, $fileKey)
+	{
+		$s3Options = array();
+		if ($storage->getS3Region())
+		{
+			$s3Options['s3Region'] = $storage->getS3Region();
+		}
+
+		$s3Mgr = kFileTransferMgr::getInstance(kFileTransferMgrType::S3, $s3Options);
+		$s3Mgr->login($storage->getStorageUrl(), $storage->getStorageUsername(), $storage->getStoragePassword());
+		$expiry = time() + 5 * 86400;
+		$signedUrl = $s3Mgr->getFileUrl($storage->getStorageBaseDir() . $fileKey, $expiry);
+		KalturaLog::debug("S3 internal import URL: " . $signedUrl);
+		return $signedUrl;
 	}
 
 	protected function addKalturaAuthParams($url)
