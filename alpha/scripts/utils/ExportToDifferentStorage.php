@@ -141,7 +141,23 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 
 	foreach ($fileSyncs as $fileSync)
 	{
-		$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
+		if ($fileSync->getLinkedId())
+		{
+			$resolvedFileSync = FileSyncPeer::retrieveByPK($fileSync->getLinkedId());
+			if(!$resolvedFileSync)
+			{
+				KalturaLog::log("XXX $assetId: BROKEN_LINK_DELETED - deleting broken link to " . $fileSync->getLinkedId());
+				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
+				$fileSync->save();
+				handleSyncKey($assetId, $syncKey);		// restart
+				return;
+			}
+		}
+		else
+		{
+			$resolvedFileSync = $fileSync;
+		}
+
 		if ($resolvedFileSync->getDc() != $fileSync->getDc())
 		{
 			if ($fileSync->getDc() == $targetDcId)
