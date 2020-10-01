@@ -154,7 +154,7 @@ class s3Mgr extends kFileTransferMgr
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
 
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
-		$roleRefresh->s3Arn = $this->s3Arn;
+		$roleRefresh->setRoleArn($this->s3Arn);
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
 

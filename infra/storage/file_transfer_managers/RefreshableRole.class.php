@@ -1,7 +1,7 @@
 <?php
 
 // AWS SDK PHP Client Library
-require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-autoloader.php'));
+require_once(dirname(__FILE__) . '/../../../vendor/aws/aws-autoloader.php');
 
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
@@ -23,6 +23,8 @@ class RefreshableRole extends AbstractRefreshableCredentials
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const SESSION_DURATION = 3600;
 	
+	private $roleArn;
+	
 	public function refresh()
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
@@ -37,7 +39,7 @@ class RefreshableRole extends AbstractRefreshableCredentials
 		));
 		
 		$call = $sts->assumeRole(array(
-			'RoleArn' => getenv(s3Mgr::S3_ARN_ROLE_ENV_NAME),
+			'RoleArn' => $this->roleArn,
 			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
 			'SessionDuration' => self::SESSION_DURATION,
 		));
@@ -56,5 +58,10 @@ class RefreshableRole extends AbstractRefreshableCredentials
 			->setExpiration($result->getExpiration());
 		
 		return $credentials;
+	}
+	
+	public function setRoleArn($roleArn)
+	{
+		$this->roleArn = $roleArn;
 	}
 }

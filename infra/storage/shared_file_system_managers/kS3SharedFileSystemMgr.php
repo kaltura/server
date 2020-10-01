@@ -9,6 +9,7 @@
 // AWS SDK PHP Client Library
 require_once(dirname(__FILE__) . '/../../../vendor/aws/aws-autoloader.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
+require_once(dirname(__FILE__) . '/../file_transfer_managers/RefreshableRole.class.php');
 
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
@@ -16,6 +17,11 @@ use Aws\Sts\StsClient;
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
 use Aws\S3\Enum\CannedAcl;
+
+use Aws\Common\Credentials\Credentials;
+use Doctrine\Common\Cache\FilesystemCache;
+use Guzzle\Cache\DoctrineCacheAdapter;
+use Aws\Common\Credentials\CacheableCredentials;
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
@@ -39,6 +45,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $endPoint;
 	protected $accessKeySecret;
 	protected $accessKeyId;
+	protected $s3Arn = null;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -50,7 +57,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		parent::__construct($options);
 		
-		if(!$options)
+		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
 		}
@@ -66,6 +73,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
+			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : getenv(self::S3_ARN_ROLE_ENV_NAME);
 		}
 		
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
@@ -80,7 +88,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		if(getenv(self::S3_ARN_ROLE_ENV_NAME) && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		if($this->s3Arn)
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
@@ -121,10 +129,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
 		
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleRefresh->setRoleArn($this->s3Arn);
+		
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
 		
-		$this->s3 = S3Client::factory(array(
+		$this->s3Client = S3Client::factory(array(
 			'credentials' => $roleCreds,
 			'region' => $this->s3Region,
 			'signature' => 'v4',
