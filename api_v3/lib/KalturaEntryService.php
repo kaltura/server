@@ -1088,10 +1088,6 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 		}
-		else if(!$local)
-		{
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
-		}
 		
 		// even if it null
 		$entry->setConversionQuality($conversionProfileId);
