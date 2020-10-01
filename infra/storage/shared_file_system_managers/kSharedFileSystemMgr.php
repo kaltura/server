@@ -587,7 +587,7 @@ abstract class kSharedFileSystemMgr
 		
 		switch ($type) {
 			case kSharedFileSystemMgrType::NFS:
-				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr($options);
+				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr(self::$storageConfig);
 				break;
 			
 			case kSharedFileSystemMgrType::S3:
