@@ -103,7 +103,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		if (!$rootPath)
 			throw new Exception("Cannot create temp thumbnail directory [$rootPath] due to an error. Please fix and restart", -1);
 		
-		$sharedFile = $this->createUniqFileName($rootPath);
+		$sharedFile = $this->createUniqFileName($rootPath, $data->thumbAssetId);
 		
 		clearstatcache();
 		$fileSize = filesize($data->thumbPath);
@@ -173,9 +173,9 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		return array($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType, $mediaInfoVideoRotation);
 	}
 	
-	private function createUniqFileName($rootPath)
+	private function createUniqFileName($rootPath, $thumbAssetId)
 	{
-		return realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid('thumb_');
+		return realpath($rootPath) . DIRECTORY_SEPARATOR . uniqid("thumb_{$thumbAssetId}_");
 	}
 
 	protected function createBasicThumb($job, $data, $rootPath, $mediaFile, $thumbParamsOutput)
@@ -183,7 +183,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 		$capturePath = null;
 		if($data->srcAssetType == KalturaAssetType::FLAVOR)
 		{
-			$capturePath = $this->createUniqFileName($rootPath);
+			$capturePath = $this->createUniqFileName($rootPath, $data->thumbAssetId);
 			list($mediaInfoWidth, $mediaInfoHeight, $mediaInfoDar, $mediaInfoVidDur, $mediaInfoScanType, $mediaInfoVideoRotation) = $this->getMediaInfoData($job->partnerId, $data->srcAssetId);
 
 			// generates the thumbnail
@@ -204,7 +204,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 			$this->updateJob($job, "Thumbnail captured [$capturePath]", KalturaBatchJobStatus::PROCESSING);
 		}
 
-		$thumbPath = $this->createUniqFileName($rootPath);
+		$thumbPath = $this->createUniqFileName($rootPath, $data->thumbAssetId);
 
 		if ($capturePath || !$data->fileContainer->encryptionKey)
 		{
@@ -245,7 +245,7 @@ class KAsyncCaptureThumb extends KJobHandlerWorker
 
 		$bifInterval = $this->getBifInterval($thumbParamsOutput);
 		$rootPath = $this->createRootFolder($rootPath, $job);
-		$generalCapturePath = $this->createUniqFileName($rootPath);
+		$generalCapturePath = $this->createUniqFileName($rootPath, $data->thumbAssetId);
 
 		$images = $this->createBifFrames($job, $data, $bifInterval, $thumbParamsOutput, $generalCapturePath, $mediaFile);
 
