@@ -162,7 +162,7 @@ class s3Mgr extends kFileTransferMgr
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
 
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
-		$roleRefresh->s3Arn = $this->s3Arn;
+		$roleRefresh->setRoleArn($this->s3Arn);
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
 
@@ -396,48 +396,4 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$this->s3->registerStreamWrapper();
 	}
-}
-
-
-
-class RefreshableRole extends AbstractRefreshableCredentials
-{
-    const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
-    const SESSION_DURATION = 3600;
-    public $s3Arn = null;
-
-    public function refresh()
-    {
-        $credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
-
-        $credentials = new Credentials('', '');
-        $ipRefresh = new RefreshableInstanceProfileCredentials(new Credentials('', '', '', 1));
-        $ipCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/instanceProfileCache"));
-
-        $ipCreds = new CacheableCredentials($ipRefresh, $ipCache, 'refresh_role_creds_key');
-        $sts = StsClient::factory(array(
-            'credentials' => $ipCreds,
-        ));
-
-        $call = $sts->assumeRole(array(
-            'RoleArn' => $this->s3Arn,
-            'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
-            'SessionDuration' => self::SESSION_DURATION,
-        ));
-
-        $creds = $call['Credentials'];
-        $result = new Credentials(
-            $creds['AccessKeyId'],
-            $creds['SecretAccessKey'],
-            $creds['SessionToken'],
-            strtotime($creds['Expiration'])
-        );
-
-        $this->credentials->setAccessKeyId($result->getAccessKeyId())
-            ->setSecretKey($result->getSecretKey())
-            ->setSecurityToken($result->getSecurityToken())
-            ->setExpiration($result->getExpiration());
-
-        return $credentials;
-    }
 }
