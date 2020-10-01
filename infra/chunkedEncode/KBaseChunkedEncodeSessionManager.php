@@ -12,13 +12,13 @@
 	{
 		const 	SessionStatsJSONLogPrefix = "SessionStatsJSON";
 		
-		protected $name = null;
+		protected $name = null;	
 		protected $chunker = null;
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
-		protected $maxExecutionTime = 3000;	// In seconds. Suits FHD, represents transcoding ratio of x50,
-							// other resolutions will be adjusted accordingly (aka 360p, 4K/H265, ..)
+		protected $maxExecutionTime = 3000;	// In seconds. Suits FHD, represents transcoding ratio of x50, 
+											// other resolutions will be adjusted accordingly (aka 360p, 4K/H265, ..)
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();
@@ -93,18 +93,20 @@
 				$this->name = basename($chunker->params->output);
 
 			$videoCmdLines = array();
-			$sharedMode = $chunker->setup->sharedChunkPath;
-			
+			$sharedMode = isset($chunker->setup->sharedChunkPath)?$chunker->setup->sharedChunkPath:null;
+
 			for($chunkIdx=0;$chunkIdx<$chunker->GetMaxChunks();$chunkIdx++) {
 				$chunkData = $chunker->GetChunk($chunkIdx);
 				$start = $chunkData->start;
-				$cmdLine = $chunker->BuildVideoCommandLine($start, $chunkIdx);
-				$logFilename = $chunker->getChunkName($chunkIdx,".log");
-				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				
+
 				$outFileNames = array();
 				$outFileNames[] = $chunker->getChunkName($chunkIdx);
-				$outFileNames[] = substr($outFileNames[0], 0, -1) . (substr($outFileNames[0], -1)+1);
+				$outFileNames[] = $chunker->getChunkName($chunkIdx,"base").($chunkIdx+1);
+				$logFilename = $chunker->getChunkName($chunkIdx,"base").".log";
+				$outFileNames[] = $logFilename;
+				
+				$cmdLine = $chunker->BuildVideoCommandLine($start, $chunkIdx);
+				$cmdLine = "time $cmdLine > $logFilename 2>&1";
 				$currVideoCmdLine = array($cmdLine, $outFileNames);
 				
 				if($sharedMode)
@@ -114,26 +116,28 @@
 					if($sharedChunkName)
 					{
 						$sharedOutFilenames[] = $sharedChunkName;
-						$sharedOutFilenames[] = substr($sharedChunkName, 0, -1) . (substr($sharedChunkName, -1)+1);
+						$sharedOutFilenames[] =$chunker->getChunkName($chunkIdx,"shared_base").($chunkIdx+1);
+						$sharedOutFilenames[] =$chunker->getChunkName($chunkIdx,"shared_base").".log";
 						$currVideoCmdLine[] = $sharedOutFilenames;
 					}
 				}
 				
+
 				$videoCmdLines[$chunkIdx] = $currVideoCmdLine;
 				KalturaLog::log($cmdLine);
 			}
-			
 			$this->videoCmdLines = $videoCmdLines;
 			
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
 				$outFilename = $chunker->getSessionName("audio");
 				$logFilename = $outFilename.".log";
-				$currAudioCmdLine = array("time $cmdLine > $logFilename 2>&1", array($outFilename));
+				$currAudioCmdLine = array("time $cmdLine > $logFilename 2>&1", array($outFilename,$logFilename));
 				
 				if($sharedMode) {
 					$sharedAudioChunkName = $chunker->getSessionName("shared_audio");;
-					$currAudioCmdLine[] = array($sharedAudioChunkName);
+					$logFilename = $sharedAudioChunkName.".log";
+					$currAudioCmdLine[] = array($sharedAudioChunkName,$logFilename);
 				}
 				
 				$this->audioCmdLines[] = $currAudioCmdLine;
@@ -143,7 +147,7 @@
 		}
 
 		/********************
-		 * Analyze
+		 * Analyze 
 		 */
 		public function Analyze()
 		{
@@ -151,7 +155,7 @@
 		}
 		
 		/* ---------------------------
-		 *
+		 * 
 		 */
 		public function FixChunks()
 		{
@@ -174,7 +178,7 @@
 					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
 					return false;
 				}
-
+			
 				$toFixChunkIdx = $chunkData->index;
 				
 				$chunkFixName = $chunker->getChunkName($toFixChunkIdx, "fix");
@@ -216,7 +220,6 @@
 				$this->returnStatus = KChunkedEncodeReturnStatus::MergeError;
 				return false;
 			}
-			
 			$concatFilenameLog = $this->chunker->getSessionName("concat");
 
 			$mergeCmd = $this->chunker->BuildMergeCommandLine();
@@ -227,7 +230,7 @@
 				$process = $this->executeCmdline($mergeCmd, $concatFilenameLog);
 				if($process==false) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt)!");
-					$logTail = self::getLogTail($concatFilenameLog);
+					$logTail = self::GetLogTail($concatFilenameLog);
 					if(isset($logTail))
 						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
@@ -238,7 +241,7 @@
 				$execData = new KProcessExecutionData($process, $concatFilenameLog);
 				if($execData->exitCode!=0) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt, exitCode:$execData->exitCode)!");
-					$logTail = self::getLogTail($concatFilenameLog);
+					$logTail = self::GetLogTail($concatFilenameLog);
 					if(isset($logTail))
 						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
@@ -301,6 +304,7 @@
 					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
 				}
 				$cnt = $chunker->GetMaxChunks();
+
 			}
 			
 //			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
@@ -394,7 +398,7 @@
 			
 			$errStr = null;
 			$lasted = $this->finishTime - $this->createTime;
-			
+				
 			if($sessionData->returnStatus==KChunkedEncodeReturnStatus::OK) {
 				$msgStr = "RESULT:Success"."  Lasted:".gmdate('H:i:s',$lasted)."/".($lasted)."s";
 				if(isset($concurrencyLevel)) {
@@ -426,13 +430,12 @@
 					KalturaLog::log("cleanup cmd:$cmd");
 					$rv = null; $op = null;
 					$output = exec($cmd, $op, $rv);
-				}
+				} 
 			}
-
+			
 			if(!(isset($setup->cleanUp) && $setup->cleanUp)){
 				return;
 			}
-
 			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
 				$chunkName_wc = $this->chunker->getChunkName($idx,"*");
 				$cmd = "rm -f $chunkName_wc";
@@ -463,7 +466,7 @@
 		}
 
 		/********************
-		 *
+		 * 
 		 */
 		public function getErrorMessage()
 		{
@@ -490,7 +493,7 @@
 		}
 		
 		/********************
-		 *
+		 * 
 		 */
 		public static function GetLogTail($logFilename, $size=5000)
 		{
@@ -533,16 +536,16 @@
 		{
 			KalturaLog::log("$logFilename, $size");
 			if($lines=self::GetLogTailLines($logFilename, $size)) {
-				foreach($lines as $idx=>$line) {
+               foreach($lines as $idx=>$line) {
 					$prefix=self::SessionStatsJSONLogPrefix;
 					if(($pos=strpos($line,$prefix))===false)
-						continue;
+							continue;
 					KalturaLog::log("$line");
 					$jsonStr = substr($line, $pos+strlen($prefix));
 					$obj = json_decode($jsonStr);
 					KalturaLog::log("JSON:$jsonStr, object:".print_r($obj,1));
 					return $obj;
-				}
+                }
 			}
 			return null;
 		}
