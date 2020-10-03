@@ -80,7 +80,6 @@ class kUploadTokenMgr
 		
 		self::$sharedStorageOptions = array(
 			's3Region' => $sharedStorageClientConfig['s3Region'],
-			'endPoint' => null,
 			'sharedStorageBaseDir' => $sharedStorageClientConfig['sharedStorageBaseDir'],
 			'uploadTokenId' => $this->_uploadToken->getId()
 			);
