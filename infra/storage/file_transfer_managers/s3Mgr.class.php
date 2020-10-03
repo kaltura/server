@@ -231,13 +231,23 @@ class s3Mgr extends kFileTransferMgr
 
 			KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
 			$fp = fopen($local_file, 'r');
+			if (!$fp)
+			{
+				KalturaLog::err("Failed to fopen give file [$local_file]");
+				return array(false, "Failed to fopen give file [$local_file]");
+			}
+			
 			$res = $this->s3->upload($bucket,
 				$remote_file,
 				$fp,
 				$this->filesAcl,
 				array('params' => $params)
 			);
-			fclose($fp);
+			
+			if($fp)
+			{
+				fclose($fp);
+			}
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return array(true, null);
@@ -298,7 +308,6 @@ class s3Mgr extends kFileTransferMgr
 		{
 			return true;
 		}
-		KalturaLog::debug("remote_file: ".$remote_file);
 
 		$exists = $this->s3->doesObjectExist($bucket, $remote_file);
 		return $exists;
@@ -346,9 +355,33 @@ class s3Mgr extends kFileTransferMgr
 		return false;
 	}
 
-	protected function doList ($remote_path)
+	protected function doList ($remoteDir)
 	{
-		return false;
+		$dirList = array();
+		list($bucket, $remoteDir) = explode("/",ltrim($remoteDir,"/"),2);
+		KalturaLog::debug("Listing dir contents for bucket [$bucket] and dir [$remoteDir]");
+		
+		try
+		{
+			$dirListObjectsRaw = $this->s3->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $remoteDir
+			));
+			
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				$dirList[] = array (
+					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
+					"fileSize" => $dirListObject['Size']
+				);
+			}
+		}
+		catch ( Exception $e )
+		{
+			KalturaLog::err("Couldn't list file objects for remote file, [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
+		}
+		
+		return $dirList;
 	}
 
 	protected function doListFileObjects ($remoteDir)
@@ -371,7 +404,26 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$this->s3->registerStreamWrapper();
 	}
-
+	
+	public function getRemoteUrl($remote_file)
+	{
+		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
+		
+		$params = array(
+			'Bucket' => $bucket,
+			'Key'    => $remote_file,
+		);
+		
+		$cmd = $this->s3->getCommand('GetObject', $params);
+		
+		$expiry = time() + 600;
+		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		
+		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
+		
+		return $preSignedUrl;
+	}
+	
 	public function getFileUrl($remote_file, $expires = null)
 	{
 		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
