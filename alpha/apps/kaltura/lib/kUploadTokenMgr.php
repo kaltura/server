@@ -117,8 +117,6 @@ class kUploadTokenMgr
 	 * Upload a file to the current upload token
 	 * @param file $fileData
 	 * @param bool $resume
-	 * @param bool $resume
-	 * @param bool $resume
 	 * @param bool $finalChunk
 	 * @param int $resumeAt
 	 * @throw kUploadTokenException
