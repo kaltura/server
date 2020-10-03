@@ -233,8 +233,8 @@ class s3Mgr extends kFileTransferMgr
 			$fp = fopen($local_file, 'r');
 			if (!$fp)
 			{
-				KalturaLog::err("Failed to fopen give file [$local_file]");
-				return array(false, "Failed to fopen give file [$local_file]");
+				KalturaLog::err("Failed to fopen given file [$local_file]");
+				return array(false, "Failed to fopen given file [$local_file]");
 			}
 			
 			$res = $this->s3->upload($bucket,

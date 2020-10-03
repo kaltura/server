@@ -546,7 +546,14 @@ class kUploadTokenMgr
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
 		$bytesWritten = 0;
-		$resolvedSourceFilePath = self::resolveFileLocation($sourceFilePath);
+		list($isRemote, $resolvedSourceFilePath) = self::resolveFileLocation($sourceFilePath);
+		
+		if($isRemote)
+		{
+			stream_wrapper_restore('http');
+			stream_wrapper_restore('https');
+		}
+		
 		$sourceFileResource = self::openFile($resolvedSourceFilePath, 'rb');
 		if(!$sourceFileResource)
 		{
@@ -564,6 +571,13 @@ class kUploadTokenMgr
 
 		fclose($sourceFileResource);
 		self::deleteChunkFile($sourceFilePath);
+		
+		if($isRemote)
+		{
+			stream_wrapper_unregister ('http');
+			stream_wrapper_unregister ('https');
+		}
+		
 		return $bytesWritten;
 	}
 
@@ -783,7 +797,7 @@ class kUploadTokenMgr
 			return kFile::moveFile($sourceFilePath, $chunkFilePath);
 		}
 		
-		$sharedChunkPath = self::translateLocalSharedPathToRemoe($chunkFilePath);
+		$sharedChunkPath = self::translateLocalSharedPathToRemote($chunkFilePath);
 		
 		try
 		{
@@ -811,7 +825,7 @@ class kUploadTokenMgr
 			return kFile::checkFileExists($chunkPath);
 		}
 		
-		$sharedChunkPath = self::translateLocalSharedPathToRemoe($chunkPath);
+		$sharedChunkPath = self::translateLocalSharedPathToRemote($chunkPath);
 		
 		try
 		{
@@ -832,7 +846,7 @@ class kUploadTokenMgr
 			return unlink($filePath);
 		}
 		
-		$sharedChunkPath = self::translateLocalSharedPathToRemoe($filePath);
+		$sharedChunkPath = self::translateLocalSharedPathToRemote($filePath);
 		
 		try
 		{
@@ -862,7 +876,7 @@ class kUploadTokenMgr
 			return $dirList;
 		}
 		
-		$sharedUploadPath = self::translateLocalSharedPathToRemoe($uploadFilePath);
+		$sharedUploadPath = self::translateLocalSharedPathToRemote($uploadFilePath);
 		return self::$sharedStorageClient->listDir(dirname($sharedUploadPath));
 	}
 	
@@ -870,18 +884,15 @@ class kUploadTokenMgr
 	{
 		if(!self::$storeChunksInRemoteShared || strpos($filePath, ".chunk.") == false)
 		{
-			return realpath($filePath);
+			return array(false, realpath($filePath));
 		}
 		
-		$sharedChunkPath = self::translateLocalSharedPathToRemoe($filePath);
-		
-		stream_wrapper_restore('http');
-		stream_wrapper_restore('https');
-		
-		return self::$sharedStorageClient->getRemoteUrl($sharedChunkPath);
+		$sharedChunkPath = self::translateLocalSharedPathToRemote($filePath);
+		$remoteSharedPath = self::$sharedStorageClient->getRemoteUrl($sharedChunkPath);
+		return array(true, $remoteSharedPath);
 	}
 	
-	private static function translateLocalSharedPathToRemoe($localShared)
+	private static function translateLocalSharedPathToRemote($localShared)
 	{
 		$uploadTokenId = self::$sharedStorageOptions['uploadTokenId'];
 		
