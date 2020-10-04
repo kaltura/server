@@ -12,7 +12,7 @@ class simuliveUtils
 	 */
 	public static function serveSimuliveAsLiveStream(LiveEntry $entry, $pathOnly)
 	{
-		$currentEvent = $entry->getCurrentSimuliveEvent();
+		$currentEvent = simuliveUtils::getCurrentSimuliveEvent($entry);
 		if (!$currentEvent)
 		{
 			return null;
@@ -51,5 +51,25 @@ class simuliveUtils
 			$sequences[] = array('clips' => serveFlavorAction::getClipData($path, $flavor, $sourceType));
 		}
 		return $sequences;
+	}
+
+	/**
+	 * @param Entry $entry
+	 * @return LiveStreamScheduleEventable | null
+	 */
+	public static function getCurrentSimuliveEvent(Entry $entry)
+	{
+		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		{
+			/* @var $entry LiveEntry */
+			foreach ($entry->getScheduleEvents() as $event)
+			{
+				if($event->getSourceEntryId())
+				{
+					return $event;
+				}
+			}
+		}
+		return null;
 	}
 }

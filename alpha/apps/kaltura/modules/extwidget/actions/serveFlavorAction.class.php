@@ -900,7 +900,7 @@ class serveFlavorAction extends kalturaAction
 		return array($segmentDuration, $dvrWindowSize);
 	}
 
-	protected function servePlaylistAsLiveChannel(LiveEntry $entry)
+	protected function servePlaylistAsLiveChannel(LiveChannel $entry)
 	{
 		// get cycle info
 		$playlist = entryPeer::retrieveByPK($entry->getPlaylistId());

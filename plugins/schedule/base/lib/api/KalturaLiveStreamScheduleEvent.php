@@ -63,4 +63,37 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	{
 		return ScheduleEventType::LIVE_STREAM;
 	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validateInsertUpdate();
+		parent::validateForInsert($propertiesToSkip);
+	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validateInsertUpdate();
+		parent::validateForUpdate($sourceObject, $propertiesToSkip = array());
+	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	protected function validateInsertUpdate()
+	{
+		if(!BaseentryPeer::retrieveByPK($this->sourceEntryId))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
+		}
+		if($this->preStartTime < 0)
+		{
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'preStartTime');
+		}
+	}
 }

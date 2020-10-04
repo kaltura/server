@@ -476,24 +476,6 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
-	 * @return LiveStreamScheduleEventable | null
-	 */
-	public function getCurrentSimuliveEvent()
-	{
-		if ($this->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
-		{
-			foreach ($this->getScheduleEvents() as $event)
-			{
-				if($event->getSourceEntryId())
-				{
-					return $event;
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * @param int $time
 	 * @return array<LiveStreamScheduleEventable>
 	 */
@@ -526,7 +508,7 @@ abstract class LiveEntry extends entry
 				return false;
 		}
 
-		if ($this->getCurrentSimuliveEvent())
+		if (simuliveUtils::getCurrentSimuliveEvent($this))
 		{
 			return true;
 		}
