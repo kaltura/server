@@ -373,7 +373,7 @@ class kUploadTokenMgr
 			if(!$verifyFinalChunk)
 			{
 				KalturaLog::debug("This is not the final chunk trying to append available chunks");
-				$currentFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource);
+				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $this->_uploadToken->getId());
 				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize $currentFileSize");
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
@@ -582,7 +582,7 @@ class kUploadTokenMgr
 		return $bytesWritten;
 	}
 
-	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId, $expectedFileSize)
+	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId, $expectedFileSize = null)
 	{
 		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000, $expectedFileSize);
 		
