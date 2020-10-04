@@ -355,24 +355,24 @@ class s3Mgr extends kFileTransferMgr
 		return false;
 	}
 
-	protected function doList ($remoteDir)
+	protected function doList ($remote_path)
 	{
-		$dirList = array();
-		list($bucket, $remoteDir) = explode("/",ltrim($remoteDir,"/"),2);
-		KalturaLog::debug("Listing dir contents for bucket [$bucket] and dir [$remoteDir]");
+		$dir_list = array();
+		list($bucket, $remote_path) = explode("/", ltrim($remote_path,"/"), 2 );
+		KalturaLog::debug("Listing dir contents for bucket [$bucket] and dir [$remote_path]");
 		
 		try
 		{
-			$dirListObjectsRaw = $this->s3->getIterator('ListObjects', array(
+			$dir_list_objects_raw = $this->s3->getIterator('ListObjects', array(
 				'Bucket' => $bucket,
-				'Prefix' => $remoteDir
+				'Prefix' => $remote_path
 			));
 			
-			foreach ($dirListObjectsRaw as $dirListObject)
+			foreach ($dir_list_objects_raw as $dir_list_object)
 			{
-				$dirList[] = array (
-					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
-					"fileSize" => $dirListObject['Size']
+				$dir_list[] = array (
+					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dir_list_object['Key'],
+					"fileSize" => $dir_list_object['Size']
 				);
 			}
 		}
@@ -381,7 +381,7 @@ class s3Mgr extends kFileTransferMgr
 			KalturaLog::err("Couldn't list file objects for remote file, [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
 		}
 		
-		return $dirList;
+		return $dir_list;
 	}
 
 	protected function doListFileObjects ($remoteDir)
@@ -407,7 +407,7 @@ class s3Mgr extends kFileTransferMgr
 	
 	public function getRemoteUrl($remote_file)
 	{
-		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
+		list($bucket, $remote_file) = explode("/", ltrim($remote_file,"/"), 2);
 		
 		$params = array(
 			'Bucket' => $bucket,
@@ -417,11 +417,11 @@ class s3Mgr extends kFileTransferMgr
 		$cmd = $this->s3->getCommand('GetObject', $params);
 		
 		$expiry = time() + 600;
-		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		$pre_signed_url = $cmd->createPresignedUrl($expiry);
 		
-		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
+		KalturaLog::debug("remote_file: [$remote_file] pre_signed_url: [$pre_signed_url]");
 		
-		return $preSignedUrl;
+		return $pre_signed_url;
 	}
 	
 	public function getFileUrl($remote_file, $expires = null)
