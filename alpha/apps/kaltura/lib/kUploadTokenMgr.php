@@ -560,7 +560,7 @@ class kUploadTokenMgr
 
 	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId)
 	{
-		//$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000);
+		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000);
 		
 		fseek($targetFileResource, 0, SEEK_END);
 		

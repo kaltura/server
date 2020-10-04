@@ -308,7 +308,8 @@ class s3Mgr extends kFileTransferMgr
 		{
 			return true;
 		}
-
+		
+		KalturaLog::debug("remote_file: ".$remote_file);
 		$exists = $this->s3->doesObjectExist($bucket, $remote_file);
 		return $exists;
 	}
