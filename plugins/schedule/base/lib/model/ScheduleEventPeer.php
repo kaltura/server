@@ -230,6 +230,21 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	}
 
 	/**
+	 * @param string $templateEntryId
+	 * @param array $types
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveByTemplateEntryIdAndTypes($templateEntryId, $types)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		$filter = new ScheduleEventFilter();
+		$filter->setTemplateEntryIdEqual($templateEntryId);
+		$filter->attachToCriteria($c);
+		return self::doSelect($c);
+	}
+
+	/**
 	 * @param string $resourceIds
 	 * @param date $startDate
 	 * @param date $endDate

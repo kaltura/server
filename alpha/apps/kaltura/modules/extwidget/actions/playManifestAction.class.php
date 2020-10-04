@@ -377,6 +377,7 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_CHANNEL:
+			case entryType::LIVE_STREAM:
 				break;
 
 			case entryType::PLAYLIST:
@@ -546,13 +547,10 @@ class playManifestAction extends kalturaAction
 	
 	protected function shouldInitFlavorAssetsArray()
 	{
-		if ($this->entry->getType() == entryType::LIVE_STREAM)
-			return false;
-			
 		if($this->deliveryAttributes->getFormat() == "hdnetwork")
 			return false;
 	
-		if ($this->entry instanceof LiveEntry)
+		if ($this->entry instanceof LiveEntry && !$this->entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
 			return false;			// live stream entries don't have flavors
 		
 		return true;
@@ -919,6 +917,17 @@ class playManifestAction extends kalturaAction
 				{
 					$this->initFlavorAssetArray();
 					$this->initEntryDuration();
+				}
+				break;
+
+			case entryType::LIVE_STREAM:
+				/* @var LiveEntry $liveStreamEntry*/
+				$liveStreamEntry = $this->entry;
+				$currentEvent = $liveStreamEntry->getEvent();
+				if (!is_null($currentEvent) && $currentEvent->getSourceEntryId())
+				{
+					$this->entryId = $currentEvent->getSourceEntryId();
+					$this->initFlavorAssetArray();
 				}
 				break;
 		}
@@ -1300,10 +1309,18 @@ class playManifestAction extends kalturaAction
 				$entryType = 'vod';
 				break;
 				
-			case entryType::LIVE_STREAM:			
-				// Live stream
-				$renderer = $this->serveLiveEntry();
-				$entryType = 'live';
+			case entryType::LIVE_STREAM:
+				/* @var LiveEntry $liveStreamEntry*/
+				$liveStreamEntry = $this->entry;
+				if ($liveStreamEntry->isCurrentlySimulive())
+				{
+					$renderer = $this->serveVodEntry();
+					$entryType = 'vod';
+				} else {
+					// Live stream
+					$renderer = $this->serveLiveEntry();
+					$entryType = 'live';
+				}
 				break;
 			
 			default:

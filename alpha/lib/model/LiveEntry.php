@@ -10,6 +10,7 @@ abstract class LiveEntry extends entry
 	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
+	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
@@ -477,12 +478,53 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return boolean
 	 */
+	public function isCurrentlySimulive()
+	{
+		if ($this->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		{
+			$event = $this->getEvent();
+			return $event && !is_null($event->getSourceEntryId());
+		}
+		return false;
+	}
+
+	/**
+	 * @param int $time
+	 * @return LiveStreamScheduleEvent
+	 */
+	public function getEvent($time = null)
+	{
+		if (is_null($time))
+		{
+			$time = time();
+		}
+		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTypes($this->getId(), array(ScheduleEventType::LIVE_STREAM));
+		foreach ($scheduleEvents as $scheduleEvent)
+		{
+			/* @var LiveStreamScheduleEvent $scheduleEvent*/
+			if ($scheduleEvent->isTimeInEvent($time))
+			{
+				return $scheduleEvent;
+			}
+		}
+		return null;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
 	public function isCurrentlyLive($currentDcOnly = false)
 	{
 		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
 			if (!$this->canViewExplicitLive())
 				return false;
+		}
+
+		if ($this->isCurrentlySimulive())
+		{
+			return true;
 		}
 
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();

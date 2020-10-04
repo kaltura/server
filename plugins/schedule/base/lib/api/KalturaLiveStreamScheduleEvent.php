@@ -12,6 +12,18 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	public $projectedAudience;
 
+	/**
+	 * The entry ID of the source entry (for simulive)
+	 * @var string
+	 */
+	public $sourceEntryId;
+
+	/**
+	 * The time relative time before the startTime considered as preStart time
+	 * @var int
+	 */
+	public $preStartTime;
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
@@ -31,6 +43,8 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	private static $map_between_objects = array
 	(
 		'projectedAudience',
+		'sourceEntryId',
+		'preStartTime'
 	);
 
 	/* (non-PHPdoc)

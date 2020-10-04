@@ -314,5 +314,20 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		$objectName = $this->getIndexObjectName();
 		return $objectName::getSphinxMatchOptimizations($this);
 	}
+
+	public function isTimeInEvent($epochTime)
+	{
+		$startTs = $this->getStartTime();
+		$endTs = strtotime($this->end_date);
+		return (($epochTime >= $startTs) && ($epochTime <= $endTs));
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getStartTime()
+	{
+		return strtotime($this->start_date);
+	}
 	
 } // ScheduleEvent
