@@ -318,7 +318,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function isTimeInEvent($epochTime)
 	{
 		$startTs = $this->getStartTime();
-		$endTs = strtotime($this->end_date);
+		$endTs = $this->getEndTime();
 		return (($epochTime >= $startTs) && ($epochTime <= $endTs));
 	}
 
@@ -328,6 +328,14 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function getStartTime()
 	{
 		return strtotime($this->start_date);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getEndTime()
+	{
+		return strtotime($this->end_date);
 	}
 	
 } // ScheduleEvent

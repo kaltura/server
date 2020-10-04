@@ -289,7 +289,7 @@ class serveFlavorAction extends kalturaAction
 		// build the media set
 		if ($isLive)
 		{
-			$repeat = !!$origEntry->getRepeat(); // Convert to bool
+			$repeat = $origEntry->getRepeat() ? true : false;
 			$mediaSet = $this->serveLiveMediaSet($durations, $sequences,
 				$playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $repeat, !$repeat);
 		}
@@ -928,7 +928,7 @@ class serveFlavorAction extends kalturaAction
 		$dvrWindow = $entry->getDvrWindow() * 60 * 1000;
 		$durations[] = $sourceEntry->getLengthInMsecs();
 		$startTime = $currentEvent->getStartTime();
-		$endTime = min(strtotime($currentEvent->getEndDate()), $currentEvent->getStartTime() + intval(array_sum($durations) / 1000));
+		$endTime = min($currentEvent->getEndTime(), $currentEvent->getStartTime() + intval(array_sum($durations) / 1000));
 		$sequences = $this->buildSimuliveSequencesArray($sourceEntry, $entry);
 		$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
 								null, null, true, true, $dvrWindow, $endTime);

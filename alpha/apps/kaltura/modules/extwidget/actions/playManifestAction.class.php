@@ -18,6 +18,8 @@ class playManifestAction extends kalturaAction
 	);
 	const FLAVOR_GROUPING_PERCENTAGE_FACTOR = 0.05; // 5 percent
 	const WATERMARK = 'watermark';
+	const ENTRY_TYPE_VOD = 'vod';
+	const ENTRY_TYPE_LIVE = 'live';
 
 	/**
 	 * When this list start to contain plugins - 
@@ -924,7 +926,7 @@ class playManifestAction extends kalturaAction
 				/* @var LiveEntry $liveStreamEntry*/
 				$liveStreamEntry = $this->entry;
 				$currentEvent = $liveStreamEntry->getEvent();
-				if (!is_null($currentEvent) && $currentEvent->getSourceEntryId())
+				if ($currentEvent && $currentEvent->getSourceEntryId())
 				{
 					$this->entryId = $currentEvent->getSourceEntryId();
 					$this->initFlavorAssetArray();
@@ -1306,7 +1308,7 @@ class playManifestAction extends kalturaAction
 			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
-				$entryType = 'vod';
+				$entryType = self::ENTRY_TYPE_VOD;
 				break;
 				
 			case entryType::LIVE_STREAM:
@@ -1315,11 +1317,12 @@ class playManifestAction extends kalturaAction
 				if ($liveStreamEntry->isCurrentlySimulive())
 				{
 					$renderer = $this->serveVodEntry();
-					$entryType = 'vod';
-				} else {
+					$entryType = self::ENTRY_TYPE_VOD;
+				} else
+				{
 					// Live stream
 					$renderer = $this->serveLiveEntry();
-					$entryType = 'live';
+					$entryType = self::ENTRY_TYPE_LIVE;
 				}
 				break;
 			
