@@ -34,12 +34,6 @@ class kUploadTokenMgr
 	private $_autoFinalizeCache;
 	
 	/**
-	 * Should chunks be stored in remote s3 storage
-	 * @var bool
-	 */
-	private static $storeChunksInRemoteShared;
-	
-	/**
 	 * Shared storage client
 	 * @var kFileTransferMgr
 	 */
@@ -61,10 +55,11 @@ class kUploadTokenMgr
 		$this->_uploadToken = $uploadToken;
 		$this->_finalChunk = $finalChunk;
 		
-		$storeInRemoteMinCreateTime = kConf::get("store_in_remote_min_create_time", "runtime_config", null);
-		if($storeInRemoteMinCreateTime && $uploadToken->getCreatedAt(null) > $storeInRemoteMinCreateTime)
+		$remoteChunkUploadDir = kConf::get("remote_chunk_upload_dir", "runtime_config", null);
+		$uploadTempPath = $this->_uploadToken->getUploadTempPath();
+		if($uploadTempPath && strpos($uploadTempPath, $remoteChunkUploadDir))
 		{
-			self::$storeChunksInRemoteShared = $this->initSharedStorageClient();
+			$this->initSharedStorageClient();
 		}
 	}
 	
@@ -75,18 +70,19 @@ class kUploadTokenMgr
 			!isset($sharedStorageClientConfig['sharedStorageBaseDir']))
 		{
 			KalturaLog::debug("Failed to load shared storage client config, will revert to using FS for shared storage");
-			return null;
 		}
 		
 		self::$sharedStorageOptions = array(
 			's3Region' => $sharedStorageClientConfig['s3Region'],
+			'endPoint' => isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null,
 			'sharedStorageBaseDir' => $sharedStorageClientConfig['sharedStorageBaseDir'],
+			'accessKey' => isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null,
+			'accessSecret' => isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null,
 			'uploadTokenId' => $this->_uploadToken->getId()
 			);
 		
 		self::$sharedStorageClient = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, self::$sharedStorageOptions);
-		self::$sharedStorageClient->login(self::$sharedStorageOptions['endPoint'], $sharedStorageClientConfig['accessKey'], $sharedStorageClientConfig['accessSecret']);
-		return true;
+		self::$sharedStorageClient->login(self::$sharedStorageOptions['endPoint'], self::$sharedStorageOptions['accessKey'], self::$sharedStorageOptions['accessSecret']);
 	}
 	
 	private function initUploadTokenMemcache()
@@ -139,7 +135,7 @@ class kUploadTokenMgr
 			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
 
 		$this->updateFileName($fileData);
-			
+		
 		try
 		{
 			$this->checkIfFileIsValid($fileData, $resumeAt, $this->_finalChunk);
@@ -310,18 +306,32 @@ class kUploadTokenMgr
 			$fsRootUploadPath = myContentStorage::getFSUploadsPath();
 		}
 		
-		return $fsRootUploadPath.
-			substr($uploadTokenId, -2).'/'.
-			substr($uploadTokenId, -4, 2).'/'.
+		$remoteChunkUploadDir = null;
+		$remoteChunkEnabled = kConf::get("remote_chunk_enabled", "runtime_config", null);
+		if($remoteChunkEnabled)
+		{
+			$remoteChunkUploadDir = kConf::get("remote_chunk_upload_dir", "runtime_config", null);
+		}
+		
+		$uploadPath = $fsRootUploadPath;
+		if(!is_null($remoteChunkUploadDir))
+		{
+			$uploadPath .= "/" . $remoteChunkUploadDir . "/";
+		}
+		
+		$uploadPath .=substr($uploadTokenId, -2).'/'.
+			substr($uploadTokenId, -4, 2).'/' .
 			$uploadTokenId.'.'.$extension;
+		
+		return str_replace('//', '/', $uploadPath);
 	}
 	
 	protected function tryMoveToErrors($fileData)
 	{
-		if (kFile::checkFileExists($fileData['tmp_name']))
+		if (file_exists($fileData['tmp_name']))
 		{
 			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true));
-			kFile::moveFile($fileData['tmp_name'], $errorFilePath);
+			rename($fileData['tmp_name'], $errorFilePath);
 		}
 	}
 
@@ -335,7 +345,7 @@ class kUploadTokenMgr
 	protected function handleResume($fileData, $resumeAt)
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
-		if (!kFile::checkFileExists($uploadFilePath))
+		if (!file_exists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 		
 		$sourceFilePath = $fileData['tmp_name'];
@@ -346,7 +356,7 @@ class kUploadTokenMgr
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$chunkSize = kFile::fileSize($sourceFilePath);
+			$chunkSize = filesize($sourceFilePath);
 			
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
@@ -399,7 +409,7 @@ class kUploadTokenMgr
 				if ($count ++)
 					Sleep(1);
 					
-				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $this->_uploadToken->getId());
+				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $this->_uploadToken->getId(), $expectedFileSize);
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
 			
@@ -457,7 +467,7 @@ class kUploadTokenMgr
 		return ftell($targetFileResource);
 	}
 	
-	private static function syncAppendAvailableChunks($uploadFilePath, $targetFileResource, $maxSyncedConcat = 10)
+	private static function syncAppendAvailableChunks($uploadFilePath, $targetFileResource, $maxSyncedConcat = 10, $expectedFileSize = null)
 	{
 		fseek($targetFileResource, 0, SEEK_END);
 		$targetFileSize = ftell($targetFileResource);
@@ -467,6 +477,12 @@ class kUploadTokenMgr
 			$nextChunkPath = "$uploadFilePath.chunk.$targetFileSize";
 			if(!self::checkChunkExists($nextChunkPath))
 			{
+				break;
+			}
+			
+			if($expectedFileSize && $targetFileSize == $expectedFileSize)
+			{
+				KalturaLog::debug("Expected file size reached, [$targetFileSize] [$expectedFileSize]");
 				break;
 			}
 			
@@ -498,7 +514,7 @@ class kUploadTokenMgr
 					throw new kUploadTokenException("Max retires reached when trying to auto finalize uploadToken", kUploadTokenException::UPLOAD_TOKEN_MAX_AUTO_FINALIZE_RETRIES_REACHED);
 				
 				$this->_finalChunk = true;
-				return true;
+					return true;
 			}
 		}
 		
@@ -531,12 +547,12 @@ class kUploadTokenMgr
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
 		}
 		
-		kFile::chmod($uploadFilePath, 0600);
+		chmod($uploadFilePath, 0600);
 		
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
 		{
-			$fileSize = kFile::fileSize($uploadFilePath);
+			$fileSize = filesize($uploadFilePath);
 			$this->_autoFinalizeCache->set($this->_uploadToken->getId().".size", $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;
@@ -546,15 +562,7 @@ class kUploadTokenMgr
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
 		$bytesWritten = 0;
-		list($isRemote, $resolvedSourceFilePath) = self::resolveFileLocation($sourceFilePath);
-		
-		if($isRemote)
-		{
-			stream_wrapper_restore('http');
-			stream_wrapper_restore('https');
-		}
-		
-		$sourceFileResource = self::openFile($resolvedSourceFilePath, 'rb');
+		$sourceFileResource = self::openChunkFile($sourceFilePath);
 		if(!$sourceFileResource)
 		{
 			KalturaLog::err("Could not open file [{$sourceFilePath}] for read");
@@ -571,19 +579,12 @@ class kUploadTokenMgr
 
 		fclose($sourceFileResource);
 		self::deleteChunkFile($sourceFilePath);
-		
-		if($isRemote)
-		{
-			stream_wrapper_unregister ('http');
-			stream_wrapper_unregister ('https');
-		}
-		
 		return $bytesWritten;
 	}
 
-	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId)
+	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId, $expectedFileSize)
 	{
-		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000);
+		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000, $expectedFileSize);
 		
 		fseek($targetFileResource, 0, SEEK_END);
 		
@@ -597,7 +598,7 @@ class kUploadTokenMgr
 		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
 		{
 			$globStart = microtime(true);
-			$chunks = self::globUploadDir($uploadFilePath);
+			$chunks = self::listPendingChunks($uploadFilePath);
 			$globTook = (microtime(true) - $globStart);
 			KalturaLog::debug("glob took - " . $globTook . " seconds count " . count($chunks));
 			
@@ -607,7 +608,7 @@ class kUploadTokenMgr
 				KalturaLog::debug("Max chunk's waiting for concat reached [$chunkCount], failing upload for token id [$uploadTokenId]");
 				//return null;
 			}
-						
+			
 			if (!self::appendChunks($targetFileResource, $chunks))
 			{
 				break;
@@ -644,7 +645,7 @@ class kUploadTokenMgr
 				}
 				
 				$fileSize = $nextChunkData['fileSize'];
-				if(!$fileSize)
+				if(is_null($fileSize))
 				{
 					$fileSize = filesize($nextChunk);
 				}
@@ -745,8 +746,8 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
-	
-	private static function lockFile($nextChunk, $lockedFile)
+ 
+  private static function lockFile($nextChunk, $lockedFile)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
 		if (!$cache)
@@ -774,12 +775,12 @@ class kUploadTokenMgr
 		$fsUploadPaths[] = realpath(myContentStorage::getFSUploadsPath());
 		
 		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
-		foreach ($uploadVolumes as $uploadVolume) 
+		foreach ($uploadVolumes as $uploadVolume)
 		{
 			$fsUploadPaths[] = realpath($uploadVolume . "content/uploads/");
 		}
 		
-		foreach ($fsUploadPaths as $fsUploadPath) 
+		foreach ($fsUploadPaths as $fsUploadPath)
 		{
 			if (strpos($uploadDir, $fsUploadPath) === 0) // Composed path doesn't begin with $uploadPathBase?
 			{
@@ -792,7 +793,7 @@ class kUploadTokenMgr
 	
 	private static function moveChunkToShared($sourceFilePath, $chunkFilePath)
 	{
-		if(!self::$storeChunksInRemoteShared)
+		if(!self::$sharedStorageClient)
 		{
 			return kFile::moveFile($sourceFilePath, $chunkFilePath);
 		}
@@ -809,6 +810,13 @@ class kUploadTokenMgr
 				KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $moveSucceeded ? null : kFile::RENAME_FAILED_CODE);
 			}
 			
+			if($moveSucceeded)
+			{
+				KalturaLog::log("rename took : $timeTook [$sourceFilePath] to [$sharedChunkPath] size: ".filesize($sourceFilePath));
+				return true;
+			}
+			
+			KalturaLog::err("Failed to rename file : [$sourceFilePath] to [$chunkFilePath]");
 			return $moveSucceeded;
 		}
 		catch(Exception $e)
@@ -820,7 +828,7 @@ class kUploadTokenMgr
 	
 	private static function checkChunkExists($chunkPath)
 	{
-		if(!self::$storeChunksInRemoteShared)
+		if(!self::$sharedStorageClient)
 		{
 			return kFile::checkFileExists($chunkPath);
 		}
@@ -841,7 +849,7 @@ class kUploadTokenMgr
 	
 	private static function deleteChunkFile($filePath)
 	{
-		if(!self::$storeChunksInRemoteShared || kString::beginsWith($filePath, "/tmp/"))
+		if(!self::$sharedStorageClient || strpos($filePath, ".chunk.") === false)
 		{
 			return unlink($filePath);
 		}
@@ -854,14 +862,14 @@ class kUploadTokenMgr
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::notice("Failed to check file exists fo shared location with error message [" . $e->getMessage() . "]");
+			KalturaLog::notice("Failed to delete file from shared location with error message [" . $e->getMessage() . "]");
 			return false;
 		}
 	}
 	
-	private static function globUploadDir($uploadFilePath)
+	private static function listPendingChunks($uploadFilePath)
 	{
-		if(!self::$storeChunksInRemoteShared)
+		if(!self::$sharedStorageClient)
 		{
 			$dirList = array();
 			$dirListObjects = glob("$uploadFilePath.chunk.*", GLOB_NOSORT);
@@ -877,12 +885,33 @@ class kUploadTokenMgr
 		}
 		
 		$sharedUploadPath = self::translateLocalSharedPathToRemote($uploadFilePath);
-		return self::$sharedStorageClient->listDir(dirname($sharedUploadPath));
+		return self::$sharedStorageClient->listDir("$sharedUploadPath.chunk.");
+	}
+	
+	private static function openChunkFile($filePath)
+	{
+		list($isRemote, $resolvedSourceFilePath) = self::resolveFileLocation($filePath);
+		
+		if($isRemote)
+		{
+			stream_wrapper_restore('http');
+			stream_wrapper_restore('https');
+		}
+		
+		$sourceFileResource = self::openFile($resolvedSourceFilePath, 'rb');
+		
+		if($isRemote)
+		{
+			stream_wrapper_unregister ('http');
+			stream_wrapper_unregister ('https');
+		}
+		
+		return $sourceFileResource;
 	}
 	
 	private static function resolveFileLocation($filePath)
 	{
-		if(!self::$storeChunksInRemoteShared || strpos($filePath, ".chunk.") == false)
+		if(!self::$sharedStorageClient || strpos($filePath, ".chunk.") === false)
 		{
 			return array(false, realpath($filePath));
 		}
@@ -903,7 +932,7 @@ class kUploadTokenMgr
 			basename($localShared);
 		
 		$sharedFilePath = str_replace('//', '/', $sharedFilePath);
-		 
+		
 		KalturaLog::debug("Translated [$localShared] to [$sharedFilePath]");
 		
 		return $sharedFilePath;
