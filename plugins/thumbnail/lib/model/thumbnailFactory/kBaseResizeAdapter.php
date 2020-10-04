@@ -143,19 +143,6 @@ class kBaseResizeAdapter
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				if($currPath != $this->finalThumbPath)
-				{
-					$moveFileSuccess = kFile::moveFile($currPath, $this->finalThumbPath);
-					if($moveFileSuccess)
-					{
-						return array (true, $this->finalThumbPath);
-					}
-					else
-					{
-						KalturaLog::warning("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
-					}
-				}
-
 				return array (true, $currPath);
 			}
 		}

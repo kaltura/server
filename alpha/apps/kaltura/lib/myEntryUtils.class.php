@@ -788,19 +788,8 @@ class myEntryUtils
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				if($currPath != $finalThumbPath)
-				{
-					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
-					if(!$moveFileSuccess)
-					{
-						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
-						header("X-Kaltura:cached-thumb-exists,".md5($currPath));
-						return $currPath;
-					}
-				}
-				
-				header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
-				return $finalThumbPath;
+				header("X-Kaltura:cached-thumb-exists,".md5($currPath));
+				return $currPath;;
 			}
 		}
 		
