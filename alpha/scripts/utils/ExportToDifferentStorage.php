@@ -97,12 +97,12 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 	}
 
 	// create missing file sync
-	$newfileSync = $readyFileSync->cloneToAnotherStorage($targetDcId);
-	$newfileSync->setLinkCount(0);
-	$newfileSync->putInCustomData('srcDc', $readyFileSync->getDc());
-
 	try
 	{
+		$newfileSync = $readyFileSync->cloneToAnotherStorage($targetDcId);
+		$newfileSync->setLinkCount(0);
+		$newfileSync->putInCustomData('srcDc', $readyFileSync->getDc());
+
 		$syncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
 
 		KalturaLog::log("XXX $assetId: CREATED - creating file sync in dc $targetDcId key $syncKey");
@@ -193,7 +193,14 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 		return;
 	}
 
-	$resolvedSyncKey = reset($resolvedFileSyncKeys);
+	if ($resolvedFileSyncKeys)
+	{
+		$resolvedSyncKey = reset($resolvedFileSyncKeys);
+	}
+	else
+	{
+		$resolvedSyncKey = $targetResolvedFileSyncKey;
+	}
 
 	if ($targetFileSync)
 	{
