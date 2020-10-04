@@ -12,13 +12,13 @@ class simuliveUtils
 	 */
 	public static function serveSimuliveAsLiveStream(LiveEntry $entry, $pathOnly)
 	{
-		$currentEvent = $entry->getEvent();
-		if (!$currentEvent || is_null($currentEvent->getSourceEntryId()))
+		$currentEvent = $entry->getCurrentSimuliveEvent();
+		if (!$currentEvent)
 		{
 			return null;
 		}
 
-		/* @var $currentEvent LiveStreamScheduleEvent */
+		/* @var $currentEvent LiveStreamScheduleEventable */
 		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
 		$dvrWindow = $entry->getDvrWindow() * 60 * 1000;
 		$durations[] = $sourceEntry->getLengthInMsecs();

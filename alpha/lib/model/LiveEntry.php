@@ -476,38 +476,42 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
-	 * @return boolean
+	 * @return LiveStreamScheduleEventable | null
 	 */
-	public function isCurrentlySimulive()
+	public function getCurrentSimuliveEvent()
 	{
 		if ($this->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
 		{
-			$event = $this->getEvent();
-			return $event && !is_null($event->getSourceEntryId());
+			foreach ($this->getScheduleEvents() as $event)
+			{
+				if($event->getSourceEntryId())
+				{
+					return $event;
+				}
+			}
 		}
-		return false;
+		return null;
 	}
 
 	/**
 	 * @param int $time
-	 * @return LiveStreamScheduleEvent
+	 * @return array<LiveStreamScheduleEventable>
 	 */
-	public function getEvent($time = null)
+	public function getScheduleEvents($time = null)
 	{
-		if (is_null($time))
+		$events = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaGetEventer');
+		foreach ($pluginInstances as $getEventer)
 		{
-			$time = time();
-		}
-		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTypes($this->getId(), array(ScheduleEventType::LIVE_STREAM));
-		foreach ($scheduleEvents as $scheduleEvent)
-		{
-			/* @var LiveStreamScheduleEvent $scheduleEvent*/
-			if ($scheduleEvent->isTimeInEvent($time))
+			/* @var $getEventer IKalturaGetEventer */
+			$pluginEvents = $getEventer->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $time);
+			if (count($pluginEvents))
 			{
-				return $scheduleEvent;
+				KalturaLog::debug('IKalturaGetEventer pluginEvents = ' . print_r($pluginEvents, true));
+				$events = array_merge($events, $pluginEvents);
 			}
 		}
-		return null;
+		return $events;
 	}
 
 
@@ -522,7 +526,7 @@ abstract class LiveEntry extends entry
 				return false;
 		}
 
-		if ($this->isCurrentlySimulive())
+		if ($this->getCurrentSimuliveEvent())
 		{
 			return true;
 		}

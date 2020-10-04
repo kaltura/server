@@ -925,10 +925,12 @@ class playManifestAction extends kalturaAction
 			case entryType::LIVE_STREAM:
 				/* @var LiveEntry $liveStreamEntry*/
 				$liveStreamEntry = $this->entry;
-				$currentEvent = $liveStreamEntry->getEvent();
-				if ($currentEvent && $currentEvent->getSourceEntryId())
+				$currentEvent = $liveStreamEntry->getCurrentSimuliveEvent();
+				if ($currentEvent)
 				{
 					$this->entryId = $currentEvent->getSourceEntryId();
+					$sourceEntry = BaseentryPeer::retrieveByPK($this->entryId);
+					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
 					$this->initFlavorAssetArray();
 				}
 				break;
@@ -1314,7 +1316,7 @@ class playManifestAction extends kalturaAction
 			case entryType::LIVE_STREAM:
 				/* @var LiveEntry $liveStreamEntry*/
 				$liveStreamEntry = $this->entry;
-				if ($liveStreamEntry->isCurrentlySimulive())
+				if ($liveStreamEntry->getCurrentSimuliveEvent())
 				{
 					$renderer = $this->serveVodEntry();
 					$entryType = self::ENTRY_TYPE_VOD;
