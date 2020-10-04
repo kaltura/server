@@ -307,22 +307,22 @@ class kUploadTokenMgr
 		}
 		
 		$remoteChunkUploadDir = null;
-		$storeInRemoteMinCreateTime = kConf::get("store_in_remote_min_create_time", "runtime_config", null);
-		if($storeInRemoteMinCreateTime && $this->_uploadToken->getCreatedAt(null) > $storeInRemoteMinCreateTime)
+		$remoteChunkEnabled = kConf::get("remote_chunk_enabled", "runtime_config", null);
+		if($remoteChunkEnabled)
 		{
 			$remoteChunkUploadDir = kConf::get("remote_chunk_upload_dir", "runtime_config", null);
 		}
 		
-		$uploadPath = $fsRootUploadPath .
-			substr($uploadTokenId, -2).'/'.
-			substr($uploadTokenId, -4, 2).'/';
-		
+		$uploadPath = $fsRootUploadPath;
 		if(!is_null($remoteChunkUploadDir))
 		{
 			$uploadPath .= "/" . $remoteChunkUploadDir . "/";
 		}
 		
-		$uploadPath .= $uploadTokenId.'.'.$extension;
+		$uploadPath .=substr($uploadTokenId, -2).'/'.
+			substr($uploadTokenId, -4, 2).'/' .
+			$uploadTokenId.'.'.$extension;
+		
 		return str_replace('//', '/', $uploadPath);
 	}
 	
@@ -562,7 +562,7 @@ class kUploadTokenMgr
 	static protected function appendChunk($sourceFilePath, $targetFileResource)
 	{
 		$bytesWritten = 0;
-		$sourceFileResource = self::openChunkFle($sourceFilePath);
+		$sourceFileResource = self::openChunkFile($sourceFilePath);
 		if(!$sourceFileResource)
 		{
 			KalturaLog::err("Could not open file [{$sourceFilePath}] for read");
@@ -888,7 +888,7 @@ class kUploadTokenMgr
 		return self::$sharedStorageClient->listDir("$sharedUploadPath.chunk.");
 	}
 	
-	private static function openChunkFle($filePath)
+	private static function openChunkFile($filePath)
 	{
 		list($isRemote, $resolvedSourceFilePath) = self::resolveFileLocation($filePath);
 		
