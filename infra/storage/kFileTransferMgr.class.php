@@ -792,6 +792,11 @@ abstract class kFileTransferMgr
 		return $res;
 	}
 	
+	public function getRemoteUrl($remote_file)
+	{
+		return $remote_file;
+	}
+	
 
 	/***************************/
 	/* Other private functions */
