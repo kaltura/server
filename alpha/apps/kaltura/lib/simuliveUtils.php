@@ -5,6 +5,7 @@
  */
 class simuliveUtils
 {
+	const MINUTE_TO_MS = 60000;
 	/**
 	 * @param LiveEntry $entry
 	 * @param bool $pathOnly
@@ -20,10 +21,10 @@ class simuliveUtils
 
 		/* @var $currentEvent LiveStreamScheduleEventable */
 		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
-		$dvrWindow = $entry->getDvrWindow() * 60 * 1000;
+		$dvrWindow = $entry->getDvrWindow() * self::MINUTE_TO_MS;
 		$durations[] = $sourceEntry->getLengthInMsecs();
 		$startTime = $currentEvent->getStartTime();
-		$endTime = min($currentEvent->getEndTime(), $currentEvent->getStartTime() + intval(array_sum($durations) / 1000));
+		$endTime = min($currentEvent->getEndTime(), $currentEvent->getStartTime() + intval(array_sum($durations) / serveFlavorAction::SECOND_IN_MILLISECONDS));
 		$sequences = self::buildSimuliveSequencesArray($sourceEntry, $pathOnly);
 		return serveFlavorAction::serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
 			null, null, true, true, $dvrWindow, $endTime);

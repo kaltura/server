@@ -2,7 +2,7 @@
 /**
  * @package plugins.schedule
  */
-class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion, IKalturaObjectLoader, IKalturaGetEventer
+class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion, IKalturaObjectLoader, IKalturaScheduleEventGetter
 {
 	const PLUGIN_NAME = 'schedule';
 	const PLUGIN_VERSION_MAJOR = 1;

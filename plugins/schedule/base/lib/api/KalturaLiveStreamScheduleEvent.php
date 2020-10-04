@@ -69,7 +69,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validateInsertUpdate();
+		$this->validateLiveStreamEventFields();
 		parent::validateForInsert($propertiesToSkip);
 	}
 
@@ -78,20 +78,20 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateInsertUpdate();
+		$this->validateLiveStreamEventFields();
 		parent::validateForUpdate($sourceObject, $propertiesToSkip = array());
 	}
 
 	/**
 	 * @throws KalturaAPIException
 	 */
-	protected function validateInsertUpdate()
+	protected function validateLiveStreamEventFields()
 	{
-		if(!BaseentryPeer::retrieveByPK($this->sourceEntryId))
+		if (!BaseentryPeer::retrieveByPK($this->sourceEntryId))
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
 		}
-		if($this->preStartTime < 0)
+		if ($this->preStartTime < 0)
 		{
 			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'preStartTime');
 		}

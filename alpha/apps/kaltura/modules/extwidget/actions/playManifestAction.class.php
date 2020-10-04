@@ -549,10 +549,13 @@ class playManifestAction extends kalturaAction
 	
 	protected function shouldInitFlavorAssetsArray()
 	{
+		if ($this->entry->getType() == entryType::LIVE_STREAM)
+			return false;
+			
 		if($this->deliveryAttributes->getFormat() == "hdnetwork")
 			return false;
 	
-		if ($this->entry instanceof LiveEntry && !$this->entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		if ($this->entry instanceof LiveEntry)
 			return false;			// live stream entries don't have flavors
 		
 		return true;

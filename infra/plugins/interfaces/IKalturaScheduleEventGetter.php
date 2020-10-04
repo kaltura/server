@@ -5,7 +5,7 @@
  * @subpackage Plugins
  */
 
-interface IKalturaGetEventer extends IKalturaBase
+interface IKalturaScheduleEventGetter extends IKalturaBase
 {
 	/**
 	 * @param string $entryId
