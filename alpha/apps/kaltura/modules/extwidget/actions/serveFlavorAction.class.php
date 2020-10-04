@@ -112,7 +112,7 @@ class serveFlavorAction extends kalturaAction
 		$renderer->output();
 	}
 
-	protected function serveLiveMediaSet($durations, $sequences, $playlistStartTime = 1451624400000,
+	public static function serveLiveMediaSet($durations, $sequences, $playlistStartTime = 1451624400000,
 										 $firstClipStartTime, $initialClipIndex, $initialSegmentIndex,
 										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null)
 	{
@@ -278,7 +278,7 @@ class serveFlavorAction extends kalturaAction
 						$storeCache = false;
 					}
 
-					$clips[] = $this->getClipData($path,$flavor, $sourceType);
+					$clips[] = self::getClipData($path, $flavor, $sourceType);
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
@@ -290,7 +290,7 @@ class serveFlavorAction extends kalturaAction
 		if ($isLive)
 		{
 			$repeat = $origEntry->getRepeat() ? true : false;
-			$mediaSet = $this->serveLiveMediaSet($durations, $sequences,
+			$mediaSet = self::serveLiveMediaSet($durations, $sequences,
 				$playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $repeat, !$repeat);
 		}
 		else
@@ -410,7 +410,11 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
-				$this->serveSimuliveAsLiveStream($entry);
+				$mediaSet = simuliveUtils::serveSimuliveAsLiveStream($entry, $this->pathOnly);
+				if ($mediaSet)
+				{
+					$this->sendJson($mediaSet, false, true, $entry);
+				}
 			}
 
 			if ($entry->getType() == entryType::PLAYLIST && self::$requestAuthorized)
@@ -790,7 +794,7 @@ class serveFlavorAction extends kalturaAction
 	 * @param $sourceType
 	 * @return array
 	 */
-	private function getClipData($path, $flavor, $sourceType)
+	public static function getClipData($path, $flavor, $sourceType)
 	{
 		$flavorId = $flavor->getId();
 		$hasAudio = $flavor->getContainsAudio();
@@ -894,45 +898,6 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		return array($segmentDuration, $dvrWindowSize);
-	}
-
-	protected function buildSimuliveSequencesArray(Entry $sourceEntry, $liveChannelEntry)
-	{
-		$sequences = array();
-		// getting the flavors from source entry
-		$flavors = assetPeer::retrieveReadyFlavorsByEntryId($sourceEntry->getId());
-		foreach ($flavors as $flavor)
-		{
-			$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
-			if(!$path)
-			{
-				KalturaLog::debug('missing path for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
-				continue;
-			}
-			$sequences[] = array('clips' => $this->getClipData($path,$flavor, $sourceType));
-		}
-		return $sequences;
-	}
-
-	protected function serveSimuliveAsLiveStream(LiveEntry $entry)
-	{
-		$currentEvent = $entry->getEvent();
-		if (!$currentEvent || is_null($currentEvent->getSourceEntryId()))
-		{
-			return null;
-		}
-
-		/* @var $currentEvent LiveStreamScheduleEvent */
-		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
-		$dvrWindow = $entry->getDvrWindow() * 60 * 1000;
-		$durations[] = $sourceEntry->getLengthInMsecs();
-		$startTime = $currentEvent->getStartTime();
-		$endTime = min($currentEvent->getEndTime(), $currentEvent->getStartTime() + intval(array_sum($durations) / 1000));
-		$sequences = $this->buildSimuliveSequencesArray($sourceEntry, $entry);
-		$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
-								null, null, true, true, $dvrWindow, $endTime);
-		$this->sendJson($mediaSet, false, true, $entry);
 	}
 
 	protected function servePlaylistAsLiveChannel(LiveEntry $entry)
