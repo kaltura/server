@@ -68,7 +68,10 @@ class FacebookDistributionEngine extends DistributionEngine implements
 		try
 		{
 			if ($data->providerData->thumbAssetId)
+			{
 				$tempThumbFile = $this->getAssetFile($data->providerData->thumbAssetId, $this->tempDirectory);
+			}
+
 			$data->remoteId = FacebookGraphSdkUtils::uploadVideo(
 				$this->appId,
 				$this->appSecret,
@@ -79,7 +82,11 @@ class FacebookDistributionEngine extends DistributionEngine implements
 				kFile::fileSize($videoPath),
 				$this->tempDirectory,
 				$facebookMetadata);
-			unlink($tempThumbFile);
+
+			if($tempThumbFile)
+			{
+				unlink($tempThumbFile);
+			}
 		}
 		catch (Exception $e)
 		{
