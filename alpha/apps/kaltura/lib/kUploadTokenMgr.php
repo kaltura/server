@@ -372,8 +372,17 @@ class kUploadTokenMgr
 			
 			if(!$verifyFinalChunk)
 			{
-				KalturaLog::debug("This is not the final chunk trying to append available chunks");
-				$currentFileSize = self::appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $this->_uploadToken->getId());
+				$useGlobDuringChunkUploads = kConf::get("use_glob_during_chunk_uploads", "runtime_config", null);
+				KalturaLog::debug("This is not the final chunk trying to append available chunks $useGlobDuringChunkUploads");
+				if($useGlobDuringChunkUploads)
+				{
+					$currentFileSize = self::appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $this->_uploadToken->getId());
+				}
+				else
+				{
+					$currentFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource);
+				}
+				
 				KalturaLog::debug("uploadStats {$this->_uploadToken->getId()} : $resumeAt $chunkSize $currentFileSize");
 				if($resumeAt >= 0 && $resumeAt <= $currentFileSize && $resumeAt + $chunkSize > $currentFileSize)
 				{
