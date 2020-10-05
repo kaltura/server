@@ -36,15 +36,21 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		 * and for test reasons prior to switching from mediainfo to ffprobe
 		 */
 		$ffParser = new KFFMpegMediaParser($this->filePath);//, "ffmpeg-20140326", "ffprobe-20140326");
+//if(isset($this->newFlow))
+//$ffParser->newFlow=$this->newFlow;
 		$ffMi = null;
 		try {
 			if(isset($this->encryptionKey))
 				$ffParser->setEncryptionKey($this->encryptionKey);
 			$ffMi = $ffParser->getMediaInfo();
+//if($this->newFlow!=0)
+			return $ffMi;
 		}
 		catch(Exception $ex)
 		{
 			KalturaLog::log(print_r($ex,1));
+//if($this->newFlow!=0)
+			return null;
 		}
 		
 		try

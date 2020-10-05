@@ -131,6 +131,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
+//if($this->newFlow!=0)
+		$mediaInfo = self::convertToMediaInfoNames($mediaInfo);
+
 		return $mediaInfo;
 	}
 	
@@ -899,7 +902,6 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	private static function parsePixelFormat($pixelFormat, KalturaMediaInfo $mediaInfo)
 	{
 		KalturaLog::log("In - pixelFormat:$pixelFormat");
-//$pixelFormat='yuv422pzzz';;//
 		$rv = preg_match('/\s*([a-z]+)\s*([0-9]+)\s*([a-z]*)\s*([0-9]*)/', $pixelFormat, $matches, PREG_OFFSET_CAPTURE);
 		if($rv===false || !(isset($matches) && is_array($matches) and count($matches)>=3)){
 			KalturaLog::log("Out - Unrecognized pixelFormat");
@@ -914,5 +916,75 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			$bitsDepth = null;
 		KalturaLog::log("Out - colorSpace:$mediaInfo->colorSpace, chromaSubsampling:$mediaInfo->chromaSubsampling, bitsDepth:$bitsDepth");
 	}
-};
+	
+	/**
+	 * convertToMediaInfoNames
+	 *
+	 * @param KalturaMediaInfo $mediaInfo
+	 */	
+	private static function convertToMediaInfoNames($mediaInfo)
+	{
+			$containerFormatList = array (
+				"mov" => 		"mpeg-4",	
+				"mpegts" =>     "mpeg-ts",		
+				"wav" =>		"wave",		
+				"mpegvideo" =>  "mpeg video",
+				"mp4" =>        "mpeg-4",		
+				"rm" =>         "realmedia",	
+				"3gp" =>        "mpeg-4",	
+			);
+			$audioFormatList = array (
+				"pcm_s24le" =>	"pcm",	
+				"pcm_dvd" =>    "pcm",	
+				"aac_latm" =>   "aac",	
+				"wmalossless" =>"wma",	
+				"adpcm_ima_wav" =>  "adpcm",	
+				"cook" =>		"cooker",
+				"pcm_s16be" =>	"pcm",
+				"pcm_s16le" =>  "pcm",	
+				"pcm_s24be" =>	"pcm",
+				"pcm_s24le" =>  "pcm",	
+				"pcm_f32be" =>  "pcm",	
+				"pcm_f32le" =>	"pcm",	
+				"pcm_u8" =>     "pcm",	
+			);
+			$videoFormatList = array (
+				"h264" =>		"avc",		
+				"hevc" =>	    "hvc1",			
+				"mjpeg" =>	    "jpeg",			
+				"vp9" =>	    "v_vp9",			
+				"flv1" =>	    "sorenson spark",
+				"mss2" =>	    "windows media",	
+				"rv30" =>	    "realvideo 3",	
+				"msmpeg4v3" =>	"mpeg-4 visual",	
+				"msmpeg4v2" =>	"mpeg-4 visual",	
+				"cinepak" =>	"cinepack",		
+				"svq3" =>		"sorenson 3",
+			);
 
+			if($mediaInfo->containerFormat!='image2') {
+				if(key_exists($mediaInfo->videoFormat,$videoFormatList)==true)
+					$mediaInfo->videoFormat = $videoFormatList[$mediaInfo->videoFormat];
+			}
+
+			$mkvCodecList = array (
+				"vp9" =>	"v_vp9",			
+				"v_vp9" =>	"v_vp9",			
+				"vp8" =>	"v_vp8",			
+				"vorbis" =>	"a_vorbis"
+			);
+			if(key_exists($mediaInfo->videoFormat,$mkvCodecList)==true)
+				$mediaInfo->videoCodecId = $mkvCodecList[$mediaInfo->videoFormat];
+
+			if(key_exists($mediaInfo->audioFormat,$audioFormatList)==true)
+				$mediaInfo->audioFormat = $audioFormatList[$mediaInfo->audioFormat];
+			if(key_exists($mediaInfo->audioFormat,$mkvCodecList)==true)
+				$mediaInfo->audioCodecId = $mkvCodecList[$mediaInfo->audioFormat];
+
+			if(key_exists($mediaInfo->containerFormat,$containerFormatList)==true)
+				$mediaInfo->containerFormat = $containerFormatList[$mediaInfo->containerFormat];
+
+		return $mediaInfo;
+	}
+
+};
