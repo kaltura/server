@@ -95,21 +95,18 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	/**
 	 * @param string $entryId
 	 * @param array $types
-	 * @param int $time
+	 * @param int $startTime
+	 * @param int $endTime
 	 * @return array<ILiveStreamScheduleEvent>
 	 */
-	public function getScheduleEvents($entryId, $types, $time = null)
+	public function getScheduleEvents($entryId, $types, $startTime, $endTime)
 	{
 		$events = array();
-		if (is_null($time))
-		{
-			$time = time();
-		}
-		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTypes($entryId, $types, $time);
+		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTypes($entryId, $types, $startTime);
 		foreach ($scheduleEvents as $scheduleEvent)
 		{
 			/* @var LiveStreamScheduleEvent $scheduleEvent*/
-			if ($scheduleEvent->isTimeInEvent($time))
+			if ($scheduleEvent->isTimeInEvent($startTime, $endTime))
 			{
 				$events[] = $scheduleEvent;
 			}

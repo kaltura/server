@@ -10,8 +10,9 @@ interface IKalturaScheduleEventGetter extends IKalturaBase
 	/**
 	 * @param string $entryId
 	 * @param array $types
-	 * @param int $time
+	 * @param int $startTime
+	 * @param int $endTime
 	 * @return array<ILiveStreamScheduleEvent>
 	 */
-	public function getScheduleEvents($entryId, $types, $time = null);
+	public function getScheduleEvents($entryId, $types, $startTime, $endTime);
 }

@@ -926,10 +926,11 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_STREAM:
-				$currentEvent = kSimuliveUtils::getCurrentSimuliveEvent($this->entry);
-				if ($currentEvent)
+				$time = $this->getRequestParameter("scheduleTime", null);
+				$event = kSimuliveUtils::getSimuliveEvent($this->entry, $time);
+				if ($event)
 				{
-					$this->entryId = $currentEvent->getSourceEntryId();
+					$this->entryId = $event->getSourceEntryId();
 					$sourceEntry = BaseentryPeer::retrieveByPK($this->entryId);
 					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
 					$this->initFlavorAssetArray();
@@ -1315,7 +1316,8 @@ class playManifestAction extends kalturaAction
 				break;
 				
 			case entryType::LIVE_STREAM:
-				if (kSimuliveUtils::getCurrentSimuliveEvent($this->entry))
+				$time = $this->getRequestParameter("scheduleTime", null);
+				if (kSimuliveUtils::getSimuliveEvent($this->entry, $time))
 				{
 					$renderer = $this->serveVodEntry();
 					$entryType = self::ENTRY_TYPE_VOD;

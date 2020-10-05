@@ -6,6 +6,7 @@
 class kSimuliveUtils
 {
 	const MINUTE_TO_MS = 60000;
+	const SIMULIVE_SCHEDULE_MARGIN = 2;
 	/**
 	 * @param LiveEntry $entry
 	 * @param bool $pathOnly
@@ -13,7 +14,8 @@ class kSimuliveUtils
 	 */
 	public static function serveSimuliveAsLiveStream(LiveEntry $entry, $pathOnly)
 	{
-		$currentEvent = kSimuliveUtils::getCurrentSimuliveEvent($entry);
+		$dvrWindow = $entry->getDvrWindow() * self::MINUTE_TO_MS;
+		$currentEvent = kSimuliveUtils::getSimuliveEvent($entry, null, $dvrWindow);
 		if (!$currentEvent)
 		{
 			return null;
@@ -21,7 +23,6 @@ class kSimuliveUtils
 
 		/* @var $currentEvent ILiveStreamScheduleEvent */
 		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
-		$dvrWindow = $entry->getDvrWindow() * self::MINUTE_TO_MS;
 		$durations[] = $sourceEntry->getLengthInMsecs();
 		$startTime = $currentEvent->getStartTime();
 		$endTime = min($currentEvent->getEndTime(), $currentEvent->getStartTime() + intval(array_sum($durations) / serveFlavorAction::SECOND_IN_MILLISECONDS));
@@ -56,14 +57,23 @@ class kSimuliveUtils
 
 	/**
 	 * @param Entry $entry
+	 * @param int $endTime - epoch time
+	 * @param int $duration - in ms
 	 * @return ILiveStreamScheduleEvent | null
 	 */
-	public static function getCurrentSimuliveEvent(Entry $entry)
+	public static function getSimuliveEvent(Entry $entry, $endTime = 0, $duration = 0)
 	{
+
 		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
 		{
+			if (!$endTime)
+			{
+				$endTime = time();
+			}
+			$endTime += self::SIMULIVE_SCHEDULE_MARGIN;
+			$startTime = $endTime - $duration - self::SIMULIVE_SCHEDULE_MARGIN;
 			/* @var $entry LiveEntry */
-			foreach ($entry->getScheduleEvents() as $event)
+			foreach ($entry->getScheduleEvents($startTime, $endTime) as $event)
 			{
 				if($event->getSourceEntryId())
 				{

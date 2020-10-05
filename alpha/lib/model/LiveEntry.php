@@ -476,17 +476,18 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
-	 * @param int $time
+	 * @param int $startTime
+	 * @param int $endTime
 	 * @return array<ILiveStreamScheduleEvent>
 	 */
-	public function getScheduleEvents($time = null)
+	public function getScheduleEvents($startTime, $endTime)
 	{
 		$events = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaScheduleEventGetter');
 		foreach ($pluginInstances as $getEventer)
 		{
 			/* @var $getEventer IKalturaScheduleEventGetter */
-			$pluginEvents = $getEventer->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $time);
+			$pluginEvents = $getEventer->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $startTime, $endTime);
 			if ($pluginEvents)
 			{
 				KalturaLog::debug('IKalturaScheduleEventGetter pluginEvents = ' . print_r($pluginEvents, true));
@@ -508,7 +509,7 @@ abstract class LiveEntry extends entry
 				return false;
 		}
 
-		if (kSimuliveUtils::getCurrentSimuliveEvent($this))
+		if (kSimuliveUtils::getSimuliveEvent($this))
 		{
 			return true;
 		}
