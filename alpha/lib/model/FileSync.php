@@ -361,6 +361,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 	protected function getDownloadFileSyncUrl()
 	{
 		$asset = assetPeer::retrieveById($this->getObjectId());
+		if(!$asset)
+		{
+			return null;
+		}
 		$downloadUrl = $asset->getDownloadUrlWithExpiry(86400);
 		$downloadUrl = $asset->finalizeDownloadUrl($this, $downloadUrl);
 
