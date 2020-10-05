@@ -2,12 +2,12 @@
 interface IScheduleEvent
 {
 	/**
-	 * @return int
+	 * @return int - epoch time
 	 */
-	public function getStartTime();
+	public function getCalculatedStartTime();
 
 	/**
-	 * @return int
+	 * @return int - epoch time
 	 */
-	public function getEndTime();
+	public function getCalculatedEndTime();
 }

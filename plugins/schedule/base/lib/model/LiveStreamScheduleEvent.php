@@ -88,10 +88,10 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 			}
 	}
 
-	public function getStartTime()
+	public function getCalculatedStartTime()
 	{
 		$preStartTime = !is_null($this->getPreStartTime()) ? $this->getPreStartTime() : 0;
-		return parent::getStartTime() - $preStartTime;
+		return parent::getCalculatedStartTime() - $preStartTime;
 	}
 
 }

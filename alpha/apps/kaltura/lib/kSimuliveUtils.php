@@ -15,7 +15,7 @@ class kSimuliveUtils
 	public static function getSimuliveEventDetails(LiveEntry $entry)
 	{
 		$dvrWindow = $entry->getDvrWindow() * self::MINUTE_TO_MS;
-		$currentEvent = kSimuliveUtils::getSimuliveEvent($entry, null, $dvrWindow);
+		$currentEvent = self::getSimuliveEvent($entry, null, $dvrWindow);
 		if (!$currentEvent)
 		{
 			return null;
@@ -28,8 +28,8 @@ class kSimuliveUtils
 			return null;
 		}
 		$durations[] = $sourceEntry->getLengthInMsecs();
-		$startTime = $currentEvent->getStartTime();
-		$endTime = min($currentEvent->getEndTime(), $currentEvent->getStartTime() + intval(array_sum($durations) / self::SECOND_IN_MILLISECONDS));
+		$startTime = $currentEvent->getCalculatedStartTime();
+		$endTime = min($currentEvent->getCalculatedEndTime(), $currentEvent->getCalculatedStartTime() + intval(array_sum($durations) / self::SECOND_IN_MILLISECONDS));
 		// getting the flavors from source entry
 		$flavors = assetPeer::retrieveReadyFlavorsByEntryId($sourceEntry->getId());
 		return array($durations, $flavors, $startTime, $endTime, $dvrWindow);
