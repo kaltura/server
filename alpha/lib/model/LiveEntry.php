@@ -487,7 +487,7 @@ abstract class LiveEntry extends entry
 		{
 			/* @var $getEventer IKalturaScheduleEventGetter */
 			$pluginEvents = $getEventer->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $time);
-			if (count($pluginEvents))
+			if ($pluginEvents)
 			{
 				KalturaLog::debug('IKalturaScheduleEventGetter pluginEvents = ' . print_r($pluginEvents, true));
 				$events = array_merge($events, $pluginEvents);
