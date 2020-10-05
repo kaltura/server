@@ -158,27 +158,23 @@ class downloadAction extends sfAction
 				$fileSize = $fileSync->getFileSize();
 		}
 
-		$mimeType = null;
 		$allowRemote = false;
 		if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
 			$allowRemote = true;
+			$fileExt = null;
 			$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-			try {
+			try
+			{
 				$filePath = $fileSync->getS3FileSyncUrl($storage, $fileSync->getFilePath());
-				$curlWrapper = new KCurlWrapper();
-				$curlHeaderResponse = $curlWrapper->getHeader($filePath, true);
-				if (isset($curlHeaderResponse->headers['content-type']))
-				{
-					$mimeType = $curlHeaderResponse->headers['content-type'];
-				}
+				$fileExt = $flavorAsset->getFileExt();
 			}
 			catch (Exception $ex)
 			{
 				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 			}
 		}
-		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize, $mimeType, $allowRemote);
+		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize, $fileExt, $allowRemote);
 	
 		KExternalErrors::dieGracefully(); // no view
 	}
@@ -209,7 +205,7 @@ class downloadAction extends sfAction
 		return $syncKey;
 	}
 
-	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null, $mime_type = null, $allowRemote = false)
+	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null, $fileExt = null, $allowRemote = false)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
@@ -239,12 +235,16 @@ class downloadAction extends sfAction
 			if(!$directServe)
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 
-			if(!$mime_type)
+			if(!$fileExt)
 			{
 				$mime_type = kFile::mimeType($file_path);
 			}
+			else
+			{
+				$mime_type = null;
+			}
 
-			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, $allowRemote);
+			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, $allowRemote, $fileExt);
 		}
 	}
 	

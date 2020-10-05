@@ -532,19 +532,18 @@ class infraRequestUtils
 	{
 		self::registerStreamWrappers();
 
-		$chunk_size = 100000;
-		$fh = fopen($file_name, "rb");
-		if($fh)
+		$sourceFH = fopen($file_name, "rb");
+		if(!$sourceFH)
 		{
-			$pos = 0;
-			fseek($fh, $range_from);
-			while($range_length > 0)
-			{
-				$content = fread($fh, min($chunk_size, $range_length));
-				echo $content;
-				$range_length -= $chunk_size;
-			}
-			fclose($fh);
+			KalturaLog::err("Could not open source file [$file_name] for read");
+			self::unregisterStreamWrappers();
+		}
+
+		fseek($sourceFH, $range_from);
+		while (!feof($sourceFH))
+		{
+			$srcContent = stream_get_contents($sourceFH, 100000);
+			echo $srcContent;
 		}
 
 		self::unregisterStreamWrappers();
