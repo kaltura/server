@@ -71,7 +71,7 @@
 
 		<item>
 
-			<guid isPermaLink="false">
+			<guid isPermalink="false">
 
 				<xsl:value-of select="string(entryId)" />
 
