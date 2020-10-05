@@ -926,7 +926,7 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_STREAM:
-				$currentEvent = simuliveUtils::getCurrentSimuliveEvent($this->entry);
+				$currentEvent = kSimuliveUtils::getCurrentSimuliveEvent($this->entry);
 				if ($currentEvent)
 				{
 					$this->entryId = $currentEvent->getSourceEntryId();
@@ -1315,7 +1315,7 @@ class playManifestAction extends kalturaAction
 				break;
 				
 			case entryType::LIVE_STREAM:
-				if (simuliveUtils::getCurrentSimuliveEvent($this->entry))
+				if (kSimuliveUtils::getCurrentSimuliveEvent($this->entry))
 				{
 					$renderer = $this->serveVodEntry();
 					$entryType = self::ENTRY_TYPE_VOD;

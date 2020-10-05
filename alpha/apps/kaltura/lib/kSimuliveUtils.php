@@ -3,7 +3,7 @@
 /**
  * Will hold helper functions for simulive usage
  */
-class simuliveUtils
+class kSimuliveUtils
 {
 	const MINUTE_TO_MS = 60000;
 	/**
@@ -13,7 +13,7 @@ class simuliveUtils
 	 */
 	public static function serveSimuliveAsLiveStream(LiveEntry $entry, $pathOnly)
 	{
-		$currentEvent = simuliveUtils::getCurrentSimuliveEvent($entry);
+		$currentEvent = kSimuliveUtils::getCurrentSimuliveEvent($entry);
 		if (!$currentEvent)
 		{
 			return null;

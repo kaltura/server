@@ -410,7 +410,7 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
-				$mediaSet = simuliveUtils::serveSimuliveAsLiveStream($entry, $this->pathOnly);
+				$mediaSet = kSimuliveUtils::serveSimuliveAsLiveStream($entry, $this->pathOnly);
 				if ($mediaSet)
 				{
 					$this->sendJson($mediaSet, false, true, $entry);
