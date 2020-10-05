@@ -316,16 +316,18 @@ class FileSync extends BaseFileSync implements IBaseObject
 			{
 				return $this->getS3FileSyncUrl($storage, $url);
 			}
-			else
+			else if($this->getObjectType() == FileSyncObjectType::ASSET)
 			{
-				$url = '/direct' . $url;
-				$authParams = $this->addKalturaAuthParams($url);
-				$url .= $authParams;
+				$asset = assetPeer::retrieveById($this->getObjectId());
+				$downloadUrl = $asset->getDownloadUrlWithExpiry(86400);
+				$downloadUrl = $asset->finalizeDownloadUrl($this, $downloadUrl);
 
-				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl,'http://') === 0)
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($downloadUrl,'http://') === 0)
 				{
-					$baseUrl =  preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+					$downloadUrl =  preg_replace('/http:\/\//', 'https://', $downloadUrl, 1);
 				}
+
+				return $downloadUrl;
 			}
 		}
 
