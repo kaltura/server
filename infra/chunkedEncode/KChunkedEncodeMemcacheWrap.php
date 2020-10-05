@@ -672,7 +672,7 @@ ini_set("memory_limit","512M");
 				$rvStr = "FAILED - rv($rv),";
 			}
 			else {
-				if(isset($outFilename)) {
+				if(isset($outFilename) && strstr($outFilename,'.vid')) {
 					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
 				}
