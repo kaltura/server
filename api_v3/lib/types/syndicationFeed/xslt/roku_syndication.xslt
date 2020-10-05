@@ -36,7 +36,7 @@
         <xsl:variable name="tags" select="tags" />
         <xsl:variable name="entryId" select="string(entryId)" />
         <item>
-            <guid isPermalink="false">
+            <guid isPermaLink="false">
                 <xsl:value-of select="string(entryId)" />
             </guid>
             <title>
