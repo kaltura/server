@@ -920,7 +920,7 @@ class serveFlavorAction extends kalturaAction
 				KalturaLog::debug('missing path for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
 				continue;
 			}
-			$sequences[] = array('clips' => self::getClipData($path, $flavor, $sourceType));
+			$sequences[] = array('clips' => array(self::getClipData($path, $flavor, $sourceType)));
 		}
 		return $sequences;
 	}
