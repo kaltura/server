@@ -530,6 +530,7 @@ class infraRequestUtils
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
+		$chunk_size = 100000;
 		stream_wrapper_restore('https');
 		$sourceFH = fopen($file_name, "rb");
 		if(!$sourceFH)
@@ -538,15 +539,12 @@ class infraRequestUtils
 			self::unregisterStreamWrappers();
 		}
 
-		if($range_from !== 0)
+		while($range_length > 0)
 		{
-			fseek($sourceFH, $range_from);
-		}
-
-		while (!feof($sourceFH))
-		{
-			$srcContent = stream_get_contents($sourceFH, 100000);
+			$srcContent = stream_get_contents($sourceFH, min($chunk_size, $range_length), $range_from);
 			echo $srcContent;
+			$range_length -= $chunk_size;
+			$range_from += strlen($srcContent);
 		}
 
 		fclose($sourceFH);
