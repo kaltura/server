@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class LiveStreamScheduleEvent extends EntryScheduleEvent implements LiveStreamScheduleEventable
+class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamScheduleEvent
 {
 	const PROJECTED_AUDIENCE = 'projected_audience';
 	const SOURCE_ENTRY_ID = 'source_entry_id';

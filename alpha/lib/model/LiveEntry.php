@@ -477,7 +477,7 @@ abstract class LiveEntry extends entry
 
 	/**
 	 * @param int $time
-	 * @return array<LiveStreamScheduleEventable>
+	 * @return array<ILiveStreamScheduleEvent>
 	 */
 	public function getScheduleEvents($time = null)
 	{

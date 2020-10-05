@@ -96,7 +96,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	 * @param string $entryId
 	 * @param array $types
 	 * @param int $time
-	 * @return array<LiveStreamScheduleEventable>
+	 * @return array<ILiveStreamScheduleEvent>
 	 */
 	public function getScheduleEvents($entryId, $types, $time = null)
 	{

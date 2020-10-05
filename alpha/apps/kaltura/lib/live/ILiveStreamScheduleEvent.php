@@ -1,7 +1,7 @@
 <?php
 
 
-interface LiveStreamScheduleEventable
+interface ILiveStreamScheduleEvent
 {
 	/**
 	 * @return int

@@ -19,7 +19,7 @@ class simuliveUtils
 			return null;
 		}
 
-		/* @var $currentEvent LiveStreamScheduleEventable */
+		/* @var $currentEvent ILiveStreamScheduleEvent */
 		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
 		$dvrWindow = $entry->getDvrWindow() * self::MINUTE_TO_MS;
 		$durations[] = $sourceEntry->getLengthInMsecs();
@@ -56,7 +56,7 @@ class simuliveUtils
 
 	/**
 	 * @param Entry $entry
-	 * @return LiveStreamScheduleEventable | null
+	 * @return ILiveStreamScheduleEvent | null
 	 */
 	public static function getCurrentSimuliveEvent(Entry $entry)
 	{
