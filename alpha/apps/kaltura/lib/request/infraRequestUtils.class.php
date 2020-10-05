@@ -530,6 +530,8 @@ class infraRequestUtils
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
+		self::registerStreamWrappers();
+
 		$chunk_size = 100000;
 		$fh = fopen($file_name, "rb");
 		if($fh)
@@ -544,5 +546,19 @@ class infraRequestUtils
 			}
 			fclose($fh);
 		}
+
+		self::unregisterStreamWrappers();
+	}
+
+	protected static function registerStreamWrappers()
+	{
+		stream_wrapper_restore('http');
+		stream_wrapper_restore('https');
+	}
+
+	protected static function unregisterStreamWrappers()
+	{
+		stream_wrapper_unregister('https');
+		stream_wrapper_unregister('http');
 	}
 }
