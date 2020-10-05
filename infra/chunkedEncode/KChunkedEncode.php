@@ -628,6 +628,8 @@
 		 */
 		public function ConcatChunks()
 		{
+// Disable separate merging of video chunks
+return true;
 			$videoFilename = $this->getSessionName("video");
 			
 			$oFh=fopen($videoFilename,"wb");
@@ -653,9 +655,9 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
-			
-			$videoFilename = $this->getSessionName("video");
-/*
+/* Disable separate merging of video chunks			
+			$vidConcatStr = $this->getSessionName("video");
+*/
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				if(isset($chunkData->toFix))
@@ -666,7 +668,7 @@
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
-*/
+
 			$setup = $this->setup;
 			$params = $this->params;
 			$audioInputParams = null;
@@ -694,7 +696,7 @@
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
-			$mergeCmd.= " -i $videoFilename";
+			$mergeCmd.= " -i $vidConcatStr";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
 				$mergeCmd.= " ".$params->formatParams;

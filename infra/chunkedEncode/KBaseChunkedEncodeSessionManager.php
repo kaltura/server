@@ -110,7 +110,7 @@
 				$outFilename = $chunker->getSessionName("audio");
 				$logFilename = "$outFilename.log";
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$this->audioCmdLines = array($cmdLine);
+				$this->audioCmdLines[0] = array($cmdLine,$outFilename);
 				KalturaLog::log($cmdLine);
 			}
 			$this->SerializeSession();
