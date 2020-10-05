@@ -327,7 +327,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	 */
 	public function getStartTime()
 	{
-		return strtotime($this->start_date);
+		return $this->getStartDate(null);
 	}
 
 	/**
@@ -335,7 +335,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	 */
 	public function getEndTime()
 	{
-		return strtotime($this->end_date);
+		return $this->getEndDate(null);
 	}
 	
 } // ScheduleEvent

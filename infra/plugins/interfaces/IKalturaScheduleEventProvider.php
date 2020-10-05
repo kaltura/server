@@ -5,14 +5,14 @@
  * @subpackage Plugins
  */
 
-interface IKalturaScheduleEventGetter extends IKalturaBase
+interface IKalturaScheduleEventProvider extends IKalturaBase
 {
 	/**
 	 * @param string $entryId
 	 * @param array $types
 	 * @param int $startTime
 	 * @param int $endTime
-	 * @return array<ILiveStreamScheduleEvent>
+	 * @return array<IScheduleEvent>
 	 */
 	public function getScheduleEvents($entryId, $types, $startTime, $endTime);
 }

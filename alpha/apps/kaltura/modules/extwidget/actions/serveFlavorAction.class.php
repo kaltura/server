@@ -410,9 +410,12 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
-				$mediaSet = kSimuliveUtils::serveSimuliveAsLiveStream($entry, $this->pathOnly);
-				if ($mediaSet)
+				list($durations, $flavors, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry);
+				if ($flavors)
 				{
+					$sequences = self::buildSequencesArray($flavors);
+					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
+						null, null, true, true, $dvrWindow, $endTime);
 					$this->sendJson($mediaSet, false, true, $entry);
 				}
 			}
@@ -898,6 +901,28 @@ class serveFlavorAction extends kalturaAction
 		}
 
 		return array($segmentDuration, $dvrWindowSize);
+	}
+
+	/**
+	 * @param array $flavors
+	 * @return array
+	 */
+	public static function buildSequencesArray($flavors)
+	{
+		$sequences = array();
+
+		foreach ($flavors as $flavor)
+		{
+			$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			if(!$path)
+			{
+				KalturaLog::debug('missing path for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+				continue;
+			}
+			$sequences[] = array('clips' => self::getClipData($path, $flavor, $sourceType));
+		}
+		return $sequences;
 	}
 
 	protected function servePlaylistAsLiveChannel(LiveChannel $entry)

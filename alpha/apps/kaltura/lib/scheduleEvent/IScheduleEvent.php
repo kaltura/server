@@ -1,7 +1,5 @@
 <?php
-
-
-interface ILiveStreamScheduleEvent
+interface IScheduleEvent
 {
 	/**
 	 * @return int
@@ -12,9 +10,4 @@ interface ILiveStreamScheduleEvent
 	 * @return int
 	 */
 	public function getEndTime();
-
-	/**
-	 * @return string
-	 */
-	public function getSourceEntryId();
 }
