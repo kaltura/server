@@ -536,7 +536,8 @@ class infraRequestUtils
 		if(!$sourceFH)
 		{
 			KalturaLog::err("Could not open source file [$file_name] for read");
-			self::unregisterStreamWrappers();
+			stream_wrapper_unregister('https');
+			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		}
 
 		while($range_length > 0)
