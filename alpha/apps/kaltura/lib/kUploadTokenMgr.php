@@ -328,10 +328,10 @@ class kUploadTokenMgr
 	
 	protected function tryMoveToErrors($fileData)
 	{
-		if (file_exists($fileData['tmp_name']))
+		if (kFile::checkFileExists($fileData['tmp_name']))
 		{
 			$errorFilePath = $this->getUploadPath('error-'.$this->_uploadToken->getId(), microtime(true));
-			rename($fileData['tmp_name'], $errorFilePath);
+			kFile::moveFile($fileData['tmp_name'], $errorFilePath);
 		}
 	}
 
@@ -345,7 +345,7 @@ class kUploadTokenMgr
 	protected function handleResume($fileData, $resumeAt)
 	{
 		$uploadFilePath = $this->_uploadToken->getUploadTempPath();
-		if (!file_exists($uploadFilePath))
+		if (!kFile::checkFileExists($uploadFilePath))
 			throw new kUploadTokenException("Temp file [$uploadFilePath] was not found when trying to resume", kUploadTokenException::UPLOAD_TOKEN_FILE_NOT_FOUND_FOR_RESUME);
 		
 		$sourceFilePath = $fileData['tmp_name'];
@@ -356,7 +356,7 @@ class kUploadTokenMgr
 			$verifyFinalChunk = $this->_finalChunk && $resumeAt > 0;
 			
 			// if this is the final chunk the expected file size would be the resume position + the last chunk size
-			$chunkSize = filesize($sourceFilePath);
+			$chunkSize = kFile::fileSize($sourceFilePath);
 			
 			$expectedFileSize = $verifyFinalChunk ? ($resumeAt + $chunkSize) : 0;
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
@@ -523,7 +523,7 @@ class kUploadTokenMgr
 					throw new kUploadTokenException("Max retires reached when trying to auto finalize uploadToken", kUploadTokenException::UPLOAD_TOKEN_MAX_AUTO_FINALIZE_RETRIES_REACHED);
 				
 				$this->_finalChunk = true;
-					return true;
+				return true;
 			}
 		}
 		
@@ -556,12 +556,12 @@ class kUploadTokenMgr
 			throw new kUploadTokenException($msg, kUploadTokenException::UPLOAD_TOKEN_FAILED_TO_MOVE_UPLOADED_FILE);
 		}
 		
-		chmod($uploadFilePath, 0600);
+		kFile::chmod($uploadFilePath, 0600);
 		
 		//If uplaodToken is set to AutoFinalize set file size into memcache
 		if($this->_autoFinalize)
 		{
-			$fileSize = filesize($uploadFilePath);
+			$fileSize = kFile::fileSize($uploadFilePath);
 			$this->_autoFinalizeCache->set($this->_uploadToken->getId().".size", $fileSize, self::AUTO_FINALIZE_CACHE_TTL);
 			if($this->_uploadToken->getFileSize() == $fileSize)
 				$this->_finalChunk = true;
@@ -755,8 +755,8 @@ class kUploadTokenMgr
 			$uploadToken->save();
 		}
 	}
- 
-  private static function lockFile($nextChunk, $lockedFile)
+
+	private static function lockFile($nextChunk, $lockedFile)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
 		if (!$cache)
