@@ -235,13 +235,10 @@ class downloadAction extends sfAction
 			if(!$directServe)
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 
-			if(!$fileExt)
+			$mime_type = null;
+			if(!$allowRemote)
 			{
 				$mime_type = kFile::mimeType($file_path);
-			}
-			else
-			{
-				$mime_type = null;
 			}
 
 			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, $allowRemote, $fileExt);
