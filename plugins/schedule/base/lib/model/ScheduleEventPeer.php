@@ -21,6 +21,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	const BLACKOUT_SESSION_CACHE_START_DATE = 'start_date';
 	const BLACKOUT_SESSION_CACHE_END_DATE = 'end_date';
 	const BLACKOUT_SESSION_CACHE_RESULT = 'result';
+	const END_TIME_MARGIN = 21600; // 6 * 60 * 60 = 6 hours
 
 	protected static $blackoutSessionCache = array();
 
@@ -226,6 +227,31 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
 
+		return self::doSelect($c);
+	}
+
+	/**
+	 * @param string $templateEntryId
+	 * @param array $types
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveByTemplateEntryIdAndTypes($templateEntryId, $types, $startTime = null, $endTime = null)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		if ($startTime) // if giving start time - ignore all the events that already finished
+		{
+			$c->add(ScheduleEventPeer::END_DATE, $startTime, Criteria::GREATER_EQUAL);
+		}
+		if ($endTime) // if giving end time - ignore all future events after 6 hours margin.
+		{
+			$c->add(ScheduleEventPeer::START_DATE, $endTime + self::END_TIME_MARGIN, Criteria::LESS_EQUAL);
+		}
+		$filter = new ScheduleEventFilter();
+		$filter->setTemplateEntryIdEqual($templateEntryId);
+		$filter->attachToCriteria($c);
 		return self::doSelect($c);
 	}
 

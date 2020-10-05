@@ -3698,6 +3698,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $capabilitiesStr;
 	}
 
+
+	public function hasCapability($capability)
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		return array_key_exists($capability, $capabilitiesArr);
+	}
+
 	public function addCapability($capability)
 	{
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());

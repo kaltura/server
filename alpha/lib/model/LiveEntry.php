@@ -10,6 +10,7 @@ abstract class LiveEntry extends entry
 	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
+	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
@@ -475,6 +476,29 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @return array<ILiveStreamScheduleEvent>
+	 */
+	public function getScheduleEvents($startTime, $endTime)
+	{
+		$events = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaScheduleEventProvider');
+		foreach ($pluginInstances as $instance)
+		{
+			/* @var $instance IKalturaScheduleEventProvider */
+			$pluginEvents = $instance->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $startTime, $endTime);
+			if ($pluginEvents)
+			{
+				KalturaLog::debug('IKalturaScheduleEventProvider pluginEvents = ' . print_r($pluginEvents, true));
+				$events = array_merge($events, $pluginEvents);
+			}
+		}
+		return $events;
+	}
+
+
+	/**
 	 * @return boolean
 	 */
 	public function isCurrentlyLive($currentDcOnly = false)
@@ -483,6 +507,11 @@ abstract class LiveEntry extends entry
 		{
 			if (!$this->canViewExplicitLive())
 				return false;
+		}
+
+		if (kSimuliveUtils::getSimuliveEvent($this))
+		{
+			return true;
 		}
 
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();

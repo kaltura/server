@@ -18,6 +18,8 @@ class playManifestAction extends kalturaAction
 	);
 	const FLAVOR_GROUPING_PERCENTAGE_FACTOR = 0.05; // 5 percent
 	const WATERMARK = 'watermark';
+	const ENTRY_TYPE_VOD = 'vod';
+	const ENTRY_TYPE_LIVE = 'live';
 
 	/**
 	 * When this list start to contain plugins - 
@@ -377,6 +379,7 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_CHANNEL:
+			case entryType::LIVE_STREAM:
 				break;
 
 			case entryType::PLAYLIST:
@@ -921,6 +924,18 @@ class playManifestAction extends kalturaAction
 					$this->initEntryDuration();
 				}
 				break;
+
+			case entryType::LIVE_STREAM:
+				$time = $this->getRequestParameter("scheduleTime", null);
+				$event = kSimuliveUtils::getSimuliveEvent($this->entry, $time);
+				if ($event)
+				{
+					$this->entryId = $event->getSourceEntryId();
+					$sourceEntry = BaseentryPeer::retrieveByPK($this->entryId);
+					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
+					$this->initFlavorAssetArray();
+				}
+				break;
 		}
 		
 		if ($this->duration && $this->duration < 10 && $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
@@ -1297,13 +1312,21 @@ class playManifestAction extends kalturaAction
 			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
-				$entryType = 'vod';
+				$entryType = self::ENTRY_TYPE_VOD;
 				break;
 				
-			case entryType::LIVE_STREAM:			
-				// Live stream
-				$renderer = $this->serveLiveEntry();
-				$entryType = 'live';
+			case entryType::LIVE_STREAM:
+				$time = $this->getRequestParameter("scheduleTime", null);
+				if (kSimuliveUtils::getSimuliveEvent($this->entry, $time))
+				{
+					$renderer = $this->serveVodEntry();
+					$entryType = self::ENTRY_TYPE_VOD;
+				} else
+				{
+					// Live stream
+					$renderer = $this->serveLiveEntry();
+					$entryType = self::ENTRY_TYPE_LIVE;
+				}
 				break;
 			
 			default:
