@@ -74,7 +74,15 @@ class kEncryptFileUtils
             $tempPath =  self::getClearTempPath($srcFilePath);
 	        $srcFilePath = kFile::realPath($srcFilePath);
             $fd1 = fopen($srcFilePath, "rb");
+			if ($fd1 === false)
+			{
+				return false;
+			}
             $fd2 = fopen($tempPath, "w");
+			if ($fd2 === false)
+			{
+				return false;
+			}
             while (!feof($fd1))
             {
                 $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
