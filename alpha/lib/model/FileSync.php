@@ -316,18 +316,19 @@ class FileSync extends BaseFileSync implements IBaseObject
 			{
 				return $this->getS3FileSyncUrl($storage, $url);
 			}
+			else if(in_array(kDataCenterMgr::getCurrentDcId(), kConf::get('direct_url_dc_ids','cloud_storage', array())))
+			{
+				$url = '/direct' . $url;
+				$authParams = $this->addKalturaAuthParams($url);
+				$url .= $authParams;
+
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0) {
+					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+				}
+			}
 			else if($this->getObjectType() == FileSyncObjectType::ASSET)
 			{
-				$asset = assetPeer::retrieveById($this->getObjectId());
-				$downloadUrl = $asset->getDownloadUrlWithExpiry(86400);
-				$downloadUrl = $asset->finalizeDownloadUrl($this, $downloadUrl);
-
-				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($downloadUrl,'http://') === 0)
-				{
-					$downloadUrl =  preg_replace('/http:\/\//', 'https://', $downloadUrl, 1);
-				}
-
-				return $downloadUrl;
+				return $this->getDownloadFileSyncUrl();
 			}
 		}
 
@@ -354,6 +355,19 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$signedUrl = $s3Mgr->getFileUrl($storage->getStorageBaseDir() . $fileKey, $expiry);
 		KalturaLog::debug("S3 internal import URL: " . $signedUrl);
 		return $signedUrl;
+	}
+
+	protected function getDownloadFileSyncUrl()
+	{
+		$asset = assetPeer::retrieveById($this->getObjectId());
+		$downloadUrl = $asset->getDownloadUrlWithExpiry(86400);
+		$downloadUrl = $asset->finalizeDownloadUrl($this, $downloadUrl);
+
+		if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($downloadUrl,'http://') === 0)
+		{
+			$downloadUrl =  preg_replace('/http:\/\//', 'https://', $downloadUrl, 1);
+		}
+		return $downloadUrl;
 	}
 
 	protected function addKalturaAuthParams($url)
