@@ -232,12 +232,18 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	/**
 	 * @param string $templateEntryId
 	 * @param array $types
+	 * @param int $time
 	 * @return array<ScheduleEvent>
 	 */
-	public static function retrieveByTemplateEntryIdAndTypes($templateEntryId, $types)
+	public static function retrieveByTemplateEntryIdAndTypes($templateEntryId, $types, $time = null)
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		// if giving specific time - ignore all the events that already finished
+		if ($time)
+		{
+			$c->add(ScheduleEventPeer::END_DATE, $time, Criteria::GREATER_EQUAL);
+		}
 		$filter = new ScheduleEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
