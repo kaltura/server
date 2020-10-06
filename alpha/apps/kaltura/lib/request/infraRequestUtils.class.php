@@ -530,7 +530,6 @@ class infraRequestUtils
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
-
 		if(filter_var($file_name, FILTER_VALIDATE_URL))
 		{
 			self::dumpRemoteFilePart($file_name, $range_from, $range_length);
@@ -561,8 +560,6 @@ class infraRequestUtils
 
 	protected static function dumpRemoteFilePart($file_name, $range_from, $range_length)
 	{
-		KalturaLog::debug("range_from [$range_from] range_length [$range_length]");
-
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_URL, $file_name);
