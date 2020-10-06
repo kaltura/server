@@ -8,14 +8,16 @@ class kSimuliveUtils
 	const MINUTE_TO_MS = 60000;
 	const SIMULIVE_SCHEDULE_MARGIN = 2;
 	const SECOND_IN_MILLISECONDS = 1000;
+	const LIVE_SCHEDULE_AHEAD_TIME = 60;
 	/**
 	 * @param LiveEntry $entry
 	 * @return array
 	 */
 	public static function getSimuliveEventDetails(LiveEntry $entry)
 	{
-		$dvrWindow = $entry->getDvrWindow() * self::MINUTE_TO_MS;
-		$currentEvent = self::getSimuliveEvent($entry, null, $dvrWindow / self::SECOND_IN_MILLISECONDS);
+		$dvrWindowMs = $entry->getDvrWindow() * self::MINUTE_TO_MS;
+		$dvrWindowSec = $dvrWindowMs / self::SECOND_IN_MILLISECONDS;
+		$currentEvent = self::getSimuliveEvent($entry, time() - $dvrWindowSec, $dvrWindowSec);
 		if (!$currentEvent)
 		{
 			return null;
@@ -33,26 +35,26 @@ class kSimuliveUtils
 		$endTime = min($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS, $startTime + intval(array_sum($durations)));
 		// getting the flavors from source entry
 		$flavors = assetPeer::retrieveReadyFlavorsByEntryId($sourceEntry->getId());
-		return array($durations, $flavors, $startTime, $endTime, $dvrWindow);
+		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs);
 	}
 
 	/**
 	 * @param Entry $entry
-	 * @param int $endTime - epoch time
+	 * @param int $startTime - epoch time
 	 * @param int $duration - in sec
 	 * @return ILiveStreamScheduleEvent | null
 	 */
-	public static function getSimuliveEvent(Entry $entry, $endTime = 0, $duration = 0)
+	public static function getSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
 	{
 
 		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
 		{
-			if (!$endTime)
+			if (!$startTime)
 			{
-				$endTime = time();
+				$startTime = time();
 			}
-			$startTime = $endTime - $duration - self::SIMULIVE_SCHEDULE_MARGIN;
-			$endTime += self::SIMULIVE_SCHEDULE_MARGIN;
+			$endTime = $startTime + $duration + self::SIMULIVE_SCHEDULE_MARGIN;
+			$startTime -= self::SIMULIVE_SCHEDULE_MARGIN;
 			/* @var $entry LiveEntry */
 			foreach ($entry->getScheduleEvents($startTime, $endTime) as $event)
 			{
@@ -63,5 +65,28 @@ class kSimuliveUtils
 			}
 		}
 		return null;
+	}
+
+	public static function isSimuliveCurrentlyLive (LiveEntry $entry)
+	{
+		if (!$entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		{
+			return false;
+		}
+		$nowEpoch = time();
+		$simuliveEvent = kSimuliveUtils::getSimuliveEvent($entry, $nowEpoch, self::LIVE_SCHEDULE_AHEAD_TIME);
+		if (!$simuliveEvent)
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry(self::LIVE_SCHEDULE_AHEAD_TIME);
+			return false;
+		}
+		if ($nowEpoch >= $simuliveEvent->getCalculatedStartTime() && $nowEpoch <= $simuliveEvent->getCalculatedEndTime())
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry($simuliveEvent->getCalculatedEndTime() - $nowEpoch);
+			return true;
+		}
+		// conditional cache should expire when event start
+		KalturaResponseCacher::setConditionalCacheExpiry($simuliveEvent->getCalculatedStartTime() - $nowEpoch);
+		return false;
 	}
 }
