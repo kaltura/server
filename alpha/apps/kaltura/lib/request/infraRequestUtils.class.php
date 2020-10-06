@@ -531,18 +531,24 @@ class infraRequestUtils
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
 		$chunk_size = 100000;
-		$fh = fopen($file_name, "rb");
-		if($fh)
+		stream_wrapper_restore('https');
+		$sourceFH = fopen($file_name, "rb");
+		if(!$sourceFH)
 		{
-			$pos = 0;
-			fseek($fh, $range_from);
-			while($range_length > 0)
-			{
-				$content = fread($fh, min($chunk_size, $range_length));
-				echo $content;
-				$range_length -= $chunk_size;
-			}
-			fclose($fh);
+			KalturaLog::err("Could not open source file [$file_name] for read");
+			stream_wrapper_unregister('https');
+			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		}
+
+		while($range_length > 0)
+		{
+			$srcContent = stream_get_contents($sourceFH, min($chunk_size, $range_length), $range_from);
+			echo $srcContent;
+			$range_length -= $chunk_size;
+			$range_from += strlen($srcContent);
+		}
+
+		fclose($sourceFH);
+		stream_wrapper_unregister('https');
 	}
 }
