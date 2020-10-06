@@ -385,6 +385,12 @@ class LiveStreamService extends KalturaLiveEntryService
 
 		/* @var $liveStreamEntry LiveStreamEntry */
 	
+		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
+		if ($simuliveCondCacheTime)
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
+		}
+
 		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			return $this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
