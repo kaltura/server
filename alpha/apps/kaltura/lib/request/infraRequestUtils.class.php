@@ -530,25 +530,45 @@ class infraRequestUtils
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
+		if(filter_var($file_name, FILTER_VALIDATE_URL))
+		{
+			self::dumpRemoteFilePart($file_name, $range_from, $range_length);
+		}
+		else
+		{
+			self::dumpLocalFilePart($file_name, $range_from, $range_length);
+		}
+	}
+
+	protected static function dumpLocalFilePart($file_name, $range_from, $range_length)
+	{
 		$chunk_size = 100000;
-		stream_wrapper_restore('https');
-		$sourceFH = fopen($file_name, "rb");
-		if(!$sourceFH)
+		$fh = fopen($file_name, "rb");
+		if($fh)
 		{
-			KalturaLog::err("Could not open source file [$file_name] for read");
-			stream_wrapper_unregister('https');
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			$pos = 0;
+			fseek($fh, $range_from);
+			while($range_length > 0)
+			{
+				$content = fread($fh, min($chunk_size, $range_length));
+				echo $content;
+				$range_length -= $chunk_size;
+			}
+			fclose($fh);
 		}
+	}
 
-		while($range_length > 0)
-		{
-			$srcContent = stream_get_contents($sourceFH, min($chunk_size, $range_length), $range_from);
-			echo $srcContent;
-			$range_length -= $chunk_size;
-			$range_from += strlen($srcContent);
-		}
+	protected static function dumpRemoteFilePart($file_name, $range_from, $range_length)
+	{
+		$ch = curl_init();
 
-		fclose($sourceFH);
-		stream_wrapper_unregister('https');
+		curl_setopt($ch, CURLOPT_URL, $file_name);
+		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+		$range_to = ($range_from + $range_length) - 1;
+		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
+		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
+
+		$result = curl_exec($ch);
 	}
 }

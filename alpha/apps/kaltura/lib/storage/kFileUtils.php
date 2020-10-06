@@ -56,11 +56,11 @@ class kFileUtils extends kFile
 		if(!$allowRemote)
 		{
 			self::pollFileExists($filePath);
+
+			// if by now there is no file - die !
+			if(!file_exists($filePath))
+				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		}
-		
-		// if by now there is no file - die !
-		if(!$allowRemote && !file_exists($filePath))
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
 		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key, $iv, $fileSize, $fileExt);
 	}
