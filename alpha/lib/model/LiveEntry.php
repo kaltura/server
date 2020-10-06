@@ -510,7 +510,7 @@ abstract class LiveEntry extends entry
 				return false;
 		}
 
-		if (kSimuliveUtils::getSimuliveEvent($this))
+		if (kSimuliveUtils::isSimuliveCurrentlyLive($this))
 		{
 			return true;
 		}
