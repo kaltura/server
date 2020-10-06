@@ -482,6 +482,7 @@ abstract class LiveEntry extends entry
 	 */
 	public function getScheduleEvents($startTime, $endTime)
 	{
+		KalturaLog::debug("getting schedule events between [$startTime] to [$endTime] for entryId " . $this->getId());
 		$events = array();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaScheduleEventProvider');
 		foreach ($pluginInstances as $instance)
