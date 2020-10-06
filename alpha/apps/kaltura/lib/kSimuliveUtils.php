@@ -42,11 +42,11 @@ class kSimuliveUtils
 	 * @param Entry $entry
 	 * @param int $startTime - epoch time
 	 * @param int $duration - in sec
-	 * @return ILiveStreamScheduleEvent | null
+	 * @return array<ILiveStreamScheduleEvent>
 	 */
-	public static function getSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
+	public static function getSimuliveEvents(Entry $entry, $startTime = 0, $duration = 0)
 	{
-
+		$events = array();
 		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
 		{
 			if (!$startTime)
@@ -60,33 +60,42 @@ class kSimuliveUtils
 			{
 				if($event->getSourceEntryId())
 				{
-					return $event;
+					$events[] = $event;
 				}
 			}
 		}
-		return null;
+		return $events;
 	}
 
-	public static function isSimuliveCurrentlyLive (LiveEntry $entry)
+	/**
+	 * @param Entry $entry
+	 * @param int $startTime - epoch time
+	 * @param int $duration - in sec
+	 * @return ILiveStreamScheduleEvent | null
+	 */
+	public static function getSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
+	{
+		$events = self::getSimuliveEvents($entry, $startTime, $duration);
+		return $events ? $events[0] : null;
+	}
+
+	public static function getIsLiveCacheTime (LiveEntry $entry)
 	{
 		if (!$entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
 		{
-			return false;
+			return 0;
 		}
 		$nowEpoch = time();
 		$simuliveEvent = kSimuliveUtils::getSimuliveEvent($entry, $nowEpoch, self::LIVE_SCHEDULE_AHEAD_TIME);
 		if (!$simuliveEvent)
 		{
-			KalturaResponseCacher::setConditionalCacheExpiry(self::LIVE_SCHEDULE_AHEAD_TIME);
-			return false;
+			return self::LIVE_SCHEDULE_AHEAD_TIME;
 		}
 		if ($nowEpoch >= $simuliveEvent->getCalculatedStartTime() && $nowEpoch <= $simuliveEvent->getCalculatedEndTime())
 		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveEvent->getCalculatedEndTime() - $nowEpoch);
-			return true;
+			return $simuliveEvent->getCalculatedEndTime() - $nowEpoch;
 		}
 		// conditional cache should expire when event start
-		KalturaResponseCacher::setConditionalCacheExpiry($simuliveEvent->getCalculatedStartTime() - $nowEpoch);
-		return false;
+		return $simuliveEvent->getCalculatedStartTime() - $nowEpoch;
 	}
 }
