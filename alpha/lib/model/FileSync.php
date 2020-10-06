@@ -316,7 +316,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 			{
 				return $this->getS3FileSyncUrl($storage, $url);
 			}
-			else if(in_array(kDataCenterMgr::getCurrentDcId(), kConf::get('direct_url_dc_ids','cloud_storage', array())))
+			else
 			{
 				$url = '/direct' . $url;
 				$authParams = $this->addKalturaAuthParams($url);
@@ -326,10 +326,6 @@ class FileSync extends BaseFileSync implements IBaseObject
 				{
 					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
 				}
-			}
-			else if($this->getObjectType() == FileSyncObjectType::ASSET)
-			{
-				return $this->getDownloadFileSyncUrl();
 			}
 		}
 
