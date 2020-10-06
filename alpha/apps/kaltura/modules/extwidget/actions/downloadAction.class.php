@@ -120,7 +120,7 @@ class downloadAction extends sfAction
 			
 		$this->handleFileSyncRedirection($syncKey);
 
-		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
+		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		/**@var $fileSync FileSync */
@@ -141,17 +141,34 @@ class downloadAction extends sfAction
 			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
 		}
 		
-               //enable downloading file_name which inside the flavor asset directory
-                if(is_dir($filePath))
-                {
-                        $filePath = $filePath . DIRECTORY_SEPARATOR . $fileName;
-                        $fileSize = null;
-                }
-                else
-                {
-                        $fileSize = $fileSync->getFileSize();
-                }
-                $this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize);
+	   //enable downloading file_name which inside the flavor asset directory
+		if(is_dir($filePath))
+		{
+				$filePath = $filePath . DIRECTORY_SEPARATOR . $fileName;
+				$fileSize = null;
+		}
+		else
+		{
+				$fileSize = $fileSync->getFileSize();
+		}
+
+		$allowRemote = false;
+		if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+		{
+			$allowRemote = true;
+			$fileExt = null;
+			$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
+			try
+			{
+				$filePath = $fileSync->getS3FileSyncUrl($storage, $fileSync->getFilePath());
+				$fileExt = $flavorAsset->getFileExt();
+			}
+			catch (Exception $ex)
+			{
+				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			}
+		}
+		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize, $fileExt, $allowRemote);
 	
 		KExternalErrors::dieGracefully(); // no view
 	}
@@ -182,7 +199,7 @@ class downloadAction extends sfAction
 		return $syncKey;
 	}
 
-	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null)
+	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null, $fileExt = null, $allowRemote = false)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
@@ -211,9 +228,14 @@ class downloadAction extends sfAction
 		{
 			if(!$directServe)
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
-				
-			$mime_type = kFile::mimeType($file_path);
-			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize);
+
+			$mime_type = null;
+			if(!$allowRemote)
+			{
+				$mime_type = kFile::mimeType($file_path);
+			}
+
+			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, $allowRemote, $fileExt);
 		}
 	}
 	
@@ -224,7 +246,7 @@ class downloadAction extends sfAction
 		if (is_null($fileSync))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 			
-		if (!$local)
+		if (!$local && !in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
 			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KExternalErrors::terminateDispatch();

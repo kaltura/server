@@ -339,7 +339,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $url;
 	}
 
-	protected function getS3FileSyncUrl($storage, $fileKey)
+	public function getS3FileSyncUrl($storage, $fileKey)
 	{
 		$s3Options = array();
 		if ($storage->getS3Region())
