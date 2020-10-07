@@ -717,7 +717,6 @@ ini_set("memory_limit","512M");
 						
 						$remoteFileName = str_replace('//', '/', $remoteFileName);
 						
-						KalturaLog::debug("Putting localFile [$tmpFilename] to remote s3 [$remoteFileName]");
 						try {
 							$s3Client->putFile($remoteFileName, $tmpFilename);
 						} catch (kFileTransferMgrException $e) {
