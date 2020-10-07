@@ -424,6 +424,11 @@ class myPackagerUtils
 		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix);
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
+		if($success)
+		{
+			$success = kFile::fileSize($tempThumbPath) > 0;
+		}
+
 		return $success;
 	}
 }
