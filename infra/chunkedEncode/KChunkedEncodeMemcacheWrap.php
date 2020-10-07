@@ -688,15 +688,56 @@ ini_set("memory_limit","512M");
 					$rvStr = "SUCCESS -";
 				}
 			}
+			
+			$s3Client = null;
+			$sharedStorageOptions = KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
+			if($sharedStorageOptions && $sharedStorageOptions['enable_push_chunk_to_remote'] != "") {
+				try{
+					$s3Client = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, $sharedStorageOptions);
+					$s3Client->login(null, $sharedStorageOptions['accessKey'], $sharedStorageOptions['accessSecret']);
+				} catch (kFileTransferMgrException $e) {
+					$s3Client = null;
+				}
+			}
+			
 					// !!!TO DISABLE chunk-to-tmp flow, turn the 'true' to 'false' in condition bellow!!!
 			if(isset($tmpPromptFolder) && isset($outFilename) && true){
 				$scanFolder=$tmpPromptFolder.'/'.$outFilenameInfo['filename'].'*';
 				$scanOutputfiles = glob($scanFolder);
-				foreach($scanOutputfiles as $tmpFilename){
-					$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
-					if(rename($tmpFilename, $moveToName)==false){
-						$rv=-1;
-						$rvStr = "FAILED - to mov file to $moveToName,";
+				foreach($scanOutputfiles as $tmpFilename) {
+					
+					if($s3Client) {
+						list($baseDirName, $uniqId) = explode(".", basename($outFilenameInfo['dirname']));
+						$remoteFileName = $sharedStorageOptions['chunkBaseDir'] .
+							substr($baseDirName, -4, 2). '/'.
+							substr($baseDirName, -2). '/' .
+							basename($outFilenameInfo['dirname']) . '/' .
+							basename($tmpFilename);
+						
+						$remoteFileName = str_replace('//', '/', $remoteFileName);
+						
+						KalturaLog::debug("Putting localFile [$tmpFilename] to remote s3 [$remoteFileName] out file name info " . print_r($outFilenameInfo, true));
+						try {
+							$s3Client->putFile($remoteFileName, $tmpFilename);
+						} catch (kFileTransferMgrException $e) {
+							$rv=-1;
+							$rvStr = "FAILED - to mov file to $moveToName,";
+						}
+					}
+					
+					//At first duplicate file also to efs
+					if(!$s3Client || ($s3Client && $sharedStorageOptions['enable_write_chunk_to_shared_nfs']))
+					{
+						KalturaLog::debug("Shared storage client not found OR client set but nfs write is enabled");
+						$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
+						if(rename($tmpFilename, $moveToName)==false){
+							$rv=-1;
+							$rvStr = "FAILED - to mov file to $moveToName,";
+						}
+					}
+					else
+					{
+						KalturaLog::debug("Chunk will not be written to shared nfs, Shared storage client found AND enable_write_chunk_to_shared_nfs is disabled");
 					}
 				}
 			}

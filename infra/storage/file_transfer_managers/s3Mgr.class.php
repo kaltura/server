@@ -78,8 +78,12 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$this->storageClass = $options['storageClass'];
 		}
-
-		if (class_exists('KBatchBase'))
+		
+		if($options && isset($options['s3Arn']))
+		{
+			$this->s3Arn = $options['s3Arn'];
+		}
+		elseif(class_exists('KBatchBase') && isset(KBatchBase::$taskConfig) )
 		{
 			$this->s3Arn = KBatchBase::$taskConfig->s3Arn;
 		}
@@ -91,9 +95,7 @@ class s3Mgr extends kFileTransferMgr
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
 	}
-
-
-
+	
 	public function getConnection()
 	{
 		return $this->connection_id;

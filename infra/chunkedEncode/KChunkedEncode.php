@@ -29,6 +29,8 @@
 		public $audioFilePostfix = 'aud';		//
 		
 		public $chunkFileFormat = "mpegts";
+		protected $s3Client = null;
+		protected static $sharedStorageOptions;
 	
 		/********************
 		 * 
@@ -37,6 +39,17 @@
 		{
 			$this->setup = $setup;
 			$this->params  = new KChunkedEncodeParams();
+			
+			self::$sharedStorageOptions = KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
+			if(self::$sharedStorageOptions && self::$sharedStorageOptions['enable_read_chunk_from_remote'] != "")
+			{
+				try {
+					$this->s3Client = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, self::$sharedStorageOptions);
+					$this->s3Client->login(self::$sharedStorageOptions['endPoint'], self::$sharedStorageOptions['accessKey'], self::$sharedStorageOptions['accessSecret']);
+				} catch (kFileTransferMgrException $e) {
+					$this->s3Client = null;
+				}
+			}
 		}
 		
 		
@@ -75,6 +88,8 @@
 
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
 				$setup->output.= "_".$this->chunkEncodeToken."/";
+				//Added to be able to build the remote s3 path
+				$setup->baseOutputFolder = $setup->output;
 				if(!file_exists($setup->output)) {
 					KalturaLog::log("Create tmp folder:".$setup->output);
 					mkdir($setup->output);
@@ -660,10 +675,16 @@ return true;
 */
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
-				if(isset($chunkData->toFix))
+				if(isset($chunkData->toFix)){
 					$chunkFileName = $this->getChunkName($idx,"fix");
-				else 
+				}
+				else {
 					$chunkFileName = $this->getChunkName($idx);
+					if($this->s3Client)  {
+						$chunkFileName = $this->translateLocalPathToRemote($chunkFileName);
+					}
+				}
+				
 				$vidConcatStr.= $chunkFileName.'|';
 			}
 			$vidConcatStr = rtrim($vidConcatStr, '|');
@@ -674,6 +695,9 @@ return true;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
 				$audioFilename = $this->getSessionName("audio");
+				if($this->s3Client) {
+					$audioFilename = $this->translateLocalPathToRemote($audioFilename);
+				}
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
@@ -683,7 +707,7 @@ return true;
 				}
 				if($this->chunkFileFormat=="mpegts")
 					$audioInputParams.= " -itsoffset -1.4";
-				$audioInputParams.= " -i $audioFilename";
+				$audioInputParams.= " -i \"$audioFilename\"";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
 					$audioCopyParams.= " -bsf:a aac_adtstoasc";
@@ -693,6 +717,8 @@ return true;
 			}
 
 			$mergeCmd = $setup->ffmpegBin;
+			if($this->s3Client)
+				$mergeCmd .= " -protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\"";
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
@@ -729,6 +755,33 @@ return true;
 			KalturaLog::log("mergeCmd:\n$mergeCmd ".date("Y-m-d H:i:s"));
 			return $mergeCmd;
 		}
+		
+		private function translateLocalPathToRemote($chunkFileName, $getRemoteUrl = true)
+		{
+			$baseFolder = dirname($this->setup->baseOutputFolder);
+			list($baseDirName, $uniqId) = explode(".", basename($this->setup->baseOutputFolder));
+			$remoteBasePath = self::$sharedStorageOptions['chunkBaseDir'] .
+				substr($baseDirName, -4, 2).'/' .
+				substr($baseDirName, -2);
+			
+			$remoteChunkFileName = str_replace($baseFolder, $remoteBasePath, $chunkFileName);
+			$remoteChunkFileName = str_replace('//', '/', $remoteChunkFileName);
+			KalturaLog::log("Translated local chunk name [$chunkFileName] to remote [$remoteChunkFileName]");
+			
+			if(!$getRemoteUrl)
+				return $remoteChunkFileName;
+			
+			return $this->s3Client->getRemoteUrl($remoteChunkFileName);
+		}
+		
+		private function checkChunkExists($chunkFileName)
+		{
+			if(!$this->s3Client)
+			 return file_exists($chunkFileName);
+			
+			$chunkFileName = $this->translateLocalPathToRemote($chunkFileName, false);
+			return $this->s3Client->fileExists($chunkFileName);
+		}
 
 		/********************
 		 *
@@ -744,12 +797,23 @@ return true;
 			if(isset($this->params->fps)) 
 				$cmdLine.= " -r ".$this->params->fps;
 			
-			if(file_exists($this->getChunkName($idx, $idx+1))) {
-				$cmdLine.= " -i concat:'".$this->getChunkName($idx, $idx);
-				$cmdLine.= "|".$this->getChunkName($idx, $idx+1)."'";
+			$currChunkName = $this->getChunkName($idx, $idx);
+			$nextChunkName = $this->getChunkName($idx, $idx+1);
+			
+			if($this->checkChunkExists($nextChunkName)) {
+				if($this->s3Client) {
+					$currChunkName = $this->translateLocalPathToRemote($currChunkName);
+					$nextChunkName = $this->translateLocalPathToRemote($nextChunkName);
+					$cmdLine .= " -protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\"";
+				}
+				
+				$cmdLine.= " -i concat:'".$currChunkName."|".$nextChunkName."'";;
 			}
-			else
-				$cmdLine.= " -i ".$this->getChunkName($idx, $idx);
+			else {
+				if($this->s3Client)
+					$currChunkName = $this->translateLocalPathToRemote($currChunkName);
+				$cmdLine.= " -i \"$currChunkName\"";
+			}
 				
 			$start = $chunkData->start; 
 			$segmentTime = $chunkData->duration+(1/$this->params->fps*1.5);
