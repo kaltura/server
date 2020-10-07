@@ -108,58 +108,74 @@
 		
 		public static function tryLoadSharedRemoteChunkConfig()
 		{
-			$configCacheFileName = '/tmp/sharedRemoteChunkConfig_serialized.txt';
-			if(kFile::checkFileExists($configCacheFileName))
+			$configCacheFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'sharedRemoteChunkConfig_serialized.txt';
+			if(!kFile::checkFileExists($configCacheFileName))
+				return self::loadAndSaveSharedRemoteChunkConfig($configCacheFileName);
+			
+			$sharedStorageClientConfig = unserialize(kFile::getFileContent($configCacheFileName));
+			if(time() > $sharedStorageClientConfig['expirationTime'])
 			{
-				$sharedStorageClientConfig = unserialize(kFile::getFileContent($configCacheFileName));
-				if(time() - 60 > $sharedStorageClientConfig['loadTime'])
-				{
-					KalturaLog::debug("Config cache file no longer valid, Will reload config");
-					$sharedStorageClientConfig = self::loadSharedRemoteChunkConfig($configCacheFileName);
-				}
-				else
-				{
-					KalturaLog::debug("Config cache file valid, return cached config");
-				}
-				
-				return$sharedStorageClientConfig;
+				KalturaLog::debug("Config cache file no longer valid, Will reload config");
+				$sharedStorageClientConfig = self::loadAndSaveSharedRemoteChunkConfig($configCacheFileName);
+			}
+			else
+			{
+				KalturaLog::debug("Config cache file valid, return cached config: " . print_r($sharedStorageClientConfig, true));
 			}
 			
-			return self::loadSharedRemoteChunkConfig($configCacheFileName);
-		
+			return $sharedStorageClientConfig;
 		}
 		
-		public static function loadSharedRemoteChunkConfig($configCacheFileName)
+		public static function loadAndSaveSharedRemoteChunkConfig($configCacheFileName)
 		{
 			$sharedStorageClientConfig = kConf::get("shared_storage_client_config", "runtime_config", null);
-			if(!$sharedStorageClientConfig || !isset($sharedStorageClientConfig['s3Region']) ||
-				!isset($sharedStorageClientConfig['chunkBaseDir']))
+			
+			if(!$sharedStorageClientConfig || !isset($sharedStorageClientConfig['s3Region']) || !isset($sharedStorageClientConfig['chunkBaseDir']))
 			{
 				KalturaLog::debug("Failed to load shared storage client config, will revert to using FS for shared storage");
-				return null;
+				$sharedStorageClientConfig = array('expirationTime' => time() + 60);
+			}
+			else
+			{
+				$enableReadChunkFromRemote = kConf::get("enable_read_chunk_from_remote", "runtime_config", null);
+				$enablePushChunkToRemote = kConf::get("enable_push_chunk_to_remote", "runtime_config", null);
+				$enableWriteChunkToSharedNfs = kConf::get("enable_write_chunk_to_shared_nfs", "runtime_config", true);
+				$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 60);
+				$s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+				
+				$sharedStorageClientConfig = array(
+					's3Region' => $sharedStorageClientConfig['s3Region'],
+					'endPoint' => isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null,
+					'chunkBaseDir' => $sharedStorageClientConfig['chunkBaseDir'],
+					'accessKey' => isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null,
+					'accessSecret' => isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null,
+					'enable_read_chunk_from_remote' => $enableReadChunkFromRemote,
+					'enable_push_chunk_to_remote' => $enablePushChunkToRemote,
+					'enable_write_chunk_to_shared_nfs' => $enableWriteChunkToSharedNfs,
+					's3Arn' => $s3Arn,
+					'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
+				);
 			}
 			
-			$enableReadChunkFromRemote = kConf::get("enable_read_chunk_from_remote", "runtime_config", null);
-			$enablePushChunkToRemote = kConf::get("enable_push_chunk_to_remote", "runtime_config", null);
-			$enableWriteChunkToSharedNfs = kConf::get("enable_write_chunk_to_shared_nfs", "runtime_config", true);
-			$s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
-			
-			$sharedStorageClientConfig = array(
-				's3Region' => $sharedStorageClientConfig['s3Region'],
-				'endPoint' => isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null,
-				'chunkBaseDir' => $sharedStorageClientConfig['chunkBaseDir'],
-				'accessKey' => isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null,
-				'accessSecret' => isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null,
-				'enable_read_chunk_from_remote' => $enableReadChunkFromRemote,
-				'enable_push_chunk_to_remote' => $enablePushChunkToRemote,
-				'enable_write_chunk_to_shared_nfs' => $enableWriteChunkToSharedNfs,
-				's3Arn' => $s3Arn,
-				'loadTime' => time()
-			);
-			
+			KalturaLog::debug("Config loaded: " . print_r($sharedStorageClientConfig, true));
 			kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageClientConfig));
 			kCacheConfFactory::close();
 			return $sharedStorageClientConfig;
+		}
+		
+		public static function buildRemoteChunkPath($chunkDirName, $chunkBaseDir, $pathSuffix = null)
+		{
+			list($baseDirName, $uniqId) = explode(".", $chunkDirName);
+			$remoteChunkName = $chunkBaseDir .
+				substr($baseDirName, -4, 2).'/' .
+				substr($baseDirName, -2);
+			
+			if($pathSuffix)
+			{
+				$remoteChunkName .= "/" . $pathSuffix;
+			}
+			
+			return str_replace('//', '/', $remoteChunkName);
 		}
 	}
 

@@ -41,14 +41,14 @@
 			$this->params  = new KChunkedEncodeParams();
 			
 			self::$sharedStorageOptions = KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
-			if(self::$sharedStorageOptions && self::$sharedStorageOptions['enable_read_chunk_from_remote'] != "")
+			if(self::$sharedStorageOptions && self::$sharedStorageOptions['enable_read_chunk_from_remote'])
 			{
 				try {
 					$this->s3Client = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, self::$sharedStorageOptions);
 					$this->s3Client->login(self::$sharedStorageOptions['endPoint'], self::$sharedStorageOptions['accessKey'], self::$sharedStorageOptions['accessSecret']);
 				} catch (kFileTransferMgrException $e) {
 					$this->s3Client = null;
-					KalturaLog::debug("Failed to initiate remote s3 client with error: " . $e->getMessage());
+					KalturaLog::err("Failed to initiate remote s3 client with error: " . $e->getMessage());
 				}
 			}
 		}
@@ -681,9 +681,7 @@ return true;
 				}
 				else {
 					$chunkFileName = $this->getChunkName($idx);
-					if($this->s3Client)  {
-						$chunkFileName = $this->translateLocalPathToRemote($chunkFileName);
-					}
+					$chunkFileName = $this->translateLocalPathToRemote($chunkFileName);
 				}
 				
 				$vidConcatStr.= $chunkFileName.'|';
@@ -696,9 +694,8 @@ return true;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
 				$audioFilename = $this->getSessionName("audio");
-				if($this->s3Client) {
-					$audioFilename = $this->translateLocalPathToRemote($audioFilename);
-				}
+				$audioFilename = $this->translateLocalPathToRemote($audioFilename);
+				
 				if($setup->duration!=-1){
 					$fileDt = self::getMediaData($audioFilename);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
@@ -719,7 +716,7 @@ return true;
 
 			$mergeCmd = $setup->ffmpegBin;
 			if($this->s3Client)
-				$mergeCmd .= " -protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\"";
+				$mergeCmd .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
@@ -759,14 +756,12 @@ return true;
 		
 		private function translateLocalPathToRemote($chunkFileName, $getRemoteUrl = true)
 		{
-			$baseFolder = dirname($this->setup->baseOutputFolder);
-			list($baseDirName, $uniqId) = explode(".", basename($this->setup->baseOutputFolder));
-			$remoteBasePath = self::$sharedStorageOptions['chunkBaseDir'] .
-				substr($baseDirName, -4, 2).'/' .
-				substr($baseDirName, -2);
+			if(!$this->s3Client)  {
+				return $chunkFileName;
+			}
 			
-			$remoteChunkFileName = str_replace($baseFolder, $remoteBasePath, $chunkFileName);
-			$remoteChunkFileName = str_replace('//', '/', $remoteChunkFileName);
+			$remoteBasePath = KChunkedEncodeSetup::buildRemoteChunkPath(basename($this->setup->baseOutputFolder), self::$sharedStorageOptions['chunkBaseDir']);
+			$remoteChunkFileName = str_replace(dirname($this->setup->baseOutputFolder), $remoteBasePath, $chunkFileName);
 			KalturaLog::log("Translated local chunk name [$chunkFileName] to remote [$remoteChunkFileName]");
 			
 			if(!$getRemoteUrl)
@@ -802,17 +797,15 @@ return true;
 			$nextChunkName = $this->getChunkName($idx, $idx+1);
 			
 			if($this->checkChunkExists($nextChunkName)) {
-				if($this->s3Client) {
-					$currChunkName = $this->translateLocalPathToRemote($currChunkName);
-					$nextChunkName = $this->translateLocalPathToRemote($nextChunkName);
-					$cmdLine .= " -protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\"";
-				}
+				$currChunkName = $this->translateLocalPathToRemote($currChunkName);
+				$nextChunkName = $this->translateLocalPathToRemote($nextChunkName);
+				if($this->s3Client)
+					$cmdLine .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
 				
 				$cmdLine.= " -i concat:'".$currChunkName."|".$nextChunkName."'";;
 			}
 			else {
-				if($this->s3Client)
-					$currChunkName = $this->translateLocalPathToRemote($currChunkName);
+				$currChunkName = $this->translateLocalPathToRemote($currChunkName);
 				$cmdLine.= " -i \"$currChunkName\"";
 			}
 				

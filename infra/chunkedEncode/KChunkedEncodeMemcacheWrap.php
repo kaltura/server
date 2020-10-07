@@ -691,13 +691,17 @@ ini_set("memory_limit","512M");
 			
 			$s3Client = null;
 			$sharedStorageOptions = KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
-			if($sharedStorageOptions && $sharedStorageOptions['enable_push_chunk_to_remote'] != "") {
+			if($sharedStorageOptions && $sharedStorageOptions['enable_push_chunk_to_remote']) {
 				try {
 					$s3Client = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, $sharedStorageOptions);
 					$s3Client->login(null, $sharedStorageOptions['accessKey'], $sharedStorageOptions['accessSecret']);
 				} catch (kFileTransferMgrException $e) {
-					$s3Client = null;
 					KalturaLog::debug("Failed to initiate remote s3 client with error: " . $e->getMessage());
+					
+					$s3Client = null;
+					$job->state = $job::STATE_FAIL;
+					$rvStr = "FAILED - Configured to run with chunk push to remote, but failed to generate remote client";
+					$job->msg = "Configured to run with chunk push to remote, but failed to generate remote client";
 				}
 			}
 			
@@ -708,14 +712,11 @@ ini_set("memory_limit","512M");
 				foreach($scanOutputfiles as $tmpFilename) {
 					
 					if($s3Client) {
-						list($baseDirName, $uniqId) = explode(".", basename($outFilenameInfo['dirname']));
-						$remoteFileName = $sharedStorageOptions['chunkBaseDir'] .
-							substr($baseDirName, -4, 2). '/'.
-							substr($baseDirName, -2). '/' .
-							basename($outFilenameInfo['dirname']) . '/' .
-							basename($tmpFilename);
-						
-						$remoteFileName = str_replace('//', '/', $remoteFileName);
+						$remoteFileName = KChunkedEncodeSetup::buildRemoteChunkPath(
+							basename($outFilenameInfo['dirname']),
+							$sharedStorageOptions['chunkBaseDir'],
+							basename($outFilenameInfo['dirname']) . '/' . basename($tmpFilename)
+						);
 						
 						try {
 							$s3Client->putFile($remoteFileName, $tmpFilename);
@@ -728,7 +729,7 @@ ini_set("memory_limit","512M");
 					//At first duplicate file also to efs
 					if(!$s3Client || ($s3Client && $sharedStorageOptions['enable_write_chunk_to_shared_nfs']))
 					{
-						KalturaLog::debug("Shared storage client not found OR client set but nfs write is enabled");
+						KalturaLog::debug("Shared storage client not found OR client set and nfs write is enabled");
 						$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);
 						if(rename($tmpFilename, $moveToName)==false){
 							$rv=-1;
@@ -737,7 +738,8 @@ ini_set("memory_limit","512M");
 					}
 					else
 					{
-						KalturaLog::debug("Chunk will not be written to shared nfs, Shared storage client found AND enable_write_chunk_to_shared_nfs is disabled");
+						KalturaLog::debug("Chunk will not be written to shared nfs, deleting tmp file [$tmpFilename]");
+						unlink($tmpFilename);
 					}
 				}
 			}
