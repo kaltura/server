@@ -215,10 +215,13 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		if(isset($batchVersions[$job_type]))
 			return $batchVersions[$job_type];
 
-		$jobDcInfo = kDataCenterMgr::getDcById($jobDcId);
-		if (isset($jobDcInfo['batchVersion']))
+		if(!is_null($jobDcId))
 		{
-			return $jobDcInfo['batchVersion'];
+			$jobDcInfo = kDataCenterMgr::getDcById($jobDcId);
+			if (isset($jobDcInfo['batchVersion']))
+			{
+				return $jobDcInfo['batchVersion'];
+			}
 		}
 		
 		return kConf::get('default_batch_version');
