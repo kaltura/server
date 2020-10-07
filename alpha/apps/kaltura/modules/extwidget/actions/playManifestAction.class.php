@@ -628,12 +628,11 @@ class playManifestAction extends kalturaAction
 		return assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 	}
 	
-	protected function initFlavorAssetArray()
+	protected function initFlavorAssetArray($oneOnly = false)
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
 			return;
 		
-		$oneOnly = false;
 		if(in_array($this->deliveryAttributes->getFormat(), 
 			array(PlaybackProtocol::HTTP, PlaybackProtocol::RTSP, self::URL, self::DOWNLOAD)))
 		{
@@ -933,7 +932,7 @@ class playManifestAction extends kalturaAction
 					$this->entryId = $event->getSourceEntryId();
 					$sourceEntry = BaseentryPeer::retrieveByPK($this->entryId);
 					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
-					$this->initFlavorAssetArray();
+					$this->initFlavorAssetArray(true);
 				}
 				break;
 		}
