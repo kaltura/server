@@ -951,10 +951,6 @@ class kJobsManager
     		{
     		    $subType = kFileTransferMgrType::HTTPS;
     		}
-    		elseif(stripos($entryUrl, 's3:') === 0)
-    		{
-    			$subType = kFileTransferMgrType::S3;
-    		}
     		else 
     		{
     		    $subType = kFileTransferMgrType::HTTP;
