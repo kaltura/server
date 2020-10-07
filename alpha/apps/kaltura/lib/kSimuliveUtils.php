@@ -30,9 +30,9 @@ class kSimuliveUtils
 			return null;
 		}
 		// all times should be in ms
-		$durations[] = $sourceEntry->getLengthInMsecs();
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
-		$endTime = min($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS, $startTime + intval(array_sum($durations)));
+		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
+		$endTime = $startTime + array_sum($durations);
 		// getting the flavors from source entry
 		$flavors = assetPeer::retrieveReadyFlavorsByEntryId($sourceEntry->getId());
 		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs);
