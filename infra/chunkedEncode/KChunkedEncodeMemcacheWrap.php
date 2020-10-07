@@ -692,11 +692,12 @@ ini_set("memory_limit","512M");
 			$s3Client = null;
 			$sharedStorageOptions = KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
 			if($sharedStorageOptions && $sharedStorageOptions['enable_push_chunk_to_remote'] != "") {
-				try{
+				try {
 					$s3Client = kFileTransferMgr::getInstance(StorageProfileProtocol::S3, $sharedStorageOptions);
 					$s3Client->login(null, $sharedStorageOptions['accessKey'], $sharedStorageOptions['accessSecret']);
 				} catch (kFileTransferMgrException $e) {
 					$s3Client = null;
+					KalturaLog::debug("Failed to initiate remote s3 client with error: " . $e->getMessage());
 				}
 			}
 			
@@ -716,12 +717,12 @@ ini_set("memory_limit","512M");
 						
 						$remoteFileName = str_replace('//', '/', $remoteFileName);
 						
-						KalturaLog::debug("Putting localFile [$tmpFilename] to remote s3 [$remoteFileName] out file name info " . print_r($outFilenameInfo, true));
+						KalturaLog::debug("Putting localFile [$tmpFilename] to remote s3 [$remoteFileName]");
 						try {
 							$s3Client->putFile($remoteFileName, $tmpFilename);
 						} catch (kFileTransferMgrException $e) {
 							$rv=-1;
-							$rvStr = "FAILED - to mov file to $moveToName,";
+							$rvStr = "FAILED - to mov file to $remoteFileName,";
 						}
 					}
 					

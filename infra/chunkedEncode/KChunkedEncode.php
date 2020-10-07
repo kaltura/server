@@ -48,6 +48,7 @@
 					$this->s3Client->login(self::$sharedStorageOptions['endPoint'], self::$sharedStorageOptions['accessKey'], self::$sharedStorageOptions['accessSecret']);
 				} catch (kFileTransferMgrException $e) {
 					$this->s3Client = null;
+					KalturaLog::debug("Failed to initiate remote s3 client with error: " . $e->getMessage());
 				}
 			}
 		}
@@ -777,7 +778,7 @@ return true;
 		private function checkChunkExists($chunkFileName)
 		{
 			if(!$this->s3Client)
-			 return file_exists($chunkFileName);
+				return file_exists($chunkFileName);
 			
 			$chunkFileName = $this->translateLocalPathToRemote($chunkFileName, false);
 			return $this->s3Client->fileExists($chunkFileName);
