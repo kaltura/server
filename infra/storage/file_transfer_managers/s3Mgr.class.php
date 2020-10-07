@@ -385,7 +385,7 @@ class s3Mgr extends kFileTransferMgr
 	protected function doList ($remote_path)
 	{
 		$dirList = array();
-		list($bucket, $remoteDir) = explode("/",ltrim($remoteDir,"/"),2);
+		list($bucket, $remoteDir) = explode("/",ltrim($remote_path,"/"),2);
 		KalturaLog::debug("Listing dir contents for bucket [$bucket] and dir [$remoteDir]");
 		
 		try
@@ -405,7 +405,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("Couldn't list file objects for remote file, [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
+			KalturaLog::err("Couldn't list file objects for remote path, [$remote_path] from bucket [$bucket]: {$e->getMessage()}");
 		}
 		
 		return $dirList;
