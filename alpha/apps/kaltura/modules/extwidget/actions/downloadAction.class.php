@@ -168,17 +168,17 @@ class downloadAction extends sfAction
 		if($isPeriodic)
 		{
 			$allowRemote = true;
-			$fileExt = null;
 			$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 			try
 			{
-				$filePath = $fileSync->getFilePath();
 				if($isDir)
 				{
 					$filePath = $fileSync->getFilePath() . DIRECTORY_SEPARATOR . $fileName;
+					$fileExt = null;
 				}
 				else
 				{
+					$filePath = $fileSync->getFilePath();
 					$fileExt = $flavorAsset->getFileExt();
 				}
 				$filePath = $fileSync->getS3FileSyncUrl($storage, $filePath);
