@@ -135,8 +135,8 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$mediaInfoBin = isset(self::$taskConfig->params->mediaInfoCmd)? self::$taskConfig->params->mediaInfoCmd: null;
 			$calcComplexity = new KMediaFileComplexity($ffmpegBin, $ffprobeBin, $mediaInfoBin);
 			
-			$baseOutputName = tempnam(self::$taskConfig->params->localTempPath, "/complexitySampled_".pathinfo($mediaFile, PATHINFO_FILENAME)).".mp4";
-			$stat = $calcComplexity->EvaluateSampled($mediaFile, $mediaInfo, $baseOutputName);
+			$baseOutputName = tempnam(self::$taskConfig->params->localTempPath, "/complexitySampled_".pathinfo($mediaFile, PATHINFO_FILENAME));
+			$stat = $calcComplexity->EvaluateSampled($mediaFile, $mediaInfo, $baseOutputName.".mp4");
 			if(isset($stat->complexityValue))
 			{
 				KalturaLog::log("Complexity: value($stat->complexityValue)");
@@ -145,6 +145,12 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 				
 				$complexityValue = $stat->complexityValue;
 			}
+			$scanTmpfiles = glob($baseOutputName.'*');
+                        foreach($scanTmpfiles as $tmpFilename) {
+                                KalturaLog::log("deleting tmp file: $tmpFilename");
+                                unlink($tmpFilename);
+                        }
+
 		}
 		
 		if($complexityValue)
