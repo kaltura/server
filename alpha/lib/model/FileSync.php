@@ -318,7 +318,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 			}
 			else if(in_array($this->getPartnerId(), kConf::get('use_download_url_partners','cloud_storage', array())))
 			{
-				return $this->getDownloadFileSyncUrl();
+				return $this->getAssetDownloadUrl();
 			}
 			else
 			{
@@ -358,7 +358,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $signedUrl;
 	}
 
-	protected function getDownloadFileSyncUrl()
+	protected function getAssetDownloadUrl()
 	{
 		if($this->getObjectType() != FileSyncObjectType::ASSET)
 		{
