@@ -131,19 +131,8 @@ class downloadAction extends sfAction
 
 		if (!$fileName)
 			$fileName = $fileBaseName;
-
-		$isPeriodic = in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds());
-		if($isPeriodic && in_array($fileSync->getPartnerId(), kConf::get('use_download_url_partners','cloud_storage', array())))
-		{
-			$isDir = $fileSync->getIsDir();
-		}
-		else
-		{
-			$isDir = is_dir($filePath);
-		}
-
-
-		if ($fileExt && !$isDir)
+		
+		if ($fileExt && !is_dir($filePath))
 			$fileName = $fileName . '.' . $fileExt;
 		
 		$preview = 0;
@@ -154,7 +143,7 @@ class downloadAction extends sfAction
 		}
 		
 	   //enable downloading file_name which inside the flavor asset directory
-		if($isDir)
+		if(is_dir($filePath))
 		{
 				$filePath = $filePath . DIRECTORY_SEPARATOR . $fileName;
 				$fileSize = null;
@@ -165,23 +154,15 @@ class downloadAction extends sfAction
 		}
 
 		$allowRemote = false;
-		if($isPeriodic)
+		if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
 			$allowRemote = true;
+			$fileExt = null;
 			$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 			try
 			{
-				if($isDir)
-				{
-					$filePath = $fileSync->getFilePath() . DIRECTORY_SEPARATOR . $fileName;
-					$fileExt = null;
-				}
-				else
-				{
-					$filePath = $fileSync->getFilePath();
-					$fileExt = $flavorAsset->getFileExt();
-				}
-				$filePath = $fileSync->getS3FileSyncUrl($storage, $filePath);
+				$filePath = $fileSync->getS3FileSyncUrl($storage, $fileSync->getFilePath());
+				$fileExt = $flavorAsset->getFileExt();
 			}
 			catch (Exception $ex)
 			{
