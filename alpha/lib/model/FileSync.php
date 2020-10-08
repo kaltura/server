@@ -457,6 +457,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function cloneToAnotherStorage($storageId)
 	{
 		$newfileSync = $this->copy(true);
+		$newfileSync->m_custom_data = null; // force reload of custom data
 		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
 		$newfileSync->setSrcPath($this->getFullPath());
 		$newfileSync->setSrcEncKey($this->getSrcEncKey());
