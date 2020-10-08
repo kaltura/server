@@ -727,7 +727,7 @@ ini_set("memory_limit","512M");
 					}
 					
 					//At first duplicate file also to efs
-					if(!$s3Client || ($s3Client && $sharedStorageOptions['enable_write_chunk_to_shared_nfs']))
+					if(!$s3Client || $sharedStorageOptions['enable_write_chunk_to_shared_nfs'])
 					{
 						KalturaLog::debug("Shared storage client not found OR client set and nfs write is enabled");
 						$moveToName = $outFilenameInfo['dirname'].'/'.basename($tmpFilename);

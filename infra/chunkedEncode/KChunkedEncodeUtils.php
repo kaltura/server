@@ -129,45 +129,40 @@
 		public static function loadAndSaveSharedRemoteChunkConfig($configCacheFileName)
 		{
 			$sharedStorageClientConfig = kConf::get("shared_storage_client_config", "runtime_config", null);
+			$enableReadChunkFromRemote = kConf::get("enable_read_chunk_from_remote", "runtime_config", null);
+			$enablePushChunkToRemote = kConf::get("enable_push_chunk_to_remote", "runtime_config", null);
+			$enableWriteChunkToSharedNfs = kConf::get("enable_write_chunk_to_shared_nfs", "runtime_config", true);
+			$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 60);
+			$s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
 			
-			if(!$sharedStorageClientConfig || !isset($sharedStorageClientConfig['s3Region']) || !isset($sharedStorageClientConfig['chunkBaseDir']))
+			$chunkConvertSharedStorageConfig = array(
+				'enable_read_chunk_from_remote' => $enableReadChunkFromRemote,
+				'enable_push_chunk_to_remote' => $enablePushChunkToRemote,
+				'enable_write_chunk_to_shared_nfs' => $enableWriteChunkToSharedNfs,
+				's3Arn' => $s3Arn,
+				'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
+			);
+			
+			if($sharedStorageClientConfig && isset($sharedStorageClientConfig['s3Region']) && isset($sharedStorageClientConfig['chunkBaseDir']))
 			{
-				KalturaLog::debug("Failed to load shared storage client config, will revert to using FS for shared storage");
-				$sharedStorageClientConfig = array('expirationTime' => time() + 60);
-			}
-			else
-			{
-				$enableReadChunkFromRemote = kConf::get("enable_read_chunk_from_remote", "runtime_config", null);
-				$enablePushChunkToRemote = kConf::get("enable_push_chunk_to_remote", "runtime_config", null);
-				$enableWriteChunkToSharedNfs = kConf::get("enable_write_chunk_to_shared_nfs", "runtime_config", true);
-				$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 60);
-				$s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
-				
-				$sharedStorageClientConfig = array(
-					's3Region' => $sharedStorageClientConfig['s3Region'],
-					'endPoint' => isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null,
-					'chunkBaseDir' => $sharedStorageClientConfig['chunkBaseDir'],
-					'accessKey' => isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null,
-					'accessSecret' => isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null,
-					'enable_read_chunk_from_remote' => $enableReadChunkFromRemote,
-					'enable_push_chunk_to_remote' => $enablePushChunkToRemote,
-					'enable_write_chunk_to_shared_nfs' => $enableWriteChunkToSharedNfs,
-					's3Arn' => $s3Arn,
-					'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
-				);
+				$chunkConvertSharedStorageConfig['s3Region'] = $sharedStorageClientConfig['s3Region'];
+				$chunkConvertSharedStorageConfig['chunkBaseDir'] = $sharedStorageClientConfig['chunkBaseDir'];
+				$chunkConvertSharedStorageConfig['endPoint'] = isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null;
+				$chunkConvertSharedStorageConfig['accessKey'] = isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null;
+				$chunkConvertSharedStorageConfig['accessSecret'] = isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null;
 			}
 			
-			KalturaLog::debug("Config loaded: " . print_r($sharedStorageClientConfig, true));
-			kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageClientConfig));
+			KalturaLog::debug("Config loaded: " . print_r($chunkConvertSharedStorageConfig, true));
+			kFile::safeFilePutContents($configCacheFileName, serialize($chunkConvertSharedStorageConfig));
 			kCacheConfFactory::close();
-			return $sharedStorageClientConfig;
+			return $chunkConvertSharedStorageConfig;
 		}
 		
 		public static function buildRemoteChunkPath($chunkDirName, $chunkBaseDir, $pathSuffix = null)
 		{
 			list($baseDirName, $uniqId) = explode(".", $chunkDirName);
 			$remoteChunkName = $chunkBaseDir .
-				substr($baseDirName, -4, 2).'/' .
+				substr($baseDirName, -4, 2). '/' .
 				substr($baseDirName, -2);
 			
 			if($pathSuffix)

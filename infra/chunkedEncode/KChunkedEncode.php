@@ -676,7 +676,7 @@ return true;
 */
 			$vidConcatStr = "concat:'";
 			foreach($this->chunkDataArr as $idx=>$chunkData){
-				if(isset($chunkData->toFix)){
+				if(isset($chunkData->toFix)) {
 					$chunkFileName = $this->getChunkName($idx,"fix");
 				}
 				else {
@@ -802,7 +802,7 @@ return true;
 				if($this->s3Client)
 					$cmdLine .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
 				
-				$cmdLine.= " -i concat:'".$currChunkName."|".$nextChunkName."'";;
+				$cmdLine.= " -i concat:'".$currChunkName."|".$nextChunkName."'";
 			}
 			else {
 				$currChunkName = $this->translateLocalPathToRemote($currChunkName);
