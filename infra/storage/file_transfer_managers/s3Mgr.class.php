@@ -165,6 +165,8 @@ class s3Mgr extends kFileTransferMgr
 
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
 		$roleRefresh->s3Arn = $this->s3Arn;
+		$roleRefresh->s3Region = $this->s3Region;
+		
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
 
@@ -419,7 +421,7 @@ class s3Mgr extends kFileTransferMgr
 		
 		$cmd = $this->s3->getCommand('GetObject', $params);
 		
-		$expiry = time() + 600;
+		$expiry = time() + 86400;
 		$pre_signed_url = $cmd->createPresignedUrl($expiry);
 		
 		KalturaLog::debug("remote_file: [$remote_file] pre_signed_url: [$pre_signed_url]");
@@ -440,6 +442,7 @@ class RefreshableRole extends AbstractRefreshableCredentials
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const SESSION_DURATION = 3600;
 	public $s3Arn = null;
+	public $s3Region = null;
 
 	public function refresh()
 	{
@@ -448,11 +451,20 @@ class RefreshableRole extends AbstractRefreshableCredentials
 		$credentials = new Credentials('', '');
 		$ipRefresh = new RefreshableInstanceProfileCredentials(new Credentials('', '', '', 1));
 		$ipCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/instanceProfileCache"));
-
 		$ipCreds = new CacheableCredentials($ipRefresh, $ipCache, 'refresh_role_creds_key');
-		$sts = StsClient::factory(array(
+		
+		$stsFactoryParams = array(
 			'credentials' => $ipCreds,
-		));
+		);
+		
+		//Added to support regional STS endpoints in case external traffic is blocked
+		if($this->s3Region)
+		{
+			$stsFactoryParams['region'] = $this->s3Region;
+			$stsFactoryParams['endpoint'] = "https://sts.{$this->s3Region}.amazonaws.com";
+		}
+		
+		$sts = StsClient::factory($stsFactoryParams);
 
 		$call = $sts->assumeRole(array(
 			'RoleArn' => $this->s3Arn,
