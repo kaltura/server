@@ -364,7 +364,6 @@ class kFileBase
 	
 	public static function checkFileExists($path)
 	{
-		KalturaLog::debug("Check file exists [$path]");
 		if(kFile::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
