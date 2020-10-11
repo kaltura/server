@@ -37,6 +37,7 @@
 		{
 			$this->setup = $setup;
 			$this->params  = new KChunkedEncodeParams();
+			KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
 		}
 		
 		
@@ -76,7 +77,11 @@
 			//Build remote shared path to follow same setting as output path
 			if($setup->sharedChunkPath)
 			{
-				$setup->sharedChunkPath = kFile::fixPath($setup->sharedChunkPath . "/" . $pInfo['basename']);
+				list($baseDirName, $uniqId) = explode(".", $setup->output);
+				$setup->sharedChunkPath = kFile::fixPath($setup->sharedChunkPath . '/' .
+					substr($baseDirName, -4, 2). '/' .
+					substr($baseDirName, -2) . '/' .
+					$pInfo['basename']);
 			}
 
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
@@ -645,6 +650,8 @@
 		 */
 		public function ConcatChunks()
 		{
+			//Remove return to revert back to using ts concat flow
+			return true;
 			$videoFilename = $this->getSessionName("video");
 			$oFh=fopen($videoFilename,"wb");
 			if($oFh===false){
@@ -679,21 +686,35 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
-			$videoFilename = $this->getSessionName("video");
-			
-			/*
-			$vidConcatStr = "concat:'";
-			foreach($this->chunkDataArr as $idx=>$chunkData){
-				if(isset($chunkData->toFix))
-					$chunkFileName = $this->getChunkName($idx,"fix");
-				else 
-					$vidConcatStr.= $this->getChunkName($idx).'|';
-			}
-			$vidConcatStr = rtrim($vidConcatStr, '|');
-			$vidConcatStr.= "'";
+			/* Disable separate merging of video chunks
+			$vidConcatStr = $this->getSessionName("video");
 			*/
 			
+			$mode = null;
 			$setup = $this->setup;
+			$vidConcatStr = "concat:'";
+			$mergeCmd = $setup->ffmpegBin;
+			if($this->setup->sharedChunkPath) {
+				$mode = "shared";
+				$mergeCmd .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\" ";
+			}
+			
+			foreach($this->chunkDataArr as $idx=>$chunkData){
+				if(isset($chunkData->toFix))
+				{
+					$chunkFileName = $this->getChunkName($idx,"fix");
+				}
+				else
+				{
+					$chunkFileName = $this->getChunkName($idx, $mode);
+					$chunkFileName = kFile::realPath($chunkFileName);
+				}
+				$vidConcatStr.= $chunkFileName.'|';
+			}
+			
+			$vidConcatStr = rtrim($vidConcatStr, '|');
+			$vidConcatStr.= "'";
+			
 			$params = $this->params;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
@@ -716,12 +737,16 @@
 			else{
 				$audioCopyParams = null;
 			}
-
-			$mergeCmd = $setup->ffmpegBin;
+			
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
-			$mergeCmd.= " -i $videoFilename";
+			
+			/* Disable separate merging of video chunks
+			//$mergeCmd.= " -i $videoFilename";
+			*/
+			
+			$mergeCmd.= " -i $vidConcatStr";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
 				$mergeCmd.= " ".$params->formatParams;
@@ -769,12 +794,28 @@
 			if(isset($this->params->fps)) 
 				$cmdLine.= " -r ".$this->params->fps;
 			
-			if(file_exists($this->getChunkName($idx, $idx+1))) {
-				$cmdLine.= " -i concat:'".$this->getChunkName($idx, $idx);
-				$cmdLine.= "|".$this->getChunkName($idx, $idx+1)."'";
+			$mode = "base";
+			if($this->setup->sharedChunkPath) {
+				$mode = "shared_base";
+				$cmdLine .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
 			}
-			else
-				$cmdLine.= " -i ".$this->getChunkName($idx, $idx);
+			
+			$currChunkName = $this->getChunkName($idx, $mode).($idx);
+			$nextChunkName = $this->getChunkName($idx, $mode).($idx+1);
+			KalturaLog::debug("currChunkName: $currChunkName");
+			KalturaLog::debug("currChunkName: $nextChunkName");
+			
+			$resolveCurrChunkPath = kFile::realPath($currChunkName);
+			$resolveNextChunkPath = kFile::realPath($nextChunkName);
+			KalturaLog::debug("resolveCurrChunkPath: $resolveCurrChunkPath");
+			KalturaLog::debug("resolveNextChunkPath: $resolveNextChunkPath");
+			
+			if(kFile::checkFileExists($nextChunkName)) {
+				$cmdLine.= " -i concat:'".$resolveCurrChunkPath."|".$resolveNextChunkPath."'";
+			}
+			else {
+				$cmdLine.= " -i \"$resolveCurrChunkPath\"";
+			}
 				
 			$start = $chunkData->start; 
 			$segmentTime = $chunkData->duration+(1/$this->params->fps*1.5);
