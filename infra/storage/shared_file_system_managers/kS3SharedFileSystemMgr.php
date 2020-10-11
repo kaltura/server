@@ -61,7 +61,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
-			$arnRole = kConf::get("s3Arn" , "cloud_storage", null);
+			$arnRole = kConf::get("s3Arn" , "cloud_storage", getenv(self::S3_ARN_ROLE_ENV_NAME));
 		}
 		
 		if($options)
