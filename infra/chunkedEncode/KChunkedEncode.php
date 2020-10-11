@@ -803,7 +803,7 @@
 			$currChunkName = $this->getChunkName($idx, $mode).($idx);
 			$nextChunkName = $this->getChunkName($idx, $mode).($idx+1);
 			KalturaLog::debug("currChunkName: $currChunkName");
-			KalturaLog::debug("currChunkName: $nextChunkName");
+			KalturaLog::debug("nextChunkName: $nextChunkName");
 			
 			$resolveCurrChunkPath = kFile::realPath($currChunkName);
 			$resolveNextChunkPath = kFile::realPath($nextChunkName);
