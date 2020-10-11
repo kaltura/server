@@ -566,20 +566,46 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doListFiles($filePath, $pathPrefix = '')
 	{
+		$dirList = array();
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		
-		$params = array(
-			'Bucket' => $bucket,
-			'Prefix'    => $filePath,
-		);
-		
-		$results = $this->s3Call('listObjects', $params, $filePath);
-		
-		if(!$results)
+		try
 		{
-			return false;
+			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $filePath
+			));
+			
+			$originalFilePath = $bucket . '/' . $filePath . '/';
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				$objectPath = $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
+				if($originalFilePath == $objectPath)
+					continue;
+				
+				$fileType = "file";
+				if($dirListObject['Size'] == 0 && substr_compare($objectPath, '/', -strlen('/')) === 0)
+				{
+					$fileType = 'dir';
+				}
+				
+				if ($fileType == 'dir')
+				{
+					$dirList[] = array($objectPath, 'dir', $dirListObject['Size']);
+					$dirList = array_merge($dirList, self::doListFiles($objectPath, $pathPrefix));
+				}
+				else
+				{
+					$dirList[] = array($objectPath, 'file', $dirListObject['Size']);
+				}
+			}
 		}
-		return $results;
+		catch ( Exception $e )
+		{
+			KalturaLog::err("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
+		}
+		
+		return $dirList;
 	}
 	
 	protected function doGetMaximumPartsNum()

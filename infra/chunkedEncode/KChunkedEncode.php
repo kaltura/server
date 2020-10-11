@@ -783,7 +783,7 @@
 		/********************
 		 *
 		 */
-		public function BuildFixVideoCommandLine($idx)
+		public function BuildFixVideoCommandLine($idx, $chunkOutputFileList = array())
 		{
 			$chunkData = $this->chunkDataArr[$idx];
 			$chunkFixName = $this->getChunkName($idx, "fix");
@@ -800,21 +800,19 @@
 				$cmdLine .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
 			}
 			
-			$currChunkName = $this->getChunkName($idx, $mode).($idx);
-			$nextChunkName = $this->getChunkName($idx, $mode).($idx+1);
-			KalturaLog::debug("currChunkName: $currChunkName");
-			KalturaLog::debug("nextChunkName: $nextChunkName");
+			$firstSegmentName = $this->getChunkName($idx, $mode).($idx);
+			$secondSegmentName = $this->getChunkName($idx, $mode).($idx+1);
+			KalturaLog::debug("firstSegmentName: $firstSegmentName , secondSegmentName: $secondSegmentName");
 			
-			$resolveCurrChunkPath = kFile::realPath($currChunkName);
-			$resolveNextChunkPath = kFile::realPath($nextChunkName);
-			KalturaLog::debug("resolveCurrChunkPath: $resolveCurrChunkPath");
-			KalturaLog::debug("resolveNextChunkPath: $resolveNextChunkPath");
+			$resolvedFirstSegmentName = kFile::realPath($firstSegmentName);
+			$resolvedSecondSegmentName = kFile::realPath($secondSegmentName);
+			KalturaLog::debug("resolvedFirstSegmentName: $resolvedFirstSegmentName, resolvedSecondSegmentName: $resolvedSecondSegmentName");
 			
-			if(kFile::checkFileExists($nextChunkName)) {
-				$cmdLine.= " -i concat:'".$resolveCurrChunkPath."|".$resolveNextChunkPath."'";
+			if( (count($chunkOutputFileList) && in_array($secondSegmentName, $chunkOutputFileList)) || kFile::checkFileExists($secondSegmentName)) {
+				$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
 			}
 			else {
-				$cmdLine.= " -i \"$resolveCurrChunkPath\"";
+				$cmdLine.= " -i \"$resolvedFirstSegmentName\"";
 			}
 				
 			$start = $chunkData->start; 
