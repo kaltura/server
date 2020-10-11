@@ -136,7 +136,7 @@
 			$s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
 			$storageOptions = kConf::get('storage_options', 'cloud_storage', array());
 			$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
-			$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 60);
+			$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 120);
 			
 			$chunkConvertSharedStorageConfig = array(
 				'arnRole' => $s3Arn,

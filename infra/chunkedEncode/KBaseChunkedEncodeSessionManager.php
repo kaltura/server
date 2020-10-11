@@ -165,7 +165,7 @@
 			
 			$chunkOutputFileList = array();
 			if($chunker->setup->sharedChunkPath) {
-				$rawChunkDirList = kFile::listDir($chunker->setup->sharedChunkPath);
+				$rawChunkOutputFileList = kFile::listDir($chunker->setup->sharedChunkPath);
 				foreach ($rawChunkOutputFileList as $fileItem) {
 					$chunkOutputFileList[] = kFile::fixPath( "/" . $fileItem[0]);
 				}
