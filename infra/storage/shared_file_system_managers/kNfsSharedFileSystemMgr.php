@@ -80,7 +80,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		$httpCode = $curlWrapper->getHttpCode();
 		if (KCurlHeaderResponse::isError($httpCode))
 		{
-			KalturaLog::info("curl request [$resource] return with http-code of [$httpCode]");
+			kFile::safeLog("info", "curl request [$resource] return with http-code of [$httpCode]");
 			if ($destFilePath && file_exists($destFilePath))
 				unlink($destFilePath);
 			$res = false;

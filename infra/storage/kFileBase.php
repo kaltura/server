@@ -200,7 +200,7 @@ class kFileBase
     {
 	    if(kFile::isSharedPath($filename))
 	    {
-		    KalturaLog::debug("Check file size for shared file [$filename]");
+		    self::safeLog("debug", "Check file size for shared file [$filename]");
 		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filename);
 		    return $kSharedFsMgr->fileSize($filename);
 	    }
@@ -218,7 +218,7 @@ class kFileBase
         curl_setopt($ch, CURLOPT_HEADER, true);
         $headers = curl_exec($ch);
         if(!$headers)
-            KalturaLog::err('Curl error: ' . curl_error($ch));
+	        self::safeLog("err", 'Curl error: ' . curl_error($ch));
         curl_close($ch);
 
         if(!$headers)
@@ -343,7 +343,7 @@ class kFileBase
 			$httpCode = $curlWrapper->getHttpCode();
 			if (KCurlHeaderResponse::isError($httpCode))
 			{
-				KalturaLog::info("curl request [$src] return with http-code of [$httpCode]");
+				self::safeLog("info", "curl request [$src] return with http-code of [$httpCode]");
 				if ($destFilePath && file_exists($destFilePath))
 					unlink($destFilePath);
 				$res = false;
@@ -539,7 +539,7 @@ class kFileBase
 			$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
 			if(kFile::isDir($newSrc))
 			{
-				KalturaLog::err("Copying of non-flat directories is illegal");
+				self::safeLog("err", "Copying of non-flat directories is illegal");
 				return false;
 			}
 			
@@ -651,17 +651,17 @@ class kFileBase
 			if ($res)
 			{
 				$res = $tmpFilePath;
-				KalturaLog::debug("Succeeded to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				self::safeLog("debug", "Succeeded to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 			else
 			{
-				KalturaLog::err("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				self::safeLog("err", "Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 				throw new KalturaException("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err("Failed to fetch from [$externalUrl] " . $e->getMessage());
+			self::safeLog("err", "Failed to fetch from [$externalUrl] " . $e->getMessage());
 			throw $e;
 		}
 		
@@ -671,5 +671,11 @@ class kFileBase
 	public static function setStorageTypeMap($key, $value)
 	{
 		self::$storageTypeMap[$key] = $value;
+	}
+	
+	public static function safeLog($function, $msg)
+	{
+		if (class_exists('KalturaLog'))
+			KalturaLog::$function($msg);
 	}
 }

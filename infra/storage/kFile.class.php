@@ -69,7 +69,7 @@ class kFile extends kFileBase
 		// create a handler for the directory
 		$handler = @opendir($directory);
 		if(! $handler)
-			KalturaLog::info("dirList $directory does not exist");
+			self::safeLog("info", "dirList $directory does not exist");
 		
 		// keep going until all files in directory have been read
 		while($file = readdir($handler))

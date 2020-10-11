@@ -85,7 +85,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		if(!class_exists('Aws\S3\S3Client'))
 		{
-			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
+			kFile::safeLog("err", 'Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
 		
@@ -93,7 +93,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
-				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				kFile::safeLog("err", 'Class Aws\S3\StsClient was not found!!');
 				return false;
 			}
 			
@@ -292,7 +292,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$sourceFH = fopen($resource, 'rb');
 		if(!$sourceFH)
 		{
-			KalturaLog::err("Could not open source file [$resource] for read");
+			kFile::safeLog("err", "Could not open source file [$resource] for read");
 			$this->unregisterStreamWrappers();
 			return false;
 		}
@@ -304,7 +304,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		KalturaLog::debug("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
+		kFile::safeLog("debug", "Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
 		
 		// Upload the file in parts.
 		$partNumber = 1;
@@ -325,7 +325,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				'ETag' => $result['ETag'],
 			);
 			
-			KalturaLog::debug("Uploading part [$partNumber] dest file path [$destFilePath]");
+			kFile::safeLog("debug",  "Uploading part [$partNumber] dest file path [$destFilePath]");
 			$partNumber++;
 		}
 		
@@ -626,8 +626,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		$fileUrl = $this->doRealPath($filePath);
 		
-		KalturaLog::debug("Test:: range_from [$range_from] range_length [$range_length]");
-		
 		$ch = curl_init();
 		
 		curl_setopt($ch, CURLOPT_URL, $fileUrl);
@@ -864,7 +862,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			unset($params['Body']);
 		}
 		
-		KalturaLog::warning("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
+		kFile::safeLog("warning", "S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
 	}
 	
 	protected function doCopySharedToSharedAllowed()
