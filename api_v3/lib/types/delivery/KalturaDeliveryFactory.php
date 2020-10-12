@@ -88,6 +88,8 @@ class KalturaDeliveryProfileFactory {
 				return new KalturaUrlTokenizerKs();
 			case 'kWowzaSecureTokenUrlTokenizer':
 				return new KalturaUrlTokenizerWowzaSecureToken();
+			case 'kKalturaUrlTokenizer':
+				return new KalturaUrlTokenizerKaltura();
 
 			// Add other tokenizers here
 			default:
@@ -103,6 +105,8 @@ class KalturaDeliveryProfileFactory {
 		switch ($type) {
 			case 'kUrlRecognizerAkamaiG2O':
 				return new KalturaUrlRecognizerAkamaiG2O();
+			case 'kKalturaUrlRecognizer':
+				return new kKalturaUrlRecognizer();
 			case 'kUrlRecognizer':
 				return new KalturaUrlRecognizer();
 			default:
