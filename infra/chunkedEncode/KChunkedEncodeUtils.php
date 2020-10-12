@@ -148,8 +148,8 @@
 			if($storageOptions && isset($storageOptions['accessKeyId']) && isset($storageOptions['accessKeySecret']))
 			{
 				$chunkConvertSharedStorageConfig['endPoint'] = isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null;
-				$chunkConvertSharedStorageConfig['accessKey'] = isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null;
-				$chunkConvertSharedStorageConfig['accessSecret'] = isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null;
+				$chunkConvertSharedStorageConfig['accessKeyId'] = isset($sharedStorageClientConfig['accessKeyId']) ? $sharedStorageClientConfig['accessKeyId'] : null;
+				$chunkConvertSharedStorageConfig['accessKeySecret'] = isset($sharedStorageClientConfig['accessKeySecret']) ? $sharedStorageClientConfig['accessKeySecret'] : null;
 			}
 			
 			
