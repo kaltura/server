@@ -145,11 +145,11 @@
 				'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
 			);
 			
-			if($storageOptions && isset($storageOptions['accessKey']) && isset($storageOptions['accessSecret']))
+			if($storageOptions && isset($storageOptions['accessKeyId']) && isset($storageOptions['accessKeySecret']))
 			{
-				$chunkConvertSharedStorageConfig['endPoint'] = isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null;
-				$chunkConvertSharedStorageConfig['accessKey'] = isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null;
-				$chunkConvertSharedStorageConfig['accessSecret'] = isset($sharedStorageClientConfig['accessSecret']) ? $sharedStorageClientConfig['accessSecret'] : null;
+				$chunkConvertSharedStorageConfig['endPoint'] = isset($storageOptions['endPoint']) ? $storageOptions['endPoint'] : null;
+				$chunkConvertSharedStorageConfig['accessKeyId'] = isset($storageOptions['accessKeyId']) ? $storageOptions['accessKeyId'] : null;
+				$chunkConvertSharedStorageConfig['accessKeySecret'] = isset($storageOptions['accessKeySecret']) ? $storageOptions['accessKeySecret'] : null;
 			}
 			
 			
@@ -163,6 +163,18 @@
 		{
 			kSharedFileSystemMgr::setFileSystemOptions('arnRole', $storageRunParams['arnRole']);
 			kSharedFileSystemMgr::setFileSystemOptions('s3Region', $storageRunParams['s3Region']);
+			
+			if(isset($storageRunParams['endPoint'])) {
+				kSharedFileSystemMgr::setFileSystemOptions('endPoint', $storageRunParams['endPoint']);
+			}
+			
+			if(isset($storageRunParams['accessKeyId'])) {
+				kSharedFileSystemMgr::setFileSystemOptions('accessKeyId', $storageRunParams['accessKeyId']);
+			}
+			
+			if(isset($storageRunParams['accessKeySecret'])) {
+				kSharedFileSystemMgr::setFileSystemOptions('accessKeySecret', $storageRunParams['accessKeySecret']);
+			}
 			
 			$storageTypeMap = $storageRunParams['storageTypeMap'];
 			foreach ($storageTypeMap as $key => $value) {
