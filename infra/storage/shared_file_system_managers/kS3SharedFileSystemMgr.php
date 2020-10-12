@@ -223,6 +223,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array('params' => $params)
 			);
 			
+			KalturaLog::debug("File uploaded to s3, info: " . print_r($res, true));
 			return array(true, $res);
 		}
 		catch (Exception $e)
