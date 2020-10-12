@@ -18,8 +18,6 @@
  */
 class BatchControlService extends KalturaBaseService 
 {
-	const SCHEDULER_BASE_ID = 1000000;
-
 	// use initService to add a peer to the partner filter
 	/**
 	 * @ignore
