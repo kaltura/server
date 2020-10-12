@@ -198,8 +198,23 @@ class BatchControlService extends KalturaBaseService
 	 */
 	private function getOrCreateSchedulerByHost(KalturaScheduler $scheduler)
 	{
+		//make sure we dont have the same configured_id by mistake
+		if ($scheduler->configuredId)
+		{
+			$c = new Criteria();
+			$c->add(SchedulerPeer::CONFIGURED_ID, $scheduler->configuredId);
+			$c->add(SchedulerPeer::HOST, $scheduler->host, Criteria::NOT_EQUAL);
+			$schedulerDb = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+
+			if ($schedulerDb)
+			{
+				throw new KalturaAPIException(KalturaErrors::SCHEDULER_HOST_CONFLICT, $scheduler->configuredId, $scheduler->host, $schedulerDb->getHost());
+			}
+		}
+
 		$c = new Criteria();
 		$c->add ( SchedulerPeer::CONFIGURED_ID, null , criteria::ISNOTNULL);
+		$c->add ( SchedulerPeer::CONFIGURED_ID, 0 , criteria::NOT_EQUAL);
 		$c->add ( SchedulerPeer::HOST, $scheduler->host);
 		$schedulerDb = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
 

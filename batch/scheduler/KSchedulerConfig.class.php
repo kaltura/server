@@ -544,16 +544,14 @@ class KSchedulerConfig extends Zend_Config_Ini
 	 */
 	protected function initSchedulerId($hostname)
 	{
-		if (!is_null($this->getId()))
-		{
-			$this->schedulerId = $this->getId();
-			return true;
-		}
-
-		KalturaLog::debug("Scheduler ID not configured for hostname $hostname . Trying to retrieve scheduler id from server.");
 		$kalturaScheduler = new KalturaScheduler();
 		$kalturaScheduler->host = $hostname;
 		$kalturaScheduler->name = $hostname;
+		if ($this->getId())
+		{
+			$kalturaScheduler->configuredId = $this->getId();
+		}
+		KalturaLog::debug("Trying to retrieve scheduler for hostname $hostname for configuredId [ " . $kalturaScheduler->configuredId . "] from server.");
 		$scheulder = $this->kClient->batchcontrol->getOrCreateScheduler($kalturaScheduler);
 		if (!$scheulder)
 		{
