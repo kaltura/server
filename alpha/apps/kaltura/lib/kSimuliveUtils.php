@@ -9,15 +9,17 @@ class kSimuliveUtils
 	const SIMULIVE_SCHEDULE_MARGIN = 2;
 	const SECOND_IN_MILLISECONDS = 1000;
 	const LIVE_SCHEDULE_AHEAD_TIME = 60;
+	const MIN_DVR_WINDOW_MS = 30000;
+	const IS_LIVE_START_MARGIN_SEC = 3 * (LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS / 1000);
 	/**
 	 * @param LiveEntry $entry
 	 * @return array
 	 */
 	public static function getSimuliveEventDetails(LiveEntry $entry)
 	{
-		$dvrWindowMs = $entry->getDvrWindow() * self::MINUTE_TO_MS;
+		$dvrWindowMs = max($entry->getDvrWindow() * self::MINUTE_TO_MS, self::MIN_DVR_WINDOW_MS);
 		$dvrWindowSec = $dvrWindowMs / self::SECOND_IN_MILLISECONDS;
-		$currentEvent = self::getSimuliveEvent($entry, time() - $dvrWindowSec, $dvrWindowSec);
+		$currentEvent = self::getPlayableSimuliveEvent($entry, time() - $dvrWindowSec, $dvrWindowSec);
 		if (!$currentEvent)
 		{
 			return null;
@@ -79,6 +81,23 @@ class kSimuliveUtils
 		return $events ? $events[0] : null;
 	}
 
+	/**
+	 * @param Entry $entry
+	 * @param int $startTime - epoch time
+	 * @param int $duration - in sec
+	 * @return ILiveStreamScheduleEvent | null
+	 */
+	public static function getPlayableSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
+	{
+		$startTime = $startTime ? $startTime : time();
+		$event = self::getSimuliveEvent($entry, $startTime, $duration);
+		if ($event && ($startTime + $duration) >= ($event->getCalculatedStartTime() + self::IS_LIVE_START_MARGIN_SEC))
+		{
+			return $event;
+		}
+		return null;
+	}
+
 	public static function getIsLiveCacheTime (LiveEntry $entry)
 	{
 		if (!$entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
@@ -86,16 +105,17 @@ class kSimuliveUtils
 			return 0;
 		}
 		$nowEpoch = time();
-		$simuliveEvent = kSimuliveUtils::getSimuliveEvent($entry, $nowEpoch, self::LIVE_SCHEDULE_AHEAD_TIME);
+		$simuliveEvent = kSimuliveUtils::getPlayableSimuliveEvent($entry, $nowEpoch, self::LIVE_SCHEDULE_AHEAD_TIME);
 		if (!$simuliveEvent)
 		{
 			return self::LIVE_SCHEDULE_AHEAD_TIME;
 		}
-		if ($nowEpoch >= $simuliveEvent->getCalculatedStartTime() && $nowEpoch <= $simuliveEvent->getCalculatedEndTime())
+		$playableStartTime = $simuliveEvent->getCalculatedStartTime() + self::IS_LIVE_START_MARGIN_SEC;
+		if ($nowEpoch >= $playableStartTime && $nowEpoch < $simuliveEvent->getCalculatedEndTime())
 		{
 			return $simuliveEvent->getCalculatedEndTime() - $nowEpoch;
 		}
 		// conditional cache should expire when event start
-		return $simuliveEvent->getCalculatedStartTime() - $nowEpoch;
+		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
 	}
 }
