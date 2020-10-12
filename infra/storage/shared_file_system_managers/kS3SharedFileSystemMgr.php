@@ -733,6 +733,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			if ($success)
 				break;
 			
+			sleep(rand(2,5));
 			$retries--;
 		}
 		
