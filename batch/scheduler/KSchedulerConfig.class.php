@@ -71,6 +71,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public $errorLoading = false;
 
 	/**
+	 * @var int
+	 */
+	private $schedulerId;
+
+	/**
 	 * @param string $configFileName
 	 */
 	public function __construct($configFileName)
@@ -128,7 +133,23 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$this->hostName = $hostname;
 
 		$this->taskConfigList = array();
-		$schedulerId = $this->getSchedulerId($hostname);
+
+		if (!$this->schedulerId)
+		{
+			try
+			{
+				if (!$this->initSchedulerId($hostname))
+				{
+					return false;
+				}
+			}
+			catch(Exception $e)
+			{
+				KalturaLog::alert('Error loading SchedulerId from server! ' . $e->getMessage());
+				return false;
+			}
+		}
+
 		foreach ($this->enabledWorkers as $workerName => $maxInstances)
 		{
 			if (!$maxInstances)
@@ -138,7 +159,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setPartnerId($this->getPartnerId());
 			$task->setSecret($this->getSecret());
 			$task->setCurlTimeout($this->getCurlTimeout());
-			$task->setSchedulerId($schedulerId);
+			$task->setSchedulerId($this->schedulerId);
 			$task->setSchedulerName($this->getName());
 			$task->setServiceUrl($this->getServiceUrl());
 			$task->setS3Arn($this->getS3Arn());
@@ -415,6 +436,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 						file_put_contents($configFileName, $content);
 						$this->currentIniMd5 = $newIniMd5;
 						KalturaLog::log('Configuration Loaded from Server ' . date('H:i:s', $this->configTimestamp));
+						$this->schedulerId = null;
 						return true;
 					}
 					else
@@ -515,17 +537,37 @@ class KSchedulerConfig extends Zend_Config_Ini
 		return $configFilePaths;
 	}
 
-	protected function getSchedulerId($hostname)
+	/**
+	 * @param $hostname
+	 * @return bool
+	 * @throws KalturaClientException
+	 */
+	protected function initSchedulerId($hostname)
 	{
 		if (!is_null($this->getId()))
 		{
-			return $this->getId();
+			$this->schedulerId = $this->getId();
+			return true;
 		}
+
+		KalturaLog::debug("Scheduler ID not configured for hostname $hostname . Trying to retrieve scheduler id from server.");
 		$kalturaScheduler = new KalturaScheduler();
 		$kalturaScheduler->host = $hostname;
 		$kalturaScheduler->name = $hostname;
 		$scheulder = $this->kClient->batchcontrol->getOrCreateScheduler($kalturaScheduler);
-		return $scheulder->configuredId;
+		if (!$scheulder)
+		{
+			KalturaLog::alert('No Scheduler has be returned from server!');
+			return false;
+		}
+		if (is_null($scheulder->configuredId))
+		{
+			KalturaLog::alert('Empty schedulerId was retrieved from server for scheudler ' . print_r($scheulder, true));
+			return false;
+		}
+		KalturaLog::debug("Retrieved ID - " . $scheulder->configuredId);
+		$this->schedulerId = $scheulder->configuredId;
+		return true;
 	}
 }
 

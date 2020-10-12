@@ -392,6 +392,8 @@ class KalturaErrors extends APIErrors
 
 	const SCHEDULER_NOT_FOUND = "SCHEDULER_NOT_FOUND;ID;Scheduler id \"@ID@\" not found";
 
+	const MAX_CONFIGURED_ID_NOT_FOUND = "MAX_CONFIGURED_ID_NOT_FOUND;;Could not retrieve max configured_id";
+
 	const WORKER_NOT_FOUND = "WORKER_NOT_FOUND;ID;Worker id \"@ID@\" not found";
 
 	const COMMAND_NOT_FOUND = "COMMAND_NOT_FOUND;ID;Command id \"@ID@\" not found";
