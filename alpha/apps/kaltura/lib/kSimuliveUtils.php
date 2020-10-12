@@ -10,7 +10,7 @@ class kSimuliveUtils
 	const SECOND_IN_MILLISECONDS = 1000;
 	const LIVE_SCHEDULE_AHEAD_TIME = 60;
 	const MIN_DVR_WINDOW_MS = 30000;
-	const IS_LIVE_START_MARGIN_SEC = 3 * (LiveEntry::DEFAULT_SEGMENT_DURATION_MILLISECONDS / self::SECOND_IN_MILLISECONDS);
+	const MINIMUM_TIME_TO_PLAYABLE_SEC = 18; // 3 * default segment duration
 	/**
 	 * @param LiveEntry $entry
 	 * @return array
@@ -91,7 +91,7 @@ class kSimuliveUtils
 	{
 		$startTime = $startTime ? $startTime : time();
 		$event = self::getSimuliveEvent($entry, $startTime, $duration);
-		if ($event && ($startTime + $duration) >= ($event->getCalculatedStartTime() + self::IS_LIVE_START_MARGIN_SEC))
+		if ($event && ($startTime + $duration) >= ($event->getCalculatedStartTime() + self::MINIMUM_TIME_TO_PLAYABLE_SEC))
 		{
 			return $event;
 		}
@@ -110,7 +110,7 @@ class kSimuliveUtils
 		{
 			return self::LIVE_SCHEDULE_AHEAD_TIME;
 		}
-		$playableStartTime = $simuliveEvent->getCalculatedStartTime() + self::IS_LIVE_START_MARGIN_SEC;
+		$playableStartTime = $simuliveEvent->getCalculatedStartTime() + self::MINIMUM_TIME_TO_PLAYABLE_SEC;
 		if ($nowEpoch >= $playableStartTime && $nowEpoch < $simuliveEvent->getCalculatedEndTime())
 		{
 			return $simuliveEvent->getCalculatedEndTime() - $nowEpoch;
