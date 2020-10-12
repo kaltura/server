@@ -113,16 +113,10 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		if(in_array($object->getDc(), $dataCenters))
 		{
-			$currentDcId = kDataCenterMgr::getCurrentDcId();
-			$sufficientDc = kConf::get('source_dc_for_export', 'cloud_storage', $currentDcId);
-
-			if( $sufficientDc ==  $currentDcId)
+			$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
+			if(!$externalStorageProfiles)
 			{
-				$externalStorageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($object->getPartnerId());
-				if(!$externalStorageProfiles)
-				{
-					$exportToPeriodicStorage = true;
-				}
+				$exportToPeriodicStorage = true;
 			}
 		}
 		else
@@ -152,7 +146,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 				self::handleAssetStorageExports($srcFlavor);
 
 				//Periodic storage
-				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+				$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfilesByFlag();
+				if(!$periodicStorageProfiles)
+				{
+					$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfiles($srcFlavor->getPartnerId());
+				}
 				self::exportToPeriodicStorage($srcFlavor, $periodicStorageProfiles);
 				break;
 			}
@@ -550,6 +548,11 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		self::deleteAdditionalEntryFilesFromStorage($entry, $profile);
 	}
 
+	public static function getPeriodicStorageIds()
+	{
+		return kConf::get('periodic_storage_ids','cloud_storage', array());
+	}
+
 	public static function getPeriodicStorageIdsByPartner($partnerId)
 	{
 		$isPartnerValid = true;
@@ -577,15 +580,28 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 		if($isPartnerValid)
 		{
-			return kConf::get('periodic_storage_ids','cloud_storage', array());
+			return self::getPeriodicStorageIds();
 		}
 
 		return array();
 	}
 
+	public static function getPeriodicStorageProfilesByFlag()
+	{
+		$storageProfiles = array();
+		if( kConf::get('copy_all_content_to_cloud', 'cloud_storage', 0) )
+		{
+			$storageIds = self::getPeriodicStorageIds();
+			if($storageIds)
+			{
+				$storageProfiles = StorageProfilePeer::retrieveByPKs($storageIds);
+			}
+		}
+		return $storageProfiles;
+	}
+
 	public static function getPeriodicStorageProfiles($partnerId)
 	{
-		// check if should export to periodically only if we dont have existing storage profiles, if we do add export only after they finish
 		$externalStorages = array();
 		$storageIds = self::getPeriodicStorageIdsByPartner($partnerId);
 		if($storageIds)
@@ -610,6 +626,12 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($object->getObjectType() != FileSyncObjectType::ASSET || $object->getObjectSubType() != asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET)
 		{
 			return null;
+		}
+
+		$periodicStorageProfiles = kStorageExporter::getPeriodicStorageProfilesByFlag();
+		if($periodicStorageProfiles)
+		{
+			return $periodicStorageProfiles;
 		}
 
 		return kStorageExporter::getPeriodicStorageProfiles($object->getPartnerId());

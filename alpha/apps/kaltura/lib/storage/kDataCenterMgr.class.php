@@ -64,7 +64,7 @@ class kDataCenterMgr
 	{
 		if (is_null(self::$is_multi_dc))
 		{
-			$ids = self::getDcIds();
+			$ids = self::getDcIds(false);
 			self::$is_multi_dc = count($ids) > 1;
 		}
 		return self::$is_multi_dc;
@@ -78,10 +78,32 @@ class kDataCenterMgr
 			return self::getDcById( self::$s_current_dc );
 		return self::getDcById( $dc_config["current"] );
 	}
+	
+	public static function getSharedStorageProfileIds()
+	{
+		$sharedStorageProfileIdsStr = kConf::get('sharedStorageProfileIds', 'cloud_storage', null);
+		$sharedStorageProfileIds = array();
+		if($sharedStorageProfileIdsStr)
+		{
+			$sharedStorageProfileIds = explode(",", $sharedStorageProfileIdsStr);
+		}
+		
+		return $sharedStorageProfileIds;
+	}
+	
+	
+	public static function isDcIdShared($dcId)
+	{
+		$sharedStorageProfileIds = self::getSharedStorageProfileIds();
+		return in_array($dcId, $sharedStorageProfileIds);
+	}
 
 	// returns a tupple with the id and the DC's properties
 	public static function getDcById ( $dc_id , $partnerId = null)
 	{
+		if(self::isDcIdShared($dc_id))
+			$dc_id = kDataCenterMgr::getCurrentDcId();
+		
 		$dc_config = kConf::getMap("dc_config");
 		// find the dc with the desired id
 		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
@@ -89,7 +111,7 @@ class kDataCenterMgr
 			$dc = $dc_list[$dc_id];
 		else if ($partnerId)
 		{
-			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIdsByPartner($partnerId);
+			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIds();
 			if(in_array($dc_id, $cloudStorageProfileIds))
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);
@@ -112,11 +134,19 @@ class kDataCenterMgr
 //		return array ( $dc_id , $dc );
 	}
 
-	public static function getDcIds()
+public static function getDcIds($includeShared = true)
 	{
 		$dc_config = kConf::getMap("dc_config");
 		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
-		return array_keys($dc_list);
+		$dcIds = array_keys($dc_list);
+		
+		if($includeShared)
+		{
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$dcIds = array_merge($dcIds, $sharedDcIds);
+		}
+		
+		return $dcIds;
 	}
 		
 	public static function getAllDcs( $include_current = false )
@@ -194,12 +224,13 @@ class kDataCenterMgr
 		$file_hash = md5( $dc["secret" ] .  $file_sync_id );	// will be verified on the other side to make sure not some attack or external invalid request  
 		
 		$filename = 'f.' . $file_sync->getFileExt();
-		
-		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/f/$filename"; // or something similar
+		$objectId = $file_sync->getObjectId();
+		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/objectid/$objectId/f/$filename"; // or something similar
 		if($addBaseUrl)
 		{
 			$build_remote_url = $dc["url"] . $build_remote_url;
 		}
+		
 		return $build_remote_url;
 	}
 		
@@ -217,13 +248,13 @@ class kDataCenterMgr
 		$cmd_line = self::createCmdForRemoteDataCenter($file_sync);
 		$local_file_path = self::getLocalTempPathForFileSync($file_sync);
 		
-		if (!file_exists($local_file_path)) // don't need to fetch twice 
+		if (!kFile::checkFileExists($local_file_path)) // don't need to fetch twice
 		{ 
 			KalturaLog::log("Executing " . $cmd_line);
 			exec($cmd_line);
 			
 			clearstatcache();
-			if (!file_exists($local_file_path))
+			if (!kFile::checkFileExists($local_file_path))
 			{
 				KalturaLog::err("Temp file not retrieved [$local_file_path]");
 				return false;
@@ -249,7 +280,7 @@ class kDataCenterMgr
 		$current_dc = self::getCurrentDc();
 		$current_dc_id = $current_dc["id"];
 
-		if ( $file_sync->getDc() != $current_dc_id )
+		if ( $file_sync->getDc() != $current_dc_id && !kDataCenterMgr::isDcIdShared($file_sync->getDc()))
 		{
 			$error = "DC[$current_dc_id]: FileSync with id [$file_sync_id] does not belong to this DC";
 			KalturaLog::err($error); 
@@ -263,12 +294,12 @@ class kDataCenterMgr
 		
 		// check if file sync path leads to a file or a directory
 		$resolvedPath = $file_sync_resolved->getFullPath();
-		$fileSyncIsDir = is_dir($resolvedPath);
+		$fileSyncIsDir = kFile::isDir($resolvedPath);
 		if ($fileSyncIsDir && $file_name) {
 			$resolvedPath .= '/'.$file_name;
 		}
 		
-		if (!file_exists($resolvedPath))
+		if (!kFile::checkFileExists($resolvedPath))
 		{
 			$file_name_msg = $file_name ? "file name [$file_name] " : '';
 			$error = "DC[$current_dc_id]: Path for fileSync id [$file_sync_id] ".$file_name_msg."does not exist, resolved path [$resolvedPath]";
@@ -285,7 +316,7 @@ class kDataCenterMgr
 			KExternalErrors::dieError(KExternalErrors::INVALID_TOKEN);
 		}
 				
-		if ($fileSyncIsDir && is_dir($resolvedPath))
+		if ($fileSyncIsDir && kFile::isDir($resolvedPath))
 		{
 			KalturaLog::log("Serving directory content from [".$resolvedPath."]");
 			$contents = kFile::listDir($resolvedPath);

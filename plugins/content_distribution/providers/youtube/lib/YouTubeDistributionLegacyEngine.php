@@ -177,7 +177,7 @@ class YouTubeDistributionLegacyEngine extends PublicPrivateKeysDistributionEngin
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
-		if (!file_exists($videoFilePath))
+		if (!kFile::checkFileExists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 			
 		$thumbnailFilePath = $providerData->thumbAssetFilePath;
@@ -187,7 +187,7 @@ class YouTubeDistributionLegacyEngine extends PublicPrivateKeysDistributionEngin
 		$feed->setMetadataFromEntry();
 		$newPlaylists = $feed->setPlaylists($providerData->currentPlaylists);
 		$feed->setContentUrl('file://' . pathinfo($videoFilePath, PATHINFO_BASENAME));
-		if (file_exists($thumbnailFilePath))
+		if (kFile::checkFileExists($thumbnailFilePath))
 			$feed->setThumbnailUrl('file://' . pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 		$feed->setAdParams();
 			

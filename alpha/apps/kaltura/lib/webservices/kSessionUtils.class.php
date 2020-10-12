@@ -805,7 +805,7 @@ class ks extends kSessionBase
 			$cacheStore = kCacheManager::getCache($cacheSection);
 			if (!$cacheStore)
 				continue;
-			$cacheStore->set($cacheKey, array($adminSecretsAsString, $partner->getSecret(), $ksVersion));
+			$cacheStore->set($cacheKey, array($adminSecretsAsString, $partner->getSecret(), $ksVersion, $partner->getEnforceHttpsApi()));
 		}
 		return array($ksVersion, $adminSecretsAsString);
 	}

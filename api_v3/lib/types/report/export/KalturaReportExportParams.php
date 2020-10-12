@@ -22,10 +22,16 @@ class KalturaReportExportParams extends KalturaObject
 	 */
 	public $reportItems;
 
+	/**
+	 * @var string
+	 */
+	public $reportsItemsGroup;
+
 	private static $map_between_objects = array
 	(
 		"recipientEmail",
 		"reportItems",
+		"reportsItemsGroup",
 	);
 
 	public function getMapBetweenObjects()

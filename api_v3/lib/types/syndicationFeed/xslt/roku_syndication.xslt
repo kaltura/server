@@ -36,7 +36,7 @@
         <xsl:variable name="tags" select="tags" />
         <xsl:variable name="entryId" select="string(entryId)" />
         <item>
-            <guid isPermalink="false">
+            <guid isPermaLink="false">
                 <xsl:value-of select="string(entryId)" />
             </guid>
             <title>
@@ -45,9 +45,9 @@
             <description>
                 <xsl:value-of select="string(description)" disable-output-escaping="no" />
             </description>
-            <pubdate>
-                <xsl:value-of select="php:function('date', 'c', sum($stamp))"/>
-            </pubdate>
+            <pubDate>
+                <xsl:value-of select="php:function('date', 'D, d M Y\ H:i:s O', sum($stamp))" />
+            </pubDate>
             <!--<xsl:for-each select="$var1_content">-->
             <media:content>
                 <xsl:attribute name="url">

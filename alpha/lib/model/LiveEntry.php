@@ -10,6 +10,7 @@ abstract class LiveEntry extends entry
 	const SECONDARY_HOSTNAME = 'backupHostname';
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
+	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
@@ -475,6 +476,30 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @return array<ILiveStreamScheduleEvent>
+	 */
+	public function getScheduleEvents($startTime, $endTime)
+	{
+		KalturaLog::debug("getting schedule events between [$startTime] to [$endTime] for entryId " . $this->getId());
+		$events = array();
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaScheduleEventProvider');
+		foreach ($pluginInstances as $instance)
+		{
+			/* @var $instance IKalturaScheduleEventProvider */
+			$pluginEvents = $instance->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $startTime, $endTime);
+			if ($pluginEvents)
+			{
+				KalturaLog::debug('IKalturaScheduleEventProvider pluginEvents = ' . print_r($pluginEvents, true));
+				$events = array_merge($events, $pluginEvents);
+			}
+		}
+		return $events;
+	}
+
+
+	/**
 	 * @return boolean
 	 */
 	public function isCurrentlyLive($currentDcOnly = false)
@@ -483,6 +508,11 @@ abstract class LiveEntry extends entry
 		{
 			if (!$this->canViewExplicitLive())
 				return false;
+		}
+
+		if (kSimuliveUtils::getSimuliveEvent($this))
+		{
+			return true;
 		}
 
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
@@ -521,20 +551,24 @@ abstract class LiveEntry extends entry
 			return false;
 		
 		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore)
+		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
+		foreach ($cacheLayers as $cacheLayer)
 		{
-			KalturaLog::warning("Cache store [$cacheType] not found");
-			$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
-			$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
-			
-			return $lastUpdate <= $expiry;
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if($cacheStore)
+			{
+				$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
+				$ans = $cacheStore->get($key);
+				KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
+				return $ans;
+			}
 		}
 		
-		$key = $this->getEntryServerNodeCacheKey($liveEntryServerNode);
-		$ans = $cacheStore->get($key);
-		KalturaLog::debug("Get cache key [$key] from store [$cacheType] returned [$ans]");
-		return $ans;
+		KalturaLog::warning("Cache store [$cacheType] not found");
+		$lastUpdate = time() - $liveEntryServerNode->getUpdatedAt(null);
+		$expiry = kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY);
+		
+		return $lastUpdate <= $expiry;
 	}
 
 	/**
@@ -546,13 +580,22 @@ abstract class LiveEntry extends entry
 	private function storeInCache($key)
 	{
 		$cacheType = self::getCacheType();
-		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-		if(! $cacheStore) {
-			KalturaLog::debug("cacheStore is null. cacheType: $cacheType . returning false");
-			return false;
+		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
+		
+		$res = false;
+		foreach ($cacheLayers as $cacheLayer)
+		{
+			$cacheStore = kCacheManager::getCache($cacheLayer);
+			if(!$cacheStore) {
+				KalturaLog::debug("cacheStore is null. cacheType: $cacheType . skip to next one");
+				continue;
+			}
+			
+			KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
+			$res = $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
 		}
-		KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
-		return $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+		
+		return $res;
 	}
 
 	/**
@@ -573,7 +616,7 @@ abstract class LiveEntry extends entry
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
 
-		$dbLiveEntryServerNode = $this->getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $mediaServerNode->getId(), $applicationName);
+		$dbLiveEntryServerNode = $this->getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $mediaServerNode, $applicationName);
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
@@ -590,8 +633,9 @@ abstract class LiveEntry extends entry
 		return $dbLiveEntryServerNode;
 	}
 	
-	private function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $serverNodeId, $applicationName = null)
+	private function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, MediaServerNode $serverNode, $applicationName = null)
 	{
+		$serverNodeId = $serverNode->getId();
 		$shouldSave = false;
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		$dbLiveEntryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($this->getId(), $mediaServerIndex);
@@ -606,7 +650,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setServerNodeId($serverNodeId);
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
-			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
+			$dbLiveEntryServerNode->setDc($serverNode->getDc());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -616,12 +660,6 @@ abstract class LiveEntry extends entry
 		{
 			$shouldSave = true;
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);	
-		}
-		
-		if (kDataCenterMgr::getCurrentDcId() !== $dbLiveEntryServerNode->getDc())
-		{
-			$shouldSave = true;
-			$dbLiveEntryServerNode->setDc(kDataCenterMgr::getCurrentDcId());
 		}
 		
 		if ($dbLiveEntryServerNode->getServerNodeId() !== $serverNodeId)
@@ -674,7 +712,7 @@ abstract class LiveEntry extends entry
 		/* @var $dbLiveEntryServerNode LiveEntryServerNode */
 		foreach($dbLiveEntryServerNodes as $dbLiveEntryServerNode)
 		{
-			if ($dbLiveEntryServerNode->getDc() === kDataCenterMgr::getCurrentDcId() && !$this->isCacheValid($dbLiveEntryServerNode))
+			if ($dbLiveEntryServerNode->isDcValid() && !$this->isCacheValid($dbLiveEntryServerNode))
 			{
 				KalturaLog::info("Removing media server id [" . $dbLiveEntryServerNode->getServerNodeId() . "]");
 				$dbLiveEntryServerNode->deleteOrMarkForDeletion();

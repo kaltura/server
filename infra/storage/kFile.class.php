@@ -3,6 +3,9 @@
  * @package infra
  * @subpackage Storage
  */
+
+require_once(dirname(__FILE__) . '/shared_file_system_managers/kSharedFileSystemMgr.php');
+
 class kFile extends kFileBase
 {
 	const MO_PATTERN = "GNU message catalog";
@@ -22,31 +25,37 @@ class kFile extends kFileBase
 	 */
 	public static function listDir($path, $pathPrefix = '')
 	{
+		if (kFile::isSharedPath($path))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $sharedFsMgr->listFiles($path, $pathPrefix);
+		}
+		
 		$fileList = array();
 		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $path);
 		$handle = opendir($path);
 		if ($handle)
 		{
-		    while (false !== ($file = readdir($handle)))
-		    {
-		    	if ($file != '.' && $file != '..')
-		    	{
-		    		$fullPath = $path.'/'.$file;
-		    		$tmpPrefix = $pathPrefix.$file;
-		    		
-			    	if (is_dir($fullPath))
-			    	{
-			    		$tmpPrefix = $tmpPrefix.'/';
-			    		$fileList[] = array($tmpPrefix, 'dir', self::fileSize($fullPath));
-			    		$fileList = array_merge($fileList, self::listDir($fullPath, $tmpPrefix));
-			    	}	
-			    	else
-			    	{
-			    		$fileList[] = array($tmpPrefix, 'file', self::fileSize($fullPath));
-			    	}	    	
-		    	}
-		    }
-		    closedir($handle);
+			while (false !== ($file = readdir($handle)))
+			{
+				if ($file != '.' && $file != '..')
+				{
+					$fullPath = $path.'/'.$file;
+					$tmpPrefix = $pathPrefix.$file;
+					
+					if (is_dir($fullPath))
+					{
+						$tmpPrefix = $tmpPrefix.'/';
+						$fileList[] = array($tmpPrefix, 'dir', self::fileSize($fullPath));
+						$fileList = array_merge($fileList, self::listDir($fullPath, $tmpPrefix));
+					}
+					else
+					{
+						$fileList[] = array($tmpPrefix, 'file', self::fileSize($fullPath));
+					}
+				}
+			}
+			closedir($handle);
 		}
 		return $fileList;
 	}
@@ -102,8 +111,6 @@ class kFile extends kFileBase
 			return NULL;
 		
 		//		echo  ( "directory: " .$directory . "<br>" );
-		
-
 		$current_path = pathinfo($directory, PATHINFO_DIRNAME) . "/" . pathinfo($directory, PATHINFO_BASENAME) . "/";
 		// keep going until all files in directory have been read
 		while(($file = readdir($handler)) != NULL)
@@ -224,54 +231,66 @@ class kFile extends kFileBase
 	 * Doesn't support non-flat directories!
 	 * One can't use rename because rename isn't supported between partitions.
 	 */
-	private static function copyRecursively($src, $dest, $deleteSrc = false) {
-		if (is_dir($src)) {
-			
+	private static function copyRecursively($src, $dest, $deleteSrc = false)
+	{
+		if (kFile::isDir($src))
+		{
 			// Generate target directory
-			if (file_exists ($dest)) {
-				if (! is_dir($dest)) {
+			if (kFile::checkFileExists($dest))
+			{
+				if (! kFile::isDir($dest))
+				{
 					KalturaLog::err("Can't override a file with a directory [$dest]");
 					return false;
 				}
-			} else {
-				if (! mkdir($dest)) {
+			}
+			else
+			{
+				if (! kFile::mkdir($dest))
+				{
 					KalturaLog::err("Failed to create directory [$dest]");
 					return false;
 				}
 			}
 			
 			// Copy files
-			$dir = dir($src);
-			while ( false !== $entry = $dir->read () ) {
-				if ($entry == '.' || $entry == '..') {
-					continue;
-				}
-				
-				$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
-				if(is_dir($newSrc)) {
-					KalturaLog::err("Copying of non-flat directroeis is illegal");
-					return false;
-				}
-				
-				$res =  self::copySingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
-				if (! $res)
-					return false;
+			$success = kFile::copyDir($src, $dest, $deleteSrc);
+			if(!$success)
+			{
+				return false;
 			}
 			
 			// Delete source
-			if ($deleteSrc && (! rmdir($src))) {
+			if ($deleteSrc && (! kFile::rmdir($src)))
+			{
 				KalturaLog::err("Failed to delete source directory : [$src]");
 				return false;
 			}
-		} else {
-			$res = self::copySingleFile($src, $dest, $deleteSrc);
+		}
+		else
+		{
+			$res = kFile::copySingleFile($src, $dest, $deleteSrc);
 			if (! $res)
 				return false;
 		}
 		return true;
 	}
 	
-	private static function copySingleFile($src, $dest, $deleteSrc) {
+	
+	public static function copySingleFile($src, $dest, $deleteSrc)
+	{
+		if (kFile::isSharedPath($dest))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($dest);
+			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);
+		}
+		
+		if (kFile::isSharedPath($src))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($src);
+			return $sharedFsMgr->copySingleFile($src, $dest, $deleteSrc);
+		}
+		
 		if($deleteSrc)
 		{
 			// In case of move, first try to move the file before copy & unlink.
@@ -317,11 +336,12 @@ class kFile extends kFileBase
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		KalturaLog::debug("moveFile from [$from] to [$to] override_if_exists [$override_if_exists] copy [$copy]");
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 		
 		// Validation
-		if(!file_exists($from))
+		if(!kFile::checkFileExists($from))
 		{
 			KalturaLog::err("Source doesn't exist [$from]");
 			return false;
@@ -334,12 +354,12 @@ class kFile extends kFileBase
 		}
 		
 		// Preperation
-		if($override_if_exists && is_file($to))
+		if($override_if_exists && kFile::isFile($to))
 		{
 			self::deleteFile($to);
 		}
 		
-		if(! is_dir(dirname($to)))
+		if(!kFile::isDir(dirname($to)))
 		{
 			self::fullMkdir($to);
 		}
@@ -350,8 +370,8 @@ class kFile extends kFileBase
 	
 	public static function linkFile($from, $to, $overrideIfExists = false, $copyIfLinkFailed = true)
 	{
-		$from = str_replace("\\", "/", $from);
-		$to = str_replace("\\", "/", $to);
+		$from = kFile::fixPath($from);
+		$to = kFile::fixPath($to);
 		
 		if($overrideIfExists && (is_file($to) || is_link($to)))
 		{
@@ -420,7 +440,7 @@ class kFile extends kFileBase
 			if($extraHeaders)
 				curl_setopt($ch, CURLOPT_HTTPHEADER, $extraHeaders);
 			
-		// grab URL and pass it to the browser
+			// grab URL and pass it to the browser
 			$content = curl_exec($ch);
 			
 			// close curl resource, and free up system resources
@@ -440,7 +460,6 @@ class kFile extends kFileBase
 		$add_content = (strpos($file_full_path, ".txt") !== false || strpos($file_full_path, ".log") !== false);
 		
 		return new kFileData($file_full_path, $add_content);
-	
 	}
 	
 
@@ -491,6 +510,10 @@ class kFile extends kFileBase
 	
 	public static function closeDbConnections()
 	{
+		kQueryCache::close();
+		kCacheManager::close();
+		kCacheConfFactory::close();
+
 		// close all opened db connetion while we end an action with a long executing operation such as dumping a file.
 		// this will limit the number of concurrent db connections as dumping a file make take a long time
 

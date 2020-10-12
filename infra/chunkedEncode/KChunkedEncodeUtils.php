@@ -53,7 +53,8 @@
 		
 		public $createFolder = 1;
 		public $cleanUp = 1;
-
+		public $sharedChunkPath = null; //Added to support FS wrappers which do not support shared NFS storage (S3)
+		
 		/********************
 		 * C'tor
 		 */

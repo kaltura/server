@@ -42,6 +42,11 @@ class kCacheManager
 
 	protected static $caches = array();
 	
+	public static function close()
+	{
+		self::$caches = array();
+	}
+
 	/**
 	 * @param string $cacheType
 	 * @return array

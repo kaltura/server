@@ -19,8 +19,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($ffmpegBin)){
 			$this->cmdPath = $ffmpegBin;
 		}
-		else if(kConf::hasParam('bin_path_ffmpeg')) {
-			$this->cmdPath = kConf::get('bin_path_ffmpeg');
+		else if(kConf::hasParam(kFfmpegUtils::FFMPEG_PATH_CONF_NAME)) {
+			$this->cmdPath = kConf::get(kFfmpegUtils::FFMPEG_PATH_CONF_NAME);
 		}
 		else{
 			$this->cmdPath = "ffmpeg";
@@ -36,7 +36,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$this->ffprobeBin = "ffprobe";
 		}
 		if(strstr($filePath, "http")===false) {
-			if (!file_exists($filePath))
+			if (!kFile::checkFileExists($filePath))
 				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 		}
 		parent::__construct($filePath);
@@ -48,10 +48,12 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected function getCommand($filePath=null)
 	{
 		if(!isset($filePath)) $filePath=$this->filePath;
+		$filePath = kFile::realPath($filePath);
+		
 		if(isset($this->encryptionKey))
-			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i \"{$filePath}\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 		else	
-			return "{$this->ffprobeBin} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+			return "{$this->ffprobeBin} -i \"{$filePath}\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 	}
 	
 	/**
@@ -60,6 +62,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	public function getRawMediaInfo($filePath=null)
 	{
 		if(!isset($filePath)) $filePath=$this->filePath;
+		$filePath = kFile::realPath($filePath);
+		
 		$cmd = $this->getCommand($filePath);
 		KalturaLog::debug("Executing '$cmd'");
 		$output = shell_exec($cmd);
@@ -89,7 +93,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				$mediaInfo = new KalturaMediaInfo();
 				$mediaInfo->containerFormat = "arf";
 				$mediaInfo->containerId = "arf";
-				$mediaInfo->fileSize = round(filesize($this->filePath)/1024);
+				$mediaInfo->fileSize = round(kFile::fileSize($this->filePath)/1024);
 				return $mediaInfo;
 			}
 			return null;
@@ -117,7 +121,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 * To be handled by mencoder in auto-inter-src mode
 		 */
 		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3"))){
-			$cmd = "$this->cmdPath -i $this->filePath 2>&1 ";
+			$cmd = "$this->cmdPath -i \"$this->filePath\" 2>&1 ";
 			$output = shell_exec($cmd);
 			if(strstr($output,"Progressive Segmented")){
 				if(isset($mediaInfo->contentStreams) && count($mediaInfo->contentStreams['video'])>0){
@@ -127,6 +131,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
+//if($this->newFlow!=0)
+		$mediaInfo = self::convertToMediaInfoNames($mediaInfo);
+
 		return $mediaInfo;
 	}
 	
@@ -508,7 +515,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($detectDur) && $detectDur>0){
 			$cmdLine.= "-t $detectDur";
 		}
-		$cmdLine.= " -i $srcFileName $detectFiltersStr -nostats -f null dummyfilename 2>&1";
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine.= " -i \"$srcFileName\" $detectFiltersStr -nostats -f null dummyfilename 2>&1";
 		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
 	
 		/*
@@ -620,6 +629,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				$trimStr = ",trim=duration=$duration";
 		}
 		
+		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time";
 		KalturaLog::log("$cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
@@ -728,8 +738,9 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 */
 		if(stristr(PHP_OS,'win')) $nullDev = "NULL";
 		else $nullDev = "/dev/null";
-
-		$cmdLine = "$ffmpegBin -filter:v idet -frames:v $frames -an -f rawvideo -y $nullDev -i $srcFileName -nostats  2>&1";
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -filter:v idet -frames:v $frames -an -f rawvideo -y $nullDev -i \"$srcFileName\" -nostats  2>&1";
 		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
@@ -772,6 +783,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		 */
 		if(stristr(PHP_OS,'win')) return 1;
 		
+		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "dd if=$srcFileName count=1 | $ffprobeBin -i pipe:  2>&1";
 		KalturaLog::log("FastStart detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine, $outputArr, $rv);
@@ -813,8 +825,9 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		KalturaLog::log("srcFileName($srcFileName)");
 			
 		$trimStr=null;
-			
-		$cmdLine = "$ffprobeBin $srcFileName -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffprobeBin \"$srcFileName\" -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
 		KalturaLog::log("$cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
@@ -838,7 +851,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	public static function retrieveVolumeLevels($ffprobeBin, $srcFileName, $reset=1)
 	{
 		KalturaLog::log("srcFileName($srcFileName)");
-				
+		
+		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
 		KalturaLog::log("$cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
@@ -888,7 +902,6 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	private static function parsePixelFormat($pixelFormat, KalturaMediaInfo $mediaInfo)
 	{
 		KalturaLog::log("In - pixelFormat:$pixelFormat");
-//$pixelFormat='yuv422pzzz';;//
 		$rv = preg_match('/\s*([a-z]+)\s*([0-9]+)\s*([a-z]*)\s*([0-9]*)/', $pixelFormat, $matches, PREG_OFFSET_CAPTURE);
 		if($rv===false || !(isset($matches) && is_array($matches) and count($matches)>=3)){
 			KalturaLog::log("Out - Unrecognized pixelFormat");
@@ -903,5 +916,75 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			$bitsDepth = null;
 		KalturaLog::log("Out - colorSpace:$mediaInfo->colorSpace, chromaSubsampling:$mediaInfo->chromaSubsampling, bitsDepth:$bitsDepth");
 	}
-};
+	
+	/**
+	 * convertToMediaInfoNames
+	 *
+	 * @param KalturaMediaInfo $mediaInfo
+	 */	
+	private static function convertToMediaInfoNames($mediaInfo)
+	{
+			$containerFormatList = array (
+				"mov" => 		"mpeg-4",	
+				"mpegts" =>     "mpeg-ts",		
+				"wav" =>		"wave",		
+				"mpegvideo" =>  "mpeg video",
+				"mp4" =>        "mpeg-4",		
+				"rm" =>         "realmedia",	
+				"3gp" =>        "mpeg-4",	
+			);
+			$audioFormatList = array (
+				"pcm_s24le" =>	"pcm",	
+				"pcm_dvd" =>    "pcm",	
+				"aac_latm" =>   "aac",	
+				"wmalossless" =>"wma",	
+				"adpcm_ima_wav" =>  "adpcm",	
+				"cook" =>		"cooker",
+				"pcm_s16be" =>	"pcm",
+				"pcm_s16le" =>  "pcm",	
+				"pcm_s24be" =>	"pcm",
+				"pcm_s24le" =>  "pcm",	
+				"pcm_f32be" =>  "pcm",	
+				"pcm_f32le" =>	"pcm",	
+				"pcm_u8" =>     "pcm",	
+			);
+			$videoFormatList = array (
+				"h264" =>		"avc",		
+				"hevc" =>	    "hvc1",			
+				"mjpeg" =>	    "jpeg",			
+				"vp9" =>	    "v_vp9",			
+				"flv1" =>	    "sorenson spark",
+				"mss2" =>	    "windows media",	
+				"rv30" =>	    "realvideo 3",	
+				"msmpeg4v3" =>	"mpeg-4 visual",	
+				"msmpeg4v2" =>	"mpeg-4 visual",	
+				"cinepak" =>	"cinepack",		
+				"svq3" =>		"sorenson 3",
+			);
 
+			if($mediaInfo->containerFormat!='image2') {
+				if(key_exists($mediaInfo->videoFormat,$videoFormatList)==true)
+					$mediaInfo->videoFormat = $videoFormatList[$mediaInfo->videoFormat];
+			}
+
+			$mkvCodecList = array (
+				"vp9" =>	"v_vp9",			
+				"v_vp9" =>	"v_vp9",			
+				"vp8" =>	"v_vp8",			
+				"vorbis" =>	"a_vorbis"
+			);
+			if(key_exists($mediaInfo->videoFormat,$mkvCodecList)==true)
+				$mediaInfo->videoCodecId = $mkvCodecList[$mediaInfo->videoFormat];
+
+			if(key_exists($mediaInfo->audioFormat,$audioFormatList)==true)
+				$mediaInfo->audioFormat = $audioFormatList[$mediaInfo->audioFormat];
+			if(key_exists($mediaInfo->audioFormat,$mkvCodecList)==true)
+				$mediaInfo->audioCodecId = $mkvCodecList[$mediaInfo->audioFormat];
+
+			if(key_exists($mediaInfo->containerFormat,$containerFormatList)==true)
+				$mediaInfo->containerFormat = $containerFormatList[$mediaInfo->containerFormat];
+
+		return $mediaInfo;
+	}
+
+};

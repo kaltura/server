@@ -72,8 +72,17 @@ class kEncryptFileUtils
         try
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
+            $srcFilePath = kFile::realPath($srcFilePath);
             $fd1 = fopen($srcFilePath, "rb");
+            if ($fd1 === false)
+            {
+                return false;
+            }
             $fd2 = fopen($tempPath, "w");
+            if ($fd2 === false)
+            {
+                return false;
+            }
             while (!feof($fd1))
             {
                 $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
@@ -84,7 +93,7 @@ class kEncryptFileUtils
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
             // adding @ to avoid valid case which in 2 process creating clear file at the same time
-            return @rename($tempPath, $dstFilePath);
+            return @kFile::rename($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
@@ -100,7 +109,7 @@ class kEncryptFileUtils
     {
         $tempPath = self::getClearTempPath($filePath);
         self::decryptFile($filePath, $key, $iv, $tempPath);
-        infraRequestUtils::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
+        kFile::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
         unlink($tempPath);
         return;
     }
@@ -110,7 +119,7 @@ class kEncryptFileUtils
         $size = kFileBase::fileSize($filePath);
         if (!$key)
             return $size;
-        
+
         if ($size < self::ENCRYPT_INTERVAL)
             return strlen(self::getEncryptedFileContent($filePath, $key, $iv, 0, -1));
 
@@ -120,7 +129,7 @@ class kEncryptFileUtils
         unlink($tempPath);
         return $size;
     }
-    
+
     public static function encryptFolder($dirName, $key, $iv)
     {
         $filesPaths = kFile::dirList($dirName);
@@ -137,11 +146,11 @@ class kEncryptFileUtils
         else if (is_dir($path))
             return self::encryptFolder($path, $key, $iv);
     }
-    
+
     public static function getClearTempPath($path)
     {
         return sys_get_temp_dir(). "/clear_" . pathinfo($path, PATHINFO_BASENAME);
     }
 
-    
+
 }

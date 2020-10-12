@@ -153,7 +153,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	private function filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance)
 	{
 		return array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType) {
-			if ($requestedServerType && $esn->getServerType() != $requestedServerType)
+			if (!is_null($requestedServerType) && $esn->getServerType() != $requestedServerType)
 				return false; // if request specific type then ignore all others
 			$esn->serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $esn->getServerNodeId());
 			if (!$esn->serverNode)

@@ -100,6 +100,15 @@ class kPlayManifestCacher extends kApiCache
 	public function storeRendererToCache($renderer)
 	{
 		$requiredFiles = $renderer->getRequiredFiles();
+		
+		$baseAppDir = kConf::get('kaltura_app_root_path', 'local', null);
+		if($baseAppDir)
+		{
+			foreach ($requiredFiles as &$fileName)
+			{
+				$fileName = str_replace(realpath($baseAppDir), $baseAppDir, $fileName);
+			}
+		}
 	
 		parent::storeCache($renderer, implode(',', $requiredFiles), true);
 	}

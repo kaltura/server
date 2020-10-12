@@ -10,12 +10,12 @@ require_once(ROOT_DIR . '/alpha/config/kConf.php');
 class OldLogRecordsFilter
 {
 	private $logId;
-	
+
 	function __construct($logId)
 	{
 		$this->logId = $logId;
 	}
-	
+
 	function filter($i)
 	{
 		return $i > $this->logId;
@@ -109,7 +109,7 @@ while (true)
 	}
 
 	$elasticLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxLogReadConn, SphinxLogType::ELASTIC);
-	
+
 	while (!count($elasticLogs))
 	{
 		$skipExecutedUpdates = true;
@@ -129,25 +129,25 @@ while (true)
 		$assocElasticLogs[$key] = $log;
 	}
 	$elasticLogs = $assocElasticLogs;
-	
+
 	$ping = $elasticClient->ping();
-	
+
 	if (!$ping)
 	{
 		KalturaLog::err('cannot connect to elastic cluster with client[' . print_r($elasticClient, true) . ']');
 		sleep(5);
 		continue;
 	}
-	
+
 	foreach ($elasticLogs as $elasticLog)
 	{
 		/* @var $elasticLog SphinxLog */
 		$dc = $elasticLog->getDc();
 		$executedServerId = $elasticLog->getExecutedServerId();
 		$elasticLogId = $elasticLog->getId();
-		
+
 		$serverLastLog = null;
-		
+
 		if (isset($lastLogs[$dc]))
 		{
 			$serverLastLog = $lastLogs[$dc];
@@ -157,13 +157,13 @@ while (true)
 			$serverLastLog = new SphinxLogServer();
 			$serverLastLog->setServer($elasticCluster);
 			$serverLastLog->setDc($dc);
-			
+
 			$lastLogs[$dc] = $serverLastLog;
 		}
-		
+
 		$handledRecords[$dc][] = $elasticLogId;
 		KalturaLog::log("Elastic log id $elasticLogId dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
-		
+
 		try
 		{
 			$objectId = $elasticLog->getObjectId();
@@ -181,29 +181,29 @@ while (true)
 				$command = unserialize($command);
 				$index = $command['index'];
 				$action = $command['action'];
-				
+
 				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
 				{
-					$response = $elasticClient->$action($command);
+					$response = $elasticClient->addToBulk($command);
 				}
-				
+
 				unset($objectIdElasticLog[$objectId]);
-				
+
 				if (count($objectIdElasticLog) > $maxIndexHistory)
 				{
 					reset($objectIdElasticLog);
 					$oldestElementKey = key($objectIdElasticLog);
 					unset($objectIdElasticLog[$oldestElementKey]);
 				}
-				
+
 				$objectIdElasticLog[$objectId] = $elasticLogId;
 			}
-			
+
 			// If the record is an historical record, don't take back the last log id
 			if ($serverLastLog->getLastLogId() < $elasticLogId)
 			{
 				$serverLastLog->setLastLogId($elasticLogId);
-				
+
 				// Clear $handledRecords from before last - gap.
 				foreach ($serverLastLogs as $serverLastLog)
 				{
@@ -218,12 +218,21 @@ while (true)
 			KalturaLog::err($e->getMessage());
 		}
 	}
-	
+
+	try
+	{
+		$response = $elasticClient->flushBulk();
+	}
+	catch(Exception $e)
+	{
+		KalturaLog::err($e->getMessage());
+	}
+
 	foreach ($lastLogs as $serverLastLog)
 	{
 		$serverLastLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
 	}
-	
+
 	SphinxLogPeer::clearInstancePool();
 	kMemoryManager::clearMemory();
 }

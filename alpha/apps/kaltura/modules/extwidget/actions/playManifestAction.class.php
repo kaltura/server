@@ -18,6 +18,8 @@ class playManifestAction extends kalturaAction
 	);
 	const FLAVOR_GROUPING_PERCENTAGE_FACTOR = 0.05; // 5 percent
 	const WATERMARK = 'watermark';
+	const ENTRY_TYPE_VOD = 'vod';
+	const ENTRY_TYPE_LIVE = 'live';
 
 	/**
 	 * When this list start to contain plugins - 
@@ -377,6 +379,7 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_CHANNEL:
+			case entryType::LIVE_STREAM:
 				break;
 
 			case entryType::PLAYLIST:
@@ -625,12 +628,11 @@ class playManifestAction extends kalturaAction
 		return assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 	}
 	
-	protected function initFlavorAssetArray()
+	protected function initFlavorAssetArray($oneOnly = false)
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
 			return;
 		
-		$oneOnly = false;
 		if(in_array($this->deliveryAttributes->getFormat(), 
 			array(PlaybackProtocol::HTTP, PlaybackProtocol::RTSP, self::URL, self::DOWNLOAD)))
 		{
@@ -682,7 +684,7 @@ class playManifestAction extends kalturaAction
 		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
-		$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+		$cloudStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
@@ -855,7 +857,7 @@ class playManifestAction extends kalturaAction
 	
 	protected function initDeliveryProfile()
 	{
-		if ($this->deliveryAttributes->getStorageId())
+		if ($this->deliveryAttributes->getStorageId() && (!in_array($this->deliveryAttributes->getStorageId(), kStorageExporter::getPeriodicStorageIds())))
 		{
 			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
@@ -919,6 +921,18 @@ class playManifestAction extends kalturaAction
 				{
 					$this->initFlavorAssetArray();
 					$this->initEntryDuration();
+				}
+				break;
+
+			case entryType::LIVE_STREAM:
+				$time = $this->getRequestParameter("scheduleTime", null);
+				$event = kSimuliveUtils::getSimuliveEvent($this->entry, $time);
+				if ($event)
+				{
+					$this->entryId = $event->getSourceEntryId();
+					$sourceEntry = BaseentryPeer::retrieveByPK($this->entryId);
+					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
+					$this->initFlavorAssetArray(true);
 				}
 				break;
 		}
@@ -1297,13 +1311,21 @@ class playManifestAction extends kalturaAction
 			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
-				$entryType = 'vod';
+				$entryType = self::ENTRY_TYPE_VOD;
 				break;
 				
-			case entryType::LIVE_STREAM:			
-				// Live stream
-				$renderer = $this->serveLiveEntry();
-				$entryType = 'live';
+			case entryType::LIVE_STREAM:
+				$time = $this->getRequestParameter("scheduleTime", null);
+				if (kSimuliveUtils::getSimuliveEvent($this->entry, $time))
+				{
+					$renderer = $this->serveVodEntry();
+					$entryType = self::ENTRY_TYPE_VOD;
+				} else
+				{
+					// Live stream
+					$renderer = $this->serveLiveEntry();
+					$entryType = self::ENTRY_TYPE_LIVE;
+				}
 				break;
 			
 			default:

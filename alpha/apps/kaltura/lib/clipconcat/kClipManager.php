@@ -360,7 +360,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 */
 	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
-	                             array $operationAttributes, $priority = 0)
+								 array $operationAttributes, $priority = 0)
 	{
 		$batchArray = array();
 		$order = 0;
@@ -477,6 +477,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset->setStatus(asset::ASSET_STATUS_QUEUED);
 		$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorAsset->setIsOriginal(false);
+		/*
+		 * TODO - AWS - Handle shared concat flow
+		 * When using shared storage based on partner we need to set file ext and version so that the shared file paths will be created correctly
+		 *
+		$flavorAsset->setFileExt("mp4");
+		$flavorAsset->setVersion(0);
+		*/
 		$flavorAsset->save();
 		return $flavorAsset;
 	}
@@ -499,6 +506,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$tempEntry->setSourceType(EntrySourceType::CLIP);
 		$tempEntry->setKuserId(kCurrentContext::getCurrentKsKuserId());
 		$tempEntry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($partnerId)->getId());
+		$tempEntry->setIsTemporary(true);
 		$tempEntry->save();
 		KalturaLog::info('Temp ClipConcat Entry Created, Entry ID:  ' . $tempEntry->getId());
 		return $tempEntry;

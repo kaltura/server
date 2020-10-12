@@ -247,6 +247,7 @@ class sftpMgr extends kFileTransferMgr
 			if($stream)
 			{
 				// Writes the file in chunks (for large files bug)
+				$localFile = kFile::realPath($localFile);
 				$fileToReadHandle = fopen($localFile, "r");
 				$ret = $this->writeFileInChunks($fileToReadHandle, $stream);
 				@fclose($fileToReadHandle);
@@ -327,7 +328,7 @@ class sftpMgr extends kFileTransferMgr
 	 */
 	protected function doChmod($remoteFile, $mode)
 	{
-		if($this->useCmdChmod)
+		if($this->useCmdChmod && !$this->passphrase)
 			return $this->execSftpCommand("chmod $mode \"$remoteFile\"");
 			
 		$chmod_cmd = "chmod $mode $remoteFile";

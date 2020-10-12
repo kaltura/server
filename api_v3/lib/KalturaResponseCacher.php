@@ -397,7 +397,13 @@ class KalturaResponseCacher extends kApiCache
 		{
 			return;			// can't find the secrets of the partner in the cache
 		}
-		list($adminSecrets, $userSecret, $ksVersion) = $secrets;
+		list($adminSecrets, $userSecret, $ksVersion, $enforceHttpsApi) = $secrets;
+
+		if ($enforceHttpsApi && infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS)
+		{
+			return;
+		}
+
 		$paramSecret = $params['secret'];
 		$adminSecretArray = explode(',', $adminSecrets);
 		if(!self::matchParamSecret($paramSecret, $adminSecretArray, $userSecret, $type))
@@ -514,6 +520,13 @@ class KalturaResponseCacher extends kApiCache
 		{
 			$postProcessorClass = new ReflectionClass(self::$_responsePostProcessor);
 			$fileName = $postProcessorClass->getFileName();
+			
+			$baseAppDir = kConf::get('kaltura_app_root_path', 'local', null);
+			if($baseAppDir)
+			{
+				$fileName = str_replace(realpath($baseAppDir), $baseAppDir, $fileName);
+			}
+			
 			$responsePostProcessor = array($fileName => serialize(self::$_responsePostProcessor));
 			$responseMetadata['responsePostProcessor'] = $responsePostProcessor;
 		}

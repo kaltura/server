@@ -103,7 +103,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'value'			=> 'en',
 		));
-		
+
 		$arr = array();
 		foreach(Zend_Registry::get('config')->languages as $language)
 			$arr[$language->id] = $language->name;

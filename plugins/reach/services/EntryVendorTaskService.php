@@ -524,7 +524,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			$finalPath .= "dueDate/$dueDate/";
 		}
 		$finalPath .= 'ks/' . kCurrentContext::$ks;
-		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $finalPath;
+		$url = 'http://' . kConf::get('www_host') . $finalPath;
 		return $url;
 	}
 }

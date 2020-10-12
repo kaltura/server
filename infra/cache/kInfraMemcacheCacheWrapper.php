@@ -41,12 +41,26 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		return $this->reconnect();
 	}
 	
+	public function __destruct()
+	{
+		$this->close();
+	}
+
+	protected function close()
+	{
+		if ($this->memcache)
+		{
+			$this->memcache->close();
+		}
+		$this->memcache = null;
+	}
+
 	/**
 	 * @return bool false on error
 	 */
 	protected function reconnect()
 	{
-		$this->memcache = null;
+		$this->close();
 		
 		if ($this->connectAttempts >= self::MAX_CONNECT_ATTEMPTS)
 		{

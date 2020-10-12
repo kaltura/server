@@ -141,8 +141,13 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'label'			=> 'Export all assets periodically:',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('text', 'pathPrefix', array(
+			'label'			=> 'Delivery path prefix:',
+			'filters'		=> array('StringTrim'),
+		));
 
-		$this->addDisplayGroup ( array ('exportPeriodically', 'delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
+		$this->addDisplayGroup ( array ('exportPeriodically', 'pathPrefix', 'delivery_profile_ids', 'deliveryFormat', 'editDeliveryProfiles' ), 'playback_info', array ('legend' => 'Delivery Details' ) );
 
 		$this->addElement('hidden', 'crossLine4', array(
 				'lable'			=> 'line',

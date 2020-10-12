@@ -195,9 +195,15 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveEntries = $this->getLiveEntriesForPartner($liveEntryPartner->getId(), $liveEntry->getId());
 		$maxPassthroughStreams = $liveEntryPartner->getMaxLiveStreamInputs();
 		KalturaLog::debug("Max Passthrough streams [$maxPassthroughStreams]");
-		$adminTagsOrigLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
-		$adminTagsCounters = $adminTagsOrigLimits;
+		$adminTagsLimits = $liveEntryPartner->getMaxConcurrentLiveByAdminTag();
+		KalturaLog::debug('Current AdminTags: [' . $liveEntry->getAdminTags() . '] AdminTag limits : [' . print_r($adminTagsLimits, true) . ']');
+		$isCloudTranscode = $this->isCloudTranscode($liveEntry->getConversionProfileId());
 		
+		// If the entry is limited by adminTag, no other limit will be checked
+		if($this->isAdminTagLimited($liveEntry, array_keys($adminTagsLimits)))
+		{
+			return $this->validateAdminTagLimits($liveEntry, $liveEntries, $adminTagsLimits);
+		}
 		$maxTranscodedStreams = 0;
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_STREAM_TRANSCODE, $liveEntryPartner->getId()))
 		{
@@ -209,17 +215,10 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entryConversionProfiles[$liveEntry->getConversionProfileId()][] = $liveEntry->getId();
 		foreach($liveEntries as $entry)
 		{
-			if(!$this->updateAdminTagsCounters($entry, $adminTagsCounters))
+			if(!$this->isAdminTagLimited($entry, array_keys($adminTagsLimits)))
 			{
 				/* @var $entry LiveEntry */
 				$entryConversionProfiles[$entry->getConversionProfileId()][] = $entry->getId();
-			}
-		}
-		foreach (explode(',', $liveEntry->getAdminTags()) as $adminTag)
-		{
-			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
-			{
-				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $liveEntry->getId(), $adminTag, $adminTagsOrigLimits[$adminTag]);
 			}
 		}
 		
@@ -227,30 +226,22 @@ class LiveStreamService extends KalturaLiveEntryService
 		$transcodedEntriesCount = 0;
 		foreach($entryConversionProfiles as $conversionProfileId => $entriesArray)
 		{
-			$isCloud = false;
-			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
-			foreach($flavorParamsConversionProfile as $flavorParamConversionProfile)
+			if($this->isCloudTranscode($conversionProfileId))
 			{
-				/* @var $flavorParamConversionProfile flavorParamsConversionProfile */
-				if($flavorParamConversionProfile->getOrigin() == KalturaAssetParamsOrigin::CONVERT)
-				{
-					$isCloud = true;
-					break;
-				}
-			}
-			
-			if($isCloud)
 				$transcodedEntriesCount += count($entriesArray);
+			}
 			else
+			{
 				$passthroughEntriesCount += count($entriesArray);
+			}
 		}
 		
 		KalturaLog::debug("Live transcoded entries [$transcodedEntriesCount], max live transcoded streams [$maxTranscodedStreams]");
-		if($transcodedEntriesCount > $maxTranscodedStreams)
+		if($isCloudTranscode && ($transcodedEntriesCount > $maxTranscodedStreams))
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED, $liveEntry->getId());
 		
 		KalturaLog::debug("Live Passthrough entries [$passthroughEntriesCount], max live Passthrough streams [$maxPassthroughStreams]");
-		if($passthroughEntriesCount > $maxPassthroughStreams)
+		if(!$isCloudTranscode && ($passthroughEntriesCount > $maxPassthroughStreams))
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU, $liveEntry->getId());
 	}
 	
@@ -369,7 +360,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
-	public function isLiveAction ($id, $protocol)
+	public function isLiveAction ($id, $protocol = null)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -394,6 +385,12 @@ class LiveStreamService extends KalturaLiveEntryService
 
 		/* @var $liveStreamEntry LiveStreamEntry */
 	
+		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
+		if ($simuliveCondCacheTime)
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
+		}
+
 		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			return $this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
@@ -439,6 +436,30 @@ class LiveStreamService extends KalturaLiveEntryService
 					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 					if($urlManager)
 						return $this->responseHandlingIsLive($urlManager->isLive($url));
+				}
+				break;
+
+			case null:
+				$resultIsLive = null;
+				$configurations = $liveStreamEntry->getLiveStreamConfigurations(requestUtils::getProtocol());
+				foreach ($configurations as $config)
+				{
+					$dpda->setFormat($config->getProtocol());
+					$url = $config->getUrl();
+					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
+					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+					if($urlManager)
+					{
+						$resultIsLive = $this->responseHandlingIsLive($urlManager->isLive($url));
+						if ($resultIsLive)
+						{
+							return $resultIsLive;
+						}
+					}
+				}
+				if ($resultIsLive !== null)
+				{
+					return $resultIsLive;
 				}
 				break;
 		}
@@ -756,6 +777,66 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 		}
 		return $counterChanged;
+	}
+
+	/**
+	 * Checking whether conversionProfileId is cloud transcode
+	 *
+	 * @param int $conversionProfileId
+	 * @return boolean
+	 */
+	protected function isCloudTranscode($conversionProfileId)
+	{
+		$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
+		foreach($flavorParamsConversionProfile as $flavorParamConversionProfile)
+		{
+			/* @var $flavorParamConversionProfile flavorParamsConversionProfile */
+			if($flavorParamConversionProfile->getOrigin() == KalturaAssetParamsOrigin::CONVERT)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checking whether $entry is limited by adminTags existing in $limitedAdminTags
+	 *
+	 * @param LiveEntry $entry
+	 * @param array $limitedAdminTags
+	 * @return boolean
+	 */
+	protected function isAdminTagLimited(LiveEntry $entry, $limitedAdminTags)
+	{
+		return count(array_intersect(explode(',', $entry->getAdminTags()), $limitedAdminTags)) !== 0;
+	}
+
+
+	/**
+	 * Validating adminTag limits not reached.
+	 *
+	 * @param LiveEntry $currentEntry
+	 * @param array $liveEntries
+	 * @param array $adminTagsLimits
+	 * @throws KalturaAPIException
+	 */
+	protected function validateAdminTagLimits(LiveEntry $currentEntry, $liveEntries, $adminTagsLimits)
+	{
+		$adminTagsCounters = $adminTagsLimits;
+		foreach($liveEntries as $entry)
+		{
+			$this->updateAdminTagsCounters($entry, $adminTagsCounters);
+		}
+
+		// Validate adminTag limits not reached
+		foreach (explode(',', $currentEntry->getAdminTags()) as $adminTag)
+		{
+			if(array_key_exists($adminTag, $adminTagsCounters) && $adminTagsCounters[$adminTag] <= 0)
+			{
+				KalturaLog::debug('AdminTag exceeded : [' . $adminTag . '] limits left [' . print_r($adminTagsCounters, true) . ']');
+				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $currentEntry->getId(), $adminTag, $adminTagsLimits[$adminTag]);
+			}
+		}
 	}
 
 }

@@ -17,8 +17,8 @@
 
 		protected $maxFailures = 5;		// Max allowed job failures (if more, get out w/out retry)
 		protected $maxRetries = 10;		// Max retries per failed job
-		protected $maxExecutionTime = 3000;	// In seconds. Suits FHD, represents transcoding ratio of x50,
-							// other resolutions will be adjusted accordingly (aka 360p, 4K/H265, ..)
+		protected $maxExecutionTime = 3000;	// In seconds. Suits FHD, represents transcoding ratio of x50, 
+											// other resolutions will be adjusted accordingly (aka 360p, 4K/H265, ..)
 		
 		protected $videoCmdLines = array();
 		protected $audioCmdLines = array();
@@ -68,14 +68,12 @@
 				return false;
 			}
 			
-			if(isset($this->chunker->setup->cleanUp) && $this->chunker->setup->cleanUp){
-				$this->CleanUp();
-			}
+			$this->CleanUp();
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
 			if(file_exists($this->chunker->getSessionName())) {
 				copy($this->chunker->getSessionName(), $this->chunker->params->output);
-			}			
+			}
 			return true;
 		}
 		
@@ -95,14 +93,37 @@
 				$this->name = basename($chunker->params->output);
 
 			$videoCmdLines = array();
+			$sharedMode = isset($chunker->setup->sharedChunkPath)?$chunker->setup->sharedChunkPath:null;
+
 			for($chunkIdx=0;$chunkIdx<$chunker->GetMaxChunks();$chunkIdx++) {
 				$chunkData = $chunker->GetChunk($chunkIdx);
 				$start = $chunkData->start;
+
+				$outFileNames = array();
+				$outFileNames[] = $chunker->getChunkName($chunkIdx);
+				$outFileNames[] = $chunker->getChunkName($chunkIdx,"base").($chunkIdx+1);
+				$logFilename = $chunker->getChunkName($chunkIdx,"base").".log";
+				$outFileNames[] = $logFilename;
+				
 				$cmdLine = $chunker->BuildVideoCommandLine($start, $chunkIdx);
-				$logFilename = $chunker->getChunkName($chunkIdx,".log");
 				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$outFilename = $chunker->getChunkName($chunkIdx);
-				$videoCmdLines[$chunkIdx] = array($cmdLine, $outFilename);
+				$currVideoCmdLine = array($cmdLine, $outFileNames);
+				
+				if($sharedMode)
+				{
+					$sharedOutFilenames = array();
+					$sharedChunkName = $chunker->getChunkName($chunkIdx, "shared");
+					if($sharedChunkName)
+					{
+						$sharedOutFilenames[] = $sharedChunkName;
+						$sharedOutFilenames[] =$chunker->getChunkName($chunkIdx,"shared_base").($chunkIdx+1);
+						$sharedOutFilenames[] =$chunker->getChunkName($chunkIdx,"shared_base").".log";
+						$currVideoCmdLine[] = $sharedOutFilenames;
+					}
+				}
+				
+
+				$videoCmdLines[$chunkIdx] = $currVideoCmdLine;
 				KalturaLog::log($cmdLine);
 			}
 			$this->videoCmdLines = $videoCmdLines;
@@ -110,10 +131,16 @@
 			$cmdLine = $chunker->BuildAudioCommandLine();
 			if(isset($cmdLine)){
 				$outFilename = $chunker->getSessionName("audio");
-				$logFilename = "$outFilename.log";
-				$cmdLine = "time $cmdLine > $logFilename 2>&1";
-				$this->audioCmdLines = array($cmdLine);
-				KalturaLog::log($cmdLine);
+				$logFilename = $outFilename.".log";
+				$currAudioCmdLine = array("time $cmdLine > $logFilename 2>&1", array($outFilename,$logFilename));
+				
+				if($sharedMode) {
+					$sharedAudioChunkName = $chunker->getSessionName("shared_audio");;
+					$logFilename = $sharedAudioChunkName.".log";
+					$currAudioCmdLine[] = array($sharedAudioChunkName,$logFilename);
+				}
+				
+				$this->audioCmdLines[] = $currAudioCmdLine;
 			}
 			$this->SerializeSession();
 			return true;
@@ -151,7 +178,7 @@
 					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
 					return false;
 				}
-
+			
 				$toFixChunkIdx = $chunkData->index;
 				
 				$chunkFixName = $chunker->getChunkName($toFixChunkIdx, "fix");
@@ -203,7 +230,7 @@
 				$process = $this->executeCmdline($mergeCmd, $concatFilenameLog);
 				if($process==false) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt)!");
-					$logTail = self::getLogTail($concatFilenameLog);
+					$logTail = self::GetLogTail($concatFilenameLog);
 					if(isset($logTail))
 						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
@@ -214,7 +241,7 @@
 				$execData = new KProcessExecutionData($process, $concatFilenameLog);
 				if($execData->exitCode!=0) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt, exitCode:$execData->exitCode)!");
-					$logTail = self::getLogTail($concatFilenameLog);
+					$logTail = self::GetLogTail($concatFilenameLog);
 					if(isset($logTail))
 						KalturaLog::log("Log dump:\n".$logTail);
 					sleep(5);
@@ -277,6 +304,7 @@
 					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
 				}
 				$cnt = $chunker->GetMaxChunks();
+
 			}
 			
 //			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
@@ -396,6 +424,19 @@
 		{
 			$setup = $this->chunker->setup;
 			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
+				$chunkName_wc = $this->chunker->getChunkName($idx,"fix");
+				if(file_exists($chunkName_wc)){
+					$cmd = "rm -f $chunkName_wc*";
+					KalturaLog::log("cleanup cmd:$cmd");
+					$rv = null; $op = null;
+					$output = exec($cmd, $op, $rv);
+				} 
+			}
+			
+			if(!(isset($setup->cleanUp) && $setup->cleanUp)){
+				return;
+			}
+			for($idx=0;$idx<$this->chunker->GetMaxChunks();$idx++){
 				$chunkName_wc = $this->chunker->getChunkName($idx,"*");
 				$cmd = "rm -f $chunkName_wc";
 				KalturaLog::log("cleanup cmd:$cmd");
@@ -495,16 +536,16 @@
 		{
 			KalturaLog::log("$logFilename, $size");
 			if($lines=self::GetLogTailLines($logFilename, $size)) {
-				foreach($lines as $idx=>$line) {
+               foreach($lines as $idx=>$line) {
 					$prefix=self::SessionStatsJSONLogPrefix;
 					if(($pos=strpos($line,$prefix))===false)
-						continue;
+							continue;
 					KalturaLog::log("$line");
 					$jsonStr = substr($line, $pos+strlen($prefix));
 					$obj = json_decode($jsonStr);
 					KalturaLog::log("JSON:$jsonStr, object:".print_r($obj,1));
 					return $obj;
-				}
+                }
 			}
 			return null;
 		}

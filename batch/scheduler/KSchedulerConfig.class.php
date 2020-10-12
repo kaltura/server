@@ -130,6 +130,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setSchedulerId($this->getId());
 			$task->setSchedulerName($this->getName());
 			$task->setServiceUrl($this->getServiceUrl());
+			$task->setS3Arn($this->getS3Arn());
+			$task->setS3Region($this->getS3Region());
+			$task->setS3AccessKeyId($this->getS3AccessKeyId());
+			$task->setS3AccessKeySecret($this->getS3AccessKeySecret());
+			$task->setStorageTypeMap($this->getStorageTypeMap());
 			$task->setDwhPath($this->getDwhPath());
 			$task->setDirectoryChmod($this->getDirectoryChmod());
 			$task->setChmod($this->getChmod());
@@ -355,6 +360,31 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function getSecret()
 	{
 		return $this->secret;
+	}
+
+	public function getS3Arn()
+	{
+		return isset($this->s3Arn) ? $this->s3Arn : null;
+	}
+	
+	public function getS3Region()
+	{
+		return isset($this->s3Region) ? $this->s3Region : null;
+	}
+	
+	public function getS3AccessKeyId()
+	{
+		return isset($this->s3AccessKeyId) ? $this->s3AccessKeyId : null;
+	}
+	
+	public function getS3AccessKeySecret()
+	{
+		return isset($this->s3AccessKeySecret) ? $this->s3AccessKeySecret : null;
+	}
+	
+	public function getStorageTypeMap()
+	{
+		return isset($this->storageTypeMap) ? $this->storageTypeMap : null;
 	}
 
 	/**

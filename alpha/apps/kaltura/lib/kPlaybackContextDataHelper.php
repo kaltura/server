@@ -48,7 +48,7 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
-		$this->storageIds = kConf::get('periodic_storage_ids', 'cloud_storage', array());
+		$this->storageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$this->generateRestrictedMessages($contextDataHelper);
 
@@ -223,7 +223,6 @@ class kPlaybackContextDataHelper
 	{
 		// get flavors availability
 		$servePriority = $dbEntry->getPartner()->getStorageServePriority();
-
 		$remoteFileSyncs = array();
 
 		if($dbEntry->getType() == entryType::LIVE_STREAM)
@@ -238,7 +237,7 @@ class kPlaybackContextDataHelper
 
 			foreach ($fileSyncs as $fileSync)
 			{
-				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+				if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && !in_array($fileSync->getDc() , kStorageExporter::getPeriodicStorageIds()))
 				{
 					$dc = $fileSync->getDc();
 					$this->remoteFlavorsByDc[$dc] [] = $flavorAsset;
@@ -396,6 +395,17 @@ class kPlaybackContextDataHelper
 	{
 		if (!count($this->remoteFlavorsByDc))
 			return;
+
+		$partner = $dbEntry->getPartner();
+		if ( $partner->getEnforceDelivery() && ($dbEntry->getType() != entryType::LIVE_STREAM) )
+		{
+			$partnerDeliveryIds = $partner->getDeliveryProfileIds();
+			if (count($partnerDeliveryIds))
+			{
+				$partnerDeliveryIds = call_user_func_array('array_merge', $partnerDeliveryIds);
+				$this->remoteDeliveryProfileIds = array_intersect($this->remoteDeliveryProfileIds, $partnerDeliveryIds);
+			}
+		}
 
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $dbEntry->getId(), null);
 		$remoteDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $this->remoteDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);

@@ -212,26 +212,7 @@ abstract class KalturaFilter extends KalturaObject
 //		if ( ! $operator ) $operator = "eq";
 //		return "_{$operator}_"
 	}
-	
-	protected function preparePusersToKusersFilter( $puserIdsCsv )
-	{
-		$kuserIdsArr = array();
-		$puserIdsArr = explode(',',$puserIdsCsv);
-		$kuserArr = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), $puserIdsArr);
 
-		foreach($kuserArr as $kuser)
-		{
-			$kuserIdsArr[] = $kuser->getId();
-		}
-
-		if(!empty($kuserIdsArr))
-		{
-			return implode(',',$kuserIdsArr);
-		}
-
-		return -1; // no result will be returned if no puser exists
-	}
-	
 	protected function prepareKusersToPusersFilter( $kuserIdsCsv )
 	{
 		$puserIdsArr = array();

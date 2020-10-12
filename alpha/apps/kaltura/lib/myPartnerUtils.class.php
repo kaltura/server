@@ -1486,6 +1486,11 @@ class myPartnerUtils
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
  		{
+			$UserRolesNamesToIgnore = kConf::get('partner_copy_user_roles_ignore_list', 'local', array());
+ 			if (in_array($role->getName(), $UserRolesNamesToIgnore))
+			{
+				continue;
+			}
  			$newRole = $role->copyToPartner($toPartner->getId());
  			$newRole->save();
  		}

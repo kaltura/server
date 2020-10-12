@@ -49,7 +49,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		if(!$this->pollingFileExists($mediaFile))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile does not exist", KalturaBatchJobStatus::RETRY);
 		
-		if(!is_file($mediaFile))
+		if(!kFile::isFile($mediaFile))
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, "Source file $mediaFile is not a file", KalturaBatchJobStatus::FAILED);
 		
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
@@ -99,8 +99,7 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		$mediaInfo = null;
 		try
 		{
-			$mediaFile = realpath($mediaFile);
-			
+			$mediaFile = kFile::realPath($mediaFile);
 			$engine = KBaseMediaParser::getParser($job->jobSubType, $mediaFile, self::$taskConfig, $job);
 			if($engine)
 			{
@@ -135,8 +134,8 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 			$mediaInfoBin = isset(self::$taskConfig->params->mediaInfoCmd)? self::$taskConfig->params->mediaInfoCmd: null;
 			$calcComplexity = new KMediaFileComplexity($ffmpegBin, $ffprobeBin, $mediaInfoBin);
 			
-			$baseOutputName = tempnam(self::$taskConfig->params->localTempPath, "/complexitySampled_".pathinfo($mediaFile, PATHINFO_FILENAME)).".mp4";
-			$stat = $calcComplexity->EvaluateSampled($mediaFile, $mediaInfo, $baseOutputName);
+			$baseOutputName = tempnam(self::$taskConfig->params->localTempPath, "/complexitySampled_".pathinfo($mediaFile, PATHINFO_FILENAME));
+			$stat = $calcComplexity->EvaluateSampled($mediaFile, $mediaInfo, $baseOutputName.".mp4");
 			if(isset($stat->complexityValue))
 			{
 				KalturaLog::log("Complexity: value($stat->complexityValue)");
@@ -145,6 +144,11 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 				
 				$complexityValue = $stat->complexityValue;
 			}
+			$scanTmpfiles = glob($baseOutputName.'*');
+                        foreach($scanTmpfiles as $tmpFilename) {
+                                KalturaLog::log("deleting tmp file: $tmpFilename");
+                                unlink($tmpFilename);
+                        }
 		}
 		
 		if($complexityValue)

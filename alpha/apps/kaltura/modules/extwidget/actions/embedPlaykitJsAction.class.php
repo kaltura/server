@@ -11,6 +11,7 @@ class embedPlaykitJsAction extends sfAction
 	const VERSIONS_PARAM_NAME = "versions";
 	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
+	const PLAYLIST_ID_PARAM_NAME = "playlist_id";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -50,6 +51,9 @@ class embedPlaykitJsAction extends sfAction
 
 	public function execute()
 	{
+	    // Return 404 in case of error to avoid CDN caching
+		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+
 		$this->initMembers();
 
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
@@ -389,11 +393,15 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
-		if (!$entry_id)
-		{
-			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
+		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+		$loadContentMethod = "";
+		if (!is_null($entry_id)) {
+		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
+		} elseif (!is_null($playlist_id)) {
+		    $loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
+		} else {
+		    KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry and Playlist ID not defined");
 		}
-
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
@@ -427,7 +435,7 @@ class embedPlaykitJsAction extends sfAction
 		$autoEmbedCode = "
 		try {
 			var kalturaPlayer = KalturaPlayer.setup($config);
-			kalturaPlayer.loadMedia({entryId: \"" . $entry_id . "\"});
+			$loadContentMethod
 		} catch (e) {
 			console.error(e.message);
 		}
