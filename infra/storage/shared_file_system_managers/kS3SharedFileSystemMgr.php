@@ -23,6 +23,9 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Guzzle\Cache\DoctrineCacheAdapter;
 use Aws\Common\Credentials\CacheableCredentials;
 
+use Aws\Common\Exception\MultipartUploadException;
+use Aws\S3\Model\MultipartUpload\UploadBuilder;
+
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
@@ -229,6 +232,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::debug("Failed to uploaded to s3, info with message: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
@@ -722,7 +726,16 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+		$retries = $this->retriesNum;
+		while ($retries)
+		{
+			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+			if ($success)
+				break;
+			
+			$retries--;
+		}
+		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
 		if (!$success)
