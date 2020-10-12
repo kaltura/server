@@ -145,7 +145,7 @@
 				'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
 			);
 			
-			if($storageOptions && isset($storageOptions['accessKey']) && isset($storageOptions['accessSecret']))
+			if($storageOptions && isset($storageOptions['accessKeyId']) && isset($storageOptions['accessKeySecret']))
 			{
 				$chunkConvertSharedStorageConfig['endPoint'] = isset($sharedStorageClientConfig['endPoint']) ? $sharedStorageClientConfig['endPoint'] : null;
 				$chunkConvertSharedStorageConfig['accessKey'] = isset($sharedStorageClientConfig['accessKey']) ? $sharedStorageClientConfig['accessKey'] : null;
