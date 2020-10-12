@@ -61,6 +61,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
+			$arnRole = kConf::get("s3Arn" , "cloud_storage", getenv(self::S3_ARN_ROLE_ENV_NAME));
 		}
 		
 		if($options)
@@ -74,7 +75,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
-			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : getenv(self::S3_ARN_ROLE_ENV_NAME);
+			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
@@ -108,7 +109,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'region' => $this->s3Region,
 			'signature' => $this->signatureType ? $this->signatureType : 'v4',
 			'version' => '2006-03-01',
-			'scheme'  => 'http'
 		);
 		
 		if ($this->endPoint)
@@ -131,6 +131,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
 		$roleRefresh->setRoleArn($this->s3Arn);
+		$roleRefresh->setS3Region($this->s3Region);
 		
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
@@ -222,6 +223,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array('params' => $params)
 			);
 			
+			KalturaLog::debug("File uploaded to s3, info: " . print_r($res, true));
 			return array(true, $res);
 		}
 		catch (Exception $e)
@@ -565,20 +567,46 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doListFiles($filePath, $pathPrefix = '')
 	{
+		$dirList = array();
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		
-		$params = array(
-			'Bucket' => $bucket,
-			'Prefix'    => $filePath,
-		);
-		
-		$results = $this->s3Call('listObjects', $params, $filePath);
-		
-		if(!$results)
+		try
 		{
-			return false;
+			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $filePath
+			));
+			
+			$originalFilePath = $bucket . '/' . $filePath . '/';
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				$objectPath = $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
+				if($originalFilePath == $objectPath)
+					continue;
+				
+				$fileType = "file";
+				if($dirListObject['Size'] == 0 && substr_compare($objectPath, '/', -strlen('/')) === 0)
+				{
+					$fileType = 'dir';
+				}
+				
+				if ($fileType == 'dir')
+				{
+					$dirList[] = array($objectPath, 'dir', $dirListObject['Size']);
+					$dirList = array_merge($dirList, self::doListFiles($objectPath, $pathPrefix));
+				}
+				else
+				{
+					$dirList[] = array($objectPath, 'file', $dirListObject['Size']);
+				}
+			}
 		}
-		return $results;
+		catch ( Exception $e )
+		{
+			KalturaLog::err("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
+		}
+		
+		return $dirList;
 	}
 	
 	protected function doGetMaximumPartsNum()
