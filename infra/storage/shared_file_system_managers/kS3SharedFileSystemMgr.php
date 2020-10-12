@@ -51,17 +51,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected $retriesNum;
 	
-	protected $s3Arn = null;
+	protected $s3Arn;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kLocalFileSystemManger' class
 	public function __construct(array $options = null)
 	{
 		parent::__construct($options);
 		
+		$arnRole = getenv(self::S3_ARN_ROLE_ENV_NAME);
 		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
-			$arnRole = kConf::get("s3Arn" , "cloud_storage", getenv(self::S3_ARN_ROLE_ENV_NAME));
+			$arnRole = kConf::get("s3Arn" , "cloud_storage", null);
 		}
 		
 		if($options)
@@ -228,6 +229,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::debug("Failed to push file to s3, info: " . print_r($e, true));
 			return array(false, $e->getMessage());
 		}
 	}
