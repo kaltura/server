@@ -229,7 +229,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::debug("Failed to push file to s3, info: " . print_r($e, true));
 			return array(false, $e->getMessage());
 		}
 	}
