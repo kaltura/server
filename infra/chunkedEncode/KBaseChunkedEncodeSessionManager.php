@@ -162,6 +162,16 @@
 			$chunker = $this->chunker;
 			$processArr = array();
 			$maxChunks = $chunker->GetMaxChunks();
+			
+			$chunkOutputFileList = array();
+			if($chunker->setup->sharedChunkPath) {
+				$rawChunkOutputFileList = kFile::listDir($chunker->setup->sharedChunkPath);
+				foreach ($rawChunkOutputFileList as $fileItem) {
+					$chunkOutputFileList[] = kFile::fixPath( "/" . $fileItem[0]);
+				}
+				KalturaLog::debug("Chunk dir content list: " . print_r($chunkOutputFileList, true));
+			}
+			
 			for($idx=0; $idx<$maxChunks; $idx++) {
 				$chunkData = $chunker->GetChunk($idx);
 				if(!isset($chunkData->toFix) || $chunkData->toFix==0)
@@ -182,7 +192,7 @@
 				$toFixChunkIdx = $chunkData->index;
 				
 				$chunkFixName = $chunker->getChunkName($toFixChunkIdx, "fix");
-				$cmdLine = $chunker->BuildFixVideoCommandLine($toFixChunkIdx)." > $chunkFixName.log 2>&1";
+				$cmdLine = $chunker->BuildFixVideoCommandLine($toFixChunkIdx, $chunkOutputFileList)." > $chunkFixName.log 2>&1";
 				$process = $this->executeCmdline($cmdLine, "$chunkFixName.log");
 				if($process==false){
 					KalturaLog::log($msgStr="Chunk ($chunkFixName) fix FAILED !");
