@@ -230,7 +230,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::debug("Failed to uploaded to s3, info with message: " . $e->getMessage());
+			KalturaLog::warning("Failed to uploaded to s3, info with message: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
@@ -725,7 +725,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		$retries = $this->retriesNum;
-		while ($retries)
+		while ($retries > 0)
 		{
 			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
 			if ($success)
@@ -828,9 +828,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			$params = $this->initBasicS3Params($filePath);
 		}
-		$retries = $this->retriesNum;
 		
-		while ($retries)
+		$retries = $this->retriesNum;
+		while ($retries > 0)
 		{
 			try
 			{
