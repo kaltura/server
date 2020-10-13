@@ -237,8 +237,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
-		$retries = 3;
-		
 		$params = array();
 		if ($this->sseType === "KMS")
 		{
@@ -251,6 +249,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$params['ServerSideEncryption'] = "AES256";
 		}
 		
+		$retries = $this->retriesNum;
 		while ($retries > 0)
 		{
 			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
