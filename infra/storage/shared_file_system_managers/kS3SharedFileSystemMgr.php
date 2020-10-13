@@ -845,7 +845,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				{
 					$retries = 0;
 					//In case final status is passed dont log the exception to avoid spamming the log file
-					return;
+					return false;
 				}
 				$this->handleS3Exception($command, $retries, $params, $e);
 			}
