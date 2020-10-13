@@ -89,9 +89,24 @@ class kAssetUtils
 		}
 		else
 		{
-			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
+			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
 			if(!$urlManager)
-				return null;
+			{
+				$syncKey = $asset->getSyncKey();
+				$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
+				foreach($fileSyncs as $fileSync)
+				{
+					if($fileSync->getStatus())
+					{
+						$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc());
+					}
+				}
+
+				if(!$urlManager)
+				{
+					return null;
+				}
+			}
 
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);

@@ -18,6 +18,8 @@ class myPartnerUtils
 	const MARKETO_NEW_INTERNAL_TRIAL_ACCOUNT = 'marketo_new_register_internal_success_campaign';
 	const MARKETO_MISSING_PASSWORD = 'marketo_missing_Password_campaign';
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
+
+	const TYPE_DOWNLOAD = 'download';
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1773,7 +1775,7 @@ class myPartnerUtils
 	 * @param entry $entry
 	 * @param asset $asset
 	 */
-	public static function enforceDelivery($entry, $asset = null)
+	public static function enforceDelivery($entry, $asset = null, $storageProfileId = null)
 	{
 		// block inactive partner
 		$partnerId = $entry->getPartnerId();
@@ -1782,18 +1784,31 @@ class myPartnerUtils
 		// validate serve access control
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
-		$secureEntryHelper->validateForServe($flavorParamsId);
+		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
+		if(!$validServe && is_null($storageProfileId))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
 
 		// enforce delivery
 		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
 		
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
-		if ($restricted)
+		if ($restricted && is_null($storageProfileId))
 		{
 			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
 		}
+
+		if(!is_null($storageProfileId))
+		{
+			if(!self::isDownloadAllowed($storageProfileId))
+			{
+				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
+			}
+		}
 	}
+
 	
 	public static function getPartnersArray(array $partnerIds, Criteria $c = null)
 	{
@@ -2187,6 +2202,45 @@ class myPartnerUtils
 			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
 		}
 		return PartnerAuthenticationType::PASSWORD_ONLY;
+	}
+
+	public static function isDownloadAllowed ($storageProfileId)
+	{
+		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId);
+		if(!$downloadDeliveryProfile)
+		{
+			return false;
+		}
+
+		$downloadRecognizer = $downloadDeliveryProfile->getRecognizer();
+		if($downloadRecognizer)
+		{
+			$urlRecognized = $downloadRecognizer->isRecognized(null);
+			if($urlRecognized)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static function getDownloadDeliveryProfile($storageProfileId)
+	{
+		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+		if(!$storageProfile)
+		{
+			return null;
+		}
+
+		$deliveryProfileIds = $storageProfile->getDeliveryProfileIds();
+		if(!$deliveryProfileIds || !$deliveryProfileIds[self::TYPE_DOWNLOAD])
+		{
+			return null;
+		}
+		$downloadDeliveryProfileId = $deliveryProfileIds[self::TYPE_DOWNLOAD][0];
+		$downloadDeliveryProfile = DeliveryProfilePeer::retrieveByPK($downloadDeliveryProfileId);
+		return $downloadDeliveryProfile;
 	}
 
 }

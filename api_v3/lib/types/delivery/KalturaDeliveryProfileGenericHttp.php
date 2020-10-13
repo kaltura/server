@@ -9,11 +9,17 @@ class KalturaDeliveryProfileGenericHttp extends KalturaDeliveryProfile {
 	 * @var string
 	 */
 	public $pattern;
+
+	/**
+	 * @var int
+	 */
+	public $maxSize;
 	
 	
 	private static $map_between_objects = array
 	(
-			"pattern"
+			"pattern",
+			"maxSize"
 	);
 	
 	public function getMapBetweenObjects ( )
