@@ -512,7 +512,8 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		if (!$targetEntry->startDate) { $targetEntry->startDate = null; }
 		if (!$targetEntry->endDate) { $targetEntry->endDate = null; }
 		if (!$targetEntry->referenceId) { $targetEntry->referenceId = null; }
-		if ($targetEntry->parentEntryId) { $targetEntry->parentEntryId = null; }
+
+		if (isset($targetEntry->parentEntryId)) { $targetEntry->parentEntryId = null; }
 
 		// return transformed entry object
 		return $targetEntry;
