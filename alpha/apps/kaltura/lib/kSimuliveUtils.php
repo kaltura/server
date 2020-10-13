@@ -82,6 +82,8 @@ class kSimuliveUtils
 	}
 
 	/**
+	 * Get an event that startTime + duration (now epoch by default) is at least MINIMUM_TIME_TO_PLAYABLE_SEC inside
+	 * the event.
 	 * @param Entry $entry
 	 * @param int $startTime - epoch time
 	 * @param int $duration - in sec
@@ -91,6 +93,7 @@ class kSimuliveUtils
 	{
 		$startTime = $startTime ? $startTime : time();
 		$event = self::getSimuliveEvent($entry, $startTime, $duration);
+		// consider the event as playable only after 3 segments
 		if ($event && ($startTime + $duration) >= ($event->getCalculatedStartTime() + self::MINIMUM_TIME_TO_PLAYABLE_SEC))
 		{
 			return $event;
@@ -110,6 +113,7 @@ class kSimuliveUtils
 		{
 			return self::LIVE_SCHEDULE_AHEAD_TIME;
 		}
+		// playableStartTime only after 3 segments
 		$playableStartTime = $simuliveEvent->getCalculatedStartTime() + self::MINIMUM_TIME_TO_PLAYABLE_SEC;
 		if ($nowEpoch >= $playableStartTime && $nowEpoch < $simuliveEvent->getCalculatedEndTime())
 		{
