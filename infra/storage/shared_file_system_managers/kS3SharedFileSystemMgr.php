@@ -23,8 +23,6 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Guzzle\Cache\DoctrineCacheAdapter;
 use Aws\Common\Credentials\CacheableCredentials;
 
-use Aws\Common\Exception\MultipartUploadException;
-use Aws\S3\Model\MultipartUpload\UploadBuilder;
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
