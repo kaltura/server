@@ -230,15 +230,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::debug("Failed to uploaded to s3, info with message: " . $e->getMessage());
+			KalturaLog::warning("Failed to uploaded to s3, info with message: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
 	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
-		$retries = 3;
-		
 		$params = array();
 		if ($this->sseType === "KMS")
 		{
@@ -251,7 +249,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$params['ServerSideEncryption'] = "AES256";
 		}
 		
-		while ($retries)
+		$retries = $this->retriesNum;
+		while ($retries > 0)
 		{
 			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
 			if ($success)
@@ -830,7 +829,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		$retries = $this->retriesNum;
 		
-		while ($retries)
+		while ($retries > 0)
 		{
 			try
 			{
