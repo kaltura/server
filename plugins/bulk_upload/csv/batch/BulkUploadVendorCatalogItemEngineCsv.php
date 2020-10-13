@@ -419,6 +419,11 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 		return new KalturaBulkUploadResultVendorCatalogItem();
 	}
 
+	protected function getUploadResultInstanceType()
+	{
+		return KalturaBulkUploadObjectType::VENDOR_CATALOG_ITEM;
+	}
+
 	public function getObjectTypeTitle()
 	{
 		return self::OBJECT_TYPE_TITLE;
