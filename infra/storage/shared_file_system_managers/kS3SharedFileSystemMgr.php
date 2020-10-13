@@ -23,6 +23,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Guzzle\Cache\DoctrineCacheAdapter;
 use Aws\Common\Credentials\CacheableCredentials;
 
+
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
@@ -229,6 +230,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::debug("Failed to uploaded to s3, info with message: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
@@ -348,25 +350,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
 	{
-		return $this->doFullMkfileDir(dirname($path), $rights, $recursive);
+		return true;
 	}
 	
 	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
 	{
-		if($this->doIsDir($path))
-		{
-			return;
-		}
-		
-		list($bucket, $key) = $this->getBucketAndFilePath($path);
-		$dirList = explode("/", $key);
-		$fullDir = "/$bucket/";
-		
-		while($currDir = array_shift($dirList))
-		{
-			$fullDir .= "$currDir/";
-			$this->doMkdir($fullDir, $rights, $recursive);
-		}
+		return true;
 	}
 	
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -417,14 +406,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doMkdir($path, $mode, $recursive)
 	{
-		$params = $this->initBasicS3Params($path);
-		$params['Body'] = '';
-		$result = $this->s3Call('putObject', $params, $path);
-		
-		if(!$result)
-		{
-			return false;
-		}
 		return true;
 	}
 	
@@ -743,7 +724,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+		$retries = $this->retriesNum;
+		while ($retries)
+		{
+			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+			if ($success)
+				break;
+			
+			sleep(rand(1,3));
+			$retries--;
+		}
+		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
 		if (!$success)
@@ -853,6 +844,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				if(in_array($e->$getExceptionFunctionName(), $finalErrorCodes))
 				{
 					$retries = 0;
+					//In case final status is passed dont log the exception to avoid spamming the log file
+					return false;
 				}
 				$this->handleS3Exception($command, $retries, $params, $e);
 			}
