@@ -262,8 +262,8 @@ class BatchControlService extends KalturaBaseService
 	 */
 	public static function calculateConfiguredId($lastConfiguredId)
 	{
-		$dc = kDataCenterMgr::getCurrentDc();
-		return intval(ceil($lastConfiguredId / 10) * 10 + 2 - $dc["id"]);
+		$dcId = kDataCenterMgr::getCurrentDcId();
+		return intval(ceil($lastConfiguredId / 10) * 10 + 1 + $dcId);
 	}
 
 	/**

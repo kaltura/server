@@ -123,7 +123,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		{
 			parent::__construct($configFileName, $hostname, true);
 		}
-		catch (Exception $e)
+		catch (Zend_Config_Exception $e)
 		{
 			$hostNamePrefix = preg_replace('/\d+$/', self::HOSTNAME_WILDCARD , $hostname);
 			parent::__construct($configFileName, $hostNamePrefix, true);
