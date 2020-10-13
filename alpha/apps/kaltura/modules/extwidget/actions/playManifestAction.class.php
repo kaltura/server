@@ -926,7 +926,7 @@ class playManifestAction extends kalturaAction
 
 			case entryType::LIVE_STREAM:
 				$time = $this->getRequestParameter("scheduleTime", null);
-				$event = kSimuliveUtils::getSimuliveEvent($this->entry, $time);
+				$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $time);
 				if ($event)
 				{
 					$this->entryId = $event->getSourceEntryId();
@@ -1316,7 +1316,7 @@ class playManifestAction extends kalturaAction
 				
 			case entryType::LIVE_STREAM:
 				$time = $this->getRequestParameter("scheduleTime", null);
-				if (kSimuliveUtils::getSimuliveEvent($this->entry, $time))
+				if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $time))
 				{
 					$renderer = $this->serveVodEntry();
 					$entryType = self::ENTRY_TYPE_VOD;
