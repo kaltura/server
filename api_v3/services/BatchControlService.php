@@ -245,17 +245,27 @@ class BatchControlService extends KalturaBaseService
 		}
 		KalturaLog::debug("BATCH MAX CONFIGURED ID IS " . $latestScheduler->getConfiguredId());
 
+		$configuredId = self::calculateConfiguredId($latestScheduler->getConfiguredId());
 		$schedulerDb = new Scheduler();
 		$schedulerDb->setLastStatus(time());
 		$schedulerDb->setName($scheduler->name);
 		$schedulerDb->setHost($scheduler->host);
 		$schedulerDb->setDescription('Dynamically allocted scheduler');
-		$schedulerDb->setConfiguredId($latestScheduler->getConfiguredId() + 1);
+		$schedulerDb->setConfiguredId($configuredId);
 		$schedulerDb->save();
 		return $schedulerDb;
 	}
-	
-	
+
+	/**
+	 * @param $lastConfiguredId
+	 * @return int
+	 */
+	public static function calculateConfiguredId($lastConfiguredId)
+	{
+		$dc = kDataCenterMgr::getCurrentDc();
+		return intval(ceil($lastConfiguredId / 10) * 10 + 2 - $dc["id"]);
+	}
+
 	/**
 	 * batch getOrCreateWorker returns a worker by name, create it if doesn't exist
 	 * 
