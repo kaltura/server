@@ -96,6 +96,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		{
 			KalturaLog::log('loading configuration from Disc at ' . date('H:i:s', $this->configTimestamp));
 			$this->configTimestamp = $this->calculateFileTimestamp();
+			$this->schedulerId = $this->getId();
 			if(is_dir($this->configFileName))
 			{
 				$this->implodeDirectoryFiles($configFileName);
@@ -134,7 +135,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 		$this->taskConfigList = array();
 
-		if (!$this->schedulerId)
+		if (!$this->schedulerId && !$this->loadConfigFromDisc)
 		{
 			try
 			{
