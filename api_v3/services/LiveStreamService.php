@@ -721,6 +721,17 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 		}
 		$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
+
+		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
+		if ($simuliveCondCacheTime)
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
+		}
+
+		if (kSimuliveUtils::getPlayableSimuliveEvent($liveStreamEntry))
+		{
+			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+		}
 		return $res;
 	}
 
