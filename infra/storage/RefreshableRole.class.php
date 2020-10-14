@@ -23,7 +23,6 @@ class RefreshableRole extends AbstractRefreshableCredentials
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME = 43200;
 	const SESSION_DURATION = 43200;
-	const FORCE_REFRESH_INTERVAL = 3600;
 	
 	private $roleArn = null;
 	private $s3Region = null;
@@ -70,18 +69,6 @@ class RefreshableRole extends AbstractRefreshableCredentials
 			->setExpiration($result->getExpiration());
 		
 		return $credentials;
-	}
-	
-	public function isExpired()
-	{
-		if(parent::isExpired())
-			return true;
-		
-		//Always refresh token before it expires to avoid it being expired during the running session
-		if(time() > $this->credentials->getExpiration() - self::FORCE_REFRESH_INTERVAL)
-			return true;
-		
-		return false;
 	}
 	
 	public function setRoleArn($roleArn)
