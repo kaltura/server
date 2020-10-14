@@ -75,7 +75,7 @@ class ReachProfileCloneAction extends KalturaApplicationPlugin
 		Infra_ClientHelper::unimpersonate();
 	}
 
-	protected function gotBooleanEventNotificationCondition($rule)
+	protected static function gotBooleanEventNotificationCondition($rule)
 	{
 
 		foreach ($rule->conditions as $condition)
