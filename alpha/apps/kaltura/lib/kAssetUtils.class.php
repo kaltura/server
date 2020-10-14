@@ -92,13 +92,12 @@ class kAssetUtils
 			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
 			if(!$urlManager)
 			{
-				$syncKey = $asset->getSyncKey();
 				$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
 				foreach($fileSyncs as $fileSync)
 				{
 					if($fileSync->getStatus())
 					{
-						$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc());
+						$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
 					}
 				}
 

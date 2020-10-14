@@ -106,7 +106,7 @@ class KalturaDeliveryProfileFactory {
 			case 'kUrlRecognizerAkamaiG2O':
 				return new KalturaUrlRecognizerAkamaiG2O();
 			case 'kKalturaUrlRecognizer':
-				return new kKalturaUrlRecognizer();
+				return new KalturaUrlRecognizerKaltura();
 			case 'kUrlRecognizer':
 				return new KalturaUrlRecognizer();
 			default:

@@ -56,7 +56,7 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 				$flavorSize = $flavorAsset->getSize() * 1024; // size in MB
 				if($flavorSize > $this->getMaxSize())
 				{
-					return self::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT;
+					return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 				}
 			}
 		}

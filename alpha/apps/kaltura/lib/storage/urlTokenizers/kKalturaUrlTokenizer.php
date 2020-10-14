@@ -33,9 +33,7 @@ class kKalturaUrlTokenizer extends kUrlTokenizer
 	public function tokenizeSingleUrl($url, $urlPrefix = null)
 	{
 		$signature = urlencode(base64_encode(hash_hmac('sha256', $url, $this->secret)));
-		$path = substr($url, 0, strrpos($url, "/"));
-		$fileName = substr($url, strrpos($url, "/") - strlen($url) + 1);
-		return $path . '/sig/' . $signature . '/' . $fileName;
+		return $url . '/sig/' . $signature;
 	}
 
 }

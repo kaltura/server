@@ -1802,7 +1802,7 @@ class myPartnerUtils
 
 		if(!is_null($storageProfileId))
 		{
-			if(!self::isDownloadAllowed($storageProfileId))
+			if(!self::isDownloadAllowed($storageProfileId, $entry->getId()))
 			{
 				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 			}
@@ -2204,9 +2204,9 @@ class myPartnerUtils
 		return PartnerAuthenticationType::PASSWORD_ONLY;
 	}
 
-	public static function isDownloadAllowed ($storageProfileId)
+	public static function isDownloadAllowed ($storageProfileId, $entryId)
 	{
-		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId);
+		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
 		if(!$downloadDeliveryProfile)
 		{
 			return false;
@@ -2225,7 +2225,7 @@ class myPartnerUtils
 		return false;
 	}
 
-	public static function getDownloadDeliveryProfile($storageProfileId)
+	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)
 	{
 		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 		if(!$storageProfile)
@@ -2240,6 +2240,13 @@ class myPartnerUtils
 		}
 		$downloadDeliveryProfileId = $deliveryProfileIds[self::TYPE_DOWNLOAD][0];
 		$downloadDeliveryProfile = DeliveryProfilePeer::retrieveByPK($downloadDeliveryProfileId);
+
+		if($downloadDeliveryProfile)
+		{
+			$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, PlaybackProtocol::HTTP);
+			$downloadDeliveryProfile->setDynamicAttributes($deliveryAttributes);
+		}
+
 		return $downloadDeliveryProfile;
 	}
 

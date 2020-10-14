@@ -118,7 +118,7 @@ class downloadAction extends sfAction
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 			
-		$this->handleFileSyncRedirection($syncKey, $flavorAsset);
+		$this->handleFileSyncRedirection($syncKey, $flavorAsset, $entry->getId());
 
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
@@ -239,7 +239,7 @@ class downloadAction extends sfAction
 		}
 	}
 	
-	private function handleFileSyncRedirection(FileSyncKey $syncKey, asset $flavorAsset)
+	private function handleFileSyncRedirection(FileSyncKey $syncKey, asset $flavorAsset, $entryId)
 	{
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		
@@ -248,10 +248,10 @@ class downloadAction extends sfAction
 
 		if (!$local)
 		{
-			$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc());
-			if($downloadDeliveryProfile)
+			$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $entryId);
+			if($downloadDeliveryProfile && $flavorAsset)
 			{
-				$url = $downloadDeliveryProfile->getAssetUrl($flavorAsset, true);
+				$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset);
 			}
 			else
 			{
@@ -261,5 +261,16 @@ class downloadAction extends sfAction
 			KExternalErrors::terminateDispatch();
 			$this->redirect($url);
 		}
+	}
+
+	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset)
+	{
+		$url = $downloadDeliveryProfile->getAssetUrl($flavorAsset, true);
+		$url = preg_replace('/^https?:\/\//', '', $url);
+		$url = $downloadDeliveryProfile->getHostName() . $url;
+		$url = infraRequestUtils::getProtocol() . '://' . $url;
+
+		KalturaLog::log ("URL to redirect to [$url]" );
+		return $url;
 	}
 }
