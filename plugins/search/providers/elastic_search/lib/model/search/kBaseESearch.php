@@ -80,4 +80,26 @@ abstract class kBaseESearch extends kBaseSearch
 		kEventsManager::raiseEventDeferred(new kESearchSearchHistoryInfoEvent($searchHistoryInfo));
 	}
 
+	public static function getElasticIndexNamePerPartner($indexName, $partnerId)
+	{
+		$dedicatedPartnersList = kConf::get('dedicated_partners_list', 'elasticDynamicMap', array());
+        KalturaLog::debug("dedicated_partners_list " .  print_r($dedicatedPartnersList,true));
+		if(isset($dedicatedPartnersList[$partnerId]))
+		{
+			$indices = explode(',', $dedicatedPartnersList[$partnerId]);
+			foreach ($indices as $indexNameInConfig)
+			{
+				if($indexName === trim($indexNameInConfig))
+				{
+					$indexName .= '_' . $partnerId;
+					break;
+				}
+			}
+		}
+
+		KalturaLog::debug("Using index name $indexName for $partnerId");
+
+		return $indexName;
+	}
+
 }

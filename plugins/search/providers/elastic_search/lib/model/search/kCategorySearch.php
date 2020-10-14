@@ -27,7 +27,7 @@ class kCategorySearch extends kBaseESearch
     protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
     {
         $this->query = array(
-            'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
+            'index' => kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId()),
             'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
         );
 

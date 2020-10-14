@@ -3855,19 +3855,24 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getElasticIndexName()
 	{
-		return self::getElasticEntryIndexNameForPartner(kCurrentContext::getCurrentPartnerId());
+		return self::getElasticIndexNameByPartnerId($this->getPartnerId());
 	}
 
-	public static function getElasticEntryIndexNameForPartner($partnerId)
+	public static function getCurrentContextElasticIndexName()
 	{
-		$indexName = ElasticIndexMap::ELASTIC_ENTRY_INDEX;
-		$dedicateEntryPartnerList = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
-		if(in_array($partnerId,$dedicateEntryPartnerList))
-		{
-			$indexName = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_NAME,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, $indexName);
-		}
-		return $indexName;
+		return self::getElasticIndexNameByPartnerId(kCurrentContext::getCurrentPartnerId());
 	}
+
+	protected static function getElasticIndexNameByPartnerId($partnerId)
+	{
+		$dedicateEntryPartnerList = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
+		if(in_array($partnerId, $dedicateEntryPartnerList))
+		{
+			return kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_NAME, ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, ElasticIndexMap::ELASTIC_ENTRY_INDEX);
+		}
+		return kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_ENTRY_INDEX, $partnerId);
+	}
+
 
 	/**
 	 * return the name of the elasticsearch type for this object

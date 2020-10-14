@@ -141,6 +141,8 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
+        KalturaLog::debug("Using elastic Index:" . $object->getElasticIndexName() );
+
         $params['index'] = $object->getElasticIndexName();
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();

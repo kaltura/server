@@ -245,6 +245,7 @@ class elasticClient
 	 */
 	public function search(array $params, $logQuery = false, $shouldAddPreference = false)
 	{
+		KalturaLog::debug("Searching in index - " . $params[self::ELASTIC_INDEX_KEY] );
 		kApiCache::disableConditionalCache();
 		if ($shouldAddPreference)
 		{

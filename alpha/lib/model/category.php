@@ -408,10 +408,10 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		parent::setParentId($v);
 		$this->parent_category = null;
 	}
-   	
-   	/**
-   	* entryAlreadyBlongToCategory return true when entry was already belong to this category before
-   	*/
+
+	/**
+	* entryAlreadyBlongToCategory return true when entry was already belong to this category before
+	*/
 	private function entryAlreadyBlongToCategory(array $entryCategoriesIds = null)
 	{
 		if (!$entryCategoriesIds){
@@ -471,8 +471,8 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		else
 			$this->setDirectEntriesCount($this->getDirectEntriesCount() + 1);
 	}
-      
-    /**
+
+	/**
 	 * Increment direct pending entries count
 	 */
 	public function incrementPendingEntriesCount()
@@ -495,7 +495,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		else	
 			$this->setDirectEntriesCount(max(0, $this->getDirectEntriesCount() - 1));
 	}
-      
+
 	/**
 	* Decrement direct pending entries count
 	*/
@@ -504,7 +504,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$this->setPendingEntriesCount(max(0, $this->getPendingEntriesCount() - 1));
 		$this->save();
 	}
-      
+
 	protected function validateFullNameIsUnique()
 	{
 		$fullName = $this->getFullName();
@@ -1918,7 +1918,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function getElasticIndexName()
 	{
-		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
+		return kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_CATEGORY_INDEX, $this->getPartnerId());
 	}
 
 	/**

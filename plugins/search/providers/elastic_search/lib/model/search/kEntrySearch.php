@@ -40,9 +40,12 @@ class kEntrySearch extends kBaseESearch
     protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
     {
         $this->query = array(
-            'index' => entry::getElasticEntryIndexNameForPartner(kCurrentContext::getCurrentPartnerId()),
+            'index' => entry::getCurrentContextElasticIndexName(),
             'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE
         );
+
+        KalturaLog::debug("Index -" . entry::getCurrentContextElasticIndexName());
+
         parent::initQuery($statuses, $objectId, $pager, $order, $aggregations);
     }
 
