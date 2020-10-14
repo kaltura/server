@@ -680,4 +680,11 @@ abstract class kSharedFileSystemMgr
 	{
 		self::$storageConfig[$key] = $value;
 	}
+	
+	// Force clearing static member of the fs manager to force re-login, added to force credentials refresh
+	public function clearSharedFsManagers()
+	{
+		KalturaLog::debug("Clearing sharedFsMgr cache to force re-login");
+		self::$kSharedFsMgr = null;
+	}
 }
