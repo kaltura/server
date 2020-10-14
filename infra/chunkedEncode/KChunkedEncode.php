@@ -801,9 +801,6 @@
 			if($this->setup->sharedChunkPath) {
 				$mode = "shared_base";
 				$cmdLine .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
-				
-				//Clear sharedFsMgr to avoid cases where the f credentials are getting expired during the concat operation
-				kSharedFileSystemMgr::clearSharedFsManagers();
 			}
 			
 			$firstSegmentName = $this->getChunkName($idx, $mode).($idx);

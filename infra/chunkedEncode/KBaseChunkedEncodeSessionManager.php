@@ -170,6 +170,9 @@
 					$chunkOutputFileList[] = kFile::fixPath( "/" . $fileItem[0]);
 				}
 				KalturaLog::debug("Chunk dir content list: " . print_r($chunkOutputFileList, true));
+				
+				//Clear sharedFsMgr to avoid cases where the credentials are getting expired during the concat operation
+				kSharedFileSystemMgr::clearSharedFsManagers();
 			}
 			
 			for($idx=0; $idx<$maxChunks; $idx++) {
