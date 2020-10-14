@@ -21,6 +21,7 @@ use Guzzle\Cache\DoctrineCacheAdapter;
 class RefreshableRole extends AbstractRefreshableCredentials
 {
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
+	const ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME = 43200;
 	const SESSION_DURATION = 3600;
 	const FORCE_REFRESH_INTERVAL = 1800;
 	
@@ -51,7 +52,8 @@ class RefreshableRole extends AbstractRefreshableCredentials
 		$call = $sts->assumeRole(array(
 			'RoleArn' => $this->roleArn,
 			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
-			'SessionDuration' => self::SESSION_DURATION,
+			'DurationSeconds' => self::ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME,
+			'SessionDuration' => self::SESSION_DURATION
 		));
 		
 		$creds = $call['Credentials'];
