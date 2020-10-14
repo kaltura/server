@@ -930,7 +930,7 @@ class playManifestAction extends kalturaAction
 				if ($event)
 				{
 					$this->entryId = $event->getSourceEntryId();
-					$sourceEntry = BaseentryPeer::retrieveByPK($this->entryId);
+					$sourceEntry = entryPeer::retrieveByPKNoFilter($this->entryId, null, false);
 					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
 					$this->initFlavorAssetArray(true);
 				}
