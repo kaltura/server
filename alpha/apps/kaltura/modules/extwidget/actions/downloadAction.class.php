@@ -253,6 +253,10 @@ class downloadAction extends sfAction
 			{
 				$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset);
 			}
+			else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+			{
+				return;
+			}
 			else
 			{
 				$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
