@@ -962,7 +962,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$desired_file_sync = null;
 		$local = false;
-		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $currentDcId);
+		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $resolve, $currentDcId);
 		if($sortedFileSync)
 		{
 			$desired_file_sync = $sortedFileSync[0];
@@ -995,17 +995,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
-	public static function getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $partner_id, $dc_id)
+	public static function getSortedFileSyncs($file_sync_list, $resolve, $dc_id)
 	{
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
 		$periodicFileSyncs = array();
-		$periodicStorageIds = array();
-
-		if($fetch_from_remote_if_no_local)
-		{
-			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner_id);
-		}
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		foreach ($file_sync_list as $file_sync)
 		{

@@ -59,13 +59,13 @@ class kStorageExportJobData extends kStorageJobData
 		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		$this->setCreateLink($externalStorage->getCreateFileLink());
 
-		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds())))
 		{
 			$assetId = $srcFileSync->getObjectId();
 			$asset = assetPeer::retrieveById($assetId);
 
 			$this->setAssetId($assetId);
-			$this->setExternalUrl($srcFileSync->getExternalUrl($asset->getEntryId()));
+			$this->setExternalUrl($srcFileSync->getExternalUrl($asset->getEntryId(), null, true));
 		}
 	}
 	
