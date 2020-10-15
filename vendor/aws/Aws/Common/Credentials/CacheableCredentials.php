@@ -57,7 +57,7 @@ class CacheableCredentials extends AbstractRefreshableCredentials
             $this->credentials->getAccessKeyId();
             if (!$this->credentials->isExpired()) {
                 // The credentials were updated, so cache them
-                $this->cache->save($this->cacheKey, $this->credentials, $this->credentials->getExpiration() - time());
+                $this->cache->save($this->cacheKey, $this->credentials, 3600);
             }
         } else {
             // The credentials were found in cache, so update the adapter object
