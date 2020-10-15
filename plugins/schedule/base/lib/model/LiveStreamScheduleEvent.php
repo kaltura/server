@@ -81,10 +81,23 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	protected function addCapabilityToTemplateEntry($con)
 	{
 			$liveEntry = entryPeer::retrieveByPK($this->getTemplateEntryId());
-			if ($liveEntry && !$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+			if ($liveEntry)
 			{
-				$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
-				$liveEntry->save($con);
+				$shouldSave = false;
+				if (!$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+				{
+					$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
+					$shouldSave = true;
+				}
+				if ($this->getSourceEntryId() && !$liveEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY))
+				{
+					$liveEntry->addCapability(LiveEntry::SIMULIVE_CAPABILITY);
+					$shouldSave = true;
+				}
+				if ($shouldSave)
+				{
+					$liveEntry->save($con);
+				}
 			}
 	}
 
