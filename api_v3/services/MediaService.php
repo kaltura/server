@@ -144,7 +144,7 @@ class MediaService extends KalturaEntryService
     	}
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$resource->validateEntry($dbEntry, true);
+			$resource->validateEntry($dbEntry);
 
 			if($conversionProfileId)
 			{
