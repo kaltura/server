@@ -1879,7 +1879,7 @@ class KalturaEntryService extends KalturaBaseService
 						throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
 					}
 
-					return $fileSync->getExternalUrl($entryId);
+					return $fileSync->getExternalUrl($entryId, null, true);
 				}
 			}
 		}
