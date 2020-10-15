@@ -429,7 +429,7 @@ class serveFlavorAction extends kalturaAction
 			if ($entry->getType() == entryType::PLAYLIST && self::$requestAuthorized)
 			{
 				list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
-				myPartnerUtils::enforceDelivery($entry, $asset);
+				myPartnerUtils::enforceDelivery($entry, $asset, self::$preferredStorageId);
 				$this->servePlaylist($entry, $captionLanguages);
 			}
 			if ($sequence  && self::$requestAuthorized)
@@ -439,7 +439,7 @@ class serveFlavorAction extends kalturaAction
 				if (count($sequenceEntries))
 				{
 					list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
-					myPartnerUtils::enforceDelivery($entry, $asset);
+					myPartnerUtils::enforceDelivery($entry, $asset, self::$preferredStorageId);
 					$this->verifySequenceEntries($sequenceEntries);
 					$this->serveEntryWithSequence($entry, $sequenceEntries, $asset, $flavorParamId, $captionLanguages);
 				}
@@ -485,7 +485,7 @@ class serveFlavorAction extends kalturaAction
 		
 		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFlavor', $flavorAsset->getPartnerId());
 			
-		myPartnerUtils::enforceDelivery($entry, $flavorAsset);
+		myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
 		
 		$version = $this->getRequestParameter( "v" );
 		if (!$version)

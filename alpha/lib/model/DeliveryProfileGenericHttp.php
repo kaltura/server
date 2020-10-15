@@ -10,15 +10,6 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 	{
 		return $this->getFromCustomData("pattern");
 	}
-
-	public function setMaxSize($v)
-	{
-		$this->putInCustomData("maxSize", $v);
-	}
-	public function getMaxSize()
-	{
-		return $this->getFromCustomData("maxSize");
-	}
 	
 	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
 	{
@@ -48,18 +39,6 @@ class DeliveryProfileGenericHttp extends DeliveryProfileHttp {
 		// the profile supports seek if it has the {seekFromSec} placeholder in its pattern
 		if ($deliveryAttributes->getSeekFromTime() > 0 && strpos($this->getPattern(), "{seekFromSec}") === false)
 			return self::DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT;
-
-		if($this->getMaxSize())
-		{
-			foreach($deliveryAttributes->getFlavorAssets() as $flavorAsset)
-			{
-				$flavorSize = $flavorAsset->getSize() * 1024; // size in MB
-				if($flavorSize > $this->getMaxSize())
-				{
-					return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
-				}
-			}
-		}
 				
 		return $result;
 	}

@@ -69,7 +69,7 @@ class kAssetUtils
 	}
 	
 
-	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null)
+	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null, $urlManager = null)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
@@ -89,21 +89,24 @@ class kAssetUtils
 		}
 		else
 		{
-			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
 			if(!$urlManager)
 			{
-				$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
-				foreach($fileSyncs as $fileSync)
-				{
-					if($fileSync->getStatus())
-					{
-						$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
-					}
-				}
-
+				$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
 				if(!$urlManager)
 				{
-					return null;
+					$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
+					foreach($fileSyncs as $fileSync)
+					{
+						if($fileSync->getStatus())
+						{
+							$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
+						}
+					}
+
+					if(!$urlManager)
+					{
+						return null;
+					}
 				}
 			}
 

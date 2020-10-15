@@ -269,11 +269,8 @@ class downloadAction extends sfAction
 
 	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset)
 	{
-		$url = $downloadDeliveryProfile->getAssetUrl($flavorAsset, true);
-		$url = preg_replace('/^https?:\/\//', '', $url);
-		$url = $downloadDeliveryProfile->getHostName() . $url;
-		$url = infraRequestUtils::getProtocol() . '://' . $url;
 
+		$url = $flavorAsset->getServeFlavorUrl(null, null, $downloadDeliveryProfile);
 		KalturaLog::log ("URL to redirect to [$url]" );
 		return $url;
 	}

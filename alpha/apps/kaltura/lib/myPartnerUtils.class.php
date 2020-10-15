@@ -1766,14 +1766,15 @@ class myPartnerUtils
 			}
 		}
 	}
-	
+
 	/**
 	 * Ensure the request for media arrived in a way approved by the partner.
 	 * this may include restricting to a specific cdn, enforcing token usage etc..
 	 * Die in case of a breach.
-	 * 
+	 *
 	 * @param entry $entry
 	 * @param asset $asset
+	 * @param $storageProfileId
 	 */
 	public static function enforceDelivery($entry, $asset = null, $storageProfileId = null)
 	{
@@ -1800,7 +1801,7 @@ class myPartnerUtils
 			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
 		}
 
-		if(!is_null($storageProfileId))
+		if((!$validServe || $restricted) && !is_null($storageProfileId))
 		{
 			if(!self::isDownloadAllowed($storageProfileId, $entry->getId()))
 			{

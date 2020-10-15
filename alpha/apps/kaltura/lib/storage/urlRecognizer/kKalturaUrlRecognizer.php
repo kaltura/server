@@ -38,21 +38,13 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 			return false;
 		}
 		$endingParts = explode('/', $uriParts[1]);
-		if(count($endingParts) > 2)
+		if(count($endingParts) !== 2)
 		{
 			return false;
 		}
+		$requestSignature = $endingParts[0];
 
-		$requestSignature =  $endingParts[0];
-		$pathEnding = '';
-		if(count($endingParts) == 2)
-		{
-			$pathEnding = '/' . $endingParts[1];
-		}
-
-		$nonSignedUri = $uriParts[0] . $pathEnding;
-		$calculatedSignature = urlencode(base64_encode(hash_hmac('sha256', $nonSignedUri, $this->secret)));
-
+		$calculatedSignature = urlencode(base64_encode(hash_hmac('sha256', $uriParts[0], $this->secret)));
 		if($calculatedSignature !== $requestSignature)
 		{
 			return false;

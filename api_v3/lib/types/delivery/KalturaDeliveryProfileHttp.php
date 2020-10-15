@@ -3,24 +3,22 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDeliveryProfileAkamaiHttp extends KalturaDeliveryProfileHttp {
-	
+class KalturaDeliveryProfileHttp extends KalturaDeliveryProfile
+{
+
 	/**
-	 * Should we use intelliseek
-	 * 
-	 * @var bool
+	 * @var int
 	 */
-	public $useIntelliseek;
-	
+	public $maxSize;
+
 	private static $map_between_objects = array
 	(
-			"useIntelliseek",
+		"maxSize"
 	);
-	
+
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
-	
-}
 
+}
