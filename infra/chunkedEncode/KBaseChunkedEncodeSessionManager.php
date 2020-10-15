@@ -223,6 +223,12 @@ $retries=3;
 					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
 					return false;
 				}
+				if(!file_exists($chunkFixName)){
+					KalturaLog::log($msgStr="Chunk ($idx) fix FAILED, missing fixed file ($chunkFixName)!");
+					$this->returnMessages[] = $msgStr;
+					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
+					return false;
+				}
 			}
 			
 			return true;
