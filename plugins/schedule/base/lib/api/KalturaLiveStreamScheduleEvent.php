@@ -87,7 +87,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	protected function validateLiveStreamEventFields()
 	{
-		if (isset($this->sourceEntryId) && !BaseentryPeer::retrieveByPK($this->sourceEntryId))
+		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
 		}
