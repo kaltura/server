@@ -18,7 +18,7 @@ class KThumbnailCapture
 	}
 
 
-	public static function generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '')
+	public static function generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '')
 	{
 		$offset = floor($calc_vid_sec * 1000);
 		if ($width)
@@ -29,7 +29,7 @@ class KThumbnailCapture
 		$packagerThumbCapture = str_replace(
 			array("{url}", "{offset}"),
 			array($url, $offsetPrefix . $offset),
-			$packagerCaptureUrl);
+			$packagerCaptureUrl) . $postFix;
 
 		$tempThumbPath = self::getCapturePath($capturedThumbPath);
 		return array($packagerThumbCapture, $tempThumbPath);
