@@ -989,6 +989,12 @@ class BaseEntryService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
 		}
 
+		$simuliveEvent = kSimuliveUtils::getPlayableSimuliveEvent($dbEntry);
+		if ($simuliveEvent)
+		{
+			$dbEntry = kSimuliveUtils::getSourceEntry($simuliveEvent);
+		}
+
 		$asset = null;
 		if ($contextDataParams->flavorAssetId)
 		{
