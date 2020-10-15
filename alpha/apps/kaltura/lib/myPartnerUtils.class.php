@@ -1786,25 +1786,32 @@ class myPartnerUtils
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
 		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
-		if(!$validServe && is_null($storageProfileId))
+		$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+		if(!$validServe)
 		{
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+			if(!is_null($storageProfileId) && $downloadAllowed)
+			{
+				return;
+			}
+			else
+			{
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+			}
 		}
 
 		// enforce delivery
 		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
 		
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
-		if ($restricted && is_null($storageProfileId))
+		if ($restricted)
 		{
-			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
-			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
-		}
-
-		if((!$validServe || $restricted) && !is_null($storageProfileId))
-		{
-			if(!self::isDownloadAllowed($storageProfileId, $entry->getId()))
+			if(!is_null($storageProfileId) && $downloadAllowed)
 			{
+				return;
+			}
+			else
+			{
+				KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 			}
 		}
@@ -2235,7 +2242,7 @@ class myPartnerUtils
 		}
 
 		$deliveryProfileIds = $storageProfile->getDeliveryProfileIds();
-		if(!$deliveryProfileIds || !$deliveryProfileIds[self::TYPE_DOWNLOAD])
+		if(!$deliveryProfileIds || !isset($deliveryProfileIds[self::TYPE_DOWNLOAD]))
 		{
 			return null;
 		}

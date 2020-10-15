@@ -53,7 +53,7 @@ class DeliveryProfileHttp extends DeliveryProfileVod {
 		{
 			foreach($deliveryAttributes->getFlavorAssets() as $flavorAsset)
 			{
-				$flavorSize = $flavorAsset->getSize() * 1024; // size in MB
+				$flavorSize = $flavorAsset->getSize() * 1024 * 1024; // size in MB
 				if($flavorSize > $this->getMaxSize())
 				{
 					return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
