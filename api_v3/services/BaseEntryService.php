@@ -992,7 +992,7 @@ class BaseEntryService extends KalturaEntryService
 		$simuliveEvent = kSimuliveUtils::getPlayableSimuliveEvent($dbEntry);
 		if ($simuliveEvent)
 		{
-			$dbEntry = entryPeer::retrieveByPK($simuliveEvent->getSourceEntryId());
+			$dbEntry = kSimuliveUtils::getSourceEntry($simuliveEvent);
 		} 
 
 		$asset = null;
