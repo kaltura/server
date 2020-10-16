@@ -284,6 +284,14 @@ $retries=3;
 				
 				break;
 			}
+			
+			// remove if you are not working with the fopen flow
+			$localTmpConcatVideoFilePath = $this->chunker->getSessionName("video");
+			if(file_exists($localTmpConcatVideoFilePath)) {
+				KalturaLog::debug("Deleting local copy of the tmp video concat file from [$localTmpConcatVideoFilePath]");
+				unlink($localTmpConcatVideoFilePath);
+			}
+			
 			if($attempt==$maxAttempts){
 				KalturaLog::log($msgStr="FAILED to merge, leaving!");
 				$this->returnMessages[] = $msgStr;
