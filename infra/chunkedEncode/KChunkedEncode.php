@@ -1018,7 +1018,6 @@
 		{
 			switch($mode){
 			case "merged":
-				$name = sys_get_temp_dir() . '/' . basename($this->setup->output) . '_merged';
 				$name = $this->setup->output."_merged";
 				break;
 			case "audio":
@@ -1038,6 +1037,9 @@
 				break;
 			case "concat":
 				$name = $this->setup->output."_concat.log";
+				break;
+			case "video":
+				$name = sys_get_temp_dir() . '/' . basename($this->setup->output) . "_$mode";
 				break;
 			default:
 				$name = $this->setup->output."_$mode";
