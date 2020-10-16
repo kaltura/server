@@ -642,7 +642,7 @@
 			}
 			fclose($ifhd);
 			KalturaLog::log("sz:$wrSz  ".$fileName);
-			return true;
+			return $wrSz;
 		}
 		
 		/********************
@@ -670,8 +670,24 @@
 					$chunkFileName = $this->getChunkName($idx, $mode);
 				}
 				
-				if(($rv=self::concatChunk($oFh, $chunkFileName))===false)
+				$retries = 3;
+				$mergeFileSuccess = false;
+				while($retries > 0) {
+					$bytesWritten=self::concatChunk($oFh, $chunkFileName);
+					if($bytesWriten !== false) {
+						$mergedFileSize += $bytesWriten;
+						$mergeFileSuccess = true;
+						break;
+					}
+					
+					fseek($oFh, $mergedFileSize, SEEK_SET);
+					$retries--;
+				}
+				
+				if(!$mergeFileSuccess) {
+					KalturaLog::debug("Failed to build merged file, Convert will fail, bytes fetched [$mergedFileSize]");
 					break;
+				}
 			}
 			fclose($oFh);
 			
@@ -1002,6 +1018,7 @@
 		{
 			switch($mode){
 			case "merged":
+				$name = sys_get_temp_dir() . '/' . basename($this->setup->output) . '_merged';
 				$name = $this->setup->output."_merged";
 				break;
 			case "audio":
