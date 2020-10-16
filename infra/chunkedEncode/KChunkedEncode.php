@@ -622,7 +622,7 @@
 		/********************
 		 * concatChunk
 		 */
-		private static function concatChunk($fhd, $fileName, $rdSz=10000000)
+		private static function concatChunk($fhd, $fileName, $rdSz=10000000, $expectedFileSize = null)
 		{
 			$fileName = kFile::realPath($fileName);
 			if(($ifhd=fopen($fileName,"rb"))===false){
@@ -641,7 +641,11 @@
 				$wrSz+=$sz;
 			}
 			fclose($ifhd);
-			KalturaLog::log("sz:$wrSz  ".$fileName);
+			KalturaLog::log("sz:$wrSz ex: $expectedFileSize ".$fileName);
+			
+			if($expectedFileSize && $expectedFileSize != $wrSz)
+				return false;
+			
 			return $wrSz;
 		}
 		
@@ -661,31 +665,40 @@
 			stream_wrapper_restore('http');
 			stream_wrapper_restore('https');
 			
-			foreach($this->chunkDataArr as $idx=>$chunkData){
+			$rv = true;
+			$mergedFileSize = 0;
+			$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
+			foreach($this->chunkDataArr as $idx=>$chunkData) {
+				$originalFileSize = null;
 				if(isset($chunkData->toFix)) {
 					$chunkFileName = $this->getChunkName($idx,"fix");
+					$originalFileSize = filesize($chunkFileName);
 				}
 				else {
-					$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
 					$chunkFileName = $this->getChunkName($idx, $mode);
+					if( isset($chunkData->outFileSizes) && isset($chunkData->outFileSizes[basename($chunkFileName)]) ) {
+						$originalFileSize = $chunkData->outFileSizes[basename($chunkFileName)];
+					}
 				}
 				
 				$retries = 3;
 				$mergeFileSuccess = false;
 				while($retries > 0) {
-					$bytesWritten=self::concatChunk($oFh, $chunkFileName);
-					if($bytesWriten !== false) {
-						$mergedFileSize += $bytesWriten;
+					$bytesWritten=self::concatChunk($oFh, $chunkFileName, 10000000, $originalFileSize);
+					if($bytesWritten !== false) {
+						$mergedFileSize += $bytesWritten;
 						$mergeFileSuccess = true;
 						break;
 					}
 					
-					fseek($oFh, $mergedFileSize, SEEK_SET);
 					$retries--;
+					fseek($oFh, $mergedFileSize, SEEK_SET);
+					KalturaLog::debug("Failed to download [$chunkFileName], retries left [$retries]");
 				}
 				
 				if(!$mergeFileSuccess) {
 					KalturaLog::debug("Failed to build merged file, Convert will fail, bytes fetched [$mergedFileSize]");
+					$rv = false;
 					break;
 				}
 			}
@@ -1006,9 +1019,11 @@
 		 * updateChunkFileStatData
 		 *	Retrieve chunk stat data and update the chunks data array
 		 */
-		public function updateChunkFileStatData($idx, $stat)
+		public function updateChunkFileStatData($idx, $stat, $outFileSizes = array())
 		{
 			$this->chunkDataArr[$idx]->stat = $stat;
+			$this->chunkDataArr[$idx]->outFileSizes = $outFileSizes;
+			
 		}
 		
 		/********************
