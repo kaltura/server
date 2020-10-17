@@ -98,7 +98,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		foreach ($profiles as $profile)
 		{
 			/** @var KalturaScheduledTaskProfile $profile */
-			$sorted[$profile->id][] = $profile;
+			$sorted[$profile->partnerId][] = $profile;
 		}
 		return $sorted;
 	}
