@@ -65,7 +65,7 @@ class myPackagerUtils
 		}
 		else
 		{
-			$entry_data_path = $path = $fileSync->getFilePath();
+			$entry_data_path = $fileSync->getFilePath();
 			$entry_data_path = ltrim($entry_data_path, '/');
 			return self::captureLocalThumb($entry_data_path, $capturedThumbPath, $calc_vid_sec, $width, $height);
 		}

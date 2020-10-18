@@ -14,6 +14,5 @@ class myCloudUtils
 	public static function getCloudPreferredStorage()
 	{
 		return kConf::get(self::PREFERRED_CLOUD_STORAGE_ID_PARAM, self::CLOUD_STORAGE_MAP, null);
-
 	}
 }
