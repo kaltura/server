@@ -96,7 +96,6 @@ class KSchedulerConfig extends Zend_Config_Ini
 		{
 			KalturaLog::log('loading configuration from Disc at ' . date('H:i:s', $this->configTimestamp));
 			$this->configTimestamp = $this->calculateFileTimestamp();
-			$this->schedulerId = $this->getId();
 			if(is_dir($this->configFileName))
 			{
 				$this->implodeDirectoryFiles($configFileName);
@@ -134,20 +133,26 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$this->hostName = $hostname;
 
 		$this->taskConfigList = array();
-
-		if (!$this->schedulerId && !$this->loadConfigFromDisc)
+		if($this->loadConfigFromDisc)
 		{
-			try
+			$this->schedulerId = $this->getId();
+		}
+		else
+		{
+			if (!$this->schedulerId)
 			{
-				if (!$this->initSchedulerId($hostname))
+				try
 				{
+					if (!$this->initSchedulerId($hostname))
+					{
+						return false;
+					}
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::alert('Error loading SchedulerId from server! ' . $e->getMessage());
 					return false;
 				}
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::alert('Error loading SchedulerId from server! ' . $e->getMessage());
-				return false;
 			}
 		}
 
