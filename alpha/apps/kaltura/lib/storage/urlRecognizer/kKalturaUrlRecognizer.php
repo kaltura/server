@@ -11,22 +11,22 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 	/**
 	 * @var string
 	 */
-	protected $secret;
+	protected $key;
 
 	/**
 	 * @return string
 	 */
-	public function getSecret()
+	public function getKey()
 	{
-		return $this->secret;
+		return $this->key;
 	}
 
 	/**
-	 * @param string $secret
+	 * @param string $key
 	 */
-	public function setSecret($secret)
+	public function setKey($key)
 	{
-		$this->secret = $secret;
+		$this->key = $key;
 	}
 
 	public function isRecognized($requestOrigin)
@@ -40,8 +40,7 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 		}
 		$partToSign = substr($uri, 0, $matches[0][1]);
 		$requestSignature = $matches[1][0];
-
-		$calculatedSignature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $partToSign, $this->secret));
+		$calculatedSignature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $partToSign, $this->key));
 		if($calculatedSignature !== $requestSignature)
 		{
 			return false;

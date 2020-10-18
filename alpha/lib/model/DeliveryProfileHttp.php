@@ -47,14 +47,16 @@ class DeliveryProfileHttp extends DeliveryProfileVod {
 		$result = parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
 
 		if ($result == self::DYNAMIC_ATTRIBUTES_NO_SUPPORT)
+		{
 			return $result;
+		}
 
 		if($this->getMaxSize())
 		{
 			foreach($deliveryAttributes->getFlavorAssets() as $flavorAsset)
 			{
-				$flavorSize = $flavorAsset->getSize() * 1024 * 1024; // size in MB
-				if($flavorSize > $this->getMaxSize())
+				$flavorSizeInBytes = $flavorAsset->getSize() * 1024;
+				if($flavorSizeInBytes > $this->getMaxSize())
 				{
 					return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 				}

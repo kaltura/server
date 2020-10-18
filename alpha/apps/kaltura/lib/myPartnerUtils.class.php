@@ -2226,6 +2226,7 @@ class myPartnerUtils
 			$urlRecognized = $downloadRecognizer->isRecognized(null);
 			if($urlRecognized)
 			{
+				KalturaLog::log ( "Download from storage [$storageProfileId] allowed" );
 				return true;
 			}
 		}

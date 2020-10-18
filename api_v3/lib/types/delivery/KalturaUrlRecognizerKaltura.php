@@ -11,11 +11,11 @@ class KalturaUrlRecognizerKaltura extends KalturaUrlRecognizer
 	 *
 	 * @var string
 	 */
-	public $secret;
+	public $key;
 
 	private static $map_between_objects = array
 	(
-		"secret",
+		"key",
 	);
 
 	public function getMapBetweenObjects ( )

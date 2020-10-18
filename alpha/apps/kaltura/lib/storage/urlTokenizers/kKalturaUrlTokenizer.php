@@ -3,28 +3,6 @@
 
 class kKalturaUrlTokenizer extends kUrlTokenizer
 {
-
-	/**
-	 * @var string
-	 */
-	protected $secret;
-
-	/**
-	 * @return string
-	 */
-	public function getSecret()
-	{
-		return $this->secret;
-	}
-
-	/**
-	 * @param string $secret
-	 */
-	public function setSecret($secret)
-	{
-		$this->secret = $secret;
-	}
-
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -35,7 +13,7 @@ class kKalturaUrlTokenizer extends kUrlTokenizer
 		$lastSlashPosition = strrpos($url, "/");
 		$path = substr($url, 0, $lastSlashPosition);
 		$fileName = substr($url, $lastSlashPosition + 1);
-		$signature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $path, $this->secret));
+		$signature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $path, $this->key));
 		return $path . '/sig/' . $signature . '/' . $fileName;
 	}
 
