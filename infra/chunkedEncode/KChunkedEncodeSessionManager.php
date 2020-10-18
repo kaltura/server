@@ -314,7 +314,7 @@
 			$chunker = $this->chunker;
 			$videoJobs = $this->getVideoJobs();
 			foreach($videoJobs as $job) {
-				$chunker->updateChunkFileStatData($job->id,$job->stat); 
+				$chunker->updateChunkFileStatData($job->id,$job->stat,isset($job->outFileSizes) ? $job->outFileSizes : array());
 				$logFilename = $chunker->getChunkName($job->id,".log");
 				$execData = new KProcessExecutionData($job->process, $logFilename);
 				$execData->startedAt = $job->startTime;

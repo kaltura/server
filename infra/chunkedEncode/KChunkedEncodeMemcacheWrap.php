@@ -718,11 +718,14 @@ ini_set("memory_limit","512M");
 			else if(isset($tmpPromptFolder) && isset($storageFilenames) && true)
 				$moveToFilenames = $storageFilenames;
 			
+			$outFileSizes = array();
 			if(isset($moveToFilenames)){
 				$keys = array_keys($outFilenames);
 				$movErrStr = null;
 				foreach ($keys as $key) {
-					KalturaLog::debug("Move file from [" . $outFilenames[$key] . "] to [" . $moveToFilenames[$key] . "]");
+					$outFileSize = filesize($outFilenames[$key]);
+					$outFileSizes[basename($outFilenames[$key])] = $outFileSize;
+					KalturaLog::debug("Move file from [" . $outFilenames[$key] . "] to [" . $moveToFilenames[$key] . "] fileSize [$outFileSize]");
 					if(kFile::checkFileExists($outFilenames[$key]) && !kFile::moveFile($outFilenames[$key], $moveToFilenames[$key])) {
 						$job->state = $job::STATE_FAIL;
 						$movErrStr.= ($storageFilenames[$key].",");
@@ -735,6 +738,7 @@ ini_set("memory_limit","512M");
 				}
 			}
 
+			$job->outFileSizes = $outFileSizes;
 			$storeManager->SaveJob($job);
 			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
