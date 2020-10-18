@@ -160,7 +160,7 @@ while($s = trim(fgets($f)))
 			$doc = array_map('intval', $doc);
 
 			$params = array(
-				'index' => $entry->getElasticIndexName(),
+				'index' => kBaseESearch::getElasticIndexNamePerPartner($entry->getElasticIndexName(),$entry->getPartnerId()),
 				'type' => $entry->getElasticObjectType(),
 				'id' => $entry->getElasticId(),
 				'action' => ElasticMethodType::UPDATE,

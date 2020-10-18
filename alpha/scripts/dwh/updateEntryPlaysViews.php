@@ -55,7 +55,7 @@ while($s = trim(fgets($f))){
 
 			//update elastic via sphinx log
 			$params = array(
-				'index' => $entry->getElasticIndexName(),
+				'index' => kBaseESearch::getElasticIndexNamePerPartner($entry->getElasticIndexName(),$entry->getPartnerId()),
 				'type' => $entry->getElasticObjectType(),
 				'id' => $entry->getElasticId(),
 				'action' => ElasticMethodType::UPDATE,
