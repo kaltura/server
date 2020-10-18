@@ -650,8 +650,11 @@
 		 */
 		public function ConcatChunks()
 		{
-			//Remove return to revert back to using ts concat flow
+			/*
+			Remove return to revert back to using ts concat flow
 			return true;
+			*/
+			
 			$videoFilename = $this->getSessionName("video");
 			$oFh=fopen($videoFilename,"wb");
 			if($oFh===false){
@@ -686,14 +689,14 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
-			/* Disable separate merging of video chunks
 			$vidConcatStr = $this->getSessionName("video");
-			*/
 			
 			$mode = null;
 			$setup = $this->setup;
-			$vidConcatStr = "concat:'";
 			$mergeCmd = $setup->ffmpegBin;
+			
+			/* Remove comment to re-enable chuk concat via ffmpeg
+			$vidConcatStr = "concat:'";
 			if($this->setup->sharedChunkPath) {
 				$mode = "shared";
 				$mergeCmd .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\" ";
@@ -714,6 +717,7 @@
 			
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
+			*/
 			
 			$params = $this->params;
 			$audioInputParams = null;
