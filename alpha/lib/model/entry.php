@@ -1775,6 +1775,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setReplacedEntryId ( $v )	{	$this->putInCustomData ( "replacedEntryId" , $v );	}
 	public function getReplacedEntryId (  )		{	return $this->getFromCustomData( "replacedEntryId" );	}
 
+	public function setBumperEntryId ( $v )	{	$this->putInCustomData ( "bumperEntryId" , $v );	}
+	public function getBumperEntryId (  )		{	return $this->getFromCustomData( "bumperEntryId" );	}
+
 	public function setIsTemporary ( $v )	{	$this->putInCustomData ( "isTemporary" , $v );	}
 	public function getIsTemporary (  )		{	return $this->getFromCustomData( "isTemporary", null, false );	}
 

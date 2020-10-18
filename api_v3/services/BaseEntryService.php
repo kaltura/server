@@ -973,6 +973,34 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		$bumperEntryId = $dbEntry->getBumperEntryId();
+		$dbBumperEntry = null;
+		if($bumperEntryId)
+		{
+			$dbBumperEntry = entryPeer::retrieveByPK($bumperEntryId);
+			if (!$dbBumperEntry)
+			{
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $bumperEntryId);
+			}
+		}
+
+		list($playbackContextDataHelper, $contextDataHelper) = $this->constructContextDataHelpers($dbEntry, $contextDataParams);
+
+		// Bumper
+		if($dbBumperEntry)
+		{
+			$this->handleBumperOnEntry($dbBumperEntry, $contextDataParams, $playbackContextDataHelper);
+		}
+
+		$result = new KalturaPlaybackContext();
+		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
+		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
+
+		return $result;
+	}
+
+	protected function constructContextDataHelpers(entry $dbEntry, KalturaPlaybackContextOptions $contextDataParams)
+	{
 		if ($dbEntry->getStatus() != entryStatus::READY)
 		{
 			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
@@ -1025,11 +1053,40 @@ class BaseEntryService extends KalturaEntryService
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
 		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
 
-		$result = new KalturaPlaybackContext();
-		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
-		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
-
-		return $result;
+		return array($playbackContextDataHelper, $contextDataHelper);
 	}
 
+	protected function handleBumperOnEntry(entry $dbBumperEntry, KalturaPlaybackContextOptions $contextDataParams, kPlaybackContextDataHelper $playbackContextDataHelper)
+	{
+		$contextDataParams->flavorAssetId = null;
+		list($bumperPlaybackContextDataHelper,) = $this->constructContextDataHelpers($dbBumperEntry, $contextDataParams);
+
+		$entrySources = $this->sortSources($playbackContextDataHelper->getPlaybackContext()->getSources());
+		$bumperSources = $this->sortSources($bumperPlaybackContextDataHelper->getPlaybackContext()->getSources());
+
+		foreach($entrySources as $deliveryProfileId => $entrySource)
+		{
+			if(isset($bumperSources[$deliveryProfileId]))
+			{
+				$entrySource->setBumperData($this->extractBumperData($bumperSources[$deliveryProfileId]));
+			}
+		}
+	}
+
+	protected function sortSources($sources)
+	{
+		$sortedSources = array();
+		foreach ($sources as $source)
+		{
+			$sortedSources[$source->getDeliveryProfileId()] = $source;
+		}
+		return $sortedSources;
+	}
+
+	protected function extractBumperData($bumperSource)
+	{
+		$bumperData = array();
+		$bumperData['url'] = $bumperSource->getUrl();
+		return $bumperData;
+	}
 }

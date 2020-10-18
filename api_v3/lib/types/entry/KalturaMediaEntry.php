@@ -109,9 +109,16 @@ class KalturaMediaEntry extends KalturaPlayableEntry {
 	 */
 	public $streams;
 
-	private static $map_between_objects = array ("mediaType", "conversionQuality", "sourceType" , "sourceVersion", "searchProviderType", // see special logic for this field below
-	//"searchProviderType", // see special logic for this field below
-	"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled", "streams" );
+	/**
+	 * The value for the bumper entry id field.
+	 * @var string
+	 */
+	public $bumperEntryId;
+
+	private static $map_between_objects = array (
+		"mediaType", "conversionQuality", "sourceType" , "sourceVersion", "searchProviderType", "bumperEntryId",
+		"searchProviderId" => "sourceId", "creditUserName" => "credit", "creditUrl" => "siteUrl", "partnerId", "mediaDate", "dataUrl", "flavorParamsIds", "isTrimDisabled", "streams"
+	);
 	
 	public function __construct() {
 		$this->type = KalturaEntryType::MEDIA_CLIP;
