@@ -60,10 +60,20 @@
 				return false;
 			}
 			
-			if($this->Analyze()>0 && $this->FixChunks()!==true){
-				return false;
+$retries=3;			
+			if($this->Analyze()>0) {
+				for($idx=0;$idx<$retries;$idx++) {
+					if($this->FixChunks()===true){
+						break;
+					}
+					KalturaLog::log("FixChunks failed: retry $idx/$retries");
+					sleep(rand(1,3));
+				}
+				if($idx==$retries){
+					return false;
+				}
 			}
-
+			
 			if($this->Merge()!=true){
 				return false;
 			}
@@ -213,6 +223,12 @@
 					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
 					return false;
 				}
+				if(!file_exists($chunkFixName)){
+					KalturaLog::log($msgStr="Chunk ($idx) fix FAILED, missing fixed file ($chunkFixName)!");
+					$this->returnMessages[] = $msgStr;
+					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
+					return false;
+				}
 			}
 			
 			return true;
@@ -257,6 +273,15 @@
 					sleep(5);
 					continue;
 				}
+				if($this->chunker->ValidateMergedFile($msgStr)!=true){
+					KalturaLog::log("FAILED to merge (attempt:$attempt, $msgStr)!");
+					$logTail = self::getLogTail($concatFilenameLog);
+					if(isset($logTail))
+						KalturaLog::log("Log dump:\n".$logTail);
+					sleep(5);
+					continue;
+				}
+				
 				break;
 			}
 			if($attempt==$maxAttempts){
@@ -266,12 +291,6 @@
 				return false;
 			}
 
-			if($this->chunker->ValidateMergedFile($msgStr)!=true){
-				KalturaLog::log($msgStr);
-				$this->returnMessages[] = $msgStr;
-				$this->returnStatus = KChunkedEncodeReturnStatus::MergeThreshError;
-				return false;
-			}
 			return true;
 		}
 		

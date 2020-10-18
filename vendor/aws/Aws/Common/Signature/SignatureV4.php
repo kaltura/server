@@ -160,14 +160,18 @@ class SignatureV4 extends AbstractSignature implements EndpointSignatureInterfac
     ) {
         $request = $this->createPresignedRequest($request, $credentials);
         $query = $request->getQuery();
-        $httpDate = gmdate(DateFormat::ISO8601, $this->getTimestamp());
+        
+        // Get timestamp once to avoid drift in timestamp when setting X-Amz-Date
+        $timeStamp = $this->getTimestamp();
+        
+        $httpDate = gmdate(DateFormat::ISO8601, $timeStamp);
         $shortDate = substr($httpDate, 0, 8);
         $scope = $this->createScope(
             $shortDate,
             $this->regionName,
             $this->serviceName
         );
-        $this->addQueryValues($scope, $request, $credentials, $expires);
+        $this->addQueryValues($scope, $request, $credentials, $expires, $timeStamp);
         $payload = $this->getPresignedPayload($request);
         $context = $this->createSigningContext($request, $payload);
         $stringToSign = $this->createStringToSign(
@@ -441,7 +445,8 @@ class SignatureV4 extends AbstractSignature implements EndpointSignatureInterfac
         $scope,
         RequestInterface $request,
         CredentialsInterface $credentials,
-        $expires
+        $expires,
+        $timeStamp
     ) {
         $credential = $credentials->getAccessKeyId() . '/' . $scope;
 
@@ -449,7 +454,7 @@ class SignatureV4 extends AbstractSignature implements EndpointSignatureInterfac
         $request->getQuery()
             ->set('X-Amz-Algorithm', 'AWS4-HMAC-SHA256')
             ->set('X-Amz-Credential', $credential)
-            ->set('X-Amz-Date', gmdate('Ymd\THis\Z', $this->getTimestamp()))
+            ->set('X-Amz-Date', gmdate('Ymd\THis\Z', $timeStamp))
             ->set('X-Amz-SignedHeaders', 'Host')
             ->set('X-Amz-Expires', $this->convertExpires($expires));
     }
