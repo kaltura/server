@@ -604,7 +604,7 @@ function compareHeaders($headersNew, $headersOld)
 	$headersArrNew = getHeadersArr($headersNew);
 	$headersArrOld = getHeadersArr($headersOld);
 	$keys = array_unique(array_merge(array_keys($headersArrNew), array_keys($headersArrOld)));
-	$ignoreHeaders = array('Server', 'Date', 'Connection', 'X-Me', 'X-Kaltura-Session', 'Expires', 'Cache-Control', 'Last-modified', 'ETag');
+	$ignoreHeaders = array('Server', 'Date', 'Connection', 'X-Me', 'X-Kaltura-Session', 'Expires', 'Cache-Control', 'Last-modified', 'ETag', 'Pragma', 'X-Kaltura');
 
 	foreach($keys as $key)
 	{
@@ -1474,7 +1474,7 @@ class LogProcessorDownloadList implements LogProcessor
 			extendRequestKss($parsedParams);
 			$startUri = substr($uri, 0, $matches[0][1]);
 			$endUri = substr($uri,  $matches[1][1] + strlen($matches[1][0]) + 1);
-			$uri = $startUri . '/ks/' . $parsedParams['ks'] . $endUri;
+			$uri = $startUri . '/ks/' . $parsedParams['ks'] . '/' . $endUri;
 		}
 
 		testAction(null, 'downloadAction', array(), $uri, array(), CM_BINARY, '', true);
