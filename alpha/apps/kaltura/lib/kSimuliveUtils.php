@@ -26,7 +26,7 @@ class kSimuliveUtils
 		}
 
 		/* @var $currentEvent ILiveStreamScheduleEvent */
-		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
+		$sourceEntry = kSimuliveUtils::getSourceEntry($currentEvent);
 		if(!$sourceEntry)
 		{
 			return null;
@@ -49,7 +49,7 @@ class kSimuliveUtils
 	public static function getSimuliveEvents(Entry $entry, $startTime = 0, $duration = 0)
 	{
 		$events = array();
-		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
 		{
 			if (!$startTime)
 			{
@@ -101,9 +101,18 @@ class kSimuliveUtils
 		return null;
 	}
 
+	/**
+	 * @param ILiveStreamScheduleEvent $event
+	 * @return Entry
+	 */
+	public static function getSourceEntry($event)
+	{
+		return entryPeer::retrieveByPK($event->getSourceEntryId());
+	}
+
 	public static function getIsLiveCacheTime (LiveEntry $entry)
 	{
-		if (!$entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		if (!$entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY))
 		{
 			return 0;
 		}
