@@ -52,6 +52,11 @@ class myPackagerUtils
 		$currentDcId = kDataCenterMgr::getCurrentDcId();
 		$preferredStorageId = self::getPreferredStorageId($currentDcId);
 		list ($fileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($fileSyncKey, $flavorAsset, $preferredStorageId, null);
+		if(!$fileSync)
+		{
+			return self::captureRemoteThumbByDeliveryProfile($capturedThumbPath, $calc_vid_sec, $flavorAsset, $width, $height);
+		}
+
 		if(myCloudUtils::isCloudDc($currentDcId) || $fileSync->getDc() != $currentDcId)
 		{
 			if(in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) || in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
@@ -109,6 +114,7 @@ class myPackagerUtils
 					$postFix = "?$queryString";
 				}
 
+				$baseUrl = str_replace("://", "/", $baseUrl);
 				return self::curlThumbUrlWithOffset($baseUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $postFix);
 			}
 		}
@@ -339,12 +345,8 @@ class myPackagerUtils
 		$packagerCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::MAPPED_THUMB);
 		if ($packagerCaptureUrl)
 		{
-			$flavorParamsId = $flavorAsset->getFlavorParamsId();
-			if ($flavorParamsId)
-			{
-				$flavorUrl = self::buildThumbUrl($entry, $flavorAsset);
-				return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
-			}
+			$flavorUrl = self::buildThumbUrl($entry, $flavorAsset);
+			return self::curlThumbUrlWithOffset($flavorUrl, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);
 		}
 
 		return false;
