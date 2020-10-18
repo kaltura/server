@@ -60,6 +60,15 @@
 				KalturaLog::log($msgStr="ERROR: missing essential - source");
 				return false;
 			}
+/**/
+KalturaLog::log(md5_file ($params->source));
+$md5TestStr='0e618f6ed97fac8d01cc213f6dc5af0d';
+$s3TestFileUrl='https://nvp1-kalt-ovp-apptemp.s3.amazonaws.com/convert/chunked/23/88/tmp_convert_5f8818cae72388.10250614_chunkenc/1_4z9ufjfw_1_tcupflmb_1.mp4?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJHMEUCIQCD19zPvt7NGY2IqwA8tq4pVUxwHYKPQRaas%2BSD2bBoAAIgHYPKeLHI%2BqhfToyurHgesJOeTB4BiQIOZKPX5JdiGBwqpwIIKRAAGgw1NzM5ODk3MDI2OTkiDOS%2BuN%2BReWzhiuGV7iqEAnCkXtTVdpwp7Mfv%2BGRRrNCbumpPy3rnXZg6PSmGaJZRud82l1UfOaXowj9Ca1L0TltDaHN4caPOjUwCRV9J0B5AAVHtaBlkkkH8fM06hSNCRF4gwOtu8loaFTbp6ERQYOtWHzSqCw4ppnVHnzzEFXAbIiR%2BfPDWZiEHoUjssT1r8TRYDsCFqCiGIXWRa5ZUHKhZGCjJK51ahjxjea7%2BUzPLjqQMgJkOLjdeRSWzdUw9xCYzCbFHtEFRIOJbMcV4AP0uTUqS056biKPD2Lqn2xnca4ygfQENGHuUWU1DNJ%2FLxYW%2BJYrN8%2B0Ed4z9bgsI4Xjsz1VH0ky9je3H4uffNjvxZzvkMMzur%2FwFOp0BtISULSpU3bDKnKHKa5Sx%2FS0IvMAQuEavFD9ZCvpl%2Bn5dCqXPMMYXyxs%2BKQMgdXJL%2FpXpGvoyU%2FMofmzl%2BAsSR21%2BqAX6wK7rEZWPr3mKHaMiybQ9W8rLMjGUAu0lTfK2OQQwKu3KQGpZ9AAl%2BfXbQI2DAUTCi8IWwJNd%2BrWg9JgEYGaJJKAuS6V1KvHaL9PVT24yq5rPwcfoRRylCA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYLJDTZQV4BLK2HFD%2F20201018%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20201018T081156Z&X-Amz-SignedHeaders=Host&X-Amz-Expires=432000&X-Amz-Signature=20bb02306f10ba69ba1e49a2229f50d94d70081689ad06d414b8601badf8f88b';
+if($md5TestStr==md5_file ($params->source)){
+	$params->source=$s3TestFileUrl;
+	$params->cmdLineArr[0]=$s3TestFileUrl;
+	KalturaLog::log(print_r($params->cmdLineArr,1));
+}
 
 				// Get source mediaData. Required for 'supported' validation
 			$this->sourceFileDt = $this->getMediaData($params->source);
@@ -324,7 +333,7 @@
 			 */
 			$srcIndexes = array_keys($cmdLineArr,'-i');
 			foreach($srcIndexes as $idx) {
-				$cmdLineArr[$idx+1] = realpath($cmdLineArr[$idx+1]);
+				$cmdLineArr[$idx+1] = "'".realpath($cmdLineArr[$idx+1])."'";
 			}
 			
 			$toAddFps = false;
@@ -906,7 +915,7 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
-			$cmdLine.= " -i $params->source";
+			$cmdLine.= " -i '$params->source'";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
