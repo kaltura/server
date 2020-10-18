@@ -82,8 +82,18 @@ abstract class kBaseESearch extends kBaseSearch
 
 	public static function getElasticIndexNamePerPartner($indexName, $partnerId)
 	{
-		$dedicatedPartnersList = kConf::get('dedicated_partners_list', 'elasticDynamicMap', array());
-		KalturaLog::debug("dedicated_partners_list " .  print_r($dedicatedPartnersList,true));
+		//Legacy support of dedicated entry table
+		if($indexName===ElasticIndexMap::ELASTIC_ENTRY_INDEX)
+		{
+			$dedicateEntryPartnerList = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
+			if(in_array($partnerId,$dedicateEntryPartnerList))
+			{
+				$indexName = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_NAME,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, $indexName);
+			}
+		}
+
+		$dedicatedPartnersList = kConf::get(ElasticSearchPlugin::DEDICATE_INDEX_PARTNER_LIST, ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
+
 		if(isset($dedicatedPartnersList[$partnerId]))
 		{
 			$indices = explode(',', $dedicatedPartnersList[$partnerId]);

@@ -3855,24 +3855,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getElasticIndexName()
 	{
-		return self::getElasticIndexNameByPartnerId($this->getPartnerId());
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
 	}
-
-	public static function getCurrentContextElasticIndexName()
-	{
-		return self::getElasticIndexNameByPartnerId(kCurrentContext::getCurrentPartnerId());
-	}
-
-	protected static function getElasticIndexNameByPartnerId($partnerId)
-	{
-		$dedicateEntryPartnerList = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
-		if(in_array($partnerId, $dedicateEntryPartnerList))
-		{
-			return kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_NAME, ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, ElasticIndexMap::ELASTIC_ENTRY_INDEX);
-		}
-		return kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_ENTRY_INDEX, $partnerId);
-	}
-
 
 	/**
 	 * return the name of the elasticsearch type for this object

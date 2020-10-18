@@ -1296,7 +1296,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 */
 	public function getElasticIndexName()
 	{
-		return kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_KUSER_INDEX, $this->getPartnerId());
+		return ElasticIndexMap::ELASTIC_KUSER_INDEX;
 	}
 
 	/**

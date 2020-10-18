@@ -17,6 +17,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 	const DEDICATED_ENTRY_INDEX_NAME = 'dedicated_entry_index_name';
 	const FILTER_TAGS_MAP_NAME = 'elasticDynamicMap';
 	const FILTER_TAGS_PARAM_NAME = 'filterExecutionTags';
+	const DEDICATE_INDEX_PARTNER_LIST = 'dedicate_index_partner_list';
 
 	public static function getPluginName()
 	{

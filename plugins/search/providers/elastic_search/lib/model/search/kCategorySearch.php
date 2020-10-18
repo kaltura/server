@@ -26,10 +26,13 @@ class kCategorySearch extends kBaseESearch
 
     protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
     {
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
         $this->query = array(
-            'index' => kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId()),
+            'index' =>  $indexName,
             'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
         );
+
+        KalturaLog::debug("Index -" . $indexName);
 
         parent::initQuery($statuses, $objectId, $pager, $order);
     }

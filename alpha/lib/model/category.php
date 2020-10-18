@@ -1918,7 +1918,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	 */
 	public function getElasticIndexName()
 	{
-		return kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_CATEGORY_INDEX, $this->getPartnerId());
+		return ElasticIndexMap::ELASTIC_CATEGORY_INDEX;
 	}
 
 	/**
