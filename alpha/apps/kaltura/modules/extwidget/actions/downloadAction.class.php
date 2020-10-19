@@ -118,7 +118,7 @@ class downloadAction extends sfAction
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 			
-		$this->handleFileSyncRedirection($syncKey, $flavorAsset, $entry->getId());
+		$this->handleFileSyncRedirection($syncKey);
 
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
@@ -239,29 +239,17 @@ class downloadAction extends sfAction
 		}
 	}
 	
-	private function handleFileSyncRedirection(FileSyncKey $syncKey, asset $flavorAsset, $entryId)
+	private function handleFileSyncRedirection(FileSyncKey $syncKey)
 	{
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		
 		if (is_null($fileSync))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 
-		if (!$local)
+		if (!$local && !in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
-			$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $entryId);
-			if($downloadDeliveryProfile && $flavorAsset)
-			{
-				$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset);
-			}
-			else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
-			{
-				return;
-			}
-			else
-			{
-				$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-			}
 
+			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KExternalErrors::terminateDispatch();
 			$this->redirect($url);
 		}
