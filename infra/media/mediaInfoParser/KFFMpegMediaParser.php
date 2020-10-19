@@ -784,6 +784,9 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		if(stristr(PHP_OS,'win')) return 1;
 		
 		$srcFileName = kFile::realPath($srcFileName);
+		if(kString::beginsWith($srcFileName, 'http'))
+			return 1;
+		
 		$cmdLine = "dd if=$srcFileName count=1 | $ffprobeBin -i pipe:  2>&1";
 		KalturaLog::log("FastStart detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine, $outputArr, $rv);
