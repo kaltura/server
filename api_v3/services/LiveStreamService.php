@@ -422,9 +422,8 @@ class LiveStreamService extends KalturaLiveEntryService
 					}
 				}
 
-				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+				KalturaLog::info("Determining status of live stream URL [ $url ] and Backup URL [ $backupUrl ]");
 				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-				KalturaLog::info('Determining status of backup live stream URL [' .$backupUrl. ']');
 				$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
 				if ($urlManager || $urlManagerBackup)
 					return $this->responseHandlingIsLive(self::isLiveByUrlManager($urlManager, $url) || self::isLiveByUrlManager($urlManagerBackup, $backupUrl));
@@ -854,13 +853,13 @@ class LiveStreamService extends KalturaLiveEntryService
 	}
 
 	/**
-	 * Using $urlManager isLive method to detect whether the $url is currently live.
+	 * Using $urlManager isLive method to detect if the $url is currently live.
 	 *
-	 * @param DeliveryProfile $urlManager
+	 * @param DeliveryProfileLive $urlManager
 	 * @param string $url
 	 * @return boolean
 	 */
-	protected static function isLiveByUrlManager(DeliveryProfile $urlManager, $url)
+	protected static function isLiveByUrlManager(DeliveryProfileLive $urlManager, $url)
 	{
 		if ($urlManager)
 		{
