@@ -117,8 +117,6 @@ class downloadAction extends sfAction
 		
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-			
-		$this->handleFileSyncRedirection($syncKey, $flavorAsset, $entry->getId());
 
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
@@ -130,10 +128,12 @@ class downloadAction extends sfAction
 
 		if (!$fileName)
 			$fileName = $fileBaseName;
-		
+
 		if ($fileExt && !is_dir($filePath))
 			$fileName = $fileName . '.' . $fileExt;
-		
+
+		$this->handleFileSyncRedirection($syncKey, $flavorAsset, $entry->getId(), $fileName);
+
 		$preview = 0;
 		if($shouldPreview && $flavorAsset) {
 			$preview = $flavorAsset->estimateFileSize($entry, $securyEntryHelper->getPreviewLength());
@@ -239,7 +239,7 @@ class downloadAction extends sfAction
 		}
 	}
 	
-	private function handleFileSyncRedirection(FileSyncKey $syncKey, asset $flavorAsset, $entryId)
+	private function handleFileSyncRedirection(FileSyncKey $syncKey, asset $flavorAsset, $entryId, $fileName)
 	{
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		
@@ -251,7 +251,7 @@ class downloadAction extends sfAction
 			$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $entryId);
 			if($downloadDeliveryProfile && $flavorAsset)
 			{
-				$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset);
+				$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName);
 			}
 			else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 			{
@@ -267,10 +267,10 @@ class downloadAction extends sfAction
 		}
 	}
 
-	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset)
+	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName)
 	{
 
-		$url = $flavorAsset->getServeFlavorUrl(null, null, $downloadDeliveryProfile);
+		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile);
 		KalturaLog::log ("URL to redirect to [$url]" );
 		return $url;
 	}
