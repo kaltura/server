@@ -49,7 +49,7 @@ class DbManager
 	/**
 	 * @param array
 	 */
-	protected static $connNamesByPattern = false;
+	protected static $connNamesByPattern = array();
 
 	public static function setConfig(array $config)
 	{
