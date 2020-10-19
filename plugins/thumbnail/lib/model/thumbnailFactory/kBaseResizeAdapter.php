@@ -117,17 +117,7 @@ class kBaseResizeAdapter
 		$entry = $this->getEntry();
 		$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
 		$format = $this->parameters->get(kThumbFactoryFieldName::IMAGE_FORMAT);
-		//create final path for thumbnail created
-		$sharedFilePath = kFileBase::getS3SharedPath();
-		if($sharedFilePath)
-		{
-			$this->finalThumbPath = $sharedFilePath . myContentStorage::getThumbEntitySharedPath("entry/" . $thumbDirs[0], $entry->getId(), $this->thumbName, $this->entryThumbFilename, $version);
-		}
-		else
-		{
-			$this->finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/" . $thumbDirs[0], $entry->getIntId(), $this->thumbName, $this->entryThumbFilename, $version);
-		}
-
+		$this->finalThumbPath =  myContentStorage::getThumbEntityPath("entry/" . $thumbDirs[0], $entry, $this->thumbName, $this->entryThumbFilename, $version);
 		if($format)
 		{
 			$this->finalThumbPath = kFile::replaceExt($this->finalThumbPath, $format);
