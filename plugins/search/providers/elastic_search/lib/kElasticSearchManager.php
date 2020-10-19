@@ -141,10 +141,16 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $params['index'] = $object->getElasticIndexName();
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner($object->getElasticIndexName(),$object->getPartnerId());
+
+
+        $params['index'] = $indexName;
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
         $params['action'] = $action;
+
+        KalturaLog::debug('Using elastic Index:' . $object->getElasticIndexName() . ' ,actual index name:' . $indexName );
+
 
         try
         {
@@ -194,7 +200,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     private function shouldSyncElastic($object)
     {
-        $key = kCurrentContext::$ks_partner_id . "_" . kCurrentContext::$service . "_" . kCurrentContext::$action . "_" . $object->getElasticIndexName();
+        $key = kCurrentContext::$ks_partner_id . "_" . kCurrentContext::$service . "_" . kCurrentContext::$action . "_" . kBaseESearch::getElasticIndexNamePerPartner($object->getElasticIndexName(),$object->getPartnerId());
         $map = kConf::get('partner_actions_to_skip_elastic_map', 'local', array());
         if (isset($map[$key]))
         {

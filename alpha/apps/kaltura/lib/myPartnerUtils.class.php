@@ -18,6 +18,8 @@ class myPartnerUtils
 	const MARKETO_NEW_INTERNAL_TRIAL_ACCOUNT = 'marketo_new_register_internal_success_campaign';
 	const MARKETO_MISSING_PASSWORD = 'marketo_missing_Password_campaign';
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
+
+	const TYPE_DOWNLOAD = 'download';
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1764,16 +1766,17 @@ class myPartnerUtils
 			}
 		}
 	}
-	
+
 	/**
 	 * Ensure the request for media arrived in a way approved by the partner.
 	 * this may include restricting to a specific cdn, enforcing token usage etc..
 	 * Die in case of a breach.
-	 * 
+	 *
 	 * @param entry $entry
 	 * @param asset $asset
+	 * @param $storageProfileId
 	 */
-	public static function enforceDelivery($entry, $asset = null)
+	public static function enforceDelivery($entry, $asset = null, $storageProfileId = null)
 	{
 		// block inactive partner
 		$partnerId = $entry->getPartnerId();
@@ -1782,7 +1785,19 @@ class myPartnerUtils
 		// validate serve access control
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
-		$secureEntryHelper->validateForServe($flavorParamsId);
+		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
+		$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+		if(!$validServe)
+		{
+			if(!is_null($storageProfileId) && $downloadAllowed)
+			{
+				return;
+			}
+			else
+			{
+				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+			}
+		}
 
 		// enforce delivery
 		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
@@ -1790,10 +1805,18 @@ class myPartnerUtils
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		if ($restricted)
 		{
-			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
-			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
+			if(!is_null($storageProfileId) && $downloadAllowed)
+			{
+				return;
+			}
+			else
+			{
+				KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
+				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
+			}
 		}
 	}
+
 	
 	public static function getPartnersArray(array $partnerIds, Criteria $c = null)
 	{
@@ -2187,6 +2210,53 @@ class myPartnerUtils
 			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
 		}
 		return PartnerAuthenticationType::PASSWORD_ONLY;
+	}
+
+	public static function isDownloadAllowed ($storageProfileId, $entryId)
+	{
+		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
+		if(!$downloadDeliveryProfile)
+		{
+			return false;
+		}
+
+		$downloadRecognizer = $downloadDeliveryProfile->getRecognizer();
+		if($downloadRecognizer)
+		{
+			$urlRecognized = $downloadRecognizer->isRecognized(null);
+			if($urlRecognized)
+			{
+				KalturaLog::log ( "Download from storage [$storageProfileId] allowed" );
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)
+	{
+		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+		if(!$storageProfile)
+		{
+			return null;
+		}
+
+		$deliveryProfileIds = $storageProfile->getDeliveryProfileIds();
+		if(!$deliveryProfileIds || !isset($deliveryProfileIds[self::TYPE_DOWNLOAD]))
+		{
+			return null;
+		}
+		$downloadDeliveryProfileId = $deliveryProfileIds[self::TYPE_DOWNLOAD][0];
+		$downloadDeliveryProfile = DeliveryProfilePeer::retrieveByPK($downloadDeliveryProfileId);
+
+		if($downloadDeliveryProfile)
+		{
+			$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, PlaybackProtocol::HTTP);
+			$downloadDeliveryProfile->setDynamicAttributes($deliveryAttributes);
+		}
+
+		return $downloadDeliveryProfile;
 	}
 
 }

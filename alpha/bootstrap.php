@@ -21,6 +21,8 @@ sfLogger::getInstance()->registerLogger(KalturaLog::getInstance());
 sfLogger::getInstance()->setLogLevel(7);
 sfConfig::set('sf_logging_enabled', true);
 
+kInfraMemcacheCacheWrapper::outputStats();
+
 DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 

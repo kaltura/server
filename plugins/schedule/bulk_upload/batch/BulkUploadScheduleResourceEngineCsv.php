@@ -450,7 +450,12 @@ class BulkUploadScheduleResourceEngineCsv extends BulkUploadEngineCsv
 	{
 		return new KalturaBulkUploadResultScheduleResource();
 	}
-	
+
+	protected function getUploadResultInstanceType()
+	{
+		return KalturaBulkUploadObjectType::SCHEDULE_RESOURCE;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @see KBulkUploadEngine::getObjectTypeTitle()

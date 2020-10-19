@@ -158,7 +158,7 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		$batchJobLock->setJobType($batchJob->getJobType());
 		$batchJobLock->setJobSubType($batchJob->getJobSubType());
 		$batchJobLock->setExecutionAttempts(0);
-		$batchJobLock->setBatchVersion(self::getBatchVersion($batchJob->getJobType()));
+		$batchJobLock->setBatchVersion(self::getBatchVersion($batchJob->getJobType(), $batchJob->getDc()));
 		$batchJobLock->setRootJobId($batchJob->getRootJobId());
 		
 		self::commonLockObjectUpdate($batchJob, $batchJobLock);
@@ -210,10 +210,19 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		}
 	}
 	
-	public static function getBatchVersion($job_type = null) {
+	public static function getBatchVersion($job_type = null, $jobDcId = null) {
 		$batchVersions = kConf::get('batch_version_for_job');
 		if(isset($batchVersions[$job_type]))
 			return $batchVersions[$job_type];
+
+		if(!is_null($jobDcId))
+		{
+			$jobDcInfo = kDataCenterMgr::getDcById($jobDcId);
+			if (isset($jobDcInfo['batchVersion']))
+			{
+				return $jobDcInfo['batchVersion'];
+			}
+		}
 		
 		return kConf::get('default_batch_version');
 	}

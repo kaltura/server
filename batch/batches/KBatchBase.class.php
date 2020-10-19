@@ -266,6 +266,7 @@ abstract class KBatchBase implements IKalturaLogger
 				self::$kClientConfig->$attr = $value;
 		}
 
+		self::setSharedStorageConfig();
 		self::$kClient = new KalturaClient(self::$kClientConfig);
 		self::$kClient->setPartnerId(self::$taskConfig->getPartnerId());
 
@@ -281,6 +282,38 @@ abstract class KBatchBase implements IKalturaLogger
 		$this->onBatchUp();
 
 		KScheduleHelperManager::saveRunningBatch($this->getName(), $this->getIndex());
+	}
+	
+	private static function setSharedStorageConfig()
+	{
+		//Load shared storage config
+		if(self::$taskConfig->getS3Arn())
+		{
+			kSharedFileSystemMgr::setFileSystemOptions("arnRole", self::$taskConfig->getS3Arn());
+		}
+		if(self::$taskConfig->getS3Region())
+		{
+			kSharedFileSystemMgr::setFileSystemOptions("s3Region", self::$taskConfig->getS3Region());
+		}
+		if(self::$taskConfig->getS3AccessKeyId())
+		{
+			kSharedFileSystemMgr::setFileSystemOptions("accessKeyId", self::$taskConfig->getS3AccessKeyId());
+		}
+		if(self::$taskConfig->getS3AccessKeySecret())
+		{
+			kSharedFileSystemMgr::setFileSystemOptions("accessKeySecret", self::$taskConfig->getS3AccessKeySecret());
+		}
+		
+		$storageTypeMap = self::$taskConfig->getStorageTypeMap();
+		if($storageTypeMap)
+		{
+			$maps = explode(":", $storageTypeMap);
+			foreach ($maps as $map)
+			{
+				list($pathPrefix, $storageType) = explode("=", $map);
+				kFile::setStorageTypeMap($pathPrefix, $storageType);
+			}
+		}
 	}
 
 	protected function getParams($name)

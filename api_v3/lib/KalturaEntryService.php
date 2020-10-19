@@ -1088,10 +1088,6 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
 		}
-		else if(!$local)
-		{
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
-		}
 		
 		// even if it null
 		$entry->setConversionQuality($conversionProfileId);
@@ -1883,7 +1879,7 @@ class KalturaEntryService extends KalturaBaseService
 						throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
 					}
 
-					return $fileSync->getExternalUrl($entryId);
+					return $fileSync->getExternalUrl($entryId, null, true);
 				}
 			}
 		}

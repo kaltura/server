@@ -490,7 +490,12 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 	{
 		return new KalturaBulkUploadResultScheduleEvent();
 	}
-	
+
+	protected function getUploadResultInstanceType()
+	{
+		return KalturaBulkUploadObjectType::SCHEDULE_EVENT;
+	}
+
 	/**
 	 *
 	 * Get object type title for messaging purposes

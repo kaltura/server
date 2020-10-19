@@ -136,7 +136,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 			$start = microtime(true);
 			
 			$sharedChunkPath = null;
-			if(isset($data->destFileSyncSharedPath) && isset(KBatchBase::$taskConfig->params->sharedChunkPath))
+			if(isset(KBatchBase::$taskConfig->params->sharedChunkPath))
 			{
 				$sharedChunkPath = KBatchBase::$taskConfig->params->sharedChunkPath;
 			}

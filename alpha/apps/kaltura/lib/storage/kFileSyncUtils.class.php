@@ -478,98 +478,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 		
-		$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-		$keepFileInOriginalMount = kConf::get('keep_original_file_location', 'runtime_config', 0);
-		if($keepFileInOriginalMount)
-		{
-			$fileRealPath = realpath($temp_file_path);
-			
-			$partnerVolumes = kConf::get('partner_volumes', 'local', array());
-			if(isset($partnerVolumes[$target_key->getPartnerId()]))
-			{
-				$volumes = $partnerVolumes[$target_key->getPartnerId()];
-			}
-			else
-			{
-				$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
-			}
-			
-			$mountPrefixTranslate = kConf::get('mount_prefix_translate', 'runtime_config', array());
-			foreach ($mountPrefixTranslate as $mount => $destination)
-			{
-				if(!kString::beginsWith($fileRealPath ,$mount))
-				{
-					continue;
-				}
-				
-				foreach ($volumes as $volume)
-				{
-					if(!strpos($targetFullPath, $volume))
-					{
-						continue;
-					}
-					
-					$targetFullPath = str_replace($volume, $destination, $targetFullPath);
-					$filePath = str_replace($volume, $destination, $filePath);
-					break;
-				}
-				
-				break;
-			}
-		}
-		
-		KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
-		
-		if ( !file_exists( dirname( $targetFullPath )))
-		{
-			self::fullMkdir($targetFullPath);
-		}
-
-		if ( file_exists( $temp_file_path ))
-		{
-			KalturaLog::info("$temp_file_path file exists");
-		}
-		else
-		{
-			$fileRealPath = realpath($temp_file_path);
-			
-			$partnerVolumes = kConf::get('partner_volumes', 'local', array());
-			if(isset($partnerVolumes[$target_key->getPartnerId()]))
-			{
-				$volumes = $partnerVolumes[$target_key->getPartnerId()];
-			}
-			else
-			{
-				$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
-			}
-			
-			$mountPrefixTranslate = kConf::get('mount_prefix_translate', 'runtime_config', array());
-			foreach ($mountPrefixTranslate as $mount => $destination)
-			{
-				if(!kString::beginsWith($fileRealPath ,$mount))
-				{
-					continue;
-				}
-				
-				foreach ($volumes as $volume)
-				{
-					if(!strpos($targetFullPath, $volume))
-					{
-						continue;
-					}
-					
-					$targetFullPath = str_replace($volume, $destination, $targetFullPath);
-					$filePath = str_replace($volume, $destination, $filePath);
-					break;
-				}
-				
-				break;
-			}
-		}
-		
-		KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
-		
-		if ( !file_exists( dirname( $targetFullPath )))
+		if(!kFile::isSharedPath($temp_file_path) || kSharedFileSystemMgr::getIsMoveAtomic($temp_file_path))
 		{
 			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
 			$targetFullPath = $rootPath . $filePath;
@@ -580,7 +489,46 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 			
 			$targetFullPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $targetFullPath);
-	
+			$keepFileInOriginalMount = kConf::get('keep_original_file_location', 'runtime_config', 0);
+			if($keepFileInOriginalMount)
+			{
+				$fileRealPath = realpath($temp_file_path);
+				
+				$partnerVolumes = kConf::get('partner_volumes', 'local', array());
+				if(isset($partnerVolumes[$target_key->getPartnerId()]))
+				{
+					$volumes = $partnerVolumes[$target_key->getPartnerId()];
+				}
+				else
+				{
+					$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
+				}
+				
+				$mountPrefixTranslate = kConf::get('mount_prefix_translate', 'runtime_config', array());
+				foreach ($mountPrefixTranslate as $mount => $destination)
+				{
+					if(!kString::beginsWith($fileRealPath ,$mount))
+					{
+						continue;
+					}
+					
+					foreach ($volumes as $volume)
+					{
+						if(!strpos($targetFullPath, $volume))
+						{
+							continue;
+						}
+						
+						$targetFullPath = str_replace($volume, $destination, $targetFullPath);
+						$filePath = str_replace($volume, $destination, $filePath);
+						break;
+					}
+					
+					break;
+				}
+			}
+			
+			KalturaLog::debug("temp_file_path [$temp_file_path] filePath [$filePath] targetFilePath [$targetFullPath]");
 			if ( !kFile::checkFileExists(dirname( $targetFullPath )))
 			{
 				self::fullMkdir($targetFullPath);
@@ -633,7 +581,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::err("could not move file from [$temp_file_path] to [{$targetFullPath}]");
 			throw new Exception ( "Could not move file from [$temp_file_path] to [{$targetFullPath}]");
 		}
-
 	}
 
 	public static function copyFromFile ($temp_file_path , FileSyncKey $target_key , $strict = true)
@@ -1015,7 +962,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		$desired_file_sync = null;
 		$local = false;
-		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $key->partner_id, $currentDcId);
+		$sortedFileSync = self::getSortedFileSyncs($file_sync_list, $resolve, $currentDcId);
 		if($sortedFileSync)
 		{
 			$desired_file_sync = $sortedFileSync[0];
@@ -1048,17 +995,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 
-	public static function getSortedFileSyncs($file_sync_list, $fetch_from_remote_if_no_local, $resolve, $partner_id, $dc_id)
+	public static function getSortedFileSyncs($file_sync_list, $resolve, $dc_id)
 	{
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
 		$periodicFileSyncs = array();
-		$periodicStorageIds = array();
-
-		if($fetch_from_remote_if_no_local)
-		{
-			$periodicStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($partner_id);
-		}
+		$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		foreach ($file_sync_list as $file_sync)
 		{

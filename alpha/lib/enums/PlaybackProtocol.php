@@ -19,4 +19,5 @@ interface PlaybackProtocol extends BaseEnum
 	const MULTICAST_SL = 'multicast_silverlight';
 	const APPLE_HTTP_TO_MC = 'applehttp_to_mc';
 	const URL = 'url';
+	const DOWNLOAD = 'download';
 }

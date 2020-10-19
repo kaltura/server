@@ -162,7 +162,7 @@ class s3Mgr extends kFileTransferMgr
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
 
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
-		$roleRefresh->s3Arn = $this->s3Arn;
+		$roleRefresh->setRoleArn($this->s3Arn);
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
 
@@ -236,13 +236,24 @@ class s3Mgr extends kFileTransferMgr
 			}
 			KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
 			$fp = fopen($local_file, 'r');
+			
+			if (!$fp)
+			{
+				KalturaLog::err("Failed to fopen given file [$local_file]");
+				return array(false, "Failed to fopen given file [$local_file]");
+			}
+			
 			$res = $this->s3->upload($bucket,
 				$remote_file,
 				$fp,
 				$this->filesAcl,
 				$options
 			);
-			fclose($fp);
+			
+			if($fp)
+			{
+				fclose($fp);
+			}
 
 			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
 			return array(true, null);
@@ -373,7 +384,31 @@ class s3Mgr extends kFileTransferMgr
 
 	protected function doList ($remote_path)
 	{
-		return false;
+		$dirList = array();
+		list($bucket, $remoteDir) = explode("/",ltrim($remote_path,"/"),2);
+		KalturaLog::debug("Listing dir contents for bucket [$bucket] and dir [$remoteDir]");
+		
+		try
+		{
+			$dirListObjectsRaw = $this->s3->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $remoteDir
+			));
+			
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				$dirList[] = array (
+					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
+					"fileSize" => $dirListObject['Size']
+				);
+			}
+		}
+		catch ( Exception $e )
+		{
+			KalturaLog::err("Couldn't list file objects for remote path, [$remote_path] from bucket [$bucket]: {$e->getMessage()}");
+		}
+		
+		return $dirList;
 	}
 
 	protected function doListFileObjects ($remoteDir)
@@ -396,48 +431,30 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$this->s3->registerStreamWrapper();
 	}
-}
+	
+	public function getRemoteUrl($remote_file)
+	{
+		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
+		
+		$params = array(
+			'Bucket' => $bucket,
+			'Key'    => $remote_file,
+		);
+		
+		$cmd = $this->s3->getCommand('GetObject', $params);
+		
+		$expiry = time() + 600;
+		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		
+		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
+		
+		return $preSignedUrl;
+	}
 
-
-
-class RefreshableRole extends AbstractRefreshableCredentials
-{
-    const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
-    const SESSION_DURATION = 3600;
-    public $s3Arn = null;
-
-    public function refresh()
-    {
-        $credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
-
-        $credentials = new Credentials('', '');
-        $ipRefresh = new RefreshableInstanceProfileCredentials(new Credentials('', '', '', 1));
-        $ipCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/instanceProfileCache"));
-
-        $ipCreds = new CacheableCredentials($ipRefresh, $ipCache, 'refresh_role_creds_key');
-        $sts = StsClient::factory(array(
-            'credentials' => $ipCreds,
-        ));
-
-        $call = $sts->assumeRole(array(
-            'RoleArn' => $this->s3Arn,
-            'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
-            'SessionDuration' => self::SESSION_DURATION,
-        ));
-
-        $creds = $call['Credentials'];
-        $result = new Credentials(
-            $creds['AccessKeyId'],
-            $creds['SecretAccessKey'],
-            $creds['SessionToken'],
-            strtotime($creds['Expiration'])
-        );
-
-        $this->credentials->setAccessKeyId($result->getAccessKeyId())
-            ->setSecretKey($result->getSecretKey())
-            ->setSecurityToken($result->getSecurityToken())
-            ->setExpiration($result->getExpiration());
-
-        return $credentials;
-    }
+	public function getFileUrl($remote_file, $expires = null)
+	{
+		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
+		KalturaLog::debug("remote_file: " . $remote_file);
+		return $this->s3->getObjectUrl($bucket, $remote_file, $expires);
+	}
 }

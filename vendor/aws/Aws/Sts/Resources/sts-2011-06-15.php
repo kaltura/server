@@ -118,7 +118,7 @@ return array (
                     'type' => 'numeric',
                     'location' => 'aws.query',
                     'minimum' => 900,
-                    'maximum' => 3600,
+                    'maximum' => 43200,
                 ),
                 'ExternalId' => array(
                     'type' => 'string',

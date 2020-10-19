@@ -951,10 +951,6 @@ class kJobsManager
     		{
     		    $subType = kFileTransferMgrType::HTTPS;
     		}
-    		elseif(stripos($entryUrl, 's3:') === 0)
-    		{
-    			$subType = kFileTransferMgrType::S3;
-    		}
     		else 
     		{
     		    $subType = kFileTransferMgrType::HTTP;
@@ -1463,7 +1459,7 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
 
-		if($srcFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL || in_array($srcFileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds())))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
 		}

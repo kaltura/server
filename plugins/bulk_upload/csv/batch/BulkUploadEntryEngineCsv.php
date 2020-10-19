@@ -545,6 +545,11 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    return new KalturaBulkUploadResultEntry();
 	}
 
+	protected function getUploadResultInstanceType()
+	{
+		return KalturaBulkUploadObjectType::ENTRY;
+	}
+
 	public function getObjectTypeTitle()
 	{
 		return self::OBJECT_TYPE_TITLE;

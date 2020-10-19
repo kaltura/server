@@ -364,7 +364,6 @@ class kFileBase
 	
 	public static function checkFileExists($path)
 	{
-		KalturaLog::debug("Check file exists [$path]");
 		if(kFile::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
@@ -678,5 +677,10 @@ class kFileBase
 		}
 		
 		return $res;
+	}
+	
+	public static function setStorageTypeMap($key, $value)
+	{
+		self::$storageTypeMap[$key] = $value;
 	}
 }

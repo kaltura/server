@@ -1391,6 +1391,7 @@ return array(
 	"Kaltura_Client_Enum_PlaybackProtocol::AUTO" => "auto",
 	"Kaltura_Client_Enum_PlaybackProtocol::AKAMAI_HD" => "AKAMAI_HD",
 	"Kaltura_Client_Enum_PlaybackProtocol::AKAMAI_HDS" => "AKAMAI_HDS",
+	"Kaltura_Client_Enum_PlaybackProtocol::DOWNLOAD" => "DOWNLOAD",
 	"Kaltura_Client_Enum_PlaybackProtocol::HDS" => "HDS",
 	"Kaltura_Client_Enum_PlaybackProtocol::HLS" => "HLS",
 	"Kaltura_Client_Enum_PlaybackProtocol::HTTP" => "HTTP",

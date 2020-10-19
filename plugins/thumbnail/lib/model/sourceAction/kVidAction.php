@@ -103,7 +103,7 @@ abstract class kVidAction extends kSourceAction
 
 		if(!$success)
 		{
-			$data = array(kThumbnailErrorMessages::ERROR_STRING => self::$action_name . kThumbnailErrorMessages::FAILED);
+			$data = array(kThumbnailErrorMessages::ERROR_STRING => static::$action_name . kThumbnailErrorMessages::FAILED);
 			throw new kThumbnailException(kThumbnailException::ACTION_FAILED, kThumbnailException::ACTION_FAILED, $data);
 		}
 	}

@@ -90,7 +90,7 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 				$values = fgetcsv($fileHandle);
 				continue;
 			}
-			
+
 			// creates a result object
 			$this->createUploadResult($values, $columns);
 			if($this->exceededMaxRecordsEachRun)
@@ -157,27 +157,48 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	 */
 	protected function createUploadResult($values, $columns)
 	{
-	    if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
+		if($this->handledRecordsThisRun > $this->maxRecordsEachRun)
 		{
 			$this->exceededMaxRecordsEachRun = true;
 			return null;
 		}
 		$this->handledRecordsThisRun++;
-		
-	    $bulkUploadResult = $this->getUploadResultInstance();
+
+		$foundUnknownEncoding = false;
+
+		$bulkUploadResult = $this->getUploadResultInstance();
+		$bulkUploadResult->bulkUploadResultObjectType = $this->getUploadResultInstanceType();
 		$bulkUploadResult->bulkUploadJobId = $this->job->id;
 		$bulkUploadResult->lineIndex = $this->lineNumber;
 		$bulkUploadResult->partnerId = $this->job->partnerId;
 		//CSV files allow values to contain the "," character, on the condition that the value is surrounded by "".
 		for ($index = 0; $index < count($values); $index++)
 		{
-		    if (strpos($values[$index], ",") !== false)
-		    {
-		        $values[$index] = '"'.$values[$index].'"';
-		    }
+			if (strpos($values[$index], ",") !== false)
+			{
+				$values[$index] = '"'.$values[$index].'"';
+			}
+
+			if(!mb_detect_encoding($values[$index]))
+			{
+				KalturaLog::warning('encoding cannot be detected');
+				$values[$index] = 'encoding cannot be detected';
+				$foundUnknownEncoding = true;
+			}
 		}
 		$bulkUploadResult->rowData = implode(",", $values);
-		
+
+		if ($foundUnknownEncoding)
+		{
+			$bulkUploadResult->objectStatus = KalturaUserStatus::ACTIVE;
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = 'value with unknown encoding was passed';
+
+			$this->addBulkUploadResult($bulkUploadResult);
+			return null;
+		}
+
 		return $bulkUploadResult;
 	}
 
@@ -241,6 +262,8 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	}
 	
 	abstract protected function getUploadResultInstance ();
+
+	abstract protected function getUploadResultInstanceType();
 
 	protected function setResultValues($columns, $values, &$bulkUploadResult)
 	{

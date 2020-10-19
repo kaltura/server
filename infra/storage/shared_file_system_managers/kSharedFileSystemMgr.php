@@ -31,6 +31,8 @@ abstract class kSharedFileSystemMgr
 	
 	private static $kSharedRootPath;
 	
+	public static $storageConfig = array();
+	
 	public function __construct(array $options = null)
 	{
 		return;
@@ -572,10 +574,10 @@ abstract class kSharedFileSystemMgr
 		return true;
 	}
 	
-	public static function getInstance($type = null, $options = null)
+	public static function getInstance($type = null)
 	{
-		$dc_config = kConf::getMap("dc_config");
 		if (!$type) {
+			$dc_config = kConf::getMap("dc_config");
 			$type = isset($dc_config['fileSystemType']) ? $dc_config['fileSystemType'] : kSharedFileSystemMgrType::NFS;
 		}
 		
@@ -585,11 +587,11 @@ abstract class kSharedFileSystemMgr
 		
 		switch ($type) {
 			case kSharedFileSystemMgrType::NFS:
-				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr($options);
+				self::$kSharedFsMgr[$type] = new kNfsSharedFileSystemMgr(self::$storageConfig);
 				break;
 			
 			case kSharedFileSystemMgrType::S3:
-				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr($options);
+				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr(self::$storageConfig);
 				break;
 		}
 		
@@ -672,5 +674,10 @@ abstract class kSharedFileSystemMgr
 			}
 		}
 		return myContentStorage::getFSContentRootPath();
+	}
+	
+	public static function setFileSystemOptions($key, $value)
+	{
+		self::$storageConfig[$key] = $value;
 	}
 }

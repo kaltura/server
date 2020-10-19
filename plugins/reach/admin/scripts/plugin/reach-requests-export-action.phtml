@@ -1,6 +1,6 @@
-
-<?php if($this->exportUrl): ?>
-	<a href="<?php echo $this->exportUrl;?>"> Download exported CSV </a>
+<?php if($this->servedContent): ?>
+    <a href="data:application/csv;charset=utf-8,<?php echo $this->servedContent;?>"
+       download="export.csv">Download exported CSV</a>
 <?php endif; ?>
 
 <style type="text/css">
