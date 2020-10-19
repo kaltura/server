@@ -8,7 +8,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected $cmdPath;
 	protected $ffmprobeBin;
 	
-	public $checkScanTypeFlag=false;
+	public $checkScanTypeFlag=true;
 	
 	/**
 	 * @param string $filePath
@@ -108,7 +108,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
 		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
-			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
+			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->ffprobeBin, $this->filePath);
 		else
 			$mediaInfo->scanType = 0; // Progressive
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
@@ -725,40 +725,39 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	/**
 	 * 
 	 * @param $ffmpegBin
+	 * @param $ffprobeBin
 	 * @param $srcFileName
 	 * @return number
 	 */
-	private static function checkForScanType($ffmpegBin, $srcFileName, $frames=1000)
+	private static function checkForScanType($ffmpegBin, $ffprobeBin, $srcFileName, $seconds=5)
 	{
-/*
-	ffmpeg-2.1.3 -filter:v idet -frames:v 100 -an -f rawvideo -y /dev/null -nostats -i /mnt/shared/Media/114141.flv
-	[Parsed_idet_0 @ 0000000000331de0] Single frame detection: TFF:1 BFF:96 Progressive:2 Undetermined:1	
-	[Parsed_idet_0 @ 0000000000331de0] Multi frame detection: TFF:0 BFF:100 Progressive:0 Undetermined:0	
-	$mediaInfo->scanType=1; 
-*/
-		if(stristr(PHP_OS,'win')) $nullDev = "NULL";
-		else $nullDev = "/dev/null";
-		
-		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffmpegBin -filter:v idet -frames:v $frames -an -f rawvideo -y $nullDev -i \"$srcFileName\" -nostats  2>&1";
+		$cmdLine = "$ffprobeBin -show_frames -select_streams v $srcFileName -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -$frames 2>&1";
+		$cmdLine = "ffmpeg -t $seconds -i $srcFileName -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_firste| head -$frames 2>&1";
 		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
-		$tff=0; $bff=0; $progessive=0; $undermined=0;
+		$interlaced=0;
 		foreach($outputArr as $line){
-			if(strstr($line, "Parsed_idet")==false)
-				continue;
-			KalturaLog::log($line);
-			$str = strstr($line, "TFF");
-			sscanf($str,"TFF:%d BFF:%d Progressive:%d Undetermined:%d", $t, $b, $p, $u);
-			$tff+=$t; $bff+=$b; $progessive+=$p; $undermined+=$u;
+			$stam=$pts=$inter=$tff=0;
+			list($stam,$pts,$inter,$tff) = explode(',', $line);
+			KalturaLog::log("$stam,pts:$pts,inter:$inter,tff:$tff");
+			$interlaced+=$inter;
 		}
-		$scanType = 0; // Default would be 'progressive'
-		if($progessive<$tff+$bff)
-			$scanType = 1;
+		if(count($outputArr)==0)
+			$scanType=0;
+		else {
+			if(count($outputArr)>5)	$thresh = 3;
+			else $thresh = 1;
+			
+			if($interlaced>$thresh) {
+				$scanType=1;
+			}
+			else
+				$scanType=0;
+		}
 		KalturaLog::log("ScanType: $scanType");
 		return $scanType;
 	}
