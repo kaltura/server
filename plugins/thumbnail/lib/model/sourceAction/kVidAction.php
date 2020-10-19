@@ -78,7 +78,7 @@ abstract class kVidAction extends kSourceAction
 	 */
 	protected function captureThumb($entry, $destPath, $second)
 	{
-		$success = myPackagerUtils::captureThumbUsingPackager($entry, $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
+		$success = myPackagerUtils::captureThumb($entry, $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
 		if(!$success)
 		{
 			if ($entry->getType() == entryType::PLAYLIST)
@@ -89,16 +89,18 @@ abstract class kVidAction extends kSourceAction
 					throw new kTumbnailException(kThumbnailException::PLAYLIST_ENTRY_NOT_FOUND, kThumbnailException::PLAYLIST_ENTRY_NOT_FOUND);
 				}
 			}
+
 			if (!$this->newWidth)
 			{
 				$this->newWidth = kThumbAdapterParameters::UNSET_PARAMETER;
 			}
+
 			if (!$this->newHeight)
 			{
 				$this->newHeight = kThumbAdapterParameters::UNSET_PARAMETER;
 			}
-			$success = myEntryUtils::captureLocalThumb($entry, $destPath, $second, null, null, null, $flavorAssetId, $this->newWidth, $this->newHeight) ||
-				myPackagerUtils::captureRemoteThumbUsingPackager($entry, $destPath, $second, $flavorAssetId);;
+
+			$success = myEntryUtils::captureLocalThumb($entry, $destPath, $second, null, null, null, $flavorAssetId, $this->newWidth, $this->newHeight);
 		}
 
 		if(!$success)

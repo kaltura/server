@@ -254,12 +254,13 @@ class KCurlWrapper
 	{
 		return str_replace(array(' ', '[', ']'), array('%20', '%5B', '%5D'), $url);
 	}
-	
+
 	/**
 	 * This Function can work in two ways if destFilePath is provided it will copy the url to the dest file else will return the file as string as an output
 	 * @param string $url - URL to get data from
 	 * @param $destFilePath - Optional URL to copy data to
 	 * @param int $maxFileSize - Optional max file size allowed for the retrieval action
+	 * @return bool|string
 	 * @throws Exception | file as string | if $destFilePath provide - true or false
 	 */
 	
