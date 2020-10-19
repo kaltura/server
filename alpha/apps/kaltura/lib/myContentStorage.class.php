@@ -70,7 +70,29 @@ class myContentStorage
 		
 	}
 
-	public static function getThumbEntitySharedPath($entityName, $entryId, $thumbName, $fileName , $version = null)
+	public static function getThumbEntityPath($entityName, $entry, $thumbName, $fileName, $version)
+	{
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		if(myCloudUtils::isCloudDc($currentDcId))
+		{
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
+			if($periodicStorageIds)
+			{
+				foreach($periodicStorageIds as $periodicStorageId)
+				{
+					$storage = StorageProfilePeer::retrieveByPK($periodicStorageId);
+					if($storage && $storage->getStorageBaseDir())
+					{
+						return $storage->getStorageBaseDir() . self::getThumbEntitySharedPath($entityName, $entry->getId(), $thumbName, $fileName, $version);
+					}
+				}
+			}
+		}
+
+		return self::getFSContentRootPath() . self::getGeneralEntityPath($entityName, $entry->getIntId(), $thumbName, $fileName, $version);
+	}
+
+	protected static function getThumbEntitySharedPath($entityName, $entryId, $thumbName, $fileName , $version = null)
 	{
 		if( $version != null )
 		{
@@ -79,7 +101,7 @@ class myContentStorage
 		}
 
 		$dir = self::getPathFromId($entryId);
-		$res = '/content/'.$entityName.'/'. $dir .'/'.  $thumbName . '_'. $fileName;
+		$res = '/content/'. $entityName . '/' . $dir . '/' .  $thumbName . '_' . $fileName;
 
 		if( $version != null )
 		{
