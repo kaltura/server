@@ -428,4 +428,17 @@ class DbManager
 		}
 		return array(null, false);
 	}
+	
+	public static function getAvailableConnNames($sourceNamePattern)
+	{
+		$slaveList = array();
+		$datasourceNames = array_keys(self::$config['datasources']);
+		foreach ($datasourceNames as $datasourceName)
+		{
+			if (preg_match("/$sourceNamePattern/", $datasourceName))
+				$slaveList[] = $datasourceName;
+		}
+		
+		return $slaveList;
+	}
 }
