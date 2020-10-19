@@ -422,12 +422,11 @@ class LiveStreamService extends KalturaLiveEntryService
 					}
 				}
 
-				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
-				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-				KalturaLog::info('Determining status of backup live stream URL [' .$backupUrl. ']');
-				$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
-				if ($urlManager || $urlManagerBackup)
-					return $this->responseHandlingIsLive(self::isLiveByUrlManager($urlManager, $url) || self::isLiveByUrlManager($urlManagerBackup, $backupUrl));
+				$isLive = self::isLiveByUrl($url, $dpda) || self::isLiveByUrl($backupUrl, $dpda);
+				if (!is_null($isLive))
+				{
+					return $this->responseHandlingIsLive($isLive);
+				}
 
 				break;
 			case KalturaPlaybackProtocol::HDS:
@@ -435,11 +434,11 @@ class LiveStreamService extends KalturaLiveEntryService
 				$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
 				if ($config)
 				{
-					$url = $config->getUrl();
-					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-					if($urlManager)
-						return $this->responseHandlingIsLive($urlManager->isLive($url));
+					$isLive = self::isLiveByUrl($config->getUrl(), $dpda) || self::isLiveByUrl($config->getBackupUrl(), $dpda);
+					if (!is_null($isLive))
+					{
+						return $this->responseHandlingIsLive($isLive);
+					}
 				}
 				break;
 
@@ -854,19 +853,24 @@ class LiveStreamService extends KalturaLiveEntryService
 	}
 
 	/**
-	 * Using $urlManager isLive method to detect whether the $url is currently live.
-	 *
-	 * @param DeliveryProfile $urlManager
+	 * Using url isLive method to detect whether the $url is currently live.
 	 * @param string $url
-	 * @return boolean
+	 * @param DeliveryProfileDynamicAttributes $dpda
+	 * @return boolean | null
 	 */
-	protected static function isLiveByUrlManager(DeliveryProfile $urlManager, $url)
+	protected static function isLiveByUrl($url, $dpda)
 	{
-		if ($urlManager)
+		KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+		$isLive = null;
+		if ($url)
 		{
-			return $urlManager->isLive($url);
+			$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+			if ($urlManager)
+			{
+				$isLive = $urlManager->isLive($url);
+			}
 		}
-		return false;
+		return $isLive;
 	}
 
 }
