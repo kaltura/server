@@ -1156,7 +1156,7 @@ class myEntryUtils
 		{
 			return null;
 		}
-		KalturaLog::debug('file sync id: ' . $fileSync->getId() . ' , local: ' . $local);
+		KalturaLog::info('file sync id: ' . $fileSync->getId() . ' , local: ' . $local);
 		if ($local)
 		{
 			$parentFileSync = kFileSyncUtils::resolve($fileSync);
