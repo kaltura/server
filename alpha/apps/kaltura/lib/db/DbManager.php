@@ -45,6 +45,11 @@ class DbManager
 	 * @param array
 	 */
 	protected static $connIndexes = false;
+	
+	/**
+	 * @param array
+	 */
+	protected static $connNamesByPattern = false;
 
 	public static function setConfig(array $config)
 	{
@@ -431,14 +436,20 @@ class DbManager
 	
 	public static function getAvailableConnNames($sourceNamePattern)
 	{
-		$slaveList = array();
+		if(isset(self::$connNamesByPattern[$sourceNamePattern]))
+		{
+			return self::$connNamesByPattern[$sourceNamePattern];
+		}
+		
+		$availableConnNames = array();
 		$datasourceNames = array_keys(self::$config['datasources']);
 		foreach ($datasourceNames as $datasourceName)
 		{
 			if (preg_match("/$sourceNamePattern/", $datasourceName))
-				$slaveList[] = $datasourceName;
+				$availableConnNames[] = $datasourceName;
 		}
 		
-		return $slaveList;
+		self::$connNamesByPattern[$sourceNamePattern] = $availableConnNames;
+		return $availableConnNames;
 	}
 }
