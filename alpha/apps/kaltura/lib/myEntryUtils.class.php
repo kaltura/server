@@ -909,7 +909,7 @@ class myEntryUtils
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
-						$success = myPackagerUtils::captureThumbUsingPackager($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
 						$packagerResizeFullPath = $destPath . self::TEMP_FILE_POSTFIX;
 						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
 						if(!$success)
@@ -924,13 +924,12 @@ class myEntryUtils
 					{
 						if ($entry->getType() == entryType::PLAYLIST)
 						{
-							$success = self::capturePlaylistThumbUsingFirstEntry($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $orig_image_path);
+							$success = self::capturePlaylistThumbUsingFirstEntry($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing);
 						}
 
 						if (!$success)
 						{
-							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
-								myPackagerUtils::captureRemoteThumbUsingPackager($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId);
 						}
 					}
 
@@ -1060,13 +1059,12 @@ class myEntryUtils
 	}
 
 
-	public static function capturePlaylistThumbUsingFirstEntry($playlist, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing,$orig_image_path)
+	public static function capturePlaylistThumbUsingFirstEntry($playlist, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing)
 	{
 		$entry = myPlaylistUtils::getFirstEntryFromPlaylist($playlist);
 		if (!$entry)
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
-		$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId) ||
-			myPackagerUtils::captureRemoteThumbUsingPackager($entry, $orig_image_path, $calc_vid_sec, $flavorAssetId);
+		$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId);
 		return $success;
 	}
 
