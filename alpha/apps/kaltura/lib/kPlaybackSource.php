@@ -144,4 +144,5 @@ class kPlaybackSource {
 	{
 		$this->drm = $drm;
 	}
+
 }
