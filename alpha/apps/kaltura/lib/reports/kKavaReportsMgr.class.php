@@ -301,6 +301,9 @@ class kKavaReportsMgr extends kKavaBase
 
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 
+	protected static $query_cache = null;
+	protected static $query_cache_expiration = 0;
+
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
@@ -1403,6 +1406,11 @@ class kKavaReportsMgr extends kKavaBase
 		);
 	}
 
+	protected static function initQueryCache()
+	{
+		//implement in case we always want query cache
+	}
+
 	protected static function getFlavorParamViewCount($name, $flavorParamId)
 	{
 		return self::getFilteredAggregator(
@@ -1527,7 +1535,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, $dimension, $druid_filter,
 			$order_by, self::DRUID_DESCENDING, 1, $metrics);
-		$response = self::runQuery($query);
+		$response = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 		return isset($response[0][self::DRUID_RESULT][0][$metric]) ? $response[0][self::DRUID_RESULT][0][$metric] : 0;
 	}
 
@@ -2950,7 +2958,7 @@ class kKavaReportsMgr extends kKavaBase
 			$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity_def, $metrics, $druid_filter, $response_options);
 			break;
 		}
-		$result = self::runQuery($query);
+		$result = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 		KalturaLog::log('Druid returned [' . count($result) . '] rows');
 
 		// parse the result
@@ -4493,6 +4501,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$query = self::getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $druid_filter, self::getMetrics($report_def));
 
+		//no need to add query cache - we have report count cache
 		$total_count_arr = self::runQuery($query);
 		if (isset($total_count_arr[0][self::DRUID_RESULT][self::METRIC_CARDINALITY]))
 		{
@@ -4535,7 +4544,7 @@ class kKavaReportsMgr extends kKavaBase
 				// no metrics and more than one dimension - use a group by query
 				$query = self::getGroupByReport($data_source, $partner_id, $intervals, self::DRUID_GRANULARITY_ALL,
 					$dimension, null, $druid_filter);
-				$result = self::runQuery($query);
+				$result = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 
 				$data = array();
 				if ($result)
@@ -4551,7 +4560,7 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				// no metrics - can use a search query
 				$query = self::getSearchReport($data_source, $partner_id, $intervals, array($dimension), $druid_filter);
-				$result = self::runQuery($query);
+				$result = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 
 				$data = array();
 				if ($result)
@@ -4683,7 +4692,7 @@ class kKavaReportsMgr extends kKavaBase
 			// get the topN objects first, otherwise the returned metrics can be inaccurate
 			$query = self::getTopReport($data_source, $partner_id, $intervals, array($order_by), 
 				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold, $metrics);
-			$result = self::runQuery($query);
+			$result = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 			if (!$result)
 			{
 				return array(array(), array(), 0);
@@ -4746,7 +4755,7 @@ class kKavaReportsMgr extends kKavaBase
 			$query[self::DRUID_CONTEXT][self::DRUID_PRIORITY] = 0;
 		}
 
-		$result = self::runQuery($query);
+		$result = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 		if (!$result)
 		{
 			return array(array(), array(), 0);
@@ -5606,7 +5615,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		$granularity = self::DRUID_GRANULARITY_ALL;
 		$query = self::getTimeSeriesReport($data_source, $partner_id, $intervals, $granularity, $metrics, $druid_filter, $response_options);
-		$result = self::runQuery($query);
+		$result = self::runQuery($query, self::$query_cache, self::$query_cache_expiration);
 		
 		$headers = array();
 		$data = array();
