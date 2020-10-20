@@ -469,10 +469,24 @@ class kJobsManager
 		{		
 			$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 			$addImportJob = false;
-				
-			$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
+			
+			$fileSync = null;
+			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			if($preferSharedDcForConvert && count($sharedDcIds))
+			{
+				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
+			}
+			
 			if(!$fileSync)
+			{
+				$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
+			}
+			
+			if(!$fileSync)
+			{
 				return null;
+			}
 				
 			$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 			if($addImportJob)
@@ -1278,7 +1292,10 @@ class kJobsManager
 
 		$inputFileSyncLocalPath = $fileSync->getFullPath();
 		if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-			$inputFileSyncLocalPath = $fileSync->getFilePath();
+		{
+			$inputFileSyncLocalPath = $fileSync->getRemotePath();
+		}
+
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!kFile::checkFileExists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
@@ -1592,9 +1609,13 @@ class kJobsManager
 			KalturaLog::err($e->getMessage());
 		}
 		
+		$shouldCalculateComplexity = false;
 		$mediaInfoEngine = mediaParserType::MEDIAINFO;
 		if($profile)
+		{
 			$mediaInfoEngine = $profile->getMediaParserType();
+			$shouldCalculateComplexity = $profile->getCalculateComplexity();
+		}
 		
 		$extractMediaData = new kExtractMediaJobData();
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
@@ -1602,7 +1623,6 @@ class kJobsManager
 		$srcFileSyncDescriptor->setFileEncryptionKey(self::getEncryptionKeyForAssetId($flavorAssetId));
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
-		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
 		$extractMediaData->setCalculateComplexity($shouldCalculateComplexity);
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
@@ -1624,6 +1644,13 @@ class kJobsManager
 		if($shouldDetectGOP === null)
 			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
 		$extractMediaData->setDetectGOP($shouldDetectGOP);
+		
+		//Added to support the flow where extract media will push the source file directly to the shared storage
+		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+		if($pendingFileSync)
+		{
+			$extractMediaData->setSrcFileSyncRemoteUrl($pendingFileSync->getFullPath());
+		}
 		
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);

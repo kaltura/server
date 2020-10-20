@@ -1563,6 +1563,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::DE' => "German",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::IT' => "Italian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ES' => "Spanish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ES_XL' => "Spanish (Latin America)",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AR' => "Arabic",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH' => "Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::CMN' => "Mandarin Chinese",
@@ -1586,6 +1587,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::RO' => "Romanian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::HU' => "Hungarian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::GA' => "Irish",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::GD' => "Gaelic (Scottish)",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::CY' => "Welsh",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::UR' => "Urdu",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TA' => "Tamil",
@@ -1595,6 +1597,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::UK' => "Ukrainian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FR_CA' => "French (Canada)",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_TW' => "Taiwanese Mandarin",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PT_BR' => "Portuguese (Brazil)",
 
 	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
