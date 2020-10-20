@@ -217,11 +217,11 @@ class flavorAsset extends exportableAsset
 		return $this->getBitrate();
 	}
 	
-	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null)
+	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null, $isDir = false)
 	{
 		$entry = $this->getentry();
 
-		if (!$entry || $entry->getType() != entryType::MEDIA_CLIP)
+		if (!$entry || !in_array($entry->getType(), array(entryType::MEDIA_CLIP, entryType::DOCUMENT)))
 		{
 			$id = $this->getId();
 			throw new kCoreException("asset $id belongs to an entry of a wrong type", kCoreException::INVALID_ENTRY_TYPE);
@@ -249,11 +249,17 @@ class flavorAsset extends exportableAsset
 		
 		//adding a serveFlavor download parameter
 		$urlParameters = "/fileName/$fileName";
+		$explicitFileExt = null;
+		if($isDir)
+		{
+			$urlParameters .= "/inDir/1";
+			$explicitFileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+		}
 
 		if ($previewLength)
 			$urlParameters .= "/clipTo/$previewLength";
 
-		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager);
+		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager, $explicitFileExt);
 		
 		return $url;
 	}
