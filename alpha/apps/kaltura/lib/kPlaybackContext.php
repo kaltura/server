@@ -32,6 +32,10 @@ class kPlaybackContext {
 	 */
 	protected $messages;
 
+	/**
+	 * @var array
+	 */
+	protected $bumperData;
 
 	/**
 	 * @return array<kPlaybackSource>
@@ -111,6 +115,22 @@ class kPlaybackContext {
 	public function setActions($actions)
 	{
 		$this->actions = $actions;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getBumperData()
+	{
+		return $this->bumperData;
+	}
+
+	/**
+	 * @param array $bumperData
+	 */
+	public function setBumperData($bumperData)
+	{
+		$this->bumperData = $bumperData;
 	}
 
 }

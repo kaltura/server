@@ -35,11 +35,6 @@ class kPlaybackSource {
 	 */
 	protected $drm;
 
-	/**
-	 * @var array
-	 */
-	protected $bumperData;
-
 	public function __construct($deliveryProfileId = null, $format  = null, $protocols = null , $flavorIds = null, $url = null, $drm = null )
 	{
 		$this->deliveryProfileId = $deliveryProfileId;
@@ -52,7 +47,6 @@ class kPlaybackSource {
 		$this->flavorIds = $flavorIds;
 		$this->url = $url;
 		$this->drm = $drm;
-		$this->bumperData = array();
 	}
 
 	/**
@@ -150,21 +144,4 @@ class kPlaybackSource {
 	{
 		$this->drm = $drm;
 	}
-
-	/**
-	 * @return array
-	 */
-	public function getBumperData()
-	{
-		return $this->bumperData;
-	}
-
-	/**
-	 * @param array $bumperData
-	 */
-	public function setBumperData($bumperData)
-	{
-		$this->bumperData = $bumperData;
-	}
-
 }

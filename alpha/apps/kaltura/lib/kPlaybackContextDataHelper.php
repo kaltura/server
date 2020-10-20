@@ -80,6 +80,7 @@ class kPlaybackContextDataHelper
 		$this->filterFlavorsBySources();
 		$this->playbackContext->setFlavorAssets($this->flavorAssets);
 		$this->playbackContext->setPlaybackCaptions($this->playbackCaptions);
+		$this->playbackContext->setBumperData(array());
 	}
 
 	/**

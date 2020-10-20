@@ -39,11 +39,6 @@ class KalturaPlaybackSource extends KalturaObject{
 	 */
 	public $drm;
 
-	/**
-	 * @var KalturaKeyValueArray
-	 */
-	public $bumperData;
-
 	private static $map_between_objects = array
 	(
 		"deliveryProfileId",
@@ -52,7 +47,6 @@ class KalturaPlaybackSource extends KalturaObject{
 		"flavorIds",
 		"url",
 		"drm",
-		"bumperData",
 	);
 
 	public function getMapBetweenObjects()

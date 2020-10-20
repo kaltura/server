@@ -1041,7 +1041,7 @@ class BaseEntryService extends KalturaEntryService
 		if (!($isScheduledNow) && $this->getKs() ){
 			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
 			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
+				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $dbEntry->getEntryId())) {
 				$isScheduledNow = true;
 			}
 		}
@@ -1058,35 +1058,23 @@ class BaseEntryService extends KalturaEntryService
 
 	protected function handleBumperOnEntry(entry $dbBumperEntry, KalturaPlaybackContextOptions $contextDataParams, kPlaybackContextDataHelper $playbackContextDataHelper)
 	{
+
 		$contextDataParams->flavorAssetId = null;
 		list($bumperPlaybackContextDataHelper,) = $this->constructContextDataHelpers($dbBumperEntry, $contextDataParams);
+		$bumperSources = $bumperPlaybackContextDataHelper->getPlaybackContext()->getSources();
 
-		$entrySources = $this->sortSources($playbackContextDataHelper->getPlaybackContext()->getSources());
-		$bumperSources = $this->sortSources($bumperPlaybackContextDataHelper->getPlaybackContext()->getSources());
+		$bumperData = array();
 
-		foreach($entrySources as $deliveryProfileId => $entrySource)
+		/* @var kPlaybackSource $source */
+		foreach($bumperSources as $source)
 		{
-			if(isset($bumperSources[$deliveryProfileId]))
+			if($source->getFormat() == 'url')
 			{
-				$entrySource->setBumperData($this->extractBumperData($bumperSources[$deliveryProfileId]));
+				$bumperData['url'] = $source->getUrl();
+				break;
 			}
 		}
-	}
 
-	protected function sortSources($sources)
-	{
-		$sortedSources = array();
-		foreach ($sources as $source)
-		{
-			$sortedSources[$source->getDeliveryProfileId()] = $source;
-		}
-		return $sortedSources;
-	}
-
-	protected function extractBumperData($bumperSource)
-	{
-		$bumperData = array();
-		$bumperData['url'] = $bumperSource->getUrl();
-		return $bumperData;
+		$playbackContextDataHelper->getPlaybackContext()->setBumperData($bumperData);
 	}
 }
