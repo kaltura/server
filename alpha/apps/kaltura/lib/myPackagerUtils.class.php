@@ -491,7 +491,7 @@ class myPackagerUtils
 		return false;
 	}
 
-	protected static function getPreferredStorageId($dcId)
+	public static function getPreferredStorageId($dcId)
 	{
 		$preferredStorageId = null;
 		if(myCloudUtils::isCloudDc($dcId))

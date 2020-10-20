@@ -1124,7 +1124,7 @@ class myEntryUtils
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $entry->getId());
+		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
 		
 		if (!$entry_data_path)
 			return false;
@@ -1149,15 +1149,18 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function getEntryDataPath($flavorSyncKey, $entryId)
+	public static function getEntryDataPath($flavorSyncKey, $flavorAsset, $entryId)
 	{
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey, true, false);
+		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
+		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
 		if (!$fileSync)
 		{
 			return null;
 		}
-		KalturaLog::info('file sync id: ' . $fileSync->getId() . ' , local: ' . $local);
-		if ($local)
+		$entryDataPath = null;
+		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
+		if ($fileSync->getDc() === $currentDcId)
 		{
 			$parentFileSync = kFileSyncUtils::resolve($fileSync);
 			$entryDataPath = $parentFileSync->getFullPath();
@@ -1165,9 +1168,8 @@ class myEntryUtils
 		}
 		else
 		{
-			$currentDcId = kDataCenterMgr::getCurrentDcId();
 			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
-			if ($isCloudDc)
+			if ($isCloudDc && $fileSync->getDc() === 2)
 			{
 				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
 				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
@@ -1175,10 +1177,14 @@ class myEntryUtils
 			else
 			{
 				$remoteDc = 1 - $currentDcId;
-				KalturaLog::info("File wasn't found on current DC, and current DC is not cloud DC. Dumping the request to DC ID [$remoteDc]");
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+				if ($remoteDc === $fileSync->getDc())
+				{
+					KalturaLog::info("File wasn't found on current DC and not on prefer storage. Dumping the request to DC ID [$remoteDc]");
+					kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+				}
 			}
 		}
+
 		return $entryDataPath;
 	}
 
