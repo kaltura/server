@@ -97,7 +97,15 @@ class kDruidBase
 	const COMMENT_MARKER = '@COMMENT@';
 
 	protected static $curl_handle = null;
-	
+
+	protected static $query_cache = null;
+	protected static $query_cache_expiration = 0;
+
+	protected static function initQueryCache()
+	{
+		//implement in case we always want query cache
+	}
+
 	protected static function getIntervals($fromTime, $toTime)
 	{
 		$fromTime = gmdate('Y-m-d\\TH:i:s\\Z', $fromTime);

@@ -371,7 +371,6 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		self::$query_cache_expiration = self::REALTIME_QUERY_CACHE_EXPIRATION;
 	}
 
-
 	public static function getReportDef($report_type, $input_filter)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
