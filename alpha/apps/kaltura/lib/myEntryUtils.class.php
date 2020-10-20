@@ -1162,14 +1162,15 @@ class myEntryUtils
 		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
 		if ($fileSync->getDc() === $currentDcId)
 		{
-			$parentFileSync = kFileSyncUtils::resolve($fileSync);
-			$entryDataPath = $parentFileSync->getFullPath();
+			$entryDataPath = $fileSync->getFullPath();
 			KalturaLog::info("path [$entryDataPath]");
 		}
 		else
 		{
 			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
-			if ($isCloudDc && $fileSync->getDc() === 2)
+			$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
+			$periodicStorageId = isset($periodicStorageIds[0]) ? intval($periodicStorageIds[0]) : null;
+			if ($isCloudDc && ($fileSync->getDc() === $periodicStorageId))
 			{
 				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
 				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
@@ -1177,7 +1178,7 @@ class myEntryUtils
 			else
 			{
 				$remoteDc = 1 - $currentDcId;
-				if ($remoteDc === $fileSync->getDc())
+				if (($remoteDc === $fileSync->getDc()) || ($periodicStorageId === $fileSync->getDc()))
 				{
 					KalturaLog::info("File wasn't found on current DC and not on prefer storage. Dumping the request to DC ID [$remoteDc]");
 					kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
