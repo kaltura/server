@@ -55,7 +55,7 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	 */
 	public function getPreStartTime()
 	{
-		return $this->getFromCustomData(self::PRE_START_TIME);
+		return $this->getFromCustomData(self::PRE_START_TIME, null, 0);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	 */
 	public function getPostEndTime()
 	{
-		return $this->getFromCustomData(self::POST_END_TIME);
+		return $this->getFromCustomData(self::POST_END_TIME, null, 0);
 	}
 
 	/* (non-PHPdoc)
@@ -120,14 +120,12 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 
 	public function getCalculatedStartTime()
 	{
-		$preStartTime = !is_null($this->getPreStartTime()) ? $this->getPreStartTime() : 0;
-		return parent::getCalculatedStartTime() - $preStartTime;
+		return parent::getCalculatedStartTime() - $this->getPreStartTime();
 	}
 
 	public function getCalculatedEndTime()
 	{
-		$postEndTime = !is_null($this->getPostEndTime()) ? $this->getPostEndTime() : 0;
-		return parent::getCalculatedEndTime() + $postEndTime;
+		return parent::getCalculatedEndTime() + $this->getPostEndTime();
 	}
 
 }
