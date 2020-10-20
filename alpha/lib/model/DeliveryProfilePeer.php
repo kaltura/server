@@ -617,7 +617,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $entryId The entry for which we search for the delivery profile
 	 * @param PlaybackProtocol $streamerType - The protocol
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
-	 * @return DeliveryProfile
+	 * @return DeliveryProfileLive
 	 */
 	public static function getLiveDeliveryProfileByHostName($cdnHost, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$entryId = $deliveryAttributes->getEntryId();

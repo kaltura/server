@@ -238,6 +238,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$flavors = array();
 		
 		$httpUrl = $this->liveStreamConfig->getUrl();
+		if ($this->getDynamicAttributes()->getStreamType() == EntryServerNodeType::LIVE_BACKUP)
+		{
+			$httpUrl = $this->liveStreamConfig->getBackupUrl();
+		}
 		$flavors[] = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
 		return $flavors;
 	}

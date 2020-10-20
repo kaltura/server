@@ -405,6 +405,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			case KalturaPlaybackProtocol::HLS:
 			case KalturaPlaybackProtocol::APPLE_HTTP:
 				$url = $liveStreamEntry->getHlsStreamUrl('http');
+				$backupUrl = '';
 				if($protocol == KalturaPlaybackProtocol::HLS)
 					$hlsProtocols = array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP);
 				else
@@ -414,16 +415,18 @@ class LiveStreamService extends KalturaLiveEntryService
 					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::getProtocol());
 					if ($config){
 						$url = $config->getUrl();
+						$backupUrl = $config->getBackupUrl();
 						$protocol = $hlsProtocol;
 						$dpda->setFormat($protocol);
 						break;
 					}
 				}
 
-				KalturaLog::info('Determining status of live stream URL [' .$url. ']');
+				KalturaLog::info("Determining status of live stream URL [ $url ] and Backup URL [ $backupUrl ]");
 				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-				if($urlManager)
-					return $this->responseHandlingIsLive($urlManager->isLive($url));
+				$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
+				if ($urlManager || $urlManagerBackup)
+					return $this->responseHandlingIsLive(self::isLiveByUrlManager($urlManager, $url) || self::isLiveByUrlManager($urlManagerBackup, $backupUrl));
 
 				break;
 			case KalturaPlaybackProtocol::HDS:
@@ -847,6 +850,22 @@ class LiveStreamService extends KalturaLiveEntryService
 				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $currentEntry->getId(), $adminTag, $adminTagsLimits[$adminTag]);
 			}
 		}
+	}
+
+	/**
+	 * Using $urlManager isLive method to detect if the $url is currently live.
+	 *
+	 * @param DeliveryProfileLive $urlManager
+	 * @param string $url
+	 * @return boolean
+	 */
+	protected static function isLiveByUrlManager($urlManager, $url)
+	{
+		if ($urlManager)
+		{
+			return $urlManager->isLive($url);
+		}
+		return false;
 	}
 
 }
