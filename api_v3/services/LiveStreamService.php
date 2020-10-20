@@ -859,7 +859,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @param string $url
 	 * @return boolean
 	 */
-	protected static function isLiveByUrlManager(DeliveryProfileLive $urlManager, $url)
+	protected static function isLiveByUrlManager($urlManager, $url)
 	{
 		if ($urlManager)
 		{
