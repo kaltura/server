@@ -247,6 +247,11 @@ class BaseEntryService extends KalturaEntryService
 		{
 			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
 			{
+				$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+				if($remoteDCHost)
+				{
+					kFileUtils::dumpApiRequest($remoteDCHost);
+				}
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
 			}
 			throw($ex);
