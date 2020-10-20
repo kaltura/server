@@ -1124,7 +1124,7 @@ class myEntryUtils
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
+		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
 		
 		if (!$entry_data_path)
 			return false;
@@ -1147,6 +1147,41 @@ class myEntryUtils
 		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
 		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath . 'temp_', $calc_vid_sec, $width, $height, $decryptionKey);
 		return true;
+	}
+
+	public static function getEntryDataPath($flavorSyncKey, $flavorAsset, $entryId)
+	{
+		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
+		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
+		if (!$fileSync)
+		{
+			return null;
+		}
+		$entryDataPath = null;
+		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
+		if ($fileSync->getDc() === $currentDcId)
+		{
+			$entryDataPath = $fileSync->getFullPath();
+			KalturaLog::info("path [$entryDataPath]");
+		}
+		else
+		{
+			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
+			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
+			{
+				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
+				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
+			}
+			else
+			{
+				$remoteDc = 1 - $currentDcId;
+				KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
+				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+			}
+		}
+
+		return $entryDataPath;
 	}
 
 	public static function isSupportedContainerFormat($flavorAsset){
