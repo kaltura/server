@@ -460,6 +460,11 @@ class MediaService extends KalturaEntryService
 		{
 			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
 			{
+				$uploadToken = UploadTokenPeer::retrieveByPK($uploadTokenId);
+				if($uploadToken->getDc()!=kDataCenterMgr::getCurrentDcId ())
+				{
+					kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
+				}
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
 			}
 			throw($ex);
