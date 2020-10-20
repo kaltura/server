@@ -373,17 +373,17 @@ class kFile extends kFileBase
 		$from = kFile::fixPath($from);
 		$to = kFile::fixPath($to);
 		
-		if($overrideIfExists && (is_file($to) || is_link($to)))
+		if($overrideIfExists && (kFile::isFile($to) || kFile::isLink($to)))
 		{
 			self::deleteFile($to);
 		}
 		
-		if(! is_dir(dirname($to)))
+		if(! kFile::isDir(dirname($to)))
 		{
 			self::fullMkdir($to);
 		}
 		
-		if(!file_exists($from))
+		if(!kFile::checkFileExists($from))
 		{
 			KalturaLog::err("Source file doesn't exist [$from]");
 			return false;
@@ -395,7 +395,7 @@ class kFile extends kFileBase
 			return false;
 		}
 			
-		if(symlink($from, $to)) 
+		if(kFile::symlink($from, $to))
 			return true;
 		
 		$out_arr = array();
