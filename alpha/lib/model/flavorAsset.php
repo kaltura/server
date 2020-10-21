@@ -217,7 +217,7 @@ class flavorAsset extends exportableAsset
 		return $this->getBitrate();
 	}
 	
-	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null)
+	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null, $isDir = false)
 	{
 		$entry = $this->getentry();
 
