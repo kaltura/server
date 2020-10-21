@@ -79,9 +79,16 @@ class kDataCenterMgr
 		return self::getDcById( $dc_config["current"] );
 	}
 	
-	public static function getSharedStorageProfileIds()
+	public static function getSharedStorageProfileIds($getFromLegacyConfig = false)
 	{
-		$sharedStorageProfileIds = kConf::get('shared_storage_profile_ids', 'cloud_storage', array());
+		if($getFromLegacyConfig)
+		{
+			$sharedStorageProfileIds = kConf::get('periodic_storage_ids', 'cloud_storage', array());
+		}
+		else
+		{
+			$sharedStorageProfileIds = kConf::get('shared_storage_profile_ids', 'cloud_storage', array());
+		}
 		
 		if(is_array($sharedStorageProfileIds))
 			return $sharedStorageProfileIds;
@@ -131,7 +138,7 @@ class kDataCenterMgr
 //		return array ( $dc_id , $dc );
 	}
 
-public static function getDcIds($includeShared = true)
+	public static function getDcIds($includeShared = true)
 	{
 		$dc_config = kConf::getMap("dc_config");
 		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];

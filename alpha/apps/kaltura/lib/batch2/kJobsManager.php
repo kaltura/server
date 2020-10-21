@@ -484,7 +484,7 @@ class kJobsManager
 			
 			$fileSync = null;
 			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
-			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
 			if($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
 			{
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);

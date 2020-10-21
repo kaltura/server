@@ -21,6 +21,9 @@ class kFlowHelper
 
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 
+	const DAYS = 'days';
+	const HOURS = 'hours';
+
 
 	/**
 	 * @param int $partnerId
@@ -2989,7 +2992,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry)
+	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $privilegeActionsLimit = null)
 	{
 		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
 		if (!preg_match($regex, $file_name, $matches))
@@ -3000,6 +3003,10 @@ class kFlowHelper
 
 		$partner = PartnerPeer::retrieveByPK($partner_id);
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+		if ($privilegeActionsLimit)
+		{
+			$privilege .= "," . $privilegeActionsLimit;
+		}
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
@@ -3035,14 +3042,24 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		$privilegeActionsLimit = null;
+		$expiryByPartner = kConf::get("report_export_expiry_by_partner", 'analytics', array());
+		if (array_key_exists($dbBatchJob->getPartnerId(), $expiryByPartner))
+		{
+			$expiry = $expiryByPartner[$dbBatchJob->getPartnerId()];
+			$privilegeActionsLimit = kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
+		}
+		else
+		{
+			$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		}
 
 		$links = array();
 		// Create download URL's
 		foreach ($finalFiles as $finalFile)
 		{
 			$fileName = basename($finalFile->getFileId());
-			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry);
+			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $privilegeActionsLimit);
 			if (!$url)
 			{
 				KalturaLog::err("Failed to create download URL for file - {$finalFile->getFileId()}");
@@ -3056,7 +3073,15 @@ class kFlowHelper
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_SUCCESS;
 		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
 		$expiryInDays = $expiry / 60 / 60 / 24;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, $validUntil);
+		if ($expiryInDays >= 1)
+		{
+			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
+		}
+		else
+		{
+			$expiryInHours = $expiry / 60 / 60;
+			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
+		}
 		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
