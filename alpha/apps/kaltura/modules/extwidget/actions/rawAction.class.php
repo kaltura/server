@@ -453,7 +453,8 @@ class rawAction extends sfAction
 		{
 			$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
 			$fileName = kString::removeNewLine($fileName. '.' .$ext);
-			$fileName = urlencode($fileName);
+			$fileName = kString::stripInvalidUrlChars($fileName);
+			$fileName = rawurlencode($fileName);
 		}
 		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
 		KalturaLog::log ("URL to redirect to [$url]" );
