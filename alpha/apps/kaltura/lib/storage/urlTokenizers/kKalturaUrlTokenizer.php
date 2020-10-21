@@ -13,7 +13,7 @@ class kKalturaUrlTokenizer extends kUrlTokenizer
 		$lastSlashPosition = strrpos($url, "/");
 		$path = substr($url, 0, $lastSlashPosition);
 		$fileName = substr($url, $lastSlashPosition + 1);
-		$signature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $path, $this->key));
+		$signature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $path, $this->key, true));
 		return $path . '/sig/' . $signature . '/' . $fileName;
 	}
 

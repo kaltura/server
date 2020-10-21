@@ -91,7 +91,7 @@ class kAssetUtils
 		{
 			if(!$urlManager)
 			{
-				$urlManager = self::getUrlManager($asset, $syncKey);
+				$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 				if(!$urlManager)
 				{
 					return null;

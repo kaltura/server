@@ -40,7 +40,7 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 		}
 		$partToSign = substr($uri, 0, $matches[0][1]);
 		$requestSignature = $matches[1][0];
-		$calculatedSignature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $partToSign, $this->key));
+		$calculatedSignature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $partToSign, $this->key, true));
 		if($calculatedSignature !== $requestSignature)
 		{
 			return false;
