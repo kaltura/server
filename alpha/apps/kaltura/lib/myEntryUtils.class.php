@@ -8,6 +8,10 @@ class myEntryUtils
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 
+	const CLOUD_STORAGE_MAP = 'cloud_storage';
+	const CLOUD_DCS_PARAM = 'cloud_dcs';
+	const PREFERRED_CLOUD_STORAGE_ID_PARAM = 'preferred_cloud_storage_id';
+
 	static private $liveSourceType = array
 	(
 		EntrySourceType::RECORDED_LIVE,
@@ -1126,7 +1130,7 @@ class myEntryUtils
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
+		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
 		
 		if (!$entry_data_path)
 			return false;
@@ -1149,6 +1153,41 @@ class myEntryUtils
 		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
 		myFileConverter::autoCaptureFrame($entry_data_path, $capturedThumbPath . 'temp_', $calc_vid_sec, $width, $height, $decryptionKey);
 		return true;
+	}
+	
+	public static function getEntryDataPath($flavorSyncKey, $flavorAsset, $entryId)
+	{
+		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
+		$preferredStorageId = self::getPreferredStorageId($currentDcId);
+		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
+		if (!$fileSync)
+		{
+			return null;
+		}
+		$entryDataPath = null;
+		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
+		if ($fileSync->getDc() === $currentDcId)
+		{
+			$entryDataPath = $fileSync->getFullPath();
+			KalturaLog::info("path [$entryDataPath]");
+		}
+		else
+		{
+			$isCloudDc = self::isCloudDc($currentDcId);
+			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
+			{
+				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
+				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
+			}
+			else
+			{
+				$remoteDc = 1 - $currentDcId;
+				KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
+				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+			}
+		}
+
+		return $entryDataPath;
 	}
 
 	public static function isSupportedContainerFormat($flavorAsset){
@@ -2207,5 +2246,32 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		return $result;
+	}
+
+	public static function getPreferredStorageId($dcId)
+	{
+		$preferredStorageId = null;
+		if(self::isCloudDc($dcId))
+		{
+			$preferredStorageId = self::getCloudPreferredStorage();
+		}
+
+		if(!$preferredStorageId)
+		{
+			$preferredStorageId = $dcId;
+		}
+
+		return $preferredStorageId;
+	}
+
+	public static function isCloudDc($dcId)
+	{
+		$cloudDcs = kConf::get(self::CLOUD_DCS_PARAM, self::CLOUD_STORAGE_MAP, array());
+		return in_array($dcId, $cloudDcs);
+	}
+
+	public static function getCloudPreferredStorage()
+	{
+		return kConf::get(self::PREFERRED_CLOUD_STORAGE_ID_PARAM, self::CLOUD_STORAGE_MAP, null);
 	}
 }
