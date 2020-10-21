@@ -414,22 +414,22 @@ class rawAction extends sfAction
 	 */
 	private function redirectFileSyncIfRemote($file_sync, $local, $object, $fileName = null)
 	{
-		if ( !$local )
+		if(kFile::isSharedPath($file_sync->getFullPath()) || in_array($file_sync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
-			if(kFile::isSharedPath($file_sync->getFullPath()) || in_array($file_sync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+			if($object instanceof asset)
 			{
-				if($object instanceof asset)
+				$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($file_sync->getDc(), $object->getEntryId());
+				if($downloadDeliveryProfile && $object)
 				{
-					$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($file_sync->getDc(), $object->getEntryId());
-					if($downloadDeliveryProfile && $object)
-					{
-						$isDir = kFile::isDir($file_sync->getFullPath());
-						$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir);
-						$this->redirect($url);
-					}
+					$isDir = kFile::isDir($file_sync->getFullPath());
+					$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir, $file_sync);
+					$this->redirect($url);
 				}
 			}
+		}
 
+		if ( !$local )
+		{
 			$shouldProxy = $this->getRequestParameter("forceproxy", false);
 			$remote_url = kDataCenterMgr::getRedirectExternalUrl ( $file_sync , $_SERVER['REQUEST_URI'] );
 			KalturaLog::log ( __METHOD__ . ": redirecting to [$remote_url]" );
@@ -447,12 +447,13 @@ class rawAction extends sfAction
 		return $file_sync;
 	}
 
-	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir)
+	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir, $file_sync)
 	{
 		if($fileName)
 		{
-			$fileName = str_replace("\n", ' ', $fileName);
-			$fileName = kString::keepOnlyValidUrlChars($fileName);
+			$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
+			$fileName = kString::removeNewLine($fileName. '.' .$ext);
+			$fileName = urlencode($fileName);
 		}
 		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
 		KalturaLog::log ("URL to redirect to [$url]" );
