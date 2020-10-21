@@ -41,7 +41,6 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 		$partToSign = substr($uri, 0, $matches[0][1]);
 		$requestSignature = $matches[1][0];
 
-		$fileNameMatches = null;
 		if(preg_match('#/fileName/([^/]+)/#', $partToSign, $fileNameMatches, PREG_OFFSET_CAPTURE))
 		{
 			$prefix = substr($partToSign, 0, $fileNameMatches[1][1]);
