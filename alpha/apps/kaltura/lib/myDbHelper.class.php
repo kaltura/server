@@ -10,6 +10,7 @@ class myDbHelper
 	const DB_HELPER_CONN_SPHINX_LOG = "sphinx_log";
 	const DB_HELPER_CONN_SPHINX_LOG_READ = "sphinx_log_read";
 	const DB_HELPER_CONN_DWH = "dwh";
+	const DB_HELPER_CONN_PROPEL_SLAVE_PATTERN = "propel[2-9]";
 	
 	public static $use_alternative_con = null;
 	protected static $slaveConnIndex = false;
@@ -26,7 +27,10 @@ class myDbHelper
 			DbManager::initialize();
 		}
 		
-		$slaves = array(self::DB_HELPER_CONN_PROPEL2, self::DB_HELPER_CONN_PROPEL3);
+		$slaves = DbManager::getAvailableConnNames(self::DB_HELPER_CONN_PROPEL_SLAVE_PATTERN);
+		if(!count($slaves))
+			$slaves = array(self::DB_HELPER_CONN_PROPEL2, self::DB_HELPER_CONN_PROPEL3);
+		
 		if (!in_array($name, $slaves))
 			return Propel::getConnection($name);
 		
