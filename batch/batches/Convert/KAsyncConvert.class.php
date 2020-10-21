@@ -125,7 +125,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
 			$srcFileSyncDescriptor->isRemote = false;
 			
-			if(!in_array($job->jobSubType, array(KalturaConversionEngineType::CHUNKED_FFMPEG, KalturaConversionEngineType::FFMPEG)))
+			if(!in_array($job->jobSubType, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
 			{
 				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)
