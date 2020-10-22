@@ -420,7 +420,7 @@ class serveFlavorAction extends kalturaAction
 				if ($flavors)
 				{
 					$sequences = self::buildSequencesArray($flavors);
-					$initialSegmentIndex = $startTime / $entry->getSegmentDuration();
+					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
