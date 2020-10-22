@@ -58,7 +58,7 @@ class kBusinessPreConvertDL
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
+	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId, $fetchFromRemote = false)
 	{
 		if($sourceAssetId)
 		{
@@ -76,7 +76,7 @@ class kBusinessPreConvertDL
 		}
 
 		KalturaLog::info("Look for a flavor tagged with thumbsource of entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE, null, false, $fetchFromRemote);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 
@@ -88,13 +88,13 @@ class kBusinessPreConvertDL
 
 
 		KalturaLog::info("Look for highest bitrate flavor with web tag on entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB);
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB, null, false, $fetchFromRemote);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 
 
 		KalturaLog::info("Look for highest bitrate flavor of entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, null, null, false, $fetchFromRemote);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 
@@ -285,13 +285,20 @@ class kBusinessPreConvertDL
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 
-		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		if(!$fileSync || (!in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()) && ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)))
 		{
-			$errDescription = 'Source asset could has no valid file sync';
+			$errDescription = 'Source asset has no valid file sync';
 			return false;
 		}
 
-		$srcPath = $fileSync->getFullPath();
+		if (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+		{
+			$srcPath = $fileSync->getRemotePath();
+		}
+		else
+		{
+			$srcPath = $fileSync->getFullPath();
+		}
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!kFile::checkFileExists($tempDir))
