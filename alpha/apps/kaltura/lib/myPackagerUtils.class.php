@@ -9,6 +9,7 @@ class myPackagerUtils
 	const PACKAGER_MAPPED_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
 	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_local_volume_map_url';
 	const PACKAGER_URL = "packager_url";
+	const VOLUME_PACKAGER_URL = 'volume_packager_url';
 	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
 
@@ -299,6 +300,7 @@ class myPackagerUtils
 	protected static function getPackagerUrlFromConf($packagerUrlType, $packagerUrl = null)
 	{
 		$result = null;
+
 		if (!$packagerUrl)
 		{
 			$packagerUrl = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null);
@@ -319,6 +321,7 @@ class myPackagerUtils
 				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_LOCAL_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::REGULAR_VOLUME_MAP:
+				$packagerUrl = kConf::get(self::VOLUME_PACKAGER_URL, self::LOCAL_MAP_NAME, $packagerUrl);
 				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::MAPPED_VOLUME_MAP:
