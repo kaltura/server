@@ -649,10 +649,6 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				}
 			}
 		}
-		else
-		{
-			self::$kuser = null;
-		}
 		
 		// choose operating partner!
 		if ($ksPartner) {
