@@ -122,6 +122,8 @@ class kBaseResizeAdapter
 		{
 			$this->finalThumbPath = kFile::replaceExt($this->finalThumbPath, $format);
 		}
+
+		KalturaLog::debug("Path for saving thumbnail is [$this->finalThumbPath]");
 	}
 
 	protected function checkIfOldApiCachedExists($contentPath, $thumbDirs)

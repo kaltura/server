@@ -766,14 +766,22 @@ class myEntryUtils
 		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
 		
 		//create path for processing thumbnail request
-		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
-		
+		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
+
 		if(!is_null($format))
 		{
 			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
-		
+
+		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
+
+		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
+		{
+			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
+			return $finalThumbPath;;
+		}
+
 		foreach ($thumbDirs as $thumbDir)
 		{
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
@@ -786,13 +794,16 @@ class myEntryUtils
 		
 		/* @var  $fileSync FileSync*/
 		if ($fileSync)
+		{
 			$orig_image_path = $fileSync->getFullPath();
+		}
 		
 		if ($orig_image_path === null || !file_exists($orig_image_path))
 		{
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
+
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
 		
 		
@@ -811,7 +822,7 @@ class myEntryUtils
 		if ($multi)
 			$vid_slice = 0;
 		
-		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
+		$cacheLockKey = "thumb-processing-resize" . $finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
@@ -879,9 +890,9 @@ class myEntryUtils
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
-				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
+				$capturedThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
-				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
+				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
