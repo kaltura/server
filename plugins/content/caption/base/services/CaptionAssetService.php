@@ -702,10 +702,14 @@ class CaptionAssetService extends KalturaAssetService
 		$entryKuserId = $entry->getKuserId();
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
-		
-		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
+		$ks = $this->getKs();
+
+		if( $isNotAdmin && !is_null($entryKuserId) && ($entryKuserId != $thisKuserId) &&
+			(!$ks || !$ks->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $captionAsset->getEntryId())) )
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
-			
+		}
+
 		$entryCaptionAssets = assetPeer::retrieveByEntryId($captionAsset->getEntryId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 		foreach($entryCaptionAssets as $entryCaptionAsset)
 		{
