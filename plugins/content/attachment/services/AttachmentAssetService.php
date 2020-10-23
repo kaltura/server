@@ -231,7 +231,14 @@ class AttachmentAssetService extends KalturaAssetService
 
 		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $fileName;
 		if (KCurlWrapper::getDataFromFile($url, $fullPath))
+		{
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId())
+				&& !myUploadUtils::checkIfFileIsAllowed($fullPath))
+			{
+				throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_FILE_TYPE_RESTRICTED);
+			}
 			return $this->attachFile($attachmentAsset, $fullPath);
+		}
 			
 		if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
 		{
