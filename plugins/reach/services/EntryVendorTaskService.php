@@ -247,6 +247,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::REJECTED);
 		$dbEntryVendorTask->setErrDescription($rejectReason);
+		$dbEntryVendorTask->setOldPrice($dbEntryVendorTask->getPrice());
+		$dbEntryVendorTask->setPrice(0);
 		$dbEntryVendorTask->save();
 		
 		// return the saved object
