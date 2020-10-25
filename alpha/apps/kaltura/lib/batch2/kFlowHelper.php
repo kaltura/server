@@ -567,18 +567,7 @@ class kFlowHelper
 	{
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-
-		$rootBatchJob = $dbBatchJob->getRootJob();
-		if(!$rootBatchJob)
-			return $dbBatchJob;
-
-			/*
-			 * Fix web-cam sources with bad timestamps
-			 */
-		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
-		if($dbBatchJobAux!=null)
-			return $dbBatchJobAux;
-
+		
 		//Check if src remote file was pushed, if so mark it as ready
 		$fileSyncRemoteUrl = $data->getSrcFileSyncRemoteUrl();
 		$fileSyncLocalPath = $data->getSrcFileSyncLocalPath();
@@ -593,6 +582,17 @@ class kFlowHelper
 				$pendingFileSync->save();
 			}
 		}
+		
+		$rootBatchJob = $dbBatchJob->getRootJob();
+		if(!$rootBatchJob)
+			return $dbBatchJob;
+
+			/*
+			 * Fix web-cam sources with bad timestamps
+			 */
+		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
+		if($dbBatchJobAux!=null)
+			return $dbBatchJobAux;
 		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
