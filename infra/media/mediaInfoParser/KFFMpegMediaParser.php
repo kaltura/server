@@ -841,21 +841,29 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	
 	/**
 	 * 
-	 * @param unknown_type $ffprobeBin
-	 * @param unknown_type $srcFileName
-	 * $param unknown_type $reset
-	 * @return array of volumeLevels
+	 * @param string  $ffmpegBin
+	 * @param string  $ffprobeBin
+	 * @param string  $srcFileName
+	 * $param integer $duration (sec)
+	 * $param integer $startFrom (sec)
+	 * @return array of volumeLevels (msec => DB), null on failure
 	 */	
-	public static function retrieveVolumeLevels($ffprobeBin, $srcFileName, $reset=1)
+	public static function retrieveVolumeLevels($ffmpegBin, $ffprobeBin, $srcFileName, $duration=30, $startFrom=0)
 	{
-		KalturaLog::log("srcFileName($srcFileName)");
-		
+//ffmpeg -i /web7/r74/v1/content/entry/data/1523/941/1_slxmaed8_1_ae1dirzj_1 -c:a copy -vn -copyts -f matroska -y /tmp/aaa.mkv; ffprobe -f lavfi -i "amovie=/tmp/aaa.mkv,astats=metadata=1:reset=1" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0
+		KalturaLog::log("srcFileName($srcFileName),duration($duration), startFrom($startFrom)");
+				
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
+		$tmpFilename = tempnam("/tmp","tmp");//"/tmp/zzz.mkv";
+		$cmdLine = $ffmpegBin;
+		if($startFrom>0) $cmdLine.= " -ss $startFrom";
+		if($duration>0) $cmdLine.= " -t $duration";
+		$cmdLine.= " -i '$srcFileName' -c:a copy -vn -copyts -f matroska -y $tmpFilename && ";
+		$cmdLine.= "$ffprobeBin -f lavfi -i \"amovie='$tmpFilename',astats=metadata=1:reset=1\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet; unlink $tmpFilename";
 		KalturaLog::log("$cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
-			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine)");
+			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine),tmpfile($tmpFilename)");
 			return null;
 		}
 		$volumeLevels = array();
@@ -865,15 +873,33 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			if(!isset($tm) || !isset($vol))
 				continue;
 			$vol = trim($vol);
-			if($vol!='-inf')
-				$volumeLevels[$tm] = $vol;
-			else
-				$volumeLevels[$tm] = -1000;
+			$volumeLevels[$tm] = ($vol=='-inf')? -1000: $vol;
 		}
 
 		return $volumeLevels;
 	}
 
+	/**
+	 * 
+	 * @param array of volumeLevels
+	 * @param integer  $thresh - noise level in DB's
+	 * @return integer - time dur (msec) of sound above the threshold, null on failure
+	 */	
+	public static function analizeVolumeLevels($levelsArr, $thresh=-70)
+	{
+		$cnt=count($levelsArr);
+		if($cnt<1)
+			return null;
+		end($levelsArr);	$last=key($levelsArr);
+		reset($levelsArr);	$first=key($levelsArr);
+		$avg = ($last-$first)/($cnt-1);
+		$cnt=0;
+		foreach($levelsArr as $pts=>$level) {
+			if($level>$thresh) $cnt++;
+		}
+		return round($cnt*$avg);
+	}
+	
 	/**
 	 * retrieveDuration
 	 *
