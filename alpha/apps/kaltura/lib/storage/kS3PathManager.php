@@ -28,24 +28,24 @@ class kS3PathManager extends kPathManager
 	{
 		$root = '/';
 		$partnerId = $object->getPartnerId();
-		if(!$partnerId)
+		
+		if(!$storageProfileId && $partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			$storageProfileId = $partner ? $partner->getSharedStorageProfileId() : null;
+		}
+		
+		if(!$storageProfileId)
 		{
 			return $root;
 		}
 		
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner)
+		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+		if($storageProfile && $storageProfile->getStorageBaseDir())
 		{
-			return $root;
+			$root = $storageProfile->getStorageBaseDir();
 		}
 		
-		$storageProfileId = $storageProfileId ? $storageProfileId : $partner->getSharedStorageProfileId();
-		$sharedStorage = StorageProfilePeer::retrieveByPK($storageProfileId);
-		if(!$sharedStorage)
-		{
-			return $root;
-		}
-		
-		return $sharedStorage->getStorageBaseDir();
+		return $root;
 	}
 }
