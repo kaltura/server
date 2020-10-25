@@ -761,6 +761,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		return self::getExternalFileSyncForKeyByStatus($key, $externalStorageId, array(FileSync::FILE_SYNC_STATUS_READY), $retrieveMode);
 	}
+	
+	/**
+	 * Get the PENDING external FileSync object by its key
+	 *
+	 * @param FileSyncKey $key
+	 * @param int $storageProfileId
+	 * @return FileSync
+	 */
+	public static function getPendingFileSyncForKey(FileSyncKey $key, $storageProfileId = null)
+	{
+		return self::getExternalFileSyncForKeyByStatus($key, $storageProfileId, array(FileSync::FILE_SYNC_STATUS_PENDING));
+	}
 
 
 	/**
@@ -1104,48 +1116,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 	}
 	
-	//	/**
-//	 * @param FileSyncKey $key
-//	 * @param string $url
-//	 * @param StorageProfile $externalStorage
-//	 * @return SyncFile
-//	 */
-//	public static function createReadySyncFileForKey(FileSyncKey $key, $targetFullPath, $storageProfileId)
-//	{
-//		list($rootPath, $filePath) = explode("/", ltrim($targetFullPath, "/"), 2);
-//		$rootPath = DIRECTORY_SEPARATOR . $rootPath . DIRECTORY_SEPARATOR;
-//		$filePath = DIRECTORY_SEPARATOR . $filePath;
-//		$isDir = kFile::isDir($targetFullPath);
-//
-//		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-//		$c->add(FileSyncPeer::DC, $storageProfileId);
-//		$fileSync = FileSyncPeer::doSelectOne($c);
-//		if(!$fileSync)
-//			$fileSync = FileSync::createForFileSyncKey($key);
-//
-//		$fileSync->setDc( $storageProfileId );
-//		$fileSync->setFileRoot ( $rootPath );
-//		$fileSync->setFilePath ( $filePath );
-//		$fileSync->setPartnerId ( $key->partner_id);
-//		$fileSync->setOriginal ( 1 );
-//		$fileSync->setStatus	( FileSync::FILE_SYNC_STATUS_READY );
-//		$fileSync->setFileType	( FileSync::FILE_SYNC_FILE_TYPE_URL );
-//		$fileSync->setIsDir($isDir);
-//		if ( kFile::checkFileExists($targetFullPath))
-//		{
-//			$fileSync->setFileSizeFromPath ( $targetFullPath );
-//		}
-//		else
-//		{
-//			$fileSync->setFileSize	( -1 );
-//		}
-//		$fileSync->save();
-//
-//		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
-//
-//		return $fileSync;
-//	}
-	
 	/**
 	 * @param FileSyncKey $key
 	 * @param string $url
@@ -1194,36 +1164,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
 		return $fileSync;
-		
-//		$isDir = kFile::isDir($targetFullPath);
-//
-//		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
-//		$c->add(FileSyncPeer::DC, $storageProfileId);
-//		$fileSync = FileSyncPeer::doSelectOne($c);
-//		if(!$fileSync)
-//			$fileSync = FileSync::createForFileSyncKey($key);
-//
-//		$fileSync->setDc( $storageProfileId );
-//		$fileSync->setFileRoot ( $rootPath );
-//		$fileSync->setFilePath ( $filePath );
-//		$fileSync->setPartnerId ( $key->partner_id);
-//		$fileSync->setOriginal ( 1 );
-//		$fileSync->setStatus	( FileSync::FILE_SYNC_STATUS_READY );
-//		$fileSync->setFileType	( FileSync::FILE_SYNC_FILE_TYPE_URL );
-//		$fileSync->setIsDir($isDir);
-//		if ( kFile::checkFileExists($targetFullPath))
-//		{
-//			$fileSync->setFileSizeFromPath ( $targetFullPath );
-//		}
-//		else
-//		{
-//			$fileSync->setFileSize	( -1 );
-//		}
-//		$fileSync->save();
-//
-//		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
-//
-//		return $fileSync;
 	}
 
 	/**
@@ -1336,11 +1276,53 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 					kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
 				}
+				
+				self::generateSharedStoragePendingFileSync($currentDCFileSync, $key, $isDir);
 			}
 			kEventsManager::raiseEvent(new kObjectAddedEvent($currentDCFileSync));
 		}
 
 		return $currentDCFileSync;
+	}
+	
+	private static function generateSharedStoragePendingFileSync(FileSync $sourceFileSync, FileSyncKey $key, $isDir)
+	{
+		$shouldCreateSharedDcFileSync = kConf::get('sync_file_sync_to_shared', 'cloud_storage', null);
+		if(!$shouldCreateSharedDcFileSync)
+			return;
+		
+		$syncFileSyncTypeMap = kConf::get('sync_file_sync_type_map', 'cloud_storage', null);
+		$objectKey = $key->getObjectType() . ":" . $key->getObjectSubType();
+		if($isDir || !in_array($objectKey, $syncFileSyncTypeMap))
+		{
+			return;
+		}
+		
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+		foreach ($sharedDcIds as $sharedDcId)
+		{
+			$sharedDCFileSync = FileSync::createForFileSyncKey( $key );
+			$sharedDCFileSync->setDc( $sharedDcId );
+			$sharedDCFileSync->setStatus( FileSync::FILE_SYNC_STATUS_PENDING );
+			$sharedDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
+			$sharedDCFileSync->setOriginal ( 0 );
+			$sharedDCFileSync->setPartnerId ( $key->partner_id );
+			$sharedDCFileSync->setIsDir($isDir);
+			$sharedDCFileSync->setFileSize($sourceFileSync->getFileSize());
+			$sharedDCFileSync->setOriginalId($sourceFileSync->getId());
+			$sharedDCFileSync->setOriginalDc($sourceFileSync->getDc());
+			$sharedDCFileSync->setSrcEncKey($sourceFileSync->getSrcEncKey());
+			$sharedDCFileSync->setSrcDc($sourceFileSync->getDc());
+			$sharedDCFileSync->setSrcPath($sourceFileSync->getFullPath());
+			
+			$fileSyncKey = kFileSyncUtils::getKeyForFileSync($sharedDCFileSync);
+			list($fileRoot, $realPath) = kPathManager::getFilePathArr($fileSyncKey, $sharedDcId);
+			
+			$sharedDCFileSync->setFileRoot($fileRoot);
+			$sharedDCFileSync->setFilePath($realPath);
+			
+			$sharedDCFileSync->save();
+		}
 	}
 
 	public static function setSizeInBytesOnAsset($currentDCFileSync)
