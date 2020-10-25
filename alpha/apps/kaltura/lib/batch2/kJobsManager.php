@@ -469,10 +469,28 @@ class kJobsManager
 		{		
 			$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 			$addImportJob = false;
-				
-			$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
+			
+			$fileSync = null;
+			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+			if($preferSharedDcForConvert && count($sharedDcIds))
+			{
+				while(!$fileSync && count($sharedDcIds))
+				{
+					$sharedDcId = array_shift($sharedDcIds);
+					$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcId);
+				}
+			}
+			
 			if(!$fileSync)
+			{
+				$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
+			}
+			
+			if(!$fileSync)
+			{
 				return null;
+			}
 				
 			$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 			if($addImportJob)
@@ -1624,12 +1642,22 @@ class kJobsManager
 		if($shouldDetectGOP === null)
 			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
 		$extractMediaData->setDetectGOP($shouldDetectGOP);
+		self::setRemoteSrcUrl($extractMediaData, $flavorAsset);
 		
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
+	}
+	
+	public static function setRemoteSrcUrl(kExtractMediaJobData $extractMediaData, flavorAsset $flavorAsset)
+	{
+		$pendingFileSync = kFlowHelper::getSharedPendingFileSyncForAsset($flavorAsset);
+		if(!$pendingFileSync)
+			return;
+		
+		$extractMediaData->setSrcFileSyncRemoteUrl($pendingFileSync->getFullPath());
 	}
 
 	private static function getEncryptionKeyForAssetId($flavorAssetId)

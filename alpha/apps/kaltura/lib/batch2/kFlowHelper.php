@@ -579,6 +579,21 @@ class kFlowHelper
 		if($dbBatchJobAux!=null)
 			return $dbBatchJobAux;
 
+		//Check if src remote file was pushed, if so mark it as ready
+		$fileSyncRemoteUrl = $data->getSrcFileSyncRemoteUrl();
+		$fileSyncLocalPath = $data->getSrcFileSyncLocalPath();
+		if($fileSyncRemoteUrl && kFile::fileSize($fileSyncLocalPath) == kFile::fileSize($fileSyncRemoteUrl))
+		{
+			//get pending file sync to shared storage
+			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			$pendingFileSync = kFlowHelper::getSharedPendingFileSyncForAsset($flavorAsset);
+			if($pendingFileSync && $pendingFileSync->getFullPath() == $fileSyncRemoteUrl)
+			{
+				$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+				$pendingFileSync->save();
+			}
+		}
+		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
@@ -614,6 +629,13 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+	
+	public static function getSharedPendingFileSyncForAsset(flavorAsset $flavorAsset)
+	{
+		$key = $flavorAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+		return kFileSyncUtils::getPendingFileSyncForKey($key, reset($sharedDcIds));
 	}
 
 	/**
