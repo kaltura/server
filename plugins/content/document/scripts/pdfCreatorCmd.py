@@ -1,3 +1,4 @@
+from win32com.client import GetObject
 import ntsecuritycon
 import win32security
 import pywintypes
@@ -5,7 +6,6 @@ import win32print
 import win32con
 import win32api
 import os.path
-import ctypes
 import time
 import sys
 
@@ -16,38 +16,11 @@ def getDefaultPrinter():
         return None
 
 
-TH32CS_SNAPPROCESS = 0x00000002
-class PROCESSENTRY32(ctypes.Structure):
-     _fields_ = [("dwSize", ctypes.c_ulong),
-                 ("cntUsage", ctypes.c_ulong),
-                 ("th32ProcessID", ctypes.c_ulong),
-                 ("th32DefaultHeapID", ctypes.c_ulong),
-                 ("th32ModuleID", ctypes.c_ulong),
-                 ("cntThreads", ctypes.c_ulong),
-                 ("th32ParentProcessID", ctypes.c_ulong),
-                 ("pcPriClassBase", ctypes.c_ulong),
-                 ("dwFlags", ctypes.c_ulong),
-                 ("szExeFile", ctypes.c_char * 260)]
-
 def getProcessList():
-     # See http://msdn2.microsoft.com/en-us/library/ms686701.aspx
-     CreateToolhelp32Snapshot = ctypes.windll.kernel32.\
-                                CreateToolhelp32Snapshot
-     Process32First = ctypes.windll.kernel32.Process32First
-     Process32Next = ctypes.windll.kernel32.Process32Next
-     CloseHandle = ctypes.windll.kernel32.CloseHandle
-     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)
-     pe32 = PROCESSENTRY32()
-     pe32.dwSize = ctypes.sizeof(PROCESSENTRY32)
-     if Process32First(hProcessSnap,
-                       ctypes.byref(pe32)) == win32con.FALSE:
-         print >> sys.stderr, "Failed getting first process."
-         return
-     while True:
-         yield (pe32.szExeFile, pe32.th32ProcessID)
-         if Process32Next(hProcessSnap, ctypes.byref(pe32)) == win32con.FALSE:
-             break
-     CloseHandle(hProcessSnap)
+    WMI = GetObject('winmgmts:')
+    processes = WMI.InstancesOf('Win32_Process')
+    for cur in processes:
+        yield (cur.Properties_('Name').Value, cur.Properties_('ProcessId').Value)
 
 def adjustPrivilege(priv, enable = True):
     flags = ntsecuritycon.TOKEN_ADJUST_PRIVILEGES | ntsecuritycon.TOKEN_QUERY

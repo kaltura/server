@@ -37,6 +37,7 @@
 		{
 			$this->setup = $setup;
 			$this->params  = new KChunkedEncodeParams();
+			KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
 		}
 		
 		
@@ -76,7 +77,11 @@
 			//Build remote shared path to follow same setting as output path
 			if($setup->sharedChunkPath)
 			{
-				$setup->sharedChunkPath = kFile::fixPath($setup->sharedChunkPath . "/" . $pInfo['basename']);
+				list($baseDirName, $uniqId) = explode(".", $setup->output);
+				$setup->sharedChunkPath = kFile::fixPath($setup->sharedChunkPath . '/' .
+					substr($baseDirName, -4, 2). '/' .
+					substr($baseDirName, -2) . '/' .
+					$pInfo['basename']);
 			}
 
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
@@ -617,7 +622,7 @@
 		/********************
 		 * concatChunk
 		 */
-		private static function concatChunk($fhd, $fileName, $rdSz=10000000)
+		private static function concatChunk($fhd, $fileName, $rdSz=10000000, $expectedFileSize = null)
 		{
 			$fileName = kFile::realPath($fileName);
 			if(($ifhd=fopen($fileName,"rb"))===false){
@@ -636,8 +641,12 @@
 				$wrSz+=$sz;
 			}
 			fclose($ifhd);
-			KalturaLog::log("sz:$wrSz  ".$fileName);
-			return true;
+			KalturaLog::log("sz:$wrSz ex: $expectedFileSize ".$fileName);
+			
+			if($expectedFileSize && $expectedFileSize != $wrSz)
+				return false;
+			
+			return $wrSz;
 		}
 		
 		/********************
@@ -645,6 +654,11 @@
 		 */
 		public function ConcatChunks()
 		{
+			/*
+			Remove return to revert back to using ts concat flow
+			return true;
+			*/
+			
 			$videoFilename = $this->getSessionName("video");
 			$oFh=fopen($videoFilename,"wb");
 			if($oFh===false){
@@ -654,17 +668,43 @@
 			stream_wrapper_restore('http');
 			stream_wrapper_restore('https');
 			
-			foreach($this->chunkDataArr as $idx=>$chunkData){
+			$rv = true;
+			$mergedFileSize = 0;
+			$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
+			
+			foreach($this->chunkDataArr as $idx=>$chunkData) {
+				$originalFileSize = null;
 				if(isset($chunkData->toFix)) {
 					$chunkFileName = $this->getChunkName($idx,"fix");
+					$originalFileSize = filesize($chunkFileName);
 				}
 				else {
-					$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
 					$chunkFileName = $this->getChunkName($idx, $mode);
+					if( isset($chunkData->outFileSizes) && isset($chunkData->outFileSizes[basename($chunkFileName)]) ) {
+						$originalFileSize = $chunkData->outFileSizes[basename($chunkFileName)];
+					}
 				}
 				
-				if(($rv=self::concatChunk($oFh, $chunkFileName))===false)
+				$retries = 3;
+				$mergeFileSuccess = false;
+				while($retries > 0) {
+					$bytesWritten=self::concatChunk($oFh, $chunkFileName, 10000000, $originalFileSize);
+					if($bytesWritten !== false) {
+						$mergedFileSize += $bytesWritten;
+						$mergeFileSuccess = true;
+						break;
+					}
+					
+					$retries--;
+					fseek($oFh, $mergedFileSize, SEEK_SET);
+					KalturaLog::debug("Failed to download [$chunkFileName], retries left [$retries]");
+				}
+				
+				if(!$mergeFileSuccess) {
+					KalturaLog::debug("Failed to build merged file, Convert will fail, bytes fetched [$mergedFileSize]");
+					$rv = false;
 					break;
+				}
 			}
 			fclose($oFh);
 			
@@ -679,21 +719,36 @@
 		public function BuildMergeCommandLine()
 		{
 			$mergedFilename= $this->getSessionName();
-			$videoFilename = $this->getSessionName("video");
+			$vidConcatStr = $this->getSessionName("video");
 			
-			/*
+			$mode = null;
+			$setup = $this->setup;
+			$mergeCmd = $setup->ffmpegBin;
+			
+			/* Remove comment to re-enable chuk concat via ffmpeg
 			$vidConcatStr = "concat:'";
+			if($this->setup->sharedChunkPath) {
+				$mode = "shared";
+				$mergeCmd .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\" ";
+			}
+			
 			foreach($this->chunkDataArr as $idx=>$chunkData){
 				if(isset($chunkData->toFix))
+				{
 					$chunkFileName = $this->getChunkName($idx,"fix");
-				else 
-					$vidConcatStr.= $this->getChunkName($idx).'|';
+				}
+				else
+				{
+					$chunkFileName = $this->getChunkName($idx, $mode);
+					$chunkFileName = kFile::realPath($chunkFileName);
+				}
+				$vidConcatStr.= $chunkFileName.'|';
 			}
+			
 			$vidConcatStr = rtrim($vidConcatStr, '|');
 			$vidConcatStr.= "'";
 			*/
 			
-			$setup = $this->setup;
 			$params = $this->params;
 			$audioInputParams = null;
 			if(isset($params->acodec)) {
@@ -716,12 +771,16 @@
 			else{
 				$audioCopyParams = null;
 			}
-
-			$mergeCmd = $setup->ffmpegBin;
+			
 			if(isset($params->fps)) $mergeCmd.= " -r ".$params->fps;
 			if($this->chunkFileFormat=="mpegts")
 				$mergeCmd.= " -itsoffset -1.4";
-			$mergeCmd.= " -i $videoFilename";
+			
+			/* Disable separate merging of video chunks
+			//$mergeCmd.= " -i $videoFilename";
+			*/
+			
+			$mergeCmd.= " -i $vidConcatStr";
 			$mergeCmd.= "$audioInputParams -map 0:v:0 -c:v copy $audioCopyParams";
 			if(isset($params->formatParams))
 				$mergeCmd.= " ".$params->formatParams;
@@ -758,7 +817,7 @@
 		/********************
 		 *
 		 */
-		public function BuildFixVideoCommandLine($idx)
+		public function BuildFixVideoCommandLine($idx, $chunkOutputFileList = array())
 		{
 			$chunkData = $this->chunkDataArr[$idx];
 			$chunkFixName = $this->getChunkName($idx, "fix");
@@ -769,12 +828,26 @@
 			if(isset($this->params->fps)) 
 				$cmdLine.= " -r ".$this->params->fps;
 			
-			if(file_exists($this->getChunkName($idx, $idx+1))) {
-				$cmdLine.= " -i concat:'".$this->getChunkName($idx, $idx);
-				$cmdLine.= "|".$this->getChunkName($idx, $idx+1)."'";
+			$mode = "base";
+			if($this->setup->sharedChunkPath) {
+				$mode = "shared_base";
+				$cmdLine .= " -protocol_whitelist \"concat,file,https,http,tls,tcp\"";
 			}
-			else
-				$cmdLine.= " -i ".$this->getChunkName($idx, $idx);
+			
+			$firstSegmentName = $this->getChunkName($idx, $mode).($idx);
+			$secondSegmentName = $this->getChunkName($idx, $mode).($idx+1);
+			KalturaLog::debug("firstSegmentName: $firstSegmentName , secondSegmentName: $secondSegmentName");
+			
+			$resolvedFirstSegmentName = kFile::realPath($firstSegmentName);
+			$resolvedSecondSegmentName = kFile::realPath($secondSegmentName);
+			KalturaLog::debug("resolvedFirstSegmentName: $resolvedFirstSegmentName, resolvedSecondSegmentName: $resolvedSecondSegmentName");
+			
+			if( (count($chunkOutputFileList) && in_array($secondSegmentName, $chunkOutputFileList)) || kFile::checkFileExists($secondSegmentName)) {
+				$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
+			}
+			else {
+				$cmdLine.= " -i \"$resolvedFirstSegmentName\"";
+			}
 				
 			$start = $chunkData->start; 
 			$segmentTime = $chunkData->duration+(1/$this->params->fps*1.5);
@@ -951,9 +1024,10 @@
 		 * updateChunkFileStatData
 		 *	Retrieve chunk stat data and update the chunks data array
 		 */
-		public function updateChunkFileStatData($idx, $stat)
+		public function updateChunkFileStatData($idx, $stat, $outFileSizes = array())
 		{
 			$this->chunkDataArr[$idx]->stat = $stat;
+			$this->chunkDataArr[$idx]->outFileSizes = $outFileSizes;
 		}
 		
 		/********************
@@ -982,6 +1056,9 @@
 				break;
 			case "concat":
 				$name = $this->setup->output."_concat.log";
+				break;
+			case "video":
+				$name = sys_get_temp_dir() . '/' . basename($this->setup->output) . "_$mode";
 				break;
 			default:
 				$name = $this->setup->output."_$mode";

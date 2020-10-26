@@ -14,7 +14,7 @@ class kEntrySource extends kThumbnailSource
 		if (!$dbEntry)
 		{
 			$data = array(kThumbnailErrorMessages::ENTRY_ID => $entryId);
-			throw new kTumbnailException(kThumbnailException::ENTRY_NOT_FOUND, kThumbnailException::ENTRY_NOT_FOUND, $data);
+			throw new kThumbnailException(kThumbnailException::ENTRY_NOT_FOUND, kThumbnailException::ENTRY_NOT_FOUND, $data);
 		}
 
 		$secureEntryHelper = new KSecureEntryHelper($dbEntry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);

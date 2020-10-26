@@ -121,4 +121,9 @@ class kDeliveryUtils {
 	
 		return $outLines;
 	}
+
+	public static function urlsafeB64Encode($input)
+	{
+		return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
+	}
 }

@@ -316,7 +316,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$uniqid = uniqid("convert_{$job->entryId}_");
 			$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . substr($job->entryId, -2) . DIRECTORY_SEPARATOR . $uniqid;
-			kFile::fullMkdir($sharedFile);
+			kFile::fullMkdir($sharedFile,0775);
 		}
 		
 		if(!$data->flavorParamsOutput->sourceRemoteStorageProfileId)

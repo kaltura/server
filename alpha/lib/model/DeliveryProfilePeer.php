@@ -135,17 +135,23 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	// -------------------------------------
 	// ------ Retrieval functionality ------
 	// -------------------------------------
-	
+
 	/**
 	 * Returns the delivery profile that matches the entryID and the streamer type.
 	 * @param string $entryId The entry id
-	 * @param PlayBackProtocol $streamerType the streamer type
+	 * @param string $streamerType the streamer type
+	 * @param null $flavorAssets
 	 * @return DeliveryProfile
 	 */
-	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
+	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP, $flavorAssets = null)
 	{
 		$delivery = null;
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, $streamerType);
+
+		if($flavorAssets)
+		{
+			$deliveryAttributes->setFlavorAssets($flavorAssets);
+		}
 		
 		if ($streamerType == PlaybackProtocol::HTTP)
 		{
@@ -159,7 +165,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		if(!$delivery)
 			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
-		
+
 		if($delivery)
 			$delivery->setDynamicAttributes($deliveryAttributes);
 		
@@ -611,7 +617,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $entryId The entry for which we search for the delivery profile
 	 * @param PlaybackProtocol $streamerType - The protocol
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
-	 * @return DeliveryProfile
+	 * @return DeliveryProfileLive
 	 */
 	public static function getLiveDeliveryProfileByHostName($cdnHost, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$entryId = $deliveryAttributes->getEntryId();

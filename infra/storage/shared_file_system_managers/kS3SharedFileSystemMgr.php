@@ -23,6 +23,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Guzzle\Cache\DoctrineCacheAdapter;
 use Aws\Common\Credentials\CacheableCredentials;
 
+
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
@@ -51,16 +52,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected $retriesNum;
 	
-	protected $s3Arn = null;
+	protected $s3Arn;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kLocalFileSystemManger' class
 	public function __construct(array $options = null)
 	{
 		parent::__construct($options);
 		
+		$arnRole = getenv(self::S3_ARN_ROLE_ENV_NAME);
 		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
+			$arnRole = kConf::get("s3Arn" , "cloud_storage", null);
 		}
 		
 		if($options)
@@ -74,7 +77,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
-			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : getenv(self::S3_ARN_ROLE_ENV_NAME);
+			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
@@ -108,7 +111,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'region' => $this->s3Region,
 			'signature' => $this->signatureType ? $this->signatureType : 'v4',
 			'version' => '2006-03-01',
-			'scheme'  => 'http'
 		);
 		
 		if ($this->endPoint)
@@ -131,6 +133,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
 		$roleRefresh->setRoleArn($this->s3Arn);
+		$roleRefresh->setS3Region($this->s3Region);
 		
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
@@ -222,18 +225,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				array('params' => $params)
 			);
 			
+			KalturaLog::debug("File uploaded to s3, info: " . print_r($res, true));
 			return array(true, $res);
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::warning("Failed to uploaded to s3, info with message: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
 	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
-		$retries = 3;
-		
 		$params = array();
 		if ($this->sseType === "KMS")
 		{
@@ -246,7 +249,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$params['ServerSideEncryption'] = "AES256";
 		}
 		
-		while ($retries)
+		$retries = $this->retriesNum;
+		while ($retries > 0)
 		{
 			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
 			if ($success)
@@ -345,25 +349,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
 	{
-		return $this->doFullMkfileDir(dirname($path), $rights, $recursive);
+		return true;
 	}
 	
 	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
 	{
-		if($this->doIsDir($path))
-		{
-			return;
-		}
-		
-		list($bucket, $key) = $this->getBucketAndFilePath($path);
-		$dirList = explode("/", $key);
-		$fullDir = "/$bucket/";
-		
-		while($currDir = array_shift($dirList))
-		{
-			$fullDir .= "$currDir/";
-			$this->doMkdir($fullDir, $rights, $recursive);
-		}
+		return true;
 	}
 	
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -414,14 +405,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doMkdir($path, $mode, $recursive)
 	{
-		$params = $this->initBasicS3Params($path);
-		$params['Body'] = '';
-		$result = $this->s3Call('putObject', $params, $path);
-		
-		if(!$result)
-		{
-			return false;
-		}
 		return true;
 	}
 	
@@ -565,20 +548,46 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doListFiles($filePath, $pathPrefix = '')
 	{
+		$dirList = array();
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		
-		$params = array(
-			'Bucket' => $bucket,
-			'Prefix'    => $filePath,
-		);
-		
-		$results = $this->s3Call('listObjects', $params, $filePath);
-		
-		if(!$results)
+		try
 		{
-			return false;
+			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $filePath
+			));
+			
+			$originalFilePath = $bucket . '/' . $filePath . '/';
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				$objectPath = $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
+				if($originalFilePath == $objectPath)
+					continue;
+				
+				$fileType = "file";
+				if($dirListObject['Size'] == 0 && substr_compare($objectPath, '/', -strlen('/')) === 0)
+				{
+					$fileType = 'dir';
+				}
+				
+				if ($fileType == 'dir')
+				{
+					$dirList[] = array($objectPath, 'dir', $dirListObject['Size']);
+					$dirList = array_merge($dirList, self::doListFiles($objectPath, $pathPrefix));
+				}
+				else
+				{
+					$dirList[] = array($objectPath, 'file', $dirListObject['Size']);
+				}
+			}
 		}
-		return $results;
+		catch ( Exception $e )
+		{
+			KalturaLog::err("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
+		}
+		
+		return $dirList;
 	}
 	
 	protected function doGetMaximumPartsNum()
@@ -714,7 +723,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+		$retries = $this->retriesNum;
+		while ($retries > 0)
+		{
+			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+			if ($success)
+				break;
+			
+			sleep(rand(1,3));
+			$retries--;
+		}
+		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
 		if (!$success)
@@ -808,9 +827,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			$params = $this->initBasicS3Params($filePath);
 		}
-		$retries = $this->retriesNum;
 		
-		while ($retries)
+		$retries = $this->retriesNum;
+		while ($retries > 0)
 		{
 			try
 			{
@@ -824,6 +843,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				if(in_array($e->$getExceptionFunctionName(), $finalErrorCodes))
 				{
 					$retries = 0;
+					//In case final status is passed dont log the exception to avoid spamming the log file
+					return false;
 				}
 				$this->handleS3Exception($command, $retries, $params, $e);
 			}

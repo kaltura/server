@@ -8,6 +8,7 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	const PROJECTED_AUDIENCE = 'projected_audience';
 	const SOURCE_ENTRY_ID = 'source_entry_id';
 	const PRE_START_TIME = 'pre_start_time';
+	const POST_END_TIME = 'post_end_time';
 
 	/**
 	 * @param int $v
@@ -54,7 +55,23 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	 */
 	public function getPreStartTime()
 	{
-		return $this->getFromCustomData(self::PRE_START_TIME);
+		return $this->getFromCustomData(self::PRE_START_TIME, null, 0);
+	}
+
+	/**
+	 * @param int $v
+	 */
+	public function setPostEndTime($v)
+	{
+		$this->putInCustomData(self::POST_END_TIME, $v);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getPostEndTime()
+	{
+		return $this->getFromCustomData(self::POST_END_TIME, null, 0);
 	}
 
 	/* (non-PHPdoc)
@@ -81,17 +98,34 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	protected function addCapabilityToTemplateEntry($con)
 	{
 			$liveEntry = entryPeer::retrieveByPK($this->getTemplateEntryId());
-			if ($liveEntry && !$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+			if ($liveEntry)
 			{
-				$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
-				$liveEntry->save($con);
+				$shouldSave = false;
+				if (!$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+				{
+					$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
+					$shouldSave = true;
+				}
+				if ($this->getSourceEntryId() && !$liveEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY))
+				{
+					$liveEntry->addCapability(LiveEntry::SIMULIVE_CAPABILITY);
+					$shouldSave = true;
+				}
+				if ($shouldSave)
+				{
+					$liveEntry->save($con);
+				}
 			}
 	}
 
 	public function getCalculatedStartTime()
 	{
-		$preStartTime = !is_null($this->getPreStartTime()) ? $this->getPreStartTime() : 0;
-		return parent::getCalculatedStartTime() - $preStartTime;
+		return parent::getCalculatedStartTime() - $this->getPreStartTime();
+	}
+
+	public function getCalculatedEndTime()
+	{
+		return parent::getCalculatedEndTime() + $this->getPostEndTime();
 	}
 
 }

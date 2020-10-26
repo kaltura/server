@@ -433,7 +433,12 @@ class BulkUploadCategoryEngineCsv extends BulkUploadEngineCsv
 	{
 	    return new KalturaBulkUploadResultCategory();
 	}
-	
+
+	protected function getUploadResultInstanceType()
+	{
+		return KalturaBulkUploadObjectType::CATEGORY;
+	}
+
 	public function getObjectTypeTitle()
 	{
 		return self::OBJECT_TYPE_TITLE;

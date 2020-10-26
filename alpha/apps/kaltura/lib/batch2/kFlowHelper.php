@@ -778,11 +778,6 @@ class kFlowHelper
 			$shouldSave = true;
 		}
 		
-		if($data->getLogFileSyncLocalPath()) {
-			$flavorAsset->incLogFileVersion();
-			$shouldSave = true;
-		}
-		
 		if($shouldSave)
 			$flavorAsset->save();
 		

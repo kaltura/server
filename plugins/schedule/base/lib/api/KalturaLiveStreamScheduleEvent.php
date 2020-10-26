@@ -24,6 +24,12 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	public $preStartTime;
 
+	/**
+	 * The time relative time before the endTime considered as postEnd time
+	 * @var int
+	 */
+	public $postEndTime;
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
@@ -44,7 +50,8 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	(
 		'projectedAudience',
 		'sourceEntryId',
-		'preStartTime'
+		'preStartTime',
+		'postEndTime'
 	);
 
 	/* (non-PHPdoc)
@@ -87,13 +94,17 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	protected function validateLiveStreamEventFields()
 	{
-		if (isset($this->sourceEntryId) && !BaseentryPeer::retrieveByPK($this->sourceEntryId))
+		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
 		}
 		if (isset($this->preStartTime) && $this->preStartTime < 0)
 		{
 			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'preStartTime');
+		}
+		if (isset($this->postEndTime) && $this->postEndTime < 0)
+		{
+		    throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'postEndTime');
 		}
 	}
 }

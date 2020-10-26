@@ -144,7 +144,7 @@ class MediaService extends KalturaEntryService
     	}
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$resource->validateEntry($dbEntry, true);
+			$resource->validateEntry($dbEntry);
 
 			if($conversionProfileId)
 			{
@@ -460,6 +460,12 @@ class MediaService extends KalturaEntryService
 		{
 			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
 			{
+				$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+				if($remoteDCHost)
+				{
+					kFileUtils::dumpApiRequest($remoteDCHost);
+				}
+				
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
 			}
 			throw($ex);

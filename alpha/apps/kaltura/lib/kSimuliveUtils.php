@@ -9,22 +9,24 @@ class kSimuliveUtils
 	const SIMULIVE_SCHEDULE_MARGIN = 2;
 	const SECOND_IN_MILLISECONDS = 1000;
 	const LIVE_SCHEDULE_AHEAD_TIME = 60;
+	const MIN_DVR_WINDOW_MS = 30000;
+	const MINIMUM_TIME_TO_PLAYABLE_SEC = 18; // 3 * default segment duration
 	/**
 	 * @param LiveEntry $entry
 	 * @return array
 	 */
 	public static function getSimuliveEventDetails(LiveEntry $entry)
 	{
-		$dvrWindowMs = $entry->getDvrWindow() * self::MINUTE_TO_MS;
+		$dvrWindowMs = max($entry->getDvrWindow() * self::MINUTE_TO_MS, self::MIN_DVR_WINDOW_MS);
 		$dvrWindowSec = $dvrWindowMs / self::SECOND_IN_MILLISECONDS;
-		$currentEvent = self::getSimuliveEvent($entry, time() - $dvrWindowSec, $dvrWindowSec);
+		$currentEvent = self::getPlayableSimuliveEvent($entry, time() - $dvrWindowSec, $dvrWindowSec);
 		if (!$currentEvent)
 		{
 			return null;
 		}
 
 		/* @var $currentEvent ILiveStreamScheduleEvent */
-		$sourceEntry = BaseentryPeer::retrieveByPK($currentEvent->getSourceEntryId());
+		$sourceEntry = kSimuliveUtils::getSourceEntry($currentEvent);
 		if(!$sourceEntry)
 		{
 			return null;
@@ -47,7 +49,7 @@ class kSimuliveUtils
 	public static function getSimuliveEvents(Entry $entry, $startTime = 0, $duration = 0)
 	{
 		$events = array();
-		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
 		{
 			if (!$startTime)
 			{
@@ -79,23 +81,54 @@ class kSimuliveUtils
 		return $events ? $events[0] : null;
 	}
 
+	/**
+	 * Get an event that startTime + duration (now epoch by default) is at least MINIMUM_TIME_TO_PLAYABLE_SEC inside
+	 * the event.
+	 * @param Entry $entry
+	 * @param int $startTime - epoch time
+	 * @param int $duration - in sec
+	 * @return ILiveStreamScheduleEvent | null
+	 */
+	public static function getPlayableSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
+	{
+		$startTime = $startTime ? $startTime : time();
+		$event = self::getSimuliveEvent($entry, $startTime, $duration);
+		// consider the event as playable only after 3 segments
+		if ($event && ($startTime + $duration) >= ($event->getCalculatedStartTime() + self::MINIMUM_TIME_TO_PLAYABLE_SEC))
+		{
+			return $event;
+		}
+		return null;
+	}
+
+	/**
+	 * @param ILiveStreamScheduleEvent $event
+	 * @return Entry
+	 */
+	public static function getSourceEntry($event)
+	{
+		return entryPeer::retrieveByPK($event->getSourceEntryId());
+	}
+
 	public static function getIsLiveCacheTime (LiveEntry $entry)
 	{
-		if (!$entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		if (!$entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY))
 		{
 			return 0;
 		}
 		$nowEpoch = time();
-		$simuliveEvent = kSimuliveUtils::getSimuliveEvent($entry, $nowEpoch, self::LIVE_SCHEDULE_AHEAD_TIME);
+		$simuliveEvent = kSimuliveUtils::getPlayableSimuliveEvent($entry, $nowEpoch, self::LIVE_SCHEDULE_AHEAD_TIME);
 		if (!$simuliveEvent)
 		{
 			return self::LIVE_SCHEDULE_AHEAD_TIME;
 		}
-		if ($nowEpoch >= $simuliveEvent->getCalculatedStartTime() && $nowEpoch <= $simuliveEvent->getCalculatedEndTime())
+		// playableStartTime only after 3 segments
+		$playableStartTime = $simuliveEvent->getCalculatedStartTime() + self::MINIMUM_TIME_TO_PLAYABLE_SEC;
+		if ($nowEpoch >= $playableStartTime && $nowEpoch < $simuliveEvent->getCalculatedEndTime())
 		{
 			return $simuliveEvent->getCalculatedEndTime() - $nowEpoch;
 		}
 		// conditional cache should expire when event start
-		return $simuliveEvent->getCalculatedStartTime() - $nowEpoch;
+		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
 	}
 }

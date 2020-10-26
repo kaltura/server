@@ -75,7 +75,7 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 
 		foreach ($tasksData as $task) {
 			$taskArray[] = $this->buildTask($task);
-			$taskArray[] = $task->taskTimeToNext;
+			$taskArray[] = intval($task->taskTimeToNext);
 		}
 		return $taskArray;
 	}

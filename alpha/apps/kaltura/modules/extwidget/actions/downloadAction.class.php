@@ -245,12 +245,21 @@ class downloadAction extends sfAction
 		
 		if (is_null($fileSync))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-			
+
 		if (!$local && !in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
+
 			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
 			KExternalErrors::terminateDispatch();
 			$this->redirect($url);
 		}
+	}
+
+	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset)
+	{
+
+		$url = $flavorAsset->getServeFlavorUrl(null, null, $downloadDeliveryProfile);
+		KalturaLog::log ("URL to redirect to [$url]" );
+		return $url;
 	}
 }

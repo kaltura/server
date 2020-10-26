@@ -130,8 +130,20 @@ class BatchControlService extends KalturaBaseService
 		
 		return $schedulerStatusResponse;
 	}
-	
-	
+
+	/**
+	 * @action getOrCreateScheduler
+	 * @param KalturaScheduler $scheduler
+	 * @return KalturaScheduler
+	 * @throws KalturaAPIException
+	 */
+	public function getOrCreateSchedulerAction(KalturaScheduler $scheduler)
+	{
+		$dbScheduler = $this->getOrCreateSchedulerByHost($scheduler);
+		$scheduler->fromObject($dbScheduler, $this->getResponseProfile());
+		return $scheduler;
+	}
+
 	/**
 	 * batch getOrCreateScheduler returns a scheduler by name, create it if doesn't exist
 	 * 
@@ -140,6 +152,12 @@ class BatchControlService extends KalturaBaseService
 	 */
 	private function getOrCreateScheduler(KalturaScheduler $scheduler)
 	{
+		//handle misconfiguring a batch without id
+		if (is_null($scheduler->configuredId))
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaScheduler:configuredId');
+		}
+
 		$c = new Criteria();
 		$c->add ( SchedulerPeer::CONFIGURED_ID, $scheduler->configuredId);
 		$schedulerDb = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
@@ -170,8 +188,84 @@ class BatchControlService extends KalturaBaseService
 		
 		return $schedulerDb;
 	}
-	
-	
+
+
+	/**
+	 * batch getOrCreateScheduler returns a scheduler by name, create it if doesn't exist
+	 *
+	 * @param KalturaScheduler $scheduler
+	 * @return Scheduler
+	 */
+	private function getOrCreateSchedulerByHost(KalturaScheduler $scheduler)
+	{
+		//make sure we dont have the same configured_id by mistake
+		if ($scheduler->configuredId)
+		{
+			$c = new Criteria();
+			$c->add(SchedulerPeer::CONFIGURED_ID, $scheduler->configuredId);
+			$c->add(SchedulerPeer::HOST, $scheduler->host, Criteria::NOT_EQUAL);
+			$schedulerDb = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+
+			if ($schedulerDb)
+			{
+				throw new KalturaAPIException(KalturaErrors::SCHEDULER_HOST_CONFLICT, $scheduler->configuredId, $scheduler->host, $schedulerDb->getHost());
+			}
+		}
+
+		$c = new Criteria();
+		$c->add ( SchedulerPeer::CONFIGURED_ID, null , criteria::ISNOTNULL);
+		$c->add ( SchedulerPeer::CONFIGURED_ID, 0 , criteria::NOT_EQUAL);
+		$c->add ( SchedulerPeer::HOST, $scheduler->host);
+		$schedulerDb = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+
+		if($schedulerDb)
+		{
+			return $schedulerDb;
+		}
+
+		$lockKey = "scehduler_add";
+		return kLock::runLocked($lockKey, array($this, 'addSchdulerImpl'), array($scheduler));
+	}
+
+	/**
+	 * @param $scheduler
+	 * @return Scheduler
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public static function addSchdulerImpl($scheduler)
+	{
+		$c = new Criteria();
+		$c->addDescendingOrderByColumn(SchedulerPeer::CONFIGURED_ID);
+		$c->setLimit(1);
+		$latestScheduler = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		if(!$latestScheduler || !$latestScheduler->getConfiguredId())
+		{
+			throw new KalturaAPIException(KalturaErrors::MAX_CONFIGURED_ID_NOT_FOUND);
+		}
+		KalturaLog::debug("BATCH MAX CONFIGURED ID IS " . $latestScheduler->getConfiguredId());
+
+		$configuredId = self::calculateConfiguredId($latestScheduler->getConfiguredId());
+		$schedulerDb = new Scheduler();
+		$schedulerDb->setLastStatus(time());
+		$schedulerDb->setName($scheduler->name);
+		$schedulerDb->setHost($scheduler->host);
+		$schedulerDb->setDescription('Dynamically allocted scheduler');
+		$schedulerDb->setConfiguredId($configuredId);
+		$schedulerDb->save();
+		return $schedulerDb;
+	}
+
+	/**
+	 * @param $lastConfiguredId
+	 * @return int
+	 */
+	public static function calculateConfiguredId($lastConfiguredId)
+	{
+		$dcId = kDataCenterMgr::getCurrentDcId();
+		return intval(ceil($lastConfiguredId / 10) * 10 + 1 + $dcId);
+	}
+
 	/**
 	 * batch getOrCreateWorker returns a worker by name, create it if doesn't exist
 	 * 

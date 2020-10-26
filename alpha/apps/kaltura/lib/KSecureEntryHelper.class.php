@@ -465,12 +465,13 @@ class KSecureEntryHelper
 	{
 		if (!$this->isFlavorParamsAllowed($flavorParamsId))
 		{
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+			return false;
 		}
 		if ($this->shouldBlock())
 		{
-			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+			return false;
 		}
+		return true;
 	}
 
 	public function getScope()

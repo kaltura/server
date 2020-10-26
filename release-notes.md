@@ -1,3 +1,12 @@
+# Propus 16.10.0  #
+## Dynamic batch schedulers allocation ##
+- Issue Type: Task
+- Issue ID: WEBC-2048
+
+### Configuration ###
+run the following:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_13_add_permissions_batch_control.php
+
 # Propus 16.9.0  #
 ## Remove automatic creation of Cielo Role ##
 - Issue Type: Task

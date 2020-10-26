@@ -27,6 +27,7 @@ ActKeyUtils::checkCurrent();
 
 KalturaLog::debug(">------------------------------------- api_v3 -------------------------------------");
 KalturaLog::info("API-start pid:".getmypid());
+kInfraMemcacheCacheWrapper::outputStats();
 
 $controller = KalturaFrontController::getInstance();
 $result = $controller->run();

@@ -231,7 +231,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		else
 		{
 			kJobsManager::addStorageExportJob(null, $entry->getId(), $entry->getPartnerId(),
-				$externalStorage, $externalFileSync, $srcFileSync, $force, $fileSync->getDc());
+				$externalStorage, $externalFileSync, $srcFileSync, $force, $srcFileSync->getDc());
 		}
 		return true;
 	}
