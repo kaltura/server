@@ -58,7 +58,7 @@ class kBusinessPreConvertDL
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
+	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId, $preferredStorageId = null)
 	{
 		if($sourceAssetId)
 		{
@@ -76,9 +76,11 @@ class kBusinessPreConvertDL
 		}
 
 		KalturaLog::info("Look for a flavor tagged with thumbsource of entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
-		if($srcAsset && $srcAsset->isLocalReadyStatus())
-			return $srcAsset;
+		$resultAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE, null, false, $preferredStorageId);
+		if ($resultAsset)
+		{
+			return $resultAsset;
+		}
 
 
 		KalturaLog::info("Look for original flavor of entry [$entryId]");
@@ -88,15 +90,19 @@ class kBusinessPreConvertDL
 
 
 		KalturaLog::info("Look for highest bitrate flavor with web tag on entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB);
-		if($srcAsset && $srcAsset->isLocalReadyStatus())
-			return $srcAsset;
+		$resultAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB, null, false, $preferredStorageId);
+		if ($resultAsset)
+		{
+			return $resultAsset;
+		}
 
 
 		KalturaLog::info("Look for highest bitrate flavor of entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
-		if($srcAsset && $srcAsset->isLocalReadyStatus())
-			return $srcAsset;
+		$resultAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, null, null, false, $preferredStorageId);
+		if ($resultAsset)
+		{
+			return $resultAsset;
+		}
 
 		return null;
 	}
@@ -110,7 +116,7 @@ class kBusinessPreConvertDL
 	 * @param BatchJob $parentJob
 	 * @return thumbAsset
 	 */
-	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false , $srcAsset = null)
+	public static function decideThumbGenerate(entry $entry, thumbParams $destThumbParams, BatchJob $parentJob = null, $sourceAssetId = null, $runSync = false , $srcAsset = null, $entryDataPath = null, $fileSync = null)
 	{
 		if (is_null($srcAsset)){
 			$srcAsset = self::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entry->getId());
@@ -188,7 +194,7 @@ class kBusinessPreConvertDL
 
 		$errDescription = null;
 		// Since this method is called when trying to crop an existing thumbnail, need to add this check - thumbAssets have no mediaInfo.
-		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription, $mediaInfo? $mediaInfo->getVideoRotation() : null);
+		$capturedPath = self::generateThumbnail($srcAsset, $destThumbParamsOutput, $errDescription, $mediaInfo? $mediaInfo->getVideoRotation() : null, $entryDataPath, $fileSync);
 
 		// failed
 		if(!$capturedPath)
@@ -279,19 +285,30 @@ class kBusinessPreConvertDL
 		}
 	}
 
-	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription, $rotate=null)
+	private static function generateThumbnail(asset $srcAsset, thumbParamsOutput $destThumbParamsOutput, &$errDescription, $rotate=null, $entryDataPath = null, $fileSync = null)
 	{
-		$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		/* @var $fileSync FileSync */
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
-
-		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		if (!$fileSync)
 		{
-			$errDescription = 'Source asset could has no valid file sync';
-			return false;
+			$srcSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			/* @var $fileSync FileSync */
+			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+
+			if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+			{
+				$errDescription = 'Source asset could has no valid file sync';
+				return false;
+			}
 		}
 
-		$srcPath = $fileSync->getFullPath();
+		if ($entryDataPath)
+		{
+			$srcPath = $entryDataPath;
+		}
+		else
+		{
+			$srcPath = $fileSync->getFullPath();
+
+		}
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
 		if(!kFile::checkFileExists($tempDir))

@@ -649,30 +649,28 @@ class ThumbAssetService extends KalturaAssetService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
-		$srcAsset = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId);		
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		$assetResults = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId, $preferredStorageId);
+		if (is_array($assetResults))
+		{
+			$srcAsset = $assetResults[assetPeer::FLAVOR_ASSET];
+			$fileSync = $assetResults[assetPeer::FILE_SYNC];
+			$entryDataPath = myEntryUtils::getEntryDataPath($entryId, $currentDcId, $fileSync);
+		}
+		else
+		{
+			$srcAsset = $assetResults;
+			$fileSync = null;
+			$entryDataPath = null;
+		}
+
 		if (is_null($srcAsset))
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
-		
-		$sourceFileSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET); 
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($sourceFileSyncKey,true);
-		/* @var $fileSync FileSync */
-		
-		if(is_null($fileSync))
 		{
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 		}
-		
-		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-		{
-			throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_REMOTE);
-		}
-		
-		if(!$local)
-		{
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
-		}
-		
-		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true , $srcAsset);
+
+		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true , $srcAsset, $entryDataPath, $fileSync);
 		if(!$dbThumbAsset)
 			return null;
 			

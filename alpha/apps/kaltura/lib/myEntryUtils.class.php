@@ -1124,7 +1124,10 @@ class myEntryUtils
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
+		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
+		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
+		$entry_data_path = self::getEntryDataPath($entry->getId(), $currentDcId, $fileSync);
 		
 		if (!$entry_data_path)
 			return false;
@@ -1149,11 +1152,8 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function getEntryDataPath($flavorSyncKey, $flavorAsset, $entryId)
+	public static function getEntryDataPath($entryId, $currentDcId, $fileSync)
 	{
-		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
-		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
-		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
 		if (!$fileSync)
 		{
 			return null;
