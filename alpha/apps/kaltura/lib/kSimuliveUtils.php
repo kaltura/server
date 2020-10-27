@@ -11,8 +11,8 @@ class kSimuliveUtils
 	const LIVE_SCHEDULE_AHEAD_TIME = 60;
 	const MIN_DVR_WINDOW_MS = 30000;
 	const MINIMUM_TIME_TO_PLAYABLE_SEC = 18; // 3 * default segment duration
-	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'scheduleTimeOffset';
-	const SCHEDULE_TIME_URL_PARAM = 'scheduleTime';
+	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
+	const SCHEDULE_TIME_URL_PARAM = 'time';
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
