@@ -1292,7 +1292,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		$shouldCreateSharedDcFileSync = kConf::get('sync_file_sync_to_shared', 'cloud_storage', null);
 		if(!$shouldCreateSharedDcFileSync)
+		{
 			return;
+		}
 		
 		$syncFileSyncTypeMap = kConf::get('sync_file_sync_type_map', 'cloud_storage', null);
 		$objectKey = $key->getObjectType() . ":" . $key->getObjectSubType();

@@ -54,7 +54,8 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
 		
-		if($srcFileSyncDescriptor->fileSyncRemoteUrl) {
+		if($srcFileSyncDescriptor->fileSyncRemoteUrl)
+		{
 			kFile::moveFile($mediaFile, $srcFileSyncDescriptor->fileSyncRemoteUrl, true, true);
 		}
 		
