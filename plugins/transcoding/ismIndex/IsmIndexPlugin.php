@@ -106,9 +106,12 @@ class IsmIndexPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
-	public static function contributeToConvertJobData ($jobType, $jobSubType, kConvertJobData $jobData)
+	public static function contributeToJobData ($jobType, $jobSubType, kJobData $jobData)
 	{
-		if($jobType == BatchJobType::CONVERT && $jobSubType == self::getApiValue(IsmIndexConversionEngineType::ISM_MANIFEST))
+		if($jobType == BatchJobType::CONVERT &&
+			$jobSubType == self::getApiValue(IsmIndexConversionEngineType::ISM_MANIFEST) &&
+			$jobData instanceof kConvertJobData
+		)
 			return self::addIsmManifestsToSrcFileSyncDesc($jobData);
 		else
 			return $jobData;

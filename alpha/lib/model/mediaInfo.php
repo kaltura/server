@@ -50,6 +50,9 @@ class mediaInfo extends BasemediaInfo
 
 	public function setBitsDepth($v)	{$this->putInCustomData('BitsDepth', $v);}
 	public function getBitsDepth()	{return $this->getFromCustomData('BitsDepth', null, null);}
+	
+	public function setSpeechDetected($v)	{$this->putInCustomData('speechDetected', $v);}
+	public function getSpeechDetected()	{return $this->getFromCustomData('speechDetected', null, false);}
 
 	public function setRawData($v)
 	{

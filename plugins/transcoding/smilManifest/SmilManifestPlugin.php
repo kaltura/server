@@ -82,9 +82,12 @@ class SmilManifestPlugin extends KalturaPlugin implements IKalturaObjectLoader, 
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 
-	public static function contributeToConvertJobData ($jobType, $jobSubType, kConvertJobData $jobData)
+	public static function contributeToJobData ($jobType, $jobSubType, kJobData $jobData)
 	{
-		if($jobType == BatchJobType::CONVERT && $jobSubType == self::getApiValue(SmilManifestConversionEngineType::SMIL_MANIFEST))
+		if($jobType == BatchJobType::CONVERT &&
+			$jobSubType == self::getApiValue(SmilManifestConversionEngineType::SMIL_MANIFEST) &&
+			$jobData instanceof kConvertJobData
+		)
 			return self::addFlavorParamsOutputForSourceAssets($jobData);
 		else
 			return $jobData;

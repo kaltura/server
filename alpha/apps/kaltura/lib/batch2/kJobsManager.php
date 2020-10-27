@@ -713,7 +713,7 @@ class kJobsManager
 		$plugin = kPluginableEnumsManager::getPlugin($conversionEngineId);
 		if($plugin && $plugin instanceof IKalturaBatchJobDataContributor)
 		{
-			$convertData = $plugin->contributeToConvertJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
+			$convertData = $plugin->contributeToJobData(BatchJobType::CONVERT, $conversionEngineId, $convertData);
 		}
 	}
 	
@@ -1600,6 +1600,7 @@ class kJobsManager
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 		$srcFileSyncDescriptor->setFileSyncLocalPath($inputFileSyncLocalPath);
 		$srcFileSyncDescriptor->setFileEncryptionKey(self::getEncryptionKeyForAssetId($flavorAssetId));
+		
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
 		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
@@ -1628,8 +1629,20 @@ class kJobsManager
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		
+		self::contributeToExtractMediaJobData($extractMediaData);
+		
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
+	}
+	
+	private static function contributeToExtractMediaJobData(kExtractMediaJobData $extractMediaJobData)
+	{
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaBatchJobDataContributor');
+		foreach ($pluginInstances as $pluginInstance)
+		{
+			$pluginInstance->contributeToJobData(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, $extractMediaJobData);
+		}
 	}
 
 	private static function getEncryptionKeyForAssetId($flavorAssetId)
