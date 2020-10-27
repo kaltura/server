@@ -180,8 +180,8 @@ abstract class KConversionEngine
 		$binName=$this->getCmd();
 		$exec_cmd = $binName . " " . 
 			str_replace ( 
-				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $binName),
+				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
+				array('"' . kFile::realPath($this->inFilePath) . '"', $this->outFilePath, $this->configFilePath, $binName),
 				$cmd_line);
 				
 		if ( $add_log )

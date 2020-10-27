@@ -563,6 +563,7 @@ class kFileBase
 	
 	public static function isSharedPath($path)
 	{
+		$path = kFile::fixPath($path);
 		$storageTypeMap = self::getStorageTypeMap();
 		if(!$storageTypeMap)
 			return false;

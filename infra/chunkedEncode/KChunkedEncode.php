@@ -324,7 +324,7 @@
 			 */
 			$srcIndexes = array_keys($cmdLineArr,'-i');
 			foreach($srcIndexes as $idx) {
-				$cmdLineArr[$idx+1] = realpath($cmdLineArr[$idx+1]);
+				$cmdLineArr[$idx+1] = '"' . kFile::realPath($cmdLineArr[$idx+1]) . '"';
 			}
 			
 			$toAddFps = false;
@@ -911,7 +911,7 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
-			$cmdLine.= " -i $params->source";
+			$cmdLine.= " -i \"$params->source\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
@@ -1593,7 +1593,9 @@
 				$this->formatParams = null;
 			
 			if(($key=array_search("-i", $cmdLineArr))!==false) {
-				$this->source = $cmdLineArr[$key+1];
+				$resolvedPath = kFile::realPath($cmdLineArr[$key+1]);
+				$cmdLineArr[$key+1] = "\"$resolvedPath\"";
+				$this->source = $resolvedPath;
 			}
 			$this->output = end($cmdLineArr);
 		}
