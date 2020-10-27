@@ -253,6 +253,16 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $this->getFileRoot() . $this->getFilePath();
 	}
 
+	public function getRemotePath()
+	{
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ))
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
+			return $sharedStorageProfile->getStorageBaseDir() . $this->getFilePath();
+		}
+		return $this->getFilePath();
+	}
+
 	/**
 	 * Its the caller responsibility to remove the file after usage
 	 * @return string path to a temporary decrypted file

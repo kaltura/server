@@ -1292,7 +1292,10 @@ class kJobsManager
 
 		$inputFileSyncLocalPath = $fileSync->getFullPath();
 		if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
-			$inputFileSyncLocalPath = $fileSync->getFilePath();
+		{
+			$inputFileSyncLocalPath = $fileSync->getRemotePath();
+		}
+
 		$importingSources = false;
 		// if file size is 0, do not create conversion profile and set entry status as error converting
 		if (!kFile::checkFileExists($inputFileSyncLocalPath) || kFile::fileSize($inputFileSyncLocalPath) == 0)
