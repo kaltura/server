@@ -472,14 +472,10 @@ class kJobsManager
 			
 			$fileSync = null;
 			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
-			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
 			if($preferSharedDcForConvert && count($sharedDcIds))
 			{
-				while(!$fileSync && count($sharedDcIds))
-				{
-					$sharedDcId = array_shift($sharedDcIds);
-					$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcId);
-				}
+				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
 			}
 			
 			if(!$fileSync)
@@ -1610,9 +1606,13 @@ class kJobsManager
 			KalturaLog::err($e->getMessage());
 		}
 		
+		$shouldCalculateComplexity = false;
 		$mediaInfoEngine = mediaParserType::MEDIAINFO;
 		if($profile)
+		{
 			$mediaInfoEngine = $profile->getMediaParserType();
+			$shouldCalculateComplexity = $profile->getCalculateComplexity();
+		}
 		
 		$extractMediaData = new kExtractMediaJobData();
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
@@ -1620,7 +1620,6 @@ class kJobsManager
 		$srcFileSyncDescriptor->setFileEncryptionKey(self::getEncryptionKeyForAssetId($flavorAssetId));
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
-		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
 		$extractMediaData->setCalculateComplexity($shouldCalculateComplexity);
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
@@ -1642,22 +1641,19 @@ class kJobsManager
 		if($shouldDetectGOP === null)
 			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
 		$extractMediaData->setDetectGOP($shouldDetectGOP);
-		self::setRemoteSrcUrl($extractMediaData, $flavorAsset);
+		
+		//Added to support the flow where extract media will push the source file directly to the shared storage
+		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+		if($pendingFileSync)
+		{
+			$extractMediaData->setSrcFileSyncRemoteUrl($pendingFileSync->getFullPath());
+		}
 		
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
-	}
-	
-	public static function setRemoteSrcUrl(kExtractMediaJobData $extractMediaData, flavorAsset $flavorAsset)
-	{
-		$pendingFileSync = kFlowHelper::getSharedPendingFileSyncForAsset($flavorAsset);
-		if(!$pendingFileSync)
-			return;
-		
-		$extractMediaData->setSrcFileSyncRemoteUrl($pendingFileSync->getFullPath());
 	}
 
 	private static function getEncryptionKeyForAssetId($flavorAssetId)

@@ -786,4 +786,11 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	{
 		return true;
 	}
+	
+	public function getSharedPendingFileSync()
+	{
+		$key = $this->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		return kFileSyncUtils::getPendingFileSyncForKey($key, reset($sharedDcIds));
+	}
 }

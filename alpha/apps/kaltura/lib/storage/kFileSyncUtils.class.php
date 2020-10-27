@@ -1277,7 +1277,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 					kEventsManager::raiseEvent(new kObjectAddedEvent($remoteDCFileSync));
 				}
 				
-				self::generateSharedStoragePendingFileSync($currentDCFileSync, $key, $isDir);
+				if(!$isDir)
+				{
+					self::generateSharedStoragePendingFileSync($currentDCFileSync, $key);
+				}
 			}
 			kEventsManager::raiseEvent(new kObjectAddedEvent($currentDCFileSync));
 		}
@@ -1285,7 +1288,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $currentDCFileSync;
 	}
 	
-	private static function generateSharedStoragePendingFileSync(FileSync $sourceFileSync, FileSyncKey $key, $isDir)
+	private static function generateSharedStoragePendingFileSync(FileSync $sourceFileSync, FileSyncKey $key)
 	{
 		$shouldCreateSharedDcFileSync = kConf::get('sync_file_sync_to_shared', 'cloud_storage', null);
 		if(!$shouldCreateSharedDcFileSync)
@@ -1293,12 +1296,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		$syncFileSyncTypeMap = kConf::get('sync_file_sync_type_map', 'cloud_storage', null);
 		$objectKey = $key->getObjectType() . ":" . $key->getObjectSubType();
-		if($isDir || !in_array($objectKey, $syncFileSyncTypeMap))
+		if(!in_array($objectKey, $syncFileSyncTypeMap))
 		{
 			return;
 		}
 		
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
 		foreach ($sharedDcIds as $sharedDcId)
 		{
 			$sharedDCFileSync = FileSync::createForFileSyncKey( $key );
@@ -1307,10 +1310,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$sharedDCFileSync->setFileType( FileSync::FILE_SYNC_FILE_TYPE_FILE );
 			$sharedDCFileSync->setOriginal ( 0 );
 			$sharedDCFileSync->setPartnerId ( $key->partner_id );
-			$sharedDCFileSync->setIsDir($isDir);
+			$sharedDCFileSync->setIsDir(false);
 			$sharedDCFileSync->setFileSize($sourceFileSync->getFileSize());
-			$sharedDCFileSync->setOriginalId($sourceFileSync->getId());
-			$sharedDCFileSync->setOriginalDc($sourceFileSync->getDc());
 			$sharedDCFileSync->setSrcEncKey($sourceFileSync->getSrcEncKey());
 			$sharedDCFileSync->setSrcDc($sourceFileSync->getDc());
 			$sharedDCFileSync->setSrcPath($sourceFileSync->getFullPath());
@@ -1981,13 +1982,23 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	}
 
 
-	public static function getReadyFileSyncForKeyAndDc($key, $dcId)
+	public static function getReadyFileSyncForKeyAndDc($key, $dcIds)
 	{
-		KalturaLog::debug("key [$key], DC Id [$dcId]");
+		$orderBy = FileSyncPeer::DC;
+		if(is_array($dcIds))
+		{
+			$orderBy = "FIELD (" . FileSyncPeer::DC . "," . implode(",", $dcIds) . ")";  // Save the order of the dcIds as provided in the list
+		}
+		else
+		{
+			$dcIds = array($dcIds);
+		}
+		
+		KalturaLog::debug("key [$key], DC Id [" . print_r($dcIds, true) . "]");
 		$c = FileSyncPeer::getCriteriaForFileSyncKey($key);
-		$c->addAnd (FileSyncPeer::DC , $dcId);
+		$c->addAnd (FileSyncPeer::DC , $dcIds, Criteria::IN);
 		$c->addAnd (FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY);
-		$c->addAscendingOrderByColumn(FileSyncPeer::DC);
+		$c->addAscendingOrderByColumn($orderBy);
 		$fileSync = FileSyncPeer::doSelectOne($c);
 		if (!$fileSync)
 		{

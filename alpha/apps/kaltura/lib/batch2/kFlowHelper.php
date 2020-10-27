@@ -575,7 +575,7 @@ class kFlowHelper
 		{
 			//get pending file sync to shared storage
 			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-			$pendingFileSync = kFlowHelper::getSharedPendingFileSyncForAsset($flavorAsset);
+			$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
 			if($pendingFileSync && $pendingFileSync->getFullPath() == $fileSyncRemoteUrl)
 			{
 				$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
@@ -629,13 +629,6 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
-	}
-	
-	public static function getSharedPendingFileSyncForAsset(flavorAsset $flavorAsset)
-	{
-		$key = $flavorAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
-		return kFileSyncUtils::getPendingFileSyncForKey($key, reset($sharedDcIds));
 	}
 
 	/**
