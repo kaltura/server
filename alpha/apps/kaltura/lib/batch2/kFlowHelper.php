@@ -567,7 +567,22 @@ class kFlowHelper
 	{
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-
+		
+		//Check if src remote file was pushed, if so mark it as ready
+		$fileSyncRemoteUrl = $data->getSrcFileSyncRemoteUrl();
+		$fileSyncLocalPath = $data->getSrcFileSyncLocalPath();
+		if($fileSyncRemoteUrl && kFile::fileSize($fileSyncLocalPath) == kFile::fileSize($fileSyncRemoteUrl))
+		{
+			//get pending file sync to shared storage
+			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+			if($pendingFileSync && $pendingFileSync->getFullPath() == $fileSyncRemoteUrl)
+			{
+				$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+				$pendingFileSync->save();
+			}
+		}
+		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if(!$rootBatchJob)
 			return $dbBatchJob;
@@ -578,7 +593,7 @@ class kFlowHelper
 		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
 		if($dbBatchJobAux!=null)
 			return $dbBatchJobAux;
-
+		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
