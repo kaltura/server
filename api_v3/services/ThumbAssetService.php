@@ -649,7 +649,7 @@ class ThumbAssetService extends KalturaAssetService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
-		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
 		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
 		$assetResults = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId, $preferredStorageId);
 		if (is_array($assetResults))

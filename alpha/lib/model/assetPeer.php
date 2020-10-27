@@ -559,7 +559,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
     /**
      * @param string $entryId
      * @param string $tag tag filter
-     * @return flavorAsset|array that has a file_sync in status ready
+     * @return array|flavorAsset that has a file_sync in status ready
      */
 	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false, $preferredStorageId = null)
 	{
