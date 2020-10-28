@@ -26,10 +26,12 @@ class kElasticDisplayAndMemberEntitlementDecorator extends kElasticCategoryEntit
 
 		if ($kuser)
 		{
-			// get the groups that the user belongs to in case she is not associated to the category directly
+            $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
+
+            // get the groups that the user belongs to in case she is not associated to the category directly
 			//kuser ids are equivalent to members in our elastic search
 			$userGroupsQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS,array(
-				'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+				'index' => $indexName,
 				'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 				'id' => $kuser->getId(),
 				'path' => ESearchUserFieldName::GROUP_IDS
