@@ -138,10 +138,12 @@ class ESearchCategoryUserItem extends ESearchItem
 	{
 		$exactQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 
-		if ($this->getFieldName()  ==  ESearchCategoryUserFieldName::USER_ID)
+		$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
+
+        if ($this->getFieldName()  ==  ESearchCategoryUserFieldName::USER_ID)
 		{
 			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
-				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+				array('index' => $indexName,
 					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 					'id' => $this->getSearchTerm(),
 					'path' => ESearchUserFieldName::GROUP_IDS));
@@ -215,8 +217,10 @@ class ESearchCategoryUserItem extends ESearchItem
 
 	protected function getGroupIds($kuserId)
 	{
-		$params = array(
-			elasticClient::ELASTIC_INDEX_KEY => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
+
+        $params = array(
+			elasticClient::ELASTIC_INDEX_KEY => $indexName,
 			elasticClient::ELASTIC_TYPE_KEY => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 			elasticClient::ELASTIC_ID_KEY => $kuserId
 		);

@@ -92,7 +92,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$asset->fromObject($dbAsset, $this->getResponseProfile());
 		return $asset;
     }
-    
+
     /**
      * Update content of attachment asset
      *
