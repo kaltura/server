@@ -652,6 +652,10 @@ class ThumbAssetService extends KalturaAssetService
 		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
 		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
 		$assetResults = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId, $preferredStorageId);
+		if (is_null($assetResults))
+		{
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
+		}
 		if (is_array($assetResults))
 		{
 			$srcAsset = $assetResults[assetPeer::FLAVOR_ASSET];
@@ -663,13 +667,7 @@ class ThumbAssetService extends KalturaAssetService
 			$flavorSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $srcAsset, $preferredStorageId, null);
 		}
-
 		$entryDataPath = myEntryUtils::getEntryDataPath($entryId, $currentDcId, $fileSync, true);
-
-		if (is_null($srcAsset))
-		{
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
-		}
 
 		$dbThumbAsset = kBusinessPreConvertDL::decideThumbGenerate($entry, $destThumbParams, null, $sourceAssetId, true , $srcAsset, $entryDataPath, $fileSync);
 		if(!$dbThumbAsset)
