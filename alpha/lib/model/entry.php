@@ -4387,4 +4387,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return in_array($adminTag, explode(',', $this->getAdminTags()));
 	}
+
+
+	/**
+	 * allow edit or change related metadata
+	 * @return boolean
+	 */
+	public function allowEdit()
+	{
+		return kCurrentContext::$is_admin_session || $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+	}
 }
