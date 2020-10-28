@@ -869,7 +869,7 @@ class kFlowHelper
 		
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
-			if($partnerSharedStorageProfileId)
+			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
 			{
 				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
 				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
