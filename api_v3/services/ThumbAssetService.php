@@ -656,14 +656,15 @@ class ThumbAssetService extends KalturaAssetService
 		{
 			$srcAsset = $assetResults[assetPeer::FLAVOR_ASSET];
 			$fileSync = $assetResults[assetPeer::FILE_SYNC];
-			$entryDataPath = myEntryUtils::getEntryDataPath($entryId, $currentDcId, $fileSync);
 		}
 		else
 		{
 			$srcAsset = $assetResults;
-			$fileSync = null;
-			$entryDataPath = null;
+			$flavorSyncKey = $srcAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $srcAsset, $preferredStorageId, null);
 		}
+
+		$entryDataPath = myEntryUtils::getEntryDataPath($entryId, $currentDcId, $fileSync, true);
 
 		if (is_null($srcAsset))
 		{

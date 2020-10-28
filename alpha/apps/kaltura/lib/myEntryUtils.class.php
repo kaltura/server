@@ -1152,7 +1152,7 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function getEntryDataPath($entryId, $currentDcId, $fileSync)
+	public static function getEntryDataPath($entryId, $currentDcId, $fileSync, $getRemotePath = false)
 	{
 		if (!$fileSync)
 		{
@@ -1171,7 +1171,14 @@ class myEntryUtils
 			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
 			{
 				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
-				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
+				if ($getRemotePath)
+				{
+					$entryDataPath = $fileSync->getRemotePath();
+				}
+				else
+				{
+					$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
+				}
 			}
 			else
 			{
