@@ -416,7 +416,7 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
-				$offset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', false) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
 				list($durations, $flavors, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($flavors)
 				{
@@ -425,7 +425,7 @@ class serveFlavorAction extends kalturaAction
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
-					if ($offset && kConf::get('serve_flavor_accept_time_offset', 'live', false))
+					if ($offset)
 					{
 						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = $offset;
 					}
