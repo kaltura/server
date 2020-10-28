@@ -425,7 +425,7 @@ class serveFlavorAction extends kalturaAction
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
-					if ($offset)
+					if ($offset && kConf::get('serve_flavor_accept_time_offset', 'live', false))
 					{
 						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = $offset;
 					}
