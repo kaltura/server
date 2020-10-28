@@ -79,7 +79,7 @@ class AttachmentAssetService extends KalturaAssetService
     function addAction($entryId, KalturaAttachmentAsset $attachmentAsset)
     {
 		$dbEntry = entryPeer::retrieveByPK($entryId);
-		if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
+		if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !$dbEntry->allowEdit() )
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$dbAsset = $attachmentAsset->toInsertableObject();
@@ -92,7 +92,7 @@ class AttachmentAssetService extends KalturaAssetService
 		$asset->fromObject($dbAsset, $this->getResponseProfile());
 		return $asset;
     }
-    
+
     /**
      * Update content of attachment asset
      *
@@ -116,7 +116,7 @@ class AttachmentAssetService extends KalturaAssetService
    			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !$dbEntry->allowEdit())
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
 		
 		
@@ -159,7 +159,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $id);
     	
 		$dbEntry = $dbAttachmentAsset->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !$dbEntry->allowEdit())
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbAttachmentAsset->getEntryId());
 		
 		
@@ -549,7 +549,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_ID_NOT_FOUND, $attachmentAssetId);
 	
 		$dbEntry = $attachmentAssetDb->getentry();
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !$dbEntry->allowEdit())
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $attachmentAssetDb->getEntryId());
 		
 		
