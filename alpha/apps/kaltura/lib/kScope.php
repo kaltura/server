@@ -276,7 +276,6 @@ class kScope
 
 	public function getPartnerId()
 	{
-
 		if($this->getKs())
 		{
 			return $this->getKs()->partner_id;
