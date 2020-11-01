@@ -2113,7 +2113,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$forceRemoteServePattern = kConf::get('force_remote_serve_pattern', 'local', '');
 
 		// handle remote dc
-		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds(false)))
 		{
 			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_HTTP);
 		}

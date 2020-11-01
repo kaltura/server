@@ -131,7 +131,7 @@ class kDataCenterMgr
 //		return array ( $dc_id , $dc );
 	}
 
-public static function getDcIds($includeShared = true)
+	public static function getDcIds($includeShared = true)
 	{
 		$dc_config = kConf::getMap("dc_config");
 		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
