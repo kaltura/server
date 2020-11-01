@@ -465,14 +465,40 @@ class kJobsManager
 		$srcFileSyncs = array();
 		$firstValidFileSync = null;
 		
+		// creates convert data
+		$convertData = new kConvertJobData();
+		$convertData->setMediaInfoId($mediaInfoId);
+		$convertData->setFlavorParamsOutputId($flavor->getId());
+		$convertData->setFlavorAssetId($flavorAssetId);
+		$convertData->setConversionProfileId($conversionProfileId);
+		$convertData->setPriority($priority);
+		
+		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
+		if(!$dbCurrentConversionEngine)
+			return null;
+		
 		foreach ($srcSyncKeys as $srcSyncKey) 
 		{		
 			$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 			$addImportJob = false;
-				
-			$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
+			
+			$fileSync = null;
+			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			if($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
+			{
+				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
+			}
+			
 			if(!$fileSync)
+			{
+				$fileSync = self::getFileSyncForKey($srcSyncKey, $flavor, $flavorAsset, $partner, $addImportJob);
+			}
+			
+			if(!$fileSync)
+			{
 				return null;
+			}
 				
 			$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 			if($addImportJob)
@@ -506,19 +532,10 @@ class kJobsManager
 		if (!self::shouldExeConvertJob($firstValidFileSync))
 			return null;
 
-		// creates convert data
-		$convertData = new kConvertJobData();
-		$convertData->setSrcFileSyncs($srcFileSyncs);
-		$convertData->setMediaInfoId($mediaInfoId);
-		$convertData->setFlavorParamsOutputId($flavor->getId());
-		$convertData->setFlavorAssetId($flavorAssetId);
-		$convertData->setConversionProfileId($conversionProfileId);
-		$convertData->setPriority($priority);
-
-		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
-		if(!$dbCurrentConversionEngine)
-			return null;
-
+		//Set convert src file syns
+		$currentSrcFileSyncs = $convertData->getSrcFileSyncs() ? $convertData->getSrcFileSyncs() : array();
+		$convertData->setSrcFileSyncs(array_merge($srcFileSyncs, $currentSrcFileSyncs));
+		
 		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
@@ -1592,9 +1609,13 @@ class kJobsManager
 			KalturaLog::err($e->getMessage());
 		}
 		
+		$shouldCalculateComplexity = false;
 		$mediaInfoEngine = mediaParserType::MEDIAINFO;
 		if($profile)
+		{
 			$mediaInfoEngine = $profile->getMediaParserType();
+			$shouldCalculateComplexity = $profile->getCalculateComplexity();
+		}
 		
 		$extractMediaData = new kExtractMediaJobData();
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
@@ -1602,7 +1623,6 @@ class kJobsManager
 		$srcFileSyncDescriptor->setFileEncryptionKey(self::getEncryptionKeyForAssetId($flavorAssetId));
 		$extractMediaData->setSrcFileSyncs(array($srcFileSyncDescriptor));
 		$extractMediaData->setFlavorAssetId($flavorAssetId);
-		$shouldCalculateComplexity = $profile ? $profile->getCalculateComplexity() : false;
 		$extractMediaData->setCalculateComplexity($shouldCalculateComplexity);
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$entry = $flavorAsset->getentry();
@@ -1624,6 +1644,13 @@ class kJobsManager
 		if($shouldDetectGOP === null)
 			$shouldDetectGOP = $profile ? $profile->getDetectGOP() : 0;
 		$extractMediaData->setDetectGOP($shouldDetectGOP);
+		
+		//Added to support the flow where extract media will push the source file directly to the shared storage
+		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+		if($pendingFileSync)
+		{
+			$extractMediaData->setSrcFileSyncRemoteUrl($pendingFileSync->getFullPath());
+		}
 		
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);

@@ -81,16 +81,13 @@ class kDataCenterMgr
 	
 	public static function getSharedStorageProfileIds()
 	{
-		$sharedStorageProfileIdsStr = kConf::get('sharedStorageProfileIds', 'cloud_storage', null);
-		$sharedStorageProfileIds = array();
-		if($sharedStorageProfileIdsStr)
-		{
-			$sharedStorageProfileIds = explode(",", $sharedStorageProfileIdsStr);
-		}
+		$sharedStorageProfileIds = kConf::get('shared_storage_profile_ids', 'cloud_storage', array());
 		
-		return $sharedStorageProfileIds;
+		if(is_array($sharedStorageProfileIds))
+			return $sharedStorageProfileIds;
+		
+		return explode(",", $sharedStorageProfileIds);
 	}
-	
 	
 	public static function isDcIdShared($dcId)
 	{
