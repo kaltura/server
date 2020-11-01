@@ -723,6 +723,11 @@ abstract class LiveEntry extends entry
 
 	public function getLiveStatus()
 	{
+		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
+		{
+			return EntryServerNodeStatus::PLAYABLE;
+		}
+		
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
 
 		$status = EntryServerNodeStatus::STOPPED;
