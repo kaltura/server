@@ -568,32 +568,5 @@ $stub=null;
 		KalturaLog::log("Successfully retrieved $captionFilePath!");
 		return $captionFilePath;
 	}
-	
-	/**
-	 * derived classes can override this is they create the command lines in a different way
-	 *
-	 * @param string $cmd_line
-	 * @param boolean $add_log
-	 * @return string
-	 */
-	protected function getCmdLine ($cmd_line , $add_log )
-	{
-		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
-		$binName=$this->getCmd();
-		$inFilePath = '"' . kFile::realPath($this->inFilePath) . '"';
-		$exec_cmd = $binName . " " .
-			str_replace (
-				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
-				array($inFilePath, $this->outFilePath, $this->configFilePath, $binName),
-				$cmd_line);
-		
-		if ( $add_log )
-		{
-			// redirect both the STDOUT & STDERR to the log
-			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
-		}
-		
-		return $exec_cmd;
-	}
 }
 
