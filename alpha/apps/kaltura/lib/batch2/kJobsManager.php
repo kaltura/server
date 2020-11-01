@@ -465,6 +465,18 @@ class kJobsManager
 		$srcFileSyncs = array();
 		$firstValidFileSync = null;
 		
+		// creates convert data
+		$convertData = new kConvertJobData();
+		$convertData->setMediaInfoId($mediaInfoId);
+		$convertData->setFlavorParamsOutputId($flavor->getId());
+		$convertData->setFlavorAssetId($flavorAssetId);
+		$convertData->setConversionProfileId($conversionProfileId);
+		$convertData->setPriority($priority);
+		
+		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
+		if(!$dbCurrentConversionEngine)
+			return null;
+		
 		foreach ($srcSyncKeys as $srcSyncKey) 
 		{		
 			$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
@@ -473,7 +485,7 @@ class kJobsManager
 			$fileSync = null;
 			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
 			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
-			if($preferSharedDcForConvert && count($sharedDcIds))
+			if($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
 			{
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
 			}
@@ -520,19 +532,10 @@ class kJobsManager
 		if (!self::shouldExeConvertJob($firstValidFileSync))
 			return null;
 
-		// creates convert data
-		$convertData = new kConvertJobData();
-		$convertData->setSrcFileSyncs($srcFileSyncs);
-		$convertData->setMediaInfoId($mediaInfoId);
-		$convertData->setFlavorParamsOutputId($flavor->getId());
-		$convertData->setFlavorAssetId($flavorAssetId);
-		$convertData->setConversionProfileId($conversionProfileId);
-		$convertData->setPriority($priority);
-
-		$dbCurrentConversionEngine = self::getNextConversionEngine($flavor, $parentJob, $lastEngineType, $convertData);
-		if(!$dbCurrentConversionEngine)
-			return null;
-
+		//Set convert src file syns
+		$currentSrcFileSyncs = $convertData->getSrcFileSyncs() ? $convertData->getSrcFileSyncs() : array();
+		$convertData->setSrcFileSyncs(array_merge($srcFileSyncs, $currentSrcFileSyncs));
+		
 		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
