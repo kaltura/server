@@ -188,7 +188,7 @@ class KAsyncConvertCollectionCloser extends KJobCloserWorker
 		try
 		{
 			$curlWrapper = new KCurlWrapper();
-			$curlHeaderResponse = $curlWrapper->getHeader($srcFileSyncRemoteUrl, true);
+			$curlHeaderResponse = $curlWrapper->getHeader($srcFileSyncRemoteUrl, true, true);
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
 				$errDescription = "Error: " . $curlWrapper->getError();
