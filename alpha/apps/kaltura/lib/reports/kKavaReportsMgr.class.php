@@ -220,7 +220,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_ORDER_BY = 'report_order_by';
 	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
 	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
-	const REPORT_KEEP_ROW_CONDITION = 'report_keep_row_condition';
+	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -4117,7 +4117,7 @@ class kKavaReportsMgr extends kKavaBase
 			$output = array();
 			list($puser, $registrationInfo) = $columns;
 			$output[] = $puser;
-			$parsedRegistrationInfo = json_decode($registrationInfo,true);
+			$parsedRegistrationInfo = json_decode($registrationInfo, true);
 			if (!$parsedRegistrationInfo)
 			{
 				$output = array_merge($output, array_fill(1, count($enrichedInfoFields), ''));
@@ -6083,26 +6083,27 @@ class kKavaReportsMgr extends kKavaBase
 				}
 			}
 
-			if (isset($report_def[self::REPORT_KEEP_ROW_CONDITION]))
+			if (isset($report_def[self::REPORT_ROW_FILTER_BY_COLUMN]))
 			{
-				$header_to_check = $report_def[self::REPORT_KEEP_ROW_CONDITION];
+				$header_to_check = $report_def[self::REPORT_ROW_FILTER_BY_COLUMN]['column'];
 				$field_index = array_search($header_to_check, $header);
 				//remove condition check header
 				unset($header[$field_index]);
 				$header = array_values($header);
+				$value_to_keep = $report_def[self::REPORT_ROW_FILTER_BY_COLUMN]['value'];
 
-				foreach($data as $key => &$row)
+				foreach ($data as $key => &$row)
 				{
-					//check if the row should be removed
-					if ($row[$field_index] == false)
-					{
-						unset($data[$key]);
-					}
-					else
+					//check if we should keep the row
+					if ($row[$field_index] == $value_to_keep)
 					{
 						//remove condition check column
 						unset($row[$field_index]);
 						$row = array_values($row);
+					}
+					else
+					{
+						unset($data[$key]);
 					}
 				}
 				$data = array_values($data);
