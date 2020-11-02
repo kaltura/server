@@ -1303,7 +1303,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return;
 		}
 		
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
 		foreach ($sharedDcIds as $sharedDcId)
 		{
 			$sharedDCFileSync = FileSync::createForFileSyncKey( $key );
