@@ -601,8 +601,9 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		else
 			$version = "";
 		
+		$volume = kPathManager::getVolumeForWrite($this->getPartnerId());
 		$dir = (intval($this->getId() / 1000000)).'/'.	(intval($this->getId() / 1000) % 1000);
-		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
+		$file_name = "/content/$volume/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
 		return $file_name;
 	}
 
