@@ -323,6 +323,10 @@ class rawAction extends sfAction
 		if($shouldProxy || !empty($relocate))
 		{
 			// dump the file
+			if(isset($file_sync) && $file_sync && in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+			{
+				$archive_file = $file_sync->getRemotePath();
+			}
 			kFileUtils::dumpFile($archive_file , $mime_type );
 			KExternalErrors::dieGracefully();
 		}
