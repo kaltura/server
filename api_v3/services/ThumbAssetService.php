@@ -649,7 +649,7 @@ class ThumbAssetService extends KalturaAssetService
 		$destThumbParams = new thumbParams();
 		$thumbParams->toUpdatableObject($destThumbParams);
 
-		$srcAsset = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId);		
+		$srcAsset = kBusinessPreConvertDL::getSourceAssetForGenerateThumbnail($sourceAssetId, $destThumbParams->getSourceParamsId(), $entryId, true);
 		if (is_null($srcAsset))
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 		
@@ -661,13 +661,15 @@ class ThumbAssetService extends KalturaAssetService
 		{
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 		}
-		
-		if($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+
+		$isFsOnPeriodicStorage = in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds());
+		if(!$isFsOnPeriodicStorage && ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL))
 		{
 			throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_REMOTE);
 		}
-		
-		if(!$local)
+
+		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
+		if (!$local && (!$isCloudDc || !$isFsOnPeriodicStorage))
 		{
 			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
