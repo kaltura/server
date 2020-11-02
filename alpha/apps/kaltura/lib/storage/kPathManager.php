@@ -47,11 +47,8 @@ class kPathManager
 		
 		if(isset(self::$sessionCache[$path]))
 			return array($root, self::$sessionCache[$path]);
-			
-		$partnerId = $object->getPartnerId();
-		$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
-		$partnerVolumes = kConf::get('partner_volumes', 'local', array());
-		$volume = isset($partnerVolumes[$partnerId]) ? $partnerVolumes[$partnerId] : $volumes[rand(0, count($volumes) - 1)];
+		
+		$volume = self::getVolumeForWrite($object->getPartnerId());
 		
 		$newPath = str_replace('/content/', "/content/$volume/", $path);
 		self::$sessionCache[$path] = $newPath;
@@ -72,6 +69,13 @@ class kPathManager
 	public static function getFilePathArr(FileSyncKey $key, $storageProfileId = null)
 	{
 		KalturaLog::log(__METHOD__." - key [$key], storageProfileId [$storageProfileId]");
+		
+		$objectKey = $key->getObjectType() . ":" . $key->getObjectSubType();
+		$cloudStorageObjectMap = kConf::get("cloud_storage_object_map", "cloud_storage", array());
+		if(in_array($objectKey, $cloudStorageObjectMap))
+		{
+			$storageProfileId = reset(kDataCenterMgr::getSharedStorageProfileIds());
+		}
 		
 		$storageProfile = self::getStorageProfile($storageProfileId);
 		if(is_null($storageProfile))
@@ -95,5 +99,14 @@ class kPathManager
 	public static function getFilePath(FileSyncKey $key, $storageProfileId = null)
 	{
 		return implode('', self::getFilePathArr($key, $storageProfileId));
+	}
+	
+	public static function getVolumeForWrite($partnerId)
+	{
+		$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
+		$partnerVolumes = kConf::get('partner_volumes', 'local', array());
+		$volume = isset($partnerVolumes[$partnerId]) ? $partnerVolumes[$partnerId] : $volumes[rand(0, count($volumes) - 1)];
+		
+		return $volume;
 	}
 }
