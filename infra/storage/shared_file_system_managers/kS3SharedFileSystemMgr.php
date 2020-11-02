@@ -280,12 +280,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRename($filePath, $newFilePath)
 	{
-		if(!$this->doCopy($filePath, $newFilePath))
+		if(kFile::isSharedPath($filePath) && !$this->doCopy($filePath, $newFilePath))
 		{
 			return false;
 		}
 		
-		$this->doUnlink($filePath);
+		if(!$this->doMoveLocalToShared($filePath, $newFilePath, true))
+		{
+			return false;
+		}
+		
+		kFile::unlink($filePath);
 		return true;
 	}
 	
