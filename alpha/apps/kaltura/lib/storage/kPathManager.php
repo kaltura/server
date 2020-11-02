@@ -73,7 +73,7 @@ class kPathManager
 	{
 		KalturaLog::log(__METHOD__." - key [$key], storageProfileId [$storageProfileId]");
 		
-		$storageProfileId = self::getStorageProfileIdForKey($key);
+		$storageProfileId = self::getStorageProfileIdForKey($key, $storageProfileId);
 		$storageProfile = self::getStorageProfile($storageProfileId);
 		if(is_null($storageProfile))
 			throw new Exception("Storage Profile [$storageProfileId] not found");
