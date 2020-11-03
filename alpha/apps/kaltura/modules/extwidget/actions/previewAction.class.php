@@ -20,6 +20,12 @@ class previewAction extends kalturaAction
 		if(!$this->partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
 
+		$disablePreviewPage = PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_PREVIEW_PAGE, $this->partner_id);
+		if ($disablePreviewPage && $disablePreviewPage->getStatus() == PermissionStatus::ACTIVE)
+		{
+			return;
+		}
+
 		// Single Player parameters
 		$this->entry_id = htmlspecialchars($this->getRequestParameter('entry_id'));
 		if( $this->entry_id ) {
