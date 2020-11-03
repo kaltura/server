@@ -1,3 +1,20 @@
+# Propus 16.11.0  #
+## Add permission in Admin Console for disable preview page ##
+- Issue Type: Task
+- Issue ID: PLAT-11256
+
+### Configuration ###
+Add the following to admin.ini:
+
+moduls.disablePreviewPage.enabled = true
+moduls.disablePreviewPage.permissionType = 2
+moduls.disablePreviewPage.label = "Disable Preview Page"
+moduls.disablePreviewPage.permissionName = FEATURE_DISABLE_PREVIEW_PAGE
+moduls.disablePreviewPage.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None
+
 # Propus 16.10.0  #
 ## Dynamic batch schedulers allocation ##
 - Issue Type: Task
