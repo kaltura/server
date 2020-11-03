@@ -925,13 +925,17 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_STREAM:
-				$time = $this->getRequestParameter("scheduleTime", null);
-				$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $time);
+				$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $this->getScheduleTime());
 				if ($event)
 				{
 					$this->entryId = $event->getSourceEntryId();
 					$sourceEntry = kSimuliveUtils::getSourceEntry($event);
 					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
+					$offset = $this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, "0"); // offset in sec
+					if ($offset)
+					{
+						$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
+					}
 					$this->initFlavorAssetArray(true);
 				}
 				break;
@@ -1315,8 +1319,7 @@ class playManifestAction extends kalturaAction
 				break;
 				
 			case entryType::LIVE_STREAM:
-				$time = $this->getRequestParameter("scheduleTime", null);
-				if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $time))
+				if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime()))
 				{
 					$renderer = $this->serveVodEntry();
 					$entryType = self::ENTRY_TYPE_VOD;
@@ -1512,4 +1515,11 @@ class playManifestAction extends kalturaAction
 
 		return array($maxDc, $remoteFlavors);
 	}
+
+    protected function getScheduleTime()
+    {
+		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, time()));
+		$time += intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+		return $time;
+    }
 }

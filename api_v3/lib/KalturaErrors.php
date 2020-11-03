@@ -652,6 +652,8 @@ class KalturaErrors extends APIErrors
 
 	const LIVE_CLIPPING_UNSUPPORTED_OPERATION = "LIVE_CLIPPING_UNSUPPORTED_OPERATION;OPERATION; Unsupported operation for live clipping: @OPERATION@";
 
+	const USER_NOT_ALLOWED_TO_EDIT_ENTRY = "USER_NOT_ALLOWED_TO_EDIT_ENTRY;;User not allow to edit entry";
+
 	/*
 	 * BaseEntry Service
 	 */

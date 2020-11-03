@@ -41,6 +41,7 @@ class KalturaShortLinkFilter extends KalturaShortLinkBaseFilter
 				$this->userIdIn = -1; // no result will be returned when the user is missing
 			}
 		}
+	//	$this->partnerIdEqual = $partnerId;
 
 		return parent::toObject();
 	}	

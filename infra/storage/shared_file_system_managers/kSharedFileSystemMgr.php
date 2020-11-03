@@ -600,6 +600,7 @@ abstract class kSharedFileSystemMgr
 	
 	public static function getInstanceFromPath($path)
 	{
+		$path = kFile::fixPath($path);
 		$storageTypeMap = kFile::getStorageTypeMap();
 		
 		foreach (array_keys($storageTypeMap) as $pathPrefix) {

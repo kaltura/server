@@ -219,4 +219,4 @@ class elasticSearchUtils
 		$value = strip_tags($value);
 	}
 
-}
+[]}

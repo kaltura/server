@@ -506,16 +506,21 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	 */
 	public static function shouldImportFile($fileSync, $partner)
 	{
-		if ($fileSync && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner )
+		if(!$fileSync)
 		{
-			if ( $partner->getImportRemoteSourceForConvert())
+			return false;
+		}
+
+		if($fileSync->getDc() != kDataCenterMgr::getCurrentDcId())
+		{
+			if( in_array( $fileSync->getDc(), kDataCenterMgr::getDcIds() ) ||
+				in_array( $fileSync->getDc(), kStorageExporter::getPeriodicStorageIds() ))
 			{
 				return true;
 			}
-			else
+			elseif ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner )
 			{
-				$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIds();
-				return in_array($fileSync->getDc(), $cloudStorageProfileIds);
+				return $partner->getImportRemoteSourceForConvert();
 			}
 		}
 		return false;
