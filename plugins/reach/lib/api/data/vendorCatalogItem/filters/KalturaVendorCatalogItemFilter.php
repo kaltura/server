@@ -41,10 +41,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 			$partnerIdEqual = $this->partnerIdEqual;
 		}
 		// Dont filter on partner if requesting partner id is admin console or has the vendor permission
-		elseif (!$this->partnerIdEqual && kCurrentContext::$ks_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID &&
-			(!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::$ks_partner_id)
-				&& kCurrentContext::$action == "getJobs")
-		)
+		elseif (!$this->partnerIdEqual && (kCurrentContext::$ks_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID || kCurrentContext::$action == "getJobs"))
 		{
 			$partnerIdEqual = kCurrentContext::$ks_partner_id;
 		}
