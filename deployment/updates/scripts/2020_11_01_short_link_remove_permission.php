@@ -2,8 +2,8 @@
 
 /**
 * @package deployment
-* @subpackage falcon.roles_and_permissions
-* Remove shortlink plugin permissions
+* @subpackage plugins.shortLink
+* Remove shortLink plugin permissions
 */
 
 $script = realpath(dirname(__FILE__) . '/../../../') . '/alpha/scripts/utils/permissions/removePermissionsAndItems.php';
