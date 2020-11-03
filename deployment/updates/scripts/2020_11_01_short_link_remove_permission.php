@@ -3,9 +3,7 @@
 /**
 * @package deployment
 * @subpackage falcon.roles_and_permissions
-*
-* Adds event notification plugin permissions
-* No need to re-run after server code deploy
+* Remove shortlink plugin permissions
 */
 
 $script = realpath(dirname(__FILE__) . '/../../../') . '/alpha/scripts/utils/permissions/removePermissionsAndItems.php';
