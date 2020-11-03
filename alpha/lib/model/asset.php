@@ -792,8 +792,12 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		$key = $this->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
 		$pendingFileSync = kFileSyncUtils::getPendingFileSyncForKey($key, reset($sharedDcIds));
-		$resolvedFileSync = kFileSyncUtils::resolve($pendingFileSync);
+		if(!$pendingFileSync)
+		{
+			return null;
+		}
 		
+		$resolvedFileSync = kFileSyncUtils::resolve($pendingFileSync);
 		//Validate resolved file sync is also pending before returning it
 		if($resolvedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_PENDING)
 		{
