@@ -244,6 +244,10 @@ $retries=3;
 				KalturaLog::log($msgStr="FAILED to merge - missing concat'ed chunk video file, leaving!");
 				$this->returnMessages[] = $msgStr;
 				$this->returnStatus = KChunkedEncodeReturnStatus::MergeError;
+				
+				// remove if you are not working with the fopen flow
+				$this->deleteTmpMergedVideoFile();
+				
 				return false;
 			}
 			$concatFilenameLog = $this->chunker->getSessionName("concat");
@@ -286,11 +290,7 @@ $retries=3;
 			}
 			
 			// remove if you are not working with the fopen flow
-			$localTmpConcatVideoFilePath = $this->chunker->getSessionName("video");
-			if(file_exists($localTmpConcatVideoFilePath)) {
-				KalturaLog::debug("Deleting local copy of the tmp video concat file from [$localTmpConcatVideoFilePath]");
-				unlink($localTmpConcatVideoFilePath);
-			}
+			$this->deleteTmpMergedVideoFile();
 			
 			if($attempt==$maxAttempts){
 				KalturaLog::log($msgStr="FAILED to merge, leaving!");
@@ -300,6 +300,17 @@ $retries=3;
 			}
 
 			return true;
+		}
+		
+		private function deleteTmpMergedVideoFile()
+		{
+			$localTmpConcatVideoFilePath = $this->chunker->getSessionName("video");
+			if(file_exists($localTmpConcatVideoFilePath)) {
+				KalturaLog::debug("Deleting local copy of the tmp video concat file from [$localTmpConcatVideoFilePath]");
+				if(!unlink($localTmpConcatVideoFilePath)) {
+					KalturaLog::warning("Failed to delete local the tmp video concat file from [$localTmpConcatVideoFilePath]");
+				}
+			}
 		}
 		
 		/********************
