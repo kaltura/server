@@ -23,7 +23,7 @@ class previewAction extends kalturaAction
 		$disablePreviewPage = PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_PREVIEW_PAGE, $this->partner_id);
 		if ($disablePreviewPage && $disablePreviewPage->getStatus() == PermissionStatus::ACTIVE)
 		{
-			return;
+			KExternalErrors::dieError(KExternalErrors::PREVIEW_PAGE_WAS_DISABLED);
 		}
 
 		// Single Player parameters
