@@ -506,15 +506,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
-			$user = kuserPeer::getAdminUser($partnerId, $loginData);
-			if($user)
-			{
-				$otpRequired = true;
-			}
-			else
-			{
-				throw new kUserException('User not found', kUserException::USER_NOT_FOUND);
-			}
+			$otpRequired = true;
 		}
 
 		if ($otpRequired)
