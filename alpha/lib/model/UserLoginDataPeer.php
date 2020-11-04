@@ -511,6 +511,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			{
 				$otpRequired = true;
 			}
+			else
+			{
+				throw new kUserException('User not found', kUserException::USER_NOT_FOUND);
+			}
 		}
 
 		if ($otpRequired)
