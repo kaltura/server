@@ -24,7 +24,7 @@ class languageCodeManager
         {
             $max_include_retries = 10;
             $cacheFileCode = null;
-            while ((!@include_once($cacheFileName)) and $max_include_retries--) {
+            while (((!@include_once($cacheFileName)) or !file_exists($cacheFileName)) and $max_include_retries--) {
                 if (!$cacheFileCode) {
                     $cacheFileCode = self::generateCacheFile();
                     if (!$cacheFileCode)
