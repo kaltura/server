@@ -503,14 +503,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			if(!$otp)
 			{
-				self::loginAttemptsLogic($loginData);
-				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+				return self::loginAttemptsLogic($loginData);
 			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				self::loginAttemptsLogic($loginData);
-				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+				return self::loginAttemptsLogic($loginData);
 			}
 		}
 
