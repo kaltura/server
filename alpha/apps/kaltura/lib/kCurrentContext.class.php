@@ -251,10 +251,7 @@ class kCurrentContext
 	
 	public static function getCurrentKsKuser($activeOnly = true)
 	{
-		if(!kCurrentContext::$ks_kuser)
-		{			
-			kCurrentContext::$ks_kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid, true);
-		}
+		kCurrentContext::$ks_kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, kCurrentContext::$ks_uid, true);
 		
 		if(kCurrentContext::$ks_kuser &&
 		   $activeOnly && 
@@ -288,9 +285,6 @@ class kCurrentContext
 
 	public static function getCurrentKsKuserId()
 	{
-		if (!is_null(kCurrentContext::$ks_kuser_id))
-			return kCurrentContext::$ks_kuser_id;
-			
 		$ksKuser = kCurrentContext::getCurrentKsKuser(false);
 		if($ksKuser)
 			kCurrentContext::$ks_kuser_id = $ksKuser->getId();
