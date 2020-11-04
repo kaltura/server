@@ -451,21 +451,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		// check if password is valid
 		if ($validatePassword && !$loginData->isPasswordValid($password)) 
 		{
-			if (time() < $loginData->getLoginBlockedUntil(null)) 
-			{
-				throw new kUserException('', kUserException::LOGIN_BLOCKED);
-			}
-			if ($loginData->getLoginAttempts()+1 >= $loginData->getMaxLoginAttempts()) 
-			{
-				$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
-				$loginData->setLoginAttempts(0);
-				$loginData->save();
-				throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
-			}
-			$loginData->incLoginAttempts();
-			$loginData->save();	
-				
-			throw new kUserException('', kUserException::WRONG_PASSWORD);
+			return self::loginAttemptsLogic($loginData);
 		}
 		
 		if (time() < $loginData->getLoginBlockedUntil(null)) {
@@ -506,23 +492,44 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
-			$user = kuserPeer::getAdminUser($partnerId, $loginData);
-			if($user)
-			{
-				$otpRequired = true;
-			}
+			$otpRequired = true;
 		}
 
 		if ($otpRequired)
 		{
 			if(!$otp)
 			{
-				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+					}
+					throw $e;
+				}
+
 			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+					}
+					throw $e;
+				}
 			}
 		}
 
@@ -566,6 +573,25 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		return self::setLastLoginFields($loginData, $kuser);
+	}
+
+	public static function loginAttemptsLogic($loginData)
+	{
+		if (time() < $loginData->getLoginBlockedUntil(null))
+		{
+			throw new kUserException('', kUserException::LOGIN_BLOCKED);
+		}
+		if ($loginData->getLoginAttempts()+1 >= $loginData->getMaxLoginAttempts())
+		{
+			$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
+			$loginData->setLoginAttempts(0);
+			$loginData->save();
+			throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
+		}
+		$loginData->incLoginAttempts();
+		$loginData->save();
+
+		throw new kUserException('', kUserException::WRONG_PASSWORD);
 	}
 
 	public static function setLastLoginFields($loginData, $kuser)

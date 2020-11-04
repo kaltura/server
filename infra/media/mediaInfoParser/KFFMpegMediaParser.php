@@ -733,22 +733,30 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	{
 		$cmdLine = "$ffmpegBin -t $seconds -i $srcFileName -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
 		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
+
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
 		$interlaced=0;
+		$samples=0;
 		foreach($outputArr as $line){
 			$stam=$pts=$inter=$tff=0;
-			list($stam,$pts,$inter,$tff) = explode(',', $line);
+			$valsArr=explode(',', $line);
+			if(count($valsArr)<4)
+				continue;
+			list($stam,$pts,$inter,$tff) = $valsArr;
+			if($stam!="frame")
+				continue;
+			$samples++;
 			KalturaLog::log("$stam,pts:$pts,inter:$inter,tff:$tff");
 			$interlaced+=$inter;
 		}
-		if(count($outputArr)==0)
+		if($samples==0)
 			$scanType=0;
 		else {
-			if(count($outputArr)>5)	$thresh = 3;
+			if($samples>5)	$thresh = 3;
 			else $thresh = 1;
 			
 			if($interlaced>$thresh) {

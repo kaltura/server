@@ -1303,7 +1303,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return;
 		}
 		
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
 		foreach ($sharedDcIds as $sharedDcId)
 		{
 			$sharedDCFileSync = FileSync::createForFileSyncKey( $key );
@@ -2122,7 +2122,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$forceRemoteServePattern = kConf::get('force_remote_serve_pattern', 'local', '');
 
 		// handle remote dc
-		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()))
+		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds(false)))
 		{
 			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync), self::SOURCE_TYPE_HTTP);
 		}
