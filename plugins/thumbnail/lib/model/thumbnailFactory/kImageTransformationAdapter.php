@@ -101,12 +101,22 @@ class kImageTransformationAdapter
 		switch($this->parameters->get(kThumbFactoryFieldName::TYPE))
 		{
 			case kExtwidgetThumbnailActionType::RESIZE:
+				if($this->parameters->get(kThumbFactoryFieldName::CROP_X) || $this->parameters->get(kThumbFactoryFieldName::CROP_Y) || $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH) || $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT))
+				{
+					$this->addPreCorp($step);
+				}
+
 				$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT), true);
 				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_FORCE:
 				$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT));
 				break;
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_PADDING:
+				if($this->parameters->get(kThumbFactoryFieldName::CROP_X) || $this->parameters->get(kThumbFactoryFieldName::CROP_Y) || $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH) || $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT))
+				{
+					$this->addPreCorp($step);
+				}
+
 				if($this->parameters->get(kThumbFactoryFieldName::WIDTH) && $this->parameters->get(kThumbFactoryFieldName::HEIGHT))
 				{
 					$this->handleResizeWithPadding($step);
@@ -127,6 +137,20 @@ class kImageTransformationAdapter
 				$this->handleCropAfterResize($step);
 				break;
 		}
+	}
+
+	protected function addPreCorp($step)
+	{
+		$cropAction = new kCropAction();
+		$cropW = $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH);
+		$cropH = $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT);
+		$cropAction->setActionParameter(kThumbnailParameterName::WIDTH, $cropW ? $cropW : $this->parameters->get(kThumbFactoryFieldName::SRC_WIDTH));
+		$cropAction->setActionParameter(kThumbnailParameterName::HEIGHT, $cropH ? $cropH : $this->parameters->get(kThumbFactoryFieldName::SRC_HEIGHT));
+		$cropX = $this->parameters->get(kThumbFactoryFieldName::CROP_X);
+		$cropY = $this->parameters->get(kThumbFactoryFieldName::CROP_Y);
+		$cropAction->setActionParameter(kThumbnailParameterName::X, $cropX ? $cropX : 0);
+		$cropAction->setActionParameter(kThumbnailParameterName::Y, $cropY ? $cropY : 0);
+		$step->addAction($cropAction);
 	}
 
 	protected function handleCropAfterResize($step)

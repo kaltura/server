@@ -51,6 +51,8 @@ class kThumbnailAdapterFactory
 		$params->set(kThumbFactoryFieldName::CROP_Y, $src_y);
 		$params->set(kThumbFactoryFieldName::SRC_WIDTH, $src_w);
 		$params->set(kThumbFactoryFieldName::SRC_HEIGHT, $src_h);
+		$params->set(kThumbFactoryFieldName::CROP_WIDTH, $src_w);
+		$params->set(kThumbFactoryFieldName::CROP_HEIGHT, $src_h);
 		$params->set(kThumbFactoryFieldName::VID_SEC, $vid_sec);
 		$params->set(kThumbFactoryFieldName::VID_SLICE, intval($vid_slice));
 		$params->set(kThumbFactoryFieldName::VID_SLICES, intval($vid_slices));
