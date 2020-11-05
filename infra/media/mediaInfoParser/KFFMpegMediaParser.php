@@ -731,7 +731,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	 */
 	private static function checkForScanType($ffmpegBin, $ffprobeBin, $srcFileName, $seconds=5)
 	{
-		$cmdLine = "$ffmpegBin -t $seconds -i $srcFileName -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -t $seconds -i \"$srcFileName\" -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
 		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
 		$lastLine=exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
