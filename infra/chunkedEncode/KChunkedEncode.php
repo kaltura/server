@@ -917,6 +917,7 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
+			self::addFfmpegReconnectParams('http', $params->source, $cmdLine);
 			$cmdLine.= " -i \"$params->source\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
