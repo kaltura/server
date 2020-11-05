@@ -551,7 +551,7 @@ class kFileBase
 		}
 		return true;
 	}
-	
+
 	public static function getStorageTypeMap()
 	{
 		if(self::$storageTypeMap)
