@@ -571,9 +571,11 @@
 			$setup = $this->setup;
 			$params = $this->params;
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
+			$cmdLine = "";
 			$chunkData = $this->chunkDataArr[$chunkIdx];
 			{
-				$cmdLine = " -i ".$this->cmdLine." -t $chunkWithOverlap";
+				self::addFfmpegReconnectParams("\"http", $this->cmdLine, $cmdLine);
+				$cmdLine .= " -i ".$this->cmdLine." -t $chunkWithOverlap";
 				if(isset($params->httpHeaderExtPrefix)){
 					$cmdLine = " -headers \"$params->httpHeaderExtPrefix,chunk($chunkIdx)\"".$cmdLine;
 				}
@@ -763,7 +765,10 @@
 				}
 				if($this->chunkFileFormat=="mpegts")
 					$audioInputParams.= " -itsoffset -1.4";
-				$audioInputParams.= " -i '" . kfile::realPath($audioFilename) . "'";
+				
+				$resolvedAudioFileName = kfile::realPath($audioFilename);
+				self::addFfmpegReconnectParams("http", $resolvedAudioFileName, $audioInputParams);
+				$audioInputParams.= " -i '$resolvedAudioFileName'";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
 					$audioCopyParams.= " -bsf:a aac_adtstoasc";
@@ -846,6 +851,7 @@
 				$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
 			}
 			else {
+				self::addFfmpegReconnectParams("http", $resolvedFirstSegmentName, $cmdLine);
 				$cmdLine.= " -i \"$resolvedFirstSegmentName\"";
 			}
 				
@@ -911,6 +917,7 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
+			self::addFfmpegReconnectParams('http', $params->source, $cmdLine);
 			$cmdLine.= " -i \"$params->source\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
@@ -1320,6 +1327,18 @@
 			sscanf($outputArr[0],"%s %s %s ",$str,$str,$strVer);
 			KalturaLog::log("$strVer");
 			return $strVer;
+		}
+		
+		protected static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
+		{
+			if (strpos($fileCmd, $pattern) !== 0) {
+				return;
+			}
+			
+			$ffmpegReconnectParams = KChunkedEncodeSetup::getChunkConfigParam('ffmpegReconnectParams');
+			if ($ffmpegReconnectParams) {
+				$cmdLine .= " $ffmpegReconnectParams";
+			}
 		}
 	}
 	
