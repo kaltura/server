@@ -75,10 +75,10 @@ class myContentStorage
 		$currentDcId = kDataCenterMgr::getCurrentDcId();
 		if(myCloudUtils::isCloudDc($currentDcId))
 		{
-			$tempCloudBucket = myCloudUtils::getCloudTempBucket();
-			if($tempCloudBucket)
+			$sharedTempBucket = myCloudUtils::getSharedTempBucket();
+			if($sharedTempBucket)
 			{
-				return $tempCloudBucket . self::getThumbEntitySharedPath($entry->getId(), $thumbName, $fileName, $version);
+				return $sharedTempBucket . self::getThumbEntitySharedPath($entry->getId(), $thumbName, $fileName, $version);
 			}
 		}
 
