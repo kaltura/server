@@ -288,6 +288,9 @@ class kCurrentContext
 
 	public static function getCurrentKsKuserId()
 	{
+		if (!is_null(kCurrentContext::$ks_kuser_id))
+			return kCurrentContext::$ks_kuser_id;
+			
 		$ksKuser = kCurrentContext::getCurrentKsKuser(false);
 		if($ksKuser)
 			kCurrentContext::$ks_kuser_id = $ksKuser->getId();
