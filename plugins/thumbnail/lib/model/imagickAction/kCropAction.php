@@ -89,6 +89,7 @@ class kCropAction extends kImagickAction
 	{
 		$this->calculateGravityOffSet();
 		$this->image->cropImage($this->newWidth, $this->newHeight, $this->x, $this->y);
+		$this->image->setImagePage($this->newWidth, $this->newHeight, 0, 0);
 		return $this->image;
 	}
 
