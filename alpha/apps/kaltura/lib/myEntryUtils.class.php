@@ -7,6 +7,7 @@ class myEntryUtils
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
+	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 
 	static private $liveSourceType = array
 	(
@@ -760,13 +761,13 @@ class myEntryUtils
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
 		//create final path for thumbnail created
-		$finalThumbPath = myContentStorage::getThumbEntityPath('entry/' . $thumbDirs[0], $entry, $thumbName, $entryThumbFilename, $version);
+		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry, $thumbName, $entryThumbFilename, $version);
 
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
 		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
 		
 		//create path for processing thumbnail request
-		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
+		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
 
 		if(!is_null($format))
 		{
@@ -784,7 +785,7 @@ class myEntryUtils
 
 		foreach ($thumbDirs as $thumbDir)
 		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
 			{
 				header("X-Kaltura:cached-thumb-exists,".md5($currPath));
@@ -797,8 +798,8 @@ class myEntryUtils
 		{
 			$orig_image_path = $fileSync->getFullPath();
 		}
-		
-		if ($orig_image_path === null || !file_exists($orig_image_path))
+
+		if ($orig_image_path === null || !kFile::checkFileExists($orig_image_path))
 		{
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
@@ -808,7 +809,7 @@ class myEntryUtils
 		
 		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
-		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !file_exists($orig_image_path))
+		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 		
 		// check a request for animated thumbs without a concrete vid_slice
@@ -890,7 +891,7 @@ class myEntryUtils
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
-				$capturedThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
+				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				

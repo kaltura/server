@@ -76,15 +76,12 @@ class myContentStorage
 		if(myCloudUtils::isCloudDc($currentDcId))
 		{
 			$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
-			if($periodicStorageIds)
+			foreach($periodicStorageIds as $periodicStorageId)
 			{
-				foreach($periodicStorageIds as $periodicStorageId)
+				$storage = StorageProfilePeer::retrieveByPK($periodicStorageId);
+				if($storage && $storage->getStorageBaseDir())
 				{
-					$storage = StorageProfilePeer::retrieveByPK($periodicStorageId);
-					if($storage && $storage->getStorageBaseDir())
-					{
-						return $storage->getStorageBaseDir() . self::getThumbEntitySharedPath($entityName, $entry->getId(), $thumbName, $fileName, $version);
-					}
+					return $storage->getStorageBaseDir() . self::getThumbEntitySharedPath($entityName, $entry->getId(), $thumbName, $fileName, $version);
 				}
 			}
 		}
@@ -97,17 +94,11 @@ class myContentStorage
 		if( $version != null )
 		{
 			$ext = pathinfo ($fileName , PATHINFO_EXTENSION);
-			$fileName = $version;
+			$fileName = $version . '.' . $ext;
 		}
 
 		$dir = self::getPathFromId($entryId);
-		$res = '/content/'. $entityName . '/' . $dir . '/' .  $thumbName . '_' . $fileName;
-
-		if( $version != null )
-		{
-			$res .= "." . $ext;
-		}
-
+		$res = '/content/' . $entityName . '/' . $dir . '/' .  $thumbName . '_' . $fileName;
 		return $res;
 	}
 
