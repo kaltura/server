@@ -484,8 +484,10 @@ class kJobsManager
 			
 			$fileSync = null;
 			$preferSharedDcForConvert = kConf::get('prefer_shared_file_sync_for_convert', 'cloud_storage', null);
+			$preferSharedDcForConvertPartnerIds = kConf::get('prefer_shared_file_sync_for_convert_partner_ids', 'cloud_storage', array());
 			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
-			if($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
+			if( ($preferSharedDcForConvert  || in_array($flavorAsset->getPartnerId(), $preferSharedDcForConvertPartnerIds) )
+				&& count($sharedDcIds) && in_array($dbCurrentConversionEngine, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
 			{
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
 			}
