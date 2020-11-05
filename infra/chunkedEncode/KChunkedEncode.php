@@ -699,7 +699,7 @@
 					
 					$retries--;
 					fseek($oFh, $mergedFileSize, SEEK_SET);
-					$remoteFileSize = kFile::checkFileExists($chunkFileName);
+					$remoteFileSize = kFile::fileSize($chunkFileName);
 					KalturaLog::debug("Failed to download [$chunkFileName], rfs [$remoteFileSize], ofs [$originalFileSize], retries left [$retries]");
 					sleep(rand(1,3));
 				}
