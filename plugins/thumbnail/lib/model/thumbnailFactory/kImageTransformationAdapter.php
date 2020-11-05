@@ -103,7 +103,7 @@ class kImageTransformationAdapter
 			case kExtwidgetThumbnailActionType::RESIZE:
 				if($this->parameters->get(kThumbFactoryFieldName::CROP_X) || $this->parameters->get(kThumbFactoryFieldName::CROP_Y) || $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH) || $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT))
 				{
-					$this->addPreCorp($step);
+					$this->addInitialCrop($step);
 				}
 
 				$this->addResizeAction($step, $this->parameters->get(kThumbFactoryFieldName::WIDTH), $this->parameters->get(kThumbFactoryFieldName::HEIGHT), true);
@@ -114,7 +114,7 @@ class kImageTransformationAdapter
 			case kExtwidgetThumbnailActionType::RESIZE_WITH_PADDING:
 				if($this->parameters->get(kThumbFactoryFieldName::CROP_X) || $this->parameters->get(kThumbFactoryFieldName::CROP_Y) || $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH) || $this->parameters->get(kThumbFactoryFieldName::CROP_HEIGHT))
 				{
-					$this->addPreCorp($step);
+					$this->addInitialCrop($step);
 				}
 
 				if($this->parameters->get(kThumbFactoryFieldName::WIDTH) && $this->parameters->get(kThumbFactoryFieldName::HEIGHT))
@@ -139,7 +139,7 @@ class kImageTransformationAdapter
 		}
 	}
 
-	protected function addPreCorp($step)
+	protected function addInitialCrop($step)
 	{
 		$cropAction = new kCropAction();
 		$cropW = $this->parameters->get(kThumbFactoryFieldName::CROP_WIDTH);
