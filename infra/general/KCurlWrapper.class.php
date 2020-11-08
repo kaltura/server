@@ -170,7 +170,52 @@ class KCurlWrapper
 	 */
 	public $httpCode = 0;
 
-	private static function read_header($ch, $string) {
+	private static function read_header($ch, $string)
+	{
+		return strlen($string);
+	}
+
+	private static function read_header_validate_redirect($ch, $string)
+	{
+		$prefix = 'location:';
+        if (strtolower(substr($string, 0, strlen($prefix))) != $prefix)
+		{
+			return strlen($string);
+		}
+
+		$url = trim(substr(trim($string), strlen($prefix)));
+		KalturaLog::debug("Validating redirect url [$url]");
+
+		$parts = parse_url($url);
+		if (!isset($parts['scheme']) || !isset($parts['host']))
+		{
+			KalturaLog::log("Failed to parse redirect url [$url]");
+			return 0;
+		}
+
+		if (self::isInternalHost($parts['host']) && !self::isWhiteListedInternalUrl($url))
+		{
+			KalturaLog::log("Redirect url [$url] is internal and not whiteListed");
+			return 0;
+		}
+
+		if (isset($parts['user']) && strpos($parts['user'], '@') !== false)
+		{
+			KalturaLog::log("Redirect url [$url] user contains @");
+			return 0;
+		}
+
+		if (isset($parts['pass']) && strpos($parts['pass'], '@') !== false)
+		{
+			KalturaLog::log("Redirect url [$url] pass contains @");
+			return 0;
+		}
+
+		return strlen($string);
+	}
+
+	private static function read_header_store($ch, $string)
+	{
 		self::$headers .= $string;
 		if ($string == "\r\n")
 		{
@@ -180,19 +225,20 @@ class KCurlWrapper
 				self::$lastHeader = true;
 		}
 		
-		$length = strlen ( $string );
-		return $length;
+		return strlen($string);
 	}
+
+	private static function read_header_store_validate_redirect($ch, $string)
+	{
+		self::read_header_store($ch, $string);
+		return self::read_header_validate_redirect($ch, $string);
+	}
+
 
 	private static function read_body($ch, $string) {
 		if (self::$lastHeader) // if we read the last header abort the curl
 			return 0;
 
-		$length = strlen ( $string );
-		return $length;
-	}
-	
-	private static function read_header_do_nothing($ch, $string) {
 		$length = strlen ( $string );
 		return $length;
 	}
@@ -394,10 +440,9 @@ class KCurlWrapper
 	{
 		curl_setopt($this->ch, CURLOPT_HEADER, true);
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
-		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
 
-		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl))
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl, true))
 		{
 			$this->setInternalUrlErrorResults($sourceUrl);
 			return false;
@@ -531,7 +576,6 @@ class KCurlWrapper
 			}
 		}
 
-		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header_do_nothing');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
 		
 		return $curlHeaderResponse;
@@ -693,7 +737,7 @@ class KCurlWrapper
 		return $protocol;
 	}
 
-	public static function setSourceUrl($ch, $sourceUrl, &$protocol, $allowInternalUrl = false)
+	public static function setSourceUrl($ch, $sourceUrl, &$protocol, $allowInternalUrl = false, $readHeader = false)
 	{
 		$sourceUrl = trim($sourceUrl);
 		if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
@@ -763,6 +807,18 @@ class KCurlWrapper
 		}
 		curl_setopt($ch, CURLOPT_URL, $url);
 		
+		$headerFunction = 'KCurlWrapper::read_header';
+		if ($readHeader)
+		{
+			$headerFunction .= '_store';
+		}
+		if (!$allowInternalUrl)
+		{
+			$headerFunction .= '_validate_redirect';
+		}
+
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, $headerFunction);
+
 		return true;
 	}
 
