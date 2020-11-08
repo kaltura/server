@@ -16,6 +16,7 @@
 class ServerNode extends BaseServerNode {
 
 	const SERVER_NODE_TTL_TIME = 120;
+	const SIMULIVE_SERVER_NODE_ID = -1;
 
 	public function getCacheInvalidationKeys()
 	{

@@ -575,10 +575,11 @@ abstract class LiveEntry extends entry
 	/**
 	 * Stores given value in cache for with the given key as an identifier
 	 * @param string $key
+	 * @param int $expiry
 	 * @return bool
 	 * @throws Exception
 	 */
-	private function storeInCache($key)
+	private function storeInCache($key, $expiry = self::DEFAULT_CACHE_EXPIRY)
 	{
 		$cacheType = self::getCacheType();
 		$cacheLayers = kCacheManager::getCacheSectionNames($cacheType);
@@ -593,7 +594,7 @@ abstract class LiveEntry extends entry
 			}
 			
 			KalturaLog::debug("Set cache key [$key] from store [$cacheType] ");
-			$res = $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', self::DEFAULT_CACHE_EXPIRY));
+			$res = $cacheStore->set($key, true, kConf::get('media_server_cache_expiry', 'local', $expiry));
 		}
 		
 		return $res;
@@ -624,11 +625,7 @@ abstract class LiveEntry extends entry
 			if(is_null($this->getFirstBroadcast()) && $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY)
 				$this->setFirstBroadcast(kApiCache::getTime());
 			
-			$key = $this->getEntryServerNodeCacheKey($dbLiveEntryServerNode);
-			if($this->storeInCache($key))
-			{
-				KalturaLog::debug("cached and registered - index: $mediaServerIndex, hostname: $hostname");
-			}
+			$this->storeEntryServerNodeInCache($dbLiveEntryServerNode);
 		}
 		
 		return $dbLiveEntryServerNode;
@@ -1069,5 +1066,12 @@ abstract class LiveEntry extends entry
 	    return $conversionProfileId;
     }
 
+    public function storeEntryServerNodeInCache(LiveEntryServerNode $entryServerNode, $expiry = self::DEFAULT_CACHE_EXPIRY)
+	{
+		$key = $this->getEntryServerNodeCacheKey($entryServerNode);
+		$res = $this->storeInCache($key, $expiry);
+		KalturaLog::debug("store in cache for [$key], result [$res] for  $expiry seconds. entryServerNodeId: " . $entryServerNode->getId());
+		return $res;
+	}
 
 }

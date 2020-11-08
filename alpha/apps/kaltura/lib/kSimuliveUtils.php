@@ -40,7 +40,7 @@ class kSimuliveUtils
 		$endTime = $startTime + array_sum($durations);
 		// getting the flavors from source entry
 		$flavors = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
-		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs);
+		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs, $currentEvent->getCalculatedEndTime());
 	}
 
 	/**
@@ -134,4 +134,25 @@ class kSimuliveUtils
 		// conditional cache should expire when event start
 		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
 	}
+
+	public static function createEntryServerNode(LiveEntry $entry, $endTime)
+	{
+		$expiry = $endTime - time();
+		$esn = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY); // simulive always primary
+		if (!$esn && $expiry > 0)
+		{
+			KalturaLog::debug('creating ESN for simulive entry ' . $entry->getId());
+			/* @var $dbSimuliveEntryServerNode LiveEntryServerNode */
+			$dbSimuliveEntryServerNode = new LiveEntryServerNode();
+			$dbSimuliveEntryServerNode->setEntryId($entry->getId());
+			$dbSimuliveEntryServerNode->setServerType(EntryServerNodeType::LIVE_PRIMARY);
+			$dbSimuliveEntryServerNode->setServerNodeId(ServerNode::SIMULIVE_SERVER_NODE_ID); //TODO: add release script for serverNode -1 creation
+			$dbSimuliveEntryServerNode->setPartnerId($entry->getPartnerId());
+			$dbSimuliveEntryServerNode->setStatus(EntryServerNodeStatus::PLAYABLE);
+			$dbSimuliveEntryServerNode->setDc(0);
+			$dbSimuliveEntryServerNode->save();
+			$entry->storeEntryServerNodeInCache($dbSimuliveEntryServerNode, $expiry);
+			kEventsManager::flushEvents(); // live entry need to be re-indexed
+		}
+   }
 }

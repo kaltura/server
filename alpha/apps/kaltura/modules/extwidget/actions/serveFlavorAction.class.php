@@ -417,7 +417,7 @@ class serveFlavorAction extends kalturaAction
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
 				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', 0) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
-				list($durations, $flavors, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				list($durations, $flavors, $startTime, $endTime, $dvrWindow, $eventEndTime) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($flavors)
 				{
 					$sequences = self::buildSequencesArray($flavors);
@@ -428,6 +428,10 @@ class serveFlavorAction extends kalturaAction
 					if ($offset)
 					{
 						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = $offset;
+					}
+					else
+					{
+						kSimuliveUtils::createEntryServerNode($entry, $eventEndTime);
 					}
 					$this->sendJson($mediaSet, false, true, $entry);
 				}
