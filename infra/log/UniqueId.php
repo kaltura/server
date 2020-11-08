@@ -19,7 +19,7 @@ class UniqueId
 			self::$_uniqueId = (string)rand();
 			if (php_sapi_name() !== 'cli')
 			{
-				header('X-Kaltura-Session:'.self::$_uniqueId, false);
+				header('X-Kaltura-Session: ' . self::$_uniqueId . ', ' . time(), false);
 
 				if (function_exists('apache_note'))
 				{
