@@ -12,7 +12,6 @@ class kBaseResizeAdapter
 	const LOCAL_MAP_NAME = 'local';
 	const CONFIGURATION_PARAM_NAME = 'thumb_path';
 	const DEFAULT_THUMB_DIR = 'tempthumb';
-	const CACHED_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 	const THUMB_PROCESSING_LOCK_DURATION = 300; //5 minutes
 	const LOCK_KEY_PREFIX = 'thumb-processing-resize';
 	const DEFAULT_THUMB_SEC = 3;
@@ -134,7 +133,17 @@ class kBaseResizeAdapter
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(myEntryUtils::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				return array (true, $currPath);
+				if ($currPath != $this->finalThumbPath)
+				{
+					$moveFileSuccess = kFile::moveFile($currPath, $this->finalThumbPath);
+					if (!$moveFileSuccess)
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
+						return array(true, $currPath);
+					}
+				}
+
+				return array(true, $this->finalThumbPath);
 			}
 		}
 
@@ -254,7 +263,7 @@ class kBaseResizeAdapter
 
 	protected function returnCachedVersion($filePath)
 	{
-		header(self::CACHED_EXISTS_HEADER . md5($filePath));
+		header(myEntryUtils::CACHED_THUMB_EXISTS_HEADER . md5($filePath));
 		return $filePath;
 	}
 }
