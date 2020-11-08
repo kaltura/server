@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaVendorTaskData extends KalturaObject implements IApiObjectFactory
+abstract class KalturaVendorTaskData extends KalturaObject implements IApiObjectFactory
 {
 	
 	/**
@@ -49,10 +49,6 @@ class KalturaVendorTaskData extends KalturaObject implements IApiObjectFactory
 		$taskData = null;
 		switch ($taskDataType)
 		{
-			case 'kVendorTaskData':
-				$taskData = new KalturaVendorTaskData();
-				break;
-			
 			case 'kAlignmentVendorTaskData':
 				$taskData = new KalturaAlignmentVendorTaskData();
 				break;
