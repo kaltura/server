@@ -178,7 +178,7 @@ class KCurlWrapper
 	private static function read_header_validate_redirect($ch, $string)
 	{
 		$prefix = 'location:';
-        if (strtolower(substr($string, 0, strlen($prefix))) != $prefix)
+		if (strtolower(substr($string, 0, strlen($prefix))) != $prefix)
 		{
 			return strlen($string);
 		}
