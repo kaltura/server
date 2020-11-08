@@ -776,7 +776,7 @@ class myEntryUtils
 		}
 
 		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
-
+		kFile::fullMkdir($processingThumbPath);
 		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
 			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
@@ -958,8 +958,6 @@ class myEntryUtils
 				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
 				KalturaLog::debug("Creating Clear file at [$orig_image_path] for image conversion");
 			}
-
-			kFile::fullMkdir($processingThumbPath);
 
 			if ($thumbCaptureByPackager && $shouldResizeByPackager)
 			{
