@@ -8,7 +8,7 @@
  * @subpackage model
  *
  */
-class kAlignmentVendorTaskData extends kVendorTaskData
+class kAlignmentVendorTaskData
 {
 	/**
 	 * @var string

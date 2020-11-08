@@ -7,7 +7,7 @@
  *
  */
 
-class kTranslationVendorTaskData extends kVendorTaskData
+class kTranslationVendorTaskData
 {
 	/**
 	 * @var string

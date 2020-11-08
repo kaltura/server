@@ -357,15 +357,6 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			$this->setFinishTime(time());
 		}
 		
-		$entryDuration = $this->getEntry()->getLengthInMsecs();
-		$taskJobData = $this->getTaskJobData();
-		if(!$taskJobData)
-		{
-			$taskJobData = new kVendorTaskData();
-		}
-		$taskJobData->setEntryDuration($entryDuration);
-		$this->setTaskJobData($taskJobData);
-		
 		return parent::preSave($con);
 	}
 	
