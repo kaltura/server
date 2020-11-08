@@ -1,0 +1,1 @@
+ALTER TABLE sphinx_log ADD INDEX `dc_id` (`dc`,`id`);

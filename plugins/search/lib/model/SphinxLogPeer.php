@@ -60,6 +60,7 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 		$baseCriteria->add(SphinxLogPeer::TYPE, $types, Criteria::IN);
 		$baseCriteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
 		$baseCriteria->setLimit($limit);
+		$baseCriteria->setForceIndex('dc_id');
 
 		$result = array();
 
