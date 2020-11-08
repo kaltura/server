@@ -138,11 +138,9 @@ class kSimuliveUtils
 	public static function createEntryServerNode(LiveEntry $entry, $endTime)
 	{
 		$expiry = $endTime - time();
-		$esn = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY); // simulive always primary
-		if (!$esn && $expiry > 0)
+		if ($expiry > 0 && !EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getId(), EntryServerNodeType::LIVE_PRIMARY))
 		{
 			KalturaLog::debug('creating ESN for simulive entry ' . $entry->getId());
-			/* @var $dbSimuliveEntryServerNode LiveEntryServerNode */
 			$dbSimuliveEntryServerNode = new LiveEntryServerNode();
 			$dbSimuliveEntryServerNode->setEntryId($entry->getId());
 			$dbSimuliveEntryServerNode->setServerType(EntryServerNodeType::LIVE_PRIMARY);
