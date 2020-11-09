@@ -27,6 +27,14 @@ class LiveConversionProfileService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('assetParams');
 	}
 
+	/* (non-PHPdoc)	
+     * @see KalturaBaseService::isPermitted()	
+     */	
+	protected function isPermitted(&$allowPrivatePartnerData)	
+	{	
+		return true;	
+	}	
+
 	/**
 	 * Serve XML rendition of the Kaltura Live Transcoding Profile usable by the Wowza transcoding add-on
 	 *
