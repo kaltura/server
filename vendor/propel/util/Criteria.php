@@ -131,6 +131,7 @@ class Criteria implements IteratorAggregate {
 	private $singleRecord = false;
 	private $selectModifiers = array();
 	private $selectColumns = array();
+	private $forceIndex = null;
 	private $orderByColumns = array();
 	private $groupByColumns = array();
 	private $having = null;
@@ -216,6 +217,7 @@ class Criteria implements IteratorAggregate {
 		$this->singleRecord = false;
 		$this->selectModifiers = array();
 		$this->selectColumns = array();
+		$this->forceIndex = null;
 		$this->orderByColumns = array();
 		$this->groupByColumns = array();
 		$this->having = null;
@@ -858,6 +860,26 @@ class Criteria implements IteratorAggregate {
 	}
 
 	/**
+	 * Get the forced index for this Criteria.
+	 *
+	 * @return     string
+	 */
+	public function getForceIndex()
+	{
+		return $this->forceIndex;
+	}
+
+	/**
+	 * Sets the forced index for this Criteria.
+	 *
+	 * @param      string $v
+	 */
+	public function setForceIndex($forceIndex)
+	{
+		$this->forceIndex = $forceIndex;
+	}
+
+	/**
 	 * Clears current select columns.
 	 *
 	 * @return     Criteria Modified Criteria object (for fluent API)
@@ -1045,6 +1067,7 @@ class Criteria implements IteratorAggregate {
 				&& $this->dbName === $criteria->getDbName()
 				&& $this->selectModifiers === $criteria->getSelectModifiers()
 				&& $this->selectColumns === $criteria->getSelectColumns()
+				&& $this->forceIndex === $criteria->getForceIndex()
 				&& $this->orderByColumns === $criteria->getOrderByColumns()
 				&& $this->groupByColumns === $criteria->getGroupByColumns()
 			   )

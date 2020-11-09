@@ -324,7 +324,7 @@
 			 */
 			$srcIndexes = array_keys($cmdLineArr,'-i');
 			foreach($srcIndexes as $idx) {
-				$cmdLineArr[$idx+1] = realpath($cmdLineArr[$idx+1]);
+				$cmdLineArr[$idx+1] = '"' . kFile::realPath($cmdLineArr[$idx+1]) . '"';
 			}
 			
 			$toAddFps = false;
@@ -571,9 +571,11 @@
 			$setup = $this->setup;
 			$params = $this->params;
 			$chunkWithOverlap = $setup->chunkDuration + $setup->chunkOverlap;
+			$cmdLine = "";
 			$chunkData = $this->chunkDataArr[$chunkIdx];
 			{
-				$cmdLine = " -i ".$this->cmdLine." -t $chunkWithOverlap";
+				self::addFfmpegReconnectParams("\"http", $this->cmdLine, $cmdLine);
+				$cmdLine .= " -i ".$this->cmdLine." -t $chunkWithOverlap";
 				if(isset($params->httpHeaderExtPrefix)){
 					$cmdLine = " -headers \"$params->httpHeaderExtPrefix,chunk($chunkIdx)\"".$cmdLine;
 				}
@@ -697,7 +699,9 @@
 					
 					$retries--;
 					fseek($oFh, $mergedFileSize, SEEK_SET);
-					KalturaLog::debug("Failed to download [$chunkFileName], retries left [$retries]");
+					$remoteFileSize = kFile::fileSize($chunkFileName);
+					KalturaLog::debug("Failed to download [$chunkFileName], rfs [$remoteFileSize], ofs [$originalFileSize], retries left [$retries]");
+					sleep(rand(1,3));
 				}
 				
 				if(!$mergeFileSuccess) {
@@ -763,7 +767,10 @@
 				}
 				if($this->chunkFileFormat=="mpegts")
 					$audioInputParams.= " -itsoffset -1.4";
-				$audioInputParams.= " -i '" . kfile::realPath($audioFilename) . "'";
+				
+				$resolvedAudioFileName = kfile::realPath($audioFilename);
+				self::addFfmpegReconnectParams("http", $resolvedAudioFileName, $audioInputParams);
+				$audioInputParams.= " -i '$resolvedAudioFileName'";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
 					$audioCopyParams.= " -bsf:a aac_adtstoasc";
@@ -846,6 +853,7 @@
 				$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
 			}
 			else {
+				self::addFfmpegReconnectParams("http", $resolvedFirstSegmentName, $cmdLine);
 				$cmdLine.= " -i \"$resolvedFirstSegmentName\"";
 			}
 				
@@ -911,7 +919,8 @@
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
 			
-			$cmdLine.= " -i $params->source";
+			self::addFfmpegReconnectParams('http', $params->source, $cmdLine);
+			$cmdLine.= " -i \"$params->source\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
@@ -1321,6 +1330,18 @@
 			KalturaLog::log("$strVer");
 			return $strVer;
 		}
+		
+		protected static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
+		{
+			if (strpos($fileCmd, $pattern) !== 0) {
+				return;
+			}
+			
+			$ffmpegReconnectParams = KChunkedEncodeSetup::getChunkConfigParam('ffmpegReconnectParams');
+			if ($ffmpegReconnectParams) {
+				$cmdLine .= " $ffmpegReconnectParams";
+			}
+		}
 	}
 	
 	/********************
@@ -1593,7 +1614,9 @@
 				$this->formatParams = null;
 			
 			if(($key=array_search("-i", $cmdLineArr))!==false) {
-				$this->source = $cmdLineArr[$key+1];
+				$resolvedPath = kFile::realPath($cmdLineArr[$key+1]);
+				$cmdLineArr[$key+1] = "\"$resolvedPath\"";
+				$this->source = $resolvedPath;
 			}
 			$this->output = end($cmdLineArr);
 		}

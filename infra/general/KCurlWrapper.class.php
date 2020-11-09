@@ -170,7 +170,52 @@ class KCurlWrapper
 	 */
 	public $httpCode = 0;
 
-	private static function read_header($ch, $string) {
+	private static function read_header($ch, $string)
+	{
+		return strlen($string);
+	}
+
+	private static function read_header_validate_redirect($ch, $string)
+	{
+		$prefix = 'location:';
+		if (strtolower(substr($string, 0, strlen($prefix))) != $prefix)
+		{
+			return strlen($string);
+		}
+
+		$url = trim(substr(trim($string), strlen($prefix)));
+		KalturaLog::debug("Validating redirect url [$url]");
+
+		$parts = parse_url($url);
+		if (!isset($parts['scheme']) || !isset($parts['host']))
+		{
+			KalturaLog::log("Failed to parse redirect url [$url]");
+			return 0;
+		}
+
+		if (self::isInternalHost($parts['host']) && !self::isWhiteListedInternalUrl($url))
+		{
+			KalturaLog::log("Redirect url [$url] is internal and not whiteListed");
+			return 0;
+		}
+
+		if (isset($parts['user']) && strpos($parts['user'], '@') !== false)
+		{
+			KalturaLog::log("Redirect url [$url] user contains @");
+			return 0;
+		}
+
+		if (isset($parts['pass']) && strpos($parts['pass'], '@') !== false)
+		{
+			KalturaLog::log("Redirect url [$url] pass contains @");
+			return 0;
+		}
+
+		return strlen($string);
+	}
+
+	private static function read_header_store($ch, $string)
+	{
 		self::$headers .= $string;
 		if ($string == "\r\n")
 		{
@@ -180,19 +225,20 @@ class KCurlWrapper
 				self::$lastHeader = true;
 		}
 		
-		$length = strlen ( $string );
-		return $length;
+		return strlen($string);
 	}
+
+	private static function read_header_store_validate_redirect($ch, $string)
+	{
+		self::read_header_store($ch, $string);
+		return self::read_header_validate_redirect($ch, $string);
+	}
+
 
 	private static function read_body($ch, $string) {
 		if (self::$lastHeader) // if we read the last header abort the curl
 			return 0;
 
-		$length = strlen ( $string );
-		return $length;
-	}
-	
-	private static function read_header_do_nothing($ch, $string) {
 		$length = strlen ( $string );
 		return $length;
 	}
@@ -269,7 +315,7 @@ class KCurlWrapper
 		if(!is_null($maxFileSize))
 		{
 			$curlWrapper = new KCurlWrapper();
-			$curlHeaderResponse = $curlWrapper->getHeader($url, true);
+			$curlHeaderResponse = $curlWrapper->getHeader($url, true, $allowInternalUrl);
 			$curlWrapper->close();
 			
 			if(!$curlHeaderResponse || $curlWrapper->getError())
@@ -390,14 +436,17 @@ class KCurlWrapper
 	/**
 	 * @return false|KCurlHeaderResponse
 	 */
-	public function getHeader($sourceUrl, $noBody = false)
+	public function getHeader($sourceUrl, $noBody = false, $allowInternalUrl = false)
 	{
 		curl_setopt($this->ch, CURLOPT_HEADER, true);
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
-		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
-		
-		$this->setSourceUrlAndprotocol($sourceUrl);
+
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl, true))
+		{
+			$this->setInternalUrlErrorResults($sourceUrl);
+			return false;
+		}
 
 		if($this->protocol == self::HTTP_PROTOCOL_FTP)
 			$noBody = true;
@@ -476,7 +525,7 @@ class KCurlWrapper
 				}
 				else
 				{
-					return $this->getHeader($sourceUrl, true);
+					return $this->getHeader($sourceUrl, true, $allowInternalUrl);
 				}
 			}
 		}
@@ -527,7 +576,6 @@ class KCurlWrapper
 			}
 		}
 
-		curl_setopt($this->ch, CURLOPT_HEADERFUNCTION, 'KCurlWrapper::read_header_do_nothing');
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body_do_nothing');
 		
 		return $curlHeaderResponse;
@@ -542,14 +590,11 @@ class KCurlWrapper
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl))
 		{
-			KalturaLog::debug("Exec Curl - Found not allowed and not whiteListed Internal url: $sourceUrl");
 			$this->setInternalUrlErrorResults($sourceUrl);
 			return false;
 		}
-
-		$this->setSourceUrlAndprotocol($sourceUrl);
 
 		$returnTransfer = is_null($destFile);
 		$destFd = null;
@@ -591,14 +636,11 @@ class KCurlWrapper
 	 */
 	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && self::isInternalUrl($sourceUrl) && !self::isWhiteListedInternalUrl($sourceUrl))
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl))
 		{
-			KalturaLog::debug("DoExec Curl - Found not allowed and not whiteListed Internal url: $sourceUrl");
 			$this->setInternalUrlErrorResults($sourceUrl);
 			return false;
 		}
-
-		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
 
 		$res = $this->execCurl();
 
@@ -637,9 +679,8 @@ class KCurlWrapper
 		}
 	}
 
-	private static function isInternalUrl($url = null)
+	private static function isInternalHost($host)
 	{
-		$host = self::getUrlHost($url);
 		if (!$host)
 			return true;
 		if (filter_var($host, FILTER_VALIDATE_IP)) // do we have an ip and not a hostname
@@ -661,7 +702,7 @@ class KCurlWrapper
 		if(!kConf::hasMap('security'))
 			return true;
 
-    $whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
+		$whiteListedInternalPatterns = kConf::get('internal_url_whitelist', 'security', array());
 		foreach ($whiteListedInternalPatterns as $pattern)
 		{
 			if (preg_match($pattern, $url))
@@ -670,20 +711,6 @@ class KCurlWrapper
 		return false;
 	}
 
-	private static function getUrlHost($url = null)
-	{
-		$host = null;
-		$url = trim($url);
-		if (strpos($url, "://") === false && substr($url, 0, 1) != "/")
-			$url = "http://" . $url;
-		$url_parts = parse_url($url);
-		if ($url_parts === false)
-			return false;
-		if (isset ($url_parts["host"]))
-			$host = $url_parts["host"];
-		return $host;
-	}
-	
 	public function getSourceUrlProtocol($sourceUrl)
 	{
 		$protocol = null;
@@ -710,32 +737,89 @@ class KCurlWrapper
 		return $protocol;
 	}
 
-	public function setSourceUrlAndprotocol($sourceUrl)
+	public static function setSourceUrl($ch, $sourceUrl, &$protocol, $allowInternalUrl = false, $readHeader = false)
 	{
 		$sourceUrl = trim($sourceUrl);
-		try
+		if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
 		{
-			$url_parts = parse_url( $sourceUrl );
-			if ( isset ( $url_parts["scheme"] ) )
+			$sourceUrl = 'http://' . $sourceUrl;
+		}
+
+		$parts = parse_url($sourceUrl);
+		if (!isset($parts['scheme']) || !isset($parts['host']))
+		{
+			KalturaLog::log("Failed to parse url [$sourceUrl]");
+			return false;
+		}
+
+		if (!$allowInternalUrl && self::isInternalHost($parts['host']) && !self::isWhiteListedInternalUrl($sourceUrl))
+		{
+			KalturaLog::log("Url [$sourceUrl] is internal and not whiteListed");
+			return false;
+		}
+
+		if (in_array($parts['scheme'], array('ftp', 'ftps')))
+		{
+			$protocol = self::HTTP_PROTOCOL_FTP;
+		}
+		else
+		{
+			$protocol = self::HTTP_PROTOCOL_HTTP;
+		}
+
+		$userPwd = '';
+		if (isset($parts['user']) && isset($parts['pass']))
+		{
+			if (in_array($parts['scheme'], array('http', 'https')))
 			{
-				if ( $url_parts["scheme"] == "ftp" || $url_parts["scheme"] == "ftps" )
-					$this->protocol = self::HTTP_PROTOCOL_FTP;
-					
-				if ( in_array ($url_parts["scheme"], array ('http', 'https')) && isset ($url_parts['user']) )
-				{
-					curl_setopt ($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-				}
+				curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
 			}
 			
+			$userPwd = $parts['user'] . ':' . $parts['pass'];
+			curl_setopt($ch, CURLOPT_USERPWD, $userPwd);
 		}
-		catch ( Exception $exception )
+
+		$url = $parts['scheme'] . '://' . $parts['host'];
+		if (isset($parts['port']))
 		{
-			throw new Exception($exception->getMessage());
+			$url .= ':' . $parts['port'];
 		}
-		KalturaLog::info("Setting source URL to [$sourceUrl]");
+
+		if (isset($parts['path']))
+		{
+			$url .= $parts['path'];
+		}
+
+		if (isset($parts['query']))
+		{
+			$url .= '?' . $parts['query'];
+		}
+
+		$url = self::encodeUrl($url);
+
+		if ($sourceUrl != $url)
+		{
+			KalturaLog::info("Input url [$sourceUrl] final url [$url] userpwd [$userPwd]");
+		}
+		else
+		{
+			KalturaLog::info("Input url [$url]");
+		}
+		curl_setopt($ch, CURLOPT_URL, $url);
 		
-		$sourceUrl = self::encodeUrl($sourceUrl);
-		curl_setopt($this->ch, CURLOPT_URL, $sourceUrl);
+		$headerFunction = 'KCurlWrapper::read_header';
+		if ($readHeader)
+		{
+			$headerFunction .= '_store';
+		}
+		if (!$allowInternalUrl)
+		{
+			$headerFunction .= '_validate_redirect';
+		}
+
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, $headerFunction);
+
+		return true;
 	}
 
 	public function close()
@@ -750,16 +834,14 @@ class KCurlWrapper
 
 	public static function getContent($url, $headers = null, $allowInternalUrl = false)
 	{
-		if (!$allowInternalUrl && self::isInternalUrl($url) && !self::isWhiteListedInternalUrl($url))
+		$ch = curl_init();
+
+		// set URL and other appropriate options
+		if (!self::setSourceUrl($ch, $url, $protocol, $allowInternalUrl))
 		{
-			KalturaLog::debug("Exec Curl in getContent - Found Internal and not whiteListed url: $url");
 			return false;
 		}
 
-		$ch = curl_init();
-		
-		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_NOBODY, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

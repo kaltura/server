@@ -1,3 +1,44 @@
+# Propus 16.11.0  #
+
+## Reach - update reach_vendor response profile ##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+	
+First replace all tokens in the XML file below and remove ".template" from the file name:
+		
+		- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2020_11_03_update_reach_vendor_response_profiles.template.xml
+		
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/2020_11_03_update_reach_vendor_response_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add permission in Admin Console for disable preview page ##
+- Issue Type: Task
+- Issue ID: PLAT-11256
+
+### Configuration ###
+Add the following to admin.ini:
+
+moduls.disablePreviewPage.enabled = true
+moduls.disablePreviewPage.permissionType = 2
+moduls.disablePreviewPage.label = "Disable Preview Page"
+moduls.disablePreviewPage.permissionName = FEATURE_DISABLE_PREVIEW_PAGE
+moduls.disablePreviewPage.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None
+
 # Propus 16.10.0  #
 ## Dynamic batch schedulers allocation ##
 - Issue Type: Task

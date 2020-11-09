@@ -107,13 +107,24 @@
 				return self::DefaultChunkDuration*6;
 		}
 		
+		public static function getChunkConfigParam($param)
+		{
+			$chunkConfig = self::tryLoadSharedRemoteChunkConfig();
+			if(!$chunkConfig || !isset($chunkConfig[$param])) {
+				return null;
+			}
+			
+			return $chunkConfig[$param];
+		}
+		
 		public static function tryLoadSharedRemoteChunkConfig()
 		{
 			$configCacheFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'sharedRemoteChunkConfig_serialized.txt';
 			if(!kFile::checkFileExists($configCacheFileName))
 			{
 				$sharedStorageClientConfig = self::loadAndSaveSharedRemoteChunkConfig($configCacheFileName);
-				return self::setStorageRunParams($sharedStorageClientConfig);
+				self::setStorageRunParams($sharedStorageClientConfig);
+				return $sharedStorageClientConfig;
 			}
 			
 			$sharedStorageClientConfig = unserialize(kFile::getFileContent($configCacheFileName));
@@ -121,14 +132,16 @@
 			{
 				KalturaLog::debug("Config cache file no longer valid, Will reload config");
 				$sharedStorageClientConfig = self::loadAndSaveSharedRemoteChunkConfig($configCacheFileName);
-				return self::setStorageRunParams($sharedStorageClientConfig);
+				self::setStorageRunParams($sharedStorageClientConfig);
+				return $sharedStorageClientConfig;
 			}
 			else
 			{
-				KalturaLog::debug("Config cache file valid, return cached config: " . print_r($sharedStorageClientConfig, true));
+				KalturaLog::debug("Config cache file valid, returning cached config");
 			}
 			
-			return self::setStorageRunParams($sharedStorageClientConfig);
+			self::setStorageRunParams($sharedStorageClientConfig);
+			return $sharedStorageClientConfig;
 		}
 		
 		public static function loadAndSaveSharedRemoteChunkConfig($configCacheFileName)
@@ -137,10 +150,12 @@
 			$storageOptions = kConf::get('storage_options', 'cloud_storage', array());
 			$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
 			$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 120);
+			$ffmpegReconnectParams = kConf::get("ffmpeg_reconnect_params", "runtime_config", null);
 			
 			$chunkConvertSharedStorageConfig = array(
 				'arnRole' => $s3Arn,
 				'storageTypeMap' => $storageTypeMap,
+				'ffmpegReconnectParams' => $ffmpegReconnectParams,
 				's3Region' => isset($storageOptions['s3Region']) ? $storageOptions['s3Region'] : null,
 				'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
 			);

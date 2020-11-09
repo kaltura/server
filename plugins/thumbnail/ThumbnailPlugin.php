@@ -140,6 +140,7 @@ class ThumbnailPlugin extends KalturaPlugin implements IKalturaServices, IKaltur
 		$result = false;
 		if($this->shouldUseThumbnailAdapter($entry->getPartnerId()))
 		{
+			KalturaLog::info('Executing image transformation on ' . get_class($this));
 			$adapter = kThumbnailAdapterFactory::getAdapter($entry);
 			$params = kThumbnailAdapterFactory::getResizeThumbAdapterParameters($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
 				$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);

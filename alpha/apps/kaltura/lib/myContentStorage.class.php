@@ -69,6 +69,35 @@ class myContentStorage
 		return $res;
 		
 	}
+
+	public static function getThumbEntityPath($entityName, $entry, $thumbName, $fileName, $version)
+	{
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		if(myCloudUtils::isCloudDc($currentDcId))
+		{
+			$sharedTempBucket = myCloudUtils::getSharedTempBucket();
+			if($sharedTempBucket)
+			{
+				return $sharedTempBucket . self::getThumbEntitySharedPath($entry->getId(), $thumbName, $fileName, $version);
+			}
+		}
+
+		return self::getFSContentRootPath() . self::getGeneralEntityPath($entityName, $entry->getIntId(), $thumbName, $fileName, $version);
+	}
+
+	protected static function getThumbEntitySharedPath($entryId, $thumbName, $fileName , $version = null)
+	{
+		if( $version != null )
+		{
+			$ext = pathinfo ($fileName , PATHINFO_EXTENSION);
+			$fileName = $version . '.' . $ext;
+		}
+
+		$dir = self::getPathFromId($entryId);
+		$res = '/tempthumb/' . $dir . '/' .  $thumbName . '_' . $fileName;
+		return $res;
+	}
+
 /*
 	public static function dirForId ( $id )
 	{

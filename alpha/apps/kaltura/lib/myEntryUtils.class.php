@@ -7,6 +7,7 @@ class myEntryUtils
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
+	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 
 	static private $liveSourceType = array
 	(
@@ -755,59 +756,60 @@ class myEntryUtils
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
+
 		
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
 		//create final path for thumbnail created
-		$finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
-		
+		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry, $thumbName, $entryThumbFilename, $version);
+
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
 		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
 		
 		//create path for processing thumbnail request
-		$processingThumbPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
-		
+		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
+
 		if(!is_null($format))
 		{
 			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
-		
+
+		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
+		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
+		{
+			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
+			return $finalThumbPath;;
+		}
+
 		foreach ($thumbDirs as $thumbDir)
 		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath("entry/".$thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				if($currPath != $finalThumbPath)
-				{
-					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
-					if(!$moveFileSuccess)
-					{
-						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
-						header("X-Kaltura:cached-thumb-exists,".md5($currPath));
-						return $currPath;
-					}
-				}
-				
-				header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
-				return $finalThumbPath;
+				header("X-Kaltura:cached-thumb-exists,".md5($currPath));
+				return $currPath;;
 			}
 		}
-		
+
+		kFile::fullMkdir($processingThumbPath);
 		/* @var  $fileSync FileSync*/
 		if ($fileSync)
+		{
 			$orig_image_path = $fileSync->getFullPath();
-		
-		if ($orig_image_path === null || !file_exists($orig_image_path))
+		}
+
+		if ($orig_image_path === null || !kFile::checkFileExists($orig_image_path))
 		{
 			$fileSync = self::getEntryLocalImageFileSync($entry, $version);
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
+
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
 		
 		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
-		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !file_exists($orig_image_path))
+		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 		
 		// check a request for animated thumbs without a concrete vid_slice
@@ -821,7 +823,7 @@ class myEntryUtils
 		if ($multi)
 			$vid_slice = 0;
 		
-		$cacheLockKey = "thumb-processing-resize".$finalThumbPath;
+		$cacheLockKey = "thumb-processing-resize" . $finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
@@ -889,9 +891,9 @@ class myEntryUtils
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
-				$capturedThumbPath = $contentPath.myContentStorage::getGeneralEntityPath("entry/".$thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
+				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 	
-				$orig_image_path = $capturedThumbPath.self::TEMP_FILE_POSTFIX;
+				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
@@ -956,8 +958,6 @@ class myEntryUtils
 				$orig_image_path = $fileSync->createTempClear(); //will be deleted after the conversion
 				KalturaLog::debug("Creating Clear file at [$orig_image_path] for image conversion");
 			}
-
-			kFile::fullMkdir($processingThumbPath);
 
 			if ($thumbCaptureByPackager && $shouldResizeByPackager)
 			{
@@ -2215,7 +2215,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			foreach ($pluginInstances as $KalturaTransformationExecutor)
 			{
 				/* @var $KalturaTransformationExecutor IKalturaImageTransformationExecutor */
-				KalturaLog::info('Executing image transformation on ' . get_class($KalturaTransformationExecutor));
 				$result = $KalturaTransformationExecutor->getImageFile($entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
 					$vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec);
 
@@ -2229,14 +2228,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		catch (Exception $e)
 		{
 			kalturaLog::warning('Could not execute image transformation');
-			if(kConf::get('throw_on_failure', 'thumbnail', null))
-			{
-				throw $e;
-			}
-			else
-			{
-				kalturaLog::err("transformations failed with error {$e->getMessage()}");
-			}
+			throw $e;
 		}
 
 		return $result;

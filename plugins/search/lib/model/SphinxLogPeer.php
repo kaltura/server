@@ -39,24 +39,7 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 	 */
 	public static function retrieveByLastId(array $servers, $gap = 0, $limit = 1000, array $handledEntries = null, PropelPDO $con = null, $type = SphinxLogType::SPHINX)
 	{
-		$criteria = new Criteria();
-		$criterions = null;
-		if(count($servers))
-			$criterions = $criteria->getNewCriterion(SphinxLogPeer::ID, null, Criteria::ISNULL);
-		
-		foreach($servers as $server)
-		{
-			$dc = $server->getDc();
-			$crit = $criteria->getNewCriterion(SphinxLogPeer::ID, $server->getLastLogId() - $gap, Criteria::GREATER_THAN);
-			$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::DC, $dc));
-			if(!is_null($handledEntries)) {
-				$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::ID, $handledEntries[$dc], Criteria::NOT_IN));
-			}
-			$criterions->addOr($crit);
-		}
-		
-		if($criterions)
-			$criteria->addAnd($criterions);
+		$baseCriteria = new Criteria();
 
 		$disabledPartnerIds = array();
 		if ($type == SphinxLogType::SPHINX)
@@ -70,15 +53,41 @@ class SphinxLogPeer extends BaseSphinxLogPeer {
 
 		if ($disabledPartnerIds)
 		{
-			$criteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
+			$baseCriteria->add(SphinxLogPeer::PARTNER_ID, $disabledPartnerIds, Criteria::NOT_IN);
 		}
 
 		$types = array($type);
-		$criteria->add(SphinxLogPeer::TYPE, $types, Criteria::IN);
-		$criteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
-		$criteria->setLimit($limit);
+		$baseCriteria->add(SphinxLogPeer::TYPE, $types, Criteria::IN);
+		$baseCriteria->addAscendingOrderByColumn(SphinxLogPeer::ID);
+		$baseCriteria->setLimit($limit);
+		$baseCriteria->setForceIndex('dc_id');
 
-		return SphinxLogPeer::doSelect($criteria, $con);
+		$result = array();
+
+		foreach($servers as $server)
+		{
+			$criteria = clone $baseCriteria;
+
+			$dc = $server->getDc();
+			$criteria->add(SphinxLogPeer::DC, $dc);
+
+			$crit = $criteria->getNewCriterion(SphinxLogPeer::ID, $server->getLastLogId() - $gap, Criteria::GREATER_THAN);
+			if(!is_null($handledEntries)) {
+				$crit->addAnd($criteria->getNewCriterion(SphinxLogPeer::ID, $handledEntries[$dc], Criteria::NOT_IN));
+			}
+
+			$criteria->add($crit);
+
+			$rows = SphinxLogPeer::doSelect($criteria, $con);
+			foreach ($rows as $row)
+			{
+				$result[$row->getId()] = $row;
+			}
+		}
+
+		ksort($result, SORT_NUMERIC);
+
+		return array_values($result);
 	}
 	
 } // SphinxLogPeer

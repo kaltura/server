@@ -4014,11 +4014,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	protected function shouldAddCategoryPrivacyByContextsSearchData($categoryEntryStatus)
 	{
-		$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE);
-		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-		{
-			$privacyByContextCategoryEntryStatuses[] = CategoryEntryStatus::PENDING;
-		}
+		$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE, CategoryEntryStatus::PENDING);
 
 		return in_array($categoryEntryStatus, $privacyByContextCategoryEntryStatuses);
 	}
@@ -4386,5 +4382,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function isContainsAdminTag($adminTag)
 	{
 		return in_array($adminTag, explode(',', $this->getAdminTags()));
+	}
+
+
+	/**
+	 * allow edit or change related metadata
+	 * @return boolean
+	 */
+	public function allowEdit()
+	{
+		return true;
+		//return kCurrentContext::$is_admin_session || $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
 	}
 }

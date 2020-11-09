@@ -63,6 +63,7 @@ class KExternalErrors
 	const PLAYLIST_DURATION_IS_ZERO = 51;
 	const MISSING_LIVE_CONFIGURATION = 52;
 	const INVALID_AUTH_HEADER = 53;
+	const PREVIEW_PAGE_WAS_DISABLED = 54;
 	const HTTP_STATUS_NOT_FOUND = 404;
 
 	private static $errorCodeMap = array(
@@ -121,6 +122,7 @@ class KExternalErrors
 		self::INVALID_MIN_BITRATE => "min bitrate is not valid",
 		self::INVALID_PARAMETER => "Request parameter [%s] is invalid",
 		self::PLAYLIST_DURATION_IS_ZERO => "The duration of the playlist is zero",
+		self::PREVIEW_PAGE_WAS_DISABLED => 'Preview page was disabled',
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
 	);
 
