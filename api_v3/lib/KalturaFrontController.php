@@ -113,6 +113,10 @@ class KalturaFrontController
 			{
 				$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
 			}
+			catch (PropelException $ex)
+			{
+				throw $ex;
+			}
 			catch(Exception $ex)
 			{
 				$success = false;
