@@ -296,20 +296,20 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
-		$this->registerStreamWrappers();
+		kSharedFileSystemMgr::restoreStreamWrappers();
 		
 		$sourceFH = fopen($resource, 'rb');
 		if(!$sourceFH)
 		{
 			KalturaLog::err("Could not open source file [$resource] for read");
-			$this->unregisterStreamWrappers();
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 			return false;
 		}
 		
 		$uploadId = $this->createMultipartUpload($destFilePath);
 		if(!$uploadId)
 		{
-			$this->unregisterStreamWrappers();
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 			return false;
 		}
 		
@@ -324,7 +324,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$result = $this->multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath);
 			if(!$result)
 			{
-				$this->unregisterStreamWrappers();
+				kSharedFileSystemMgr::unRegisterStreamWrappers();
 				$this->abortMultipartUpload($destFilePath, $uploadId);
 				return false;
 			}
@@ -344,11 +344,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$result = $this->completeMultiPartUpload($destFilePath, $uploadId, $parts);
 		if(!$result)
 		{
-			$this->unregisterStreamWrappers();
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 			return false;
 		}
 		
-		$this->unregisterStreamWrappers();
+		kSharedFileSystemMgr::unRegisterStreamWrappers();
 		return true;
 	}
 	
@@ -856,19 +856,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		return false;
-	}
-	
-	
-	protected function registerStreamWrappers()
-	{
-		stream_wrapper_restore('http');
-		stream_wrapper_restore('https');
-	}
-	
-	protected function unregisterStreamWrappers()
-	{
-		stream_wrapper_unregister('https');
-		stream_wrapper_unregister('http');
 	}
 	
 	public function initBasicS3Params($filePath)
