@@ -104,7 +104,8 @@ class kPathManager
 		$cloudStorageObjectMap = kConf::get("cloud_storage_object_map", "cloud_storage", array());
 		if(in_array($objectKey, $cloudStorageObjectMap))
 		{
-			$storageProfileId = reset(kDataCenterMgr::getSharedStorageProfileIds(true));
+			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+			$storageProfileId = reset($storageProfileIds);
 		}
 		
 		return $storageProfileId;
