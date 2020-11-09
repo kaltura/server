@@ -100,9 +100,14 @@ class kPathManager
 	
 	public static function getStorageProfileIdForKey(FileSyncKey $key, $storageProfileId = null)
 	{
-		$objectKey = $key->getObjectType() . ":" . $key->getObjectSubType();
+		$objectKeys = array (
+			$key->getObjectType() . ":" . $key->getObjectSubType(),
+			$key->getObjectType() . ":" . '*',
+			'*' // WildCard
+		);
+		
 		$cloudStorageObjectMap = kConf::get("cloud_storage_object_map", "cloud_storage", array());
-		if(in_array($objectKey, $cloudStorageObjectMap))
+		if(array_intersect($objectKeys, $cloudStorageObjectMap))
 		{
 			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds(true);
 			$storageProfileId = reset($storageProfileIds);
