@@ -455,6 +455,12 @@ class serveFlavorAction extends kalturaAction
 		
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$fileName = $this->getRequestParameter( "fileName" );
+		$inDir = $this->getRequestParameter( "inDir", false);
+		$innerFileName = null;
+		if($inDir)
+		{
+			$innerFileName =  basename($fileName);
+		}
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
@@ -502,7 +508,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), true, $innerFileName);
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
