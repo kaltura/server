@@ -284,6 +284,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function fullMkdir($filePath)
 	{
+		if(kFile::isSharedPath($filePath))
+			return true;
+		
 		$filePath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $filePath);
 	
 		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
