@@ -72,12 +72,10 @@ class kEncryptFileUtils
         try
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
-	        
-            stream_wrapper_restore('http');
-	        stream_wrapper_restore('https');
-         
-	        $resolvedSrcFilePath = kFile::realPath($srcFilePath);
-	        $fd1 = fopen($resolvedSrcFilePath, "rb");
+            
+            kSharedFileSystemMgr::restoreStreamWrappers();
+            $resolvedSrcFilePath = kFile::realPath($srcFilePath);
+            $fd1 = fopen($resolvedSrcFilePath, "rb");
             if ($fd1 === false)
             {
                 return false;
@@ -93,11 +91,9 @@ class kEncryptFileUtils
             }
             fclose($fd1);
             fclose($fd2);
-	        
-            stream_wrapper_unregister ('http');
-	        stream_wrapper_unregister ('https');
+            kSharedFileSystemMgr::unRegisterStreamWrappers();
 	
-	        if (!$dstFilePath)
+            if (!$dstFilePath)
                 $dstFilePath = kFile::realPath($srcFilePath, false);
             // adding @ to avoid valid case which in 2 process creating clear file at the same time
             return @kFile::rename($tempPath, $dstFilePath);

@@ -681,4 +681,16 @@ abstract class kSharedFileSystemMgr
 	{
 		self::$storageConfig[$key] = $value;
 	}
+	
+	public static function restoreStreamWrappers()
+	{
+		stream_wrapper_restore('http');
+		stream_wrapper_restore('https');
+	}
+	
+	public static function unRegisterStreamWrappers()
+	{
+		stream_wrapper_unregister('http');
+		stream_wrapper_unregister('https');
+	}
 }
