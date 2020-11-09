@@ -133,7 +133,7 @@ class downloadAction extends sfAction
 		if ($fileExt && !$isDir)
 			$fileName = $fileName . '.' . $fileExt;
 
-		if(!$local)
+		if(!$local || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 		{
 			$this->handleFileSyncRedirection($fileSync, $flavorAsset, $entry->getId(), $fileName, $isDir);
 		}
@@ -250,7 +250,7 @@ class downloadAction extends sfAction
 		{
 			$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);
 		}
-		else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+		else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()) || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 		{
 			return;
 		}
@@ -266,8 +266,9 @@ class downloadAction extends sfAction
 	{
 		if($fileName)
 		{
-			$fileName = str_replace("\n", ' ', $fileName);
-			$fileName = kString::keepOnlyValidUrlChars($fileName);
+			$fileName = kString::removeNewLine($fileName);
+			$fileName = kString::stripInvalidUrlChars($fileName);
+			$fileName = rawurlencode($fileName);
 		}
 		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
 		KalturaLog::log ("URL to redirect to [$url]" );
