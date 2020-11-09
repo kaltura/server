@@ -28,8 +28,8 @@ class KalturaCaptionAssetFilter extends KalturaCaptionAssetBaseFilter
 		$this->entryIdEqual = null;
 		$this->entryIdIn =  implode(',', $entryIds);
 
-		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
-		
+		list($list, $totalCount) = $entryIds ? $this->doGetListResponse($pager, $types) : array(array(), 0);
+
 		$response = new KalturaCaptionAssetListResponse();
 		$response->objects = KalturaCaptionAssetArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $totalCount;

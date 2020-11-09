@@ -494,6 +494,50 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		return $delivery;
 	}
+
+	protected static function selectByCdnRatios($supportedDPs, $ratios, $key)
+	{
+		// group the delivery profiles by pricing profile
+		$dpsByPricingProfile = array();
+		foreach($supportedDPs as $delivery)
+		{
+			$cdnName = $delivery->getPricingProfile();
+
+			// prefer the first delivery profile if there are multiple on the same cdn
+			if (!isset($dpsByPricingProfile[$cdnName]))
+			{
+				$dpsByPricingProfile[$cdnName] = $delivery;
+			}
+		}
+
+		// filter the ratios leaving only those that have a supported delivery profile
+		$ratios = array_intersect_key($ratios, $dpsByPricingProfile);
+		$sum = array_sum($ratios);
+		if (!$sum)
+		{
+			return null;
+		}
+
+		// choose a profile according to the ratio, using key affinity
+		$index = crc32($key) % $sum;
+		$total = 0;
+		foreach($ratios as $cdnName => $ratio)
+		{
+			$total += $ratio;
+			if ($index >= $total)
+			{
+				continue;
+			}
+
+			$delivery = $dpsByPricingProfile[$cdnName];
+
+			KalturaLog::debug("delivery [" . $delivery->getId() . "], cdn [$cdnName], key [$key], index [$index], filtered ratios [" . print_r($ratios, true) . "]");
+			return $delivery;
+		}
+
+		return null;
+	}
+
 	/**
 	 * Selects between a list of deliveries by a requested media protocol
 	 * @param array $deliveries list of deliveries
@@ -537,27 +581,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$cdnRatios = kConf::getMap('cdn_ratios');
 		if ($cdnRatios && isset($cdnRatios[$partnerId]))
 		{
-			$ratios = $cdnRatios[$partnerId];
-			$sum = array_sum($ratios);
-			if ($sum)
+			$delivery = self::selectByCdnRatios($supportedDPs, $cdnRatios[$partnerId], $deliveryAttributes->getEntryId());
+			if ($delivery)
 			{
-				$entryIdAffinity = crc32($deliveryAttributes->getEntryId()) % $sum;
-				$total = 0;
-				foreach($ratios as $cdnName => $ratio)
-				{
-					$total += $ratio;
-					if ($entryIdAffinity >= $total)
-						continue;
-
-					foreach($supportedDPs as $delivery)
-					{
-						if ($delivery->getPricingProfile() == $cdnName) {
-							return $delivery;
-						}
-					}
-
-					break;
-				}
+				return $delivery;
 			}
 		}
 
