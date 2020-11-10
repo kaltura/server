@@ -124,11 +124,12 @@ class KExternalErrors
 		self::PLAYLIST_DURATION_IS_ZERO => "The duration of the playlist is zero",
 		self::PREVIEW_PAGE_WAS_DISABLED => 'Preview page was disabled',
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
+		self::HTTP_STATUS_NOT_FOUND => "HTTP/1.0 404 Not Found",
 	);
 
 	public static function dieError($errorCode, $message = null)
 	{
-		$description = array_key_exists($errorCode, self::$errorDescriptionMap) ? self::$errorDescriptionMap[$errorCode] : null;
+		$description = self::$errorDescriptionMap[$errorCode];
 		$args = func_get_args();
 		if (count($args) > 1) {
 			array_shift($args);
