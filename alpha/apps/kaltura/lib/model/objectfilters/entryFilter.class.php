@@ -780,5 +780,10 @@ class entryFilter extends baseObjectFilter
 		$this->set('_eq_parent_entry_id', ($v));
 	}
 
+	public function setRootEntryIdEqual($v)
+	{
+		$this->set('_eq_root_entry_id', ($v));
+	}
+
 }
 

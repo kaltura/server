@@ -3414,4 +3414,22 @@ class kFlowHelper
 		}
 		return $allFinished;
 	}
+
+	public static function deleteLiveEntryAssociatedVod(BaseObject $object)
+	{
+		$vodEntries = entryPeer::retrieveEntriesByRootEntryIdAndPartnerId($object->getId(), $object->getPartnerId());
+		if(!$vodEntries)
+		{
+			return;
+		}
+
+		foreach ($vodEntries as $entry)
+		{
+			if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+			{
+				myEntryUtils::deleteEntry($entry);
+			}
+		}
+
+	}
 }

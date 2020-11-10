@@ -784,6 +784,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	{
 		if($object instanceof UploadToken)
 			return true;
+
+		if($object instanceof LiveStreamEntry &&
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_ASSOCIATED_VOD, $object->getPartnerId()))
+			return true;
 			
 		return false;
 	}
@@ -822,7 +826,17 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		kFlowHelper::handleUploadCanceled($object);
+		if($object instanceof UploadToken)
+		{
+			kFlowHelper::handleUploadCanceled($object);
+		}
+
+		if($object instanceof LiveStreamEntry &&
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_ASSOCIATED_VOD, $object->getPartnerId()))
+		{
+			kFlowHelper::deleteLiveEntryAssociatedVod($object);
+		}
+
 		return true;
 	}
 

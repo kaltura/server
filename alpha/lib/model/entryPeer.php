@@ -931,6 +931,25 @@ class entryPeer extends BaseentryPeer
 		return $entry;
 	}
 
+	public static function retrieveEntriesByRootEntryIdAndPartnerId ($rootId, $partnerId)
+	{
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+
+		$filter = new entryFilter();
+		$filter->setRootEntryIdEqual($rootId);
+		$filter->setPartnerSearchScope($partnerId);
+		$filter->setDisplayInSearchEquel(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$filter->attachToCriteria($c);
+
+		$rootEntry = entryPeer::retrieveByPK($rootId);
+		if($rootEntry)
+			KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		$res = self::doSelect($c);
+		if($rootEntry)
+			KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_ENTRY);
+		return $res;
+	}
+
 }
 
 class entryPool
