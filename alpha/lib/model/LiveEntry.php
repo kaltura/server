@@ -511,11 +511,6 @@ abstract class LiveEntry extends entry
 				return false;
 		}
 
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
-		{
-			return true;
-		}
-
 		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
 		if(!count($liveEntryServerNodes))
 			return false;
@@ -723,10 +718,6 @@ abstract class LiveEntry extends entry
 
 	public function getLiveStatus()
 	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
-		{
-			return EntryServerNodeStatus::PLAYABLE;
-		}
 
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
 
