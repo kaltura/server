@@ -16,6 +16,8 @@ class KalturaFrontController
 	private $serializer;
 	private $exceptionHandlers = null;
 
+	protected static $serviceActionPropelErrors = array('system' => 'ping');
+
 	private function __construct()
 	{
 		$this->dispatcher = KalturaDispatcher::getInstance();
@@ -113,12 +115,16 @@ class KalturaFrontController
 			{
 				$result = $this->dispatcher->dispatch($this->service, $this->action, $this->params);
 			}
-			catch (PropelException $ex)
-			{
-				throw $ex;
-			}
 			catch(Exception $ex)
 			{
+				if ($ex instanceof PropelException &&
+					array_key_exists($this->service, self::$serviceActionPropelErrors) &&
+					($this->action === self::$serviceActionPropelErrors[$this->service]))
+				{
+					KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+					KExternalErrors::dieError(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+
+				}
 				$success = false;
 				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);

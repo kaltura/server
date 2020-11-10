@@ -128,7 +128,7 @@ class KExternalErrors
 
 	public static function dieError($errorCode, $message = null)
 	{
-		$description = self::$errorDescriptionMap[$errorCode];
+		$description = array_key_exists($errorCode, self::$errorDescriptionMap) ? self::$errorDescriptionMap[$errorCode] : null;
 		$args = func_get_args();
 		if (count($args) > 1) {
 			array_shift($args);
