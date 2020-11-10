@@ -1,3 +1,20 @@
+# Propus 16.12.0  #
+
+## Update permission of short link service ##
+
+ - Issue Type: Task
+ - Issue ID: PLAT-22445
+ 
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+Run deployment script:
+
+        - php deployment/updates/scripts/2020_11_01_short_link_remove_permission.php
+s
 # Propus 16.11.0  #
 
 ## Reach - update reach_vendor response profile ##
