@@ -892,4 +892,16 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		return $defaultValue;
 	}
+
+	/**
+	 * Calling to listAction on the required $service
+	 * @param $service
+	 * @param $filter
+	 * @param $pager
+	 * @return mixed|null
+	 */
+	public static function apiListCall($service, $filter, $pager)
+	{
+		return self::$kClient->$service->listAction($filter, $pager);
+	}
 }

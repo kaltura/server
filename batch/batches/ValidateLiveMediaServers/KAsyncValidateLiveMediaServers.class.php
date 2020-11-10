@@ -66,22 +66,22 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		}
 
 		//getting all esn of the simulive serverNode
-		$entryServerNodes = KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers', 'getEntryServerNodes'), array($simuliveServerNode->id));
+		$entryServerNodes = self::getEntryServerNodes($simuliveServerNode->id);
 
 		// getting currently live events
-		$currentlyLiveEvents = KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers', 'getSimulivePlayableEvents'), array());
+		$currentlyLiveEvents = self::getSimulivePlayableEvents();
 
-		// map between templateEntryId to sourceEntryId
-		$eventsMap = self::arrayColumn($currentlyLiveEvents, 'templateEntryId', 'sourceEntryId');
+		// map between templateEntryId to eventId
+		$eventsMap = self::arrayColumn($currentlyLiveEvents, 'templateEntryId', 'id');
 		// map between entryId to entryServerNode object
 		$entryServerNodesMap = self::arrayColumn($entryServerNodes, 'entryId');
 
-		foreach ($eventsMap as $templateEntryId => $sourceEntryId)
+		foreach ($eventsMap as $templateEntryId => $eventId)
 		{
 			// event exist but there's no entry serverNode - create the entryServerNode (only for simulve - has sourceEntryId)
-			if ($templateEntryId && $sourceEntryId && !array_key_exists($templateEntryId, $entryServerNodesMap))
+			if ($templateEntryId && !array_key_exists($templateEntryId, $entryServerNodesMap))
 			{
-				KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers', 'registerMediaServer'), array($templateEntryId));
+				KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers', 'registerSimuliveMediaServer'), array($templateEntryId));
 			}
 		}
 
@@ -173,16 +173,18 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	}
 
 	/**
-	 * Filter and take only the events that currently live and playable (considering preStart / postEnd)
+	 * Filter and take only the simulive (has sourceEntryId) events that currently live and playable (considering preStart / postEnd)
 	 * @param array<KalturaLiveStreamScheduleEvent> $events
 	 * @return array<KalturaLiveStreamScheduleEvent>
 	 */
-	protected static function filterPlayableEvents($events)
+	protected static function filterSimulivePlayableEvents($events)
 	{
 		return array_filter($events, function ($event) {
 			$now = time();
 			/* @var $event KalturaLiveStreamScheduleEvent */
-			return $now >= ($event->startDate - $event->preStartTime + self::MINIMUM_TIME_TO_PLAYABLE_SEC) && $now <= ($event->endDate + $event->postEndTime);
+			return $event->sourceEntryId
+				&& ($now >= ($event->startDate - $event->preStartTime + self::MINIMUM_TIME_TO_PLAYABLE_SEC))
+				&& ($now <= ($event->endDate + $event->postEndTime));
 		});
 	}
 
@@ -219,13 +221,12 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$simuliveEventsMerged = array();
 		$simuliveEventsFilter = self::getSimuliveEventsFilter();
 		$simuliveEventsPager = self::getDefaultPager();
-		$simuliveEvents = self::$kClient->scheduleEvent->listAction($simuliveEventsFilter, $simuliveEventsPager);
-
-		while ($simuliveEvents->objects && count($simuliveEvents->objects))
+		$simuliveEvents = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("scheduleEvent", $simuliveEventsFilter, $simuliveEventsPager));
+		while ($simuliveEvents && $simuliveEvents->objects && count($simuliveEvents->objects))
 		{
-			$simuliveEventsMerged = array_merge($simuliveEventsMerged, self::filterPlayableEvents($simuliveEvents->objects));
+			$simuliveEventsMerged = array_merge($simuliveEventsMerged, self::filterSimulivePlayableEvents($simuliveEvents->objects));
 			$simuliveEventsPager->pageIndex++;
-			$simuliveEvents = self::$kClient->scheduleEvent->listAction($simuliveEventsFilter, $simuliveEventsPager);
+			$simuliveEvents = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("scheduleEvent", $simuliveEventsFilter, $simuliveEventsPager));
 		}
 		return $simuliveEventsMerged;
 	}
@@ -241,12 +242,12 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
 		$entryServerNodeFilter->serverNodeIdEqual = $serverNodeId;
 		$entryServerNodePager = self::getDefaultPager();
-		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
-		while ($entryServerNodes->objects && count($entryServerNodes->objects))
+		$entryServerNodes = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("entryServerNode", $entryServerNodeFilter, $entryServerNodePager));
+		while ($entryServerNodes && $entryServerNodes->objects && count($entryServerNodes->objects))
 		{
 			$entryServerNodesMerged = array_merge($entryServerNodesMerged, $entryServerNodes->objects);
 			$entryServerNodePager->pageIndex++;
-			$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
+			$entryServerNodes = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("entryServerNode", $entryServerNodeFilter, $entryServerNodePager));
 		}
 		return $entryServerNodesMerged;
 	}
@@ -276,7 +277,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	 * Static function to call to LiveStreamService->registerMediaServer
 	 * @param string $entryId
 	 */
-	protected static function registerMediaServer($entryId)
+	protected static function registerSimuliveMediaServer($entryId)
 	{
 		self::$kClient->liveStream->registerMediaServer($entryId, self::SIMULIVE_HOSTNAME, KalturaEntryServerNodeType::LIVE_PRIMARY, null, KalturaEntryServerNodeStatus::PLAYABLE, false);
 	}
