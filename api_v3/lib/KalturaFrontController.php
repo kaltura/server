@@ -122,7 +122,7 @@ class KalturaFrontController
 					(in_array($this->action, self::$serviceActionPropelErrors[$this->service])))
 				{
 					KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
-					KExternalErrors::dieError(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+					KExternalErrors::dieError(KExternalErrors::DATABASE_ERROR);
 
 				}
 				$success = false;

@@ -64,6 +64,7 @@ class KExternalErrors
 	const MISSING_LIVE_CONFIGURATION = 52;
 	const INVALID_AUTH_HEADER = 53;
 	const PREVIEW_PAGE_WAS_DISABLED = 54;
+	const DATABASE_ERROR = 55;
 	const HTTP_STATUS_NOT_FOUND = 404;
 
 	private static $errorCodeMap = array(
@@ -124,7 +125,7 @@ class KExternalErrors
 		self::PLAYLIST_DURATION_IS_ZERO => "The duration of the playlist is zero",
 		self::PREVIEW_PAGE_WAS_DISABLED => 'Preview page was disabled',
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
-		self::HTTP_STATUS_NOT_FOUND => "HTTP/1.0 404 Not Found",
+		self::DATABASE_ERROR => 'Database error',
 	);
 
 	public static function dieError($errorCode, $message = null)
