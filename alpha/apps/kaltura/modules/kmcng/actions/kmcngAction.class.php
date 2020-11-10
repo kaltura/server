@@ -176,6 +176,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		$config = array(
+			'ks' =>  $_SERVER['REQUEST_METHOD'] == 'POST' ? $_COOKIE['kmcks'] : null,
 			'kalturaServer' => array(
 				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
