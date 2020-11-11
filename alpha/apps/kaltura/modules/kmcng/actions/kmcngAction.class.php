@@ -176,7 +176,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		$config = array(
-			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST) ? $this->getRequest()->getCookie('kmcks') : null,
+			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getRequest()->getParameter('ks') : null,
 			'kalturaServer' => array(
 				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
