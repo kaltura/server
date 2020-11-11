@@ -396,7 +396,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			return $this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 		}
 
-		$isLive = $this->isExternalLive($liveStreamEntry, $protocol);
+		$isLive = $this->isExternalEntryLive($liveStreamEntry, $protocol);
 		if ($isLive !== null)
 		{
 			return $this->responseHandlingIsLive($isLive);
@@ -404,7 +404,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
 	}
 
-	private function isExternalLive(LiveEntry $liveStreamEntry, $protocol = null)
+	private function isExternalEntryLive(LiveEntry $liveStreamEntry, $protocol = null)
 	{
 		$dpda = new DeliveryProfileDynamicAttributes();
 		$dpda->setEntryId($liveStreamEntry->getId());
@@ -691,7 +691,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		if ($liveStreamEntry->getSource() === EntrySourceType::MANUAL_LIVE_STREAM)
 		{
 			$res = new KalturaLiveStreamDetails();
-			$res->broadcastStatus = $this->isExternalLive($liveStreamEntry) ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
+			$res->broadcastStatus = $this->isExternalEntryLive($liveStreamEntry) ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
 			return $res;
 		}
 
