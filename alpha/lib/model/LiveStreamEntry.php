@@ -103,8 +103,12 @@ class LiveStreamEntry extends LiveEntry
 		return $url;
 	}
 
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
+	public function getLiveStreamConfigurations($protocol = null, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
 	{
+		if(!$protocol)
+		{
+			$protocol = requestUtils::getProtocol();
+		}
 		$configurations =  parent::getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds, $format);
 		if($format == PlaybackProtocol::APPLE_HTTP && !in_array($this->getSource(), self::$kalturaLiveSourceTypes) && $this->getHlsStreamUrl())
 		{
