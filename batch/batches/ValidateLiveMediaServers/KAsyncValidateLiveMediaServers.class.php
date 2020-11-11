@@ -72,9 +72,9 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$currentlyLiveEvents = self::getSimulivePlayableEvents();
 
 		// map between templateEntryId to eventId
-		$eventsMap = self::arrayColumn($currentlyLiveEvents, 'templateEntryId', 'id');
+		$eventsMap = self::arrayColumn($currentlyLiveEvents, 'id', 'templateEntryId');
 		// map between entryId to entryServerNode object
-		$entryServerNodesMap = self::arrayColumn($entryServerNodes, 'entryId');
+		$entryServerNodesMap = self::arrayColumn($entryServerNodes, null, 'entryId');
 
 		foreach ($eventsMap as $templateEntryId => $eventId)
 		{
@@ -140,10 +140,10 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 	 */
 	protected static function getDefaultPager()
 	{
-		$entryServerNodePager = new KalturaFilterPager();
-		$entryServerNodePager->pageSize = 500;
-		$entryServerNodePager->pageIndex = 1;
-		return $entryServerNodePager;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
+		return $pager;
 	}
 
 	public static function getExcludeServerNodesFromAPI($serverTypesNotIn)
@@ -221,12 +221,12 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$simuliveEventsMerged = array();
 		$simuliveEventsFilter = self::getSimuliveEventsFilter();
 		$simuliveEventsPager = self::getDefaultPager();
-		$simuliveEvents = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("scheduleEvent", $simuliveEventsFilter, $simuliveEventsPager));
+		$simuliveEvents = self::apiListCall('scheduleEvent', $simuliveEventsFilter, $simuliveEventsPager);
 		while ($simuliveEvents && $simuliveEvents->objects && count($simuliveEvents->objects))
 		{
 			$simuliveEventsMerged = array_merge($simuliveEventsMerged, self::filterSimulivePlayableEvents($simuliveEvents->objects));
 			$simuliveEventsPager->pageIndex++;
-			$simuliveEvents = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("scheduleEvent", $simuliveEventsFilter, $simuliveEventsPager));
+			$simuliveEvents = self::apiListCall('scheduleEvent', $simuliveEventsFilter, $simuliveEventsPager);
 		}
 		return $simuliveEventsMerged;
 	}
@@ -242,35 +242,14 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		$entryServerNodeFilter = new KalturaEntryServerNodeFilter();
 		$entryServerNodeFilter->serverNodeIdEqual = $serverNodeId;
 		$entryServerNodePager = self::getDefaultPager();
-		$entryServerNodes = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("entryServerNode", $entryServerNodeFilter, $entryServerNodePager));
+		$entryServerNodes = self::apiListCall('entryServerNode', $entryServerNodeFilter, $entryServerNodePager);
 		while ($entryServerNodes && $entryServerNodes->objects && count($entryServerNodes->objects))
 		{
 			$entryServerNodesMerged = array_merge($entryServerNodesMerged, $entryServerNodes->objects);
 			$entryServerNodePager->pageIndex++;
-			$entryServerNodes = KBatchBase::tryExecuteApiCall(array('KBatchBase', 'apiListCall'), array("entryServerNode", $entryServerNodeFilter, $entryServerNodePager));
+			$entryServerNodes = self::apiListCall('entryServerNode', $entryServerNodeFilter, $entryServerNodePager);
 		}
 		return $entryServerNodesMerged;
-	}
-
-	/**
-	 * Return the new array with key as $id and value as $value (or the object as value if $value not given)
-	 * (this function exists in PHP versions of >=5.5.0)
-	 * @param array $arr - the array to manipulate on
-	 * @param $id - the new id
-	 * @param $value - the new value
-	 * @return array or empty array if $arr isn't array
-	 */
-	protected static function arrayColumn($arr, $id, $value = null)
-	{
-		$res = array();
-		if (is_array($arr))
-		{
-			foreach ($arr as $e)
-			{
-				$res[$e->$id] = $value ? $e->$value : $e;
-			}
-		}
-		return $res;
 	}
 
 	/**

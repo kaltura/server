@@ -902,6 +902,34 @@ abstract class KBatchBase implements IKalturaLogger
 	 */
 	public static function apiListCall($service, $filter, $pager)
 	{
-		return self::$kClient->$service->listAction($filter, $pager);
+		return self::tryExecuteApiCall(array(self::$kClient->$service, 'listAction'), array($filter, $pager));
+	}
+
+	/**
+	 * Return the new array with key as $id and value as $value (or the object as value if $value not given)
+	 * (this function exists in PHP versions of >=5.5.0 as array_column)
+	 * @param array $array - the array to manipulate on
+	 * @param $column - The column of values to return (or the original object if $column is null)
+	 * @param $index_key - [optional] The column to use as the index/keys for the returned array.
+	 * @return array or empty array if $arr isn't array
+	 */
+	protected static function arrayColumn(array $array, $column, $index_key = null)
+	{
+	// implementation equivalent to array_column($array, $column, $index_key)
+		$res = array();
+		if (is_array($array))
+		{
+			foreach ($array as $e)
+			{
+				if ($index_key)
+				{
+					$res[$e->$index_key] = $column ? $e->$column : $e;
+				} else
+				{
+					$res[] = $column ? $e->$column : $e;
+				}
+			}
+		}
+		return $res;
 	}
 }
