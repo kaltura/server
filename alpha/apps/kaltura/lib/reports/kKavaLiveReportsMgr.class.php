@@ -32,7 +32,7 @@ class kKavaLiveReportsMgr extends kKavaBase
 
 	protected static function initQueryCache()
 	{
-		if (self::$query_cache && self::$query_cache_expiration)
+		if (self::$query_cache)
 		{
 			return;
 		}
