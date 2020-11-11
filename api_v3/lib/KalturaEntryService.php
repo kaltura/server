@@ -1869,8 +1869,12 @@ class KalturaEntryService extends KalturaBaseService
 			{
 				$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+				//To-Do Change the import flow for periodic storage file syncs to work natively with the shared storage flow
 				/* @var $fileSync FileSync */
-				if ($fileSync && !$local)
+				if ( $fileSync && (!$local ||
+						($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL &&
+							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds(true)) )
+					))
 				{
 					$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
 					if(myEntryUtils::shouldValidateLocal() && $fileSync->getDc() == $remoteDc)
