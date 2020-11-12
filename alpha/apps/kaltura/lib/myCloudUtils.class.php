@@ -28,6 +28,6 @@ class myCloudUtils
 	{
 		$exportRatio = kConf::get(self::THUMB_EXPORT_RATIO_PARAM, self::CLOUD_STORAGE_MAP, 0);
 		$random = mt_rand(0, 99);
-		return $exportRatio < $random;
+		return $exportRatio > $random;
 	}
 }
