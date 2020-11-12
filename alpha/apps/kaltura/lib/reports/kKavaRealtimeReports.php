@@ -2,6 +2,7 @@
 
 class kKavaRealtimeReports extends kKavaReportsMgr
 {
+	const REALTIME_QUERY_CACHE_EXPIRATION = 30;
 
 	protected static $reports_def = array(
 
@@ -364,6 +365,12 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		);
 	}
 
+	protected static function initQueryCache()
+	{
+		self::$query_cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES);
+		self::$query_cache_expiration = self::REALTIME_QUERY_CACHE_EXPIRATION;
+	}
+
 	public static function getReportDef($report_type, $input_filter)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
@@ -373,6 +380,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		}
 
 		self::initTransformTimeDimensions();
+		self::initQueryCache();
 
 		//default datasource
 		if (!isset($report_def[self::REPORT_JOIN_GRAPHS]) && !isset($report_def[self::REPORT_DATA_SOURCE]))
