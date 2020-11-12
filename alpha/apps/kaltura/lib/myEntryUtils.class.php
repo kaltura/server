@@ -8,6 +8,7 @@ class myEntryUtils
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
+	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 
 	static private $liveSourceType = array
 	(
@@ -778,17 +779,31 @@ class myEntryUtils
 		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
 		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
-			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
-			return $finalThumbPath;;
+			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+			return $finalThumbPath;
 		}
 
 		foreach ($thumbDirs as $thumbDir)
 		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version);
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				header("X-Kaltura:cached-thumb-exists,".md5($currPath));
-				return $currPath;;
+				if(myCloudUtils::shouldExportThumbToCloud())
+				{
+					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+					if($moveFileSuccess)
+					{
+						header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+						return $finalThumbPath;
+					}
+					else
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+					}
+				}
+
+				header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
+				return $currPath;
 			}
 		}
 
