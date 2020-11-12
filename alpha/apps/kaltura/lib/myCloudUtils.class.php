@@ -27,7 +27,7 @@ class myCloudUtils
 	public static function shouldExportThumbToCloud()
 	{
 		$exportRatio = kConf::get(self::THUMB_EXPORT_RATIO_PARAM, self::CLOUD_STORAGE_MAP, 0);
-		$random = rand(0, 99);
+		$random = mt_rand(0, 99);
 		return $exportRatio < $random;
 	}
 }
