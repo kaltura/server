@@ -161,10 +161,10 @@ class kReachUtils
 		return $remainingCredit >= 0 ? true : false;
 	}
 	
-	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version)
+	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission)
 	{
 		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		if($activeTask)
+		if($activeTask && !$allowResubmission)
 			return true;
 		
 		return false;
@@ -197,7 +197,7 @@ class kReachUtils
 	 */
 	public static function getEntryVendorTaskCsvHeaders()
 	{
-		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription');
+		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription','allowResubmission');
 	}
 
 	/**
@@ -205,7 +205,7 @@ class kReachUtils
 	 */
 	public static function getVendorCatalogItemsCsvHeaders()
 	{
-		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId');
+		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId','allowResubmission');
 	}
 
 
