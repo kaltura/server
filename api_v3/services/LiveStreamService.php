@@ -384,12 +384,6 @@ class LiveStreamService extends KalturaLiveEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
 
 		/* @var $liveStreamEntry LiveStreamEntry */
-	
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
 
 		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
@@ -680,11 +674,6 @@ class LiveStreamService extends KalturaLiveEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
 		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
-			$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-			if ($simuliveCondCacheTime)
-			{
-				KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-			}
 			$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 			return $this->getLiveStreamDetails($id, $liveStreamEntry);
 		}
