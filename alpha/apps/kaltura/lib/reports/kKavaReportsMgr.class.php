@@ -2157,7 +2157,6 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
 				self::DRUID_VALUES => $playback_types
 			);
-			$input_filter->playback_types = "";
 		}
 		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) && !isset($input_filter->playback_types))
 		{
@@ -2166,7 +2165,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_VALUES => array(self::PLAYBACK_TYPE_VOD)
 			);
 		}
-		
+
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
