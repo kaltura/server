@@ -376,7 +376,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		{
 			$liveStreamEntry = entryPeer::retrieveByPK($id);
 		}
-		
+
 		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
 
@@ -384,7 +384,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
 
 		/* @var $liveStreamEntry LiveStreamEntry */
-	
+
 		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
 		if ($simuliveCondCacheTime)
 		{
@@ -395,9 +395,19 @@ class LiveStreamService extends KalturaLiveEntryService
 		{
 			return $this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 		}
+
+		$isLive = $this->isExternalEntryLive($liveStreamEntry, $protocol);
+		if ($isLive !== null) {
+			return $this->responseHandlingIsLive($isLive);
+		}
+		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+    }
+
+    private function isExternalEntryLive(LiveEntry $liveStreamEntry, $protocol = null)
+    {
 		
 		$dpda= new DeliveryProfileDynamicAttributes();
-		$dpda->setEntryId($id);
+		$dpda->setEntryId($liveStreamEntry->getId());
 		$dpda->setFormat($protocol);
 		
 		switch ($protocol)
@@ -426,7 +436,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 				$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
 				if ($urlManager || $urlManagerBackup)
-					return $this->responseHandlingIsLive(self::isLiveByUrlManager($urlManager, $url) || self::isLiveByUrlManager($urlManagerBackup, $backupUrl));
+					return self::isLiveByUrlManager($urlManager, $url) || self::isLiveByUrlManager($urlManagerBackup, $backupUrl);
 
 				break;
 			case KalturaPlaybackProtocol::HDS:
@@ -438,7 +448,7 @@ class LiveStreamService extends KalturaLiveEntryService
 					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
 					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 					if($urlManager)
-						return $this->responseHandlingIsLive($urlManager->isLive($url));
+						return $urlManager->isLive($url);
 				}
 				break;
 
@@ -453,7 +463,7 @@ class LiveStreamService extends KalturaLiveEntryService
 					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
 					if($urlManager)
 					{
-						$resultIsLive = $this->responseHandlingIsLive($urlManager->isLive($url));
+						$resultIsLive = $urlManager->isLive($url);
 						if ($resultIsLive)
 						{
 							return $resultIsLive;
@@ -467,7 +477,7 @@ class LiveStreamService extends KalturaLiveEntryService
 				break;
 		}
 		
-		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+		return null;
 	}
 
 	private function responseHandlingIsLive($isLive)
@@ -676,7 +686,17 @@ class LiveStreamService extends KalturaLiveEntryService
 			{
 				KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
 			}
+			$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 			return $this->getLiveStreamDetails($id, $liveStreamEntry);
+		}
+
+		if ($liveStreamEntry->getSource() === EntrySourceType::MANUAL_LIVE_STREAM)
+		{
+			$res = new KalturaLiveStreamDetails();
+			$isLive = $this->isExternalEntryLive($liveStreamEntry);
+			$this->responseHandlingIsLive($isLive);
+			$res->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
+			return $res;
 		}
 
 		throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
@@ -728,7 +748,6 @@ class LiveStreamService extends KalturaLiveEntryService
 				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 			}
 		}
-		$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 
 		if (kSimuliveUtils::getPlayableSimuliveEvent($liveStreamEntry))
 		{
