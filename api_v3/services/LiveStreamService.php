@@ -730,10 +730,6 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 
-		if (kSimuliveUtils::getPlayableSimuliveEvent($liveStreamEntry))
-		{
-			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
-		}
 		return $res;
 	}
 
