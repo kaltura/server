@@ -574,15 +574,20 @@ class kFlowHelper
 		//Check if src remote file was pushed, if so mark it as ready
 		$fileSyncRemoteUrl = $data->getSrcFileSyncRemoteUrl();
 		$fileSyncLocalPath = $data->getSrcFileSyncLocalPath();
-		if($fileSyncRemoteUrl && kFile::fileSize($fileSyncLocalPath) == kFile::fileSize($fileSyncRemoteUrl))
+		if($fileSyncRemoteUrl)
 		{
-			//get pending file sync to shared storage
-			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-			$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
-			if($pendingFileSync && $pendingFileSync->getFullPath() == $fileSyncRemoteUrl)
+			$localFileSize = kFile::fileSize($fileSyncLocalPath);
+			$remoteFileSize = kFile::fileSize($fileSyncRemoteUrl);
+			KalturaLog::debug("local file [$fileSyncLocalPath] size [$localFileSize] remote file [$fileSyncRemoteUrl] size [$remoteFileSize]");
+			if($localFileSize == $remoteFileSize)
 			{
-				$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-				$pendingFileSync->save();
+				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+				$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+				if($pendingFileSync && $pendingFileSync->getFullPath() == $fileSyncRemoteUrl)
+				{
+					$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+					$pendingFileSync->save();
+				}
 			}
 		}
 		
