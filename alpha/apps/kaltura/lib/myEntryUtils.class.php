@@ -820,9 +820,22 @@ class myEntryUtils
 			$orig_image_path = self::getLocalImageFilePathByEntry( $entry, $version );
 		}
 
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($orig_image_path);
+		if($isRemote)
+		{
+			$orig_image_baseName = basename($orig_image_path);
+			if(file_exists(sys_get_temp_dir() . $orig_image_baseName))
+			{
+				$orig_image_path = sys_get_temp_dir() . $orig_image_baseName;
+			}
+			else
+			{
+				$orig_image_path = kFile::getExternalFile($remoteUrl, sys_get_temp_dir(), $orig_image_baseName);
+			}
+
+		}
+
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
-		
-		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
 		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
