@@ -197,7 +197,7 @@ class kReachUtils
 	 */
 	public static function getEntryVendorTaskCsvHeaders()
 	{
-		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription','allowResubmission');
+		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription');
 	}
 
 	/**
