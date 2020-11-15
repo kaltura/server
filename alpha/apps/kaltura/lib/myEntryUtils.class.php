@@ -703,6 +703,7 @@ class myEntryUtils
 			return $result;
 		}
 
+		$filesToClean = array();
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
 
@@ -821,6 +822,15 @@ class myEntryUtils
 		}
 
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($orig_image_path);
+		if($isRemote)
+		{
+			$orig_image_baseName = basename($orig_image_path);
+			$orig_image_path = kFile::getExternalFile($remoteUrl, sys_get_temp_dir(), $orig_image_baseName);
+			$filesToClean[] = $orig_image_path;
+
+		}
+
 		// remark added so ffmpeg will try to load the thumbnail from the original source
 		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
@@ -905,7 +915,6 @@ class myEntryUtils
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
-	
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
@@ -1054,7 +1063,15 @@ class myEntryUtils
 		{
 			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
-				
+
+		foreach ($filesToClean as $file)
+		{
+			if(file_exists($file))
+			{
+				unlink($file);
+			}
+		}
+
 		return $finalThumbPath;
 	}
 
