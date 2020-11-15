@@ -75,6 +75,7 @@ class BumperService extends KalturaBaseService
 	 * @action delete
 	 * @param string $entryId
 	 * @return KalturaBumper  empty object object
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::INVALID_USER_ID
 	 */
 	public function deleteAction($entryId)
