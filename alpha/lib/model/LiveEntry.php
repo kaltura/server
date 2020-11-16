@@ -70,7 +70,7 @@ abstract class LiveEntry extends entry
 		
 		return myEntryUtils::resizeEntryImage($this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see entry::validateFileSyncSubType($sub_type)
 	 */
@@ -499,11 +499,84 @@ abstract class LiveEntry extends entry
 		return $events;
 	}
 
+	public function isCurrentlyLive($currentDcOnly = false, $protocol = null)
+	{
+		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		{
+			return $this->isInternalCurrentlyLive($currentDcOnly);
+		}
+		else
+		{
+			return $this->isExternalCurrentlyLive($protocol);
+		}
+
+	}
+
+	private function isExternalCurrentlyLive($reqProtocol = null)
+	{
+		$isLive = null;
+		$protocols = array();
+		switch ($reqProtocol)
+		{
+			case KalturaPlaybackProtocol::HLS:
+			case KalturaPlaybackProtocol::APPLE_HTTP:
+				$protocols = array_unique(array($reqProtocol, KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP));
+				break;
+			case KalturaPlaybackProtocol::HDS:
+			case KalturaPlaybackProtocol::AKAMAI_HDS:
+				$protocols = array($reqProtocol);
+				break;
+
+			case null:
+				$configurations = $this->getLiveStreamConfigurations(requestUtils::getProtocol());
+				foreach ($configurations as $config)
+				{
+					$protocols[] = $config->getProtocol();
+				}
+				break;
+		}
+
+		foreach($protocols as $protocol)
+		{
+			$isLive = $this->checkIsLiveByProtocol($protocol, $dpda);
+			if ($isLive !== null)
+				break;
+		}
+
+		return $isLive;
+	}
+
+	private function checkIsLiveByProtocol($protocol) {
+		$config = $this->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
+		if ($config)
+		{
+			$url = $config->getUrl();
+			$backupUrl = $config->getBackupUrl();
+
+			$dpda = new DeliveryProfileDynamicAttributes();
+			$dpda->setEntryId($this->getId());
+			$dpda->setFormat($config->getProtocol());
+			KalturaLog::info("Determining status of live stream URL [ $url ] and Backup URL [ $backupUrl ]");
+
+			$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+			if ($urlManager)
+			{
+				return $urlManager->isLive($url);
+			}
+			$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
+			if ($urlManagerBackup)
+			{
+				return $urlManagerBackup->isLive($backupUrl);
+			}
+		}
+		return null;
+	}
+
 
 	/**
 	 * @return boolean
 	 */
-	public function isCurrentlyLive($currentDcOnly = false)
+	public function isInternalCurrentlyLive($currentDcOnly = false)
 	{
 		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
@@ -723,7 +796,7 @@ abstract class LiveEntry extends entry
 
 	public function getLiveStatus()
 	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
+		if ($this->isCurrentlyLive())
 		{
 			return EntryServerNodeStatus::PLAYABLE;
 		}
