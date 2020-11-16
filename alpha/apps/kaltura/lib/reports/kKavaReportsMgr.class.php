@@ -5411,7 +5411,8 @@ class kKavaReportsMgr extends kKavaBase
 		$criteria->applyFilters();
 		$live_now_entries = $criteria->getFetchedIds();
 		$simulive_and_manual = self::getCurrentlyLiveSimuliveAndManualEntries($partner_id);
-		return array_merge($live_now_entries, $simulive_and_manual);
+		$entries = array_unique(array_merge($live_now_entries, $simulive_and_manual));
+		return array_values($entries);
 	}
 
 	protected static function getCurrentlyLiveSimuliveAndManualEntries($partner_id) {
@@ -5437,7 +5438,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		return $live_entries_ids;
 	}
-	
+
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
 	{
 		$headers = $result[0];
