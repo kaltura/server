@@ -81,9 +81,9 @@ $retries=3;
 			$this->CleanUp();
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
-			if(file_exists($this->chunker->getSessionName())) {
-				kFile::rename($this->chunker->getSessionName(), $this->chunker->params->output);
-			}
+//			if(file_exists($this->chunker->getSessionName())) {
+//				kFile::rename($this->chunker->getSessionName(), $this->chunker->params->output);
+//			}
 			return true;
 		}
 		

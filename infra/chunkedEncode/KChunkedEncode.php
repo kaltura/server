@@ -1046,7 +1046,8 @@
 		{
 			switch($mode){
 			case "merged":
-				$name = $this->setup->output."_merged";
+				$name = $this->params->output;
+				//$name = $this->setup->output."_merged";
 				break;
 			case "audio":
 				$name = $this->setup->output."_audio";
