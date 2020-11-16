@@ -821,8 +821,6 @@ class myEntryUtils
 		}
 
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
-		
-		
 		// remark added so ffmpeg will try to load the thumbnail from the original source
 		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);

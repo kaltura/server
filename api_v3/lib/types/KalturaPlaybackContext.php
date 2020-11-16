@@ -32,12 +32,18 @@ class KalturaPlaybackContext extends KalturaObject{
 	 */
 	public $messages;
 
+	/**
+	* @var KalturaTypedArray
+	*/
+	public $bumperData;
+
 	private static $mapBetweenObjects = array
 	(
 		'playbackCaptions',
 		'flavorAssets',
 		'sources',
 		'messages',
+		'bumperData',
 	);
 
 	/* (non-PHPdoc)
