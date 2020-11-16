@@ -82,7 +82,7 @@ $retries=3;
 			
 			$this->returnStatus = KChunkedEncodeReturnStatus::OK;
 			if(file_exists($this->chunker->getSessionName())) {
-				copy($this->chunker->getSessionName(), $this->chunker->params->output);
+				kFile::rename($this->chunker->getSessionName(), $this->chunker->params->output);
 			}
 			return true;
 		}
@@ -442,7 +442,7 @@ $retries=3;
 			}
 			
 			KalturaLog::log("$msgStr");
-			KalturaLog::log("OutputFile: ".realpath($chunker->getSessionName()));
+			KalturaLog::log("OutputFile: ".realpath($chunker->params->output));
 			
 			$errStr = null;
 			$lasted = $this->finishTime - $this->createTime;
