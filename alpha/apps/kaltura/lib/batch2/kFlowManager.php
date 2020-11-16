@@ -786,7 +786,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			return true;
 
 		if($object instanceof LiveStreamEntry &&
-			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_ASSOCIATED_VOD, $object->getPartnerId()))
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD, $object->getPartnerId()))
 			return true;
 			
 		return false;
@@ -832,9 +832,18 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		}
 
 		if($object instanceof LiveStreamEntry &&
-			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_ASSOCIATED_VOD, $object->getPartnerId()))
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD, $object->getPartnerId()))
 		{
-			kFlowHelper::deleteLiveEntryAssociatedVod($object);
+			if(!$object->getRecordedEntryId())
+			{
+				return true;
+			}
+
+			$recordedEntry = entryPeer::retrieveByPK($object->getRecordedEntryId());
+			if($recordedEntry)
+			{
+				myEntryUtils::deleteEntry($recordedEntry);
+			}
 		}
 
 		return true;
