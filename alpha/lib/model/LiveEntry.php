@@ -515,12 +515,14 @@ abstract class LiveEntry extends entry
 	private function isExternalCurrentlyLive($reqProtocol = null)
 	{
 		$isLive = null;
+		$takeFirst = false;
 		$protocols = array();
 		switch ($reqProtocol)
 		{
 			case KalturaPlaybackProtocol::HLS:
 			case KalturaPlaybackProtocol::APPLE_HTTP:
 				$protocols = array_unique(array($reqProtocol, KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP));
+				$takeFirst = true;
 				break;
 			case KalturaPlaybackProtocol::HDS:
 			case KalturaPlaybackProtocol::AKAMAI_HDS:
@@ -538,9 +540,15 @@ abstract class LiveEntry extends entry
 
 		foreach($protocols as $protocol)
 		{
-			$isLive = $this->checkIsLiveByProtocol($protocol, $dpda);
-			if ($isLive !== null)
-				break;
+			$isProtocolLive = $this->checkIsLiveByProtocol($protocol);
+			if ($isProtocolLive !== null)
+			{
+				if ($isProtocolLive || $takeFirst)
+				{
+					return $isProtocolLive;
+				}
+				$isLive = $isProtocolLive; // as false
+			}
 		}
 
 		return $isLive;
@@ -559,15 +567,12 @@ abstract class LiveEntry extends entry
 			KalturaLog::info("Determining status of live stream URL [ $url ] and Backup URL [ $backupUrl ]");
 
 			$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-			if ($urlManager)
+			if ($urlManager && $urlManager->isLive($url))
 			{
-				return $urlManager->isLive($url);
+				return true;
 			}
 			$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
-			if ($urlManagerBackup)
-			{
-				return $urlManagerBackup->isLive($backupUrl);
-			}
+			return $urlManagerBackup ? $urlManagerBackup->isLive($backupUrl) : false;
 		}
 		return null;
 	}
@@ -576,7 +581,7 @@ abstract class LiveEntry extends entry
 	/**
 	 * @return boolean
 	 */
-	public function isInternalCurrentlyLive($currentDcOnly = false)
+	private function isInternalCurrentlyLive($currentDcOnly = false)
 	{
 		if ($this->getViewMode() == ViewMode::PREVIEW)
 		{
