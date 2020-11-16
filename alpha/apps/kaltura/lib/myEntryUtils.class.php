@@ -1065,7 +1065,7 @@ class myEntryUtils
 
 		if($fileToDelete)
 		{
-			unlink($fileToDelete);
+			kFile::doDeleteFile($fileToDelete);
 		}
 
 		return $finalThumbPath;
