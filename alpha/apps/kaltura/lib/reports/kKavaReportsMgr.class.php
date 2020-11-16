@@ -2150,15 +2150,24 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]) || isset($report_def[self::REPORT_PLAYBACK_TYPES]))
+
+		if (isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
-			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
+			$playback_types = $report_def[self::REPORT_PLAYBACK_TYPES];
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
 				self::DRUID_VALUES => $playback_types
 			);
 		}
-		
+		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) &&
+			(is_null($input_filter->playback_types) || trim($input_filter->playback_types === "")))
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+				self::DRUID_VALUES => array(self::PLAYBACK_TYPE_VOD)
+			);
+		}
+
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
