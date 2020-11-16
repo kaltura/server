@@ -16,11 +16,9 @@ class kFileSource extends kThumbnailSource
 	public function __construct($filePath)
 	{
 		$filePath = kFile::realPath($filePath);
-		stream_wrapper_restore('http');
 		stream_wrapper_restore('https');
 		$this->imagick = new Imagick($filePath);
 		stream_wrapper_unregister('https');
-		stream_wrapper_unregister('http');
 	}
 
 	public function getImage()
