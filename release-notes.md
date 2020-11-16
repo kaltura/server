@@ -19,6 +19,17 @@
 ### Deployment scripts ###
     None
 
+## Bumper Plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-11197
+
+### Configuration ###
+run the following:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_12_add_permissions_bumper_service.php
+
+Add 'Bumper' to:
+    /opt/kaltura/app/configurations/plugins.ini
+    
 # Propus 16.11.0  #
 
 ## Reach - update reach_vendor response profile ##

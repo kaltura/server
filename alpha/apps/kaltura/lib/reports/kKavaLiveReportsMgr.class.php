@@ -28,6 +28,17 @@ class kKavaLiveReportsMgr extends kKavaBase
 	const OUTPUT_BUFFER_TIME = 'bufferTime';
 	const OUTPUT_PLAYS = 'plays';
 	const OUTPUT_REFERRER = 'referrer';
+
+
+	protected static function initQueryCache()
+	{
+		if (self::$query_cache)
+		{
+			return;
+		}
+		self::$query_cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES);
+		self::$query_cache_expiration = self::CACHE_EXPIRATION;
+	}
 		
 	protected static function getLimit($limit)
 	{
@@ -167,11 +178,9 @@ class kKavaLiveReportsMgr extends kKavaBase
 	// base queries
 	protected static function runGranularityAllQuery($query)
 	{
+		self::initQueryCache();
 		$query[self::DRUID_GRANULARITY] = self::getGranularityAll();
-		$result = self::runQuery(
-			$query,
-			kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES),
-			self::CACHE_EXPIRATION);
+		$result = self::runQuery($query);
 		if (!$result)
 		{
 			return array();
@@ -184,11 +193,9 @@ class kKavaLiveReportsMgr extends kKavaBase
 
 	protected static function runGranularityPeriodQuery($query, $period)
 	{
+		self::initQueryCache();
 		$query[self::DRUID_GRANULARITY] = self::getGranularityPeriod($period);
-		$result = self::runQuery(
-			$query,
-			kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES),
-			self::CACHE_EXPIRATION);
+		$result = self::runQuery($query);
 		KalturaLog::log("Druid returned [" . count($result) . "] rows");
 		return $result;
 	}
