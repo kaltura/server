@@ -5418,9 +5418,35 @@ class kKavaReportsMgr extends kKavaBase
 		$filter->attachToCriteria($criteria);
 
 		$criteria->applyFilters();
-		return $criteria->getFetchedIds();
+		$live_now_entries = $criteria->getFetchedIds();
+		$simulive_and_manual = self::getCurrentlyLiveSimuliveAndManualEntries($partner_id);
+		$entries = array_unique(array_merge($live_now_entries, $simulive_and_manual));
+		return array_values($entries);
 	}
 
+	protected static function getCurrentlyLiveSimuliveAndManualEntries($partner_id) {
+		$now = time();
+		$start_time = $now - 2;
+		$end_time = $now + 2;
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::PARTNER_ID, $partner_id, Criteria::EQUAL);
+		$c->add(ScheduleEventPeer::TYPE, ScheduleEventType::LIVE_STREAM, Criteria::EQUAL);
+		// set 1 hour margin to get also preStart and postEnd on the events
+		$c->add(ScheduleEventPeer::END_DATE, $start_time - 3600, Criteria::GREATER_EQUAL);
+		$c->add(ScheduleEventPeer::START_DATE, $end_time + 3600, Criteria::LESS_EQUAL);
+
+		$schedule_events = ScheduleEventPeer::doSelect($c);
+
+		$live_entries_ids = array();
+		foreach ($schedule_events as $schedule_event)
+		{
+			if ($schedule_event->isRangeIntersects($start_time, $end_time)) // in current +-2 sec
+			{
+				$live_entries_ids[] = $schedule_event->getTemplateEntryId(); // the live entry id from the event
+			}
+		}
+		return $live_entries_ids;
+	}
 
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
 	{
