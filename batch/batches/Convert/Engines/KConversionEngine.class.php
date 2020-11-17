@@ -161,7 +161,7 @@ abstract class KConversionEngine
 		if ( $add_log )
 		{
 			// redirect both the STDOUT & STDERR to the log
-			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
+			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1 && rm -f \"{$this->inFilePath}\"";
 		}
 		
 		return $exec_cmd;
