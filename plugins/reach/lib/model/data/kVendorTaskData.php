@@ -8,6 +8,6 @@
  * @subpackage model
  *
  */
-abstract class kVendorTaskData
+class kVendorTaskData
 {
 }
