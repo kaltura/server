@@ -164,7 +164,7 @@ abstract class KConversionEngine
 			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
 			if($this->inFilePath)
 			{
-				$exec_cmd .= " && rm -f {$this->inFilePath}";
+				$exec_cmd .= " && rm -f \"{$this->inFilePath}\"";
 			}
 		}
 		
