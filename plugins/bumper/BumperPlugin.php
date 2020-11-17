@@ -51,9 +51,22 @@ class BumperPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
 			$dbBumper = kBumper::getBumperData($entry);
 			if($dbBumper && $dbBumper->getEntryId() && $dbBumper->getUrl())
 			{
-				$bumper = new KalturaBumper();
-				$bumper->fromObject( $dbBumper );
-				$bumperData[] = $bumper;
+				$dbBumperEntry = entryPeer::retrieveByPK($dbBumper->getEntryId());
+				if ($dbBumperEntry)
+				{
+					$bumper = new KalturaBumper();
+					$bumper->fromObject( $dbBumper );
+
+					$playbackContextDataHelper = new kPlaybackContextDataHelper();
+					$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbBumperEntry);
+
+					$bumperResult = new KalturaPlaybackContext();
+					$bumperResult->fromObject($playbackContextDataHelper->getPlaybackContext());
+
+					$bumper->sources = $bumperResult->sources;
+
+					$bumperData[] = $bumper;
+				}
 			}
 			$result->setBumperData($bumperData);
 		}
