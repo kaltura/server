@@ -100,7 +100,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 		$this->localTempSharedPath = isset(self::$taskConfig->params->localTempSharedPath) ? self::$taskConfig->params->localTempSharedPath : null;
 	
-		$res = self::createDir( $this->localTempPathx );
+		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue conversion without temp local directory");
