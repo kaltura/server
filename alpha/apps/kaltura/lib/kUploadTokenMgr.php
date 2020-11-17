@@ -163,7 +163,7 @@ class kUploadTokenMgr
 		
 		if ($this->_finalChunk)
 		{
-			if(myUploadUtils::isFileTypeRestricted($this->_uploadToken->getUploadTempPath()))
+			if(myUploadUtils::isFileTypeRestricted($this->_uploadToken->getUploadTempPath()) && $fileSize)
 			{
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
 				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
