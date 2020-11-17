@@ -217,7 +217,7 @@ class kDataCenterMgr
 		return DIRECTORY_SEPARATOR . "tmp" . DIRECTORY_SEPARATOR . "file_sync-" .  $fileSync->getId();
 	}
 	
-	public static function getInternalRemoteUrl(FileSync $file_sync, $addBaseUrl = true)
+	public static function getInternalRemoteUrl(FileSync $file_sync, $addBaseUrl = true, $innerFileName = null)
 	{
 		KalturaLog::log("File Sync [{$file_sync->getId()}]");
 		// LOG retrieval
@@ -226,8 +226,16 @@ class kDataCenterMgr
 		
 		$file_sync_id = $file_sync->getId();
 		$file_hash = md5( $dc["secret" ] .  $file_sync_id );	// will be verified on the other side to make sure not some attack or external invalid request  
-		
-		$filename = 'f.' . $file_sync->getFileExt();
+
+		if(!$innerFileName)
+		{
+			$filename = 'f.' . $file_sync->getFileExt();
+		}
+		else
+		{
+			$filename = $innerFileName;
+		}
+
 		$objectId = $file_sync->getObjectId();
 		$build_remote_url = "/index.php/extwidget/servefile/id/$file_sync_id/hash/$file_hash/objectid/$objectId/f/$filename"; // or something similar
 		if($addBaseUrl)
@@ -298,7 +306,7 @@ class kDataCenterMgr
 		
 		// check if file sync path leads to a file or a directory
 		$resolvedPath = $file_sync_resolved->getFullPath();
-		$fileSyncIsDir = kFile::isDir($resolvedPath);
+		$fileSyncIsDir = kFile::isDir($resolvedPath) || $file_sync->getIsDir();
 		if ($fileSyncIsDir && $file_name) {
 			$resolvedPath .= '/'.$file_name;
 		}
