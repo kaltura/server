@@ -69,7 +69,7 @@ class kAssetUtils
 	}
 	
 
-	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null, $urlManager = null, $explicitFileExt = null)
+	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null, $urlManager = null)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
@@ -91,7 +91,7 @@ class kAssetUtils
 		{
 			if(!$urlManager)
 			{
-				$urlManager = self::getUrlManager($asset, $syncKey);
+				$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 				if(!$urlManager)
 				{
 					return null;
@@ -99,13 +99,7 @@ class kAssetUtils
 			}
 
 			if($asset instanceof flavorAsset)
-			{
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
-				if($explicitFileExt)
-				{
-					$urlManager->setFileExt($explicitFileExt);
-				}
-			}
 			$profileAttributes = $urlManager->getDynamicAttributes();
 			$profileAttributes->setUrlParams($urlParameters);
 

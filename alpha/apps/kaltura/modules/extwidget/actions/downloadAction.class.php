@@ -117,6 +117,8 @@ class downloadAction extends sfAction
 		
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			
+		$this->handleFileSyncRedirection($syncKey);
 
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
@@ -128,15 +130,9 @@ class downloadAction extends sfAction
 
 		if (!$fileName)
 			$fileName = $fileBaseName;
-
-		$isDir = is_dir($filePath) || $fileSync->getIsDir();
-		if ($fileExt && !$isDir)
+		
+		if ($fileExt && !is_dir($filePath))
 			$fileName = $fileName . '.' . $fileExt;
-
-		if(!$local || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
-		{
-			$this->handleFileSyncRedirection($fileSync, $flavorAsset, $entry->getId(), $fileName, $isDir);
-		}
 		
 		$preview = 0;
 		if($shouldPreview && $flavorAsset) {
@@ -242,35 +238,27 @@ class downloadAction extends sfAction
 			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, $allowRemote, $fileExt);
 		}
 	}
-
-	private function handleFileSyncRedirection($fileSync, asset $flavorAsset, $entryId, $fileName, $isDir)
+	
+	private function handleFileSyncRedirection(FileSyncKey $syncKey)
 	{
-		$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $entryId);
-		if($downloadDeliveryProfile && $flavorAsset)
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
+		
+		if (is_null($fileSync))
+			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+
+		if (!$local && !in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
-			$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);
-		}
-		else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()) || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
-		{
-			return;
-		}
-		else
-		{
+
 			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+			KExternalErrors::terminateDispatch();
+			$this->redirect($url);
 		}
-		KExternalErrors::terminateDispatch();
-		$this->redirect($url);
 	}
 
-	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir)
+	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset)
 	{
-		if($fileName)
-		{
-			$fileName = kString::removeNewLine($fileName);
-			$fileName = kString::stripInvalidUrlChars($fileName);
-			$fileName = rawurlencode($fileName);
-		}
-		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
+
+		$url = $flavorAsset->getServeFlavorUrl(null, null, $downloadDeliveryProfile);
 		KalturaLog::log ("URL to redirect to [$url]" );
 		return $url;
 	}
