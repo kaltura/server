@@ -16,6 +16,12 @@ class KalturaBumper extends KalturaObject
 	 */
 	public $url;
 
+	/**
+	 * @var KalturaPlaybackSourceArray
+	 * @readonly
+	 */
+	public $sources;
+
 	private static $map_between_objects = array
 	(
 		'entryId',
@@ -52,9 +58,9 @@ class KalturaBumper extends KalturaObject
 		return parent::validateForInsert($propertiesToSkip);
 	}
 
-	public function validateForUpdate($propertiesToSkip = array())
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validateEntryId();
-		return parent::validateForUpdate($propertiesToSkip);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
