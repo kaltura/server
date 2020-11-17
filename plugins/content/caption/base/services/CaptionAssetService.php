@@ -289,7 +289,7 @@ class CaptionAssetService extends KalturaAssetService
 	{
 		$destPath = md5($url);
 		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $destPath;
-		if (KCurlWrapper::getDataFromFile($url, $fullPath))
+		if (KCurlWrapper::getDataFromFile($url, $fullPath) && !myUploadUtils::isFileTypeRestricted($fullPath))
 			return $this->attachFile($captionAsset, $fullPath);
 
 		if ($captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_NOT_APPLICABLE)

@@ -88,8 +88,7 @@ class myUploadUtils
 		}
 		chmod ( $fullPath , 0777 );
 
-		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, kCurrentContext::getCurrentPartnerId())
-			 && !self::checkIfFileIsAllowed($fullPath))
+		if (myUploadUtils::isFileTypeRestricted($fullPath))
 		{
 			KalturaLog::log ( "Error: File type is not allowed for [$token] [$filename] [$extra_id] [$create_thumb] \n->[$fullPath]" . "\n");
 			return;
@@ -232,6 +231,21 @@ class myUploadUtils
 		}
 		$fileTypes = kConf::get('file_type');
 		return in_array($fileType, $fileTypes['allowed']);
+	}
+
+	public static function isFileTypeRestricted($fullPath, $partnerId = null)
+	{
+		if(!$partnerId)
+		{
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+		}
+
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
+			&& !myUploadUtils::checkIfFileIsAllowed($fullPath))
+		{
+			return true;
+		}
+		return false;
 	}
 	
 }
