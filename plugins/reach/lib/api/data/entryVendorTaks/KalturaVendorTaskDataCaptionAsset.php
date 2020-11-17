@@ -4,7 +4,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-abstract class KalturaVendorTaskDataCaptionAsset extends KalturaVendorTaskData
+abstract class KalturaVendorTaskDataCaptionAsset extends KalturaGenericVendorTaskData
 {
 	/**
 	 * Optional - The id of the caption asset object
