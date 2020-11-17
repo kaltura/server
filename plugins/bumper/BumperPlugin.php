@@ -49,7 +49,7 @@ class BumperPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
 		{
 			$bumperData = array();
 			$dbBumper = kBumper::getBumperData($entry);
-			if($dbBumper && $dbBumper->getEntryId() && $dbBumper->getUrl())
+			if($dbBumper && $dbBumper->getEntryId())
 			{
 				$dbBumperEntry = entryPeer::retrieveByPK($dbBumper->getEntryId());
 				if ($dbBumperEntry)
