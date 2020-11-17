@@ -26,6 +26,11 @@ class KAsyncConvert extends KJobHandlerWorker
 	/**
 	 * @var string
 	 */
+	protected $localTempSharedPath;
+	
+	/**
+	 * @var string
+	 */
 	protected $sharedTempPath;
 	
 	/**
@@ -37,6 +42,8 @@ class KAsyncConvert extends KJobHandlerWorker
 	 * @var KOperationEngine
 	 */
 	protected $operationEngine = null;
+	
+	const DEFAULT_MAX_FILE_SIZE_FOR_LOCAL_TMP = 21474836480; // 20GB
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -91,8 +98,9 @@ class KAsyncConvert extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
+		$this->localTempSharedPath = isset(self::$taskConfig->params->localTempSharedPath) ? self::$taskConfig->params->localTempSharedPath : null;
 	
-		$res = self::createDir( $this->localTempPath );
+		$res = self::createDir( $this->localTempPathx );
 		if ( !$res )
 		{
 			KalturaLog::err( "Cannot continue conversion without temp local directory");
@@ -103,6 +111,15 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			KalturaLog::err( "Cannot continue conversion without temp shared directory");
 			return null;
+		}
+		if($this->localTempSharedPath)
+		{
+			$res = self::createDir( $this->localTempSharedPath );
+			if ( !$res )
+			{
+				KalturaLog::err( "Cannot continue conversion without temp local shared directory");
+				return null;
+			}
 		}
 		
 		$remoteFileRoot = self::$taskConfig->getRemoteServerUrl() . self::$taskConfig->params->remoteUrlDirectory;
@@ -144,10 +161,18 @@ class KAsyncConvert extends KJobHandlerWorker
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
 
 		// creates a temp file path
-		// $uniqid = uniqid("convert_{$job->entryId}_");
 		$uniqid = uniqid();
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
-		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
+		$localTempPath = $this->localTempPath;
+		
+		list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
+		$maxLocalTmpFileSize = kConf::get("max_source_size_for_local_tmp", "runtime_config", self::DEFAULT_MAX_FILE_SIZE_FOR_LOCAL_TMP)
+		if($this->localTempSharedPath && $actualFileSyncLocalPath && kFile::fileSize($actualFileSyncLocalPath) > $maxLocalTmpFileSize)
+		{
+			$localTempPath = $this->localTempSharedPath;
+		}
+		
+		$data->destFileSyncLocalPath = $localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $data, $job);
 		
 		if ( $this->operationEngine == null )
