@@ -34,6 +34,11 @@ class KAsyncConvert extends KJobHandlerWorker
 	protected $sharedTempPath;
 	
 	/**
+	 * @var int
+	 */
+	protected $maxSourceSizeForLocalTmp;
+	
+	/**
 	 * @var KDistributedFileManager
 	 */
 	protected $distributedFileManager = null;
@@ -42,8 +47,6 @@ class KAsyncConvert extends KJobHandlerWorker
 	 * @var KOperationEngine
 	 */
 	protected $operationEngine = null;
-	
-	const DEFAULT_MAX_FILE_SIZE_FOR_LOCAL_TMP = 21474836480; // 20GB
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -99,6 +102,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 		$this->localTempSharedPath = isset(self::$taskConfig->params->localTempSharedPath) ? self::$taskConfig->params->localTempSharedPath : null;
+		$this->maxSourceSizeForLocalTmp = isset(self::$taskConfig->params->maxSourceSizeForLocalTmp) ? self::$taskConfig->params->maxSourceSizeForLocalTmp : null;
 	
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -166,8 +170,8 @@ class KAsyncConvert extends KJobHandlerWorker
 		$localTempPath = $this->localTempPath;
 		
 		list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
-		$maxLocalTmpFileSize = kConf::get("max_source_size_for_local_tmp", "runtime_config", self::DEFAULT_MAX_FILE_SIZE_FOR_LOCAL_TMP)
-		if($this->localTempSharedPath && $actualFileSyncLocalPath && kFile::fileSize($actualFileSyncLocalPath) > $maxLocalTmpFileSize)
+		if($this->localTempSharedPath && $this->maxSourceSizeForLocalTmp && $actualFileSyncLocalPath
+			&& kFile::fileSize($actualFileSyncLocalPath) > $this->maxSourceSizeForLocalTmp)
 		{
 			$localTempPath = $this->localTempSharedPath;
 		}
