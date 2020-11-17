@@ -499,16 +499,16 @@ abstract class LiveEntry extends entry
 		return $events;
 	}
 
-	public function getLiveStatus($explicit = false, $protocol = null)
+	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
 	{
-		if ($explicit && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
+		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
 		{
 			return EntryServerNodeStatus::STOPPED;
 		}
 
 		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 		{
-			return $this->getInternalLiveStatus($explicit);
+			return $this->getInternalLiveStatus($checkExplicitLive);
 		}
 		else
 		{
@@ -591,30 +591,30 @@ abstract class LiveEntry extends entry
 	}
 
 
-	private function getInternalLiveStatus($explicit = false)
+	private function getInternalLiveStatus($checkExplicitLive = false)
 	{
 		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
 		{
 			return EntryServerNodeStatus::PLAYABLE;
 		}
 
-		// array flip will cause the status to become the keys and the value as their order in this array
-		$order = array_flip(array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE));
-
+		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
+
 		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
 		foreach ($entryServerNodes as $entryServerNode)
 		{
-			if ($this->shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $explicit))
+			if ($this->shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $checkExplicitLive))
 			{
-				$status = max($order[$status], $order[$entryServerNode->getStatus()]);
+				$maxKey = max(array_search($status, $statusOrder), array_search($entryServerNode->getStatus(), $statusOrder));
+				$status = $statusOrder[$maxKey];
 			}
 			//TODO case where on other dc has the explicit protected node we were return true even it is not viewable
 		}
-		return array_search($status, $order);
+		return $status;
 	}
 
-	private function shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $explicit)
+	private function shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $checkExplicitLive)
 	{
 		if (!$entryServerNode || !($entryServerNode instanceof LiveEntryServerNode))
 			return false;
@@ -622,7 +622,7 @@ abstract class LiveEntry extends entry
 		if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY,EntryServerNodeType::LIVE_BACKUP)))
 			return false;
 
-		if ($explicit && $this->getExplicitLive() && !$this->canViewExplicitLive() && !$entryServerNode->getIsPlayableUser())
+		if ($checkExplicitLive && $this->getExplicitLive() && !$this->canViewExplicitLive() && !$entryServerNode->getIsPlayableUser())
 			return false;
 
 		return true;
