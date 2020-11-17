@@ -214,12 +214,14 @@ class ESearchEntryItem extends ESearchItem
 	protected function getExactMatchQuery($allowedSearchTypes, &$queryAttributes)
 	{
 		$exactQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+		
+		$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
 
 		if (in_array($this->getFieldName(), array(ESearchEntryFieldName::ENTITLED_USER_EDIT,ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
 			ESearchEntryFieldName::ENTITLED_USER_VIEW, ESearchEntryFieldName::USER_ID)))
 		{
 			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
-				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+				array('index' => $indexName,
 					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 					'id' => $this->getSearchTerm(),
 					'path' => ESearchUserFieldName::GROUP_IDS));
