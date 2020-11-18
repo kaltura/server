@@ -41,8 +41,10 @@ class KalturaSshUrlResource extends KalturaUrlResource
 	 */
 	public function validateAsset(asset $dbAsset)
 	{
-		if(!($dbAsset instanceof flavorAsset))
+		if( (!($dbAsset instanceof flavorAsset)) && (!($dbAsset instanceof CaptionAsset)) )
+		{
 			throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($this));
+		}
 	}
 	
 	/* (non-PHPdoc)
