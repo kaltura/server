@@ -11,6 +11,11 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	protected $zoomClient;
 
 	/**
+	 * @var entry
+	 */
+	protected $mainEntry;
+
+	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
 	 */
@@ -62,10 +67,9 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 
 		$extraUsers = $this->getAdditionalUsers($recording->id, $zoomIntegration, $dbUser->getPuserId());
-		$entry = null;
 		foreach ($recording->recordingFiles[kRecordingFileType::VIDEO] as $recordingFile)
 		{
-			$entry = $this->handleVideoRecord($recording, $dbUser, $zoomIntegration, $extraUsers, $recordingFile, $event);
+			$this->handleVideoRecord($recording, $dbUser, $zoomIntegration, $extraUsers, $recordingFile, $event);
 		}
 
 		if(isset($recording->recordingFiles[kRecordingFileType::CHAT]))
@@ -73,7 +77,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 			$chatFilesProcessor = new kZoomChatFilesProcessor();
 			foreach ($recording->recordingFiles[kRecordingFileType::CHAT] as $recordingFile)
 			{
-				$chatFilesProcessor->handleChatRecord($entry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
+				$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
 			}
 		}
 	}
@@ -93,9 +97,20 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	protected function handleVideoRecord($recording, $owner, $zoomIntegration, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromRecording($recording, $owner);
+		if($this->mainEntry)
+		{
+			$entry->setParentEntryId($this->mainEntry->getId());
+		}
+
 		$this->setEntryCategory($zoomIntegration, $entry);
 		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
 		$entry->save();
+
+		if(!$this->mainEntry)
+		{
+			$this->mainEntry = $entry;
+		}
+
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry;
