@@ -477,7 +477,7 @@ $stub=null;
 					$tmpCaptionFilePath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($tmpCaptionFilePath);
 				}
 				
-				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $data->destFileSyncLocalPath.".temp.$lang.srt");
+				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $tmpCaptionFilePath);
 				break;
 			}
 		}

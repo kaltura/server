@@ -26,11 +26,6 @@ class KAsyncConvert extends KJobHandlerWorker
 	/**
 	 * @var string
 	 */
-	protected $localTempSharedPath;
-	
-	/**
-	 * @var string
-	 */
 	protected $sharedTempPath;
 	
 	/**
@@ -101,7 +96,6 @@ class KAsyncConvert extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
-		$this->localTempSharedPath = isset(self::$taskConfig->params->localTempSharedPath) ? self::$taskConfig->params->localTempSharedPath : null;
 		$this->maxSourceSizeForLocalTmp = isset(self::$taskConfig->params->maxSourceSizeForLocalTmp) ? self::$taskConfig->params->maxSourceSizeForLocalTmp : null;
 	
 		$res = self::createDir( $this->localTempPath );
@@ -115,15 +109,6 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			KalturaLog::err( "Cannot continue conversion without temp shared directory");
 			return null;
-		}
-		if($this->localTempSharedPath)
-		{
-			$res = self::createDir( $this->localTempSharedPath );
-			if ( !$res )
-			{
-				KalturaLog::err( "Cannot continue conversion without temp local shared directory");
-				return null;
-			}
 		}
 		
 		$remoteFileRoot = self::$taskConfig->getRemoteServerUrl() . self::$taskConfig->params->remoteUrlDirectory;
@@ -170,10 +155,10 @@ class KAsyncConvert extends KJobHandlerWorker
 		$localTempPath = $this->localTempPath;
 		
 		list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
-		if($this->localTempSharedPath && $this->maxSourceSizeForLocalTmp && $actualFileSyncLocalPath
+		if($this->maxSourceSizeForLocalTmp && $actualFileSyncLocalPath
 			&& kFile::fileSize($actualFileSyncLocalPath) > $this->maxSourceSizeForLocalTmp)
 		{
-			$localTempPath = $this->localTempSharedPath;
+			$localTempPath = $this->sharedTempPath;
 		}
 		
 		$data->destFileSyncLocalPath = $localTempPath . DIRECTORY_SEPARATOR . $uniqid;
