@@ -8,10 +8,11 @@ class myPackagerUtils
 	const PACKAGER_REMOTE_THUMB_URL = 'packager_thumb_capture_url';
 	const PACKAGER_MAPPED_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
 	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_local_volume_map_url';
+	const PACKAGER_REMOTE_VOLUME_MAP_URL = 'packager_remote_volume_map_url';
 	const PACKAGER_URL = "packager_url";
-	const VOLUME_PACKAGER_URL = 'volume_packager_url';
 	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
+	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 
 	/**
 	 * @param entry $entry
@@ -181,7 +182,7 @@ class myPackagerUtils
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
 		$url .= '/flavorId/' . $flavorAsset->getId();
-		$url .= myEntryUtils::MP4_FILENAME_PARAMETER;
+		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
 
@@ -199,7 +200,7 @@ class myPackagerUtils
 		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
 		$url .= ($entryVersion ? "/v/$entryVersion" : '');
 		$url .= '/flavorParamIds/' . $flavorAsset->getFlavorParamsId();
-		$url .= myEntryUtils::MP4_FILENAME_PARAMETER;
+		$url .= self::MP4_FILENAME_PARAMETER;
 		return $url;
 	}
 
@@ -223,55 +224,6 @@ class myPackagerUtils
 		}
 
 		return $flavorAsset;
-	}
-
-	/**
-	 * @param kPackagerUrlType $packagerUrlType
-	 * @param flavorAsset $flavorAsset
-	 * @return string
-	 * @throws PropelException
-	 * @throws kFileSyncException
-	 */
-	public static function getPackagerUrlByTypeAndFlavorAsset($packagerUrlType, $flavorAsset)
-	{
-		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		if(is_null($fileSyncKey->partner_id))
-		{
-			throw new kFileSyncException("partner id not defined for key [$fileSyncKey]", kFileSyncException::FILE_SYNC_PARTNER_ID_NOT_DEFINED);
-		}
-		
-		$localDcs = kDataCenterMgr::getDcIds();
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey, true, false);
-		if(!$fileSync)
-		{
-			return null;
-		}
-			
-		/* @var $fileSync fileSync */
-		$fileDc = $fileSync->getDc();
-		if(in_array ($fileDc, $localDcs))
-		{
-			$packagerUrl = null;
-			if(in_array($fileDc, kDataCenterMgr::getSharedStorageProfileIds()))
-			{
-				$sharedStorageProfile = StorageProfilePeer::retrieveByPK($fileDc);
-				$packagerUrl = $sharedStorageProfile->getPackagerUrl();
-			}
-			return self::getPackagerUrlFromConf($packagerUrlType, $packagerUrl);
-		}
-
-		$storageProfiles = self::loadStorageProfiles($fileSyncKey->partner_id);
-		$result = null;
-		if(array_key_exists($fileDc, $storageProfiles))
-		{
-			$storageProfile = $storageProfiles[$fileDc];
-			if ($storageProfile)
-			{
-				$result = self::getPackagerUrlFromConf($packagerUrlType, $storageProfile->getPackagerUrl());
-			}
-		}
-
-		return $result;
 	}
 
 	/**
@@ -321,11 +273,13 @@ class myPackagerUtils
 				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_LOCAL_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::REGULAR_VOLUME_MAP:
-				$packagerUrl = kConf::get(self::VOLUME_PACKAGER_URL, self::LOCAL_MAP_NAME, $packagerUrl);
 				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::MAPPED_VOLUME_MAP:
 				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				break;
+			case kPackagerUrlType::REMOTE_VOLUME_MAP:
+				$result = $packagerUrl . kConf::get(self::PACKAGER_REMOTE_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			default:
 		}
@@ -508,5 +462,123 @@ class myPackagerUtils
 		}
 
 		return $preferredStorageId;
+	}
+
+	public static function retrieveVolumeMapFromPackager($flavorAsset)
+	{
+		if ($flavorAsset->getEncryptionKey())
+		{
+			return self::retrieveMappedVolumeMapFromPackager($flavorAsset);
+		}
+
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		$preferredStorageId = self::getPreferredStorageId($currentDcId);
+		list ($fileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($fileSyncKey, $flavorAsset, $preferredStorageId, null);
+		if(!$fileSync)
+		{
+			return null;
+		}
+
+		if(myCloudUtils::isCloudDc($currentDcId) || $fileSync->getDc() != $currentDcId)
+		{
+			return self::retrieveRemoteVolumeMapFromPackager($path);
+		}
+		else
+		{
+			return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+		}
+
+		return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
+	}
+
+
+	protected static function retrieveRemoteVolumeMapFromPackager($path)
+	{
+		$packagerRemoteVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlFromConf(kPackagerUrlType::REMOTE_VOLUME_MAP);
+		if (!$packagerRemoteVolumeMapUrlPattern)
+		{
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+		}
+
+		$content = self::curlVolumeMapUrl($path, $packagerRemoteVolumeMapUrlPattern);
+		if(!$content)
+		{
+			return false;
+		}
+
+		return $content;
+	}
+
+	protected static function curlVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
+	{
+		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
+		kFile::closeDbConnections();
+		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl, null, null, true);
+		return $content;
+	}
+
+	protected static function buildVolumeMapPath($entry, $flavorAsset)
+	{
+		$partnerId = $flavorAsset->getPartnerId();
+		$subpId = $entry->getSubpId();
+		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
+		$entryVersion = $entry->getVersion();
+
+		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
+		$url .= ($entryVersion ? "/v/$entryVersion" : '');
+		$url .= "/flavorId/".$flavorAsset->getId();
+		$url .= self::MP4_FILENAME_PARAMETER;
+		return $url;
+	}
+
+	protected static function retrieveLocalVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = self::getPackagerUrlFromConf(kPackagerUrlType::REGULAR_VOLUME_MAP);
+		if (!$packagerVolumeMapUrlPattern)
+		{
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+		}
+
+		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
+		$entry_data_path = ltrim($entry_data_path, "/");
+		if (!$entry_data_path)
+		{
+			return null;
+		}
+
+		$content = self::curlVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
+		if(!$content)
+		{
+			return false;
+		}
+
+		return $content;
+	}
+
+	protected static function retrieveMappedVolumeMapFromPackager($flavorAsset)
+	{
+		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlFromConf(kPackagerUrlType::MAPPED_VOLUME_MAP);
+		if (!$packagerVolumeMapUrlPattern)
+		{
+			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
+		}
+
+		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND);
+		}
+
+		$volumeMapUrl = self::buildVolumeMapPath($entry, $flavorAsset);
+
+		$content = self::curlVolumeMapUrl($volumeMapUrl, $packagerVolumeMapUrlPattern);
+		if(!$content)
+		{
+			return false;
+		}
+
+		return $content;
 	}
 }
