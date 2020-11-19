@@ -4386,7 +4386,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 
 	/**
- * allow edit or change related metadata
+	 * allow edit or change related metadata
 	 * @return boolean
 	 */
 	public function allowEdit()
