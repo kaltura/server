@@ -284,6 +284,11 @@ $pixFmt = "yuv420p";
 	public static function buildWatermarkedCommandLine($watermMarkData, $destFileSyncLocalPath, $cmdLine, $ffmpegBin = "ffmpeg", $mediaInfoBin = "mediainfo")
 	{
 		KalturaLog::log("In:cmdline($cmdLine)");
+		
+		if(isset(KBatchBase::$taskConfig->params->sharedTempPath)){
+			$destFileSyncLocalPath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($destFileSyncLocalPath);
+		}
+		
 		if(!isset($mediaInfoBin) || strlen($mediaInfoBin)==0)
 			$mediaInfoBin = "mediainfo";
 
@@ -466,7 +471,13 @@ $stub=null;
 		foreach($captionsArr as $lang=>$captionFileUrl){
 			if($subtitlesData->language==$lang){
 				KalturaLog::log("Found required language($lang)");
-				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $data->destFileSyncLocalPath.".temp.$lang.srt");
+				
+				$tmpCaptionFilePath = $data->destFileSyncLocalPath.".temp.$lang.srt";
+				if(isset(KBatchBase::$taskConfig->params->sharedTempPath)){
+					$tmpCaptionFilePath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($tmpCaptionFilePath);
+				}
+				
+				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $tmpCaptionFilePath);
 				break;
 			}
 		}
