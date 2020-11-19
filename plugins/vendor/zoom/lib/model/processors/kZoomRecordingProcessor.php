@@ -22,6 +22,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	public function __construct($zoomBaseUrl)
 	{
 		$this->zoomClient = new kZoomClient($zoomBaseUrl);
+		$this->mainEntry = null;
 	}
 
 	/**
