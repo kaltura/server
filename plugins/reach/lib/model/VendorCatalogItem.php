@@ -142,5 +142,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 		return $serviceFeatureName;
 	}
+	
+	public function getCacheInvalidationKeys()
+	{
+		return array("vendorCatalogItem:id=".strtolower($this->getId()));
+	}
 
 } // VendorCatalogItem
