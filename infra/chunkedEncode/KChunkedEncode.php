@@ -1103,7 +1103,8 @@
 				$name.= "$this->videoChunkPostfix";
 				break;
 			case "srt":
-				$name.= "srt";
+				//When splitting subtitles we need to write output file to shared location for handling env that run tmp as local path (cloud storage)
+				$name = dirname($this->params->videoFilters->subsFilename) . "/" . basename($name) . "srt";
 				break;
 			default:
 				$name.= "$this->videoChunkPostfix".$mode;
