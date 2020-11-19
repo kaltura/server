@@ -52,6 +52,8 @@ $INVALIDATION_KEYS = array(
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
 	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
 	array('table' => "scheduler_worker", 				'keys' => array(array("'schedulerWorker:schedulerConfiguredId='", '@OBJ@.scheduler_configured_id'))),
+	array('table' => "vendor_catalog_item", 			'keys' => array(array("'vendorCatalogItem:id='", '@OBJ@.id'))),
+	array('table' => "reach_profile", 			        'keys' => array(array("'reachProfile:id='", '@OBJ@.id'))),
 	);
 
 $setFunc = 'memc_set';
