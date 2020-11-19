@@ -56,7 +56,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "reach_profile", 			        'keys' => array(array("'reachProfile:id='", '@OBJ@.id'))),
 	);
 
-$setFunc = 'memc_set';
+$setFunc = 'memc_async_set';
 
 $TRIGGER_TYPES = array('INSERT', 'UPDATE', 'DELETE');
 
