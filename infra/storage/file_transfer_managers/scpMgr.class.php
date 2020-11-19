@@ -63,7 +63,7 @@ class scpMgr extends kFileTransferMgr
 	{	
 		// try to download file
 		$remote_file = ltrim($remote_file, '/');
-		$ret = ssh2_scp_recv($this->getConnection(), $remote_file, $local_file);
+		return ssh2_scp_recv($this->getConnection(), $remote_file, $local_file);
 	}
 	
 	// create a new directory
