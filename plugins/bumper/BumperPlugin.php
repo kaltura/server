@@ -49,11 +49,42 @@ class BumperPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
 		{
 			$bumperData = array();
 			$dbBumper = kBumper::getBumperData($entry);
-			if($dbBumper && $dbBumper->getEntryId() && $dbBumper->getUrl())
+			if($dbBumper && $dbBumper->getEntryId())
 			{
-				$bumper = new KalturaBumper();
-				$bumper->fromObject( $dbBumper );
-				$bumperData[] = $bumper;
+				$dbBumperEntry = entryPeer::retrieveByPK($dbBumper->getEntryId());
+				if ($dbBumperEntry)
+				{
+					$bumper = new KalturaBumper();
+					$bumper->fromObject( $dbBumper );
+
+					$bumperContextDataHelper = new kContextDataHelper($dbBumperEntry, $dbBumperEntry->getPartner(), null);
+					if ($dbBumperEntry->getAccessControl() && $dbBumperEntry->getAccessControl()->hasRules())
+					{
+						$accessControlScope = $dbBumperEntry->getAccessControl()->getScope();
+					}
+					else
+					{
+						$accessControlScope = new accessControlScope();
+					}
+					$bumperContextDataHelper->buildContextDataResult($accessControlScope, kContextDataHelper::ALL_TAGS, null, null, true);
+					if ($bumperContextDataHelper->getDisableCache())
+					{
+						KalturaResponseCacher::disableCache();
+					}
+
+					$bumperContextDataHelper->setMediaProtocol(null);
+					$bumperContextDataHelper->setStreamerType(null);
+
+					$playbackContextDataHelper = new kPlaybackContextDataHelper();
+					$playbackContextDataHelper->constructPlaybackContextResult($bumperContextDataHelper, $dbBumperEntry);
+
+					$bumperResult = new KalturaPlaybackContext();
+					$bumperResult->fromObject($playbackContextDataHelper->getPlaybackContext());
+
+					$bumper->sources = $bumperResult->sources;
+
+					$bumperData[] = $bumper;
+				}
 			}
 			$result->setBumperData($bumperData);
 		}

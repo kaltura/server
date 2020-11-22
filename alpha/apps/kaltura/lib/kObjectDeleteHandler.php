@@ -130,11 +130,25 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 		
 		$c = new Criteria();
 		$c->add(UserEntryPeer::ENTRY_ID, $entry->getId());
-		if(!UserEntryPeer::doSelectOne($c)) {
-			return;
+		if(UserEntryPeer::doSelectOne($c))
+		{
+			kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
 		}
-		
-		kJobsManager::addDeleteJob($entry->getPartnerId(), DeleteObjectType::USER_ENTRY, $userEntryFilter);
+
+		if($entry instanceof LiveStreamEntry &&
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD, $entry->getPartnerId()))
+		{
+			if(!$entry->getRecordedEntryId())
+			{
+				return;
+			}
+
+			$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
+			if($recordedEntry)
+			{
+				myEntryUtils::deleteEntry($recordedEntry);
+			}
+		}
 	}
 	
 	protected function kuserDelete(kuser $kuser)
