@@ -687,7 +687,7 @@ class kFileBase
 			throw new Exception("VOD direct serve secret not found");
 		}
 		
-		$vodPackagerInternalDomain = kConf::get('vod_packager_internal_domain', 'cloud_storage', "localhost");
+		$vodPackagerInternalDomain = kConf::get('vod_packager_internal_domain', 'cloud_storage', null);
 		if(!$vodPackagerInternalDomain)
 		{
 			throw new Exception("Path is shared but no valid serve domain found in config");
