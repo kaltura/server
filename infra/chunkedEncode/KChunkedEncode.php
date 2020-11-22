@@ -1333,7 +1333,7 @@
 			return $strVer;
 		}
 		
-		protected static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
+		public static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
 		{
 			if (strpos($fileCmd, $pattern) !== 0) {
 				return;
