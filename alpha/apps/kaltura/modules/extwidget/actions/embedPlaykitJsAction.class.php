@@ -106,10 +106,19 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$content = json_decode($content, true);
-		if(!$content || !$content['bundle'])
-		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
-		}
+
+        if (isset($content['status'])) {
+            if ($content['status'] != 0) {
+                $message = $content['message'];
+                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . ". " . $message);
+            } else {
+                $content = $content['payload'];
+            }
+        } else {
+            if (!$content || !$content['bundle']) {
+                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
+            }
+        }
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
 		$bundleContent = time() . "," . base64_decode($content['bundle']);

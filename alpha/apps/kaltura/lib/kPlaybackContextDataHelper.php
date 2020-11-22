@@ -75,8 +75,8 @@ class kPlaybackContextDataHelper
 			$this->constructLocalPlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructPlaybackCaptions($dbEntry, $contextDataHelper);
-			$this->constructBumperData($dbEntry, $contextDataHelper);
 		}
+		$this->constructBumperData($dbEntry, $contextDataHelper);
 
 		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 		$this->filterFlavorsBySources();

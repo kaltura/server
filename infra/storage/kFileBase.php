@@ -200,7 +200,6 @@ class kFileBase
     {
 	    if(kFile::isSharedPath($filename))
 	    {
-		    KalturaLog::debug("Check file size for shared file [$filename]");
 		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filename);
 		    return $kSharedFsMgr->fileSize($filename);
 	    }
