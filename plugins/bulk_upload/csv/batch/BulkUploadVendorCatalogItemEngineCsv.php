@@ -341,7 +341,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	{
 		$bulkUploadResultParams = array('vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
 			'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
-			'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId');
+			'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission');
 
 		$kalturaVendorCatalogItem = self::getObjectByServiceFeature($bulkUploadResult->serviceFeature);
 
@@ -410,7 +410,8 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			'pricing:pricePerUnit',
 			'pricing:priceFunction',
 			'flavorParamsId',
-			'clearAudioFlavorParamsId'
+			'clearAudioFlavorParamsId',
+			'allowResubmission',
 		);
 	}
 

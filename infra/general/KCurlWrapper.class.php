@@ -186,6 +186,18 @@ class KCurlWrapper
 		$url = trim(substr(trim($string), strlen($prefix)));
 		KalturaLog::debug("Validating redirect url [$url]");
 
+		if (strpos($url, '://') === false)
+		{
+			if (substr($url, 0, 2) != '//')
+			{
+				// relative redirect without host
+				return strlen($string);
+			}
+
+			// assume http, just for validating
+			$url = 'http:' . $url;
+		}
+
 		$parts = parse_url($url);
 		if (!isset($parts['scheme']) || !isset($parts['host']))
 		{

@@ -8,6 +8,7 @@ class myEntryUtils
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
+	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 
 	static private $liveSourceType = array
 	(
@@ -702,6 +703,7 @@ class myEntryUtils
 			return $result;
 		}
 
+		$fileToDelete = null;
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
 
@@ -778,17 +780,31 @@ class myEntryUtils
 		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
 		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
-			header("X-Kaltura:cached-thumb-exists,".md5($finalThumbPath));
-			return $finalThumbPath;;
+			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+			return $finalThumbPath;
 		}
 
 		foreach ($thumbDirs as $thumbDir)
 		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version );
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version);
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				header("X-Kaltura:cached-thumb-exists,".md5($currPath));
-				return $currPath;;
+				if(myCloudUtils::shouldExportThumbToCloud())
+				{
+					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+					if($moveFileSuccess)
+					{
+						header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+						return $finalThumbPath;
+					}
+					else
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+					}
+				}
+
+				header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
+				return $currPath;
 			}
 		}
 
@@ -806,8 +822,13 @@ class myEntryUtils
 		}
 
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
-		
-		
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($orig_image_path);
+		if($isRemote)
+		{
+			$orig_image_path = kFile::getExternalFile($remoteUrl);
+			$fileToDelete = $orig_image_path;
+		}
+
 		// remark added so ffmpeg will try to load the thumbnail from the original source
 		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
@@ -892,7 +913,6 @@ class myEntryUtils
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
-	
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
@@ -1041,7 +1061,13 @@ class myEntryUtils
 		{
 			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
-				
+
+
+		if($fileToDelete)
+		{
+			kFile::doDeleteFile($fileToDelete);
+		}
+
 		return $finalThumbPath;
 	}
 

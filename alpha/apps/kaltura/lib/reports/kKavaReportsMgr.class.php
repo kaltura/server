@@ -282,7 +282,7 @@ class kKavaReportsMgr extends kKavaBase
 	// limits
 	const MAX_RESULT_SIZE = 12000;
 	const MAX_CSV_RESULT_SIZE = 60000;
-	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
+	const MAX_CUSTOM_REPORT_RESULT_SIZE = 500000;
 	const MIN_THRESHOLD = 500;
 	const MAX_ESEARCH_RESULTS = 1000;
 	const MAX_SPHINX_RESULTS = 1000;
@@ -2150,15 +2150,24 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]) || isset($report_def[self::REPORT_PLAYBACK_TYPES]))
+
+		if (isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
-			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
+			$playback_types = $report_def[self::REPORT_PLAYBACK_TYPES];
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
 				self::DRUID_VALUES => $playback_types
 			);
 		}
-		
+		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) &&
+			(is_null($input_filter->playback_types) || trim($input_filter->playback_types === "")))
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+				self::DRUID_VALUES => array(self::PLAYBACK_TYPE_VOD)
+			);
+		}
+
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
@@ -5409,9 +5418,35 @@ class kKavaReportsMgr extends kKavaBase
 		$filter->attachToCriteria($criteria);
 
 		$criteria->applyFilters();
-		return $criteria->getFetchedIds();
+		$live_now_entries = $criteria->getFetchedIds();
+		$simulive_and_manual = self::getCurrentlyLiveSimuliveAndManualEntries($partner_id);
+		$entries = array_unique(array_merge($live_now_entries, $simulive_and_manual));
+		return array_values($entries);
 	}
 
+	protected static function getCurrentlyLiveSimuliveAndManualEntries($partner_id) {
+		$now = time();
+		$start_time = $now - 2;
+		$end_time = $now + 2;
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::PARTNER_ID, $partner_id, Criteria::EQUAL);
+		$c->add(ScheduleEventPeer::TYPE, ScheduleEventType::LIVE_STREAM, Criteria::EQUAL);
+		// set 1 hour margin to get also preStart and postEnd on the events
+		$c->add(ScheduleEventPeer::END_DATE, $start_time - 3600, Criteria::GREATER_EQUAL);
+		$c->add(ScheduleEventPeer::START_DATE, $end_time + 3600, Criteria::LESS_EQUAL);
+
+		$schedule_events = ScheduleEventPeer::doSelect($c);
+
+		$live_entries_ids = array();
+		foreach ($schedule_events as $schedule_event)
+		{
+			if ($schedule_event->isRangeIntersects($start_time, $end_time)) // in current +-2 sec
+			{
+				$live_entries_ids[] = $schedule_event->getTemplateEntryId(); // the live entry id from the event
+			}
+		}
+		return $live_entries_ids;
+	}
 
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
 	{

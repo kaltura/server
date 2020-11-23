@@ -806,9 +806,11 @@ class kMetadataManager
 			KalturaLog::err('Could not load metadata xml [' . $xmlString . '] - ' . $ex->getMessage());
 			return;
 		}
-
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
 		$metadataId = $metadata->getId();
+		$partnerId = $metadata->getPartnerId();
+		$maxMetadataLength = kConf::getArrayValue($partnerId, ElasticSearchPlugin::MAX_METADATA_INDEX_LENGTH,
+			ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP,kElasticSearchManager::METADATA_MAX_LENGTH);
 
 		foreach($profileFields as $profileField)
 		{
@@ -856,8 +858,8 @@ class kMetadataManager
 				$profileFieldData['value_text'] = array();
 				foreach ($searchItemValues as $searchItemValue)
 				{
-					if(strlen($searchItemValue) > kElasticSearchManager::METADATA_MAX_LENGTH)
-						$searchItemValue = substr($searchItemValue, 0, kElasticSearchManager::METADATA_MAX_LENGTH);
+					if(strlen($searchItemValue) > $maxMetadataLength)
+						$searchItemValue = substr($searchItemValue, 0, $maxMetadataLength);
 
 					$profileFieldData['value_text'][] = $searchItemValue;
 				}
@@ -884,9 +886,9 @@ class kMetadataManager
 			{
 				foreach ($searchItemValues as &$searchValue)
 				{
-					if (strlen($searchValue) > kElasticSearchManager::METADATA_MAX_LENGTH)
+					if (strlen($searchValue) > $maxMetadataLength)
 					{
-						$searchValue = substr($searchValue, 0, kElasticSearchManager::METADATA_MAX_LENGTH);
+						$searchValue = substr($searchValue, 0, $maxMetadataLength);
 					}
 				}
 				$profileFieldData['value_text'] = $searchItemValues;

@@ -350,13 +350,12 @@ class UserService extends KalturaBaseUserService
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
-	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
-	 * @throws KalturaErrors::WRONG_OLD_PASSWORD
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
-	 * @throws KalturaErrors::INVALID_OTP
-	 * @throws KalturaErrors::MISSING_OTP
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws APIErrors::LOGIN_RETRIES_EXCEEDED
+	 * @throws APIErrors::LOGIN_BLOCKED
 	 */
 	public function updateLoginDataAction( $oldLoginId , $password , $newLoginId = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
 	{
@@ -364,7 +363,24 @@ class UserService extends KalturaBaseUserService
 										'firstName' => $newFirstName,
 										'lastName' => $newLastName));
 
-		return parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName, $otp);
+		try
+		{
+			$updateLoginData = parent::updateLoginDataImpl($oldLoginId , $password , $newLoginId, $newPassword, $newFirstName, $newLastName, $otp);
+		}
+		catch(KalturaAPIException $e)
+		{
+			$error = $e->getCode().';;'.$e->getMessage();
+			if ($error == KalturaErrors::LOGIN_DATA_NOT_FOUND ||
+				$error == KalturaErrors::USER_WRONG_PASSWORD ||
+				$error == KalturaErrors::WRONG_OLD_PASSWORD ||
+				$error == KalturaErrors::INVALID_OTP ||
+				$error == KalturaErrors::MISSING_OTP)
+			{
+				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+			}
+			throw $e;
+		}
+		return $updateLoginData;
 	}
 	
 	/**

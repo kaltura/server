@@ -357,6 +357,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			$this->setFinishTime(time());
 		}
 		
+		/*
 		$entryDuration = $this->getEntry()->getLengthInMsecs();
 		$taskJobData = $this->getTaskJobData();
 		if(!$taskJobData)
@@ -365,6 +366,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		}
 		$taskJobData->setEntryDuration($entryDuration);
 		$this->setTaskJobData($taskJobData);
+		*/
 		
 		return parent::preSave($con);
 	}

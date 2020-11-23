@@ -537,4 +537,9 @@ class ReachProfile extends BaseReachProfile
 		}
 		return $ret;
 	}
+	
+	public function getCacheInvalidationKeys()
+	{
+		return array("reachProfile:id=".strtolower($this->getId()));
+	}
 } // ReachProfile
