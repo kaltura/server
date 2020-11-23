@@ -484,11 +484,7 @@ class myPackagerUtils
 		{
 			return self::retrieveRemoteVolumeMapFromPackager($path);
 		}
-		else
-		{
-			return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
-		}
-
+		
 		return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
 	}
 
@@ -559,7 +555,7 @@ class myPackagerUtils
 
 	protected static function retrieveMappedVolumeMapFromPackager($flavorAsset)
 	{
-		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlFromConf(kPackagerUrlType::MAPPED_VOLUME_MAP);
+		$packagerVolumeMapUrlPattern = self::getPackagerUrlFromConf(kPackagerUrlType::MAPPED_VOLUME_MAP);
 		if (!$packagerVolumeMapUrlPattern)
 		{
 			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
