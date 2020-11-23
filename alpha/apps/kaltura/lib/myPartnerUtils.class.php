@@ -20,6 +20,10 @@ class myPartnerUtils
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
 
 	const TYPE_DOWNLOAD = 'download';
+
+	const DOWNLOAD_NOT_RECOGNIZED = 0;
+	const DOWNLOAD_RECOGNIZED_OK = 1;
+	const DOWNLOAD_RECOGNIZED_NOT_OK = 2;
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1789,7 +1793,7 @@ class myPartnerUtils
 		$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
 		if(!$validServe)
 		{
-			if(!is_null($storageProfileId) && $downloadAllowed)
+			if(!is_null($storageProfileId) && $downloadAllowed === self::DOWNLOAD_RECOGNIZED_OK)
 			{
 				return;
 			}
@@ -1805,7 +1809,7 @@ class myPartnerUtils
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		if ($restricted)
 		{
-			if(!is_null($storageProfileId) && $downloadAllowed)
+			if(!is_null($storageProfileId) && $downloadAllowed === self::DOWNLOAD_RECOGNIZED_OK)
 			{
 				return;
 			}
@@ -1814,6 +1818,12 @@ class myPartnerUtils
 				KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 			}
+		}
+
+		if($downloadAllowed === self::DOWNLOAD_RECOGNIZED_NOT_OK)
+		{
+			KalturaLog::debug('Failed to recognize url due to wrong or missing signing');
+			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'wrong request signing');
 		}
 	}
 
@@ -2217,21 +2227,16 @@ class myPartnerUtils
 		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
 		if(!$downloadDeliveryProfile)
 		{
-			return false;
+			return self::DOWNLOAD_NOT_RECOGNIZED;
 		}
 
 		$downloadRecognizer = $downloadDeliveryProfile->getRecognizer();
 		if($downloadRecognizer)
 		{
-			$urlRecognized = $downloadRecognizer->isRecognized(null);
-			if($urlRecognized)
-			{
-				KalturaLog::log ( "Download from storage [$storageProfileId] allowed" );
-				return true;
-			}
+			return $downloadRecognizer->isRecognized(null);
 		}
 
-		return false;
+		return self::DOWNLOAD_NOT_RECOGNIZED;
 	}
 
 	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)
