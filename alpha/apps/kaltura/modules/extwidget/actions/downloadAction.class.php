@@ -129,7 +129,7 @@ class downloadAction extends sfAction
 		if (!$fileName)
 			$fileName = $fileBaseName;
 
-		$isDir = is_dir($filePath) || $fileSync->getIsDir();
+		$isDir = kFile::isDir($filePath) || $fileSync->getIsDir();
 		if ($fileExt && !$isDir)
 			$fileName = $fileName . '.' . $fileExt;
 
@@ -250,7 +250,7 @@ class downloadAction extends sfAction
 		{
 			$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);
 		}
-		else if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()) || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		else if(in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 		{
 			return;
 		}
