@@ -387,6 +387,7 @@ class KalturaRequestDeserializer
 			
 			if ($property->isFile())
 			{
+				self::validateFile($value);
 				$obj->$name = $value;
 				continue;
 			}

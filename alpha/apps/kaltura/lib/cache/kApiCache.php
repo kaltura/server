@@ -93,12 +93,18 @@ class kApiCache extends kApiCacheBase
 	
 	protected function __construct($cacheType, $params = null)
 	{
-		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		if ($params)
 			$this->_params = $params;
 		else
 			$this->_params = infraRequestUtils::getRequestParams();
+
+		if(isset($this->_params['action'])  && isset($this->_params['service']))
+		{
+			$cacheType = kConf::getArrayValue($this->_params['service'] . '_' . $this->_params['action'], 'api_v3', 'cache', $cacheType);
+		}
+
+		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		parent::__construct();
 	}

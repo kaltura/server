@@ -4391,6 +4391,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function allowEdit()
 	{
-		return kCurrentContext::$is_admin_session || $this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId());
+		//Admin's should be allowed to edit
+		if(kCurrentContext::$is_admin_session)
+		{
+			return true;
+		}
+
+		//If current user is entitled to edit the entry
+		if($this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()))
+		{
+			return true;
+		}
+
+		//If provided KS contains edit privilege for the given entry ID
+		if(isset(kCurrentContext::$ks_object) && (kCurrentContext::$ks_object->hasPrivilege(ks::PRIVILEGE_WILDCARD) ||
+				kCurrentContext::$ks_object->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $this->getId())))
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

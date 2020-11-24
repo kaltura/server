@@ -27,6 +27,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const CATALOG_ITEM_ONLY_HUMAN_ALLOWED = "CATALOG_ITEM_ONLY_HUMAN_ALLOWED;;Only human service type is allowed for given vendor catalog item";
 
+	const CATALOG_ITEM_ONLY_MACHINE_ALLOWED_RESUBMISSION = "CATALOG_ITEM_ONLY_MACHINE_ALLOWED_RESUBMISSION;;Only machine service type is allowed for resubmission";
+
 	/* Reach Profile */
 
 	const REACH_PROFILE_NOT_FOUND = "REACH_PROFILE_NOT_FOUND;ID;Reach profile with id provided not found [@ID@]";

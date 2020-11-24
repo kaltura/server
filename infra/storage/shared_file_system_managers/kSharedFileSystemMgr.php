@@ -693,4 +693,17 @@ abstract class kSharedFileSystemMgr
 		stream_wrapper_unregister('http');
 		stream_wrapper_unregister('https');
 	}
+	
+	/**
+	 * This function is required since this code can run before the autoloader
+	 *
+	 * @param string $msg
+	 */
+	public static function safeLog($msg)
+	{
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::log($msg);
+		}
+	}
 }

@@ -103,7 +103,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		// if this is an update request (and not just password reset), check that old password is valid
 		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
 		{
-			throw new kUserException('', kUserException::WRONG_PASSWORD);
+			return self::loginAttemptsLogic($loginData);
 		}
 		
 		// no need to query the DB if login email is the same
@@ -164,12 +164,37 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			if(!$otp)
 			{
-				throw new kUserException (self::OTP_MISSING, kUserException::MISSING_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException (self::OTP_MISSING, kUserException::MISSING_OTP);
+					}
+					throw $e;
+				}
+
 			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				throw new kUserException (self::OTP_INVALID, kUserException::INVALID_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException (self::OTP_INVALID, kUserException::INVALID_OTP);
+					}
+					throw $e;
+				}
 			}
 		}
 	}

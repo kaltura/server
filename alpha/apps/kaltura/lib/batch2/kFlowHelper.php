@@ -3265,6 +3265,10 @@ class kFlowHelper
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		if ($partner->getEnforceHttpsApi())
+		{
+			$url = str_replace("http:", "https:", $url);
+		}
 
 		return $url;
 	}

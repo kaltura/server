@@ -1,3 +1,35 @@
+# Propus 16.12.0  #
+
+## Add permission in Admin Console for automatically deleting recorded VOD entry when deleting live entry ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-11221
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.liveStreamDeleteRecordedVod.enabled = true
+    moduls.liveStreamDeleteRecordedVod.permissionType = 2
+    moduls.liveStreamDeleteRecordedVod.label = Kaltura Live Streams - Delete recorded VOD
+    moduls.liveStreamDeleteRecordedVod.permissionName = FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD
+    moduls.liveStreamDeleteRecordedVod.basePermissionType = 2
+    moduls.liveStreamDeleteRecordedVod.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamDeleteRecordedVod.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## Bumper Plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-11197
+
+### Configuration ###
+run the following:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_12_add_permissions_bumper_service.php
+
+Add 'Bumper' to:
+    /opt/kaltura/app/configurations/plugins.ini
+    
 # Propus 16.11.0  #
 
 ## Reach - update reach_vendor response profile ##

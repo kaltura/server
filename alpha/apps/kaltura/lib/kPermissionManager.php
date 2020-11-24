@@ -635,7 +635,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		
 		// init current kuser
-		if (self::$ksUserId) { // will never be null because ks::uid is never null
+		if (self::$ksUserId && (!self::$kuser || self::$kuser->getPartnerId() != self::$ksPartnerId || self::$kuser->getPuserId() != self::$ksUserId)) { // will never be null because ks::uid is never null
 			kuserPeer::setUseCriteriaFilter(false);
 			self::$kuser = kuserPeer::getActiveKuserByPartnerAndUid(self::$ksPartnerId, self::$ksUserId);
 			kuserPeer::setUseCriteriaFilter(true);

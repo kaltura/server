@@ -97,7 +97,15 @@ class kDruidBase
 	const COMMENT_MARKER = '@COMMENT@';
 
 	protected static $curl_handle = null;
-	
+
+	protected static $query_cache = null;
+	protected static $query_cache_expiration = 0;
+
+	protected static function initQueryCache()
+	{
+		//implement in case we always want query cache
+	}
+
 	protected static function getIntervals($fromTime, $toTime)
 	{
 		$fromTime = gmdate('Y-m-d\\TH:i:s\\Z', $fromTime);
@@ -305,7 +313,7 @@ class kDruidBase
 		);
 	}
 	
-	protected static function runQuery($content, $cache = null, $cacheExpiration = 0)
+	protected static function runQuery($content)
 	{
 		if (isset($content[self::DRUID_FILTER]) && !$content[self::DRUID_FILTER])
 		{
@@ -331,10 +339,10 @@ class kDruidBase
 
 		$post = json_encode($content);
 
-		if ($cache)
+		if (self::$query_cache)
 		{
 			$cacheKey = 'druidQuery-' . md5($post);
-			$response = $cache->get($cacheKey);
+			$response = self::$query_cache->get($cacheKey);
 			if ($response)
 			{
 				$result = json_decode($response, true);
@@ -428,10 +436,10 @@ class kDruidBase
 			throw new Exception('Error while running report ' . $result[self::DRUID_ERROR_MSG]);
 		}
 
-		if ($cache)
+		if (self::$query_cache)
 		{
 			KalturaLog::log("Saving query response to cache $cacheKey");
-			$cache->set($cacheKey, $response, $cacheExpiration);
+			self::$query_cache->set($cacheKey, $response, self::$query_cache_expiration);
 		}
 
 		return $result;

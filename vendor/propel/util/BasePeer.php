@@ -756,6 +756,7 @@ class BasePeer
 		$orderByClause = array();
 		// redundant definition $groupByClause = array();
 
+		$forceIndex = $criteria->getForceIndex();
 		$orderBy = $criteria->getOrderByColumns();
 		$groupBy = $criteria->getGroupByColumns();
 		$ignoreCase = $criteria->isIgnoreCase();
@@ -1001,6 +1002,12 @@ class BasePeer
 		}
 		
 		$from .= $joinClause ? ' ' . implode(' ', $joinClause) : '';
+		if ($forceIndex) {
+			if ($db->useQuoteIdentifier()) {
+				$forceIndex = $db->quoteIdentifier($forceIndex);
+			}
+			$from .= " FORCE INDEX($forceIndex)";
+		}
 
 		// Build the SQL from the arrays we compiled
 		$sql =  "SELECT "
