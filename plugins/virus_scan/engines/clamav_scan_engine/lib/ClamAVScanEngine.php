@@ -59,7 +59,8 @@ class ClamAVScanEngine extends VirusScanEngine
 		$statusLine = false;
 		foreach ($output as $line)
 		{
-			if (strpos($line, $filePath) === 0) {
+			if (strpos($line, $filePath) === 0 || strpos($line, realpath($filePath)) === 0)
+			{
 				$statusLine = $line;
 				break;
 			}
