@@ -198,6 +198,8 @@ class APIErrors
 	
 	// FILE_NAME - file name
 	const INVALID_FILE_NAME = "INVALID_FILE_NAME;FILE_NAME;Cannot find file @FILE_NAME@";
+
+	const INVALID_FILE_TYPE = "INVALID_FILE_TYPE;FILE_NAME;Restricted file type for file @FILE_NAME@";
 	
 	const ADMIN_KUSER_NOT_FOUND = "ADMIN_KUSER_NOT_FOUND;;The data you entered is invalid";
 	
