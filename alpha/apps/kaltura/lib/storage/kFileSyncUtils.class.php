@@ -1033,7 +1033,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 			
 			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
-			if($isClodDc && $skipFileSyncTypeMap && $skipFileSyncPattern && $tmp_file_sync->getDc() == $dc_id &&
+			if($isClodDc && $skipFileSyncTypeMap && $skipFileSyncPattern &&
 				in_array($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) && !preg_match($skipFileSyncPattern, $tmp_file_sync->getFullPath()))
 			{
 				continue;
