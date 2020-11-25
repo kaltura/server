@@ -85,6 +85,7 @@ function addCategoryEntryIds($client, $simuliveEntryId, $vodEntryId)
 	catch(Exception $e)
 	{
 		print_r($e->getMessage() . ' entryId: ' . $simuliveEntryId ."\n");
+		return;
 	}
 	foreach ($categoryEntryResult->objects as $categoryEntry)
 	{
