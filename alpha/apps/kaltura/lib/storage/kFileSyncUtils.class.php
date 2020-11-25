@@ -1014,7 +1014,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$periodicFileSyncs = array();
 		$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
 		
-		$isClodDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
+		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
 		$skipFileSyncTypeMap = kConf::get("skip_file_sync_type_map", "runtime_config", null);
 		$skipFileSyncPattern = kConf::get("skip_file_sync_pattern", "runtime_config", null);
 
@@ -1033,7 +1033,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 			
 			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
-			if($isClodDc && $skipFileSyncTypeMap && $skipFileSyncPattern && $tmp_file_sync->getDc() == $dc_id &&
+			if($isCloudDc && $skipFileSyncTypeMap && $skipFileSyncPattern && $tmp_file_sync->getDc() == $dc_id &&
 				in_array($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) && !preg_match($skipFileSyncPattern, $tmp_file_sync->getFullPath()))
 			{
 				continue;
