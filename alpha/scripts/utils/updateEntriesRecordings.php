@@ -27,7 +27,8 @@ $vodEntryIds = file ($vodEntryIdsFile) or die ('Could not read file'."\n");
 
 if (count($simuliveEntryIds) != count($vodEntryIds))
 {
-	KalturaLog::err('simuliveEntryIdsFile and vodEntryIdsFile should be on the same length');
+	print_r("simuliveEntryIdsFile and vodEntryIdsFile should be on the same length \n");
+	exit;
 }
 
 for ($i = 0; $i < count($simuliveEntryIds); $i++)
