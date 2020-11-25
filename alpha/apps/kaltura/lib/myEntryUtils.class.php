@@ -1231,7 +1231,18 @@ class myEntryUtils
 	{
 		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? kEntryFileSyncSubType::DATA : kEntryFileSyncSubType::THUMB;
 		$entryImageKey = $entry->getSyncKey($sub_type, $version);
-		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey, false, false);
+		
+		if(kConf::get('prefer_shared_file_sync_for_thumb', 'cloud_storage', null))
+		{
+			$file_sync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($entryImageKey, kDataCenterMgr::getSharedStorageProfileIds());
+			$local = true;
+		}
+		
+		if(!$file_sync)
+		{
+			list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey($entryImageKey, false, false);
+		}
+		
 		return ($local ? $file_sync : null);
 	}
 	

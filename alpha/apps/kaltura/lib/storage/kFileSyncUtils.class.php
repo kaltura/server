@@ -1106,7 +1106,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyLocalFilePathForKey( FileSyncKey $key , $strict = false )
 	{
 		KalturaLog::debug("key [$key], strict [$strict]");
-		list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
+		
+		if(kConf::get('prefer_shared_file_sync_for_thumb', 'cloud_storage', null))
+		{
+			$file_sync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($key, kDataCenterMgr::getSharedStorageProfileIds());
+			$local = true;
+		}
+		
+		if(!$file_sync)
+		{
+			list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
+		}
+		
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
