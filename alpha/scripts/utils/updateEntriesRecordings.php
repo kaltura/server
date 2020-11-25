@@ -60,7 +60,7 @@ foreach($simuliveVodEntryIds as $simuliveEntryIdVodEntryId)
 		}
 		catch(Exception $e)
 		{
-			print_r($e->getMessage() . ' entryId: ' . $simuliveEntryId ."\n");
+			print_r($e->getMessage() . ' entryId: ' . $vodEntryId ."\n");
 			continue;
 		}
 		addCategoryEntryIds($client, $simuliveEntryId, $vodEntryId);
