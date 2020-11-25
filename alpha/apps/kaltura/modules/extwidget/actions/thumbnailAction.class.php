@@ -436,16 +436,7 @@ class thumbnailAction extends sfAction
 		}
 			
 		$dataKey = $entry->getSyncKey($subType);
-		
-		$file_sync = null;
-		if(kConf::get('prefer_shared_file_sync_for_thumb', 'cloud_storage', null))
-		{
-			$file_sync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($dataKey, kDataCenterMgr::getSharedStorageProfileIds());
-			$local = true;
-		}
-		
-		if(!$file_sync)
-			list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
+		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
 		
 		$tempThumbPath = null;
 		$entry_status = $entry->getStatus();

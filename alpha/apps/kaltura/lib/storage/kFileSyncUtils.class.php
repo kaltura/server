@@ -1013,6 +1013,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$remoteFileSyncs = array();
 		$periodicFileSyncs = array();
 		$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
+		$skipFileSyncTypeMap = kConf::get("skip_file_sync_type_map", "runtime_config", null);
+		$skipFileSyncPattern = kConf::get("skip_file_sync_pattern", "runtime_config", null);
 
 		foreach ($file_sync_list as $file_sync)
 		{
@@ -1024,6 +1026,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 
 			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
+			{
+				continue;
+			}
+			
+			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
+			if($skipFileSyncTypeMap && $skipFileSyncPattern &&
+				in_array($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) && !preg_match($skipFileSyncPattern, $tmp_file_sync->getFullPath()))
 			{
 				continue;
 			}
@@ -1106,18 +1115,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyLocalFilePathForKey( FileSyncKey $key , $strict = false )
 	{
 		KalturaLog::debug("key [$key], strict [$strict]");
-		
-		if(kConf::get('prefer_shared_file_sync_for_thumb', 'cloud_storage', null))
-		{
-			$file_sync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($key, kDataCenterMgr::getSharedStorageProfileIds());
-			$local = true;
-		}
-		
-		if(!$file_sync)
-		{
-			list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
-		}
-		
+		list ( $file_sync , $local )= self::getReadyFileSyncForKey( $key , false , $strict );
 		if ( $file_sync )
 		{
 			$parent_file_sync = self::resolve($file_sync);
