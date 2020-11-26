@@ -158,6 +158,12 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 			$resolvedFileSync = $fileSync;
 		}
 
+		if ($resolvedFileSync->getIsDir())
+		{
+			KalturaLog::log("XXX $assetId: DIR_FILE_SYNC - dir file sync");
+			return;
+		}
+
 		if ($resolvedFileSync->getDc() != $fileSync->getDc())
 		{
 			if ($fileSync->getDc() == $targetDcId)
