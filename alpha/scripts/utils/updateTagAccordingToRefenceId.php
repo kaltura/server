@@ -28,11 +28,21 @@ foreach ($entryIds as $entryId)
 			list($referenceId, $tag) = explode(',', $referenceIdsTag);
 			if ($referenceId && $tag && $entryReferenceId === $referenceId)
 			{
-				$entryTags = $entry->getTags();
-				$entry->setTags($entryTags . ',__' . $tag);
-				$entry->save();
-				print_r('Adding tag __' . $tag . ' to entryId: '. $entryId .
-					' with reference id: ' . $entryReferenceId . "\n");
+				$pattern = array('/^/', '/[^[:alnum:]]/u');
+				$replacement = array('__', '_');
+				$tag = preg_replace($pattern, $replacement, $tag);
+				if ($tag)
+				{
+					$entryTags = $entry->getTags();
+					if ($entryTags)
+					{
+						$entryTags .= ',';
+					}
+					$entry->setTags($entryTags . $tag);
+					$entry->save();
+					print_r('Adding tag __' . $tag . ' to entryId: '. $entryId .
+						' with reference id: ' . $entryReferenceId . "\n");
+				}
 			}
 		}
 	}
