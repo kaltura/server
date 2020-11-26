@@ -302,6 +302,9 @@ class kKavaReportsMgr extends kKavaBase
 
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 
+	const SIMULIVE_PAST_DATE = 1577836800; // 1.1.2020
+	const SIMULIVE_DURATION = 94608000; // 3 years
+
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
@@ -5446,6 +5449,45 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 		return $live_entries_ids;
+	}
+
+	protected static function editWebcastEngagementTimelineFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		if (isset($input_filter->fromDate) && isset($input_filter->toDate))
+		{
+			return;
+		}
+
+		$entry_ids = explode($response_options->getDelimiter(), $input_filter->entries_ids);
+		$entry_id = reset($entry_ids);
+		$entry_id = trim($entry_id);
+		if (!$entry_id)
+		{
+			return;
+		}
+
+		$entry = entryPeer::retrieveByPK($entry_id);
+		if (!$entry)
+		{
+			return;
+		}
+
+		$simulive_event = kSimuliveUtils::getPlayableSimuliveEvent($entry, self::SIMULIVE_PAST_DATE, self::SIMULIVE_DURATION);
+		if (!$simulive_event)
+		{
+			return;
+		}
+
+		$simulive_starttime = $simulive_event->getCalculatedStartTime();
+		$simulive_endtime = $simulive_event->getCalculatedEndTime();
+		if (!$simulive_starttime || !$simulive_endtime)
+		{
+			return;
+		}
+
+		//edit filter with simulive start time and end time
+		$input_filter->from_date = $simulive_starttime;
+		$input_filter->to_date = $simulive_endtime;
 	}
 
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
