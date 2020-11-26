@@ -1044,6 +1044,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				return array($tmp_file_sync);
 			}
+			
+			// If file sync type is in skipFileSyncTypeMap we can also return teh cloud storage file sync
+			if($isCloudDc && $skipFileSyncTypeMap && $skipFileSyncPattern &&
+				in_array($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) && in_array($tmp_file_sync->getDc(), $periodicStorageIds))
+			{
+				return array($tmp_file_sync);
+			}
 
 			if(in_array($tmp_file_sync->getDc(), kDataCenterMgr::getDcIds()))
 			{
