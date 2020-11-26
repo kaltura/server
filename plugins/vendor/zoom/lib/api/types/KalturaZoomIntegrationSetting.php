@@ -17,6 +17,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 
 	/**
 	 * @var string
+	 * @readonly
 	 */
 	public $accountId;
 
@@ -54,4 +55,9 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableWebinarUploads;
+
+	/**
+	* @var int
+	 */
+	public $conversionProfileId;
 }

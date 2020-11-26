@@ -18,7 +18,8 @@ class ZoomVendorIntegration extends VendorIntegration
 	const USER_MATCHING = 'userMatching';
 	const HANDLE_PARTICIPANTS_MODE = 'HandleParticipantsMode';
 	const USER_POSTFIX = 'UserPostfix';
-	const ENABLE_WEBINAR_UPLOADS = "enableWebinarUploads";
+	const ENABLE_WEBINAR_UPLOADS = 'enableWebinarUploads';
+	const CONVERSION_PROFILE_ID = 'conversionProfileId';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -54,6 +55,9 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setEnableWebinarUploads($v) { $this->putInCustomData ( self::ENABLE_WEBINAR_UPLOADS, $v); }
 	public function getEnableWebinarUploads() { return $this->getFromCustomData ( self::ENABLE_WEBINAR_UPLOADS,null, true); }
+
+	public function setConversionProfileId($v) { $this->putInCustomData ( self::CONVERSION_PROFILE_ID, $v); }
+	public function getConversionProfileId() { return $this->getFromCustomData ( self::CONVERSION_PROFILE_ID,null, null); }
 
 	public function setLastError($v)
 	{

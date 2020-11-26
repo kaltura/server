@@ -211,6 +211,11 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration->setUserMatching($integrationSetting->zoomUserMatchingMode);
 		$zoomIntegration->setUserPostfix($integrationSetting->zoomUserPostfix);
 		$zoomIntegration->setEnableWebinarUploads($integrationSetting->enableWebinarUploads);
+		if($integrationSetting->conversionProfileId)
+		{
+			$zoomIntegration->setConversionProfileId($integrationSetting->conversionProfileId);
+		}
+
 		$zoomIntegration->save();
 		return true;
 	}
@@ -261,5 +266,37 @@ class ZoomVendorService extends KalturaBaseService
 		ZoomHelper::verifyZoomIntegration($zoomIntegration);
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());
 		$kZoomEventHandler->processEvent($event);
+	}
+
+	/**
+	 * Retrieve zoom integration setting object by partner id
+	 *
+	 * @action get
+	 * @param int $partnerId
+	 * @return KalturaZoomIntegrationSetting
+	 * @throws APIErrors::INVALID_PARTNER_ID
+	 */
+	public function getAction($partnerId)
+	{
+		/** @var ZoomVendorIntegration $zoomIntegration */
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByPartner($partnerId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if($zoomIntegration)
+		{
+			$integrationSetting = new KalturaZoomIntegrationSetting();
+			$integrationSetting->defaultUserId = $zoomIntegration->getDefaultUserEMail();
+			$integrationSetting->createUserIfNotExist = $zoomIntegration->getCreateUserIfNotExist();
+			$integrationSetting->handleParticipantMode = $zoomIntegration->getHandleParticipantsMode();
+			$integrationSetting->zoomUserMatchingMode = $zoomIntegration->getUserMatching();
+			$integrationSetting->zoomUserPostfix = $zoomIntegration->getUserPostfix();
+			$integrationSetting->enableWebinarUploads = $zoomIntegration->getEnableWebinarUploads();
+			$integrationSetting->conversionProfileId = $zoomIntegration->getConversionProfileId();
+			$integrationSetting->zoomCategory = $zoomIntegration->getZoomCategory();
+			$integrationSetting->zoomWebinarCategory = $zoomIntegration->getZoomWebinarCategory();
+			$integrationSetting->enableRecordingUpload = $zoomIntegration->getStatus() == VendorStatus::ACTIVE ? 1 : 0;
+			$integrationSetting->accountId = $zoomIntegration->getAccountId();
+			return $integrationSetting;
+		}
+
+		throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 	}
 }
