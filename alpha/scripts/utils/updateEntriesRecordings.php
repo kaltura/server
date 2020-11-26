@@ -63,11 +63,11 @@ foreach($simuliveVodEntryIds as $simuliveEntryIdVodEntryId)
 			continue;
 		}
 
-		$kLive = new KalturaBaseEntry();
-		$kLive->displayInSearch = KalturaEntryDisplayInSearchType::SYSTEM;
+		$kBase = new KalturaBaseEntry();
+		$kBase->displayInSearch = KalturaEntryDisplayInSearchType::SYSTEM;
 		try
 		{
-			$client->baseEntry->update($vodEntryId, $kLive);
+			$client->baseEntry->update($vodEntryId, $kBase);
 			print_r('EntryId: ' . $vodEntryId . ' was updated with displayInSearch: ' . KalturaEntryDisplayInSearchType::SYSTEM . "\n");
 		}
 		catch(Exception $e)
