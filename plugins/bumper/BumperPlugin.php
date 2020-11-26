@@ -58,22 +58,7 @@ class BumperPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPe
 					$bumper->fromObject( $dbBumper );
 
 					$bumperContextDataHelper = new kContextDataHelper($dbBumperEntry, $dbBumperEntry->getPartner(), null);
-					if ($dbBumperEntry->getAccessControl() && $dbBumperEntry->getAccessControl()->hasRules())
-					{
-						$accessControlScope = $dbBumperEntry->getAccessControl()->getScope();
-					}
-					else
-					{
-						$accessControlScope = new accessControlScope();
-					}
-					$bumperContextDataHelper->buildContextDataResult($accessControlScope, kContextDataHelper::ALL_TAGS, null, null, true);
-					if ($bumperContextDataHelper->getDisableCache())
-					{
-						KalturaResponseCacher::disableCache();
-					}
-
-					$bumperContextDataHelper->setMediaProtocol(null);
-					$bumperContextDataHelper->setStreamerType(null);
+					$bumperContextDataHelper->buildContextDataResult(null, kContextDataHelper::ALL_TAGS, null, null, true);
 
 					$playbackContextDataHelper = new kPlaybackContextDataHelper();
 					$playbackContextDataHelper->constructPlaybackContextResult($bumperContextDataHelper, $dbBumperEntry);
