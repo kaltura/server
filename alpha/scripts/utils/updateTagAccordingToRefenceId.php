@@ -40,7 +40,7 @@ foreach ($entryIds as $entryId)
 					}
 					$entry->setTags($entryTags . $tag);
 					$entry->save();
-					print_r('Adding tag __' . $tag . ' to entryId: '. $entryId .
+					print_r('Adding tag ' . $tag . ' to entryId: '. $entryId .
 						' with reference id: ' . $entryReferenceId . "\n");
 				}
 			}
