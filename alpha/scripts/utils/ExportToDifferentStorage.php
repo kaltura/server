@@ -370,7 +370,6 @@ function handleAssets($handle)
 		// get the asset
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
-		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$asset = assetPeer::doSelectOne($c);
 		if (!$asset)
