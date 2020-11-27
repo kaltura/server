@@ -302,8 +302,8 @@ class kKavaReportsMgr extends kKavaBase
 
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 
-	const SIMULIVE_PAST_DATE = 1577836800; // 1.1.2020
-	const SIMULIVE_DURATION = 94608000; // 3 years
+	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
+	const SCHEDULE_EVENT_DURATION = 94608000; // 3 years
 
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
@@ -5479,7 +5479,7 @@ class kKavaReportsMgr extends kKavaBase
 		$event = null;
 		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
 		{
-			$events =  $entry->getScheduleEvents(self::SIMULIVE_PAST_DATE, self::SIMULIVE_PAST_DATE + self::SIMULIVE_DURATION);
+			$events =  $entry->getScheduleEvents(self::SCHEDULE_EVENT_PAST_DATE, self::SCHEDULE_EVENT_PAST_DATE + self::SCHEDULE_EVENT_DURATION);
 			$event = $events ? $events[0] : null;
 		}
 
