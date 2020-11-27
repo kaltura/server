@@ -5453,12 +5453,16 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function editWebcastEngagementTimelineFilter($input_filter, $partner_id, $response_options, $context)
 	{
-		if (isset($input_filter->fromDate) && isset($input_filter->toDate))
+		if ($input_filter->from_date || $input_filter->to_date)
 		{
 			return;
 		}
 
 		$entry_ids = explode($response_options->getDelimiter(), $input_filter->entries_ids);
+		if (count($entry_ids) != 1)
+		{
+			return;
+		}
 		$entry_id = reset($entry_ids);
 		$entry_id = trim($entry_id);
 		if (!$entry_id)
@@ -5466,28 +5470,34 @@ class kKavaReportsMgr extends kKavaBase
 			return;
 		}
 
-		$entry = entryPeer::retrieveByPK($entry_id);
+		$entry = entryPeer::retrieveByPKNoFilter($entry_id);
 		if (!$entry)
 		{
 			return;
 		}
 
-		$simulive_event = kSimuliveUtils::getPlayableSimuliveEvent($entry, self::SIMULIVE_PAST_DATE, self::SIMULIVE_DURATION);
-		if (!$simulive_event)
+		$event = null;
+		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		{
+			$events =  $entry->getScheduleEvents(self::SIMULIVE_PAST_DATE, self::SIMULIVE_PAST_DATE + self::SIMULIVE_DURATION);
+			$event = $events ? $events[0] : null;
+		}
+
+		if (!$event)
 		{
 			return;
 		}
 
-		$simulive_starttime = $simulive_event->getCalculatedStartTime();
-		$simulive_endtime = $simulive_event->getCalculatedEndTime();
-		if (!$simulive_starttime || !$simulive_endtime)
+		$event_starttime = $event->getCalculatedStartTime();
+		$event_endtime = $event->getCalculatedEndTime();
+		if (!$event_starttime || !$event_endtime)
 		{
 			return;
 		}
 
 		//edit filter with simulive start time and end time
-		$input_filter->from_date = $simulive_starttime;
-		$input_filter->to_date = $simulive_endtime;
+		$input_filter->from_date = $event_starttime;
+		$input_filter->to_date = $event_endtime;
 	}
 
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
