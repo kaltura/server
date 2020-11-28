@@ -489,6 +489,8 @@ class KalturaErrors extends APIErrors
 	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED;PROP;The property \"@PROP@\" is deprecated and should not be used";
 
 	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
+	
+	const GROUPS_CANNOT_CO_EXIST = "GROUPS_CANNOT_CO_EXIST;userId,group,blockedCoExist;Cannot add user [@userId@] to group [@group@] since user is already member of a group it cannot co exist with [@blockedCoExist@]";
 
 	/*
 	 * syndication service

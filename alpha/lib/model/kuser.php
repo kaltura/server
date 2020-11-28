@@ -23,6 +23,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	const REGISTRATION_INFO = "registration_info";
 	const ATTENDANCE_INFO = "attendance_info";
+	const CO_EXISTENCE_BLOCKED_IDS = "co_existence_blocked_ids";
 
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
@@ -1441,5 +1442,35 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function getAttendanceInfo()
 	{
 		return $this->getFromCustomData(self::ATTENDANCE_INFO);
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getCoExistenceBlockedIdsArray()
+	{
+		$coExistenceBlockedIds = $this->getCoExistenceBlockedIds();
+		if(!$coExistenceBlockedIds)
+		{
+			return array();
+		}
+		
+		return explode(",", $coExistenceBlockedIds);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getCoExistenceBlockedIds()
+	{
+		return $this->getFromCustomData(self::CO_EXISTENCE_BLOCKED_IDS);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setCoExistenceBlockedIds($v)
+	{
+		$this->putInCustomData(self::CO_EXISTENCE_BLOCKED_IDS, $v);
 	}
 }
