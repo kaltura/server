@@ -921,11 +921,11 @@ class myPartnerUtils
 
 		$reportFilter = new reportsInputFilter();
 		$reportFilter->from_day = str_replace('-','',$report_date);
-		
+
 		$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "FALSE";
 		if ($partnerPackage['id'] == 1) // free package
 			$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
-
+		
 		list($header, $data) = kKavaReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD ,
 		 $reportFilter, 10000 , 1 , "", null);
 
