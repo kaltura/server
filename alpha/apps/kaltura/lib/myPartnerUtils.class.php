@@ -910,6 +910,7 @@ class myPartnerUtils
  	const KALTURA_MONTHLY_PACKAGE_LIMIT_WARNING_2 = 97;
 	
 	const IS_FREE_PACKAGE_PLACE_HOLDER = "{IS_FREE_PACKAGE}";
+	const PARTNER_CREATION_DATE = 'PARTNER_CREATION_DATE';
 	
 	
 	public static function collectPartnerStatisticsFromDWH($partner, $partnerPackage, $report_date, $data_for_graph = false)
@@ -925,7 +926,9 @@ class myPartnerUtils
 		$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "FALSE";
 		if ($partnerPackage['id'] == 1) // free package
 			$reportFilter->extra_map[self::IS_FREE_PACKAGE_PLACE_HOLDER] = "TRUE";
-		
+
+		$reportFilter->extra_map[self::PARTNER_CREATION_DATE] = $partner->getCreatedAt('Ymd');
+
 		list($header, $data) = kKavaReportsMgr::getTable( $partner->getId(), myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD ,
 		 $reportFilter, 10000 , 1 , "", null);
 
