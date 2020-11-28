@@ -43,6 +43,8 @@ class GroupUserService extends KalturaBaseService
 		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
 		if($kuserKgroup)
 			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
+		
+		$this->validateKuserkGroupCoExistence($kgroup, $kuser->getId());
 
 		//verify user does not belongs to more than max allowed groups
 		$criteria = new Criteria();
@@ -412,5 +414,29 @@ class GroupUserService extends KalturaBaseService
 				$this->throwServiceForbidden();
 			}
 		}
+	}
+	
+	protected function validateKuserkGroupCoExistence(kuser $kGroup, $kuserId)
+	{
+		$kuserKgroupCoExistenceConfig = kConf::get("kuser_kgroup_co_existence_config", "runtime_config", array());
+		if(!isset($kuserKgroupCoExistenceConfig[$kGroup->getPartnerId()]))
+		{
+			return;
+		}
+		
+		$kuserKgroupCoExistenceConfig = $kuserKgroupCoExistenceConfig[$kGroup->getPartnerId()];
+		$kuserKGroupCoExistenceConfigArray = explode(",", $kuserKgroupCoExistenceConfig);
+		if(!in_array($kGroup->getId(), $kuserKGroupCoExistenceConfigArray))
+		{
+			return;
+		}
+		
+		$kuserKgroup = KuserKgroupPeer::retrieveByKgroupIdsAndKuserId($kuserKGroupCoExistenceConfigArray, $kuserId);
+		if(!$kuserKgroup)
+		{
+			return;
+		}
+		
+		throw new KalturaAPIException (KalturaErrors::GROUPS_CANNOT_CO_EXIST, $kuserId, $kGroup->getId(), $kuserKgroupCoExistenceConfig);
 	}
 }
