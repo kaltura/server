@@ -5383,16 +5383,19 @@ class kKavaReportsMgr extends kKavaBase
 		$month_end = min($date->format('Ymd'), $current_date_id);
 		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER] == 'TRUE';
 
-		$partner_created_at = 0;
-		if (isset($input_filter->extra_map[myPartnerUtils::PARTNER_CREATION_DATE]))
+		if ($is_free_package)
 		{
-			$partner_created_at = self::dateIdToDateTime($input_filter->extra_map[myPartnerUtils::PARTNER_CREATION_DATE]);
+			$partner_created_at = 0;
+			$partner = PartnerPeer::retrieveByPK($partner_id);
+			if ($partner)
+			{
+				$partner_created_at = $partner->getCreatedAt('Ymd');
+			}
+			$end_date = self::dateIdToDateTime($month_end);
+			$end_date->modify('-6 month');
+			$free_package_start_date = max(self::dateIdToDateTime($partner_created_at), $end_date);
+			$free_package_start_date = $free_package_start_date->format('Ymd');
 		}
-
-		$enddate = self::dateIdToDateTime($month_end);;
-		$enddate->modify('-6 month');
-		$free_package_start_date = max($partner_created_at, $enddate);
-		$free_package_start_date = $free_package_start_date->format('Ymd');
 
 		$input_filter->from_day = $is_free_package ? $free_package_start_date : $month_start;
 		$input_filter->to_day = $month_end;
