@@ -93,6 +93,8 @@ class kDruidBase
 	// kConf params
 	const DRUID_URL = "druid_url";
 	const DRUID_QUERY_TIMEOUT = 'druid_timeout';
+	const DRUID_DYNAMIC_MAP = 'druid_dynamic_map';
+	const DRUID_BROKER_URL = 'druid_broker_url';
 
 	const COMMENT_MARKER = '@COMMENT@';
 
@@ -360,8 +362,10 @@ class kDruidBase
 		$comment .= "[$uniqueId][$clientTag]";
 		$post = str_replace(json_encode(self::COMMENT_MARKER), json_encode($comment), $post);
 		KalturaLog::log($post);
-			
+
 		$url = kConf::get(self::DRUID_URL);
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$url = kConf::getArrayValue($partnerId, self::DRUID_BROKER_URL, self::DRUID_DYNAMIC_MAP, $url);
 
 		if (!self::$curl_handle)
 		{
