@@ -23,14 +23,17 @@ foreach ($kuserIds as $kuserId)
 	if ($kuser)
 	{
 		$registerInfo = $kuser->getRegistrationInfo();
-		$registerInfoDecoded = json_decode($registerInfo, true);
-		if ($registerInfoDecoded && !$registerInfoDecoded['groupId'])
+		if ($registerInfo)
 		{
-			$registerInfoDecoded['groupId'] = $groupId;
-			$registerInfoEncoded = str_replace('\/', '/', json_encode($registerInfoDecoded));
-			$kuser->setRegistrationInfo($registerInfoEncoded);
-			$kuser->save();
-			print_r('Adding groupId: ' . $groupId . ' to RegistrationInfo on kuserId: '. $kuserId . "\n");
+			$registerInfoDecoded = json_decode($registerInfo, true);
+			if ($registerInfoDecoded && !$registerInfoDecoded['groupId'])
+			{
+				$registerInfoDecoded['groupId'] = $groupId;
+				$registerInfoEncoded = str_replace('\/', '/', json_encode($registerInfoDecoded));
+				$kuser->setRegistrationInfo($registerInfoEncoded);
+				$kuser->save();
+				print_r('Adding groupId: ' . $groupId . ' to RegistrationInfo on kuserId: '. $kuserId . "\n");
+			}
 		}
 	}
 }
