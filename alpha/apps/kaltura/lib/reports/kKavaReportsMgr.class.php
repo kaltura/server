@@ -302,6 +302,9 @@ class kKavaReportsMgr extends kKavaBase
 
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 
+	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
+	const SCHEDULE_EVENT_DURATION = 94608000; // 3 years
+
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
@@ -5446,6 +5449,55 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 		return $live_entries_ids;
+	}
+
+	protected static function editWebcastEngagementTimelineFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		if ($input_filter->from_date || $input_filter->to_date)
+		{
+			return;
+		}
+
+		$entry_ids = explode($response_options->getDelimiter(), $input_filter->entries_ids);
+		if (count($entry_ids) != 1)
+		{
+			return;
+		}
+		$entry_id = reset($entry_ids);
+		$entry_id = trim($entry_id);
+		if (!$entry_id)
+		{
+			return;
+		}
+
+		$entry = entryPeer::retrieveByPKNoFilter($entry_id);
+		if (!$entry)
+		{
+			return;
+		}
+
+		$event = null;
+		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		{
+			$events =  $entry->getScheduleEvents(self::SCHEDULE_EVENT_PAST_DATE, self::SCHEDULE_EVENT_PAST_DATE + self::SCHEDULE_EVENT_DURATION);
+			$event = $events ? $events[0] : null;
+		}
+
+		if (!$event)
+		{
+			return;
+		}
+
+		$event_starttime = $event->getCalculatedStartTime();
+		$event_endtime = $event->getCalculatedEndTime();
+		if (!$event_starttime || !$event_endtime)
+		{
+			return;
+		}
+
+		//edit filter with simulive start time and end time
+		$input_filter->from_date = $event_starttime;
+		$input_filter->to_date = $event_endtime;
 	}
 
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
