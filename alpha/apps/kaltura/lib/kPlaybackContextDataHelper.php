@@ -76,12 +76,16 @@ class kPlaybackContextDataHelper
 			$this->constructRemotePlaybackSources($dbEntry, $contextDataHelper);
 			$this->constructPlaybackCaptions($dbEntry, $contextDataHelper);
 		}
-		$this->constructBumperData($dbEntry, $contextDataHelper);
 
 		$this->setPlaybackSources($dbEntry->getPartner()->getStorageServePriority());
 		$this->filterFlavorsBySources();
 		$this->playbackContext->setFlavorAssets($this->flavorAssets);
 		$this->playbackContext->setPlaybackCaptions($this->playbackCaptions);
+
+		if($this->playbackContext->getSources())
+		{
+			$this->constructBumperData($dbEntry, $contextDataHelper);
+		}
 		$this->playbackContext->setBumperData($this->bumperData);
 	}
 
