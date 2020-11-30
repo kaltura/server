@@ -13,6 +13,8 @@ if($argc == 4 && $argv[3] == 'realrun')
 {
 	$dryrun = false;
 }
+KalturaStatement::setDryRun($dryrun);
+KalturaLog::debug('dryrun value: ['.$dryrun.']');
 
 $kuserIds = file ($kuserIdsFile) or die ('Could not read file'."\n");
 
@@ -36,5 +38,10 @@ foreach ($kuserIds as $kuserId)
 			}
 		}
 	}
+}
+unset($kuserIds);
+if(function_exists('gc_collect_cycles'))
+{
+	gc_collect_cycles();
 }
 print_r("Done! \n");
