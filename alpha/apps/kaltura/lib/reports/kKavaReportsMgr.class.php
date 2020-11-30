@@ -5381,9 +5381,27 @@ class kKavaReportsMgr extends kKavaBase
 		$date->modify('+1 month');
 		$date->modify('-1 day');
 		$month_end = min($date->format('Ymd'), $current_date_id);
-		
 		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER] == 'TRUE';
-		$input_filter->from_day = $is_free_package ? str_replace('-', '', self::BASE_DATE_ID) : $month_start;
+
+		if ($is_free_package)
+		{
+			$partner_created_at = str_replace('-', '', self::BASE_DATE_ID);
+			$partner = PartnerPeer::retrieveByPK($partner_id);
+			if ($partner)
+			{
+				$partner_created_at = $partner->getCreatedAt('Ymd');
+			}
+			$end_date = self::dateIdToDateTime($month_end);
+			$end_date->modify('-6 month');
+			$free_package_start_date = max(self::dateIdToDateTime($partner_created_at), $end_date);
+			$free_package_start_date = $free_package_start_date->format('Ymd');
+			$input_filter->from_day = $free_package_start_date;
+		}
+		else
+		{
+			$input_filter->from_day = $month_start;
+		}
+
 		$input_filter->to_day = $month_end;
 		$input_filter->interval = reportInterval::MONTHS;
 	}
