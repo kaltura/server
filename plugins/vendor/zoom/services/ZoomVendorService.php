@@ -202,20 +202,8 @@ class ZoomVendorService extends KalturaBaseService
 		}
 
 		kuserPeer::createKuserForPartner($partnerId, $integrationSetting->defaultUserId);
-		$status = $integrationSetting->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED;
-		$zoomIntegration->setStatus($status);
 		$this->configureZoomCategories($integrationSetting, $zoomIntegration);
-		$zoomIntegration->setDefaultUserEMail($integrationSetting->defaultUserId);
-		$zoomIntegration->setCreateUserIfNotExist($integrationSetting->createUserIfNotExist);
-		$zoomIntegration->setHandleParticipantsMode($integrationSetting->handleParticipantMode);
-		$zoomIntegration->setUserMatching($integrationSetting->zoomUserMatchingMode);
-		$zoomIntegration->setUserPostfix($integrationSetting->zoomUserPostfix);
-		$zoomIntegration->setEnableWebinarUploads($integrationSetting->enableWebinarUploads);
-		if($integrationSetting->conversionProfileId)
-		{
-			$zoomIntegration->setConversionProfileId($integrationSetting->conversionProfileId);
-		}
-
+		$integrationSetting->toInsertableObject($zoomIntegration);
 		$zoomIntegration->save();
 		return true;
 	}
@@ -283,17 +271,7 @@ class ZoomVendorService extends KalturaBaseService
 		if($zoomIntegration)
 		{
 			$integrationSetting = new KalturaZoomIntegrationSetting();
-			$integrationSetting->defaultUserId = $zoomIntegration->getDefaultUserEMail();
-			$integrationSetting->createUserIfNotExist = $zoomIntegration->getCreateUserIfNotExist();
-			$integrationSetting->handleParticipantMode = $zoomIntegration->getHandleParticipantsMode();
-			$integrationSetting->zoomUserMatchingMode = $zoomIntegration->getUserMatching();
-			$integrationSetting->zoomUserPostfix = $zoomIntegration->getUserPostfix();
-			$integrationSetting->enableWebinarUploads = $zoomIntegration->getEnableWebinarUploads();
-			$integrationSetting->conversionProfileId = $zoomIntegration->getConversionProfileId();
-			$integrationSetting->zoomCategory = $zoomIntegration->getZoomCategory();
-			$integrationSetting->zoomWebinarCategory = $zoomIntegration->getZoomWebinarCategory();
-			$integrationSetting->enableRecordingUpload = $zoomIntegration->getStatus() == VendorStatus::ACTIVE ? 1 : 0;
-			$integrationSetting->accountId = $zoomIntegration->getAccountId();
+			$integrationSetting->fromObject($zoomIntegration);
 			return $integrationSetting;
 		}
 
