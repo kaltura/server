@@ -37,11 +37,11 @@ foreach ($kuserIds as $kuserId)
 				print_r('Adding groupId: ' . $groupId . ' to RegistrationInfo on kuserId: '. $kuserId . "\n");
 			}
 		}
+		unset($kuser);
 	}
-}
-unset($kuserIds);
-if(function_exists('gc_collect_cycles'))
-{
-	gc_collect_cycles();
+	if(function_exists('gc_collect_cycles'))
+	{
+		gc_collect_cycles();
+	}
 }
 print_r("Done! \n");
