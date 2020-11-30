@@ -72,9 +72,9 @@ class kRendererDumpFile implements kRendererBase
 	
 	public function output()
 	{
-		if ($this->maxAge && 
-			isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
-			$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($this->lastModified))
+		$forceCacheResults = kConf::get("force_cached_result", "runtime_config", null);
+		if ( isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $this->maxAge &&
+			($forceCacheResults || $_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($this->lastModified)) )
 		{
 			infraRequestUtils::sendCachingHeaders($this->maxAge, false, $this->lastModified);
 			header("HTTP/1.1 304 Not Modified");
