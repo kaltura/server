@@ -651,7 +651,7 @@ class embedPlaykitJsAction extends sfAction
 		//Get bundle configuration stored in conf_vars
 		$confVars = $this->uiConf->getConfVars();
 		if (!$confVars) {
-			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
+			KExternalErrors::dieError("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
 		}
 
 		//Get partner ID from QS or from UI conf
