@@ -1,3 +1,18 @@
+# Propus 16.13.0  #
+
+## Configurable Transcoding Profile for Zoom Integration ##
+- Issue Type: Task
+- Issue ID: PLAT-22489
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_25_update_zoomVendor_add_get_action.php
+
 # Propus 16.12.0  #
 
 ## Add permission in Admin Console for automatically deleting recorded VOD entry when deleting live entry ##
