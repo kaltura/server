@@ -73,17 +73,21 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 
 		$extraUsers = $this->getAdditionalUsers($recording->id, $dbUser->getPuserId());
-		foreach ($recording->recordingFiles[kRecordingFileType::VIDEO] as $recordingFile)
+		foreach ($recording->recordingFiles as $recordingFilesPerTimeSlot)
 		{
-			$this->handleVideoRecord($recording, $dbUser, $extraUsers, $recordingFile, $event);
-		}
-
-		if(isset($recording->recordingFiles[kRecordingFileType::CHAT]))
-		{
-			$chatFilesProcessor = new kZoomChatFilesProcessor();
-			foreach ($recording->recordingFiles[kRecordingFileType::CHAT] as $recordingFile)
+			$this->mainEntry = null;
+			foreach ($recordingFilesPerTimeSlot[kRecordingFileType::VIDEO] as $recordingFile)
 			{
-				$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
+				$this->handleVideoRecord($recording, $dbUser, $extraUsers, $recordingFile, $event);
+			}
+
+			if (isset($recordingFilesPerTimeSlot[kRecordingFileType::CHAT]))
+			{
+				$chatFilesProcessor = new kZoomChatFilesProcessor();
+				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
+				{
+					$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
+				}
 			}
 		}
 	}
