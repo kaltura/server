@@ -910,7 +910,7 @@ class kFlowHelper
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			try
 			{
-				if($partnerSharedStorageProfileId)
+				if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
 				{
 					KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
 					$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
