@@ -268,36 +268,40 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		    $recipientsBcc = $this->getRecipientArray($data->bcc, $contentParameters);
 		}
 
-		$recipientsBccCount=0;
-		$recipientsBccBulk=500;
+		$recipientsBccHandledCounter = 0;
+		$recipientsBccBulk = 500;
 		do
 		{
 		    if($recipientsBcc)
 		    {
-			$recipients =  array_slice($recipientsBcc,$recipientsBccCount,$recipientsBccBulk-1);
+			$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk - 1);
 			foreach ($recipients as $email=>$name)
 			{
-			    $recipientsBccCount++;
+			    $recipientsBccHandledCounter++;
 			    if (filter_var($email, FILTER_VALIDATE_EMAIL))
 			    {
-				KalturaLog::info("Adding recipient to BCC recipients $name<$email> , Index:$recipientsBccCount");
+				KalturaLog::info("Adding recipient to BCC recipients $name<$email> , Index:$recipientsBccHandledCounter");
 				self::$mailer->AddBCC($email, $name);
 			    }
 			}
 		    }
 
-		    try {
-			KalturaLog::info("Sending Bulk");
+		    try 
+		    {
+			KalturaLog::info('Sending Bulk');
 			$success = $this::$mailer->Send();
 			if (!$success)
+			{	
 			    throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
-		    } catch (Exception $e) {
+			}
+		    } catch (Exception $e) 
+		    {
 			throw new kTemporaryException("Sending mail failed with exception: " . $e->getMessage(), $e->getCode());
 		    }
 
 		    self::$mailer->ClearBCCs();
 		}
-		while($recipientsBccCount < count($recipientsBcc));
+		while($recipientsBccHandledCounter < count($recipientsBcc));
 		
 		return true;
 	}
