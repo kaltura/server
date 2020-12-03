@@ -100,7 +100,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$entry = $this->createEntryFromRecording($recording, $owner);
 		if($this->mainEntry)
 		{
-			$entry->setParentEntryId($this->mainEntry->getId());
+			//$entry->setParentEntryId($this->mainEntry->getId());
 		}
 
 		$this->setEntryCategory($zoomIntegration, $entry);
