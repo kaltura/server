@@ -185,20 +185,6 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			}
 		}
 		
-		if($data->bcc)
-		{
-			$recipients = $this->getRecipientArray($data->bcc, $contentParameters);
-			foreach ($recipients as $email=>$name)
-			{
-				if (!filter_var($email, FILTER_VALIDATE_EMAIL))
-				{
-					continue;
-				}
-				KalturaLog::info("Adding recipient to BCC recipients $name<$email>");
-				self::$mailer->AddBCC($email, $name);
-			}
-		}
-		
 		if($data->replyTo)
 		{
 			$recipients = $this->getRecipientArray($data->replyTo, $contentParameters);
@@ -276,17 +262,47 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			}
 		}
 		
-		try
+		$recipientsBcc = array();
+		if($data->bcc)
 		{
+		    $recipientsBcc = $this->getRecipientArray($data->bcc, $contentParameters);
+		}
+
+		$recipientsBccHandledCounter = 0;
+		$recipientsBccBulk = 500;
+		do
+		{
+		    if($recipientsBcc)
+		    {
+			$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk - 1);
+			foreach ($recipients as $email=>$name)
+			{
+			    $recipientsBccHandledCounter++;
+			    if (filter_var($email, FILTER_VALIDATE_EMAIL))
+			    {
+				KalturaLog::info("Adding recipient to BCC recipients $name<$email> , Index:$recipientsBccHandledCounter");
+				self::$mailer->AddBCC($email, $name);
+			    }
+			}
+		    }
+
+		    try 
+		    {
+			KalturaLog::info('Sending Bulk');
 			$success = $this::$mailer->Send();
-			if(!$success)
-				throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
+			if (!$success)
+			{	
+			    throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
+			}
+		    } catch (Exception $e) 
+		    {
+			throw new kTemporaryException("Sending mail failed with exception: " . $e->getMessage(), $e->getCode());
+		    }
+
+		    self::$mailer->ClearBCCs();
 		}
-		catch(Exception $e)
-		{
-			throw new kTemporaryException("Sending mail failed with exception: " . $e->getMessage(), $e->getCode());	
-		}
-			
+		while($recipientsBccHandledCounter < count($recipientsBcc));
+		
 		return true;
 	}
 	
