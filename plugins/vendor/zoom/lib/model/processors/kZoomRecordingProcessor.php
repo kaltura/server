@@ -98,11 +98,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	protected function handleVideoRecord($recording, $owner, $zoomIntegration, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromRecording($recording, $owner);
-		if($this->mainEntry)
-		{
-			$entry->setParentEntryId($this->mainEntry->getId());
-		}
-
 		$this->setEntryCategory($zoomIntegration, $entry);
 		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
 		$entry->save();
