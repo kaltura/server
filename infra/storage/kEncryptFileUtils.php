@@ -45,10 +45,10 @@ class kEncryptFileUtils
         $bytesRead = 0;
         $bytesToRead = self::ENCRYPT_INTERVAL;
 	
-	    if (function_exists('stream_set_chunk_size'))
-	    {
-		    stream_set_chunk_size($srcFd, $bytesToRead);
-	    }
+        if (function_exists('stream_set_chunk_size'))
+        {
+            stream_set_chunk_size($srcFd, $bytesToRead);
+        }
         
         while(!feof($srcFd) || $bytesRead < $bytesToRead)
         {
@@ -73,10 +73,10 @@ class kEncryptFileUtils
         $bytesRead = 0;
         $bytesToRead = self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE;
 	
-	    if (function_exists('stream_set_chunk_size'))
-	    {
-		    stream_set_chunk_size($srcFd, $bytesToRead);
-	    }
+        if (function_exists('stream_set_chunk_size'))
+        {
+            stream_set_chunk_size($srcFd, $bytesToRead);
+        }
     	
         while(!feof($srcFd) || $bytesRead < $bytesToRead)
         {
