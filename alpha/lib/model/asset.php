@@ -539,10 +539,12 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey, true);
 		
-		if($serveRemote && $fileSync) {
+		if($serveRemote && $fileSync && !in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		{
 			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
 		}
-		else {
+		else
+		{
 		    $downloadUrl = $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview, $includeKs);
 		}
 		
