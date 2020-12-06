@@ -1,5 +1,18 @@
 # Propus 16.13.0  #
 
+## Adjust Kaltura Capture transcoding profile ##
+- Issue Type: Task
+- Issue ID: PSVAMB-16978
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/2020_12_06_update_lectureCapture_ConversionProfile2.php
+
 ## Configurable Transcoding Profile for Zoom Integration ##
 - Issue Type: Task
 - Issue ID: PLAT-22489
