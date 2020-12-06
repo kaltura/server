@@ -41,7 +41,21 @@ class kEncryptFileUtils
 
     private static function doEncryptFile($srcFd, $key, $iv, $destFd)
     {
-        $clear = fread($srcFd,self::ENCRYPT_INTERVAL);
+        $clear = '';
+        $bytesRead = 0;
+        $bytesToRead = self::ENCRYPT_INTERVAL;
+	
+	    if (function_exists('stream_set_chunk_size'))
+	    {
+		    stream_set_chunk_size($srcFd, $bytesToRead);
+	    }
+        
+        while(!feof($srcFd) || $bytesRead < $bytesToRead)
+        {
+            $clear .= fread($srcFd, $bytesToRead);
+            $bytesRead += strlen($clear);
+        }
+	    
         $enc = self::encryptData($clear, $key, $iv);
         $iv = substr($enc, -self::AES_BLOCK_SIZE);
         fwrite($destFd, $enc);
@@ -55,7 +69,21 @@ class kEncryptFileUtils
 
     private static function doDecryptFile($srcFd, $key, $iv, $destFd)
     {
-        $content = fread($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
+        $content = '';
+        $bytesRead = 0;
+        $bytesToRead = self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE;
+	
+	    if (function_exists('stream_set_chunk_size'))
+	    {
+		    stream_set_chunk_size($srcFd, $bytesToRead);
+	    }
+    	
+        while(!feof($srcFd) || $bytesRead < $bytesToRead)
+        {
+            $content .= fread($srcFd, $bytesToRead);
+            $bytesRead += strlen($content);
+        }
+	    
         $clear = self::decryptData($content, $key, $iv);
         fwrite($destFd, $clear);
         return substr($content, -self::AES_BLOCK_SIZE);
@@ -73,6 +101,10 @@ class kEncryptFileUtils
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
             $srcFilePath = kFile::realPath($srcFilePath);
+	        
+            stream_wrapper_restore('http');
+            stream_wrapper_restore('https');
+         
             $fd1 = fopen($srcFilePath, "rb");
             if ($fd1 === false)
             {
@@ -89,11 +121,14 @@ class kEncryptFileUtils
             }
             fclose($fd1);
             fclose($fd2);
+	
+            stream_wrapper_unregister ('http');
+            stream_wrapper_unregister ('https');
 
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
             // adding @ to avoid valid case which in 2 process creating clear file at the same time
-            return @kFile::rename($tempPath, $dstFilePath);
+            return @kFile::moveFile($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
@@ -132,6 +167,7 @@ class kEncryptFileUtils
 
     public static function encryptFolder($dirName, $key, $iv)
     {
+    	//ToDo Handle dir listing method when working with shared storage
         $filesPaths = kFile::dirList($dirName);
         $done = true;
         foreach ($filesPaths as $filePath)
@@ -141,9 +177,9 @@ class kEncryptFileUtils
 
     public static function encrypt($path, $key, $iv)
     {
-        if (is_file($path))
+        if (kFile::isFile($path))
             return self::encryptFile($path, $key, $iv);
-        else if (is_dir($path))
+        else if (kFile::isDir($path))
             return self::encryptFolder($path, $key, $iv);
     }
 
