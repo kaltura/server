@@ -1230,8 +1230,6 @@ class LogProcessorApiV3 implements LogProcessor
 			{
 				$this->inParams = false;
 
-				//Making sure that every Array starts in a new line
-				$this->params = str_replace('=> Array', "=>\nArray",$this->params);
 				$parsedParams = print_r_reverse($this->params);
 				if (print_r($parsedParams, true) != $this->params)
 				{
