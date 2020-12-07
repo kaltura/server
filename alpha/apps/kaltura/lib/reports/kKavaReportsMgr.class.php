@@ -221,6 +221,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
 	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
+	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -282,7 +283,7 @@ class kKavaReportsMgr extends kKavaBase
 	// limits
 	const MAX_RESULT_SIZE = 12000;
 	const MAX_CSV_RESULT_SIZE = 60000;
-	const MAX_CUSTOM_REPORT_RESULT_SIZE = 500000;
+	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
 	const MAX_ESEARCH_RESULTS = 1000;
 	const MAX_SPHINX_RESULTS = 1000;
@@ -5967,6 +5968,20 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function getCustomReportMaxResultSize($report_def, $params)
+	{
+		if (isset($report_def[self::REPORT_MAX_RESULT_SIZE]))
+		{
+			return $report_def[self::REPORT_MAX_RESULT_SIZE];
+		}
+
+		if (isset($params['limit']))
+		{
+			return min($params['limit'], self::MAX_CUSTOM_REPORT_RESULT_SIZE);
+		}
+
+		return self::MAX_CUSTOM_REPORT_RESULT_SIZE;
+	}
 
 	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
 	{
@@ -6159,7 +6174,7 @@ class kKavaReportsMgr extends kKavaBase
 				$partner_id,
 				$report_def,
 				$input_filter,
-				isset($params['limit']) ? $params['limit'] : self::MAX_CUSTOM_REPORT_RESULT_SIZE,
+				self::getCustomReportMaxResultSize($report_def, $params),
 				1,
 				$report_def['order_by'],
 				$object_ids,
