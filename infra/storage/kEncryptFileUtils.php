@@ -41,7 +41,7 @@ class kEncryptFileUtils
 
     private static function doEncryptFile($srcFd, $key, $iv, $destFd)
     {
-    	$clear = self::readBytesFromStream($srcFd, self::ENCRYPT_INTERVAL);
+        $clear = self::readBytesFromStream($srcFd, self::ENCRYPT_INTERVAL);
         $enc = self::encryptData($clear, $key, $iv);
         $iv = substr($enc, -self::AES_BLOCK_SIZE);
         fwrite($destFd, $enc);
