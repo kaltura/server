@@ -157,7 +157,7 @@ class LiveStreamEntry extends LiveEntry
 
 	public function copyInto($copyObj, $deepCopy = false)
 	{
-		parent::copyInto($copyObj,$deepCopy);
+		parent::copyInto($copyObj, $deepCopy);
 		$copyObj->setStreamPassword(self::generateStreamPassword()); //password should be re-generated on copy
 	}
 
