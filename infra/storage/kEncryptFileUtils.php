@@ -41,7 +41,7 @@ class kEncryptFileUtils
 
     private static function doEncryptFile($srcFd, $key, $iv, $destFd)
     {
-    	$clear = self::readBytesFormStream($srcFd, self::ENCRYPT_INTERVAL);
+    	$clear = self::readBytesFromStream($srcFd, self::ENCRYPT_INTERVAL);
         $enc = self::encryptData($clear, $key, $iv);
         $iv = substr($enc, -self::AES_BLOCK_SIZE);
         fwrite($destFd, $enc);
@@ -55,7 +55,7 @@ class kEncryptFileUtils
 
     private static function doDecryptFile($srcFd, $key, $iv, $destFd)
     {
-        $content = self::readBytesFormStream($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
+        $content = self::readBytesFromStream($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
         $clear = self::decryptData($content, $key, $iv);
         fwrite($destFd, $clear);
         return substr($content, -self::AES_BLOCK_SIZE);
@@ -73,25 +73,19 @@ class kEncryptFileUtils
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
             $srcFilePath = kFile::realPath($srcFilePath);
-	        
+            $bytesToRead = self::getBytesToRead($functionName);
+            
             self::restoreStreamWrappers();
-         
-            $fd1 = fopen($srcFilePath, "rb");
+            
+            $fd1 = self::openFile($srcFilePath, "rb", $bytesToRead);
             if ($fd1 === false)
             {
-                self::unregisterStreamWrappers();
                 return false;
             }
-	
-            if (function_exists('stream_set_chunk_size'))
-            {
-                stream_set_chunk_size($fd1, $bytesToRead);
-            }
             
-            $fd2 = fopen($tempPath, "w");
+            $fd2 = self::openFile($tempPath, "w", $bytesToRead);
             if ($fd2 === false)
             {
-                self::unregisterStreamWrappers();
                 return false;
             }
             while (!feof($fd1))
@@ -100,7 +94,7 @@ class kEncryptFileUtils
             }
             fclose($fd1);
             fclose($fd2);
-	
+            
             self::unregisterStreamWrappers();
 
             if (!$dstFilePath)
@@ -178,7 +172,7 @@ class kEncryptFileUtils
         stream_wrapper_unregister ('https');
     }
 	
-    protected function readBytesFormStream($fd, $bytesToRead)
+    protected function readBytesFromStream($fd, $bytesToRead)
     {
         $data = '';
         $bytesRead = 0;
@@ -190,5 +184,38 @@ class kEncryptFileUtils
         
         return $data;
     }
-
+    
+    protected function getBytesToRead($mode)
+    {
+        switch ($mode)
+        {
+            case 'doEncryptFile':
+                $bytesToRead = self::ENCRYPT_INTERVAL;
+                break;
+            case 'doDecryptFile':
+                $bytesToRead = self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE;
+                break;
+            default:
+                $bytesToRead = self::ENCRYPT_INTERVAL;
+        }
+        
+        return $bytesToRead;
+    }
+    
+    protected function openFile($path, $mode, $bytesToRead)
+    {
+        $fd = fopen($path, $mode);
+        if ($fd === false)
+        {
+            self::unregisterStreamWrappers();
+            return false;
+        }
+        
+        if (function_exists('stream_set_chunk_size'))
+        {
+            stream_set_chunk_size($fd, $bytesToRead);
+        }
+        
+        return $fd;
+    }
 }
