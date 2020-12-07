@@ -126,6 +126,7 @@ class KExternalErrors
 		self::PREVIEW_PAGE_WAS_DISABLED => 'Preview page was disabled',
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
 		self::DATABASE_ERROR => 'Database error',
+		self::INVALID_AUTH_HEADER => 'Invalid auth header',
 	);
 
 	public static function dieError($errorCode, $message = null)
