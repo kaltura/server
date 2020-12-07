@@ -246,6 +246,8 @@ CONFIG = [
     ('text:Microsoft Word/text:Windows cannot print due to a problem with the current printer setup.',  0, None, (ET_PUSH_BUTTON, 'text:OK,class:Button')),
     ('text:Microsoft Word/text:Your margins are pretty small. Some of your content might be cut off when you print. Do you still want to print?',  0, None, (ET_PUSH_BUTTON, 'text:Yes,class:Button')),
 
+    ('text:Microsoft Word/text:Your margins are pretty small. It\'s possible some of your content will be cut off when you print. Do you still want to print?',  0, None, (ET_PUSH_BUTTON, 'text:Yes,class:Button')),
+
     ('text:Microsoft Word/text:Do you want to update this document with the data from the linked files',  0, None, (ET_PUSH_BUTTON, 'text:No,class:Button')),    
 
     ('text:Microsoft Word/text:Word was unable to read this document',  0, None, (ET_PUSH_BUTTON, 'text:OK,class:Button')),    

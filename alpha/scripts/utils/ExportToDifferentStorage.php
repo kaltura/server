@@ -158,6 +158,12 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 			$resolvedFileSync = $fileSync;
 		}
 
+		if ($resolvedFileSync->getIsDir())
+		{
+			KalturaLog::log("XXX $assetId: DIR_FILE_SYNC - dir file sync");
+			return;
+		}
+
 		if ($resolvedFileSync->getDc() != $fileSync->getDc())
 		{
 			if ($fileSync->getDc() == $targetDcId)
@@ -370,7 +376,6 @@ function handleAssets($handle)
 		// get the asset
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
-		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$asset = assetPeer::doSelectOne($c);
 		if (!$asset)

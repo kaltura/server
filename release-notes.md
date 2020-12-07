@@ -1,3 +1,31 @@
+# Propus 16.13.0  #
+
+## Adjust Kaltura Capture transcoding profile ##
+- Issue Type: Task
+- Issue ID: PSVAMB-16978
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/2020_12_06_update_lectureCapture_ConversionProfile2.php
+
+## Configurable Transcoding Profile for Zoom Integration ##
+- Issue Type: Task
+- Issue ID: PLAT-22489
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_25_update_zoomVendor_add_get_action.php
+
 # Propus 16.12.0  #
 
 ## Add permission in Admin Console for automatically deleting recorded VOD entry when deleting live entry ##

@@ -647,7 +647,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 		$range_to = ($range_from + $range_length) - 1;
 		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
-		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 		
 		$result = curl_exec($ch);
 

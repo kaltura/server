@@ -152,20 +152,28 @@ class kContextDataHelper
 		 $this->mediaProtocol = $protocol;
 	}
 
-	public function buildContextDataResult(accessControlScope $scope, $flavorTags, $streamerType, $mediaProtocol, $shouldHandleRuleCodes = false)
+	public function buildContextDataResult($scope, $flavorTags, $streamerType, $mediaProtocol, $shouldHandleRuleCodes = false)
 	{
 		$this->streamerType = $streamerType;
 		$this->mediaProtocol = $mediaProtocol;
-		$this->isAdmin = $scope->getKs() ? $scope->getKs()->isAdmin() : false;
+		$this->isAdmin = ($scope && $scope->getKs()) ? $scope->getKs()->isAdmin() : false;
 		$this->contextDataResult = new kEntryContextDataResult();
 
 		$this->contextDataResult->setShouldHandleRuleCodes($shouldHandleRuleCodes);
-		
-		$this->applyAccessControlOnContextData($scope);
+
+		if($scope)
+		{
+			$this->applyAccessControlOnContextData($scope);
+		}
+
 		$this->setContextDataFlavorAssets($flavorTags);
-		$this->setContextDataStorageProfilesXml();	
-		$this->setContextDataStreamerTypeAndMediaProtocol($scope, $flavorTags);
-		
+		$this->setContextDataStorageProfilesXml();
+
+		if($scope)
+		{
+			$this->setContextDataStreamerTypeAndMediaProtocol($scope, $flavorTags);
+		}
+
 	}
 	
 	private function applyAccessControlOnContextData(accessControlScope $accessControlScope)
