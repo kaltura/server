@@ -5959,7 +5959,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (isset($params['limit']))
 		{
-			return $params['limit'];
+			return min($params['limit'], self::MAX_CUSTOM_REPORT_RESULT_SIZE);
 		}
 
 		return self::MAX_CUSTOM_REPORT_RESULT_SIZE;
