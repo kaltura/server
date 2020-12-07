@@ -41,21 +41,7 @@ class kEncryptFileUtils
 
     private static function doEncryptFile($srcFd, $key, $iv, $destFd)
     {
-        $clear = '';
-        $bytesRead = 0;
-        $bytesToRead = self::ENCRYPT_INTERVAL;
-	
-        if (function_exists('stream_set_chunk_size'))
-        {
-            stream_set_chunk_size($srcFd, $bytesToRead);
-        }
-        
-        while(!feof($srcFd) || $bytesRead < $bytesToRead)
-        {
-            $clear .= fread($srcFd, $bytesToRead);
-            $bytesRead += strlen($clear);
-        }
-	    
+    	$clear = self::readBytesFormStream($srcFd, self::ENCRYPT_INTERVAL);
         $enc = self::encryptData($clear, $key, $iv);
         $iv = substr($enc, -self::AES_BLOCK_SIZE);
         fwrite($destFd, $enc);
@@ -69,21 +55,7 @@ class kEncryptFileUtils
 
     private static function doDecryptFile($srcFd, $key, $iv, $destFd)
     {
-        $content = '';
-        $bytesRead = 0;
-        $bytesToRead = self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE;
-	
-        if (function_exists('stream_set_chunk_size'))
-        {
-            stream_set_chunk_size($srcFd, $bytesToRead);
-        }
-    	
-        while(!feof($srcFd) || $bytesRead < $bytesToRead)
-        {
-            $content .= fread($srcFd, $bytesToRead);
-            $bytesRead += strlen($content);
-        }
-	    
+        $content = self::readBytesFormStream($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
         $clear = self::decryptData($content, $key, $iv);
         fwrite($destFd, $clear);
         return substr($content, -self::AES_BLOCK_SIZE);
@@ -102,17 +74,24 @@ class kEncryptFileUtils
             $tempPath =  self::getClearTempPath($srcFilePath);
             $srcFilePath = kFile::realPath($srcFilePath);
 	        
-            stream_wrapper_restore('http');
-            stream_wrapper_restore('https');
+            self::restoreStreamWrappers();
          
             $fd1 = fopen($srcFilePath, "rb");
             if ($fd1 === false)
             {
+                self::unregisterStreamWrappers();
                 return false;
             }
+	
+            if (function_exists('stream_set_chunk_size'))
+            {
+                stream_set_chunk_size($fd1, $bytesToRead);
+            }
+            
             $fd2 = fopen($tempPath, "w");
             if ($fd2 === false)
             {
+                self::unregisterStreamWrappers();
                 return false;
             }
             while (!feof($fd1))
@@ -122,8 +101,7 @@ class kEncryptFileUtils
             fclose($fd1);
             fclose($fd2);
 	
-            stream_wrapper_unregister ('http');
-            stream_wrapper_unregister ('https');
+            self::unregisterStreamWrappers();
 
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
@@ -187,6 +165,30 @@ class kEncryptFileUtils
     {
         return sys_get_temp_dir(). "/clear_" . pathinfo($path, PATHINFO_BASENAME);
     }
-
+    
+    protected static function restoreStreamWrappers()
+    {
+        stream_wrapper_restore('http');
+        stream_wrapper_restore('https');
+    }
+	
+    protected static function unregisterStreamWrappers()
+    {
+        stream_wrapper_unregister ('http');
+        stream_wrapper_unregister ('https');
+    }
+	
+    protected function readBytesFormStream($fd, $bytesToRead)
+    {
+        $data = '';
+        $bytesRead = 0;
+        while(!feof($fd) || $bytesRead < $bytesToRead)
+        {
+            $data .= fread($fd, $bytesToRead);
+            $bytesRead += strlen($data);
+        }
+        
+        return $data;
+    }
 
 }
