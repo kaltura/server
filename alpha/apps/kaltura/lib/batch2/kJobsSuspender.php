@@ -110,7 +110,7 @@ class kJobsSuspender {
 	
 		$limit = min(self::MAX_PROCESSED_ROWS, $limit);
 		
-		// Find IDs
+		// Find IDs which are not root
 		$c = new Criteria();
 		$c->addSelectColumn(BatchJobLockPeer::ID);
 		$c->add( BatchJobLockPeer::STATUS, BatchJob::BATCHJOB_STATUS_PENDING, Criteria::EQUAL);
@@ -119,7 +119,8 @@ class kJobsSuspender {
 		$c->add( BatchJobLockPeer::JOB_TYPE, $jobType, Criteria::EQUAL);
 		$c->add( BatchJobLockPeer::JOB_SUB_TYPE, $jobSubType, Criteria::EQUAL);
 		$c->add( BatchJobLockPeer::SCHEDULER_ID, null, Criteria::ISNULL);
-	
+		$c->add( BatchJobLockPeer::ID, '(batch_job_lock.ID != batch_job_lock.ROOT_JOB_ID)', Criteria::CUSTOM);
+
 		$c->addDescendingOrderByColumn(BatchJobLockPeer::PRIORITY);
 		$c->addDescendingOrderByColumn(BatchJobLockPeer::URGENCY);
 		$c->addDescendingOrderByColumn(BatchJobLockPeer::ESTIMATED_EFFORT);
@@ -150,8 +151,8 @@ class kJobsSuspender {
 		$c->add( BatchJobLockSuspendPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 		$c->add( BatchJobLockSuspendPeer::JOB_TYPE, $jobType, Criteria::EQUAL);
 		$c->add( BatchJobLockSuspendPeer::JOB_SUB_TYPE, $jobSubType, Criteria::EQUAL);
-		$c->add( BatchJobLockSuspendPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_SUSPEND, BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE), Criteria::IN);
-	
+		$c->add( BatchJobLockSuspendPeer::STATUS, BatchJob::BATCHJOB_STATUS_SUSPEND);
+
 		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::PRIORITY);
 		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::URGENCY);
 		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::ESTIMATED_EFFORT);
