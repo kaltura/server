@@ -208,11 +208,10 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		
 		/* @var $dbObject LiveStreamEntry */
 		
-		// if the given password is empty, generate a random 8-character string as the new password
+		// if the given password is empty, generate a new password
 		if(($this->streamPassword == null) || (strlen(trim($this->streamPassword)) <= 0))
 		{
-			$tempPassword = sha1(md5(uniqid(rand(), true)));
-			$this->streamPassword = substr($tempPassword, rand(0, strlen($tempPassword) - 8), 8);
+			$this->streamPassword = LiveStreamEntry::generateStreamPassword();
 		}
 	
 		return parent::toInsertableObject($dbObject, $props_to_skip);
