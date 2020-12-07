@@ -73,17 +73,14 @@ class kEncryptFileUtils
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
             $srcFilePath = kFile::realPath($srcFilePath);
-            $bytesToRead = self::getBytesToRead($functionName);
             
-            self::restoreStreamWrappers();
-            
-            $fd1 = self::openFile($srcFilePath, "rb", $bytesToRead);
+            $fd1 = self::openFile($srcFilePath, "rb");
             if ($fd1 === false)
             {
                 return false;
             }
             
-            $fd2 = self::openFile($tempPath, "w", $bytesToRead);
+            $fd2 = self::openFile($tempPath, "w");
             if ($fd2 === false)
             {
                 return false;
@@ -94,8 +91,6 @@ class kEncryptFileUtils
             }
             fclose($fd1);
             fclose($fd2);
-            
-            self::unregisterStreamWrappers();
 
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
@@ -159,18 +154,6 @@ class kEncryptFileUtils
     {
         return sys_get_temp_dir(). "/clear_" . pathinfo($path, PATHINFO_BASENAME);
     }
-    
-    protected static function restoreStreamWrappers()
-    {
-        stream_wrapper_restore('http');
-        stream_wrapper_restore('https');
-    }
-	
-    protected static function unregisterStreamWrappers()
-    {
-        stream_wrapper_unregister ('http');
-        stream_wrapper_unregister ('https');
-    }
 	
     protected function readBytesFromStream($fd, $bytesToRead)
     {
@@ -185,37 +168,26 @@ class kEncryptFileUtils
         return $data;
     }
     
-    protected function getBytesToRead($mode)
+    protected function openFile($path, $mode)
     {
-        switch ($mode)
-        {
-            case 'doEncryptFile':
-                $bytesToRead = self::ENCRYPT_INTERVAL;
-                break;
-            case 'doDecryptFile':
-                $bytesToRead = self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE;
-                break;
-            default:
-                $bytesToRead = self::ENCRYPT_INTERVAL;
-        }
+        stream_wrapper_restore('http');
+        stream_wrapper_restore('https');
         
-        return $bytesToRead;
-    }
-    
-    protected function openFile($path, $mode, $bytesToRead)
-    {
         $fd = fopen($path, $mode);
         if ($fd === false)
         {
-            self::unregisterStreamWrappers();
+            stream_wrapper_unregister ('http');
+            stream_wrapper_unregister ('https');
             return false;
         }
         
         if (function_exists('stream_set_chunk_size'))
         {
-            stream_set_chunk_size($fd, $bytesToRead);
+            stream_set_chunk_size($fd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
         }
         
+        stream_wrapper_unregister ('http');
+        stream_wrapper_unregister ('https');
         return $fd;
     }
 }
