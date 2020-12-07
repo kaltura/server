@@ -525,7 +525,7 @@ abstract class LiveEntry extends entry
 		return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
 	}
 
-	private function isExternalCurrentlyLive($reqProtocol = null)
+	protected function isExternalCurrentlyLive($reqProtocol = null)
 	{
 		$isLive = null;
 		$takeFirst = false;
@@ -567,7 +567,7 @@ abstract class LiveEntry extends entry
 		return $isLive;
 	}
 
-	private function checkIsLiveByProtocol($protocol) {
+	protected function checkIsLiveByProtocol($protocol) {
 		$config = $this->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
 		if ($config)
 		{
@@ -591,7 +591,7 @@ abstract class LiveEntry extends entry
 	}
 
 
-	private function getInternalLiveStatus($checkExplicitLive = false)
+	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
 		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
 		{
@@ -614,16 +614,22 @@ abstract class LiveEntry extends entry
 		return $status;
 	}
 
-	private function shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $checkExplicitLive)
+	protected function shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $checkExplicitLive)
 	{
 		if (!$entryServerNode || !($entryServerNode instanceof LiveEntryServerNode))
+		{
 			return false;
+		}
 
 		if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY,EntryServerNodeType::LIVE_BACKUP)))
+		{
 			return false;
+		}
 
 		if ($checkExplicitLive && $this->getExplicitLive() && !$this->canViewExplicitLive() && !$entryServerNode->getIsPlayableUser())
+		{
 			return false;
+		}
 
 		return true;
 	}
