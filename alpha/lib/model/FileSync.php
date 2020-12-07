@@ -174,15 +174,15 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$this->save();
 
 		$key = $this->getEncryptionKey();
-		$realPath = kFile::realPath($this->getFullPath(), false);
+		$realPath = realpath($this->getFullPath());
 		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
 		kEncryptFileUtils::encrypt($realPath, $key, $this->getIv());
 	}
 
 	public function decrypt()
 	{
-		$realPath = kFile::realPath($this->getFullPath(), false);
-		$fileData = kFileBase::getFileContent($realPath);
+		$realPath = realpath($this->getFullPath());
+		$fileData = kFileBase::getFileContent( $realPath);
 		if (!$this->isEncrypted()) 
 		{
 			KalturaLog::info("File of fileSyncId [$this->id] in path $realPath is not encrypted");
@@ -290,10 +290,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 	 */
 	public function createTempClear()
 	{
-		$realPath = kFile::realPath($this->getFullPath(), false);
+		$realPath = realpath($this->getFullPath());
 		$tempPath = $this->getClearTempPath();
 		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
-		if (!kFile::checkFileExists($tempPath))
+		if (!file_exists($tempPath))
 			kEncryptFileUtils::decryptFile($realPath, $this->getEncryptionKey(), $this->getIv(), $tempPath);
 		return $tempPath;
 	}
