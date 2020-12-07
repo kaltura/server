@@ -159,10 +159,11 @@ class kEncryptFileUtils
     {
         $data = '';
         $bytesRead = 0;
-        while(!feof($fd) || $bytesRead < $bytesToRead)
+        while(!feof($fd) && $bytesRead < $bytesToRead)
         {
-            $data .= fread($fd, $bytesToRead);
-            $bytesRead += strlen($data);
+            $curr = fread($fd, $bytesToRead);
+            $bytesRead += strlen($curr);
+            $data .= $curr;
         }
         
         return $data;
