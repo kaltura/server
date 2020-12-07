@@ -13,6 +13,8 @@ class myPackagerUtils
 	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
 	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
+	
+	protected static $flavorSupportedByPackager = array();
 
 	/**
 	 * @param entry $entry
@@ -206,6 +208,11 @@ class myPackagerUtils
 
 	protected static function getFlavorSupportedByPackagerForThumbCapture($entryId)
 	{
+		if(isset(self::$flavorSupportedByPackager[$entryId]))
+		{
+			return self::$flavorSupportedByPackager[$entryId];
+		}
+		
 		//look for the highest bitrate flavor tagged with thumbsource
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
@@ -218,11 +225,13 @@ class myPackagerUtils
 				$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($entryId);
 				if(is_null($flavorAsset) || !self::isFlavorSupportedByPackager($flavorAsset))
 				{
+					self::$flavorSupportedByPackager[$entryId] = false;
 					return null;
 				}
 			}
 		}
-
+		
+		self::$flavorSupportedByPackager[$entryId] = $flavorAsset;
 		return $flavorAsset;
 	}
 
