@@ -24,11 +24,12 @@ class KSingleOutputOperationEngine extends KOperationEngine
 		}
 		
 		$command = '';
+		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
 		if($this->operator && $this->operator->command)
 		{
 			$command = str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $this->cmd),
+				array('"' . $inputFilePath . '"', $this->outFilePath, $this->configFilePath, $this->cmd),
 				$this->operator->command);
 		}
 				
