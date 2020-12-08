@@ -2025,7 +2025,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			KalturaLog::notice("FileSync was not found");
 			return null;
 		}
-		return $fileSync;
+		return kFileSyncUtils::resolve($fileSync);
 	}
 
 	/**
