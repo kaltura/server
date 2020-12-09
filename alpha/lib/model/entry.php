@@ -2830,7 +2830,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
-		if($this->customDataValueHasChanged('parentEntryId'))
+		if($this->getParentEntryId() && $this->customDataValueHasChanged('parentEntryId'))
 		{
 			$parentEntry = $this->getParentEntry();
 			if($parentEntry->getId() != $this->getId() && $parentEntry->getPuserId() != $this->getPuserId())
