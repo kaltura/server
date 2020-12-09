@@ -65,6 +65,7 @@ class KExternalErrors
 	const INVALID_AUTH_HEADER = 53;
 	const PREVIEW_PAGE_WAS_DISABLED = 54;
 	const DATABASE_ERROR = 55;
+	const MISSING_BUNDLE_CONFIGURATION = 56;
 	const HTTP_STATUS_NOT_FOUND = 404;
 
 	private static $errorCodeMap = array(
@@ -119,7 +120,8 @@ class KExternalErrors
 		self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
 		self::TOO_MANY_PROCESSES => "Too many executed processes",
 		self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]",
-		self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
+        	self::MISSING_BUNDLE_CONFIGURATION => "Missing bundle configuration in uiConf, uiConfID: [%s]",
+        	self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
 		self::INVALID_MIN_BITRATE => "min bitrate is not valid",
 		self::INVALID_PARAMETER => "Request parameter [%s] is invalid",
 		self::PLAYLIST_DURATION_IS_ZERO => "The duration of the playlist is zero",
