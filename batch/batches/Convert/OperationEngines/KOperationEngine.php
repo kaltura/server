@@ -96,7 +96,7 @@ abstract class KOperationEngine
 	
 	protected function doOperation()
 	{
-		if(!file_exists($this->inFilePath))
+		if(!kFile::checkFileExists($this->inFilePath))
 			throw new KOperationEngineException("File [$this->inFilePath] does not exist");
 
 		$cmd = $this->getCmdLine();
@@ -160,10 +160,10 @@ abstract class KOperationEngine
 			
 		try
 		{
-			$filePath = realpath($filePath);
-			if(($filePath !== FALSE) && (file_exists($filePath)))
+			$mediaInfoFilePath = kFile::realPath($filePath);
+			if(($mediaInfoFilePath !== FALSE) && (kFile::checkFileExists($filePath)))
 			{
-				system("mediainfo $filePath >> \"{$this->logFilePath}\" 2>&1");
+				system("mediainfo \"$mediaInfoFilePath\" >> \"{$this->logFilePath}\" 2>&1");
 			}
 			else
 			{

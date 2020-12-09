@@ -24,15 +24,18 @@ class KSingleOutputOperationEngine extends KOperationEngine
 		}
 		
 		$command = '';
+		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
 		if($this->operator && $this->operator->command)
 		{
 			$command = str_replace ( 
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $this->cmd),
+				array('"' . $inputFilePath . '"', $this->outFilePath, $this->configFilePath, $this->cmd),
 				$this->operator->command);
 		}
-				
-		return "{$this->cmd} $command >> \"{$this->logFilePath}\" 2>&1";
+		
+		$exec_cmd = $this->cmd;
+		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$exec_cmd);
+		return "$exec_cmd $command >> \"{$this->logFilePath}\" 2>&1";
 	}
 
 	public function __construct($cmd, $outFilePath)
