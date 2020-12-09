@@ -99,7 +99,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function getContentsByFileSync ( FileSync $file_sync , $local = true , $fetch_from_remote_if_no_local = true , $strict = true )
 	{
-		if ( $local || in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds(true)))
+		if ( $local || in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 			return self::getLocalContentsByFileSync($file_sync);
 		
 
@@ -1324,7 +1324,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return;
 		}
 		
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
 		foreach ($sharedDcIds as $sharedDcId)
 		{
 			//If original file sync was already created in teh shared storage skip

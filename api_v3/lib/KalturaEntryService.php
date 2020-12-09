@@ -1875,7 +1875,7 @@ class KalturaEntryService extends KalturaBaseService
 				/* @var $fileSync FileSync */
 				if ( $fileSync && (!$local ||
 						($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL &&
-							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds(true)) )
+							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()) )
 					))
 				{
 					$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();

@@ -293,7 +293,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$realPath = kFile::realPath($this->getFullPath(), false);
 		$tempPath = $this->getClearTempPath();
 		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
-		if (!file_exists($tempPath))
+		if (!kFile::checkFileExists($tempPath))
 			kEncryptFileUtils::decryptFile($realPath, $this->getEncryptionKey(), $this->getIv(), $tempPath);
 		return $tempPath;
 	}

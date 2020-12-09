@@ -98,7 +98,7 @@ class kDataCenterMgr
 	
 	public static function isDcIdShared($dcId)
 	{
-		$sharedStorageProfileIds = self::getSharedStorageProfileIds(true);
+		$sharedStorageProfileIds = self::getSharedStorageProfileIds();
 		return in_array($dcId, $sharedStorageProfileIds);
 	}
 

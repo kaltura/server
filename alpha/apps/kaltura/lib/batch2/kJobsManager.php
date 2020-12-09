@@ -492,8 +492,7 @@ class kJobsManager
 				$remoteConvertSupportedEngines = explode("," ,$partnerRemoteConvertSupportedEngines[$partner->getId()]);
 			}
 			
-			
-			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds(true);
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
 			if( ($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, $remoteConvertSupportedEngines)) )
 			{
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
