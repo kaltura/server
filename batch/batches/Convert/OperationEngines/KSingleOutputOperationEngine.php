@@ -32,8 +32,10 @@ class KSingleOutputOperationEngine extends KOperationEngine
 				array('"' . $inputFilePath . '"', $this->outFilePath, $this->configFilePath, $this->cmd),
 				$this->operator->command);
 		}
-				
-		return "{$this->cmd} $command >> \"{$this->logFilePath}\" 2>&1";
+		
+		$exec_cmd = $this->cmd;
+		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$exec_cmd);
+		return "$exec_cmd $command >> \"{$this->logFilePath}\" 2>&1";
 	}
 
 	public function __construct($cmd, $outFilePath)
