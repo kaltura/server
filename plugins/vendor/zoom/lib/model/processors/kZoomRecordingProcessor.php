@@ -75,6 +75,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$extraUsers = $this->getAdditionalUsers($recording->id, $dbUser->getPuserId());
 		foreach ($recording->recordingFiles as $recordingFilesPerTimeSlot)
 		{
+			$this->mainEntry = null;
 			foreach ($recordingFilesPerTimeSlot[kRecordingFileType::VIDEO] as $recordingFile)
 			{
 				$this->handleVideoRecord($recording, $dbUser, $extraUsers, $recordingFile, $event);
