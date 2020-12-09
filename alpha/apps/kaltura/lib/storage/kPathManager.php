@@ -109,7 +109,7 @@ class kPathManager
 			'*' // WildCard
 		);
 		
-		$cloudStorageObjectMap = kConf::get("cloud_storage_object_map", "cloud_storage", array());
+		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
 		if( array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
 		{
 			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
