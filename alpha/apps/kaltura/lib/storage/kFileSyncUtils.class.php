@@ -576,7 +576,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			self::setPermissions($targetFullPath);
 			if(!$existsFileSync)
-				self::createSyncFileForKey($rootPath, $filePath, $target_key, $strict, false, $cacheOnly, null, kPathManager::getStorageProfileIdForKey($target_key, null));
+				self::createSyncFileForKey($rootPath, $filePath, $target_key, $strict, false, $cacheOnly, null, kPathManager::getStorageProfileIdForKey($target_key));
 			self::encryptByFileSyncKey($target_key);
 		}
 		else
