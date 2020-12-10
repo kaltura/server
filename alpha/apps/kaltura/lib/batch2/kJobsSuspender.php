@@ -150,7 +150,7 @@ class kJobsSuspender {
 		$c->add( BatchJobLockSuspendPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 		$c->add( BatchJobLockSuspendPeer::JOB_TYPE, $jobType, Criteria::EQUAL);
 		$c->add( BatchJobLockSuspendPeer::JOB_SUB_TYPE, $jobSubType, Criteria::EQUAL);
-		$c->add( BatchJobLockSuspendPeer::STATUS, array(BatchJob::BATCHJOB_STATUS_SUSPEND, BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE), Criteria::IN);
+		$c->add( BatchJobLockSuspendPeer::STATUS, BatchJob::BATCHJOB_STATUS_SUSPEND);
 	
 		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::PRIORITY);
 		$c->addAscendingOrderByColumn(BatchJobLockSuspendPeer::URGENCY);
