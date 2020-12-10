@@ -675,12 +675,12 @@ class kFileBase
 	
 	public static function buildDirectUrl($path)
 	{
-		$path = kFile::fixPath($path);
 		if(!self::isSharedPath($path))
 		{
 			return $path;
 		}
 		
+		$path = kFile::fixPath($path);	
 		$vodPackagerDirectSecret = kConf::get('vod_packager_direct_serve_secret', 'local', null);
 		if(!$vodPackagerDirectSecret)
 		{
