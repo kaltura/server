@@ -51,7 +51,7 @@ class KalturaMonitorClient
 	
 	protected static $basicEventInfo = array();
 	protected static $basicApiInfo = array();
-	protected static $apiStartTime = null;
+	protected static $lastTime = null;
 	
 	protected static $bufferedPacket = '';
 
@@ -166,6 +166,15 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 		self::flushPacket();
 	}
+
+	protected static function getApiExecTime()
+	{
+		$currentTime = microtime(true);
+		$result = $currentTime - self::$lastTime;
+		self::$lastTime = $currentTime;
+
+		return $result;
+	}
 	
 	public static function initApiMonitor($cached, $action, $partnerId, $clientTag = null)
 	{
@@ -175,7 +184,10 @@ class KalturaMonitorClient
 		if (!self::$stream)
 			return;
 
-		self::$apiStartTime = isset($GLOBALS['start']) ? $GLOBALS['start'] : microtime(true);
+		if (!self::$lastTime)
+		{
+			self::$lastTime = isset($GLOBALS['start']) ? $GLOBALS['start'] : microtime(true);
+		}
 		
 		self::$basicEventInfo = array(
 			self::FIELD_SERVER			=> infraRequestUtils::getHostname(),
@@ -219,7 +231,7 @@ class KalturaMonitorClient
 		if ($cached)
 		{
 			$data[self::FIELD_EVENT_TYPE] = self::EVENT_API_CACHE;
-			$data[self::FIELD_EXECUTION_TIME] = microtime(true) - self::$apiStartTime;
+			$data[self::FIELD_EXECUTION_TIME] = self::getApiExecTime();
 		}
 		else
 		{
@@ -236,7 +248,7 @@ class KalturaMonitorClient
 		
 		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_API_END,
-			self::FIELD_EXECUTION_TIME	=> (microtime(true) - self::$apiStartTime),
+			self::FIELD_EXECUTION_TIME	=> self::getApiExecTime(),
 			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
 	
