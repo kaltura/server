@@ -25,7 +25,7 @@ class kFileUtils extends kFile
 			}
 			else
 			{
-				sleep(3);
+				KalturaMonitorClient::sleep(3);
 			}
 		}
 	}
