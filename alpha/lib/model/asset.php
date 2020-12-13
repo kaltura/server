@@ -463,14 +463,20 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	public function setFileExt($v)
 	{
 		$v = trim($v);
-		if (preg_match('/[\s\t\n\r]/', $v)){
+		
+		if (preg_match('/[\s\t\n\r]/', $v))
+		{
 			preg_match('/\w*/', $v, $v);
 			KalturaLog::err("File extension cannot contain spaces, saving only ".$v[0]);
-			parent::setFileExt($v[0]);
+			$v = $v[0];
 		}
-		else{
-			parent::setFileExt($v);
+		elseif (!ctype_alnum($v))
+		{
+			$v = substr(preg_replace('/\\W+/', '', $v), 0, 4);
+			KalturaLog::err("File extension cannot contain none alphanumeric characters, saving only ".$v);
 		}
+		
+		parent::setFileExt($v);
 	}
 	
 	private function calculateId()
