@@ -162,7 +162,7 @@ class kJobsSuspender {
 	
 		// Return the jobs from batch_job_lock_suspend table
 		self::moveFromSuspendedJobsTable($jobIds);
-		$rootJobIds = self::unsuspendRootJob($jobIds, false);
+		$rootJobIds = self::unsuspendRootJob($jobIds);
 		// Update the jobs status to pending
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_SUSPEND, false);
 		$resRoot = self::setJobsStatus($rootJobIds, BatchJob::BATCHJOB_STATUS_ALMOST_DONE, BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE, false);
@@ -236,7 +236,7 @@ class kJobsSuspender {
 	}
 	
 	
-	private static function unsuspendRootJob($jobIds, $idsAreRoot)
+	private static function unsuspendRootJob($jobIds)
 	{
 		if(empty($jobIds))
 		{
@@ -249,17 +249,13 @@ class kJobsSuspender {
 		$c->addSelectColumn(BatchJobLockPeer::ROOT_JOB_ID);
 		$c->setDistinct();
 		$c->add(BatchJobLockPeer::ID, $jobIds, Criteria::IN);
+		$c->add(BatchJobLockPeer::ID, '(batch_job_lock.ID != batch_job_lock.ROOT_JOB_ID)', Criteria::CUSTOM);
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
 		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-		if($idsAreRoot)
+		if(empty($rootIds))
 		{
-			// jobsId are root Ids that we already moved from suspended jobs table
-			$rootIds = array_diff($rootIds, $jobIds);
-			if(empty($rootIds))
-			{
-				return array();
-			}
+			return array();
 		}
 
 		// Select only root ids that has no other suspended descendants
@@ -275,7 +271,7 @@ class kJobsSuspender {
 		$unsuspendedRootJobs = array_diff($rootIds, $usedRootIds);
 		self::moveFromSuspendedJobsTable($unsuspendedRootJobs);
 
-		return array_merge(self::unsuspendRootJob($unsuspendedRootJobs, true), $unsuspendedRootJobs);
+		return array_merge(self::unsuspendRootJob($unsuspendedRootJobs), $unsuspendedRootJobs);
 	}
 	
 	/**
