@@ -1823,7 +1823,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	    return $newEntry;
  	}
 
-	private static function isSourceLive($sourceType)
+	public static function isSourceLive($sourceType)
     	{
         	return in_array($sourceType,self::$liveSourceType);
     	}

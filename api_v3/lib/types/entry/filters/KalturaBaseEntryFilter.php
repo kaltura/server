@@ -85,7 +85,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	/**
 	 * Set the default status to ready if other status filters are not specified
 	 */
-	private function setDefaultStatus()
+	protected function setDefaultStatus()
 	{
 		if ($this->statusEqual === null && 
 			$this->statusIn === null &&
@@ -99,7 +99,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	/**
 	 * Set the default moderation status to ready if other moderation status filters are not specified
 	 */
-	private function setDefaultModerationStatus()
+	protected function setDefaultModerationStatus()
 	{
 		if ($this->moderationStatusEqual === null && 
 			$this->moderationStatusIn === null && 
@@ -116,7 +116,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	/**
 	 * The user_id is infact a puser_id and the kuser_id should be retrieved
 	 */
-	private function fixFilterUserId()
+	protected function fixFilterUserId()
 	{
 		if ($this->userIdEqual !== null)
 		{
