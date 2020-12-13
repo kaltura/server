@@ -6,6 +6,8 @@ class myFileConverter
 	const MENCODER = 'mencoder';
 	const DEFAULT_THUMBNAIL_WIDTH = 120;
 	const DEFAULT_THUMBNAIL_HEIGHT = 90;
+	
+	protected static $fileConversionInfo = array();
 
 	// -b 500kb -r 25 -g 5 -s 400x300 -ar 22050 -ac 2 -y 
 	public static function formatConversionString ( $conversion_str , 
@@ -157,11 +159,17 @@ class myFileConverter
 				break;
 			}
 		}
-
-		$conversion_info = new kConversionInfo();
-		$conversion_info->fillFromMetadata( $source_file );
-		$conversion_info->video_width = $width;
-		$conversion_info->video_height = $height;
+		
+		$conversion_info = isset(self::$fileConversionInfo[$source_file]) ? self::$fileConversionInfo[$source_file] : null;
+		if(!$conversion_info)
+		{
+			$conversion_info = new kConversionInfo();
+			$conversion_info->fillFromMetadata($source_file);
+			$conversion_info->video_width = $width;
+			$conversion_info->video_height = $height;
+			self::$fileConversionInfo[$source_file] = $conversion_info;
+		}
+		
 		// encapsulate
 		return array ( 'return_value' => $return_value , 'output' => $output , 'conversion_info' => $conversion_info );
 	}
