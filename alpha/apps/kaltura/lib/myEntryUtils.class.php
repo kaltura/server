@@ -870,13 +870,16 @@ class myEntryUtils
 		{
 			$start_sec = 0;
 		}
-
+		
+		$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+		$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
+		list($flavorAssetForCapture, $entryDataPath) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
+		
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
+			
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -915,7 +918,7 @@ class myEntryUtils
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
-				if (!file_exists($orig_image_path))
+				if (!kFile::checkFileExists($orig_image_path))
 				{
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
@@ -951,7 +954,7 @@ class myEntryUtils
 
 						if (!$success)
 						{
-							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId);
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId, -1, -1, $flavorAssetForCapture, $entryDataPath);
 						}
 					}
 
@@ -992,7 +995,7 @@ class myEntryUtils
 				}
 				else
 				{
-					if (!file_exists($orig_image_path) || !filesize($orig_image_path))
+					if (!kFile::checkFileExists($orig_image_path) || !kFile::filesize($orig_image_path))
 						KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 
 					$imageSizeArray = getimagesize($orig_image_path);
@@ -1004,7 +1007,7 @@ class myEntryUtils
 
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
 				}
-				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
+				if ($thumbCaptureByPackager && kFile::checkFileExists($packagerResizeFullPath))
 				{
 					unlink($packagerResizeFullPath);
 				}
@@ -1037,9 +1040,9 @@ class myEntryUtils
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
-				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
+				if (self::isTempFile($orig_image_path) && kFile::checkFileExists($orig_image_path))
 				{
-					unlink($orig_image_path);
+					kFile::unlink($orig_image_path);
 				}
 			}
 		}
@@ -1143,13 +1146,22 @@ class myEntryUtils
 
 		return $flavorAsset;
 	}
-
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
+	
+	public static function getEntryDataPathAndAssetLocalCaptureThumb($entry)
 	{
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
+		return array($flavorAsset, $entry_data_path);
+	}
+	
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1, $flavorAsset = null, $entry_data_path = null)
+	{
+		if (!$flavorAsset || !$entry_data_path)
+		{
+			list($flavorAsset, $entry_data_path) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
+		}
 		
 		if (!$entry_data_path)
 			return false;
@@ -1196,7 +1208,7 @@ class myEntryUtils
 			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
 			{
 				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
-				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
+				$entryDataPath = $fileSync->getFullPath();
 			}
 			else
 			{
