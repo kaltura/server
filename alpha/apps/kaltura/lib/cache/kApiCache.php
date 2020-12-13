@@ -785,7 +785,7 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			usleep(50000);
+			KalturaMonitorClient::usleep(50000);
 		}
 		
 		if(isset($this->_params['service']))
@@ -793,9 +793,10 @@ class kApiCache extends kApiCacheBase
 			$isInMultiRequest = isset($this->_params['multirequest']);
 			$action = $this->_params['service'];
 			if ($action != 'multirequest' && isset($this->_params['action']))
+			{
 				$action = $this->_params['service'] . '.' . $this->_params['action'];
-		
-			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
+				KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
+			}
 
 			foreach ($this->_monitorEvents as $event)
 			{

@@ -109,7 +109,7 @@ class ConferenceService extends KalturaBaseService {
 				$reachable = $this->canReach($serverNode);
 				if ($reachable)
 					break;
-				sleep(self::SLEEP_TIME_BETWEEN_RETRY_SECONDS);
+				KalturaMonitorClient::sleep(self::SLEEP_TIME_BETWEEN_RETRY_SECONDS);
 			}
 			if (!$reachable)
 			{

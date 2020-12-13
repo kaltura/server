@@ -21,6 +21,7 @@ class KalturaMonitorClient
 	const EVENT_MEMCACHE       = 'memcache';
 	const EVENT_CURL           = 'curl';
 	const EVENT_RABBIT         = 'rabbit';
+	const EVENT_SLEEP          = 'sleep';
 
 
 	const FIELD_ACTION = 			'a';
@@ -57,6 +58,9 @@ class KalturaMonitorClient
 	protected static $basicApiInfo = array();
 	protected static $lastTime = null;
 	
+	protected static $sleepTime = 0;
+	protected static $sleepCount = 0;
+
 	protected static $bufferedPacket = '';
 
 	static protected $sessionCounters = array (
@@ -180,6 +184,22 @@ class KalturaMonitorClient
 		return $result;
 	}
 	
+	protected static function flushEvents()
+	{
+		kInfraMemcacheCacheWrapper::sendMonitorEvents();
+
+		if (self::$sleepCount > 0)
+		{
+			$data = array_merge(self::$basicEventInfo, array(
+					self::FIELD_EVENT_TYPE 		=> self::EVENT_SLEEP,
+					self::FIELD_EXECUTION_TIME	=> self::$sleepTime,
+					self::FIELD_COUNT			=> self::$sleepCount,
+			));
+
+			self::writeDeferredEvent($data);
+		}
+	}
+
 	public static function initApiMonitor($cached, $action, $partnerId, $clientTag = null)
 	{
 		if (is_null(self::$stream))
@@ -234,7 +254,7 @@ class KalturaMonitorClient
 
 		if ($cached)
 		{
-			kInfraMemcacheCacheWrapper::sendMonitorEvents();
+			self::flushEvents();
 
 			$data[self::FIELD_EVENT_TYPE] = self::EVENT_API_CACHE;
 			$data[self::FIELD_EXECUTION_TIME] = self::getApiExecTime();
@@ -252,7 +272,7 @@ class KalturaMonitorClient
 		if (!self::$stream)
 			return;
 
-		kInfraMemcacheCacheWrapper::sendMonitorEvents();
+		self::flushEvents();
 
 		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_API_END,
@@ -512,4 +532,19 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
+	public static function sleep($sec)
+	{
+		sleep($sec);
+
+		self::$sleepTime += $sec;
+		self::$sleepCount++;
+	}
+
+	public static function usleep($micros)
+	{
+		usleep($micros);
+
+		self::$sleepTime += $micros / 1000000;
+		self::$sleepCount++;
+	}
 }
