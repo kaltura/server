@@ -6,7 +6,7 @@
 class KalturaMonitorClient
 {
 	const MAX_PACKET_SIZE = 1400;
-	
+
 	const EVENT_API_CACHE      = 'cache';
 	const EVENT_API_START      = 'start';
 	const EVENT_API_END        = 'end';
@@ -18,25 +18,27 @@ class KalturaMonitorClient
 	const EVENT_DRUID          = 'druid';
 	const EVENT_COUCHBASE      = 'couchbase';
 	const EVENT_FILE_SYSTEM    = 'filesystem';
+	const EVENT_MEMCACHE       = 'memcache';
 	const EVENT_RABBIT         = 'rabbit';
 
 
-	const FIELD_EVENT_TYPE = 		'e';
-	const FIELD_SERVER = 			's';
-	const FIELD_UNIQUE_ID =			'u';
-	const FIELD_IP_ADDRESS = 		'i';
-	const FIELD_PARTNER_ID = 		'p';
 	const FIELD_ACTION = 			'a';
+	const FIELD_COUNT =				'c';
+	const FIELD_DATABASE = 			'd';
+	const FIELD_EVENT_TYPE = 		'e';
+	const FIELD_FILE_PATH = 		'f';
+	const FIELD_IP_ADDRESS = 		'i';
 	const FIELD_KS_TYPE = 			'k';
 	const FIELD_CLIENT_TAG = 		'l';
 	const FIELD_MULTIREQUEST = 		'm';
-	const FIELD_EXECUTION_TIME = 	'x';
-	const FIELD_ERROR_CODE = 		'r';
-	const FIELD_DATABASE = 			'd';
-	const FIELD_TABLE = 			't';
-	const FIELD_QUERY_TYPE = 		'q';
-	const FIELD_FILE_PATH = 		'f';
 	const FIELD_LENGTH =			'n';
+	const FIELD_PARTNER_ID = 		'p';
+	const FIELD_QUERY_TYPE = 		'q';
+	const FIELD_ERROR_CODE = 		'r';
+	const FIELD_SERVER = 			's';
+	const FIELD_TABLE = 			't';
+	const FIELD_UNIQUE_ID =			'u';
+	const FIELD_EXECUTION_TIME = 	'x';
 	const FIELD_FILE_SIZE = 		'z';
 
 	const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_X_KALTURA_SESSION_COUNTERS';
@@ -230,6 +232,8 @@ class KalturaMonitorClient
 
 		if ($cached)
 		{
+			kInfraMemcacheCacheWrapper::sendMonitorEvents();
+
 			$data[self::FIELD_EVENT_TYPE] = self::EVENT_API_CACHE;
 			$data[self::FIELD_EXECUTION_TIME] = self::getApiExecTime();
 		}
@@ -245,13 +249,15 @@ class KalturaMonitorClient
 	{
 		if (!self::$stream)
 			return;
-		
+
+		kInfraMemcacheCacheWrapper::sendMonitorEvents();
+
 		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_API_END,
 			self::FIELD_EXECUTION_TIME	=> self::getApiExecTime(),
 			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
-	
+
 		self::writeEvent($data);
 	}
 	
@@ -369,7 +375,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorConnTook($dsn, $connTook)
+	public static function monitorConnTook($dsn, $connTook, $count=1)
 	{
 		if (!self::$stream)
 			return;
@@ -388,11 +394,27 @@ class KalturaMonitorClient
 				self::FIELD_EVENT_TYPE 		=> self::EVENT_CONNTOOK,
 				self::FIELD_DATABASE		=> $hostName,
 				self::FIELD_EXECUTION_TIME	=> $connTook,
+				self::FIELD_COUNT			=> $count,
 		));
 		
 		self::writeDeferredEvent($data);		
 	}
-	
+
+	public static function monitorMemcacheAccess($hostName, $timeTook, $count)
+	{
+		if (!self::$stream)
+			return;
+
+		$data = array_merge(self::$basicEventInfo, array(
+				self::FIELD_EVENT_TYPE 		=> self::EVENT_MEMCACHE,
+				self::FIELD_DATABASE		=> $hostName,
+				self::FIELD_EXECUTION_TIME	=> $timeTook,
+				self::FIELD_COUNT			=> $count,
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
 	public static function monitorFileSystemAccess($operation, $timeTook, $execStatus)
 	{
 		if (!self::$stream)
