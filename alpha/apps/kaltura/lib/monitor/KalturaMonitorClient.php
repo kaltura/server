@@ -19,6 +19,7 @@ class KalturaMonitorClient
 	const EVENT_COUCHBASE      = 'couchbase';
 	const EVENT_FILE_SYSTEM    = 'filesystem';
 	const EVENT_MEMCACHE       = 'memcache';
+	const EVENT_CURL           = 'curl';
 	const EVENT_RABBIT         = 'rabbit';
 
 
@@ -27,6 +28,7 @@ class KalturaMonitorClient
 	const FIELD_DATABASE = 			'd';
 	const FIELD_EVENT_TYPE = 		'e';
 	const FIELD_FILE_PATH = 		'f';
+	const FIELD_HOST =				'h';
 	const FIELD_IP_ADDRESS = 		'i';
 	const FIELD_KS_TYPE = 			'k';
 	const FIELD_CLIENT_TAG = 		'l';
@@ -410,6 +412,20 @@ class KalturaMonitorClient
 				self::FIELD_DATABASE		=> $hostName,
 				self::FIELD_EXECUTION_TIME	=> $timeTook,
 				self::FIELD_COUNT			=> $count,
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
+	public static function monitorCurl($hostName, $timeTook)
+	{
+		if (!self::$stream)
+			return;
+
+		$data = array_merge(self::$basicEventInfo, array(
+				self::FIELD_EVENT_TYPE 		=> self::EVENT_CURL,
+				self::FIELD_HOST			=> $hostName,
+				self::FIELD_EXECUTION_TIME	=> $timeTook,
 		));
 
 		self::writeDeferredEvent($data);
