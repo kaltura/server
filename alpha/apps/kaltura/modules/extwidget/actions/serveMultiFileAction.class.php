@@ -26,10 +26,6 @@ class serveMultiFileAction extends sfAction
 		
 		// load file syncs
 		$fileSyncs = FileSyncPeer::retrieveByPks(explode(',', $fileSyncIds));
-		if ($fileSyncs)
-		{
-			KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveMultiFile', $fileSyncs[0]->getPartnerId());
-		}
 		
 		// resolve file syncs
 		$resolvedFileSyncs = array();

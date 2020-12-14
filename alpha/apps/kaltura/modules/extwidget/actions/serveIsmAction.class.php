@@ -37,8 +37,6 @@ class serveIsmAction extends sfAction
 						
 		$syncKey = $this->getFileSyncKey($objectId, $type);
 				
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveIsm', $this->entry->getPartnerId());
-		
 		myPartnerUtils::enforceDelivery($this->entry, $this->flavorAsset);
 		
 		if (!kFileSyncUtils::file_exists($syncKey, false))
