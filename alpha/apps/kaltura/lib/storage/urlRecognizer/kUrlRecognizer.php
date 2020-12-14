@@ -7,6 +7,11 @@
  */ 
 class kUrlRecognizer
 {
+
+	const NOT_RECOGNIZED = 0;
+	const RECOGNIZED_OK = 1;
+	const RECOGNIZED_NOT_OK = 2;
+
 	/**
 	 * @var array
 	 */

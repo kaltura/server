@@ -20,10 +20,6 @@ class myPartnerUtils
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
 
 	const TYPE_DOWNLOAD = 'download';
-
-	const DOWNLOAD_NOT_RECOGNIZED = 0;
-	const DOWNLOAD_RECOGNIZED_OK = 1;
-	const DOWNLOAD_RECOGNIZED_NOT_OK = 2;
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1790,10 +1786,20 @@ class myPartnerUtils
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
 		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
-		$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+		$downloadAllowed = kUrlRecognizer::NOT_RECOGNIZED;
+		if(!is_null($storageProfileId))
+		{
+			$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_NOT_OK)
+			{
+				KalturaLog::debug('Failed to recognize url due to wrong or missing signing');
+				KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'wrong request signing');
+			}
+		}
+
 		if(!$validServe)
 		{
-			if(!is_null($storageProfileId) && $downloadAllowed === self::DOWNLOAD_RECOGNIZED_OK)
+			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_OK)
 			{
 				return;
 			}
@@ -1809,7 +1815,7 @@ class myPartnerUtils
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		if ($restricted)
 		{
-			if(!is_null($storageProfileId) && $downloadAllowed === self::DOWNLOAD_RECOGNIZED_OK)
+			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_OK)
 			{
 				return;
 			}
@@ -1818,12 +1824,6 @@ class myPartnerUtils
 				KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 			}
-		}
-
-		if($downloadAllowed === self::DOWNLOAD_RECOGNIZED_NOT_OK)
-		{
-			KalturaLog::debug('Failed to recognize url due to wrong or missing signing');
-			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'wrong request signing');
 		}
 	}
 
@@ -2227,7 +2227,7 @@ class myPartnerUtils
 		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
 		if(!$downloadDeliveryProfile)
 		{
-			return self::DOWNLOAD_NOT_RECOGNIZED;
+			return kUrlRecognizer::NOT_RECOGNIZED;
 		}
 
 		$downloadRecognizer = $downloadDeliveryProfile->getRecognizer();
@@ -2236,7 +2236,7 @@ class myPartnerUtils
 			return $downloadRecognizer->isRecognized(null);
 		}
 
-		return self::DOWNLOAD_NOT_RECOGNIZED;
+		return kUrlRecognizer::NOT_RECOGNIZED;
 	}
 
 	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)
