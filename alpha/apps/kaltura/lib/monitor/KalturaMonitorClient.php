@@ -22,6 +22,7 @@ class KalturaMonitorClient
 	const EVENT_CURL           = 'curl';
 	const EVENT_RABBIT         = 'rabbit';
 	const EVENT_SLEEP          = 'sleep';
+	const EVENT_UPLOAD         = 'upload';
 
 
 	const FIELD_ACTION = 			'a';
@@ -60,6 +61,8 @@ class KalturaMonitorClient
 	
 	protected static $sleepTime = 0;
 	protected static $sleepCount = 0;
+
+	protected static $wroteUpload = false;
 
 	protected static $bufferedPacket = '';
 
@@ -258,13 +261,17 @@ class KalturaMonitorClient
 
 			$data[self::FIELD_EVENT_TYPE] = self::EVENT_API_CACHE;
 			$data[self::FIELD_EXECUTION_TIME] = self::getApiExecTime();
-		}
-		else
-		{
-			$data[self::FIELD_EVENT_TYPE] = self::EVENT_API_START;
+			self::writeEvent($data);
+			return;
 		}
 
-		self::writeEvent($data);
+		$data[self::FIELD_EVENT_TYPE] = self::EVENT_API_START;
+		self::writeDeferredEvent($data);
+
+		if (count($_FILES) > 0)
+		{
+			self::monitorUpload();
+		}
 	}
 	
 	public static function monitorPs2Start()
@@ -293,12 +300,44 @@ class KalturaMonitorClient
 		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_API_END,
 			self::FIELD_EXECUTION_TIME	=> self::getApiExecTime(),
-			self::FIELD_ERROR_CODE		=> $errorCode,
+			self::FIELD_ERROR_CODE		=> strval($errorCode),
 		));
 
 		self::writeEvent($data);
 	}
-	
+
+	protected static function monitorUpload()
+	{
+		if (self::$wroteUpload)
+		{
+			return;
+		}
+
+		self::$wroteUpload = true;
+
+		$size = 0;
+		$errorCode = null;
+		foreach ($_FILES as $curFile)
+		{
+			$size += $curFile['size'];
+			if ($curFile['error'])
+			{
+				$errorCode = strval($curFile['error']);
+			}
+		}
+
+		$requestTime = isset($_SERVER['REQUEST_TIME_FLOAT']) ? $_SERVER['REQUEST_TIME_FLOAT'] : $_SERVER['REQUEST_TIME'];
+
+		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_UPLOAD,
+			self::FIELD_FILE_SIZE		=> $size,
+			self::FIELD_EXECUTION_TIME	=> self::$lastTime - $requestTime,
+			self::FIELD_ERROR_CODE		=> $errorCode,
+		));
+
+		self::writeDeferredEvent($data);
+	}
+
 	public static function monitorDatabaseAccess($sql, $sqlTook, $hostName = null)
 	{
 		if (!self::$stream)
@@ -475,8 +514,8 @@ class KalturaMonitorClient
 		$data = array_merge(self::$basicEventInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_FILE_SYSTEM,
 			self::FIELD_EXECUTION_TIME	=> $timeTook,
-			self::FIELD_QUERY_TYPE	=> $operation,
-			self::FIELD_ERROR_CODE => $execStatus,
+			self::FIELD_QUERY_TYPE		=> $operation,
+			self::FIELD_ERROR_CODE 		=> $execStatus,
 		));
 		
 		self::writeDeferredEvent($data);
@@ -538,10 +577,10 @@ class KalturaMonitorClient
 		$data = array_merge(self::$basicEventInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_RABBIT,
 			self::FIELD_DATABASE		=> $dataSource,
-			self::FIELD_TABLE		=> $tableName,
+			self::FIELD_TABLE			=> $tableName,
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
-			self::FIELD_LENGTH		=> $querySize ? $querySize : 0,
+			self::FIELD_LENGTH			=> $querySize ? $querySize : 0,
 			self::FIELD_ERROR_CODE		=> $errorType,
 		));
 
