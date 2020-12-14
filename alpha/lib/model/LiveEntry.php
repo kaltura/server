@@ -31,24 +31,13 @@ abstract class LiveEntry extends entry
 	
 	protected $decidingLiveProfile = false;
 
-    public function formatGenericFunction($funcName, $variableName){
-        return $funcName.str_replace("_", "", ucwords($variableName, "_"));
-    }
-
     public function copyInto($copyObj, $deepcopy = false){
         parent::copyInto($copyObj, $deepcopy);
-        $copyables = array(
-            "RecordStatus",
-            "ExplicitLive",
-            "DvrStatus",
-            "DvrWindow"
-        );
-        foreach ($copyables as $varName){
-            $getterFunc = $this->formatGenericFunction("get", $varName);
-            $setterFunc = $this->formatGenericFunction("set", $varName);
 
-            $copyObj->$setterFunc($this->$getterFunc());
-        }
+        $copyObj->setRecordStatus($this->getRecordStatus());
+        $copyObj->setExplicitLive($this->getExplicitLive());
+        $copyObj->setDvrStatus($this->getDvrStatus());
+        $copyObj->setDvrWindow($this->getDvrWindow());
     }
 	
 	/* (non-PHPdoc)
