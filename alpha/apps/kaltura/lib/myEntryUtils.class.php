@@ -871,11 +871,10 @@ class myEntryUtils
 			$start_sec = 0;
 		}
 		
-		$forceRotation = null;
+		$forceRotationByAssetId = array();
 		$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-		list($flavorAssetForCapture, $entryDataPath, $flavorAssetId) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
+		list($flavorAssetForCapture, $entryDataPath, $localCaptureFlavorAssetId) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
 		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
-		$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 		
 		while($count--)
 		{
@@ -954,6 +953,7 @@ class myEntryUtils
 
 						if (!$success)
 						{
+							$flavorAssetId = $localCaptureFlavorAssetId;
 							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey,
 								$cacheLockKeyProcessing, $flavorAssetId, -1, -1, $flavorAssetForCapture, $entryDataPath);
 						}
@@ -973,6 +973,15 @@ class myEntryUtils
 				}
 			}
 
+			//Avoid calculating forceRotation for each slice, calculate it once per flavor asset id
+			//This will handle cases when one frame is capture locally and another one is captured by packager
+			$forceRotation = isset($forceRotationByAssetId[$flavorAssetId]) ? $forceRotationByAssetId[$flavorAssetId] : null;
+			if(is_null($forceRotation))
+			{
+				$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+				$forceRotationByAssetId[$flavorAssetId] = $forceRotation;
+			}
+			
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 
@@ -1198,26 +1207,18 @@ class myEntryUtils
 			return null;
 		}
 		$entryDataPath = null;
-		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
-		if ($fileSync->getDc() === $currentDcId)
+		$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
+		KalturaLog::info("file sync id: {$fileSync->getId()} found on DC: {$fileSync->getDc()} current DC: $currentDcId isClodDc: $isCloudDc");
+		if ($fileSync->getDc() === $currentDcId || ($isCloudDc && (in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))))
 		{
 			$entryDataPath = $fileSync->getFullPath();
 			KalturaLog::info("path [$entryDataPath]");
 		}
 		else
 		{
-			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
-			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
-			{
-				KalturaLog::info("Current DC id: $currentDcId is cloud DC $isCloudDc]");
-				$entryDataPath = $fileSync->getFullPath();
-			}
-			else
-			{
-				$remoteDc = 1 - $currentDcId;
-				KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
-			}
+			$remoteDc = 1 - $currentDcId;
+			KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 
 		return $entryDataPath;

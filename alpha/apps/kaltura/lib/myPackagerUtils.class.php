@@ -232,7 +232,6 @@ class myPackagerUtils
 
 		self::$flavorSupportedByPackager[$entryId] = $flavorAsset;
 		return $flavorAsset;
-		return $flavorAsset;
 	}
 
 	/**
