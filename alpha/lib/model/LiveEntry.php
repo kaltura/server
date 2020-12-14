@@ -31,14 +31,15 @@ abstract class LiveEntry extends entry
 	
 	protected $decidingLiveProfile = false;
 
-    public function copyInto($copyObj, $deepcopy = false){
-        parent::copyInto($copyObj, $deepcopy);
+	public function copyInto($copyObj, $deepcopy = false)
+	{
+		parent::copyInto($copyObj, $deepcopy);
 
-        $copyObj->setRecordStatus($this->getRecordStatus());
-        $copyObj->setExplicitLive($this->getExplicitLive());
-        $copyObj->setDvrStatus($this->getDvrStatus());
-        $copyObj->setDvrWindow($this->getDvrWindow());
-    }
+		$copyObj->setRecordStatus($this->getRecordStatus());
+		$copyObj->setExplicitLive($this->getExplicitLive());
+		$copyObj->setDvrStatus($this->getDvrStatus());
+		$copyObj->setDvrWindow($this->getDvrWindow());
+	}
 	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
