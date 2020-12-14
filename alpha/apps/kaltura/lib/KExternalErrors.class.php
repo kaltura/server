@@ -159,7 +159,7 @@ class KExternalErrors
 
 		$headers[] = "X-Kaltura:cached-error-$errorCode";
 
-		self::terminateDispatch();
+		self::terminateDispatch($errorCode);
 
 		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED &&
 			$errorCode != self::IP_COUNTRY_BLOCKED &&
@@ -192,10 +192,17 @@ class KExternalErrors
 		die();
 	}
 
-	public static function terminateDispatch()
+	public static function terminateDispatch($errorCode = null)
 	{
 		if (class_exists('KalturaLog') && isset($GLOBALS["start"]))
+		{
 			KalturaLog::debug("Dispatch took - " . (microtime(true) - $GLOBALS["start"]) . " seconds, memory: " . memory_get_peak_usage(true));
+		}
+
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorApiEnd($errorCode);
+		}
 	}
 
 	public static function setResponseErrorCode($errorCode)

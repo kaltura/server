@@ -267,6 +267,22 @@ class KalturaMonitorClient
 		self::writeEvent($data);
 	}
 	
+	public static function monitorPs2Start()
+	{
+		$context = sfContext::getInstance();
+		$request = $context->getRequest();
+		$moduleName = $request->getParameter('module');
+		$actionName = $request->getParameter('action');
+
+		$partnerId = preg_match('#^/p/(\d+)/#', $_SERVER['REQUEST_URI'], $matches) ? $matches[1] : null;
+
+		$params = infraRequestUtils::getRequestParams();
+		$sessionType = isset($params['ks']) ? kSessionBase::SESSION_TYPE_USER : kSessionBase::SESSION_TYPE_NONE;	// assume user ks
+		$clientTag = isset($params['clientTag']) ? $params['clientTag'] : null;
+
+		self::monitorApiStart(false, "$moduleName.$actionName", $partnerId, $sessionType, $clientTag);
+	}
+
 	public static function monitorApiEnd($errorCode)
 	{
 		if (!self::$stream)
