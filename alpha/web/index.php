@@ -208,7 +208,7 @@ function checkCache()
 				}
 				
 				require_once(dirname(__FILE__) . '/../apps/kaltura/lib/monitor/KalturaMonitorClient.php');
-				KalturaMonitorClient::initApiMonitor(true, 'extwidget.thumbnail', $renderer->partnerId);
+				KalturaMonitorClient::monitorApiStart(true, 'extwidget.thumbnail', $renderer->partnerId);
 				header("X-Kaltura:cached-dispatcher-thumb");
 				$renderer->output();
 				die;
@@ -247,7 +247,7 @@ function checkCache()
 		$renderer = apc_fetch($cacheKey);
 		if ($renderer)
 		{
-			KalturaMonitorClient::initApiMonitor(true, 'extwidget.serveFlavor', $renderer->partnerId);
+			KalturaMonitorClient::monitorApiStart(true, 'extwidget.serveFlavor', $renderer->partnerId);
 			header("X-Kaltura:cached-dispatcher");
 			$renderer->output();
 			die;

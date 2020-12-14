@@ -490,8 +490,6 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFlavor', $flavorAsset->getPartnerId());
-			
 		myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
 		
 		$version = $this->getRequestParameter( "v" );

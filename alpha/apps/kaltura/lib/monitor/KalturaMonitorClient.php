@@ -231,7 +231,7 @@ class KalturaMonitorClient
 		}
 	}
 	
-	public static function monitorApiStart($cached, $action, $partnerId, $sessionType, $clientTag, $isInMultiRequest = false)
+	public static function monitorApiStart($cached, $action, $partnerId, $sessionType = null, $clientTag = null, $isInMultiRequest = false)
 	{
 		if ($partnerId == -1)		// cannot use BATCH_PARTNER_ID since this may run before the autoloader
 		{
@@ -278,8 +278,11 @@ class KalturaMonitorClient
 	{
 		$context = sfContext::getInstance();
 		$request = $context->getRequest();
-		$moduleName = $request->getParameter('module');
-		$actionName = $request->getParameter('action');
+		$action = $request->getParameter('module') . '.' . $request->getParameter('action');
+		if (strtolower($action) == 'extwidget.playmanifest')
+		{
+			return;		// handled by kApiCache
+		}
 
 		$partnerId = preg_match('#^/p/(\d+)/#', $_SERVER['REQUEST_URI'], $matches) ? $matches[1] : null;
 
@@ -287,7 +290,7 @@ class KalturaMonitorClient
 		$sessionType = isset($params['ks']) ? kSessionBase::SESSION_TYPE_USER : kSessionBase::SESSION_TYPE_NONE;	// assume user ks
 		$clientTag = isset($params['clientTag']) ? $params['clientTag'] : null;
 
-		self::monitorApiStart(false, "$moduleName.$actionName", $partnerId, $sessionType, $clientTag);
+		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
 	}
 
 	public static function monitorApiEnd($errorCode)

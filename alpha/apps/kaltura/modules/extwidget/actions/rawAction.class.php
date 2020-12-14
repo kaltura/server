@@ -62,8 +62,6 @@ class rawAction extends sfAction
 				KExternalErrors::dieGracefully();
 		}
 
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.raw', $entry->getPartnerId());
-		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::DOWNLOAD);
