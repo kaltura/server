@@ -582,9 +582,7 @@ class kFlowHelper
 			return $dbBatchJob;
 		
 		//Check if src remote file was pushed, if so mark it as ready
-		$fileSyncRemoteUrl = $data->getSrcFileSyncRemoteUrl();
-		$fileSyncLocalPath = $data->getSrcFileSyncLocalPath();
-		self::handleExtractMediaRemoteUrl($data->getFlavorAssetId(), $fileSyncRemoteUrl, $fileSyncLocalPath);
+		self::handleExtractMediaRemoteUrl($data->getFlavorAssetId(), $data->getSrcFileSyncRemoteUrl(), $data->getSrcFileSyncLocalPath());
 		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if(!$rootBatchJob)
@@ -644,8 +642,7 @@ class kFlowHelper
 		
 		$localFileSize = kFile::fileSize($fileSyncLocalPath);
 		$remoteFileSize = kFile::fileSize($fileSyncRemoteUrl);
-		KalturaLog::debug("local file [$fileSyncLocalPath] size [$localFileSize] remote file [" . $fileSyncRemoteUrl . "] size [$remoteFileSize]");
-	
+		KalturaLog::debug("local file [$fileSyncLocalPath] size [$localFileSize] remote file [$fileSyncRemoteUrl] size [$remoteFileSize]");
 		if($remoteFileSize != $localFileSize)
 		{
 			return;
@@ -654,10 +651,9 @@ class kFlowHelper
 		//get pending file sync to shared storage
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
-		
 		if(!$pendingFileSync)
 		{
-			KalturaLog::debug("No pending file sync found for current asset");
+			KalturaLog::debug("No pending file sync found for current asset [$flavorAssetId]");
 			return;
 		}
 		
