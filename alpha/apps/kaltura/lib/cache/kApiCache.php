@@ -93,12 +93,18 @@ class kApiCache extends kApiCacheBase
 	
 	protected function __construct($cacheType, $params = null)
 	{
-		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		if ($params)
 			$this->_params = $params;
 		else
 			$this->_params = infraRequestUtils::getRequestParams();
+
+		if(isset($this->_params['action'])  && isset($this->_params['service']))
+		{
+			$cacheType = kConf::getArrayValue($this->_params['service'] . '_' . $this->_params['action'], 'api_v3', 'cache', $cacheType);
+		}
+
+		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		parent::__construct();
 	}
@@ -779,7 +785,7 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			usleep(50000);
+			KalturaMonitorClient::usleep(50000);
 		}
 		
 		if(isset($this->_params['service']))
@@ -787,9 +793,10 @@ class kApiCache extends kApiCacheBase
 			$isInMultiRequest = isset($this->_params['multirequest']);
 			$action = $this->_params['service'];
 			if ($action != 'multirequest' && isset($this->_params['action']))
+			{
 				$action = $this->_params['service'] . '.' . $this->_params['action'];
-		
-			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
+				KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
+			}
 
 			foreach ($this->_monitorEvents as $event)
 			{

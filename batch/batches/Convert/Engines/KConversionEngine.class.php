@@ -162,6 +162,10 @@ abstract class KConversionEngine
 		{
 			// redirect both the STDOUT & STDERR to the log
 			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
+			if($this->inFilePath)
+			{
+				$exec_cmd .= " && rm -f \"{$this->inFilePath}\"";
+			}
 		}
 		
 		return $exec_cmd;
@@ -212,7 +216,7 @@ abstract class KConversionEngine
 			
 		try
 		{			
-			if ( file_exists ( $file ))
+			if ( kFile::checkFileExists(( $file )) )
 			{
 				$media_info = shell_exec("mediainfo ".realpath($file));
 				$this->addToLogFile ( $log_file ,$media_info ) ;

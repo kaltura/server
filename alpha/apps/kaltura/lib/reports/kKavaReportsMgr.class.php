@@ -221,6 +221,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
 	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
+	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -301,6 +302,9 @@ class kKavaReportsMgr extends kKavaBase
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
 
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
+
+	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
+	const SCHEDULE_EVENT_DURATION = 94608000; // 3 years
 
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
@@ -2150,15 +2154,24 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]) || isset($report_def[self::REPORT_PLAYBACK_TYPES]))
+
+		if (isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
-			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
+			$playback_types = $report_def[self::REPORT_PLAYBACK_TYPES];
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
 				self::DRUID_VALUES => $playback_types
 			);
 		}
-		
+		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) &&
+			(is_null($input_filter->playback_types) || trim($input_filter->playback_types === "")))
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+				self::DRUID_VALUES => array(self::PLAYBACK_TYPE_VOD)
+			);
+		}
+
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
@@ -5369,9 +5382,27 @@ class kKavaReportsMgr extends kKavaBase
 		$date->modify('+1 month');
 		$date->modify('-1 day');
 		$month_end = min($date->format('Ymd'), $current_date_id);
-		
 		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER] == 'TRUE';
-		$input_filter->from_day = $is_free_package ? str_replace('-', '', self::BASE_DATE_ID) : $month_start;
+
+		if ($is_free_package)
+		{
+			$partner_created_at = str_replace('-', '', self::BASE_DATE_ID);
+			$partner = PartnerPeer::retrieveByPK($partner_id);
+			if ($partner)
+			{
+				$partner_created_at = $partner->getCreatedAt('Ymd');
+			}
+			$end_date = self::dateIdToDateTime($month_end);
+			$end_date->modify('-6 month');
+			$free_package_start_date = max(self::dateIdToDateTime($partner_created_at), $end_date);
+			$free_package_start_date = $free_package_start_date->format('Ymd');
+			$input_filter->from_day = $free_package_start_date;
+		}
+		else
+		{
+			$input_filter->from_day = $month_start;
+		}
+
 		$input_filter->to_day = $month_end;
 		$input_filter->interval = reportInterval::MONTHS;
 	}
@@ -5409,9 +5440,84 @@ class kKavaReportsMgr extends kKavaBase
 		$filter->attachToCriteria($criteria);
 
 		$criteria->applyFilters();
-		return $criteria->getFetchedIds();
+		$live_now_entries = $criteria->getFetchedIds();
+		$simulive_and_manual = self::getCurrentlyLiveSimuliveAndManualEntries($partner_id);
+		$entries = array_unique(array_merge($live_now_entries, $simulive_and_manual));
+		return array_values($entries);
 	}
 
+	protected static function getCurrentlyLiveSimuliveAndManualEntries($partner_id) {
+		$now = time();
+		$start_time = $now - 2;
+		$end_time = $now + 2;
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::PARTNER_ID, $partner_id, Criteria::EQUAL);
+		$c->add(ScheduleEventPeer::TYPE, ScheduleEventType::LIVE_STREAM, Criteria::EQUAL);
+		// set 1 hour margin to get also preStart and postEnd on the events
+		$c->add(ScheduleEventPeer::END_DATE, $start_time - 3600, Criteria::GREATER_EQUAL);
+		$c->add(ScheduleEventPeer::START_DATE, $end_time + 3600, Criteria::LESS_EQUAL);
+
+		$schedule_events = ScheduleEventPeer::doSelect($c);
+
+		$live_entries_ids = array();
+		foreach ($schedule_events as $schedule_event)
+		{
+			if ($schedule_event->isRangeIntersects($start_time, $end_time)) // in current +-2 sec
+			{
+				$live_entries_ids[] = $schedule_event->getTemplateEntryId(); // the live entry id from the event
+			}
+		}
+		return $live_entries_ids;
+	}
+
+	protected static function editWebcastEngagementTimelineFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		if ($input_filter->from_date || $input_filter->to_date)
+		{
+			return;
+		}
+
+		$entry_ids = explode($response_options->getDelimiter(), $input_filter->entries_ids);
+		if (count($entry_ids) != 1)
+		{
+			return;
+		}
+		$entry_id = reset($entry_ids);
+		$entry_id = trim($entry_id);
+		if (!$entry_id)
+		{
+			return;
+		}
+
+		$entry = entryPeer::retrieveByPKNoFilter($entry_id);
+		if (!$entry)
+		{
+			return;
+		}
+
+		$event = null;
+		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		{
+			$events =  $entry->getScheduleEvents(self::SCHEDULE_EVENT_PAST_DATE, self::SCHEDULE_EVENT_PAST_DATE + self::SCHEDULE_EVENT_DURATION);
+			$event = $events ? $events[0] : null;
+		}
+
+		if (!$event)
+		{
+			return;
+		}
+
+		$event_starttime = $event->getCalculatedStartTime();
+		$event_endtime = $event->getCalculatedEndTime();
+		if (!$event_starttime || !$event_endtime)
+		{
+			return;
+		}
+
+		//edit filter with simulive start time and end time
+		$input_filter->from_date = $event_starttime;
+		$input_filter->to_date = $event_endtime;
+	}
 
 	protected static function addCombinedUsageColumn(&$result, $input_filter)
 	{
@@ -5862,6 +5968,20 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function getCustomReportMaxResultSize($report_def, $params)
+	{
+		if (isset($report_def[self::REPORT_MAX_RESULT_SIZE]))
+		{
+			return $report_def[self::REPORT_MAX_RESULT_SIZE];
+		}
+
+		if (isset($params['limit']))
+		{
+			return min($params['limit'], self::MAX_CUSTOM_REPORT_RESULT_SIZE);
+		}
+
+		return self::MAX_CUSTOM_REPORT_RESULT_SIZE;
+	}
 
 	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
 	{
@@ -6054,7 +6174,7 @@ class kKavaReportsMgr extends kKavaBase
 				$partner_id,
 				$report_def,
 				$input_filter,
-				isset($params['limit']) ? $params['limit'] : self::MAX_CUSTOM_REPORT_RESULT_SIZE,
+				self::getCustomReportMaxResultSize($report_def, $params),
 				1,
 				$report_def['order_by'],
 				$object_ids,

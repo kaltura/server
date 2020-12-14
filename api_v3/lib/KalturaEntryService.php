@@ -858,8 +858,10 @@ class KalturaEntryService extends KalturaBaseService
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
 			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
+    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
+    			{
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+    			}
 
     			KalturaLog::err("Failed downloading file[$url]");
     			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
@@ -871,7 +873,7 @@ class KalturaEntryService extends KalturaBaseService
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
     		{
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
+    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
     			{
     				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     				return $dbAsset;
@@ -1873,7 +1875,7 @@ class KalturaEntryService extends KalturaBaseService
 				/* @var $fileSync FileSync */
 				if ( $fileSync && (!$local ||
 						($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL &&
-							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds(true)) )
+							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()) )
 					))
 				{
 					$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();

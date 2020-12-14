@@ -1011,11 +1011,17 @@ class playManifestAction extends kalturaAction
 			$assets = assetPeer::doSelect($c);
 			
 			//Filter out all caption assets that have displayOnPlayer set to false
+			$disableCaptions = $this->getRequestParameter('disableCaptions', false);
 			$filteredAssets = array(); 
 			foreach ($assets as $asset)
 			{
 				if(is_callable($asset, 'getDisplayOnPlayer') && !$asset->getDisplayOnPlayer())
 					continue;
+
+				if($disableCaptions && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
+				{
+					continue;
+				}
 				
 				$filteredAssets[] = $asset;
 			}

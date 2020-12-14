@@ -88,7 +88,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		if(!class_exists('Aws\S3\S3Client'))
 		{
-			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
+			self::safeLog('Class Aws\S3\S3Client was not found!!');
 			return false;
 		}
 		
@@ -96,7 +96,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
-				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				self::safeLog('Class Aws\S3\StsClient was not found!!');
 				return false;
 			}
 			
@@ -280,35 +280,40 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRename($filePath, $newFilePath)
 	{
-		if(!$this->doCopy($filePath, $newFilePath))
+		if(kFile::isSharedPath($filePath) && !$this->doCopy($filePath, $newFilePath))
 		{
 			return false;
 		}
 		
-		$this->doUnlink($filePath);
+		if(!$this->doMoveLocalToShared($filePath, $newFilePath, true))
+		{
+			return false;
+		}
+		
+		kFile::unlink($filePath);
 		return true;
 	}
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
-		$this->registerStreamWrappers();
+		kSharedFileSystemMgr::restoreStreamWrappers();
 		
 		$sourceFH = fopen($resource, 'rb');
 		if(!$sourceFH)
 		{
-			KalturaLog::err("Could not open source file [$resource] for read");
-			$this->unregisterStreamWrappers();
+			self::safeLog("Could not open source file [$resource] for read");
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 			return false;
 		}
 		
 		$uploadId = $this->createMultipartUpload($destFilePath);
 		if(!$uploadId)
 		{
-			$this->unregisterStreamWrappers();
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 			return false;
 		}
 		
-		KalturaLog::debug("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
+		self::safeLog("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
 		
 		// Upload the file in parts.
 		$partNumber = 1;
@@ -319,7 +324,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$result = $this->multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath);
 			if(!$result)
 			{
-				$this->unregisterStreamWrappers();
+				kSharedFileSystemMgr::unRegisterStreamWrappers();
 				$this->abortMultipartUpload($destFilePath, $uploadId);
 				return false;
 			}
@@ -329,7 +334,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				'ETag' => $result['ETag'],
 			);
 			
-			KalturaLog::debug("Uploading part [$partNumber] dest file path [$destFilePath]");
+			self::safeLog("Uploading part [$partNumber] dest file path [$destFilePath]");
 			$partNumber++;
 		}
 		
@@ -339,11 +344,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$result = $this->completeMultiPartUpload($destFilePath, $uploadId, $parts);
 		if(!$result)
 		{
-			$this->unregisterStreamWrappers();
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 			return false;
 		}
 		
-		$this->unregisterStreamWrappers();
+		kSharedFileSystemMgr::unRegisterStreamWrappers();
 		return true;
 	}
 	
@@ -584,7 +589,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
+			self::safeLog("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
 		}
 		
 		return $dirList;
@@ -635,8 +640,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		$fileUrl = $this->doRealPath($filePath);
 		
-		KalturaLog::debug("Test:: range_from [$range_from] range_length [$range_length]");
-		
 		$ch = curl_init();
 		
 		curl_setopt($ch, CURLOPT_URL, $fileUrl);
@@ -644,7 +647,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 		$range_to = ($range_from + $range_length) - 1;
 		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
-		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 		
 		$result = curl_exec($ch);
 
@@ -853,19 +855,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return false;
 	}
 	
-	
-	protected function registerStreamWrappers()
-	{
-		stream_wrapper_restore('http');
-		stream_wrapper_restore('https');
-	}
-	
-	protected function unregisterStreamWrappers()
-	{
-		stream_wrapper_unregister('https');
-		stream_wrapper_unregister('http');
-	}
-	
 	public function initBasicS3Params($filePath)
 	{
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
@@ -885,7 +874,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			unset($params['Body']);
 		}
 		
-		KalturaLog::warning("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
+		self::safeLog("S3 [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
 	}
 	
 	protected function doCopySharedToSharedAllowed()

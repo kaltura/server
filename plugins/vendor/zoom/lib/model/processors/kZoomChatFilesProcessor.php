@@ -51,6 +51,7 @@ class kZoomChatFilesProcessor extends kZoomProcessor
 		}
 		catch (Exception $e)
 		{
+			KalturaLog::debug($e);
 			ZoomHelper::exitWithError(kZoomErrorMessages::ERROR_HANDLING_CHAT);
 		}
 	}

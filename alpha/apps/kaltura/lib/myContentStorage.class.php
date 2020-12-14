@@ -121,6 +121,18 @@ class myContentStorage
 	{
 		return substr($id, -4, 2) . '/' . substr($id, -2);
 	}
+	
+	public static function getScatteredPathFromIntId($intId)
+	{
+		$intId = intval($intId/10);
+		$base36IntId = base_convert($intId, 10, 36);
+		
+		//Handle cases where base36 string is shorter the minimum required
+		$base36IntId = str_pad($base36IntId, 4, 0, STR_PAD_LEFT);
+		
+		//Return first last 4 chars to ensure even spread when it comes to working with Consecutive numbers
+		return substr($base36IntId, -2) . '/' . substr($base36IntId, -4, 2);
+	}
 
 	public static function getPathFromIntId($intId)
 	{

@@ -284,6 +284,11 @@ $pixFmt = "yuv420p";
 	public static function buildWatermarkedCommandLine($watermMarkData, $destFileSyncLocalPath, $cmdLine, $ffmpegBin = "ffmpeg", $mediaInfoBin = "mediainfo")
 	{
 		KalturaLog::log("In:cmdline($cmdLine)");
+		
+		if(isset(KBatchBase::$taskConfig->params->sharedTempPath)){
+			$destFileSyncLocalPath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($destFileSyncLocalPath);
+		}
+		
 		if(!isset($mediaInfoBin) || strlen($mediaInfoBin)==0)
 			$mediaInfoBin = "mediainfo";
 
@@ -466,7 +471,12 @@ $stub=null;
 		foreach($captionsArr as $lang=>$captionFileUrl){
 			if($subtitlesData->language==$lang){
 				KalturaLog::log("Found required language($lang)");
-				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $data->destFileSyncLocalPath.".temp.$lang.srt");
+				$tmpCaptionFilePath = $data->destFileSyncLocalPath.".temp.$lang.srt";
+				if(isset(KBatchBase::$taskConfig->params->sharedTempPath)){
+					$tmpCaptionFilePath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($tmpCaptionFilePath);
+				}
+				
+				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $tmpCaptionFilePath);
 				break;
 			}
 		}
@@ -567,6 +577,37 @@ $stub=null;
 		}
 		KalturaLog::log("Successfully retrieved $captionFilePath!");
 		return $captionFilePath;
+	}
+	
+	/**
+	 * derived classes can override this is they create the command lines in a different way
+	 *
+	 * @param string $cmd_line
+	 * @param boolean $add_log
+	 * @return string
+	 */
+	protected function getCmdLine ($cmd_line , $add_log )
+	{
+		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
+		$binName = $this->getCmd();
+		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
+		
+		$exec_cmd = $binName;
+		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$exec_cmd);
+		
+		$exec_cmd .= " " .
+			str_replace (
+				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
+				array('"' . $inputFilePath . '"', $this->outFilePath, $this->configFilePath, $binName),
+				$cmd_line);
+		
+		if ( $add_log )
+		{
+			// redirect both the STDOUT & STDERR to the log
+			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
+		}
+		
+		return $exec_cmd;
 	}
 }
 

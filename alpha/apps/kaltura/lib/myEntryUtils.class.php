@@ -4,7 +4,6 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
-	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
@@ -703,6 +702,7 @@ class myEntryUtils
 			return $result;
 		}
 
+		$fileToDelete = null;
 		if (is_null($thumbParams) || !($thumbParams instanceof kThumbnailParameters))
 			$thumbParams = new kThumbnailParameters();
 
@@ -821,8 +821,13 @@ class myEntryUtils
 		}
 
 		$isEncryptionNeeded = ($fileSync && $fileSync->isEncrypted());
-		
-		
+		list($isRemote, $remoteUrl) = kFile::resolveFilePath($orig_image_path);
+		if($isRemote)
+		{
+			$orig_image_path = kFile::getExternalFile($remoteUrl);
+			$fileToDelete = $orig_image_path;
+		}
+
 		// remark added so ffmpeg will try to load the thumbnail from the original source
 		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
@@ -869,8 +874,7 @@ class myEntryUtils
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+			$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
 			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
@@ -907,7 +911,6 @@ class myEntryUtils
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
-	
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
@@ -965,6 +968,7 @@ class myEntryUtils
 				}
 			}
 
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 
@@ -984,7 +988,7 @@ class myEntryUtils
 			{
 				if ($crop_provider)
 				{
-					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
+					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $forceRotation);
 				}
 				else
 				{
@@ -998,7 +1002,7 @@ class myEntryUtils
 						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
 					}
 
-					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format, $forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
 				{
@@ -1056,7 +1060,13 @@ class myEntryUtils
 		{
 			$finalThumbPath = self::encryptThumb($finalThumbPath, $entry->getGeneralEncryptionKey(), $entry->getEncryptionIv());
 		}
-				
+
+
+		if($fileToDelete)
+		{
+			kFile::doDeleteFile($fileToDelete);
+		}
+
 		return $finalThumbPath;
 	}
 
@@ -2064,75 +2074,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = null;
 		while ($packagerRetries && !$content)
 		{
-			$content = self::retrieveVolumeMapFromPackager($flavorAsset);
+			$content = myPackagerUtils::retrieveVolumeMapFromPackager($flavorAsset);
 			$packagerRetries--;
 		}
+
 		if(!$content)
+		{
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+		}
 
 		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
 		return new kRendererString($content, 'text/csv');
-	}
-
-	private static function retrieveVolumeMapFromPackager($flavorAsset)
-	{
-		if ($flavorAsset->getEncryptionKey())
-		{
-			return self::retrieveMappedVolumeMapFromPackager($flavorAsset);
-		}
-		return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
-	}
-
-	private static function retrieveMappedVolumeMapFromPackager($flavorAsset)
-	{
-		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::MAPPED_VOLUME_MAP, $flavorAsset);
-		if (!$packagerVolumeMapUrlPattern)
-		{
-			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
-		}
-
-		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-		if (!$entry)
-		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND);
-		}
-
-		$volumeMapUrl = self::buildVolumeMapPath($entry, $flavorAsset);
-
-		$content = self::curlVolumeMapUrl($volumeMapUrl, $packagerVolumeMapUrlPattern);
-		if(!$content)
-		{
-			return false;
-		}
-
-		return $content;
-	}
-
-	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
-	{
-		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::REGULAR_VOLUME_MAP, $flavorAsset);
-		if (!$packagerVolumeMapUrlPattern)
-			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
-
-		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
-		$entry_data_path = ltrim($entry_data_path, "/");
-		if (!$entry_data_path)
-			return null;
-
-		$content = self::curlVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
-		if(!$content)
-			return false;
-
-		return $content;
-	}
-
-	private static function curlVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
-	{
-		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
-		kFile::closeDbConnections();
-		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl, null, null, true);
-		return $content;
 	}
 
 	public static function addTrackEntryInfo(entry $entry,$message)
@@ -2141,20 +2093,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$trackEntry->setEntryId($entry->getId());
 		$trackEntry->setDescription($message);
 		TrackEntry::addTrackEntry($trackEntry);
-	}
-
-	private static function buildVolumeMapPath($entry, $flavorAsset)
-	{
-		$partnerId = $flavorAsset->getPartnerId();
-		$subpId = $entry->getSubpId();
-		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-		$entryVersion = $entry->getVersion();
-
-		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
-		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		$url .= "/flavorId/".$flavorAsset->getId();
-		$url .= self::MP4_FILENAME_PARAMETER;
-		return $url;
 	}
 
 	public static function verifyEntryType($entry)

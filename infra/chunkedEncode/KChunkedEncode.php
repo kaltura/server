@@ -1046,7 +1046,8 @@
 		{
 			switch($mode){
 			case "merged":
-				$name = $this->setup->output."_merged";
+				$name = $this->params->output;
+				//$name = $this->setup->output."_merged";
 				break;
 			case "audio":
 				$name = $this->setup->output."_audio";
@@ -1102,7 +1103,8 @@
 				$name.= "$this->videoChunkPostfix";
 				break;
 			case "srt":
-				$name.= "srt";
+				//When splitting subtitles we need to write output file to shared location for handling env that run tmp as local path (cloud storage)
+				$name = dirname($this->params->videoFilters->subsFilename) . "/" . basename($name) . "srt";
 				break;
 			default:
 				$name.= "$this->videoChunkPostfix".$mode;
@@ -1331,7 +1333,7 @@
 			return $strVer;
 		}
 		
-		protected static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
+		public static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
 		{
 			if (strpos($fileCmd, $pattern) !== 0) {
 				return;

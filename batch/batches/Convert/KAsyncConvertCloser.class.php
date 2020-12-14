@@ -154,7 +154,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			return true;
 		foreach ($extraDestFileSyncs as $fileSync) 
 		{
-			if(!$fileSync->fileSyncLocalPath || !file_exists($fileSync->fileSyncLocalPath))
+			if(!$fileSync->fileSyncLocalPath || !kFile::checkFileExists($fileSync->fileSyncLocalPath))
 				return false;
 		}
 		return true;

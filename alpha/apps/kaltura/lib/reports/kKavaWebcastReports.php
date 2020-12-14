@@ -187,6 +187,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			),
 			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
 			self::REPORT_METRICS => array(self::METRIC_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_EDIT_FILTER_FUNC => 'self::editWebcastEngagementTimelineFilter',
 			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
 		),
 

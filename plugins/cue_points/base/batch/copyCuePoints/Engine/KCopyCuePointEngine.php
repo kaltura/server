@@ -152,7 +152,7 @@ abstract class KCopyCuePointEngine
 	protected function getCuePointPager()
 	{
 		$pager = new KalturaFilterPager();
-		$pager->pageIndex = 0;
+		$pager->pageIndex = 1;
 		$pager->pageSize = self::MAX_CUE_POINT_CHUNKS;
 		return $pager;
 	}

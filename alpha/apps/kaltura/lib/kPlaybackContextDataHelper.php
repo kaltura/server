@@ -20,6 +20,7 @@ class kPlaybackContextDataHelper
 	private $remoteDeliveryProfileIds = array();
 	private $remoteDcByDeliveryProfile = array();
 	private $playbackCaptions = array();
+	private $bumperData = array();
 	private $localPlaybackSources = array();
 	private $remotePlaybackSources = array();
 	private $kalturaStoragePlaybackSources = array();
@@ -80,6 +81,12 @@ class kPlaybackContextDataHelper
 		$this->filterFlavorsBySources();
 		$this->playbackContext->setFlavorAssets($this->flavorAssets);
 		$this->playbackContext->setPlaybackCaptions($this->playbackCaptions);
+
+		if($this->playbackContext->getSources())
+		{
+			$this->constructBumperData($dbEntry, $contextDataHelper);
+		}
+		$this->playbackContext->setBumperData($this->bumperData);
 	}
 
 	/**
@@ -457,10 +464,20 @@ class kPlaybackContextDataHelper
 
 	/**
 	 * @param entry $dbEntry
+	 * @param kContextDataHelper $contextDataHelper
 	 */
 	private function constructPlaybackCaptions(entry $dbEntry, $contextDataHelper)
 	{
 		$this->playbackCaptions = self::getPlaybackCaptionsData($dbEntry, $contextDataHelper);
+	}
+
+	/**
+	 * @param entry $dbEntry
+	 * @param kContextDataHelper $contextDataHelper
+	 */
+	private function constructBumperData(entry $dbEntry, $contextDataHelper)
+	{
+		$this->bumperData = self::getBumperData($dbEntry, $contextDataHelper);
 	}
 
 	private function getTagsByFormat($format)
@@ -629,6 +646,7 @@ class kPlaybackContextDataHelper
 	/* @param entry $dbEntry
 	 * @param $flavorAssets
 	 * @param $deliveryProfile
+	 * @param $contextDataHelper
 	 * @return array
 	 */
 	private static function getDrmData(entry $dbEntry, $flavorAssets, $deliveryProfile, $contextDataHelper)
@@ -649,13 +667,13 @@ class kPlaybackContextDataHelper
 		return array($result->getPluginData(), $flavorAssets);
 	}
 
-	/* @param entry $dbEntry
-	 * @return array
+	/* @param string $type
+	 * @return kPlaybackContextDataResult
 	 */
-	protected static function getPlaybackCaptionsData(entry $dbEntry, $contextDataHelper)
+	protected static function getPluginDataByType(entry $dbEntry, $contextDataHelper, $type)
 	{
 		$playbackContextDataParams = new kPlaybackContextDataParams();
-		$playbackContextDataParams->setType('caption');
+		$playbackContextDataParams->setType($type);
 		$result = new kPlaybackContextDataResult();
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaPlaybackContextDataContributor');
 		foreach ($pluginInstances as $pluginInstance)
@@ -663,7 +681,27 @@ class kPlaybackContextDataHelper
 			$pluginInstance->contributeToPlaybackContextDataResult($dbEntry, $playbackContextDataParams, $result, $contextDataHelper);
 		}
 
+		return $result;
+	}
+
+	/* @param entry $dbEntry
+	 * @param kContextDataHelper $contextDataHelper
+	 * @return array
+	 */
+	protected static function getPlaybackCaptionsData(entry $dbEntry, $contextDataHelper)
+	{
+		$result = self::getPluginDataByType($dbEntry, $contextDataHelper, 'caption');
 		return $result->getPlaybackCaptions();
+	}
+
+	/* @param entry $dbEntry
+	 * @param kContextDataHelper $contextDataHelper
+	 * @return array
+	 */
+	protected static function getBumperData(entry $dbEntry, $contextDataHelper)
+	{
+		$result = self::getPluginDataByType($dbEntry, $contextDataHelper, 'bumper');
+		return $result->getBumperData();
 	}
 
 	private function setPlaybackSources($servePriority)

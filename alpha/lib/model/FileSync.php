@@ -174,14 +174,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$this->save();
 
 		$key = $this->getEncryptionKey();
-		$realPath = realpath($this->getFullPath());
+		$realPath = kFile::realPath($this->getFullPath(), false);
 		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
 		kEncryptFileUtils::encrypt($realPath, $key, $this->getIv());
 	}
 
 	public function decrypt()
 	{
-		$realPath = realpath($this->getFullPath());
+		$realPath = kFile::realPath($this->getFullPath(), false);
 		$fileData = kFileBase::getFileContent( $realPath);
 		if (!$this->isEncrypted()) 
 		{
@@ -251,8 +251,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getFullPath ()
 	{
 		$fileRoot = $this->getFileRoot();
-		$fileType = parent::getFileType();
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && $fileType == self::FILE_SYNC_FILE_TYPE_URL)
+
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
 			if($sharedStorageProfile)
@@ -290,10 +290,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 	 */
 	public function createTempClear()
 	{
-		$realPath = realpath($this->getFullPath());
+		$realPath = kFile::realPath($this->getFullPath(), false);
 		$tempPath = $this->getClearTempPath();
 		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
-		if (!file_exists($tempPath))
+		if (!kFile::checkFileExists($tempPath))
 			kEncryptFileUtils::decryptFile($realPath, $this->getEncryptionKey(), $this->getIv(), $tempPath);
 		return $tempPath;
 	}

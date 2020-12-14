@@ -19,6 +19,11 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		$userPager = new KalturaFilterPager();
 		$userPager->pageSize = $pager->pageSize;
 		$maxPagesToScan = 7;
+		if (isset(KBatchBase::$taskConfig->params->maxPagesToScan))
+		{
+			$maxPagesToScan = KBatchBase::$taskConfig->params->maxPagesToScan;
+		}
+
 		do
 		{
 			$categoryUserList = KBatchBase::$kClient->categoryUser->listAction($this->recipientJobData->categoryUserFilter, $pager);

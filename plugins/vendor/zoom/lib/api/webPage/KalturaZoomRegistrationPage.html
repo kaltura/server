@@ -119,7 +119,7 @@
             var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
             var enableWebinarUpload = enableWebinarUploadObj.is(":checked");
             var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
-            var handleParticipantMode = $('[name=participantHandler]:checked').val();
+            var handleParticipantsMode = $('[name=participantsHandler]:checked').val();
             var zoomUserMatchingMode = $('[name=userMatchingHandler]:checked').val();
             var zoomUserPostfix = $('#zoomUserPostfix').val().trim();
 
@@ -131,7 +131,7 @@
                     'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
                     'integrationSetting:enableRecordingUpload':enableRecordingUpload,
                     'integrationSetting:createUserIfNotExist':createUserIfNotExist,
-                    'integrationSetting:handleParticipantMode':handleParticipantMode,
+                    'integrationSetting:handleParticipantsMode':handleParticipantsMode,
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
@@ -213,15 +213,15 @@
         <p class="small margin">Please select how meeting participants should be handled:</p>
         <div class="margin">
             <input type="radio" id="participantsChoice1"
-                   name="participantHandler" value="0"  checked>
+                   name="participantsHandler" value="0"  checked>
             <label for="participantsChoice1" class="small">Add as Co publishers</label>
 
             <input type="radio" id="participantsChoice2"
-                   name="participantHandler" value="1">
+                   name="participantsHandler" value="1">
             <label for="participantsChoice2" class="small">Add as Co viewers</label>
 
             <input type="radio" id="participantsChoice3"
-                   name="participantHandler" value="2">
+                   name="participantsHandler" value="2">
             <label for="participantsChoice3" class="small">Ignore participants</label>
         </div>
 
