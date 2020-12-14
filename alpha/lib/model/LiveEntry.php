@@ -593,11 +593,6 @@ abstract class LiveEntry extends entry
 
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
-		{
-			return EntryServerNodeStatus::PLAYABLE;
-		}
-
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
 
