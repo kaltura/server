@@ -42,8 +42,10 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 		$partToSign = substr($uri, 0, $matches[1][1] + strlen($expiry));
 		$requestSignature = $matches[2][0];
 
-		if($expiry && (time() > $expiry))
+		$currentTime = time();
+		if($expiry && ($currentTime > $expiry))
 		{
+			KalturaLog::debug("Request expired, expiry value: [$expiry] current time: [$currentTime]");
 			return self::RECOGNIZED_NOT_OK;
 		}
 
