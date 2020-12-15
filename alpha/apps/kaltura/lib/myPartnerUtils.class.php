@@ -1786,27 +1786,25 @@ class myPartnerUtils
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
 		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
-		$downloadAllowed = kUrlRecognizer::NOT_RECOGNIZED;
+
 		if(!is_null($storageProfileId))
 		{
 			$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
 			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_NOT_OK)
 			{
 				KalturaLog::debug('Failed to recognize url due to wrong or missing signing');
-				KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'wrong request signing');
+				KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'Failed to parse signature');
+			}
+
+			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_OK)
+			{
+				return;
 			}
 		}
 
 		if(!$validServe)
 		{
-			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_OK)
-			{
-				return;
-			}
-			else
-			{
-				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-			}
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
 
 		// enforce delivery
@@ -1815,15 +1813,8 @@ class myPartnerUtils
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		if ($restricted)
 		{
-			if($downloadAllowed === kUrlRecognizer::RECOGNIZED_OK)
-			{
-				return;
-			}
-			else
-			{
 				KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
 				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
-			}
 		}
 	}
 
