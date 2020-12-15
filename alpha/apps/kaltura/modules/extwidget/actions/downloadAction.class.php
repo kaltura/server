@@ -218,7 +218,7 @@ class downloadAction extends sfAction
 			
 			//If file is in shared storage don't calc the mime type and let the renderer output to decide it from the file ext
 			$mime_type = null;
-			if(!kFile::isSharedPath($file_name))
+			if(!kFile::isSharedPath($file_path))
 			{
 				$mime_type = kFile::mimeType($file_path);
 			}
