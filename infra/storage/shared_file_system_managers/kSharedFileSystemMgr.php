@@ -280,6 +280,15 @@ abstract class kSharedFileSystemMgr
 	abstract protected function doRealPath($filePath, $getRemote = true);
 	
 	/**
+	 * Returns the mime_type of the file.
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return string
+	 */
+	abstract protected function doMimeType($filePath);
+	
+	/**
 	 * dump file in parts
 	 *
 	 * @param $filePath
@@ -519,6 +528,12 @@ abstract class kSharedFileSystemMgr
 	{
 		$filePath = kFileBase::fixPath($filePath);
 		return $this->doRealPath($filePath, $getRemote);
+	}
+	
+	public function mimeType($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doMimeType($filePath);
 	}
 	
 	/**
