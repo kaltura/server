@@ -123,7 +123,8 @@ class downloadAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 		
 		/**@var $fileSync FileSync */
-		$filePath = $fileSync->getFullPath();
+		//To-Do: Remote the use of fix path in various locations in the code and escape the double slashes in the get full path method
+		$filePath = kFile::fixPath($fileSync->getFullPath());
 
 		list($fileBaseName, $fileExt) = kAssetUtils::getFileName($entry, $flavorAsset);
 
