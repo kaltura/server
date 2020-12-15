@@ -387,14 +387,33 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doIsDir($path)
 	{
-		$res = $this->getHeadObjectForPath($path);
-		if(!$res)
+		//Object storage does use directories so to determine if path is dir or not we simply list the path on s3
+		//If it returns more than 1 match than its a directory
+		
+		$dirList = array();
+		list($bucket, $key) = $this->getBucketAndFilePath($path);
+		
+		try
 		{
-			return false;
+			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $key
+			));
+			
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				$dirList[] = array (
+					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
+					"fileSize" => $dirListObject['Size']
+				);
+			}
+		}
+		catch ( Exception $e )
+		{
+			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
 		}
 		
-		$contentLength = $res['ContentLength'];
-		return ($contentLength == 0 && substr($path, -1) == "/") ? true : false;
+		return count($dirList) > 1;
 	}
 	
 	protected function getHeadObjectForPath($path)
@@ -634,6 +653,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$expiry = time() + 5 * 86400;
 		$preSignedUrl = $cmd->createPresignedUrl($expiry);
 		return $preSignedUrl;
+	}
+	
+	protected function doMimeType($filePath)
+	{
+		$res = $this->getHeadObjectForPath($filePath);
+		if(!$res)
+		{
+			return null;
+		}
+		
+		return $res->get('ContentType');
 	}
 	
 	protected function doDumpFilePart($filePath, $range_from, $range_length)

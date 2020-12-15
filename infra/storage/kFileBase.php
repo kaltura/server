@@ -306,8 +306,14 @@ class kFileBase
     
     public static function mimeType($file_name)
     {
-        if (!file_exists($file_name))
+        if (!kFile::checkFileExists($file_name))
             return false;
+        
+        if(kFile::isSharedPath($file_name))
+        {
+	        $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+	        return $kSharedFsMgr->mimeType($file_name);
+        }
 
         if(! function_exists('mime_content_type'))
         {
