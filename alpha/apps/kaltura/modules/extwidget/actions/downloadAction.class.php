@@ -216,7 +216,12 @@ class downloadAction extends sfAction
 			if(!$directServe)
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
 			
-			$mime_type = kFile::mimeType($file_path);
+			//If file is in shared storage don't calc the mime type and let the renderer output to decide it from the file ext
+			$mime_type = null;
+			if(!kFile::isSharedPath($file_name))
+			{
+				$mime_type = kFile::mimeType($file_path);
+			}
 			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, false, $fileExt);
 		}
 	}
