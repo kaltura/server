@@ -389,8 +389,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		//Object storage does use directories so to determine if path is dir or not we simply list the path on s3
 		//If it returns more than 1 match than its a directory
-		
 		$dirList = array();
+		
+		//When checking if path is Dir in s3 add a trailing slash to the path to avoid considering files with the same name but different ext as dir's
+		// Example:
+		//  my_bucket/dir1/dir2/my_file.mp4
+		//  my_bucket/dir1/dir2/my_file.mp4.log
+		$path = $path . DIRECTORY_SEPARATOR;
 		list($bucket, $key) = $this->getBucketAndFilePath($path);
 		
 		try
