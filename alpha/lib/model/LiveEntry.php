@@ -24,10 +24,22 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
 	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
+	const CUSTOM_DATA_DVR_STATUS = "dvr_status";
+	const CUSTOM_DATA_DVR_WINDOW = "dvr_window";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
+
+	public function copyInto($copyObj, $deepcopy = false)
+	{
+		parent::copyInto($copyObj, $deepcopy);
+
+		$copyObj->setRecordStatus($this->getRecordStatus());
+		$copyObj->setExplicitLive($this->getExplicitLive());
+		$copyObj->setDvrStatus($this->getDvrStatus());
+		$copyObj->setDvrWindow($this->getDvrWindow());
+	}
 	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
@@ -269,22 +281,22 @@ abstract class LiveEntry extends entry
 	
 	public function getDvrStatus()
 	{
-		return $this->getFromCustomData("dvr_status");
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_DVR_STATUS);
 	}
 	
 	public function setDvrStatus($v)
 	{
-		$this->putInCustomData("dvr_status", $v);
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_DVR_STATUS, $v);
 	}
 	
 	public function getDvrWindow()
 	{
-		return $this->getFromCustomData("dvr_window");
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_DVR_WINDOW);
 	}
 	
 	public function setDvrWindow($v)
 	{
-		$this->putInCustomData("dvr_window", $v);
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_DVR_WINDOW, $v);
 	}
 	
 	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
