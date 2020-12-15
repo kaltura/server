@@ -165,7 +165,7 @@ class kJobsSuspender {
 	
 		// Return the jobs from batch_job_lock_suspend table
 		self::moveFromSuspendedJobsTable($jobIds);
-		$rootJobIds = self::unsuspendRootJob($jobIds, 0);
+		$rootJobIds = self::unsuspendRootJob($jobIds);
 		// Update the jobs status to pending
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_SUSPEND, false);
 		$resRoot = self::setJobsStatus($rootJobIds, BatchJob::BATCHJOB_STATUS_ALMOST_DONE, BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE, false);
@@ -239,14 +239,14 @@ class kJobsSuspender {
 	}
 	
 	
-	private static function unsuspendRootJob($jobIds, $rootLevel)
+	private static function unsuspendRootJob($jobIds, $rootLevel = 0)
 	{
 		if(empty($jobIds))
 		{
 			return array();
 		}
 
-		if($rootLevel == self::MAX_ROOT_LEVELS)
+		if($rootLevel >= self::MAX_ROOT_LEVELS)
 		{
 			KalturaLog::warning('Reach max levels of root!');
 			return array();
