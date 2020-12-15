@@ -11,7 +11,10 @@ class kJobsSuspender {
 	
 	/** The maximum number of jobs we will handle for each (dc,partner_id,job_type,job_sub_type) */
 	const MAX_PROCESSED_ROWS = 500;
-	
+
+	/** The maximum levels of root jobs (a job that has a root job that also has a root job...) */
+	const MAX_ROOT_LEVELS = 5;
+
 	/**
 	 * Entry point to job balancing.
 	 * - Move jobs from status '0' to status '11' in case there are too many pending jobs
@@ -162,7 +165,7 @@ class kJobsSuspender {
 	
 		// Return the jobs from batch_job_lock_suspend table
 		self::moveFromSuspendedJobsTable($jobIds);
-		$rootJobIds = self::unsuspendRootJob($jobIds);
+		$rootJobIds = self::unsuspendRootJob($jobIds, 0);
 		// Update the jobs status to pending
 		$res = self::setJobsStatus($jobIds, BatchJob::BATCHJOB_STATUS_PENDING, BatchJob::BATCHJOB_STATUS_SUSPEND, false);
 		$resRoot = self::setJobsStatus($rootJobIds, BatchJob::BATCHJOB_STATUS_ALMOST_DONE, BatchJob::BATCHJOB_STATUS_SUSPEND_ALMOST_DONE, false);
@@ -236,10 +239,16 @@ class kJobsSuspender {
 	}
 	
 	
-	private static function unsuspendRootJob($jobIds)
+	private static function unsuspendRootJob($jobIds, $rootLevel)
 	{
 		if(empty($jobIds))
 		{
+			return array();
+		}
+
+		if($rootLevel == self::MAX_ROOT_LEVELS)
+		{
+			KalturaLog::warning('Reach max levels of root!');
 			return array();
 		}
 
@@ -249,10 +258,11 @@ class kJobsSuspender {
 		$c->addSelectColumn(BatchJobLockPeer::ROOT_JOB_ID);
 		$c->setDistinct();
 		$c->add(BatchJobLockPeer::ID, $jobIds, Criteria::IN);
-		$c->add(BatchJobLockPeer::ID, '(batch_job_lock.ID != batch_job_lock.ROOT_JOB_ID)', Criteria::CUSTOM);
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
 		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+		// jobsId are Ids that we already moved from suspended jobs table
+		$rootIds = array_diff($rootIds, $jobIds);
 		if(empty($rootIds))
 		{
 			return array();
@@ -271,7 +281,7 @@ class kJobsSuspender {
 		$unsuspendedRootJobs = array_diff($rootIds, $usedRootIds);
 		self::moveFromSuspendedJobsTable($unsuspendedRootJobs);
 
-		return array_merge(self::unsuspendRootJob($unsuspendedRootJobs), $unsuspendedRootJobs);
+		return array_merge(self::unsuspendRootJob($unsuspendedRootJobs, $rootLevel + 1), $unsuspendedRootJobs);
 	}
 	
 	/**
