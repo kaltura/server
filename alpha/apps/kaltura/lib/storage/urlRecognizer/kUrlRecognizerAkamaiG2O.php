@@ -93,7 +93,7 @@ class kUrlRecognizerAkamaiG2O extends kUrlRecognizer
 			// Compare the absolute value of the difference between the current time
 			// and the "token" time.
 			if (abs(time() - $time) > $this->timeout ) {
-				return self::NOT_RECOGNIZED;
+				return self::RECOGNIZED_NOT_OK;
 			}
 		}
 
@@ -102,7 +102,7 @@ class kUrlRecognizerAkamaiG2O extends kUrlRecognizer
 			return self::RECOGNIZED_OK;
 		}
 		
-		return self::NOT_RECOGNIZED;
+		return self::RECOGNIZED_NOT_OK;
 	}
 	
 }

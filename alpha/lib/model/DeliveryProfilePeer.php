@@ -714,7 +714,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		foreach($deliveries as $delivery) {
 			$recognizer = $delivery->getRecognizer();
 			if(!is_null($recognizer)) {
-				if($recognizer->isRecognized($requestOrigin)) {
+				if($recognizer->isRecognized($requestOrigin) == kUrlRecognizer::RECOGNIZED_OK) {
 					return false;					
 				}
 			}
