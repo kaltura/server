@@ -48,7 +48,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 				EntryVendorTaskStatus::PENDING, 
 				EntryVendorTaskStatus::PENDING_MODERATION
 			), Criteria::IN);
-		return EntryVendorTaskPeer::doSelectOne($c);
+		return EntryVendorTaskPeer::doSelect($c);
 	}
 	
 	public static function retrievePendingByEntryId($entryId, $partnerId = null ,$status = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY))
