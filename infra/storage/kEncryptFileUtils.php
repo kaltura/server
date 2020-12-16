@@ -155,7 +155,7 @@ class kEncryptFileUtils
         return sys_get_temp_dir(). "/clear_" . pathinfo($path, PATHINFO_BASENAME);
     }
 	
-    protected function readBytesFromStream($fd, $bytesToRead)
+    protected static function readBytesFromStream($fd, $bytesToRead)
     {
         $data = '';
         $bytesRead = 0;
@@ -169,7 +169,7 @@ class kEncryptFileUtils
         return $data;
     }
     
-    protected function openFile($path, $mode)
+    protected static function openFile($path, $mode)
     {
         stream_wrapper_restore('http');
         stream_wrapper_restore('https');
