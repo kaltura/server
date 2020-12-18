@@ -126,14 +126,14 @@ class KalturaFrontController
 
 				}
 				$success = false;
-				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);
+				$errorCode = $result->getCode();
 			}
 			catch (Error $ex) 
 			{
 				$success = false;
-				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);
+				$errorCode = $result->getCode();
 			}
 			
 			$this->onRequestEnd($success, $errorCode);
@@ -325,14 +325,14 @@ class KalturaFrontController
 				catch(Exception $ex)
 				{
 					$success = false;
-					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
+					$errorCode = $currentResult->getCode();
 				}
 				catch (Error $ex)
 				{
 					$success = false;
-					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
+					$errorCode = $currentResult->getCode();
 				}
 				$cache->storeCache($currentResult, array(), true);
 				$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);
