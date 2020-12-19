@@ -70,6 +70,11 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$catalogItemForView->setAttrib('disabled', 'disabled');
 		$this->addElement($catalogItemForView);
 
+        $catalogItemForView = new Kaltura_Form_Element_EnumSelect('engineType', array('enum' => 'Kaltura_Client_Reach_Enum_ReachVendorEngineType'));
+        $catalogItemForView->setLabel('Engine Type:');
+
+        $this->addElement($catalogItemForView);
+
 		$serviceTypeForView = new Kaltura_Form_Element_EnumSelect('serviceType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceType'));
 		$serviceTypeForView->setLabel('Service Type:');
 		$serviceTypeForView->setRequired(true);

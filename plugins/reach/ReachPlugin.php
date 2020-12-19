@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Enable time based cue point objects management on entry objects
+ * Enable Reach feature
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaApplicationTranslations
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -185,7 +185,9 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 	{
 		$eventNotificationDependency = new KalturaDependency(EventNotificationPlugin::getPluginName());
 		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::getPluginName());
-		return array($eventNotificationDependency, $bulkUploadDependency);
+		$captionPluginDependency = new KalturaDependency(CaptionPlugin::getPluginName());
+
+		return array($eventNotificationDependency, $bulkUploadDependency, $captionPluginDependency);
 	}
 	
 	/**
@@ -329,5 +331,24 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		
 		return $data;
 	}
-	
+
+    /**
+     * @inheritDoc
+     */
+    public static function getTranslations($locale)
+    {
+        $array = array();
+
+        $langFilePath = __DIR__ . "/config/lang/$locale.php";
+        if(!file_exists($langFilePath))
+        {
+            $default = 'en';
+            $langFilePath = __DIR__ . "/config/lang/$default.php";
+        }
+
+        KalturaLog::info("Loading file [$langFilePath]");
+        $array = include($langFilePath);
+
+        return array($locale => $array);
+    }
 }

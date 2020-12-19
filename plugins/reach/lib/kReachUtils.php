@@ -161,15 +161,6 @@ class kReachUtils
 		return $remainingCredit >= 0 ? true : false;
 	}
 	
-	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version)
-	{
-		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		if($activeTask)
-			return true;
-		
-		return false;
-	}
-	
 	public static function isEntryTypeSupported($type, $mediaType = null)
 	{
 		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);

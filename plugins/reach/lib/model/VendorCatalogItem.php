@@ -37,8 +37,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	{
 	}
 	
-	const CUSTOM_DATA_PRICING = "pricing";
+	const CUSTOM_DATA_PRICING = 'pricing';
 	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
+	const CUSTOM_DATA_ENGINE_TYPE = 'engineType';
 	
 	public function setPricing($pricing)
 	{
@@ -67,6 +68,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID);
 	}
+
+    public function setEngineType($engineType)
+    {
+        $this->putInCustomData(self::CUSTOM_DATA_ENGINE_TYPE, $engineType);
+    }
+
+    public function getEngineType()
+    {
+        return $this->getFromCustomData(self::CUSTOM_DATA_ENGINE_TYPE);
+    }
 	
 	public function getPartnerId()
 	{
@@ -128,5 +139,37 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 		return $serviceFeatureName;
 	}
+
+    public function isDuplicateTask(entry $entry)
+    {
+        $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+        $sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
+        $activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartner(), $sourceFlavorVersion);
+        if($activeTask)
+            return true;
+
+        return false;
+    }
+
+    public function calculateVersion ($entry)
+    {
+        $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+
+        return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+    }
+
+    public function getTaskJobData($object)
+    {
+        if($object instanceof CaptionAsset)
+        {
+            $taskJobData = new kTranslationVendorTaskData();
+            $taskJobData->captionAssetId = $object->getId();
+            return $taskJobData;
+        }
+
+        return null;
+    }
+
 
 } // VendorCatalogItem

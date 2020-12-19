@@ -34,22 +34,38 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		$c->add(EntryVendorTaskPeer::VERSION, $version);
 		return EntryVendorTaskPeer::doSelect($c);
 	}
-	
-	public static function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version)
+
+	public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
+    {
+        $c = new Criteria();
+        $c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+        $c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
+        $c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+        $c->add(EntryVendorTaskPeer::VERSION, $version);
+        $c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
+
+        return EntryVendorTaskPeer::doSelectOne($c);
+    }
+
+	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version)
 	{
-		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
-		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
-		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->add(EntryVendorTaskPeer::VERSION, $version);
-		$c->add(EntryVendorTaskPeer::STATUS, 
-			array(EntryVendorTaskStatus::PROCESSING, 
-				EntryVendorTaskStatus::READY, 
-				EntryVendorTaskStatus::PENDING, 
-				EntryVendorTaskStatus::PENDING_MODERATION
-			), Criteria::IN);
-		return EntryVendorTaskPeer::doSelectOne($c);
+	    $statusList = array(EntryVendorTaskStatus::PROCESSING,
+            EntryVendorTaskStatus::READY,
+            EntryVendorTaskStatus::PENDING,
+            EntryVendorTaskStatus::PENDING_MODERATION,
+        );
+	    return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
 	}
+
+    public static function retrieveOneActiveTask($entryId, $catalogItemId, $partnerId, $version)
+    {
+        $statusList = array(EntryVendorTaskStatus::PROCESSING,
+            EntryVendorTaskStatus::PENDING,
+            EntryVendorTaskStatus::PENDING_MODERATION,
+        );
+
+        return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
+    }
 	
 	public static function retrievePendingByEntryId($entryId, $partnerId = null ,$status = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY))
 	{

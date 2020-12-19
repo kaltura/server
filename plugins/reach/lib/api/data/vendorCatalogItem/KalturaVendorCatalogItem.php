@@ -75,6 +75,12 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $pricing;
 
+    /**
+     * Property showing the catalog item's engine type, in case a vendor can offer the same service via different engines.
+     * @var KalturaReachVendorEngineType
+     */
+	public $engineType;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -88,6 +94,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'serviceFeature',
 		'turnAroundTime',
 		'pricing',
+        'engineType',
 	);
 
 	abstract protected function getServiceFeature();
@@ -196,6 +203,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::CHAPTERING:
 				$object = new KalturaVendorChapteringCatalogItem();
 				break;
+
+            case VendorServiceFeature::INTELLIGENT_TAGGING:
+                $object = new KalturaVendorIntelligentTaggingCatalogItem();
+                break;
 
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();

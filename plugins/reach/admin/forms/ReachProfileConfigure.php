@@ -131,7 +131,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		));
 		
 		$this->addElement('text', 'flavorParamsIds', array(
-			'label' => 'Flavor Params Idss:',
+			'label' => 'Flavor Params IDs:',
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));

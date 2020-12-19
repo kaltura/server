@@ -44,11 +44,30 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
 		$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
-		$taskJobData = self::getTaskJobData($object);
+
+		//If both the entry and reach profile don't exist, there's no need to hit the loop
+        $entry = entryPeer::retrieveByPK($entryId);
+        $reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
+
+        if(!$entry || !$reachProfile)
+        {
+            KalturaLog::log("Not all mandatory objects were found, tasks will not be added");
+            return true;
+        }
+
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
+		    //Validate the existence of the catalog item
+            $catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
+            if(!$catalogItemToAdd)
+            {
+                KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
+                continue;
+            }
+
 			//Pass the object Id as the context of the task
-			self::addEntryVendorTaskByObjectIds($entryId, $catalogItemIdToAdd, $profileId, $this->getContextByObjectType($object), $taskJobData);
+            $taskJobData = $catalogItemToAdd->getTaskJobData($object);
+			self::addEntryVendorTaskByObjectIds($entry, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
 
@@ -469,24 +488,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds($entryId, $vendorCatalogItemId, $reachProfileId, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds(entry $entry, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
-		$reachProfile = ReachProfilePeer::retrieveActiveByPk($reachProfileId);
-		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
-		
-		if(!$entry || !$reachProfile || !$vendorCatalogItem)
-		{
-			KalturaLog::log("Not all mandatory objects were found, task will not be added");
-			return true;
-		}
+	    $entryId = $entry->getId();
+	    $vendorCatalogItemId = $vendorCatalogItem->getId();
 
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
-		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
-
-		if (kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
+        $targetVersion = $vendorCatalogItem->calculateVersionByEngineType($entry);
+		if ($vendorCatalogItem->isDuplicateTask($entry))
 		{
-			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
+			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$targetVersion]");
 			return true;
 		}
 
@@ -515,7 +525,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $sourceFlavorVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
+		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
 		if($entryVendorTask)
 		{
 			if ($taskJobData)
@@ -682,18 +692,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		if ($object instanceof categoryEntry)
 			return $object->getCategoryId();
-
-		return null;
-	}
-
-	protected static function getTaskJobData($object)
-	{
-		if($object instanceof CaptionAsset)
-		{
-			$taskJobData = new kTranslationVendorTaskData();
-			$taskJobData->captionAssetId = $object->getId();
-			return $taskJobData;
-		}
 
 		return null;
 	}
