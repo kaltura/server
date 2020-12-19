@@ -40,7 +40,21 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_PRICING = 'pricing';
 	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
 	const CUSTOM_DATA_ENGINE_TYPE = 'engineType';
-	
+	const CUSTOM_DATA_ALLOW_RESUBMISSION = 'allowResubmission';
+
+	public function setAllowResubmission($allowResubmission)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ALLOW_RESUBMISSION, $allowResubmission);
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllowResubmission()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ALLOW_RESUBMISSION);
+	}
+
 	public function setPricing($pricing)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_PRICING, serialize($pricing));
@@ -139,20 +153,26 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 		return $serviceFeatureName;
 	}
+	
+	public function getCacheInvalidationKeys()
+	{
+		return array("vendorCatalogItem:id=".strtolower($this->getId()));
+	}
 
     public function isDuplicateTask(entry $entry)
     {
-        $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
-        $sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+        $version = $this->calculateEntryVendorTaskVersion($entry);
 
-        $activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartner(), $sourceFlavorVersion);
-        if($activeTask)
+        $activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartner(), $version);
+        if($activeTask && !$this->getAllowResubmission())
+        {
             return true;
+        }
 
         return false;
     }
 
-    public function calculateVersion ($entry)
+    public function calculateEntryVendorTaskVersion ($entry)
     {
         $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 
@@ -161,13 +181,6 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
     public function getTaskJobData($object)
     {
-        if($object instanceof CaptionAsset)
-        {
-            $taskJobData = new kTranslationVendorTaskData();
-            $taskJobData->captionAssetId = $object->getId();
-            return $taskJobData;
-        }
-
         return null;
     }
 

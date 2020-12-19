@@ -273,4 +273,24 @@ class kScope
 			
 		return in_array($context, $this->contexts);
 	}
+
+	public function getPartnerId()
+	{
+		if($this->getKs())
+		{
+			return $this->getKs()->partner_id;
+		}
+
+		if($this->getEntryId())
+		{
+			$dbEntry = entryPeer::retrieveByPK($this->getEntryId());
+			if($dbEntry)
+			{
+				return $dbEntry->getPartnerId();
+			}
+		}
+
+		return null;
+	}
+
 }

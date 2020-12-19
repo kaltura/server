@@ -11,7 +11,10 @@ class kJobsSuspender {
 	
 	/** The maximum number of jobs we will handle for each (dc,partner_id,job_type,job_sub_type) */
 	const MAX_PROCESSED_ROWS = 500;
-	
+
+	/** The maximum levels of root jobs (a job that has a root job that also has a root job...) */
+	const MAX_ROOT_LEVELS = 5;
+
 	/**
 	 * Entry point to job balancing.
 	 * - Move jobs from status '0' to status '11' in case there are too many pending jobs
@@ -236,10 +239,19 @@ class kJobsSuspender {
 	}
 	
 	
-	private static function unsuspendRootJob($jobIds) {
+	private static function unsuspendRootJob($jobIds, $rootLevel = 0)
+	{
 		if(empty($jobIds))
+		{
 			return array();
-		
+		}
+
+		if($rootLevel >= self::MAX_ROOT_LEVELS)
+		{
+			KalturaLog::warning('Reach max levels of root!');
+			return array();
+		}
+
 		// Get possible root job ids
 		// select root_job_id from batch_job_lock where id in (unsuspended jobs)
 		$c = new Criteria();
@@ -248,8 +260,15 @@ class kJobsSuspender {
 		$c->add(BatchJobLockPeer::ID, $jobIds, Criteria::IN);
 		$stmt = BatchJobLockPeer::doSelectStmt($c);
 		$rootIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-		
-		// Select only root ids that has no other suspended descendats
+
+		// jobsId are Ids that we already moved from suspended jobs table
+		$rootIds = array_diff($rootIds, $jobIds);
+		if(empty($rootIds))
+		{
+			return array();
+		}
+
+		// Select only root ids that has no other suspended descendants
 		$c = new Criteria();
 		$c->addSelectColumn(BatchJobLockSuspendPeer::ROOT_JOB_ID);
 		$c->add(BatchJobLockSuspendPeer::ROOT_JOB_ID, $rootIds, Criteria::IN);
@@ -261,7 +280,8 @@ class kJobsSuspender {
 		
 		$unsuspendedRootJobs = array_diff($rootIds, $usedRootIds);
 		self::moveFromSuspendedJobsTable($unsuspendedRootJobs);
-		return $unsuspendedRootJobs;
+
+		return array_merge(self::unsuspendRootJob($unsuspendedRootJobs, $rootLevel + 1), $unsuspendedRootJobs);
 	}
 	
 	/**

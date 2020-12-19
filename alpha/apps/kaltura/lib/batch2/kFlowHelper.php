@@ -21,6 +21,9 @@ class kFlowHelper
 
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 
+	const DAYS = 'days';
+	const HOURS = 'hours';
+
 
 	/**
 	 * @param int $partnerId
@@ -133,6 +136,16 @@ class kFlowHelper
 		// get entry
 		$entryId = $dbBatchJob->getEntryId();
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+
+		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(), $dbBatchJob->getPartnerId()))
+		{
+			if($dbEntry)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+				$dbEntry->save();
+			}
+			throw new APIException(APIErrors::INVALID_FILE_TYPE, $data->getDestFileLocalPath());
+		}
 
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -567,7 +580,10 @@ class kFlowHelper
 	{
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-
+		
+		//Check if src remote file was pushed, if so mark it as ready
+		self::handleExtractMediaRemoteUrl($data->getFlavorAssetId(), $data->getSrcFileSyncRemoteUrl(), $data->getSrcFileSyncLocalPath());
+		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if(!$rootBatchJob)
 			return $dbBatchJob;
@@ -578,7 +594,7 @@ class kFlowHelper
 		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
 		if($dbBatchJobAux!=null)
 			return $dbBatchJobAux;
-
+		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
@@ -614,6 +630,42 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+	
+	protected static function handleExtractMediaRemoteUrl($flavorAssetId, $fileSyncRemoteUrl, $fileSyncLocalPath)
+	{
+		if(!$fileSyncRemoteUrl)
+		{
+			KalturaLog::debug("File sync remote url not provided, will not check for shared file syncs");
+			return;
+		}
+		
+		$localFileSize = kFile::fileSize($fileSyncLocalPath);
+		$remoteFileSize = kFile::fileSize($fileSyncRemoteUrl);
+		KalturaLog::debug("local file [$fileSyncLocalPath] size [$localFileSize] remote file [$fileSyncRemoteUrl] size [$remoteFileSize]");
+		if($remoteFileSize != $localFileSize)
+		{
+			return;
+		}
+		
+		//get pending file sync to shared storage
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+		if(!$pendingFileSync)
+		{
+			KalturaLog::debug("No pending file sync found for current asset [$flavorAssetId]");
+			return;
+		}
+		
+		if($pendingFileSync->getFullPath() != $fileSyncRemoteUrl)
+		{
+			KalturaLog::debug("Pending file sync full path does not match file sync remote url [{$pendingFileSync->getFullPath()}] [$fileSyncRemoteUrl]");
+			return;
+		}
+		
+		
+		$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+		$pendingFileSync->save();
 	}
 
 	/**
@@ -854,7 +906,7 @@ class kFlowHelper
 		
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
-			if($partnerSharedStorageProfileId)
+			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
 			{
 				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
 				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
@@ -882,7 +934,7 @@ class kFlowHelper
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			try
 			{
-				if($partnerSharedStorageProfileId)
+				if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
 				{
 					KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
 					$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
@@ -2974,7 +3026,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry)
+	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $privilegeActionsLimit = null)
 	{
 		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
 		if (!preg_match($regex, $file_name, $matches))
@@ -2985,6 +3037,10 @@ class kFlowHelper
 
 		$partner = PartnerPeer::retrieveByPK($partner_id);
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+		if ($privilegeActionsLimit)
+		{
+			$privilege .= "," . $privilegeActionsLimit;
+		}
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
@@ -3020,14 +3076,24 @@ class kFlowHelper
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		$privilegeActionsLimit = null;
+		$expiryByPartner = kConf::get("report_export_expiry_by_partner", 'analytics', array());
+		if (array_key_exists($dbBatchJob->getPartnerId(), $expiryByPartner))
+		{
+			$expiry = $expiryByPartner[$dbBatchJob->getPartnerId()];
+			$privilegeActionsLimit = kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
+		}
+		else
+		{
+			$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		}
 
 		$links = array();
 		// Create download URL's
 		foreach ($finalFiles as $finalFile)
 		{
 			$fileName = basename($finalFile->getFileId());
-			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry);
+			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $privilegeActionsLimit);
 			if (!$url)
 			{
 				KalturaLog::err("Failed to create download URL for file - {$finalFile->getFileId()}");
@@ -3041,7 +3107,15 @@ class kFlowHelper
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_SUCCESS;
 		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
 		$expiryInDays = $expiry / 60 / 60 / 24;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, $validUntil);
+		if ($expiryInDays >= 1)
+		{
+			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
+		}
+		else
+		{
+			$expiryInHours = $expiry / 60 / 60;
+			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
+		}
 		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
@@ -3225,6 +3299,10 @@ class kFlowHelper
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		if ($partner->getEnforceHttpsApi())
+		{
+			$url = str_replace("http:", "https:", $url);
+		}
 
 		return $url;
 	}

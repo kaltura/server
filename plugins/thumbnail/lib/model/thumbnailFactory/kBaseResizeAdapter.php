@@ -12,8 +12,6 @@ class kBaseResizeAdapter
 	const LOCAL_MAP_NAME = 'local';
 	const CONFIGURATION_PARAM_NAME = 'thumb_path';
 	const DEFAULT_THUMB_DIR = 'tempthumb';
-	const ENTITY_NAME_PREFIX = 'entry/';
-	const CACHED_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 	const THUMB_PROCESSING_LOCK_DURATION = 300; //5 minutes
 	const LOCK_KEY_PREFIX = 'thumb-processing-resize';
 	const DEFAULT_THUMB_SEC = 3;
@@ -117,12 +115,13 @@ class kBaseResizeAdapter
 		$entry = $this->getEntry();
 		$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
 		$format = $this->parameters->get(kThumbFactoryFieldName::IMAGE_FORMAT);
-		//create final path for thumbnail created
-		$this->finalThumbPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
+		$this->finalThumbPath =  myContentStorage::getThumbEntityPath(myEntryUtils::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry, $this->thumbName, $this->entryThumbFilename, $version);
 		if($format)
 		{
 			$this->finalThumbPath = kFile::replaceExt($this->finalThumbPath, $format);
 		}
+
+		KalturaLog::debug("Path for saving thumbnail is [$this->finalThumbPath]");
 	}
 
 	protected function checkIfOldApiCachedExists($contentPath, $thumbDirs)
@@ -131,23 +130,23 @@ class kBaseResizeAdapter
 		{
 			$entry = $this->getEntry();
 			$version = $this->parameters->get(kThumbFactoryFieldName::VERSION);
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(myEntryUtils::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $this->thumbName, $this->entryThumbFilename , $version);
 			if (file_exists($currPath) && @filesize($currPath))
 			{
-				if($currPath != $this->finalThumbPath)
+				if(myCloudUtils::shouldExportThumbToCloud())
 				{
 					$moveFileSuccess = kFile::moveFile($currPath, $this->finalThumbPath);
-					if($moveFileSuccess)
+					if ($moveFileSuccess)
 					{
-						return array (true, $this->finalThumbPath);
+						return array(true, $this->finalThumbPath);
 					}
 					else
 					{
-						KalturaLog::warning("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$this->finalThumbPath], will return oldPath");
 					}
 				}
 
-				return array (true, $currPath);
+				return array(true, $currPath);
 			}
 		}
 
@@ -267,7 +266,7 @@ class kBaseResizeAdapter
 
 	protected function returnCachedVersion($filePath)
 	{
-		header(self::CACHED_EXISTS_HEADER . md5($filePath));
+		header(myEntryUtils::CACHED_THUMB_EXISTS_HEADER . md5($filePath));
 		return $filePath;
 	}
 }

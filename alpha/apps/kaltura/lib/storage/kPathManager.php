@@ -73,6 +73,7 @@ class kPathManager
 	{
 		KalturaLog::log(__METHOD__." - key [$key], storageProfileId [$storageProfileId]");
 		
+		$storageProfileId = self::getStorageProfileIdForKey($key, $storageProfileId);
 		$storageProfile = self::getStorageProfile($storageProfileId);
 		if(is_null($storageProfile))
 			throw new Exception("Storage Profile [$storageProfileId] not found");
@@ -95,5 +96,26 @@ class kPathManager
 	public static function getFilePath(FileSyncKey $key, $storageProfileId = null)
 	{
 		return implode('', self::getFilePathArr($key, $storageProfileId));
+	}
+	
+	public static function getStorageProfileIdForKey(FileSyncKey $key, $storageProfileId = null)
+	{
+		$object = kFileSyncUtils::retrieveObjectForSyncKey($key);
+		$class = get_class($object);
+		
+		$objectKeys = array (
+			$class . ':' . $key->getObjectType() . ':' . $key->getObjectSubType(),
+			$class . ':' . $key->getObjectType() . ':' . '*',
+			'*' // WildCard
+		);
+		
+		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
+		if( array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
+		{
+			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$storageProfileId = reset($storageProfileIds);
+		}
+		
+		return $storageProfileId;
 	}
 }

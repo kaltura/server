@@ -162,6 +162,10 @@ abstract class KConversionEngine
 		{
 			// redirect both the STDOUT & STDERR to the log
 			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
+			if($this->inFilePath)
+			{
+				$exec_cmd .= " && rm -f \"{$this->inFilePath}\"";
+			}
 		}
 		
 		return $exec_cmd;
@@ -180,8 +184,8 @@ abstract class KConversionEngine
 		$binName=$this->getCmd();
 		$exec_cmd = $binName . " " . 
 			str_replace ( 
-				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName), 
-				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $binName),
+				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
+				array('"' . kFile::realPath($this->inFilePath) . '"', $this->outFilePath, $this->configFilePath, $binName),
 				$cmd_line);
 				
 		if ( $add_log )
@@ -212,7 +216,7 @@ abstract class KConversionEngine
 			
 		try
 		{			
-			if ( file_exists ( $file ))
+			if ( kFile::checkFileExists(( $file )) )
 			{
 				$media_info = shell_exec("mediainfo ".realpath($file));
 				$this->addToLogFile ( $log_file ,$media_info ) ;

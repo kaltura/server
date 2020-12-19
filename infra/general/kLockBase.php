@@ -42,7 +42,14 @@ class kLockBase
 		{
 			if (!$this->store->add($this->key, true, $lockHoldTimeout))
 			{
-				usleep(self::LOCK_GRAB_TRY_INTERVAL);
+				if (class_exists('KalturaMonitorClient'))
+				{
+					KalturaMonitorClient::usleep(self::LOCK_GRAB_TRY_INTERVAL);
+				}
+				else
+				{
+					usleep(self::LOCK_GRAB_TRY_INTERVAL);
+				}
 				continue;
 			}
 			

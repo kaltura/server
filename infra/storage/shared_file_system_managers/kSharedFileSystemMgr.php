@@ -280,6 +280,15 @@ abstract class kSharedFileSystemMgr
 	abstract protected function doRealPath($filePath, $getRemote = true);
 	
 	/**
+	 * Returns the mime_type of the file.
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return string
+	 */
+	abstract protected function doMimeType($filePath);
+	
+	/**
 	 * dump file in parts
 	 *
 	 * @param $filePath
@@ -521,6 +530,12 @@ abstract class kSharedFileSystemMgr
 		return $this->doRealPath($filePath, $getRemote);
 	}
 	
+	public function mimeType($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doMimeType($filePath);
+	}
+	
 	/**
 	 * copies local src to shared destination.
 	 * Doesn't support non-flat directories!
@@ -600,6 +615,7 @@ abstract class kSharedFileSystemMgr
 	
 	public static function getInstanceFromPath($path)
 	{
+		$path = kFile::fixPath($path);
 		$storageTypeMap = kFile::getStorageTypeMap();
 		
 		foreach (array_keys($storageTypeMap) as $pathPrefix) {
@@ -679,5 +695,30 @@ abstract class kSharedFileSystemMgr
 	public static function setFileSystemOptions($key, $value)
 	{
 		self::$storageConfig[$key] = $value;
+	}
+	
+	public static function restoreStreamWrappers()
+	{
+		stream_wrapper_restore('http');
+		stream_wrapper_restore('https');
+	}
+	
+	public static function unRegisterStreamWrappers()
+	{
+		stream_wrapper_unregister('http');
+		stream_wrapper_unregister('https');
+	}
+	
+	/**
+	 * This function is required since this code can run before the autoloader
+	 *
+	 * @param string $msg
+	 */
+	public static function safeLog($msg)
+	{
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::log($msg);
+		}
 	}
 }

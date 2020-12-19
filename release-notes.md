@@ -1,3 +1,104 @@
+# Propus 16.13.0  #
+
+## Adjust Kaltura Capture transcoding profile ##
+- Issue Type: Task
+- Issue ID: PSVAMB-16978
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/2020_12_06_update_lectureCapture_ConversionProfile2.php
+
+## Configurable Transcoding Profile for Zoom Integration ##
+- Issue Type: Task
+- Issue ID: PLAT-22489
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_25_update_zoomVendor_add_get_action.php
+
+# Propus 16.12.0  #
+
+## Add permission in Admin Console for automatically deleting recorded VOD entry when deleting live entry ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-11221
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.liveStreamDeleteRecordedVod.enabled = true
+    moduls.liveStreamDeleteRecordedVod.permissionType = 2
+    moduls.liveStreamDeleteRecordedVod.label = Kaltura Live Streams - Delete recorded VOD
+    moduls.liveStreamDeleteRecordedVod.permissionName = FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD
+    moduls.liveStreamDeleteRecordedVod.basePermissionType = 2
+    moduls.liveStreamDeleteRecordedVod.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamDeleteRecordedVod.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## Bumper Plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-11197
+
+### Configuration ###
+run the following:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_12_add_permissions_bumper_service.php
+
+Add 'Bumper' to:
+    /opt/kaltura/app/configurations/plugins.ini
+    
+# Propus 16.11.0  #
+
+## Reach - update reach_vendor response profile ##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+	
+First replace all tokens in the XML file below and remove ".template" from the file name:
+		
+		- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2020_11_03_update_reach_vendor_response_profiles.template.xml
+		
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/2020_11_03_update_reach_vendor_response_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add permission in Admin Console for disable preview page ##
+- Issue Type: Task
+- Issue ID: PLAT-11256
+
+### Configuration ###
+Add the following to admin.ini:
+
+moduls.disablePreviewPage.enabled = true
+moduls.disablePreviewPage.permissionType = 2
+moduls.disablePreviewPage.label = "Disable Preview Page"
+moduls.disablePreviewPage.permissionName = FEATURE_DISABLE_PREVIEW_PAGE
+moduls.disablePreviewPage.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None
+
 # Propus 16.10.0  #
 ## Dynamic batch schedulers allocation ##
 - Issue Type: Task

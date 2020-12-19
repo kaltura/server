@@ -4014,11 +4014,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	protected function shouldAddCategoryPrivacyByContextsSearchData($categoryEntryStatus)
 	{
-		$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE);
-		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-		{
-			$privacyByContextCategoryEntryStatuses[] = CategoryEntryStatus::PENDING;
-		}
+		$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE, CategoryEntryStatus::PENDING);
 
 		return in_array($categoryEntryStatus, $privacyByContextCategoryEntryStatuses);
 	}
@@ -4386,5 +4382,34 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function isContainsAdminTag($adminTag)
 	{
 		return in_array($adminTag, explode(',', $this->getAdminTags()));
+	}
+
+
+	/**
+	 * allow edit or change related metadata
+	 * @return boolean
+	 */
+	public function allowEdit()
+	{
+		//Admin's should be allowed to edit
+		if(kCurrentContext::$is_admin_session)
+		{
+			return true;
+		}
+
+		//If current user is entitled to edit the entry
+		if($this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()))
+		{
+			return true;
+		}
+
+		//If provided KS contains edit privilege for the given entry ID
+		if(isset(kCurrentContext::$ks_object) && (kCurrentContext::$ks_object->hasPrivilege(ks::PRIVILEGE_WILDCARD) ||
+				kCurrentContext::$ks_object->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $this->getId())))
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

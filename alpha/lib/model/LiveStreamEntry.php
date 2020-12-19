@@ -103,8 +103,12 @@ class LiveStreamEntry extends LiveEntry
 		return $url;
 	}
 
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
+	public function getLiveStreamConfigurations($protocol = null, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
 	{
+		if(!$protocol)
+		{
+			$protocol = requestUtils::getProtocol();
+		}
 		$configurations =  parent::getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds, $format);
 		if($format == PlaybackProtocol::APPLE_HTTP && !in_array($this->getSource(), self::$kalturaLiveSourceTypes) && $this->getHlsStreamUrl())
 		{
@@ -140,4 +144,21 @@ class LiveStreamEntry extends LiveEntry
 	public function getSipSourceType (  )	{	return $this->getFromCustomData( "sipSourceType" );	}
 	public function setSipDualStreamEntryId ( $v )	{	$this->putInCustomData ( "sipDualStreamEntryId" , $v );	}
 	public function getSipDualStreamEntryId (  )	{	return $this->getFromCustomData( "sipDualStreamEntryId" );	}
+
+	/**
+	 * generate a random 8-character string as stream password
+	 * @return string - streaming password
+	 */
+	public static function generateStreamPassword()
+	{
+		$password = sha1(md5(uniqid(rand(), true)));
+		return substr($password, rand(0, strlen($password) - 8), 8);
+	}
+
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj, $deepCopy);
+		$copyObj->setStreamPassword(self::generateStreamPassword()); //password should be re-generated on copy
+	}
+
 }

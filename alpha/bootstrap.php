@@ -27,4 +27,5 @@ DbManager::setConfig(kConf::getDB());
 DbManager::initialize();
 
 ActKeyUtils::checkCurrent();
+KalturaMonitorClient::monitorPs2Start();
 sfContext::getInstance()->getController()->dispatch();

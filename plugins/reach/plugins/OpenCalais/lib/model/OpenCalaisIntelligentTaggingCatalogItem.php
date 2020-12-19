@@ -4,7 +4,7 @@
 class OpenCalaisIntelligentTaggingCatalogItem extends VendorIntelligentTaggingCatalogItem
 {
 
-    public function calculateVersionByEngineType ($entry)
+    public function calculateEntryVendorTaskVersion ($entry)
     {
         $transcriptAssets = assetPeer::retrieveByEntryId($entry->getId(), array(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT)), array(asset::ASSET_STATUS_READY));
 

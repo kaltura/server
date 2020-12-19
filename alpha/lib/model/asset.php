@@ -463,14 +463,20 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	public function setFileExt($v)
 	{
 		$v = trim($v);
-		if (preg_match('/[\s\t\n\r]/', $v)){
+		
+		if (preg_match('/[\s\t\n\r]/', $v))
+		{
 			preg_match('/\w*/', $v, $v);
 			KalturaLog::err("File extension cannot contain spaces, saving only ".$v[0]);
-			parent::setFileExt($v[0]);
+			$v = $v[0];
 		}
-		else{
-			parent::setFileExt($v);
+		elseif (!ctype_alnum($v))
+		{
+			$v = substr(preg_replace('/\\W+/', '', $v), 0, 4);
+			KalturaLog::err("File extension cannot contain none alphanumeric characters, saving only ".$v);
 		}
+		
+		parent::setFileExt($v);
 	}
 	
 	private function calculateId()
@@ -539,10 +545,15 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		$syncKey = $this->getSyncKey(self::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey, true);
 		
-		if($serveRemote && $fileSync) {
+		//Shared storage file syncs should not be handled as remote
+		$serveRemote = $serveRemote && $fileSync && !in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds());
+		
+		if($serveRemote && $fileSync)
+		{
 			$downloadUrl = $fileSync->getExternalUrl($this->getEntryId());
 		}
-		else {
+		else
+		{
 		    $downloadUrl = $this->getDownloadUrlWithExpiry(86400, $useCdn, $forceProxy, $preview, $includeKs);
 		}
 		
@@ -785,5 +796,28 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	public function shouldEncrypt()
 	{
 		return true;
+	}
+	
+	public function getSharedPendingFileSync()
+	{
+		$key = $this->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$pendingFileSync = kFileSyncUtils::getPendingFileSyncForKey($key, reset($sharedDcIds));
+		if(!$pendingFileSync)
+		{
+			return null;
+		}
+		
+		$resolvedFileSync = kFileSyncUtils::resolve($pendingFileSync);
+		//Validate resolved file sync is also pending before returning it
+		if($resolvedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_PENDING)
+		{
+			return $resolvedFileSync;
+		}
+		else
+		{
+			return null;
+		}
+		
 	}
 }

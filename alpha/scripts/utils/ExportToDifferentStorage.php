@@ -158,6 +158,12 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 			$resolvedFileSync = $fileSync;
 		}
 
+		if ($resolvedFileSync->getIsDir())
+		{
+			KalturaLog::log("XXX $assetId: DIR_FILE_SYNC - dir file sync");
+			return;
+		}
+
 		if ($resolvedFileSync->getDc() != $fileSync->getDc())
 		{
 			if ($fileSync->getDc() == $targetDcId)
@@ -319,6 +325,37 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 	}
 }
 
+function handleFileSyncKeys($handle)
+{
+	$count = 0;
+	while($line = fgets($handle))
+	{
+		$line = trim($line);
+		if (!$line)
+		{
+			continue;
+		}
+
+		$split = explode(' ', $line);
+		if (count($split) != 5)
+		{
+			continue;
+		}
+
+		$syncKey = new FileSyncKey();
+		list($syncKey->object_id, $syncKey->object_type, $syncKey->object_sub_type, $syncKey->version, $syncKey->partner_id) = $split;
+
+		$count++;
+		if ($count % 100 == 0)
+		{
+			kMemoryManager::clearMemory();
+		}
+
+		// process
+		handleSyncKey($syncKey->object_id, $syncKey);
+	}
+}
+
 function handleAssets($handle)
 {
 	$count = 0;
@@ -339,7 +376,6 @@ function handleAssets($handle)
 		// get the asset
 		$c = new Criteria();
 		$c->add(assetPeer::ID, $assetId);
-		$c->add(assetPeer::TYPE, assetPeer::retrieveAllFlavorsTypes(), Criteria::IN);
 		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_ERROR), Criteria::NOT_IN);
 		$asset = assetPeer::doSelectOne($c);
 		if (!$asset)
@@ -405,7 +441,7 @@ function handleEntries($handle)
 
 if ($argc != 7)
 {
-	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset> <partner ids/!partner ids/all> <dryrun/realrun>\n";
+	echo "USAGE: <source storage ids> <target storage id> <file name> <type - entry/asset/filesynckey> <partner ids/!partner ids/all> <dryrun/realrun>\n";
 	exit(1);
 }
 
@@ -466,6 +502,10 @@ switch ($fileType)
 
 	case 'asset':
 		handleAssets($handle);
+		break;
+
+	case 'filesynckey':
+		handleFileSyncKeys($handle);
 		break;
 
 	default:

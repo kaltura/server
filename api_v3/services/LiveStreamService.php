@@ -391,84 +391,15 @@ class LiveStreamService extends KalturaLiveEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
 		}
 
-		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
+		if ($isLive !== null)
 		{
-			return $this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
+			return $this->responseHandlingIsLive($isLive);
 		}
-		
-		$dpda= new DeliveryProfileDynamicAttributes();
-		$dpda->setEntryId($id);
-		$dpda->setFormat($protocol);
-		
-		switch ($protocol)
-		{
-			case KalturaPlaybackProtocol::HLS:
-			case KalturaPlaybackProtocol::APPLE_HTTP:
-				$url = $liveStreamEntry->getHlsStreamUrl('http');
-				$backupUrl = '';
-				if($protocol == KalturaPlaybackProtocol::HLS)
-					$hlsProtocols = array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP);
-				else
-					$hlsProtocols = array(KalturaPlaybackProtocol::APPLE_HTTP, KalturaPlaybackProtocol::HLS);
-
-				foreach ($hlsProtocols as $hlsProtocol){
-					$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::getProtocol());
-					if ($config){
-						$url = $config->getUrl();
-						$backupUrl = $config->getBackupUrl();
-						$protocol = $hlsProtocol;
-						$dpda->setFormat($protocol);
-						break;
-					}
-				}
-
-				KalturaLog::info("Determining status of live stream URL [ $url ] and Backup URL [ $backupUrl ]");
-				$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-				$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
-				if ($urlManager || $urlManagerBackup)
-					return $this->responseHandlingIsLive(self::isLiveByUrlManager($urlManager, $url) || self::isLiveByUrlManager($urlManagerBackup, $backupUrl));
-
-				break;
-			case KalturaPlaybackProtocol::HDS:
-			case KalturaPlaybackProtocol::AKAMAI_HDS:
-				$config = $liveStreamEntry->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
-				if ($config)
-				{
-					$url = $config->getUrl();
-					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-					if($urlManager)
-						return $this->responseHandlingIsLive($urlManager->isLive($url));
-				}
-				break;
-
-			case null:
-				$resultIsLive = null;
-				$configurations = $liveStreamEntry->getLiveStreamConfigurations(requestUtils::getProtocol());
-				foreach ($configurations as $config)
-				{
-					$dpda->setFormat($config->getProtocol());
-					$url = $config->getUrl();
-					KalturaLog::info('Determining status of live stream URL [' .$url . ']');
-					$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
-					if($urlManager)
-					{
-						$resultIsLive = $this->responseHandlingIsLive($urlManager->isLive($url));
-						if ($resultIsLive)
-						{
-							return $resultIsLive;
-						}
-					}
-				}
-				if ($resultIsLive !== null)
-				{
-					return $resultIsLive;
-				}
-				break;
-		}
-		
 		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
 	}
+
+
 
 	private function responseHandlingIsLive($isLive)
 	{
@@ -669,18 +600,23 @@ class LiveStreamService extends KalturaLiveEntryService
 
 		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
-		if(in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+
+		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
+		if ($simuliveCondCacheTime)
 		{
-			$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-			if ($simuliveCondCacheTime)
-			{
-				KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-			}
-			return $this->getLiveStreamDetails($id, $liveStreamEntry);
+			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
 		}
 
-		throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
+		$res = new KalturaLiveStreamDetails();
+		$isLive = $liveStreamEntry->isCurrentlyLive();
+		$res->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
+		if (in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
+		{
+			$res = $this->getLiveStreamDetails($id, $liveStreamEntry);
+		}
 
+		$this->responseHandlingIsLive($isLive);
+		return $res;
 	}
 
 	/**
@@ -728,7 +664,6 @@ class LiveStreamService extends KalturaLiveEntryService
 				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 			}
 		}
-		$this->responseHandlingIsLive($liveStreamEntry->isCurrentlyLive());
 
 		if (kSimuliveUtils::getPlayableSimuliveEvent($liveStreamEntry))
 		{
@@ -742,9 +677,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function setBroadcastinUrlsAndStreamPassword(LiveStreamEntry $liveEntry)
 	{
-		$password = sha1(md5(uniqid(rand(), true)));
-		$password = substr($password, rand(0, strlen($password) - 8), 8);
-		$liveEntry->setStreamPassword($password);
+		$liveEntry->setStreamPassword(LiveStreamEntry::generateStreamPassword());
 
 		$broadcastUrlManager = kBroadcastUrlManager::getInstance($liveEntry->getPartnerId());
 		$broadcastUrlManager->setEntryBroadcastingUrls($liveEntry);
@@ -850,22 +783,6 @@ class LiveStreamService extends KalturaLiveEntryService
 				throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG, $currentEntry->getId(), $adminTag, $adminTagsLimits[$adminTag]);
 			}
 		}
-	}
-
-	/**
-	 * Using $urlManager isLive method to detect if the $url is currently live.
-	 *
-	 * @param DeliveryProfileLive $urlManager
-	 * @param string $url
-	 * @return boolean
-	 */
-	protected static function isLiveByUrlManager($urlManager, $url)
-	{
-		if ($urlManager)
-		{
-			return $urlManager->isLive($url);
-		}
-		return false;
 	}
 
 }

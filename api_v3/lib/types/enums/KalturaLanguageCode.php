@@ -108,6 +108,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const PS = 'ps';
 	const PL = 'pl';
 	const PT = 'pt';
+	const PT_BR = 'pt_br';
 	const PA = 'pa';
 	const QU = 'qu';
 	const RM = 'rm';
@@ -128,6 +129,7 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const SL = 'sl';
 	const SO = 'so';
 	const ES = 'es';
+	const ES_XL = 'es_xl';
 	const SU = 'su';
 	const SW = 'sw';
 	const SV = 'sv';

@@ -38,6 +38,16 @@ class KAsyncConvert extends KJobHandlerWorker
 	 */
 	protected $operationEngine = null;
 	
+	/**
+	 * @var int
+	 */
+	protected $maxSourceSizeForLocalTmp;
+	
+	/**
+	 * @var int
+	 */
+	protected $remoteConvertSupportedEngines;
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -91,7 +101,9 @@ class KAsyncConvert extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
-	
+		$this->maxSourceSizeForLocalTmp = isset(self::$taskConfig->params->maxSourceSizeForLocalTmp) ? self::$taskConfig->params->maxSourceSizeForLocalTmp : null;
+		$this->remoteConvertSupportedEngines = isset(self::$taskConfig->params->remoteConvertSupportedEngines) ? explode("," ,self::$taskConfig->params->remoteConvertSupportedEngines) : array(KalturaConversionEngineType::CHUNKED_FFMPEG);
+		
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
 		{
@@ -123,14 +135,19 @@ class KAsyncConvert extends KJobHandlerWorker
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
+			$srcFileSyncDescriptor->isRemote = false;
 			
-			list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
-			if($isRemote)
+			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
-				$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+				if($isRemote)
+				{
+					$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+				}
+				
+				$srcFileSyncDescriptor->isRemote = $isRemote;
 			}
 			
-			$srcFileSyncDescriptor->isRemote = $isRemote;
 			$srcFileSyncDescriptor->actualFileSyncLocalPath = $fileSyncLocalPath;
 		}
 		
@@ -139,10 +156,18 @@ class KAsyncConvert extends KJobHandlerWorker
 		$job = $this->updateJob($job, null, KalturaBatchJobStatus::QUEUED, $updateData);
 
 		// creates a temp file path
-		// $uniqid = uniqid("convert_{$job->entryId}_");
 		$uniqid = uniqid();
 		$uniqid = "convert_{$job->entryId}_".substr($uniqid,-5);
-		$data->destFileSyncLocalPath = $this->localTempPath . DIRECTORY_SEPARATOR . $uniqid;
+		$localTempPath = $this->localTempPath;
+		
+		list($actualFileSyncLocalPath, $key) = self::getFirstFilePathAndKey($data->srcFileSyncs);
+		if($this->maxSourceSizeForLocalTmp && $actualFileSyncLocalPath
+			&& kFile::fileSize($actualFileSyncLocalPath) > $this->maxSourceSizeForLocalTmp)
+		{
+			$localTempPath = $this->sharedTempPath;
+		}
+		
+		$data->destFileSyncLocalPath = $localTempPath . DIRECTORY_SEPARATOR . $uniqid;
 		$this->operationEngine = KOperationManager::getEngine($job->jobSubType, $data, $job);
 		
 		if ( $this->operationEngine == null )

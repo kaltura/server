@@ -141,6 +141,13 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$this->addElement($enableSpeakerId);
 		}
 
+		$allowResubmission = new Kaltura_Form_Element_EnumSelect('allowResubmission', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
+			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
+		$allowResubmission->setLabel('Allow Resubmission:');
+		$allowResubmission->setRequired(true);
+		$allowResubmission->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$this->addElement($allowResubmission);
+
 		$this->addLine("Pricing Line");
 		$this->addTitle('Pricing:');
 

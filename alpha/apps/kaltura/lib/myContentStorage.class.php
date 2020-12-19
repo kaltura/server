@@ -69,6 +69,35 @@ class myContentStorage
 		return $res;
 		
 	}
+
+	public static function getThumbEntityPath($entityName, $entry, $thumbName, $fileName, $version)
+	{
+		$currentDcId = kDataCenterMgr::getCurrentDcId();
+		if(myCloudUtils::isCloudDc($currentDcId))
+		{
+			$sharedTempBucket = myCloudUtils::getSharedTempBucket();
+			if($sharedTempBucket)
+			{
+				return $sharedTempBucket . self::getThumbEntitySharedPath($entry->getId(), $thumbName, $fileName, $version);
+			}
+		}
+
+		return self::getFSContentRootPath() . self::getGeneralEntityPath($entityName, $entry->getIntId(), $thumbName, $fileName, $version);
+	}
+
+	protected static function getThumbEntitySharedPath($entryId, $thumbName, $fileName , $version = null)
+	{
+		if( $version != null )
+		{
+			$ext = pathinfo ($fileName , PATHINFO_EXTENSION);
+			$fileName = $version . '.' . $ext;
+		}
+
+		$dir = self::getPathFromId($entryId);
+		$res = '/tempthumb/' . $dir . '/' .  $thumbName . '_' . $fileName;
+		return $res;
+	}
+
 /*
 	public static function dirForId ( $id )
 	{
@@ -91,6 +120,18 @@ class myContentStorage
 	public static function getPathFromId($id)
 	{
 		return substr($id, -4, 2) . '/' . substr($id, -2);
+	}
+	
+	public static function getScatteredPathFromIntId($intId)
+	{
+		$intId = intval($intId/10);
+		$base36IntId = base_convert($intId, 10, 36);
+		
+		//Handle cases where base36 string is shorter the minimum required
+		$base36IntId = str_pad($base36IntId, 4, 0, STR_PAD_LEFT);
+		
+		//Return first last 4 chars to ensure even spread when it comes to working with Consecutive numbers
+		return substr($base36IntId, -2) . '/' . substr($base36IntId, -4, 2);
 	}
 
 	public static function getPathFromIntId($intId)

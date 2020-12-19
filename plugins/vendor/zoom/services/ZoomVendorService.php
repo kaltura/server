@@ -202,15 +202,8 @@ class ZoomVendorService extends KalturaBaseService
 		}
 
 		kuserPeer::createKuserForPartner($partnerId, $integrationSetting->defaultUserId);
-		$status = $integrationSetting->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED;
-		$zoomIntegration->setStatus($status);
 		$this->configureZoomCategories($integrationSetting, $zoomIntegration);
-		$zoomIntegration->setDefaultUserEMail($integrationSetting->defaultUserId);
-		$zoomIntegration->setCreateUserIfNotExist($integrationSetting->createUserIfNotExist);
-		$zoomIntegration->setHandleParticipantsMode($integrationSetting->handleParticipantMode);
-		$zoomIntegration->setUserMatching($integrationSetting->zoomUserMatchingMode);
-		$zoomIntegration->setUserPostfix($integrationSetting->zoomUserPostfix);
-		$zoomIntegration->setEnableWebinarUploads($integrationSetting->enableWebinarUploads);
+		$integrationSetting->toInsertableObject($zoomIntegration);
 		$zoomIntegration->save();
 		return true;
 	}
@@ -261,5 +254,27 @@ class ZoomVendorService extends KalturaBaseService
 		ZoomHelper::verifyZoomIntegration($zoomIntegration);
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());
 		$kZoomEventHandler->processEvent($event);
+	}
+
+	/**
+	 * Retrieve zoom integration setting object by partner id
+	 *
+	 * @action get
+	 * @param int $partnerId
+	 * @return KalturaZoomIntegrationSetting
+	 * @throws APIErrors::INVALID_PARTNER_ID
+	 */
+	public function getAction($partnerId)
+	{
+		/** @var ZoomVendorIntegration $zoomIntegration */
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByPartner($partnerId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if($zoomIntegration)
+		{
+			$integrationSetting = new KalturaZoomIntegrationSetting();
+			$integrationSetting->fromObject($zoomIntegration);
+			return $integrationSetting;
+		}
+
+		throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 	}
 }

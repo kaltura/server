@@ -89,5 +89,10 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		self::setUseCriteriaFilter ( true );
 		return $res;
 	}
+	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("vendorCatalogItem:id=%s", self::ID));
+	}
 
 } // VendorCatalogItemPeer

@@ -15,8 +15,9 @@ CREATE TABLE IF NOT EXISTS `sphinx_log` (
   `custom_data` TEXT,
   PRIMARY KEY (`id`),
   KEY `entry_id` (`entry_id`),
-  KEY `creatd_at` (`created_at`),
-  KEY `sphinx_log_FI_1` (`partner_id`)
+  KEY `created_at` (`created_at`),
+  KEY `partner_id` (`partner_id`),
+  KEY `dc_id` (`dc`,`id`)
 ) ENGINE=MYISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `sphinx_log_server` */

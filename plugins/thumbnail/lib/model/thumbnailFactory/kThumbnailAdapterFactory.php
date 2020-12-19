@@ -36,7 +36,7 @@ class kThumbnailAdapterFactory
 	}
 	
 	public static function getResizeThumbAdapterParameters(entry $entry, $version, $width, $height, $type, $bgcolor, $quality, $src_x, $src_y, $src_w, $src_h,
-	                                                       $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $fileSync, $format, $start_sec, $end_sec)
+	                                                       $vid_sec, $vid_slice, $vid_slices, $orig_image_path, $density, $stripProfiles, $format, $fileSync, $start_sec, $end_sec)
 	{
 		$params = new kThumbAdapterParameters();
 		$params->set(kThumbFactoryFieldName::ENTRY, $entry);
@@ -51,6 +51,8 @@ class kThumbnailAdapterFactory
 		$params->set(kThumbFactoryFieldName::CROP_Y, $src_y);
 		$params->set(kThumbFactoryFieldName::SRC_WIDTH, $src_w);
 		$params->set(kThumbFactoryFieldName::SRC_HEIGHT, $src_h);
+		$params->set(kThumbFactoryFieldName::CROP_WIDTH, $src_w);
+		$params->set(kThumbFactoryFieldName::CROP_HEIGHT, $src_h);
 		$params->set(kThumbFactoryFieldName::VID_SEC, $vid_sec);
 		$params->set(kThumbFactoryFieldName::VID_SLICE, intval($vid_slice));
 		$params->set(kThumbFactoryFieldName::VID_SLICES, intval($vid_slices));

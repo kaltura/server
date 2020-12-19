@@ -1485,7 +1485,6 @@ return array(
     'Kaltura_Client_Enum_ContainerFormat::WMV' => 'WMV',
     'Kaltura_Client_Enum_ContainerFormat::WVM' => 'WVM',
 
-
 	'Kaltura_Client_Sso_Enum_SsoStatus::DISABLED' => 'Disabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',

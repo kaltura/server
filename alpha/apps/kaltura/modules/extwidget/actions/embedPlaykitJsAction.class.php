@@ -106,10 +106,19 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$content = json_decode($content, true);
-		if(!$content || !$content['bundle'])
-		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
-		}
+
+        if (isset($content['status'])) {
+            if ($content['status'] != 0) {
+                $message = $content['message'];
+                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . ". " . $message);
+            } else {
+                $content = $content['payload'];
+            }
+        } else {
+            if (!$content || !$content['bundle']) {
+                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
+            }
+        }
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
@@ -642,7 +651,7 @@ class embedPlaykitJsAction extends sfAction
 		//Get bundle configuration stored in conf_vars
 		$confVars = $this->uiConf->getConfVars();
 		if (!$confVars) {
-			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
+            		KExternalErrors::dieError(KExternalErrors::MISSING_BUNDLE_CONFIGURATION, "" . $this->uiconfId);
 		}
 
 		//Get partner ID from QS or from UI conf

@@ -223,6 +223,7 @@ class CuePointIndex extends BaseIndexObject
 				'cue_point.DIRECT_CHILDREN_COUNT' => 'direct_children_count',
 				'cue_point.CREATED_AT' => 'created_at',
 				'cue_point.UPDATED_AT' => 'updated_at',
+				'cue_point.INT_ID' => 'cue_point_int_id',
 			);
 		}
 		return self::$orderFields;

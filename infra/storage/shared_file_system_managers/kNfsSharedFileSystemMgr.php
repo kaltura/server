@@ -261,6 +261,24 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return realpath($filePath);
 	}
+
+	protected function doMimeType($filePath)
+	{
+		if(!function_exists('mime_content_type'))
+		{
+			$type = null;
+			exec('file -i -b ' . realpath($filePath), $type);
+			
+			$parts = @ explode(";", $type[0]); // can be of format text/plain;  charset=us-ascii
+			
+			
+			return trim($parts[0]);
+		}
+		else
+		{
+			return mime_content_type($filePath);
+		}
+	}
 	
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{

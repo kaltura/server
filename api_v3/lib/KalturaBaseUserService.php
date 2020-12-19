@@ -101,6 +101,14 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaErrors::MISSING_OTP);
 			}
+			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED)
+			{
+				throw new KalturaAPIException(APIErrors::LOGIN_RETRIES_EXCEEDED);
+			}
+			else if ($code == kUserException::LOGIN_BLOCKED)
+			{
+				throw new KalturaAPIException(APIErrors::LOGIN_BLOCKED);
+			}
 			throw $e;			
 		}
 	}

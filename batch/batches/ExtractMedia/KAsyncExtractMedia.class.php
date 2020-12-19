@@ -54,6 +54,18 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		
 		$this->updateJob($job, "Extracting file media info on $mediaFile", KalturaBatchJobStatus::QUEUED);
 		
+		$localFileSize = kFile::fileSize($mediaFile);
+		$remoteFileSize = isset($srcFileSyncDescriptor->fileSyncRemoteUrl) ? kFile::fileSize($srcFileSyncDescriptor->fileSyncRemoteUrl) : 0;
+		if($srcFileSyncDescriptor->fileSyncRemoteUrl && $localFileSize != $remoteFileSize)
+		{
+			KalturaLog::debug("Moving file from [$mediaFile] to [{$srcFileSyncDescriptor->fileSyncRemoteUrl}]");
+			kFile::moveFile($mediaFile, $srcFileSyncDescriptor->fileSyncRemoteUrl, true, true);
+		}
+		else
+		{
+			KalturaLog::debug("File will not be synced to shared storage, either fileSyncRemoteUrl not provided or file already exists and size match [$localFileSize] [$remoteFileSize]");
+		}
+		
 		$mediaInfo = $this->extractMediaInfo($job, $mediaFile);
 		
 		if(is_null($mediaInfo))

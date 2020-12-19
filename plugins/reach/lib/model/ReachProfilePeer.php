@@ -13,7 +13,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class ReachProfilePeer extends BaseReachProfilePeer 
+class ReachProfilePeer extends BaseReachProfilePeer
 {
 	public static function setDefaultCriteriaFilter ()
 	{
@@ -62,5 +62,10 @@ class ReachProfilePeer extends BaseReachProfilePeer
 		
 		$reachProfile = ReachProfilePeer::retrieveByPK($reachProfileId);
 		$reachProfile->syncCreditPercentageUsage();
+	}
+	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("reachProfile:id=%s", self::ID));
 	}
 } // ReachProfilePeer

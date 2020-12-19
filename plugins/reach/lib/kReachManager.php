@@ -493,8 +493,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	    $entryId = $entry->getId();
 	    $vendorCatalogItemId = $vendorCatalogItem->getId();
 
-        $targetVersion = $vendorCatalogItem->calculateVersionByEngineType($entry);
+        $targetVersion = $vendorCatalogItem->calculateEntryVendorTaskVersion($entry);
 		if ($vendorCatalogItem->isDuplicateTask($entry))
+
 		{
 			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$targetVersion]");
 			return true;

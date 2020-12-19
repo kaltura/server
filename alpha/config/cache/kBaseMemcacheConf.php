@@ -6,9 +6,14 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 {
 	protected $cache;
 	protected $inLoad;
+	protected $confParams;
 
 	public function getCache()
 	{
+		if(!$this->cache)
+		{
+			$this->cache = $this->initCache();
+		}
 		return $this->cache;
 	}
 
@@ -20,13 +25,7 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 	function __construct()
 	{
 		$this->cache=null;
-		$confParams = $this->getConfigParams(get_class($this));
-		if($confParams)
-		{
-			$port = $confParams['port'];
-			$host = $confParams['host'];
-			$this->cache = $this->initCache($port, $host);
-		}
+		$this->confParams = $this->getConfigParams(get_class($this));
 	}
 
 	protected function getConfigParams($mapName)
@@ -35,14 +34,13 @@ class kBaseMemcacheConf extends kBaseConfCache implements kMapCacheInterface
 		return $map;
 	}
 
-	protected function initCache($port, $host)
+	protected function initCache()
 	{
 		require_once (__DIR__ . '/../../../infra/cache/kInfraMemcacheCacheWrapper.php');
 		$cache = new kInfraMemcacheCacheWrapper;
-		$sectionConfig= array('host'=>$host,'port'=>$port);
 		try
 		{
-			if (!$cache->init($sectionConfig))
+			if (!$cache->init($this->confParams))
 				$cache = null;
 		}
 		catch (Exception $e)

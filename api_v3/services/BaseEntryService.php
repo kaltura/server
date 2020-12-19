@@ -993,6 +993,10 @@ class BaseEntryService extends KalturaEntryService
 		if ($simuliveEvent)
 		{
 			$dbEntry = kSimuliveUtils::getSourceEntry($simuliveEvent);
+			if (!$dbEntry)
+			{	
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			}
 		}
 
 		$asset = null;

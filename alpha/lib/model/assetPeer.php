@@ -559,9 +559,9 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
      * @param string $tag tag filter
      * @return flavorAsset that has a file_sync in status ready
      */
-	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false)
+	public static function retrieveHighestBitrateByEntryId($entryId, $tag = null, $excludeTag = null, $external = false, $fetchFromRemote = false)
 	{
-		$highestBitrateFlavor = self::getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, true);
+		$highestBitrateFlavor = self::getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, true, $fetchFromRemote);
 		return $highestBitrateFlavor;
 	}
 
@@ -583,7 +583,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	 * if $retrieveHighestBitrate is set to true we will retrieve the flavor with the highest bitrate among the suitable entry flavors,
 	 * else we will retrieve the flavor with the lowest bitrate
 	 */
-	public static function getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true)
+	public static function getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true, $fetchFromRemote = false)
 	{
 		$flavorAssets = self::retrieveFlavorsWithTagsFiltering($entryId, $tag, $excludeTag);
 		if(!$flavorAssets)
@@ -597,7 +597,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 				if ($external)
 					$fileSync = kFileSyncUtils::getReadyPendingExternalFileSyncForKey($flavorSyncKey);
 				else
-					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey,false,false);
+					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($flavorSyncKey ,$fetchFromRemote ,false);
 
 				if ($fileSync){
 					$ret = $flavorAsset;

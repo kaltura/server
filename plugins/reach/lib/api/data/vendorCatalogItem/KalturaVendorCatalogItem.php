@@ -81,6 +81,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
      */
 	public $engineType;
 
+	/**
+	 * @var bool
+	 */
+	public $allowResubmission = false;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -95,6 +100,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'turnAroundTime',
 		'pricing',
         'engineType',
+		'allowResubmission',
 	);
 
 	abstract protected function getServiceFeature();
@@ -137,6 +143,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 
 		$this->validateVendorPartnerId($sourceObject);
 		$this->validateSystemName($sourceObject);
+		$this->validateResubmission($sourceObject);
 	}
 
 	public function getExtraFilters()
@@ -173,6 +180,15 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($this->systemName, $id);
 			if (count($systemNameTemplates))
 				throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $this->systemName);
+		}
+	}
+
+	protected function validateResubmission(VendorCatalogItem $sourceObject = null)
+	{
+		if (($this->serviceType == KalturaVendorServiceType::HUMAN && $this->allowResubmission) ||
+			($sourceObject && $sourceObject->getServiceType() == KalturaVendorServiceType::HUMAN && $this->allowResubmission))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_ONLY_MACHINE_ALLOWED_RESUBMISSION);
 		}
 	}
 

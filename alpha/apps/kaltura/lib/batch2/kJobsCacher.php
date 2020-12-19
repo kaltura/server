@@ -84,7 +84,7 @@ class kJobsCacher
 				$jobsFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobsToPull, $workerLockKey);
 				return $jobsFromDB;
 			}
-			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
+			KalturaMonitorClient::usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
 		}
 		return array();
 

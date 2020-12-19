@@ -639,10 +639,13 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 
 	public static function exportToPeriodicStorage($asset, $periodicStorageProfiles)
 	{
-		foreach($periodicStorageProfiles as $periodicStorageProfile)
+		if($periodicStorageProfiles)
 		{
-			$exported = kStorageExporter::exportFlavorAsset($asset, $periodicStorageProfile, true);
-			KalturaLog::debug("assetId [{$asset->getId()}] exported is [$exported]");
+			foreach($periodicStorageProfiles as $periodicStorageProfile)
+			{
+				$exported = kStorageExporter::exportFlavorAsset($asset, $periodicStorageProfile, true);
+				KalturaLog::debug("assetId [{$asset->getId()}] exported is [$exported]");
+			}
 		}
 	}
 

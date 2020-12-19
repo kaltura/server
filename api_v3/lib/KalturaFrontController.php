@@ -16,6 +16,8 @@ class KalturaFrontController
 	private $serializer;
 	private $exceptionHandlers = null;
 
+	protected static $serviceActionPropelErrors = array('system' => array('ping'));
+
 	private function __construct()
 	{
 		$this->dispatcher = KalturaDispatcher::getInstance();
@@ -115,15 +117,23 @@ class KalturaFrontController
 			}
 			catch(Exception $ex)
 			{
+				if ($ex instanceof PropelException &&
+					array_key_exists($this->service, self::$serviceActionPropelErrors) &&
+					(in_array($this->action, self::$serviceActionPropelErrors[$this->service])))
+				{
+					KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+					KExternalErrors::dieError(KExternalErrors::DATABASE_ERROR);
+
+				}
 				$success = false;
-				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);
+				$errorCode = $result->getCode();
 			}
 			catch (Error $ex) 
 			{
 				$success = false;
-				$errorCode = $ex->getCode();
 				$result = $this->getExceptionObject($ex, $this->service, $this->action);
+				$errorCode = $result->getCode();
 			}
 			
 			$this->onRequestEnd($success, $errorCode);
@@ -315,14 +325,14 @@ class KalturaFrontController
 				catch(Exception $ex)
 				{
 					$success = false;
-					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
+					$errorCode = $currentResult->getCode();
 				}
 				catch (Error $ex)
 				{
 					$success = false;
-					$errorCode = $ex->getCode();
 					$currentResult = $this->getExceptionObject($ex, $currentService, $currentAction);
+					$errorCode = $currentResult->getCode();
 				}
 				$cache->storeCache($currentResult, array(), true);
 				$this->onRequestEnd($success, $errorCode, kCurrentContext::$multiRequest_index);

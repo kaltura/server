@@ -161,6 +161,7 @@ class kReachUtils
 		return $remainingCredit >= 0 ? true : false;
 	}
 	
+
 	public static function isEntryTypeSupported($type, $mediaType = null)
 	{
 		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
@@ -196,7 +197,7 @@ class kReachUtils
 	 */
 	public static function getVendorCatalogItemsCsvHeaders()
 	{
-		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId');
+		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId','allowResubmission');
 	}
 
 
