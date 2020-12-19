@@ -221,7 +221,7 @@ class KalturaMonitorClient
 			self::FIELD_IP_ADDRESS		=> infraRequestUtils::getRemoteAddress(),
 			self::FIELD_PARTNER_ID		=> strval($partnerId),
 			self::FIELD_ACTION			=> $action,
-			self::FIELD_CLIENT_TAG		=> $clientTag,
+			self::FIELD_CLIENT_TAG		=> strval($clientTag),
 		);
 		
 		if (!$cached)
