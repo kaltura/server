@@ -189,7 +189,10 @@ class KalturaMonitorClient
 	
 	protected static function flushEvents()
 	{
-		kInfraMemcacheCacheWrapper::sendMonitorEvents();
+		if (class_exists('kInfraMemcacheCacheWrapper'))
+		{
+			kInfraMemcacheCacheWrapper::sendMonitorEvents();
+		}
 
 		if (self::$sleepCount > 0)
 		{
@@ -322,7 +325,11 @@ class KalturaMonitorClient
 		$errorCode = null;
 		foreach ($_FILES as $curFile)
 		{
-			$size += $curFile['size'];
+			if (is_numeric($curFile['size']))
+			{
+				$size += $curFile['size'];
+			}
+
 			if ($curFile['error'])
 			{
 				$errorCode = strval($curFile['error']);
