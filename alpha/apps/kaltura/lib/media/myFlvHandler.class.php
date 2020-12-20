@@ -119,7 +119,10 @@ class myFlvHandler
 	
 	public function getHeader()
 	{
-		kFileBase::fseek($this->flv_file_name, $this->fh, 0, SEEK_SET);
+		if(!kFile::isSharedPath($this->flv_file_name))
+		{
+			fseek($this->fh, 0, SEEK_SET);
+		}
 		$header = fread($this->fh, self::FLV_HEADER_SIZE);
 		$this->pos = self::FLV_HEADER_SIZE;
 		

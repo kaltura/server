@@ -371,15 +371,6 @@ class kFileBase
 		
 		return file_exists($path);
 	}
-
-	public static function fseek($path, $handle, $offset, $whence = SEEK_SET)
-	{
-		if(kFile::isSharedPath($path))
-		{
-			return;
-		}
-		fseek($handle, $offset, $whence);
-	}
 	
 	public static function isFile($filePath)
 	{
