@@ -870,12 +870,15 @@ class myEntryUtils
 		{
 			$start_sec = 0;
 		}
-
+		
+		$forceRotationByAssetId = array();
+		$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+		list($flavorAssetForCapture, $entryDataPath, $localCaptureFlavorAssetId) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
+		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
+		
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
-			$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -914,7 +917,7 @@ class myEntryUtils
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
 				
 				// if we already captured the frame at that second, do not recapture, just use the existing file
-				if (!file_exists($orig_image_path))
+				if (!kFile::checkFileExists($orig_image_path))
 				{
 					// creating the thumbnail is a very heavy operation
 					// prevent calling it in parallel for the same thumbnail for 5 minutes
@@ -950,7 +953,9 @@ class myEntryUtils
 
 						if (!$success)
 						{
-							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId);
+							$flavorAssetId = $localCaptureFlavorAssetId;
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey,
+								$cacheLockKeyProcessing, $flavorAssetId, -1, -1, $flavorAssetForCapture, $entryDataPath);
 						}
 					}
 
@@ -968,7 +973,15 @@ class myEntryUtils
 				}
 			}
 
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			//Avoid calculating forceRotation for each slice, calculate it once per flavor asset id
+			//This will handle cases when one frame is capture locally and another one is captured by packager
+			$forceRotation = isset($forceRotationByAssetId[$flavorAssetId]) ? $forceRotationByAssetId[$flavorAssetId] : null;
+			if(is_null($forceRotation))
+			{
+				$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+				$forceRotationByAssetId[$flavorAssetId] = $forceRotation;
+			}
+			
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 
@@ -992,7 +1005,7 @@ class myEntryUtils
 				}
 				else
 				{
-					if (!file_exists($orig_image_path) || !filesize($orig_image_path))
+					if (!kFile::checkFileExists($orig_image_path) || !kFile::fileSize($orig_image_path))
 						KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 
 					$imageSizeArray = getimagesize($orig_image_path);
@@ -1004,16 +1017,16 @@ class myEntryUtils
 
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format, $forceRotation);
 				}
-				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
+				if ($thumbCaptureByPackager && kFile::checkFileExists($packagerResizeFullPath))
 				{
-					unlink($packagerResizeFullPath);
+					kFile::unlink($packagerResizeFullPath);
 				}
 			}
 
 
 
 			// die if resize operation failed
-			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
+			if ($convertedImagePath === null || !@kFile::fileSize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 			}
 			
@@ -1037,7 +1050,7 @@ class myEntryUtils
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
-				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
+				if (self::isTempFile($orig_image_path) && kFile::checkFileExists($orig_image_path))
 				{
 					unlink($orig_image_path);
 				}
@@ -1143,13 +1156,23 @@ class myEntryUtils
 
 		return $flavorAsset;
 	}
-
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
+	
+	public static function getEntryDataPathAndAssetLocalCaptureThumb($entry)
 	{
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
+		return array($flavorAsset, $entry_data_path, $flavorAssetId);
+	}
+
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing,
+	                                         &$flavorAssetId, $width = -1, $height = -1, $flavorAsset = null, $entry_data_path = null)
+	{
+		if (!$flavorAsset || !$entry_data_path)
+		{
+			list($flavorAsset, $entry_data_path, $flavorAssetId) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
+		}
 		
 		if (!$entry_data_path)
 			return false;
@@ -1184,26 +1207,18 @@ class myEntryUtils
 			return null;
 		}
 		$entryDataPath = null;
-		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
-		if ($fileSync->getDc() === $currentDcId)
+		$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
+		KalturaLog::info("file sync id: {$fileSync->getId()} found on DC: {$fileSync->getDc()} current DC: $currentDcId isClodDc: $isCloudDc");
+		if ($fileSync->getDc() === $currentDcId || ($isCloudDc && (in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))))
 		{
 			$entryDataPath = $fileSync->getFullPath();
 			KalturaLog::info("path [$entryDataPath]");
 		}
 		else
 		{
-			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
-			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
-			{
-				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
-				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
-			}
-			else
-			{
-				$remoteDc = 1 - $currentDcId;
-				KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
-			}
+			$remoteDc = 1 - $currentDcId;
+			KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 
 		return $entryDataPath;
