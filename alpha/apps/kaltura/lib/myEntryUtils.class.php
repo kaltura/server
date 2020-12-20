@@ -1196,7 +1196,7 @@ class myEntryUtils
 			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
 			{
 				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
-				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
+				$entryDataPath = $fileSync->getFullPath();
 			}
 			else
 			{
