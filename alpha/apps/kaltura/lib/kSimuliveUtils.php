@@ -38,19 +38,14 @@ class kSimuliveUtils
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
 		$endTime = $startTime + array_sum($durations);
+		$assets = array();
 		// getting the flavors from source entry
-		$flavors = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
-		// getting captions
-		$captions = myPlaylistUtils::getCaptionFilesForEntryIds($sourceEntry->getId(), '', true);
-		if (!is_null($captions) && count($captions))
-		{
-			$captions = array_shift($captions);
-		}
-		else
-		{
-			$captions = array();
-		}
-		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs, $captions);
+		$flavorAssets = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
+		$assets = self::mergeAssets($assets, $flavorAssets);
+		// getting the entry's caption assets
+		$captionAssets = myPlaylistUtils::getEntryIdsCaptions($sourceEntry->getId());
+		$assets = self::mergeAssets($assets, $captionAssets);
+		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
 	}
 
 	/**
@@ -143,5 +138,14 @@ class kSimuliveUtils
 		}
 		// conditional cache should expire when event start
 		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
+	}
+
+	protected static function mergeAssets($assets, $newAssets)
+	{
+		if (is_array($newAssets))
+		{
+			return array_merge($assets, $newAssets);
+		}
+		return $assets;
 	}
 }

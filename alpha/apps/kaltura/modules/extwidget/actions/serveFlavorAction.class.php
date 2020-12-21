@@ -417,10 +417,10 @@ class serveFlavorAction extends kalturaAction
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
 				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', 0) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
-				list($durations, $flavors, $startTime, $endTime, $dvrWindow, $captions) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
-				if ($flavors)
+				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				if ($assets)
 				{
-					$sequences = self::buildSequencesArray($flavors, $captions);
+					$sequences = self::buildSequencesArray($assets);
 					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
@@ -915,37 +915,35 @@ class serveFlavorAction extends kalturaAction
 	}
 
 	/**
-	 * @param array $flavors
-	 * @param array $captions
+	 * @param array $assets
 	 * @return array
 	 */
-	public static function buildSequencesArray($flavors, $captions)
+	public static function buildSequencesArray($assets)
 	{
 		$sequences = array();
 
-		foreach ($flavors as $flavor)
+		foreach ($assets as $asset)
 		{
-			$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $asset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if(!$path)
 			{
-				KalturaLog::debug('missing path for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 			}
-			$sequences[] = array('clips' => array(self::getClipData($path, $flavor, $sourceType)));
-		}
-		foreach ($captions as $lang => $caption)
-		{
-			if (!$caption['path'])
+			if ($asset instanceof CaptionAsset)
 			{
-				KalturaLog::debug('missing path for caption ' . $caption['captionId']);
+				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
+				if (!$languageCode)
+				{
+					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
+					continue;
+				}
+				$sequences[] = array('language' => $languageCode, 'clips' => array(self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType)));
 			}
-			$languageCode = languageCodeManager::getLanguageCode($lang, true);
-			if (!$languageCode)
+			else
 			{
-				KalturaLog::debug('language ' . $lang . ' not supported');
-				continue;
+				$sequences[] = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
 			}
-			$sequences[] = array('language' => $languageCode, 'clips' => array(self::getAssetFieldsArray(self::TYPE_SOURCE, $caption['path'], $caption['sourceType'])));
 		}
 		return $sequences;
 	}
