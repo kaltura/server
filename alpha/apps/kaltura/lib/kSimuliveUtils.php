@@ -40,7 +40,17 @@ class kSimuliveUtils
 		$endTime = $startTime + array_sum($durations);
 		// getting the flavors from source entry
 		$flavors = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
-		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs);
+		// getting captions
+		$captions = myPlaylistUtils::getCaptionFilesForEntryIds($sourceEntry->getId(), '', true);
+		if (!is_null($captions) && count($captions))
+		{
+			$captions = array_shift($captions);
+		}
+		else
+		{
+			$captions = [];
+		}
+		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs, $captions);
 	}
 
 	/**

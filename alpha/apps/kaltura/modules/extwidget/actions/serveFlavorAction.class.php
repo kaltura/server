@@ -417,10 +417,10 @@ class serveFlavorAction extends kalturaAction
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
 				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', 0) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
-				list($durations, $flavors, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				list($durations, $flavors, $startTime, $endTime, $dvrWindow, $captions) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($flavors)
 				{
-					$sequences = self::buildSequencesArray($flavors);
+					$sequences = self::buildSequencesArray($flavors, $captions);
 					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
@@ -916,9 +916,10 @@ class serveFlavorAction extends kalturaAction
 
 	/**
 	 * @param array $flavors
+	 * @param array $captions
 	 * @return array
 	 */
-	public static function buildSequencesArray($flavors)
+	public static function buildSequencesArray($flavors, $captions)
 	{
 		$sequences = array();
 
@@ -931,6 +932,19 @@ class serveFlavorAction extends kalturaAction
 				KalturaLog::debug('missing path for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
 			}
 			$sequences[] = array('clips' => array(self::getClipData($path, $flavor, $sourceType)));
+		}
+		foreach ($captions as $lang => $caption)
+		{
+			if (!$caption['path'])
+			{
+				KalturaLog::debug('missing path for caption ' . $caption['captionId']);
+			}
+			if (!isset(CaptionPlugin::$captionsFormatMap[$lang]))
+			{
+				KalturaLog::debug('language ' . $lang . ' not supported');
+				continue;
+			}
+			$sequences[] = array('language' => CaptionPlugin::$captionsFormatMap[$lang], 'clips' => array(self::getAssetFieldsArray(self::TYPE_SOURCE, $caption['path'], $caption['sourceType'])));
 		}
 		return $sequences;
 	}
