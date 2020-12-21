@@ -203,6 +203,9 @@ class KalturaMonitorClient
 			));
 
 			self::writeDeferredEvent($data);
+
+			self::$sleepTime = 0;
+			self::$sleepCount = 0;
 		}
 	}
 
