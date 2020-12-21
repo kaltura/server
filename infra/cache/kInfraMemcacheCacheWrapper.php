@@ -21,9 +21,9 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	protected $port;
 	protected $flags = 0;
 	protected $persistent = false;
+	protected $statsKey;
 
 	protected static $_stats = array();
-	protected $stats;
 
 	protected $memcache = null;
 	protected $gotError = false;
@@ -46,12 +46,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		if (isset($config['persistent']) && $config['persistent'])
 			$this->persistent = true;
 
-		$statsKey = $this->hostName . ':' . $this->port;
-		if (!isset(self::$_stats[$statsKey]))
-		{
-			self::$_stats[$statsKey] = array();
-		}
-		$this->stats = &self::$_stats[$statsKey];
+		$this->statsKey = $this->hostName . ':' . $this->port;
 
 		return $this->reconnect();
 	}
@@ -223,20 +218,26 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 
 	protected function updateStats($type, $stats)
 	{
-		if (!isset($this->stats[$type]))
+		if (!isset(self::$_stats[$this->statsKey]))
 		{
-			$this->stats[$type] = array();
+			self::$_stats[$this->statsKey] = array();
+		}
+		$typeStats = &self::$_stats[$this->statsKey];
+
+		if (!isset($typeStats[$type]))
+		{
+			$typeStats[$type] = array();
 		}
 
 		foreach ($stats as $key => $value)
 		{
-			if (isset($this->stats[$type][$key]))
+			if (isset($typeStats[$type][$key]))
 			{
-				$this->stats[$type][$key] += $value;
+				$typeStats[$type][$key] += $value;
 			}
 			else
 			{
-				$this->stats[$type][$key] = $value;
+				$typeStats[$type][$key] = $value;
 			}
 		}
 	}
@@ -276,5 +277,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 				}
 			}
 		}
+
+		self::$_stats = array();
 	}
 }
