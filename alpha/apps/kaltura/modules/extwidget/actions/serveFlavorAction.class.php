@@ -939,12 +939,13 @@ class serveFlavorAction extends kalturaAction
 			{
 				KalturaLog::debug('missing path for caption ' . $caption['captionId']);
 			}
-			if (!isset(CaptionPlugin::$captionsFormatMap[$lang]))
+			$languageCode = languageCodeManager::getLanguageCode($lang, true);
+			if (!$languageCode)
 			{
 				KalturaLog::debug('language ' . $lang . ' not supported');
 				continue;
 			}
-			$sequences[] = array('language' => CaptionPlugin::$captionsFormatMap[$lang], 'clips' => array(self::getAssetFieldsArray(self::TYPE_SOURCE, $caption['path'], $caption['sourceType'])));
+			$sequences[] = array('language' => $languageCode, 'clips' => array(self::getAssetFieldsArray(self::TYPE_SOURCE, $caption['path'], $caption['sourceType'])));
 		}
 		return $sequences;
 	}

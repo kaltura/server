@@ -48,7 +48,7 @@ class kSimuliveUtils
 		}
 		else
 		{
-			$captions = [];
+			$captions = array();
 		}
 		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs, $captions);
 	}
