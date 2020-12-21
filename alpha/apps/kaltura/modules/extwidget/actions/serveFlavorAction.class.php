@@ -804,23 +804,27 @@ class serveFlavorAction extends kalturaAction
 
 	/**
 	 * @param string $path
-	 * @param flavorAsset $flavor
+	 * @param asset $asset
 	 * @param $sourceType
 	 * @return array
 	 */
-	public static function getClipData($path, $flavor, $sourceType)
+	public static function getClipData($path, $asset, $sourceType)
 	{
-		$flavorId = $flavor->getId();
-		$hasAudio = $flavor->getContainsAudio();
-		if (is_null($hasAudio))
+		$assetId = $asset->getId();
+		$addSilence = true;
+		if ($asset instanceof flavorAsset)
 		{
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
-			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+			$addSilence = is_null($asset->getContainsAudio()) ? null : !$asset->getContainsAudio();
+		}
+		if (is_null($addSilence))
+		{
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($assetId);
+			$addSilence = !$mediaInfo || !$mediaInfo->isContainAudio();
 		}
 		$clipDesc = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
-		if (!$hasAudio)
+		if ($asset instanceof flavorAsset && $addSilence)
 		{
-			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
+			KalturaLog::debug("$assetId Audio Bit rate is null or 0 (taken from mediaInfo)");
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
 			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
 		}
@@ -930,20 +934,18 @@ class serveFlavorAction extends kalturaAction
 			{
 				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 			}
-			if ($asset instanceof CaptionAsset)
+			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
+			if (is_callable(array($asset, 'getLanguage')) && $asset->getLanguage())
 			{
 				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
-				if (!$languageCode)
+				if ($languageCode === 'und')
 				{
 					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
 					continue;
 				}
-				$sequences[] = array('language' => $languageCode, 'clips' => array(self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType)));
+				$sequence['language'] = $languageCode;
 			}
-			else
-			{
-				$sequences[] = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
-			}
+			$sequences[] = $sequence;
 		}
 		return $sequences;
 	}
