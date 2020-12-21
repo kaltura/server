@@ -306,8 +306,14 @@ class kFileBase
     
     public static function mimeType($file_name)
     {
-        if (!file_exists($file_name))
+        if (!kFile::checkFileExists($file_name))
             return false;
+        
+        if(kFile::isSharedPath($file_name))
+        {
+	        $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+	        return $kSharedFsMgr->mimeType($file_name);
+        }
 
         if(! function_exists('mime_content_type'))
         {
@@ -671,5 +677,53 @@ class kFileBase
 	public static function setStorageTypeMap($key, $value)
 	{
 		self::$storageTypeMap[$key] = $value;
+	}
+	
+	public static function buildDirectUrl($path)
+	{
+		if(!self::isSharedPath($path))
+		{
+			return $path;
+		}
+		
+		$path = kFile::fixPath($path);	
+		$vodPackagerDirectSecret = kConf::get('vod_packager_direct_serve_secret', 'local', null);
+		if(!$vodPackagerDirectSecret)
+		{
+			throw new Exception("VOD direct serve secret not found");
+		}
+		
+		$vodPackagerInternalDomain = kConf::get('vod_packager_internal_domain', 'cloud_storage', null);
+		if(!$vodPackagerInternalDomain)
+		{
+			throw new Exception("Path is shared but no valid serve domain found in config");
+		}
+		
+		$storageType = self::getStorageType($path);
+		list($bucket, $path) = explode("/",ltrim($path,"/"),2);
+		
+		$sig = base64_encode(hash_hmac('sha256', $path, $vodPackagerDirectSecret, true));
+		$sig = rtrim(strtr($sig, '+/', '-_'), '=');
+		return "http://$vodPackagerInternalDomain/direct/$storageType/sig/{$sig}/{$path}";
+	}
+	
+	public static function getStorageType($path)
+	{
+		$path = kFile::fixPath($path);
+		$storageTypeMap = self::getStorageTypeMap();
+		if(!$storageTypeMap)
+		{
+			return false;
+		}
+		
+		foreach ( $storageTypeMap as $pathPrefix => $storageType)
+		{
+			if(kString::beginsWith($path, $pathPrefix))
+			{
+				return strtolower($storageType);
+			}
+		}
+		
+		return false;
 	}
 }

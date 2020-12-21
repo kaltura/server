@@ -4,7 +4,6 @@ class myEntryUtils
 {
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
-	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
@@ -875,8 +874,7 @@ class myEntryUtils
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
-			$params = array($density, $quality, $forceRotation, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+			$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
 			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
@@ -970,6 +968,7 @@ class myEntryUtils
 				}
 			}
 
+			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 
@@ -989,7 +988,7 @@ class myEntryUtils
 			{
 				if ($crop_provider)
 				{
-					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles,$forceRotation);
+					$convertedImagePath = myFileConverter::convertImageUsingCropProvider($orig_image_path, $processingThumbPath, $width, $height, $type, $crop_provider, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $forceRotation);
 				}
 				else
 				{
@@ -1003,7 +1002,7 @@ class myEntryUtils
 						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
 					}
 
-					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format,$forceRotation);
+					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format, $forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
 				{
@@ -1150,7 +1149,7 @@ class myEntryUtils
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
+		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset);
 		
 		if (!$entry_data_path)
 			return false;
@@ -1175,7 +1174,7 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function getEntryDataPath($flavorSyncKey, $flavorAsset, $entryId)
+	public static function getEntryDataPath($flavorSyncKey, $flavorAsset)
 	{
 		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
 		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
@@ -1185,26 +1184,18 @@ class myEntryUtils
 			return null;
 		}
 		$entryDataPath = null;
-		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
-		if ($fileSync->getDc() === $currentDcId)
+		$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
+		KalturaLog::info("file sync id: {$fileSync->getId()} found on DC: {$fileSync->getDc()} current dcId: $currentDcId is cloud dc: $isCloudDc");
+		if ($fileSync->getDc() === $currentDcId || ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))))
 		{
 			$entryDataPath = $fileSync->getFullPath();
 			KalturaLog::info("path [$entryDataPath]");
 		}
 		else
 		{
-			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
-			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
-			{
-				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
-				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
-			}
-			else
-			{
-				$remoteDc = 1 - $currentDcId;
-				KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
-			}
+			$remoteDc = 1 - $currentDcId;
+			KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 
 		return $entryDataPath;
@@ -2075,75 +2066,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = null;
 		while ($packagerRetries && !$content)
 		{
-			$content = self::retrieveVolumeMapFromPackager($flavorAsset);
+			$content = myPackagerUtils::retrieveVolumeMapFromPackager($flavorAsset);
 			$packagerRetries--;
 		}
+
 		if(!$content)
+		{
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+		}
 
 		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
 		return new kRendererString($content, 'text/csv');
-	}
-
-	private static function retrieveVolumeMapFromPackager($flavorAsset)
-	{
-		if ($flavorAsset->getEncryptionKey())
-		{
-			return self::retrieveMappedVolumeMapFromPackager($flavorAsset);
-		}
-		return self::retrieveLocalVolumeMapFromPackager($flavorAsset);
-	}
-
-	private static function retrieveMappedVolumeMapFromPackager($flavorAsset)
-	{
-		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::MAPPED_VOLUME_MAP, $flavorAsset);
-		if (!$packagerVolumeMapUrlPattern)
-		{
-			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
-		}
-
-		$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-		if (!$entry)
-		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND);
-		}
-
-		$volumeMapUrl = self::buildVolumeMapPath($entry, $flavorAsset);
-
-		$content = self::curlVolumeMapUrl($volumeMapUrl, $packagerVolumeMapUrlPattern);
-		if(!$content)
-		{
-			return false;
-		}
-
-		return $content;
-	}
-
-	private static function retrieveLocalVolumeMapFromPackager($flavorAsset)
-	{
-		$packagerVolumeMapUrlPattern = myPackagerUtils::getPackagerUrlByTypeAndFlavorAsset(kPackagerUrlType::REGULAR_VOLUME_MAP, $flavorAsset);
-		if (!$packagerVolumeMapUrlPattern)
-			throw new KalturaAPIException(KalturaErrors::VOLUME_MAP_NOT_CONFIGURED);
-
-		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = kFileSyncUtils::getRelativeFilePathForKey($fileSyncKey);
-		$entry_data_path = ltrim($entry_data_path, "/");
-		if (!$entry_data_path)
-			return null;
-
-		$content = self::curlVolumeMapUrl($entry_data_path, $packagerVolumeMapUrlPattern);
-		if(!$content)
-			return false;
-
-		return $content;
-	}
-
-	private static function curlVolumeMapUrl($url, $packagerVolumeMapUrlPattern)
-	{
-		$packagerVolumeMapUrl = str_replace(array("{url}"), array($url), $packagerVolumeMapUrlPattern);
-		kFile::closeDbConnections();
-		$content = KCurlWrapper::getDataFromFile($packagerVolumeMapUrl, null, null, true);
-		return $content;
 	}
 
 	public static function addTrackEntryInfo(entry $entry,$message)
@@ -2152,20 +2085,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$trackEntry->setEntryId($entry->getId());
 		$trackEntry->setDescription($message);
 		TrackEntry::addTrackEntry($trackEntry);
-	}
-
-	private static function buildVolumeMapPath($entry, $flavorAsset)
-	{
-		$partnerId = $flavorAsset->getPartnerId();
-		$subpId = $entry->getSubpId();
-		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
-		$entryVersion = $entry->getVersion();
-
-		$url = "$partnerPath/serveFlavor/entryId/".$entry->getId();
-		$url .= ($entryVersion ? "/v/$entryVersion" : '');
-		$url .= "/flavorId/".$flavorAsset->getId();
-		$url .= self::MP4_FILENAME_PARAMETER;
-		return $url;
 	}
 
 	public static function verifyEntryType($entry)

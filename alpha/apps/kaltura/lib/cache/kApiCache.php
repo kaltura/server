@@ -785,16 +785,22 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			usleep(50000);
+			KalturaMonitorClient::usleep(50000);
 		}
-		
-		if(isset($this->_params['service']))
+
+		$action = null;
+		if (get_class($this) == 'kPlayManifestCacher')
+		{
+			$action = 'extwidget.playManifest';
+		}
+		else if (isset($this->_params['service']) && isset($this->_params['action']) && $this->_params['service'] != 'multirequest')
+		{
+			$action = $this->_params['service'] . '.' . $this->_params['action'];
+		}
+
+		if ($action)
 		{
 			$isInMultiRequest = isset($this->_params['multirequest']);
-			$action = $this->_params['service'];
-			if ($action != 'multirequest' && isset($this->_params['action']))
-				$action = $this->_params['service'] . '.' . $this->_params['action'];
-		
 			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
 
 			foreach ($this->_monitorEvents as $event)

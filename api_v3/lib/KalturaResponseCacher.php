@@ -52,15 +52,23 @@ class KalturaResponseCacher extends kApiCache
 		for ($i = 0; ; $i++)
 		{
 			$prefix = $i ? "{$i}:" : "";		// 0 = try single request, >0 = try multirequest
-			if (!isset($this->_params["{$prefix}service"]) || !isset($this->_params["{$prefix}action"]))
+			if (isset($this->_params["{$prefix}service"]) && isset($this->_params["{$prefix}action"]))
+			{
+				$service = $this->_params["{$prefix}service"];
+				$action = $this->_params["{$prefix}action"];
+			}
+			else if (isset($this->_params[$i]['service']) && isset($this->_params[$i]['action']))
+			{
+				$service = $this->_params[$i]['service'];
+				$action = $this->_params[$i]['action'];
+			}
+			else
 			{
 				if (!$i)			// could not find service/action, try multirequest - 1:service/1:action
 					continue;
 				break;
 			}
-			
-			$service = $this->_params["{$prefix}service"];
-			$action = $this->_params["{$prefix}action"];
+
 			if (strtolower($service) != 'baseentry' || !in_array(strtolower($action), array('getcontextdata', 'getplaybackcontext')))
 			{
 				continue;
@@ -72,8 +80,15 @@ class KalturaResponseCacher extends kApiCache
 				$referrer = $this->_params[$referrerKey];
 				unset($this->_params[$referrerKey]);
 			}
+			else if (isset($this->_params[$i]['contextDataParams']['referrer']))
+			{
+				$referrer = $this->_params[$i]['contextDataParams']['referrer'];
+				unset($this->_params[$i]['contextDataParams']['referrer']);
+			}
 			else
+			{
 				$referrer = self::getHttpReferrer();
+			}
 			
 			$this->_referrers[] = $referrer;			
 		}

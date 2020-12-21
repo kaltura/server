@@ -237,7 +237,7 @@ class ThumbAssetService extends KalturaAssetService
 	protected function attachUrl(thumbAsset $thumbAsset, $url)
 	{
 		$fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
-		if (KCurlWrapper::getDataFromFile($url, $fullPath))
+		if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
 			return $this->attachFile($thumbAsset, $fullPath);
 			
 		if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)

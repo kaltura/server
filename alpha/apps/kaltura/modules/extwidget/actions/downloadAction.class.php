@@ -55,8 +55,6 @@ class downloadAction extends sfAction
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.download', $entry->getPartnerId());
-		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		$shouldPreview = false;
@@ -123,26 +121,32 @@ class downloadAction extends sfAction
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+		
 		/**@var $fileSync FileSync */
-		$filePath = $fileSync->getFullPath();
+		//To-Do: Remote the use of fix path in various locations in the code and escape the double slashes in the get full path method
+		$filePath = kFile::fixPath($fileSync->getFullPath());
 
 		list($fileBaseName, $fileExt) = kAssetUtils::getFileName($entry, $flavorAsset);
 
 		if (!$fileName)
 			$fileName = $fileBaseName;
 		
-		if ($fileExt && !is_dir($filePath))
+		$isFileDir = kFile::isDir($filePath);
+		if ($fileExt && !$isFileDir)
 			$fileName = $fileName . '.' . $fileExt;
 		
 		$preview = 0;
-		if($shouldPreview && $flavorAsset) {
+		if($shouldPreview && $flavorAsset)
+		{
 			$preview = $flavorAsset->estimateFileSize($entry, $securyEntryHelper->getPreviewLength());
-		} else if(kCurrentContext::$ks_object) {
+		}
+		else if(kCurrentContext::$ks_object)
+		{
 			$preview = kCurrentContext::$ks_object->getPrivilegeValue(kSessionBase::PRIVILEGE_PREVIEW, 0);
 		}
 		
 	   //enable downloading file_name which inside the flavor asset directory
-		if(is_dir($filePath))
+		if($isFileDir)
 		{
 				$filePath = $filePath . DIRECTORY_SEPARATOR . $fileName;
 				$fileSize = null;
@@ -151,24 +155,8 @@ class downloadAction extends sfAction
 		{
 				$fileSize = $fileSync->getFileSize();
 		}
-
-		$allowRemote = false;
-		if(in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
-		{
-			$allowRemote = true;
-			$fileExt = null;
-			$storage = StorageProfilePeer::retrieveByPK($fileSync->getDc());
-			try
-			{
-				$filePath = $fileSync->getS3FileSyncUrl($storage, $fileSync->getFilePath());
-				$fileExt = $flavorAsset->getFileExt();
-			}
-			catch (Exception $ex)
-			{
-				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-			}
-		}
-		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize, $fileExt, $allowRemote);
+		
+		$this->dumpFile($filePath, $fileName, $preview, $fileSync->getEncryptionKey(), $fileSync->getIv(), $fileSize, $fileExt);
 	
 		KExternalErrors::dieGracefully(); // no view
 	}
@@ -199,7 +187,7 @@ class downloadAction extends sfAction
 		return $syncKey;
 	}
 
-	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null, $fileExt = null, $allowRemote = false)
+	private function dumpFile($file_path, $file_name, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null, $fileExt = null)
 	{
 		$file_name = str_replace("\n", ' ', $file_name);
 		$relocate = $this->getRequestParameter("relocate");
@@ -228,14 +216,14 @@ class downloadAction extends sfAction
 		{
 			if(!$directServe)
 				header("Content-Disposition: attachment; filename=\"$file_name\"");
-
+			
+			//If file is in shared storage don't calc the mime type and let the renderer output to decide it from the file ext
 			$mime_type = null;
-			if(!$allowRemote)
+			if(!kFile::isSharedPath($file_path))
 			{
 				$mime_type = kFile::mimeType($file_path);
 			}
-
-			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, $allowRemote, $fileExt);
+			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, false, $fileExt);
 		}
 	}
 	

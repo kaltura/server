@@ -13,14 +13,13 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 	 */
 	public function handleRecordingVideoComplete($event)
 	{
-		$zoomIntegration = ZoomHelper::getZoomIntegration();
-		if($zoomIntegration->getEnableWebinarUploads())
+		if($this->zoomIntegration->getEnableWebinarUploads())
 		{
 			parent::handleRecordingVideoComplete($event);
 		}
 		else
 		{
-			KalturaLog::debug('webinar uploads is disabled for ' . $zoomIntegration->getPartnerId());
+			KalturaLog::debug('webinar uploads is disabled for ' . $this->zoomIntegration->getPartnerId());
 		}
 	}
 
@@ -29,7 +28,7 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 		return $this->zoomClient->retrieveWebinarPanelists($accessToken, $recordingId);
 	}
 
-	protected function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration)
+	protected function parseAdditionalUsers($additionalUsersZoomResponse)
 	{
 		$panelists = new kZoomPanelists();
 		$panelists->parseData($additionalUsersZoomResponse);
@@ -42,7 +41,7 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 			{
 				$zoomUser = new kZoomUser();
 				$zoomUser->setOriginalName($panelistEmail);
-				$zoomUser->setProcessedName($this->processZoomUserName($panelistEmail, $zoomIntegration));
+				$zoomUser->setProcessedName($this->processZoomUserName($panelistEmail, $this->zoomIntegration));
 				$result[] = $zoomUser;
 			}
 		}
@@ -55,15 +54,14 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 	}
 
 	/**
-	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
 	 * @throws kCoreException
 	 */
-	protected function setEntryCategory($zoomIntegration, $entry)
+	protected function setEntryCategory($entry)
 	{
-		if ($zoomIntegration->getZoomWebinarCategory())
+		if ($this->zoomIntegration->getZoomWebinarCategory())
 		{
-			$entry->setCategories($zoomIntegration->getZoomWebinarCategory());
+			$entry->setCategories($this->zoomIntegration->getZoomWebinarCategory());
 		}
 	}
 }

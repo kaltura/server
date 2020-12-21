@@ -43,6 +43,11 @@ class KAsyncConvert extends KJobHandlerWorker
 	 */
 	protected $maxSourceSizeForLocalTmp;
 	
+	/**
+	 * @var int
+	 */
+	protected $remoteConvertSupportedEngines;
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -97,6 +102,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 		$this->maxSourceSizeForLocalTmp = isset(self::$taskConfig->params->maxSourceSizeForLocalTmp) ? self::$taskConfig->params->maxSourceSizeForLocalTmp : null;
+		$this->remoteConvertSupportedEngines = isset(self::$taskConfig->params->remoteConvertSupportedEngines) ? explode("," ,self::$taskConfig->params->remoteConvertSupportedEngines) : array(KalturaConversionEngineType::CHUNKED_FFMPEG);
 		
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -131,7 +137,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
 			$srcFileSyncDescriptor->isRemote = false;
 			
-			if(!in_array($job->jobSubType, array(KalturaConversionEngineType::CHUNKED_FFMPEG)))
+			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
 				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)

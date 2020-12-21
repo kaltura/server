@@ -65,6 +65,7 @@ class KExternalErrors
 	const INVALID_AUTH_HEADER = 53;
 	const PREVIEW_PAGE_WAS_DISABLED = 54;
 	const DATABASE_ERROR = 55;
+	const MISSING_BUNDLE_CONFIGURATION = 56;
 	const HTTP_STATUS_NOT_FOUND = 404;
 
 	private static $errorCodeMap = array(
@@ -119,13 +120,15 @@ class KExternalErrors
 		self::LIVE_STREAM_CONFIG_NOT_FOUND => "Live stream playback config not found for requested live entry",
 		self::TOO_MANY_PROCESSES => "Too many executed processes",
 		self::BUNDLE_CREATION_FAILED => "Failed to build bundle for [%s]",
-		self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
+        	self::MISSING_BUNDLE_CONFIGURATION => "Missing bundle configuration in uiConf, uiConfID: [%s]",
+        	self::ENTRY_NOT_SEQUENCE => "One or more of the sequence entry ids given is not a sequence entry",
 		self::INVALID_MIN_BITRATE => "min bitrate is not valid",
 		self::INVALID_PARAMETER => "Request parameter [%s] is invalid",
 		self::PLAYLIST_DURATION_IS_ZERO => "The duration of the playlist is zero",
 		self::PREVIEW_PAGE_WAS_DISABLED => 'Preview page was disabled',
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
 		self::DATABASE_ERROR => 'Database error',
+		self::INVALID_AUTH_HEADER => 'Invalid auth header',
 	);
 
 	public static function dieError($errorCode, $message = null)
@@ -156,7 +159,7 @@ class KExternalErrors
 
 		$headers[] = "X-Kaltura:cached-error-$errorCode";
 
-		self::terminateDispatch();
+		self::terminateDispatch($errorCode);
 
 		if ($errorCode != self::ACCESS_CONTROL_RESTRICTED &&
 			$errorCode != self::IP_COUNTRY_BLOCKED &&
@@ -189,10 +192,17 @@ class KExternalErrors
 		die();
 	}
 
-	public static function terminateDispatch()
+	public static function terminateDispatch($errorCode = null)
 	{
 		if (class_exists('KalturaLog') && isset($GLOBALS["start"]))
+		{
 			KalturaLog::debug("Dispatch took - " . (microtime(true) - $GLOBALS["start"]) . " seconds, memory: " . memory_get_peak_usage(true));
+		}
+
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorApiEnd($errorCode);
+		}
 	}
 
 	public static function setResponseErrorCode($errorCode)

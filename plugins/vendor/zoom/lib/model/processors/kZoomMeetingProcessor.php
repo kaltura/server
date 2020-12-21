@@ -12,19 +12,18 @@ class kZoomMeetingProcessor extends kZoomRecordingProcessor
 	}
 
 	/**
-	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
 	 * @throws kCoreException
 	 */
-	protected function setEntryCategory($zoomIntegration, $entry)
+	protected function setEntryCategory($entry)
 	{
-		if ($zoomIntegration->getZoomCategory())
+		if ($this->zoomIntegration->getZoomCategory())
 		{
-			$entry->setCategories($zoomIntegration->getZoomCategory());
+			$entry->setCategories($this->zoomIntegration->getZoomCategory());
 		}
 	}
 
-	protected function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration)
+	protected function parseAdditionalUsers($additionalUsersZoomResponse)
 	{
 		$participants = new kZoomParticipants();
 		$participants->parseData($additionalUsersZoomResponse);
@@ -37,7 +36,7 @@ class kZoomMeetingProcessor extends kZoomRecordingProcessor
 			{
 				$zoomUser = new kZoomUser();
 				$zoomUser->setOriginalName($participantEmail);
-				$zoomUser->setProcessedName($this->processZoomUserName($participantEmail, $zoomIntegration));
+				$zoomUser->setProcessedName($this->processZoomUserName($participantEmail, $this->zoomIntegration));
 				$result[] = $zoomUser;
 			}
 		}

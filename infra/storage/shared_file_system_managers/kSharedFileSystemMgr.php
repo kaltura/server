@@ -280,6 +280,15 @@ abstract class kSharedFileSystemMgr
 	abstract protected function doRealPath($filePath, $getRemote = true);
 	
 	/**
+	 * Returns the mime_type of the file.
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return string
+	 */
+	abstract protected function doMimeType($filePath);
+	
+	/**
 	 * dump file in parts
 	 *
 	 * @param $filePath
@@ -521,6 +530,12 @@ abstract class kSharedFileSystemMgr
 		return $this->doRealPath($filePath, $getRemote);
 	}
 	
+	public function mimeType($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doMimeType($filePath);
+	}
+	
 	/**
 	 * copies local src to shared destination.
 	 * Doesn't support non-flat directories!
@@ -680,6 +695,18 @@ abstract class kSharedFileSystemMgr
 	public static function setFileSystemOptions($key, $value)
 	{
 		self::$storageConfig[$key] = $value;
+	}
+	
+	public static function restoreStreamWrappers()
+	{
+		stream_wrapper_restore('http');
+		stream_wrapper_restore('https');
+	}
+	
+	public static function unRegisterStreamWrappers()
+	{
+		stream_wrapper_unregister('http');
+		stream_wrapper_unregister('https');
 	}
 	
 	/**

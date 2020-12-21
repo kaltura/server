@@ -25,7 +25,7 @@ class kFileUtils extends kFile
 			}
 			else
 			{
-				sleep(3);
+				KalturaMonitorClient::sleep(3);
 			}
 		}
 	}
@@ -59,7 +59,14 @@ class kFileUtils extends kFile
 
 			// if by now there is no file - die !
 			if(! kFile::checkFileExists($filePath))
+			{
+				if (class_exists('KalturaLog'))
+				{
+					KalturaLog::log("file not found: $filePath");
+				}
+
 				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			}
 		}
 		
 		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key, $iv, $fileSize, $fileExt);

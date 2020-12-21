@@ -152,6 +152,8 @@ class KCurlWrapper
 
 	public $protocol;
 
+	protected $host;
+
 	private static $headers;
 	private static $lastHeader;
 
@@ -454,7 +456,7 @@ class KCurlWrapper
 		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
 
-		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl, true))
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $this->host, $allowInternalUrl, true))
 		{
 			$this->setInternalUrlErrorResults($sourceUrl);
 			return false;
@@ -602,7 +604,7 @@ class KCurlWrapper
 	 */
 	public function exec($sourceUrl, $destFile = null,$progressCallBack = null, $allowInternalUrl = false)
 	{
-		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl))
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $this->host, $allowInternalUrl))
 		{
 			$this->setInternalUrlErrorResults($sourceUrl);
 			return false;
@@ -648,7 +650,7 @@ class KCurlWrapper
 	 */
 	public function doExec($sourceUrl, $allowInternalUrl = false)
 	{
-		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $allowInternalUrl))
+		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $this->host, $allowInternalUrl))
 		{
 			$this->setInternalUrlErrorResults($sourceUrl);
 			return false;
@@ -673,7 +675,15 @@ class KCurlWrapper
 
 	private function execCurl()
 	{
+		$start = microtime(true);
 		$res = curl_exec($this->ch);
+		$end = microtime(true);
+
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorCurl($this->host, $end - $start);
+		}
+
 		$this->httpCode = $this->getInfo(CURLINFO_HTTP_CODE);
 		$this->errorNumber = curl_errno($this->ch);
 		$this->error = $this->getErrorMsg();
@@ -749,7 +759,7 @@ class KCurlWrapper
 		return $protocol;
 	}
 
-	public static function setSourceUrl($ch, $sourceUrl, &$protocol, $allowInternalUrl = false, $readHeader = false)
+	public static function setSourceUrl($ch, $sourceUrl, &$protocol, &$host, $allowInternalUrl = false, $readHeader = false)
 	{
 		$sourceUrl = trim($sourceUrl);
 		if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
@@ -763,6 +773,8 @@ class KCurlWrapper
 			KalturaLog::log("Failed to parse url [$sourceUrl]");
 			return false;
 		}
+
+		$host = $parts['host'];
 
 		if (!$allowInternalUrl && self::isInternalHost($parts['host']) && !self::isWhiteListedInternalUrl($sourceUrl))
 		{
@@ -849,7 +861,7 @@ class KCurlWrapper
 		$ch = curl_init();
 
 		// set URL and other appropriate options
-		if (!self::setSourceUrl($ch, $url, $protocol, $allowInternalUrl))
+		if (!self::setSourceUrl($ch, $url, $protocol, $host, $allowInternalUrl))
 		{
 			return false;
 		}
@@ -865,7 +877,15 @@ class KCurlWrapper
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
 
+		$start = microtime(true);
 		$content = curl_exec($ch);
+		$end = microtime(true);
+
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorCurl($host, $end - $start);
+		}
+
 		curl_close($ch);
 		
 		return $content;

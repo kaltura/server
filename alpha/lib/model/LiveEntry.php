@@ -24,10 +24,22 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_RECORDING_STATUS = "recording_status";
 	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
+	const CUSTOM_DATA_DVR_STATUS = "dvr_status";
+	const CUSTOM_DATA_DVR_WINDOW = "dvr_window";
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
+
+	public function copyInto($copyObj, $deepcopy = false)
+	{
+		parent::copyInto($copyObj, $deepcopy);
+
+		$copyObj->setRecordStatus($this->getRecordStatus());
+		$copyObj->setExplicitLive($this->getExplicitLive());
+		$copyObj->setDvrStatus($this->getDvrStatus());
+		$copyObj->setDvrWindow($this->getDvrWindow());
+	}
 	
 	/* (non-PHPdoc)
 	 * @see entry::getLocalThumbFilePath()
@@ -70,7 +82,7 @@ abstract class LiveEntry extends entry
 		
 		return myEntryUtils::resizeEntryImage($this, $version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $msgPath, $density, $stripProfiles);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see entry::validateFileSyncSubType($sub_type)
 	 */
@@ -269,22 +281,22 @@ abstract class LiveEntry extends entry
 	
 	public function getDvrStatus()
 	{
-		return $this->getFromCustomData("dvr_status");
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_DVR_STATUS);
 	}
 	
 	public function setDvrStatus($v)
 	{
-		$this->putInCustomData("dvr_status", $v);
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_DVR_STATUS, $v);
 	}
 	
 	public function getDvrWindow()
 	{
-		return $this->getFromCustomData("dvr_window");
+		return $this->getFromCustomData(LiveEntry::CUSTOM_DATA_DVR_WINDOW);
 	}
 	
 	public function setDvrWindow($v)
 	{
-		$this->putInCustomData("dvr_window", $v);
+		$this->putInCustomData(LiveEntry::CUSTOM_DATA_DVR_WINDOW, $v);
 	}
 	
 	public function getLastElapsedRecordingTime()		{ return $this->getFromCustomData( "lastElapsedRecordingTime", null, 0 ); }
@@ -499,41 +511,139 @@ abstract class LiveEntry extends entry
 		return $events;
 	}
 
+	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
+	{
+		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
+		{
+			return EntryServerNodeStatus::STOPPED;
+		}
+
+		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		{
+			return $this->getInternalLiveStatus($checkExplicitLive);
+		}
+		else
+		{
+			// for external entry we have only live or offline status
+			return $this->isExternalCurrentlyLive($protocol) ? EntryServerNodeStatus::PLAYABLE : EntryServerNodeStatus::STOPPED;
+		}
+	}
 
 	/**
 	 * @return boolean
 	 */
-	public function isCurrentlyLive($currentDcOnly = false)
+	public function isCurrentlyLive($currentDcOnly = false, $protocol = null)
 	{
-		if ($this->getViewMode() == ViewMode::PREVIEW)
+		return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+	}
+
+	protected function isExternalCurrentlyLive($reqProtocol = null)
+	{
+		$isLive = null;
+		$takeFirst = false;
+		$protocols = array();
+		switch ($reqProtocol)
 		{
-			if (!$this->canViewExplicitLive())
-				return false;
+			case KalturaPlaybackProtocol::HLS:
+			case KalturaPlaybackProtocol::APPLE_HTTP:
+				$protocols = array_unique(array($reqProtocol, KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP));
+				$takeFirst = true;
+				break;
+			case KalturaPlaybackProtocol::HDS:
+			case KalturaPlaybackProtocol::AKAMAI_HDS:
+				$protocols = array($reqProtocol);
+				break;
+
+			case null:
+				$configurations = $this->getLiveStreamConfigurations(requestUtils::getProtocol());
+				foreach ($configurations as $config)
+				{
+					$protocols[] = $config->getProtocol();
+				}
+				break;
 		}
 
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
+		foreach($protocols as $protocol)
 		{
-			return true;
-		}
-
-		$liveEntryServerNodes = $this->getPlayableEntryServerNodes();
-		if(!count($liveEntryServerNodes))
-			return false;
-
-		/* @var LiveEntryServerNode $liveEntryServerNode*/
-		foreach($liveEntryServerNodes as $liveEntryServerNode)
-		{
-			/* @var WowzaMediaServerNode $serverNode*/
-			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $liveEntryServerNode->getServerNodeId());
-			if($serverNode->getDc() == kDataCenterMgr::getCurrentDcId())
+			$isProtocolLive = $this->checkIsLiveByProtocol($protocol);
+			if ($isProtocolLive !== null)
 			{
-				if ($this->getExplicitLive() && !$this->canViewExplicitLive() && !$liveEntryServerNode->getIsPlayableUser())
-					return false;
-				return true;
+				if ($isProtocolLive || $takeFirst)
+				{
+					return $isProtocolLive;
+				}
+				$isLive = $isProtocolLive; // as false
 			}
 		}
-		
-		return !$currentDcOnly;
+
+		return $isLive;
+	}
+
+	protected function checkIsLiveByProtocol($protocol) {
+		$config = $this->getLiveStreamConfigurationByProtocol($protocol, requestUtils::getProtocol());
+		if ($config)
+		{
+			$url = $config->getUrl();
+			$backupUrl = $config->getBackupUrl();
+
+			$dpda = new DeliveryProfileDynamicAttributes();
+			$dpda->setEntryId($this->getId());
+			$dpda->setFormat($config->getProtocol());
+			KalturaLog::info("Determining status of live stream URL [ $url ] and Backup URL [ $backupUrl ]");
+
+			$urlManager = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($url, PHP_URL_HOST), $dpda);
+			if ($urlManager && $urlManager->isLive($url))
+			{
+				return true;
+			}
+			$urlManagerBackup = DeliveryProfilePeer::getLiveDeliveryProfileByHostName(parse_url($backupUrl, PHP_URL_HOST), $dpda);
+			return $urlManagerBackup ? $urlManagerBackup->isLive($backupUrl) : false;
+		}
+		return null;
+	}
+
+
+	protected function getInternalLiveStatus($checkExplicitLive = false)
+	{
+		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
+		{
+			return EntryServerNodeStatus::PLAYABLE;
+		}
+
+		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
+		$status = EntryServerNodeStatus::STOPPED;
+
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
+		foreach ($entryServerNodes as $entryServerNode)
+		{
+			if ($this->shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $checkExplicitLive))
+			{
+				$maxKey = max(array_search($status, $statusOrder), array_search($entryServerNode->getStatus(), $statusOrder));
+				$status = $statusOrder[$maxKey];
+			}
+			//TODO case where on other dc has the explicit protected node we were return true even it is not viewable
+		}
+		return $status;
+	}
+
+	protected function shouldConsiderEntryServerNodeStatusForLiveStatus($entryServerNode, $checkExplicitLive)
+	{
+		if (!$entryServerNode || !($entryServerNode instanceof LiveEntryServerNode))
+		{
+			return false;
+		}
+
+		if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY,EntryServerNodeType::LIVE_BACKUP)))
+		{
+			return false;
+		}
+
+		if ($checkExplicitLive && $this->getExplicitLive() && !$this->canViewExplicitLive() && !$entryServerNode->getIsPlayableUser())
+		{
+			return false;
+		}
+
+		return true;
 	}
 	
 	private static function getCacheType()
@@ -721,28 +831,7 @@ abstract class LiveEntry extends entry
 		}
 	}
 
-	public function getLiveStatus()
-	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
-		{
-			return EntryServerNodeStatus::PLAYABLE;
-		}
-
-		$entryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->getId());
-
-		$status = EntryServerNodeStatus::STOPPED;
-		foreach ($entryServerNodes as $entryServerNode)
-		{
-			/* @var $entryServerNode EntryServerNode */
-			if (!in_array($entryServerNode->getServerType(), array(EntryServerNodeType::LIVE_PRIMARY,EntryServerNodeType::LIVE_BACKUP)))
-				continue;
-			$status = self::maxLiveEntryStatus($status, $entryServerNode->getStatus());
-		}
-		
-		return $status;
-	}
-
-	public function setLiveStatus ($v, $mediaServerIndex)
+	public function setLiveStatus($v, $mediaServerIndex)
 	{
 		throw new KalturaAPIException("This function is deprecated - you cannot set the live status");
 	}
@@ -894,18 +983,6 @@ abstract class LiveEntry extends entry
 			$recordingOptions = unserialize($recordingOptions);
 		
 		return $recordingOptions; 
-	}
-
-	public static function maxLiveEntryStatus($primaryMediaServerStatus, $secondaryMediaServerStatus)
-	{
-		if ($primaryMediaServerStatus == EntryServerNodeStatus::PLAYABLE || $secondaryMediaServerStatus == EntryServerNodeStatus::PLAYABLE)
-			return EntryServerNodeStatus::PLAYABLE;
-		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING || $secondaryMediaServerStatus == EntryServerNodeStatus::BROADCASTING)
-			return EntryServerNodeStatus::BROADCASTING;
-		elseif ($primaryMediaServerStatus == EntryServerNodeStatus::AUTHENTICATED || $secondaryMediaServerStatus == EntryServerNodeStatus::AUTHENTICATED)
-			return EntryServerNodeStatus::AUTHENTICATED;
-		else
-			return EntryServerNodeStatus::STOPPED;
 	}
 	
 	public function isStreamAlreadyBroadcasting()

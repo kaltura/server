@@ -137,6 +137,16 @@ class kFlowHelper
 		$entryId = $dbBatchJob->getEntryId();
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 
+		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(), $dbBatchJob->getPartnerId()))
+		{
+			if($dbEntry)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+				$dbEntry->save();
+			}
+			throw new APIException(APIErrors::INVALID_FILE_TYPE, $data->getDestFileLocalPath());
+		}
+
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
 		{
@@ -572,19 +582,7 @@ class kFlowHelper
 			return $dbBatchJob;
 		
 		//Check if src remote file was pushed, if so mark it as ready
-		$fileSyncRemoteUrl = $data->getSrcFileSyncRemoteUrl();
-		$fileSyncLocalPath = $data->getSrcFileSyncLocalPath();
-		if($fileSyncRemoteUrl && kFile::fileSize($fileSyncLocalPath) == kFile::fileSize($fileSyncRemoteUrl))
-		{
-			//get pending file sync to shared storage
-			$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
-			$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
-			if($pendingFileSync && $pendingFileSync->getFullPath() == $fileSyncRemoteUrl)
-			{
-				$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
-				$pendingFileSync->save();
-			}
-		}
+		self::handleExtractMediaRemoteUrl($data->getFlavorAssetId(), $data->getSrcFileSyncRemoteUrl(), $data->getSrcFileSyncLocalPath());
 		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if(!$rootBatchJob)
@@ -632,6 +630,42 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+	
+	protected static function handleExtractMediaRemoteUrl($flavorAssetId, $fileSyncRemoteUrl, $fileSyncLocalPath)
+	{
+		if(!$fileSyncRemoteUrl)
+		{
+			KalturaLog::debug("File sync remote url not provided, will not check for shared file syncs");
+			return;
+		}
+		
+		$localFileSize = kFile::fileSize($fileSyncLocalPath);
+		$remoteFileSize = kFile::fileSize($fileSyncRemoteUrl);
+		KalturaLog::debug("local file [$fileSyncLocalPath] size [$localFileSize] remote file [$fileSyncRemoteUrl] size [$remoteFileSize]");
+		if($remoteFileSize != $localFileSize)
+		{
+			return;
+		}
+		
+		//get pending file sync to shared storage
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+		if(!$pendingFileSync)
+		{
+			KalturaLog::debug("No pending file sync found for current asset [$flavorAssetId]");
+			return;
+		}
+		
+		if($pendingFileSync->getFullPath() != $fileSyncRemoteUrl)
+		{
+			KalturaLog::debug("Pending file sync full path does not match file sync remote url [{$pendingFileSync->getFullPath()}] [$fileSyncRemoteUrl]");
+			return;
+		}
+		
+		
+		$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+		$pendingFileSync->save();
 	}
 
 	/**
@@ -900,7 +934,7 @@ class kFlowHelper
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			try
 			{
-				if($partnerSharedStorageProfileId)
+				if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
 				{
 					KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
 					$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
