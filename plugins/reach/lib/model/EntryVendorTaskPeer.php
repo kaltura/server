@@ -35,19 +35,29 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelect($c);
 	}
 	
-	public static function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version)
+	public static function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version, $statuses = array())
 	{
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
 		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->add(EntryVendorTaskPeer::VERSION, $version);
-		$c->add(EntryVendorTaskPeer::STATUS, 
-			array(EntryVendorTaskStatus::PROCESSING, 
-				EntryVendorTaskStatus::READY, 
-				EntryVendorTaskStatus::PENDING, 
-				EntryVendorTaskStatus::PENDING_MODERATION
-			), Criteria::IN);
+		if ($version)
+		{
+			$c->add(EntryVendorTaskPeer::VERSION, $version);
+		}
+		if ($statuses)
+		{
+			$c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
+		}
+		else
+		{
+			$c->add(EntryVendorTaskPeer::STATUS,
+				array(EntryVendorTaskStatus::PROCESSING,
+					EntryVendorTaskStatus::READY,
+					EntryVendorTaskStatus::PENDING,
+					EntryVendorTaskStatus::PENDING_MODERATION
+				), Criteria::IN);
+		}
 		return EntryVendorTaskPeer::doSelect($c);
 	}
 	

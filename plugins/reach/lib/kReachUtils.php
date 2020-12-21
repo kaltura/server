@@ -165,7 +165,8 @@ class kReachUtils
 	{
 		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING);
 		$activeTasks = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		if($activeTasks && !$allowResubmission)
+		$activeTasksOnOlderVersion = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, $statusArr);
+		if(($activeTasks || $activeTasksOnOlderVersion) && !$allowResubmission)
 		{
 			return true;
 		}
