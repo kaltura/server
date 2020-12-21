@@ -131,7 +131,7 @@ class downloadAction extends sfAction
 		if (!$fileName)
 			$fileName = $fileBaseName;
 
-		if(is_null($fileExt) && $flavorAsset && $flavorAsset->getContainerFormat())
+		if(!$fileExt && $flavorAsset && $flavorAsset->getContainerFormat())
 		{
 			$fileExt = kAssetUtils::getFileExtension($flavorAsset->getContainerFormat());
 		}
