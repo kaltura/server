@@ -941,7 +941,6 @@ class serveFlavorAction extends kalturaAction
 				if ($languageCode === 'und')
 				{
 					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
-					continue;
 				}
 				$sequence['language'] = $languageCode;
 			}
