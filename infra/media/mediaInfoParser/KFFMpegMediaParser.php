@@ -65,8 +65,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$filePath = kFile::realPath($filePath);
 		
 		$cmd = $this->getCommand($filePath);
-		KalturaLog::debug("Executing '$cmd'");
-		$output = shell_exec($cmd);
+		$output = kExecWrapper::shell_exec($cmd);
 		if (trim($output) === "")
 			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			
@@ -122,7 +121,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 */
 		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3"))){
 			$cmd = "$this->cmdPath -i \"$this->filePath\" 2>&1 ";
-			$output = shell_exec($cmd);
+			$output = kExecWrapper::shell_exec($cmd);
 			if(strstr($output,"Progressive Segmented")){
 				if(isset($mediaInfo->contentStreams) && count($mediaInfo->contentStreams['video'])>0){
 					$mediaInfo->contentStreams['video'][0]->progressiveSegmented=true;
@@ -518,12 +517,11 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine.= " -i \"$srcFileName\" $detectFiltersStr -nostats -f null dummyfilename 2>&1";
-		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
 	
 		/*
 		 * Execute the black/silence detection
 		*/
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -592,8 +590,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		KalturaLog::log("srcFileName($srcFileName)");
 	
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("SceneCuts detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -631,8 +628,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -733,9 +729,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	{
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffmpegBin -t $seconds -i \"$srcFileName\" -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
-		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
 
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
@@ -795,8 +790,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			return 1;
 		
 		$cmdLine = "dd if=$srcFileName count=1 | $ffprobeBin -i pipe:  2>&1";
-		KalturaLog::log("FastStart detection cmdLine - $cmdLine");
-		$lastLine=exec($cmdLine, $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine, $outputArr, $rv);
 		{
 			KalturaLog::log("FastStart detection results printout - lastLine($lastLine),output-\n".print_r($outputArr,1));
 		}
@@ -838,8 +832,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin \"$srcFileName\" -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -864,8 +857,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine)");
 			return null;

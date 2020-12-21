@@ -75,7 +75,7 @@ class kFfmpegUtils
 	{
 		$baseCmd = kConf::get(self::FFMPEG_PATH_CONF_NAME);
 		$exec_cmd = $baseCmd . $cmd;
-		KalturaLog::log("ffmpeg cmd [$exec_cmd]");
+
 		$output = array();
 		$return_value = '';
 		if($timeLimit)
@@ -83,7 +83,7 @@ class kFfmpegUtils
 			set_time_limit(self::MAX_EXECUTION_TIME);
 		}
 
-		exec ( $exec_cmd , $output , $return_value );
+		kExecWrapper::exec ( $exec_cmd , $output , $return_value );
 		return array($output, $return_value);
 	}
 
@@ -102,9 +102,9 @@ class kFfmpegUtils
 
 		$baseCmd = kConf::get(self::FFMPEG_PATH_CONF_NAME);
 		$cmd_line = $baseCmd . " -i \"". $filePath . "\" 2>&1";
-		KalturaLog::log("ffmpeg cmd [$cmd_line]");
+
 		ob_start();
-		passthru( $cmd_line );
+		kExecWrapper::passthru( $cmd_line );
 		$content = ob_get_contents();
 		ob_end_clean();
 		return $content;

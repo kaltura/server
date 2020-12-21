@@ -247,7 +247,7 @@ class myFileConverter
 				throw new Exception('Illegal input was given');
 			}
 			
-			exec($cmd . " \"$source_file\" \"$jpeg_file\"", $output);
+			kExecWrapper::exec($cmd . " \"$source_file\" \"$jpeg_file\"", $output, $rv);
 			if (kFile::checkFileExists($jpeg_file))
 			{
 				list($sourcewidth, $sourceheight, $type, $attr) = getimagesize($jpeg_file);
