@@ -49,7 +49,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		{
 			curl_setopt($ch, CURLOPT_RANGE, $range);
 		}
+
+		$start = microtime(true);
 		$data = curl_exec($ch);
+		KalturaMonitorClient::monitorCurl(parse_url($url, PHP_URL_HOST), microtime(true) - $start);
+
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 		curl_close($ch);
