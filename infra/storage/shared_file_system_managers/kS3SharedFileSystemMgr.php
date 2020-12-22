@@ -81,7 +81,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
-		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : AmazonS3FilesStorageClassType::STORAGE_CLASS_INTELLIGENT_TIERING;
+		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : 'INTELLIGENT_TIERING';
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
