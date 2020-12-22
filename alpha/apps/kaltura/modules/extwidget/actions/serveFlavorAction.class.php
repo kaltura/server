@@ -811,18 +811,19 @@ class serveFlavorAction extends kalturaAction
 	public static function getClipData($path, $asset, $sourceType)
 	{
 		$assetId = $asset->getId();
-		$addSilence = true;
+		$addSilence = false;
 		if ($asset instanceof flavorAsset)
 		{
-			$addSilence = is_null($asset->getContainsAudio()) ? null : !$asset->getContainsAudio();
-		}
-		if (is_null($addSilence))
-		{
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($assetId);
-			$addSilence = !$mediaInfo || !$mediaInfo->isContainAudio();
+			$hasAudio = $asset->getContainsAudio();
+			if (is_null($hasAudio))
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($assetId);
+				$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+			}
+			$addSilence = !$hasAudio;
 		}
 		$clipDesc = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
-		if ($asset instanceof flavorAsset && $addSilence)
+		if ($addSilence)
 		{
 			KalturaLog::debug("$assetId Audio Bit rate is null or 0 (taken from mediaInfo)");
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
@@ -938,11 +939,14 @@ class serveFlavorAction extends kalturaAction
 			if (is_callable(array($asset, 'getLanguage')) && $asset->getLanguage())
 			{
 				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
-				if ($languageCode === 'und')
+				if ($languageCode && $languageCode !== 'und')
+				{
+					$sequence['language'] = $languageCode;
+				}
+				else
 				{
 					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
 				}
-				$sequence['language'] = $languageCode;
 			}
 			$sequences[] = $sequence;
 		}

@@ -41,10 +41,10 @@ class kSimuliveUtils
 		$assets = array();
 		// getting the flavors from source entry
 		$flavorAssets = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
-		$assets = self::mergeAssets($assets, $flavorAssets);
+		$assets = array_merge($assets, $flavorAssets);
 		// getting the entry's caption assets
 		$captionAssets = myPlaylistUtils::getEntryIdsCaptions($sourceEntry->getId());
-		$assets = self::mergeAssets($assets, $captionAssets);
+		$assets = array_merge($assets, $captionAssets);
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
 	}
 
@@ -140,12 +140,4 @@ class kSimuliveUtils
 		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
 	}
 
-	protected static function mergeAssets($assets, $newAssets)
-	{
-		if (is_array($newAssets))
-		{
-			return array_merge($assets, $newAssets);
-		}
-		return $assets;
-	}
 }
