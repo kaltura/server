@@ -1427,7 +1427,7 @@ HTML;
 		return array($entryIds, $durations, $mediaEntry, $captionFiles);
 	}
 
-	public static function getCaptionFilesForEntryIds($entryIds, $captionLanguages, $allLanguages = false)
+	protected static function getCaptionFilesForEntryIds($entryIds, $captionLanguages)
 	{
 		$captionLangsArr = explode(',', $captionLanguages);
 		$captionAssets = self::getEntryIdsCaptions($entryIds);
@@ -1435,7 +1435,7 @@ HTML;
 		foreach ($captionAssets as $captionAsset)
 		{
 			/** @var CaptionAsset $captionAsset */
-			if (!in_array($captionAsset->getLanguage(), $captionLangsArr) && !$allLanguages)
+			if (!in_array($captionAsset->getLanguage(), $captionLangsArr))
 				continue;
 			if(!$captionAsset->getDisplayOnPlayer())
 				continue;

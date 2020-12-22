@@ -38,13 +38,11 @@ class kSimuliveUtils
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
 		$endTime = $startTime + array_sum($durations);
-		$assets = array();
 		// getting the flavors from source entry
 		$flavorAssets = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
-		$assets = array_merge($assets, $flavorAssets);
 		// getting the entry's caption assets
 		$captionAssets = myPlaylistUtils::getEntryIdsCaptions($sourceEntry->getId());
-		$assets = array_merge($assets, $captionAssets);
+		$assets = array_merge($captionAssets, $flavorAssets);
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
 	}
 

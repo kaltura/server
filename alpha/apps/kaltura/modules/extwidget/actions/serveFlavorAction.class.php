@@ -936,7 +936,7 @@ class serveFlavorAction extends kalturaAction
 				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 			}
 			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
-			if (is_callable(array($asset, 'getLanguage')) && $asset->getLanguage())
+			if ($asset->getLanguage())
 			{
 				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
 				if ($languageCode && $languageCode !== 'und')
