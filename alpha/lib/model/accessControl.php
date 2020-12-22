@@ -268,15 +268,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$disableCache = false;
 		$ks = $this->scope ? $this->scope->getKs() : null;
 
-		$isKsReachVendor = false;
-		if( ($ks) &&
-			($ks->getRole() == UserRoleId::REACH_VENDOR_ROLE) &&
-			($ks->getPrivilegeValue(kSessionBase::PRIVILEGE_VIEW) == $this->scope->getEntryId()))
-		{
-			$isKsReachVendor = true;
-		}
-
 		$isKsAdmin = $ks && $ks->isAdmin();
+		$isKsReachVendor = $ks && ($ks->getRole() === UserRoleId::REACH_VENDOR_ROLE) &&
+			($ks->getPrivilegeValue(kSessionBase::PRIVILEGE_VIEW) === $this->scope->getEntryId());
 
 		$rules = $this->getRulesArray();
 		$specialProperties = $this->getSpecialProperties();
