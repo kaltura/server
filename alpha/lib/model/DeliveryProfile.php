@@ -392,7 +392,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					$audioLabel = $flavor->getLabel();
 				}
 				
-				$audioLanguageData = is_callable(array($flavor, 'getLanguage')) ? $this->getAudioLanguage($flavor) : null;
+				$audioLanguageData = $flavor->getLanguage() ? $this->getAudioLanguage($flavor) : null;
 				if (!$audioLanguageData) 
 				{
 					$audioLanguage = 'und';
