@@ -820,4 +820,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		}
 		
 	}
+
+	public function getLanguage()
+	{
+		return null;
+	}
 }
