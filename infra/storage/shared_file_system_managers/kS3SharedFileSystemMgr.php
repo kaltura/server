@@ -46,6 +46,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $endPoint;
 	protected $accessKeySecret;
 	protected $accessKeyId;
+	protected $storageClass;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -80,6 +81,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
+		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : AmazonS3FilesStorageClassType::STORAGE_CLASS_INTELLIGENT_TIERING;
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
@@ -215,6 +217,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	private function doPutFileHelper($filePath , $fileContent, $params)
 	{
+		$params['StorageClass'] = $this->storageClass;
+		
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		try
 		{
