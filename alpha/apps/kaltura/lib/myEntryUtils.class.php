@@ -786,10 +786,12 @@ class myEntryUtils
 		foreach ($thumbDirs as $thumbDir)
 		{
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version);
+			KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
 			if (file_exists($currPath) && @filesize($currPath))
 			{
 				if(myCloudUtils::shouldExportThumbToCloud())
 				{
+					KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath]");
 					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
 					if($moveFileSuccess)
 					{
