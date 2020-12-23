@@ -160,12 +160,11 @@
 				'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
 			);
 			
-			if($storageOptions && isset($storageOptions['accessKeyId']) && isset($storageOptions['accessKeySecret']))
-			{
-				$chunkConvertSharedStorageConfig['endPoint'] = isset($storageOptions['endPoint']) ? $storageOptions['endPoint'] : null;
-				$chunkConvertSharedStorageConfig['accessKeyId'] = isset($storageOptions['accessKeyId']) ? $storageOptions['accessKeyId'] : null;
-				$chunkConvertSharedStorageConfig['accessKeySecret'] = isset($storageOptions['accessKeySecret']) ? $storageOptions['accessKeySecret'] : null;
-			}
+			
+			$chunkConvertSharedStorageConfig['endPoint'] = isset($storageOptions['endPoint']) ? $storageOptions['endPoint'] : null;
+			$chunkConvertSharedStorageConfig['accessKeyId'] = isset($storageOptions['accessKeyId']) ? $storageOptions['accessKeyId'] : null;
+			$chunkConvertSharedStorageConfig['accessKeySecret'] = isset($storageOptions['accessKeySecret']) ? $storageOptions['accessKeySecret'] : null;
+			$chunkConvertSharedStorageConfig['concurrency'] = isset($storageOptions['concurrency']) ? $storageOptions['concurrency'] : null;
 			
 			
 			KalturaLog::debug("Config loaded: " . print_r($chunkConvertSharedStorageConfig, true));
@@ -178,6 +177,7 @@
 		{
 			kSharedFileSystemMgr::setFileSystemOptions('arnRole', $storageRunParams['arnRole']);
 			kSharedFileSystemMgr::setFileSystemOptions('s3Region', $storageRunParams['s3Region']);
+			kSharedFileSystemMgr::setFileSystemOptions('concurrency', $storageRunParams['concurrency']);
 			
 			if(isset($storageRunParams['endPoint'])) {
 				kSharedFileSystemMgr::setFileSystemOptions('endPoint', $storageRunParams['endPoint']);

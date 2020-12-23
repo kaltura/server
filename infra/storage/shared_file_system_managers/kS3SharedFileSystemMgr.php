@@ -47,6 +47,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $accessKeySecret;
 	protected $accessKeyId;
 	protected $storageClass;
+	protected $concurrency;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -81,6 +82,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
+		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
 		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : 'INTELLIGENT_TIERING';
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
@@ -217,8 +219,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	private function doPutFileHelper($filePath , $fileContent, $params)
 	{
+		$params['concurrency'] = $this->concurrency;
 		$params['StorageClass'] = $this->storageClass;
-		
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		try
 		{
