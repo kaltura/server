@@ -13,80 +13,80 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 				return true;
 		}
 
-        if($object instanceof KuserKgroup)
-        {
-                return true;
-        }
+		if($object instanceof KuserKgroup)
+		{
+				return true;
+		}
 
 
-		
+
 		return false;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see kObjectCreatedEventConsumer::objectCreated()
 	 */
 	public function objectCreated(BaseObject $object)
 	{
-        if ($object instanceof KuserKgroup)
-        {
-            $this->handleKuserKgroupCreated($object);
-        }
+		if ($object instanceof KuserKgroup)
+		{
+			return $this->handleKuserKgroupCreated($object);
+		}
 
-        if ($object instanceof Entry)
-        {
-            $this->handleEntryCreated($object);
-        }
+		if ($object instanceof entry)
+		{
+			return $this->handleEntryCreated($object);
+		}
 
-        return true;
+		return true;
 	}
 
-    protected function handleKuserKgroupCreated (KuserKgroup $object)
-    {
-        $kgroup = kuserPeer::retrieveByPK($object->getKgroupId());
-        $numberOfUsersPerGroup = $kgroup->getMembersCount();
-        $kgroup->setMembersCount($numberOfUsersPerGroup+1);
-        $kgroup->save();
-        return true;
-    }
+	protected function handleKuserKgroupCreated (KuserKgroup $object)
+	{
+		$kgroup = kuserPeer::retrieveByPK($object->getKgroupId());
+		$numberOfUsersPerGroup = $kgroup->getMembersCount();
+		$kgroup->setMembersCount($numberOfUsersPerGroup+1);
+		$kgroup->save();
+		return true;
+	}
 
-    protected function handleEntryCreated (Entry $object)
-    {
-        /* @var $object entry */
-        $rootEntryId = $object->getRootEntryId();
-        if(!$rootEntryId)
-            return true;
+	protected function handleEntryCreated (entry $object)
+	{
+		/* @var $object entry */
+		$rootEntryId = $object->getRootEntryId();
+		if(!$rootEntryId)
+			return true;
 
-        $liveEntry = entryPeer::retrieveByPK($rootEntryId);
-        if(!$liveEntry)
-        {
-            KalturaLog::info("Live entry with id [{$object->getRootEntryId()}] not found, categories will not be copied");
-            return true;
-        }
+		$liveEntry = entryPeer::retrieveByPK($rootEntryId);
+		if(!$liveEntry)
+		{
+			KalturaLog::info("Live entry with id [{$object->getRootEntryId()}] not found, categories will not be copied");
+			return true;
+		}
 
-        /* @var $liveEntry LiveEntry */
-        $recordingOptions = $liveEntry->getRecordingOptions();
-        if(!$recordingOptions)
-            return true;
+		/* @var $liveEntry LiveEntry */
+		$recordingOptions = $liveEntry->getRecordingOptions();
+		if(!$recordingOptions)
+			return true;
 
-        /* @var $recordingOptions kLiveEntryRecordingOptions */
-        if($recordingOptions->getShouldCopyEntitlement())
-        {
-            $this->syncEntryEntitlementInfo($object, $liveEntry);
-            $this->syncCategoryEntries($object, $liveEntry);
-        }
-        if ($recordingOptions->getShouldCopyThumbnail())
-        {
-            $this->syncLiveEntryThumbnail ($object, $liveEntry);
-        }
+		/* @var $recordingOptions kLiveEntryRecordingOptions */
+		if($recordingOptions->getShouldCopyEntitlement())
+		{
+			$this->syncEntryEntitlementInfo($object, $liveEntry);
+			$this->syncCategoryEntries($object, $liveEntry);
+		}
+		if ($recordingOptions->getShouldCopyThumbnail())
+		{
+			$this->syncLiveEntryThumbnail ($object, $liveEntry);
+		}
 
-        return true;
-    }
+		return true;
+	}
 
 	public function syncCategoryEntries(entry $vodEntry, LiveEntry $liveEntry)
 	{
 		$liveCategoryEntryArray = categoryEntryPeer::selectByEntryId($liveEntry->getId());
-		
+
 		if(!count($liveCategoryEntryArray))
 			return;
 
@@ -98,29 +98,29 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 			$vodCategoryEntry->save();
 		}
 	}
-	
+
 	public function syncEntryEntitlementInfo(entry $vodEntry, LiveEntry $liveEntry)
 	{
 		$entitledPusersEdit = $liveEntry->getEntitledPusersEdit();
 		$entitledPusersPublish = $liveEntry->getEntitledPusersPublish();
-		
+
 		if(!$entitledPusersEdit && !$entitledPusersPublish)
 			return;
-		
+
 		if($entitledPusersEdit)
 			$vodEntry->setEntitledPusersEdit($entitledPusersEdit);
-		
+
 		if($entitledPusersPublish)
 			$vodEntry->setEntitledPusersPublish($entitledPusersPublish);
-			
+
 		$vodEntry->save();
 	}
-	
+
 	protected function syncLiveEntryThumbnail (entry $object, LiveEntry $liveEntry)
 	{
 		//Get live entry thumbnails
 		$thumbAssetList = assetPeer::retrieveReadyThumbnailsByEntryId($liveEntry->getId());
-		
+
 		foreach ($thumbAssetList as $thumbAsset)
 		{
 			/* @var $thumbAsset thumbAsset */
