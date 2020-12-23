@@ -163,7 +163,7 @@ class kReachUtils
 	
 	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission)
 	{
-		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING);
+		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_MODERATION);
 		$activeTasks = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
 		$activeTasksOnOlderVersion = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, $statusArr);
 		if(($activeTasks || $activeTasksOnOlderVersion) && !$allowResubmission)
