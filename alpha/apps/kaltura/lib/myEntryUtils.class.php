@@ -791,7 +791,8 @@ class myEntryUtils
 			{
 				if(myCloudUtils::shouldExportThumbToCloud())
 				{
-					KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath]");
+					KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath], original file mtime: "
+						. date("Y-m-d H:i:s", filemtime($currPath)) );
 					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
 					if($moveFileSuccess)
 					{
