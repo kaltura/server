@@ -524,8 +524,9 @@ abstract class LiveEntry extends entry
 		}
 		else
 		{
-			// for external entry we have only live or offline status
-			return $this->isExternalCurrentlyLive($protocol) ? EntryServerNodeStatus::PLAYABLE : EntryServerNodeStatus::STOPPED;
+			// for external entry we have only live or offline status - so we should call isExternalCurrentlyLive and assign status PLAYABLE or STOPPED
+			// but do this on each liveEntry populate is take long time so external live entry will always have status of STOPPED
+			return EntryServerNodeStatus::STOPPED;
 		}
 	}
 
@@ -534,7 +535,11 @@ abstract class LiveEntry extends entry
 	 */
 	public function isCurrentlyLive($currentDcOnly = false, $protocol = null)
 	{
-		return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		{
+			return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+		}
+		return $this->isExternalCurrentlyLive($protocol);
 	}
 
 	protected function isExternalCurrentlyLive($reqProtocol = null)
