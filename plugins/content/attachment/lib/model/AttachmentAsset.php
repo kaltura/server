@@ -50,4 +50,13 @@ class AttachmentAsset extends asset
 	{
 		return $this->getFilename();
 	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see lib/model/ISyncableFile#getTypeFolderName()
+	 */
+	public function getTypeFolderName()
+	{
+		return 'attachments';
+	}
 }
