@@ -1968,7 +1968,7 @@ KalturaLog::log("==>\n");
 					$sourcePart = $mediaSet->_audio;
 					break;
 				default:
-					continue;
+					break;
 				}
 				if($sourcePart && is_array($subBlackList)
 				&& (in_array($sourcePart->_id, $subBlackList)

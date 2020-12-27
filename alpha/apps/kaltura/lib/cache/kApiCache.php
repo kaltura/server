@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
 require_once(dirname(__FILE__) . '/../request/kGeoUtils.php');
 require_once(dirname(__FILE__) . '/../kGeoCoderManager.php');
-require_once(dirname(__FILE__) . '/../monitor/KalturaMonitorClient.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/monitor/KalturaMonitorClient.php');
 
 /**
  * @package server-infra
@@ -93,12 +93,18 @@ class kApiCache extends kApiCacheBase
 	
 	protected function __construct($cacheType, $params = null)
 	{
-		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		if ($params)
 			$this->_params = $params;
 		else
 			$this->_params = infraRequestUtils::getRequestParams();
+
+		if(isset($this->_params['action'])  && isset($this->_params['service']))
+		{
+			$cacheType = kConf::getArrayValue($this->_params['service'] . '_' . $this->_params['action'], 'api_v3', 'cache', $cacheType);
+		}
+
+		$this->_cacheStoreTypes = kCacheManager::getCacheSectionNames($cacheType);
 
 		parent::__construct();
 	}
@@ -779,16 +785,22 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			usleep(50000);
+			KalturaMonitorClient::usleep(50000);
 		}
-		
-		if(isset($this->_params['service']))
+
+		$action = null;
+		if (get_class($this) == 'kPlayManifestCacher')
+		{
+			$action = 'extwidget.playManifest';
+		}
+		else if (isset($this->_params['service']) && isset($this->_params['action']) && $this->_params['service'] != 'multirequest')
+		{
+			$action = $this->_params['service'] . '.' . $this->_params['action'];
+		}
+
+		if ($action)
 		{
 			$isInMultiRequest = isset($this->_params['multirequest']);
-			$action = $this->_params['service'];
-			if ($action != 'multirequest' && isset($this->_params['action']))
-				$action = $this->_params['service'] . '.' . $this->_params['action'];
-		
 			KalturaMonitorClient::monitorApiStart($result !== false, $action, $this->_partnerId, $this->getCurrentSessionType(), $this->clientTag, $isInMultiRequest);
 
 			foreach ($this->_monitorEvents as $event)

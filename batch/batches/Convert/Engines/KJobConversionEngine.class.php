@@ -9,6 +9,8 @@ require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/dateUtils.class.php');
 require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/storage/kFileUtils.php');
 abstract class KJobConversionEngine extends KConversionEngine
 {
+	const SEC_TIMEOUT = 10;
+	
 	/**
 	 * @param KalturaConvertJobData $data
 	 * @return array<KConversioEngineResult>
@@ -46,7 +48,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 			
 				if($lastIndex > $index)
 				{
-					$uniqid = uniqid("tmp_convert_");
+					$uniqid = uniqid("tmp_convert_", true);
 					$this->outFilePath = $tempPath . DIRECTORY_SEPARATOR . $uniqid;
 				}
 				else
@@ -91,7 +93,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 		$error_message = "";  
 		$actualFileSyncLocalPath = $this->getSrcActualPathFromData($data);
-		if ( ! file_exists ( $actualFileSyncLocalPath ) )
+		if ( ! kFile::checkFileExists( $actualFileSyncLocalPath ) )
 		{
 			$error_message = "File [{$actualFileSyncLocalPath}] does not exist";
 			KalturaLog::err(  $error_message );
@@ -132,9 +134,16 @@ abstract class KJobConversionEngine extends KConversionEngine
                                 $urgency = null;
 	
 			$start = microtime(true);
+			
+			$sharedChunkPath = null;
+			if(isset(KBatchBase::$taskConfig->params->sharedChunkPath))
+			{
+				$sharedChunkPath = KBatchBase::$taskConfig->params->sharedChunkPath;
+			}
+			
 			// TODO add BatchEvent - before conversion + conversion engine
-			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $urgency, $jobId);
-			// TODO add BatchEvent - after conversion + conversion engine		
+			$output = $this->execute_conversion_cmdline($execution_command_str, $return_value, $urgency, $jobId, $sharedChunkPath);
+			// TODO add BatchEvent - after conversion + conversion engine
 			$end = microtime(true);
 	
 			// 	TODO - find some place in the DB for the duration
@@ -160,13 +169,18 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected function isConversionProgressing($currentModificationTime)
 	{
-		if (kFile::checkFileExists($this->inFilePath))
+		if (kFile::checkFileExists($this->inFilePath) && !kFile::checkIsDir($this->inFilePath))
 		{
 			$newModificationTime = kFile::getFileLastUpdatedTime($this->inFilePath);
-			if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
-			{
-				return $newModificationTime;
-			}
+		}
+		else
+		{
+			$newModificationTime = kFileUtils::getMostRecentModificationTimeFromDir($this->inFilePath);
+		}
+
+		if ($newModificationTime !== false && $newModificationTime > $currentModificationTime)
+		{
+			return $newModificationTime;
 		}
 		return false;
 	}
@@ -191,7 +205,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 	/**
 	 *
 	 */
-	protected function execute_conversion_cmdline($command, &$return_var, $urgency, $jobId = null)
+	protected function execute_conversion_cmdline($command, &$return_var, $urgency, $jobId = null, $sharedChunkPath = null)
 	{
 		if (isset(KBatchBase::$taskConfig->params->usingSmartJobTimeout) && KBatchBase::$taskConfig->params->usingSmartJobTimeout == 1)
 		{
@@ -238,7 +252,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				}
 				$currentModificationTime = $newModificationTime;
 			}
-			sleep(1);
+			sleep(self::SEC_TIMEOUT);
 			if(self::isReachedTimeout($timeout))
 			{
 				pclose($handle);
@@ -270,7 +284,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 
 	protected static function isReachedTimeout(&$timeout)
 	{
-		$timeout--;
+		$timeout -= self::SEC_TIMEOUT;
 		if($timeout <= 0)
 		{
 			KalturaLog::debug("Reached to TIMEOUT");

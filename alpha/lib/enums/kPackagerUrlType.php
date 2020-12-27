@@ -11,4 +11,5 @@ interface kPackagerUrlType extends BaseEnum
 	const LOCAL_LIVE_THUMB = 4;
 	const REGULAR_VOLUME_MAP = 5;
 	const MAPPED_VOLUME_MAP = 6;
+	const REMOTE_VOLUME_MAP = 7;
 }

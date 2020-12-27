@@ -18,6 +18,8 @@ class myPartnerUtils
 	const MARKETO_NEW_INTERNAL_TRIAL_ACCOUNT = 'marketo_new_register_internal_success_campaign';
 	const MARKETO_MISSING_PASSWORD = 'marketo_missing_Password_campaign';
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
+
+	const TYPE_DOWNLOAD = 'download';
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -1486,6 +1488,11 @@ class myPartnerUtils
  		UserRolePeer::setUseCriteriaFilter ( true );
  		foreach($roles as $role)
  		{
+			$UserRolesNamesToIgnore = kConf::get('partner_copy_user_roles_ignore_list', 'local', array());
+ 			if (in_array($role->getName(), $UserRolesNamesToIgnore))
+			{
+				continue;
+			}
  			$newRole = $role->copyToPartner($toPartner->getId());
  			$newRole->save();
  		}
@@ -1759,16 +1766,17 @@ class myPartnerUtils
 			}
 		}
 	}
-	
+
 	/**
 	 * Ensure the request for media arrived in a way approved by the partner.
 	 * this may include restricting to a specific cdn, enforcing token usage etc..
 	 * Die in case of a breach.
-	 * 
+	 *
 	 * @param entry $entry
 	 * @param asset $asset
+	 * @param $storageProfileId
 	 */
-	public static function enforceDelivery($entry, $asset = null)
+	public static function enforceDelivery($entry, $asset = null, $storageProfileId = null)
 	{
 		// block inactive partner
 		$partnerId = $entry->getPartnerId();
@@ -1777,7 +1785,26 @@ class myPartnerUtils
 		// validate serve access control
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
-		$secureEntryHelper->validateForServe($flavorParamsId);
+		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
+
+		if(!is_null($storageProfileId))
+		{
+			$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+			switch($downloadAllowed)
+			{
+				case kUrlRecognizer::RECOGNIZED_OK:
+					return;
+				case kUrlRecognizer::RECOGNIZED_NOT_OK:
+					KalturaLog::debug('Failed to recognize url due to wrong or missing signing');
+					KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'Failed to parse signature');
+					break;
+			}
+		}
+
+		if(!$validServe)
+		{
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
+		}
 
 		// enforce delivery
 		$partner = PartnerPeer::retrieveByPK($partnerId);		// Note: Partner was already loaded by blockInactivePartner, no need to check for null
@@ -1786,9 +1813,10 @@ class myPartnerUtils
 		if ($restricted)
 		{
 			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
-			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);			
+			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 		}
 	}
+
 	
 	public static function getPartnersArray(array $partnerIds, Criteria $c = null)
 	{
@@ -2182,6 +2210,48 @@ class myPartnerUtils
 			return PartnerAuthenticationType::TWO_FACTOR_AUTH;
 		}
 		return PartnerAuthenticationType::PASSWORD_ONLY;
+	}
+
+	public static function isDownloadAllowed ($storageProfileId, $entryId)
+	{
+		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
+		if(!$downloadDeliveryProfile)
+		{
+			return kUrlRecognizer::NOT_RECOGNIZED;
+		}
+
+		$downloadRecognizer = $downloadDeliveryProfile->getRecognizer();
+		if($downloadRecognizer)
+		{
+			return $downloadRecognizer->isRecognized(null);
+		}
+
+		return kUrlRecognizer::NOT_RECOGNIZED;
+	}
+
+	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)
+	{
+		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
+		if(!$storageProfile)
+		{
+			return null;
+		}
+
+		$deliveryProfileIds = $storageProfile->getDeliveryProfileIds();
+		if(!$deliveryProfileIds || !isset($deliveryProfileIds[self::TYPE_DOWNLOAD]))
+		{
+			return null;
+		}
+		$downloadDeliveryProfileId = $deliveryProfileIds[self::TYPE_DOWNLOAD][0];
+		$downloadDeliveryProfile = DeliveryProfilePeer::retrieveByPK($downloadDeliveryProfileId);
+
+		if($downloadDeliveryProfile)
+		{
+			$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, PlaybackProtocol::HTTP);
+			$downloadDeliveryProfile->setDynamicAttributes($deliveryAttributes);
+		}
+
+		return $downloadDeliveryProfile;
 	}
 
 }

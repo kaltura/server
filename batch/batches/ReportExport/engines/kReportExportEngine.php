@@ -24,6 +24,17 @@ abstract class kReportExportEngine
 		}
 	}
 
+	public function getEmailFileName()
+	{
+		$emailFile = trim($this->reportItem->reportTitle);
+		if ($emailFile && preg_match('/^\w[\w\s]*$/', $emailFile))
+		{
+			return $emailFile;
+		}
+
+		return null;
+	}
+
 	abstract public function createReport();
 	abstract protected function buildCsv($res);
 
@@ -91,6 +102,12 @@ abstract class kReportExportEngine
 		{	
 			$categoriesIds = $filter->categoriesIdsIn;
 			$this->writeRow("Filtered categories: $categoriesIds");
+		}
+
+		if ($filter->userIds)
+		{
+			$userIds = $filter->userIds;
+			$this->writeRow("Filtered users: $userIds");
 		}
 
 		if (isset($filter->playbackContext))

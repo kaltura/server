@@ -112,7 +112,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	{
 		if($job->executionAttempts > 1) // is a retry
 		{
-			if(	strlen($data->destFileSyncLocalPath) && file_exists($data->destFileSyncLocalPath) 
+			if(	strlen($data->destFileSyncLocalPath) && kFile::checkFileExists($data->destFileSyncLocalPath)
 				&& $this->checkExtraDestFileSyncsFetched($data->extraDestFileSyncs))
 			{
 				return $this->moveFile($job, $data);
@@ -154,7 +154,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			return true;
 		foreach ($extraDestFileSyncs as $fileSync) 
 		{
-			if(!$fileSync->fileSyncLocalPath || !file_exists($fileSync->fileSyncLocalPath))
+			if(!$fileSync->fileSyncLocalPath || !kFile::checkFileExists($fileSync->fileSyncLocalPath))
 				return false;
 		}
 		return true;
@@ -162,12 +162,11 @@ class KAsyncConvertCloser extends KJobCloserWorker
 	
 	private function moveFile(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
-		$uniqid = uniqid('convert_');
-		$sharedFile = $this->sharedTempPath . DIRECTORY_SEPARATOR . $uniqid;
+		$sharedFile = $data->destFileSyncSharedPath ? $data->destFileSyncSharedPath : $this->sharedTempPath . DIRECTORY_SEPARATOR . uniqid('convert_');
 		
 		try
 		{
-			rename($data->logFileSyncLocalPath, "$sharedFile.log");
+			kFile::rename($data->logFileSyncLocalPath, "$sharedFile.log");
 		}
 		catch(Exception $ex)
 		{
@@ -216,8 +215,8 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			$newName = $newName.'.'.$ext;
 		}
 		$fileSize = kFile::fileSize($oldName);
-		rename($oldName, $newName);
-		if(!file_exists($newName) || kFile::fileSize($newName) != $fileSize)
+		kFile::rename($oldName, $newName);
+		if(!kFile::checkFileExists($newName) || kFile::fileSize($newName) != $fileSize)
 		{
 			KalturaLog::err("Error: moving file failed: ".$oldName);
 			die();
@@ -236,7 +235,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 		try
 		{
 			$curlWrapper = new KCurlWrapper();
-			$curlHeaderResponse = $curlWrapper->getHeader($srcFileSyncRemoteUrl, true);
+			$curlHeaderResponse = $curlWrapper->getHeader($srcFileSyncRemoteUrl, true, true);
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{
 				$errDescription = "Error: " . $curlWrapper->getError();
@@ -265,7 +264,7 @@ class KAsyncConvertCloser extends KJobCloserWorker
 			}
 			$curlWrapper->close();
 			
-			if(!file_exists($srcFileSyncLocalPath))
+			if(!kFile::checkFileExists($srcFileSyncLocalPath))
 			{
 				$errDescription = "Error: output file doesn't exist";
 				return false;

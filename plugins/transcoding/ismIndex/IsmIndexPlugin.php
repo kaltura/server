@@ -128,7 +128,8 @@ class IsmIndexPlugin extends KalturaPlugin implements IKalturaObjectLoader, IKal
 			}								
 		}
 		
-		$jobData->setSrcFileSyncs(array_merge($jobData->getSrcFileSyncs(), $additionalFileSyncs));
+		$jobDataSrcFileSyncs = $jobData->getSrcFileSyncs() ? $jobData->getSrcFileSyncs() : array();
+		$jobData->setSrcFileSyncs(array_merge($jobDataSrcFileSyncs, $additionalFileSyncs));
 		return $jobData;
 		
 	}

@@ -209,6 +209,9 @@ abstract class kManifestRenderer
 			'playSessionId' => 'sessionId',
 			'clientTag' => 'clientTag', 
 			'playbackType' => 'playbackType',
+			'customVar1' => 'customVar1',
+			'customVar2' => 'customVar2',
+			'customVar3' => 'customVar3',
 		);
 		foreach ($mapping as $src => $dest)
 		{
@@ -281,7 +284,7 @@ abstract class kManifestRenderer
 		$out .= "\r\n";
 
 		// send the request
-		$fp = fsockopen($host, $port, $errno, $errstr, 1);
+		$fp = fsockopen($host, $port, $errno, $errstr, 0.1);
 		if ($fp === false)
 		{
 			return;

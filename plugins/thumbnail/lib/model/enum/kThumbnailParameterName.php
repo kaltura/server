@@ -27,7 +27,6 @@ interface kThumbnailParameterName extends BaseEnum
 	const STROKE_COLOR = 'strokeColor';
 	const FILL_COLOR = 'fillColor';
 	const SECOND = 'second';
-	const ENTRY_SOURCE = 'entrySource';
 	const SLICE_NUMBER = 'sliceNumber';
 	const NUMBER_OF_SLICES = 'numberOfSlices';
 	const START_SEC = 'startSec';
@@ -39,4 +38,6 @@ interface kThumbnailParameterName extends BaseEnum
 	const SIZE_CORRECTION = 'sizeCorrection';
 	const IMAGE_FORMAT = 'format';
 	const QUALITY = 'quality';
+	const DENSITY = 'density';
+	const EXTEND_VECTOR = 'extendVector';
 }

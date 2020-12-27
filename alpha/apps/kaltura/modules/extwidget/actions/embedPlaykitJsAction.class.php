@@ -11,6 +11,7 @@ class embedPlaykitJsAction extends sfAction
 	const VERSIONS_PARAM_NAME = "versions";
 	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
+	const PLAYLIST_ID_PARAM_NAME = "playlist_id";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -21,6 +22,11 @@ class embedPlaykitJsAction extends sfAction
 	const CANARY = "{canary}";
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
+	const PLAYKIT_KAVA = 'playkit-kava';
+	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
+	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
+	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
+	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -45,6 +51,9 @@ class embedPlaykitJsAction extends sfAction
 
 	public function execute()
 	{
+	    // Return 404 in case of error to avoid CDN caching
+		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
+
 		$this->initMembers();
 
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
@@ -97,10 +106,19 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$content = json_decode($content, true);
-		if(!$content || !$content['bundle'])
-		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
-		}
+
+        if (isset($content['status'])) {
+            if ($content['status'] != 0) {
+                $message = $content['message'];
+                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . ". " . $message);
+            } else {
+                $content = $content['payload'];
+            }
+        } else {
+            if (!$content || !$content['bundle']) {
+                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
+            }
+        }
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
@@ -384,11 +402,15 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
-		if (!$entry_id)
-		{
-			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry ID not defined");
+		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+		$loadContentMethod = "";
+		if (!is_null($entry_id)) {
+		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
+		} elseif (!is_null($playlist_id)) {
+		    $loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
+		} else {
+		    KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry and Playlist ID not defined");
 		}
-
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
 		foreach ($config as $key=>$val)
@@ -422,7 +444,7 @@ class embedPlaykitJsAction extends sfAction
 		$autoEmbedCode = "
 		try {
 			var kalturaPlayer = KalturaPlayer.setup($config);
-			kalturaPlayer.loadMedia({entryId: \"" . $entry_id . "\"});
+			$loadContentMethod
 		} catch (e) {
 			console.error(e.message);
 		}
@@ -512,6 +534,41 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
+	private function maybeAddAnalyticsPlugins()
+	{
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
+		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
+		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig))
+		{
+			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
+			list($latestVersionMap) = $this->getConfigByVersion("latest");
+			list($betaVersionMap) = $this->getConfigByVersion("beta");
+			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
+			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+
+			// For player latest/beta >= 0.56.0 or canary
+			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
+				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
+				$playerVersion == self::CANARY)
+			{
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
+				if ($tvPlayerConfig)
+				{
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
+				}
+			}
+			// For specific version >= 0.56.0
+			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
+			{
+				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
+				if ($tvPlayerConfig)
+				{
+					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
+				}
+			}
+		}
+	}
+
 	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -594,7 +651,7 @@ class embedPlaykitJsAction extends sfAction
 		//Get bundle configuration stored in conf_vars
 		$confVars = $this->uiConf->getConfVars();
 		if (!$confVars) {
-			KExternalErrors::dieGracefully("Missing bundle configuration in uiConf, uiConfID: $this->uiconfId");
+            		KExternalErrors::dieError(KExternalErrors::MISSING_BUNDLE_CONFIGURATION, "" . $this->uiconfId);
 		}
 
 		//Get partner ID from QS or from UI conf
@@ -649,7 +706,8 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
-        $this->setFixVersionsNumber();
+		$this->maybeAddAnalyticsPlugins();
+		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
 

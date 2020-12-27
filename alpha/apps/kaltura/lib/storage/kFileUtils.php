@@ -12,7 +12,7 @@ class kFileUtils extends kFile
 	public static function pollFileExists($file_name)
 	{
 		$nfs_file_tries = 0;
-		while(! file_exists($file_name))
+		while(! kFile::checkFileExists($file_name))
 		{
 			//			clearstatcache(true,$file_name);
 			clearstatcache();
@@ -25,7 +25,7 @@ class kFileUtils extends kFile
 			}
 			else
 			{
-				sleep(3);
+				KalturaMonitorClient::sleep(3);
 			}
 		}
 	}
@@ -49,22 +49,32 @@ class kFileUtils extends kFile
 		return false;
 	}
 
-	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null, $fileSize = null)
+	public static function getDumpFileRenderer($filePath, $mimeType, $maxAge = null, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null, $fileSize = null, $allowRemote = false, $fileExt = null)
 	{
 		self::closeDbConnections();
+
+		if(!$allowRemote)
+		{
+			self::pollFileExists($filePath);
+
+			// if by now there is no file - die !
+			if(! kFile::checkFileExists($filePath))
+			{
+				if (class_exists('KalturaLog'))
+				{
+					KalturaLog::log("file not found: $filePath");
+				}
+
+				KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
+			}
+		}
 		
-		self::pollFileExists($filePath);
-		
-		// if by now there is no file - die !
-		if(! file_exists($filePath))
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-		
-		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key, $iv, $fileSize);
+		return new kRendererDumpFile($filePath, $mimeType, self::xSendFileAllowed($filePath), $maxAge, $limitFileSize, $lastModified, $key, $iv, $fileSize, $fileExt);
 	}
 	
-	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null)
+	public static function dumpFile($file_name, $mime_type = null, $max_age = null, $limit_file_size = 0, $key = null, $iv = null, $fileSize = null, $allowRemote = false, $fileExt = null)
 	{
-		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size, null, $key, $iv, $fileSize);
+		$renderer = self::getDumpFileRenderer($file_name, $mime_type, $max_age, $limit_file_size, null, $key, $iv, $fileSize, $allowRemote, $fileExt);
 		
 		$renderer->output();
 		
@@ -152,8 +162,10 @@ class kFileUtils extends kFile
 		
 		header("X-Kaltura:dumpApiRequest " . kDataCenterMgr::getCurrentDcId());
 		// grab URL and pass it to the browser
+		$start = microtime(true);
 		$content = curl_exec($ch);
-		
+		KalturaMonitorClient::monitorCurl($host, microtime(true) - $start);
+
 		// close curl resource, and free up system resources
 		curl_close($ch);
 		KExternalErrors::dieGracefully();
@@ -254,7 +266,9 @@ class kFileUtils extends kFile
 		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 		header("X-Kaltura:dumpUrl");
 		// grab URL and pass it to the browser
+		$start = microtime(true);
 		$content = curl_exec($ch);
+		KalturaMonitorClient::monitorCurl($urlHost, microtime(true) - $start);
 		KalturaLog::debug("CURL executed [$content]");
 		
 		// close curl resource, and free up system resources

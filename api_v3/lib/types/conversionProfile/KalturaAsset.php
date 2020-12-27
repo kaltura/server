@@ -115,6 +115,15 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	 * @var string
 	 */
 	public $actualSourceAssetParamsIds;
+
+
+	/**
+	 * The size (in Bytes) of the asset
+	 *
+	 * @var int
+	 * @readonly
+	 */
+	public $sizeInBytes;
 	
 	private static $map_between_objects = array
 	(
@@ -132,6 +141,7 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 		"partnerData",
 		"partnerDescription",
 		"actualSourceAssetParamsIds",
+		"sizeInBytes"
 	);
 	
 	public function getMapBetweenObjects ( )

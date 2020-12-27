@@ -589,7 +589,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							continue;
 
 						$getHostFromDeliveryProfile = array(DeliveryProfileType::VOD_PACKAGER_HLS, DeliveryProfileType::VOD_PACKAGER_HLS_MANIFEST);
-						if(in_array($config->deliveryProfile->getType(), $getHostFromDeliveryProfile) && !$config->storageId)
+						if( in_array($config->deliveryProfile->getType(), $getHostFromDeliveryProfile) &&
+							(!$config->storageId || in_array($config->storageId, kStorageExporter::getPeriodicStorageIds())) )
 						{
 							$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
 							$host = $protocol . '://' . $config->deliveryProfile->getHostName();

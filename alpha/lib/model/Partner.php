@@ -86,6 +86,12 @@ class Partner extends BasePartner
 
 	const CUSTOM_DATA_ALLOWED_FROM_EMAIL_WHITELIST = 'allowedFromEmailWhiteList';
 
+	const CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID = 'shared_storage_profile_id';
+
+	const LIVE_CONCURRENT_BY_ADMIN_TAG = 'live_concurrent_by_admin_tag';
+
+	const ALL_PARTNERS_WILD_CHAR = "*";
+  
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -1137,6 +1143,16 @@ class Partner extends BasePartner
 			$liveRtcStreamInputs = kConf::get('live_rtc_concurrent_streams', 'local', 2);
 		return $liveRtcStreamInputs;
 	}
+
+	public function setMaxConcurrentLiveByAdminTag($limitsArray)			{
+		$this->putInCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG, $limitsArray);
+	}
+
+	public function getMaxConcurrentLiveByAdminTag()			{
+		$defaultValues = kConf::get('ConcurrentLiveLimitByAdminTag_DefaultValues', 'local', array());
+		return array_replace($defaultValues, (array)$this->getFromCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG));
+	}
+
 	public function getLoginUsersOveragePrice()			{return $this->getFromCustomData('login_users_overage_price');}
 	public function getAdminLoginUsersOveragePrice()	{return $this->getFromCustomData('admin_login_users_overage_price');}
 	public function getPublishersOveragePrice()			{return $this->getFromCustomData('publishers_overage_price');}
@@ -2164,7 +2180,35 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
+	
+	public function getSharedStorageProfileId()
+	{
+		$sharedStorageId = null;
+		$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
 
+		$sharedIncludePartnerIds = kConf::get('shared_include_partner_ids', 'cloud_storage', array());
+		if (in_array($this->getId(), $sharedIncludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedIncludePartnerIds))
+		{
+			$sharedStorageId = reset($allSharedStorageIds);
+		}
 
+		$sharedPartnerPackages = kConf::get('shared_partner_package_types', 'cloud_storage', array());
+		if (in_array($this->getPartnerPackage(), $sharedPartnerPackages) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedPartnerPackages))
+		{
+			$sharedStorageId = reset($allSharedStorageIds);
+		}
 
+		$sharedExcludePartnerIds = kConf::get('shared_exclude_partner_ids', 'cloud_storage', array());
+		if (in_array($this->getId(), $sharedExcludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedExcludePartnerIds))
+		{
+			$sharedStorageId = null;
+		}
+
+		return $sharedStorageId;
+	}
+	
+	public function setSharedStorageProfileId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID, $v);
+	}
 }

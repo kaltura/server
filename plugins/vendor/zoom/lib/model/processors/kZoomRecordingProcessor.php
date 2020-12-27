@@ -11,12 +11,24 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	protected $zoomClient;
 
 	/**
+	 * @var ZoomVendorIntegration
+	 */
+	protected $zoomIntegration;
+
+	/**
+	 * @var entry
+	 */
+	protected $mainEntry;
+
+	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
 	 */
 	public function __construct($zoomBaseUrl)
 	{
 		$this->zoomClient = new kZoomClient($zoomBaseUrl);
+		$this->mainEntry = null;
+		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
 	}
 
 	/**
@@ -52,28 +64,29 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	public function handleRecordingVideoComplete($event)
 	{
-		$zoomIntegration = ZoomHelper::getZoomIntegration();
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
-		$dbUser = $this->getEntryOwner($recording->hostEmail, $zoomIntegration);
+		$dbUser = $this->getEntryOwner($recording->hostEmail, $this->zoomIntegration);
 		if($this->wasEventHandled($recording, $dbUser))
 		{
 			return;
 		}
 
-		$extraUsers = $this->getAdditionalUsers($recording->id, $zoomIntegration, $dbUser->getPuserId());
-		$entry = null;
-		foreach ($recording->recordingFiles[kRecordingFileType::VIDEO] as $recordingFile)
+		$extraUsers = $this->getAdditionalUsers($recording->id, $dbUser->getPuserId());
+		foreach ($recording->recordingFiles as $recordingFilesPerTimeSlot)
 		{
-			$entry = $this->handleVideoRecord($recording, $dbUser, $zoomIntegration, $extraUsers, $recordingFile, $event);
-		}
-
-		if(isset($recording->recordingFiles[kRecordingFileType::CHAT]))
-		{
-			$chatFilesProcessor = new kZoomChatFilesProcessor();
-			foreach ($recording->recordingFiles[kRecordingFileType::CHAT] as $recordingFile)
+			foreach ($recordingFilesPerTimeSlot[kRecordingFileType::VIDEO] as $recordingFile)
 			{
-				$chatFilesProcessor->handleChatRecord($entry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
+				$this->handleVideoRecord($recording, $dbUser, $extraUsers, $recordingFile, $event);
+			}
+
+			if (isset($recordingFilesPerTimeSlot[kRecordingFileType::CHAT]))
+			{
+				$chatFilesProcessor = new kZoomChatFilesProcessor();
+				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
+				{
+					$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
+				}
 			}
 		}
 	}
@@ -81,7 +94,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	/**
 	 * @param kZoomRecording $recording
 	 * @param kuser $owner
-	 * @param $zoomIntegration
 	 * @param $validatedUsers
 	 * @param kZoomRecordingFile $recordingFile
 	 * @param kZoomEvent $event
@@ -90,12 +102,18 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 * @throws kCoreException
 	 * @throws Exception
 	 */
-	protected function handleVideoRecord($recording, $owner, $zoomIntegration, $validatedUsers, $recordingFile, $event)
+	protected function handleVideoRecord($recording, $owner, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromRecording($recording, $owner);
-		$this->setEntryCategory($zoomIntegration, $entry);
-		$this->handleParticipants($entry, $validatedUsers, $zoomIntegration);
+		$this->setEntryCategory($entry);
+		$this->handleParticipants($entry, $validatedUsers);
 		$entry->save();
+
+		if(!$this->mainEntry)
+		{
+			$this->mainEntry = $entry;
+		}
+
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
 		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
 		return $entry;
@@ -104,21 +122,20 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	/**
 	 * @param entry $entry
 	 * @param array $validatedUsers
-	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @throws kCoreException
 	 */
-	protected function handleParticipants($entry, $validatedUsers, $zoomIntegration)
+	protected function handleParticipants($entry, $validatedUsers)
 	{
-		$handleParticipantMode = $zoomIntegration->getHandleParticipantsMode();
+		$handleParticipantMode = $this->zoomIntegration->getHandleParticipantsMode();
 		if ($validatedUsers && $handleParticipantMode != kHandleParticipantsMode::IGNORE)
 		{
 			switch ($handleParticipantMode)
 			{
 				case kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS:
-					$entry->setEntitledPusersPublish(implode(",", array_unique($validatedUsers)));
+					$entry->setEntitledPusersPublish(implode(',', array_unique($validatedUsers)));
 					break;
 				case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
-					$entry->setEntitledPusersView(implode(",", array_unique($validatedUsers)));
+					$entry->setEntitledPusersView(implode(',', array_unique($validatedUsers)));
 					break;
 			}
 		}
@@ -163,11 +180,10 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	}
 
 	/**
-	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param entry $entry
 	 * @throws kCoreException
 	 */
-	protected abstract function setEntryCategory($zoomIntegration, $entry);
+	protected abstract function setEntryCategory($entry);
 
 	/**
 	 * @param kZoomRecording $recording
@@ -190,30 +206,34 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($owner->getPartnerId())->getId());
 		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
 		$entry->setReferenceID(self::ZOOM_PREFIX . $recording->uuid);
+		if($this->zoomIntegration->getConversionProfileId())
+		{
+			$entry->setConversionProfileId($this->zoomIntegration->getConversionProfileId());
+		}
+
 		return $entry;
 	}
 
 	/**
 	 * @param string $recordingId
-	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param sting $userToExclude
 	 * @return array|null
 	 */
-	protected function getAdditionalUsers($recordingId, $zoomIntegration, $userToExclude)
+	protected function getAdditionalUsers($recordingId, $userToExclude)
 	{
-		if ($zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
+		if ($this->zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
 		{
 			return null;
 		}
 
 		$userToExclude = strtolower($userToExclude);
-		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
+		$accessToken = kZoomOauth::getValidAccessToken($this->zoomIntegration);
 		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($accessToken, $recordingId);
-		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration);
-		return $this->getValidatedUsers($additionalZoomUsers, $zoomIntegration->getPartnerId(), $zoomIntegration->getCreateUserIfNotExist(), $userToExclude);
+		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse);
+		return $this->getValidatedUsers($additionalZoomUsers, $this->zoomIntegration->getPartnerId(), $this->zoomIntegration->getCreateUserIfNotExist(), $userToExclude);
 	}
 
 	protected abstract function getAdditionalUsersFromZoom($accessToken, $recordingId);
 
-	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse, $zoomIntegration);
+	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse);
 }

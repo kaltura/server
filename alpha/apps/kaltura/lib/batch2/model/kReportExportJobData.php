@@ -32,6 +32,16 @@ class kReportExportJobData extends kJobData
 	protected $filePaths;
 
 	/**
+	 * @var array
+	 */
+	protected $files;
+
+	/**
+	 * @var string
+	 */
+	protected $reportsGroup;
+
+	/**
 	 * @return string
 	 */
 	public function getRecipientEmail()
@@ -109,6 +119,38 @@ class kReportExportJobData extends kJobData
 	public function setFilePaths($filePaths)
 	{
 		$this->filePaths = $filePaths;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getFiles()
+	{
+		return $this->files;
+	}
+
+	/**
+	 * @param array $files
+	 */
+	public function setFiles($files)
+	{
+		$this->files = $files;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getReportsGroup()
+	{
+		return $this->reportsGroup ? $this->reportsGroup : ' ';
+	}
+
+	/**
+	 * @param string $reportsGroup
+	 */
+	public function setReportsGroup($reportsGroup)
+	{
+		$this->reportsGroup = $reportsGroup;
 	}
 
 }

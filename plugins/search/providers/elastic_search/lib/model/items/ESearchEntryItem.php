@@ -12,6 +12,11 @@ class ESearchEntryItem extends ESearchItem
 	protected $fieldName;
 
 	/**
+	 * @var bool
+	 */
+	protected $ignoreDisplayInSearch = true;
+
+	/**
 	 * @var string
 	 */
 	protected $searchTerm;
@@ -110,6 +115,22 @@ class ESearchEntryItem extends ESearchItem
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getIgnoreDisplayInSearch()
+	{
+		return $this->ignoreDisplayInSearch;
+	}
+
+	/**
+	 * @param bool $ignoreDisplayInSearch
+	 */
+	public function setIgnoreDisplayInSearch($ignoreDisplayInSearch)
+	{
+		$this->ignoreDisplayInSearch = $ignoreDisplayInSearch;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getSearchTerm()
@@ -177,25 +198,29 @@ class ESearchEntryItem extends ESearchItem
 				$subQuery = kESearchQueryManager::getRangeQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
 				break;
 			default:
-				KalturaLog::log("Undefined item type[".$this->getItemType()."]");
+				KalturaLog::log("Undefined item type[" . $this->getItemType() . "]");
 		}
 
-		if ($this->getItemType() == ESearchItemType::EXACT_MATCH && in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields))
+		if ($this->getItemType() == ESearchItemType::EXACT_MATCH
+			&& in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields)
+			&& $this->getIgnoreDisplayInSearch())
+		{
 			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
-
-		if($subQuery)
+		}
+		if ($subQuery)
 			$entryQuery[] = $subQuery;
 	}
 
 	protected function getExactMatchQuery($allowedSearchTypes, &$queryAttributes)
 	{
 		$exactQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-
+		
+		$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
 		if (in_array($this->getFieldName(), array(ESearchEntryFieldName::ENTITLED_USER_EDIT,ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
 			ESearchEntryFieldName::ENTITLED_USER_VIEW, ESearchEntryFieldName::USER_ID)))
 		{
 			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
-				array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+				array('index' => $indexName,
 					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 					'id' => $this->getSearchTerm(),
 					'path' => ESearchUserFieldName::GROUP_IDS));

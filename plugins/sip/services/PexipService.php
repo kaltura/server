@@ -26,11 +26,12 @@ class PexipService extends KalturaBaseService
 	/**
 	 * @action generateSipUrl
 	 * @param string $entryId
+	 * @param KalturaSipSourceType $sourceType
 	 * @param bool $regenerate
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateSipUrlAction($entryId, $regenerate = false)
+	public function generateSipUrlAction($entryId, $regenerate = false, $sourceType = KalturaSipSourceType::PICTURE_IN_PICTURE)
 	{
 		kApiCache::disableCache();
 		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SIP, $this->getPartnerId()))
@@ -47,14 +48,21 @@ class PexipService extends KalturaBaseService
 			kPexipHandler::deleteCallObjects($dbLiveEntry, $pexipConfig);
 		}
 
+		$dualStreamLiveEntry = kPexipUtils::validateAndRetrieveDualStreamEntry($dbLiveEntry, $sourceType);
+
 		$sipToken = kPexipUtils::generateSipToken($dbLiveEntry, $pexipConfig, $regenerate);
-		list ($roomId, $primaryAdpId, $secondaryAdpId) = kPexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken);
+		list ($roomId, $primaryAdpId, $secondaryAdpId) = kPexipHandler::createCallObjects($dbLiveEntry, $pexipConfig, $sipToken, $dualStreamLiveEntry, $sourceType);
 
 		$dbLiveEntry->setSipToken($sipToken);
 		$dbLiveEntry->setSipRoomId($roomId);
 		$dbLiveEntry->setPrimaryAdpId($primaryAdpId);
 		$dbLiveEntry->setSecondaryAdpId($secondaryAdpId);
 		$dbLiveEntry->setIsSipEnabled(true);
+		$dbLiveEntry->setSipSourceType($sourceType);
+		if($dualStreamLiveEntry)
+		{
+			$dbLiveEntry->setSipDualStreamEntryId($dualStreamLiveEntry->getId());
+		}
 		$dbLiveEntry->save();
 
 		return $sipToken;
@@ -62,7 +70,6 @@ class PexipService extends KalturaBaseService
 
 	/**
 	 * @action handleIncomingCall
-	 * @return bool
 	 */
 	public function handleIncomingCallAction()
 	{
@@ -79,12 +86,14 @@ class PexipService extends KalturaBaseService
 		catch(Exception $e)
 		{
 			KalturaLog::err($e->getMessage());
+			$response->msg = $e->getMessage();
 			return $response;
 		}
 
 		$queryParams = kPexipUtils::validateAndGetQueryParams();
 		if(!$queryParams)
 		{
+			$response->msg = 'could not validate query params';
 			return $response;
 		}
 
@@ -102,14 +111,18 @@ class PexipService extends KalturaBaseService
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Error validating and retrieving Entry for sip Call');
+			$msg = 'Error validating and retrieving Entry for sip Call';
+			KalturaLog::err($msg);
+			$response->msg = $msg;
 			return $response;
 		}
 
 		/** @var LiveStreamEntry $dbLiveEntry */
 		if (!$dbLiveEntry)
 		{
-			KalturaLog::err('Live entry for call not Validated!');
+			$msg = 'Live entry for call not Validated!';
+			KalturaLog::err($msg);
+			$response->msg = $msg;
 			return $response;
 		}
 
@@ -117,6 +130,7 @@ class PexipService extends KalturaBaseService
 		{
 			$msg = 'Max number of active rooms reached. Please try again shortly.';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+			$response->msg = $msg;
 			return $response;
 		}
 
@@ -126,6 +140,7 @@ class PexipService extends KalturaBaseService
 		{
 			$msg = 'Entry ' . $dbLiveEntry->getId() . ' is Live and Active. can\'t connect call.';
 			kPexipUtils::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+			$response->msg = $msg;
 			return $response;
 		}
 
@@ -151,5 +166,4 @@ class PexipService extends KalturaBaseService
 		$res = kPexipHandler::listRooms($offset, $pageSize, $pexipConfig, $activeOnly);
 		return KalturaStringValueArray::fromDbArray(array(json_encode($res)));
 	}
-
 }

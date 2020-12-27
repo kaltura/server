@@ -57,16 +57,29 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT, $entryVendorTask->catalogItemId);
 		
 		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null);
-		if (kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $taskVersion);
 		
 		//check if credit has expired
-		if (kReachUtils::hasCreditExpired($dbReachProfile))
+		if (kReachUtils::hasCreditExpired($dbReachProfile) && $dbVendorCatalogItem->getPricing() && $dbVendorCatalogItem->getPricing()->getPricePerUnit())
 			throw new KalturaAPIException(KalturaReachErrors::CREDIT_EXPIRED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
 		if (!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
-		
+
+		$lockKey = "entryVendorTask_add_" . $entryVendorTask->entryId . '_' . $entryVendorTask->catalogItemId . '_' . kCurrentContext::getCurrentPartnerId() . '_' . $taskVersion;
+		$dbEntryVendorTask = kLock::runLocked($lockKey, array($this, 'addEntryVendorTaskImpl'), array($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem));
+
+		// return the saved object
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+		return $entryVendorTask;
+	}
+
+	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem)
+	{
+		if (kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion, $dbVendorCatalogItem->getAllowResubmission()))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $taskVersion);
+		}
+
 		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion);
 		if(!$dbEntryVendorTask)
 		{
@@ -74,10 +87,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		}
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
 		$dbEntryVendorTask->save();
-		
-		// return the saved object
-		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
-		return $entryVendorTask;
+		return $dbEntryVendorTask;
 	}
 	
 	/**
@@ -420,5 +430,101 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
+	}
+
+	/**
+	 * @action serve
+	 * @param int $vendorPartnerId
+	 * @param int $partnerId
+	 * @param int $status
+	 * @param string $dueDate
+	 * @return file
+	 */
+	public function serveAction($vendorPartnerId = null, $partnerId = null, $status = null, $dueDate = null)
+	{
+		$filter = new KalturaEntryVendorTaskFilter();
+		if($vendorPartnerId)
+		{
+			$filter->vendorPartnerIdEqual = $vendorPartnerId;
+		}
+		if ($partnerId)
+		{
+			kCurrentContext::$partner_id = $partnerId;
+		}
+		if ($status)
+		{
+			$filter->statusEqual = $status;
+		}
+		else
+		{
+			$filter->statusIn = EntryVendorTaskStatus::PENDING .','. EntryVendorTaskStatus::PROCESSING.','.EntryVendorTaskStatus::ERROR;
+		}
+
+		kReachUtils::setSelectedRelativeTime($dueDate, $filter);
+		$filter->updatedAtGreaterThanOrEqual = time() - (VendorServiceTurnAroundTime::TEN_DAYS * 4);
+		$filter->orderBy = '-createdAt';
+
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = KalturaPager::MAX_PAGE_SIZE;
+		$pager->pageIndex = 1;
+
+		$content = implode(',', kReachUtils::getEntryVendorTaskCsvHeaders()) . PHP_EOL;
+		$res =  $filter->getListResponse($pager, $this->getResponseProfile());
+		$totalCount = min($res->totalCount, SphinxCriteria::MAX_MATCHES - 1);
+		while ($totalCount > 0 && $pager->pageIndex <= 20)
+		{
+			foreach ($res->objects as $entryVendorTask)
+			{
+				$entryVendorTaskValues = kReachUtils::getObejctValues($entryVendorTask);
+				$csvRowData = kReachUtils::createCsvRowData($entryVendorTaskValues, 'entryVendorTask');
+				$content .= $csvRowData . PHP_EOL;
+			}
+
+			$pager->pageIndex++;
+			$totalCount = $totalCount - $pager->pageSize;
+			$pager->pageSize = min(KalturaPager::MAX_PAGE_SIZE, $totalCount);
+			if ($pager->pageSize > 0)
+			{
+				$res = $filter->getListResponse($pager, $this->getResponseProfile());
+			}
+		}
+		$fileName = "export.csv";
+		header('Content-Disposition: attachment; filename="'.$fileName.'"');
+		return new kRendererString($content, 'text/csv');
+	}
+
+	/**
+	 * @action getServeUrl
+	 * @param string $filterType
+	 * @param int $filterInput
+	 * @param int $status
+	 * @param string $dueDate
+	 * @return string $url
+	 */
+	public function getServeUrlAction($filterType = null, $filterInput = null, $status = null, $dueDate = null)
+	{
+		$finalPath = '/api_v3/service/reach_entryvendortask/action/serve/';
+		if ($filterType && $filterInput && is_numeric($filterInput))
+		{
+			if ($filterType === 'vendorPartnerIdEqual')
+			{
+				$finalPath .= "vendorPartnerId/$filterInput/";
+			}
+			else if($filterType === 'partnerIdEqual')
+			{
+				$finalPath .= "partnerId/$filterInput/";
+			}
+		}
+		if ($status)
+		{
+			$finalPath .= "status/$status/";
+		}
+		if ($dueDate)
+		{
+			$finalPath .= "dueDate/$dueDate/";
+		}
+		$finalPath .= 'ks/' . kCurrentContext::$ks;
+		$url = 'http://' . kConf::get('www_host') . $finalPath;
+		return $url;
 	}
 }

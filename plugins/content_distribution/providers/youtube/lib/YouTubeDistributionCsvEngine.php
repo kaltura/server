@@ -19,7 +19,7 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 		if (!$videoFilePath)
 			throw new KalturaDistributionException('No video asset to distribute, the job will fail');
 
-		if (!file_exists($videoFilePath))
+		if (!kFile::checkFileExists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
 
 		$csvMap = unserialize($providerData->submitCsvMap);
@@ -52,6 +52,11 @@ class YouTubeDistributionCsvEngine extends YouTubeDistributionRightsFeedEngine
 
 	public function handleThumbUpload($thumbAssetId, $providerData, $sftpManager, $thumbnailFilePath = null)
 	{
+		if(empty($thumbAssetId))
+		{
+			return;
+		}
+
 		$thumbAssetPath = $this->getAssetFile($thumbAssetId, sys_get_temp_dir(), pathinfo($thumbnailFilePath, PATHINFO_BASENAME));
 
 		if ($thumbAssetPath && file_exists($thumbAssetPath))

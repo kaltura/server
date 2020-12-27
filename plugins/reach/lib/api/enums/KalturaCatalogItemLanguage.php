@@ -22,6 +22,7 @@ class KalturaCatalogItemLanguage extends KalturaStringEnum
 	const JA = KalturaLanguage::JA;
 	const KO = KalturaLanguage::KO;
 	const PT = KalturaLanguage::PT;
+	const PT_BR = KalturaLanguage::PT_BR;
 	const RU = KalturaLanguage::RU;
 	const TR = KalturaLanguage::TR;
 	const TH = KalturaLanguage::TH;
@@ -35,4 +36,16 @@ class KalturaCatalogItemLanguage extends KalturaStringEnum
 	const EL = KalturaLanguage::EL;
 	const RO = KalturaLanguage::RO;
 	const HU = KalturaLanguage::HU;
+	const GA = KalturaLanguage::GA;
+	const GD = KalturaLanguage::GD;
+	const CY = KalturaLanguage::CY;
+	const UR = KalturaLanguage::UR;
+	const TA = KalturaLanguage::TA;
+	const ML = KalturaLanguage::ML;
+	const ZU = KalturaLanguage::ZU;
+	const VI = KalturaLanguage::VI;
+	const UK = KalturaLanguage::UK;
+	const FR_CA = KalturaLanguage::FR_CA;
+	const ZH_TW = KalturaLanguage::ZH_TW;
+	const ES_XL = KalturaLanguage::ES_XL;
 }

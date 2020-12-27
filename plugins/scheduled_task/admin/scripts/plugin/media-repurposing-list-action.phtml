@@ -315,6 +315,15 @@ function checkNumValid(val) {
 		alert("You need to enter number!");
 }
 
+function validateNumber(val)
+{
+    if (isNaN(val))
+    {
+        alert("You need to enter number! - invalid number will be set to 0");
+    }
+    return;
+}
+
 
 function setConditionData() {
 	var conditions = [];

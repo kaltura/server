@@ -144,7 +144,7 @@ class MediaService extends KalturaEntryService
     	}
 		if($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT || $dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$resource->validateEntry($dbEntry, true);
+			$resource->validateEntry($dbEntry);
 
 			if($conversionProfileId)
 			{
@@ -446,12 +446,11 @@ class MediaService extends KalturaEntryService
 		try
 		{
 		    // check that the uploaded file exists
-		    $entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
+			$entryFullPath = kUploadTokenMgr::getFullPathByUploadTokenId($uploadTokenId);
 		    
 		    // Make sure that the uploads path is not modified by $uploadTokenId (with the value of "../" for example )
-		    $entryRootDir = realpath( dirname( $entryFullPath ) );
-			$uploadPathBase = realpath( myContentStorage::getFSUploadsPath() );
-			if ( strpos( $entryRootDir, $uploadPathBase ) !== 0 ) // Composed path doesn't begin with $uploadPathBase?  
+			$entryRootDir = realpath( dirname( $entryFullPath ) );
+			if ( !kUploadTokenMgr::isValidUploadDir($entryRootDir) ) // Composed path doesn't begin with $uploadPathBase?
 			{
 				KalturaLog::err( "uploadTokenId [$uploadTokenId] points outside of uploads directory" );
 				throw new KalturaAPIException( KalturaErrors::INVALID_UPLOAD_TOKEN_ID );			
@@ -461,6 +460,12 @@ class MediaService extends KalturaEntryService
 		{
 			if ($ex->getCode() == kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS)
 			{
+				$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
+				if($remoteDCHost)
+				{
+					kFileUtils::dumpApiRequest($remoteDCHost);
+				}
+				
 				throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_ADD_ENTRY);
 			}
 			throw($ex);
@@ -718,7 +723,7 @@ class MediaService extends KalturaEntryService
      */
     function getMrssAction($entryId, KalturaExtendingItemMrssParameterArray $extendingItemsArray = null, $features = null)
     {
-        $dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+        $dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		$mrssParams = new kMrssParameters();

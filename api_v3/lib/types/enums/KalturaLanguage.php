@@ -44,6 +44,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const FJ = 'Fiji';
 	const FI = 'Finnish';
 	const FR = 'French';
+	const FR_CA = 'French (Canada)';
 	const FY = 'Frisian';
 	const GL = 'Galician';
 	const GD = 'Gaelic (Scottish)';
@@ -105,6 +106,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const PS = 'Pashto (Pushto)';
 	const PL = 'Polish';
 	const PT = 'Portuguese';
+	const PT_BR = 'Portuguese (Brazil)';
 	const PA = 'Punjabi';
 	const QU = 'Quechua';
 	const RM = 'Rhaeto-Romance';
@@ -125,6 +127,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const SL = 'Slovenian';
 	const SO = 'Somali';
 	const ES = 'Spanish';
+	const ES_XL = 'Spanish (Latin America)';
 	const SU = 'Sundanese';
 	const SW = 'Swahili (Kiswahili)';
 	const SV = 'Swedish';
@@ -154,6 +157,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const JI = 'Yiddish';
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
+	const ZH_TW = 'Taiwanese Mandarin';
 	const ZXX = 'No linguistic content';
 	const MU = 'Multilingual';
 

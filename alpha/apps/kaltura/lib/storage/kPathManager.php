@@ -39,7 +39,7 @@ class kPathManager
 		$root = str_replace('//', '/', $root);
 		$path = str_replace('//', '/', $path);
 		
-		if(!kConf::hasParam('volumes'))
+		if(!kConf::hasParam('volumes') && !kConf::hasParam('local_volumes'))
 		{
 			KalturaLog::debug("Path [{$root}{$path}]");
 			return array($root, $path);
@@ -48,8 +48,11 @@ class kPathManager
 		if(isset(self::$sessionCache[$path]))
 			return array($root, self::$sessionCache[$path]);
 			
-		$volumes = kConf::get('volumes');
-		$volume = $volumes[rand(0, count($volumes) - 1)];
+		$partnerId = $object->getPartnerId();
+		$volumes = kConf::hasParam('local_volumes') ? kConf::get('local_volumes') : kConf::get('volumes');
+		$partnerVolumes = kConf::get('partner_volumes', 'local', array());
+		$volume = isset($partnerVolumes[$partnerId]) ? $partnerVolumes[$partnerId] : $volumes[rand(0, count($volumes) - 1)];
+		
 		$newPath = str_replace('/content/', "/content/$volume/", $path);
 		self::$sessionCache[$path] = $newPath;
 		$path = $newPath;
@@ -70,6 +73,7 @@ class kPathManager
 	{
 		KalturaLog::log(__METHOD__." - key [$key], storageProfileId [$storageProfileId]");
 		
+		$storageProfileId = self::getStorageProfileIdForKey($key, $storageProfileId);
 		$storageProfile = self::getStorageProfile($storageProfileId);
 		if(is_null($storageProfile))
 			throw new Exception("Storage Profile [$storageProfileId] not found");
@@ -92,5 +96,26 @@ class kPathManager
 	public static function getFilePath(FileSyncKey $key, $storageProfileId = null)
 	{
 		return implode('', self::getFilePathArr($key, $storageProfileId));
+	}
+	
+	public static function getStorageProfileIdForKey(FileSyncKey $key, $storageProfileId = null)
+	{
+		$object = kFileSyncUtils::retrieveObjectForSyncKey($key);
+		$class = get_class($object);
+		
+		$objectKeys = array (
+			$class . ':' . $key->getObjectType() . ':' . $key->getObjectSubType(),
+			$class . ':' . $key->getObjectType() . ':' . '*',
+			'*' // WildCard
+		);
+		
+		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
+		if( array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
+		{
+			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$storageProfileId = reset($storageProfileIds);
+		}
+		
+		return $storageProfileId;
 	}
 }

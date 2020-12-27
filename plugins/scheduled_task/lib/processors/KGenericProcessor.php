@@ -250,7 +250,7 @@ class KGenericProcessor
 			}
 			$this->handlePager($pager);
 		}
-		while ($result->objects->count == $pager->pageSize);
+		while (count($result->objects) == $pager->pageSize);
 
 		return $objectsData;
 	}

@@ -8,12 +8,13 @@ class kEntrySource extends kThumbnailSource
 {
 	protected $dbEntry;
 
-	public function  __construct($entryId)
+	public function setEntryId($entryId)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			$data = array(kThumbnailErrorMessages::ENTRY_ID => $entryId);
+			throw new kThumbnailException(kThumbnailException::ENTRY_NOT_FOUND, kThumbnailException::ENTRY_NOT_FOUND, $data);
 		}
 
 		$secureEntryHelper = new KSecureEntryHelper($dbEntry, kCurrentContext::$ks, null, ContextType::THUMBNAIL);
@@ -26,6 +27,19 @@ class kEntrySource extends kThumbnailSource
 		return $this->dbEntry->getMediaType();
 	}
 
+	public function getEntryType()
+	{
+		return $this->dbEntry->getType();
+	}
+
+	/**
+	 * @param entry $dbEntry
+	 */
+	public function setEntry($dbEntry)
+	{
+		$this->dbEntry = $dbEntry;
+	}
+
 	/**
 	 * @return entry
 	 */
@@ -34,6 +48,11 @@ class kEntrySource extends kThumbnailSource
 		return $this->dbEntry;
 	}
 
+	/**
+	 * @return Imagick
+	 * @throws ImagickException
+	 * @throws kThumbnailException
+	 */
 	public function getImage()
 	{
 		if($this->getEntryMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)

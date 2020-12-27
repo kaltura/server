@@ -185,7 +185,7 @@ function print_r_reverse($in) {
         array_pop($lines); // )
         $in = implode("\n", $lines);
         // make sure we only match stuff with 4 preceding spaces (stuff for this array and not a nested one)
-        preg_match_all('/^\s{4}\[(.+?)\] \=\> /m', $in, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        preg_match_all('/^\s{4}\[(.+?)\] \=\> ?/m', $in, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
         $pos = array();
         $previous_key = '';
         $in_length = strlen($in);
@@ -624,12 +624,17 @@ function compareResults($resultNew, $resultOld)
 
 	if (!$resultNew)
 	{
-		return array('failed to parse new XML');
+		return array('#ERROR - failed to parse new XML');
 	}
 
 	if (!$resultOld)
 	{
 		return array('failed to parse old XML');
+	}
+
+	if (isset($resultNew['result']['error']) && !isset($resultOld['result']['error']))
+	{
+		return array("#ERROR - in new result and not in old result");
 	}
 
 	return compareArrays($resultNew, $resultOld, "");
@@ -764,6 +769,11 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 		{
 			print "Curl error [$curlErrorNew] [$curlErrorOld]\n";
 			return;
+		}
+
+		if( !trim($resultNew) && trim($resultOld) )
+		{
+			print "#ERROR - Empty/False result was recieved from new server\n";
 		}
 
 		if ($compareMode == CM_BINARY &&
@@ -990,9 +1000,29 @@ function isActionApproved($fullActionName, $action)
 	return false;
 }
 
+function flattenArray($input, $prefix)
+{
+	$result = array();
+	foreach ($input as $key => $value)
+	{
+		if (is_array($value))
+		{
+			$result = array_merge($result, flattenArray($value, $prefix . "$key:"));
+		}
+		else
+		{
+			$result[$prefix . $key] = $value;
+		}
+	}
+	return $result;
+}
+
 function generateKalcliCommand($ipAddress, $service, $action, $parsedParams)
 {
 	$kalcliCmd = "kalcli -x -H`genipheader {$ipAddress}` {$service} {$action}";
+
+	$parsedParams = flattenArray($parsedParams, '');
+
 	foreach ($parsedParams as $key => $value)
 	{
 		if (in_array($key, array('action', 'service')))

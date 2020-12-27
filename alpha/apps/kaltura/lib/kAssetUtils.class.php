@@ -69,7 +69,7 @@ class kAssetUtils
 	}
 	
 
-	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '')
+	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null, $urlManager = null)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
@@ -89,9 +89,14 @@ class kAssetUtils
 		}
 		else
 		{
-			$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
 			if(!$urlManager)
-				return null;
+			{
+				$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId());
+				if(!$urlManager)
+				{
+					return null;
+				}
+			}
 
 			if($asset instanceof flavorAsset)
 				$urlManager->initDeliveryDynamicAttributes(null, $asset);
@@ -100,7 +105,14 @@ class kAssetUtils
 
 			$protocol = infraRequestUtils::getProtocol();
 			$profileAttributes->setMediaProtocol($protocol);
-			$url = $urlManager->getFullAssetUrl($asset);
+			if ($cdnUrl)
+			{
+				$url = $cdnUrl . $urlManager->getAssetUrl($asset);
+			}
+			else
+			{
+				$url = $urlManager->getFullAssetUrl($asset);
+			}
 
 			$url = preg_replace('/^https?:\/\//', '', $url);
 
@@ -111,6 +123,27 @@ class kAssetUtils
 		}
 		
 		return $url;
+	}
+
+	protected static function getUrlManager($asset, $syncKey)
+	{
+		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
+		if(!$urlManager)
+		{
+			$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
+			foreach($fileSyncs as $fileSync)
+			{
+				if($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
+				{
+					$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
+					if($urlManager)
+					{
+						return $urlManager;
+					}
+				}
+			}
+		}
+		return $urlManager;
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)

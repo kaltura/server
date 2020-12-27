@@ -41,7 +41,7 @@ class kEncryptFileUtils
 
     private static function doEncryptFile($srcFd, $key, $iv, $destFd)
     {
-        $clear = fread($srcFd,self::ENCRYPT_INTERVAL);
+        $clear = self::readBytesFromStream($srcFd, self::ENCRYPT_INTERVAL);
         $enc = self::encryptData($clear, $key, $iv);
         $iv = substr($enc, -self::AES_BLOCK_SIZE);
         fwrite($destFd, $enc);
@@ -55,7 +55,7 @@ class kEncryptFileUtils
 
     private static function doDecryptFile($srcFd, $key, $iv, $destFd)
     {
-        $content = fread($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
+        $content = self::readBytesFromStream($srcFd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
         $clear = self::decryptData($content, $key, $iv);
         fwrite($destFd, $clear);
         return substr($content, -self::AES_BLOCK_SIZE);
@@ -72,8 +72,19 @@ class kEncryptFileUtils
         try
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
-            $fd1 = fopen($srcFilePath, "rb");
-            $fd2 = fopen($tempPath, "w");
+            $srcFilePath = kFile::realPath($srcFilePath);
+            
+            $fd1 = self::openFile($srcFilePath, "rb");
+            if ($fd1 === false)
+            {
+                return false;
+            }
+            
+            $fd2 = self::openFile($tempPath, "w");
+            if ($fd2 === false)
+            {
+                return false;
+            }
             while (!feof($fd1))
             {
                 $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
@@ -84,7 +95,7 @@ class kEncryptFileUtils
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
             // adding @ to avoid valid case which in 2 process creating clear file at the same time
-            return @rename($tempPath, $dstFilePath);
+            return @kFile::moveFile($tempPath, $dstFilePath);
         }
         catch(Exception $e)
         {
@@ -100,7 +111,7 @@ class kEncryptFileUtils
     {
         $tempPath = self::getClearTempPath($filePath);
         self::decryptFile($filePath, $key, $iv, $tempPath);
-        infraRequestUtils::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
+        kFile::dumpFilePart($tempPath, $rangeFrom, $rangeLength);
         unlink($tempPath);
         return;
     }
@@ -110,7 +121,7 @@ class kEncryptFileUtils
         $size = kFileBase::fileSize($filePath);
         if (!$key)
             return $size;
-        
+
         if ($size < self::ENCRYPT_INTERVAL)
             return strlen(self::getEncryptedFileContent($filePath, $key, $iv, 0, -1));
 
@@ -120,9 +131,10 @@ class kEncryptFileUtils
         unlink($tempPath);
         return $size;
     }
-    
+
     public static function encryptFolder($dirName, $key, $iv)
     {
+        //ToDo Handle dir listing method when working with shared storage
         $filesPaths = kFile::dirList($dirName);
         $done = true;
         foreach ($filesPaths as $filePath)
@@ -132,16 +144,51 @@ class kEncryptFileUtils
 
     public static function encrypt($path, $key, $iv)
     {
-        if (is_file($path))
+        if (kFile::isFile($path))
             return self::encryptFile($path, $key, $iv);
-        else if (is_dir($path))
+        else if (kFile::isDir($path))
             return self::encryptFolder($path, $key, $iv);
     }
-    
+
     public static function getClearTempPath($path)
     {
         return sys_get_temp_dir(). "/clear_" . pathinfo($path, PATHINFO_BASENAME);
     }
-
+	
+    protected static function readBytesFromStream($fd, $bytesToRead)
+    {
+        $data = '';
+        $bytesRead = 0;
+        while(!feof($fd) && $bytesRead < $bytesToRead)
+        {
+            $curr = fread($fd, $bytesToRead);
+            $bytesRead += strlen($curr);
+            $data .= $curr;
+        }
+        
+        return $data;
+    }
     
+    protected static function openFile($path, $mode)
+    {
+        stream_wrapper_restore('http');
+        stream_wrapper_restore('https');
+        
+        $fd = fopen($path, $mode);
+        if ($fd === false)
+        {
+            stream_wrapper_unregister ('http');
+            stream_wrapper_unregister ('https');
+            return false;
+        }
+        
+        if (function_exists('stream_set_chunk_size'))
+        {
+            stream_set_chunk_size($fd, self::ENCRYPT_INTERVAL + self::AES_BLOCK_SIZE);
+        }
+        
+        stream_wrapper_unregister ('http');
+        stream_wrapper_unregister ('https');
+        return $fd;
+    }
 }

@@ -13,6 +13,11 @@ class kReportExportParams
 	protected $reportItems;
 
 	/**
+	 * @var string
+	 */
+	protected $reportsItemsGroup;
+
+	/**
 	 * @return string
 	 */
 	public function getRecipientEmail()
@@ -42,6 +47,22 @@ class kReportExportParams
 	public function setReportItems($reportItems)
 	{
 		$this->reportItems = $reportItems;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getReportsItemsGroup()
+	{
+		return $this->reportsItemsGroup;
+	}
+
+	/**
+	 * @param string $reportsItemsGroup
+	 */
+	public function setReportsItemsGroup($reportsItemsGroup)
+	{
+		$this->reportsItemsGroup = $reportsItemsGroup;
 	}
 
 }

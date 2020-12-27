@@ -32,6 +32,8 @@
 		public $process = 0;		// Linux process id
 		public $hostname = 0;
 		
+		public $attempt = 0; //Job execution attempt
+		
 		/* ---------------------------
 		 *
 		 */
@@ -312,7 +314,7 @@
 			$chunker = $this->chunker;
 			$videoJobs = $this->getVideoJobs();
 			foreach($videoJobs as $job) {
-				$chunker->updateChunkFileStatData($job->id,$job->stat); 
+				$chunker->updateChunkFileStatData($job->id,$job->stat,isset($job->outFileSizes) ? $job->outFileSizes : array());
 				$logFilename = $chunker->getChunkName($job->id,".log");
 				$execData = new KProcessExecutionData($job->process, $logFilename);
 				$execData->startedAt = $job->startTime;
@@ -340,9 +342,29 @@
 		 */
 		protected function detectErrors($chunkedEncodeReadIdx)
 		{		
-			if($this->videoJobs->detectErrors($this->storeManager, $this->maxExecutionTime, $chunkedEncodeReadIdx)!=true)
+				/*
+				 * Adjust chunk's default maxExecutionTime (matches FHD)
+				 * to all resolutions and to audio stream generation
+				 */
+$vidMaxExecutionTime = 0;
+$audMaxExecutionTime = 0;
+			{
+					// Video maxExecutionTime adjusted relatively to resolution pix count/frame area
+				if(isset($this->chunker->params->width) && isset($this->chunker->params->height) && isset($this->chunker->setup->chunkDuration)) {
+					$vidMaxExecutionTime=round(($this->maxExecutionTime/(1920*1080))*($this->chunker->params->width*$this->chunker->params->height)*($this->chunker->setup->chunkDuration/60));
+				}
+				if($vidMaxExecutionTime==0) $vidMaxExecutionTime = $this->maxExecutionTime;
+				else if($vidMaxExecutionTime<1800)	$vidMaxExecutionTime = 1800;
+				
+					// Audio maxExecutionTime adjusted to content duration (no chunks for audio)
+				if(isset($this->chunker->params->duration) && $this->chunker->params->duration>0)
+					$audMaxExecutionTime=round($this->chunker->params->duration/2);
+				else $audMaxExecutionTime = round($this->maxExecutionTime);
+			}
+
+			if($this->videoJobs->detectErrors($this->storeManager, $vidMaxExecutionTime, $chunkedEncodeReadIdx)!=true)
 				return false;
-			return $this->audioJobs->detectErrors($this->storeManager, $this->maxExecutionTime, $chunkedEncodeReadIdx);
+			return $this->audioJobs->detectErrors($this->storeManager, $audMaxExecutionTime, $chunkedEncodeReadIdx);
 		}
 
 		/* ---------------------------
@@ -405,7 +427,7 @@
 			}
 			
 			if($this->detectErrors($readIndex)===false){
-				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED could not get RD/WR indexes!");
+				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED to handle broken chunks!");
 				$this->returnMessages[] = $msgStr;
 				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
 				return false;			

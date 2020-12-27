@@ -2,7 +2,7 @@
 /**
  * @package plugins.schedule
  */
-class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion, IKalturaObjectLoader
+class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion, IKalturaObjectLoader, IKalturaScheduleEventProvider
 {
 	const PLUGIN_NAME = 'schedule';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -90,5 +90,27 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	{
 		$maxRecurrences = 1000;
 		return kConf::get('max_schedule_event_recurrences', 'local', $maxRecurrences);
+	}
+
+	/**
+	 * @param string $entryId
+	 * @param array $types
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @return array<IScheduleEvent>
+	 */
+	public function getScheduleEvents($entryId, $types, $startTime, $endTime)
+	{
+		$events = array();
+		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTypes($entryId, $types, $startTime, $endTime);
+		foreach ($scheduleEvents as $scheduleEvent)
+		{
+			/* @var LiveStreamScheduleEvent $scheduleEvent*/
+			if ($scheduleEvent->isRangeIntersects($startTime, $endTime))
+			{
+				$events[] = $scheduleEvent;
+			}
+		}
+		return $events;
 	}
 }

@@ -41,7 +41,7 @@ class kQueryCache
 													// in order to compensate for clock differences
 	const SLAVE_LAG_TIME_MARGIN_SEC = 70;			// This value is added to the measured slave lag as a safety margin.
 													// it is composed of the lag measuring period (60) and the clock sync margin (10)
-	const MAX_QUERY_MASTER_TIME_MARGIN_SEC = 300;	// The maximum time frame after a DB change during which we should query the master
+	const MAX_QUERY_MASTER_TIME_MARGIN_SEC = 3600;	// The maximum time frame after a DB change during which we should query the master
 	
 	const MAX_CACHED_OBJECT_COUNT = 500;			// Select queries that return more objects than this const will not be cached
 													// 500 serialized entries take 110K after compression, well below the memcache 1M limit  
@@ -89,6 +89,13 @@ class kQueryCache
 		self::$s_memcacheQueries = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_QUERIES);
 	}
 	
+	public static function close()
+	{
+		self::$s_memcacheInited = false;
+		self::$s_memcacheKeys = null;
+		self::$s_memcacheQueries = null;
+	}
+
 	protected static function replaceVariable($formatString, $variableValue)
 	{
 		$firstVarPos = strpos($formatString, '%s');

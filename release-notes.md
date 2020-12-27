@@ -1,3 +1,261 @@
+# Propus 16.13.0  #
+
+## Adjust Kaltura Capture transcoding profile ##
+- Issue Type: Task
+- Issue ID: PSVAMB-16978
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/2020_12_06_update_lectureCapture_ConversionProfile2.php
+
+## Configurable Transcoding Profile for Zoom Integration ##
+- Issue Type: Task
+- Issue ID: PLAT-22489
+
+### Configuration ###
+    None
+
+### Deployment scripts ###
+   
+Run deployment script:
+   
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_25_update_zoomVendor_add_get_action.php
+
+# Propus 16.12.0  #
+
+## Add permission in Admin Console for automatically deleting recorded VOD entry when deleting live entry ##
+
+- Issue Type: Feature
+- Issue ID: PLAT-11221
+
+### configuration ###
+    Add the following to admin.ini:
+
+    moduls.liveStreamDeleteRecordedVod.enabled = true
+    moduls.liveStreamDeleteRecordedVod.permissionType = 2
+    moduls.liveStreamDeleteRecordedVod.label = Kaltura Live Streams - Delete recorded VOD
+    moduls.liveStreamDeleteRecordedVod.permissionName = FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD
+    moduls.liveStreamDeleteRecordedVod.basePermissionType = 2
+    moduls.liveStreamDeleteRecordedVod.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamDeleteRecordedVod.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+    None
+
+## Bumper Plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-11197
+
+### Configuration ###
+run the following:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_12_add_permissions_bumper_service.php
+
+Add 'Bumper' to:
+    /opt/kaltura/app/configurations/plugins.ini
+    
+# Propus 16.11.0  #
+
+## Reach - update reach_vendor response profile ##
+
+ - Issue Type: Task
+ - Issue ID: No-Plat
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+	
+First replace all tokens in the XML file below and remove ".template" from the file name:
+		
+		- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2020_11_03_update_reach_vendor_response_profiles.template.xml
+		
+Run deployment script:
+		
+		- php /opt/kaltura/app/deployment/updates/scripts/2020_11_03_update_reach_vendor_response_profile.php
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Add permission in Admin Console for disable preview page ##
+- Issue Type: Task
+- Issue ID: PLAT-11256
+
+### Configuration ###
+Add the following to admin.ini:
+
+moduls.disablePreviewPage.enabled = true
+moduls.disablePreviewPage.permissionType = 2
+moduls.disablePreviewPage.label = "Disable Preview Page"
+moduls.disablePreviewPage.permissionName = FEATURE_DISABLE_PREVIEW_PAGE
+moduls.disablePreviewPage.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+None
+
+# Propus 16.10.0  #
+## Dynamic batch schedulers allocation ##
+- Issue Type: Task
+- Issue ID: WEBC-2048
+
+### Configuration ###
+run the following:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_13_add_permissions_batch_control.php
+
+# Propus 16.9.0  #
+## Remove automatic creation of Cielo Role ##
+- Issue Type: Task
+- Issue ID: REACH2-941
+
+### Configuration ###
+add the following to 'local.ini' under 'partner_copy_user_roles_ignore_list':
+	0 = 'cielo24'
+
+## Modify report export to csv  ##
+- Issue Type: Task
+- Issue ID: AN-1409
+
+### Configuration ###
+edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
+    update ids 136, 137 and 138 as described in emails_en.template.ini
+
+## Support using S3 as shared storage instead of NFS##
+Issue Type: Feature
+Issue ID : S3
+
+#### Configuration ####
+* Create a new storage profile with the following configurations by running the following script:
+            
+           php /opt/kaltura/app/deployment/updates/scripts/2020_09_02_create_s3_shared_storage_profile.php
+           
+           Params:
+           @name@ 
+           @description@ 
+           @system_name@ 
+           @storage_url@ 
+           @bucket_name@ 
+           @packager_url@ 
+           @ID (optional to set to id of the profile without lettign mysql set it for you)@  
+
+* Add/Update a configuration map called 'cloud_storage' with following config:
+    - sharedStorageProfileIds = @id of the s3 shared storage profile@
+    
+    - Storage options:
+    
+            [storage_options]
+            s3Region = @AWS_REGION@
+            accessKeySecret = @ACCESS_KEY_TOKEN@
+            accessKeyId = @ACCESS_KEY_ID@
+            *** The code also supports definineg arn_role_name and using that for the authentication flow
+            
+    - Storage type mype (Defines the base path of your bucket in aws and the which should also corrolate to the storage profile defined in step 1)
+            
+            [storage_type_map]
+            /@bucket_name@/ = S3 
+
+# Propus 16.8.0  #
+
+## Adding permission to entryVendorTask object and to entryVendorTask service ##
+Issue Type: Task
+Issue ID : REACH2-911
+
+
+# Propus 16.8.0  #
+## Adding permission to entryVendorTask object and to entryVendorTask service ##	
+Issue Type: Task	
+Issue ID : REACH2-911	
+
+#### Deployment Scripts ####	
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_09_add_permissions_entry_vendor_task.php
+
+
+## New KMS user reset password link  ##
+- Issue Type: Task
+- Issue ID: PLAT-10876
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links':
+    kms = "https://%s.mediaspace.kaltura.com/user/set-initial-password?hashKey="
+    
+
+## DropFolder Enhancements - allow publisher admin KS to set description and status of drop folders  ##
+Issue Type: Task
+Issue ID : PSVAMB-14576
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_25_addNewDropFolderServiceActions.php
+
+
+# Propus 16.7.0  #
+
+## Adding privileges field on widget object ##
+Issue Type: Task
+Issue ID : PLAT-10953
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permission_widget_object_privileges_field.php
+
+## Add more user details name to Q&A response profile  ##
+- Issue Type: Feature
+- Issue ID: WEBC-1925
+
+### Configuration ###
+    First replace all tokens from the XML files below and remove ".template" from the file name:
+    /opt/kaltura/app/deployment/updates/scripts/xml/2020_07_16_updateQandAResponseProfile_addMoreUserData.template.xml
+		
+#### Deployment Scripts ####	
+    php /opt/kaltura/app/deployment/updates/scripts/2020_07_16_updateQandAResponseProfile_addMoreUserData.php
+
+## Adding permission to serve and getServeUrl in entryVendorTask ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_permissions_entry_vendor_task.php
+
+# Propus 16.6.0  #
+## Adding permissions to base-playback-role ##
+Issue Type: Task
+Issue ID: PLAT-11034
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_07_08_base_playback_role_add_metadata_cuepoint_permission.php
+
+## Export Reach Requests in admin console to csv ##
+Issue Type: Task
+Issue ID : REACH2-879
+
+#### Deployment Scripts ####
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_12_add_permission_entry_vendor_task.php
+
+## Adding permission to mediaServer partner for livereports ##
+Issue Type: Task
+Issue ID : LIV-156
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_28_add_permission_livereports.php
+
+## Adding permission to capture apps to add code cue point ##
+Issue Type: Task
+Issue ID : KMS-20244
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_25_add_capture_codeCuePoint_permission.php
+
+# Propus 16.5.0  #
+## Adding permission to mediaServer partner for partner:get ##
+Issue Type: Task
+Issue ID : LIV-145
+
+#### Deployment Scripts ####
+php deployment/updates/scripts/add_permissions/2020_06_20_add_permission_partner_get.php
+
 # Propus 16.4.0  #
 ## New Boolean notification template: Caption Ready With Conditions ##
 Issue Type: Task

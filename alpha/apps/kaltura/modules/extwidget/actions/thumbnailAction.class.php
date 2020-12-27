@@ -49,30 +49,26 @@ class thumbnailAction extends sfAction
 	public function execute()
 	{
 		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
-		
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
-		
 		requestUtils::handleConditionalGet();
-		
 		ignore_user_abort();
-		
 		$entry_id = $this->getRequestParameter("entry_id");
 		$widget_id = $this->getRequestParameter("widget_id", 0);
 		$upload_token_id = $this->getRequestParameter("upload_token_id");
 		$version = $this->getIntRequestParameter("version", null, 0, 10000000);
 		$type = $this->getIntRequestParameter("type", 1, 1, 5);
 		//Hack: if KMS sends thumbnail request containing "!" char, the type should be treated as 5.
-		
+
 		$width = $this->getRequestParameter("width", self::DEFAULT_DIMENSION);
 		$height = $this->getRequestParameter("height", self::DEFAULT_DIMENSION);
 		if(strpos($width, "!") || strpos($height, "!"))
+		{
 			$type = 5;
+		}
 
 		list($width, $height) = $this->getDimensions();
-		
 		$nearest_aspect_ratio = $this->getIntRequestParameter("nearest_aspect_ratio", 0, 0, 1);
 		$imageFilePath = null;
-
 		$crop_provider = $this->getRequestParameter("crop_provider", null);
 		$quality = $this->getIntRequestParameter("quality", 0, 0, 100);
 		$src_x = $this->getFloatRequestParameter("src_x", 0, 0, 10000);
@@ -89,26 +85,33 @@ class thumbnailAction extends sfAction
 		$file_name = basename($file_name);
 		$start_sec = $this->getFloatRequestParameter("start_sec", -1, -1);
 		$end_sec = $this->getFloatRequestParameter("end_sec", -1, -1);
-		
+
 		// actual width and height of image from which the src_* values were taken.
 		// these will be used to multiply the src_* parameters to make them relate to the original image size.
 		$rel_width = $this->getFloatRequestParameter("rel_width", -1, -1, 10000);
 		$rel_height = $this->getFloatRequestParameter("rel_height", -1, -1, 10000);
-
 		$def_width = $this->getFloatRequestParameter("def_width", -1, -1, 10000);
 		$def_height = $this->getFloatRequestParameter("def_height", -1, -1, 10000);
-		
+
 		if ($width == self::DEFAULT_DIMENSION && $height == self::DEFAULT_DIMENSION) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
 		{
 			if ( $def_width == -1 )
+			{
 				$width = 120;
+			}
 			else
+			{
 				$width = $def_width;
+			}
 
 			if ( $def_height == -1 )
+			{
 				$height = 90;
+			}
 			else
+			{
 				$height = $def_height;
+			}
 		}
 		else if ($width == self::DEFAULT_DIMENSION) // if only either width or height is missing reset them to zero, and convertImage will handle them
 		{
@@ -118,50 +121,77 @@ class thumbnailAction extends sfAction
 		{
 				$height = 0;
 		}
-		
+
 		$bgcolor = $this->getRequestParameter( "bgcolor", "ffffff" );
 		$partner = null;
-		
+
 		$format = $this->getRequestParameter( "format", null);
-		
+
 		// validating the inputs
 		if(!is_numeric($quality) || $quality < 0 || $quality > 100)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'quality must be between 20 and 100');
-		
+		}
+
 		if(!is_numeric($src_x) || $src_x < 0 || $src_x > 10000)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_x must be between 0 and 10000');
-		
+		}
+
 		if(!is_numeric($src_y) || $src_y < 0 || $src_y > 10000)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_y must be between 0 and 10000');
-			
+		}
+
 		if(!is_numeric($src_w) || $src_w < 0 || $src_w > 10000)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_w must be between 0 and 10000');
-			
+		}
+
 		if(!is_numeric($src_h) || $src_h < 0 || $src_h > 10000)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'src_h must be between 0 and 10000');
-			
+		}
+
 		if(!is_numeric($width) || $width < 0 || $width > 10000)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'width must be between 0 and 10000');
-			
+		}
+
 		if(!is_numeric($height) || $height < 0 || $height > 10000)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'height must be between 0 and 10000');
-			
+		}
+
 		if(!is_numeric($density) || $density < 0)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'density must be positive');
+		}
 			
 		if(!is_numeric($vid_sec) || $vid_sec < -1)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_sec must be positive');
+		}
 			
 		if(!preg_match('/^[0-9a-fA-F]{1,6}$/', $bgcolor))
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'bgcolor must be six hexadecimal characters');
+		}
 
 		if(($vid_slices != -1 && $vid_slices <= 0) || !is_numeric($vid_slices))
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
+		}
 
 		if($vid_slices > 0 && ($vid_slices * $width) >= 65500)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, "width($width) * vid_slices($vid_slices) must be between 0 and 65500");
+		}
+
 		if($vid_slices > 0 && ($vid_slices * $height) >= 65500)
+		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, "height($height) * vid_slices($vid_slices) must be between 0 and 65500");
+		}
 
 		if(!is_numeric($start_sec) || ($start_sec < 0 && $start_sec != -1))
 		{
@@ -172,6 +202,7 @@ class thumbnailAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'end_sec must be positive');
 		}
+
 		if($start_sec != -1 && $end_sec != -1 && ($start_sec > $end_sec))
 		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'start_sec cant be greater then end_sec');
@@ -187,7 +218,6 @@ class thumbnailAction extends sfAction
 
 				if ($partner)
 				{
-					KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $partner->getId());
 					myPartnerUtils::blockInactivePartner($partner->getId());
 
 					if ($quality == 0)
@@ -203,9 +233,9 @@ class thumbnailAction extends sfAction
 				
 				$thumb_full_path =  myContentStorage::getFSCacheRootPath() . myContentStorage::getGeneralEntityPath("uploadtokenthumb", $upload_token->getIntId(), $upload_token->getId(), $upload_token->getId() . ".jpg");
 				kFile::fullMkdir($thumb_full_path);
-				if (file_exists($upload_token->getUploadTempPath()))
+				if (kfile::checkFileExists($upload_token->getUploadTempPath()))
 				{
-					$src_full_path = $upload_token->getUploadTempPath();
+					$src_full_path = kFile::realPath($upload_token->getUploadTempPath());
 					$valid_image_types = array(
 						IMAGETYPE_GIF,
 						IMAGETYPE_JPEG,
@@ -219,8 +249,10 @@ class thumbnailAction extends sfAction
 					{
 						// capture full frame
 						myFileConverter::captureFrame($src_full_path, $thumb_full_path, 1, "image2", -1, -1, 3 );
-						if (!file_exists($thumb_full_path))
+						if (!kfile::checkFileExists($thumb_full_path))
+						{
 							myFileConverter::captureFrame($src_full_path, $thumb_full_path, 1, "image2", -1, -1, 0);
+						}
 						
 						$src_full_path = $thumb_full_path;
 					}
@@ -238,7 +270,6 @@ class thumbnailAction extends sfAction
 			}
 		}
 
-
 		if ($entry_id)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter( $entry_id );
@@ -254,6 +285,7 @@ class thumbnailAction extends sfAction
 						kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($entryDc));
 					}
 				}
+
 				KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 			}
 		}
@@ -285,7 +317,6 @@ class thumbnailAction extends sfAction
 			}
 		}
 
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.thumbnail', $entry->getPartnerId());
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		if ( $nearest_aspect_ratio )
@@ -321,9 +352,15 @@ class thumbnailAction extends sfAction
 		$base64Referrer = $this->getRequestParameter("referrer");
 		$referrer = base64_decode($base64Referrer);
 		if (!is_string($referrer))
+		{
 			$referrer = ""; // base64_decode can return binary data
+		}
+
 		if (!$referrer)
+		{
 			$referrer = kApiCache::getHttpReferrer();
+		}
+
 		$ksStr = $this->getRequestParameter("ks");
 
 		$enableCacheValidation = true;
@@ -376,13 +413,15 @@ class thumbnailAction extends sfAction
 			$stripProfiles = $partner->getStripThumbProfile();
 		
 		// multiply the passed $src_* values so that they will relate to the original image size, according to $src_display_*
-		if ($rel_width != -1 && $rel_width) {
+		if ($rel_width != -1 && $rel_width)
+		{
 			$widthRatio  = $entry->getWidth() / $rel_width;
 			$src_x = $src_x * $widthRatio;
 			$src_w = $src_w * $widthRatio;
 		}
 		
-		if ($rel_height != -1 && $rel_height) {
+		if ($rel_height != -1 && $rel_height)
+		{
 			$heightRatio  = $entry->getHeight() / $rel_height;
 			$src_y  = $src_y * $heightRatio;
 			$src_h  = $src_h * $heightRatio;
@@ -390,7 +429,9 @@ class thumbnailAction extends sfAction
 		
 		$subType = kEntryFileSyncSubType::THUMB;
 		if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+		{
 			$subType = kEntryFileSyncSubType::DATA;
+		}
 			
 		$dataKey = $entry->getSyncKey($subType);
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
@@ -426,7 +467,8 @@ class thumbnailAction extends sfAction
 		if ( ! $file_sync )
 		{
 			$tempThumbPath = $entry->getLocalThumbFilePath($version, $width, $height, $type, $bgcolor, $crop_provider, $quality, $src_x, $src_y, $src_w, $src_h, $vid_sec, $vid_slice, $vid_slices, $density, $stripProfiles, $flavor_id, $file_name, $start_sec, $end_sec);
-			if (!$tempThumbPath ){
+			if (!$tempThumbPath )
+			{
 				KExternalErrors::dieError ( KExternalErrors::MISSING_THUMBNAIL_FILESYNC );
 			}
 		}
@@ -570,12 +612,12 @@ class thumbnailAction extends sfAction
 
 	private function getDimensions()
 	{
-		$width = $this->getFloatRequestParameter("width", self::DEFAULT_DIMENSION, -1, 10000);
-		$height = $this->getFloatRequestParameter("height", self::DEFAULT_DIMENSION, -1, 10000);
+		$width = $this->getIntRequestParameter('width', self::DEFAULT_DIMENSION, -1, 10000);
+		$height = $this->getIntRequestParameter('height', self::DEFAULT_DIMENSION, -1, 10000);
 		if ($width != self::DEFAULT_DIMENSION || $height != self::DEFAULT_DIMENSION)
 			return array($width, $height);
 
-		$flavorParamsId = $this->getRequestParameter("flavor_params_id");
+		$flavorParamsId = $this->getRequestParameter('flavor_params_id');
 		$flavorPrams = assetParamsPeer::retrieveByPK($flavorParamsId);
 
 		if ($flavorPrams)

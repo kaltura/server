@@ -4,49 +4,19 @@
  */
 class kReachUtils
 {
-	static private $dateFields = array('createdAt', 'updatedAt');
+	static private $catalogItemDateFields = array('createdAt', 'updatedAt');
 	static private $catalogItemTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime','outputFormat');
 
-	static private $statusEnumTranslate = array(
-		1 => "DEPRECATED",
-		2 => "ACTIVE",
-		3 => "DELETED",
-	);
+	static private $entryVendorTaskDateFields = array('createdAt', 'expectedFinishTime');
+	static private $entryVendorTaskTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime');
 
-	static private $outputFormatEnumTranslate = array(
-		1 => "SRT",
-		2 => "DFXP",
-	);
-
-	static private $turnAroundTimeEnumTranslate = array(
-		-1 => "BEST_EFFORT",
-		0 => "IMMEDIATE",
-		1800 => "THIRTY_MINUTES",
-		7200 => "TWO_HOURS",
-		10800 => "THREE_HOURS",
-		21600 => "SIX_HOURS",
-		28800 => "EIGHT_HOURS",
-		43200 => "TWELVE_HOURS",
-		86400 => "TWENTY_FOUR_HOURS",
-		172800 => "FORTY_EIGHT_HOURS",
-		345600 => "FOUR_DAYS",
-		432000 => "FIVE_DAYS",
-		864000 => "TEN_DAYS",
-	);
-
-	static private $serviceFeatureEnumTranslate = array(
-		1 => "CAPTIONS",
-		2 => "TRANSLATION",
-		3 => "ALIGNMENT",
-		4 => "AUDIO_DESCRIPTION",
-		5 => "CHAPTERING",
-		"N/A" => "N/A",
-	);
-
-	static private $serviceTypeEnumTranslate = array(
-		1 => "HUMAN",
-		2 => "MACHINE",
-		"N/A" => "N/A",
+	static private $enumTranslateInterface = array(
+		'statusEntryVendorTaskEnumTranslate' => 'EntryVendorTaskStatus',
+		'statusCatalogItemEnumTranslate'	=> 'VendorCatalogItemStatus',
+		'outputFormatEnumTranslate'	=> 'VendorCatalogItemOutputFormat',
+		'turnAroundTimeEnumTranslate'	=> 'VendorServiceTurnAroundTime',
+		'serviceFeatureEnumTranslate'	=> 'VendorServiceFeature',
+		'serviceTypeEnumTranslate'	=> 'VendorServiceType'
 	);
 
 	/**
@@ -191,12 +161,23 @@ class kReachUtils
 		return $remainingCredit >= 0 ? true : false;
 	}
 	
-	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version)
+	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission)
 	{
-		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		if($activeTask)
+		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_MODERATION);
+		$activeTasks = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
+		$activeTasksOnOlderVersion = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, $statusArr);
+		if($activeTasksOnOlderVersion || ($activeTasks && !$allowResubmission))
+		{
 			return true;
-		
+		}
+		foreach ($activeTasks as $activeTask)
+		{
+			if (in_array($activeTask->getStatus(), $statusArr))
+			{
+				return true;
+			}
+		}
+
 		return false;
 	}
 	
@@ -225,39 +206,81 @@ class kReachUtils
 	/**
 	 * @return array
 	 */
-	public static function getVendorCatalogItemsCsvHeaders()
+	public static function getEntryVendorTaskCsvHeaders()
 	{
-		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId');
+		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription');
 	}
 
 	/**
-	 * @param $catalogItemValues
+	 * @return array
+	 */
+	public static function getVendorCatalogItemsCsvHeaders()
+	{
+		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId','allowResubmission');
+	}
+
+
+	protected static function getTranslationFunctionsByType($type)
+	{
+		switch ($type)
+		{
+			case 'vendorCatalogItem':
+				return array('catalogItemDateFields', 'catalogItemTranslateableFields', 'getVendorCatalogItemsCsvHeaders');
+
+			case 'entryVendorTask':
+				return array('entryVendorTaskDateFields', 'entryVendorTaskTranslateableFields', 'getEntryVendorTaskCsvHeaders');
+		}
+	}
+
+	protected static function getTranslatableFieldByType($type, $translateableField)
+	{
+		if ($translateableField === 'status')
+		{
+			switch ($type)
+			{
+				case 'vendorCatalogItem':
+					return 'statusCatalogItem';
+
+				case 'entryVendorTask':
+					return 'statusEntryVendorTask';
+			}
+		}
+
+		return $translateableField;
+	}
+
+	/**
+	 * @param $values
+	 * @param string $type
 	 * @return string
 	 */
-	public static function createCatalogItemCsvRowData($catalogItemValues)
+	public static function createCsvRowData($values, $type)
 	{
+		list($dateFields, $translateableFields, $getCsvHeaders) = self::getTranslationFunctionsByType($type);
+
 		$csvData = array();
-		foreach (self::$dateFields as $dateField)
+		foreach (self::$$dateFields as $dateField)
 		{
-			if (isset($catalogItemValues[$dateField]))
+			if (isset($values[$dateField]))
 			{
-				$catalogItemValues[$dateField] = self::getHumanReadbaleDate($catalogItemValues[$dateField]);
+				$values[$dateField] = self::getHumanReadbaleDate($values[$dateField]);
 			}
 		}
 
-		foreach (self::$catalogItemTranslateableFields as $catalogItemTranslateableField)
+		foreach (self::$$translateableFields as $translateableField)
 		{
-			if (isset($catalogItemValues[$catalogItemTranslateableField]))
+			if (isset($values[$translateableField]))
 			{
-				$catalogItemValues[$catalogItemTranslateableField] = self::translateEnumsToHumanReadable($catalogItemTranslateableField, $catalogItemValues[$catalogItemTranslateableField]);
+				$translateableFieldName = self::getTranslatableFieldByType($type, $translateableField);
+				$values[$translateableField] = self::translateEnumsToHumanReadable($translateableFieldName, $values[$translateableField]);
 			}
 		}
 
-		foreach (self::getVendorCatalogItemsCsvHeaders() as $field)
+		foreach (self::$getCsvHeaders() as $field)
 		{
-			if (isset($catalogItemValues[$field]))
+			if (isset($values[$field]))
 			{
-				$csvData[$field] = $catalogItemValues[$field];
+				$csvData[$field] = $values[$field];
 			}
 			else
 			{
@@ -302,17 +325,20 @@ class kReachUtils
 	 */
 	protected static function translateEnumsToHumanReadable($enumName, $enumValue)
 	{
-		if (!self::${$enumName . "EnumTranslate"})
+		$interfaceConstants = self::$enumTranslateInterface[$enumName . "EnumTranslate"];
+		if (!isset($interfaceConstants))
 		{
 			return 'N\A';
 		}
 
-		if (!isset(self::${$enumName . "EnumTranslate"}[$enumValue]))
+		$iClass = new ReflectionClass($interfaceConstants);
+		$constants = array_flip($iClass->getConstants());
+		if (!isset($constants[$enumValue]))
 		{
 			return 'N\A';
 		}
 
-		return self::${$enumName . "EnumTranslate"}[$enumValue];
+		return $constants[$enumValue];
 	}
 
 	/**
@@ -327,5 +353,31 @@ class kReachUtils
 		}
 
 		return date("Y-m-d H:i", $unixTimeStamp);
+	}
+
+	public static function setSelectedRelativeTime($filterDateInput, $filter)
+	{
+		$startTime = 0;
+		$endTime = 0;
+		if (!preg_match('/^(\-|\+)(\d+$)/', $filterDateInput, $matches))
+		{
+			return;
+		}
+		$sign = $matches[1];
+		$hours = (int)$matches[2];
+		$timeFromHourToSec = $hours * 60 * 60;
+		if ($sign === '-')
+		{
+			$startTime = time() - $timeFromHourToSec;
+			$endTime = time();
+		}
+		else if ($sign === '+')
+		{
+			$startTime = time();
+			$endTime = time() + $timeFromHourToSec;
+		}
+
+		$filter->expectedFinishTimeGreaterThanOrEqual = $startTime;
+		$filter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
 }

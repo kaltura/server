@@ -9,13 +9,21 @@ require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
 class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 {
 	const MAX_CONNECT_ATTEMPTS = 4;
-	
+
 	const COMPRESSED = 1;
+
+	const STAT_CONN = 'conn';
+	const STAT_OP = 'op';
+	const STAT_COUNT = 'count';
+	const STAT_TIME = 'time';
 
 	protected $hostName;
 	protected $port;
 	protected $flags = 0;
 	protected $persistent = false;
+	protected $statsKey;
+
+	protected static $_stats = array();
 
 	protected $memcache = null;
 	protected $gotError = false;
@@ -37,16 +45,32 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$this->flags = MEMCACHE_COMPRESSED;
 		if (isset($config['persistent']) && $config['persistent'])
 			$this->persistent = true;
-		
+
+		$this->statsKey = $this->hostName . ':' . $this->port;
+
 		return $this->reconnect();
 	}
 	
+	public function __destruct()
+	{
+		$this->close();
+	}
+
+	protected function close()
+	{
+		if ($this->memcache)
+		{
+			$this->memcache->close();
+		}
+		$this->memcache = null;
+	}
+
 	/**
 	 * @return bool false on error
 	 */
 	protected function reconnect()
 	{
-		$this->memcache = null;
+		$this->close();
 		
 		if ($this->connectAttempts >= self::MAX_CONNECT_ATTEMPTS)
 		{
@@ -67,7 +91,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			if ($this->persistent)
 				$connectResult = @$memcache->pconnect($this->hostName, $this->port);
 			else 
-				$connectResult = @$memcache->connect($this->hostName, $this->port);			
+				$connectResult = @$memcache->connect($this->hostName, $this->port);
 			if ($connectResult || microtime(true) - $curConnStart < .5)		// retry only if there's an error and it's a timeout error
 				break;
 
@@ -76,9 +100,10 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 
 		$connTook = microtime(true) - $connStart;
 		self::safeLog("connect took - {$connTook} seconds to {$this->hostName}:{$this->port} attempts {$this->connectAttempts}");
-		
-		if (class_exists("KalturaMonitorClient"))
-			KalturaMonitorClient::monitorConnTook($this->hostName, $connTook);
+
+		$this->updateStats(self::STAT_CONN, array(
+			self::STAT_COUNT => 1,
+			self::STAT_TIME => $connTook));
 
 		if (!$connectResult)
 		{
@@ -114,8 +139,14 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$this->gotError = false;
 			
 			set_error_handler(array($this, 'errorHandler'));
+			$start = microtime(true);
 			$result = call_user_func_array(array($this->memcache, $methodName), $params);
+			$end = microtime(true);
 			restore_error_handler();
+
+			$this->updateStats(self::STAT_OP, array(
+				self::STAT_COUNT => 1,
+				self::STAT_TIME => $end - $start));
 			
 			if (!$this->gotError)
 			{
@@ -125,7 +156,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$this->reconnect();
 		}
 
-		self::safeLog("There isnt an active memcahce connection");
+		self::safeLog("There isnt an active memcache connection");
 		return false;
 	}
 	
@@ -183,5 +214,70 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	public function doDecrement($key, $delta = 1)
 	{
 		return $this->callAndDetectErrors('decrement', array($key, $delta));
+	}
+
+	protected function updateStats($type, $stats)
+	{
+		if (!isset(self::$_stats[$this->statsKey]))
+		{
+			self::$_stats[$this->statsKey] = array();
+		}
+		$typeStats = &self::$_stats[$this->statsKey];
+
+		if (!isset($typeStats[$type]))
+		{
+			$typeStats[$type] = array();
+		}
+
+		foreach ($stats as $key => $value)
+		{
+			if (isset($typeStats[$type][$key]))
+			{
+				$typeStats[$type][$key] += $value;
+			}
+			else
+			{
+				$typeStats[$type][$key] = $value;
+			}
+		}
+	}
+
+	public static function outputStats()
+	{
+		foreach (self::$_stats as $statsKey => $typeStats)
+		{
+			$cur = 'instance:' . $statsKey;
+			foreach ($typeStats as $type => $stats)
+			{
+				foreach ($stats as $key => $value)
+				{
+					$cur .= ', ' . $type . '_' . $key . ':' . $value;
+				}
+			}
+
+			KalturaLog::log($cur);
+		}
+	}
+
+	public static function sendMonitorEvents()
+	{
+		foreach (self::$_stats as $statsKey => $typeStats)
+		{
+			foreach ($typeStats as $type => $stats)
+			{
+				switch ($type)
+				{
+				case self::STAT_CONN:
+					KalturaMonitorClient::monitorConnTook($statsKey, $stats[self::STAT_TIME], $stats[self::STAT_COUNT]);
+					break;
+
+				case self::STAT_OP:
+					KalturaMonitorClient::monitorMemcacheAccess($statsKey, $stats[self::STAT_TIME], $stats[self::STAT_COUNT]);
+					break;
+				}
+			}
+		}
+
+		self::$_stats = array();
 	}
 }

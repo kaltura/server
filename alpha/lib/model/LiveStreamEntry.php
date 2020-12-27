@@ -103,8 +103,12 @@ class LiveStreamEntry extends LiveEntry
 		return $url;
 	}
 
-	public function getLiveStreamConfigurations($protocol = 'http', $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
+	public function getLiveStreamConfigurations($protocol = null, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
 	{
+		if(!$protocol)
+		{
+			$protocol = requestUtils::getProtocol();
+		}
 		$configurations =  parent::getLiveStreamConfigurations($protocol, $tag, $currentDcOnly, $flavorParamsIds, $format);
 		if($format == PlaybackProtocol::APPLE_HTTP && !in_array($this->getSource(), self::$kalturaLiveSourceTypes) && $this->getHlsStreamUrl())
 		{
@@ -117,6 +121,15 @@ class LiveStreamEntry extends LiveEntry
 		return $configurations;
 	}
 
+	public function copyTemplate($copyPartnerId = false, $template)
+	{
+		if ($template instanceof LiveStreamEntry)
+		{
+			$this->setExplicitLive($template->getExplicitLive());
+		}
+		return parent::copyTemplate($copyPartnerId, $template);
+	}
+
 	public function setIsSipEnabled ( $v )	{	$this->putInCustomData ( "isSipEnabled" , $v );	}
 	public function getIsSipEnabled (  )	{	return $this->getFromCustomData( "isSipEnabled", null, false );	}
 	public function setSipRoomId ( $v )	{	$this->putInCustomData ( "sipRoomId" , $v );	}
@@ -127,4 +140,25 @@ class LiveStreamEntry extends LiveEntry
 	public function getSecondaryAdpId(  )	{	return $this->getFromCustomData( "secondaryAdpId", null, false );	}
 	public function setSipToken ( $v )  {	$this->putInCustomData ( "sipToken" , $v );	}
 	public function getSipToken( )  { return $this->getFromCustomData( "sipToken" ); }
+	public function setSipSourceType ( $v )	{	$this->putInCustomData ( "sipSourceType" , $v );	}
+	public function getSipSourceType (  )	{	return $this->getFromCustomData( "sipSourceType" );	}
+	public function setSipDualStreamEntryId ( $v )	{	$this->putInCustomData ( "sipDualStreamEntryId" , $v );	}
+	public function getSipDualStreamEntryId (  )	{	return $this->getFromCustomData( "sipDualStreamEntryId" );	}
+
+	/**
+	 * generate a random 8-character string as stream password
+	 * @return string - streaming password
+	 */
+	public static function generateStreamPassword()
+	{
+		$password = sha1(md5(uniqid(rand(), true)));
+		return substr($password, rand(0, strlen($password) - 8), 8);
+	}
+
+	public function copyInto($copyObj, $deepCopy = false)
+	{
+		parent::copyInto($copyObj, $deepCopy);
+		$copyObj->setStreamPassword(self::generateStreamPassword()); //password should be re-generated on copy
+	}
+
 }

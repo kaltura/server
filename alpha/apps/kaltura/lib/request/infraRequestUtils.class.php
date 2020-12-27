@@ -67,7 +67,7 @@ class infraRequestUtils
 			// If the range starts with an '-' we start from the beginning
 			// If not, we forward the file pointer
 			// And make sure to get the end byte if spesified
-			if ($range{0} == '-')
+			if ($range[0] == '-')
 			{
 				// The n-number of the last bytes is requested
 				$c_start = $size - substr($range, 1);
@@ -475,7 +475,7 @@ class infraRequestUtils
 		{
 			$key = each($pathParts);
 			$value = each($pathParts);
-			if (!array_key_exists($key['value'], $params))
+			if (is_array($key) && !array_key_exists($key['value'], $params))
 			{
 				$params[$key['value']] = $value['value'];
 			}
@@ -530,6 +530,18 @@ class infraRequestUtils
 
 	public static function dumpFilePart($file_name, $range_from, $range_length)
 	{
+		if(filter_var($file_name, FILTER_VALIDATE_URL))
+		{
+			self::dumpRemoteFilePart($file_name, $range_from, $range_length);
+		}
+		else
+		{
+			self::dumpLocalFilePart($file_name, $range_from, $range_length);
+		}
+	}
+
+	protected static function dumpLocalFilePart($file_name, $range_from, $range_length)
+	{
 		$chunk_size = 100000;
 		$fh = fopen($file_name, "rb");
 		if($fh)
@@ -544,5 +556,19 @@ class infraRequestUtils
 			}
 			fclose($fh);
 		}
+	}
+
+	protected static function dumpRemoteFilePart($file_name, $range_from, $range_length)
+	{
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, $file_name);
+		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+		$range_to = ($range_from + $range_length) - 1;
+		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
+		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
+
+		$result = curl_exec($ch);
 	}
 }

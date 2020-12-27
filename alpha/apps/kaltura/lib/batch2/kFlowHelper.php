@@ -21,6 +21,9 @@ class kFlowHelper
 
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 
+	const DAYS = 'days';
+	const HOURS = 'hours';
+
 
 	/**
 	 * @param int $partnerId
@@ -133,6 +136,16 @@ class kFlowHelper
 		// get entry
 		$entryId = $dbBatchJob->getEntryId();
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+
+		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(), $dbBatchJob->getPartnerId()))
+		{
+			if($dbEntry)
+			{
+				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+				$dbEntry->save();
+			}
+			throw new APIException(APIErrors::INVALID_FILE_TYPE, $data->getDestFileLocalPath());
+		}
 
 		// IMAGE media entries
 		if ($dbEntry->getType() == entryType::MEDIA_CLIP && $dbEntry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
@@ -511,7 +524,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFilePath()))
+		if(!kFile::checkFileExists($data->getDestFilePath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFilePath());
 
 		$flavorAsset = assetPeer::retrieveByIdNoFilter($data->getFlavorAssetId());
@@ -530,7 +543,28 @@ class kFlowHelper
 		$flavorAsset->save();
 
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		
 		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+		
+		/*
+		 * TODO - AWS - Handle shared concat flow
+		 * kFileSyncUtils::moveFromFile should be replaced with this code to support saving concat result to shared storage based on partner config
+		 * This could be done only once convert flow code is changed to support remote file input
+		 *
+		$partner = PartnerPeer::retrieveByPK($dbBatchJob->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		if($partnerSharedStorageProfileId)
+		{
+			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+			if($storageProfile)
+				kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFilePath(), $partnerSharedStorageProfileId);
+		}
+		else
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
+		}
+		*/
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
@@ -546,7 +580,10 @@ class kFlowHelper
 	{
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
-
+		
+		//Check if src remote file was pushed, if so mark it as ready
+		self::handleExtractMediaRemoteUrl($data->getFlavorAssetId(), $data->getSrcFileSyncRemoteUrl(), $data->getSrcFileSyncLocalPath());
+		
 		$rootBatchJob = $dbBatchJob->getRootJob();
 		if(!$rootBatchJob)
 			return $dbBatchJob;
@@ -557,7 +594,7 @@ class kFlowHelper
 		$dbBatchJobAux=self::fixWebCamSources($rootBatchJob, $dbBatchJob, $data);
 		if($dbBatchJobAux!=null)
 			return $dbBatchJobAux;
-
+		
 		if($dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($dbBatchJob->getEntryId());
@@ -593,6 +630,42 @@ class kFlowHelper
 		}
 
 		return $dbBatchJob;
+	}
+	
+	protected static function handleExtractMediaRemoteUrl($flavorAssetId, $fileSyncRemoteUrl, $fileSyncLocalPath)
+	{
+		if(!$fileSyncRemoteUrl)
+		{
+			KalturaLog::debug("File sync remote url not provided, will not check for shared file syncs");
+			return;
+		}
+		
+		$localFileSize = kFile::fileSize($fileSyncLocalPath);
+		$remoteFileSize = kFile::fileSize($fileSyncRemoteUrl);
+		KalturaLog::debug("local file [$fileSyncLocalPath] size [$localFileSize] remote file [$fileSyncRemoteUrl] size [$remoteFileSize]");
+		if($remoteFileSize != $localFileSize)
+		{
+			return;
+		}
+		
+		//get pending file sync to shared storage
+		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
+		$pendingFileSync = $flavorAsset->getSharedPendingFileSync();
+		if(!$pendingFileSync)
+		{
+			KalturaLog::debug("No pending file sync found for current asset [$flavorAssetId]");
+			return;
+		}
+		
+		if($pendingFileSync->getFullPath() != $fileSyncRemoteUrl)
+		{
+			KalturaLog::debug("Pending file sync full path does not match file sync remote url [{$pendingFileSync->getFullPath()}] [$fileSyncRemoteUrl]");
+			return;
+		}
+		
+		
+		$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+		$pendingFileSync->save();
 	}
 
 	/**
@@ -750,14 +823,20 @@ class kFlowHelper
 		if($data->getDestFileSyncLocalPath()) {
 			$flavorAsset->incrementVersion();
 			$shouldSave = true;
-		}		
+		}
+		
+		if($data->getLogFileSyncLocalPath()) {
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
 		
 		if($shouldSave)
 			$flavorAsset->save();
 		
-		if(count($data->getExtraDestFileSyncs()))
+		if($data->getExtraDestFileSyncs() && count($data->getExtraDestFileSyncs()))
 		{
 			//operation engine creating only file assets should be the last one in the operations chain
+			//AWS-TODO:: handle files saved directly to object stroarge
 			self::handleAdditionalFilesConvertFinished($flavorAsset, $dbBatchJob, $data);
 		}			
 		if($data->getDestFileSyncLocalPath())
@@ -822,9 +901,22 @@ class kFlowHelper
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
-			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if($storageProfile)
+					kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSyncLocalPath(), $partnerSharedStorageProfileId);
+			}
+			else
+			{
+				kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			}
 		}
 		elseif($flavorParamsOutput->getRemoteStorageProfileIds())
 		{
@@ -836,12 +928,23 @@ class kFlowHelper
 			}
 		}
 		
-		// creats the file sync
-		if(file_exists($data->getLogFileSyncLocalPath()))
+		// Creates the file sync
+		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-			try{
-				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			try
+			{
+				if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
+				{
+					KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+					$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+					if($storageProfile)
+						kFileSyncUtils::createReadySyncFileForKey($logSyncKey, $data->getLogFileSyncLocalPath(), $partnerSharedStorageProfileId);
+				}
+				else
+				{
+					kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+				}
 			}
 			catch(Exception $e){
 				$err = 'Saving conversion log: ' . $e->getMessage();
@@ -2923,7 +3026,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry)
+	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $privilegeActionsLimit = null)
 	{
 		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
 		if (!preg_match($regex, $file_name, $matches))
@@ -2934,6 +3037,10 @@ class kFlowHelper
 
 		$partner = PartnerPeer::retrieveByPK($partner_id);
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
+		if ($privilegeActionsLimit)
+		{
+			$privilege .= "," . $privilegeActionsLimit;
+		}
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
@@ -2948,48 +3055,68 @@ class kFlowHelper
 
 	public static function handleReportExportFinished(BatchJob $dbBatchJob, kReportExportJobData $data)
 	{
-		$finalPaths = array();
-		$filePaths = explode(',', $data->getFilePaths());
-		foreach ($filePaths as $filePath)
+		$finalFiles = array();
+		$exportFiles = $data->getFiles();
+		foreach ($exportFiles as $exportFile)
 		{
-			$fileName = basename($filePath);
+			$fileName = basename($exportFile->getFileId());
 			$directory = myContentStorage::getFSContentRootPath() . "/content/reports/" . $dbBatchJob->getPartnerId();
 			$finalPath = $directory . DIRECTORY_SEPARATOR . $fileName;
-			$finalPaths[] = $filePath;
-			$moveFile = kFile::moveFile($filePath, $finalPath);
+			$moveFile = kFile::moveFile($exportFile->getFileId(), $finalPath);
 			if (!$moveFile)
 			{
-				KalturaLog::err("Failed to move report file from: " . $filePath . " to: " . $finalPath);
+				KalturaLog::err("Failed to move report file from: " . $exportFile->getFileId() . " to: " . $finalPath);
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
+			$exportFile->setFileId($finalPath);
+			$finalFiles[] = $exportFile;
 		}
 
-		$data->setFilePaths(implode(',', $finalPaths));
+		$data->setFiles($finalFiles);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
-		$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		$privilegeActionsLimit = null;
+		$expiryByPartner = kConf::get("report_export_expiry_by_partner", 'analytics', array());
+		if (array_key_exists($dbBatchJob->getPartnerId(), $expiryByPartner))
+		{
+			$expiry = $expiryByPartner[$dbBatchJob->getPartnerId()];
+			$privilegeActionsLimit = kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
+		}
+		else
+		{
+			$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		}
 
 		$links = array();
 		// Create download URL's
-		foreach ($finalPaths as $finalPath)
+		foreach ($finalFiles as $finalFile)
 		{
-			$fileName = basename($finalPath);
-			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry);
+			$fileName = basename($finalFile->getFileId());
+			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $privilegeActionsLimit);
 			if (!$url)
 			{
-				KalturaLog::err("Failed to create download URL for file - $finalPath");
+				KalturaLog::err("Failed to create download URL for file - {$finalFile->getFileId()}");
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
-			$links[] = '<a href="' . $url .'" target="_blank" >' . $fileName . '</a>';
+			$linkName = $finalFile->getFileName() ? $finalFile->getFileName() : $fileName;
+			$links[] = '<a href="' . $url .'" target="_blank" >' . $linkName . '</a>';
 		}
 
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_SUCCESS;
 		$validUntil = date("m-d-y H:i", $data->getTimeReference() + $expiry + $data->getTimeZoneOffset());
 		$expiryInDays = $expiry / 60 / 60 / 24;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, $validUntil);
-		$titleParams = array($time);
+		if ($expiryInDays >= 1)
+		{
+			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
+		}
+		else
+		{
+			$expiryInHours = $expiry / 60 / 60;
+			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
+		}
+		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
 			null,
@@ -3012,7 +3139,7 @@ class kFlowHelper
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_FAILURE;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(),
 			$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
-		$titleParams = array($time);
+		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
 			null,
@@ -3034,7 +3161,7 @@ class kFlowHelper
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_ABORT;
 		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
-		$titleParams = array($time);
+		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
 			null,
@@ -3172,6 +3299,10 @@ class kFlowHelper
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		if ($partner->getEnforceHttpsApi())
+		{
+			$url = str_replace("http:", "https:", $url);
+		}
 
 		return $url;
 	}
@@ -3279,7 +3410,7 @@ class kFlowHelper
 
 		// if all exports that are not periodic finished add pending file sync to each flavor
 		$assetsIds = assetPeer::retrieveReadyFlavorsIdsByEntryId($entryId);
-		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner, $assetsIds);
+		$nonPeriodicFinished = self::checkNonPeriodicExportsFinished($partner->getId(), $assetsIds);
 		if(!$nonPeriodicFinished)
 		{
 			return;
@@ -3293,19 +3424,24 @@ class kFlowHelper
 		}
 	}
 
-	protected static function checkNonPeriodicExportsFinished($partner, $assetsIds)
+	public static function checkNonPeriodicExportsFinished($partnerId, $assetsIds)
 	{
-		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partner->getId());
+		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($partnerId);
 		$status = array(FileSync::FILE_SYNC_STATUS_PENDING, FileSync::FILE_SYNC_STATUS_ERROR);
 		$types = array(FileSyncObjectType::ASSET);
 		$subTypes = array(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$allFinished = true;
 		foreach($storageProfiles as $profile)
 		{
-			$fileSyncs = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partner->getId(), $status, $assetsIds, $types, $subTypes);
-			if(count($fileSyncs))
+			$fileSync = FileSyncPeer::retrieveFileSyncsByFlavorAndDc($profile->getId(), $partnerId, $status, $assetsIds, $types, $subTypes);
+			if($fileSync)
 			{
-				KalturaLog::debug("found unfinished file syncs for profile [{$profile->getId()}]");
+				if($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_ERROR)
+				{
+					KalturaLog::warning("Found file sync ID [{$fileSync->getId()}] profile [{$profile->getId()}] with status ERROR");
+				}
+
+				KalturaLog::debug("found unfinished file sync ID [{$fileSync->getId()}] for profile [{$profile->getId()}]");
 				$allFinished = false;
 				break;
 			}

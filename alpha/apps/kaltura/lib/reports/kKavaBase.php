@@ -156,7 +156,47 @@ class kKavaBase extends kDruidBase
 	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
 
 	//user engagement values
-	const USER_ENGAGED = 'SoundOnTabFocused';
+	const USER_SOUND_ON_TAB_FOCUSED = 'SoundOnTabFocused';
+	const USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN = 'SoundOnTabFocusedFullScreen';
+	const USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN_OFF = 'SoundOnTabFocusedFullScreenOff';
+	const USER_SOUND_ON_TAB_NOT_FOCUSED = 'SoundOnTabNotFocused';
+	const USER_SOUND_ON_TAB_NOT_FOCUSED_FULL_SCREEN = 'SoundOnTabNotFocusedFullScreen';
+	const USER_SOUND_ON_TAB_NOT_FOCUSED_FULL_SCREEN_OFF = 'SoundOnTabNotFocusedFullScreenOff';
+	const USER_SOUND_OFF_TAB_FOCUSED = 'SoundOffTabFocused';
+	const USER_SOUND_OFF_TAB_FOCUSED_FULL_SCREEN = 'SoundOffTabFocusedFullScreen';
+	const USER_SOUND_OFF_TAB_FOCUSED_FULL_SCREEN_OFF = 'SoundOffTabFocusedFullScreenOff';
+	const USER_SOUND_OFF_TAB_NOT_FOCUSED = 'SoundOffTabNotFocused';
+	const USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN = 'SoundOffTabNotFocusedFullScreen';
+	const USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN_OFF = 'SoundOffTabNotFocusedFullScreenOff';
+
+	protected static $realtime_engagement = array(
+		self::USER_SOUND_ON_TAB_FOCUSED,
+		self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN,
+		self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN_OFF,
+	);
+
+	protected static $good_engagement = array(
+		self::USER_SOUND_ON_TAB_FOCUSED,
+		self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN_OFF,
+	);
+
+	protected static $fair_engagement = array(
+		self::USER_SOUND_ON_TAB_NOT_FOCUSED,
+		self::USER_SOUND_ON_TAB_NOT_FOCUSED_FULL_SCREEN_OFF,
+		self::USER_SOUND_ON_TAB_NOT_FOCUSED_FULL_SCREEN,
+	);
+
+	protected static $low_engagement = array(
+		self::USER_SOUND_OFF_TAB_FOCUSED,
+		self::USER_SOUND_OFF_TAB_FOCUSED_FULL_SCREEN_OFF,
+		self::USER_SOUND_OFF_TAB_FOCUSED_FULL_SCREEN,
+	);
+
+	protected static $non_engaged = array(
+		self::USER_SOUND_OFF_TAB_NOT_FOCUSED,
+		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN_OFF,
+		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN,
+	);
 
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
@@ -200,6 +240,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR2 => 1,
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
+			self::DIMENSION_USER_ENGAGEMENT => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,

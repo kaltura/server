@@ -12,6 +12,24 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	public $projectedAudience;
 
+	/**
+	 * The entry ID of the source entry (for simulive)
+	 * @var string
+	 */
+	public $sourceEntryId;
+
+	/**
+	 * The time relative time before the startTime considered as preStart time
+	 * @var int
+	 */
+	public $preStartTime;
+
+	/**
+	 * The time relative time before the endTime considered as postEnd time
+	 * @var int
+	 */
+	public $postEndTime;
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
@@ -31,6 +49,9 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	private static $map_between_objects = array
 	(
 		'projectedAudience',
+		'sourceEntryId',
+		'preStartTime',
+		'postEndTime'
 	);
 
 	/* (non-PHPdoc)
@@ -48,5 +69,42 @@ class KalturaLiveStreamScheduleEvent extends KalturaEntryScheduleEvent
 	public function getScheduleEventType()
 	{
 		return ScheduleEventType::LIVE_STREAM;
+	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validateLiveStreamEventFields();
+		parent::validateForInsert($propertiesToSkip);
+	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validateLiveStreamEventFields();
+		parent::validateForUpdate($sourceObject, $propertiesToSkip = array());
+	}
+
+	/**
+	 * @throws KalturaAPIException
+	 */
+	protected function validateLiveStreamEventFields()
+	{
+		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
+		}
+		if (isset($this->preStartTime) && $this->preStartTime < 0)
+		{
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'preStartTime');
+		}
+		if (isset($this->postEndTime) && $this->postEndTime < 0)
+		{
+		    throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'postEndTime');
+		}
 	}
 }

@@ -45,12 +45,17 @@ class kZoomRecording implements iZoomObject
 		{
 			$kZoomRecordingFile = new kZoomRecordingFile();
 			$kZoomRecordingFile->parseData($recordFileData);
-			if(!isset($this->recordingFiles[$kZoomRecordingFile->recordingFileType]))
+			if(!isset($this->recordingFiles[$kZoomRecordingFile->recordingStart]))
 			{
-				$this->recordingFiles[$kZoomRecordingFile->recordingFileType] = array();
+				$this->recordingFiles[$kZoomRecordingFile->recordingStart] = array();
 			}
 
-			$this->recordingFiles[$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
+			if(!isset($this->recordingFiles[$kZoomRecordingFile->recordingStart][$kZoomRecordingFile->recordingFileType]))
+			{
+				$this->recordingFiles[$kZoomRecordingFile->recordingStart][$kZoomRecordingFile->recordingFileType] = array();
+			}
+
+			$this->recordingFiles[$kZoomRecordingFile->recordingStart][$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
 	}
 

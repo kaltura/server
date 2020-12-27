@@ -858,8 +858,10 @@ class KalturaEntryService extends KalturaBaseService
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
 			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
+    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
+    			{
     				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+    			}
 
     			KalturaLog::err("Failed downloading file[$url]");
     			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
@@ -871,7 +873,7 @@ class KalturaEntryService extends KalturaBaseService
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
     		{
     			$entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath))
+    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
     			{
     				$dbAsset = $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
     				return $dbAsset;
@@ -1087,10 +1089,6 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$fileSync)
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_DOESNT_EXIST);
-		}
-		else if(!$local)
-		{
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrl($fileSync));
 		}
 		
 		// even if it null
@@ -1873,8 +1871,12 @@ class KalturaEntryService extends KalturaBaseService
 			{
 				$srcSyncKey = $originalFlavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 				list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
+				//To-Do Change the import flow for periodic storage file syncs to work natively with the shared storage flow
 				/* @var $fileSync FileSync */
-				if ($fileSync && !$local)
+				if ( $fileSync && (!$local ||
+						($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL &&
+							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()) )
+					))
 				{
 					$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
 					if(myEntryUtils::shouldValidateLocal() && $fileSync->getDc() == $remoteDc)
@@ -1883,7 +1885,7 @@ class KalturaEntryService extends KalturaBaseService
 						throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
 					}
 
-					return $fileSync->getExternalUrl($entryId);
+					return $fileSync->getExternalUrl($entryId, null, true);
 				}
 			}
 		}

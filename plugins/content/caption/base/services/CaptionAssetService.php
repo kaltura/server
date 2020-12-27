@@ -210,12 +210,13 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
 
+		if( $captionAsset->isDefault )
+		{
+			$this->setAsDefaultAction($dbCaptionAsset->getId());
+		}
 
 		$dbCaptionAsset = $captionAsset->toUpdatableObject($dbCaptionAsset);
 		$dbCaptionAsset->save();
-
-		if ($dbCaptionAsset->getDefault())
-			$this->setAsDefaultAction($dbCaptionAsset->getId());
 
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
@@ -282,32 +283,12 @@ class CaptionAssetService extends KalturaAssetService
 
 	/**
 	 * @param CaptionAsset $captionAsset
-	 * @param string $url
-	 */
-	protected function attachUrl(CaptionAsset $captionAsset, $url)
-	{
-		$destPath = md5($url);
-		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $destPath;
-		if (KCurlWrapper::getDataFromFile($url, $fullPath))
-			return $this->attachFile($captionAsset, $fullPath);
-
-		if ($captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_QUEUED || $captionAsset->getStatus() == CaptionAsset::ASSET_STATUS_NOT_APPLICABLE)
-		{
-			$captionAsset->setDescription("Failed downloading file[$url]");
-			$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_ERROR);
-			$captionAsset->save();
-		}
-
-		throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_DOWNLOAD_FAILED, $url);
-	}
-
-	/**
-	 * @param CaptionAsset $captionAsset
 	 * @param kUrlResource $contentResource
 	 */
 	protected function attachUrlResource(CaptionAsset $captionAsset, kUrlResource $contentResource)
 	{
-		$this->attachUrl($captionAsset, $contentResource->getUrl());
+		kJobsManager::addImportJob(null, $captionAsset->getEntryId(), $this->getPartnerId(),
+			$contentResource->getUrl(), $captionAsset, null, $contentResource->getImportJobData());
 	}
 
 	/**

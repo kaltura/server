@@ -29,6 +29,7 @@ class kImageTransformationStep
 	/**
 	 * @param array $transformationParameters
 	 * @return Imagick
+	 * @throws kThumbnailException
 	 */
 	public function execute(&$transformationParameters)
 	{
@@ -51,7 +52,7 @@ class kImageTransformationStep
 	/**
 	 * @param kImagickAction $imageAction
 	 */
-	public function addImageAction($imageAction)
+	protected function addImageAction($imageAction)
 	{
 		$this->imageActionCollection[] = $imageAction;
 		if($imageAction->canHandleCompositeObject())
@@ -63,7 +64,7 @@ class kImageTransformationStep
 	/**
 	 * @param kSourceAction $sourceAction
 	 */
-	public function addSourceAction($sourceAction)
+	protected function addSourceAction($sourceAction)
 	{
 		$this->sourceActionCollection[] = $sourceAction;
 	}

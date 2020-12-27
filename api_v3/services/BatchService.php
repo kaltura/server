@@ -18,6 +18,7 @@
  */
 class BatchService extends KalturaBatchService
 {
+	const DEFAULT_MAX_DATA_SIZE = 20000000;
 
 // --------------------------------- BulkUploadJob functions 	--------------------------------- //
 
@@ -547,7 +548,7 @@ class BatchService extends KalturaBatchService
 		kApiCache::disableConditionalCache();
 		
 		$ret = new KalturaFileExistsResponse();
-		$ret->exists = file_exists($localPath);
+		$ret->exists = kFile::checkFileExists($localPath);
 		$ret->sizeOk = false;
 
 		if($ret->exists)
@@ -630,5 +631,45 @@ class BatchService extends KalturaBatchService
 			$dbBatchJobLock->save();
 			KalturaLog::debug('Expiration was: '. $currentExpiration ." ,the new expiration is: ". $dbBatchJobLock->getExpiration());
 		}
+	}
+
+	/**
+	 * batch putFileAction action allows put file on server via http
+	 *
+	 * @action putFile
+	 * @param string $destPath
+	 * @param file $data
+	 * @return int Number of bytes
+	 */
+	public function putFileAction($destPath, $data)
+	{
+		$maxDataSize = kConf::get('maxPutFileSize','batchServices', self::DEFAULT_MAX_DATA_SIZE);
+		$allowedPathPrefixArr = kConf::get('allowedPutFilePrefix','batchServices', array());
+		$found = false;
+		foreach ($allowedPathPrefixArr as $allowedPathPrefix)
+		{
+			if (strpos($destPath, $allowedPathPrefix) === 0)
+			{
+				$found = true;
+				break;
+			}
+		}
+		if (!$found)
+		{
+			throw new KalturaAPIException(KalturaErrors::PATH_NOT_ALLOWED, $destPath);
+		}
+		$size = kFile::fileSize($data['tmp_name']);
+		if ( $size > $maxDataSize )
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_SIZE_EXCEEDED, $size);
+		}
+
+		KalturaLog::debug("Going to save file in path - $destPath");
+		if(kFile::checkFileExists($destPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_ALREADY_EXISTS, $destPath);
+		}
+		$ret = kFile::moveFile($data['tmp_name'], $destPath);
+		return $ret;
 	}
 }

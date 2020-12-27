@@ -19,29 +19,31 @@ class kElasticUserEntitlementDecorator implements IKalturaESearchEntryEntitlemen
 	{
 		$conditions = array();
 
-		$userEditPreFetchGroupCondition = new kESearchTermsQuery("{$fieldPrefix}entitled_kusers_edit",
-			array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
+
+        $userEditPreFetchGroupCondition = new kESearchTermsQuery("{$fieldPrefix}entitled_kusers_edit",
+			array('index' => $indexName,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 				'id' => $params['kuserId'],	'path' => 'group_ids'));
 		$conditions[] = $userEditPreFetchGroupCondition;
 		$userEditCondition = new kESearchTermQuery("{$fieldPrefix}entitled_kusers_edit",$params['kuserId']);
 		$conditions[] = $userEditCondition;
 
 		$userPublishPreFetchGroupCondition = new kESearchTermsQuery("{$fieldPrefix}entitled_kusers_publish",
-			array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+			array('index' => $indexName,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 				'id' => $params['kuserId'],	'path' => 'group_ids'));
 		$conditions[] = $userPublishPreFetchGroupCondition;
 		$userPublishCondition = new kESearchTermQuery("{$fieldPrefix}entitled_kusers_publish",$params['kuserId']);
 		$conditions[] = $userPublishCondition;
 
 		$userViewPreFetchGroupCondition = new kESearchTermsQuery("{$fieldPrefix}entitled_kusers_view",
-			array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+			array('index' => $indexName,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 				'id' => $params['kuserId'],	'path' => 'group_ids'));
 		$conditions[] = $userViewPreFetchGroupCondition;
 		$userViewCondition = new kESearchTermQuery("{$fieldPrefix}entitled_kusers_view",$params['kuserId']);
 		$conditions[] = $userViewCondition;
 
 		$userPreFetchGroupCondition = new kESearchTermsQuery("{$fieldPrefix}kuser_id",
-			array('index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
+			array('index' => $indexName,'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 				'id' => $params['kuserId'],	'path' => 'group_ids'));
 		$conditions[] = $userPreFetchGroupCondition;
 		$userCondition = new kESearchTermQuery("{$fieldPrefix}kuser_id",$params['kuserId']);

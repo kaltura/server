@@ -68,8 +68,7 @@ abstract class KBaseMediaParser
 	public function getRawMediaInfo()
 	{
 		$cmd = $this->getCommand();
-		KalturaLog::debug("Executing '$cmd'");
-		$output = shell_exec($cmd);
+		$output = kExecWrapper::shell_exec($cmd);
 		if (trim($output) === "")
 			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			

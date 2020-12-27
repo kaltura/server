@@ -8,6 +8,8 @@
  */
 class kFileBase 
 {
+	protected static $storageTypeMap = null;
+	
     /**
      * Lazy saving of file content to a temporary path, the file will exist in this location until the temp files are purged
      * @param string $fileContent
@@ -28,6 +30,12 @@ class kFileBase
 
     public static function filePutContents($filename, $data, $flags = 0, $context = null)
 	{
+		if(kFile::isSharedPath($filename))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filename);
+			return $kSharedFsMgr->putFileContent($filename, $data, $flags, $context);
+		}
+		
 		return file_put_contents($filename, $data, $flags, $context);
 	}
 
@@ -51,8 +59,27 @@ class kFileBase
 
     public static function chmod($filePath, $mode)
     {
-        chmod($filePath, $mode);
+	    if(kFile::isSharedPath($filePath))
+	    {
+		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+		    return $kSharedFsMgr->chmod($filePath, $mode);
+	    }
+	    
+        return chmod($filePath, $mode);
     }
+	
+	public static function chown($filePath, $user, $group)
+	{
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->chown($filePath,  $user, $group);
+		}
+		
+		passthru("chown $user:$group $filePath", $ret);
+		
+		return $ret;
+	}
 
     public static function readLastBytesFromFile($file_name, $bytes = 1024)
     {
@@ -97,6 +124,12 @@ class kFileBase
     // make sure the file is closed , then remove it
     public static function deleteFile($file_name)
     {
+	    if(kFile::isSharedPath($file_name))
+	    {
+		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+		    return $kSharedFsMgr->unlink($file_name);
+	    }
+    	
         $fh = fopen($file_name, 'w') or die("can't open file");
         fclose($fh);
         unlink($file_name);
@@ -111,8 +144,8 @@ class kFileBase
      */
     public static function fullMkfileDir ($path, $rights = 0777, $recursive = true)
     {
-        if(file_exists($path))
-            return true;
+	    if(kFile::checkFileExists($path))
+		    return true;
 
         $oldUmask = umask(00);
         $result = @mkdir($path, $rights, $recursive);
@@ -150,6 +183,12 @@ class kFileBase
      */
     public static function fullMkdir($path, $rights = 0755, $recursive = true)
     {
+	    if(kFile::isSharedPath($path))
+	    {
+		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+		    return $kSharedFsMgr->fullMkdir($path, $rights, $recursive);
+	    }
+    	
         return self::fullMkfileDir(dirname($path), $rights, $recursive);
     }
     
@@ -159,6 +198,12 @@ class kFileBase
      */
     static public function fileSize($filename)
     {
+	    if(kFile::isSharedPath($filename))
+	    {
+		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filename);
+		    return $kSharedFsMgr->fileSize($filename);
+	    }
+    	
         if(PHP_INT_SIZE >= 8)
             return filesize($filename);
 
@@ -188,13 +233,11 @@ class kFileBase
     {
         file_put_contents($file_name, $str, FILE_APPEND);
     }
-
-    static public function fixPath($file_name)
-    {
-        $res = str_replace("\\", "/", $file_name);
-        $res = str_replace("//", "/", $res);
-        return $res;
-    }
+	
+	static public function fixPath($file_name)
+	{
+		return str_replace(array("//", "\\"), array("/", "/"), $file_name);
+	}
     
     static public function setFileContent($file_name, $content)
     {
@@ -220,6 +263,12 @@ class kFileBase
     
     static public function getFileContent($file_name, $from_byte = 0, $to_byte = -1, $mode = 'r')
     {
+	    if(kFile::isSharedPath($file_name))
+	    {
+		    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+		    return $kSharedFsMgr->getFileContent($file_name, $from_byte, $to_byte);
+	    }
+    	
         $file_name = self::fixPath($file_name);
 
         try
@@ -257,8 +306,14 @@ class kFileBase
     
     public static function mimeType($file_name)
     {
-        if (!file_exists($file_name))
+        if (!kFile::checkFileExists($file_name))
             return false;
+        
+        if(kFile::isSharedPath($file_name))
+        {
+	        $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+	        return $kSharedFsMgr->mimeType($file_name);
+        }
 
         if(! function_exists('mime_content_type'))
         {
@@ -284,8 +339,391 @@ class kFileBase
         self::chmod($destFile,intval($mode,8));
     }
 
+	public static function getDataFromFile($src, $destFilePath = null, $maxFileSize = null, $allowInternalUrl = false)
+	{
+		if(!$destFilePath)
+		{
+			$curlWrapper = new KCurlWrapper();
+			$res = $curlWrapper->exec($src, null, null, $allowInternalUrl);
+			$httpCode = $curlWrapper->getHttpCode();
+			if (KCurlHeaderResponse::isError($httpCode))
+			{
+				KalturaLog::info("curl request [$src] return with http-code of [$httpCode]");
+				if ($destFilePath && file_exists($destFilePath))
+					unlink($destFilePath);
+				$res = false;
+			}
+			
+			$curlWrapper->close();
+			return $res;
+		}
+		
+		if(kFile::isSharedPath($destFilePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($destFilePath);
+			return $kSharedFsMgr->getFileFromResource($src, $destFilePath, $allowInternalUrl);
+		}
+		
+		return KCurlWrapper::getDataFromFile($src, $destFilePath, $maxFileSize, $allowInternalUrl);
+	}
+	
 	public static function checkFileExists($path)
 	{
+		if(kFile::isSharedPath($path))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $kSharedFsMgr->checkFileExists($path);
+		}
+		
 		return file_exists($path);
+	}
+	
+	public static function isFile($filePath)
+	{
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->isFile($filePath);
+		}
+		
+		return is_file($filePath);
+	}
+	
+	public static function realPath($filePath, $getRemote = true)
+	{
+		if(filter_var($filePath, FILTER_VALIDATE_URL))
+		{
+			return $filePath;
+		}
+		
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->realPath($filePath, $getRemote);
+		}
+		
+		return realpath($filePath);
+	}
+	
+	public static function dumpFilePart($file_name, $range_from, $range_length)
+	{
+		if(kFile::isSharedPath($file_name))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+			return $kSharedFsMgr->dumpFilePart($file_name, $range_from, $range_length);
+		}
+		
+		return infraRequestUtils::dumpFilePart($file_name, $range_from, $range_length);
+	}
+	
+	public static function isDir($path)
+	{
+		if(kFile::isSharedPath($path))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $kSharedFsMgr->isDir($path);
+		}
+		
+		return is_dir($path);
+	}
+	
+	public static function chgrp($filePath, $contentGroup)
+	{
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->chgrp($filePath, $contentGroup);
+		}
+		
+		return chgrp($filePath, $contentGroup);
+	}
+	
+	public static function unlink($filePath)
+	{
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->unlink($filePath);
+		}
+		
+		return @unlink($filePath);
+	}
+	
+	public static function filemtime($filePath)
+	{
+		if(kFile::isSharedPath($filePath))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+			return $kSharedFsMgr->filemtime($filePath);
+		}
+		
+		return filemtime($filePath);
+	}
+	
+	public static function getFolderSize($path)
+	{
+		if(!kFile::checkFileExists($path))
+		{
+			return 0;
+		}
+		
+		if(kFile::isFile($path))
+		{
+			return kFile::fileSize($path);
+		}
+		
+		$ret = 0;
+		foreach(glob($path."/*") as $fn)
+		{
+			$ret += self::getFolderSize($fn);
+		}
+		
+		return $ret;
+	}
+	
+	public static function rename($from, $to)
+	{
+		if(kFile::isSharedPath($to))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
+			return $kSharedFsMgr->rename($from, $to);
+		}
+		
+		return rename($from, $to);
+	}
+	
+	public static function copy($from, $to)
+	{
+		if(kFile::isSharedPath($to) || kFile::isSharedPath($to))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
+			return $kSharedFsMgr->copy($from, $to);
+		}
+		
+		return copy($from, $to);
+	}
+	
+	public static function mkdir($path, $mode = 0777, $recursive = false)
+	{
+		if(kFile::isSharedPath($path))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $kSharedFsMgr->mkdir($path, $mode, $recursive);
+		}
+		
+		return mkdir($path, $mode, $recursive);
+	}
+	
+	public static function rmdir($path)
+	{
+		if(kFile::isSharedPath($path))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $kSharedFsMgr->rmdir($path);
+		}
+		
+		return rmdir($path);
+	}
+	
+	public static function copyDir($src, $dest, $deleteSrc)
+	{
+		if(kFile::isSharedPath($src))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($src);
+			return $kSharedFsMgr->copyDir($src, $dest, $deleteSrc);
+		}
+		
+		$dir = dir($src);
+		while ( false !== $entry = $dir->read () )
+		{
+			if ($entry == '.' || $entry == '..')
+			{
+				continue;
+			}
+			
+			$newSrc = $src . DIRECTORY_SEPARATOR . $entry;
+			if(kFile::isDir($newSrc))
+			{
+				KalturaLog::err("Copying of non-flat directories is illegal");
+				return false;
+			}
+			
+			$res = kFile::copySingleFile ($newSrc, $dest . DIRECTORY_SEPARATOR . $entry , $deleteSrc);
+			if (! $res)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static function getStorageTypeMap()
+	{
+		if(self::$storageTypeMap)
+			return self::$storageTypeMap;
+		
+		self::$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
+		return self::$storageTypeMap;
+	}
+	
+	public static function isSharedPath($path)
+	{
+		$path = kFile::fixPath($path);
+		$storageTypeMap = self::getStorageTypeMap();
+		if(!$storageTypeMap)
+			return false;
+		
+		foreach ( array_keys($storageTypeMap) as $pathPrefix)
+		{
+			if(kString::beginsWith($path, $pathPrefix))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 *  the function returns a unique file path for a file
+	 *
+	 * @param string $prefix the prefix for the path
+	 * @param bool $isDir should we create this path as dir
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function createUniqueFilePath($prefix = '', $isDir = false)
+	{
+		$retiresNum = kConf::get('create_path_retries', 'local', 10);
+		for ($i = 0; $i < $retiresNum; $i++)
+		{
+			$id = md5(microtime(true) . getmypid() . uniqid(rand(), true));
+			$path = $prefix . substr($id, 0, 2) . '/' . substr($id, -2) . '/' . $id;
+			if ($isDir)
+			{
+				$path .= '/';
+			}
+			
+			$path = kFile::fixPath($path);
+			$existingObject = kFile::checkFileExists($path);
+			
+			if (!$existingObject)
+			{
+				// create empty file to avoid generating the same path for a different file
+				kFile::filePutContents($path, '');
+				return $path;
+			}
+		}
+		
+		throw new Exception("Could not calculate unique path for file");
+	}
+	
+	public static function resolveFilePath($filePath)
+	{
+		$isRemote = false;
+		$realFilePath = kFile::realPath($filePath);
+		
+		if(strpos($realFilePath, "http") !== false)// && kFile::checkFileExists($filePath))
+		{
+			$isRemote = true;
+		}
+		
+		return array($isRemote, $realFilePath);
+	}
+	
+	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)
+	{
+		if(!$dirName)
+		{
+			$dirName = sys_get_temp_dir();
+		}
+		
+		if(!$baseName)
+		{
+			$baseName = md5(microtime(true) . getmypid() . uniqid(rand(), true));;
+		}
+		
+		$tmpFilePath = kFile::fixPath($dirName . DIRECTORY_SEPARATOR . $baseName);
+		
+		if(!kFile::checkFileExists(dirname($tmpFilePath)))
+		{
+			kFile::fullMkfileDir(dirname($tmpFilePath));
+		}
+		
+		$res = null;
+		try
+		{
+			$res = kFile::getDataFromFile($externalUrl, $tmpFilePath, null, true);
+			if ($res)
+			{
+				$res = $tmpFilePath;
+				KalturaLog::debug("Succeeded to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+			}
+			else
+			{
+				KalturaLog::err("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				throw new KalturaException("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err("Failed to fetch from [$externalUrl] " . $e->getMessage());
+			throw $e;
+		}
+		
+		return $res;
+	}
+	
+	public static function setStorageTypeMap($key, $value)
+	{
+		self::$storageTypeMap[$key] = $value;
+	}
+	
+	public static function buildDirectUrl($path)
+	{
+		if(!self::isSharedPath($path))
+		{
+			return $path;
+		}
+		
+		$path = kFile::fixPath($path);	
+		$vodPackagerDirectSecret = kConf::get('vod_packager_direct_serve_secret', 'local', null);
+		if(!$vodPackagerDirectSecret)
+		{
+			throw new Exception("VOD direct serve secret not found");
+		}
+		
+		$vodPackagerInternalDomain = kConf::get('vod_packager_internal_domain', 'cloud_storage', null);
+		if(!$vodPackagerInternalDomain)
+		{
+			throw new Exception("Path is shared but no valid serve domain found in config");
+		}
+		
+		$storageType = self::getStorageType($path);
+		list($bucket, $path) = explode("/",ltrim($path,"/"),2);
+		
+		$sig = base64_encode(hash_hmac('sha256', $path, $vodPackagerDirectSecret, true));
+		$sig = rtrim(strtr($sig, '+/', '-_'), '=');
+		return "http://$vodPackagerInternalDomain/direct/$storageType/sig/{$sig}/{$path}";
+	}
+	
+	public static function getStorageType($path)
+	{
+		$path = kFile::fixPath($path);
+		$storageTypeMap = self::getStorageTypeMap();
+		if(!$storageTypeMap)
+		{
+			return false;
+		}
+		
+		foreach ( $storageTypeMap as $pathPrefix => $storageType)
+		{
+			if(kString::beginsWith($path, $pathPrefix))
+			{
+				return strtolower($storageType);
+			}
+		}
+		
+		return false;
 	}
 }

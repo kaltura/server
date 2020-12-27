@@ -20,6 +20,12 @@ class kPlaybackContextDataResult
      */
     private $playbackCaptions = array();
 
+	/**
+	 *
+	 * @var array
+	 */
+	private $bumperData = array();
+
     /**
      * @return array
      */
@@ -78,5 +84,21 @@ class kPlaybackContextDataResult
     {
         $this->pluginData = $pluginData;
     }
+
+	/**
+	 * @return array
+	 */
+	public function getBumperData()
+	{
+		return $this->bumperData;
+	}
+
+	/**
+	 * @param array $bumperData
+	 */
+	public function setBumperData($bumperData)
+	{
+		$this->bumperData = $bumperData;
+	}
 
 }

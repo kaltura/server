@@ -506,9 +506,10 @@ class BaseEntryService extends KalturaEntryService
 				}
 			}
 		}
-		catch (Exception $e)
+		catch (KalturaAPIException $e)
 		{
 			kalturaLog::warning('Could not execute filter');
+			KalturaLog::debug($e);
 		}
 
 		return $result;
@@ -986,6 +987,16 @@ class BaseEntryService extends KalturaEntryService
 			$dbEntry = $dbEntry->getParentEntry();
 			if(!$dbEntry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
+		}
+
+		$simuliveEvent = kSimuliveUtils::getPlayableSimuliveEvent($dbEntry);
+		if ($simuliveEvent)
+		{
+			$dbEntry = kSimuliveUtils::getSourceEntry($simuliveEvent);
+			if (!$dbEntry)
+			{	
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			}
 		}
 
 		$asset = null;

@@ -87,8 +87,10 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 	{
 		$maxUserCategories = kConf::get('maxUserCategories', 'elastic', self::MAX_CATEGORIES);
 
-		$params = array(
-			'index' => ElasticIndexMap::ELASTIC_CATEGORY_INDEX,
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
+
+        $params = array(
+			'index' => $indexName,
 			'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE,
 			'size' => $maxUserCategories
 		);
@@ -108,8 +110,11 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
 		$conditionsBoolQuery = new kESearchBoolQuery();
 
-		$userGroupsQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS,array(
-			'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
+
+
+        $userGroupsQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS,array(
+			'index' => $indexName,
 			'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
 			'id' => $kuserId,
 			'path' => 'group_ids'

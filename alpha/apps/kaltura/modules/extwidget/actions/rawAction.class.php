@@ -62,8 +62,6 @@ class rawAction extends sfAction
 				KExternalErrors::dieGracefully();
 		}
 
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.raw', $entry->getPartnerId());
-		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		$securyEntryHelper = new KSecureEntryHelper($entry, $ks, $referrer, ContextType::DOWNLOAD);
@@ -121,7 +119,7 @@ class rawAction extends sfAction
 			$flavor_asset = $this->getAllowedFlavorAssets( $securyEntryHelper, $entry_id , $format );
 			if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
-				$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true );
+				$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true , $name);
 			}
 			else
 			{
@@ -151,7 +149,7 @@ class rawAction extends sfAction
 			
 			if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
-				$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true );
+				$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true, $name);
 			}
 			else
 			{
@@ -211,7 +209,7 @@ class rawAction extends sfAction
 		if ( $media_type == entry::ENTRY_MEDIA_TYPE_IMAGE )
 		{
 			// image - use data for entry
-			$file_sync = $this->redirectIfRemote ( $entry ,  kEntryFileSyncSubType::DATA , null );
+			$file_sync = $this->redirectIfRemote ( $entry ,  kEntryFileSyncSubType::DATA , null, true, $name);
 			$key = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
 			kFileUtils::dumpFile(kFileSyncUtils::getLocalFilePathForKey($key, true),  null, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
@@ -224,7 +222,7 @@ class rawAction extends sfAction
 				$flavor_asset = $this->getAllowedFlavorAssets( $securyEntryHelper, $entry_id , $format );
 				if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				{
-					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true );
+					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true , $name);
 				}
 				else
 				{
@@ -240,7 +238,7 @@ class rawAction extends sfAction
 				$flavor_asset = $this->getAllowedFlavorAssets( $securyEntryHelper, $entry_id , null, true );
 				if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 				{
-					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false ); // NOT strict - if there is no archive, get the data version
+					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false , $name); // NOT strict - if there is no archive, get the data version
 					if ( $file_sync )
 					{
 						$archive_file = $file_sync->getFullPath();
@@ -257,7 +255,7 @@ class rawAction extends sfAction
 						header('KalturaRaw: no original flavor asset for entry, no best play asset for entry');
 						KExternalErrors::dieGracefully();
 					}
-					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false ); // NOT strict - if there is no archive, get the data version
+					$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , false , $name); // NOT strict - if there is no archive, get the data version
 					if(!$file_sync)
 					{
 						header('KalturaRaw: no file sync found for flavor ['.$flavor_asset->getId().']');
@@ -283,7 +281,7 @@ class rawAction extends sfAction
 				if($key !== FALSE)
 					unset($try_formats[$key]);
 				
-				$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $format, false);
+				$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $format, false, $name);
 			}
 			
 			if(!isset($file_sync) || !$file_sync || !file_exists($file_sync->getFullPath()))
@@ -291,7 +289,7 @@ class rawAction extends sfAction
 				foreach($try_formats as $ext)
 				{
 					KalturaLog::log( "raw for mix - trying to find filesync for extension: [$ext] on entry [{$entry->getId()}]");
-					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, false);
+					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, false, $name);
 					if($file_sync && file_exists($file_sync->getFullPath()))
 					{
 						KalturaLog::log( "raw for mix - found flattened video of extension: [$ext] continuing with this file {$file_sync->getFullPath()}");
@@ -300,7 +298,7 @@ class rawAction extends sfAction
 				}
 				if(!$file_sync || !file_exists($file_sync->getFullPath()))
 				{
-					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, true);
+					$file_sync = $this->redirectIfRemote( $entry , kEntryFileSyncSubType::DOWNLOAD, $ext, true, $name);
 				}
 			}
 
@@ -323,6 +321,10 @@ class rawAction extends sfAction
 		if($shouldProxy || !empty($relocate))
 		{
 			// dump the file
+			if(isset($file_sync) && $file_sync && in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+			{
+				$archive_file = $file_sync->getRemotePath();
+			}
 			kFileUtils::dumpFile($archive_file , $mime_type );
 			KExternalErrors::dieGracefully();
 		}
@@ -371,15 +373,18 @@ class rawAction extends sfAction
 		header ( "Location: {$url}" );
 		KExternalErrors::dieGracefully();
 	}
-	
+
 	/**
-	 *
-	 * @param $entry
+	 * @param $obj
 	 * @param $sub_type
 	 * @param $version
-	 * @return FileSync
+	 * @param bool $strict
+	 * @param null $fileName
+	 * @return mixed|null
+	 * @throws PropelException
+	 * @throws sfStopException
 	 */
-	private function redirectIfRemote ( $obj , $sub_type , $version , $strict = true )
+	private function redirectIfRemote ( $obj , $sub_type , $version , $strict = true , $fileName = null)
 	{
 		$dataKey = $obj->getSyncKey( $sub_type , $version );
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
@@ -398,18 +403,33 @@ class rawAction extends sfAction
 				return null;
 		}
 		
-		return $this->redirectFileSyncIfRemote($file_sync, $local);
+		return $this->redirectFileSyncIfRemote($file_sync, $local, $obj, $fileName);
 	}
-	
+
 	/**
-	 *
-	 * @param $entry
-	 * @param $sub_type
-	 * @param $version
-	 * @return FileSync
+	 * @param $file_sync
+	 * @param $local
+	 * @param $object
+	 * @param null $fileName
+	 * @return mixed
+	 * @throws sfStopException
 	 */
-	private function redirectFileSyncIfRemote($file_sync, $local)
+	private function redirectFileSyncIfRemote($file_sync, $local, $object, $fileName = null)
 	{
+		if(kFile::isSharedPath($file_sync->getFullPath()) || in_array($file_sync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+		{
+			if($object instanceof asset)
+			{
+				$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($file_sync->getDc(), $object->getEntryId());
+				if($downloadDeliveryProfile && $object)
+				{
+					$isDir = kFile::isDir($file_sync->getFullPath());
+					$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir, $file_sync);
+					$this->redirect($url);
+				}
+			}
+		}
+
 		if ( !$local )
 		{
 			$shouldProxy = $this->getRequestParameter("forceproxy", false);
@@ -427,6 +447,20 @@ class rawAction extends sfAction
 		}
 		
 		return $file_sync;
+	}
+
+	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir, $file_sync)
+	{
+		if($fileName)
+		{
+			$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
+			$fileName = kString::removeNewLine($fileName. '.' .$ext);
+			$fileName = kString::stripInvalidUrlChars($fileName);
+			$fileName = rawurlencode($fileName);
+		}
+		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
+		KalturaLog::log ("URL to redirect to [$url]" );
+		return $url;
 	}
 	
 	private function getAllowedFlavorAssets(KSecureEntryHelper $secureEntryHelper, $entryId, $format = null, $isOriginal = false, $isBestPlay = false)

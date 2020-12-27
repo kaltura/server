@@ -89,6 +89,7 @@ class kContentDistributionManager
   		}
   		
 		$dcs = array();
+		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
 		foreach($fileSyncs as $fileSync)
 		{
 			/* @var $fileSync FileSync */
@@ -121,6 +122,9 @@ class kContentDistributionManager
 			
 			// populates the list of files in each dc
 			$fileSyncDc = $fileSync->getDc();
+			if(in_array($fileSyncDc, $sharedStorageIds))
+				$fileSyncDc = $dc;
+			
 			if(!isset($dcs[$fileSyncDc]))
 				$dcs[$fileSyncDc] = array();
 			

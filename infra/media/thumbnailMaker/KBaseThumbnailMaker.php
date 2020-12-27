@@ -17,7 +17,7 @@ abstract class KBaseThumbnailMaker
 	 */
 	public function __construct($srcPath, $targetPath)
 	{
-		if (!file_exists($srcPath))
+		if (!kFile::checkFileExists($srcPath))
 			throw new Exception("File not found at [$srcPath]");
 			
 		$this->srcPath = $srcPath;
@@ -30,10 +30,9 @@ abstract class KBaseThumbnailMaker
 		
 		KalturaLog::debug("position[$position], width[$width], height[$height], params[".serialize($params)."]");
 		$cmd = $this->getCommand($position, $width, $height, $params);
-		KalturaLog::info("Executing: $cmd");
 		
 		$returnValue = null;
-		$output = system( $cmd , $returnValue );
+		$output = kExecWrapper::system( $cmd , $returnValue );
 		KalturaLog::debug("Returned value: '$returnValue'");
 		
 		if($returnValue)

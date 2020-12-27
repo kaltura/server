@@ -141,7 +141,7 @@ class IdeticDistributionEngine extends PublicPrivateKeysDistributionEngine imple
 		$srcFile = $this->tempXmlPath . '/' . $fileName;
 		$destFile = "{$path}/{$fileName}";
 			
-		file_put_contents($srcFile, $feedHelper->getXmlString());
+		kFile::filePutContents($srcFile, $feedHelper->getXmlString());
 		KalturaLog::info("XML written to file [$srcFile]");
 		
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();

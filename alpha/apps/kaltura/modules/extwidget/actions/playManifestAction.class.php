@@ -18,6 +18,8 @@ class playManifestAction extends kalturaAction
 	);
 	const FLAVOR_GROUPING_PERCENTAGE_FACTOR = 0.05; // 5 percent
 	const WATERMARK = 'watermark';
+	const ENTRY_TYPE_VOD = 'vod';
+	const ENTRY_TYPE_LIVE = 'live';
 
 	/**
 	 * When this list start to contain plugins - 
@@ -377,6 +379,7 @@ class playManifestAction extends kalturaAction
 				break;
 
 			case entryType::LIVE_CHANNEL:
+			case entryType::LIVE_STREAM:
 				break;
 
 			case entryType::PLAYLIST:
@@ -625,12 +628,11 @@ class playManifestAction extends kalturaAction
 		return assetPeer::retrieveReadyFlavorsByEntryId($this->entryId);
 	}
 	
-	protected function initFlavorAssetArray()
+	protected function initFlavorAssetArray($oneOnly = false)
 	{
 		if(!$this->shouldInitFlavorAssetsArray())
 			return;
 		
-		$oneOnly = false;
 		if(in_array($this->deliveryAttributes->getFormat(), 
 			array(PlaybackProtocol::HTTP, PlaybackProtocol::RTSP, self::URL, self::DOWNLOAD)))
 		{
@@ -682,7 +684,7 @@ class playManifestAction extends kalturaAction
 		
 		// get flavors availability
 		$servePriority = $this->entry->getPartner()->getStorageServePriority();
-		$cloudStorageIds = kStorageExporter::getPeriodicStorageIdsByPartner($this->entry->getPartnerId());
+		$cloudStorageIds = kStorageExporter::getPeriodicStorageIds();
 
 		$localFlavors = array();
 		$remoteFlavorsByDc = array();
@@ -855,7 +857,7 @@ class playManifestAction extends kalturaAction
 	
 	protected function initDeliveryProfile()
 	{
-		if ($this->deliveryAttributes->getStorageId())
+		if ($this->deliveryAttributes->getStorageId() && (!in_array($this->deliveryAttributes->getStorageId(), kStorageExporter::getPeriodicStorageIds())))
 		{
 			return DeliveryProfilePeer::getRemoteDeliveryByStorageId($this->deliveryAttributes);
 		} else {		
@@ -919,6 +921,22 @@ class playManifestAction extends kalturaAction
 				{
 					$this->initFlavorAssetArray();
 					$this->initEntryDuration();
+				}
+				break;
+
+			case entryType::LIVE_STREAM:
+				$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $this->getScheduleTime());
+				if ($event)
+				{
+					$this->entryId = $event->getSourceEntryId();
+					$sourceEntry = kSimuliveUtils::getSourceEntry($event);
+					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
+					$offset = $this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, "0"); // offset in sec
+					if ($offset)
+					{
+						$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
+					}
+					$this->initFlavorAssetArray(true);
 				}
 				break;
 		}
@@ -993,11 +1011,17 @@ class playManifestAction extends kalturaAction
 			$assets = assetPeer::doSelect($c);
 			
 			//Filter out all caption assets that have displayOnPlayer set to false
+			$disableCaptions = $this->getRequestParameter('disableCaptions', false);
 			$filteredAssets = array(); 
 			foreach ($assets as $asset)
 			{
 				if(is_callable($asset, 'getDisplayOnPlayer') && !$asset->getDisplayOnPlayer())
 					continue;
+
+				if($disableCaptions && $asset->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION))
+				{
+					continue;
+				}
 				
 				$filteredAssets[] = $asset;
 			}
@@ -1297,13 +1321,20 @@ class playManifestAction extends kalturaAction
 			case entryType::LIVE_CHANNEL:
 				// VOD
 				$renderer = $this->serveVodEntry();
-				$entryType = 'vod';
+				$entryType = self::ENTRY_TYPE_VOD;
 				break;
 				
-			case entryType::LIVE_STREAM:			
-				// Live stream
-				$renderer = $this->serveLiveEntry();
-				$entryType = 'live';
+			case entryType::LIVE_STREAM:
+				if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime()))
+				{
+					$renderer = $this->serveVodEntry();
+					$entryType = self::ENTRY_TYPE_VOD;
+				} else
+				{
+					// Live stream
+					$renderer = $this->serveLiveEntry();
+					$entryType = self::ENTRY_TYPE_LIVE;
+				}
 				break;
 			
 			default:
@@ -1490,4 +1521,11 @@ class playManifestAction extends kalturaAction
 
 		return array($maxDc, $remoteFlavors);
 	}
+
+    protected function getScheduleTime()
+    {
+		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, time()));
+		$time += intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+		return $time;
+    }
 }

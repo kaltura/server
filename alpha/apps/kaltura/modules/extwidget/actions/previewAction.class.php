@@ -20,11 +20,26 @@ class previewAction extends kalturaAction
 		if(!$this->partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
 
+		$disablePreviewPage = PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_PREVIEW_PAGE, $this->partner_id);
+		if ($disablePreviewPage && $disablePreviewPage->getStatus() == PermissionStatus::ACTIVE)
+		{
+			KExternalErrors::dieError(KExternalErrors::PREVIEW_PAGE_WAS_DISABLED);
+		}
+
 		// Single Player parameters
 		$this->entry_id = htmlspecialchars($this->getRequestParameter('entry_id'));
 		if( $this->entry_id ) {
 			$entry = entryPeer::retrieveByPK($this->entry_id);
 			if( $entry ) {
+				// access control validation
+                		$ks = null;
+                		if(isset($_GET['flashvars']) && is_array($_GET['flashvars']) && isset($_GET['flashvars']['ks']))
+                		{
+                    			$ks = $_GET['flashvars']['ks'];
+				}
+                		$secureEntryHelper = new KSecureEntryHelper($entry, $ks, null, array(ContextType::METADATA));
+                		$secureEntryHelper->validateAccessControl(true);
+				
 				$this->entry_name = $entry->getName();
 				$this->entry_description = $entry->getDescription();
 				$this->entry_thumbnail_url = $entry->getThumbnailUrl();

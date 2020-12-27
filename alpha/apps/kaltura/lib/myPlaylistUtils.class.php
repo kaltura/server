@@ -14,6 +14,7 @@ class myPlaylistUtils
 	const CAPTION_FILES_LABEL = "label";
 	const CAPTION_FILES_PATH = "path";
 	const CAPTION_FILES_ID = "captionId";
+	const CAPTION_SOURCE_TYPE = "sourceType";
 
 	private static $user_cache = null;
 	
@@ -1086,24 +1087,47 @@ HTML;
 	/**
 	 * @param $captionAsset
 	 * @param &$localFilePath
+	 * @param $sourceType
 	 * @return boolean
-	 * @throws Exception
+	 * @throws PropelException
 	 */
-	protected static function getCaptionFilePath($captionAsset, &$localFilePath)
+	protected static function getCaptionFilePath($captionAsset, &$localFilePath, &$sourceType)
 	{
 		$captionFileSyncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, true, false);
-		if (!$captionFileSync)
+		$preferredStorageId = serveFlavorAction::getPreferredStorageProfileId();
+		list ($captionFileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($captionFileSyncKey, $captionAsset, $preferredStorageId, null);
+
+		if(!is_null($preferredStorageId))
 		{
-			return false;
+			if(!$captionFileSync)
+			{
+				return false;
+			}
+			$localFilePath = $path;
+			return true;
 		}
 
-		if($local)
+		if(!$captionFileSync)
 		{
+			list($captionFileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($captionFileSyncKey, true, false);
+			if(!$captionFileSync)
+			{
+				return false;
+			}
+
+			if($local)
+			{
+				$localFilePath = $captionFileSync->getFullPath();
+			}
+
+			return true;
+		}
+		else
+		{
+			// we already found a local file sync in getFileSyncAndPathForFlavor
 			$localFilePath = $captionFileSync->getFullPath();
+			return true;
 		}
-
-		return true;
 	}
 
 	/**
@@ -1419,7 +1443,8 @@ HTML;
 			//Try getting caption
 			//if exist but no local - return empty path
 			$localFilePath = '';
-			$fileSyncExist = self::getCaptionFilePath($captionAsset, $localFilePath);
+			$sourceType = kFileSyncUtils::SOURCE_TYPE_FILE;
+			$fileSyncExist = self::getCaptionFilePath($captionAsset, $localFilePath, $sourceType);
 			if ($fileSyncExist)
 			{
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()]))
@@ -1427,7 +1452,7 @@ HTML;
 				if (!isset($filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()]))
 					$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] = array();
 				$filteredCaptionAssets[$captionAsset->getEntryId()][$captionAsset->getLanguage()] =
-					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $localFilePath, self::CAPTION_FILES_ID => $captionAsset->getId());
+					array(self::CAPTION_FILES_LABEL => $captionAsset->getLabel(), self::CAPTION_FILES_PATH => $localFilePath, self::CAPTION_FILES_ID => $captionAsset->getId(), self::CAPTION_SOURCE_TYPE => $sourceType);
 			}
 		}
 		return $filteredCaptionAssets;

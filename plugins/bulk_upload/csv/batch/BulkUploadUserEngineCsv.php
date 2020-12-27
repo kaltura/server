@@ -86,14 +86,14 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$this->bulkUploadResults[] = $bulkUploadResult;
 	}
 
-	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth = null)
+	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth)
 	{
 	    /* @var $bulkUploadResult KalturaBulkUploadResultUser */
 		if (!$bulkUploadResult->userId)
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
-			$bulkUploadResult->errorDescription = "Mandatory Column [userId] missing from CSV.";
+			$bulkUploadResult->errorDescription = 'Mandatory Column [userId] missing from CSV.';
 		}
 
 		if ($dateOfBirth && !self::isFormatedDate($dateOfBirth, true))
@@ -110,7 +110,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Wrong value passed for property gender [$bulkUploadResult->gender]";
 		}
 
-	    if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
+		if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
 		    KBatchBase::impersonate($this->currentPartnerId);;
 		    try
@@ -164,7 +164,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 		KalturaLog::info("job[{$this->job->id}] start creating users");
 		$bulkUploadResultChunk = array(); // store the results of the created entries
-
 
 		foreach($this->bulkUploadResults as $bulkUploadResult)
 		{
@@ -485,7 +484,12 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	{
 	    return new KalturaBulkUploadResultUser();
 	}
-	
+
+	protected function getUploadResultInstanceType()
+	{
+		return KalturaBulkUploadObjectType::USER;
+	}
+
 	public function getObjectTypeTitle()
 	{
 		return self::OBJECT_TYPE_TITLE;

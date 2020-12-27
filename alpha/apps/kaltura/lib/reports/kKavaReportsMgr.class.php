@@ -29,6 +29,7 @@ class kKavaReportsMgr extends kKavaBase
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
+	const METRIC_LIVE_VIEW_PERIOD_PLAY_TIME = 'sum_live_view_period';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME = 'avg_view_period_time';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
@@ -58,6 +59,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_DELETED_MSEC = 'deleted_msecs';
 	const METRIC_DURATION_TOTAL_MSEC = 'total_msecs';
 	const METRIC_BUFFER_TIME_RATIO = 'avg_buffer_time';
+	const METRIC_LIVE_BUFFER_TIME_RATIO = 'avg_live_buffer_time';
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_MB = 'origin_bandwidth_consumption';
 	const METRIC_UNIQUE_CONTRIBUTORS = 'unique_contributors';
@@ -75,6 +77,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_NODE_UNIQUE_PERCENTILES_RATIO = 'node_avg_completion_rate';
 	const METRIC_TOTAL_UNIQUE_PERCENTILES = 'total_completion_rate';
 	const METRIC_VOD_PLAYS_COUNT = 'vod_plays_count';
+	const METRIC_LIVE_PLAYS_COUNT = 'live_plays_count';
 	const METRIC_VOD_UNIQUE_PERCENTILES_RATIO = 'avg_vod_completion_rate';
 	const METRIC_EBVS_RATIO = 'ebvs_ratio';
 	const METRIC_VIEW_PERIOD_UNIQUE_SESSIONS = 'view_period_unique_sessions';
@@ -82,6 +85,20 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
 	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
+	const METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC = 'live_high_eng_view_period_play_time_sum';
+	const METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC = 'live_good_eng_view_period_play_time_sum';
+	const METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC = 'live_fair_eng_view_period_play_time_sum';
+	const METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC = 'live_low_eng_view_period_play_time_sum';
+	const METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC = 'live_no_eng_view_period_play_time_sum';
+	const METRIC_LIVE_HIGH_ENGAGEMENT_RATIO = 'live_high_eng_view_period_play_time_rate';
+	const METRIC_LIVE_GOOD_ENGAGEMENT_RATIO = 'live_good_eng_view_period_play_time_rate';
+	const METRIC_LIVE_FAIR_ENGAGEMENT_RATIO = 'live_fair_eng_view_period_play_time_rate';
+	const METRIC_LIVE_LOW_ENGAGEMENT_RATIO = 'live_low_eng_view_period_play_time_rate';
+	const METRIC_LIVE_NO_ENGAGEMENT_RATIO = 'live_no_eng_view_period_play_time_rate';
+	const METRIC_LIVE_VIEW_PERIOD_COUNT = 'live_view_period_count';
+	const METRIC_LIVE_ENGAGED_USERS_COUNT = 'live_engaged_users_count';
+	const METRIC_LIVE_ENGAGED_USERS_RATIO = 'live_engaged_users_ratio';
+	const METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'live_engaged_users_play_time_ratio';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -93,7 +110,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_STORAGE_SIZE_BYTES = 'total_storage';
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
+	const METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC = 'live_view_period_play_time';
 	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
+	const METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC = 'live_view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
 
 	// non druid metrics
@@ -161,6 +180,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_REALTIME_REPORTS_CLASS = 'kKavaRealtimeReports';
 	const KAVA_VPAAS_REPORTS_CLASS = 'kKavaVpaasReports';
 	const KAVA_QOE_REPORTS_CLASS = 'kKavaQoeReports';
+	const KAVA_WEBCAST_REPORTS_CLASS = 'kKavaWebcastReports';
 
 	/// report settings
 	// report settings - common
@@ -195,10 +215,13 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_TABLE_MAP = 'report_table_map';
 	const REPORT_TABLE_FINALIZE_FUNC = 'report_table_finalize_func';
 	const REPORT_EDIT_FILTER_FUNC = 'report_edit_filter_func';
+	const REPORT_EDIT_FILTER_CONTEXT = 'report_edit_filter_context';
 	const REPORT_TOTAL_FINALIZE_FUNC = 'report_total_finalize_func';
 	const REPORT_ORDER_BY = 'report_order_by';
 	const REPORT_DYNAMIC_HEADERS = 'report_dynamic_headers';
 	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
+	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
+	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -263,6 +286,7 @@ class kKavaReportsMgr extends kKavaBase
 	const MAX_CUSTOM_REPORT_RESULT_SIZE = 100000;
 	const MIN_THRESHOLD = 500;
 	const MAX_ESEARCH_RESULTS = 1000;
+	const MAX_SPHINX_RESULTS = 1000;
 	const DYNAMIC_GRANULARITY_VIEW_MAX_BUCKETS = 1000;
 
 	const ENRICH_CHUNK_SIZE = 10000;
@@ -278,6 +302,9 @@ class kKavaReportsMgr extends kKavaBase
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
 
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
+
+	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
+	const SCHEDULE_EVENT_DURATION = 94608000; // 3 years
 
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
@@ -316,7 +343,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::MEDIA_TYPE_IMAGE,
 		self::MEDIA_TYPE_SHOW,
 	);
-	
+
 	protected static $playthrough_event_types = array(
 		self::EVENT_TYPE_PLAYTHROUGH_25,
 		self::EVENT_TYPE_PLAYTHROUGH_50,
@@ -373,6 +400,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
 		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
+		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
+		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -418,7 +448,8 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $multi_value_dimensions = array(
-		self::DIMENSION_CATEGORIES
+		self::DIMENSION_CATEGORIES,
+		self::DIMENSION_POSITION,
 	);
 
 	protected static $dynamic_metrics = array(
@@ -535,6 +566,7 @@ class kKavaReportsMgr extends kKavaBase
 		1 => self::KAVA_REALTIME_REPORTS_CLASS,
 		2 => self::KAVA_VPAAS_REPORTS_CLASS,
 		3 => self::KAVA_QOE_REPORTS_CLASS,
+		4 => self::KAVA_WEBCAST_REPORTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
@@ -701,18 +733,30 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD), 
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
-		
+
+		self::$aggregations_def[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+					self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD))),
+			self::getLongSumAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
 		self::$aggregations_def[self::METRIC_VIEW_BUFFER_TIME_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
 				self::EVENT_TYPE_VIEW,				// realtime
 				self::EVENT_TYPE_VIEW_PERIOD)),		// historical 
 			self::getDoubleSumAggregator(self::METRIC_VIEW_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
 
+		self::$aggregations_def[self::METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD))),
+			self::getDoubleSumAggregator(self::METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC, self::METRIC_BUFFER_TIME_SEC));
+
 		self::$aggregations_def[self::METRIC_BITRATE_SUM] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
 					self::EVENT_TYPE_VIEW,				// realtime
-					self::EVENT_TYPE_VIEW_PERIOD)),		// historical 
+					self::EVENT_TYPE_VIEW_PERIOD)),		// historical
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BITRATE))),
 			self::getLongSumAggregator(self::METRIC_BITRATE_SUM, self::METRIC_BITRATE_SUM));
 
@@ -791,7 +835,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$realtime_engagement))),
 			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_BUFFERING_USERS] = self::getFilteredAggregator(
@@ -872,7 +916,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_VIEW_ENGAGED_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
-				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_ENGAGED))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$realtime_engagement))),
 			self::getLongSumAggregator(self::METRIC_VIEW_ENGAGED_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_SUM_PRICE] = self::getLongSumAggregator(
@@ -906,7 +950,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getInFilter(self::DIMENSION_POSITION, array(self::VALUE_UNKNOWN, self::VALUE_ZERO)))),
 			self::getLongSumAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT, self::METRIC_COUNT));
 
-    		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_VIEW_PERIOD_BUFFER_STARTS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_VIEW_PERIOD_BUFFER_STARTS, self::METRIC_BUFFER_STARTS));
 
@@ -919,6 +963,61 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
 			self::getLongSumAggregator(self::METRIC_VOD_PLAYS_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_LIVE_PLAYS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
+			self::getLongSumAggregator(self::METRIC_LIVE_PLAYS_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_LIVE_VIEW_PERIOD_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
+			self::getLongSumAggregator(self::METRIC_LIVE_VIEW_PERIOD_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getSelectorFilter(self::DIMENSION_USER_ENGAGEMENT, self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN))),
+			self::getLongSumAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$good_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$fair_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$low_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$non_engaged))),
+			self::getLongSumAggregator(self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_LIVE_ENGAGED_USERS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$good_engagement, array(self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN))))),
+			self::getLongSumAggregator(self::METRIC_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COUNT));
+
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -933,7 +1032,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
-		
+
+		self::$metrics_def[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
+
 		self::$metrics_def[self::METRIC_DURATION_TOTAL_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
@@ -1016,6 +1120,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_VIEW_BUFFER_TIME_SEC,
 				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC));
 
+		self::$metrics_def[self::METRIC_LIVE_BUFFER_TIME_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_BUFFER_TIME_RATIO,
+				self::METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
 		self::$metrics_def[self::METRIC_AVG_BITRATE] = array(
 			self::DRUID_AGGR => array(self::METRIC_BITRATE_SUM, self::METRIC_BITRATE_COUNT),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
@@ -1090,6 +1201,62 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_JOIN_TIME,
 				self::METRIC_JOIN_TIME_SUM,
 				self::METRIC_JOIN_TIME_COUNT));
+
+		self::$metrics_def[self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_GOOD_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_GOOD_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_FAIR_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_FAIR_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_LOW_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_LOW_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_NO_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_NO_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_LIVE_ENGAGED_USERS_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_ENGAGED_USERS_COUNT, self::METRIC_LIVE_VIEW_PERIOD_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_ENGAGED_USERS_RATIO,
+				self::METRIC_LIVE_ENGAGED_USERS_COUNT,
+				self::METRIC_LIVE_VIEW_PERIOD_COUNT));
+
+		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNIQUE_PERCENTILES_SUM,
+				self::EVENT_TYPE_NODE_PLAY));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::EVENT_TYPE_PLAY));
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
@@ -1176,19 +1343,14 @@ class kKavaReportsMgr extends kKavaBase
 						self::getFieldAccessPostAggregator(self::METRIC_ERROR_UNKNOWN_POSITION_COUNT))))),
 				self::getFieldAccessPostAggregator(self::EVENT_TYPE_PLAY_REQUESTED))));
 
-		self::$metrics_def[self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO] = array(
-			self::DRUID_AGGR => array(self::EVENT_TYPE_NODE_PLAY, self::METRIC_UNIQUE_PERCENTILES_SUM),
-			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
-				self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO,
-				self::METRIC_UNIQUE_PERCENTILES_SUM,
-				self::EVENT_TYPE_NODE_PLAY));
-
-		self::$metrics_def[self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC] = array(
-			self::DRUID_AGGR => array(self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC, self::EVENT_TYPE_PLAY),
-			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
-				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
-				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
-				self::EVENT_TYPE_PLAY));
+		self::$metrics_def[self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, '/', array(
+					self::getArithmeticPostAggregator("subHighAndGood", "+", array(
+						self::getFieldAccessPostAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
+						self::getFieldAccessPostAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC))),
+					self::getFieldAccessPostAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
@@ -1526,20 +1688,20 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format('YmdH');
 	}
 
-	protected static function timestampToDateId($timestamp, $tz)
+	protected static function timestampToDateId($timestamp, $tz, $format = 'Ymd')
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
 		$date->setTimezone($tz);
-		return $date->format('Ymd');
+		return $date->format($format);
 	}
 
-	protected static function timestampToMonthId($timestamp, $tz)
+	protected static function timestampToMonthId($timestamp, $tz, $format = 'Ym')
 	{
 		$date = new DateTime($timestamp);
 		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
 		$date->setTimezone($tz);
-		return $date->format('Ym');
+		return $date->format($format);
 	}
 
 	protected static function getDateIdRange($from_day, $to_day)
@@ -1567,7 +1729,6 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$date = self::dateIdToDateTime($from_day);
 		$end_month = substr($to_day, 0, 6);
-		$interval = new DateInterval('P1M');
 
 		$result = array();
 		for (;;)
@@ -1579,7 +1740,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 
 			$result[] = $cur;
-			$date->add($interval);
+			$date->modify('first day of next month');
 		}
 
 		return $result;
@@ -1993,15 +2154,24 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]) || isset($report_def[self::REPORT_PLAYBACK_TYPES]))
+
+		if (isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
-			$playback_types = isset($report_def[self::REPORT_PLAYBACK_TYPES]) ? $report_def[self::REPORT_PLAYBACK_TYPES] : array(self::PLAYBACK_TYPE_VOD);
+			$playback_types = $report_def[self::REPORT_PLAYBACK_TYPES];
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
 				self::DRUID_VALUES => $playback_types
 			);
 		}
-		
+		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) &&
+			(is_null($input_filter->playback_types) || trim($input_filter->playback_types === "")))
+		{
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE,
+				self::DRUID_VALUES => array(self::PLAYBACK_TYPE_VOD)
+			);
+		}
+
 		if (isset($report_def[self::REPORT_FILTER]))
 		{
 			$report_filter = $report_def[self::REPORT_FILTER];
@@ -2050,10 +2220,12 @@ class kKavaReportsMgr extends kKavaBase
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
 			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
-			'playback_types' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_TYPE),
+			'entries_ids_not_in' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID, self::DRUID_TYPE => self::DRUID_NOT),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
 			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
+			'event_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR2),
+			'event_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3),
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
@@ -2404,9 +2576,10 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null)
+	protected static function getTopReport($data_source, $partner_id, $intervals, $metrics, $dimensions, $filter, $order_by, $order_dir, $threshold, $filter_metrics = null, $granularity = null)
 	{
-		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
+		$granularity = $granularity ? $granularity : self::DRUID_GRANULARITY_ALL;
+		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, $metrics, $filter, $granularity, $filter_metrics);
 
 		if (in_array($dimensions, self::$multi_value_dimensions))
 		{
@@ -3674,7 +3847,14 @@ class kKavaReportsMgr extends kKavaBase
 				continue;
 			}
 
-			$c->addSelectColumn("kuser.$column");
+			if (strpos($column, '(') !== false)
+			{
+				$c->addSelectColumn($column);
+			}
+			else
+			{
+				$c->addSelectColumn("kuser.$column");
+			}
 		}
 
 		if (!$skip_partner_filter && $partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -3936,6 +4116,58 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		return $result;
 	}
+
+	protected static function getUsersRegistrationInfo($ids, $partner_id, $context)
+	{
+		$context['columns'] = array('PUSER_ID', 'CUSTOM_DATA.registration_info');
+		$context['peer'] = 'kuserPeer';
+
+		$enrichedInfoFields = $context['info_fields'];
+		$result = array();
+		$rows = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($rows as $id => $columns)
+		{
+			$output = array();
+			list($puser, $registrationInfo) = $columns;
+			$output[] = $puser;
+			$parsedRegistrationInfo = json_decode($registrationInfo, true);
+			if (!$parsedRegistrationInfo)
+			{
+				$output = array_merge($output, array_fill(1, count($enrichedInfoFields), ''));
+			}
+			else
+			{
+				foreach ($enrichedInfoFields as $enrichedInfoField)
+				{
+					$output[] = isset($parsedRegistrationInfo[$enrichedInfoField]) ? $parsedRegistrationInfo[$enrichedInfoField] : '';
+				}
+			}
+
+			$result[$id] = $output;
+		}
+		return $result;
+	}
+
+	protected static function convertTime($dates, $partner_id, $context)
+	{
+		$granularity = self::GRANULARITY_DAY;
+		$format = 'Y-m-d';
+		if ($context['interval']['value'] === self::INTERVAL_MONTHS) {
+			$granularity = self::GRANULARITY_MONTH;
+			$format = 'Y-m';
+		}
+
+		$transform = self::getTransformTimeDimensions($granularity);
+		$tz_offset = isset($context['timezone_offset']) ? $context['timezone_offset']['value'] : 0;
+		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($tz_offset));
+
+		foreach ($dates as $date)
+		{
+			$result[$date] = call_user_func($transform, $date, $tz, $format);
+		}
+		return $result;
+	}
+
 
 	protected static function getEnrichDefs($report_def)
 	{
@@ -4338,6 +4570,7 @@ class kKavaReportsMgr extends kKavaBase
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options);
 		$dimension = self::getDimension($report_def, $object_ids);
 		$metrics = self::getMetrics($report_def);
+		$granularity = isset($report_def[self::REPORT_GRANULARITY]) ? $report_def[self::REPORT_GRANULARITY] : self::DRUID_GRANULARITY_ALL;
 
 		if (!$metrics)
 		{
@@ -4438,6 +4671,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		// Note: using a larger threshold since topN is approximate
 		$intervalDays = intval(($input_filter->to_date - $input_filter->from_date) / 86400) + 1;
+
 		$threshold = max($intervalDays * 30, $page_size * $page_index * 2);		// 30 ~ 10000 / 365, i.e. an interval of 1Y gets a minimum threshold of 10000
 		$threshold = max(self::MIN_THRESHOLD, min($max_result_size, $threshold));
 
@@ -4487,7 +4721,8 @@ class kKavaReportsMgr extends kKavaBase
 		else if (!$object_ids &&
 			!in_array($dimension, array(self::DIMENSION_LOCATION_COUNTRY, self::DIMENSION_DOMAIN, self::DIMENSION_DEVICE)) &&
 			!self::getFilterValues($druid_filter, $dimension) &&
-			($flags & self::GET_TABLE_FLAG_IS_CSV) == 0)
+			($flags & self::GET_TABLE_FLAG_IS_CSV) == 0 &&
+			$granularity != self::GRANULARITY_DYNAMIC)
 		{
 			// get the topN objects first, otherwise the returned metrics can be inaccurate
 			$query = self::getTopReport($data_source, $partner_id, $intervals, array($order_by), 
@@ -4544,8 +4779,9 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else
 		{
+			$granularity_def = $granularity == self::GRANULARITY_DYNAMIC ? self::getGranularityDef($granularity, $input_filter) : null;
 			$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, 
-				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold);
+				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold, null, $granularity_def);
 		}
 
 		// use lowest priority for csv queries
@@ -4560,7 +4796,7 @@ class kKavaReportsMgr extends kKavaBase
 			return array(array(), array(), 0);
 		}
 
-		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+		if (($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY) || ($granularity == self::GRANULARITY_DYNAMIC))
 		{
 			$rows = $result;
 		}
@@ -4575,7 +4811,11 @@ class kKavaReportsMgr extends kKavaBase
 		$rows_count = count($rows);
 		KalturaLog::log("Druid returned [$rows_count] rows");
 
-		$rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
+		// don't remove rows by pager if using topN with granularity different than ALL
+		if ($granularity != self::GRANULARITY_DYNAMIC)
+		{
+			$rows = array_slice($rows, ($page_index - 1) * $page_size, $page_size);
+		}
 		if (!$rows)
 		{
 			return array(array(), array(), $rows_count);
@@ -4656,10 +4896,28 @@ class kKavaReportsMgr extends kKavaBase
 
 		$row_mapping = array_merge($row_mapping, $metrics);
 
+		if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_TOPN && $granularity == self::GRANULARITY_DYNAMIC)
+		{
+			$data = array();
+			foreach ($rows as $index => $row)
+			{
+				$timestamp = $row[self::DRUID_TIMESTAMP];
+				$bucket_rows = $row[self::DRUID_RESULT];
+				foreach ($bucket_rows as $bucket_row)
+				{
+					$row_data[self::DRUID_TIMESTAMP] = $timestamp;
+					$row_data[self::DRUID_EVENT] = $bucket_row;
+					$data[] = $row_data;
+				}
+			}
+			$rows = $data;
+			$row_mapping[] = self::DIMENSION_TIME;
+
+		}
 		// map the rows
 		foreach ($rows as $index => $row)
 		{
-			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY)
+			if ($query[self::DRUID_QUERY_TYPE] == self::DRUID_GROUP_BY || $granularity == self::GRANULARITY_DYNAMIC)
 			{
 				$timestamp = $row[self::DRUID_TIMESTAMP];
 				$row = $row[self::DRUID_EVENT];
@@ -4901,7 +5159,9 @@ class kKavaReportsMgr extends kKavaBase
 
 		if (isset($report_def[self::REPORT_EDIT_FILTER_FUNC]))
 		{
-			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter);
+			$edit_filter_context = isset($report_def[self::REPORT_EDIT_FILTER_CONTEXT]) ?
+				$report_def[self::REPORT_EDIT_FILTER_CONTEXT] : null;
+			call_user_func($report_def[self::REPORT_EDIT_FILTER_FUNC], $input_filter, $partner_id, $response_options, $edit_filter_context);
 		}
 		if (!isset($report_def[self::REPORT_DIMENSION]))
 		{
@@ -4928,7 +5188,7 @@ class kKavaReportsMgr extends kKavaBase
 		// finalize / enrich
 		if (isset($report_def[self::REPORT_TABLE_FINALIZE_FUNC]))
 		{
-			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result));
+			call_user_func_array($report_def[self::REPORT_TABLE_FINALIZE_FUNC], array(&$result, $input_filter));
 		}
 		
 		if (isset($report_def[self::REPORT_ENRICH_DEF]))
@@ -4942,6 +5202,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::orderTableByMetric($report_def, $order_by, $result[0], $result[1]);
 		}
 		unset($result[3]);
+		if ($page_size && count($result[1]) > $page_size)
+		{
+			$result[1] = array_slice($result[1], ($page_index - 1) * $page_size, $page_size);
+		}
 		return $result;
 	}
 		
@@ -5093,8 +5357,20 @@ class kKavaReportsMgr extends kKavaBase
 
 		return $result;
 	}
-	
-	protected static function partnerUsageEditFilter($input_filter)
+
+	protected static function mapFieldsEditFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		$from_field = $context[0];
+		$to_field = $context[1];
+
+		if (isset($input_filter->$from_field))
+		{
+			$input_filter->$to_field = $input_filter->$from_field;
+
+		}
+	}
+
+	protected static function partnerUsageEditFilter($input_filter, $partner_id, $response_options, $context)
 	{
 		$current_date_id = date('Ymd');
 		$tz = self::getPhpTimezone(self::fixTimeZoneOffset($input_filter->timeZoneOffset));
@@ -5106,14 +5382,144 @@ class kKavaReportsMgr extends kKavaBase
 		$date->modify('+1 month');
 		$date->modify('-1 day');
 		$month_end = min($date->format('Ymd'), $current_date_id);
-		
 		$is_free_package = $input_filter->extra_map[myPartnerUtils::IS_FREE_PACKAGE_PLACE_HOLDER] == 'TRUE';
-		$input_filter->from_day = $is_free_package ? str_replace('-', '', self::BASE_DATE_ID) : $month_start;
+
+		if ($is_free_package)
+		{
+			$partner_created_at = str_replace('-', '', self::BASE_DATE_ID);
+			$partner = PartnerPeer::retrieveByPK($partner_id);
+			if ($partner)
+			{
+				$partner_created_at = $partner->getCreatedAt('Ymd');
+			}
+			$end_date = self::dateIdToDateTime($month_end);
+			$end_date->modify('-6 month');
+			$free_package_start_date = max(self::dateIdToDateTime($partner_created_at), $end_date);
+			$free_package_start_date = $free_package_start_date->format('Ymd');
+			$input_filter->from_day = $free_package_start_date;
+		}
+		else
+		{
+			$input_filter->from_day = $month_start;
+		}
+
 		$input_filter->to_day = $month_end;
 		$input_filter->interval = reportInterval::MONTHS;
 	}
-	
-	protected static function addCombinedUsageColumn(&$result)
+
+	protected static function excludeLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		$live_now_entries = self::getLiveNowEntries($partner_id);
+		if (count($live_now_entries))
+		{
+			$input_filter->entries_ids_not_in = implode($response_options->getDelimiter(), $live_now_entries);
+		}
+	}
+
+	protected static function includeOnlyLiveNowEntriesEditFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		$live_now_entries = self::getLiveNowEntries($partner_id);
+		if (!count($live_now_entries))
+		{
+			$live_now_entries = array(entry::ENTRY_ID_THAT_DOES_NOT_EXIST);
+		}
+		$input_filter->entries_ids = implode($response_options->getDelimiter(), $live_now_entries);
+
+	}
+
+	protected static function getLiveNowEntries($partner_id)
+	{
+		$filter = new entryFilter();
+		$filter->setTypeEquel(entryType::LIVE_STREAM);
+		$filter->setPartnerSearchScope($partner_id);
+		$filter->setIsLive(true);
+
+		$criteria = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$criteria->addAscendingOrderByColumn(entryPeer::NAME);		// Note: don't really care about order here, this is a hack to force the query to go to sphinx
+		$criteria->setLimit(self::MAX_SPHINX_RESULTS);
+		$filter->attachToCriteria($criteria);
+
+		$criteria->applyFilters();
+		$live_now_entries = $criteria->getFetchedIds();
+		$simulive_and_manual = self::getCurrentlyLiveSimuliveAndManualEntries($partner_id);
+		$entries = array_unique(array_merge($live_now_entries, $simulive_and_manual));
+		return array_values($entries);
+	}
+
+	protected static function getCurrentlyLiveSimuliveAndManualEntries($partner_id) {
+		$now = time();
+		$start_time = $now - 2;
+		$end_time = $now + 2;
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::PARTNER_ID, $partner_id, Criteria::EQUAL);
+		$c->add(ScheduleEventPeer::TYPE, ScheduleEventType::LIVE_STREAM, Criteria::EQUAL);
+		// set 1 hour margin to get also preStart and postEnd on the events
+		$c->add(ScheduleEventPeer::END_DATE, $start_time - 3600, Criteria::GREATER_EQUAL);
+		$c->add(ScheduleEventPeer::START_DATE, $end_time + 3600, Criteria::LESS_EQUAL);
+
+		$schedule_events = ScheduleEventPeer::doSelect($c);
+
+		$live_entries_ids = array();
+		foreach ($schedule_events as $schedule_event)
+		{
+			if ($schedule_event->isRangeIntersects($start_time, $end_time)) // in current +-2 sec
+			{
+				$live_entries_ids[] = $schedule_event->getTemplateEntryId(); // the live entry id from the event
+			}
+		}
+		return $live_entries_ids;
+	}
+
+	protected static function editWebcastEngagementTimelineFilter($input_filter, $partner_id, $response_options, $context)
+	{
+		if ($input_filter->from_date || $input_filter->to_date)
+		{
+			return;
+		}
+
+		$entry_ids = explode($response_options->getDelimiter(), $input_filter->entries_ids);
+		if (count($entry_ids) != 1)
+		{
+			return;
+		}
+		$entry_id = reset($entry_ids);
+		$entry_id = trim($entry_id);
+		if (!$entry_id)
+		{
+			return;
+		}
+
+		$entry = entryPeer::retrieveByPKNoFilter($entry_id);
+		if (!$entry)
+		{
+			return;
+		}
+
+		$event = null;
+		if ($entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $entry->getType() == entryType::LIVE_STREAM)
+		{
+			$events =  $entry->getScheduleEvents(self::SCHEDULE_EVENT_PAST_DATE, self::SCHEDULE_EVENT_PAST_DATE + self::SCHEDULE_EVENT_DURATION);
+			$event = $events ? $events[0] : null;
+		}
+
+		if (!$event)
+		{
+			return;
+		}
+
+		$event_starttime = $event->getCalculatedStartTime();
+		$event_endtime = $event->getCalculatedEndTime();
+		if (!$event_starttime || !$event_endtime)
+		{
+			return;
+		}
+
+		//edit filter with simulive start time and end time
+		$input_filter->from_date = $event_starttime;
+		$input_filter->to_date = $event_endtime;
+	}
+
+	protected static function addCombinedUsageColumn(&$result, $input_filter)
 	{
 		$headers = $result[0];
 		$bandwidth = array_search(self::METRIC_BANDWIDTH_SIZE_MB, $headers);
@@ -5150,7 +5556,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $row;
 	}
 
-	protected static function addContributorRankingColumn(&$result)
+	protected static function addContributorRankingColumn(&$result, $input_filter)
 	{
 		$headers = $result[0];
 		$playsRanking = array_search(self::METRIC_PLAYS_RANKING, $headers);
@@ -5167,7 +5573,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	protected static function addRollupRow(&$result)
+	protected static function addRollupRow(&$result, $input_filter)
 	{
 		list($headers, $data, $total_count) = $result;
 		
@@ -5176,7 +5582,7 @@ class kKavaReportsMgr extends kKavaBase
 		$result = array($headers, $data, $total_count);
 	}
 
-	protected static function addZeroPercentiles(&$result)
+	protected static function addZeroPercentiles(&$result, $input_filter)
 	{
 		$total_count = $result[2];
 		if (!$total_count)
@@ -5205,6 +5611,32 @@ class kKavaReportsMgr extends kKavaBase
 		unset($result[3]);
 	}
 
+	protected static function addZeroMinutes(&$result, $input_filter)
+	{
+		$total_count = $result[2];
+		if (!$total_count)
+		{
+			return;
+		}
+
+		$from_minute = round($input_filter->from_date/60) * 60;
+		$to_minute =  round($input_filter->to_date/60) * 60;
+		$minutes_count = ($to_minute - $from_minute)/60 + 1;
+		$values_count = count($result[0]);
+
+		$existing_minutes = array_combine(array_map('reset', $result[1]), $result[1]);
+		$minutes = range($from_minute, $to_minute, 60);
+		$data = array();
+		foreach($minutes as $minute)
+		{
+			$data[] = isset($existing_minutes[$minute]) ? $existing_minutes[$minute] : array_pad(array($minute), $values_count, 0);
+		}
+
+		$result[1] = $data;
+		$result[2] = $minutes_count;
+		unset($result[3]);
+	}
+
 	protected static function getFlavorParamsHeadersArray($headers)
 	{
 		$flavorHeaders = array();
@@ -5229,7 +5661,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $flavorParams;
 	}
 
-	protected static function addFlavorParamColumn(&$result)
+	protected static function addFlavorParamColumn(&$result, $input_filter)
 	{
 		$headers = $result[0];
 		$flavorHeaders = self::getFlavorParamsHeadersArray($headers);
@@ -5244,6 +5676,20 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$row[] = self::getFlavorParamsValue($flavorHeaders, $row);
 		}
+	}
+
+	protected static function getPeakViewers(&$result, $input_filter)
+	{
+		$data = array();
+		foreach ($result[1] as $row)
+		{
+			list($entry_id, $curr_viewers_count) = $row;
+			$prev_viewers_count = isset($data[$entry_id][1]) ? $data[$entry_id][1] : 0;
+			$data[$entry_id] = array($entry_id, max($prev_viewers_count, $curr_viewers_count));
+		}
+		$result[1] = $data;
+		$result[2] = count($data);
+		$result[3] = false;
 	}
 
 	/// total functions
@@ -5522,6 +5968,20 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function getCustomReportMaxResultSize($report_def, $params)
+	{
+		if (isset($report_def[self::REPORT_MAX_RESULT_SIZE]))
+		{
+			return $report_def[self::REPORT_MAX_RESULT_SIZE];
+		}
+
+		if (isset($params['limit']))
+		{
+			return min($params['limit'], self::MAX_CUSTOM_REPORT_RESULT_SIZE);
+		}
+
+		return self::MAX_CUSTOM_REPORT_RESULT_SIZE;
+	}
 
 	protected static function enrichReportWithUserEntryMetadataFields($report_def, $field, $context)
 	{
@@ -5714,7 +6174,7 @@ class kKavaReportsMgr extends kKavaBase
 				$partner_id,
 				$report_def,
 				$input_filter,
-				isset($params['limit']) ? $params['limit'] : self::MAX_CUSTOM_REPORT_RESULT_SIZE,
+				self::getCustomReportMaxResultSize($report_def, $params),
 				1,
 				$report_def['order_by'],
 				$object_ids,
@@ -5741,6 +6201,32 @@ class kKavaReportsMgr extends kKavaBase
 					}
 					$row = array_values($row);
 				}
+			}
+
+			if (isset($report_def[self::REPORT_ROW_FILTER_BY_COLUMN]))
+			{
+				$header_to_check = $report_def[self::REPORT_ROW_FILTER_BY_COLUMN]['column'];
+				$field_index = array_search($header_to_check, $header);
+				//remove condition check header
+				unset($header[$field_index]);
+				$header = array_values($header);
+				$value_to_keep = $report_def[self::REPORT_ROW_FILTER_BY_COLUMN]['value'];
+
+				foreach ($data as $key => &$row)
+				{
+					//check if we should keep the row
+					if ($row[$field_index] == $value_to_keep)
+					{
+						//remove condition check column
+						unset($row[$field_index]);
+						$row = array_values($row);
+					}
+					else
+					{
+						unset($data[$key]);
+					}
+				}
+				$data = array_values($data);
 			}
 		}
 		else
@@ -5936,4 +6422,11 @@ class kKavaReportsMgr extends kKavaBase
 		$url = myReportsMgr::createUrl($partner_id, $file_name);
 		return $url;
 	}
+
+	// transform functions
+	protected static function limitPercentages($value)
+	{
+		return min($value, 100);
+	}
+
 }

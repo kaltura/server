@@ -176,6 +176,14 @@ class StorageProfileService extends KalturaBaseService
 
 		$baseCriteria = $filter->buildFileSyncNotLinkedCriteria(FileSyncPeer::ID);
 
+		$pathByWorkerId = kConf::get('pathByWorkerId' , 'batchServices', array());
+		$key = 'worker_' . $workerId;
+		$path = isset($pathByWorkerId[$key])? trim($pathByWorkerId[$key]) : null;
+		if ($path)
+		{
+			$baseCriteria->add(FileSyncPeer::CUSTOM_DATA, "%$path%", Criteria::LIKE);
+		}
+
 		$lockedFileSyncs = array();
 		$limitReached = false;
 		$selectCount = 0;
@@ -268,16 +276,23 @@ class StorageProfileService extends KalturaBaseService
 
 	protected static function filterFileSyncs(&$fileSyncs, &$lastId, &$done, $createdAtLessThanOrEqual)
 	{
-		// filter by created at
-		if ($createdAtLessThanOrEqual)
+		foreach ($fileSyncs as $index => $fileSync)
 		{
-			foreach ($fileSyncs as $index => $fileSync)
+			// filter by created at
+			if( ($createdAtLessThanOrEqual) && ($fileSync->getCreatedAt(null) > $createdAtLessThanOrEqual) )
 			{
-				if ($fileSync->getCreatedAt(null) > $createdAtLessThanOrEqual)
+				$done = true;
+				unset($fileSyncs[$index]);
+				$lastId = min($lastId, $fileSync->getId());
+			}
+			// filter by local is original
+			else
+			{
+				$fileSyncKey = kFileSyncUtils::getKeyForFileSync($fileSync);
+				$localFileSync = FileSyncPeer::retrieveByFileSyncKey($fileSyncKey, true);
+				if( (!$localFileSync) || (!$localFileSync->getOriginal()) )
 				{
-					$done = true;
 					unset($fileSyncs[$index]);
-					$lastId = min($lastId, $fileSync->getId());
 				}
 			}
 		}

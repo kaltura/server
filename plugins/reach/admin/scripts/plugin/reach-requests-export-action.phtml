@@ -1,0 +1,8 @@
+<?php if($this->servedContent): ?>
+    <a href="data:application/csv;charset=utf-8,<?php echo $this->servedContent;?>"
+       download="export.csv">Download exported CSV</a>
+<?php endif; ?>
+
+<style type="text/css">
+	#reach-requests-export-dialog { width:auto ; left: auto; word-wrap: break-word}
+</style>

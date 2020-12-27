@@ -1839,6 +1839,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setOriginalCreationDate ( $v )	{	$this->putInCustomData ( "originalCreationDate" , $v);	}
 	public function getOriginalCreationDate() 	{	return $this->getFromCustomData( "originalCreationDate", null, null);	}
 
+	public function setApplication ( $v )	{	$this->putInCustomData ( "application" , $v);	}
+	public function getApplication() 	{	return $this->getFromCustomData( "application", null, null);	}
+
+	public function setApplicationVersion ( $v )	{	$this->putInCustomData ( "applicationVersion" , $v);	}
+	public function getApplicationVersion() 	{	return $this->getFromCustomData( "applicationVersion", null, null);	}
+
+	public function setSourceVersion( $v ) {	$this->putInCustomData ( "sourceVersion" , $v);	}
+	public function getSourceVersion() 	{	return $this->getFromCustomData( "sourceVersion", null, null);	}
 
 	public function getParentEntry()
 	{
@@ -3690,6 +3698,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $capabilitiesStr;
 	}
 
+
+	public function hasCapability($capability)
+	{
+		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		return array_key_exists($capability, $capabilitiesArr);
+	}
+
 	public function addCapability($capability)
 	{
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
@@ -3840,18 +3855,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getElasticIndexName()
 	{
-		return self::getElasticEntryIndexNameForPartner(kCurrentContext::getCurrentPartnerId());
-	}
-
-	public static function getElasticEntryIndexNameForPartner($partnerId)
-	{
-		$indexName = ElasticIndexMap::ELASTIC_ENTRY_INDEX;
-		$dedicateEntryPartnerList = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_PARTNER_LIST,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, array());
-		if(in_array($partnerId,$dedicateEntryPartnerList))
-		{
-			$indexName = kConf::get(ElasticSearchPlugin::DEDICATED_ENTRY_INDEX_NAME,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, $indexName);
-		}
-		return $indexName;
+		return ElasticIndexMap::ELASTIC_ENTRY_INDEX;
 	}
 
 	/**
@@ -4010,11 +4014,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	protected function shouldAddCategoryPrivacyByContextsSearchData($categoryEntryStatus)
 	{
-		$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE);
-		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-		{
-			$privacyByContextCategoryEntryStatuses[] = CategoryEntryStatus::PENDING;
-		}
+		$privacyByContextCategoryEntryStatuses = array(CategoryEntryStatus::ACTIVE, CategoryEntryStatus::PENDING);
 
 		return in_array($categoryEntryStatus, $privacyByContextCategoryEntryStatuses);
 	}
@@ -4371,5 +4371,45 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getVolatileInteractivityVersion()
 	{
 		return $this->getFromCustomData( self::CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION ,null, null);
+	}
+
+	/**
+	 * Check if entry contains adminTag
+	 *
+	 * @param string $adminTag
+	 * @return boolean
+	 */
+	public function isContainsAdminTag($adminTag)
+	{
+		return in_array($adminTag, explode(',', $this->getAdminTags()));
+	}
+
+
+	/**
+	 * allow edit or change related metadata
+	 * @return boolean
+	 */
+	public function allowEdit()
+	{
+		//Admin's should be allowed to edit
+		if(kCurrentContext::$is_admin_session)
+		{
+			return true;
+		}
+
+		//If current user is entitled to edit the entry
+		if($this->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()))
+		{
+			return true;
+		}
+
+		//If provided KS contains edit privilege for the given entry ID
+		if(isset(kCurrentContext::$ks_object) && (kCurrentContext::$ks_object->hasPrivilege(ks::PRIVILEGE_WILDCARD) ||
+				kCurrentContext::$ks_object->verifyPrivileges(kSessionBase::PRIVILEGE_EDIT, $this->getId())))
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

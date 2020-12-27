@@ -49,7 +49,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		{
 			curl_setopt($ch, CURLOPT_RANGE, $range);
 		}
+
+		$start = microtime(true);
 		$data = curl_exec($ch);
+		KalturaMonitorClient::monitorCurl(parse_url($url, PHP_URL_HOST), microtime(true) - $start);
+
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 		curl_close($ch);
@@ -153,7 +157,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	private function filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance)
 	{
 		return array_filter($liveEntryServerNodes, function($esn) use ($dcInMaintenance, $requestedServerType) {
-			if ($requestedServerType && $esn->getServerType() != $requestedServerType)
+			if (!is_null($requestedServerType) && $esn->getServerType() != $requestedServerType)
 				return false; // if request specific type then ignore all others
 			$esn->serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $esn->getServerNodeId());
 			if (!$esn->serverNode)
@@ -238,6 +242,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$flavors = array();
 		
 		$httpUrl = $this->liveStreamConfig->getUrl();
+		if ($this->getDynamicAttributes()->getStreamType() == EntryServerNodeType::LIVE_BACKUP)
+		{
+			$httpUrl = $this->liveStreamConfig->getBackupUrl();
+		}
 		$flavors[] = $this->getFlavorAssetInfo('', $httpUrl); // passing the url as urlPrefix so that only the path will be tokenized
 		return $flavors;
 	}
@@ -357,7 +365,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
-		$livePackagerUrl .= $serverNode->getSessionIdUrlString($entryServerNode);
+		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
 
 		$entry = $this->getDynamicAttributes()->getEntry();
 		if ($entry->getExplicitLive())

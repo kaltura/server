@@ -9,13 +9,16 @@ class serveFlavorAction extends kalturaAction
 	const NO_CLIP_TO = 2147483647;
 	
 	const JSON_CONTENT_TYPE = 'application/json';
+	const TYPE_SOURCE = 'source';
+	const PATH_EMPTY = 'empty';
 
 	const SECOND_IN_MILLISECONDS = 1000;
-	const LIVE_CHANNEL_SEGMENT_DURATION = 10000; // 10 seconds in milliseconds
 	const TIME_MARGIN = 10000; // 10 seconds in milliseconds. a safety margin to compensate for clock differences
-	const DVR_WINDOW_SIZE = 100000; // LIVE_CHANNEL_SEGMENT_DURATION * 10 segments;
 
 	protected $pathOnly = false;
+	protected static $requestAuthorized = false;
+	protected static $preferredStorageId = null;
+	protected static $fallbackStorageId = null;
 
 	protected static function jsonEncode($obj)
 	{
@@ -42,13 +45,9 @@ class serveFlavorAction extends kalturaAction
 		apc_store($cacheKey, $renderer, 86400);
 		header("X-Kaltura:cache-key");
 	}
-	
-	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null)
+	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)
 	{
-		$source = array(
-			'type' => 'source',
-			'path' => $path,
-		);
+		$source = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
 
 		if ($asset && $asset->getEncryptionKey())
 		{
@@ -94,6 +93,12 @@ class serveFlavorAction extends kalturaAction
 			'sequences' => array($sequence)
 		);
 
+		$noCachePattern = kConf::get('serve_flavor_no_cache_pattern', 'local', '');
+		if ($asset && in_array($asset->getType(), assetPeer::retrieveAllFlavorsTypes()) && $noCachePattern && preg_match($noCachePattern, $path))
+		{
+			$result['cache'] = false;
+		}
+
 		$json = str_replace('\/', '/', self::jsonEncode($result));
 
 		return new kRendererString(
@@ -106,33 +111,42 @@ class serveFlavorAction extends kalturaAction
 	 */
 	protected function renderEmptySimpleMapping()
 	{
-		if (!$this->pathOnly || !kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']))
+		if (!$this->pathOnly || (!self::$requestAuthorized))
 			return;
 
 		$renderer = $this->getSimpleMappingRenderer('', null);
 		$renderer->output();
 	}
 
-	protected function serveLivePlaylist($durations, $sequences, $playlistStartTime = 1451624400000,
-	                                        $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $repeat)
+	public static function serveLiveMediaSet($durations, $sequences, $playlistStartTime = 1451624400000,
+										 $firstClipStartTime, $initialClipIndex, $initialSegmentIndex,
+										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null)
 	{
 		$mediaSet['playlistType'] = 'live';
 		$mediaSet['firstClipTime'] = $firstClipStartTime;
+		$mediaSet['discontinuity'] = $discontinuity;
+
+		if (!is_null($endTime))
+		{
+			$mediaSet['presentationEndTime'] = $endTime;
+		}
 
 		if($repeat)
 		{
-			$mediaSet['discontinuity'] = false;
 			$mediaSet['segmentBaseTime'] = (int)$playlistStartTime;
 		}
 		else
 		{
-			$mediaSet['discontinuity'] = true;
 			$mediaSet['initialClipIndex'] = $initialClipIndex;
 			$mediaSet['initialSegmentIndex'] = $initialSegmentIndex;
 		}
 
 		$mediaSet['durations'] = $durations;
 		$mediaSet['sequences'] = $sequences;
+		if(!is_null($dvrWindow))
+		{
+			$mediaSet['liveWindowDuration'] = $dvrWindow;
+		}
 
 		return $mediaSet;
 	}
@@ -148,6 +162,8 @@ class serveFlavorAction extends kalturaAction
 		$isLive = $this->getRequestParameter("live");
 
 		$version = $this->getRequestParameter("v");
+		self::$preferredStorageId = $this->getRequestParameter('preferredStorageId');
+		self::$fallbackStorageId = $this->getRequestParameter('fallbackStorageId');
 
 		// execute the playlist
 		if ($version)
@@ -258,19 +274,17 @@ class serveFlavorAction extends kalturaAction
 					}
 					// get the file path of the flavor
 					$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-					list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, false, false);
-					if ($fileSync)
+
+					list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), $this->pathOnly);
+
+					if(!$file_sync)
 					{
-						$resolvedFileSync = kFileSyncUtils::resolve($fileSync);
-						$path = kFileSyncUtils::getFileSyncFullPath($resolvedFileSync, $this->pathOnly);
-					}
-					else
-					{
-						error_log('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+						KalturaLog::debug('missing file sync for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
 						$path = '';
 						$storeCache = false;
 					}
-					$clips[] = $this->getClipData($path,$flavor);
+
+					$clips[] = self::getClipData($path, $flavor, $sourceType);
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}
@@ -281,26 +295,31 @@ class serveFlavorAction extends kalturaAction
 		// build the media set
 		if ($isLive)
 		{
-			$mediaSet = $this->serveLivePlaylist($durations, $sequences,
-				$playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $origEntry->getRepeat());
+			$repeat = $origEntry->getRepeat() ? true : false;
+			$mediaSet = self::serveLiveMediaSet($durations, $sequences,
+				$playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $repeat, !$repeat);
 		}
 		else
 		{
 			$mediaSet = array('durations' => $durations, 'sequences' => $sequences);
 		}
 
+		$this->sendJson($mediaSet, $storeCache, $isLive, $origEntry);
+	}
+
+	protected function sendJson($jsonArray, $storeCache, $isLive, $entry)
+	{
 		// build the json
-		$json = self::jsonEncode($mediaSet);
+		$json = self::jsonEncode($jsonArray);
 		$renderer = new kRendererString($json, self::JSON_CONTENT_TYPE);
 		if ($storeCache && !$isLive)
 		{
-			$this->storeCache($renderer, $origEntry->getPartnerId());
+			$this->storeCache($renderer, $entry->getPartnerId());
 		}
 
 		$renderer->output();
 		KExternalErrors::dieGracefully();
 	}
-
 
 	protected function serveEntryWithSequence($entry, $sequenceEntries, $asset, $flavorParamId, $captionLanguages)
 	{
@@ -367,7 +386,14 @@ class serveFlavorAction extends kalturaAction
 		$sequence = $this->getRequestParameter('sequence');
 		$captionLanguages = $this->getRequestParameter('captions', '');
 		$this->pathOnly = $this->getRequestParameter('pathOnly', false);
-		$preferredStorageId = $this->getRequestParameter('preferredStorageId');
+		self::$preferredStorageId = $this->getRequestParameter('preferredStorageId');
+		self::$fallbackStorageId = $this->getRequestParameter('fallbackStorageId');
+
+		$isAuthenticatedUri = kNetworkUtils::isAuthenticatedURI();
+		if(kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || $isAuthenticatedUri)
+		{
+			self::$requestAuthorized = true;
+		}
 
 		if ($entryId)
 		{
@@ -388,21 +414,39 @@ class serveFlavorAction extends kalturaAction
 				$this->servePlaylistAsLiveChannel($entry);
 			}
 
-			$isInternalIp = kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']);
-			if ($entry->getType() == entryType::PLAYLIST && $isInternalIp)
+			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
+			{
+				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', 0) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
+				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				if ($assets)
+				{
+					$sequences = self::buildSequencesArray($assets);
+					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
+					$initialClipIndex = 1; // currently as simulive support only 1 video
+					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
+						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
+					if ($offset)
+					{
+						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = $offset;
+					}
+					$this->sendJson($mediaSet, false, true, $entry);
+				}
+			}
+
+			if ($entry->getType() == entryType::PLAYLIST && self::$requestAuthorized)
 			{
 				list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
-				myPartnerUtils::enforceDelivery($entry, $asset);
+				myPartnerUtils::enforceDelivery($entry, $asset, self::$preferredStorageId);
 				$this->servePlaylist($entry, $captionLanguages);
 			}
-			if ($sequence  && $isInternalIp)
+			if ($sequence  && self::$requestAuthorized)
 			{
 				$sequenceArr = explode(',', $sequence);
 				$sequenceEntries = entryPeer::retrieveByPKs($sequenceArr);
 				if (count($sequenceEntries))
 				{
 					list($flavorParamId, $asset) = $this->getFlavorAssetAndParamIds($flavorId);
-					myPartnerUtils::enforceDelivery($entry, $asset);
+					myPartnerUtils::enforceDelivery($entry, $asset, self::$preferredStorageId);
 					$this->verifySequenceEntries($sequenceEntries);
 					$this->serveEntryWithSequence($entry, $sequenceEntries, $asset, $flavorParamId, $captionLanguages);
 				}
@@ -446,9 +490,7 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		KalturaMonitorClient::initApiMonitor(false, 'extwidget.serveFlavor', $flavorAsset->getPartnerId());
-			
-		myPartnerUtils::enforceDelivery($entry, $flavorAsset);
+		myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
 		
 		$version = $this->getRequestParameter( "v" );
 		if (!$version)
@@ -456,35 +498,18 @@ class serveFlavorAction extends kalturaAction
 		
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $version);
 
-		if ($this->pathOnly && ( kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']) || kNetworkUtils::isAuthenticatedURI() ))
+		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			$path = '';
-			$parent_file_sync = null;
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			if ($file_sync && is_null(self::$preferredStorageId))
+			{
+				if ($fileParam && is_dir($path))
+				{
+					$path .= "/$fileParam";
+				}
+			}
 
-			if(!is_null($preferredStorageId))
-			{
-				$file_sync = kFileSyncUtils::getFileSyncByPreferredStorage($syncKey, $flavorAsset, $preferredStorageId);
-				if($file_sync)
-				{
-					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-					$path = kFileSyncUtils::getPathByFileSync($parent_file_sync, $preferredStorageId);
-				}
-			}
-			else
-			{
-				list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey( $syncKey , false, false );
-				if ( $file_sync )
-				{
-					$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-					$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync);
-					if ($fileParam && is_dir($path))
-					{
-						$path .= "/$fileParam";
-					}
-				}
-			}
-		
-			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $parent_file_sync);
+			$renderer = $this->getSimpleMappingRenderer($path, $flavorAsset, $file_sync, $sourceType);
 			if ($path)
 			{
 				$this->storeCache($renderer, $flavorAsset->getPartnerId());
@@ -496,6 +521,10 @@ class serveFlavorAction extends kalturaAction
 		if (kConf::hasParam('serve_flavor_allowed_partners') && 
 			!in_array($flavorAsset->getPartnerId(), kConf::get('serve_flavor_allowed_partners')))
 		{
+			if(!$isAuthenticatedUri)
+			{
+				KExternalErrors::dieError(KExternalErrors::INVALID_AUTH_HEADER);
+			}
 			KExternalErrors::dieError(KExternalErrors::ACTION_BLOCKED);
 		}
 
@@ -540,7 +569,7 @@ class serveFlavorAction extends kalturaAction
 			$seekFromBytes = -1;
 		
 		
-		if($fileParam && is_dir($path)) {
+		if($fileParam && kFile::isDir($path)) {
 			$path .= "/$fileParam";
 			kFileUtils::dumpFile($path, null, null);
 			KExternalErrors::dieGracefully();
@@ -560,15 +589,12 @@ class serveFlavorAction extends kalturaAction
 					{
 						kFile::fullMkdir($tempClipPath);
 						$clipToSec = round($clipTo / 1000, 3);
-						$cmdLine = kConf::get ( "bin_path_ffmpeg" ) . " -i {$path} -vcodec copy -acodec copy -f mp4 -t {$clipToSec} -y {$tempClipPath} 2>&1";
-						KalturaLog::log("Executing {$cmdLine}");
-						$output = array ();
-						$return_value = "";
-						exec($cmdLine, $output, $return_value);
+						$cmd = kFfmpegUtils::getCopyCmd($path, $clipToSec, $tempClipPath);
+						list($output, $return_value) = kFfmpegUtils::executeCmd($cmd, 0);
 						KalturaLog::log("ffmpeg returned {$return_value}, output:".implode("\n", $output));
 					}
 					
-					if (file_exists($tempClipPath))
+					if (kFile::checkFileExists($tempClipPath))
 					{
 						KalturaLog::log("Dumping {$tempClipPath}");
 						kFileUtils::dumpFile($tempClipPath);
@@ -669,11 +695,11 @@ class serveFlavorAction extends kalturaAction
 				{
 					$hasCaptions = true;
 					$labelEntryId = $entryId;
-					$captionClips[] = array('type' => 'source', 'path' => $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH]);
+					$captionClips[] = self::getAssetFieldsArray(self::TYPE_SOURCE, $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_FILES_PATH], $captionFiles[$entryId][$captionLang][myPlaylistUtils::CAPTION_SOURCE_TYPE]);
 				}
 				else
 				{
-					$captionClips[] = array('type' => 'source', 'path' => 'empty');
+					$captionClips[] = self::getAssetFieldsArray(self::TYPE_SOURCE, self::PATH_EMPTY, kFileSyncUtils::SOURCE_TYPE_FILE);
 				}
 			}
 			if ($hasCaptions)
@@ -778,22 +804,28 @@ class serveFlavorAction extends kalturaAction
 
 	/**
 	 * @param string $path
-	 * @param flavorAsset $flavor
+	 * @param asset $asset
+	 * @param $sourceType
 	 * @return array
 	 */
-	private function getClipData($path, $flavor)
+	public static function getClipData($path, $asset, $sourceType)
 	{
-		$flavorId = $flavor->getId();
-		$hasAudio = $flavor->getContainsAudio();
-		if (is_null($hasAudio))
+		$assetId = $asset->getId();
+		$addSilence = false;
+		if ($asset instanceof flavorAsset)
 		{
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
-			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+			$hasAudio = $asset->getContainsAudio();
+			if (is_null($hasAudio))
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($assetId);
+				$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+			}
+			$addSilence = !$hasAudio;
 		}
-		$clipDesc = array('type' => 'source', 'path' => $path);
-		if (!$hasAudio)
+		$clipDesc = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
+		if ($addSilence)
 		{
-			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
+			KalturaLog::debug("$assetId Audio Bit rate is null or 0 (taken from mediaInfo)");
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
 			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
 		}
@@ -812,7 +844,7 @@ class serveFlavorAction extends kalturaAction
 		return $firstEntryIndex;
 	}
 
-	protected function getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex,
+	protected function getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex, $segmentDuration,
 	                                                  &$firstClipStartTime, &$initialClipIndex, &$initialSegmentIndex)
 	{
 		//Get supporting information
@@ -827,7 +859,7 @@ class serveFlavorAction extends kalturaAction
 			$durationsSum += $duration;
 
 			$accumulateCycleSegmentsCount[] = $cycleSegmentsCount;
-			$cycleSegmentsCount += ceil($duration / self::LIVE_CHANNEL_SEGMENT_DURATION);
+			$cycleSegmentsCount += ceil($duration / $segmentDuration);
 		}
 
 		// Set the values
@@ -863,6 +895,64 @@ class serveFlavorAction extends kalturaAction
 		}
 	}
 
+	protected function getLiveParams()
+	{
+		$segmentDuration = null;
+		$dvrWindowSize = null;
+
+		$liveMap = kConf::getMap('live');
+		foreach ($liveMap as $section => $params)
+		{
+			if(strstr($_SERVER['REQUEST_URI'],"/$section/"))
+			{
+				$segmentDuration = $params['segDuration'];
+				$dvrWindowSize = $params['dvrWindowSize'];
+				break;
+			}
+		}
+
+		if(is_null($segmentDuration) || is_null($dvrWindowSize))
+		{
+			KExternalErrors::dieError(KExternalErrors::MISSING_LIVE_CONFIGURATION);
+		}
+
+		return array($segmentDuration, $dvrWindowSize);
+	}
+
+	/**
+	 * @param array $assets
+	 * @return array
+	 */
+	public static function buildSequencesArray($assets)
+	{
+		$sequences = array();
+
+		foreach ($assets as $asset)
+		{
+			$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $asset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			if(!$path)
+			{
+				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
+			}
+			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
+			if ($asset->getLanguage())
+			{
+				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
+				if ($languageCode && $languageCode !== 'und')
+				{
+					$sequence['language'] = $languageCode;
+				}
+				else
+				{
+					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
+				}
+			}
+			$sequences[] = $sequence;
+		}
+		return $sequences;
+	}
+
 	protected function servePlaylistAsLiveChannel(LiveChannel $entry)
 	{
 		// get cycle info
@@ -878,12 +968,14 @@ class serveFlavorAction extends kalturaAction
 				"Entry [$entry->getId()] has a playlist with duration zero");
 		}
 
+		list($segmentDuration, $dvrWindowSize) = $this->getLiveParams();
+
 		// Start time of the first run
 		$playlistStartTime = $entry->getStartDate('U') * self::SECOND_IN_MILLISECONDS;
 
 		// start window time and current time (which is the end time)
 		$currentTime = time() * self::SECOND_IN_MILLISECONDS;
-		$startTime = $currentTime - self::TIME_MARGIN - self::DVR_WINDOW_SIZE;
+		$startTime = $currentTime - self::TIME_MARGIN - $dvrWindowSize;
 
 		// Current cycle number
 		$cycleNumber = floor(($startTime - $playlistStartTime) / $cycleDuration);
@@ -896,7 +988,7 @@ class serveFlavorAction extends kalturaAction
 		$firstEntryIndex = $this->getCurrentLiveChannelEntryIndex($cycleDurations, $currentCycleStartTime, $startTime);
 
 		// Get Info about the first entry that should be played now
-		$this->getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex,
+		$this->getCurrentLiveChannelEntryInfo($cycleDurations, $currentCycleStartTime, $cycleNumber, $firstEntryIndex, $segmentDuration,
 			$firstClipStartTime, $initialClipIndex, $initialSegmentIndex);
 
 		// Get Entries & Durations for the current window
@@ -913,5 +1005,24 @@ class serveFlavorAction extends kalturaAction
 			$captionFiles, null, true,
 			$playlistStartTime, $firstClipStartTime,
 			$initialClipIndex, $initialSegmentIndex);
+	}
+
+	public static function getPreferredStorageProfileId()
+	{
+		return self::$preferredStorageId;
+	}
+
+	public static function getFallbackStorageProfileId()
+	{
+		return self::$fallbackStorageId;
+	}
+
+	public static function getAssetFieldsArray($type, $path, $sourceType)
+	{
+		return array(
+			'type' => $type,
+			'path' => $path,
+			'sourceType' => $sourceType,
+		);
 	}
 }

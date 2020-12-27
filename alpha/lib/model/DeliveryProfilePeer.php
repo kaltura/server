@@ -135,17 +135,23 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	// -------------------------------------
 	// ------ Retrieval functionality ------
 	// -------------------------------------
-	
+
 	/**
 	 * Returns the delivery profile that matches the entryID and the streamer type.
 	 * @param string $entryId The entry id
-	 * @param PlayBackProtocol $streamerType the streamer type
+	 * @param string $streamerType the streamer type
+	 * @param null $flavorAssets
 	 * @return DeliveryProfile
 	 */
-	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP) 
+	public static function getDeliveryProfile($entryId, $streamerType = PlaybackProtocol::HTTP, $flavorAssets = null)
 	{
 		$delivery = null;
 		$deliveryAttributes = DeliveryProfileDynamicAttributes::init(null, $entryId, $streamerType);
+
+		if($flavorAssets)
+		{
+			$deliveryAttributes->setFlavorAssets($flavorAssets);
+		}
 		
 		if ($streamerType == PlaybackProtocol::HTTP)
 		{
@@ -159,7 +165,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		if(!$delivery)
 			$delivery = self::getLocalDeliveryByPartner($entryId, $streamerType, $deliveryAttributes, null, false);
-		
+
 		if($delivery)
 			$delivery->setDynamicAttributes($deliveryAttributes);
 		
@@ -488,6 +494,50 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		
 		return $delivery;
 	}
+
+	protected static function selectByCdnRatios($supportedDPs, $ratios, $key)
+	{
+		// group the delivery profiles by pricing profile
+		$dpsByPricingProfile = array();
+		foreach($supportedDPs as $delivery)
+		{
+			$cdnName = $delivery->getPricingProfile();
+
+			// prefer the first delivery profile if there are multiple on the same cdn
+			if (!isset($dpsByPricingProfile[$cdnName]))
+			{
+				$dpsByPricingProfile[$cdnName] = $delivery;
+			}
+		}
+
+		// filter the ratios leaving only those that have a supported delivery profile
+		$ratios = array_intersect_key($ratios, $dpsByPricingProfile);
+		$sum = array_sum($ratios);
+		if (!$sum)
+		{
+			return null;
+		}
+
+		// choose a profile according to the ratio, using key affinity
+		$index = crc32($key) % $sum;
+		$total = 0;
+		foreach($ratios as $cdnName => $ratio)
+		{
+			$total += $ratio;
+			if ($index >= $total)
+			{
+				continue;
+			}
+
+			$delivery = $dpsByPricingProfile[$cdnName];
+
+			KalturaLog::debug("delivery [" . $delivery->getId() . "], cdn [$cdnName], key [$key], index [$index], filtered ratios [" . print_r($ratios, true) . "]");
+			return $delivery;
+		}
+
+		return null;
+	}
+
 	/**
 	 * Selects between a list of deliveries by a requested media protocol
 	 * @param array $deliveries list of deliveries
@@ -531,27 +581,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		$cdnRatios = kConf::getMap('cdn_ratios');
 		if ($cdnRatios && isset($cdnRatios[$partnerId]))
 		{
-			$ratios = $cdnRatios[$partnerId];
-			$sum = array_sum($ratios);
-			if ($sum)
+			$delivery = self::selectByCdnRatios($supportedDPs, $cdnRatios[$partnerId], $deliveryAttributes->getEntryId());
+			if ($delivery)
 			{
-				$entryIdAffinity = crc32($deliveryAttributes->getEntryId()) % $sum;
-				$total = 0;
-				foreach($ratios as $cdnName => $ratio)
-				{
-					$total += $ratio;
-					if ($entryIdAffinity >= $total)
-						continue;
-
-					foreach($supportedDPs as $delivery)
-					{
-						if ($delivery->getPricingProfile() == $cdnName) {
-							return $delivery;
-						}
-					}
-
-					break;
-				}
+				return $delivery;
 			}
 		}
 
@@ -611,7 +644,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param string $entryId The entry for which we search for the delivery profile
 	 * @param PlaybackProtocol $streamerType - The protocol
 	 * @param string $mediaProtocol - rtmp/rtmpe/https...
-	 * @return DeliveryProfile
+	 * @return DeliveryProfileLive
 	 */
 	public static function getLiveDeliveryProfileByHostName($cdnHost, DeliveryProfileDynamicAttributes $deliveryAttributes) {
 		$entryId = $deliveryAttributes->getEntryId();
@@ -681,7 +714,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		foreach($deliveries as $delivery) {
 			$recognizer = $delivery->getRecognizer();
 			if(!is_null($recognizer)) {
-				if($recognizer->isRecognized($requestOrigin)) {
+				if($recognizer->isRecognized($requestOrigin) == kUrlRecognizer::RECOGNIZED_OK) {
 					return false;					
 				}
 			}

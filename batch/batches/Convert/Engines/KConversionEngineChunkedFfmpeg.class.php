@@ -30,11 +30,11 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	'executionMode' config field used to differntiate between the modes, 
 	 *	allowed values - 'standalone'/'memcache'
 	 */
-	protected function execute_conversion_cmdline($command, &$returnVar, $urgency, $jobId = null)
+	protected function execute_conversion_cmdline($command, &$returnVar, $urgency, $jobId = null, $sharedChunkPath = null)
 	{
 		KalturaLog::log($command);
 		if(strstr($command,"ffmpeg")===false)
-			return parent::execute_conversion_cmdline($command, $returnVar, $urgency);
+			return parent::execute_conversion_cmdline($command, $returnVar, $urgency, $sharedChunkPath);
 		if(!isset(KBatchBase::$taskConfig->params->executionMode)){
 			$returnVar = -1;
 			$errMsg = "ERROR: Missing executionMode value in the batch/worker.ini";
@@ -47,7 +47,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$output=$this->execute_chunked_encode_standalone($command, $returnVar);
 		}
 		else if($executionMode=="memcache"){
-			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $urgency, $jobId);
+			$output=$this->execute_chunked_encode_memcache($command, $returnVar, $urgency, $jobId, $sharedChunkPath);
 		}
 		else {
 			$returnVar = -1;
@@ -68,7 +68,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 	 *	- chunkedEncodeMemcacheToken - token to differentiate between general/global Kaltura jobs and per customer dedicated servers (optional, default:null)
 	 *	- chunkedEncodeMaxConcurrent - maximum concurrently executed chunks jobs, more or less servers core number (optional, default:5)
 	 */
-	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $urgency, $jobId = null)
+	protected function execute_chunked_encode_memcache($cmdLine, &$returnVar, $urgency, $jobId = null, $sharedChunkPath = null)
 	{
 		KalturaLog::log("Original cmdLine:$cmdLine");
 		
@@ -126,7 +126,12 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			$cmdLine.= '\''.($concurrent).'\',';
 			$cmdLine.= '\''.($concurrentMin).'\',';
 			$cmdLine.= '\''.($sessionName).'\',';
-			$cmdLine.= '\''.$cmdLineAdjusted.'\');';
+			$cmdLine.= '\''.($cmdLineAdjusted).'\'';
+			if($sharedChunkPath)
+			{
+				$cmdLine.= ',\''.$sharedChunkPath.'\'';
+			}
+			$cmdLine.=');';
 			$cmdLine.= 'if(\$rv==false) exit(1);';
 			$cmdLine.= '"';
 		}
@@ -271,5 +276,31 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		KalturaLog::log("Cleaned up cmdLine:$cmdLineAdjusted");
 		
 		return $cmdLineAdjusted;
+	}
+	
+	/**
+	 * derived classes can override this is they create the command lines in a different way
+	 *
+	 * @param string $cmd_line
+	 * @param boolean $add_log
+	 * @return string
+	 */
+	protected function getCmdLine ($cmd_line , $add_log )
+	{
+		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
+		$binName=$this->getCmd();
+		$exec_cmd = $binName . " " .
+			str_replace (
+				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
+				array($this->inFilePath, $this->outFilePath, $this->configFilePath, $binName),
+				$cmd_line);
+		
+		if ( $add_log )
+		{
+			// redirect both the STDOUT & STDERR to the log
+			$exec_cmd .= " >> \"{$this->logFilePath}\" 2>&1";
+		}
+		
+		return $exec_cmd;
 	}
 }

@@ -19,8 +19,10 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	public function __construct($filePath, $cmdPath="mediainfo")
 	{
 		$this->cmdPath = $cmdPath;
-		if (!file_exists($filePath))
-			throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
+		if(strstr($filePath, "http")===false) {
+			if (!kFile::checkFileExists($filePath))
+				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
+		}
 		parent::__construct($filePath);
 	}
 	
@@ -34,19 +36,37 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		 * and for test reasons prior to switching from mediainfo to ffprobe
 		 */
 		$ffParser = new KFFMpegMediaParser($this->filePath);//, "ffmpeg-20140326", "ffprobe-20140326");
+//if(isset($this->newFlow))
+//$ffParser->newFlow=$this->newFlow;
 		$ffMi = null;
 		try {
 			if(isset($this->encryptionKey))
 				$ffParser->setEncryptionKey($this->encryptionKey);
 			$ffMi = $ffParser->getMediaInfo();
+//if($this->newFlow!=0)
+			return $ffMi;
+		}
+		catch(Exception $ex)
+		{
+			KalturaLog::log(print_r($ex,1));
+//if($this->newFlow!=0)
+			return null;
+		}
+		
+		try
+		{
+			$output = $this->getRawMediaInfo();
+			$kMi = $this->parseOutput($output);
 		}
 		catch(Exception $ex)
 		{
 			KalturaLog::log(print_r($ex,1));
 		}
-				
-		$output = $this->getRawMediaInfo();
-		$kMi = $this->parseOutput($output);
+		
+		if(!isset($kMi) && !isset($ffMi))
+		{
+			throw new kApplicativeException(KBaseMediaParser::MEDIA_PARSER_TYPE_MEDIAINFO, "Failed to get media data for file [{$this->filePath}]");
+		}
 
 		if(!isset($kMi)) {
 			$compareStr = self::compareFields($kMi, $ffMi);
@@ -95,27 +115,28 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 		}
 		
 		$durLimit=3600000;
+		$filePath = kFile::realPath($this->filePath);
 		if(get_class($this)=='KMediaInfoMediaParser'
 		&& ((isset($kMi->containerDuration) && $kMi->containerDuration>=$durLimit) 
 			|| (isset($kMi->videoDuration) && $kMi->videoDuration>=$durLimit)
 			|| (isset($kMi->audioDuration) && $kMi->audioDuration>=$durLimit))) {
-			$cmd = "{$this->cmdPath} \"--Inform=General;done %Duration%\" \"{$this->filePath}\"";
+			$cmd = "{$this->cmdPath} \"--Inform=General;done %Duration%\" \"{$filePath}\"";
 			$output=0;
-			$output = shell_exec($cmd);
+			$output = kExecWrapper::shell_exec($cmd);
 			$aux = explode(" ", trim($output));
 			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
 				$kMi->containerDuration=(int)$aux[1];
 			}
-			$cmd = "{$this->cmdPath} \"--Inform=Video;done %Duration%\" \"{$this->filePath}\"";
+			$cmd = "{$this->cmdPath} \"--Inform=Video;done %Duration%\" \"{$filePath}\"";
 			$output=0;
-			$output = shell_exec($cmd);
+			$output = kExecWrapper::shell_exec($cmd);
 			$aux = explode(" ", trim($output));
 			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
 				$kMi->videoDuration=(int)$aux[1];
 			}
-			$cmd = "{$this->cmdPath} \"--Inform=Audio;done %Duration%\" \"{$this->filePath}\"";
+			$cmd = "{$this->cmdPath} \"--Inform=Audio;done %Duration%\" \"{$filePath}\"";
 			$output=0;
-			$output = shell_exec($cmd);
+			$output = kExecWrapper::shell_exec($cmd);
 			$aux = explode(" ", trim($output));
 			if(isset($aux) && count($aux)==2 && $aux[0]=='done'){
 				$kMi->audioDuration=(int)$aux[1];
@@ -205,7 +226,8 @@ class KMediaInfoMediaParser extends KBaseMediaParser
 	
 	protected function getCommand() 
 	{
-		return "{$this->cmdPath} \"{$this->filePath}\"";
+		$filePath = kFile::realPath($this->filePath);
+		return "{$this->cmdPath} \"{$filePath}\"";
 	}
 	
 	protected function parseOutput($output) 

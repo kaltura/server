@@ -81,8 +81,6 @@ class flvclipperAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		KalturaMonitorClient::initApiMonitor(false, 'keditorservices.flvclipper', $entry->getPartnerId());
-		
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
 		
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_BLOCK_FLVCLIPPER_ACTION, $entry->getPartnerId()))

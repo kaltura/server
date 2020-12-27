@@ -28,18 +28,22 @@ class kThumbnailErrorMessages
 	const MISSING_TEXT = 'You must supply a text for this action';
 	const ENTRY_SOURCE_ONLY = ' can only work on entry source';
 	const FAILED = ' failed';
-	const SECOND =  'Second cant be negative';
+	const SECOND = 'Second cant be negative';
 	const VID_SLICE_FAILED = 'Vid slice failed';
-	const SLICE_NUMBER = 'Slice number must be positive and can not be greater then number of slices';
-	const NUMBER_OF_SLICE = 'Number of slices must be positive';
+	const SLICE_NUMBER = 'Slice number must be a natural number and can not be greater then number of slices';
+	const NUMBER_OF_SLICE = 'Number of slices must be a natural number';
 	const START_SEC = 'Start sec must be positive';
 	const END_SEC = 'End sec cant be greater then the video length';
 	const END_SEC_START_SEC = 'End sec must be greater then start sec';
 	const VID_STRIP_FAILED = 'Vid strip failed';
 	const ENTRY_TYPE = 'entryType';
+	const ENTRY_ID = 'entryId';
 	const TEXT_DOES_NOT_FIT_ERR = 'text does not fit the bounding box';
 	const ILLEGAL_ENUM_VALUE = 'Illegal enum value';
 	const NOT_VALID_IMAGE_FORMAT = 'Not valid image format';
 	const DENSITY_POSITIVE = 'Density must be positive';
 	const QUALITY_NOT_IN_RANGE = 'Quality must be between 20 and 100';
+	const WIDTH_AND_HEIGHT_ARE_ZERO = 'Width and height cannot both be equal zero';
+	const ILLEGAL_EXTEND_VECTOR = 'extend vector need to be width or height';
+	const X_MUST_BE_NATURAL = 'x must be a natural number';
 }

@@ -8,7 +8,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected $cmdPath;
 	protected $ffmprobeBin;
 	
-	public $checkScanTypeFlag=false;
+	public $checkScanTypeFlag=true;
 	
 	/**
 	 * @param string $filePath
@@ -19,8 +19,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($ffmpegBin)){
 			$this->cmdPath = $ffmpegBin;
 		}
-		else if(kConf::hasParam('bin_path_ffmpeg')) {
-			$this->cmdPath = kConf::get('bin_path_ffmpeg');
+		else if(kConf::hasParam(kFfmpegUtils::FFMPEG_PATH_CONF_NAME)) {
+			$this->cmdPath = kConf::get(kFfmpegUtils::FFMPEG_PATH_CONF_NAME);
 		}
 		else{
 			$this->cmdPath = "ffmpeg";
@@ -36,7 +36,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$this->ffprobeBin = "ffprobe";
 		}
 		if(strstr($filePath, "http")===false) {
-			if (!file_exists($filePath))
+			if (!kFile::checkFileExists($filePath))
 				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
 		}
 		parent::__construct($filePath);
@@ -48,10 +48,12 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	protected function getCommand($filePath=null)
 	{
 		if(!isset($filePath)) $filePath=$this->filePath;
+		$filePath = kFile::realPath($filePath);
+		
 		if(isset($this->encryptionKey))
-			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+			return "{$this->ffprobeBin} -decryption_key {$this->encryptionKey} -i \"{$filePath}\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 		else	
-			return "{$this->ffprobeBin} -i {$filePath} -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
+			return "{$this->ffprobeBin} -i \"{$filePath}\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json";
 	}
 	
 	/**
@@ -60,9 +62,10 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	public function getRawMediaInfo($filePath=null)
 	{
 		if(!isset($filePath)) $filePath=$this->filePath;
+		$filePath = kFile::realPath($filePath);
+		
 		$cmd = $this->getCommand($filePath);
-		KalturaLog::debug("Executing '$cmd'");
-		$output = shell_exec($cmd);
+		$output = kExecWrapper::shell_exec($cmd);
 		if (trim($output) === "")
 			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			
@@ -89,7 +92,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				$mediaInfo = new KalturaMediaInfo();
 				$mediaInfo->containerFormat = "arf";
 				$mediaInfo->containerId = "arf";
-				$mediaInfo->fileSize = round(filesize($this->filePath)/1024);
+				$mediaInfo->fileSize = round(kFile::fileSize($this->filePath)/1024);
 				return $mediaInfo;
 			}
 			return null;
@@ -104,7 +107,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
 		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
-			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->filePath);
+			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->ffprobeBin, $this->filePath);
 		else
 			$mediaInfo->scanType = 0; // Progressive
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
@@ -117,8 +120,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 * To be handled by mencoder in auto-inter-src mode
 		 */
 		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3"))){
-			$cmd = "$this->cmdPath -i $this->filePath 2>&1 ";
-			$output = shell_exec($cmd);
+			$cmd = "$this->cmdPath -i \"$this->filePath\" 2>&1 ";
+			$output = kExecWrapper::shell_exec($cmd);
 			if(strstr($output,"Progressive Segmented")){
 				if(isset($mediaInfo->contentStreams) && count($mediaInfo->contentStreams['video'])>0){
 					$mediaInfo->contentStreams['video'][0]->progressiveSegmented=true;
@@ -127,6 +130,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
+//if($this->newFlow!=0)
+		$mediaInfo = self::convertToMediaInfoNames($mediaInfo);
+
 		return $mediaInfo;
 	}
 	
@@ -180,7 +186,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				if(in_array($stream->codec_name, array('mjpeg','png'))
 				&& (in_array($mediaInfo->containerFormat, array('mp3','mpeg audio','isom','mp4','mpeg4','mpeg-4','m4a'))
 				||  in_array($mediaInfo->containerId, array('mp3','mpeg audio','isom','mp4','mpeg4','mpeg-4','m4a'))) ){
-					continue;
+					break;
 				}
 				$this->parseVideoStream($stream, $mAux);
 				if($vidCnt==0)
@@ -508,13 +514,14 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($detectDur) && $detectDur>0){
 			$cmdLine.= "-t $detectDur";
 		}
-		$cmdLine.= " -i $srcFileName $detectFiltersStr -nostats -f null dummyfilename 2>&1";
-		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine.= " -i \"$srcFileName\" $detectFiltersStr -nostats -f null dummyfilename 2>&1";
 	
 		/*
 		 * Execute the black/silence detection
 		*/
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -583,8 +590,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		KalturaLog::log("srcFileName($srcFileName)");
 	
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("SceneCuts detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -620,9 +626,9 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				$trimStr = ",trim=duration=$duration";
 		}
 		
+		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -715,39 +721,46 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	/**
 	 * 
 	 * @param $ffmpegBin
+	 * @param $ffprobeBin
 	 * @param $srcFileName
 	 * @return number
 	 */
-	private static function checkForScanType($ffmpegBin, $srcFileName, $frames=1000)
+	private static function checkForScanType($ffmpegBin, $ffprobeBin, $srcFileName, $seconds=5)
 	{
-/*
-	ffmpeg-2.1.3 -filter:v idet -frames:v 100 -an -f rawvideo -y /dev/null -nostats -i /mnt/shared/Media/114141.flv
-	[Parsed_idet_0 @ 0000000000331de0] Single frame detection: TFF:1 BFF:96 Progressive:2 Undetermined:1	
-	[Parsed_idet_0 @ 0000000000331de0] Multi frame detection: TFF:0 BFF:100 Progressive:0 Undetermined:0	
-	$mediaInfo->scanType=1; 
-*/
-		if(stristr(PHP_OS,'win')) $nullDev = "NULL";
-		else $nullDev = "/dev/null";
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -t $seconds -i \"$srcFileName\" -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
 
-		$cmdLine = "$ffmpegBin -filter:v idet -frames:v $frames -an -f rawvideo -y $nullDev -i $srcFileName -nostats  2>&1";
-		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
-		$tff=0; $bff=0; $progessive=0; $undermined=0;
+		$interlaced=0;
+		$samples=0;
 		foreach($outputArr as $line){
-			if(strstr($line, "Parsed_idet")==false)
+			$stam=$pts=$inter=$tff=0;
+			$valsArr=explode(',', $line);
+			if(count($valsArr)<4)
 				continue;
-			KalturaLog::log($line);
-			$str = strstr($line, "TFF");
-			sscanf($str,"TFF:%d BFF:%d Progressive:%d Undetermined:%d", $t, $b, $p, $u);
-			$tff+=$t; $bff+=$b; $progessive+=$p; $undermined+=$u;
+			list($stam,$pts,$inter,$tff) = $valsArr;
+			if($stam!="frame")
+				continue;
+			$samples++;
+			KalturaLog::log("$stam,pts:$pts,inter:$inter,tff:$tff");
+			$interlaced+=$inter;
 		}
-		$scanType = 0; // Default would be 'progressive'
-		if($progessive<$tff+$bff)
-			$scanType = 1;
+		if($samples==0)
+			$scanType=0;
+		else {
+			if($samples>5)	$thresh = 3;
+			else $thresh = 1;
+			
+			if($interlaced>$thresh) {
+				$scanType=1;
+			}
+			else
+				$scanType=0;
+		}
 		KalturaLog::log("ScanType: $scanType");
 		return $scanType;
 	}
@@ -772,9 +785,12 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		 */
 		if(stristr(PHP_OS,'win')) return 1;
 		
+		$srcFileName = kFile::realPath($srcFileName);
+		if(kString::beginsWith($srcFileName, 'http'))
+			return 1;
+		
 		$cmdLine = "dd if=$srcFileName count=1 | $ffprobeBin -i pipe:  2>&1";
-		KalturaLog::log("FastStart detection cmdLine - $cmdLine");
-		$lastLine=exec($cmdLine, $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine, $outputArr, $rv);
 		{
 			KalturaLog::log("FastStart detection results printout - lastLine($lastLine),output-\n".print_r($outputArr,1));
 		}
@@ -813,10 +829,10 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		KalturaLog::log("srcFileName($srcFileName)");
 			
 		$trimStr=null;
-			
-		$cmdLine = "$ffprobeBin $srcFileName -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffprobeBin \"$srcFileName\" -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -838,10 +854,10 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	public static function retrieveVolumeLevels($ffprobeBin, $srcFileName, $reset=1)
 	{
 		KalturaLog::log("srcFileName($srcFileName)");
-				
+		
+		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -888,7 +904,6 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	private static function parsePixelFormat($pixelFormat, KalturaMediaInfo $mediaInfo)
 	{
 		KalturaLog::log("In - pixelFormat:$pixelFormat");
-//$pixelFormat='yuv422pzzz';;//
 		$rv = preg_match('/\s*([a-z]+)\s*([0-9]+)\s*([a-z]*)\s*([0-9]*)/', $pixelFormat, $matches, PREG_OFFSET_CAPTURE);
 		if($rv===false || !(isset($matches) && is_array($matches) and count($matches)>=3)){
 			KalturaLog::log("Out - Unrecognized pixelFormat");
@@ -903,5 +918,75 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			$bitsDepth = null;
 		KalturaLog::log("Out - colorSpace:$mediaInfo->colorSpace, chromaSubsampling:$mediaInfo->chromaSubsampling, bitsDepth:$bitsDepth");
 	}
-};
+	
+	/**
+	 * convertToMediaInfoNames
+	 *
+	 * @param KalturaMediaInfo $mediaInfo
+	 */	
+	private static function convertToMediaInfoNames($mediaInfo)
+	{
+			$containerFormatList = array (
+				"mov" => 		"mpeg-4",	
+				"mpegts" =>     "mpeg-ts",		
+				"wav" =>		"wave",		
+				"mpegvideo" =>  "mpeg video",
+				"mp4" =>        "mpeg-4",		
+				"rm" =>         "realmedia",	
+				"3gp" =>        "mpeg-4",	
+			);
+			$audioFormatList = array (
+				"pcm_s24le" =>	"pcm",	
+				"pcm_dvd" =>    "pcm",	
+				"aac_latm" =>   "aac",	
+				"wmalossless" =>"wma",	
+				"adpcm_ima_wav" =>  "adpcm",	
+				"cook" =>		"cooker",
+				"pcm_s16be" =>	"pcm",
+				"pcm_s16le" =>  "pcm",	
+				"pcm_s24be" =>	"pcm",
+				"pcm_s24le" =>  "pcm",	
+				"pcm_f32be" =>  "pcm",	
+				"pcm_f32le" =>	"pcm",	
+				"pcm_u8" =>     "pcm",	
+			);
+			$videoFormatList = array (
+				"h264" =>		"avc",		
+				"hevc" =>	    "hvc1",			
+				"mjpeg" =>	    "jpeg",			
+				"vp9" =>	    "v_vp9",			
+				"flv1" =>	    "sorenson spark",
+				"mss2" =>	    "windows media",	
+				"rv30" =>	    "realvideo 3",	
+				"msmpeg4v3" =>	"mpeg-4 visual",	
+				"msmpeg4v2" =>	"mpeg-4 visual",	
+				"cinepak" =>	"cinepack",		
+				"svq3" =>		"sorenson 3",
+			);
 
+			if($mediaInfo->containerFormat!='image2') {
+				if(key_exists($mediaInfo->videoFormat,$videoFormatList)==true)
+					$mediaInfo->videoFormat = $videoFormatList[$mediaInfo->videoFormat];
+			}
+
+			$mkvCodecList = array (
+				"vp9" =>	"v_vp9",			
+				"v_vp9" =>	"v_vp9",			
+				"vp8" =>	"v_vp8",			
+				"vorbis" =>	"a_vorbis"
+			);
+			if(key_exists($mediaInfo->videoFormat,$mkvCodecList)==true)
+				$mediaInfo->videoCodecId = $mkvCodecList[$mediaInfo->videoFormat];
+
+			if(key_exists($mediaInfo->audioFormat,$audioFormatList)==true)
+				$mediaInfo->audioFormat = $audioFormatList[$mediaInfo->audioFormat];
+			if(key_exists($mediaInfo->audioFormat,$mkvCodecList)==true)
+				$mediaInfo->audioCodecId = $mkvCodecList[$mediaInfo->audioFormat];
+
+			if(key_exists($mediaInfo->containerFormat,$containerFormatList)==true)
+				$mediaInfo->containerFormat = $containerFormatList[$mediaInfo->containerFormat];
+
+		return $mediaInfo;
+	}
+
+};

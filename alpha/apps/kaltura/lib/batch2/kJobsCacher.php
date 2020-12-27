@@ -15,7 +15,8 @@ class kJobsCacher
 	 */
 	private static function getCacheKeyForWorkerJobs($workerId)
 	{
-		return "jobs_cache_jobs_worker_$workerId";
+		$batchVersion = BatchJobLockPeer::getBatchVersion();
+		return "jobs_cache_jobs_worker_$workerId-$batchVersion";
 	}
 
 	/**
@@ -25,7 +26,8 @@ class kJobsCacher
 	 */
 	private static function getCacheKeyForWorkerQueue($workerId)
 	{
-		return "jobs_cache_queue_worker_$workerId";
+		$batchVersion = BatchJobLockPeer::getBatchVersion();
+		return "jobs_cache_queue_worker_$workerId-$batchVersion";
 	}
 
 	/**
@@ -35,7 +37,8 @@ class kJobsCacher
 	 */
 	private static function getCacheKeyForIndex($workerId)
 	{
-		return "jobs_cache_worker_$workerId-index";
+		$batchVersion = BatchJobLockPeer::getBatchVersion();
+		return "jobs_cache_worker_$workerId-$batchVersion-index";
 	}
 
 	/**
@@ -45,7 +48,8 @@ class kJobsCacher
 	 */
 	private static function getCacheKeyForDBLock($workerId)
 	{
-		return "jobs_cache_worker_$workerId-Lock";
+		$batchVersion = BatchJobLockPeer::getBatchVersion();
+		return "jobs_cache_worker_$workerId-$batchVersion-Lock";
 	}
 
 	/**
@@ -80,7 +84,7 @@ class kJobsCacher
 				$jobsFromDB = self::getJobsFromDB($cache, $workerId, clone($c), $maxJobToPull, $jobType, $numOfJobsToPull, $workerLockKey);
 				return $jobsFromDB;
 			}
-			usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
+			KalturaMonitorClient::usleep(self::TIME_TO_USLEEP_BETWEEN_DB_PULL_ATTEMPTS);
 		}
 		return array();
 

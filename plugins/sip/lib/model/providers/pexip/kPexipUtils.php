@@ -14,11 +14,17 @@ class kPexipUtils
 	const CONFIG_PRIMARY_LOCATION_ID = 'primaryLocationId';
 	const CONFIG_SECONDARY_LOCATION_ID = 'secondaryLocationId';
 	const FORCE_NON_SECURE_STREAMING = 'forceNonSecureStreaming';
+	const RTMP_EXPLICIT_PARTNERS = 'rtmpExplicitPartners';
 	const SIP_URL_DELIMITER = '@';
 	const PARAM_META = 'meta';
 	const PARAM_TOTAL_COUNT = 'total_count';
 	const PARAM_LOCAL_ALIAS = 'local_alias';
 	const LICENSES_PER_CALL = 3;
+	const SCREEN_SHARE = 'Screen Share';
+	const TALKING_HEADS = 'Talking Heads';
+
+	protected static $allowedSourceTypes = array( KalturaSipSourceType::PICTURE_IN_PICTURE, KalturaSipSourceType::SCREEN_SHARE, KalturaSipSourceType::TALKING_HEADS );
+
 	/**
 	 * @return bool|null
 	 * @throws Exception
@@ -78,6 +84,63 @@ class kPexipUtils
 		}
 
 		return $dbEntry;
+	}
+
+
+	/**
+	 * @param $sourceType
+	 * @param LiveStreamEntry $dbLiveEntry
+	 * @return entry|LiveStreamEntry|null
+	 * @throws PropelException
+	 */
+	public static function validateAndRetrieveDualStreamEntry(LiveStreamEntry $dbLiveEntry, $sourceType = KalturaSipSourceType::PICTURE_IN_PICTURE)
+	{
+		$dualStreamLiveEntry = null;
+		if (!in_array($sourceType, self::$allowedSourceTypes))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SIP_SOURCE_TYPE);
+		}
+
+		if ($sourceType != KalturaSipSourceType::PICTURE_IN_PICTURE)
+		{
+			$dualStreamLiveEntryId = $dbLiveEntry->getSipDualStreamEntryId();
+			if ($dualStreamLiveEntryId)
+			{
+				$dualStreamLiveEntry = entryPeer::retrieveByPK($dualStreamLiveEntryId);
+			}
+			if (!$dualStreamLiveEntry)
+			{
+				$liveEntryService = new LiveStreamService();
+				$dualStreamLiveEntry = $liveEntryService->duplicateTemplateEntry($dbLiveEntry->getConversionProfileId(), $dbLiveEntry->getId(), new LiveStreamEntry());
+				$liveEntryService->setBroadcastinUrlsAndStreamPassword($dualStreamLiveEntry);
+				$dualStreamLiveEntry->setDisplayInSearch(false);
+				$dualStreamLiveEntry->setIsSipEnabled(true);
+				$dualStreamLiveEntry->setParentEntryId($dbLiveEntry->getId());
+				$dualStreamLiveEntry->setStatus(entryStatus::READY);
+				$dualStreamLiveEntry->save();
+				$liveEntryService->setFlavorsAsReady($dualStreamLiveEntry);
+			}
+
+			switch ($sourceType)
+			{
+				case KalturaSipSourceType::TALKING_HEADS:
+				{
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . ' - ' . self::SCREEN_SHARE);
+					break;
+				}
+				case KalturaSipSourceType::SCREEN_SHARE:
+				{
+					$dualStreamLiveEntry->setName($dbLiveEntry->getId() . ' - ' . self::TALKING_HEADS);
+					break;
+				}
+				default:
+				{
+					throw new KalturaAPIException(KalturaErrors::INVALID_SIP_SOURCE_TYPE);
+				}
+			}
+			$dualStreamLiveEntry->save();
+		}
+		return $dualStreamLiveEntry;
 	}
 
 	/**
@@ -161,6 +224,27 @@ class kPexipUtils
 			self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
 			KalturaLog::warning($msg);
 			return false;
+		}
+
+		if ($dbLiveEntry->getSipSourceType() && $dbLiveEntry->getSipSourceType() != KalturaSipSourceType::PICTURE_IN_PICTURE)
+		{
+			$dualStreamEntryId = $dbLiveEntry->getSipDualStreamEntryId();
+			if (!$dualStreamEntryId)
+			{
+				$msg = 'Dual Stream Entry is not defined on entry ' . $dbLiveEntry->getId() . ' while trying source type is ' . $dbLiveEntry->getSipSourceType();
+				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+				KalturaLog::warning($msg);
+				return false;
+			}
+
+			$dbDualStreamLiveEntry = entryPeer::retrieveByPKNoFilter($dualStreamEntryId, null, false);
+			if (!$dbDualStreamLiveEntry || $dbDualStreamLiveEntry->getStatus() != entryStatus::READY)
+			{
+				$msg = "Dual Stream entry $dualStreamEntryId was not found for sip call for entry " . $dbLiveEntry->getId() . ' with source type ' . $dbLiveEntry->getSipSourceType();
+				self::sendSipEmailNotification($dbLiveEntry->getPartnerId(), $dbLiveEntry->getPuserId(), $msg, $dbLiveEntry->getId());
+				KalturaLog::warning($msg);
+				return false;
+			}
 		}
 
 		return $dbLiveEntry;

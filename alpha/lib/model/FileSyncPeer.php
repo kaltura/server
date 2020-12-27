@@ -50,8 +50,15 @@ class FileSyncPeer extends BaseFileSyncPeer
 	public static function retrieveByFileSyncKey(FileSyncKey $key, $current_dc_only = false)
 	{
 		$c = self::getCriteriaForFileSyncKey($key);
+
+//      AWS: In case you want to revert the kflow helper handleConverFionished to create remote file sync this need to be added
 		if($current_dc_only)
-			$c->add(self::DC, kDataCenterMgr::getCurrentDcId());
+		{
+			$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$currentDcIds[] = kDataCenterMgr::getCurrentDcId();
+			$c->add(self::DC, $currentDcIds, Criteria::IN);
+		}
+		
 		return self::doSelectOne($c);
 	}
 	

@@ -24,10 +24,13 @@ class kUserSearch extends kBaseESearch
 
     protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
     {
+        $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
         $this->query = array(
-            'index' => ElasticIndexMap::ELASTIC_KUSER_INDEX,
+            'index' => $indexName,
             'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE
         );
+
+        KalturaLog::debug("Index -" . $indexName);
 
         parent::initQuery($statuses, $objectId, $pager, $order);
     }

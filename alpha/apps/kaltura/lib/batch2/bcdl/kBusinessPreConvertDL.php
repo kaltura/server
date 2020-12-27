@@ -58,7 +58,7 @@ class kBusinessPreConvertDL
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId)
+	public static function getSourceAssetForGenerateThumbnail($sourceAssetId ,$sourceParamsId, $entryId, $fetchFromRemote = false)
 	{
 		if($sourceAssetId)
 		{
@@ -76,7 +76,7 @@ class kBusinessPreConvertDL
 		}
 
 		KalturaLog::info("Look for a flavor tagged with thumbsource of entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE, null, false, $fetchFromRemote);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 
@@ -88,13 +88,13 @@ class kBusinessPreConvertDL
 
 
 		KalturaLog::info("Look for highest bitrate flavor with web tag on entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB);
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_WEB, null, false, $fetchFromRemote);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 
 
 		KalturaLog::info("Look for highest bitrate flavor of entry [$entryId]");
-		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId);
+		$srcAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, null, null, false, $fetchFromRemote);
 		if($srcAsset && $srcAsset->isLocalReadyStatus())
 			return $srcAsset;
 
@@ -204,7 +204,7 @@ class kBusinessPreConvertDL
 		$thumbAsset->incrementVersion();
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 
-		if(file_exists($capturedPath))
+		if(kFile::checkFileExists($capturedPath))
 		{
 			list($width, $height, $type, $attr) = getimagesize($capturedPath);
 			$thumbAsset->setWidth($width);
@@ -213,7 +213,7 @@ class kBusinessPreConvertDL
 		}
 
 		$logPath = $capturedPath . '.log';
-		if(file_exists($logPath))
+		if(kFile::checkFileExists($logPath))
 		{
 			$thumbAsset->incLogFileVersion();
 			$thumbAsset->save();
@@ -285,26 +285,36 @@ class kBusinessPreConvertDL
 		/* @var $fileSync FileSync */
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 
-		if(!$fileSync || $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
+		if(!$fileSync || (!in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()) && ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)))
 		{
-			$errDescription = 'Source asset could has no valid file sync';
+			$errDescription = 'Source asset has no valid file sync';
 			return false;
 		}
 
-		$srcPath = $fileSync->getFullPath();
+		if (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+		{
+			$srcPath = $fileSync->getRemotePath();
+		}
+		else
+		{
+			$srcPath = $fileSync->getFullPath();
+		}
 		$uniqid = uniqid('thumb_');
 		$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-		if(!file_exists($tempDir))
-			mkdir($tempDir, 0700, true);
+		if(!kFile::checkFileExists($tempDir))
+		{
+			kFile::mkdir($tempDir, 0700, true);
+		}
+
 		$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 
-		if(!file_exists($srcPath))
+		if(!kFile::checkFileExists($srcPath))
 		{
 			$errDescription = "Source file [$srcPath] does not exist";
 			return false;
 		}
 
-		if(!is_file($srcPath))
+		if(!kFile::isFile($srcPath))
 		{
 			$errDescription = "Source file [$srcPath] is not a file";
 			return false;
@@ -317,7 +327,8 @@ class kBusinessPreConvertDL
 				/* @var $srcAsset flavorAsset */
 				$params = array();
 				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($srcAsset->getId());
-				if($mediaInfo){
+				if($mediaInfo)
+				{
 					$params['dar'] = $mediaInfo->getVideoDar();
 					$params['scanType'] = $mediaInfo->getScanType();
 				}
@@ -328,27 +339,33 @@ class kBusinessPreConvertDL
 				}
 
 				// generates the thumbnail
-				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get('bin_path_ffmpeg'));
+				$thumbMaker = new KFFMpegThumbnailMaker($srcPath, $destPath, kConf::get(kFfmpegUtils::FFMPEG_PATH_CONF_NAME));
 				$created = $thumbMaker->createThumnail($destThumbParamsOutput->getVideoOffset(), $srcAsset->getWidth(), $srcAsset->getHeight(), $params);
-				if(!$created || !file_exists($destPath))
+				if(!$created || !kFile::checkFileExists($destPath))
 				{
-					$errDescription = "Thumbnail not captured";
+					$errDescription = 'Thumbnail not captured';
 					return false;
 				}
+
 				$srcPath = $destPath;
 				$uniqid = uniqid('thumb_');
-
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-				if(!file_exists($tempDir))
-					mkdir($tempDir, 0700, true);
+				if(!kFile::checkFileExists($tempDir))
+				{
+					kFile::mkdir($tempDir, 0700, true);
+				}
+
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . '.jpg';
 			}
 
 			if($srcAsset->getType() == assetType::THUMBNAIL)
 			{
 				$tempDir = kConf::get('cache_root_path') . DIRECTORY_SEPARATOR . 'thumb';
-				if(!file_exists($tempDir))
-					mkdir($tempDir, 0700, true);
+				if(!kFile::checkFileExists($tempDir))
+				{
+					kFile::mkdir($tempDir, 0700, true);
+				}
+
 				$destPath = $tempDir . DIRECTORY_SEPARATOR . $uniqid . "." . $srcAsset->getFileExt();
 			}
 
@@ -367,11 +384,13 @@ class kBusinessPreConvertDL
 			$stripProfiles = $destThumbParamsOutput->getStripProfiles();
 
 			if ($srcAsset->getType() == assetType::THUMBNAIL && $fileSync->isEncrypted())
+			{
 				$srcPath = $fileSync->createTempClear();
+			}
 			$cropper = new KImageMagickCropper($srcPath, $destPath, kConf::get('bin_path_imagemagick'), true);
 			$cropped = $cropper->crop($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $rotate, $stripProfiles);
 			$fileSync->deleteTempClear();
-			if(!$cropped || !file_exists($destPath))
+			if(!$cropped || !kFile::checkFileExists($destPath))
 			{
 				$errDescription = "Crop failed";
 				return false;
@@ -577,6 +596,7 @@ class kBusinessPreConvertDL
 	protected static function validateConversionProfile($partnerId, $entryId, mediaInfo $mediaInfo = null, array $flavors, array $conversionProfileFlavorParams, &$errDescription)
 	{
 		// if there is no media info, the entire profile returned as is, decision layer ignored
+		$entryDuration = null;
 		if(!$mediaInfo)
 		{
 			KalturaLog::log("Validate Conversion Profile, no media info supplied");
@@ -590,9 +610,16 @@ class kBusinessPreConvertDL
 		}
 		else
 		{
+			$entryDuration = $mediaInfo->getVideoDuration() ? $mediaInfo->getVideoDuration()/1000 : $mediaInfo->getContainerDuration()/1000;
 			KalturaLog::log("Validate Conversion Profile, media info [" . $mediaInfo->getId() . "]");
 		}
 
+		if(!$entryDuration)
+		{
+			$entry = entryPeer::retrieveByPK($entryId);
+			$entryDuration = $entry->getDuration();
+		}
+		
 		self::adjustAssetParams($entryId, $flavors);
 		// call the decision layer
 		KalturaLog::log("Generate Target " . count($flavors) . " Flavors supplied");
@@ -601,7 +628,7 @@ class kBusinessPreConvertDL
 		 */
 		foreach($flavors as $flavor) {
 			$flavorParamsConversionProfile = $conversionProfileFlavorParams[$flavor->getId()];
-			self::overrideFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile);
+			self::overrideFlavorParamsWithConversionProfileSettings($flavor, $flavorParamsConversionProfile, $entryDuration);
 			self::overrideFlavorParamsWithMultistreamData($flavor, $entryId);
 		}
 
@@ -2069,7 +2096,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 * @param unknown_type $flavorParams
 	 * @param unknown_type $flavorParamsConversionProfile
 	 */
-	private static function overrideFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile)
+	private static function overrideFlavorParamsWithConversionProfileSettings($flavorParams, $flavorParamsConversionProfile, $entryDuration = null)
 	{
 		if($flavorParamsConversionProfile){
 			/*
@@ -2086,8 +2113,19 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				$flavorParams->setTwoPass($overrideParam);
 			if($flavorParamsConversionProfile->getTags()!==null) 
 				$flavorParams->setTags($flavorParamsConversionProfile->getTags());
-			if($flavorParamsConversionProfile->getChunkedEncodeMode()!==null)
-				$flavorParams->setChunkedEncodeMode($flavorParamsConversionProfile->getChunkedEncodeMode());
+			
+			$chunkEncoderMode = $flavorParams->getChunkedEncodeMode();
+			if ($flavorParamsConversionProfile->getChunkedEncodeMode() !== null)
+			{
+				$chunkEncoderMode = $flavorParamsConversionProfile->getChunkedEncodeMode();
+			}
+			$chunkedConvertMinDuration = kConf::get('chunked_convert_min_duration', 'runtime_config', 0);
+			if (isset($entryDuration) && $entryDuration < $chunkedConvertMinDuration)
+			{
+				$chunkEncoderMode = false;
+			}
+			
+			$flavorParams->setChunkedEncodeMode($chunkEncoderMode);
 			$overloadParamsJsonStr = $flavorParamsConversionProfile->getOverloadParams();
 				/*
 				 * OverloadParams is JSON string containing an array of flavotParams field-value pairs. 

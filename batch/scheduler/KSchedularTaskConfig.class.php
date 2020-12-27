@@ -4,7 +4,6 @@
  */
 class KSchedularTaskConfig extends Zend_Config_Ini
 {
-	
 	protected $queueSize = 0;
 	
 	public function __construct($configFileName, $workerName, $maxInstances)
@@ -256,5 +255,45 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	
 	public function setQueueSize($queueSize) {
 		$this->queueSize = $queueSize;
+	}
+
+	public function getS3Arn() {
+		return $this->s3Arn;
+	}
+
+	public function setS3Arn($s3Arn) {
+		$this->s3Arn = $s3Arn;
+	}
+	
+	public function getS3Region() {
+		return $this->s3Region;
+	}
+	
+	public function setS3Region($s3Region) {
+		$this->s3Region = $s3Region;
+	}
+	
+	public function getS3AccessKeyId() {
+		return $this->s3AccessKeyId;
+	}
+	
+	public function setS3AccessKeyId($s3AccessKeyId) {
+		$this->s3AccessKeyId = $s3AccessKeyId;
+	}
+	
+	public function getS3AccessKeySecret() {
+		return $this->s3AccessKeySecret;
+	}
+	
+	public function setS3AccessKeySecret($s3AccessKeySecret) {
+		$this->s3AccessKeySecret = $s3AccessKeySecret;
+	}
+	
+	public function getStorageTypeMap() {
+		return $this->storageTypeMap;
+	}
+	
+	public function setStorageTypeMap($storageTypeMap) {
+		$this->storageTypeMap = $storageTypeMap;
 	}
 }

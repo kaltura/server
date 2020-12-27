@@ -42,6 +42,11 @@ class kCacheManager
 
 	protected static $caches = array();
 	
+	public static function close()
+	{
+		self::$caches = array();
+	}
+
 	/**
 	 * @param string $cacheType
 	 * @return array
@@ -61,7 +66,7 @@ class kCacheManager
 
 	/**
 	 * @param string $cacheSection
-	 * @return kBaseCacheWrapper or null on error
+	 * @return kInfraBaseCacheWrapper or null on error
 	 */
 	public static function getCache($cacheSection)
 	{
@@ -96,7 +101,7 @@ class kCacheManager
 	
 	/**
 	 * @param string $cacheType
-	 * @return kBaseCacheWrapper or null on error
+	 * @return kInfraBaseCacheWrapper or null on error
 	 */
 	public static function getSingleLayerCache($cacheType)
 	{

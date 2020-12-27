@@ -103,7 +103,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		// if this is an update request (and not just password reset), check that old password is valid
 		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
 		{
-			throw new kUserException('', kUserException::WRONG_PASSWORD);
+			return self::loginAttemptsLogic($loginData);
 		}
 		
 		// no need to query the DB if login email is the same
@@ -164,12 +164,37 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			if(!$otp)
 			{
-				throw new kUserException (self::OTP_MISSING, kUserException::MISSING_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException (self::OTP_MISSING, kUserException::MISSING_OTP);
+					}
+					throw $e;
+				}
+
 			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				throw new kUserException (self::OTP_INVALID, kUserException::INVALID_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException (self::OTP_INVALID, kUserException::INVALID_OTP);
+					}
+					throw $e;
+				}
 			}
 		}
 	}
@@ -194,7 +219,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 
 	
-	public static function resetUserPassword($email)
+	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
 	{
 		$c = new Criteria(); 
 		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
@@ -216,7 +241,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 				
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey()));
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType));
 		return true;
 	}
 	
@@ -338,7 +363,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return true;
 	}
 	
-	public static function getPassResetLink($hashKey)
+	public static function getPassResetLink($hashKey, $linkType = resetPassLinkType::KMC)
 	{
 		if (!$hashKey) {
 			return null;
@@ -347,12 +372,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$loginData) {
 			throw new Exception('Hash key not valid');
 		}
-		
-		$resetLinksArray = kConf::get('password_reset_links');
-		$resetLinkPrefix = $resetLinksArray['default'];		
-		
+
 		$partnerId = $loginData->getConfigPartnerId();
-		
+
+		$resetLinksArray = kConf::get('password_reset_links');
+		if($linkType == resetPassLinkType::KMS)
+		{
+			$resetLinkPrefix = $resetLinksArray['kms'];
+			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
+		}
+		else
+		{
+			$resetLinkPrefix = $resetLinksArray['default'];
+		}
+
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner) {
 			// partner may define a custom reset password url (admin console for example)
@@ -443,21 +476,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		// check if password is valid
 		if ($validatePassword && !$loginData->isPasswordValid($password)) 
 		{
-			if (time() < $loginData->getLoginBlockedUntil(null)) 
-			{
-				throw new kUserException('', kUserException::LOGIN_BLOCKED);
-			}
-			if ($loginData->getLoginAttempts()+1 >= $loginData->getMaxLoginAttempts()) 
-			{
-				$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
-				$loginData->setLoginAttempts(0);
-				$loginData->save();
-				throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
-			}
-			$loginData->incLoginAttempts();
-			$loginData->save();	
-				
-			throw new kUserException('', kUserException::WRONG_PASSWORD);
+			return self::loginAttemptsLogic($loginData);
 		}
 		
 		if (time() < $loginData->getLoginBlockedUntil(null)) {
@@ -498,23 +517,44 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
-			$user = kuserPeer::getAdminUser($partnerId, $loginData);
-			if($user)
-			{
-				$otpRequired = true;
-			}
+			$otpRequired = true;
 		}
 
 		if ($otpRequired)
 		{
 			if(!$otp)
 			{
-				throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException ('otp is missing', kUserException::MISSING_OTP);
+					}
+					throw $e;
+				}
+
 			}
 			$result = authenticationUtils::verify2FACode($loginData, $otp);
 			if (!$result)
 			{
-				throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+				try
+				{
+					self::loginAttemptsLogic($loginData);
+				}
+				catch (kUserException $e)
+				{
+					$code = $e->getCode();
+					if ($code == kUserException::WRONG_PASSWORD)
+					{
+						throw new kUserException ('otp is invalid', kUserException::INVALID_OTP);
+					}
+					throw $e;
+				}
 			}
 		}
 
@@ -558,6 +598,25 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		return self::setLastLoginFields($loginData, $kuser);
+	}
+
+	public static function loginAttemptsLogic($loginData)
+	{
+		if (time() < $loginData->getLoginBlockedUntil(null))
+		{
+			throw new kUserException('', kUserException::LOGIN_BLOCKED);
+		}
+		if ($loginData->getLoginAttempts()+1 >= $loginData->getMaxLoginAttempts())
+		{
+			$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
+			$loginData->setLoginAttempts(0);
+			$loginData->save();
+			throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
+		}
+		$loginData->incLoginAttempts();
+		$loginData->save();
+
+		throw new kUserException('', kUserException::WRONG_PASSWORD);
 	}
 
 	public static function setLastLoginFields($loginData, $kuser)

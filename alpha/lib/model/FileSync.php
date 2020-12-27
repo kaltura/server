@@ -21,6 +21,8 @@ class FileSync extends BaseFileSync implements IBaseObject
 	const FILE_SYNC_STATUS_DELETED = 3;
 	const FILE_SYNC_STATUS_PURGED = 4;
 
+	const ONE_DAY = 86400;
+
 	private $statusMap = array (
 		self::FILE_SYNC_STATUS_ERROR => "Error",
 		self::FILE_SYNC_STATUS_PENDING => "Pending", 
@@ -72,13 +74,13 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 		if($toId)
 		{
-			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$idCriterion = $c->getNewCriterion(FileSyncPeer::ID, $fromId, Criteria::GREATER_EQUAL);
 			$idCriterion->addAnd($c->getNewCriterion(FileSyncPeer::ID, $toId, Criteria::LESS_EQUAL));
 			$c->addAnd($idCriterion);
 		}
 		else if($fromId)
 		{
-			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_THAN);
+			$c->add(FileSyncPeer::ID, $fromId, Criteria::GREATER_EQUAL);
 		}
 
 		// Note: disabling the criteria because it accumulates more and more criterions, and the status was already explicitly added
@@ -172,14 +174,14 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$this->save();
 
 		$key = $this->getEncryptionKey();
-		$realPath = realpath($this->getFullPath());
+		$realPath = kFile::realPath($this->getFullPath(), false);
 		KalturaLog::debug("Encrypting content of fileSync " . $this->id . ". key is: [$key] in path [$realPath]");
 		kEncryptFileUtils::encrypt($realPath, $key, $this->getIv());
 	}
 
 	public function decrypt()
 	{
-		$realPath = realpath($this->getFullPath());
+		$realPath = kFile::realPath($this->getFullPath(), false);
 		$fileData = kFileBase::getFileContent( $realPath);
 		if (!$this->isEncrypted()) 
 		{
@@ -248,7 +250,38 @@ class FileSync extends BaseFileSync implements IBaseObject
 	
 	public function getFullPath ()
 	{
-		return $this->getFileRoot() . $this->getFilePath();
+		$fileRoot = $this->getFileRoot();
+
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
+			if($sharedStorageProfile)
+			{
+				$fileRoot = $sharedStorageProfile->getStorageBaseDir();
+			}
+		}
+		return $fileRoot . $this->getFilePath();
+	}
+	
+	public function getFileType()
+	{
+		$fileType = parent::getFileType();
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && $fileType == self::FILE_SYNC_FILE_TYPE_URL)
+		{
+			$fileType = self::FILE_SYNC_FILE_TYPE_FILE;
+		}
+		
+		return $fileType;
+	}
+
+	public function getRemotePath()
+	{
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ))
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
+			return $sharedStorageProfile->getStorageBaseDir() . $this->getFilePath();
+		}
+		return $this->getFilePath();
 	}
 
 	/**
@@ -257,10 +290,10 @@ class FileSync extends BaseFileSync implements IBaseObject
 	 */
 	public function createTempClear()
 	{
-		$realPath = realpath($this->getFullPath());
+		$realPath = kFile::realPath($this->getFullPath(), false);
 		$tempPath = $this->getClearTempPath();
 		KalturaLog::info("Creating new file for syncId [$this->id] on [$tempPath]");
-		if (!file_exists($tempPath))
+		if (!kFile::checkFileExists($tempPath))
 			kEncryptFileUtils::decryptFile($realPath, $this->getEncryptionKey(), $this->getIv(), $tempPath);
 		return $tempPath;
 	}
@@ -283,7 +316,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return (isset($this->statusMap[$this->getStatus()])) ? $this->statusMap[$this->getStatus()] : "Unknown";
 	}
 
-	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP)
+	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP, $internalUsage = false)
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC)
@@ -294,7 +327,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 			return null;
 		}
 		$kalturaPeriodicStorage = false;
-		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIdsByPartner($this->getPartnerId())))
+		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
 			$kalturaPeriodicStorage = true;
 		}
@@ -310,10 +343,27 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 		if($kalturaPeriodicStorage)
 		{
-			$url = '/direct' . $url;
-			$authParams = $this->addKalturaAuthParams($url);
-			$url .= $authParams;
+			if($internalUsage && $storage->getProtocol() === StorageProfile::STORAGE_PROTOCOL_S3)
+			{
+				return $this->getS3FileSyncUrl($storage, $url);
+			}
+			else if(in_array($this->getPartnerId(), kConf::get('use_download_url_partners','cloud_storage', array())))
+			{
+				return $this->getAssetDownloadUrl();
+			}
+			else
+			{
+				$url = '/direct' . $url;
+				$authParams = $this->addKalturaAuthParams($url);
+				$url .= $authParams;
+
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0) {
+					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+				}
+			}
 		}
+
+
 
 		$url = ltrim($url, "/");
 		if (strpos($url, "://") === false)
@@ -324,10 +374,47 @@ class FileSync extends BaseFileSync implements IBaseObject
 		return $url;
 	}
 
+	public function getS3FileSyncUrl($storage, $fileKey)
+	{
+		$s3Options = array();
+		if ($storage->getS3Region())
+		{
+			$s3Options['s3Region'] = $storage->getS3Region();
+		}
+
+		$s3Mgr = kFileTransferMgr::getInstance(kFileTransferMgrType::S3, $s3Options);
+		$s3Mgr->login($storage->getStorageUrl(), $storage->getStorageUsername(), $storage->getStoragePassword());
+		$expiry = time() + 5 * 86400;
+		$signedUrl = $s3Mgr->getFileUrl($storage->getStorageBaseDir() . $fileKey, $expiry);
+		KalturaLog::debug("S3 internal import URL: " . $signedUrl);
+		return $signedUrl;
+	}
+
+	protected function getAssetDownloadUrl()
+	{
+		if($this->getObjectType() != FileSyncObjectType::ASSET)
+		{
+			return null;
+		}
+		$asset = assetPeer::retrieveById($this->getObjectId());
+		if(!$asset)
+		{
+			return null;
+		}
+		$downloadUrl = $asset->getDownloadUrlWithExpiry(86400);
+		$downloadUrl = $asset->finalizeDownloadUrl($this, $downloadUrl);
+
+		if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($downloadUrl,'http://') === 0)
+		{
+			$downloadUrl =  preg_replace('/http:\/\//', 'https://', $downloadUrl, 1);
+		}
+		return $downloadUrl;
+	}
+
 	protected function addKalturaAuthParams($url)
 	{
 		$version = kNetworkUtils::DEFAULT_AUTH_HEADER_VERSION;
-		$timestamp = time();
+		$timestamp = time() + self::ONE_DAY;
 		$signature = kNetworkUtils::calculateSignature($version, $timestamp, $url);
 
 		return '?kaltura_auth=' . $version . ',' . $timestamp . ',' . $signature;
@@ -416,6 +503,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function getStorageClass () { return $this->getFromCustomData("storageClass"); }
 	public function setStorageClass ($v) { $this->putInCustomData("storageClass", $v);  }
+	
+	public function getSrcDc () { return $this->getFromCustomData("srcDc"); }
+	public function setSrcDc ($v) { $this->putInCustomData("srcDc", $v);  }
 
  	/**
 	 * Create new fileSync With status pending and new storageId
@@ -426,6 +516,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function cloneToAnotherStorage($storageId)
 	{
 		$newfileSync = $this->copy(true);
+		$newfileSync->m_custom_data = null; // force reload of custom data
 		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
 		$newfileSync->setSrcPath($this->getFullPath());
 		$newfileSync->setSrcEncKey($this->getSrcEncKey());

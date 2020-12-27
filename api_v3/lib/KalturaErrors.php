@@ -194,6 +194,8 @@ class KalturaErrors extends APIErrors
 
 	const PEXIP_MAP_NOT_CONFIGURED = "PEXIP_MAP_NOT_CONFIGURED;;Need to add pexip map support to configuration";
 
+	const INVALID_SIP_SOURCE_TYPE = "INVALID_SIP_SOURCE_TYPE;;Invalid Sip source type";
+
 	const PEXIP_ROOM_CREATION_FAILED = "PEXIP_ROOM_CREATION_FAILED;ENTRY;Can't create virtual room for entry \"@ENTRY@\" ";
 
 	const PEXIP_ADP_CREATION_FAILED = "PEXIP_ADP_CREATION_FAILED;ENTRY;Can't create virtual ADP for entry \"@ENTRY@\" ";
@@ -386,9 +388,17 @@ class KalturaErrors extends APIErrors
 	 * Batch Service
 	 */
 
+	const FILE_ALREADY_EXISTS = "FILE_ALREADY_EXISTS;PATH;File already exists \"@PATH@\" ";
+
+	const PATH_NOT_ALLOWED = "PATH_NOT_ALLOWED;PATH;Path not allowed \"@PATH@\" ";
+
+	const FILE_SIZE_EXCEEDED = "FILE_SIZE_EXCEEDED;FILE_SIZE;File size exceeded \"@FILE_SIZE@\" ";
+
 	const SCHEDULER_HOST_CONFLICT = "SCHEDULER_HOST_CONFLICT;SCHED_ID,HOST1,HOST2;Scheduler id \"@SCHED_ID@\" conflicts between hosts: \"@HOST1@\" and \"@HOST2@\"";
 
 	const SCHEDULER_NOT_FOUND = "SCHEDULER_NOT_FOUND;ID;Scheduler id \"@ID@\" not found";
+
+	const MAX_CONFIGURED_ID_NOT_FOUND = "MAX_CONFIGURED_ID_NOT_FOUND;;Could not retrieve max configured_id";
 
 	const WORKER_NOT_FOUND = "WORKER_NOT_FOUND;ID;Worker id \"@ID@\" not found";
 
@@ -433,6 +443,8 @@ class KalturaErrors extends APIErrors
 	const UPLOAD_TOKEN_MISSING_FILE_SIZE = "UPLOAD_TOKEN_MISSING_FILE_SIZE;;FileSize is mandatory when enabling autoFinalize";
 	
 	const MAX_ALLOWED_CHUNK_COUNT_EXCEEDED = "MAX_ALLOWED_CHUNK_COUNT_EXCEEDED;;Max allowed waiting chunks to be concatenated has exceeded allowed limit";
+	
+	const UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED = "UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED;MAX_RESUME_TIME;Max resume time of @MAX_RESUME_TIME@ seconds reached, cannot resume upload";
 
 	/*
 	 * Partenrs service
@@ -477,6 +489,8 @@ class KalturaErrors extends APIErrors
 	const PROPERTY_DEPRECATED = "PROPERTY_DEPRECTAED;PROP;The property \"@PROP@\" is deprecated and should not be used";
 
 	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
+	
+	const GROUPS_CANNOT_CO_EXIST = "GROUPS_CANNOT_CO_EXIST;userId,group,blockedCoExist;Cannot add user [@userId@] to group [@group@], User is already member of a group with coexistence enforcement [@blockedCoExist@]";
 
 	/*
 	 * syndication service
@@ -525,6 +539,8 @@ class KalturaErrors extends APIErrors
 	const REPORT_PARAMETER_MISSING = "REPORT_PARAMETER_MISSING;PARAM;Parameter \"@PARAM@\" is missing";
 
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL;;Unable to create report. Query produced too many results";
+
+	const INVALID_REPORT_ITEMS_GROUP = "INVALID_REPORT_ITEMS_GROUP;;Invalid report items group";
 
 
 	/**
@@ -617,6 +633,8 @@ class KalturaErrors extends APIErrors
 	const LIVE_STREAM_EXCEEDED_MAX_TRANSCODED = "LIVE_STREAM_EXCEEDED_MAX_TRANSCODED;ENTRY_ID;Partner exceeded max concurrent transcoded live streams in entry[@ENTRY_ID@]";
 
 	const LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS = "LIVE_STREAM_EXCEEDED_MAX_RTC_STREAMS;PARTNER_ID,ALLOWED;Partner [@PARTNER_ID@] exceeded max concurrent rtc streams allowed [@ALLOWED@]";
+
+	const LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG = "LIVE_STREAM_EXCEEDED_MAX_CONCURRENT_BY_ADMIN_TAG;ENTRY_ID,ADMIN_TAG,ALLOWED;entry [@ENTRY_ID@] exceeded max concurrent streams of tag [@ADMIN_TAG@] (allowed [@ALLOWED@])";
 
 	const LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION = "LIVE_STREAM_EXCEEDED_MAX_RECORDED_DURATION;ENTRY_ID;Entry exceeded max recorded live stream duration in entry[@ENTRY_ID@]";
 

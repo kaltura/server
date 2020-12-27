@@ -32,13 +32,19 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	public function run($jobs = null)
 	{
 		$maxProfiles = $this->getParams('maxProfiles');
-
-		$profiles = $this->getScheduledTaskProfiles($maxProfiles);
-		foreach($profiles as $profile)
+		$lastRuntimePerPartner = array();
+		$profiles = $this->getSortedScheduledTaskProfiles($maxProfiles);
+		/** @var KalturaScheduledTaskProfile $profile */
+		$profile = $this->getNextProfile($profiles);
+		while( $profile )
 		{
+			//make sure a profile for the same partner runs in a minimum of 2 seconds diff
+			if (isset($lastRuntimePerPartner[$profile->partnerId]) && time() - $lastRuntimePerPartner[$profile->partnerId] <= 2 )
+			{
+				sleep(2);
+			}
 			try
 			{
-
 				$processor = $this->getProcessor($profile);
 				$processor->processProfile($profile);
 			}
@@ -46,7 +52,61 @@ class KScheduledTaskRunner extends KPeriodicWorker
 			{
 				KalturaLog::err($ex);
 			}
+			$lastRuntimePerPartner[$profile->partnerId] = time();
+			$profile = $this->getNextProfile($profiles);
 		}
+	}
+
+	/**
+	 * @param $profiles
+	 * @param null $previousKey
+	 * @return mixed|null
+	 */
+	protected function getNextProfile(&$profiles)
+	{
+		if (empty($profiles))
+		{
+			return null;
+		}
+
+		if (count($profiles) == 1)
+		{
+			sleep(2);
+		}
+
+		$currentKey = key($profiles);
+		if ($currentKey === null)
+		{
+			return null;
+		}
+
+		$profile = array_shift($profiles[$currentKey]);
+		if (empty($profiles[$currentKey]))
+		{
+			unset($profiles[$currentKey]);
+		}
+
+		$res = next($profiles);
+		if ($res === false)
+		{
+			reset($profiles);
+		}
+		return $profile;
+	}
+
+	/**
+	 * @param $profiles
+	 * @return array
+	 */
+	protected function sortProfiles($profiles)
+	{
+		$sorted = array();
+		foreach ($profiles as $profile)
+		{
+			/** @var KalturaScheduledTaskProfile $profile */
+			$sorted[$profile->partnerId][] = $profile;
+		}
+		return $sorted;
 	}
 
 	protected function getProcessor($profile)
@@ -73,7 +133,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	 * @param int $maxProfiles
 	 * @return array
 	 */
-	protected function getScheduledTaskProfiles($maxProfiles = 500)
+	protected function getSortedScheduledTaskProfiles($maxProfiles = 500)
 	{
 		$scheduledTaskClient = $this->getScheduledTaskClient();
 
@@ -85,7 +145,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$pager->pageSize = $maxProfiles;
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
-		return $result->objects;
+		if (empty($result))
+		{
+			return array();
+		}
+		return $this->sortProfiles($result->objects);
 	}
 
 	/**

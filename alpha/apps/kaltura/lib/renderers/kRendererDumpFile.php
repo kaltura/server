@@ -3,6 +3,9 @@
 require_once(dirname(__file__) . '/../request/infraRequestUtils.class.php');
 require_once(dirname(__file__) . '/kRendererBase.php');
 require_once(dirname(__file__) . '/../../../../../infra/storage/kEncryptFileUtils.php');
+require_once(dirname(__file__) . '/../../../../../infra/storage/kFile.class.php');
+require_once(dirname(__file__) . '/../../../../../infra/general/kString.class.php');
+
 /*
  * @package server-infra
  * @subpackage renderers
@@ -24,7 +27,7 @@ class kRendererDumpFile implements kRendererBase
 	
 	public $partnerId;
 
-	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null, $fileSize = null)
+	public function __construct($filePath, $mimeType, $xSendFileAllowed, $maxAge = 8640000, $limitFileSize = 0, $lastModified = null, $key = null, $iv = null, $fileSize = null, $fileExt = null)
 	{
 		$this->filePath = $filePath;
 		$this->mimeType = $mimeType;
@@ -32,8 +35,16 @@ class kRendererDumpFile implements kRendererBase
 		$this->lastModified = $lastModified;
 		$this->key = $key;
 		$this->iv = $iv;
-		
-		$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
+
+		if($fileExt)
+		{
+			$this->fileExt = $fileExt;
+		}
+		else
+		{
+			$this->fileExt = pathinfo($filePath, PATHINFO_EXTENSION);
+		}
+
 		if ($limitFileSize)
 		{
 			$this->fileSize = $limitFileSize;
@@ -56,14 +67,14 @@ class kRendererDumpFile implements kRendererBase
 	
 	public function validate()
 	{
-		return $this->fileData || file_exists($this->filePath);
+		return $this->fileData || kFile::checkFileExists($this->filePath);
 	}
 	
 	public function output()
 	{
-		if ($this->maxAge && 
-			isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
-			$_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($this->lastModified))
+		$forceCacheResults = kConf::get("force_cached_result", "runtime_config", null);
+		if ( isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $this->maxAge &&
+			($forceCacheResults || $_SERVER['HTTP_IF_MODIFIED_SINCE'] == infraRequestUtils::formatHttpTime($this->lastModified)) )
 		{
 			infraRequestUtils::sendCachingHeaders($this->maxAge, false, $this->lastModified);
 			header("HTTP/1.1 304 Not Modified");
@@ -102,7 +113,9 @@ class kRendererDumpFile implements kRendererBase
 			if ($this->key)
 				kEncryptFileUtils::dumpEncryptFilePart($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeLength);
 			else
-				infraRequestUtils::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);		
+			{
+				kFile::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);
+			}
 		}
 	}
 }

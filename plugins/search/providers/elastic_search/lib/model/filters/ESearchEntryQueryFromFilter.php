@@ -19,6 +19,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 	const ID_EQUAL_FILTER = '_eq_id';
 	const REDIRECT_FROM_ENTRY_ID_EQUAL_FILTER = '_eq_redirect_from_entry_id';
 	const DURATION_TYPE_FILTER_NAME = '_matchor_duration_type';
+	const DESCRIPTION_LIKE = '_like_description';
 	const EXTERNAL_SOURCE_TYPE_EQUAL = '_like_plugins_data';
 	const EXTERNAL_SOURCE_TYPE_IN = '_mlikeor_plugins_data';
 	const SHORT_DURATION_LOWER_BOUND = 0;
@@ -67,6 +68,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		ESearchEntryFilterFields::REFERENCE_ID,
 		ESearchEntryFilterFields::ROOT_ENTRY_ID,
 		ESearchEntryFilterFields::DURATION,
+		ESearchEntryFilterFields::DESCRIPTION,
 		ESearchEntryFilterFields::CATEGORIES,
 		ESearchEntryFilterFields::CATEGORIES_IDS,
 		ESearchEntryFilterFields::CATEGORIES_ANCESTOR_ID,
@@ -84,6 +86,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 	protected static $specialFields = array(
 		ESearchEntryFilterFields::FREE_TEXT,
+		self::DESCRIPTION_LIKE,
 		self::DURATION_TYPE_FILTER_NAME,
 		self::EXTERNAL_SOURCE_TYPE_EQUAL,
 		self::EXTERNAL_SOURCE_TYPE_IN,
@@ -162,6 +165,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			ESearchEntryFilterFields::CATEGORIES_FULL_NAME => ESearchCategoryEntryFieldName::FULL_IDS,
 			ESearchEntryFilterFields::PARTNER_SORT_VALUE => ESearchEntryFieldName::PARTNER_SORT_VALUE,
 			ESearchEntryFilterFields::SEARCH_TEXT => ESearchUnifiedItem::UNIFIED,
+			ESearchEntryFilterFields::DESCRIPTION => ESearchEntryFieldName::DESCRIPTION,
 			ESearchEntryFilterFields::FREE_TEXT => ESearchUnifiedItem::UNIFIED,
 			ESearchEntryFilterFields::TOTAL_RANK => ESearchEntryOrderByFieldName::VOTES,
 			ESearchEntryFilterFields::RANK => ESearchEntryOrderByFieldName::RANK,
@@ -288,7 +292,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$elasticFieldName = $this->getSphinxToElasticFieldName($fieldName);
 		if($elasticFieldName && $searchItemType)
 		{
-			$this->AddFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
+			$this->addFieldPartToQuery($searchItemType, $elasticFieldName, $fieldValue);
 		}
 	}
 
@@ -312,7 +316,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			return null;
 		}
 
-		$fieldValue = self::translateFieldValue($fieldName, $filter, $fieldValue);
+		$fieldValue = self::translateFieldValue($operator, $fieldName, $fieldValue);
 		return array($operator, $fieldName, $fieldValue);
 	}
 
@@ -330,6 +334,9 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				break;
 			case ESearchEntryFilterFields::FREE_TEXT:
 				$this->handleFreeTextField($field, $fieldValue);
+				break;
+			case self::DESCRIPTION_LIKE:
+				$this->handleDescriptionField($field, $fieldValue);
 				break;
 			case self::EXTERNAL_SOURCE_TYPE_IN:
 				$this->handleExternalSourceTypeIn($fieldValue);
@@ -360,6 +367,11 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		$this->addingFieldPartIntoQuery(baseObjectFilter::MULTI_LIKE_OR, ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE, $externalSourceTypeIn);
 	}
 
+	protected  function handleDescriptionField($field, $fieldValue)
+	{
+		$this->addFieldPartToQuery(ESearchItemType::PARTIAL, ESearchEntryFieldName::DESCRIPTION, $fieldValue);
+	}
+
 	protected  function handleFreeTextField($field, $fieldValue)
 	{
 		$searchItem = null;
@@ -373,7 +385,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 			{
 				$searchItem = new ESearchOperator();
 				$searchItem->setOperator(ESearchOperatorType::AND_OP);
-				$freeTextSearchItem = $this->createUnifiedSearchItem($freeTextValue, true);
+				$freeTextSearchItem = $this->createUnifiedSearchItem($freeTextValue, true, false);
 				$searchItem->setSearchItems(array($freeTextSearchItem, $searchItemNot));
 			}
 			else
@@ -384,7 +396,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
 		elseif (isset($values[0]) && trim($values[0]))
 		{
-			$searchItem = $this->createUnifiedSearchItem(trim($values[0]), true);
+			$searchItem = $this->createUnifiedSearchItem(trim($values[0]), true, false);
 		}
 
 		if ($searchItem)
@@ -393,7 +405,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected function createUnifiedSearchItem($value, $removeWildCard = false)
+	protected function createUnifiedSearchItem($value, $removeWildCard = false, $ignoreDisplayInSearch = true)
 	{
 		if ($removeWildCard)
 		{
@@ -401,6 +413,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 
 		$freeTextSearchExact = new ESearchUnifiedItem();
+		$freeTextSearchExact->setIgnoreDisplayInSearch($ignoreDisplayInSearch);
 		$freeTextSearchExact->setItemType(ESearchItemType::EXACT_MATCH);
 		$freeTextSearchExact->setSearchTerm($value);
 
@@ -419,7 +432,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 				$item = trim($item);
 				if ($item)
 				{
-					$commaSeparetedSearchItems[] = $this->createUnifiedSearchItem($item);
+					$commaSeparetedSearchItems[] = $this->createUnifiedSearchItem($item, $removeWildCard, $ignoreDisplayInSearch);
 				}
 			}
 		}
@@ -464,7 +477,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 					break;
 				default:
 					KalturaLog::debug("Undefined duration type {$durationType}.");
-					continue;
+					break;
 			}
 
 			$item->setRange($range);
@@ -478,21 +491,45 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 		}
 	}
 
-	protected static function translateFieldValue($fieldName, $filter, $fieldValue)
+	/**
+	 * @param string $fieldName
+	 * @param string $operator
+	 * @param string $fieldValue
+	 * @return int
+	 * @throws KalturaAPIException
+	 */
+	protected static function translateFieldValue($operator, $fieldName, $fieldValue)
 	{
 		if(in_array($fieldName, self::$puserFields))
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid($filter->getPartnerSearchScope(), $fieldValue);
-			if (!$kuser)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $fieldValue);
-			}
-
-			$fieldValue = $kuser->getId();
+			$fieldValue = self::translatePuserFieldValue($operator, $fieldValue);
 		}
 		else if ($fieldName === ESearchEntryFilterFields::DURATION)
 		{
 			$fieldValue = $fieldValue * 1000;
+		}
+
+		return $fieldValue;
+	}
+
+
+	protected static function translatePuserFieldValue($operator, $fieldValue)
+	{
+		if($operator === baseObjectFilter::IN || $operator === baseObjectFilter::NOT_IN || $operator === baseObjectFilter::MATCH_AND || $operator === baseObjectFilter::MATCH_OR)
+		{
+			$fieldValue = myKuserUtils::preparePusersToKusersFilter($fieldValue);
+		}
+		else
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $fieldValue);
+			if ($kuser)
+			{
+				$fieldValue = $kuser->getId();
+			}
+			else
+			{
+				$fieldValue = myKuserUtils::NON_EXISTING_USER_ID;
+			}
 		}
 
 		return $fieldValue;

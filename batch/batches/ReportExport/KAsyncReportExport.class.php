@@ -43,9 +43,13 @@ class KAsyncReportExport extends KJobHandlerWorker
 			try
 			{
 				KBatchBase::impersonate($job->partnerId);
-				$reportFile = $engine->createReport($reportItem);
+				$reportFile = $engine->createReport();
+				$reportEmailName = $engine->getEmailFileName();
 				KBatchBase::unimpersonate();
-				$reportFiles[] = $reportFile;
+				$exportFile = new KalturaReportExportFile();
+				$exportFile->fileId = $reportFile;
+				$exportFile->fileName = $reportEmailName;
+				$reportFiles[] = $exportFile;
 				$this->setFilePermissions($reportFile);
 			}
 			catch (Exception $e)
@@ -63,17 +67,21 @@ class KAsyncReportExport extends KJobHandlerWorker
 	{
 		KBatchBase::createDir(self::$taskConfig->params->sharedTempPath. DIRECTORY_SEPARATOR . $partnerId);
 		$outFiles = array();
-		foreach ($tmpFiles as $filePath)
+		foreach ($tmpFiles as $tmpFile)
 		{
-			$res = $this->moveFile($filePath, $partnerId);
+			$res = $this->moveFile($tmpFile->fileId, $partnerId);
 			if (!$res)
 			{
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'Failed to move report file', KalturaBatchJobStatus::RETRY);
 			}
-			$outFiles[] = $res;
+			$exportFile = new KalturaReportExportFile();
+			$exportFile->fileId = $res;
+			$exportFile->fileName = $tmpFile->fileName;
+
+			$outFiles[] = $exportFile;
 		}
 
-		$data->filePaths = implode(',', $outFiles);
+		$data->files = $outFiles;
 		return $this->closeJob($job, null, null, 'CSV files created successfully', KalturaBatchJobStatus::FINISHED, $data);
 	}
 

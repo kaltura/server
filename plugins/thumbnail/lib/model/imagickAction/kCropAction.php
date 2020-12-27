@@ -42,7 +42,7 @@ class kCropAction extends kImagickAction
 
 	protected function validateGravityPoint()
 	{
-		if($this->gravityPoint < Imagick::GRAVITY_NORTHWEST || $this->gravityPoint > Imagick::GRAVITY_SOUTHEAST)
+		if($this->gravityPoint < kCropGravityPoint::NORTHWEST || $this->gravityPoint > kCropGravityPoint::SOUTHEAST)
 		{
 			$data = array(kThumbnailErrorMessages::ERROR_STRING => kThumbnailErrorMessages::ILLEGAL_GRAVITY);
 			throw new kThumbnailException(kThumbnailException::BAD_QUERY, kThumbnailException::BAD_QUERY, $data);
@@ -89,12 +89,14 @@ class kCropAction extends kImagickAction
 	{
 		$this->calculateGravityOffSet();
 		$this->image->cropImage($this->newWidth, $this->newHeight, $this->x, $this->y);
+		$this->image->setImagePage($this->newWidth, $this->newHeight, 0, 0);
 		return $this->image;
 	}
 
 	protected function calculateGravityOffSet()
 	{
-		switch ($this->gravityPoint) {
+		switch ($this->gravityPoint)
+		{
 			case kCropGravityPoint::NORTHWEST:
 				break;
 			case kCropGravityPoint::NORTH:
@@ -124,8 +126,6 @@ class kCropAction extends kImagickAction
 			case kCropGravityPoint::SOUTHEAST:
 				$this->x += $this->currentWidth - $this->newWidth;
 				$this->y += $this->currentHeight - $this->newHeight;
-				break;
-			default:
 				break;
 		}
 	}

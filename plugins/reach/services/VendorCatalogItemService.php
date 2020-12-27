@@ -192,7 +192,7 @@ class VendorCatalogItemService extends KalturaBaseService
 			foreach ($res->objects as $vendorCatalogItem)
 			{
 				$catalogItemValues = kReachUtils::getObejctValues($vendorCatalogItem);
-				$csvRowData = kReachUtils::createCatalogItemCsvRowData($catalogItemValues);
+				$csvRowData = kReachUtils::createCsvRowData($catalogItemValues, 'vendorCatalogItem');
 				$content .= $csvRowData . PHP_EOL;
 			}
 
@@ -218,7 +218,7 @@ class VendorCatalogItemService extends KalturaBaseService
 			$finalPath .= "vendorPartnerId/$vendorPartnerId";
 		}
 		$finalPath .= '/ks/' . kCurrentContext::$ks;
-		$url = myPartnerUtils::getCdnHost($this->getPartnerId()) . $finalPath;
+		$url = 'http://' . kConf::get('www_host') . $finalPath;
 		return $url;
 	}
 

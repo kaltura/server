@@ -373,10 +373,10 @@ class BasePeer
 								$rawcvt = '';
 								// parse the $params['raw'] for ? chars
 								for($r=0,$len=strlen($raw); $r < $len; $r++) {
-									if ($raw{$r} == '?') {
+									if ($raw[$r] == '?') {
 										$rawcvt .= ':p'.$p++;
 									} else {
-										$rawcvt .= $raw{$r};
+										$rawcvt .= $raw[$r];
 									}
 								}
 								$sql .= $rawcvt . ', ';
@@ -756,6 +756,7 @@ class BasePeer
 		$orderByClause = array();
 		// redundant definition $groupByClause = array();
 
+		$forceIndex = $criteria->getForceIndex();
 		$orderBy = $criteria->getOrderByColumns();
 		$groupBy = $criteria->getGroupByColumns();
 		$ignoreCase = $criteria->isIgnoreCase();
@@ -1001,6 +1002,12 @@ class BasePeer
 		}
 		
 		$from .= $joinClause ? ' ' . implode(' ', $joinClause) : '';
+		if ($forceIndex) {
+			if ($db->useQuoteIdentifier()) {
+				$forceIndex = $db->quoteIdentifier($forceIndex);
+			}
+			$from .= " FORCE INDEX($forceIndex)";
+		}
 
 		// Build the SQL from the arrays we compiled
 		$sql =  "SELECT "

@@ -195,7 +195,7 @@ class kIpAddressUtils
 				$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
 				$fromIp = ip2long(substr($range, 0, $d));
 				$toIp = ip2long(substr($range, $d + 1));
-				continue;
+				break;
 
 			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
 				list (, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
