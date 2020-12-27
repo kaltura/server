@@ -33,29 +33,29 @@ class kKalturaUrlRecognizer extends kUrlRecognizer
 	{
 		$uri = $_SERVER["REQUEST_URI"];
 
-		$matches = null;
-		if (!preg_match('#/sig/([^/]+)/#', $uri, $matches, PREG_OFFSET_CAPTURE))
+		if (!preg_match('#/exp/([^/]+)/sig/([^/]+)/#', $uri, $matches, PREG_OFFSET_CAPTURE))
 		{
-			return false;
+			return self::NOT_RECOGNIZED;
 		}
-		$partToSign = substr($uri, 0, $matches[0][1]);
-		$requestSignature = $matches[1][0];
 
-		if(preg_match('#/fileName/([^/]+)/#', $partToSign, $fileNameMatches, PREG_OFFSET_CAPTURE))
+		$expiry = $matches[1][0];
+		$partToSign = substr($uri, 0, $matches[1][1] + strlen($expiry));
+		$requestSignature = $matches[2][0];
+
+		$currentTime = time();
+		if($expiry && ($currentTime > $expiry))
 		{
-			$prefix = substr($partToSign, 0, $fileNameMatches[1][1]);
-			$newFileName = rawurlencode($fileNameMatches[1][0]);
-			$suffix = substr($partToSign, $fileNameMatches[1][1] + strlen($fileNameMatches[1][0]));
-			$partToSign = $prefix . $newFileName . $suffix;
+			KalturaLog::debug("Request expired, expiry value: [$expiry] current time: [$currentTime]");
+			return self::RECOGNIZED_NOT_OK;
 		}
 
 		$calculatedSignature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $partToSign, $this->key, true));
 		if($calculatedSignature !== $requestSignature)
 		{
-			return false;
+			return self::RECOGNIZED_NOT_OK;
 		}
 
-		return true;
+		return self::RECOGNIZED_OK;
 	}
 
 }
