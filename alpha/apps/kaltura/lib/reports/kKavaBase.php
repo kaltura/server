@@ -68,6 +68,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_ROOT_ENTRY_ID = 'rootEntryId';
 	const DIMENSION_NODE_ID = 'nodeId';
 	const DIMENSION_APPLICATION_VER = 'applicationVer';
+	const DIMENSION_PARTNER_CRM_ID = 'partnerCrmId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -303,6 +304,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_API_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_CRM_ID => 1,
 			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_APPLICATION => 1,
 			self::DIMENSION_DOMAIN => 1,
