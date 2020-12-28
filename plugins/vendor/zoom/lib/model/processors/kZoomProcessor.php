@@ -11,6 +11,7 @@ abstract class kZoomProcessor
 	const ZOOM_LOCK_TTL = 120;
 	const URL_ACCESS_TOKEN = '?access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
+	const CMS_USER_FIELD = 'cms_user_id';
 
 	/**
 	 * @param string $userName
@@ -39,6 +40,13 @@ abstract class kZoomProcessor
 					$result = substr($result, 0, strlen($result) - strlen($postFix));
 				}
 
+				break;
+			case kZoomUsersMatching::CMS_MATCHING:
+				$zoomUser = $this->zoomClient->retrieveZoomUser($userName);
+				if(isset($zoomUser[self::CMS_USER_FIELD]))
+				{
+					$result = $zoomUser[self::CMS_USER_FIELD];
+				}
 				break;
 		}
 

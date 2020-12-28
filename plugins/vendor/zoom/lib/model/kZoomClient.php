@@ -10,6 +10,7 @@ class kZoomClient
 
 	/** API */
 	const API_USERS_ME = '/v2/users/me';
+	const API_USERS = '/v2/users/@userId@';
 	const API_PARTICIPANT = '/v2/report/meetings/@meetingId@/participants';
 	const API_PANELISTS = '/v2/webinars/@webinarId@/panelists';
 	const API_USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
@@ -45,6 +46,12 @@ class kZoomClient
 	public function retrieveWebinarPanelists($accessToken, $webinarId)
 	{
 		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
+		return $this->callZoom($apiPath, $accessToken);
+	}
+
+	public function retrieveZoomUser($userName, $accessToken)
+	{
+		$apiPath = str_replace('@userId@', $userName, self::API_USERS);
 		return $this->callZoom($apiPath, $accessToken);
 	}
 
