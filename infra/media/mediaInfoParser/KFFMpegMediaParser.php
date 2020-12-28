@@ -128,6 +128,22 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				}
 			}
 		}
+		/*
+		 * On missing stream durations (mostly for Webm/VP8), retrieve dur from last frame
+		 */
+		{
+$startFrom = ($mediaInfo->containerDuration-500)/1000;
+			if($startFrom<0) $startFrom = 0;
+			
+			if($this->isAudioSet($mediaInfo) and $mediaInfo->audioDuration==0){
+				$audDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBin, $this->filePath, $startFrom, "audio");
+				$mediaInfo->audioDuration = round($audDur*1000);
+			}
+			if($this->isVideoSet($mediaInfo) and $mediaInfo->videoDuration==0){
+				$vidDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBin, $this->filePath, $startFrom, "video");
+				$mediaInfo->videoDuration = round($vidDur*1000);
+			}
+		}
 		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
 //if($this->newFlow!=0)
@@ -894,6 +910,78 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			return self::convertDuration2msec($stream->tags->duration);
 		else
 			return null;
+	}
+	
+	/**
+	 * 
+	 * @param $ffmpegBin
+	 * @param $ffprobeBin
+	 * @param $srcFileName
+	 * $param $startFrom
+	 * $param $stream
+	 * @return number
+	 */
+	private static function retrieveDurationFromLastFrame($ffmpegBin, $ffprobeBin, $srcFileName, $startFrom, $stream=null)
+	{
+		KalturaLog::log("src:$srcFileName,start:$startFrom,stream:$stream");
+		if($stream=="video"){
+			$selectStreams = "-select_streams v"; $copyStreams=":v";
+		}
+		else if($stream=="audio"){
+			$selectStreams = "-select_streams a"; $copyStreams=":a";
+		}
+		else {$selectStreams=null; $copyStreams=null;}
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -ss $startFrom -i \"$srcFileName\" -copyts -c$copyStreams copy -f matroska -y -v quiet - | $ffprobeBin - $selectStreams -show_frames $selectStreams -of csv -show_entries frame=media_type,pkt_pts_time,pkt_duration_time   2>&1";
+		KalturaLog::log($cmdLine);
+
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::err("Duration retrieval detection failed on ffmpeg/ffprobe call - rv($rv),lastLine($lastLine)");
+			return 0;
+		}
+		
+		for (end($outputArr); key($outputArr)!==null; prev($outputArr)){
+			$line = current($outputArr);
+//KalturaLog::log($line);
+			$stam=$pts=$strm=$dur=0;
+			$valsArr=explode(',', $line);
+			if(count($valsArr)<4)
+				continue;
+			list($stam,$strm,$pts,$dur) = $valsArr;
+			if($stam!="frame")
+				continue;
+			if(isset($pts) && isset($dur)) {
+				$duration = $pts+$dur;
+				KalturaLog::log("$stam,pts:$pts,stream:$strm,dur:$dur");
+				return $duration;
+			}
+		}
+		KalturaLog::log("Missing last frame duration for stream($stream)");
+		return 0;
+	}
+	
+	/**
+	 * parsePixelFormat
+	 *
+	 * @param KalturaMediaInfo $mediaInfo
+	 */	
+	private static function parsePixelFormat($pixelFormat, KalturaMediaInfo $mediaInfo)
+	{
+		KalturaLog::log("In - pixelFormat:$pixelFormat");
+		$rv = preg_match('/\s*([a-z]+)\s*([0-9]+)\s*([a-z]*)\s*([0-9]*)/', $pixelFormat, $matches, PREG_OFFSET_CAPTURE);
+		if($rv===false || !(isset($matches) && is_array($matches) and count($matches)>=3)){
+			KalturaLog::log("Out - Unrecognized pixelFormat");
+			return;
+		}
+		$mediaInfo->pixelFormat = $pixelFormat;
+		$mediaInfo->colorSpace = $matches[1][0];
+		$mediaInfo->chromaSubsampling = $matches[2][0];
+		if(count($matches)>=5)
+			$mediaInfo->bitsDepth = $bitsDepth = $matches[4][0];
+		else
+			$bitsDepth = null;
+		KalturaLog::log("Out - colorSpace:$mediaInfo->colorSpace, chromaSubsampling:$mediaInfo->chromaSubsampling, bitsDepth:$bitsDepth");
 	}
 	
 	/**
