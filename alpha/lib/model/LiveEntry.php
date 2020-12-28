@@ -992,7 +992,7 @@ abstract class LiveEntry extends entry
 		{
 			$url = null;
 			$protocol = null;
-			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			foreach (array(PlaybackProtocol::HLS, PlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
 			{
 				$config = $this->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
 				if ($config)
