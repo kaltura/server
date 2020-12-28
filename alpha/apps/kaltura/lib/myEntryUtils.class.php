@@ -1181,6 +1181,11 @@ class myEntryUtils
 	{
 		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
 		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		if(is_null($preferredStorageId))
+		{
+			$preferredStorageId = $currentDcId;
+		}
+		
 		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
 		if (!$fileSync)
 		{
