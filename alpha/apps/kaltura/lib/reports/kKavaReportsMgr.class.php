@@ -777,7 +777,9 @@ class kKavaReportsMgr extends kKavaBase
 			array(self::DIMENSION_ENTRY_ID));
 
 		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
 			self::getCardinalityAggregator(
 				self::METRIC_TOTAL_UNIQUE_PERCENTILES,
 				array(self::DIMENSION_PERCENTILES)));
