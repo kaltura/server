@@ -234,7 +234,7 @@ class KalturaMonitorClient
 		
 		if (!$cached)
 		{
-			require_once(__DIR__ . '/../../../../../infra/log/UniqueId.php');
+			require_once(__DIR__ . '/../log/UniqueId.php');
 			self::$basicEventInfo[self::FIELD_UNIQUE_ID] = UniqueId::get();
 		}
 	}
