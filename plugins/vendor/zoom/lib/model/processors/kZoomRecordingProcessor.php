@@ -9,11 +9,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	const ADMIN_TAG_ZOOM = 'zoomentry';
 
 	/**
-	 * @var kZoomClient
-	 */
-	protected $zoomClient;
-
-	/**
 	 * @var ZoomVendorIntegration
 	 */
 	protected $zoomIntegration;
@@ -29,9 +24,9 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	public function __construct($zoomBaseUrl)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl);
 		$this->mainEntry = null;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
+		parent::__construct($zoomBaseUrl);
 	}
 
 	/**

@@ -14,6 +14,20 @@ abstract class kZoomProcessor
 	const CMS_USER_FIELD = 'cms_user_id';
 
 	/**
+	 * @var kZoomClient
+	 */
+	protected $zoomClient;
+
+	/**
+	 * kZoomRecordingProcessor constructor.
+	 * @param string $zoomBaseUrl
+	 */
+	public function __construct($zoomBaseUrl)
+	{
+		$this->zoomClient = new kZoomClient($zoomBaseUrl);
+	}
+
+	/**
 	 * @param string $userName
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @return string kalturaUserName
