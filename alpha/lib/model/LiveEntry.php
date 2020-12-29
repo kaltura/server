@@ -549,13 +549,13 @@ abstract class LiveEntry extends entry
 		$protocols = array();
 		switch ($reqProtocol)
 		{
-			case KalturaPlaybackProtocol::HLS:
-			case KalturaPlaybackProtocol::APPLE_HTTP:
-				$protocols = array_unique(array($reqProtocol, KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP));
+			case PlaybackProtocol::HLS:
+			case PlaybackProtocol::APPLE_HTTP:
+				$protocols = array_unique(array($reqProtocol, PlaybackProtocol::HLS, PlaybackProtocol::APPLE_HTTP));
 				$takeFirst = true;
 				break;
-			case KalturaPlaybackProtocol::HDS:
-			case KalturaPlaybackProtocol::AKAMAI_HDS:
+			case PlaybackProtocol::HDS:
+			case PlaybackProtocol::AKAMAI_HDS:
 				$protocols = array($reqProtocol);
 				break;
 
@@ -997,7 +997,7 @@ abstract class LiveEntry extends entry
 		{
 			$url = null;
 			$protocol = null;
-			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			foreach (array(PlaybackProtocol::HLS, PlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
 			{
 				$config = $this->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
 				if ($config)
