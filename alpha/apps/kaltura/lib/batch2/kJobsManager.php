@@ -1976,7 +1976,16 @@ class kJobsManager
 	{
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
-		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSharedStorageProfileId())
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			if($storageProfile && $storageProfile->getStorageBaseDir())
+			{
+				$sharedPath = $storageProfile->getStorageBaseDir() . "/content/exportcsv/" . myContentStorage::getScatteredPathFromIntId($partnerId);
+				$jobData->setStorageDestinationFilePath($sharedPath);
+			}
+		}
 		return self::addJob($batchJob, $jobData, BatchJobType::EXPORT_CSV, $exportObjectType);
 	}
 

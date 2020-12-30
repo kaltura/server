@@ -94,13 +94,26 @@ class ExportCsvService extends KalturaBaseService
 		// KS verification - we accept either admin session or download privilege of the file
 		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		
-		$partner_id = kCurrentContext::getCurrentPartnerId();
-		$folderPath = "/content/exportcsv/$partner_id";
-		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
-		$file_path = "$fullPath/$id";
-		
-		return $file_path;
+
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$folderPath = "/content/exportcsv/$partnerId";
+		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath . DIRECTORY_SEPARATOR . $id;
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSharedStorageProfileId())
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			if($storageProfile && $storageProfile->getStorageBaseDir())
+			{
+				$filePath = $storageProfile->getStorageBaseDir() . "/content/exportcsv/" . myContentStorage::getScatteredPathFromIntId($partnerId);
+				$storageFullFilePath = $filePath . DIRECTORY_SEPARATOR . $id;
+				if(kFile::checkFileExists($storageFullFilePath))
+				{
+					$fullPath = $storageFullFilePath;
+				}
+			}
+		}
+		return $fullPath;
 	}
 	
 }

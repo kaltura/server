@@ -3236,31 +3236,38 @@ class kFlowHelper
 	
 	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
-		// Move file from shared temp to it's final location
-		$fileName =  basename($data->getOutputPath());
-		$directory =  myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId() ;
-		if(!file_exists($directory))
-			mkdir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-		
-		if(!$data->getOutputPath())
-			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
-		
-		KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
-		try
+		$fileName = basename($data->getOutputPath());
+		if ($data->getStorageDestinationFilePath())
 		{
-			kFile::moveFile($data->getOutputPath(), $filePath);
+			$filePath = $data->getStorageDestinationFilePath() . DIRECTORY_SEPARATOR . $fileName;
 		}
-		catch (Exception $e)
+		else
 		{
-			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
+			// Move file from shared temp to it's final location
+
+			$directory = myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId();
+			if (!file_exists($directory))
+				mkdir($directory);
+			$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+
+			if (!$data->getOutputPath())
+				throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
+
+			KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+			try
+			{
+				kFile::moveFile($data->getOutputPath(), $filePath);
+			}
+			catch (Exception $e)
+			{
+				throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
+			}
 		}
-		
-		
+
 		$data->setOutputPath($filePath);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
-		
+
 		KalturaLog::info("file path: [$filePath]");
 		
 		$downloadUrl = self::createCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
