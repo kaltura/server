@@ -115,8 +115,6 @@ class downloadAction extends sfAction
 		
 		if (is_null($syncKey))
 			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
-			
-		$this->handleFileSyncRedirection($syncKey);
 
 		list ($fileSync,$local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 		if (!$fileSync)
@@ -136,10 +134,15 @@ class downloadAction extends sfAction
 			$fileExt = kAssetUtils::getFileExtension($flavorAsset->getContainerFormat());
 		}
 
-		$isFileDir = kFile::isDir($filePath);
+		$isFileDir = kFile::isDir($filePath) || $fileSync->getIsDir();
 		if ($fileExt && !$isFileDir)
 			$fileName = $fileName . '.' . $fileExt;
-		
+
+		if(!$local || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		{
+			$this->handleFileSyncRedirection($fileSync, $flavorAsset, $entry->getId(), $fileName, $isFileDir);
+		}
+
 		$preview = 0;
 		if($shouldPreview && $flavorAsset)
 		{
@@ -231,28 +234,23 @@ class downloadAction extends sfAction
 			kFileUtils::dumpFile($file_path, $mime_type, null, $limit_file_size, $key, $iv, $fileSize, false, $fileExt);
 		}
 	}
-	
-	private function handleFileSyncRedirection(FileSyncKey $syncKey)
-	{
-		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-		
-		if (is_null($fileSync))
-			KExternalErrors::dieError(KExternalErrors::FILE_NOT_FOUND);
 
-		if (!$local && !in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+	private function handleFileSyncRedirection($fileSync, asset $flavorAsset, $entryId, $fileName, $isDir)
+	{
+		$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $entryId);
+		if($downloadDeliveryProfile && $flavorAsset)
 		{
-
-			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
-			KExternalErrors::terminateDispatch();
-			$this->redirect($url);
+			$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);
 		}
-	}
-
-	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset)
-	{
-
-		$url = $flavorAsset->getServeFlavorUrl(null, null, $downloadDeliveryProfile);
-		KalturaLog::log ("URL to redirect to [$url]" );
-		return $url;
+		else if(in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		{
+			return;
+		}
+		else
+		{
+			$url = kDataCenterMgr::getRedirectExternalUrl($fileSync);
+		}
+		KExternalErrors::terminateDispatch();
+		$this->redirect($url);
 	}
 }
