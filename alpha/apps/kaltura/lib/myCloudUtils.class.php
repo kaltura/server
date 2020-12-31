@@ -30,4 +30,9 @@ class myCloudUtils
 		$random = mt_rand(0, 99);
 		return $exportRatio > $random;
 	}
+
+	public static function isEnvironmentWithCloudStorage()
+	{
+		return kConf::hasMap(self::CLOUD_STORAGE_MAP);
+	}
 }
