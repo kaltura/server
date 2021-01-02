@@ -218,6 +218,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	private function doPutFileHelper($filePath , $fileContent, $params)
 	{
 		$params['StorageClass'] = $this->storageClass;
+
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		try
 		{

@@ -207,7 +207,7 @@ function checkCache()
 					}
 				}
 				
-				require_once(dirname(__FILE__) . '/../apps/kaltura/lib/monitor/KalturaMonitorClient.php');
+				require_once(dirname(__FILE__) . '/../../infra/monitor/KalturaMonitorClient.php');
 				KalturaMonitorClient::monitorApiStart(true, 'extwidget.thumbnail', $renderer->partnerId);
 				header("X-Kaltura:cached-dispatcher-thumb");
 				$renderer->output();
@@ -238,8 +238,8 @@ function checkCache()
 	{
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererDumpFile.php');
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererString.php');
-		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/monitor/KalturaMonitorClient.php');
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/request/kIpAddressUtils.php');
+		require_once(dirname(__FILE__) . '/../../infra/monitor/KalturaMonitorClient.php');
 		
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
 		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$uri;

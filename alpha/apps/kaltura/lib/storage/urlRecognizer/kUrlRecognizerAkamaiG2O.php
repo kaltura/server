@@ -93,16 +93,16 @@ class kUrlRecognizerAkamaiG2O extends kUrlRecognizer
 			// Compare the absolute value of the difference between the current time
 			// and the "token" time.
 			if (abs(time() - $time) > $this->timeout ) {
-				return false;
+				return self::RECOGNIZED_NOT_OK;
 			}
 		}
 
 		$newSign = base64_encode(md5($this->timeout . $authData . $url, true));
 		if ($newSign == $authSign) {
-			return true;
+			return self::RECOGNIZED_OK;
 		}
 		
-		return false;		
+		return self::RECOGNIZED_NOT_OK;
 	}
 	
 }

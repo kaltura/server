@@ -7,6 +7,11 @@
  */ 
 class kUrlRecognizer
 {
+
+	const NOT_RECOGNIZED = 0;
+	const RECOGNIZED_OK = 1;
+	const RECOGNIZED_NOT_OK = 2;
+
 	/**
 	 * @var array
 	 */
@@ -18,13 +23,13 @@ class kUrlRecognizer
 		// Check whether one of the hosts is similar to the request origin
 		$hosts = explode(",", $this->getHosts());
 		if(!in_array($requestOrigin, $hosts))
-			return false;
+			return self::NOT_RECOGNIZED;
 			
 		$uri = $_SERVER["REQUEST_URI"];
 		if($this->getUriPrefix() && strpos($uri, $this->getUriPrefix()) !== 0)
-			return false;
+			return self::NOT_RECOGNIZED;
 			
-		return true;
+		return self::RECOGNIZED_OK;
 	}
 	
 	/**

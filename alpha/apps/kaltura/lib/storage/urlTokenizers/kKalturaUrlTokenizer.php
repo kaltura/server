@@ -12,9 +12,24 @@ class kKalturaUrlTokenizer extends kUrlTokenizer
 	{
 		$lastSlashPosition = strrpos($url, "/");
 		$path = substr($url, 0, $lastSlashPosition);
-		$fileName = substr($url, $lastSlashPosition + 1);
+		$file = substr($url, $lastSlashPosition + 1);
+
+		if(preg_match('#/fileName/([^/]+)/#', $path, $matches, PREG_OFFSET_CAPTURE))
+		{
+			$fileNamePart = $matches[0][0];
+			$path = str_replace($fileNamePart, '/', $path);
+			$ending = $fileNamePart . $file;
+		}
+		else
+		{
+			$ending = '/' . $file;
+		}
+
+		$expiry = kApiCache::getTime() + $this->getWindow();
+		$path .= '/exp/' . $expiry;
+
 		$signature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $path, $this->key, true));
-		return $path . '/sig/' . $signature . '/' . $fileName;
+		return $path . '/sig/' . $signature . $ending;
 	}
 
 }

@@ -23,6 +23,7 @@ class KalturaMonitorClient
 	const EVENT_RABBIT         = 'rabbit';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
+	const EVENT_EXEC           = 'exec';
 
 
 	const FIELD_ACTION = 			'a';
@@ -36,6 +37,7 @@ class KalturaMonitorClient
 	const FIELD_CLIENT_TAG = 		'l';
 	const FIELD_MULTIREQUEST = 		'm';
 	const FIELD_LENGTH =			'n';
+	const FIELD_COMMAND =			'o';
 	const FIELD_PARTNER_ID = 		'p';
 	const FIELD_QUERY_TYPE = 		'q';
 	const FIELD_ERROR_CODE = 		'r';
@@ -232,7 +234,7 @@ class KalturaMonitorClient
 		
 		if (!$cached)
 		{
-			require_once(__DIR__ . '/../../../../../infra/log/UniqueId.php');
+			require_once(__DIR__ . '/../log/UniqueId.php');
 			self::$basicEventInfo[self::FIELD_UNIQUE_ID] = UniqueId::get();
 		}
 	}
@@ -614,5 +616,28 @@ class KalturaMonitorClient
 
 		self::$sleepTime += $micros / 1000000;
 		self::$sleepCount++;
+	}
+
+	public static function monitorExec($command, $startTime)
+	{
+		if (!self::$stream)
+			return;
+
+		$spacePos = strpos($command, ' ');
+		if ($spacePos !== false)
+		{
+			$command = substr($command, 0, $spacePos);
+		}
+
+		$command = trim($command, "'\"");
+		$command = basename($command);
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_EXEC,
+			self::FIELD_COMMAND			=> $command,
+			self::FIELD_EXECUTION_TIME	=> microtime(true) - $startTime,
+		));
+
+		self::writeDeferredEvent($data);
 	}
 }
