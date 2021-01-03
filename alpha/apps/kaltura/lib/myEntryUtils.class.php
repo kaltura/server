@@ -871,9 +871,11 @@ class myEntryUtils
 			$start_sec = 0;
 		}
 		
+		$entryDataPath = null;
+		$flavorAssetForCapture = null;
+		$localCaptureFlavorAssetId = null;
 		$forceRotationByAssetId = array();
 		$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-		list($flavorAssetForCapture, $entryDataPath, $localCaptureFlavorAssetId) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
 		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 		
 		while($count--)
@@ -953,6 +955,10 @@ class myEntryUtils
 
 						if (!$success)
 						{
+							if(!$flavorAssetForCapture && !$entryDataPath)
+							{
+								list($flavorAssetForCapture, $entryDataPath, $localCaptureFlavorAssetId) = self::getEntryDataPathAndAssetLocalCaptureThumb($entry);
+							}
 							$flavorAssetId = $localCaptureFlavorAssetId;
 							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey,
 								$cacheLockKeyProcessing, $flavorAssetId, -1, -1, $flavorAssetForCapture, $entryDataPath);
