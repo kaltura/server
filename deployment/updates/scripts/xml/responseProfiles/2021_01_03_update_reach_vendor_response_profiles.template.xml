@@ -14,7 +14,6 @@
 	</session>
 
 	<multirequest>
-		<!-- Server-Node is down -->
 		<request service="responseProfile" action="listAction" partnerId="0">
 			<filter objectType="KalturaResponseProfileFilter">
 				<systemNameEqual>reach_vendor</systemNameEqual>
