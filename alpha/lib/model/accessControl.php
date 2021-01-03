@@ -266,13 +266,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			$this->setScope($scope);
 
 		$disableCache = false;
-		$ks = $this->scope ? $this->scope->getKs() : null;
-
-		$isKsAdmin = $ks && $ks->isAdmin();
-		$isKsReachVendor = $ks &&
-			($ks->getRole() === UserRoleId::REACH_VENDOR_ROLE) &&
-			($ks->getPrivilegeValue(kSessionBase::PRIVILEGE_VIEW) === $this->scope->getEntryId());
-
+		$isKsAdmin = $this->scope && $this->scope->getKs() && $this->scope->getKs()->isAdmin();
+		
 		$rules = $this->getRulesArray();
 		$specialProperties = $this->getSpecialProperties();
 		if (isset($specialProperties[self::SERVE_FROM_SERVER_NODE_RULE]) && $specialProperties[self::SERVE_FROM_SERVER_NODE_RULE])
@@ -284,7 +279,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
-			if($checkForceAdminValidation && ($isKsAdmin || $isKsReachVendor) && !$rule->getForceAdminValidation())
+			if($checkForceAdminValidation && $isKsAdmin && !$rule->getForceAdminValidation())
 				continue;
 
 			$fulfilled = $rule->applyContext($context);
