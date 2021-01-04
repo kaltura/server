@@ -39,8 +39,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		
 		$this->ffprobeBinCmd = $this->ffprobeBin;
 		$resolvedFilePath  = kFile::realPath($filePath);
-		KChunkedEncode::addFfmpegReconnectParams("http", $resolvedFilePath, $this->ffprobeBin);
-		KChunkedEncode::addFfmpegReconnectParams("http", $resolvedFilePath, $this->cmdPath);
+		kBatchUtils::addReconnectParams("http", $resolvedFilePath, $this->ffprobeBin);
+		kBatchUtils::addReconnectParams("http", $resolvedFilePath, $this->cmdPath);
 		
 		if(strstr($filePath, "http")===false) {
 			if (!kFile::checkFileExists($filePath))

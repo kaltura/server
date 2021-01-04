@@ -593,7 +593,7 @@ $stub=null;
 		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
 		
 		$exec_cmd = $binName;
-		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$exec_cmd);
+		kBatchUtils::addReconnectParams("http", $inputFilePath,$exec_cmd);
 		
 		$exec_cmd .= " " .
 			str_replace (
