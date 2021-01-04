@@ -241,6 +241,11 @@ class KalturaMonitorClient
 	
 	public static function monitorApiStart($cached, $action, $partnerId, $sessionType = null, $clientTag = null, $isInMultiRequest = false)
 	{
+		if (!$partnerId)
+		{
+			$partnerId = preg_match('#/p/(\d+)/#', $_SERVER['REQUEST_URI'], $matches) ? $matches[1] : null;
+		}
+
 		if ($partnerId == -1)		// cannot use BATCH_PARTNER_ID since this may run before the autoloader
 		{
 			$splittedClientTag = explode(' ', $clientTag);
@@ -292,13 +297,11 @@ class KalturaMonitorClient
 			return;		// handled by kApiCache
 		}
 
-		$partnerId = preg_match('#^/p/(\d+)/#', $_SERVER['REQUEST_URI'], $matches) ? $matches[1] : null;
-
 		$params = infraRequestUtils::getRequestParams();
 		$sessionType = isset($params['ks']) ? kSessionBase::SESSION_TYPE_USER : kSessionBase::SESSION_TYPE_NONE;	// assume user ks
 		$clientTag = isset($params['clientTag']) ? $params['clientTag'] : null;
 
-		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
+		self::monitorApiStart(false, $action, null, $sessionType, $clientTag);
 	}
 
 	public static function monitorApiEnd($errorCode)
