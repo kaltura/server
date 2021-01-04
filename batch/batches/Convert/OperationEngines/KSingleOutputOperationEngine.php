@@ -34,7 +34,7 @@ class KSingleOutputOperationEngine extends KOperationEngine
 		}
 		
 		$exec_cmd = $this->cmd;
-		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$exec_cmd);
+		kBatchUtils::addReconnectParams("http", $inputFilePath,$exec_cmd);
 		return "$exec_cmd $command >> \"{$this->logFilePath}\" 2>&1";
 	}
 
