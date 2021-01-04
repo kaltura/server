@@ -611,10 +611,14 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 						$cmdLineArr[$kIdx+1] = str_replace ('0:','1:',$mapStr);
 					}
 				}
+				KChunkedEncode::addFfmpegReconnectParams("\"http", $srcFile, $pipeStr);
 				$pipeStr.= " -i $srcFile";
 			}
 			else
+			{
+				KChunkedEncode::addFfmpegReconnectParams("\"http", $srcFile, $pipeStr);
 				$pipeStr.= " -i $srcFile -map 0:v -map 1:a";
+			}
 		}
 		KalturaLog::log("Fixed part:$pipeStr");
 		$cmdLineArr[$keySrc].= " $pipeStr";
