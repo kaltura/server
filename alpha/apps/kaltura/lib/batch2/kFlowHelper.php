@@ -878,6 +878,7 @@ class kFlowHelper
 	protected static function validateSourceFileSync($sourceFileSyncDescriptors)
 	{
 		//validate that the source is still the same
+		$maxConvertTimeSec = kConf::get('max_convert_time_sec', 'runtime_config', 864000);
 		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
 		foreach ($sourceFileSyncDescriptors as $sourceFileSyncDescriptor)
 		{
@@ -889,9 +890,15 @@ class kFlowHelper
 				$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
 				$currentSourceFilePath = $currentSourceFileSync->getFilePath();
 				$originalSrcPath = $sourceFileSyncDescriptor->getFileSyncLocalPath();
-				if (!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath), basename($originalSrcPath)))
+
+				// check if source fileSync is still in convert grace period
+				if ($currentSourceFileSync->getCreatedAt(null) > time() - $maxConvertTimeSec)
 				{
-					throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+					if (!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath), basename($originalSrcPath)))
+					{
+						$msg = $currentSourceFilePath . ' | ' . $originalSrcPath . ' | ' . $srcAssetId;
+						throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $msg);
+					}
 				}
 			}
 		}
