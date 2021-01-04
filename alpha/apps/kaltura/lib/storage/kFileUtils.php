@@ -162,8 +162,10 @@ class kFileUtils extends kFile
 		
 		header("X-Kaltura:dumpApiRequest " . kDataCenterMgr::getCurrentDcId());
 		// grab URL and pass it to the browser
+		$start = microtime(true);
 		$content = curl_exec($ch);
-		
+		KalturaMonitorClient::monitorCurl($host, microtime(true) - $start);
+
 		// close curl resource, and free up system resources
 		curl_close($ch);
 		KExternalErrors::dieGracefully();
@@ -264,7 +266,9 @@ class kFileUtils extends kFile
 		header("Access-Control-Allow-Origin:*"); // avoid html5 xss issues
 		header("X-Kaltura:dumpUrl");
 		// grab URL and pass it to the browser
+		$start = microtime(true);
 		$content = curl_exec($ch);
+		KalturaMonitorClient::monitorCurl($urlHost, microtime(true) - $start);
 		KalturaLog::debug("CURL executed [$content]");
 		
 		// close curl resource, and free up system resources

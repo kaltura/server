@@ -1786,17 +1786,24 @@ class myPartnerUtils
 		$flavorParamsId = $asset ? $asset->getFlavorParamsId() : null;
 		$secureEntryHelper = new KSecureEntryHelper($entry, null, null, ContextType::SERVE, array(), $asset);
 		$validServe = $secureEntryHelper->validateForServe($flavorParamsId);
-		$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+
+		if(!is_null($storageProfileId))
+		{
+			$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+			switch($downloadAllowed)
+			{
+				case kUrlRecognizer::RECOGNIZED_OK:
+					return;
+				case kUrlRecognizer::RECOGNIZED_NOT_OK:
+					KalturaLog::debug('Failed to recognize url due to wrong or missing signing');
+					KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'Failed to parse signature');
+					break;
+			}
+		}
+
 		if(!$validServe)
 		{
-			if(!is_null($storageProfileId) && $downloadAllowed)
-			{
-				return;
-			}
-			else
-			{
-				KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-			}
+			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 		}
 
 		// enforce delivery
@@ -1805,15 +1812,8 @@ class myPartnerUtils
 		$restricted = DeliveryProfilePeer::isRequestRestricted($partner);
 		if ($restricted)
 		{
-			if(!is_null($storageProfileId) && $downloadAllowed)
-			{
-				return;
-			}
-			else
-			{
-				KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
-				KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
-			}
+			KalturaLog::log ( "DELIVERY_METHOD_NOT_ALLOWED partner [$partnerId]" );
+			KExternalErrors::dieError(KExternalErrors::DELIVERY_METHOD_NOT_ALLOWED);
 		}
 	}
 
@@ -2217,21 +2217,16 @@ class myPartnerUtils
 		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
 		if(!$downloadDeliveryProfile)
 		{
-			return false;
+			return kUrlRecognizer::NOT_RECOGNIZED;
 		}
 
 		$downloadRecognizer = $downloadDeliveryProfile->getRecognizer();
 		if($downloadRecognizer)
 		{
-			$urlRecognized = $downloadRecognizer->isRecognized(null);
-			if($urlRecognized)
-			{
-				KalturaLog::log ( "Download from storage [$storageProfileId] allowed" );
-				return true;
-			}
+			return $downloadRecognizer->isRecognized(null);
 		}
 
-		return false;
+		return kUrlRecognizer::NOT_RECOGNIZED;
 	}
 
 	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)

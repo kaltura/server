@@ -456,7 +456,7 @@ class myPackagerUtils
 			$preferredStorageId = myCloudUtils::getCloudPreferredStorage();
 		}
 
-		if(!$preferredStorageId)
+		if(!$preferredStorageId && myCloudUtils::isEnvironmentWithCloudStorage())
 		{
 			$preferredStorageId = $dcId;
 		}

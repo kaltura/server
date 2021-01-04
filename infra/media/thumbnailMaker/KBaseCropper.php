@@ -58,9 +58,8 @@ abstract class KBaseCropper
 		$cmd = $this->getCommand($quality, $cropType, $width, $height, $cropX, $cropY, $cropWidth, $cropHeight, $scaleWidth, $scaleHeight, $bgcolor, $density, $forceRotation, $strip);
 		if($cmd)
 		{
-			KalturaLog::info("Executing: $cmd");
 			$returnValue = null;
-			exec($cmd, $output, $returnValue);
+			kExecWrapper::exec($cmd, $output, $returnValue);
 			KalturaLog::debug("Returned value: $returnValue Output: " .  print_r($output, true));
 			
 			//Avoid certain images the image magic throws "no pixels defined in cache ... @ cache.c/OpenPixelCache/3789" exception but still generates the cropped image
