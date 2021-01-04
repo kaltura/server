@@ -118,6 +118,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_REGISTRATION_IMPRESSION = 'registrationImpression';
 	const EVENT_TYPE_HOTSPOT_CLICKED = 'hotspotClicked';
 	const EVENT_TYPE_NODE_SWITCH = 'nodeSwitch';
+	const EVENT_TYPE_ADD_TO_CALENDAR_CLICKED = 'addToCalendarClicked';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
