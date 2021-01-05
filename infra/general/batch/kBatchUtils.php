@@ -14,7 +14,7 @@ class kBatchUtils
 	
 	public static function tryLoadKconfConfig()
 	{
-		$configCacheFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'sharedRemoteChunkConfig_serialized.txt';
+		$configCacheFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'sharedStorageConfig_serialized.txt';
 		if(!kFile::checkFileExists($configCacheFileName))
 		{
 			$sharedStorageClientConfig = self::loadAndSaveKcofnConfig($configCacheFileName);
@@ -47,31 +47,29 @@ class kBatchUtils
 		$remoteChunkConfigStaticFileCacheTime = kConf::get("remote_chunk_config_static_file_cache_time", "runtime_config", 120);
 		$ffmpegReconnectParams = kConf::get("ffmpeg_reconnect_params", "runtime_config", null);
 		
-		$chunkConvertSharedStorageConfig = array(
-			'arnRole' => $s3Arn,
+		$sharedStorageConfig = array(
+			's3Arn' => $s3Arn,
 			'storageTypeMap' => $storageTypeMap,
 			'ffmpegReconnectParams' => $ffmpegReconnectParams,
 			's3Region' => isset($storageOptions['s3Region']) ? $storageOptions['s3Region'] : null,
 			'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
 		);
 		
-		if($storageOptions && isset($storageOptions['accessKeyId']) && isset($storageOptions['accessKeySecret']))
-		{
-			$chunkConvertSharedStorageConfig['endPoint'] = isset($storageOptions['endPoint']) ? $storageOptions['endPoint'] : null;
-			$chunkConvertSharedStorageConfig['accessKeyId'] = isset($storageOptions['accessKeyId']) ? $storageOptions['accessKeyId'] : null;
-			$chunkConvertSharedStorageConfig['accessKeySecret'] = isset($storageOptions['accessKeySecret']) ? $storageOptions['accessKeySecret'] : null;
-		}
+		$sharedStorageConfig['endPoint'] = isset($storageOptions['endPoint']) ? $storageOptions['endPoint'] : null;
+		$sharedStorageConfig['accessKeyId'] = isset($storageOptions['accessKeyId']) ? $storageOptions['accessKeyId'] : null;
+		$sharedStorageConfig['accessKeySecret'] = isset($storageOptions['accessKeySecret']) ? $storageOptions['accessKeySecret'] : null;
+		$sharedStorageConfig['concurrency'] = isset($storageOptions['concurrency']) ? $storageOptions['concurrency'] : null;
 		
 		
-		KalturaLog::debug("Config loaded: " . print_r($chunkConvertSharedStorageConfig, true));
-		kFile::safeFilePutContents($configCacheFileName, serialize($chunkConvertSharedStorageConfig));
+		KalturaLog::debug("Config loaded: " . print_r($sharedStorageConfig, true));
+		kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageConfig));
 		kCacheConfFactory::close();
-		return $chunkConvertSharedStorageConfig;
+		return $sharedStorageConfig;
 	}
 	
 	private static function setStorageRunParams($storageRunParams)
 	{
-		kSharedFileSystemMgr::setFileSystemOptions('arnRole', $storageRunParams['arnRole']);
+		kSharedFileSystemMgr::setFileSystemOptions('s3Arn', $storageRunParams['s3Arn']);
 		kSharedFileSystemMgr::setFileSystemOptions('s3Region', $storageRunParams['s3Region']);
 		
 		if(isset($storageRunParams['endPoint'])) {
