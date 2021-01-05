@@ -148,6 +148,9 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 			case kESearchException::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER:
 				$object = new KalturaAPIException(KalturaESearchErrors::UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER);
 				break;
+			case kESearchException::CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED:
+				$object = new KalturaAPIException(KalturaESearchErrors::CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
+				break;
 
 			default:
 				$object = null;

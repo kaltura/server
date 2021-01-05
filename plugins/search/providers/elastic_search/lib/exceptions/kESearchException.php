@@ -14,6 +14,7 @@ class kESearchException extends kCoreException
     const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'missing mandatory parameters in order item';
     const MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED = 'mixed search items in nested operator not allowed';
     const MISSING_OPERATOR_TYPE = 'missing operator type';
+    const CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = 'Unable to generate list. max matches value was reached';
 
     //Query parsing errors
     const MISSING_QUERY_OPERAND = 'Missing operand [AND / OR / NOT]';
