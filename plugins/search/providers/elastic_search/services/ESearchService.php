@@ -122,7 +122,7 @@ class ESearchService extends KalturaBaseService
 			$kPager = $pager->toObject();
 			if( ($kPager->getPageSize() * $kPager->getPageIndex()) > self::MAX_RESULT_WINDOW )
 			{
-				throw new kESearchException('Offset is bigger than max matches allowed', kESearchException::CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
+				throw new KalturaAPIException(KalturaESearchErrors::CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
 			}
 		}
 
