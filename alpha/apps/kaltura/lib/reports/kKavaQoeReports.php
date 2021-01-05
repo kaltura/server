@@ -67,7 +67,12 @@ class kKavaQoeReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
 					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-				)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			)
 		),
 
@@ -78,9 +83,16 @@ class kKavaQoeReports extends kKavaReportsMgr
 				'coordinates' => self::DIMENSION_LOCATION_REGION
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 
@@ -92,9 +104,16 @@ class kKavaQoeReports extends kKavaReportsMgr
 				'coordinates' => self::DIMENSION_LOCATION_CITY,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 

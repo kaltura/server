@@ -54,7 +54,12 @@ class kKavaWebcastReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
 					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-				)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			)
 		),
 
@@ -73,9 +78,16 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 
@@ -95,9 +107,16 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 

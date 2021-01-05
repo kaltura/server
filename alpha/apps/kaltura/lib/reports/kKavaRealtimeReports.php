@@ -31,7 +31,12 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
 					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-				)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			)
 		),
 
@@ -51,9 +56,16 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 
@@ -74,9 +86,16 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 
