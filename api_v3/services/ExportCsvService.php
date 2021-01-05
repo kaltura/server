@@ -90,17 +90,25 @@ class ExportCsvService extends KalturaBaseService
 	{
 		if(!preg_match('/^\w+\.csv$/', $id))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
-		
+
 		// KS verification - we accept either admin session or download privilege of the file
 		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
-		
-		$partner_id = kCurrentContext::getCurrentPartnerId();
-		$folderPath = "/content/exportcsv/$partner_id";
-		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath;
-		$file_path = "$fullPath/$id";
-		
-		return $file_path;
+
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$commonCsvPath = '/content/exportcsv/';
+
+		$fullPath = myContentStorage::getFSContentRootPath() . $commonCsvPath . $partnerId . DIRECTORY_SEPARATOR . $id;
+		$storageBaseDir = myCloudUtils::getPartnerSharedStoargeBaseDir($partnerId);
+		if($storageBaseDir)
+		{
+			$sharedStorageFullPath = $storageBaseDir . $commonCsvPath . myContentStorage::getScatteredPathFromIntId($partnerId) . DIRECTORY_SEPARATOR . $id;
+			if (kFile::checkFileExists($sharedStorageFullPath))
+			{
+				$fullPath = $sharedStorageFullPath;
+			}
+		}
+		return $fullPath;
 	}
 	
 }

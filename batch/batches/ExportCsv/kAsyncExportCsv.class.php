@@ -79,22 +79,26 @@ class KAsyncExportCsv extends KJobHandlerWorker
 	/**
 	 * the function move the file to the shared location
 	 */
-	protected function moveFile(KalturaBatchJob $job, KalturaExportCsvJobData $data, $partnerId) {
-		$fileName =  basename($data->outputPath);
-		$directory = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
-		KBatchBase::createDir($directory);
+	protected function moveFile(KalturaBatchJob $job, KalturaExportCsvJobData $data, $partnerId)
+	{
+		$directory = $data->sharedOutputPath;
+		if(!$directory)
+		{
+			$directory = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
+			KBatchBase::createDir($directory);
+		}
+		$fileName = basename($data->outputPath);
 		$sharedLocation = $directory . $fileName;
 
 		$fileSize = kFile::fileSize($data->outputPath);
-		rename($data->outputPath, $sharedLocation);
+		kFile::moveFile($data->outputPath, $sharedLocation);
 		$data->outputPath = $sharedLocation;
 
 		$this->setFilePermissions($sharedLocation);
 		if(!$this->checkFileExists($sharedLocation, $fileSize))
 		{
-			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'Failed to move csv file', KalturaBatchJobStatus::RETRY);
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::OUTPUT_FILE_DOESNT_EXIST, 'Failed to move csv file', KalturaBatchJobStatus::RETRY);
 		}
-
 		return $this->closeJob($job, null, null, 'CSV created successfully', KalturaBatchJobStatus::FINISHED, $data);
 	}
 
