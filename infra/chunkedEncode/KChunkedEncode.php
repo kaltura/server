@@ -586,7 +586,7 @@
 					 * This is required to overcome some sources that does not reposition correctly. Better solution would be to reposition to the nearest KF, 
 					 * but this will require long source query.
 					 */
-				$backOffset = 5; 
+				$backOffset = 10; 
 				if($start<$backOffset) {
 					$cmdLine = " -ss $start".$cmdLine;
 				}
