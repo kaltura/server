@@ -91,7 +91,7 @@ class kAssetUtils
 		{
 			if(!$urlManager)
 			{
-				$urlManager = self::getUrlManager($asset, $syncKey);
+				$urlManager = self::getDeliveryProfile($asset, $syncKey);
 				if(!$urlManager)
 				{
 					return null;
@@ -132,25 +132,29 @@ class kAssetUtils
 		return $url;
 	}
 
-	protected static function getUrlManager($asset, $syncKey)
+	protected static function getDeliveryProfile($asset, $syncKey)
 	{
-		$urlManager = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
-		if(!$urlManager)
+		$deliveryProfile = DeliveryProfilePeer::getDeliveryProfile($asset->getEntryId(), PlaybackProtocol::HTTP, array($asset));
+
+		if($deliveryProfile)
 		{
-			$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
-			foreach($fileSyncs as $fileSync)
+			return $deliveryProfile;
+		}
+
+		$fileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($syncKey);
+		foreach($fileSyncs as $fileSync)
+		{
+			if($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
 			{
-				if($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
+				$deliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
+				if($deliveryProfile)
 				{
-					$urlManager = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
-					if($urlManager)
-					{
-						return $urlManager;
-					}
+					return $deliveryProfile;
 				}
 			}
 		}
-		return $urlManager;
+
+		return $deliveryProfile;
 	}
 
 	private static function getExternalStorageUrl(Partner $partner, asset $asset, FileSyncKey $key, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null)

@@ -252,7 +252,7 @@ class flavorAsset extends exportableAsset
 		$explicitFileExt = null;
 		if($isDir)
 		{
-			$urlParameters .= "/dir/1";
+			$urlParameters .= "/dirFileName/$fileName";
 			$explicitFileExt = pathinfo($fileName, PATHINFO_EXTENSION);
 		}
 

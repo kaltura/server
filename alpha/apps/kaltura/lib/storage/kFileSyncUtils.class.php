@@ -2134,11 +2134,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 *
 	 * @param $fileSync
 	 * @param $preferredStorageId
-	 * @param $innerFileName
+	 * @param $dirFileName
 	 * @return array
 	 * @throws Exception
 	 */
-	public static function getPathAndSourceTypeByFileSync($fileSync, $preferredStorageId, $innerFileName)
+	public static function getPathAndSourceTypeByFileSync($fileSync, $preferredStorageId, $dirFileName)
 	{
 		$storageProfile = StorageProfilePeer::retrieveByPK($fileSync->getDc());
 		$prefix = $storageProfile ? $storageProfile->getPathPrefix() : '';
@@ -2152,21 +2152,21 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// handle remote dc
 		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds(false)))
 		{
-			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync, true, $innerFileName), self::SOURCE_TYPE_HTTP);
+			return array($prefix . kFileSyncUtils::getFileSyncFullPath($fileSync, true, $dirFileName), self::SOURCE_TYPE_HTTP);
 		}
 		// handle local preferred dc
 		else if($fileSync->getDc() == $preferredStorageId &&
 			(!$forceRemoteServePattern || !preg_match($forceRemoteServePattern, $fileSync->getFilePath())))
 		{
-			return array(kFileSyncUtils::getFileSyncFullPath($fileSync, true, $innerFileName), self::SOURCE_TYPE_FILE);
+			return array(kFileSyncUtils::getFileSyncFullPath($fileSync, true, $dirFileName), self::SOURCE_TYPE_FILE);
 		}
 		// use direct serve if configured
 		else if (kConf::hasParam('vod_packager_direct_serve_secret'))
 		{
 			$path = str_replace('//', '/', $fileSync->getFullPath());
-			if($innerFileName)
+			if($dirFileName)
 			{
-				$path .= '/' . $innerFileName;
+				$path .= '/' . $dirFileName;
 			}
 			$secret = kConf::get('vod_packager_direct_serve_secret');
 			$sig = base64_encode(hash_hmac('sha256', $path, $secret, true));
@@ -2176,7 +2176,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// if dc is local but not preferred generate serve file urls
 		else
 		{
-			return array ($prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false, $innerFileName), self::SOURCE_TYPE_HTTP);
+			return array ($prefix . kDataCenterMgr::getInternalRemoteUrl($fileSync, false, $dirFileName), self::SOURCE_TYPE_HTTP);
 		}
 	}
 
@@ -2369,12 +2369,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return FileSyncPeer::doSelect($c);
 	}
 
-	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true, $innerFileName = null)
+	public static function getFileSyncFullPath(FileSync $fileSync, $pathOnly = true, $dirFileName = null)
 	{
 		$suffix = '';
-		if($innerFileName)
+		if($dirFileName)
 		{
-			$suffix = '/' . $innerFileName;
+			$suffix = '/' . $dirFileName;
 		}
 
 		if(!in_array($fileSync->getDc(), kDataCenterMgr::getDcIds(false)))
@@ -2402,7 +2402,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $fullPath . $suffix;
 	}
 
-	public static function getFileSyncServeFlavorFields($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true, $innerFileName = null)
+	public static function getFileSyncServeFlavorFields($syncKey, $flavorAsset, $preferredStorageId, $fallbackStorageId, $pathOnly = true, $dirFileName = null)
 	{
 		$path = '';
 		$parent_file_sync = null;
@@ -2414,7 +2414,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			if($file_sync)
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				list($path, $sourceType) = kFileSyncUtils::getPathAndSourceTypeByFileSync($parent_file_sync, $preferredStorageId, $innerFileName);
+				list($path, $sourceType) = kFileSyncUtils::getPathAndSourceTypeByFileSync($parent_file_sync, $preferredStorageId, $dirFileName);
 				if(!$path)
 				{
 					$parent_file_sync = null;
@@ -2427,7 +2427,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			if ( $file_sync )
 			{
 				$parent_file_sync = kFileSyncUtils::resolve($file_sync);
-				$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync, $pathOnly, $innerFileName);
+				$path = kFileSyncUtils::getFileSyncFullPath($parent_file_sync, $pathOnly, $dirFileName);
 			}
 		}
 

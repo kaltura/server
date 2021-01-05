@@ -134,13 +134,13 @@ class downloadAction extends sfAction
 			$fileExt = kAssetUtils::getFileExtension($flavorAsset->getContainerFormat());
 		}
 
-		$isFileDir = kFile::isDir($filePath) || $fileSync->getIsDir();
+		$isFileDir = $fileSync->getIsDir() || kFile::isDir($filePath);
 		if ($fileExt && !$isFileDir)
 			$fileName = $fileName . '.' . $fileExt;
 
 		if(!$local || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
 		{
-			$this->handleFileSyncRedirection($fileSync, $flavorAsset, $entry->getId(), $fileName, $isFileDir);
+			$this->handleFileSyncRedirection($fileSync, $flavorAsset, $fileName, $isFileDir);
 		}
 
 		$preview = 0;
@@ -235,9 +235,9 @@ class downloadAction extends sfAction
 		}
 	}
 
-	private function handleFileSyncRedirection($fileSync, asset $flavorAsset, $entryId, $fileName, $isDir)
+	private function handleFileSyncRedirection($fileSync, asset $flavorAsset, $fileName, $isDir)
 	{
-		$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $entryId);
+		$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $flavorAsset->getEntryId());
 		if($downloadDeliveryProfile && $flavorAsset)
 		{
 			$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);

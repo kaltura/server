@@ -456,13 +456,16 @@ class serveFlavorAction extends kalturaAction
 		$shouldProxy = $this->getRequestParameter("forceproxy", false);
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
-		$inDir = $this->getRequestParameter( "dir", false);
-		$innerFileName = null;
-		if($inDir)
-		{
-			$innerFileName =  basename($fileName);
-		}
 		$fileParam = basename($fileParam);
+
+		$dirFileName = $this->getRequestParameter( "dirFileName" );
+		$file_name = $this->getRequestParameter( "file_name" ); // backward compatibility for download action
+		if($file_name)
+		{
+			$dirFileName = $file_name;
+		}
+		$dirFileName =  basename($dirFileName);
+
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
@@ -506,7 +509,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), true, $innerFileName);
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), true, $dirFileName);
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
