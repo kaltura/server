@@ -29,7 +29,7 @@ class kExportCsvJobData extends kJobData
 	/**
 	 * @var string
 	 */
-	public $storageDestinationFilePath;
+	public $sharedOutputPath;
 	
 	/**
 	 * @return string
@@ -82,17 +82,17 @@ class kExportCsvJobData extends kJobData
 	/**
 	 * @return string
 	 */
-	public function getStorageDestinationFilePath()
+	public function getSharedOutputPath()
 	{
-		return $this->storageDestinationFilePath;
+		return $this->sharedOutputPath;
 	}
 
 	/**
-	 * @param string $storageDestinationFilePath
+	 * @param string $sharedOutputPath
 	 */
-	public function setStorageDestinationFilePath($storageDestinationFilePath)
+	public function setSharedOutputPath($sharedOutputPath)
 	{
-		$this->storageDestinationFilePath = $storageDestinationFilePath;
+		$this->sharedOutputPath = $sharedOutputPath;
 	}
 	
 }

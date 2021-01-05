@@ -90,27 +90,22 @@ class ExportCsvService extends KalturaBaseService
 	{
 		if(!preg_match('/^\w+\.csv$/', $id))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ID, $id);
-		
+
 		// KS verification - we accept either admin session or download privilege of the file
 		if(!$ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$folderPath = "/content/exportcsv/$partnerId";
-		$fullPath = myContentStorage::getFSContentRootPath() . $folderPath . DIRECTORY_SEPARATOR . $id;
+		$commonCsvPath = '/content/exportcsv/';
 
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if($partner && $partner->getSharedStorageProfileId())
+		$fullPath = myContentStorage::getFSContentRootPath() . $commonCsvPath . $partnerId . DIRECTORY_SEPARATOR . $id;
+		$storageBaseDir = myCloudUtils::getPartnerSharedStoargeBaseDir($partnerId);
+		if($storageBaseDir)
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-			if($storageProfile && $storageProfile->getStorageBaseDir())
+			$sharedStorageFullPath = $storageBaseDir . $commonCsvPath . myContentStorage::getScatteredPathFromIntId($partnerId) . DIRECTORY_SEPARATOR . $id;
+			if (kFile::checkFileExists($sharedStorageFullPath))
 			{
-				$filePath = $storageProfile->getStorageBaseDir() . "/content/exportcsv/" . myContentStorage::getScatteredPathFromIntId($partnerId);
-				$storageFullFilePath = $filePath . DIRECTORY_SEPARATOR . $id;
-				if(kFile::checkFileExists($storageFullFilePath))
-				{
-					$fullPath = $storageFullFilePath;
-				}
+				$fullPath = $sharedStorageFullPath;
 			}
 		}
 		return $fullPath;

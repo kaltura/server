@@ -3237,14 +3237,13 @@ class kFlowHelper
 	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
 		$fileName = basename($data->getOutputPath());
-		if ($data->getStorageDestinationFilePath())
+		if ($data->getSharedOutputPath())
 		{
-			$filePath = $data->getStorageDestinationFilePath() . DIRECTORY_SEPARATOR . $fileName;
+			$filePath = $data->getSharedOutputPath() . $fileName;
 		}
 		else
 		{
 			// Move file from shared temp to it's final location
-
 			$directory = myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId();
 			if (!file_exists($directory))
 				mkdir($directory);

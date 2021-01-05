@@ -30,4 +30,18 @@ class myCloudUtils
 		$random = mt_rand(0, 99);
 		return $exportRatio > $random;
 	}
+
+	public static function getPartnerSharedStoargeBaseDir($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSharedStorageProfileId())
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			if($storageProfile && $storageProfile->getStorageBaseDir())
+			{
+				return $storageProfile->getStorageBaseDir();
+			}
+		}
+		return null;
+	}
 }

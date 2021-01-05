@@ -27,7 +27,7 @@ class KalturaExportCsvJobData extends KalturaJobData
 	/**
 	 * @var string
 	 */
-	public $storageDestinationFilePath;
+	public $sharedOutputPath;
 	
 	
 	private static $map_between_objects = array
@@ -35,7 +35,7 @@ class KalturaExportCsvJobData extends KalturaJobData
 		'userMail',
 		'userName',
 		'outputPath',
-		"storageDestinationFilePath",
+		"sharedOutputPath",
 	);
 	
 	/* (non-PHPdoc)
