@@ -3236,22 +3236,21 @@ class kFlowHelper
 	
 	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
-		$fileName = basename($data->getOutputPath());
-		if ($data->getSharedOutputPath())
+		if(!$data->getOutputPath())
 		{
-			$filePath = $data->getSharedOutputPath() . $fileName;
+			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
 		}
-		else
+		$fileName = basename($data->getOutputPath());
+		$filePath = $data->getSharedOutputPath();
+		if(!$filePath)
 		{
 			// Move file from shared temp to it's final location
 			$directory = myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId();
-			if (!file_exists($directory))
+			if(!file_exists($directory))
+			{
 				mkdir($directory);
+			}
 			$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-
-			if (!$data->getOutputPath())
-				throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
-
 			KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
 			try
 			{
@@ -3261,14 +3260,12 @@ class kFlowHelper
 			{
 				throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
 			}
+			$data->setOutputPath($filePath);
+			$dbBatchJob->setData($data);
+			$dbBatchJob->save();
 		}
 
-		$data->setOutputPath($filePath);
-		$dbBatchJob->setData($data);
-		$dbBatchJob->save();
-
 		KalturaLog::info("file path: [$filePath]");
-		
 		$downloadUrl = self::createCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
 		$userName = $data->getUserName();
 		$bodyParams = array($userName, $downloadUrl);
