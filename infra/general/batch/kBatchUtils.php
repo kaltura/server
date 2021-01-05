@@ -48,7 +48,7 @@ class kBatchUtils
 		$ffmpegReconnectParams = kConf::get("ffmpeg_reconnect_params", "runtime_config", null);
 		
 		$sharedStorageConfig = array(
-			's3Arn' => $s3Arn,
+			'arnRole' => $s3Arn,
 			'storageTypeMap' => $storageTypeMap,
 			'ffmpegReconnectParams' => $ffmpegReconnectParams,
 			's3Region' => isset($storageOptions['s3Region']) ? $storageOptions['s3Region'] : null,
@@ -69,7 +69,7 @@ class kBatchUtils
 	
 	private static function setStorageRunParams($storageRunParams)
 	{
-		kSharedFileSystemMgr::setFileSystemOptions('s3Arn', $storageRunParams['s3Arn']);
+		kSharedFileSystemMgr::setFileSystemOptions('arnRole', $storageRunParams['arnRole']);
 		kSharedFileSystemMgr::setFileSystemOptions('s3Region', $storageRunParams['s3Region']);
 		
 		if(isset($storageRunParams['endPoint'])) {

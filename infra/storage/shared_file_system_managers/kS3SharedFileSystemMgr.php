@@ -79,7 +79,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
-			$this->s3Arn = isset($options['s3Arn']) ? $options['s3Arn'] : $arnRole;
+			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
