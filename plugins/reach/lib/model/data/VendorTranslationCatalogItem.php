@@ -20,6 +20,10 @@ class VendorTranslationCatalogItem extends VendorCaptionsCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::TRANSLATION);
 	}
 
+    /**
+     * @param $object
+     * @return kTranslationVendorTaskData|null
+     */
     public function getTaskJobData($object)
     {
         if($object instanceof CaptionAsset)

@@ -147,6 +147,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = "chaptering";
 				break;
 
+            case VendorServiceFeature::INTELLIGENT_TAGGING:
+                $serviceFeatureName = "intelligent tagging";
+                break;
+
 			default:
 				$serviceFeatureName = "";
 		}
@@ -163,7 +167,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
     {
         $version = $this->calculateEntryVendorTaskVersion($entry);
 
-        $activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartner(), $version);
+        $activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
         if($activeTask && !$this->getAllowResubmission())
         {
             return true;

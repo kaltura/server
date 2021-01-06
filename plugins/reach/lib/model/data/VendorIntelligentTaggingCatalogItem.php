@@ -22,4 +22,20 @@ class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
     {
         return $entry->getVersion();
     }
+
+    /**
+     * @param $object
+     * @return kTranslationVendorTaskData|null
+     */
+    public function getTaskJobData($object)
+    {
+        if($object instanceof asset)
+        {
+            $taskJobData = new kIntelligentTaggingVendorTaskData();
+            $taskJobData->assetId = $object->getId();
+            return $taskJobData;
+        }
+
+        return null;
+    }
 }
