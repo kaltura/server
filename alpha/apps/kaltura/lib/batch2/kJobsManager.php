@@ -1976,11 +1976,10 @@ class kJobsManager
 	{
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
-		$storageBaseDir = myCloudUtils::getPartnerSharedStoargeBaseDir($partnerId);
 		$shouldExportCsvToSharedStorage = kConf::get('should_export_csv_to_shared_storage','runtime_config', null);
-		if ($storageBaseDir && $shouldExportCsvToSharedStorage)
+		if ($shouldExportCsvToSharedStorage)
 		{
-			$sharedPath = $storageBaseDir . "/content/exportcsv/" . myContentStorage::getScatteredPathFromIntId($partnerId) . DIRECTORY_SEPARATOR;
+			$sharedPath = kPathManager::getExportCsvSharedPath($partnerId, null, true);
 			$jobData->setSharedOutputPath($sharedPath);
 		}
 		return self::addJob($batchJob, $jobData, BatchJobType::EXPORT_CSV, $exportObjectType);

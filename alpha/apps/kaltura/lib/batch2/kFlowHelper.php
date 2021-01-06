@@ -3233,7 +3233,13 @@ class kFlowHelper
 			return false;
 	}
 
-	
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kExportCsvJobData $data
+	 * @return BatchJob
+	 * @throws APIException
+	 * @throws PropelException
+	 */
 	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
 		if(!$data->getOutputPath())
@@ -3245,7 +3251,7 @@ class kFlowHelper
 		if(!$filePath)
 		{
 			// Move file from shared temp to it's final location
-			$directory = myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId();
+			$directory = kPathManager::getExportCsvSharedPath($dbBatchJob->getPartnerId());
 			if(!file_exists($directory))
 			{
 				mkdir($directory);

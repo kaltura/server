@@ -6,7 +6,7 @@
 class kPathManager
 {
 	static $sessionCache = array();
-	
+
 	protected static function getStorageProfile($storageProfileId = null)
 	{
 		if(is_null($storageProfileId))
@@ -117,5 +117,38 @@ class kPathManager
 		}
 		
 		return $storageProfileId;
+	}
+
+	/**
+	 * @param $partnerId
+	 * @param $fileName
+	 * @param bool $shouldUseShared
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function getExportCsvSharedPath($partnerId, $fileName = '', $shouldUseShared = false)
+	{
+		$storageProfileId = null;
+		if ($shouldUseShared)
+		{
+			$ids = kDataCenterMgr::getSharedStorageProfileIds();
+			$storageProfileId = reset($ids);
+		}
+		$storageProfile = self::getStorageProfile($storageProfileId);
+		if(is_null($storageProfile))
+			throw new Exception("Storage Profile [$storageProfileId] not found");
+
+		$pathManager = $storageProfile->getPathManager();
+		return $pathManager->getExportCsvFilePath($partnerId, $fileName);
+	}
+
+	/**
+	 * @param $partnerId
+	 * @param string $fileName
+	 * @return string
+	 */
+	public function getExportCsvFilePath($partnerId, $fileName = '')
+	{
+		return myContentStorage::getFSContentRootPath() . '/content/exportcsv/' . $partnerId . DIRECTORY_SEPARATOR . $fileName;
 	}
 }

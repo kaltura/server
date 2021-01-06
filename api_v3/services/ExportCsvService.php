@@ -96,19 +96,12 @@ class ExportCsvService extends KalturaBaseService
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$commonCsvPath = '/content/exportcsv/';
-
-		$fullPath = myContentStorage::getFSContentRootPath() . $commonCsvPath . $partnerId . DIRECTORY_SEPARATOR . $id;
-		$storageBaseDir = myCloudUtils::getPartnerSharedStoargeBaseDir($partnerId);
-		if($storageBaseDir)
+		$fullPath = kPathManager::getExportCsvSharedPath($partnerId, $id, true);
+		if ($fullPath && kFile::checkFileExists($fullPath))
 		{
-			$sharedStorageFullPath = $storageBaseDir . $commonCsvPath . myContentStorage::getScatteredPathFromIntId($partnerId) . DIRECTORY_SEPARATOR . $id;
-			if (kFile::checkFileExists($sharedStorageFullPath))
-			{
-				$fullPath = $sharedStorageFullPath;
-			}
+				return $fullPath;
 		}
-		return $fullPath;
+		return kPathManager::getExportCsvSharedPath($partnerId , $id);
 	}
 	
 }
