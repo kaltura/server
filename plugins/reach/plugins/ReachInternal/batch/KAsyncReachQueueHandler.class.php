@@ -35,7 +35,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
     public function run($jobs = null)
     {
         //retrieve all entry vendor tasks using the response profile.
-        KBatchBase::impersonate(self::REACH_INTERNAL_VENDOR_PARTNER);
+        KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
 
         //init filter
         $filter = new KalturaEntryVendorTaskFilter();
@@ -43,7 +43,8 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
         $pager->pageSize = 100;
 
         //Set response profile in order to add the vendor catalog item and/or reach profile to the entry vendor task response.
-        KBatchBase::$kClient->setResponseProfile(KBatchBase::$taskConfig->params->responseProfileId);
+        $responseProfile = $this->constructResponseProfile();
+        KBatchBase::$kClient->setResponseProfile($responseProfile);
 
         $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
 
@@ -84,6 +85,38 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
         }
 
         KBatchBase::unimpersonate();
+    }
+
+    /**
+     * @return KalturaDetachedResponseProfile
+     */
+    protected function constructResponseProfile ()
+    {
+        $responseProfile = new KalturaDetachedResponseProfile();
+        $responseProfile->fields = 'id,partnerId,vendorPartnerId,createdAt,entryId,status,reachProfileId,catalogItemId,accessKey,notes,dictionary';
+        $responseProfile->relatedProfiles = array();
+
+        $catalogItemProfile = new KalturaDetachedResponseProfile();
+        $catalogItemProfile->fields = 'id,vendorPartnerId,name,systemName,createdAt,updatedAt,status,pricing,fixedPriceAddons,engineType';
+        $catalogItemProfile->filter = new KalturaVendorCatalogItemFilter();
+        $catalogItemProfile->mappings = array();
+        $mapping = new KalturaResponseProfileMapping();
+        $mapping->parentProperty = 'catalogItemId';
+        $mapping->filterProperty = 'idEqual';
+        $catalogItemProfile->mappings[] = $mapping;
+        $responseProfile->relatedProfiles[] = $catalogItemProfile;
+
+        $reachResponseProfile = new KalturaDetachedResponseProfile();
+        $reachResponseProfile->fields = 'id,partnerId,createdAt,updatedAt,status,profileType,rules,credit,usedCredit,dictionaries,autoDisplayMachineCaptionsOnPlayer,autoDisplayHumanCaptionsOnPlayer,enableMachineModeration,enableHumanModeration';
+        $reachResponseProfile->filter = new KalturaReachProfileFilter();
+        $reachResponseProfile->mappings = array();
+        $mapping = new KalturaResponseProfileMapping();
+        $mapping->parentProperty = 'reachProfileId';
+        $mapping->filterProperty = 'idEqual';
+        $reachResponseProfile->mappings[] = $mapping;
+        $responseProfile->relatedProfiles[] = $reachResponseProfile;
+
+        return $responseProfile;
     }
 
 }

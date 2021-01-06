@@ -14,7 +14,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 		
-		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()))
+		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()) || (!ReachPlugin::isAllowedPartner(kCurrentContext::$ks_partner_id)))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 		
 		if (!in_array($actionName, array('getJobs', 'updateJob', 'list', 'extendAccessKey')))
@@ -265,9 +265,6 @@ class EntryVendorTaskService extends KalturaBaseService
 	 */
 	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!PermissionPeer::isValidForPartner(PermissionName::REACH_VENDOR_PARTNER_PERMISSION, kCurrentContext::$ks_partner_id))
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_SERVICE_GET_JOB_NOT_ALLOWED, kCurrentContext::getCurrentPartnerId());
-		
 		if (!$filter)
 			$filter = new KalturaEntryVendorTaskFilter();
 		
