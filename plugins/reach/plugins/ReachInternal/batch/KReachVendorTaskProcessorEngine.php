@@ -73,4 +73,30 @@ abstract class KReachVendorTaskProcessorEngine
         return true;
 
     }
+
+    public function moveTaskToStatus($task, $status)
+    {
+        KBatchBase::impersonate($task->vendorPartnerId);
+
+        $updateTask = new KalturaEntryVendorTask();
+        $updateTask->status = $status;
+        try {
+            $this->reachPlugin->entryVendorTask->update($task->id, $updateTask);
+        } catch (Exception $e)
+        {
+            KalturaLog::err("Unable to move task ID {$task->id} to PROCESSING status");
+        }
+
+        KBatchBase::unimpersonate();
+    }
+
+    public function endTaskOnError ($task)
+    {
+        $this->moveTaskToStatus($task, KalturaEntryVendorTaskStatus::ERROR);
+    }
+
+    public function endTaskSuccess($task)
+    {
+        $this->moveTaskToStatus($task, KalturaEntryVendorTaskStatus::READY);
+    }
 }

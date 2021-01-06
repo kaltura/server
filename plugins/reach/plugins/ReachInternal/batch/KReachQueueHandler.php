@@ -48,15 +48,19 @@ class KReachQueueHandler extends KPeriodicWorker
                 $catalogItem = $entryVendorTask->relatedObjects[self::CATALOG_ITEM_INDEX][0];
                 /* @var $catalogItem KalturaVendorCatalogItem */
                 $engine = KReachVendorTaskProcessorEngine::getInstance($catalogItem->engineType);
-                if (!$engine) {
+                if (!$engine)
+                {
                     KalturaLog::info('No engine type found to process entry vendor task ID: ' . $entryVendorTask->id);
                     continue;
                 }
 
                 try {
+                    $engine->moveTaskToStatus($entryVendorTask, KalturaEntryVendorTaskStatus::PROCESSING);
                     $engine->handleTask($entryVendorTask);
+                    KBatchBase::unimpersonate();
                 } catch (Exception $e) {
                     KalturaLog::err('Error occurred processing vendor task with ID ' . $entryVendorTask->id . '. Message: ' . $e->getMessage());
+                    KBatchBase::unimpersonate();
                 }
 
                 $handledTasksCounter++;
@@ -67,6 +71,7 @@ class KReachQueueHandler extends KPeriodicWorker
                 }
             }
 
+            KBatchBase::impersonate(self::REACH_INTERNAL_VENDOR_PARTNER);
             $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
         }
 
