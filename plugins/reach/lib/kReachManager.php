@@ -231,6 +231,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
+		if ($object instanceof flavorAsset
+			&& in_array(assetPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+			return true;
+		}
+
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
@@ -336,6 +343,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
+		if ($object instanceof flavorAsset)
+		{
+			return $this->handleFlavorAssetReady($object);
+		}
+
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
 			if (count(self::$booleanNotificationTemplatesFulfilled))
@@ -374,7 +386,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		return true;
 	}
-	
+
+	protected function handleFlavorAssetReady(flavorAsset $object)
+	{
+		if(myEntryUtils::isEntryReady($object->getEntryId()))
+		{
+			return $this->checkAutomaticRules($object, true);
+		}
+
+		return true;
+	}
+
 	protected function checkPendingEntryTasks($object)
 	{
 		//Check if there are any tasks that were created with pending entry ready status
@@ -503,9 +525,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		if(!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
+		if (!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
+			return true;
+		}
+
+		if (!kReachUtils::areFlavorsReady($entry, $reachProfile))
+		{
+			KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
 			return true;
 		}
 
