@@ -1,7 +1,7 @@
 <?php
-if($argc < 4)
+if($argc < 3)
 {
-	echo "Usage: php $argv[0] [serviceUrl] [partnerId] [adminSecret] <dryRunMode> <maxEntries>".PHP_EOL;
+	echo "Usage: php $argv[0] [adminKs] [serviceUrl] <dryRunMode> <maxEntries>".PHP_EOL;
 	die("Not enough parameters" . "\n");
 }
 
@@ -47,14 +47,13 @@ function getMetadataOnObject($metadataPlugin, $objectId, $metadataProfileId)
 	return null;
 }
 
-function getClient($serviceUrl, $partnerId, $secret)
+function getClient($serviceUrl, $adminKs)
 {
-	$config = new KalturaConfiguration($partnerId);
+	$config = new KalturaConfiguration();
 	$config->clientTag = 'KScheduledTaskRunner';
 	$config->serviceUrl = $serviceUrl;
 	$client = new KalturaClient($config);
-	$result = $client->session->start($secret, null, KalturaSessionType::ADMIN, $partnerId, null, null);
-	$client->setKs($result);
+	$client->setKs($adminKs);
 
 	return $client;
 }
@@ -147,9 +146,9 @@ function getUpdatedDay($profile)
 	return $now - $profile->description;
 }
 
-function main($serviceUrl, $partnerId, $adminSecret, $dryRunMode, $maxEntries)
+function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 {
-	$client = getClient($serviceUrl, $partnerId, $adminSecret);
+	$client = getClient($serviceUrl, $adminKs);
 	$entriesHandledCount = 0;
 	$scheduledTaskProfiles = getMRProfiles($client);
 	$profiles = filterProfiles($scheduledTaskProfiles);
@@ -167,20 +166,19 @@ function main($serviceUrl, $partnerId, $adminSecret, $dryRunMode, $maxEntries)
 	return $entriesHandledCount;
 }
 
-$serviceUrl = $argv[1];
-$partnerId = $argv[2];
-$adminSecret = $argv[3];
+$adminKs = $argv[1];
+$serviceUrl = $argv[2];
 $dryRunMode = true;
 $maxEntries = 1000;
 
-if(isset($argv[4]))
+if(isset($argv[3]))
 {
-	$dryRunMode = $argv[4];
+	$dryRunMode = $argv[3];
 }
 
-if(isset($argv[5]))
+if(isset($argv[4]))
 {
-	$maxEntries = $argv[5];
+	$maxEntries = $argv[4];
 }
-$entriesHandledCount = main($serviceUrl, $partnerId, $adminSecret, $dryRunMode, $maxEntries);
-kalturaLog::info("finished updated {$entriesHandledCount} entry");
+$entriesHandledCount = main($serviceUrl, $adminKs, $dryRunMode, $maxEntries);
+kalturaLog::info("Reset old MR script finished and updated {$entriesHandledCount} entries");
