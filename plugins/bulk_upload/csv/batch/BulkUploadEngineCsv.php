@@ -45,7 +45,12 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		$startLineNumber = $this->getStartIndex($this->job->id);
 	
 		$filePath = $this->data->filePath;
+
+		$filePath = kFile::realPath($filePath);
+		kSharedFileSystemMgr::restoreStreamWrappers();
 		$fileHandle = fopen($filePath, "r");
+		kSharedFileSystemMgr::unRegisterStreamWrappers();
+
 		if(!$fileHandle)
 			throw new KalturaBatchException("Unable to open file: {$filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
 					
