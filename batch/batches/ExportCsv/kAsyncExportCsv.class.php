@@ -81,7 +81,7 @@ class KAsyncExportCsv extends KJobHandlerWorker
 	 */
 	protected function moveFile(KalturaBatchJob $job, KalturaExportCsvJobData $data, $partnerId)
 	{
-		$directory = $data->sharedOutputPath;
+		$directory = isset($data->sharedOutputPath) ? $data->sharedOutputPath : null;
 		if(!$directory)
 		{
 			$directory = self::$taskConfig->params->sharedTempPath . DIRECTORY_SEPARATOR . $partnerId . DIRECTORY_SEPARATOR;
