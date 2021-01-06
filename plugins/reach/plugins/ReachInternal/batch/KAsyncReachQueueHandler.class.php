@@ -4,7 +4,7 @@
  * @subpackage Scheduler
  */
 
-class KReachQueueHandler extends KPeriodicWorker
+class KAsyncReachQueueHandler extends KPeriodicWorker
 {
 
     const CATALOG_ITEM_INDEX = 'reach_vendor_catalog_item';
