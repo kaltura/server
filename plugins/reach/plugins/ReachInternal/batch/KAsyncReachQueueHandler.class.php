@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.eventNotification
+ * @package plugins.reachInternal
  * @subpackage Scheduler
  */
 
@@ -13,6 +13,14 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
      * @var KalturaReachClientPlugin
      */
     protected $reachPlugin;
+
+    /* (non-PHPdoc)
+	 * @see KBatchBase::getType()
+	 */
+    public static function getType()
+    {
+        return KalturaBatchJobType::REACH_INTERNAL_QUEUE_HANDLER;
+    }
 
     function __construct($taskConfig = null)
     {

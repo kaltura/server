@@ -2,7 +2,7 @@
 
 ini_set ( "memory_limit", "256M" );
 
-require_once(__DIR__ . "/../../../../batch/bootstrap.php");
+require_once(__DIR__ . "/../../../../../batch/bootstrap.php");
 
 //will free the exclusive drop folder when getting kill SIGNAL
 function gracefullyKill()
