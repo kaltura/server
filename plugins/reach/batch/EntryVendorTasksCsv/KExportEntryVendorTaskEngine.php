@@ -80,7 +80,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	 */
 	protected function addHeaderRowToCsv($csvFile, $additionalFields)
 	{
-		$headerRow = 'taskId,createdAt,finishTime,entryId,entryName,entryDuration,taskStatus,reachProfileId,reachProfileName,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData';
+		$headerRow = 'taskId,createdAt,finishTime,entryId,entryName,entryDuration,taskStatus,reachProfileId,reachProfileName,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData,targetLanguage';
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		return $csvFile;
 	}
@@ -135,7 +135,8 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 			'notes' => $entryVendorTask->notes,
 			'accuracy' => $entryVendorTask->accuracy,
 			'context' => $entryVendorTask->context,
-			'partnerData' => $entryVendorTask->partnerData
+			'partnerData' => $entryVendorTask->partnerData,
+			'targetLanguage' => $catalogItemData ? $catalogItemData['targetLanguage'] : 'N/A',
 		);
 		
 		$entryVendorTaskIdToRow[$entryVendorTask->id] = $defaultRowValues;
@@ -183,7 +184,8 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		$catalogItemInfo = array(
 			"TAT" => $vendorCatalogItem ? $vendorCatalogItem->turnAroundTime : "N/A",
 			"serviceType" => $vendorCatalogItem ? $vendorCatalogItem->serviceType : "N/A",
-			"serviceFeature" => $vendorCatalogItem ? $vendorCatalogItem->serviceFeature : "N/A"
+			"serviceFeature" => $vendorCatalogItem ? $vendorCatalogItem->serviceFeature : "N/A",
+			'targetLanguage' => ($vendorCatalogItem && property_exists($vendorCatalogItem,'targetLanguage')) ? $vendorCatalogItem->targetLanguage : 'N/A'
 		);
 		
 		self::$catalogItemData[$id] = $catalogItemInfo;

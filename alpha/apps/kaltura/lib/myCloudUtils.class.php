@@ -43,5 +43,10 @@ class myCloudUtils
 			}
 		}
 		return null;
+  }
+
+  public static function isEnvironmentWithCloudStorage()
+	{
+		return kConf::hasMap(self::CLOUD_STORAGE_MAP);
 	}
 }

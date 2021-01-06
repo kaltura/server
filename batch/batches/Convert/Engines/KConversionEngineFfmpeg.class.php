@@ -591,11 +591,9 @@ $stub=null;
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
 		$binName = $this->getCmd();
 		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
+		kBatchUtils::addReconnectParams("http", $inputFilePath,$binName);
 		
-		$exec_cmd = $binName;
-		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$exec_cmd);
-		
-		$exec_cmd .= " " .
+		$exec_cmd = "$binName " .
 			str_replace (
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
 				array('"' . $inputFilePath . '"', $this->outFilePath, $this->configFilePath, $binName),

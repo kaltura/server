@@ -335,6 +335,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
 		self::EVENT_TYPE_HOTSPOT_CLICKED,
 		self::EVENT_TYPE_NODE_SWITCH,
+		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -385,6 +386,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
 		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
 		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
+		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
 	);
 
 	//global transform
