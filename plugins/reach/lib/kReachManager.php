@@ -309,7 +309,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::READY
 		)
+		{
+			$this->addLabelAdditionForMachineType($object);
 			return $this->invalidateAccessKey($object);
+		}
 
 		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
 		{
@@ -374,7 +377,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		return true;
 	}
-	
+
 	protected function checkPendingEntryTasks($object)
 	{
 		//Check if there are any tasks that were created with pending entry ready status
@@ -407,7 +410,56 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
 	}
-	
+
+	protected function addLabelAdditionForMachineType(EntryVendorTask $entryVendorTask)
+	{
+		do
+		{
+			$captionAssetId = $entryVendorTask->getOutputObjectId();
+			if(!$captionAssetId)
+			{
+				break;
+			}
+
+			$reachProfile = $entryVendorTask->getReachProfile();
+			if(!$reachProfile)
+			{
+				break;
+			}
+
+			$labelAddition = $reachProfile->getLabelAdditionForMachineServiceType();
+			if(is_null($labelAddition) || $labelAddition === '')
+			{
+				break;
+			}
+
+			$catalogItem = $entryVendorTask->getCatalogItem();
+			if(!$catalogItem)
+			{
+				break;
+			}
+
+			if($catalogItem->getServiceType() != VendorServiceType::MACHINE)
+			{
+				break;
+			}
+
+
+			$dbCaptionAsset = assetPeer::retrieveById($captionAssetId);
+			if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
+			{
+				break;
+			}
+
+			$newLabel = "{$dbCaptionAsset->getLabel()} ($labelAddition)";
+			KalturaLog::debug("New label [{$newLabel}] for CaptionAsset ID [{$captionAssetId}]");
+
+			$dbCaptionAsset->setLabel($newLabel);
+			$dbCaptionAsset->save();
+
+		}while(0);
+	}
+
 	private function invalidateAccessKey(EntryVendorTask $entryVendorTask)
 	{
 		$ksString = $entryVendorTask->getAccessKey();

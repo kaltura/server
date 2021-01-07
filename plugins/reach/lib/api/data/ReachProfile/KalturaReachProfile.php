@@ -106,6 +106,11 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 	public $maxCharactersPerCaptionLine;
 
 	/**
+	 * @var string
+	 */
+	public $labelAdditionForMachineServiceType;
+
+	/**
 	 * @var KalturaReachProfileContentDeletionPolicy
 	 */
 	public $contentDeletionPolicy;
@@ -163,6 +168,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 		'enableAudioTags',
 		'enableProfanityRemoval',
 		'maxCharactersPerCaptionLine',
+		'labelAdditionForMachineServiceType',
 		'contentDeletionPolicy',
 		'rules' => 'rulesArray',
 		'credit',
