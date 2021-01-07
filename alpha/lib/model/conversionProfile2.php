@@ -140,7 +140,6 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		$path = '/conversion/xsl/';
 		if ($externalPath)
 		{
-
 			$dir = myContentStorage::getScatteredPathFromIntId($this->getId());
 		}
 		else
