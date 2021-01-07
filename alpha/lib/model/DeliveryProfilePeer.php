@@ -872,5 +872,13 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 
 		return $deliveryIds;
 	}
+
+	public static function retrieveByPartnerAndSystemName($partnerId, $systemName)
+	{
+		$criteria = new Criteria();
+		$criteria->add(DeliveryProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(DeliveryProfilePeer::SYSTEM_NAME, $systemName);
+		return DeliveryProfilePeer::doSelect($criteria);
+	}
 } // DeliveryProfilePeer
 

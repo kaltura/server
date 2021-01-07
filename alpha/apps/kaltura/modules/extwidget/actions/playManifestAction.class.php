@@ -887,7 +887,7 @@ class playManifestAction extends kalturaAction
 ///////////////////////////////////////////////////////////////////////////////////
 	//	Main functions
 
-	private function serveVodEntry()
+	private function serveVodEntry($serveOneOnlyFlavor)
 	{
 		$this->initFlavorIds();
 		
@@ -919,24 +919,8 @@ class playManifestAction extends kalturaAction
 				}
 				if (!$this->deliveryAttributes->getHasValidSequence())
 				{
-					$this->initFlavorAssetArray();
+					$this->initFlavorAssetArray($serveOneOnlyFlavor);
 					$this->initEntryDuration();
-				}
-				break;
-
-			case entryType::LIVE_STREAM:
-				$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $this->getScheduleTime());
-				if ($event)
-				{
-					$this->entryId = $event->getSourceEntryId();
-					$sourceEntry = kSimuliveUtils::getSourceEntry($event);
-					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
-					$offset = $this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, "0"); // offset in sec
-					if ($offset)
-					{
-						$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
-					}
-					$this->initFlavorAssetArray(true);
 				}
 				break;
 		}
@@ -1311,6 +1295,14 @@ class playManifestAction extends kalturaAction
 			$this->secureEntryHelper->updateDeliveryAttributes($this->deliveryAttributes);
 
 		$this->enforceEncryption();
+
+		$serveOneOnlyFlavor = false;
+		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		if ($event)
+		{
+			$serveOneOnlyFlavor = true;
+			$this->initEventData($event);
+		}
 		
 		$renderer = null;
 
@@ -1320,21 +1312,14 @@ class playManifestAction extends kalturaAction
 			case entryType::MEDIA_CLIP:
 			case entryType::LIVE_CHANNEL:
 				// VOD
-				$renderer = $this->serveVodEntry();
+				$renderer = $this->serveVodEntry($serveOneOnlyFlavor);
 				$entryType = self::ENTRY_TYPE_VOD;
 				break;
 				
 			case entryType::LIVE_STREAM:
-				if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime()))
-				{
-					$renderer = $this->serveVodEntry();
-					$entryType = self::ENTRY_TYPE_VOD;
-				} else
-				{
-					// Live stream
-					$renderer = $this->serveLiveEntry();
-					$entryType = self::ENTRY_TYPE_LIVE;
-				}
+				// Live stream
+				$renderer = $this->serveLiveEntry();
+				$entryType = self::ENTRY_TYPE_LIVE;
 				break;
 			
 			default:
@@ -1528,4 +1513,22 @@ class playManifestAction extends kalturaAction
 		$time += intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
 		return $time;
     }
+
+	protected function initEventData($event)
+	{
+		$offset = $this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, "0"); // offset in sec
+		if ($offset)
+		{
+			$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
+		}
+		$this->entryId = $event->getSourceEntryId();
+		$sourceEntry = kSimuliveUtils::getSourceEntry($event);
+		$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
+		$partner = $this->entry->getPartner();
+		$partnerHasDeliveryProfile = array_intersect(kSimuliveUtils::SIMULIVE_PLAYBACK_PROTOCOLS, array_keys($partner->getDeliveryProfileIds()));
+		if ($sourceEntry->getType() === entryType::MEDIA_CLIP && !$this->deliveryAttributes->getDeliveryProfileIds() && !$partnerHasDeliveryProfile)
+		{
+			$this->deliveryAttributes->setDeliveryProfileIds(kSimuliveUtils::getSimuliveDeliveryProfileId($sourceEntry->getPartnerId()), false);
+		}
+	}
 }

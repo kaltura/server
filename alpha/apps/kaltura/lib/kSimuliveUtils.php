@@ -13,6 +13,8 @@ class kSimuliveUtils
 	const MINIMUM_TIME_TO_PLAYABLE_SEC = 18; // 3 * default segment duration
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
+	const DELIVERY_PROFILE_SYSTEM_NAME = 'simulive';
+	const SIMULIVE_PLAYBACK_PROTOCOLS = array(PlaybackProtocol::APPLE_HTTP);
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
@@ -136,6 +138,23 @@ class kSimuliveUtils
 		}
 		// conditional cache should expire when event start
 		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
+	}
+
+	/**
+	 * @param string partnerId
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function getSimuliveDeliveryProfileId($partnerId)
+	{
+		$simuliveDeliveryProfiles = DeliveryProfilePeer::retrieveByPartnerAndSystemName($partnerId, self::DELIVERY_PROFILE_SYSTEM_NAME);
+		if (count($simuliveDeliveryProfiles))
+		{
+			/* @var $simuliveDeliveryProfile DeliveryProfile */
+			$simuliveDeliveryProfile = reset($simuliveDeliveryProfiles);
+			return $simuliveDeliveryProfile->getId();
+		}
+		return kConf::get('simulive_default_delivery_profile', 'live', null);
 	}
 
 }
