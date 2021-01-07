@@ -136,6 +136,12 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			'placement' => 'prepend',
 		));
 
+		$this->addElement('text', 'labelAdditionForHumanServiceType', array(
+			'label' => 'Label Addition For Human Service Type:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
+
 		$this->addElement('text', 'flavorParamsIds', array(
 			'label' => 'Flavor Params Idss:',
 			'filters' => array('StringTrim'),

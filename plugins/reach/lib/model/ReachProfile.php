@@ -31,6 +31,7 @@ class ReachProfile extends BaseReachProfile
 	const CUSTOM_DATA_ENABLE_POFANITY_REMOVAL = 			'enable_profanity_removal';
 	const CUSTOM_DATA_MAX_CHARS_PER_LINE = 					'max_chars_per_line';
 	const CUSTOM_DATA_LABEL_ADDITION_FOR_MACHINE =          'label_addition_for_machine';
+	const CUSTOM_DATA_LABEL_ADDITION_FOR_HUMAN =            'label_addition_for_human';
 	const CUSTOM_DATA_VENDOR_CREDIT = 						'vendor_credit';
 	
 	const CUSTOM_DATA_CREDIT_USAGE_PERCENTAGE = 			'credit_usage_percentage';
@@ -101,6 +102,11 @@ class ReachProfile extends BaseReachProfile
 	public function setLabelAdditionForMachineServiceType($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_LABEL_ADDITION_FOR_MACHINE, $v);
+	}
+
+	public function setLabelAdditionForHumanServiceType($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_LABEL_ADDITION_FOR_HUMAN, $v);
 	}
 
 	public function setRulesArrayCompressed($v)
@@ -281,6 +287,11 @@ class ReachProfile extends BaseReachProfile
 	public function getLabelAdditionForMachineServiceType()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_LABEL_ADDITION_FOR_MACHINE, null, null);
+	}
+
+	public function getLabelAdditionForHumanServiceType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LABEL_ADDITION_FOR_HUMAN, null, null);
 	}
 
 	public function getRulesArrayCompressed()

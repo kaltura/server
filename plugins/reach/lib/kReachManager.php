@@ -304,7 +304,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
-		
+
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::READY
@@ -411,6 +411,19 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->save();
 	}
 
+	protected function getLabelAdditionByType(ReachProfile $reachProfile, $serviceType)
+	{
+		switch ($serviceType)
+		{
+			case VendorServiceType::HUMAN:
+				return $reachProfile->getLabelAdditionForHumanServiceType();
+
+			case VendorServiceType::MACHINE:
+				return $reachProfile->getLabelAdditionForMachineServiceType();
+		}
+		return null;
+	}
+
 	protected function addLabelAdditionForMachineType(EntryVendorTask $entryVendorTask)
 	{
 		do
@@ -427,23 +440,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				break;
 			}
 
-			$labelAddition = $reachProfile->getLabelAdditionForMachineServiceType();
+			$labelAddition = $this->getLabelAdditionByType($reachProfile, $entryVendorTask->getServiceType());
 			if(is_null($labelAddition) || $labelAddition === '')
 			{
 				break;
 			}
-
-			$catalogItem = $entryVendorTask->getCatalogItem();
-			if(!$catalogItem)
-			{
-				break;
-			}
-
-			if($catalogItem->getServiceType() != VendorServiceType::MACHINE)
-			{
-				break;
-			}
-
 
 			$dbCaptionAsset = assetPeer::retrieveById($captionAssetId);
 			if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
