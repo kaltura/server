@@ -14,7 +14,7 @@ class kSimuliveUtils
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
 	const DELIVERY_PROFILE_SYSTEM_NAME = 'simulive';
-	const SIMULIVE_PLAYBACK_PROTOCOLS = array(PlaybackProtocol::APPLE_HTTP);
+
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time

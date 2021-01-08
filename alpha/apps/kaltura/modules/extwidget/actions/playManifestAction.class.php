@@ -1524,11 +1524,9 @@ class playManifestAction extends kalturaAction
 		$this->entryId = $event->getSourceEntryId();
 		$sourceEntry = kSimuliveUtils::getSourceEntry($event);
 		$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
-		$partner = $this->entry->getPartner();
-		$partnerHasDeliveryProfile = array_intersect(kSimuliveUtils::SIMULIVE_PLAYBACK_PROTOCOLS, array_keys($partner->getDeliveryProfileIds()));
-		if ($sourceEntry->getType() === entryType::MEDIA_CLIP && !$this->deliveryAttributes->getDeliveryProfileIds() && !$partnerHasDeliveryProfile)
+		if ($sourceEntry->getType() === entryType::MEDIA_CLIP && !$this->deliveryAttributes->getDeliveryProfileIds())
 		{
-			$this->deliveryAttributes->setDeliveryProfileIds(kSimuliveUtils::getSimuliveDeliveryProfileId($sourceEntry->getPartnerId()), false);
+			$this->deliveryAttributes->setDeliveryProfileIds(array(kSimuliveUtils::getSimuliveDeliveryProfileId($sourceEntry->getPartnerId())), false);
 		}
 	}
 }

@@ -9,7 +9,7 @@
 class DeliveryProfileDynamicAttributes {
 	
 	/**
-	 * List of delivery profiles ids which should be enfroced due to an access control action
+	 * List of delivery profiles ids which should be enfroced
 	 * @var array
 	 */
 	protected $deliveryProfileIds = null;
@@ -367,7 +367,7 @@ class DeliveryProfileDynamicAttributes {
 	}
 
 	/**
-	 * @param string $deliveryProfileIds
+	 * @param array $deliveryProfileIds
 	 * @param bool $isBlockedList
 	 */
 	public function setDeliveryProfileIds($deliveryProfileIds, $isBlockedList) {
