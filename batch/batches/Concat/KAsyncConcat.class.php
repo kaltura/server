@@ -164,7 +164,7 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @return boolean
 	 * @throws kApplicativeException
 	 */
-	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $attempt = 0)
+	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $attempt = 1)
 	{
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
