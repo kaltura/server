@@ -1318,19 +1318,31 @@ class kFlowHelper
 			$flavorAsset->save();
 		}
 
-		// creats the file sync
-		if(file_exists($data->getLogFileSyncLocalPath()))
+		// Creates the file sync
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-			try{
-				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if($storageProfile)
+					kFileSyncUtils::createReadySyncFileForKey($logSyncKey, $data->getLogFileSyncLocalPath(), $partnerSharedStorageProfileId);
 			}
-			catch(Exception $e){
-				$err = 'Saving conversion log: ' . $e->getMessage();
-				KalturaLog::err($err);
-
-				$desc = $dbBatchJob->getDescription() . "\n" . $err;
-				$dbBatchJob->getDescription($desc);
+			else
+			{
+				try{
+					kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+				}
+				catch(Exception $e){
+					$err = 'Saving conversion log: ' . $e->getMessage();
+					KalturaLog::err($err);
+					
+					$desc = $dbBatchJob->getDescription() . "\n" . $err;
+					$dbBatchJob->getDescription($desc);
+				}
 			}
 		}
 
