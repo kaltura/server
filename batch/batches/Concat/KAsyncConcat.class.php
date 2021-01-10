@@ -18,7 +18,6 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @var string
 	 */
 	protected $sharedTempPath;
-
 	/**
 	 * (non-PHPdoc)
 	 * @see KBatchBase::getJobType()
@@ -91,7 +90,6 @@ class KAsyncConcat extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
 		{
@@ -302,7 +300,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			 * For fix-durtion-delta flow - split the input concat to separate video and audio streams,
 			 * otherwise - normal single input
 			 *
-		if($fixLargeDeltaFlag && $audioParamStr) {Urgency:
+		if($fixLargeDeltaFlag && $audioParamStr) {
 			KalturaLog::log("Will attempt to fix the audio-video drift ");
 			$cmdStr = "$ffmpegBin -probesize 15M -analyzeduration 25M -i $concateStr -probesize 15M -analyzeduration 25M -i $concateStr";
 			$cmdStr.= " -map 0:v -map 1:a $videoParamStr $audioParamStr";
@@ -318,6 +316,10 @@ class KAsyncConcat extends KJobHandlerWorker
 		return ($rv == 0) ? true : false;
 	}
 
+	/**
+	 * @param $attempt
+	 * @return string
+	 */
 	protected static function getProbeSizeAndAnalyzeDuration($attempt)
 	{
 		switch ($attempt)
