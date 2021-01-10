@@ -356,6 +356,24 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
+	protected static function getDsnHost($dsn)
+	{
+		$hostStart = strpos($dsn, 'host=');
+		if ($hostStart === false)
+		{
+			return $dsn;
+		}
+
+		$hostStart += 5;
+		$hostEnd = strpos($dsn, ';', $hostStart);
+		if ($hostEnd === false)
+		{
+			return $dsn;
+		}
+
+		return substr($dsn, $hostStart, $hostEnd - $hostStart);
+	}
+
 	public static function monitorDatabaseAccess($sql, $sqlTook, $hostName = null)
 	{
 		if (!self::$stream)
@@ -369,7 +387,15 @@ class KalturaMonitorClient
 			$comment = substr($sql, 0, $commentEndPos);			
 			$matches = null;
 			if (preg_match('~^/\* [^\]]+\[\d+\]\[([^\]]+)\] \*/~', $comment, $matches))
+			{
 				$hostName = $matches[1];
+
+				$config = kConf::getDB();
+				if (isset($config['datasources'][$hostName]['connection']['dsn']))
+				{
+					$hostName = self::getDsnHost($config['datasources'][$hostName]['connection']['dsn']);
+				}
+			}
 			$sql = trim(substr($sql, $commentEndPos));
 		}
 		else
@@ -475,19 +501,9 @@ class KalturaMonitorClient
 		if (!self::$stream)
 			return;
 		
-		$hostName = $dsn;
-		$hostStart = strpos($dsn, 'host=');
-		if ($hostStart !== false)
-		{
-			$hostStart += 5;
-			$hostEnd = strpos($dsn, ';', $hostStart);
-			if ($hostEnd !== false)
-				$hostName = substr($dsn, $hostStart, $hostEnd - $hostStart);
-		}
-		
 		$data = array_merge(self::$basicEventInfo, array(
 				self::FIELD_EVENT_TYPE 		=> self::EVENT_CONNTOOK,
-				self::FIELD_DATABASE		=> $hostName,
+				self::FIELD_DATABASE		=> self::getDsnHost($dsn),
 				self::FIELD_EXECUTION_TIME	=> $connTook,
 				self::FIELD_COUNT			=> $count,
 		));
