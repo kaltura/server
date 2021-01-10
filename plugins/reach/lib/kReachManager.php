@@ -233,7 +233,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof flavorAsset
 			&& in_array(assetPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == asset::ASSET_STATUS_READY)
+			&& $object->getStatus() == asset::ASSET_STATUS_READY
+			&& myEntryUtils::isEntryReady($object->getEntryId()))
 		{
 			return true;
 		}
@@ -345,7 +346,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof flavorAsset)
 		{
-			return $this->handleFlavorAssetReady($object);
+			return $this->handleEntryReady($object->getentry());
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -386,17 +387,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		return true;
 	}
-
-	protected function handleFlavorAssetReady(flavorAsset $object)
-	{
-		if(myEntryUtils::isEntryReady($object->getEntryId()))
-		{
-			return $this->checkAutomaticRules($object, true);
-		}
-
-		return true;
-	}
-
+	
 	protected function checkPendingEntryTasks($object)
 	{
 		//Check if there are any tasks that were created with pending entry ready status
