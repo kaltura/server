@@ -1,18 +1,18 @@
 <?php
 
-class myThumbUtils
+class myXmlUtils
 {
-	public static function validateImageContent($thumbPath)
+	public static function validateXmlFileContent($filePath)
 	{
-		if(!$thumbPath)
+		if(!$filePath)
 		{
 			return true;
 		}
 
-		$fileType = kFileUtils::getMimeType($thumbPath);
-		if($fileType == 'image/svg+xml')
+		$fileType = kFileUtils::getMimeType($filePath);
+		if(strpos($fileType, 'html') !== false || strpos($fileType, 'xml') !== false)
 		{
-			$xmlContent = file_get_contents($thumbPath);
+			$xmlContent = kFile::getFileContent($filePath);
 			if($xmlContent)
 			{
 				$dom = new KDOMDocument();
