@@ -181,13 +181,16 @@ abstract class KConversionEngine
 	protected function getCmdLine ($cmd_line , $add_log )
 	{
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
-		$binName=$this->getCmd();
-		$exec_cmd = $binName . " " . 
-			str_replace ( 
+		$binName = $this->getCmd();
+		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
+		KChunkedEncode::addFfmpegReconnectParams("http", $inputFilePath,$binName);
+		
+		$exec_cmd = $binName . " " .
+			str_replace (
 				array(KDLCmdlinePlaceholders::InFileName, KDLCmdlinePlaceholders::OutFileName, KDLCmdlinePlaceholders::ConfigFileName, KDLCmdlinePlaceholders::BinaryName),
-				array('"' . kFile::realPath($this->inFilePath) . '"', $this->outFilePath, $this->configFilePath, $binName),
+				array('"' . $inputFilePath . '"', $this->outFilePath, $this->configFilePath, $binName),
 				$cmd_line);
-				
+		
 		if ( $add_log )
 		{
 			// redirect both the STDOUT & STDERR to the log
