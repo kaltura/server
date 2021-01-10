@@ -40,8 +40,8 @@ class fixUiConfFileSyncAction extends kalturaSystemAction
 			}
 			else
 			{
-				list($rootPath, $filePath) = $uiConf->generateFilePathArr($subType);
-					
+				list($rootPath, $filePath) = kPathManager::getFilePath($syncKey, kPathManager::getStorageProfileIdForKey($syncKey));
+
 				$fullPath = $rootPath . $filePath;
 
 				if (file_exists($fullPath))

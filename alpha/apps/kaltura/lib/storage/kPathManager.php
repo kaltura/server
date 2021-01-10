@@ -118,4 +118,21 @@ class kPathManager
 		
 		return $storageProfileId;
 	}
+
+	public static function getStorageProfileIdForObject($objcetClass, $objectType, $storageProfileId = null )
+	{
+		$objectKeys = array (
+			$objcetClass . ':' . $objectType . ':' . '*',
+			'*' // WildCard
+		);
+
+		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
+		if( array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
+		{
+			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$storageProfileId = reset($storageProfileIds);
+		}
+
+		return $storageProfileId;
+	}
 }
