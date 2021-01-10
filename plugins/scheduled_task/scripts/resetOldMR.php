@@ -155,7 +155,7 @@ function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 	foreach($profiles as $profile)
 	{
 		/** @var KalturaScheduledTaskProfile $profile */
-		kalturaLog::info("working on profile {$profile->name}");
+		kalturaLog::info("working on profile {$profile->name} id {$profile->id}");
 		updateEntries($client, $profile, $dryRunMode, $maxEntries, $entriesHandledCount);
 		if($entriesHandledCount >= $maxEntries)
 		{
