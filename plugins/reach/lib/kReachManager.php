@@ -310,7 +310,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& $object->getStatus() == EntryVendorTaskStatus::READY
 		)
 		{
-			$this->addLabelAdditionForMachineType($object);
+			$this->addLabelAddition($object);
 			return $this->invalidateAccessKey($object);
 		}
 
@@ -424,7 +424,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	protected function addLabelAdditionForMachineType(EntryVendorTask $entryVendorTask)
+	protected function addLabelAddition(EntryVendorTask $entryVendorTask)
 	{
 		do
 		{
@@ -441,7 +441,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$labelAddition = $this->getLabelAdditionByType($reachProfile, $entryVendorTask->getServiceType());
-			if(is_null($labelAddition) || $labelAddition === '')
+			if(empty($labelAddition))
 			{
 				break;
 			}
