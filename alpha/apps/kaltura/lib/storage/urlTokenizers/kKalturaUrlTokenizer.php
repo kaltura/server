@@ -13,28 +13,21 @@ class kKalturaUrlTokenizer extends kUrlTokenizer
 		$pathToSign = $url;
 		$lastSlashPosition = strrpos($url, "/");
 		$file = substr($url, $lastSlashPosition + 1);
-		$ending = '';
+		$ending = '/' . $file;
 
 		if(preg_match('#/fileName/([^/]+)/#', $pathToSign, $matches, PREG_OFFSET_CAPTURE))
 		{
 			$fileNamePart = $matches[0][0];
 			$pathToSign = str_replace($fileNamePart, '/', $pathToSign);
-			$ending .= $fileNamePart;
+			$ending = $fileNamePart  . ltrim($ending, '/');
 		}
 
 		if(preg_match('#/dirFileName/([^/]+)/#', $pathToSign, $matches, PREG_OFFSET_CAPTURE))
 		{
 			$fileNamePart = $matches[0][0];
 			$pathToSign = str_replace($fileNamePart, '/', $pathToSign);
-			$ending .= $fileNamePart;
+			$ending = $fileNamePart . ltrim($ending, '/');
 		}
-
-		if(!$ending)
-		{
-			$ending = '/';
-		}
-		$ending .= $file;
-		$ending = str_replace("//", "/", $ending);
 
 		$expiry = kApiCache::getTime() + $this->getWindow();
 		$pathToSign .= '/exp/' . $expiry;
