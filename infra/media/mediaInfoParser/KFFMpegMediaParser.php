@@ -6,7 +6,8 @@
 class KFFMpegMediaParser extends KBaseMediaParser
 {
 	protected $cmdPath;
-	protected $ffmprobeBin;
+	protected $ffprobeBin;
+	protected $ffprobeBinCmd;
 	
 	public $checkScanTypeFlag=true;
 	
@@ -35,6 +36,12 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else{
 			$this->ffprobeBin = "ffprobe";
 		}
+		
+		$this->ffprobeBinCmd = $this->ffprobeBin;
+		$resolvedFilePath  = kFile::realPath($filePath);
+		kBatchUtils::addReconnectParams("http", $resolvedFilePath, $this->ffprobeBin);
+		kBatchUtils::addReconnectParams("http", $resolvedFilePath, $this->cmdPath);
+		
 		if(strstr($filePath, "http")===false) {
 			if (!kFile::checkFileExists($filePath))
 				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
@@ -107,12 +114,12 @@ class KFFMpegMediaParser extends KBaseMediaParser
 
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
 		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
-			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->ffprobeBin, $this->filePath);
+			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->ffprobeBinCmd, $this->filePath);
 		else
 			$mediaInfo->scanType = 0; // Progressive
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
 		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2")) && isset($this->ffprobeBin)){
-			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
+			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBinCmd, $this->filePath);
 		}
 		
 		/*
@@ -136,11 +143,11 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 			if($startFrom<0) $startFrom = 0;
 			
 			if($this->isAudioSet($mediaInfo) and $mediaInfo->audioDuration==0){
-				$audDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBin, $this->filePath, $startFrom, "audio");
+				$audDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom, "audio");
 				$mediaInfo->audioDuration = round($audDur*1000);
 			}
 			if($this->isVideoSet($mediaInfo) and $mediaInfo->videoDuration==0){
-				$vidDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBin, $this->filePath, $startFrom, "video");
+				$vidDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom, "video");
 				$mediaInfo->videoDuration = round($vidDur*1000);
 			}
 		}

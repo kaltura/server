@@ -644,7 +644,7 @@ ini_set("memory_limit","512M");
 			if($job===false)
 				return false;
 			
-			KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
+			kBatchUtils::tryLoadKconfConfig();
 			
 			$job->startTime = time();
 			$job->process = getmypid();

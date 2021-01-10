@@ -192,15 +192,16 @@ class EntryDistribution extends BaseEntryDistribution implements IIndexable, ISy
 		if ($externalPath)
 		{
 			$path = '/distribution/generic/';
+			$dir = myContentStorage::getScatteredPathFromIntId($this->getId());
 		}
 		else
 		{
 			$path = '/content/distribution/generic/';
+			$dir = myContentStorage::getPathFromIntId($this->getId());
 		}
-		$dir = myContentStorage::getPathFromIntId($this->getId());
-		$path .=  "/$dir/" . $this->generateFileName($sub_type, $version);
 
-		return array(myContentStorage::getFSContentRootPath(), $path); 
+		$path .=  "/$dir/" . $this->generateFileName($sub_type, $version);
+		return array(myContentStorage::getFSContentRootPath(), $path);
 	}
 
 	/* (non-PHPdoc)

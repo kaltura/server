@@ -9,10 +9,11 @@ class kZoomClient
 	const PARTICIPANTS = 'participants';
 
 	/** API */
-	const API_USERS_ME = '/v2/users/me';
+	const API_USERS_ME = 'me';
+	const API_USERS = '/v2/users/@userId@';
 	const API_PARTICIPANT = '/v2/report/meetings/@meetingId@/participants';
 	const API_PANELISTS = '/v2/webinars/@webinarId@/panelists';
-	const API_USERS_ME_PERMISSIONS = '/v2/users/me/permissions';
+	const API_USERS_PERMISSIONS = '/v2/users/@userId@/permissions';
 
 	protected $zoomBaseURL;
 
@@ -26,14 +27,14 @@ class kZoomClient
 	}
 
 
-	public function retrieveZoomUserPermissions($accessToken)
+	public function retrieveTokenZoomUserPermissions($accessToken)
 	{
-		return $this->callZoom(self::API_USERS_ME_PERMISSIONS, $accessToken);
+		return $this->retrieveZoomUserPermissions(self::API_USERS_ME, $accessToken);
 	}
 
-	public function retrieveZoomUserData($accessToken)
+	public function retrieveTokenZoomUser($accessToken)
 	{
-		return $this->callZoom(self::API_USERS_ME, $accessToken);
+		return $this->retrieveZoomUser(self::API_USERS_ME, $accessToken);
 	}
 
 	public function retrieveMeetingParticipant($accessToken, $meetingId)
@@ -45,6 +46,18 @@ class kZoomClient
 	public function retrieveWebinarPanelists($accessToken, $webinarId)
 	{
 		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
+		return $this->callZoom($apiPath, $accessToken);
+	}
+
+	public function retrieveZoomUser($userName, $accessToken)
+	{
+		$apiPath = str_replace('@userId@', $userName, self::API_USERS);
+		return $this->callZoom($apiPath, $accessToken);
+	}
+
+	public function retrieveZoomUserPermissions($userName, $accessToken)
+	{
+		$apiPath = str_replace('@userId@', $userName, self::API_USERS_PERMISSIONS);
 		return $this->callZoom($apiPath, $accessToken);
 	}
 

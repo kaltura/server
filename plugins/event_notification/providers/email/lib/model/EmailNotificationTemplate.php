@@ -219,12 +219,14 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 		if($externalPath)
 		{
 			$path = '/notifications/';
+			$dir = myContentStorage::getScatteredPathFromIntId($this->getId());
 		}
 		else
 		{
 			$path = '/content/notifications/';
+			$dir = myContentStorage::getPathFromIntId($this->getId());
 		}
-		$dir = myContentStorage::getPathFromIntId($this->getId());
+
 		$path .= $dir . '/' . $this->generateFileName($sub_type, $version);
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 

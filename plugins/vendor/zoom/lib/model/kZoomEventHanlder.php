@@ -62,7 +62,7 @@ class kZoomEventHanlder
 				$zoomRecordingProcessor->handleRecordingVideoComplete($event);
 				break;
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
-				$transcriptProcessor = new kZoomTranscriptProcessor();
+				$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL]);
 				$transcriptProcessor->handleRecordingTranscriptComplete($event);
 				break;
 		}

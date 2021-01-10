@@ -8,8 +8,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 {
 	const ADMIN_TAG_ZOOM = 'zoomentry';
 
-	protected $zoomClient;
-
 	/**
 	 * @var ZoomVendorIntegration
 	 */
@@ -26,9 +24,9 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	public function __construct($zoomBaseUrl)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl);
 		$this->mainEntry = null;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
+		parent::__construct($zoomBaseUrl);
 	}
 
 	/**
@@ -227,7 +225,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected function getAdditionalUsers($recordingId, $userToExclude)
 	{
-		if ($this->zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
+		if ($this->zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE || $this->zoomIntegration->getUserMatching() == kZoomUsersMatching::CMS_MATCHING)
 		{
 			return null;
 		}
