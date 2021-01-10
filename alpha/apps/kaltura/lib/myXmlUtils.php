@@ -13,15 +13,12 @@ class myXmlUtils
 		if(strpos($fileType, 'html') !== false || strpos($fileType, 'xml') !== false)
 		{
 			$xmlContent = kFile::getFileContent($filePath);
-			if($xmlContent)
+			$dom = new KDOMDocument();
+			$dom->loadXML($xmlContent);
+			$element = $dom->getElementsByTagName('script')->item(0);
+			if($element)
 			{
-				$dom = new KDOMDocument();
-				$dom->loadXML($xmlContent);
-				$element = $dom->getElementsByTagName('script')->item(0);
-				if($element)
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 

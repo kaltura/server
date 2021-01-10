@@ -29,7 +29,7 @@ class BulkService extends KalturaBaseService
 		if(get_class($bulkUploadData) == 'KalturaBulkUploadJobData')
 			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, 'KalturaBulkUploadJobData');
 
-		$validContent = myXmlUtils::validateXmlFileContent($fileData["tmp_name"]);
+		$validContent = myXmlUtils::validateXmlFileContent($fileData['tmp_name']);
 		if(!$validContent)
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
