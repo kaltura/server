@@ -9,15 +9,17 @@ class KAsyncConcat extends KJobHandlerWorker
 {
 	const LiveChunkDuration = 900000;	// msec (15*60*1000);
 	const MaxChunkDelta 	= 150;		// msec
+
 	/**
 	 * @var string
 	 */
 	protected $localTempPath;
-	
+
 	/**
 	 * @var string
 	 */
 	protected $sharedTempPath;
+
 	/**
 	 * (non-PHPdoc)
 	 * @see KBatchBase::getJobType()
