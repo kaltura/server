@@ -2143,7 +2143,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($syncKey)
 		{
 			$filePath = kAssetUtils::getLocalImagePath($syncKey);
-			$validContent = myThumbUtils::validateImageContent($filePath);
+			$validContent = myXmlUtils::validateXmlFileContent($filePath);
 			if(!$validContent)
 			{
 				throw new Exception ("content contains potential security risks");
