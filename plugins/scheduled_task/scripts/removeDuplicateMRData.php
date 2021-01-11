@@ -58,11 +58,6 @@ function getClient($serviceUrl, $adminKs)
 	return $client;
 }
 
-function getMrIdAndSubTaskIndexFromProfile($profile)
-{
-	return explode(',', $profile->objectFilter->advancedSearch->items[0]->items[1]->value);
-}
-
 /**
  * @param $client
  * @param KalturaScheduledTaskProfile $profile
@@ -73,62 +68,65 @@ function getMrIdAndSubTaskIndexFromProfile($profile)
 function updateEntries($client, $profile, $dryRunMode, $maxEntries, &$entriesHandledCount)
 {
 	$metadataPlugin = KalturaMetadataClientPlugin::get($client);
-	$updatedDay = getUpdatedDay($profile);
-
 	$entryList = $client->baseEntry->listAction($profile->objectFilter);
 	$entries = $entryList->objects;
 	$metadataProfileId = $profile->objectFilter->advancedSearch->items[0]->metadataProfileId;
 	foreach ($entries as $entry)
 	{
+		$entriesHandledCount++;
 		$metadata = getMetadataOnObject($metadataPlugin, $entry->id, $metadataProfileId);
 		$xml_string = ($metadata && $metadata->xml) ? $metadata->xml : null;
-		if($xml_string)
+		if ($xml_string)
 		{
 			$xml = simplexml_load_string($xml_string);
 			$mrpData = $xml->xpath('/metadata/MRPData');
-			$newUpdatedDay = $updatedDay + 1;
-			$mrpFilterArr = getMrIdAndSubTaskIndexFromProfile($profile);
-			$mrId = $mrpFilterArr[0];
-			$subTaskIndex = $mrpFilterArr[1];
-			$newXmlVal = "$mrId,$subTaskIndex,$newUpdatedDay";
+			$mrpsOnEntry = $xml->xpath('/metadata/MRPsOnEntry');
 			$dataRows = count($mrpData);
+			if ($dataRows != count($mrpsOnEntry))
+			{
+				kalturaLog::err("{$entry->id} have bugged MR data");
+				return;
+			}
+
+			$uniqueMrpsOnEntry = array();
+			$newXml = new SimpleXMLElement("<metadata/>");
+			$newXml->addChild('Status', 'Enabled');
+			$shouldUpdate = false;
 			for ($i = 0; $i < $dataRows; $i++)
 			{
-				if (kString::beginsWith($mrpData[$i], $mrId . ','))
+				$mrpsOnEntryString = $mrpsOnEntry[$i][0]->__toString();
+				if (isset($uniqueMrpsOnEntry[$mrpsOnEntryString]))
 				{
-					$MRPData = explode(',', $mrpData[$i][0]);
-					if(count($MRPData) != 3)
+					$shouldUpdate = true;
+				}
+				else
+				{
+					$uniqueMrpsOnEntry[$mrpsOnEntryString] = true;
+					$newXml->addChild('MRPsOnEntry', $mrpsOnEntryString);
+					$newXml->addChild('MRPData', $mrpData[$i][0]->__toString());
+				}
+			}
+
+			if ($shouldUpdate)
+			{
+				$newXmlString = $newXml->asXML();
+				kalturaLog::info("{$entry->id} needs MR updated");
+				kalturaLog::info("old data {$xml_string}");
+				kalturaLog::info("new data {$newXmlString}");
+				if ($dryRunMode)
+				{
+					kalturaLog::info("DRY RUN Updated {$entry->id} MRP");
+				}
+				else
+				{
+					$result = $metadataPlugin->metadata->update($metadata->id, $newXmlString);
+					if ($result)
 					{
-						KalturaLog::err("Illegal MRP data for {$entry->id} {$mrpData[$i][0]}");
-						continue;
+						kalturaLog::info("Updated {$entry->id} MRP");
 					}
-
-					$day = $MRPData[2];
-					if($day < $updatedDay)
+					else
 					{
-						$dateToExecute = $day * 86400;
-						$dt = new DateTime("@$dateToExecute");
-						$dayInDateFormat = $dt->format('Y-m-d H:i:s');
-						kalturaLog::info("{$entry->id} date was suppose to be {$updatedDay} aka {$dayInDateFormat}");
-						if($dryRunMode)
-						{
-							kalturaLog::info("DRY RUN Updated {$entry->id} MRP");
-						}
-						else
-						{
-							$mrpData[$i][0] = $newXmlVal;
-							$result = $metadataPlugin->metadata->update($metadata->id, $xml->asXML());
-							if($result)
-							{
-								kalturaLog::info("Updated {$entry->id} MRP");
-							}
-							else
-							{
-								kalturaLog::err("Failed to update {$entry->id} MRP");
-							}
-						}
-
-						$entriesHandledCount++;
+						kalturaLog::err("Failed to update {$entry->id} MRP");
 					}
 				}
 			}
@@ -142,16 +140,6 @@ function updateEntries($client, $profile, $dryRunMode, $maxEntries, &$entriesHan
 	}
 }
 
-/**
- * @param KalturaScheduledTaskProfile $profile
- * @return int
- */
-function getUpdatedDay($profile)
-{
-	$now = intval(time() / 86400);  // as num of sec in day to get day number
-	return $now - $profile->description;
-}
-
 function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 {
 	$client = getClient($serviceUrl, $adminKs);
@@ -161,7 +149,7 @@ function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 	foreach($profiles as $profile)
 	{
 		/** @var KalturaScheduledTaskProfile $profile */
-		kalturaLog::info("working on profile {$profile->name} id {$profile->id} with wait days {$profile->description}");
+		kalturaLog::info("working on profile {$profile->name} id {$profile->id}");
 		updateEntries($client, $profile, $dryRunMode, $maxEntries, $entriesHandledCount);
 		if($entriesHandledCount >= $maxEntries)
 		{
@@ -187,4 +175,4 @@ if(isset($argv[4]))
 	$maxEntries = $argv[4];
 }
 $entriesHandledCount = main($serviceUrl, $adminKs, $dryRunMode, $maxEntries);
-kalturaLog::info("Reset old MR script finished and updated {$entriesHandledCount} entries");
+kalturaLog::info("Remove duplicate old MR script finished and updated {$entriesHandledCount} entries");
