@@ -15,22 +15,23 @@ class kKalturaUrlTokenizer extends kUrlTokenizer
 		$file = substr($url, $lastSlashPosition + 1);
 		$ending = '/' . $file;
 
-		if(preg_match('#/fileName/([^/]+)/#', $pathToSign, $matches, PREG_OFFSET_CAPTURE))
+		if(preg_match('#/fileName/([^/]+)#', $pathToSign, $matches, PREG_OFFSET_CAPTURE))
 		{
 			$fileNamePart = $matches[0][0];
 			$pathToSign = str_replace($fileNamePart, '/', $pathToSign);
-			$ending = $fileNamePart  . ltrim($ending, '/');
+			$ending = $fileNamePart  . $ending;
 		}
 
-		if(preg_match('#/dirFileName/([^/]+)/#', $pathToSign, $matches, PREG_OFFSET_CAPTURE))
+		if(preg_match('#/dirFileName/([^/]+)#', $pathToSign, $matches, PREG_OFFSET_CAPTURE))
 		{
 			$fileNamePart = $matches[0][0];
 			$pathToSign = str_replace($fileNamePart, '/', $pathToSign);
-			$ending = $fileNamePart . ltrim($ending, '/');
+			$ending = $fileNamePart . $ending;
 		}
 
 		$expiry = kApiCache::getTime() + $this->getWindow();
 		$pathToSign .= '/exp/' . $expiry;
+		$pathToSign = str_replace(array('///', '//'), array('/', '/'), $pathToSign);
 
 		$signature = kDeliveryUtils::urlsafeB64Encode(hash_hmac('sha256', $pathToSign, $this->key, true));
 		return $pathToSign . '/sig/' . $signature . $ending;
