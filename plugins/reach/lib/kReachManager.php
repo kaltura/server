@@ -326,12 +326,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
-		
+
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::READY
 		)
+		{
+			$this->addLabelAddition($object);
 			return $this->invalidateAccessKey($object);
+		}
 
 		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
@@ -401,7 +404,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		return true;
 	}
-	
+
 	protected function checkPendingEntryTasks($object)
 	{
 		//Check if there are any tasks that were created with pending entry ready status
@@ -434,7 +437,57 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
 	}
-	
+
+	protected function getLabelAdditionByType(ReachProfile $reachProfile, $serviceType)
+	{
+		switch ($serviceType)
+		{
+			case VendorServiceType::HUMAN:
+				return $reachProfile->getLabelAdditionForHumanServiceType();
+
+			case VendorServiceType::MACHINE:
+				return $reachProfile->getLabelAdditionForMachineServiceType();
+		}
+		return null;
+	}
+
+	protected function addLabelAddition(EntryVendorTask $entryVendorTask)
+	{
+		do
+		{
+			$captionAssetId = $entryVendorTask->getOutputObjectId();
+			if(!$captionAssetId)
+			{
+				break;
+			}
+
+			$reachProfile = $entryVendorTask->getReachProfile();
+			if(!$reachProfile)
+			{
+				break;
+			}
+
+			$labelAddition = $this->getLabelAdditionByType($reachProfile, $entryVendorTask->getServiceType());
+			if(empty($labelAddition))
+			{
+				break;
+			}
+
+			$dbCaptionAsset = assetPeer::retrieveById($captionAssetId);
+			if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
+			{
+				break;
+			}
+
+			$newLabel = "{$dbCaptionAsset->getLabel()} ($labelAddition)";
+			KalturaLog::debug("New label [{$newLabel}] for CaptionAsset ID [{$captionAssetId}]");
+
+			$dbCaptionAsset->setLabel($newLabel);
+			$dbCaptionAsset->save();
+
+		}while(0);
+	}
+
 	private function invalidateAccessKey(EntryVendorTask $entryVendorTask)
 	{
 		$ksString = $entryVendorTask->getAccessKey();
