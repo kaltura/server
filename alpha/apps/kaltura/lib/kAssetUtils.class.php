@@ -69,17 +69,21 @@ class kAssetUtils
 	}
 	
 
-	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null, $urlManager = null, $explicitFileExt = null)
+	public static function getAssetUrl(asset $asset, $servePlayManifest = false , $playManifestClientTag = null , $storageId = null, $urlParameters = '', $cdnUrl = null, $urlManager = null, $explicitFileExt = null, $ignoreExternal = false)
 	{
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if(!$partner)
 			return null;
 	
 		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $servePlayManifest, $playManifestClientTag, $storageId);
-		if($externalStorageUrl)
-			return $externalStorageUrl;
-			
+		if(!$ignoreExternal)
+		{
+			$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $servePlayManifest, $playManifestClientTag, $storageId);
+			if($externalStorageUrl)
+				return $externalStorageUrl;
+
+		}
+
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 
@@ -296,7 +300,7 @@ class kAssetUtils
 			$fileName = kString::stripInvalidUrlChars($fileName);
 			$fileName = rawurlencode($fileName);
 		}
-		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
+		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir, true);
 		KalturaLog::log ("URL to redirect to [$url]" );
 		return $url;
 	}

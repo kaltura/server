@@ -217,7 +217,7 @@ class flavorAsset extends exportableAsset
 		return $this->getBitrate();
 	}
 	
-	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null, $isDir = false)
+	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null, $isDir = false, $ignoreExternal = false)
 	{
 		$entry = $this->getentry();
 
@@ -259,7 +259,7 @@ class flavorAsset extends exportableAsset
 		if ($previewLength)
 			$urlParameters .= "/clipTo/$previewLength";
 
-		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager, $explicitFileExt);
+		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager, $explicitFileExt, $ignoreExternal);
 		
 		return $url;
 	}
