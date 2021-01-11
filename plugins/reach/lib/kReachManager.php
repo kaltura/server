@@ -238,6 +238,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
+		if ($object instanceof flavorAsset
+			&& in_array(assetPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == asset::ASSET_STATUS_READY
+			&& myEntryUtils::isEntryReady($object->getEntryId()))
+		{
+			return true;
+		}
+
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
@@ -348,6 +356,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					return $this->abortTasks($object);
 				}
 			}
+		}
+
+		if ($object instanceof flavorAsset)
+		{
+			return $this->handleEntryReady($object->getentry());
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -517,9 +530,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		if(!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
+		if (!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
+			return true;
+		}
+
+		if (!kReachUtils::areFlavorsReady($entry, $reachProfile))
+		{
+			KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
 			return true;
 		}
 
