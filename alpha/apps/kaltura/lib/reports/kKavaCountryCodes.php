@@ -506,7 +506,11 @@ class kKavaCountryCodes
 		'Zambia' => 'ZM',
 		'Zimbabwe' => 'ZW',
 	);
-	
+
+	public static $longNameMap = array(
+		'Taiwan, Province of China' => 'Taiwan',
+	);
+
 	public static function toShortName($name)
 	{
 		return self::$longToShort[$name];
@@ -515,5 +519,10 @@ class kKavaCountryCodes
 	public static function toLongName($name)
 	{
 		return self::$shortToLong[$name];
+	}
+
+	public static function toLongMappingName($name)
+	{
+		return isset(self::$longNameMap[$name]) ? self::$longNameMap[$name] : $name;
 	}
 }

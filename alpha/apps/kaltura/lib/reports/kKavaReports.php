@@ -1168,7 +1168,12 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_INPUT =>  array('country','region','city'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
 					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-				)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 			self::REPORT_COLUMN_MAP => array(
 				'count_plays' => self::EVENT_TYPE_PLAY,
@@ -1233,7 +1238,12 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
 					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-				)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 			self::REPORT_COLUMN_MAP => array(
 				'count_plays' => self::EVENT_TYPE_PLAY,
@@ -1256,9 +1266,16 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::METRIC_UNIQUE_VIEWERS, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 			self::REPORT_COLUMN_MAP => array(
 				'count_plays' => self::EVENT_TYPE_PLAY,
