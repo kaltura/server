@@ -249,11 +249,17 @@ class flavorAsset extends exportableAsset
 		
 		//adding a serveFlavor download parameter
 		$urlParameters = "/fileName/$fileName";
+		$explicitFileExt = null;
+		if($isDir)
+		{
+			$urlParameters .= "/dirFileName/$fileName";
+			$explicitFileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+		}
 
 		if ($previewLength)
 			$urlParameters .= "/clipTo/$previewLength";
 
-		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager);
+		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager, $explicitFileExt);
 		
 		return $url;
 	}
