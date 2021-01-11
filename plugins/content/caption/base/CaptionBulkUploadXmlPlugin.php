@@ -105,6 +105,11 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 						<xs:documentation>Specifies that content file location is a URL (http,ftp)</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element ref="sshUrlContentResource" minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Specifies that the content file location is a URL (scp/sftp)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 				<xs:element ref="remoteStorageContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>Specifies that content file location is a path within a Kaltura defined remote storage</xs:documentation>
