@@ -881,7 +881,7 @@ class playManifestAction extends kalturaAction
 			$cdnHost = $this->cdnHost;
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
-			$isLive = !$this->isSimuliveFlow();
+			$isLive = $this->isSimuliveFlow() ? false : $this->entry->getType() === entryType::LIVE_STREAM;
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
 					$this->deliveryAttributes, $cdnHostOnly, true, $isLive);
 		}
