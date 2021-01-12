@@ -10,9 +10,15 @@ class KalturaDeliveryProfileVodPackagerPlayServer extends KalturaDeliveryProfile
 	 */
 	public $adStitchingEnabled;
 
+	/**
+	 * @var bool
+	 */
+	public $simuliveSupport;
+
 	private static $map_between_objects = array
 	(
 		'adStitchingEnabled',
+		'simuliveSupport'
 	);
 
 	public function getMapBetweenObjects ( )

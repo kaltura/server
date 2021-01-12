@@ -12,7 +12,11 @@ class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_D
 			'label'			=> 'Enable ad stitching:',
 		));
 
-		return array('adStitchingEnabled');
+		$this->addElement('checkbox', 'simuliveSupport', array(
+			'label'			=> 'Simulive support:',
+		));
+
+		return array('adStitchingEnabled', 'simuliveSupport');
 	}
 
 }

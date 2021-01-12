@@ -179,9 +179,10 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes - constraints on delivery such as media protocol, flv support, etc..
 	 * @param string $cdnHost - The requesting CdnHost if known / preffered.
 	 * @param boolean $checkSecured whether we should prefer secured delivery profiles.
+	 * @param boolean $isLive whether the entry is live (simulive does not considered as live)
 	 * @return DeliveryProfile
 	 */
-	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $checkSecured = true)
+	public static function getLocalDeliveryByPartner($entryId, $streamerType = PlaybackProtocol::HTTP, DeliveryProfileDynamicAttributes $deliveryAttributes, $cdnHost = null, $checkSecured = true, $isLive = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
@@ -199,7 +200,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 		}
 
 		$isSecured = $checkSecured ? self::isSecured($partner, $entry) : false;
-		$isLive = $entry->getType() == entryType::LIVE_STREAM;
+		$isLive = is_null($isLive) ? $entry->getType() == entryType::LIVE_STREAM : $isLive;
 
 		$delivery = self::getDeliveryByPartner($entry, $partner, $streamerType, $deliveryAttributes, $cdnHost, $isSecured, $isLive);
 		if($delivery)

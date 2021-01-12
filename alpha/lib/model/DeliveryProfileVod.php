@@ -568,5 +568,25 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$this->params->setUsePlayServer($this->getAdStitchingEnabled());
 		}
 	}
+
+	/**
+	 * returns whether the delivery profile supports the passed deliveryAttributes such as mediaProtocol, flv support, etc..
+	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
+	 */
+	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
+	{
+		$result = parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
+		if ($result == self::DYNAMIC_ATTRIBUTES_NO_SUPPORT)
+		{
+			return $result;
+		}
+		/* @var $entry Baseentry */
+		$entry = $deliveryAttributes->getEntry();
+		if ($entry->getType() === entryType::LIVE_STREAM && !$this->getSimuliveSupport())
+		{
+			return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+		}
+		return $result;
+	}
 }
 
