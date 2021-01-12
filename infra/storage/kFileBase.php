@@ -732,7 +732,7 @@ class kFileBase
 		if (self::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
-			return $kSharedFsMgr->shouldPollFileExists($path);
+			return $kSharedFsMgr->shouldPollFileExists();
 		}
 		
 		return true;

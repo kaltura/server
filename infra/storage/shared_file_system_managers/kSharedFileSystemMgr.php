@@ -542,7 +542,7 @@ abstract class kSharedFileSystemMgr
 	}
 	
 	
-	public function shouldPollFileExists($filePath)
+	public function shouldPollFileExists()
 	{
 		return $this->doShouldPollFileExists();
 	}

@@ -24,7 +24,7 @@ class kFileUtils extends kFile
 			
 			clearstatcache();
 			KalturaMonitorClient::sleep(3);
-		}ß
+		}
 	}
 	
 	public static function xSendFileAllowed($file_name)
