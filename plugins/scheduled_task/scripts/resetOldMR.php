@@ -74,23 +74,32 @@ function getMrIdAndSubTaskIndexFromProfile($profile)
 function processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEntries, &$entriesHandledCount)
 {
 	$updatedDay = getUpdatedDay($profile);
-	$entryList = $client->baseEntry->listAction($profile->objectFilter);
-	$entries = $entryList->objects;
 	$metadataProfileId = $profile->objectFilter->advancedSearch->items[0]->metadataProfileId;
 	$newUpdatedDay = $updatedDay + 1;
 	$mrpFilterArr = getMrIdAndSubTaskIndexFromProfile($profile);
 	$mrId = $mrpFilterArr[0];
 	$subTaskIndex = $mrpFilterArr[1];
 	$newXmlVal = "$mrId,$subTaskIndex,$newUpdatedDay";
-	foreach ($entries as $entry)
+	$pager = new KalturaFilterPager();
+	$pager->pageIndex = 1;
+	$pager->pageSize = 500;
+	do
 	{
-		handleEntry($metadataPlugin, $entry, $metadataProfileId, $updatedDay, $mrId, $newXmlVal, $dryRunMode, $entriesHandledCount);
-		if($entriesHandledCount >= $maxEntries)
+		$result = $client->baseEntry->listAction($profile->objectFilter, $pager);
+		$resultCount = count($result->objects);
+		kalturaLog::info("Found $resultCount entries for pageIndex {$pager->pageIndex}");
+		$entries = $result->objects;
+		foreach ($entries as $entry)
 		{
-			kalturaLog::info("Reached max entries limit, {$entriesHandledCount} were handled");
-			return;
+			handleEntry($metadataPlugin, $entry, $metadataProfileId, $updatedDay, $mrId, $newXmlVal, $dryRunMode, $entriesHandledCount);
+			if ($entriesHandledCount >= $maxEntries)
+			{
+				kalturaLog::info("Reached max entries limit, {$entriesHandledCount} were handled");
+				return;
+			}
 		}
 	}
+	while($resultCount == $pager->pageSize);
 }
 
 function handleEntry($metadataPlugin, $entry, $metadataProfileId, $updatedDay, $mrId, $newXmlVal, $dryRunMode, &$entriesHandledCount)

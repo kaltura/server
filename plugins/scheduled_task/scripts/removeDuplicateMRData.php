@@ -74,6 +74,8 @@ function processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEnt
 	do
 	{
 		$result = $client->baseEntry->listAction($profile->objectFilter, $pager);
+		$resultCount = count($result->objects);
+		kalturaLog::info("Found $resultCount entries for pageIndex {$pager->pageIndex}");
 		$entries = $result->objects;
 		$metadataProfileId = $profile->objectFilter->advancedSearch->items[0]->metadataProfileId;
 		foreach ($entries as $entry)
@@ -88,7 +90,7 @@ function processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEnt
 
 		$pager->pageIndex++;
 	}
-	while(count($result->objects) == $pager->pageSize);
+	while($resultCount == $pager->pageSize);
 }
 
 function handleEntry($entry, $metadataPlugin, $metadataProfileId, $dryRunMode)
