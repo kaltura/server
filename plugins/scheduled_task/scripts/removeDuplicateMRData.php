@@ -60,89 +60,104 @@ function getClient($serviceUrl, $adminKs)
 
 /**
  * @param $client
+ * @param $metadataPlugin
  * @param KalturaScheduledTaskProfile $profile
  * @param bool $dryRunMode
  * @param int $maxEntries
  * @param int $entriesHandledCount
  */
-function updateEntries($client, $profile, $dryRunMode, $maxEntries, &$entriesHandledCount)
+function processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEntries, &$entriesHandledCount)
 {
-	$metadataPlugin = KalturaMetadataClientPlugin::get($client);
-	$entryList = $client->baseEntry->listAction($profile->objectFilter);
-	$entries = $entryList->objects;
-	$metadataProfileId = $profile->objectFilter->advancedSearch->items[0]->metadataProfileId;
-	foreach ($entries as $entry)
+	$pager = new KalturaFilterPager();
+	$pager->pageIndex = 1;
+	$pager->pageSize = 500;
+	do
 	{
-		$entriesHandledCount++;
-		$metadata = getMetadataOnObject($metadataPlugin, $entry->id, $metadataProfileId);
-		$xml_string = ($metadata && $metadata->xml) ? $metadata->xml : null;
-		if ($xml_string)
+		$result = $client->baseEntry->listAction($profile->objectFilter, $pager);
+		$entries = $result->objects;
+		$metadataProfileId = $profile->objectFilter->advancedSearch->items[0]->metadataProfileId;
+		foreach ($entries as $entry)
 		{
-			$xml = simplexml_load_string($xml_string);
-			$mrpData = $xml->xpath('/metadata/MRPData');
-			$mrpsOnEntry = $xml->xpath('/metadata/MRPsOnEntry');
-			$dataRows = count($mrpData);
-			if ($dataRows != count($mrpsOnEntry))
+			$entriesHandledCount += handleEntry($entry, $metadataPlugin, $metadataProfileId, $dryRunMode);
+			if ($entriesHandledCount >= $maxEntries)
 			{
-				kalturaLog::err("{$entry->id} have bugged MR data");
+				kalturaLog::info("Reached max entries limit, {$entriesHandledCount} were handled");
 				return;
 			}
+		}
 
-			$uniqueMrpsOnEntry = array();
-			$newXml = new SimpleXMLElement("<metadata/>");
-			$newXml->addChild('Status', 'Enabled');
-			$shouldUpdate = false;
-			for ($i = 0; $i < $dataRows; $i++)
+		$pager->pageIndex++;
+	}
+	while(count($result->objects) == $pager->pageSize);
+}
+
+function handleEntry($entry, $metadataPlugin, $metadataProfileId, $dryRunMode)
+{
+	$shouldUpdate = 0;
+	$metadata = getMetadataOnObject($metadataPlugin, $entry->id, $metadataProfileId);
+	$xml_string = ($metadata && $metadata->xml) ? $metadata->xml : null;
+	if ($xml_string)
+	{
+		$xml = simplexml_load_string($xml_string);
+		$mrpData = $xml->xpath('/metadata/MRPData');
+		$mrpsOnEntry = $xml->xpath('/metadata/MRPsOnEntry');
+		$dataRows = count($mrpData);
+		if ($dataRows != count($mrpsOnEntry))
+		{
+			kalturaLog::err("{$entry->id} have bugged MR data");
+			return 0;
+		}
+
+		$uniqueMrpsOnEntry = array();
+		$newXml = new SimpleXMLElement("<metadata/>");
+		$newXml->addChild('Status', 'Enabled');
+		for ($i = 0; $i < $dataRows; $i++)
+		{
+			$mrpsOnEntryString = $mrpsOnEntry[$i][0]->__toString();
+			if (isset($uniqueMrpsOnEntry[$mrpsOnEntryString]))
 			{
-				$mrpsOnEntryString = $mrpsOnEntry[$i][0]->__toString();
-				if (isset($uniqueMrpsOnEntry[$mrpsOnEntryString]))
-				{
-					$shouldUpdate = true;
-				}
-				else
-				{
-					$uniqueMrpsOnEntry[$mrpsOnEntryString] = true;
-					$newXml->addChild('MRPsOnEntry', $mrpsOnEntryString);
-					$newXml->addChild('MRPData', $mrpData[$i][0]->__toString());
-				}
+				$shouldUpdate = 1;
 			}
-
-			if ($shouldUpdate)
+			else
 			{
-				$newXmlString = $newXml->asXML();
-				kalturaLog::info("{$entry->id} needs MR updated");
-				kalturaLog::info("old data {$xml_string}");
-				kalturaLog::info("new data {$newXmlString}");
-				if ($dryRunMode)
-				{
-					kalturaLog::info("DRY RUN Updated {$entry->id} MRP");
-				}
-				else
-				{
-					$result = $metadataPlugin->metadata->update($metadata->id, $newXmlString);
-					if ($result)
-					{
-						kalturaLog::info("Updated {$entry->id} MRP");
-					}
-					else
-					{
-						kalturaLog::err("Failed to update {$entry->id} MRP");
-					}
-				}
+				$uniqueMrpsOnEntry[$mrpsOnEntryString] = true;
+				$newXml->addChild('MRPsOnEntry', $mrpsOnEntryString);
+				$newXml->addChild('MRPData', $mrpData[$i][0]->__toString());
 			}
 		}
 
-		if($entriesHandledCount >= $maxEntries)
+		if ($shouldUpdate)
 		{
-			kalturaLog::info("Reached max entries limit, {$entriesHandledCount} were handled");
-			return;
+			$newXmlString = $newXml->asXML();
+			kalturaLog::info("{$entry->id} needs MR updated");
+			kalturaLog::info("old data {$xml_string}");
+			kalturaLog::info("new data {$newXmlString}");
+			if ($dryRunMode)
+			{
+				kalturaLog::info("DRY RUN Updated {$entry->id} MRP");
+			}
+			else
+			{
+				$result = $metadataPlugin->metadata->update($metadata->id, $newXmlString);
+				if ($result)
+				{
+					kalturaLog::info("Updated {$entry->id} MRP");
+				}
+				else
+				{
+					kalturaLog::err("Failed to update {$entry->id} MRP");
+				}
+			}
 		}
 	}
+
+	return $shouldUpdate;
 }
 
 function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 {
 	$client = getClient($serviceUrl, $adminKs);
+	$metadataPlugin = KalturaMetadataClientPlugin::get($client);
 	$entriesHandledCount = 0;
 	$scheduledTaskProfiles = getMRProfiles($client);
 	$profiles = filterProfiles($scheduledTaskProfiles);
@@ -150,7 +165,7 @@ function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 	{
 		/** @var KalturaScheduledTaskProfile $profile */
 		kalturaLog::info("working on profile {$profile->name} id {$profile->id}");
-		updateEntries($client, $profile, $dryRunMode, $maxEntries, $entriesHandledCount);
+		processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEntries, $entriesHandledCount);
 		if($entriesHandledCount >= $maxEntries)
 		{
 			return;
