@@ -3,22 +3,16 @@
  * @package api
  * @subpackage objects
  */
-class KalturaDeliveryProfileVodPackagerPlayServer extends KalturaDeliveryProfile
+class KalturaDeliveryProfileVodPackagerPlayServer extends KalturaDeliveryProfileVod
 {
 	/**
 	 * @var bool
 	 */
 	public $adStitchingEnabled;
 
-	/**
-	 * @var bool
-	 */
-	public $simuliveSupport;
-
 	private static $map_between_objects = array
 	(
-		'adStitchingEnabled',
-		'simuliveSupport'
+		'adStitchingEnabled'
 	);
 
 	public function getMapBetweenObjects ( )

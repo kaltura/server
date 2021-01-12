@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_DeliveryProfileConfiguration
+class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_DeliveryProfileVod
 {
 
 	public function getAdvancedSettings()
@@ -12,11 +12,7 @@ class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_D
 			'label'			=> 'Enable ad stitching:',
 		));
 
-		$this->addElement('checkbox', 'simuliveSupport', array(
-			'label'			=> 'Simulive support:',
-		));
-
-		return array('adStitchingEnabled', 'simuliveSupport');
+		return array_merge(parent::getAdvancedSettings(), array('adStitchingEnabled'));
 	}
 
 }
