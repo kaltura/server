@@ -726,4 +726,15 @@ class kFileBase
 		
 		return false;
 	}
+	
+	public static function shouldPollFileExists($path)
+	{
+		if (self::isSharedPath($path))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $kSharedFsMgr->shouldPollFileExists($path);
+		}
+		
+		return true;
+	}
 }

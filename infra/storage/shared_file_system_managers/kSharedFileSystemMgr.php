@@ -345,6 +345,11 @@ abstract class kSharedFileSystemMgr
 	/**
 	 * @return bool
 	 */
+	abstract protected function doShouldPollFileExists();
+	
+	/**
+	 * @return bool
+	 */
 	abstract protected function doCopySharedToSharedAllowed();
 	
 	
@@ -536,6 +541,11 @@ abstract class kSharedFileSystemMgr
 		return $this->doMimeType($filePath);
 	}
 	
+	
+	public function shouldPollFileExists($filePath)
+	{
+		return $this->doShouldPollFileExists();
+	}
 	/**
 	 * copies local src to shared destination.
 	 * Doesn't support non-flat directories!

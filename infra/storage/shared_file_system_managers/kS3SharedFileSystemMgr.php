@@ -921,4 +921,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return false;
 	}
 	
+	protected function doShouldPollFileExists()
+	{
+		return false;
+	}
 }

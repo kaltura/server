@@ -12,22 +12,19 @@ class kFileUtils extends kFile
 	public static function pollFileExists($file_name)
 	{
 		$nfs_file_tries = 0;
-		while(! kFile::checkFileExists($file_name))
+		while(!kFile::checkFileExists($file_name))
 		{
-			//			clearstatcache(true,$file_name);
-			clearstatcache();
 			$nfs_file_tries ++;
-			if($nfs_file_tries > 3) // if after 9 seconds file did not appear in NFS - probably not found...
+			// if after 9 seconds file did not appear in nfs OR file is stored in shared which is not nfs based - probably not found...
+			if($nfs_file_tries > 3 || !kFile::shouldPollFileExists($file_name))
 			{
-				break;
-					
 				// when breaking, kFile will try to dump, if file not exist - will die...
+				break;
 			}
-			else
-			{
-				KalturaMonitorClient::sleep(3);
-			}
-		}
+			
+			clearstatcache();
+			KalturaMonitorClient::sleep(3);
+		}ß
 	}
 	
 	public static function xSendFileAllowed($file_name)
