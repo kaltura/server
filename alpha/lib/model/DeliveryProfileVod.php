@@ -575,18 +575,13 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	 */
 	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes)
 	{
-		$result = parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
-		if ($result == self::DYNAMIC_ATTRIBUTES_NO_SUPPORT)
-		{
-			return $result;
-		}
 		/* @var $entry Baseentry */
 		$entry = $deliveryAttributes->getEntry();
 		if ($entry->getType() === entryType::LIVE_STREAM && !$this->getSimuliveSupport())
 		{
 			return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 		}
-		return $result;
+		return parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
 	}
 }
 

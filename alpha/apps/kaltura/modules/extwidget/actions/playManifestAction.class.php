@@ -640,8 +640,7 @@ class playManifestAction extends kalturaAction
 			$liveFlavorAssets = $this->retrieveAssets();
 			if (!$liveFlavorAssets)
 			{
-				KalturaLog::info('simulive entry does not contain flavor assets');
-				return;
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			}
 			// take the first flavor assets (as it will be ignored anyway)
 			$this->deliveryAttributes->setFlavorAssets(array(array_shift($liveFlavorAssets)));
@@ -881,7 +880,7 @@ class playManifestAction extends kalturaAction
 			$cdnHost = $this->cdnHost;
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
-			$isLive = $this->isSimuliveFlow() ? false : $this->entry->getType() === entryType::LIVE_STREAM;
+			$isLive = $this->isSimuliveFlow() ? false : null;
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
 					$this->deliveryAttributes, $cdnHostOnly, true, $isLive);
 		}
@@ -1317,7 +1316,7 @@ class playManifestAction extends kalturaAction
 		
 		$this->servedEntryType = $this->entry->getType();
 		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime()))
+		if ($event)
 		{
 			$this->initEventData($event);
 		}
@@ -1545,9 +1544,10 @@ class playManifestAction extends kalturaAction
 			$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
 		}
 		$sourceEntry = kSimuliveUtils::getSourceEntry($event);
-		if ($sourceEntry)
+		if (!$sourceEntry)
 		{
-			$this->servedEntryType = $sourceEntry->getType();
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
+		$this->servedEntryType = $sourceEntry->getType();
 	}
 }
