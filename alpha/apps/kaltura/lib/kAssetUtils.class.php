@@ -76,10 +76,13 @@ class kAssetUtils
 			return null;
 	
 		$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $servePlayManifest, $playManifestClientTag, $storageId);
-		if($externalStorageUrl)
-			return $externalStorageUrl;
-			
+		if(!$urlManager)
+		{
+			$externalStorageUrl = self::getExternalStorageUrl($partner, $asset, $syncKey, $servePlayManifest, $playManifestClientTag, $storageId);
+			if($externalStorageUrl)
+				return $externalStorageUrl;
+		}
+
 		if($partner->getStorageServePriority() == StorageProfile::STORAGE_SERVE_PRIORITY_EXTERNAL_ONLY)
 			return null;
 
