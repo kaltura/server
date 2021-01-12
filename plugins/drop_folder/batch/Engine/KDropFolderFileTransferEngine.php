@@ -255,7 +255,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	public static function getFileTransferManager(KalturaDropFolder $dropFolder)
 	{
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
-	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
+		if($dropFolder instanceof KalturaS3DropFolder)
+		{
+			$engineOptions['s3Region'] = $dropFolder->s3Region;
+		}
+		$fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
 	    
 	    $host =null; $username=null; $password=null; $port=null;
 	    $privateKey = null; $publicKey = null;
@@ -273,6 +277,12 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	    	$publicKey = $dropFolder->publicKey;
 	    	$passPhrase = $dropFolder->passPhrase;  	    	
 	    }
+	    if($dropFolder instanceof KalturaS3DropFolder)
+		{
+			$host = $dropFolder->s3Host;
+			$username = $dropFolder->s3UserId;
+			$password = $dropFolder->s3Password;
+		}
 
         // login to server
         if ($privateKey || $publicKey) 
@@ -305,6 +315,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				return kFileTransferMgrType::SCP;
 			case KalturaDropFolderType::SFTP:
 				return kFileTransferMgrType::SFTP;
+			case kalturaDropFolderType::S3DROPFOLDER:
 			case KalturaDropFolderType::S3:
 				return kFileTransferMgrType::S3;
 			default:

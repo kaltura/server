@@ -399,7 +399,9 @@ class s3Mgr extends kFileTransferMgr
 			{
 				$dirList[] = array (
 					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
-					"fileSize" => $dirListObject['Size']
+					"fileSize" => $dirListObject['Size'],
+					'modificationTime' => $dirListObject['LastModified'],
+					'name' => $dirListObject['Key']
 				);
 			}
 		}
@@ -413,12 +415,92 @@ class s3Mgr extends kFileTransferMgr
 
 	protected function doListFileObjects ($remoteDir)
 	{
-		return false;
+		$Files =  $this->doList ($remoteDir);
+		$fileObjectsResult = array ();
+
+		foreach($Files as $file)
+		{
+			$fileObject = new FileObject();
+			$fileObject->filename = self::removeFolderNameFromFileName($file['name'], $remoteDir);
+			$fileObject->fileSize = $file['fileSize'];
+			$fileObject->modificationTime = strtotime($file['modificationTime']);
+			$fileObjectsResult[] = $fileObject;
+		}
+		return $fileObjectsResult;
 	}
 
-	protected function doFileSize($remote_file)
+	/*
+	 * This function will remove the folders from $fileName which appear on the remoteDir,
+	 * in order to prevent duplication when joining them together to a full path.
+	 * full path = $remoteDir.'/'.$fileName
+	 * for example:
+	 * $remoteDir = '/BucketName/Dir1'
+	 * $fileName = 'Dir1/File1'
+	 * The output will be $fileName = File1 and fullPath -> /bucketName/Dir1.'/'.File1
+	 */
+	protected static function removeFolderNameFromFileName($fileName, $remoteDir)
 	{
-		return false;
+		$lastDirPos = strrpos($fileName, '/');
+		if ($lastDirPos)
+		{
+			$dirsFileName = substr($fileName, 0 , $lastDirPos);
+			$sameDir = strpos($remoteDir, $dirsFileName);
+			if ($sameDir)
+			{
+				$fileName = substr($fileName, $lastDirPos + 1);
+			}
+		}
+		return $fileName;
+	}
+
+	public function initBasicS3Params($filePath)
+	{
+		list($bucket, $filePath) = explode("/",ltrim($filePath,"/"),2);
+
+		$params = array(
+			'Bucket' => $bucket,
+			'Key'    => $filePath,
+		);
+		return $params;
+	}
+
+	protected function s3Call($command, $params = null, $filePath = null)
+	{
+		if(!$params && $filePath)
+		{
+			$params = $this->initBasicS3Params($filePath);
+		}
+
+		try
+		{
+			$result = $this->s3->{$command}($params);
+			return $result;
+		}
+		catch (S3Exception $e)
+		{
+			KalturaLog::debug($e->getMessage());
+			return false;
+		}
+	}
+
+	protected function doFileSize($remoteFile)
+	{
+		$result = $this->s3Call('headObject', null, $remoteFile);
+		if(!$result)
+		{
+			return false;
+		}
+		return $result->get('ContentLength');
+	}
+
+	protected function doModificationTime($remoteFile)
+	{
+		$result = $this->s3Call('headObject', null, $remoteFile);
+		if(!$result)
+		{
+			return false;
+		}
+		return strtotime($result->get('LastModified'));
 	}
 
 	// execute the given command on the server
