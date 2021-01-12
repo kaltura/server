@@ -98,6 +98,8 @@ function processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEnt
 				return;
 			}
 		}
+
+		$pager->pageIndex++;
 	}
 	while($resultCount == $pager->pageSize);
 }
@@ -128,7 +130,7 @@ function handleEntry($metadataPlugin, $entry, $metadataProfileId, $updatedDay, $
 					$dateToExecute = $day * 86400;
 					$dt = new DateTime("@$dateToExecute");
 					$dayInDateFormat = $dt->format('Y-m-d H:i:s');
-					kalturaLog::info("{$entry->id} date was suppose to be {$updatedDay} aka {$dayInDateFormat}");
+					kalturaLog::info("{$entry->id} date was suppose to be equal/higher then {$updatedDay} and it is {$day} aka {$dayInDateFormat}");
 					if($dryRunMode)
 					{
 						kalturaLog::info("DRY RUN Updated {$entry->id} MRP");
@@ -178,7 +180,7 @@ function main($serviceUrl, $adminKs, $dryRunMode, $maxEntries)
 		processEntries($client, $metadataPlugin, $profile, $dryRunMode, $maxEntries, $entriesHandledCount);
 		if($entriesHandledCount >= $maxEntries)
 		{
-			return;
+			return $entriesHandledCount;
 		}
 	}
 
