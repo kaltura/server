@@ -308,7 +308,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 			case KalturaDropFolderType::SCP:
 			    $obj = new KalturaScpDropFolder();
 				break;
-
+			    
 			default:
 				$obj = KalturaPluginManager::loadObject('KalturaDropFolder', $type);
 				break;

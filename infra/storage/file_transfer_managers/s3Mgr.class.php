@@ -415,10 +415,10 @@ class s3Mgr extends kFileTransferMgr
 
 	protected function doListFileObjects ($remoteDir)
 	{
-		$Files =  $this->doList ($remoteDir);
+		$files =  $this->doList ($remoteDir);
 		$fileObjectsResult = array ();
 
-		foreach($Files as $file)
+		foreach($files as $file)
 		{
 			$fileObject = new FileObject();
 			$fileObject->filename = self::removeFolderNameFromFileName($file['name'], $remoteDir);
@@ -436,7 +436,7 @@ class s3Mgr extends kFileTransferMgr
 	 * for example:
 	 * $remoteDir = '/BucketName/Dir1'
 	 * $fileName = 'Dir1/File1'
-	 * The output will be $fileName = File1 and fullPath -> /bucketName/Dir1.'/'.File1
+	 * The output will be $fileName = 'File1' and fullPath -> /BucketName/Dir1.'/'.File1
 	 */
 	protected static function removeFolderNameFromFileName($fileName, $remoteDir)
 	{
