@@ -130,7 +130,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFileLocalPath()))
+		if(!kFile::checkFileExists($data->getDestFileLocalPath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
 		// get entry
@@ -222,15 +222,33 @@ class kFlowHelper
 		}
 		$flavorAsset->save();
 		
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
+		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
+		{
+			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+			if(!$storageProfile)
+			{
+				KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
+				throw new Exception ( "Shared storage [$partnerSharedStorageProfileId] Not found");
+			}
+			
+			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+		}
+		else
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			
+			// set the path in the job data
+			$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			$data->setDestFileLocalPath($localFilePath);
+			$dbBatchJob->setData($data);
+		}
 
-
-		// set the path in the job data
-		$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		$data->setDestFileLocalPath($localFilePath);
+		
 		$data->setFlavorAssetId($flavorAsset->getId());
-		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
 		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);

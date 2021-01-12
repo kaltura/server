@@ -1030,9 +1030,37 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-
-
-
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$importToShared = kConf::get('enable_import_to_shared', 'runtime_config', null);
+		$excludePartnersImportToShared = kConf::get('exclude_partners_import_to_shared', 'runtime_config', array());
+		if($importToShared && $partner->getSharedStorageProfileId() && !in_array($partnerId, $excludePartnersImportToShared))
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			
+			$sharedPath = null;
+			if($asset)
+			{
+				list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
+			}
+			elseif($entry)
+			{
+				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
+				$path = myContentStorage::getPathFromId($entry->getId()) . DIRECTORY_SEPARATOR . $entry->getId() . '_import';
+			}
+			else
+			{
+				//Not able to create any unique dir path based on asset or entry id so we will create random dir location
+				$randomId = kString::generateStringId();
+				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
+				$path = myContentStorage::getPathFromId($randomId) . DIRECTORY_SEPARATOR . $randomId . '_import';
+			}
+			
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+			$jobData->setDestFileSharedPath($sharedPath);
+		}
+		
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
