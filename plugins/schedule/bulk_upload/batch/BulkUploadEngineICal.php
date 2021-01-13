@@ -241,7 +241,7 @@ class BulkUploadEngineICal extends KBulkUploadEngine
 	 */
 	public function handleBulkUpload()
 	{
-		$calendar = kSchedulingICal::parse(file_get_contents($this->data->filePath), $this->data->eventsType);
+		$calendar = kSchedulingICal::parse(kFile::getFileContent($this->data->filePath), $this->data->eventsType);
 		$this->items = $calendar->getComponents();
 		
 		$this->createUploadResults();

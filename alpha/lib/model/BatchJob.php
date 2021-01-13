@@ -390,12 +390,14 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		if($externalPath)
 		{
 			$path = '/batchfiles/';
+			$path .= myContentStorage::getScatteredPathFromIntId($this->getId()) . '/' . $this->generateFileName($sub_type, $version);
 		}
 		else
 		{
 			$path = '/content/batchfiles/';
+			$path .= $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
 		}
-		$path .= $this->getPartnerId() . '/' . $this->generateFileName($sub_type, $version);
+
 
 		return array(myContentStorage::getFSContentRootPath(), $path); 
 	}
