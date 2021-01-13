@@ -474,7 +474,16 @@ class KAsyncConvert extends KJobHandlerWorker
 		else
 		{
 			$tempClearPath = self::createTempClearFile($filePath, $key);
-			$this->validateFileType($tempClearPath);
+			try
+			{
+				$this->validateFileType($tempClearPath);
+			}
+			catch (KOperationEngineException $e)
+			{
+				KalturaLog::debug("deleting not allowed file $tempClearPath");
+				kFile::unlink($tempClearPath);
+				throw $e;
+			}
 			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
 			kFile::unlink($tempClearPath);
 		}
