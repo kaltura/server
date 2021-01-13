@@ -457,6 +457,15 @@ class serveFlavorAction extends kalturaAction
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
+
+		$dirFileName = $this->getRequestParameter( "dirFileName" );
+		$file_name = $this->getRequestParameter( "file_name" ); // backward compatibility for download action
+		if($file_name)
+		{
+			$dirFileName = $file_name;
+		}
+		$dirFileName =  basename($dirFileName);
+
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
@@ -500,7 +509,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), true, $dirFileName);
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -936,6 +945,7 @@ class serveFlavorAction extends kalturaAction
 				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 			}
 			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
+			$sequence['id'] = $asset->getId();
 			if ($asset->getLanguage())
 			{
 				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);

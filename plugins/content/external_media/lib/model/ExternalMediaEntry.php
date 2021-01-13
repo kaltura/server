@@ -84,4 +84,18 @@ class ExternalMediaEntry extends entry
 		return array_merge(parent::getObjectParams($params), $body);
 	}
 
+	public function isEntryTypeSupportedForReach()
+	{
+		if (in_array($this->getType(), $this->getAllowedMediaTypesArray()))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	protected function getAllowedMediaTypesArray()
+	{
+		return ExternalMediaPlugin::getExtendedTypes(entry::class, entryType::MEDIA_CLIP);
+	}
+
 }
