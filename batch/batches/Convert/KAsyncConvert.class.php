@@ -476,7 +476,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			{
 				if(!is_dir($filePath))
 				{
-					$this->handleNotAllowedFile($filePath);
+					$this->handleInvalidFile($filePath);
 				}
 				throw $e;
 			}
@@ -491,7 +491,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 			catch (KOperationEngineException $e)
 			{
-				$this->handleNotAllowedFile($filePath);
+				$this->handleInvalidFile($filePath);
 				kFile::unlink($tempClearPath);
 				throw $e;
 			}
@@ -501,11 +501,11 @@ class KAsyncConvert extends KJobHandlerWorker
 		return $res;
 	}
 
-	protected function handleNotAllowedFile($filePath)
+	protected function handleInvalidFile($filePath)
 	{
 		if (isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
 		{
-			KalturaLog::debug("Deleting not allowed file $filePath");
+			KalturaLog::debug("Deleting invalid file $filePath");
 			kfile::unlink($filePath);
 		}
 	}
