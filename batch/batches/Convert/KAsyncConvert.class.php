@@ -506,7 +506,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		if (isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
 		{
 			KalturaLog::debug("Deleting invalid file $filePath");
-			kfile::unlink($filePath);
+			kFile::unlink($filePath);
 		}
 	}
 	/**
