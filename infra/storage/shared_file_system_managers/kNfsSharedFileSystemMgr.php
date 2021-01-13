@@ -347,4 +347,9 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return true;
 	}
 	
+	protected function doShouldPollFileExists()
+	{
+		return true;
+	}
+	
 }
