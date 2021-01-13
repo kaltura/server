@@ -468,7 +468,18 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->operationEngine->setEncryptionKey($key);
 		if (!$key || is_dir($filePath))
 		{
-			$this->validateFileType($filePath);
+			try
+			{
+				$this->validateFileType($filePath);
+			}
+			catch (KOperationEngineException $e)
+			{
+				if(!is_dir($filePath))
+				{
+					$this->handleNotAllowedFile($filePath);
+				}
+				throw $e;
+			}
 			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
 		}
 		else
@@ -480,6 +491,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 			catch (KOperationEngineException $e)
 			{
+				$this->handleNotAllowedFile($filePath);
 				kFile::unlink($tempClearPath);
 				throw $e;
 			}
@@ -489,6 +501,14 @@ class KAsyncConvert extends KJobHandlerWorker
 		return $res;
 	}
 
+	protected function handleNotAllowedFile($filePath)
+	{
+		if (isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
+		{
+			KalturaLog::debug("Deleting not allowed file $filePath");
+			kfile::unlink($filePath);
+		}
+	}
 	/**
 	 * @param $filePath
 	 * @throws KOperationEngineException
@@ -503,11 +523,6 @@ class KAsyncConvert extends KJobHandlerWorker
 			$fileTypesBlackListArr = explode(',', $fileTypesBlackList);
 			if (in_array($fileType, $fileTypesBlackListArr))
 			{
-				if(isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
-				{
-					KalturaLog::debug("Deleting not allowed file $filePath");
-					kfile::unlink($filePath);
-				}
 				throw new KOperationEngineException("File type $fileType not allowed  ");
 			}
 		}
@@ -641,6 +656,4 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 		}
 	}
-
-
 }
