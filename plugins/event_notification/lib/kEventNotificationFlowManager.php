@@ -105,6 +105,11 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		return false;
 	}
 
+	public static function resetNotificationTemplates()
+	{
+		self::$allNotificationTemplates = null;
+	}
+
 	/**
 	 * @param int $eventType
 	 * @param string $eventObjectClassName core class name

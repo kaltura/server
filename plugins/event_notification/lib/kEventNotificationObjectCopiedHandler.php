@@ -50,6 +50,8 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
 		$systemNameCriteria->add(EventNotificationTemplatePeer::STATUS, EventNotificationTemplateStatus::ACTIVE);
 		
  		$eventNotificationTemplates = EventNotificationTemplatePeer::doSelect($c);
+
+		$copiedEventNotificationTemplate = false;
  		foreach($eventNotificationTemplates as $eventNotificationTemplate)
  		{
  			/* @var $eventNotificationTemplate EventNotificationTemplate */
@@ -71,7 +73,14 @@ class kEventNotificationObjectCopiedHandler implements kObjectCopiedEventConsume
  			$newEventNotificationTemplate = $eventNotificationTemplate->copy();
  			$newEventNotificationTemplate->setPartnerId($toPartnerId);
  			$newEventNotificationTemplate->save();
+ 			$copiedEventNotificationTemplate = true;
  		}
+
+		if($copiedEventNotificationTemplate)
+		{
+			KalturaLog::info("Copied event-notification templates to partner [$toPartnerId]. Calling reset");
+			kEventNotificationFlowManager::resetNotificationTemplates();
+		}
 	}
 	
 	protected function partnerPermissionEnabled(Partner $partner)
