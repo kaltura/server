@@ -468,19 +468,47 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->operationEngine->setEncryptionKey($key);
 		if (!$key || is_dir($filePath))
 		{
-			$this->validateFileType($filePath);
+			try
+			{
+				$this->validateFileType($filePath);
+			}
+			catch (KOperationEngineException $e)
+			{
+				if(!is_dir($filePath))
+				{
+					$this->handleInvalidFile($filePath);
+				}
+				throw $e;
+			}
 			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
 		}
 		else
 		{
 			$tempClearPath = self::createTempClearFile($filePath, $key);
-			$this->validateFileType($tempClearPath);
+			try
+			{
+				$this->validateFileType($tempClearPath);
+			}
+			catch (KOperationEngineException $e)
+			{
+				$this->handleInvalidFile($filePath);
+				kFile::unlink($tempClearPath);
+				throw $e;
+			}
 			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
 			kFile::unlink($tempClearPath);
 		}
 		return $res;
 	}
 
+	protected function handleInvalidFile($filePath)
+	{
+		if (isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
+		{
+			KalturaLog::debug("Deleting invalid file $filePath");
+			kFile::unlink($filePath);
+		}
+	}
 	/**
 	 * @param $filePath
 	 * @throws KOperationEngineException
