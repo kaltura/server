@@ -480,7 +480,6 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 			catch (KOperationEngineException $e)
 			{
-				KalturaLog::debug("deleting not allowed file $tempClearPath");
 				kFile::unlink($tempClearPath);
 				throw $e;
 			}
@@ -504,6 +503,11 @@ class KAsyncConvert extends KJobHandlerWorker
 			$fileTypesBlackListArr = explode(',', $fileTypesBlackList);
 			if (in_array($fileType, $fileTypesBlackListArr))
 			{
+				if(isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
+				{
+					KalturaLog::debug("Deleting not allowed file $filePath");
+					kfile::unlink($filePath);
+				}
 				throw new KOperationEngineException("File type $fileType not allowed  ");
 			}
 		}
@@ -637,4 +641,6 @@ class KAsyncConvert extends KJobHandlerWorker
 			}
 		}
 	}
+
+
 }
