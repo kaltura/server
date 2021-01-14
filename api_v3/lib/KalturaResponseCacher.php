@@ -376,7 +376,15 @@ class KalturaResponseCacher extends kApiCache
 		}
 	}
 
-
+	private static function getEnforceHttpsApi($secrets)
+	{
+		$enforceHttpsApi = false;
+		if(count($secrets) > 3)
+		{
+			$enforceHttpsApi = $secrets[3];
+		}
+		return $enforceHttpsApi;
+	}
 
 	private static function handleSessionStart(&$params)
 	{
@@ -412,9 +420,9 @@ class KalturaResponseCacher extends kApiCache
 		{
 			return;			// can't find the secrets of the partner in the cache
 		}
-		list($adminSecrets, $userSecret, $ksVersion, $enforceHttpsApi) = $secrets;
+		list($adminSecrets, $userSecret, $ksVersion) = $secrets;
 
-		if ($enforceHttpsApi && infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS)
+		if (self::getEnforceHttpsApi($secrets) && infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS)
 		{
 			return;
 		}
