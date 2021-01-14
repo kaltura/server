@@ -70,9 +70,10 @@ $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
 DbManager::initialize();
 
-$limit = 1000;
-$gap = 500;
-$maxIndexHistory = 2000; //The maximum array size to save unique object ids update and their elastic log id
+$limit = kConf::get('populateLimit','elasticDynamicMap',1000);
+$gap = kConf::get('populateGap','elasticDynamicMap',500);
+$maxIndexHistory = kConf::get('populateMaxIndexHistory','elasticDynamicMap',2000);
+$partnerIgnoreList =  kConf::get('populatePartnerIgnoreList','elasticDynamicMap',array());
 
 $sphinxLogReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
@@ -142,6 +143,10 @@ while (true)
 	foreach ($elasticLogs as $elasticLog)
 	{
 		/* @var $elasticLog SphinxLog */
+		if( in_array($elasticLog->getPartnerId(),$partnerIgnoreList))
+		{
+			continue;
+		}
 		$dc = $elasticLog->getDc();
 		$executedServerId = $elasticLog->getExecutedServerId();
 		$elasticLogId = $elasticLog->getId();
