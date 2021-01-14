@@ -723,7 +723,7 @@ class MediaService extends KalturaEntryService
      */
     function getMrssAction($entryId, KalturaExtendingItemMrssParameterArray $extendingItemsArray = null, $features = null)
     {
-        $dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
+        $dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		$mrssParams = new kMrssParameters();
