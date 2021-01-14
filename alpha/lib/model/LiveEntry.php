@@ -610,11 +610,6 @@ abstract class LiveEntry extends entry
 
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
-		{
-			return EntryServerNodeStatus::PLAYABLE;
-		}
-
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
 
@@ -732,7 +727,8 @@ abstract class LiveEntry extends entry
 		if (!$mediaServerNode)
 			throw new kCoreException("Media server with host name [$hostname] not found", kCoreException::MEDIA_SERVER_NOT_FOUND);
 
-		$dbLiveEntryServerNode = $this->getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, $mediaServerNode, $applicationName);
+		$esnLockKey = 'getLiveEntryServerNode_' . $this->getId() . "_$mediaServerIndex";
+		$dbLiveEntryServerNode = kLock::runLocked($esnLockKey, array($this, 'getLiveEntryServerNode'), array($hostname, $mediaServerIndex, $liveEntryStatus, $mediaServerNode, $applicationName));
 		
 		if($liveEntryStatus === EntryServerNodeStatus::PLAYABLE)
 		{
@@ -749,7 +745,7 @@ abstract class LiveEntry extends entry
 		return $dbLiveEntryServerNode;
 	}
 	
-	private function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, MediaServerNode $serverNode, $applicationName = null)
+	public function getLiveEntryServerNode($hostname, $mediaServerIndex, $liveEntryStatus, MediaServerNode $serverNode, $applicationName = null)
 	{
 		$serverNodeId = $serverNode->getId();
 		$shouldSave = false;
@@ -835,6 +831,7 @@ abstract class LiveEntry extends entry
 			}
 		}
 	}
+
 
 	public function setLiveStatus($v, $mediaServerIndex)
 	{

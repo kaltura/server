@@ -384,12 +384,6 @@ class LiveStreamService extends KalturaLiveEntryService
 			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
 
 		/* @var $liveStreamEntry LiveStreamEntry */
-	
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
 
 		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
 		if ($isLive !== null)
@@ -601,12 +595,6 @@ class LiveStreamService extends KalturaLiveEntryService
 		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
 
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
-
 		$res = new KalturaLiveStreamDetails();
 		$isLive = $liveStreamEntry->isCurrentlyLive();
 		$res->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
@@ -665,10 +653,6 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 		}
 
-		if (kSimuliveUtils::getPlayableSimuliveEvent($liveStreamEntry))
-		{
-			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
-		}
 		return $res;
 	}
 
