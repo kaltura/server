@@ -297,6 +297,12 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 	 */
 	public $bitsDepth;
 	
+	/**
+	 * @var int
+	 * @requiresPermission read
+	 */
+	public $speechDetected;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -341,6 +347,7 @@ class KalturaMediaInfo extends KalturaObject implements IFilterable
 		"colorSpace",
 		"chromaSubsampling",
 		"bitsDepth",
+		"speechDetected"
 	);
 	
 	public function getMapBetweenObjects ( )

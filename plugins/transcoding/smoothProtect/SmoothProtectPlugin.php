@@ -95,9 +95,11 @@ class SmoothProtectPlugin extends KalturaPlugin implements IKalturaObjectLoader,
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
-	public static function contributeToConvertJobData ($jobType, $jobSubType, kConvertJobData $jobData)
+	public static function contributeToJobData ($jobType, $jobSubType, kJobData $jobData)
 	{
-		if($jobType == BatchJobType::CONVERT && $jobSubType == self::getApiValue(SmoothProtectConversionEngineType::SMOOTHPROTECT))
+		if($jobType == BatchJobType::CONVERT
+			&& $jobSubType == self::getApiValue(SmoothProtectConversionEngineType::SMOOTHPROTECT)
+			&& $jobData instanceof kConvertJobData)
 			return IsmIndexPlugin::addIsmManifestsToSrcFileSyncDesc($jobData);
 		else 
 			return $jobData;

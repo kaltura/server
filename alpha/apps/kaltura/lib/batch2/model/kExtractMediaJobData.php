@@ -31,6 +31,11 @@ class kExtractMediaJobData extends kConvartableJobData
 	public $detectGOP;
 	
 	/**
+	 * @var bool
+	 */
+	public $detectSpeech;
+	
+	/**
 	 * @return the $flavorAssetId
 	 */
 	public function getFlavorAssetId()
@@ -92,6 +97,22 @@ class kExtractMediaJobData extends kConvartableJobData
 	public function setDestDataFilePath($destDataFilePath)
 	{
 		$this->destDataFilePath = $destDataFilePath;
+	}
+	
+	/**
+	 * @return the $detectSpeech
+	 */
+	public function getDetectSpeech()
+	{
+		return $this->detectSpeech;
+	}
+	
+	/**
+	 * @param $detectSpeech the $detectSpeech to set
+	 */
+	public function setDetectSpeech($detectSpeech)
+	{
+		$this->detectSpeech = $detectSpeech;
 	}
 
 		/*

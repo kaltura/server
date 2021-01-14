@@ -4,7 +4,7 @@
  * Enable time based cue point objects management on entry objects
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaBatchJobDataContributor
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -328,6 +328,27 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$data .= " " . self::CATALOG_ITEM_INDEX_SUFFIX . $partnerId;
 		
 		return $data;
+	}
+	
+	public static function contributeToJobData ($jobType, $jobSubType, kJobData $jobData)
+	{
+		if($jobType == BatchJobType::EXTRACT_MEDIA &&
+			$jobData instanceof kExtractMediaJobData
+		)
+			return self::setShouldDetectSilentAudio($jobData);
+		else
+			return $jobData;
+	}
+	
+	private static function setShouldDetectSilentAudio(kExtractMediaJobData $extractMediaJobData)
+	{
+		$reachProfileForPartner = ReachProfilePeer::retrieveByPartnerId(kCurrentContext::getCurrentPartnerId());
+		$detectSpeech = false;
+		if(count($reachProfileForPartner))
+			$detectSpeech = true;
+		
+		$extractMediaJobData->setDetectSpeech($detectSpeech);
+		return $extractMediaJobData;
 	}
 	
 }

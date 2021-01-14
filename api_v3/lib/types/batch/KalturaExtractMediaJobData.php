@@ -30,6 +30,11 @@ class KalturaExtractMediaJobData extends KalturaConvartableJobData
 	 * @var int
 	 */
 	public $detectGOP;
+	
+	/**
+	 * @var bool
+	 */
+	public $detectSpeech;
 
 	private static $map_between_objects = array
 	(
@@ -38,6 +43,7 @@ class KalturaExtractMediaJobData extends KalturaConvartableJobData
 		"extractId3Tags",
 		"destDataFilePath",
 		"detectGOP",
+		"detectSpeech"
 	);
 
 	public function getMapBetweenObjects ( )

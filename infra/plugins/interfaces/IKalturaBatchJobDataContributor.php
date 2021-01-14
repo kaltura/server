@@ -8,8 +8,8 @@ interface IKalturaBatchJobDataContributor extends IKalturaBase
 {
 	/**
 	 * Contribute to convert job data 
-	 * @param kConvertJobData $jobData
-	 * @returns kConvertJobData
+	 * @param kJobData $jobData
+	 * @returns kJobData
 	 */ 
-	public static function contributeToConvertJobData ($jobType, $jobSubType, kConvertJobData $jobData);
+	public static function contributeToJobData ($jobType, $jobSubType, kJobData $jobData);
 }
