@@ -279,18 +279,22 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	 */
 	public function generateFilePathArr($sub_type, $version = null, $externalPath = false )
 	{
-		// TODO - implement field version
 		self::validateFileSyncSubType ( $sub_type );
 		$suffix = $this->getSuffixBySubType($sub_type);
 		$incVersion = false;
 		if($sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA)
 			$incVersion = true;
-			
-		$res = $this->getConfFilePathImpl( $suffix , $incVersion , $version);
-		
-		$file_root = myContentStorage::getFSContentRootPath( );
-		$file_path = str_replace ( myContentStorage::getFSContentRootPath( ) , "" , $res );
-		return array ( $file_root , $file_path )	;
+
+		$file_path = $this->getConfFilePathImpl( $suffix , $incVersion , $version, $externalPath);
+		if($externalPath)
+		{
+			$file_path = str_replace ( myCloudUtils::getPartnerSharedStoargeBaseDir($this->getPartnerId()) , "" , $file_path);
+		}
+		else
+		{
+			$file_path = str_replace ( myContentStorage::getFSContentRootPath( ) , "" , $file_path);
+		}
+		return array(myContentStorage::getFSContentRootPath(), $file_path);
 	}
 
 
@@ -317,7 +321,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	private static function validateFileSyncSubType ( $sub_type )
 	{
 		if ( !in_array($sub_type, self::$validSubTypes))
-			throw new FileSyncException ( FileSyncObjectType::UICONF ,$sub_type , $validSubTypes );
+			throw new FileSyncException ( FileSyncObjectType::UICONF ,$sub_type , self::$validSubTypes );
 	}
 
 	private function saveConfFileToDisk($v , $file_suffix = null , $isClone = false)
@@ -503,18 +507,14 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		return self::UI_CONF_CREATION_MODE_WIZARD;
 	}
 
-	// TODO - remove this function after Andromeda deployment is stable
-	public function internalGetParentConfFilePath()
-	{
-		return parent::getConfFilePath();
-	}
-
 	public function getConfFilePath( $file_suffix = null , $inc_version = false )
 	{
-		return $this->getConfFilePathImpl( $file_suffix ,$inc_version );
+		$storageProfile = kPathManager::getStorageProfileIdForObject(get_class($this), FileSyncObjectType::UICONF);
+		$isExternal = $storageProfile ? true : false;
+		return $this->getConfFilePathImpl($file_suffix, $inc_version, null, $isExternal);
 	}
 
-	private function getConfFilePathImpl( $file_suffix = null , $inc_version = false, $version = null )
+	private function getConfFilePathImpl( $file_suffix = null , $inc_version = false, $version = null, $externalPath = false )
 	{
 		$conf_file_path = parent::getConfFilePath();
 
@@ -525,13 +525,20 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 				if ( ! $this->getId() ) 
 					return null;
 
-				$conf_file_path = $this->createConfFilePath($version);
+				$conf_file_path = $this->createConfFilePath($version, $externalPath);
 				$this->setConfFilePath( $conf_file_path );
 			}
 		}
 
 		// will fix the current problem in the DB- we hold the root in the conf_file_path
-		$conf_file_path = myContentStorage::getFSContentRootPath( ).str_replace ( "/web/" , "" , $conf_file_path )  ;
+		if ($externalPath)
+		{
+			$conf_file_path = myCloudUtils::getPartnerSharedStoargeBaseDir($this->getPartnerId()).str_replace ( "/web/" , "" , $conf_file_path )  ;
+		}
+		else
+		{
+			$conf_file_path = myContentStorage::getFSContentRootPath() . str_replace("/web/", "", $conf_file_path);
+		}
 
 		if ( $file_suffix )
 		{
@@ -594,16 +601,20 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		}
 	}
 
-	private function createConfFilePath ($version = null)
+	private function createConfFilePath ($version = null, $externalPath = false)
 	{
-		if ( $this->getVersion() || $version)
+		if($this->getVersion() || $version)
 			$version = "_" . ($version ? $version : $this->getVersion());
 		else
 			$version = "";
-		
-		$dir = (intval($this->getId() / 1000000)).'/'.	(intval($this->getId() / 1000) % 1000);
-		$file_name = "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
-		return $file_name;
+
+		if($externalPath)
+		{
+			$dir = myContentStorage::getScatteredPathFromIntId($this->getId());
+			return "/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
+		}
+		$dir = (intval($this->getId() / 1000000)) . '/' . (intval($this->getId() / 1000) % 1000);
+		return "/content/generatedUiConf/$dir/ui_conf_{$this->getId()}_{$version}.xml";
 	}
 
 	// IMPORTANT : WILL NOT include the uiconf or generatedUiconf part of the path
