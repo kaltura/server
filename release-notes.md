@@ -1,3 +1,18 @@
+# Propus 16.16.0  #
+
+## Send http registration request to kaftestme when registering partner##
+- Issue Type: Task
+- Issue ID: PLAT-22547
+
+### Deployment scripts ###
+-Add kaftestme registration http request on partner creation:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET and PARTNER_ID) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_01_13_partner_Added_Kaftestme_Http_Notification.template
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
+
 # Propus 16.13.0  #
 
 ## Adjust Kaltura Capture transcoding profile ##
