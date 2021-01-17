@@ -347,6 +347,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$livePackagerUrl = str_replace("{m}", $hostname, $livePackagerUrl);
 		}
 		
+		if(strpos($livePackagerUrl, "{mn}") !== false)
+		{
+			$this->shouldRedirect = false;
+			
+			$hostname = $serverNode->getHostname();
+			if(!$serverNode->getIsExternalMediaServer())
+				$hostname = preg_replace('/\..*$/', '', $hostname);
+			
+			$livePackagerUrl = str_replace("{mn}", $hostname, $livePackagerUrl);
+		}
+		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
 		
 		if($this->getDynamicAttributes()->getServeVodFromLive())
