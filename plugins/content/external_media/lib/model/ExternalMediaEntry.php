@@ -95,7 +95,7 @@ class ExternalMediaEntry extends entry
 
 	protected function getAllowedMediaTypesArray()
 	{
-		return ExternalMediaPlugin::getExtendedTypes(entry::class, entryType::MEDIA_CLIP);
+		return ExternalMediaPlugin::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
 	}
 
 }
