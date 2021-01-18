@@ -108,7 +108,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function validate()
 	{
-		if(!file_exists($this->data->filePath))
+		if(!kFile::checkFileExists($this->data->filePath))
 		{
 			throw new KalturaBatchException("File doesn't exist [{$this->data->filePath}]", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND);
 		}
@@ -173,7 +173,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function xslTransform($filePath)
 	{
-		$xdoc = file_get_contents($filePath);
+		$xdoc = kFile::getFileContent($filePath);
 		if(is_null($xdoc) || is_null($this->conversionProfileXsl))
 			return $xdoc;
 		

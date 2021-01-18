@@ -1970,7 +1970,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
 			$dbEntry->save();
-			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
 	}
 

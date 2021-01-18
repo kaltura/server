@@ -13,6 +13,7 @@ class KalturaESearchErrors extends KalturaErrors
     const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'MISSING MANDATORY PARAMETERS IN ORDER ITEM;;missing mandatory parameters in order item';
     const MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED = 'MIXED SEARCH ITEMS IN NESTED OPERATOR NOT ALLOWED;;mixed search items in nested operator not allowed';
     const MISSING_OPERATOR_TYPE = 'MISSING OPERATOR TYPE;;missing operator type';
+    const CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED = 'CRITERIA EXCEEDED MAX MATCHES ALLOWED;;Unable to generate list. max matches value was reached';
 
     //Query parsing errors
     const UNMATCHING_BRACKETS = 'UNMATCHING BRACKETS;;Unmatching brackets';

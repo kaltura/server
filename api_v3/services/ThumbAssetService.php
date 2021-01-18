@@ -1072,7 +1072,7 @@ class ThumbAssetService extends KalturaAssetService
 		{
 			$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$dbThumbAsset->save();
-			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
 	}
 	

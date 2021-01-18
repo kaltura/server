@@ -97,16 +97,16 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		if($externalPath)
 		{
 			$path = '/distribution/profile/';
+			$dir = myContentStorage::getScatteredPathFromIntId($this->getId());
 		}
 		else
 		{
 			$path = '/content/distribution/profile/';
+			$dir = myContentStorage::getPathFromIntId($this->getId());
 		}
-		$dir = myContentStorage::getPathFromIntId($this->getId());
+
 		$path .= $dir . '/' . $this->generateFileName($sub_type, $version);
-
-
-		return array(myContentStorage::getFSContentRootPath(), $path); 
+		return array(myContentStorage::getFSContentRootPath(), $path);
 	}
 
 	/* (non-PHPdoc)

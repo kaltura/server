@@ -531,15 +531,25 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
-	 * @return boolean
+	 * @param bool $currentDcOnly
+	 * @param string $protocol
+	 * @return bool|null
 	 */
 	public function isCurrentlyLive($currentDcOnly = false, $protocol = null)
 	{
-		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		try
 		{
-			return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+			if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+			{
+				return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+			}
+			return $this->isExternalCurrentlyLive($protocol);
 		}
-		return $this->isExternalCurrentlyLive($protocol);
+		catch (Exception $e)
+		{
+			KalturaLog::debug('Got exception during checking if entry currently live: ' . $e->getMessage());
+			return null;
+		}
 	}
 
 	protected function isExternalCurrentlyLive($reqProtocol = null)
