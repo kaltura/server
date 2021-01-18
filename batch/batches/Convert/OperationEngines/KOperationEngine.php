@@ -161,7 +161,7 @@ abstract class KOperationEngine
 		try
 		{
 			$resolvedFilePath = kFile::realPath($filePath);
-			if(($filePath !== FALSE) && (kFile::checkFileExists($filePath)))
+			if(($resolvedFilePath !== FALSE) && (kFile::checkFileExists($filePath)))
 			{
 				$cmd = "ffprobe ";
 				kBatchUtils::addReconnectParams("http", $resolvedFilePath, $cmd);
