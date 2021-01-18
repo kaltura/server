@@ -48,13 +48,17 @@ class AttachmentAssetService extends KalturaAssetService
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
-			$actionName == 'get' ||
 			$actionName == 'list' ||
 			$actionName == 'getUrl'
 			)
 		{
 			$this->partnerGroup .= ',0';
 			return true;
+		}
+
+		if($actionName==='get')
+		{
+			$this->partnerGroup .= ',0';
 		}
 			
 		return parent::kalturaNetworkAllowed($actionName);

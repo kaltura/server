@@ -1,3 +1,48 @@
+# Propus-16.15.0  #
+
+## Version Highlight ##
+
+### New features ###
+	
+	- SUP-24887 : YouTube! Kaltura Distribution app is certified for authetication without warnings 
+	- PLAT-22514 : Zoom enhancement, link between cms_user_id and entry onwer upon new recording
+	- SUP-24551 : Support upload caption files using sshUrlContentResource 
+	- REACH2-990 : Ability to set label for caption by setting new properties on KalturaReachProfile
+		- labelAdditionForMachineServiceType  (to be set on Machine translated caption coming from this profile)
+		- labelAdditionForHumanServiceType    (to be set on Human translated coming from this profile)
+	- SUP-24759 : REACH Captions Dashboard - Filtering/Sorting/Report Indicating Target Language
+	- SUP-25144 : New exception is raised (CRITERIA EXCEEDED MAX MATCHES ALLOWED) when tring to access object index > 10000 in eSearch service
+
+### Bug fix ###
+
+	- PLAT-22564 : attachment_attachmentasset->get must be done with KS
+	- SUP-25087 : Clipping of old content is stuck	
+
+### SAAS related ###
+
+	- PLAT-11239 : Download of files via VOD packager  
+	- PLAT-10788 : Fix link https://kmc.kaltura.com/default
+	
+## Reach - update reach_vendor response profile ##
+- Issue Type: Task
+- Issue ID: REACH2-998
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+                - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2021_01_03_update_reach_vendor_response_profiles.template.xml
+
+Run deployment script:
+
+                - php /opt/kaltura/app/deployment/updates/scripts/2021_01_03_update_reach_vendor_response_profile.php
+
+
+
 # Propus 16.13.0  #
 
 ## Adjust Kaltura Capture transcoding profile ##

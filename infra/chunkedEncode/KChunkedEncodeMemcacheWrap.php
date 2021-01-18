@@ -421,7 +421,7 @@ ini_set("memory_limit","512M");
 		 * when large number of srvs attempt to fetch the same job. 
 		 * This situation occurred in AWS env, with high connect/'walk around' times to DC memcache srv
 		 */
-		public function FetchNextJob($fetchRangeRandMax=20)
+		public function FetchNextJob($fetchRangeRandMax=50)
 		{
 			$writeIndex = null;
 			$readIndex = null;
@@ -644,7 +644,7 @@ ini_set("memory_limit","512M");
 			if($job===false)
 				return false;
 			
-			KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
+			kBatchUtils::tryLoadKconfConfig();
 			
 			$job->startTime = time();
 			$job->process = getmypid();

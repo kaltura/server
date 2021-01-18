@@ -1181,6 +1181,11 @@ class myEntryUtils
 	{
 		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
 		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		if(is_null($preferredStorageId))
+		{
+			$preferredStorageId = $currentDcId;
+		}
+		
 		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
 		if (!$fileSync)
 		{
@@ -2138,7 +2143,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($syncKey)
 		{
 			$filePath = kAssetUtils::getLocalImagePath($syncKey);
-			$validContent = myThumbUtils::validateImageContent($filePath);
+			$validContent = myXmlUtils::validateXmlFileContent($filePath);
 			if(!$validContent)
 			{
 				throw new Exception ("content contains potential security risks");

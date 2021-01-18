@@ -93,7 +93,8 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		$response = self::curlPost($url, $xml, $innerType);
 		KalturaLog::info("Post XML Full response: " . print_r($response,true));
 
-		if ( $response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_OK )
+		if( ($response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_OK) ||
+			($response['http_code'] == KCurlHeaderResponse::HTTP_STATUS_NO_CONTENT) )
 		{
 			try
 			{

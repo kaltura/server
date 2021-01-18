@@ -524,17 +524,32 @@ abstract class LiveEntry extends entry
 		}
 		else
 		{
-			// for external entry we have only live or offline status
-			return $this->isExternalCurrentlyLive($protocol) ? EntryServerNodeStatus::PLAYABLE : EntryServerNodeStatus::STOPPED;
+			// for external entry we have only live or offline status - so we should call isExternalCurrentlyLive and assign status PLAYABLE or STOPPED
+			// but do this on each liveEntry populate is take long time so external live entry will always have status of STOPPED
+			return EntryServerNodeStatus::STOPPED;
 		}
 	}
 
 	/**
-	 * @return boolean
+	 * @param bool $currentDcOnly
+	 * @param string $protocol
+	 * @return bool|null
 	 */
 	public function isCurrentlyLive($currentDcOnly = false, $protocol = null)
 	{
-		return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+		try
+		{
+			if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+			{
+				return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+			}
+			return $this->isExternalCurrentlyLive($protocol);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::debug('Got exception during checking if entry currently live: ' . $e->getMessage());
+			return null;
+		}
 	}
 
 	protected function isExternalCurrentlyLive($reqProtocol = null)
@@ -544,13 +559,13 @@ abstract class LiveEntry extends entry
 		$protocols = array();
 		switch ($reqProtocol)
 		{
-			case KalturaPlaybackProtocol::HLS:
-			case KalturaPlaybackProtocol::APPLE_HTTP:
-				$protocols = array_unique(array($reqProtocol, KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP));
+			case PlaybackProtocol::HLS:
+			case PlaybackProtocol::APPLE_HTTP:
+				$protocols = array_unique(array($reqProtocol, PlaybackProtocol::HLS, PlaybackProtocol::APPLE_HTTP));
 				$takeFirst = true;
 				break;
-			case KalturaPlaybackProtocol::HDS:
-			case KalturaPlaybackProtocol::AKAMAI_HDS:
+			case PlaybackProtocol::HDS:
+			case PlaybackProtocol::AKAMAI_HDS:
 				$protocols = array($reqProtocol);
 				break;
 
@@ -992,7 +1007,7 @@ abstract class LiveEntry extends entry
 		{
 			$url = null;
 			$protocol = null;
-			foreach (array(KalturaPlaybackProtocol::HLS, KalturaPlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
+			foreach (array(PlaybackProtocol::HLS, PlaybackProtocol::APPLE_HTTP) as $hlsProtocol)
 			{
 				$config = $this->getLiveStreamConfigurationByProtocol($hlsProtocol, requestUtils::PROTOCOL_HTTP, null, true);
 				if ($config)

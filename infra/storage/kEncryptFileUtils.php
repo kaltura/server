@@ -72,9 +72,9 @@ class kEncryptFileUtils
         try
         {
             $tempPath =  self::getClearTempPath($srcFilePath);
-            $srcFilePath = kFile::realPath($srcFilePath);
+            $resolvedSrcFilePath = kFile::realPath($srcFilePath);
             
-            $fd1 = self::openFile($srcFilePath, "rb");
+            $fd1 = self::openFile($resolvedSrcFilePath, "rb");
             if ($fd1 === false)
             {
                 return false;

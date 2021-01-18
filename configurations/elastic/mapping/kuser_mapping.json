@@ -257,6 +257,9 @@
 				}
 			}
 		},
+		"picture": {
+			"enabled" : "false"
+		},
 		"role_ids" : {
 		  "type" : "keyword",
 		  "normalizer" : "kaltura_keyword_normalizer"

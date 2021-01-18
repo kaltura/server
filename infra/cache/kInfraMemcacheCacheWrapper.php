@@ -39,6 +39,12 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			return false;
 		}
 		
+		if (!isset($config['host']) || !isset($config['port']))
+		{
+			self::safeLog("Missing host or port in config, can't connect without it");
+			return false;
+		}
+
 		$this->hostName = $config['host'];
 		$this->port = $config['port'];
 		if (isset($config['flags']) && $config['flags'] == self::COMPRESSED)

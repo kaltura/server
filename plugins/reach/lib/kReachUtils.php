@@ -93,6 +93,25 @@ class kReachUtils
 		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
 
+	public static function areFlavorsReady(entry $entry, ReachProfile $reachProfile)
+	{
+		$reachProfileFlavorParamsIds = $reachProfile->getFlavorParamsIds();
+		if( is_null($reachProfileFlavorParamsIds) || ($reachProfileFlavorParamsIds === '') )
+		{
+			return true;
+		}
+
+		$flavorParamsIds = explode(',', $reachProfileFlavorParamsIds);
+		$readyFlavors = assetPeer::retrieveReadyFlavorsIdsByEntryId($entry->getId(), $flavorParamsIds);
+		if( count($flavorParamsIds) == count($readyFlavors) )
+		{
+			KalturaLog::log("All flavors with params IDs [{$reachProfileFlavorParamsIds}] are ready");
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * @param $entry
 	 * @param $catalogItem
