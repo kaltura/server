@@ -1,3 +1,17 @@
+# Propus-16.16.0  #
+
+## New drop folder type S3 ##
+- Issue Type: Task
+- Issue ID: PLAT-22575
+
+### Configuration ###
+
+Add S3DropFolder to your plugins.ini
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Propus-16.15.0  #
 
 ## Version Highlight ##
