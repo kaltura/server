@@ -160,10 +160,12 @@ abstract class KOperationEngine
 			
 		try
 		{
-			$mediaInfoFilePath = kFile::realPath($filePath);
-			if(($filePath !== FALSE) && (file_exists($filePath)))
+			$resolvedFilePath = kFile::realPath($filePath);
+			if(($filePath !== FALSE) && (kFile::checkFileExists($filePath)))
 			{
-				system("mediainfo \"$mediaInfoFilePath\" >> \"{$this->logFilePath}\" 2>&1");
+				$cmd = "ffprobe ";
+				kBatchUtils::addReconnectParams("http", $resolvedFilePath, $cmd);
+				system("$cmd -i \"$resolvedFilePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json >> \"{$this->logFilePath}\" 2>&1");
 			}
 			else
 			{
