@@ -625,8 +625,16 @@ ini_set("memory_limit","512M");
 			return true;
 		}
 		
-		/* ---------------------------
+		/**
+		 * This method executed one job fetched from the chunk encoding queue
+		 * Please note that changing this methods signature may require adjusting the regex in KillJobsCommand method
 		 *
+		 * @param $host
+		 * @param $port
+		 * @param $token
+		 * @param $jobIndex
+		 * @param string $tmpPromptFolder
+		 * @return bool
 		 */
 		public static function ExecuteJobCommand($host, $port, $token, $jobIndex, $tmpPromptFolder="/tmp")
 		{
@@ -737,12 +745,12 @@ ini_set("memory_limit","512M");
 					$rv=-1;
 				}
 			}
-
+			
 			$job->outFileSizes = $outFileSizes;
 			$storeManager->SaveJob($job);
 			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
-				// Move the PHP script log  from the local /tmp to the final storage
+			// Move the PHP script log  from the local /tmp to the final storage
 			if(isset($moveToFilenames)){
 				$tmpFilenameInfo = pathinfo($outFilenames[0]);
 				$movetToFilenameInfo = pathinfo($moveToFilenames[0]);
@@ -754,6 +762,60 @@ ini_set("memory_limit","512M");
 					kFile::moveFile($tmpFilename, $moveToName);
 			}
 			return ($rv==0? true: false);
+		}
+		
+		/**
+		 * This method will kill all running jobs on the machine and will re-queue it for another machine to handle.
+		 * Please note that if changing the ExecuteJobCommand method the running jobs regex may need to be adjusted accordingly
+		 */
+		public static function KillJobsCommand()
+		{
+			KalturaLog::log("Starting re-queue process for all active jobs");
+			$storeManager = $memcacheHost = $memcachePort =  $memcacheToken = null;
+			
+			//Command to fetch all the jobs that are currently running on the machine.
+			KalturaLog::log("Fetching all keys for running chunk jobs");
+			$runningJobs = explode("\n", shell_exec("ps -eo etimes,comm,args | grep [E]xecuteJobCommand"));
+			$runningJobs = array_map('trim',$runningJobs);
+			
+			//Kill all running PHP tasks, this will kill the child FFMPEG jobs as well.
+			KalturaLog::log("Killing all running jobs and re-adding them to the chunk convert queue: \n" . print_r($runningJobs, true));
+			shell_exec("pkill -9 -f ExecuteJobCommand");
+			
+			$re = '/ExecuteJobCommand\(\'(?P<memcache_host>.*?)\',\'(?P<memcache_port>.*)\',\'(?P<memcache_token>.*)\',(?<job_idx>.*),/m';
+			foreach($runningJobs as $runningJob)
+			{
+				if ($runningJob == "")
+				{
+					continue;
+				}
+				
+				preg_match_all($re, $runningJob, $matches);
+				if (!count($matches))
+				{
+					KalturaLog::log("No matches found for cmd [$runningJob]");
+					continue;
+				}
+				
+				if(!$memcacheHost || !$memcachePort || !$memcacheToken || !$storeManager)
+				{
+					$memcacheHost = $matches['memcache_host'][0];
+					$memcachePort = $matches['memcache_port'][0];
+					$memcacheToken = $matches ['memcache_token'][0];
+					if($memcacheHost && $memcachePort && $memcacheToken)
+					{
+						KalturaLog::log("host:$memcacheHost, port:$memcachePort, token:$memcacheToken");
+						$storeManager = new KChunkedEncodeMemcacheWrap($memcacheToken);
+						$storeManager->Setup(array('host'=>$memcacheHost, 'port'=>$memcachePort, 'flags'=>1));
+					}
+				}
+				
+				$jobIndex = $matches['job_idx'][0];
+				$job = $storeManager->FetchJob($jobIndex);
+				$job->state = $job::STATE_RETRY;
+				$storeManager->SaveJob($job);
+				KalturaLog::log("Refreshed job [$jobIndex]");
+			}
 		}
 
 		/* ---------------------------
