@@ -55,7 +55,7 @@
 		/* ---------------------------
 		 *
 		 */
-		public function RefreshJobs($maxSlots, &$jobs);
+		public function RefreshJobs($maxSlots, $fetchRangeRandMax, &$jobs);
 
 		/* ---------------------------
 		 *
