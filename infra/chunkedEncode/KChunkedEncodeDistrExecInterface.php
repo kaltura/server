@@ -50,7 +50,7 @@
 		/* ---------------------------
 		 *
 		 */
-		public function FetchNextJob();
+		public function FetchNextJob($fetchRangeRandMax);
 
 		/* ---------------------------
 		 *
