@@ -70,7 +70,7 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 				$chunkedEncodeMaxFetchRange = KBatchBase::$taskConfig->params->chunkedEncodeMaxFetchRange;
 			}
 			else {
-				$chunkedEncodeMaxFetchRange = 20;
+				$chunkedEncodeMaxFetchRange = 50;
 			}
 		
 			/*
