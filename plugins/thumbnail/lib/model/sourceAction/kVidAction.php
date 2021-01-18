@@ -10,12 +10,24 @@ abstract class kVidAction extends kSourceAction
 	protected $second;
 	protected $newWidth;
 	protected $newHeight;
+	protected $autoRotate;
+	protected $rotation;
+
+	/**
+	 * kVidAction constructor.
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->rotation = null;
+	}
 
 	protected function initParameterAlias()
 	{
 		$kVidAlias = array(
 			'w' => kThumbnailParameterName::WIDTH,
 			'h' => kThumbnailParameterName::HEIGHT,
+			'ar' => kThumbnailParameterName::AUTO_ROTATE,
 		);
 		$this->parameterAlias = array_merge($this->parameterAlias, $kVidAlias);
 	}
@@ -24,6 +36,7 @@ abstract class kVidAction extends kSourceAction
 	{
 		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
 		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+		$this->autoRotate = $this->getBoolActionParameter(kThumbnailParameterName::AUTO_ROTATE, false);
 	}
 
 	protected function validateInput()
@@ -67,7 +80,7 @@ abstract class kVidAction extends kSourceAction
 	{
 		$dc = kDataCenterMgr::getCurrentDc();
 		$filePath = $dc['id'].'_'.kString::generateStringId();
-		return sys_get_temp_dir().DIRECTORY_SEPARATOR . $filePath;
+		return sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filePath;
 	}
 
 	/**
@@ -101,6 +114,11 @@ abstract class kVidAction extends kSourceAction
 			}
 
 			$success = myEntryUtils::captureLocalThumb($entry, $destPath, $second, null, null, null, $flavorAssetId, $this->newWidth, $this->newHeight);
+			if($success && $this->autoRotate && is_null($this->rotation))
+			{
+				$this->rotation = myEntryUtils::getRotate($flavorAssetId);
+				$this->transformationParameters[kThumbnailParameterName::ROTATION] = $this->rotation;
+			}
 		}
 
 		if(!$success)
