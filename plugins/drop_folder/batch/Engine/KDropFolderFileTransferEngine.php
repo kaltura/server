@@ -315,7 +315,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				return kFileTransferMgrType::SCP;
 			case KalturaDropFolderType::SFTP:
 				return kFileTransferMgrType::SFTP;
-			case kalturaDropFolderType::S3DROPFOLDER:
+			case KalturaDropFolderType::S3DROPFOLDER:
 			case KalturaDropFolderType::S3:
 				return kFileTransferMgrType::S3;
 			default:

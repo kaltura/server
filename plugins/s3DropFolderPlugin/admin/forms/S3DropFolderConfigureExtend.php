@@ -3,7 +3,7 @@
  * @package plugins.dropFolder
  * @subpackage Admin
  */
-class Form_S3DropFolderConfigureExtend_SubForm extends Form_FtpDropFolderConfigureExtend_SubForm
+class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureExtend_SubForm
 {
 	public function getTitle()
 	{

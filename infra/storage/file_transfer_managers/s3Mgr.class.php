@@ -39,6 +39,11 @@ class s3Mgr extends kFileTransferMgr
 	protected $storageClass = null;
 	protected $s3Arn = null;
 
+	const SIZE = 'Size';
+	const LAST_MODIFICATION = 'LastModified';
+	const CONTENT_LENGTH = 'ContentLength';
+	const HEAD_OBJECT = 'headObject';
+
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
@@ -399,9 +404,8 @@ class s3Mgr extends kFileTransferMgr
 			{
 				$dirList[] = array (
 					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
-					"fileSize" => $dirListObject['Size'],
-					'modificationTime' => $dirListObject['LastModified'],
-					'name' => $dirListObject['Key']
+					"fileSize" => $dirListObject[self::SIZE],
+					'modificationTime' => $dirListObject[self::LAST_MODIFICATION],
 				);
 			}
 		}
@@ -420,37 +424,17 @@ class s3Mgr extends kFileTransferMgr
 
 		foreach($files as $file)
 		{
+			if(trim($remoteDir, '/') === trim($file['path'],'/'))
+			{
+				continue;
+			}
 			$fileObject = new FileObject();
-			$fileObject->filename = self::removeFolderNameFromFileName($file['name'], $remoteDir);
+			$fileObject->filename = basename($file['path']);
 			$fileObject->fileSize = $file['fileSize'];
 			$fileObject->modificationTime = strtotime($file['modificationTime']);
 			$fileObjectsResult[] = $fileObject;
 		}
 		return $fileObjectsResult;
-	}
-
-	/*
-	 * This function will remove the folders from $fileName which appear on the remoteDir,
-	 * in order to prevent duplication when joining them together to a full path.
-	 * full path = $remoteDir.'/'.$fileName
-	 * for example:
-	 * $remoteDir = '/BucketName/Dir1'
-	 * $fileName = 'Dir1/File1'
-	 * The output will be $fileName = 'File1' and fullPath -> /BucketName/Dir1.'/'.File1
-	 */
-	protected static function removeFolderNameFromFileName($fileName, $remoteDir)
-	{
-		$lastDirPos = strrpos($fileName, '/');
-		if ($lastDirPos)
-		{
-			$dirsFileName = substr($fileName, 0 , $lastDirPos);
-			$sameDir = strpos($remoteDir, $dirsFileName);
-			if ($sameDir)
-			{
-				$fileName = substr($fileName, $lastDirPos + 1);
-			}
-		}
-		return $fileName;
 	}
 
 	public function initBasicS3Params($filePath)
@@ -478,29 +462,29 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch (S3Exception $e)
 		{
-			KalturaLog::debug($e->getMessage());
+			KalturaLog::warning($e->getMessage());
 			return false;
 		}
 	}
 
 	protected function doFileSize($remoteFile)
 	{
-		$result = $this->s3Call('headObject', null, $remoteFile);
+		$result = $this->s3Call(self::HEAD_OBJECT, null, $remoteFile);
 		if(!$result)
 		{
 			return false;
 		}
-		return $result->get('ContentLength');
+		return $result->get(self::CONTENT_LENGTH);
 	}
 
 	protected function doModificationTime($remoteFile)
 	{
-		$result = $this->s3Call('headObject', null, $remoteFile);
+		$result = $this->s3Call(self::HEAD_OBJECT, null, $remoteFile);
 		if(!$result)
 		{
 			return false;
 		}
-		return strtotime($result->get('LastModified'));
+		return strtotime($result->get(self::LAST_MODIFICATION));
 	}
 
 	// execute the given command on the server

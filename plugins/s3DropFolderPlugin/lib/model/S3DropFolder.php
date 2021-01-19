@@ -5,13 +5,13 @@
  */
 class S3DropFolder extends RemoteDropFolder
 {
-	const S3_HOST = 's3_host';
+	const S3_HOST = 's3Host';
 
 	const S3_REGION = 's3Region';
 
-	const S3_USER_ID = 's3_user_id';
+	const S3_USER_ID = 's3UserId';
 
-	const S3_PASSWORD = 's3_password';
+	const S3_PASSWORD = 's3Password';
 
 	/**
 	 * @var string
