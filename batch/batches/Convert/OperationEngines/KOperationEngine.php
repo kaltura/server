@@ -165,7 +165,7 @@ abstract class KOperationEngine
 			{
 				$cmd = "ffprobe ";
 				kBatchUtils::addReconnectParams("http", $resolvedFilePath, $cmd);
-				system("$cmd -i \"$resolvedFilePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json >> \"{$this->logFilePath}\" 2>&1");
+				kExecWrapper::system("$cmd -i \"$resolvedFilePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json >> \"{$this->logFilePath}\" 2>&1");
 			}
 			else
 			{

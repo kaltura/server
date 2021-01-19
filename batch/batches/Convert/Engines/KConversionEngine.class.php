@@ -221,7 +221,7 @@ abstract class KConversionEngine
 				$resolvedFilePath = kFile::realPath($file);
 				$cmd = "ffprobe ";
 				kBatchUtils::addReconnectParams("http", $resolvedFilePath, $cmd);
-				$media_info = shell_exec("$cmd -i \"$resolvedFilePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json");
+				$media_info = kExecWrapper::shell_exec("$cmd -i \"$resolvedFilePath\" -show_streams -show_format -show_programs -v quiet -show_data  -print_format json");
 				$this->addToLogFile ( $log_file ,$media_info ) ;
 			}
 			else
