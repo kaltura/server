@@ -34,7 +34,7 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 			{
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
-				$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
+				$dropFolderForm = $this->getDropFolderConfigure($dropFolderType, $partnerId, $dropFolderType);
 				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $partnerId, $dropFolderId);
 				if(!is_null($dropFolderId))
 				{
@@ -51,13 +51,13 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 					$dropFolder = $dropFolderPluginClient->dropFolder->get($dropFolderId);
 					$partnerId = $dropFolder->partnerId;
 					$dropFolderType = $dropFolder->type;
-					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
+					$dropFolderForm = $this->getDropFolderConfigure($dropFolderType, $partnerId, $dropFolderType);
 					$dropFolderForm->populateFromObject($dropFolder, false);
 					$this->disableFileHandlerType($dropFolderForm, $dropFolder->fileHandlerType);
 				}
 				else
 				{
-					$dropFolderForm = new Form_DropFolderConfigure($partnerId, $dropFolderType);
+					$dropFolderForm = $this->getDropFolderConfigure($dropFolderType, $partnerId, $dropFolderType);
 					$dropFolderForm->getElement('partnerId')->setValue($partnerId);
 					
 					$settings = Zend_Registry::get('config')->dropFolder;
@@ -81,6 +81,17 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 		}
 		
 		$action->view->form = $dropFolderForm;
+	}
+
+	protected function getDropFolderConfigure($type, $partnerId, $dropFolderType)
+	{
+		switch ($type)
+		{
+			case S3DropFolderPlugin::getPluginName(). '.S3DROPFOLDER':
+				return new Form_S3DropFolderConfigure($partnerId, $dropFolderType);
+			default:
+				return new Form_DropFolderConfigure($partnerId, $dropFolderType);
+		}
 	}
 	
 	private function processForm(Form_DropFolderConfigure $form, $formData, $partnerId, $dropFolderId = null)
