@@ -4,7 +4,7 @@
 
 ### New features ###
 
-	- PLAT-22575 : 	Adding support for a new type in Drop Folder: S3
+	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
 
 ## New drop folder type S3 ##
 - Issue Type: Task
