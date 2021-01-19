@@ -29,13 +29,13 @@ class S3DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalt
 					return new KS3DropFolderEngine();
 				}
 				break;
-			case ('KalturaDropFolder'):
+			case 'KalturaDropFolder':
 				if ($enumValue == self::getDropFolderTypeCoreValue(S3DropFolderType::S3DROPFOLDER) )
 				{
 					return new KalturaS3DropFolder();
 				}
 				break;
-			case ('KalturaDropFolderFile'):
+			case 'KalturaDropFolderFile':
 				if ($enumValue == self::getDropFolderTypeCoreValue(S3DropFolderType::S3DROPFOLDER) )
 				{
 					return new KalturaS3DropFolderFile();
@@ -98,7 +98,7 @@ class S3DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalt
 
 	public static function getEnums($baseEnumName = null)
 	{
-		if (!$baseEnumName || $baseEnumName == 'DropFolderType')
+		if (!$baseEnumName || $baseEnumName === 'DropFolderType')
 		{
 			return array('S3DropFolderType');
 		}
