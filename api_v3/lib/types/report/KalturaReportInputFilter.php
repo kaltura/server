@@ -250,6 +250,13 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $crmIdIn;
 
+	/**
+	 * filter by playlist id
+	 *
+	 * @var string
+	 */
+	public $playlistIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -286,7 +293,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'nodeIdsIn' => 'node_ids',
 		'categoriesAncestorIdIn'=> 'categories_ancestor_ids',
 		'hotspotIdIn' => 'hotspot_ids',
-		'crmIdIn' => 'crm_ids'
+		'crmIdIn' => 'crm_ids',
+		'playlistIdIn' => 'playlist_ids'
 	);
 
 	protected function getMapBetweenObjects()
