@@ -12,7 +12,7 @@ class kExecWrapper
 		return $res;
 	}
 
-	public static function system($command, &$return_var)
+	public static function system($command, &$return_var = null)
 	{
 		KalturaLog::log("Executing [$command]");
 
