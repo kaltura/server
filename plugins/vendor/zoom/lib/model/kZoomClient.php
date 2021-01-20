@@ -14,6 +14,11 @@ class kZoomClient
 	const API_PARTICIPANT = '/v2/report/meetings/@meetingId@/participants';
 	const API_PANELISTS = '/v2/webinars/@webinarId@/panelists';
 	const API_USERS_PERMISSIONS = '/v2/users/@userId@/permissions';
+	const API_DELETE_RECORDING_FILE = 'v2/meetings/@meetingId@/recordings/@recordingId@';
+	const MEETING_ID_PLACEHOLDER = '@meetingId@';
+	const RECORDING_ID_PLACEHOLDER = '@recordingId@';
+	const WEBINAR_ID_PLACEHOLDER = '@webinderId@';
+
 
 	protected $zoomBaseURL;
 
@@ -39,13 +44,13 @@ class kZoomClient
 
 	public function retrieveMeetingParticipant($accessToken, $meetingId)
 	{
-		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
+		$apiPath = str_replace(self::MEETING_ID_PLACEHOLDER, $meetingId, self::API_PARTICIPANT);
 		return $this->callZoom($apiPath, $accessToken);
 	}
 
 	public function retrieveWebinarPanelists($accessToken, $webinarId)
 	{
-		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
+		$apiPath = str_replace(self::WEBINAR_ID_PLACEHOLDER, $webinarId, self::API_PANELISTS);
 		return $this->callZoom($apiPath, $accessToken);
 	}
 
@@ -58,6 +63,13 @@ class kZoomClient
 	public function retrieveZoomUserPermissions($userName, $accessToken)
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS_PERMISSIONS);
+		return $this->callZoom($apiPath, $accessToken);
+	}
+
+	public function deleteRecordingFile($accessToken, $meetingUUid, $recodingId)
+	{
+		$apiPath = str_replace(self::MEETING_ID_PLACEHOLDER, $meetingUUid, self::API_DELETE_RECORDING_FILE);
+		$apiPath = str_replace(self::RECORDING_ID_PLACEHOLDER, $recodingId, $apiPath);
 		return $this->callZoom($apiPath, $accessToken);
 	}
 
