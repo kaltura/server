@@ -447,7 +447,8 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			}
 			else
 			{
-				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED, $this->id, $this->status);
+				throw new kCoreException("Entry vendor task item with id [$this->id] could not be updated to status [$this->status]", kCoreException::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED);
+
 			}
 		}
 		parent::save($con);

@@ -47,7 +47,7 @@ class KalturaReachErrors implements kReachErrors
 
 	const ENTRY_VENDOR_TASK_NOT_FOUND = "ENTRY_VENDOR_TASK_NOT_FOUND;ID;Entry vendor task item with id provided not found [@ID@]";
 
-	const ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED = "ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED;ID,STATUS;Entry vendor task item with id [@ID@] could not be updated to status [@STATUS@]";
+	const ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED = "ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED;REASON;@REASON@";
 
 	const ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED = "ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED;ID,USER_ID;User id [@USER_ID@] is not allowed to do actions on entryVendorTask [@ID@]";
 	
