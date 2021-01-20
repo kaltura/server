@@ -868,6 +868,84 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	}
 	
 	/**
+	 * detectEmptyFrames
+	 *	scan for very low frames pkt sizes (thresh) to detect empty frames 
+	 * 	threshold - empty frame size threshold (bellow considerd as empty)
+	 *		if not passed - calculated automatically from scanned file portion 
+	 */
+	public static function detectEmptyFrames($ffmpegBin, $ffprobeBin, $srcFileName, $threshold=0, $startFrom=0, $duration=4)
+	{
+		if($duration==0)
+			$duration=4;
+		KalturaLog::log("Src:$srcFileName, thresh:$threshold, start:$startFrom, dur:$duration");
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -ss $startFrom -t ".($duration+1)." -i '$srcFileName' -copyts -c:v copy -f matroska -y -v quiet -vsync 0 - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=pkt_pts_time,pkt_duration_time,pkt_pos,pkt_size,pict_type,coded_picture_number,interlaced_frame -v quiet 2>&1";
+		KalturaLog::log("cmdLine: $cmdLine");
+
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::log("FAILED: to acquire list of frames - rv($rv),lastLine($lastLine)");
+			return false;
+		}
+
+		$dataArr = array();
+		$frmSizeAcc=0;
+		$frmSizeAccArr=array("I"=>0,"P"=>0,"B"=>0);
+		$cntArr=array("I"=>0,"P"=>0,"B"=>0);
+		foreach($outputArr as $line){
+			$stam=$pts=$pktDur=$pktPos=$pktSize=$pictType=$pictNum=$inter=0;
+			$data = list($stam,$pts,$pktDur,$pktPos,$pktSize,$pictType,$pictNum,$inter) = explode(',', $line);
+			$dataArr[] = $data;
+//KalturaLog::log(json_encode($data));
+			{
+				$cntArr[$pictType]+= 1;
+				$frmSizeAccArr[$pictType]+= $pktSize;
+				$frmSizeAcc+= $pktSize;
+			}
+		}
+		
+		if($frmSizeAcc==0 || count($outputArr)==0){
+			KalturaLog::log("FAILED: bad frames stat data");
+			return false;
+		}
+			// Evaluate threshold value, if unset
+		if($threshold==0){
+			$threshold = ($frmSizeAcc/count($outputArr)*0.02);
+			KalturaLog::log("auto calculated threshold:$threshold");
+		}
+			// Scan for empty frames
+		$emptyArr = array();
+		$fst=PHP_INT_MAX;$lst=0;
+		foreach($dataArr as $data){
+			if($data[4]<$threshold) {
+				$emptyArr[] = array("nm"=>$data[6],"sz"=>$data[4],"tp"=>$data[5]);
+				$fst = min($fst,$data[6]); $lst = max($lst,$data[6]);
+			}
+		}
+
+		$statStr = "TOT=av:".round($frmSizeAcc/count($outputArr)).",nm:".count($outputArr).",";
+		foreach($frmSizeAccArr as $tp=>$acc){
+			if($cntArr[$tp]==0)
+				$statStr.= "$tp=av:0,nm:0";
+			else
+				$statStr.= "$tp=av:".round($acc/$cntArr[$tp]).",nm:".$cntArr[$tp].",";
+		}
+
+		$emptyCnt=count($emptyArr);
+		$empIntervalSz = ($fst>$lst)?0:($lst-$fst+1);
+		if($emptyCnt>3 && $empIntervalSz>0 && $emptyCnt/$empIntervalSz>0.8) {
+			KalturaLog::log("Empty frames:".serialize($emptyArr));
+			KalturaLog::log("RESULT:detected empty frames - num:$emptyCnt, fst:$fst,lst:$lst, emptiness ratio:".($emptyCnt/$empIntervalSz)." ($statStr)");
+			return count($emptyArr);
+		}
+		else {
+			KalturaLog::log("RESULT:no empty frames! ($statStr)");
+			return false;
+		}
+	}
+	
+	/**
 	 * 
 	 * @param unknown_type $ffprobeBin
 	 * @param unknown_type $srcFileName
