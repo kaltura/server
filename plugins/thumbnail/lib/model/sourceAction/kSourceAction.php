@@ -24,7 +24,7 @@ abstract class kSourceAction extends kThumbnailAction
 	public function execute($source, &$transformationParameters)
 	{
 		$this->source = $source;
-		$this->transformationParameters = $transformationParameters;
+		$this->transformationParameters =& $transformationParameters;
 		$this->extractActionParameters();
 		$this->validateInput();
 		return $this->doAction();
