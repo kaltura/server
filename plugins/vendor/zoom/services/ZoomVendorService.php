@@ -277,4 +277,61 @@ class ZoomVendorService extends KalturaBaseService
 
 		throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 	}
+
+
+	/**
+	 * Delete recording file from zoom
+	 *
+	 * @action deleteRecording
+	 * @param int $partnerId
+	 * @param string $meetingUUID
+	 * @param string $recordingId
+	 * @return bool
+	 * @throws KalturaAPIException
+	 */
+	public function deleteRecordingFileAction($partnerId, $meetingUUID, $recordingId)
+	{
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByPartner($partnerId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if(!$zoomIntegration)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		}
+
+		$zoomConfiguration = self::getZoomConfiguration();
+		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
+		$zoomIntegration->getAccessToken();
+		$zoomClient = new kZoomClient($zoomBaseURL);
+		$accessToken = kZoomOauth::getValidAccessToken($this->zoomIntegration);
+		return $zoomClient->deleteRecordingFile($accessToken, $meetingUUID, $recordingId) ? true : false;
+	}
+
+	/**
+	 * Process a meeting as we recieved an event
+	 *
+	 * @action processMeeting
+	 * @param int $partnerId
+	 * @param string $meetingData
+	 * @return bool
+	 * @throws KalturaAPIException
+	 */
+	public function processMeetingAction($partnerId, $meetingData)
+	{
+		$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByPartner($partnerId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if(!$zoomIntegration)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
+		}
+
+		ZoomHelper::verifyZoomIntegration($zoomIntegration);
+		$this->setPartnerFilters($zoomIntegration->getPartnerId());
+		$kZoomRecording = new kZoomRecording();
+		$kZoomRecording->parseData($meetingData[kZoomRecording::OBJECT]);
+		$zoomConfiguration = self::getZoomConfiguration();
+		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
+		$kZoomRecordingProcessor = new kZoomMeetingProcessor($zoomBaseURL);
+		$kZoomEvent = new kZoomEvent();
+		$kZoomEvent->eventType = NEW_RECORDING_VIDEO_COMPLETED;
+		$kZoomEvent->object = $kZoomRecording;
+		$kZoomRecordingProcessor->handleRecordingVideoComplete($kZoomEvent);
+	}
 }
