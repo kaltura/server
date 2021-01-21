@@ -237,7 +237,6 @@ class kFlowHelper
 			
 			$localFilePath = $data->getDestFileSharedPath();
 			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
-			
 		}
 		else
 		{
