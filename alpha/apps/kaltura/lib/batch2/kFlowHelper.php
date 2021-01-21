@@ -235,11 +235,12 @@ class kFlowHelper
 				throw new Exception ( "Shared storage [$partnerSharedStorageProfileId] Not found");
 			}
 			
+			$localFilePath = $data->getDestFileSharedPath();
 			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
 		}
 		else
 		{
-			kFileSyncUtils::moveFromFile($data->getDestFileSyncLocalPath(), $syncKey);
+			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey);
 			
 			// set the path in the job data
 			$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);

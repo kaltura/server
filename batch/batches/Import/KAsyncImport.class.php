@@ -451,7 +451,14 @@ class KAsyncImport extends KJobHandlerWorker
 
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
+			{
 				$sharedFile .= ".$ext";
+				//If we changed the shared file name we need to update it on the jobs data
+				if($data->destFileSharedPath)
+				{
+					$data->destFileSharedPath = $sharedFile;
+				}
+			}
 			
 			KalturaLog::debug("rename('$destFile', '$sharedFile')");
 			kFile::moveFile($destFile, $sharedFile);
@@ -467,7 +474,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 			$data = $job->data;
 			$data->destFileLocalPath = $sharedFile;
-			$data->destFileSharedPath = $sharedFile;
+			
 			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 
 			if($this->checkFileExists($sharedFile, $fileSize))
