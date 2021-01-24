@@ -462,6 +462,8 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		$this->last_hydrate_time = time();
+
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -1245,6 +1247,13 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if ($deep) {
 		} // if ($deep)
 
+	}
+
+	protected $last_hydrate_time;
+
+	public function getLastHydrateTime()
+	{
+		return $this->last_hydrate_time;
 	}
 
 } // BaseConfMaps

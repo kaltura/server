@@ -133,6 +133,8 @@ abstract class BaseblockedEmail extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		$this->last_hydrate_time = time();
+
 		try {
 
 			$this->email = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
@@ -808,6 +810,13 @@ abstract class BaseblockedEmail extends BaseObject  implements Persistent {
 		if ($deep) {
 		} // if ($deep)
 
+	}
+
+	protected $last_hydrate_time;
+
+	public function getLastHydrateTime()
+	{
+		return $this->last_hydrate_time;
 	}
 
 } // BaseblockedEmail
