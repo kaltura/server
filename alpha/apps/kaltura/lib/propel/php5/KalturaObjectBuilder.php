@@ -192,6 +192,8 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 
 		$table = $this->getTable();
 		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
+
+		$script .= $newLine . '$this->last_hydrate_time = time();' . $newLine;
 		if($customDataColumn) {
 			$script .= $newLine . "// Nullify cached objects";
 			$script .= $newLine . "\$this->m_custom_data = null;" . $newLine;
@@ -893,6 +895,15 @@ abstract class ".$this->getClassname()." extends ".ClassTools::classname($this->
 		$customDataColumn = $table->getColumn(self::KALTURA_COLUMN_CUSTOM_DATA);
 		if($customDataColumn)
 			$this->addCustomDataMethods($script);
+
+		$script .= '
+	protected $last_hydrate_time;
+
+	public function getLastHydrateTime()
+	{
+		return $this->last_hydrate_time;
+	}
+';
 	}
 
 	/**
