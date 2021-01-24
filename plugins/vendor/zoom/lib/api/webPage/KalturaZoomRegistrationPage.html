@@ -10,37 +10,40 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         var ks = '@ks@';
-        var url = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/submitRegistration';
-        var accountId = '@accountId@';
+        let baseServiceUrl = '@BaseServiceUrl@';
+        var accountId = '@accoutId@';
+        var partnerId= '@partnerId@';
+        var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
+        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
+
     </script>
     <script>
         function trySubmit() {
-            console.log("ddfdf");
             $("body").css("cursor", "progress");
-            var $defaultUserId = $('#defaultUserId');
-            var $zoomCategory  = $('#zoomCategory');
-            var $zoomWebinarCategory  = $('#zoomWebinarCategory');
-            var defaultUserId = $defaultUserId.val().trim();
-            var zoomCategory = $zoomCategory.val().trim();
-            var zoomWebinarCategory = $zoomWebinarCategory.val().trim();
-            var enableRecordingUploadObj = $(".enableRecordingUpload");
-            var enableWebinarUploadObj = $(".enableWebinarUpload");
-            var createUserIfNotExistObj = $(".createUserIfNotExist");
-            var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
-            var enableWebinarUpload = enableWebinarUploadObj.is(":checked");
-            var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
-            var handleParticipantsMode = $('[name=participantsHandler]:checked').val();
-            var zoomUserMatchingMode = $('[name=userMatchingHandler]:checked').val();
-            var zoomUserPostfix = $('#zoomUserPostfix').val().trim();
+            let defaultUserId = $('#defaultUserId').val().trim();
+            let zoomCategory  = $('#zoomCategory').val().trim();
+            let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
+            let enableRecordingUpload = $("#enableRecordingUpload").is(":checked");
+            let enableWebinarUpload = $("#enableWebinarUploads").is(":checked");
+            let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
+            let zoomUserMatchingMode;
+            if($('[name=recordingOwner]:checked').val()==1)
+            {
+                zoomUserMatchingMode = 3;
+            }
+            else
+            {
+                zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
+            }
+            let zoomUserPostfix = $('#zoomUserPostfix').val().trim();
 
             $.ajax({
-                url : url,
+                url : submitUrl,
                 type : 'post',
                 data: {"ks": ks, 'accountId' : accountId,
                     'integrationSetting:objectType' : 'KalturaZoomIntegrationSetting',
                     'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
                     'integrationSetting:enableRecordingUpload':enableRecordingUpload,
-                    'integrationSetting:createUserIfNotExist':createUserIfNotExist,
                     'integrationSetting:handleParticipantsMode':handleParticipantsMode,
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
@@ -71,73 +74,157 @@
             });
         }
         function  onSuccess() {
-            $('#submitError').hide();
-            $('#submitOK').show();
+            alert("Saved Successfully");
         }
         function onFail(errorMessage) {
-            $('#submitOK').hide();
-            $('#submitError').show();
-            $('#submitError').html(errorMessage);
+            alert("Data was Not Saved.\n"+errorMessage);
+        }
+        function onLoad()
+        {
+            console.log(partnerId);
+            if(!partnerId)
+            {
+                return;
+            }
+            setDefaultValues();
+            $.ajax({
+                url: getUrl,
+                type: 'post',
+                data: {"ks": ks, 'accountId': accountId ,'partnerId':partnerId },
+                success: function (res) {
+                    console.log(res);
+                    if (res) {
+                        if (res.objectType == 'KalturaAPIException') {
+                            alert("Error loading page.\n"+res.message);
+                        } else {
+                            //   onSuccess();
+                            console.log(res);
+                            loadParameters(res);
+                        }
+                    } else {
+                        //onSuccess();
+                    }
+                },
+                error: function () {
+                    alert("Error loading page.\n");
+                    console.log('err during api call');
+                }
+            });
+        }
+
+        function setDefaultValues(){
+            $('#enableWebinarUploads').prop('checked',true);
+            $('#enableRecordingUpload').prop('checked',true);
+            $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
+            $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
+        }
+        function loadParameters(p) {
+         jQuery.each(p, function(i,v) {
+                console.log(i,v);
+                switch (i) {
+                    case 'defaultUserId':
+                    case 'zoomCategory':
+                    case 'zoomUserPostfix':
+                    case 'zoomWebinarCategory':
+                        $('#'+i).val(v);
+                        break;
+                    case 'enableWebinarUploads':
+                    case 'enableRecordingUpload':
+                        $('#'+i).prop('checked', v);
+                        break;
+                    case 'zoomUserMatchingMode':
+                    {
+                        //check user matching mode
+                        if(v==3)
+                        {
+                            $('input:radio[name=recordingOwner][value="1"]').prop('checked', true);
+                            $("#matchingZoomUserBasedOnZoomUserId").hide();
+                        }
+                        else
+                        {
+                            $('input:radio[name=recordingOwner][value="0"]').prop('checked', true);
+                            $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
+                            $("#matchingZoomUserBasedOnZoomUserId").show();
+                        }
+                    }
+                    break;
+                    case 'handleParticipantsMode':
+                        $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
+                        break;
+                }
+
+            });
+        }
+
+        function recordingOwnerChanged(e)
+        {
+            if(e) {
+                $("#matchingZoomUserBasedOnZoomUserId").show();
+            }
+            else {
+                $("#matchingZoomUserBasedOnZoomUserId").hide();
+            }
         }
     </script>
     <title>Kaltura-Zoom registration</title>
 </head>
-<body>
+<body onload="onLoad()">
     <form>
         <div class="col-sm-2"></div>
         <div class="container col-sm-8">
             <div class="imgcontainer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/KalturaLogo_Updatedpng.png" width="128" class="mx-auto d-block">
+                <img src="https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png" width="256" class="mx-auto d-block">
             </div>
-            <div class="form-group">
-                <label><b>Default User ID</b></label>
-                <input type="text" value="@defaultUserID@" id="defaultUserId" class="form-control" name="defaultUserId" required>
-            </div>
-            <div class="form-group">
-                <label for="zoomCategory"><b>Zoom Category</b></label>
-                <input type="text" value="@zoomCategory@" id="zoomCategory" class="form-control" name="zoomCategory" required>
-            </div>
-            <div class="form-group">
-            <label for="zoomWebinarCategory"><b>Zoom Webinar Category</b></label>
-                <input type="text" value="@zoomWebinarCategory@" id="zoomWebinarCategory" class="form-control" name="zoomWebinarCategory" required>
-            </div>
-
-            <div class="container p-3 my-3 border">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="EnableRecordingUpload" name="EnableRecordingUpload">
-                    <label class="custom-control-label" for="EnableRecordingUpload">Enable recording upload</label>
+            <br/><br/>
+            <div class="form-group  container p-2 my-2 border">
+                <div class="form-group">
+                    <label><h6>Default User ID</h6></label>
+                    <input type="text" value="@defaultUserID@" id="defaultUserId" class="form-control" name="defaultUserId" required>
                 </div>
-
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" id="EnableWebinarUpload" name="EnableWebinarUpload">
-                    <label class="custom-control-label" for="EnableWebinarUpload">Enable webinar upload</label>
+                <div class="form-group">
+                    <label for="zoomCategory"><h6>Zoom Category</h6></label>
+                    <input type="text" value="@zoomCategory@" id="zoomCategory" class="form-control" name="zoomCategory" required>
+                </div>
+                <div class="form-group">
+                <label for="zoomWebinarCategory"><h6>Zoom Webinar Category</h6></label>
+                    <input type="text" value="@zoomWebinarCategory@" id="zoomWebinarCategory" class="form-control" name="zoomWebinarCategory" required>
+                </div>
+                <h6>Control</h6>
+                <div class="container p-2 my-2 border">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="enableRecordingUpload" name="enableRecordingUpload">
+                        <label class="custom-control-label" for="enableRecordingUpload">Enable recording upload</label>
+                    </div>
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="enableWebinarUploads" name="enableWebinarUploads" >
+                        <label class="custom-control-label" for="enableWebinarUploads">Enable webinar upload</label>
+                    </div>
                 </div>
             </div>
 
-
-            <div class="form-group  container p-3 my-3 border">
+            <div class="form-group  container p-2 my-2 border">
                 <h6 >Setting owner for recordings</h6>
                 <div class="form-check">
                     <label class="form-check-label">
-                    <input type="radio"  name="RecordingOwner" class="form-check-input" @IS_CHECKED@>
+                    <input type="radio"  id="recordingOwnerBasedOnZoomId" name="recordingOwner" class="form-check-input" onchange="recordingOwnerChanged(this.checked)" value="0" checked>
                         Based on Zoom User ID</label>
                 </div>
-                <div class="container-fluid p-3 my-2 mx-auto border" style="width: 540px;">
+                <div id="matchingZoomUserBasedOnZoomUserId" class="container-fluid p-3 my-2 mx-auto border" style="width: 97%;">
                     <p class="form-check-label">How matching zoom users should be handled:</p>
                     <div class="form-check-inline">
                         <input type="radio" class="form-check-input"
-                               name="userMatchingHandler" value="0"  checked>
+                               name="zoomUserMatchingMode" value="0" >
                         <label class="form-check-label">Do not modify</label>
                     </div>
                     <div class="form-check-inline">
                         <input type="radio" class="form-check-input"
-                               name="userMatchingHandler" value="1">
+                               name="zoomUserMatchingMode" value="1">
                         <label class="form-check-label">Add postfix</label>
                     </div>
                     <div class="form-check-inline">
-                        <input type="radio" id="userMatchingHandler3" class="form-check-input"
-                               name="userMatchingHandler" value="2">
-                        <label for="userMatchingHandler3" class="form-check-label">Remove postfix</label>
+                        <input type="radio" class="form-check-input"
+                               name="zoomUserMatchingMode" value="2">
+                        <label class="form-check-label">Remove postfix</label>
                     </div>
                     <div class="form-group">
                         <label class="form-check-label"> User matching postfix</label>
@@ -146,31 +233,28 @@
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input type="radio"  name="RecordingOwner" class="form-check-input" @IS_CHECKED@>
+                        <input type="radio"  id="recordingOwnerBasedOnCmsUserId" name="recordingOwner" class="form-check-input" onchange="recordingOwnerChanged(!this.checked)" value="1">
                         Based on cms_user_id (SAML mapping)</label>
                 </div>
             </div>
-            <div class="form-group container p-3 my-3 border">
-                <p class="form-check-label">How meeting participants should be handled:</p>
+            <div class="form-group container p-2 my-2 border">
+                <p class="form-check-label"><h6>How meeting participants should be handled:</h6></p>
                 <div class="form-check-inline">
                     <label class="form-check-label">
-                    <input type="radio" id="participantsChoice1" class="form-check-input"
-                           name="participantsHandler" value="0"  checked>Add as Co publishers </label>
+                    <input type="radio" class="form-check-input"
+                           name="handleParticipantsMode" value="0">Add as Co publishers </label>
                 </div>
                 <div class="form-check-inline">
                     <label class="form-check-label">
-                    <input type="radio" id="participantsChoice2" class="form-check-input"
-                           name="participantsHandler" value="1">Add as Co viewers </label>
+                    <input type="radio" class="form-check-input"
+                           name="handleParticipantsMode" value="1">Add as Co viewers </label>
                 </div>
                 <div class="form-check-inline">
                     <label class="form-check-label">
-                    <input type="radio" id="participantsChoice3" class="form-check-input"
-                           name="participantsHandler" value="2">Ignore participants </label>
+                    <input type="radio" class="form-check-input"
+                           name="handleParticipantsMode" value="2">Ignore participants </label>
                 </div>
             </div>
-
-            <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
-            <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
             <button type="button" id="submitBtn" class="btn btn-block btn-primary" onclick="trySubmit()">Submit</button>
         </div>
         <div class="col-sm-2"></div>
