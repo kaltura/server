@@ -42,8 +42,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
 	{
-		$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
-		$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
+		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 		$taskJobData = self::getTaskJobData($object);
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
@@ -564,9 +563,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
-		if (kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion, false))
+		list($isDuplicate, $duplicateVersion) = kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion, false, false);
+		if ($isDuplicate)
 		{
-			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
+			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$duplicateVersion]");
 			return true;
 		}
 
@@ -582,7 +582,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
-		
+
 		if (!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");

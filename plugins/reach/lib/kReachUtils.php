@@ -180,24 +180,40 @@ class kReachUtils
 		return $remainingCredit >= 0 ? true : false;
 	}
 	
-	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission)
+	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission, $manualFlow)
 	{
-		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_MODERATION);
 		$activeTasks = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		$activeTasksOnOlderVersion = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, $statusArr);
-		if($activeTasksOnOlderVersion || ($activeTasks && !$allowResubmission))
+		if ($activeTasks)
 		{
-			return true;
-		}
-		foreach ($activeTasks as $activeTask)
-		{
-			if (in_array($activeTask->getStatus(), $statusArr))
+			foreach ($activeTasks as $activeTask)
 			{
-				return true;
+				if (!$allowResubmission ||
+					(in_array($activeTask->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_MODERATION))))
+				{
+					return array(true, $activeTask->getVersion());
+				}
 			}
+			return array(false, null);
 		}
 
-		return false;
+		$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING));
+		if ($activeTasksOnOlderVersion)
+		{
+			foreach ($activeTasksOnOlderVersion as $olderTask)
+			{
+				if ($olderTask->getStatus() == EntryVendorTaskStatus::PENDING)
+				{
+					$olderTask->setStatus(EntryVendorTaskStatus::ABORTED);
+					$olderTask->setErrDescription('Aborted following cancel request');
+					entryVendorTaskService::tryToSave($olderTask);
+				}
+				else if ($olderTask->getStatus() == EntryVendorTaskStatus::PROCESSING && $manualFlow)
+				{
+					return array(true, $olderTask->getVersion());
+				}
+			}
+		}
+		return array(false, null);
 	}
 	
 	public static function isEntryTypeSupported($type, $mediaType = null)
