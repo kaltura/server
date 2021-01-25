@@ -6,9 +6,11 @@
 
 	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
 
-## Send http registration request to kaftestme when registering partner##
+## Send http notification when registering new partner on the partner's template ##
 - Issue Type: Task
 - Issue ID: PLAT-22547
+- Description: You can use this http notification if you need to notify for every new partner created from the templates partners.
+    in this case we used the notification to call 1-kms-int.mediaspace.kaltura.com/latest/public/create_instance.php
 
 ### Deployment scripts ###
 -Add kaftestme registration http request on partner creation:
