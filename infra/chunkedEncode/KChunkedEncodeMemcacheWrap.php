@@ -510,7 +510,7 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * RefreshJobs
 		 */
-		public function RefreshJobs($maxSlots, $fetchRangeRandMax, &$jobs)
+		public function RefreshJobs($maxSlots, &$jobs)
 		{
 				/*
 				 * Get list of per scheduler running jobs
@@ -531,7 +531,7 @@ ini_set("memory_limit","512M");
 				/*
 				 * If there are no pending jobs - wait and retry
 				 */
-			$job = $this->FetchNextJob($fetchRangeRandMax);
+			$job = $this->FetchNextJob();
 			if($job===null){
 				KalturaLog::log("Running:$running - No pending jobs");
 				return null;
