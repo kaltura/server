@@ -183,7 +183,8 @@ class ClamAVScanWrapper
 		
 		//When sigchild is used the return status from pclose and proc_close() cannot be retrieved.
 		//To avoid -1 always being return we will check if stderr output is empty to return valid return_value
-		$exitCode = ($exitCode === false && !$isRunning) ? $proc_status['exitcode'] : $exitCode;
+		$proc_status = proc_get_status($process);
+		$exitCode = ($exitCode === false) ? $proc_status['exitcode'] : $exitCode;
 		return array($exitCode, $output, $procErr);
 	}
 	
