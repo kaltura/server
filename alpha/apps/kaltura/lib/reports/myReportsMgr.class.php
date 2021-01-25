@@ -1555,6 +1555,8 @@ class reportsInputFilter
 	public $categories_ancestor_ids;
 	public $hotspot_ids;
 	public $crm_ids;
+	public $playlist_ids;
+
 
 	public function getFilterBy() {
 		return "";
