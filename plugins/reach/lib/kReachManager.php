@@ -563,11 +563,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
-		list($isDuplicate, $duplicateVersion) = kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion, false, false);
-		if ($isDuplicate)
+		if (EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
 		{
-			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$duplicateVersion]");
+			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
 			return true;
+		}
+		else
+		{
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING));
+			if($activeTasksOnOlderVersion && $activeTasksOnOlderVersion->getStatus() == EntryVendorTaskStatus::PENDING)
+			{
+				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
+			}
 		}
 
 		//check if credit has expired
