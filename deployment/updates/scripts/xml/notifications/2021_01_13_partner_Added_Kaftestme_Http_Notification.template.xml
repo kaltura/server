@@ -40,9 +40,7 @@
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(kConf::getArrayValue('sig', 'MediaSpace_Partner_Registration','local', null) ?  md5(kConf::getArrayValue('sig', 'MediaSpace_Partner_Registration','local', null)
-                                . $scope->getObject()->getId()
-                                . '.' .  kConf::getArrayValue('mediaSpace_url', 'MediaSpace_Partner_Registration', 'local', null) . (intval($GLOBALS['start']) + 600)): '')</code>
+                            <code>(md5($scope->getObject()->getId() . '.kaf.kaltura.com' . (intval($GLOBALS['start']) + 600)))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
