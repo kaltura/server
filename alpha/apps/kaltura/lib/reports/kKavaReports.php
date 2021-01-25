@@ -567,12 +567,14 @@ class kKavaReports extends kKavaReportsMgr
 		ReportType::USER_USAGE => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'kuser_id' => self::DIMENSION_KUSER_ID,
-				'name' => self::DIMENSION_KUSER_ID
+				'name' => self::DIMENSION_KUSER_ID,
+				'full_name' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'name',
+				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name'),
 				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
 					'hash' => false,
 				)
 			),
