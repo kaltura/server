@@ -35,8 +35,7 @@
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
             let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
             let conversionProfileId = $('#conversionProfileId').val().trim();
-            if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID)
-            {
+            if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID) {
                 zoomUserMatchingMode = CMS_USER_ID;
             }
             let zoomUserPostfix = $('#zoomUserPostfix').val().trim();
@@ -85,8 +84,7 @@
         function onFail(errorMessage) {
             alert('Data was Not Saved.\n'+errorMessage);
         }
-        function onLoad()
-        {
+        function onLoad() {
             console.log(partnerId);
             if(!partnerId)
             {
@@ -160,8 +158,7 @@
             });
         }
 
-        function recordingOwnerChanged(e)
-        {
+        function recordingOwnerChanged(e) {
             if(e) {
                 $('#matchingZoomUserBasedOnZoomUserId').show();
             }
