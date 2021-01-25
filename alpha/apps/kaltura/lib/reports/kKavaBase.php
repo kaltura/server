@@ -69,6 +69,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_NODE_ID = 'nodeId';
 	const DIMENSION_APPLICATION_VER = 'applicationVer';
 	const DIMENSION_PARTNER_CRM_ID = 'partnerCrmId';
+	const DIMENSION_PLAYLIST_ID = 'playlistId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -210,6 +211,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PARTNER_ID => 1,
 			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_PLAYLIST_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
