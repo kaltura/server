@@ -66,13 +66,6 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 				$chunkedEncodeMaxConcurrent = 5;
 			}
 
-			if(isset(KBatchBase::$taskConfig->params->chunkedEncodeMaxFetchRange)){
-				$chunkedEncodeMaxFetchRange = KBatchBase::$taskConfig->params->chunkedEncodeMaxFetchRange;
-			}
-			else {
-				$chunkedEncodeMaxFetchRange = 50;
-			}
-		
 			/*
 			 * For AWS/Cloud deployments 'localTmpFolder' should be placed on the same cloud storage, 
 			 * in order to reduce redundant egress.
@@ -97,7 +90,7 @@ class KChunkedEncodeJobScheduler extends KPeriodicWorker
 			$jobs = $manager->GetRunningJobs();
 			$attempts = 5;
 			while(1) {
-				$rv = $manager->RefreshJobs($chunkedEncodeMaxConcurrent, $chunkedEncodeMaxFetchRange, $jobs);
+				$rv = $manager->RefreshJobs($chunkedEncodeMaxConcurrent, $jobs);
 				if($rv===false) {
 					if(--$attempts==0){
 						KalturaLog::log("Failed to RefreshJobs. Probably memcache server failure. Leaving");
