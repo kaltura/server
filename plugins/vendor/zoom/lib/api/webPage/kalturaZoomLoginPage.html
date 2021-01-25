@@ -19,25 +19,25 @@
         function onLoginSuccess(redirectUrl, res) {
             $.ajax({
                 url: redirectUrl,
-                type: "post",
-                data: {"ks": res, "tokensData" : encryption.enc, "iv" : encryption.iv},
+                type: 'post',
+                data: {'ks': res, 'tokensData' : encryption.enc, 'iv' : encryption.iv},
                 success: function (registrationPage) {
-                    $("body").css("cursor", "default");
+                    $('body').css('cursor', 'default');
                     if (registrationPage) {
-                        var newDoc = document.open("text/html", "replace");
+                        var newDoc = document.open('text/html', 'replace');
                         newDoc.write(registrationPage);
                         newDoc.close();
                     }
                 },
                 error: function () {
-                    $("body").css("cursor", "default");
+                    $('body').css('cursor', 'default');
                     console.log('err during api call');
                 }
             });
         }
 
         function tryLogin(event) {
-            $("body").css("cursor", "progress");
+            $('body').css('cursor', 'progress');
             event.preventDefault();
             var url = '@BaseServiceUrl@/api_v3/service/user/action/loginByLoginId';
             var redirectUrl = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/fetchRegistrationPage';
@@ -49,27 +49,26 @@
             var partnerId = $partnerId.val();
             if(partnerId == null || partnerId === '' || partnerId < 100)
             {
-                alert("Wrong parameters given.");
+                alert('Wrong parameters given.');
                 return false;
             }
 
             $.ajax({
                 url : url,
-                type : "post",
-                data: { "loginId" : email, "password" : pwd, "partnerId" : partnerId, "format" : 1},
+                type : 'post',
+                data: { 'loginId' : email, 'password' : pwd, 'partnerId' : partnerId, 'format' : 1},
                 success : function(res) {
                     if(res.code){
-                        alert("Login failed.\n"+res.message);
+                        alert('Login failed.\n'+res.message);
                     }
                     else {
                         onLoginSuccess(redirectUrl, res);
                     }
                 },
                 error: function() {
-                    alert("Login failed.\n");
+                    alert('Login failed.\n');
                     console.log('err during api call,please check server');
-                    $('#loginError').show();
-                    $("body").css("cursor", "default");
+                    $('body').css('cursor', 'default');
                 }
             });
         }
@@ -85,29 +84,27 @@
     <title>Kaltura-Zoom login</title>
 </head>
     <body>
-    <div style="width: 500px;margin: auto; padding-top: 200px">
+    <div style='width: 500px;margin: auto; padding-top: 200px'>
         <form>
-            <div class="form-group  container p-2 my-3 border">
-                <div class="imgcontainer">
-                    <img src="https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png" width="256" class="mx-auto d-block">
+            <div class='form-group  container p-2 my-3 border'>
+                <div class='imgcontainer'>
+                    <img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
                 </div>
-                <div class="container">
-                    <div class="form-group">
+                <div class='container'>
+                    <div class='form-group'>
                         <label><h6>Username</h6></label>
-                        <input type="text" placeholder="Enter Username" id="uname" class="form-control" name="defaultUserId" required>
+                        <input type='text' placeholder='Enter Username' id='uname' class='form-control' name='defaultUserId' required>
                     </div>
-                    <div class="form-group">
+                    <div class='form-group'>
                         <label><h6>Password</h6></label>
-                        <input type="password" placeholder="Enter Password" id="pwd" class="form-control" name="defaultUserId" required>
+                        <input type='password' placeholder='Enter Password' id='pwd' class='form-control' name='defaultUserId' required>
                     </div>
 
-                    <div class="form-group">
+                    <div class='form-group'>
                         <label><h6>Partner ID</h6></label>
-                        <input type="text" placeholder="Enter Partner ID" id="partnerId" class="form-control" name="defaultUserId" required>
+                        <input type='text' placeholder='Enter Partner ID' id='partnerId' class='form-control' name='defaultUserId' required>
                     </div>
-                    <button type="submit" id="submit-button" class="btn btn-primary">Login</button>
-                    <p id="loginError" class="error" style="display:none">Login Failed!  <br> Check User, password and partner ID. <br>
-                        Partner ID must be valid.</p>
+                    <button type='submit' id='submit-button' class='btn btn-primary'>Login</button>
                 </div>
             </div>
 
