@@ -571,7 +571,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		else
 		{
 			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING));
-			if($activeTasksOnOlderVersion && $activeTasksOnOlderVersion->getStatus() == EntryVendorTaskStatus::PENDING)
+			if($activeTasksOnOlderVersion)
 			{
 				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
 			}
@@ -589,7 +589,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
-
+		
 		if (!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
