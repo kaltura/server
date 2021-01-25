@@ -130,7 +130,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFileLocalPath()))
+		if(!kFile::checkFileExists($data->getDestFileLocalPath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
 		// get entry
@@ -222,15 +222,34 @@ class kFlowHelper
 		}
 		$flavorAsset->save();
 		
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
+		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
+		{
+			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+			if(!$storageProfile)
+			{
+				KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
+				throw new Exception ( "Shared storage [$partnerSharedStorageProfileId] Not found");
+			}
+			
+			$localFilePath = $data->getDestFileSharedPath();
+			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+		}
+		else
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey);
+			
+			// set the path in the job data
+			$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			$data->setDestFileLocalPath($localFilePath);
+			$dbBatchJob->setData($data);
+		}
 
-
-		// set the path in the job data
-		$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		$data->setDestFileLocalPath($localFilePath);
+		
 		$data->setFlavorAssetId($flavorAsset->getId());
-		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
 		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);
@@ -878,6 +897,7 @@ class kFlowHelper
 	protected static function validateSourceFileSync($sourceFileSyncDescriptors)
 	{
 		//validate that the source is still the same
+		$maxConvertTimeSec = kConf::get('max_convert_time_sec', 'runtime_config', 864000);
 		/* @var  $sourceFileSyncDescriptor kSourceFileSyncDescriptor*/
 		foreach ($sourceFileSyncDescriptors as $sourceFileSyncDescriptor)
 		{
@@ -889,9 +909,15 @@ class kFlowHelper
 				$currentSourceFileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey);
 				$currentSourceFilePath = $currentSourceFileSync->getFilePath();
 				$originalSrcPath = $sourceFileSyncDescriptor->getFileSyncLocalPath();
-				if (!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath), basename($originalSrcPath)))
+
+				// check if source fileSync is still in convert grace period
+				if ($currentSourceFileSync->getCreatedAt(null) > time() - $maxConvertTimeSec)
 				{
-					throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $currentSourceFilePath, $originalSrcPath, $srcAssetId);
+					if (!empty($currentSourceFilePath) && strcmp(basename($currentSourceFilePath), basename($originalSrcPath)))
+					{
+						$msg = $currentSourceFilePath . ' | ' . $originalSrcPath . ' | ' . $srcAssetId;
+						throw new APIException(KalturaErrors::SOURCE_FLAVOR_CHANGED_DURING_CONVERSION, $msg);
+					}
 				}
 			}
 		}
@@ -1311,19 +1337,31 @@ class kFlowHelper
 			$flavorAsset->save();
 		}
 
-		// creats the file sync
-		if(file_exists($data->getLogFileSyncLocalPath()))
+		// Creates the file sync
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
-			try{
-				kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if($storageProfile)
+					kFileSyncUtils::createReadySyncFileForKey($logSyncKey, $data->getLogFileSyncLocalPath(), $partnerSharedStorageProfileId);
 			}
-			catch(Exception $e){
-				$err = 'Saving conversion log: ' . $e->getMessage();
-				KalturaLog::err($err);
-
-				$desc = $dbBatchJob->getDescription() . "\n" . $err;
-				$dbBatchJob->getDescription($desc);
+			else
+			{
+				try{
+					kFileSyncUtils::moveFromFile($data->getLogFileSyncLocalPath(), $logSyncKey);
+				}
+				catch(Exception $e){
+					$err = 'Saving conversion log: ' . $e->getMessage();
+					KalturaLog::err($err);
+					
+					$desc = $dbBatchJob->getDescription() . "\n" . $err;
+					$dbBatchJob->getDescription($desc);
+				}
 			}
 		}
 
@@ -3233,36 +3271,45 @@ class kFlowHelper
 			return false;
 	}
 
-	
+	/**
+	 * @param BatchJob $dbBatchJob
+	 * @param kExportCsvJobData $data
+	 * @return BatchJob
+	 * @throws APIException
+	 * @throws PropelException
+	 */
 	public static function handleExportCsvFinished(BatchJob $dbBatchJob, kExportCsvJobData $data)
 	{
-		// Move file from shared temp to it's final location
-		$fileName =  basename($data->getOutputPath());
-		$directory =  myContentStorage::getFSContentRootPath() . "/content/exportcsv/" . $dbBatchJob->getPartnerId() ;
-		if(!file_exists($directory))
-			mkdir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-		
 		if(!$data->getOutputPath())
+		{
 			throw new APIException(APIErrors::FILE_CREATION_FAILED, "file path not found");
-		
-		KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
-		try
-		{
-			kFile::moveFile($data->getOutputPath(), $filePath);
 		}
-		catch (Exception $e)
+		$fileName = basename($data->getOutputPath());
+		$filePath = $data->getSharedOutputPath();
+		if(!$filePath)
 		{
-			throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
+			// Move file from shared temp to it's final location
+			$directory = kPathManager::getExportCsvSharedPath($dbBatchJob->getPartnerId());
+			if(!file_exists($directory))
+			{
+				mkdir($directory);
+			}
+			$filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+			KalturaLog::info("Trying to move exported csv file from: " . $data->getOutputPath() . " to: " . $filePath);
+			try
+			{
+				kFile::moveFile($data->getOutputPath(), $filePath);
+			}
+			catch (Exception $e)
+			{
+				throw new APIException(APIErrors::FILE_CREATION_FAILED, $e->getMessage());
+			}
+			$data->setOutputPath($filePath);
+			$dbBatchJob->setData($data);
+			$dbBatchJob->save();
 		}
-		
-		
-		$data->setOutputPath($filePath);
-		$dbBatchJob->setData($data);
-		$dbBatchJob->save();
-		
+
 		KalturaLog::info("file path: [$filePath]");
-		
 		$downloadUrl = self::createCsvDownloadUrl($dbBatchJob->getPartnerId(), $fileName);
 		$userName = $data->getUserName();
 		$bodyParams = array($userName, $downloadUrl);

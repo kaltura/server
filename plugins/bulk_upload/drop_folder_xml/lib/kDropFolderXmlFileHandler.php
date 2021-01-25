@@ -197,6 +197,9 @@ class kDropFolderXmlFileHandler
 			'useCmd' => false,
 			'asperaTempFolder' => kConf::get('temp_folder') . '/aspera_upload',
 		);
+
+		$options = $folder->getDropFolderParams();
+		$engineOptions = array_merge($engineOptions, $options);
 		$fileTransferManager = kFileTransferMgr::getInstance($folder->getFileTransferMgrType(), $engineOptions);
 		$loginStatus = $folder->loginByCredentialsType($fileTransferManager);
 

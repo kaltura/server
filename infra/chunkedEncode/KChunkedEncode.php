@@ -107,7 +107,9 @@
 				 * Evaluate session duration 
 				 */
 			if($this->setup->duration==-1) {
-				$params->duration = round($this->sourceFileDt->containerDuration/1000,4);
+				$params->duration = ($this->sourceFileDt->videoDuration>0)? 
+					$this->sourceFileDt->videoDuration: $this->sourceFileDt->containerDuration;
+				$params->duration = round($params->duration/1000,4);
 			}
 			else $params->duration = $this->setup->duration;
 			

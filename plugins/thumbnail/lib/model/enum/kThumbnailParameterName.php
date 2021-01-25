@@ -40,4 +40,6 @@ interface kThumbnailParameterName extends BaseEnum
 	const QUALITY = 'quality';
 	const DENSITY = 'density';
 	const EXTEND_VECTOR = 'extendVector';
+	const AUTO_ROTATE = 'autoRotate';
+	const ROTATION = 'rotation';
 }

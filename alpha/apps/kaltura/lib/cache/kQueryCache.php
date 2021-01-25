@@ -363,6 +363,17 @@ class kQueryCache
 		$debugInfo .= "[$uniqueId]";
 		
 		$queryTime = time();
+		if (is_array($queryResult))
+		{
+			foreach ($queryResult as $object)
+			{
+				if (is_callable(array($object, 'getLastHydrateTime')) && $object->getLastHydrateTime())
+				{
+					$queryTime = min($queryTime, $object->getLastHydrateTime());
+				}
+			}
+		}
+
 		$key = $cacheKey->getKey();
 		KalturaLog::debug("kQueryCache: Updating memcache, key=$key queryTime=$queryTime");
 		self::$s_memcacheQueries->set($key, array($queryResult, $queryTime, $debugInfo), self::CACHED_QUERIES_EXPIRY_SEC);

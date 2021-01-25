@@ -421,7 +421,7 @@ ini_set("memory_limit","512M");
 		 * when large number of srvs attempt to fetch the same job. 
 		 * This situation occurred in AWS env, with high connect/'walk around' times to DC memcache srv
 		 */
-		public function FetchNextJob($fetchRangeRandMax=20)
+		public function FetchNextJob($fetchRangeRandMax=50)
 		{
 			$writeIndex = null;
 			$readIndex = null;
@@ -597,7 +597,12 @@ ini_set("memory_limit","512M");
 			{
 				$cmdLine = 'php -r "';
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
-				
+///////////////
+// DEBUG ONLY
+//$dirName = "/web2/content/shared/tmp/qualityTest/TestBench.11";
+//$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
+//$cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
+///////////////
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';
 				$cmdLine.= '\''.($this->memcacheConfig['port']).'\',';
@@ -684,13 +689,31 @@ ini_set("memory_limit","512M");
 			}
 			else
 				$cmdLine = $job->cmdLine;
-			exec($cmdLine,$op,$rv);
-			$job->finishTime = time();
-			if($rv!=0) {
-				$job->state = $job::STATE_FAIL;
-				$rvStr = "FAILED - rv($rv),";
+				/*
+				 * Up to 2 attempts for chunk generation, in order to overcome possible
+				 * zeroed frames issue, caused by too large GOPs in the source files 
+				 */
+			for($i=0;$i<2;$i++) {
+				if($i>0){
+					$cmdLine = self::fixCmdLineBackOffset($cmdLine);
+					KalturaLog::log("2nd attempt, due to empty frames, fixed cmdLine:$cmdLine");
+					sleep(3);
+				}
+				exec($cmdLine,$op,$rv);
+				$job->finishTime = time();
+				if($rv!=0) {
+					$job->state = $job::STATE_FAIL;
+					$rvStr = "FAILED - rv($rv),";
+					break;
+				}
+					// No need to check for empties for 1st chunk and audio chunks
+				if($job->id>0 && !strstr($outFilename,'.vid')===false){
+					if(KFFMpegMediaParser::detectEmptyFrames("ffmpeg", "ffprobe", $outFilename)===false)
+						break;
+				}
 			}
-			else {
+
+			if($rv==0) {
 				if(isset($outFilename) && strstr($outFilename,'.vid')) {
 					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
@@ -708,7 +731,7 @@ ini_set("memory_limit","512M");
 					$rvStr = "SUCCESS -";
 				}
 			}
-			
+
 				//When working with remote (none nfs) shared stoarge we need to move the file to shared
 			if($sharedChunkPaths){
 				KalturaLog::log("Done running cmd line,moving file from [" . print_r($outFilenames, true) . "] to [" . print_r($sharedChunkPaths, true) . "]");
@@ -773,8 +796,39 @@ ini_set("memory_limit","512M");
 			return false;
 		}
 
+		/* ---------------------------
+		 * fixCmdLineBackOffset
+		 *	increases the default seek-to back-offset in order to handle source's large GOP cases,
+		 * 	that are located on chunk boundary, preventing the ability for precise seek-to
+		 */
+		private static function fixCmdLineBackOffset($cmdLine)
+		{
+			$cmdLineArr = explode(" ",$cmdLine);
+				// Remove spaces
+			foreach($cmdLineArr as $idx=>$val){
+				if(strlen(trim($cmdLineArr[$idx]))==0){
+					unset($cmdLineArr[$idx]);
+				}
+			}
+			$keys = array_keys($cmdLineArr, "-ss" );
+			if(count($keys)==2){
+				$startFromIdx = $keys[0]+1;
+				$backOffsIdx  = $keys[1]+1;
+				$startFrom = $cmdLineArr[$startFromIdx];
+				$backOffs  = $cmdLineArr[$backOffsIdx];
+				
+				$fix = $backOffs*2;
+				$cmdLineArr[$startFromIdx] = $startFrom - $fix;
+				$cmdLineArr[$backOffsIdx]  = $backOffs  + $fix;
+				KalturaLog::log("Fixed startfrom:$cmdLineArr[$startFromIdx] (orig $startFrom), backOffs:$backOffs($cmdLineArr[$backOffsIdx])");
+			}
+			return (implode(" ",$cmdLineArr));
+		}
 	}
+	
 	/*****************************
 	 * End of KChunkedEncodeMemcacheScheduler
 	 *****************************/
+
+	
 

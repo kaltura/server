@@ -240,6 +240,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	public function setStorageId($storageId) {
 		return $this->params->setStorageId($storageId);
 	}
+
+	public function setFileExt($fileExt)
+	{
+		return $this->params->setFileExtension($fileExt);
+	}
 	
 	// -------------------------------------
 	// -----  DeliveryProfile functionality--------

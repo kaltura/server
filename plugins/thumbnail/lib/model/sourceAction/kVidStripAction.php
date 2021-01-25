@@ -72,6 +72,11 @@ class kVidStripAction extends kVidAction
 			$second = $this->startSec + ($interval * $i);
 			$this->captureThumb($this->source->getEntry(), $destPath, $second);
 			$sliceToAdd = new Imagick(KThumbnailCapture::getCapturePath($destPath));
+			if($this->rotation)
+			{
+				$sliceToAdd->rotateImage(kRotateAction::DEFAULT_BG, $this->rotation);
+			}
+
 			if(!$sizeInitialized)
 			{
 				$width = $sliceToAdd->getImageWidth();

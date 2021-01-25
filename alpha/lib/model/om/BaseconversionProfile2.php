@@ -1177,6 +1177,8 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		$this->last_hydrate_time = time();
+
 		// Nullify cached objects
 		$this->m_custom_data = null;
 		
@@ -2588,4 +2590,11 @@ abstract class BaseconversionProfile2 extends BaseObject  implements Persistent 
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
+	protected $last_hydrate_time;
+
+	public function getLastHydrateTime()
+	{
+		return $this->last_hydrate_time;
+	}
+
 } // BaseconversionProfile2

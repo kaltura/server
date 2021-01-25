@@ -25,8 +25,17 @@ class kCropAction extends kImagickAction
 
 	protected function extractActionParameters()
 	{
-		$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
-		$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+		if($this->getIntActionParameter(kThumbnailParameterName::ROTATION) === 90 || $this->getIntActionParameter(kThumbnailParameterName::ROTATION) === 270)
+		{
+			$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+			$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
+		}
+		else
+		{
+			$this->newWidth = $this->getIntActionParameter(kThumbnailParameterName::WIDTH);
+			$this->newHeight = $this->getIntActionParameter(kThumbnailParameterName::HEIGHT);
+		}
+
 		$this->x = $this->getIntActionParameter(kThumbnailParameterName::X);
 		$this->y = $this->getIntActionParameter(kThumbnailParameterName::Y);
 		$this->gravityPoint = $this->getIntActionParameter(kThumbnailParameterName::GRAVITY_POINT, kCropGravityPoint::NORTHWEST);
