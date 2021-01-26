@@ -6,6 +6,19 @@
 
 	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
 
+## Ability to cancel tasks ##
+- Issue Type: Task
+- Issue ID: REACH2-989
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_25_add_permissions_entry_vendor_task_object.php
+
+
 ## New drop folder type S3 ##
 - Issue Type: Task
 - Issue ID: PLAT-22575
