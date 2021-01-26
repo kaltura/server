@@ -179,27 +179,25 @@ class kReachUtils
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);
 		return $remainingCredit >= 0 ? true : false;
 	}
-	
-	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission)
+
+
+	public static function isDuplicationByResubmission($activeTask, $allowResubmission)
 	{
-		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_MODERATION);
-		$activeTasks = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		$activeTasksOnOlderVersion = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, $statusArr);
-		if($activeTasksOnOlderVersion || ($activeTasks && !$allowResubmission))
+		if (!$allowResubmission ||
+			(in_array($activeTask->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PROCESSING))))
 		{
 			return true;
 		}
-		foreach ($activeTasks as $activeTask)
-		{
-			if (in_array($activeTask->getStatus(), $statusArr))
-			{
-				return true;
-			}
-		}
-
 		return false;
 	}
-	
+
+	public static function tryToCancelTask($entryVendorTask)
+	{
+		$entryVendorTask->setStatus(EntryVendorTaskStatus::ABORTED);
+		$entryVendorTask->setErrDescription('Aborted following cancel request');
+		EntryVendorTaskService::tryToSave($entryVendorTask);
+	}
+
 	public static function isEntryTypeSupported($type, $mediaType = null)
 	{
 		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);

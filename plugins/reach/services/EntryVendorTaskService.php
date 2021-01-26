@@ -75,9 +75,28 @@ class EntryVendorTaskService extends KalturaBaseService
 
 	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem)
 	{
-		if (kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion, $dbVendorCatalogItem->getAllowResubmission()))
+		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
+		if ($activeTask)
 		{
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $taskVersion);
+			if (kReachUtils::isDuplicationByResubmission($activeTask, $dbVendorCatalogItem->getAllowResubmission()))
+			{
+				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $activeTask->getVersion());
+			}
+		}
+		else
+		{
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING));
+			if($activeTasksOnOlderVersion)
+			{
+				if ($activeTasksOnOlderVersion->getStatus() == EntryVendorTaskStatus::PENDING)
+				{
+					kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
+				}
+				else if ($activeTasksOnOlderVersion->getStatus() == EntryVendorTaskStatus::PROCESSING)
+				{
+					throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $activeTasksOnOlderVersion->getVersion());
+				}
+			}
 		}
 
 		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion);
