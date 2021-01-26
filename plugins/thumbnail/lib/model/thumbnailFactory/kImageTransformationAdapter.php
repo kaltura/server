@@ -55,7 +55,7 @@ class kImageTransformationAdapter
 		{
 			$step = new kImageTransformationStep();
 			$this->addEntrySource($step);
-			$this->addVidSecAction($step, $startSec + ($i * $interval));
+			$this->addVidSecAction($step, $startSec + ($i * $interval), true);
 			$this->handleActionType($step);
 			$this->addStripConcat($step, $i);
 			$transformation->addImageTransformationStep($step);
@@ -448,16 +448,26 @@ class kImageTransformationAdapter
 			$sourceAction = new kVidSliceAction();
 			$sourceAction->setActionParameter(kThumbnailParameterName::SLICE_NUMBER, $this->parameters->get(kThumbFactoryFieldName::VID_SLICE));
 			$sourceAction->setActionParameter(kThumbnailParameterName::NUMBER_OF_SLICES, $this->parameters->get(kThumbFactoryFieldName::VID_SLICES));
-			$sourceAction->setActionParameter(kThumbnailParameterName::START_SEC, $this->parameters->get(kThumbFactoryFieldName::START_SEC));
-			$sourceAction->setActionParameter(kThumbnailParameterName::END_SEC, $this->parameters->get(kThumbFactoryFieldName::END_SEC));
+			if($this->parameters->get(kThumbFactoryFieldName::START_SEC) !== kThumbAdapterParameters::UNSET_PARAMETER)
+			{
+				$sourceAction->setActionParameter(kThumbnailParameterName::START_SEC, $this->parameters->get(kThumbFactoryFieldName::START_SEC));
+			}
+
+			if($this->parameters->get(kThumbFactoryFieldName::END_SEC) !== kThumbAdapterParameters::UNSET_PARAMETER)
+			{
+				$sourceAction->setActionParameter(kThumbnailParameterName::END_SEC, $this->parameters->get(kThumbFactoryFieldName::END_SEC));
+			}
+
+			$sourceAction->setActionParameter(kThumbnailParameterName::AUTO_ROTATE, true);
 			$step->addAction($sourceAction);
 		}
 	}
 
-	protected function addVidSecAction($step, $sec)
+	protected function addVidSecAction($step, $sec, $autoRotate = false)
 	{
 		$sourceAction = new kVidSecAction();
 		$sourceAction->setActionParameter(kThumbnailParameterName::SECOND, $sec);
+		$sourceAction->setActionParameter(kThumbnailParameterName::AUTO_ROTATE, $autoRotate);
 		$step->addAction($sourceAction);
 	}
 
@@ -560,7 +570,7 @@ class kImageTransformationAdapter
 	{
 		$step = new kImageTransformationStep();
 		$this->addEntrySource($step);
-		$this->addVidSecAction($step, $startSec);
+		$this->addVidSecAction($step, $startSec, true);
 		$this->handleActionType($step);
 		$extendAction = new kExtendImageAction();
 		$extendAction->setActionParameter(kThumbnailParameterName::X, $vidSlices);

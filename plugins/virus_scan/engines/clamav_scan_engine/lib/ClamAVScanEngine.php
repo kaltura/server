@@ -9,6 +9,8 @@ class ClamAVScanEngine extends VirusScanEngine
 	
 	private $binFile = null;
 	
+	private $runWrapped = false;
+	
 	/**
 	 * This function should be used to let the engine take specific configurations from the batch job parameters.
 	 * For example - command line of the relevant binary file.
@@ -21,6 +23,13 @@ class ClamAVScanEngine extends VirusScanEngine
 		    KalturaLog::err('Binary file configuration not found');
 			return false;
 		}
+		
+		if(isset($paramsObject->runWrapped) && $paramsObject->runWrapped == true)
+		{
+			KalturaLog::err('Process will run using stream wrapper');
+			$this->runWrapped = true;
+		}
+		
 		$this->binFile = $paramsObject->clamAvScanEngineBin;
 		return true;
 	}
@@ -40,26 +49,18 @@ class ClamAVScanEngine extends VirusScanEngine
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
-		if (!file_exists($filePath)) {
-			$errorDescription = 'Source file does not exists ['.$filePath.']';
+		if (!kFile::checkFileExists($filePath)) {
+			$errorDescription = "Source file does not exists [$filePath]";
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 		
-		clearstatcache();
-		$fileLastChanged = filemtime($filePath);
+		$clamAvScanWrapper = new ClamAVScanWrapper($this->binFile, $filePath, $this->runWrapped);
+		list($return_value, $output, $errorDescription) = $clamAvScanWrapper->execute();
 		
-		$cmd = $this->binFile . ' --verbose ' . $filePath;
-
-		$errorDescription = null;
-		$output = null;
-		
-		KalturaLog::info("Executing - [$cmd]");
-		exec($cmd, $output, $return_value);
-				
 		$statusLine = false;
 		foreach ($output as $line)
 		{
-			if (strpos($line, $filePath) === 0 || strpos($line, realpath($filePath)) === 0)
+			if (strpos($line, $filePath) === 0 || strpos($line, kFile::realPath($filePath)) === 0)
 			{
 				$statusLine = $line;
 				break;
@@ -69,7 +70,7 @@ class ClamAVScanEngine extends VirusScanEngine
 		
 		if (!$statusLine)
 		{
-			$errorDescription = 'Unknown error - return value ['.$return_value.']';
+			$errorDescription = "Unknown error - return value [$return_value] errorDescription [$errorDescription]";
 			return KalturaVirusScanJobResult::SCAN_ERROR;
 		}
 

@@ -45,11 +45,9 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		$startLineNumber = $this->getStartIndex($this->job->id);
 	
 		$filePath = $this->data->filePath;
-
 		$filePath = kFile::realPath($filePath);
 		kSharedFileSystemMgr::restoreStreamWrappers();
 		$fileHandle = fopen($filePath, "r");
-		kSharedFileSystemMgr::unRegisterStreamWrappers();
 
 		if(!$fileHandle)
 			throw new KalturaBatchException("Unable to open file: {$filePath}", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND); //The job was aborted
@@ -61,8 +59,18 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 		//removing UTF-8 BOM if exists
 		if (fread($fileHandle,3) != pack('CCC',0xef,0xbb,0xbf))
 		{
-			fseek($fileHandle,0);
+			//In case we are reading from remote path we will close and reopen the file since fseek will not work
+			if (kFile::isSharedPath($this->data->filePath))
+			{
+				fclose($fileHandle);
+				$fileHandle = fopen($filePath, "r");
+			}
+			else
+			{
+				fseek($fileHandle,0);
+			}
 		}
+		kSharedFileSystemMgr::unRegisterStreamWrappers();
 
 		$values = fgetcsv($fileHandle);
 		while($values)

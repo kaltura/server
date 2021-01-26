@@ -31,6 +31,11 @@ class kImportJobData extends kJobData
 	private $cacheOnly = false;
 	
 	/**
+	 * @var string
+	 */
+	private $destFileSharedPath;
+	
+	/**
 	 * @return the $srcFileUrl
 	 */
 	public function getSrcFileUrl()
@@ -106,5 +111,21 @@ class kImportJobData extends kJobData
 	 */
 	public function setFileSize($fileSize) {
 		$this->fileSize = $fileSize;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getDestFileSharedPath()
+	{
+		return $this->destFileSharedPath;
+	}
+	
+	/**
+	 * @param string $destFileSharedPath
+	 */
+	public function setDestFileSharedPath($destFileSharedPath)
+	{
+		$this->destFileSharedPath = $destFileSharedPath;
 	}
 }

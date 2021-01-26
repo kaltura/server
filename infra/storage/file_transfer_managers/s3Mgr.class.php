@@ -39,6 +39,11 @@ class s3Mgr extends kFileTransferMgr
 	protected $storageClass = null;
 	protected $s3Arn = null;
 
+	const SIZE = 'Size';
+	const LAST_MODIFICATION = 'LastModified';
+	const CONTENT_LENGTH = 'ContentLength';
+	const HEAD_OBJECT = 'headObject';
+
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
 	{
@@ -399,7 +404,8 @@ class s3Mgr extends kFileTransferMgr
 			{
 				$dirList[] = array (
 					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
-					"fileSize" => $dirListObject['Size']
+					"fileSize" => $dirListObject[self::SIZE],
+					'modificationTime' => $dirListObject[self::LAST_MODIFICATION],
 				);
 			}
 		}
@@ -413,12 +419,72 @@ class s3Mgr extends kFileTransferMgr
 
 	protected function doListFileObjects ($remoteDir)
 	{
-		return false;
+		$files =  $this->doList ($remoteDir);
+		$fileObjectsResult = array ();
+
+		foreach($files as $file)
+		{
+			if(trim($remoteDir, '/') === trim($file['path'],'/'))
+			{
+				continue;
+			}
+			$fileObject = new FileObject();
+			$fileObject->filename = basename($file['path']);
+			$fileObject->fileSize = $file['fileSize'];
+			$fileObject->modificationTime = strtotime($file['modificationTime']);
+			$fileObjectsResult[] = $fileObject;
+		}
+		return $fileObjectsResult;
 	}
 
-	protected function doFileSize($remote_file)
+	public function initBasicS3Params($filePath)
 	{
-		return false;
+		list($bucket, $filePath) = explode("/",ltrim($filePath,"/"),2);
+
+		$params = array(
+			'Bucket' => $bucket,
+			'Key'    => $filePath,
+		);
+		return $params;
+	}
+
+	protected function s3Call($command, $params = null, $filePath = null)
+	{
+		if(!$params && $filePath)
+		{
+			$params = $this->initBasicS3Params($filePath);
+		}
+
+		try
+		{
+			$result = $this->s3->{$command}($params);
+			return $result;
+		}
+		catch (S3Exception $e)
+		{
+			KalturaLog::warning($e->getMessage());
+			return false;
+		}
+	}
+
+	protected function doFileSize($remoteFile)
+	{
+		$result = $this->s3Call(self::HEAD_OBJECT, null, $remoteFile);
+		if(!$result)
+		{
+			return false;
+		}
+		return $result->get(self::CONTENT_LENGTH);
+	}
+
+	protected function doModificationTime($remoteFile)
+	{
+		$result = $this->s3Call(self::HEAD_OBJECT, null, $remoteFile);
+		if(!$result)
+		{
+			return false;
+		}
+		return strtotime($result->get(self::LAST_MODIFICATION));
 	}
 
 	// execute the given command on the server

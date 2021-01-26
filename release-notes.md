@@ -1,5 +1,48 @@
-# Propus 16.15.0  #
+# Propus-16.16.0  #
 
+## Version Highlight ##
+
+### New features ###
+
+	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
+
+## New drop folder type S3 ##
+- Issue Type: Task
+- Issue ID: PLAT-22575
+
+### Configuration ###
+
+Add S3DropFolder to your plugins.ini
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+# Propus-16.15.0  #
+
+## Version Highlight ##
+
+### New features ###
+	
+	- SUP-24887 : YouTube! Kaltura Distribution app is certified for authetication without warnings 
+	- PLAT-22514 : Zoom enhancement, link between cms_user_id and entry onwer upon new recording
+	- SUP-24551 : Support upload caption files using sshUrlContentResource 
+	- REACH2-990 : Ability to set label for caption by setting new properties on KalturaReachProfile
+		- labelAdditionForMachineServiceType  (to be set on Machine translated caption coming from this profile)
+		- labelAdditionForHumanServiceType    (to be set on Human translated coming from this profile)
+	- SUP-24759 : REACH Captions Dashboard - Filtering/Sorting/Report Indicating Target Language
+	- SUP-25144 : New exception is raised (CRITERIA EXCEEDED MAX MATCHES ALLOWED) when tring to access object index > 10000 in eSearch service
+
+### Bug fix ###
+
+	- PLAT-22564 : attachment_attachmentasset->get must be done with KS
+	- SUP-25087 : Clipping of old content is stuck	
+
+### SAAS related ###
+
+	- PLAT-11239 : Download of files via VOD packager  
+	- PLAT-10788 : Fix link https://kmc.kaltura.com/default
+	
 ## Reach - update reach_vendor response profile ##
 - Issue Type: Task
 - Issue ID: REACH2-998

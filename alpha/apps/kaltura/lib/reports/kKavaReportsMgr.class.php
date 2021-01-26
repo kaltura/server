@@ -2235,6 +2235,7 @@ class kKavaReportsMgr extends kKavaBase
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
 			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
 			'crm_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_CRM_ID),
+			'playlist_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYLIST_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
