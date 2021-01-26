@@ -443,7 +443,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			if (in_array($this->oldColumnsValues[EntryVendorTaskPeer::STATUS],
 				array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY)))
 			{
-				parent::save($con);
+				return parent::save($con);
 			}
 			else
 			{
