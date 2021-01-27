@@ -1085,7 +1085,7 @@ abstract class LiveEntry extends entry
 
 	public function getObjectParams($params = null)
 	{
-		$enableIsLive = kConf::get('enableIsLiveOnElasticIndex', 'live', true);
+		$enableIsLive = kConf::get('enableIsLiveOnElasticIndex', 'elastic', true);
 		$body = array(
 			'recorded_entry_id' => $this->getRecordedEntryId(),
 			'push_publish' => $this->getPushPublishEnabled(),
