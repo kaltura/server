@@ -60,7 +60,7 @@ class ClamAVScanWrapper
 		KalturaLog::info("Executing - [$cmd]");
 		exec($cmd, $output, $return_value);
 		
-		return array($output, $return_value, "");
+		return array($return_value, $output, "");
 	}
 	
 	protected function runWrapped()
@@ -82,7 +82,7 @@ class ClamAVScanWrapper
 		$process = proc_open( $cmd, $descriptorSpec, $pipes, "/tmp");
 		if (!is_resource($process))
 		{
-			return array(array(), self::COMMAND_INVOKE_CANNOT_EXECUTE, "Process returned by proc_open is not a valid resource");
+			return array(self::COMMAND_INVOKE_CANNOT_EXECUTE, array(), "Process returned by proc_open is not a valid resource");
 		}
 		
 		if (function_exists('stream_set_chunk_size'))
