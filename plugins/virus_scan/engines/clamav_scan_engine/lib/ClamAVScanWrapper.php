@@ -74,7 +74,7 @@ class ClamAVScanWrapper
 		$fd = self::openFile($this->resolvedFilePath);
 		if(!$fd)
 		{
-			return array(array(), self::CANT_ACCESS_FILE_ERROR_CODE, "Failed to open file [{$this->resolvedFilePath}]");
+			return array(self::CANT_ACCESS_FILE_ERROR_CODE, array(), "Failed to open file [{$this->resolvedFilePath}]");
 		}
 		
 		$cmd = $this->binPath . ' --verbose -';
