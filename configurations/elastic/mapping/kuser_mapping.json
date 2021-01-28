@@ -311,7 +311,10 @@
 					"type" : "integer"
 				},
 				"picture": {
-					"enabled" : "false",
+					"enabled" : "false"
+				},
+				"registration_info": {
+					"enabled" : "false"
 				}
 			}
 		}
