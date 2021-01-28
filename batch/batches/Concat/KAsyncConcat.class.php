@@ -91,7 +91,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath.".mp4" : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
 
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
@@ -149,7 +149,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::RETRY);
 			
 		$data->destFilePath = $sharedTempFilePath;
-		return $this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
+		return $this->closeJob($job, null, null, 'successfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 	}
 
 	/**
