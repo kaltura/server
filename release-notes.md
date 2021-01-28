@@ -20,7 +20,7 @@
         
     Run deployment script:
         php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
-=======
+
 ## Ability to cancel tasks ##
 - Issue Type: Task
 - Issue ID: REACH2-989
