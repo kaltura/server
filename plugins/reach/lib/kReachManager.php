@@ -42,8 +42,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
 	{
-		$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
-		$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
+		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 		$taskJobData = self::getTaskJobData($object);
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
@@ -564,10 +563,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		$sourceFlavorVersion = $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
-		if (kReachUtils::isDuplicateTask($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion, false))
+		if (EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
 		{
 			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$sourceFlavorVersion]");
 			return true;
+		}
+		else
+		{
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING));
+			if($activeTasksOnOlderVersion)
+			{
+				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
+			}
 		}
 
 		//check if credit has expired

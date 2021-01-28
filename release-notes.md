@@ -20,6 +20,18 @@
         
     Run deployment script:
         php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
+=======
+## Ability to cancel tasks ##
+- Issue Type: Task
+- Issue ID: REACH2-989
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_25_add_permissions_entry_vendor_task_object.php
 
 ## New drop folder type S3 ##
 - Issue Type: Task

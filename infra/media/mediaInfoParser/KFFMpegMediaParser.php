@@ -894,8 +894,11 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		$frmSizeAccArr=array("I"=>0,"P"=>0,"B"=>0);
 		$cntArr=array("I"=>0,"P"=>0,"B"=>0);
 		foreach($outputArr as $line){
+			$valsArr = explode(',', $line);
+			if(count($valsArr)<8)
+				continue;
 			$stam=$pts=$pktDur=$pktPos=$pktSize=$pictType=$pictNum=$inter=0;
-			$data = list($stam,$pts,$pktDur,$pktPos,$pktSize,$pictType,$pictNum,$inter) = explode(',', $line);
+			$data = list($stam,$pts,$pktDur,$pktPos,$pktSize,$pictType,$pictNum,$inter) = $valsArr;
 			$dataArr[] = $data;
 //KalturaLog::log(json_encode($data));
 			{
