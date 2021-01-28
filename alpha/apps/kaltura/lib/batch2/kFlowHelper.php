@@ -682,9 +682,11 @@ class kFlowHelper
 			return;
 		}
 		
-		
 		$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$pendingFileSync->save();
+		
+		//Once remote file is marked as ready we can delete the local copy and update local copy file sync
+		$flavorAsset->deleteLocalFileCopy();
 	}
 
 	/**
