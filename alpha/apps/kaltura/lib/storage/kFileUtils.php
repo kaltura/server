@@ -319,19 +319,6 @@ class kFileUtils extends kFile
 
 	public static function getServeMimeType($filePath)
 	{
-		$mimeType = kFile::mimeType($filePath);
-
-		if(!kConf::hasMap('security'))
-		{
-			return $mimeType;
-		}
-
-		$serveExcludedMimeTypes = kConf::get('serve_excluded_mime_types', 'security', array());
-		if($serveExcludedMimeTypes && in_array($mimeType, $serveExcludedMimeTypes))
-		{
-			$mimeType = 'text/plain';
-		}
-
-		return $mimeType;
+		return 'text/plain';
 	}
 }
