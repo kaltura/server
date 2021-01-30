@@ -585,7 +585,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		}
 		
-		if($entry->getStatus() != entryStatus::READY)
+		if($vendorCatalogItem->requiresEntryReady() && $entry->getStatus() != entryStatus::READY)
 		{
 			$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
 		}

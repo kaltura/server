@@ -30,7 +30,7 @@ class KReachVendorTaskHelloWorldProcessorEngine extends KReachVendorTaskProcesso
         }
         $metadataProfileId = $metadataProfileListResponse->objects[0]->id;
 
-        $targetMetadata = '<metadata><Control>Hello World</Control>></metadata>';
+        $targetMetadata = '<metadata><Control>Hello World</Control></metadata>';
 
         try {
             $metadata = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY, $vendorTask->entryId, $targetMetadata);

@@ -48,13 +48,20 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
 
         $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
 
+        if ($response->totalCount == 0)
+        {
+            KalturaLog::info('No jobs found to handle at this time. Exiting');
+            KBatchBase::unimpersonate();
+            return;
+        }
+
         $handledTasksCounter = 0;
         while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit) {
             foreach ($response->objects as $entryVendorTask) {
                 /* @var $entryVendorTask KalturaEntryVendorTask */
 
                 //retrieve associated catalog item and retrieve appropriate engine based on the engineType property
-                $catalogItem = $entryVendorTask->relatedObjects[self::CATALOG_ITEM_INDEX][0];
+                $catalogItem = $entryVendorTask->relatedObjects[0]->objects[0];
                 /* @var $catalogItem KalturaVendorCatalogItem */
                 $engine = KReachVendorTaskProcessorEngine::getInstance($catalogItem->engineType);
                 if (!$engine)
@@ -80,7 +87,8 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
                 }
             }
 
-            KBatchBase::impersonate(self::REACH_INTERNAL_VENDOR_PARTNER);
+            KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
+            KBatchBase::$kClient->setResponseProfile($responseProfile);
             $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
         }
 
@@ -93,10 +101,12 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
     protected function constructResponseProfile ()
     {
         $responseProfile = new KalturaDetachedResponseProfile();
+        $responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
         $responseProfile->fields = 'id,partnerId,vendorPartnerId,createdAt,entryId,status,reachProfileId,catalogItemId,accessKey,notes,dictionary';
         $responseProfile->relatedProfiles = array();
 
         $catalogItemProfile = new KalturaDetachedResponseProfile();
+        $catalogItemProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
         $catalogItemProfile->fields = 'id,vendorPartnerId,name,systemName,createdAt,updatedAt,status,pricing,fixedPriceAddons,engineType';
         $catalogItemProfile->filter = new KalturaVendorCatalogItemFilter();
         $catalogItemProfile->mappings = array();
@@ -107,6 +117,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
         $responseProfile->relatedProfiles[] = $catalogItemProfile;
 
         $reachResponseProfile = new KalturaDetachedResponseProfile();
+        $reachResponseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
         $reachResponseProfile->fields = 'id,partnerId,createdAt,updatedAt,status,profileType,rules,credit,usedCredit,dictionaries,autoDisplayMachineCaptionsOnPlayer,autoDisplayHumanCaptionsOnPlayer,enableMachineModeration,enableHumanModeration';
         $reachResponseProfile->filter = new KalturaReachProfileFilter();
         $reachResponseProfile->mappings = array();

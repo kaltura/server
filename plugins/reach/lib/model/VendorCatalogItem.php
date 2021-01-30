@@ -188,5 +188,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
         return null;
     }
 
+    public function requiresEntryReady()
+    {
+        return true;
+    }
+
 
 } // VendorCatalogItem

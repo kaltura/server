@@ -24,6 +24,13 @@ abstract class KReachVendorTaskProcessorEngine
      */
     public static function getInstance ($engineType)
     {
+        switch ($engineType)
+        {
+            case KalturaReachVendorEngineType::HELLO_WORLD:
+                return new KReachVendorTaskHelloWorldProcessorEngine();
+            break;
+        }
+
         return KalturaPluginManager::loadObject('KReachVendorTaskProcessorEngine', $engineType);
 
     }
@@ -74,9 +81,9 @@ abstract class KReachVendorTaskProcessorEngine
 
     }
 
-    public function moveTaskToStatus($task, $status)
+    public function moveTaskToStatus(KalturaEntryVendorTask $task, $status)
     {
-        KBatchBase::impersonate($task->vendorPartnerId);
+        KBatchBase::impersonate($task->partnerId);
 
         $updateTask = new KalturaEntryVendorTask();
         $updateTask->status = $status;

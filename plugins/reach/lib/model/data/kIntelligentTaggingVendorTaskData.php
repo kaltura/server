@@ -23,7 +23,7 @@ class kIntelligentTaggingVendorTaskData extends kVendorTaskData
     }
 
     /**
-     * @param string $captionAssetId
+     * @param string $assetId
      */
     public function setAssetId($assetId)
     {

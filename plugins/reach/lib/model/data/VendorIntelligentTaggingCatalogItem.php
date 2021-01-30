@@ -23,6 +23,11 @@ class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
         return $entry->getVersion();
     }
 
+    public function requiresEntryReady()
+    {
+        return false;
+    }
+
     /**
      * @param $object
      * @return kTranslationVendorTaskData|null
