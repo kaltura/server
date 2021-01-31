@@ -26,7 +26,7 @@ class ClamAVScanEngine extends VirusScanEngine
 		
 		if(isset($paramsObject->runWrapped) && $paramsObject->runWrapped == true)
 		{
-			KalturaLog::err('Process will run using stream wrapper');
+			KalturaLog::debug('Process will run using stream wrapper');
 			$this->runWrapped = true;
 		}
 		
