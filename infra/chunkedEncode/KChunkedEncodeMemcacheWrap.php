@@ -109,7 +109,7 @@ ini_set("memory_limit","512M");
 				if(($jobStr=$this->get($key))!==false){
 					break;
 				}
-				sleep(0.3);
+				usleep(rand(0,30000));
 				KalturaLog::log("Attempt($try) to fetch job ($keyIdx)");
 			}
 			if($try==$maxTries){
@@ -286,6 +286,7 @@ ini_set("memory_limit","512M");
 		{
 			$waited=0;
 	KalturaLog::log("key($key), val($val)");
+			$attemptSleep*=1000000;
 			do {
 				$addLasted = microtime(true);
 				$rv = $this->cacheStore->add($key, $val, $expiry);
@@ -294,7 +295,7 @@ ini_set("memory_limit","512M");
 					break;
 				}
 				$sleepLasted = microtime(true);
-				usleep($attemptSleep*1000000);
+				usleep(rand(0,$attemptSleep));
 				$sleepLasted = round((microtime(true)-$sleepLasted),5);
 				$waited+=($addLasted+$sleepLasted);
 				$attempDuration-= ($addLasted+$sleepLasted);
@@ -421,7 +422,13 @@ ini_set("memory_limit","512M");
 		 * when large number of srvs attempt to fetch the same job. 
 		 * This situation occurred in AWS env, with high connect/'walk around' times to DC memcache srv
 		 */
-		public function FetchNextJob($fetchRangeRandMax=50)
+		public function FetchNextJob($fetchRangeRandMax=0){
+			if($fetchRangeRandMax==0)
+				return $this->FetchNextJobIndexInc($fetchRangeRandMax);
+			else
+				return $this->FetchNextJobRandom($fetchRangeRandMax);
+		}
+		public function FetchNextJobRandom($fetchRangeRandMax=50)
 		{
 			$writeIndex = null;
 			$readIndex = null;
@@ -483,6 +490,61 @@ ini_set("memory_limit","512M");
 			return null;
 		}
 		
+		public function FetchNextJobIndexInc($fetchRangeRandMax=50){
+			if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+				KalturaLog::log("ERROR: Missing write or read index ");
+				return false;
+			}
+				/*
+				 * Stop fetching if there are no unread objects
+				 */
+			if($readIndex>$writeIndex){
+				return null;
+			}
+			
+			$fetchIndex = $this->incrementReadIndex()-1;
+			KalturaLog::log("fetchIndex:$fetchIndex (new)");
+
+			$semaphoreKey = $this->getSemaphoreKeyName($fetchIndex);
+			$semaphoreToken = getmypid().".".gethostname().".".rand();
+			$rvLock = null;
+			while(true) {
+						/*
+						 * Try to lock the next unread job object
+						 * if failed - carry on to next
+						 */
+				if(is_null($rvLock)) $rvLock = $this->lock($semaphoreKey, $semaphoreToken, 0);
+				if($rvLock!==true){
+					KalturaLog::log("Unable to lock fetchIndex($fetchIndex), retry ");
+				}
+				else {
+						/*
+						 * Try to fetch the job object from the memcache
+						 */
+					$job = $this->FetchJob($fetchIndex); 
+					if($job!==false) {
+						return $job;
+					}
+				}
+
+				if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+					KalturaLog::log("ERROR: Missing write or read index ");
+					break;
+				}
+				
+				if($fetchIndex<$readIndex-1000) {
+					KalturaLog::log("Unable to access job($fetchIndex), while rdIdx($readIndex) moved on, skipping");
+					break;
+				}
+
+				KalturaLog::log("Unable to access job ($fetchIndex), retry");
+				usleep(rand(0,100000));
+			}
+			
+			$this->delete($semaphoreKey);
+			return false;
+		}
+
 		/* ---------------------------
 		 * GetRunningJobs
 		 */
@@ -495,7 +557,8 @@ ini_set("memory_limit","512M");
 			$localHostname = gethostname();
 			$jobs = array();
 			$idx=max(0,$readIndex-$lookBackward);
-			for(; $idx<$writeIndex; $idx++) {
+			$idxMax = min($readIndex+$lookBackward,$writeIndex);
+			for(; $idx<$idxMax; $idx++) {
 				$job = $this->FetchJob($idx,1);
 				if($job!==false && $job->state==$job::STATE_RUNNING 
 				&& strcmp($localHostname, $job->hostname)=== 0 && KProcessExecutionData::isProcessRunning($job->process)) {
@@ -853,7 +916,7 @@ ini_set("memory_limit","512M");
 					return $rv;
 				}
 				KalturaLog::log("Attempt($try) to set RD($readIndex)");
-				sleep(0.3);
+				usleep(rand(0,100000));
 			}
 			return false;
 		}
@@ -885,6 +948,14 @@ ini_set("memory_limit","512M");
 				KalturaLog::log("Fixed startfrom:$cmdLineArr[$startFromIdx] (orig $startFrom), backOffs:$backOffs($cmdLineArr[$backOffsIdx])");
 			}
 			return (implode(" ",$cmdLineArr));
+		}
+		
+		/* ---------------------------
+		 * incrementReadIndex
+		 */
+		protected function incrementReadIndex()	{
+			$idx=$this->increment($this->getReadIndexKeyName());
+			return $idx;
 		}
 	}
 	
