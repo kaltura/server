@@ -301,7 +301,7 @@ class kConvertJobData extends kConvartableJobData
 			$sumEffort = 0;
 			$fileSyncs = $this->getSrcFileSyncs();
 			foreach ($fileSyncs as $fileSync) {
-				$fileSize = filesize($fileSync->getFileSyncLocalPath());
+				$fileSize = kFile::fileSize($fileSync->getFileSyncLocalPath());
 				if($fileSize !== False)
 					$sumEffort += $fileSize;
 			}
