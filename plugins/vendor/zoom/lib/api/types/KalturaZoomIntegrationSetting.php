@@ -71,7 +71,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'createUserIfNotExist',
 		'handleParticipantsMode',
 		'zoomUserMatchingMode' => 'UserMatching',
-		'zoomUserPostfix',
+		'zoomUserPostfix' => 'UserPostfix',
 		'zoomWebinarCategory',
 		'enableWebinarUploads',
 		'enableRecordingUpload' => 'status',

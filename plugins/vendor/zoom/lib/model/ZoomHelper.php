@@ -123,21 +123,9 @@ class ZoomHelper
 			/** @noinspection PhpUndefinedMethodInspection */
 			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
-			if (!is_null($zoomIntegration))
-			{
-				$page = str_replace('@defaultUserID@', $zoomIntegration->getDefaultUserEMail() , $page);
-				$page = str_replace('@zoomCategory@', $zoomIntegration->getZoomCategory() ? $zoomIntegration->getZoomCategory()  : 'Zoom Recordings'  , $page);
-				$page = str_replace('@enableRecordingUpload@', $zoomIntegration->getStatus()== VendorStatus::ACTIVE ? 'checked'  : ''  , $page);
-				$page = str_replace('@createUserIfNotExist@', $zoomIntegration->getCreateUserIfNotExist() ? 'checked'  : ''  , $page);
-			}
-			else
-			{
-				$page = str_replace('@defaultUserID@', '' , $page);
-				$page = str_replace('@zoomCategory@', 'Zoom Recordings', $page);
-				$page = str_replace('@enableRecordingUpload@', 'checked', $page);
-				$page = str_replace('@createUserIfNotExist@', 'checked', $page);
-			}
+			$page = str_replace( '@partnerId@',$zoomIntegration->getPartnerId(),$page);
 			$page = str_replace('@accountId@', $accountId , $page);
+
 			echo $page;
 			die();
 		}
