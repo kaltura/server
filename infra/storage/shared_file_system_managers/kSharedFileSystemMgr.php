@@ -257,7 +257,7 @@ abstract class kSharedFileSystemMgr
 	 *
 	 * @param $filePath file path to list dir content for
 	 *
-	 * @return int
+	 * @return array
 	 */
 	abstract protected function doListFiles($filePath, $pathPrefix = '');
 	
