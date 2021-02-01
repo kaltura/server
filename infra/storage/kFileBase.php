@@ -627,14 +627,16 @@ class kFileBase
 	public static function resolveFilePath($filePath)
 	{
 		$isRemote = false;
+		
 		$realFilePath = kFile::realPath($filePath);
+		$isDir = kFile::isDir($filePath);
 		
 		if(strpos($realFilePath, "http") !== false)// && kFile::checkFileExists($filePath))
 		{
 			$isRemote = true;
 		}
 		
-		return array($isRemote, $realFilePath);
+		return array($isRemote, $realFilePath, $isDir);
 	}
 	
 	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)

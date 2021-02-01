@@ -138,11 +138,12 @@ class KAsyncConvert extends KJobHandlerWorker
 			$srcFileSyncDescriptor->isRemote = false;
 			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
-				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+				list($isRemote, $remoteUrl, $isDir) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)
 				{
-					$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+					$fileSyncLocalPath = $this->fetchRemoteFile($fileSyncLocalPath, $remoteUrl, $isDir, $job->id);
 				}
+				$srcFileSyncDescriptor->isDir = $isDir;
 				$srcFileSyncDescriptor->isRemote = $isRemote;
 			}
 			
@@ -183,13 +184,64 @@ class KAsyncConvert extends KJobHandlerWorker
 		return $res;
 	}
 	
+	/**
+	 * Fetch remote file to local disk for engines that cannot handle remote source conversion
+	 * @param $fileSyncLocalPath string
+	 * @param $remoteUrl string
+	 * @param $isDir boolean
+	 * @param $jobId integer
+	 * @throws KalturaException
+	 */
+	protected function fetchRemoteFile($rawRemoteFilePath, $remoteUrl, $isDir, $jobId)
+	{
+		$dirName = $this->sharedTempPath . "/imports/";
+		$fileName = $jobId . "_" . basename($rawRemoteFilePath);
+		
+		if(!$isDir)
+		{
+			return kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+		}
+		
+		$remoteFiles = kFile::listDir($rawRemoteFilePath);
+		foreach ($remoteFiles as $remoteFile)
+		{
+			$filePath = DIRECTORY_SEPARATOR . $remoteFile[0];
+			$remoteFileUrl = kFile::realPath($filePath);
+			kFile::getExternalFile($remoteFileUrl, $dirName . $fileName . DIRECTORY_SEPARATOR, basename($filePath));
+		}
+		
+		return  $dirName . $fileName;
+	}
+	
 	protected function deleteTempFiles($srcFileSyncs)
 	{
 		foreach ($srcFileSyncs as $srcFileSyncDescriptor)
 		{
-			if($srcFileSyncDescriptor->isRemote)
+			if(!$srcFileSyncDescriptor->isRemote)
+				continue;
+			
+			$fileTmpPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			if($srcFileSyncDescriptor->isDir)
 			{
-				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
+				$dir = dir($fileTmpPath);
+				if (!$dir)
+				{
+					return null;
+				}
+				
+				while($dirFile = $dir->read())
+				{
+					if ($dirFile != "." && $dirFile != "..")
+					{
+						unlink($fileTmpPath.DIRECTORY_SEPARATOR.$dirFile);
+					}
+				}
+				$dir->close();
+				kFile::rmdir($fileTmpPath);
+			}
+			else
+			{
+				kFile::unlink($fileTmpPath);
 			}
 		}
 	}
