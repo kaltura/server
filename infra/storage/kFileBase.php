@@ -375,9 +375,10 @@ class kFileBase
 		if(kFile::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
-			return $kSharedFsMgr->checkFileExists($path);
+			// storage returns false on dir path so we need to check also dir
+			return $kSharedFsMgr->checkFileExists($path) || $kSharedFsMgr->isDir($path);
 		}
-		
+		// php returns true on dir path not only for file
 		return file_exists($path);
 	}
 	
@@ -463,7 +464,7 @@ class kFileBase
 		return filemtime($filePath);
 	}
 	
-	public static function getFolderSize($path)
+	public static function folderSize($path)
 	{
 		if(!kFile::checkFileExists($path))
 		{
@@ -476,11 +477,14 @@ class kFileBase
 		}
 		
 		$ret = 0;
-		foreach(glob($path."/*") as $fn)
+		foreach (kFile::listDir($path) as $file)
 		{
-			$ret += self::getFolderSize($fn);
+			//fileSize is saved under index 2 when listing dirs.
+			if (isset($file[1]) && $file[1] == 'dir' && isset($file[2]))
+			{
+				$ret += $file[2];
+			}
 		}
-		
 		return $ret;
 	}
 	
@@ -564,7 +568,6 @@ class kFileBase
 	{
 		if(self::$storageTypeMap)
 			return self::$storageTypeMap;
-		
 		self::$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
 		return self::$storageTypeMap;
 	}

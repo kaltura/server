@@ -73,7 +73,9 @@ class KDistributedFileManager
 		{
 			$folder = substr($localPath, 0, strrpos($localPath, '/'));
 			if(!file_exists($folder))
-				mkdir($folder, 777, true);
+			{
+				kFile::mkdir($folder, 777, true);
+			}
 			
 			$curlWrapper = new KCurlWrapper();
 			$curlHeaderResponse = $curlWrapper->getHeader($remotePath, true, true);
