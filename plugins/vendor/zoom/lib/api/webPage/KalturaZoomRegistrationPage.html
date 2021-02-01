@@ -28,7 +28,6 @@
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
             let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
-            let conversionProfileId = $('#conversionProfileId').val().trim();
             if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID) {
                 zoomUserMatchingMode = CMS_USER_ID;
             }
@@ -46,8 +45,6 @@
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
-                    'integrationSetting:conversionProfileId':conversionProfileId,
-
                     'format': 1 },
                 success : function(res) {
                     $('body').css('cursor', 'default');
@@ -121,7 +118,6 @@
                     case 'zoomCategory':
                     case 'zoomUserPostfix':
                     case 'zoomWebinarCategory':
-                    case 'conversionProfileId':
                         $('#'+i).val(v);
                         break;
                     case 'enableWebinarUploads':
@@ -181,11 +177,7 @@
                 <label for='zoomWebinarCategory'><h6>Zoom Webinar Category</h6></label>
                     <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
                 </div>
-                <div class='form-group'>
-                    <label for='conversionProfileId'><h6>Conversion profile ID</h6></label>
-                    <input type='text' value='@Conversion profile ID@' id='conversionProfileId' class='form-control' name='conversionProfileId' required>
-                </div>
-                <h6>Control</h6>
+                <h6>Settings</h6>
                 <div class='container p-2 my-2 border'>
                     <div class='custom-control custom-switch'>
                         <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
@@ -223,7 +215,7 @@
                         <label class='form-check-label'>Remove postfix</label>
                     </div>
                     <div class='form-group'>
-                        <label class='form-check-label'> User matching postfix</label>
+                        <label class='form-check-label'>Postfix</label>
                         <input type='text' value='' id='zoomUserPostfix' class='form-control' name='zoomUserPostfix'>
                     </div>
                 </div>
