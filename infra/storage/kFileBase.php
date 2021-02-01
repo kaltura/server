@@ -236,6 +236,9 @@ class kFileBase
 	
 	static public function fixPath($file_name)
 	{
+		if(substr(PHP_OS, 0, 3) == "WIN" && preg_match('/(^[a-zA-Z]:)/m', $file_name, $matches))
+			return;
+		
 		return str_replace(array("//", "\\"), array("/", "/"), $file_name);
 	}
     
