@@ -316,4 +316,9 @@ class kFileUtils extends kFile
 		}
 		return $mostRecentModificationTime;
 	}
+
+	public static function getServeMimeType($filePath)
+	{
+		return 'text/plain';
+	}
 }

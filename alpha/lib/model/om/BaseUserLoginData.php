@@ -691,6 +691,8 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		$this->last_hydrate_time = time();
+
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -1632,4 +1634,11 @@ abstract class BaseUserLoginData extends BaseObject  implements Persistent {
 	
 	/* ---------------------- CustomData functions ------------------------- */
 	
+	protected $last_hydrate_time;
+
+	public function getLastHydrateTime()
+	{
+		return $this->last_hydrate_time;
+	}
+
 } // BaseUserLoginData

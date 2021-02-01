@@ -259,6 +259,7 @@ abstract class KBatchBase implements IKalturaLogger
 		self::$kClientConfig->setLogger($this);
 		self::$kClientConfig->serviceUrl = self::$taskConfig->getServiceUrl();
 		self::$kClientConfig->curlTimeout = self::$taskConfig->getCurlTimeout();
+		self::$kClientConfig->max_print = self::$taskConfig->maxPrint;
 
 		if(isset(self::$taskConfig->clientConfig))
 		{

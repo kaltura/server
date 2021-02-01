@@ -327,5 +327,11 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	{
 		$dropFolderFilePath = $this->getPath().'/'.$fileName;
 		return realpath($dropFolderFilePath);
-	}	
+	}
+
+	public function getDropFolderParams()
+	{
+		return array();
+	}
+
 } // DropFolder

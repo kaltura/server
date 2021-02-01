@@ -1,3 +1,50 @@
+# Propus-16.16.0  #
+
+## Version Highlight ##
+
+### New features ###
+
+	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
+
+## Send http notification when registering new partner on the partner's template ##
+- Issue Type: Task
+- Issue ID: PLAT-22547
+- Description: You can use this http notification if you need to notify for every new partner created from the templates partners.
+    in this case we used the notification to call 1-kms-int.mediaspace.kaltura.com/latest/public/create_instance.php
+
+### Deployment scripts ###
+-Add kaftestme registration http request on partner creation:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET and PARTNER_ID) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_01_13_partner_Added_Kaftestme_Http_Notification.template
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
+
+## Ability to cancel tasks ##
+- Issue Type: Task
+- Issue ID: REACH2-989
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_25_add_permissions_entry_vendor_task_object.php
+
+## New drop folder type S3 ##
+- Issue Type: Task
+- Issue ID: PLAT-22575
+
+### Configuration ###
+
+Add S3DropFolder to your plugins.ini
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Propus-16.15.0  #
 
 ## Version Highlight ##
@@ -40,7 +87,6 @@ First replace all tokens in the XML file below and remove ".template" from the f
 Run deployment script:
 
                 - php /opt/kaltura/app/deployment/updates/scripts/2021_01_03_update_reach_vendor_response_profile.php
-
 
 
 # Propus 16.13.0  #

@@ -109,7 +109,7 @@ ini_set("memory_limit","512M");
 				if(($jobStr=$this->get($key))!==false){
 					break;
 				}
-				sleep(0.3);
+				usleep(rand(0,30000));
 				KalturaLog::log("Attempt($try) to fetch job ($keyIdx)");
 			}
 			if($try==$maxTries){
@@ -286,6 +286,7 @@ ini_set("memory_limit","512M");
 		{
 			$waited=0;
 	KalturaLog::log("key($key), val($val)");
+			$attemptSleep*=1000000;
 			do {
 				$addLasted = microtime(true);
 				$rv = $this->cacheStore->add($key, $val, $expiry);
@@ -294,7 +295,7 @@ ini_set("memory_limit","512M");
 					break;
 				}
 				$sleepLasted = microtime(true);
-				usleep($attemptSleep*1000000);
+				usleep(rand(0,$attemptSleep));
 				$sleepLasted = round((microtime(true)-$sleepLasted),5);
 				$waited+=($addLasted+$sleepLasted);
 				$attempDuration-= ($addLasted+$sleepLasted);
@@ -421,7 +422,13 @@ ini_set("memory_limit","512M");
 		 * when large number of srvs attempt to fetch the same job. 
 		 * This situation occurred in AWS env, with high connect/'walk around' times to DC memcache srv
 		 */
-		public function FetchNextJob($fetchRangeRandMax=20)
+		public function FetchNextJob($fetchRangeRandMax=0){
+			if($fetchRangeRandMax==0)
+				return $this->FetchNextJobIndexInc($fetchRangeRandMax);
+			else
+				return $this->FetchNextJobRandom($fetchRangeRandMax);
+		}
+		public function FetchNextJobRandom($fetchRangeRandMax=50)
 		{
 			$writeIndex = null;
 			$readIndex = null;
@@ -483,6 +490,61 @@ ini_set("memory_limit","512M");
 			return null;
 		}
 		
+		public function FetchNextJobIndexInc($fetchRangeRandMax=50){
+			if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+				KalturaLog::log("ERROR: Missing write or read index ");
+				return false;
+			}
+				/*
+				 * Stop fetching if there are no unread objects
+				 */
+			if($readIndex>$writeIndex){
+				return null;
+			}
+			
+			$fetchIndex = $this->incrementReadIndex()-1;
+			KalturaLog::log("fetchIndex:$fetchIndex (new)");
+
+			$semaphoreKey = $this->getSemaphoreKeyName($fetchIndex);
+			$semaphoreToken = getmypid().".".gethostname().".".rand();
+			$rvLock = null;
+			while(true) {
+						/*
+						 * Try to lock the next unread job object
+						 * if failed - carry on to next
+						 */
+				if(is_null($rvLock)) $rvLock = $this->lock($semaphoreKey, $semaphoreToken, 0);
+				if($rvLock!==true){
+					KalturaLog::log("Unable to lock fetchIndex($fetchIndex), retry ");
+				}
+				else {
+						/*
+						 * Try to fetch the job object from the memcache
+						 */
+					$job = $this->FetchJob($fetchIndex); 
+					if($job!==false) {
+						return $job;
+					}
+				}
+
+				if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
+					KalturaLog::log("ERROR: Missing write or read index ");
+					break;
+				}
+				
+				if($fetchIndex<$readIndex-1000) {
+					KalturaLog::log("Unable to access job($fetchIndex), while rdIdx($readIndex) moved on, skipping");
+					break;
+				}
+
+				KalturaLog::log("Unable to access job ($fetchIndex), retry");
+				usleep(rand(0,100000));
+			}
+			
+			$this->delete($semaphoreKey);
+			return false;
+		}
+
 		/* ---------------------------
 		 * GetRunningJobs
 		 */
@@ -495,7 +557,8 @@ ini_set("memory_limit","512M");
 			$localHostname = gethostname();
 			$jobs = array();
 			$idx=max(0,$readIndex-$lookBackward);
-			for(; $idx<$writeIndex; $idx++) {
+			$idxMax = min($readIndex+$lookBackward,$writeIndex);
+			for(; $idx<$idxMax; $idx++) {
 				$job = $this->FetchJob($idx,1);
 				if($job!==false && $job->state==$job::STATE_RUNNING 
 				&& strcmp($localHostname, $job->hostname)=== 0 && KProcessExecutionData::isProcessRunning($job->process)) {
@@ -510,7 +573,7 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * RefreshJobs
 		 */
-		public function RefreshJobs($maxSlots, &$jobs)
+		public function RefreshJobs($maxSlots, $fetchRangeRandMax, &$jobs)
 		{
 				/*
 				 * Get list of per scheduler running jobs
@@ -531,7 +594,7 @@ ini_set("memory_limit","512M");
 				/*
 				 * If there are no pending jobs - wait and retry
 				 */
-			$job = $this->FetchNextJob();
+			$job = $this->FetchNextJob($fetchRangeRandMax);
 			if($job===null){
 				KalturaLog::log("Running:$running - No pending jobs");
 				return null;
@@ -597,7 +660,12 @@ ini_set("memory_limit","512M");
 			{
 				$cmdLine = 'php -r "';
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
-				
+///////////////
+// DEBUG ONLY
+//$dirName = "/web2/content/shared/tmp/qualityTest/TestBench.11";
+//$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
+//$cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
+///////////////
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';
 				$cmdLine.= '\''.($this->memcacheConfig['port']).'\',';
@@ -625,8 +693,16 @@ ini_set("memory_limit","512M");
 			return true;
 		}
 		
-		/* ---------------------------
+		/**
+		 * This method executed one job fetched from the chunk encoding queue
+		 * Please note that changing this methods signature may require adjusting the regex in KillJobsCommand method
 		 *
+		 * @param $host
+		 * @param $port
+		 * @param $token
+		 * @param $jobIndex
+		 * @param string $tmpPromptFolder
+		 * @return bool
 		 */
 		public static function ExecuteJobCommand($host, $port, $token, $jobIndex, $tmpPromptFolder="/tmp")
 		{
@@ -684,13 +760,31 @@ ini_set("memory_limit","512M");
 			}
 			else
 				$cmdLine = $job->cmdLine;
-			exec($cmdLine,$op,$rv);
-			$job->finishTime = time();
-			if($rv!=0) {
-				$job->state = $job::STATE_FAIL;
-				$rvStr = "FAILED - rv($rv),";
+				/*
+				 * Up to 2 attempts for chunk generation, in order to overcome possible
+				 * zeroed frames issue, caused by too large GOPs in the source files 
+				 */
+			for($i=0;$i<2;$i++) {
+				if($i>0){
+					$cmdLine = self::fixCmdLineBackOffset($cmdLine);
+					KalturaLog::log("2nd attempt, due to empty frames, fixed cmdLine:$cmdLine");
+					sleep(3);
+				}
+				exec($cmdLine,$op,$rv);
+				$job->finishTime = time();
+				if($rv!=0) {
+					$job->state = $job::STATE_FAIL;
+					$rvStr = "FAILED - rv($rv),";
+					break;
+				}
+					// No need to check for empties for 1st chunk and audio chunks
+				if($job->id>0 && !strstr($outFilename,'.vid')===false){
+					if(KFFMpegMediaParser::detectEmptyFrames("ffmpeg", "ffprobe", $outFilename)===false)
+						break;
+				}
 			}
-			else {
+
+			if($rv==0) {
 				if(isset($outFilename) && strstr($outFilename,'.vid')) {
 					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
@@ -708,7 +802,7 @@ ini_set("memory_limit","512M");
 					$rvStr = "SUCCESS -";
 				}
 			}
-			
+
 				//When working with remote (none nfs) shared stoarge we need to move the file to shared
 			if($sharedChunkPaths){
 				KalturaLog::log("Done running cmd line,moving file from [" . print_r($outFilenames, true) . "] to [" . print_r($sharedChunkPaths, true) . "]");
@@ -737,12 +831,12 @@ ini_set("memory_limit","512M");
 					$rv=-1;
 				}
 			}
-
+			
 			$job->outFileSizes = $outFileSizes;
 			$storeManager->SaveJob($job);
 			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
-				// Move the PHP script log  from the local /tmp to the final storage
+			// Move the PHP script log  from the local /tmp to the final storage
 			if(isset($moveToFilenames)){
 				$tmpFilenameInfo = pathinfo($outFilenames[0]);
 				$movetToFilenameInfo = pathinfo($moveToFilenames[0]);
@@ -754,6 +848,60 @@ ini_set("memory_limit","512M");
 					kFile::moveFile($tmpFilename, $moveToName);
 			}
 			return ($rv==0? true: false);
+		}
+		
+		/**
+		 * This method will kill all running jobs on the machine and will re-queue it for another machine to handle.
+		 * Please note that if changing the ExecuteJobCommand method the running jobs regex may need to be adjusted accordingly
+		 */
+		public static function KillJobsCommand()
+		{
+			KalturaLog::log("Starting re-queue process for all active jobs");
+			$storeManager = $memcacheHost = $memcachePort =  $memcacheToken = null;
+			
+			//Command to fetch all the jobs that are currently running on the machine.
+			KalturaLog::log("Fetching all keys for running chunk jobs");
+			$runningJobs = explode("\n", shell_exec("ps -eo etimes,comm,args | grep [E]xecuteJobCommand"));
+			$runningJobs = array_map('trim',$runningJobs);
+			
+			//Kill all running PHP tasks, this will kill the child FFMPEG jobs as well.
+			KalturaLog::log("Killing all running jobs and re-adding them to the chunk convert queue: \n" . print_r($runningJobs, true));
+			shell_exec("pkill -9 -f ExecuteJobCommand");
+			
+			$re = '/ExecuteJobCommand\(\'(?P<memcache_host>.*?)\',\'(?P<memcache_port>.*)\',\'(?P<memcache_token>.*)\',(?<job_idx>.*),/m';
+			foreach($runningJobs as $runningJob)
+			{
+				if ($runningJob == "")
+				{
+					continue;
+				}
+				
+				preg_match_all($re, $runningJob, $matches);
+				if (!count($matches))
+				{
+					KalturaLog::log("No matches found for cmd [$runningJob]");
+					continue;
+				}
+				
+				if(!$memcacheHost || !$memcachePort || !$memcacheToken || !$storeManager)
+				{
+					$memcacheHost = $matches['memcache_host'][0];
+					$memcachePort = $matches['memcache_port'][0];
+					$memcacheToken = $matches ['memcache_token'][0];
+					if($memcacheHost && $memcachePort && $memcacheToken)
+					{
+						KalturaLog::log("host:$memcacheHost, port:$memcachePort, token:$memcacheToken");
+						$storeManager = new KChunkedEncodeMemcacheWrap($memcacheToken);
+						$storeManager->Setup(array('host'=>$memcacheHost, 'port'=>$memcachePort, 'flags'=>1));
+					}
+				}
+				
+				$jobIndex = $matches['job_idx'][0];
+				$job = $storeManager->FetchJob($jobIndex);
+				$job->state = $job::STATE_RETRY;
+				$storeManager->SaveJob($job);
+				KalturaLog::log("Refreshed job [$jobIndex]");
+			}
 		}
 
 		/* ---------------------------
@@ -768,13 +916,52 @@ ini_set("memory_limit","512M");
 					return $rv;
 				}
 				KalturaLog::log("Attempt($try) to set RD($readIndex)");
-				sleep(0.3);
+				usleep(rand(0,100000));
 			}
 			return false;
 		}
 
+		/* ---------------------------
+		 * fixCmdLineBackOffset
+		 *	increases the default seek-to back-offset in order to handle source's large GOP cases,
+		 * 	that are located on chunk boundary, preventing the ability for precise seek-to
+		 */
+		private static function fixCmdLineBackOffset($cmdLine)
+		{
+			$cmdLineArr = explode(" ",$cmdLine);
+				// Remove spaces
+			foreach($cmdLineArr as $idx=>$val){
+				if(strlen(trim($cmdLineArr[$idx]))==0){
+					unset($cmdLineArr[$idx]);
+				}
+			}
+			$keys = array_keys($cmdLineArr, "-ss" );
+			if(count($keys)==2){
+				$startFromIdx = $keys[0]+1;
+				$backOffsIdx  = $keys[1]+1;
+				$startFrom = $cmdLineArr[$startFromIdx];
+				$backOffs  = $cmdLineArr[$backOffsIdx];
+				
+				$fix = $backOffs*2;
+				$cmdLineArr[$startFromIdx] = $startFrom - $fix;
+				$cmdLineArr[$backOffsIdx]  = $backOffs  + $fix;
+				KalturaLog::log("Fixed startfrom:$cmdLineArr[$startFromIdx] (orig $startFrom), backOffs:$backOffs($cmdLineArr[$backOffsIdx])");
+			}
+			return (implode(" ",$cmdLineArr));
+		}
+		
+		/* ---------------------------
+		 * incrementReadIndex
+		 */
+		protected function incrementReadIndex()	{
+			$idx=$this->increment($this->getReadIndexKeyName());
+			return $idx;
+		}
 	}
+	
 	/*****************************
 	 * End of KChunkedEncodeMemcacheScheduler
 	 *****************************/
+
+	
 

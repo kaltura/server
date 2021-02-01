@@ -40,6 +40,12 @@ class kVidSliceAction extends kVidStripAction
 		$destPath = $this->getTempThumbnailPath();
 		$second = $this->startSec + ($interval * $this->sliceNumber);
 		$this->captureThumb($this->source->getEntry(), $destPath, $second);
-		return new kFileSource(KThumbnailCapture::getCapturePath($destPath));
+		$source = new kFileSource(KThumbnailCapture::getCapturePath($destPath));
+		if($this->rotation)
+		{
+			$source->getImage()->rotateImage(kRotateAction::DEFAULT_BG, $this->rotation);
+		}
+
+		return $source;
 	}
 }
