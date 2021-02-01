@@ -86,7 +86,7 @@ class s3Mgr extends kFileTransferMgr
 
 		if (class_exists('KBatchBase'))
 		{
-			$this->s3Arn = KBatchBase::$taskConfig->s3Arn;
+			$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
 		}
 		else
 		{
@@ -282,11 +282,7 @@ class s3Mgr extends kFileTransferMgr
 	{
 		if (class_exists('KBatchBase'))
 		{
-			if (isset(KBatchBase::$taskConfig->maxConcurrentUploadConnections))
-			{
-				return KBatchBase::$taskConfig->maxConcurrentUploadConnections;
-			}
-			return null;
+			return kBatchUtils::getKconfParam('maxConcurrentUploadConnections', true);
 		}
 		else
 		{
