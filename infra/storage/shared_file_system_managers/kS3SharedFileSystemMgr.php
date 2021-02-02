@@ -594,24 +594,25 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$originalFilePath = $bucket . '/' . $filePath . '/';
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
-				$objectPath = $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
-				if($originalFilePath == $objectPath)
+				$fullPath = DIRECTORY_SEPARATOR . $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
+				$fileName = $pathPrefix.basename($fullPath);
+				if($originalFilePath == $fullPath)
 					continue;
 				
 				$fileType = "file";
-				if($dirListObject['Size'] == 0 && substr_compare($objectPath, '/', -strlen('/')) === 0)
+				if($dirListObject['Size'] == 0 && substr_compare($fullPath, '/', -strlen('/')) === 0)
 				{
 					$fileType = 'dir';
 				}
 				
 				if ($fileType == 'dir')
 				{
-					$dirList[] = array($objectPath, 'dir', $dirListObject['Size']);
-					$dirList = array_merge($dirList, self::doListFiles($objectPath, $pathPrefix));
+					$dirList[] = array($fileName, 'dir', $dirListObject['Size']);
+					$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix));
 				}
 				else
 				{
-					$dirList[] = array($objectPath, 'file', $dirListObject['Size']);
+					$dirList[] = array($fileName, 'file', $dirListObject['Size']);
 				}
 			}
 		}
