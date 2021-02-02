@@ -70,7 +70,7 @@ class kBatchUtils
 		}
 
 		$s3Arn = isset($cloudStorage['s3Arn']) ? $cloudStorage['s3Arn'] : null;
-		$storageOptions = isset($cloudStorage['storage_options']) ? $cloudStorage['storage_options'] : null;
+		$storageOptions = isset($cloudStorage['storage_options']) ? $cloudStorage['storage_options'] : array();
 		$storageTypeMap = isset($cloudStorage['storage_type_map']) ? $cloudStorage['storage_type_map'] : array();
 		$remoteChunkConfigStaticFileCacheTime = isset($runtimeConfig['remote_chunk_config_static_file_cache_time']) ? $runtimeConfig['remote_chunk_config_static_file_cache_time'] : 120;
 		$ffmpegReconnectParams = isset($runtimeConfig['ffmpeg_reconnect_params']) ? $runtimeConfig['ffmpeg_reconnect_params'] : null;
