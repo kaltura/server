@@ -136,7 +136,6 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
 			$srcFileSyncDescriptor->isRemote = false;
-			
 			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
 				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
@@ -144,7 +143,6 @@ class KAsyncConvert extends KJobHandlerWorker
 				{
 					$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 				}
-				
 				$srcFileSyncDescriptor->isRemote = $isRemote;
 			}
 			
@@ -356,7 +354,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				clearstatcache();
 				$directorySync = kFile::isDir($data->destFileSyncLocalPath);
 				if($directorySync)
-					$fileSize = KBatchBase::foldersize($data->destFileSyncLocalPath);
+					$fileSize = $fileSize = kFile::folderSize($data->destFileSyncLocalPath);
 				else
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 
@@ -422,7 +420,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			clearstatcache();
 			$directorySync = kFile::isDir($destFileSync->fileSyncLocalPath);
 			if($directorySync)
-				$fileSize=KBatchBase::foldersize($destFileSync->fileSyncLocalPath);
+				$fileSize=kFile::folderSize($destFileSync->fileSyncLocalPath);
 			else
 				$fileSize = kFile::fileSize($destFileSync->fileSyncLocalPath);
 				

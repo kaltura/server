@@ -404,14 +404,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		//  my_bucket/dir1/dir2/my_file.mp4.log
 		$path = $path . DIRECTORY_SEPARATOR;
 		list($bucket, $key) = $this->getBucketAndFilePath($path);
-		
 		try
 		{
 			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
 				'Bucket' => $bucket,
 				'Prefix' => $key
 			));
-			
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
 				$dirList[] = array (
@@ -424,8 +422,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
 		}
-		
-		return count($dirList) > 1;
+		return count($dirList) >= 1;
 	}
 	
 	protected function getHeadObjectForPath($path)

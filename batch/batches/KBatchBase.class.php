@@ -260,7 +260,6 @@ abstract class KBatchBase implements IKalturaLogger
 		self::$kClientConfig->serviceUrl = self::$taskConfig->getServiceUrl();
 		self::$kClientConfig->curlTimeout = self::$taskConfig->getCurlTimeout();
 		self::$kClientConfig->max_print = self::$taskConfig->maxPrint;
-
 		if(isset(self::$taskConfig->clientConfig))
 		{
 			foreach(self::$taskConfig->clientConfig as $attr => $value)
@@ -283,7 +282,7 @@ abstract class KBatchBase implements IKalturaLogger
 
 		KScheduleHelperManager::saveRunningBatch($this->getName(), $this->getIndex());
 	}
-	
+  
 	protected function getParams($name)
 	{
 		return  self::$taskConfig->$name;
@@ -418,18 +417,14 @@ abstract class KBatchBase implements IKalturaLogger
 		return true;
 	}
 
-	protected static function foldersize($path)
-	{
-	  if(!file_exists($path)) return 0;
-	  if(is_file($path)) return kFile::fileSize($path);
-	  $ret = 0;
-	  foreach(glob($path."/*") as $fn)
-	    $ret += KBatchBase::foldersize($fn);
-	  return $ret;
-	}
-
 	protected function setFilePermissions($filePath)
 	{
+		// no need to chmod on shared cloud storage
+		if (kFile::isSharedPath($filePath))
+		{
+			return;
+		}
+
 		if(kFile::isDir($filePath))
 		{
 			$chmod = 0750;
@@ -606,7 +601,7 @@ abstract class KBatchBase implements IKalturaLogger
 		{
 			clearstatcache();
 			if($directorySync)
-				$size=KBatchBase::foldersize($file);
+				$size=kFile::folderSize($file);
 			else
 				$size = kFile::fileSize($file);
 			if($size === false)
