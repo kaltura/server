@@ -682,6 +682,30 @@ class kFileBase
 		return $res;
 	}
 	
+	public static function getExternalDir($externalDirPath, $baseDirName = null)
+	{
+		if(!$baseDirName)
+		{
+			$baseDirName = sys_get_temp_dir() . DIRECTORY_SEPARATOR .
+				md5(microtime(true) . getmypid() . uniqid(rand(), true)) . DIRECTORY_SEPARATOR;
+		}
+		
+		$remoteFiles = kFile::listDir($externalDirPath);
+		foreach ($remoteFiles as $remoteFile)
+		{
+			$filePath = DIRECTORY_SEPARATOR . $remoteFile[0];
+			$remoteFileUrl = kFile::realPath($filePath);
+			$res = kFile::getExternalFile($remoteFileUrl, $baseDirName, basename($filePath));
+			if(!$res)
+			{
+				KalturaLog::debug("Failed to fetch dir file [$filePath], aborting fetch process");
+				return $res;
+			}
+		}
+		
+		return $baseDirName;
+	}
+	
 	public static function setStorageTypeMap($key, $value)
 	{
 		self::$storageTypeMap[$key] = $value;

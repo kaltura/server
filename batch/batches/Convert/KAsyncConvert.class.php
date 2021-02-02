@@ -202,15 +202,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			return kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 		}
 		
-		$remoteFiles = kFile::listDir($rawRemoteFilePath);
-		foreach ($remoteFiles as $remoteFile)
-		{
-			$filePath = DIRECTORY_SEPARATOR . $remoteFile[0];
-			$remoteFileUrl = kFile::realPath($filePath);
-			kFile::getExternalFile($remoteFileUrl, $dirName . $fileName . DIRECTORY_SEPARATOR, basename($filePath));
-		}
-		
-		return  $dirName . $fileName;
+		return kFile::getExternalDir($rawRemoteFilePath, $dirName . $fileName . DIRECTORY_SEPARATOR);
 	}
 	
 	protected function deleteTempFiles($srcFileSyncs)
