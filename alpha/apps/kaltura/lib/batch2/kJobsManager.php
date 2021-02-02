@@ -1137,22 +1137,19 @@ class kJobsManager
 			$entry->save();
 		}
  	
-		/*
-		* TODO - AWS - Handle shared concat flow
-		* Add shared file destination when genrating the concat to stoareg output file to shared stoarge defined on the partner
-		*
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if($partner->getSharedStorageProfileId())
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 			$pathMgr = $sharedStorageProfile->getPathManager();
-			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
-			$root = $sharedStorageProfile->getStorageBaseDir();
+			
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = kFileSyncUtils::calcObjectNewVersion($asset->getId(), $asset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 		 
 			$jobData->setDestFilePath($sharedPath);
 		}
-		*/
  	
 		$batchJob = null;
 		if($parentJob)
