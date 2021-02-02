@@ -705,12 +705,7 @@ class kFileBase
 		{
 			$filePath = DIRECTORY_SEPARATOR . $remoteFile[0];
 			$remoteFileUrl = kFile::realPath($filePath);
-			$res = kFile::getExternalFile($remoteFileUrl, $baseDirName, basename($filePath));
-			if(!$res)
-			{
-				KalturaLog::debug("Failed to fetch dir file [$filePath], aborting fetch process");
-				return $res;
-			}
+			kFile::getExternalFile($remoteFileUrl, $baseDirName, basename($filePath));
 		}
 		
 		return $baseDirName;
