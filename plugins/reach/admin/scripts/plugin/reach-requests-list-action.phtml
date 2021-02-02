@@ -113,6 +113,39 @@
         );
     }
 
+    function abortTask(task_ids)
+    {
+        var result = task_ids.split(',').map(function(item) {return item.trim();});
+        var paramsStr = '/task_ids/' + result;
+        var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'ReachRequestsAbortAction')); ?>' + paramsStr;
+
+        jQuery('#reach-requests-abort-dialog').remove();
+        dialogDiv = jQuery('<div id="reach-requests-abort-dialog"><?php echo $this->translate('Loading...'); ?></div>').appendTo('body');
+
+        dialogDiv.dialog({
+            bgiframe: true,
+            modal: true,
+            resizable: true,
+            wordWrap: "break-word",
+            wordwrap: "breakword",
+            width: 500,
+            title: '<?php echo $this->translate('Abort Result'); ?>',
+            buttons: {
+                '<?php echo $this->translate('Close'); ?>': function () {
+                    jQuery(this).dialog('close');
+                }
+            },
+            close: function () {
+                jQuery(this).dialog('destroy').remove();
+            }
+        });
+
+        dialogDiv.load(
+            url,
+            null,
+            null
+        );
+    }
 
     function refreshPage()
     {
