@@ -6,8 +6,7 @@
 Enhance Zoom registation UI, adding:
     a. Reload existing configuration 
     b. Support CMS_USER_ID matching
-    c. Conversion-profile per integration
-    d. New look + updated logo  
+    c. New look + updated logo  
     
 # Propus-16.16.0  #
 
