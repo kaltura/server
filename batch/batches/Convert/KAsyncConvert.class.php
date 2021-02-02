@@ -138,11 +138,13 @@ class KAsyncConvert extends KJobHandlerWorker
 			$srcFileSyncDescriptor->isRemote = false;
 			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
-				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+				list($isRemote, $remoteUrl, $isDir) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)
 				{
-					$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+					$fileSyncLocalPath = kFile::fetchRemoteToLocal($fileSyncLocalPath, $remoteUrl, $isDir,
+						$this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 				}
+				$srcFileSyncDescriptor->isDir = $isDir;
 				$srcFileSyncDescriptor->isRemote = $isRemote;
 			}
 			
@@ -187,9 +189,31 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		foreach ($srcFileSyncs as $srcFileSyncDescriptor)
 		{
-			if($srcFileSyncDescriptor->isRemote)
+			if(!$srcFileSyncDescriptor->isRemote)
+				continue;
+			
+			$fileTmpPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			if($srcFileSyncDescriptor->isDir)
 			{
-				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
+				$dir = dir($fileTmpPath);
+				if (!$dir)
+				{
+					return null;
+				}
+				
+				while($dirFile = $dir->read())
+				{
+					if ($dirFile != "." && $dirFile != "..")
+					{
+						unlink($fileTmpPath.DIRECTORY_SEPARATOR.$dirFile);
+					}
+				}
+				$dir->close();
+				kFile::rmdir($fileTmpPath);
+			}
+			else
+			{
+				kFile::unlink($fileTmpPath);
 			}
 		}
 	}

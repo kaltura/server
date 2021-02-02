@@ -627,14 +627,26 @@ class kFileBase
 	public static function resolveFilePath($filePath)
 	{
 		$isRemote = false;
+		
 		$realFilePath = kFile::realPath($filePath);
+		$isDir = kFile::isDir($filePath);
 		
 		if(strpos($realFilePath, "http") !== false)// && kFile::checkFileExists($filePath))
 		{
 			$isRemote = true;
 		}
 		
-		return array($isRemote, $realFilePath);
+		return array($isRemote, $realFilePath, $isDir);
+	}
+	
+	public static function fetchRemoteToLocal($originalFilePath, $remoteFileUrl, $isDir, $localDirName = null, $localFileName = null)
+	{
+		if(!$isDir)
+		{
+			return self::getExternalFile($remoteFileUrl, $localDirName, $localFileName);
+		}
+		
+		return self::getExternalDir($originalFilePath, $localDirName . $localFileName . DIRECTORY_SEPARATOR);
 	}
 	
 	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)
@@ -678,6 +690,25 @@ class kFileBase
 		}
 		
 		return $res;
+	}
+	
+	public static function getExternalDir($externalDirPath, $baseDirName = null)
+	{
+		if(!$baseDirName)
+		{
+			$baseDirName = sys_get_temp_dir() . DIRECTORY_SEPARATOR .
+				md5(microtime(true) . getmypid() . uniqid(rand(), true)) . DIRECTORY_SEPARATOR;
+		}
+		
+		$remoteFiles = kFile::listDir($externalDirPath);
+		foreach ($remoteFiles as $remoteFile)
+		{
+			$filePath = DIRECTORY_SEPARATOR . $remoteFile[0];
+			$remoteFileUrl = kFile::realPath($filePath);
+			kFile::getExternalFile($remoteFileUrl, $baseDirName, basename($filePath));
+		}
+		
+		return $baseDirName;
 	}
 	
 	public static function setStorageTypeMap($key, $value)
