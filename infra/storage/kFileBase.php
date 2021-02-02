@@ -639,6 +639,16 @@ class kFileBase
 		return array($isRemote, $realFilePath, $isDir);
 	}
 	
+	public static function fetchRemoteToLocal($originalFilePath, $remoteFileUrl, $isDir, $localDirName = null, $localFileName = null)
+	{
+		if(!$isDir)
+		{
+			return self::getExternalFile($remoteFileUrl, $localDirName, $localFileName);
+		}
+		
+		return self::getExternalDir($originalFilePath, $localDirName . $localFileName . DIRECTORY_SEPARATOR);
+	}
+	
 	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)
 	{
 		if(!$dirName)

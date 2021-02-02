@@ -141,7 +141,8 @@ class KAsyncConvert extends KJobHandlerWorker
 				list($isRemote, $remoteUrl, $isDir) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)
 				{
-					$fileSyncLocalPath = $this->fetchRemoteFile($fileSyncLocalPath, $remoteUrl, $isDir, $job->id);
+					$fileSyncLocalPath = kFile::fetchRemoteToLocal($fileSyncLocalPath, $remoteUrl, $isDir,
+						$this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 				}
 				$srcFileSyncDescriptor->isDir = $isDir;
 				$srcFileSyncDescriptor->isRemote = $isRemote;
@@ -182,27 +183,6 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->deleteTempFiles($data->srcFileSyncs);
 		
 		return $res;
-	}
-	
-	/**
-	 * Fetch remote file to local disk for engines that cannot handle remote source conversion
-	 * @param $fileSyncLocalPath string
-	 * @param $remoteUrl string
-	 * @param $isDir boolean
-	 * @param $jobId integer
-	 * @throws KalturaException
-	 */
-	protected function fetchRemoteFile($rawRemoteFilePath, $remoteUrl, $isDir, $jobId)
-	{
-		$dirName = $this->sharedTempPath . "/imports/";
-		$fileName = $jobId . "_" . basename($rawRemoteFilePath);
-		
-		if(!$isDir)
-		{
-			return kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
-		}
-		
-		return kFile::getExternalDir($rawRemoteFilePath, $dirName . $fileName . DIRECTORY_SEPARATOR);
 	}
 	
 	protected function deleteTempFiles($srcFileSyncs)
