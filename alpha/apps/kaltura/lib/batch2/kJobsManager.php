@@ -2026,7 +2026,16 @@ class kJobsManager
 
 	protected static function shouldUseSharedStorageForEngine($conversionEngine)
 	{
-		$SharedSupportedEngines = Kconf::get('sharedStorageConversionEngines', 'cloud_storage', array());
+		$supportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
+			KalturaConversionEngineType::ON2,
+			KalturaConversionEngineType::FFMPEG,
+			KalturaConversionEngineType::MENCODER,
+			KalturaConversionEngineType::ENCODING_COM,
+			KalturaConversionEngineType::EXPRESSION_ENCODER3,
+			KalturaConversionEngineType::CHUNKED_FFMPEG,
+			KalturaConversionEngineType::FFMPEG_VP8,
+			KalturaConversionEngineType::FFMPEG_AUX);
+		$SharedSupportedEngines = Kconf::get('sharedStorageConversionEngines', 'cloud_storage', $supportedEngines);
 
 		if(in_array($conversionEngine, $SharedSupportedEngines))
 		{
