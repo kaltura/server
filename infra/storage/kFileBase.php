@@ -700,7 +700,7 @@ class kFileBase
 				md5(microtime(true) . getmypid() . uniqid(rand(), true)) . '/';
 		}
 		
-		$remoteFiles = kFile::listDir($externalDirPath, $externalDirPath. '/');
+		$remoteFiles = kFile::listDir($externalDirPath . '/', $externalDirPath. '/');
 		foreach ($remoteFiles as $remoteFile)
 		{
 			$filePath = $remoteFile[0];
