@@ -94,29 +94,19 @@ class kHtmlPurifier
 		
 	public static function initAllowedProperties()
 	{
-		$cacheKey = null;
-		if ( function_exists('apc_fetch') && function_exists('apc_store') )
-		{
-			$cacheKey = 'kHtmlPurifierAllowedProperties-' . kConf::getCachedVersionId();
-			self::$AllowedProperties = apc_fetch($cacheKey);
-		}
-
-		
 		if ( ! self::$AllowedProperties )
 		{
-			$allowedProperties = kConf::get("xss_allowed_object_properties");
-			self::$AllowedProperties = $allowedProperties['base_list'];
-			
+			$xssAllowedObjectProperties = kConf::get("xss_allowed_object_properties");
 			if (!kCurrentContext::$HTMLPurifierBaseListOnlyUsage)
-				self::$AllowedProperties = array_merge($allowedProperties['base_list'], $allowedProperties['extend_list']);
-
-			// Convert values to keys (we don't care about the values) in order to test via array_key_exists.
-			self::$AllowedProperties = array_flip(self::$AllowedProperties);
-
-			if ( $cacheKey )
 			{
-				apc_store( $cacheKey, self::$AllowedProperties );
+				$AllowedProperties = array_merge($xssAllowedObjectProperties['base_list'], $xssAllowedObjectProperties['extend_list']);
 			}
+			else
+			{
+				$AllowedProperties = $xssAllowedObjectProperties['base_list'];
+			}
+			// Convert values to keys (we don't care about the values) in order to test via array_key_exists.
+			self::$AllowedProperties = array_flip($AllowedProperties);
 		}
 	}
 
