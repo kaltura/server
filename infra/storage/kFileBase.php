@@ -237,7 +237,7 @@ class kFileBase
 	static public function fixPath($file_name)
 	{
 		if(substr(PHP_OS, 0, 3) == "WIN" && preg_match('/(^[a-zA-Z]:)/m', $file_name, $matches))
-			return;
+			return $file_name;
 		
 		return str_replace(array("//", "\\"), array("/", "/"), $file_name);
 	}
@@ -646,7 +646,7 @@ class kFileBase
 			return self::getExternalFile($remoteFileUrl, $localDirName, $localFileName);
 		}
 		
-		return self::getExternalDir($originalFilePath, $localDirName . $localFileName . DIRECTORY_SEPARATOR);
+		return self::getExternalDir($originalFilePath, $localDirName . $localFileName . '/');
 	}
 	
 	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)
@@ -696,11 +696,11 @@ class kFileBase
 	{
 		if(!$baseDirName)
 		{
-			$baseDirName = sys_get_temp_dir() . DIRECTORY_SEPARATOR .
-				md5(microtime(true) . getmypid() . uniqid(rand(), true)) . DIRECTORY_SEPARATOR;
+			$baseDirName = sys_get_temp_dir() . '/' .
+				md5(microtime(true) . getmypid() . uniqid(rand(), true)) . '/';
 		}
 		
-		$remoteFiles = kFile::listDir($externalDirPath, $externalDirPath.DIRECTORY_SEPARATOR);
+		$remoteFiles = kFile::listDir($externalDirPath, $externalDirPath. '/');
 		foreach ($remoteFiles as $remoteFile)
 		{
 			$filePath = $remoteFile[0];
