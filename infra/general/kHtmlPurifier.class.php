@@ -96,7 +96,7 @@ class kHtmlPurifier
 	{
 		if ( ! self::$AllowedProperties )
 		{
-			$xssAllowedObjectProperties = kConf::get("xss_allowed_object_properties");
+			$xssAllowedObjectProperties = kConf::get('xss_allowed_object_properties');
 			if (!kCurrentContext::$HTMLPurifierBaseListOnlyUsage)
 			{
 				$AllowedProperties = array_merge($xssAllowedObjectProperties['base_list'], $xssAllowedObjectProperties['extend_list']);
