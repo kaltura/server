@@ -119,6 +119,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param $entryId
      */
     private function handleCuePoints($cuePointsList, $entryId){
+        $this->cleanCuePointsForEntry($entryId);
         foreach ($cuePointsList as $cuePoint){
             $cuePointObj = new KalturaThumbCuePoint();
             $cuePointObj->title = $cuePoint['title'];
@@ -127,6 +128,22 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
             $this->addCuePoint($cuePointObj);
         }
+    }
+    /**
+     * @param $entryId
+     */
+    protected function cleanCuePointsForEntry($entryId)
+    {
+        $cuePointFilter = new KalturaThumbCuePointFilter();
+        $cuePointFilter->entryIdEqual = $entryId;
+        $cuePoints = KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint->listAction($cuePointFilter);
+        if($cuePoints->totalCount > 0){
+            /** @var KalturaCuePoint $cuePoint */
+            foreach ($cuePoints as $cuePoint){
+                CuePointPlugin::get($this->client)->getCuePointService()->delete($cuePoint->id);
+            }
+        }
+
     }
 
     /**
