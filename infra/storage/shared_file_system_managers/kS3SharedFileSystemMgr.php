@@ -402,7 +402,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		// Example:
 		//  my_bucket/dir1/dir2/my_file.mp4
 		//  my_bucket/dir1/dir2/my_file.mp4.log
-		$path = $path . DIRECTORY_SEPARATOR;
+		$path = $path . '/';
 		list($bucket, $key) = $this->getBucketAndFilePath($path);
 		try
 		{
@@ -594,7 +594,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$originalFilePath = $bucket . '/' . $filePath . '/';
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
-				$fullPath = DIRECTORY_SEPARATOR . $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
+				$fullPath = '/' . $bucket . '/' . $dirListObject['Key'];
 				$fileName = $pathPrefix.basename($fullPath);
 				if($originalFilePath == $fullPath)
 					continue;
