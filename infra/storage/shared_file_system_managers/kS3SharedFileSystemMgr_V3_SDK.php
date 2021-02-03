@@ -538,18 +538,18 @@ class kS3SharedFileSystemMgr_V3_SDK extends kSharedFileSystemMgr
 		}
 		return $result['Location'];
 	}
-	
-	protected function doListFiles($filePath, $pathPrefix = '')
+
+	protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
 		$results = $this->s3Call('listObjects', null, $filePath);
-		
+
 		if(!$results)
 		{
 			return false;
 		}
 		return $results;
 	}
-	
+
 	protected function doGetMaximumPartsNum()
 	{
 		return self::MAX_PARTS_NUMBER;

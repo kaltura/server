@@ -251,15 +251,17 @@ abstract class kSharedFileSystemMgr
 	 * @return int
 	 */
 	abstract protected function doGetUploadMaxSize();
-	
+
 	/**
 	 * returns list of files under given file path
 	 *
 	 * @param $filePath file path to list dir content for
-	 *
+	 * @param string $pathPrefix
+	 * @param bool $recursive
+	 * @param bool $fileNamesOnly
 	 * @return array
 	 */
-	abstract protected function doListFiles($filePath, $pathPrefix = '');
+	abstract protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false);
 	
 	/**
 	 * returns true/false if the givven file path exists and is a regular file
@@ -517,10 +519,10 @@ abstract class kSharedFileSystemMgr
 		return $this->doRename($from, $to);
 	}
 	
-	public function listFiles($filePath, $pathPrefix = '')
+	public function listFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
 		$filePath = kFileBase::fixPath($filePath);
-		return $this->doListFiles($filePath, $pathPrefix);
+		return $this->doListFiles($filePath, $pathPrefix, $recursive, $fileNamesOnly);
 	}
 	
 	public function isFile($filePath)

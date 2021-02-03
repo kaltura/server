@@ -578,19 +578,19 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return $result['Location'];
 	}
-	
-	protected function doListFiles($filePath, $pathPrefix = '')
+
+	protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
 		$dirList = array();
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
-		
+
 		try
 		{
 			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
 				'Bucket' => $bucket,
 				'Prefix' => $filePath
 			));
-			
+
 			$originalFilePath = $bucket . '/' . $filePath . '/';
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
@@ -598,21 +598,24 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				$fileName = $pathPrefix.basename($fullPath);
 				if($originalFilePath == $fullPath)
 					continue;
-				
+
 				$fileType = "file";
 				if($dirListObject['Size'] == 0 && substr_compare($fullPath, '/', -strlen('/')) === 0)
 				{
 					$fileType = 'dir';
 				}
-				
+
 				if ($fileType == 'dir')
 				{
-					$dirList[] = array($fileName, 'dir', $dirListObject['Size']);
-					$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix));
+					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject['Size']);
+					if( $recursive)
+					{
+						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
+					}
 				}
 				else
 				{
-					$dirList[] = array($fileName, 'file', $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject['Size']);
 				}
 			}
 		}
@@ -620,10 +623,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			self::safeLog("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
 		}
-		
+
 		return $dirList;
 	}
-	
+
 	protected function doGetMaximumPartsNum()
 	{
 		return self::MAX_PARTS_NUMBER;
