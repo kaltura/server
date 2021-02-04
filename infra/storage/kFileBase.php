@@ -311,37 +311,21 @@ class kFileBase
     {
         if (!kFile::checkFileExists($file_name))
             return false;
-        
-        $cmd = "file -b --mime-type -";
-	    list($return_value, $output, $errorDescription) = kExecWrapper::runWrapped($cmd, $file_name);
-	    $output = @explode(";", $output);
-	    $output = trim($output[0]);
-	    
-	    if($return_value == 0 && $output != "")
+	
+	    if(kFile::isSharedPath($file_name) || !function_exists('mime_content_type'))
 	    {
-	    	return $output;
+		    $cmd = "file -b --mime-type -";
+		    list($return_value, $output, $errorDescription) = kExecWrapper::runWrapped($cmd, $file_name);
+		    $output = @explode(";", $output);
+		    $output = trim($output[0]);
+		
+		    if($return_value == 0 && $output != "")
+		    {
+			    return $output;
+		    }
 	    }
-        
-//        if(kFile::isSharedPath($file_name))
-//        {
-//	        $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
-//	        return $kSharedFsMgr->mimeType($file_name);
-//        }
-//
-//        if(! function_exists('mime_content_type'))
-//        {
-//            $type = null;
-//            exec('file -i -b ' . realpath($file_name), $type);
-//
-//            $parts = @ explode(";", $type[0]); // can be of format text/plain;  charset=us-ascii
-//
-//
-//            return trim($parts[0]);
-//        }
-//        else
-//        {
-//            return mime_content_type($file_name);
-//        }
+     
+	    return mime_content_type($file_name);
     }
 
     public static function copyFileMetadata($srcFile, $destFile)
