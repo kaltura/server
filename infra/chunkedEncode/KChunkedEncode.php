@@ -294,7 +294,7 @@
 			
 				/*
 				 * Verify session duration - it should be at least twice the chunk duration
-				 */
+				 *
 			if(isset($height)) {
 				$minimalDuration = KChunkedEncodeSetup::calculateChunkDuration($height)*2;
 				if($duration<$minimalDuration){
@@ -305,7 +305,7 @@
 			else if($duration<180){
 				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 180sec");
 				return false;
-			}
+			}*/
 			
 			return true;
 		}
