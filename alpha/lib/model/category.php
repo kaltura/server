@@ -35,6 +35,8 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	const FULL_IDS_EQUAL_MATCH_STRING = 'fullidsequalmatchstring';
 	
 	const EXCEEDED_ENTRIES_COUNT_CACHE_PREFIX = "DONT_COUNT_ENTRIES_CAT_";
+
+	const ADMIN_TAGS = 'adminTags';
 	
 	// Cache expires after 4 hours.
 	const EXCEEDED_ENTRIES_COUNT_CACHE_EXPIRY = 14400; 
@@ -1652,8 +1654,18 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	
 	public function setBulkUploadId ( $bulkUploadId )	{		$this->putInCustomData ( "bulk_upload_id" , $bulkUploadId );	}
 	public function getBulkUploadId (  )	{		return $this->getFromCustomData( "bulk_upload_id" );	}
-	
-	/**
+
+	public function getAdminTags()
+	{
+		return $this->getFromCustomData(self::ADMIN_TAGS);
+	}
+
+	public function setAdminTags($v)
+	{
+		return $this->putInCustomData(self::ADMIN_TAGS, $v);
+	}
+
+    /**
 	 * to be set when category is indexing - recalculating inheritance fields.
 	 */
 	public function setIsIndex($v)
