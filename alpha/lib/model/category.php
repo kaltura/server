@@ -1665,7 +1665,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		return $this->putInCustomData(self::ADMIN_TAGS, $v);
 	}
 
-    /**
+	/**
 	 * to be set when category is indexing - recalculating inheritance fields.
 	 */
 	public function setIsIndex($v)
