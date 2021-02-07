@@ -1465,6 +1465,4 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return $this->putInCustomData(self::COMPANY, $v);
 	}
-
-
 }

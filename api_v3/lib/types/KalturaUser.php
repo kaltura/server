@@ -94,7 +94,6 @@ class KalturaUser extends KalturaBaseUser
 	 */
 	public $company;
 
-
 	private static $map_between_objects = array (
 		"type",
 		"dateOfBirth",
