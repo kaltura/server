@@ -37,6 +37,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_PERCENTILES_RATIO = 'avg_completion_rate';
 	const METRIC_PLAYTHROUGH_RATIO = 'play_through_ratio';
 	const METRIC_UNIQUE_ENTRIES = 'unique_videos';
+	const METRIC_UNIQUE_PLAYED_ENTRIES = 'unique_played_videos';
 	const METRIC_UNIQUE_USERS = 'unique_known_users';
 	const METRIC_CARDINALITY = 'cardinality';
 	const METRIC_COUNT_UGC = 'count_ugc';
@@ -392,6 +393,7 @@ class kKavaReportsMgr extends kKavaBase
 	//global transform
 	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_PLAYED_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_CONTRIBUTORS => 'floor',
 		self::METRIC_VIEW_UNIQUE_AUDIENCE => 'floor',
@@ -426,6 +428,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_DROP_OFF => true,
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
+		self::METRIC_UNIQUE_PLAYED_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
 		self::METRIC_BUFFER_TIME_RATIO => true,
 		self::METRIC_AVG_BITRATE => true,
@@ -777,6 +780,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_ENTRIES] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_ENTRIES, 
 			array(self::DIMENSION_ENTRY_ID));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
 
 		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
 			self::getAndFilter(array(
