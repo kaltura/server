@@ -23,6 +23,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	const REGISTRATION_INFO = "registration_info";
 	const ATTENDANCE_INFO = "attendance_info";
+	const TITLE = 'title';
+	const COMPANY = 'company';
 
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
@@ -1443,4 +1445,26 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return $this->getFromCustomData(self::ATTENDANCE_INFO);
 	}
+
+	public function getTitle()
+	{
+		return $this->getFromCustomData(self::TITLE);
+	}
+
+	public function setTitle($v)
+	{
+		return $this->putInCustomData(self::TITLE, $v);
+	}
+
+	public function getCompany()
+	{
+		return $this->getFromCustomData(self::COMPANY);
+	}
+
+	public function setCompany($v)
+	{
+		return $this->putInCustomData(self::COMPANY, $v);
+	}
+
+
 }
