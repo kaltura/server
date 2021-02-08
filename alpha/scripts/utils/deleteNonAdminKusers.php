@@ -19,7 +19,7 @@ $length = 100;
 while($start < count($kuserIdsArr))
 {
 	$kuserIdsToUpdate = array_slice($kuserIdsArr, $start , $length);
-	updateStatuses($kuserIdsToUpdate);
+	updateStatuses($kuserIdsToUpdate ,$dryrun);
 	$start += $length;
 	sleep(1);
 }
@@ -36,7 +36,7 @@ function getKuserIds($partnerId)
 	return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-function updateStatuses($kuserIds)
+function updateStatuses($kuserIds, $dryrun)
 {
 	$c = new Criteria();
 	$c->add(kuserPeer::ID, $kuserIds, Criteria::IN);
@@ -44,9 +44,12 @@ function updateStatuses($kuserIds)
 
 	foreach ($kusers as $kuser)
 	{
-		KalturaLog::debug('Updating status deleted on kuser id ' . $kuser->getId());
 		$kuser->setStatus(KuserStatus::DELETED);
-		$kuser->save();
+		if (!$dryrun)
+		{
+			KalturaLog::debug('Updating status deleted on kuser id ' . $kuser->getId());
+			$kuser->save();
+		}
 	}
 	kEventsManager::flushEvents();
 }
