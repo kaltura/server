@@ -336,25 +336,21 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		$livePackagerUrl = rtrim(str_replace('{DC}', $serverNode->getEnvDc(), $livePackagerUrl), '/');
 		
+		$hostname = $serverNode->getHostname();
+		if(!$serverNode->getIsExternalMediaServer())
+		{
+			$hostname = preg_replace('/\..*$/', '', $hostname);
+		}
+
 		if(strpos($livePackagerUrl, "{m}") !== false)
 		{
 			$this->shouldRedirect = true;
-			
-			$hostname = $serverNode->getHostname();
-			if(!$serverNode->getIsExternalMediaServer())
-				$hostname = preg_replace('/\..*$/', '', $hostname);
-			
 			$livePackagerUrl = str_replace("{m}", $hostname, $livePackagerUrl);
 		}
 		
 		if(strpos($livePackagerUrl, "{mn}") !== false)
 		{
 			$this->shouldRedirect = false;
-			
-			$hostname = $serverNode->getHostname();
-			if(!$serverNode->getIsExternalMediaServer())
-				$hostname = preg_replace('/\..*$/', '', $hostname);
-			
 			$livePackagerUrl = str_replace("{mn}", $hostname, $livePackagerUrl);
 		}
 		
