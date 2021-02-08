@@ -347,8 +347,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$this->shouldRedirect = true;
 			$livePackagerUrl = str_replace("{m}", $hostname, $livePackagerUrl);
 		}
-		
-		if(strpos($livePackagerUrl, "{mn}") !== false)
+		elseif(strpos($livePackagerUrl, "{mn}") !== false)
 		{
 			$this->shouldRedirect = false;
 			$livePackagerUrl = str_replace("{mn}", $hostname, $livePackagerUrl);
