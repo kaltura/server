@@ -2142,9 +2142,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		if($syncKey)
 		{
-			list($filePath, $isEncrypted) = kAssetUtils::getLocalImagePath($syncKey);
+			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
 			$validContent = myXmlUtils::validateXmlFileContent($filePath);
-			if($isEncrypted)
+			if($isTempFile)
 			{
 				unlink($filePath);
 			}
