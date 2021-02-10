@@ -310,9 +310,11 @@ class kFileBase
     public static function mimeType($file_name)
     {
         if (!kFile::checkFileExists($file_name))
-            return false;
+        {
+        	return false;
+        }
 	
-	    if(kFile::isSharedPath($file_name) || !function_exists('mime_content_type'))
+	    if(kFile::isSharedPath($file_name))
 	    {
 		    $cmd = "file -b --mime-type -";
 		    list($return_value, $output, $errorDescription) = kExecWrapper::runWrapped($cmd, $file_name);
@@ -323,9 +325,24 @@ class kFileBase
 		    {
 			    return $output;
 		    }
+		    else
+		    {
+			    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+			    return $kSharedFsMgr->mimeType($file_name);
+		    }
 	    }
-     
-	    return mime_content_type($file_name);
+	    if(!function_exists('mime_content_type'))
+	    {
+		    $type = null;
+		    exec('file -i -b ' . realpath($file_name), $type);
+
+		    $parts = @ explode(";", $type[0]); // can be of format text/plain;  charset=us-ascii
+		    return trim($parts[0]);
+	    }
+	    else
+	    {
+		    return mime_content_type($file_name);
+	    }
     }
 
     public static function copyFileMetadata($srcFile, $destFile)
