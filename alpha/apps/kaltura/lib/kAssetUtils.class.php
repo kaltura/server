@@ -223,15 +223,23 @@ class kAssetUtils
 			KalturaLog::warning("file doesn't exist");
 			return $filePath;
 		}
-
+		
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
-		/* @var $fileSync FileSync */
-		if($local)
+		if(!$local || !$fileSync)
+			return $filePath;
+		
+		$isEncrypted = false;
+		if(!$fileSync->getEncryptionKey())
 		{
 			$filePath = $fileSync->getFullPath();
 		}
+		else
+		{
+			$isEncrypted = true;
+			$filePath = $fileSync->createTempClear();
+		}
 
-		return $filePath;
+		return array($filePath, $isEncrypted);
 	}
 
 	public static function getFileExtension($containerFormat)
