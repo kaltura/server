@@ -131,11 +131,12 @@ while (true)
 	$elasticLogs = $assocElasticLogs;
 
 	$ping = $elasticClient->ping();
-
 	if (!$ping)
 	{
 		KalturaLog::err('cannot connect to elastic cluster with client[' . print_r($elasticClient, true) . ']');
 		sleep(5);
+		kMemoryManager::clearMemory();
+		$elasticClient = new elasticClient($elasticServer, $elasticPort);
 		continue;
 	}
 
