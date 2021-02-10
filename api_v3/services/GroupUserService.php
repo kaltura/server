@@ -178,18 +178,15 @@ class GroupUserService extends KalturaBaseService
 	 * @return KalturaBulkUpload|null
 	 * @throws KalturaAPIException
 	 */
-	public function syncAction($userId, $groupIds, $removeFromExistingGroups = true, $createNewGroups = true)
+	public function syncAction($userId, $groupIds = null, $removeFromExistingGroups = true, $createNewGroups = true)
 	{
+		$separator = ';';
 		if(strpos($groupIds,';')===false)
 		{
-			$seperator = ',';
-		}
-		else
-		{
-			$seperator = ';';
+			$separator = ',';
 		}
 
-		$groupIdsList = explode($seperator, $groupIds);
+		$groupIdsList = explode($separator, $groupIds);
 		self::validateSyncGroupUserArgs($userId, $groupIdsList, $groupIds);
 
 		$kUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
@@ -332,16 +329,14 @@ class GroupUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'userId');
 		}
 
-		if(!strlen(trim($groupIds)))
+		if($groupIds)
 		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'groupIds');
-		}
-
-		foreach ($groupIdsList as $groupId)
-		{
-			if (!preg_match(kuser::PUSER_ID_REGEXP, trim($groupId)))
+			foreach ($groupIdsList as $groupId)
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'groupIds');
+				if (!preg_match(kuser::PUSER_ID_REGEXP, trim($groupId)))
+				{
+					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'groupIds');
+				}
 			}
 		}
 	}
