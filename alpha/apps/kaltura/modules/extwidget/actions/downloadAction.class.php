@@ -138,7 +138,7 @@ class downloadAction extends sfAction
 		if ($fileExt && !$isFileDir)
 			$fileName = $fileName . '.' . $fileExt;
 
-		if(!$local || in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		if(!$local)
 		{
 			$this->handleFileSyncRedirection($fileSync, $flavorAsset, $fileName, $isFileDir);
 		}
