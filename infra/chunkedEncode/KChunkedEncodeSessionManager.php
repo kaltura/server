@@ -361,6 +361,9 @@ $audMaxExecutionTime = 0;
 					$audMaxExecutionTime=round($this->chunker->params->duration/2);
 				else $audMaxExecutionTime = round($this->maxExecutionTime);
 			}
+// Workarround for long audio conversions of large MXF file stored on S3
+if($this->chunker->sourceFileDt->containerFormat=="mxf")
+	$audMaxExecutionTime = round($this->chunker->params->duration*6);
 
 			if($this->videoJobs->detectErrors($this->storeManager, $vidMaxExecutionTime, $chunkedEncodeReadIdx)!=true)
 				return false;
