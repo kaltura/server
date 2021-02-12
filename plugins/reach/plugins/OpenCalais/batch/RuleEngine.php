@@ -18,7 +18,7 @@ class RuleEngine extends Constants
      * @param string $textTimes
      */
     public function __construct(array $kmsIntelliTagRules, $textTimes) {
-        $this->textTimes = json_decode($textTimes, TRUE);
+        $this->textTimes = json_decode($textTimes, true);
         $this->kmsIntelliTagRules = $this->setRulesWithKeys($kmsIntelliTagRules);
     }
     /**
@@ -37,7 +37,7 @@ class RuleEngine extends Constants
      * @return array
      */
     public function getValuesFromApiResponse($response){
-        $responseArray = json_decode($response, TRUE);
+        $responseArray = json_decode($response, true);
         $result = array();
         foreach ($responseArray as $key => $apiItemDetails){
             if(!$this->passedRuleConditions($apiItemDetails)){
@@ -64,7 +64,7 @@ class RuleEngine extends Constants
                 $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $apiItemdetailsProperties[self::OPCAL_PERM_ID],
             ),
             'dynamicMetadata' => array(
-                'systemName' => $this->getTypeFromItemInApi($apiItemDetails),
+                'fieldName' => $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP],
                 'objectId' => $apiItemdetailsProperties[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]],
                 'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]) ?  true : false,
             )
