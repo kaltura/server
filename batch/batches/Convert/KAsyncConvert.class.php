@@ -225,6 +225,17 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 	protected function convertJob(KalturaBatchJob $job, KalturaConvertJobData $data)
 	{
+		//When working with shared mode enabled and shared file path is already provided we don't not need to move through api or run the isRemoteOutput closer
+		$isSharedOutputMode = isset($data->destFileSyncSharedPath) && kFile::isSharedPath($data->destFileSyncSharedPath);
+		if(isset(self::$taskConfig->params->isRemoteOutput))
+		{
+			self::$taskConfig->params->isRemoteOutput = self::$taskConfig->params->isRemoteOutput && !$isSharedOutputMode;
+		}
+
+		if(isset(self::$taskConfig->params->moveThroughApi))
+		{
+			self::$taskConfig->params->moveThroughApi = self::$taskConfig->params->moveThroughApi && !$isSharedOutputMode;
+		}
 		// ASSUME:
 		// 1. full input file path for each ($data->srcFileSyncs actualFileSyncLocalPath)
 		// 2. flavorParams ($data->flavorParams)
@@ -307,7 +318,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			{
 				$job = $this->updateJob($job, $jobMessage, KalturaBatchJobStatus::MOVEFILE, $data);
 
-				if(isset(self::$taskConfig->params->moveThroughApi) && self::$taskConfig->params->moveThroughApi && !(isset($data->destFileSyncSharedPath) && kFile::isSharedPath($data->destFileSyncSharedPath)))
+				if(isset(self::$taskConfig->params->moveThroughApi) && self::$taskConfig->params->moveThroughApi)
 				{
 					return $this->moveThroughApi($job, $data);
 				}
