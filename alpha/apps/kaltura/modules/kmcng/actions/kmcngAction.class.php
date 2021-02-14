@@ -120,7 +120,8 @@ class kmcngAction extends kalturaAction
 				"uri" => '/apps/studioV3/' . kConf::get("studio_v3_version") . "/index.html",
 				"html5_version" => kConf::get("html5_version"),
 				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
-				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : ''
+				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
+				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : ''
 			);
 		}
 
