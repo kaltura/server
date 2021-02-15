@@ -333,7 +333,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 
 	public static function shouldSkipRulesValidation($entryId, $ks)
 	{
-		if(	($ks->getRole() === UserRoleId::REACH_VENDOR_ROLE)									&&
+		if(	($ks->getRole() === UserRoleId::REACH_VENDOR_ROLE)			&&
 			($ks->getPrivilegeValue(kSessionBase::PRIVILEGE_VIEW) === $entryId)	&&
 			(ReachProfilePeer::retrieveByPartnerId($ks->getPartnerId())) )
 		{
