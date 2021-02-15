@@ -254,7 +254,23 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			}
 		}
 	}
-	
+
+	protected function shouldSkipRulesValidation()
+	{
+		if($this->scope && $this->scope->getKs())
+		{
+			$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaAccessControlContributor');
+			foreach($pluginInstances as $pluginInstance)
+			{
+				if( $pluginInstance->shouldSkipRulesValidation($this->scope->getEntryId(), $this->scope->getKs()) )
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param kEntryContextDataResult $context
 	 * @param accessControlScope $scope
@@ -267,7 +283,8 @@ class accessControl extends BaseaccessControl implements IBaseObject
 
 		$disableCache = false;
 		$isKsAdmin = $this->scope && $this->scope->getKs() && $this->scope->getKs()->isAdmin();
-		
+		$skipRulesValidation = ($isKsAdmin || $this->shouldSkipRulesValidation());
+
 		$rules = $this->getRulesArray();
 		$specialProperties = $this->getSpecialProperties();
 		if (isset($specialProperties[self::SERVE_FROM_SERVER_NODE_RULE]) && $specialProperties[self::SERVE_FROM_SERVER_NODE_RULE])
@@ -279,7 +296,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		$fulfilledRules = array();
 		foreach($rules as $ruleNum => $rule)
 		{
-			if($checkForceAdminValidation && $isKsAdmin && !$rule->getForceAdminValidation())
+			if($checkForceAdminValidation && $skipRulesValidation && !$rule->getForceAdminValidation())
 				continue;
 
 			$fulfilled = $rule->applyContext($context);
