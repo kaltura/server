@@ -417,15 +417,14 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$files =  $this->doList ($remoteDir);
 		$fileObjectsResult = array ();
-
 		foreach($files as $file)
 		{
-			if(trim($remoteDir, '/') === trim($file['path'],'/'))
+			if(trim($remoteDir, '/') === trim($file['path'],'/') || $file['fileSize'] == 0)
 			{
 				continue;
 			}
 			$fileObject = new FileObject();
-			$fileObject->filename = basename($file['path']);
+			$fileObject->filename = substr($file['path'], strlen($remoteDir));
 			$fileObject->fileSize = $file['fileSize'];
 			$fileObject->modificationTime = strtotime($file['modificationTime']);
 			$fileObjectsResult[] = $fileObject;
