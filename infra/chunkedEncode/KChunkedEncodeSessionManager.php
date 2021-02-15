@@ -172,7 +172,12 @@
 				}
 				$elapsed = time()-$job->startTime;
 				if($elapsed>$maxExecutionTime) {
-					if(!array_key_exists($job->id, $this->failed)){
+					/*
+					 * The bellow cond was DISABLED to prevent endless loop and stuck chk on 2nd and further chk job retries.
+					 * Remarked and left as a reference, since the original need for that cond is unclear
+					 */
+//					if(!array_key_exists($job->id, $this->failed))
+					{
 						$this->retryJob($manager, $job);
 						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
 					}
@@ -361,10 +366,11 @@ $audMaxExecutionTime = 0;
 					$audMaxExecutionTime=round($this->chunker->params->duration/2);
 				else $audMaxExecutionTime = round($this->maxExecutionTime);
 			}
-// Workarround for long audio conversions of large MXF file stored on S3
-if($this->chunker->sourceFileDt->containerFormat=="mxf")
-	$audMaxExecutionTime = round($this->chunker->params->duration*6);
-
+// Workarround for long conversions of large MXF file stored on S3
+if($this->chunker->sourceFileDt->containerFormat=="mxf"){
+	$audMaxExecutionTime*= 2;
+	$vidMaxExecutionTime*= 2;
+}
 			if($this->videoJobs->detectErrors($this->storeManager, $vidMaxExecutionTime, $chunkedEncodeReadIdx)!=true)
 				return false;
 			return $this->audioJobs->detectErrors($this->storeManager, $audMaxExecutionTime, $chunkedEncodeReadIdx);
