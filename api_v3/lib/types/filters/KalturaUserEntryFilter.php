@@ -59,26 +59,28 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 				$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
 	}
 
-	protected function getEntriesByEntitledKuserEdit()
+	protected function getEntriesByEntitledKuser()
 	{
 		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
 
 		$allEntryIds = $this->entryIdEqual ? array($this->entryIdEqual) : explode(',', $this->entryIdIn);
 		$entries = entryPeer::retrieveByPKs($allEntryIds);
-		$entitledEntriesIdsForEdit = array();
+		$entitledEntriesIds = array();
 
 		/* @var $entry entry */
 		foreach ($entries as $entry)
 		{
-			if($entry->isEntitledKuserEdit($currentKsKuserId))
+			if(	$entry->isEntitledKuserEdit($currentKsKuserId)		||
+				$entry->isEntitledKuserPublish($currentKsKuserId)	||
+				$entry->isEntitledKuserView($currentKsKuserId) )
 			{
-				$entitledEntriesIdsForEdit[] = $entry->getEntryId();
+				$entitledEntriesIds[] = $entry->getEntryId();
 			}
 		}
-		return array($entitledEntriesIdsForEdit, array_diff($allEntryIds, $entitledEntriesIdsForEdit));
+		return array($entitledEntriesIds, array_diff($allEntryIds, $entitledEntriesIds));
 	}
 
-	protected function buildCriteriaByEntitledForEdit(Criteria $c, $entitledEntriesIds, $notEntitledEntriesIds)
+	protected function buildCriteriaByEntitledEntries(Criteria $c, $entitledEntriesIds, $notEntitledEntriesIds)
 	{
 		$notEntitledEntriesCriterion = $c->getNewCriterion(UserEntryPeer::ENTRY_ID, $notEntitledEntriesIds, Criteria::IN);
 		$notEntitledEntriesCriterion->addAnd($c->getNewCriterion(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId(), Criteria::EQUAL));
@@ -107,13 +109,14 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		$c = new Criteria();
 		$userEntryFilter = $this->toObject();
 
-		$showAllForEditors = false;
+		// For User KS and if no user ID was given in the filter, retrieve all the user entries for which the user is entitled to.
+		$disableDefaultCriteria = false;
 		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session && !$this->userIdEqual && !$this->userIdIn)
 		{
-			$showAllForEditors = true;
-			list($entitledEntriesIds, $notEntitledEntriesIds) = $this->getEntriesByEntitledKuserEdit();
+			$disableDefaultCriteria = true;
+			list($entitledEntriesIds, $notEntitledEntriesIds) = $this->getEntriesByEntitledKuser();
 
-			$c = $this->buildCriteriaByEntitledForEdit($c, $entitledEntriesIds, $notEntitledEntriesIds);
+			$c = $this->buildCriteriaByEntitledEntries($c, $entitledEntriesIds, $notEntitledEntriesIds);
 			$c->addAnd ( UserEntryPeer::STATUS, UserEntryStatus::DELETED, Criteria::NOT_EQUAL);
 
 			UserEntryPeer::setUseCriteriaFilter(false);
@@ -137,7 +140,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			$totalCount = UserEntryPeer::doCount($c);
 		}
 
-		if($showAllForEditors)
+		if($disableDefaultCriteria)
 		{
 			UserEntryPeer::setUseCriteriaFilter(true);
 		}
