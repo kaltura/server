@@ -63,6 +63,21 @@ class kZoomClient
 	}
 	
 	/**
+	 * @param $response
+	 * @param int $httpCode
+	 * @param KCurlWrapper $curlWrapper
+	 * @param $apiPath
+	 */
+	protected function handelCurlResponse(&$response, $httpCode, $curlWrapper, $apiPath)
+	{
+		if (!$response || $httpCode !== 200 || $curlWrapper -> getError()) {
+			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
+			KalturaLog ::debug($errMsg);
+			$response = null;
+		}
+	}
+	
+	/**
 	 * @param string $apiPath
 	 * @param string $accessToken
 	 * @return mixed
@@ -78,20 +93,5 @@ class kZoomClient
 		$this -> handelCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
 		$data = json_decode($response, true);
 		return $data;
-	}
-	
-	/**
-	 * @param $response
-	 * @param int $httpCode
-	 * @param KCurlWrapper $curlWrapper
-	 * @param $apiPath
-	 */
-	protected function handelCurlResponse(&$response, $httpCode, $curlWrapper, $apiPath)
-	{
-		if (!$response || $httpCode !== 200 || $curlWrapper -> getError()) {
-			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
-			KalturaLog ::debug($errMsg);
-			$response = null;
-		}
 	}
 }
