@@ -33,10 +33,32 @@ class kZoomClient
 		return $this -> retrieveZoomUserPermissions(self::API_USERS_ME, $accessToken);
 	}
 	
+	public function retrieveTokenZoomUser($accessToken)
+	{
+		return $this -> retrieveZoomUser(self::API_USERS_ME, $accessToken);
+	}
+	
+	public function retrieveMeetingParticipant($accessToken, $meetingId)
+	{
+		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
+		return $this -> callZoom($apiPath, $accessToken);
+	}
+	
+	public function retrieveWebinarPanelists($accessToken, $webinarId)
+	{
+		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
+		return $this -> callZoom($apiPath, $accessToken);
+	}
+	
+	public function retrieveZoomUser($userName, $accessToken)
+	{
+		$apiPath = str_replace('@userId@', $userName, self::API_USERS);
+		return $this -> callZoom($apiPath, $accessToken);
+	}
+	
 	public function retrieveZoomUserPermissions($userName, $accessToken)
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS_PERMISSIONS);
-		
 		return $this -> callZoom($apiPath, $accessToken);
 	}
 	
@@ -55,7 +77,6 @@ class kZoomClient
 		$httpCode = $curlWrapper -> getHttpCode();
 		$this -> handelCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
 		$data = json_decode($response, true);
-		
 		return $data;
 	}
 	
@@ -72,31 +93,5 @@ class kZoomClient
 			KalturaLog ::debug($errMsg);
 			$response = null;
 		}
-	}
-	
-	public function retrieveTokenZoomUser($accessToken)
-	{
-		return $this -> retrieveZoomUser(self::API_USERS_ME, $accessToken);
-	}
-	
-	public function retrieveZoomUser($userName, $accessToken)
-	{
-		$apiPath = str_replace('@userId@', $userName, self::API_USERS);
-		
-		return $this -> callZoom($apiPath, $accessToken);
-	}
-	
-	public function retrieveMeetingParticipant($accessToken, $meetingId)
-	{
-		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
-		
-		return $this -> callZoom($apiPath, $accessToken);
-	}
-	
-	public function retrieveWebinarPanelists($accessToken, $webinarId)
-	{
-		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
-		
-		return $this -> callZoom($apiPath, $accessToken);
 	}
 }
