@@ -70,7 +70,8 @@ class kZoomClient
 	 */
 	protected function handelCurlResponse(&$response, $httpCode, $curlWrapper, $apiPath)
 	{
-		if (!$response || $httpCode !== 200 || $curlWrapper -> getError()) {
+		if (!$response || $httpCode !== 200 || $curlWrapper -> getError())
+		{
 			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
 			KalturaLog ::debug($errMsg);
 			$response = null;
