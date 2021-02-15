@@ -221,7 +221,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 		return 2000000000;
 	}
 	
-	protected function doListFiles($filePath, $pathPrefix = '')
+	protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
 		$fileList = array();
 		$path = str_ireplace(DIRECTORY_SEPARATOR, '/', $filePath);
@@ -238,12 +238,15 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 					if (is_dir($fullPath))
 					{
 						$tmpPrefix = $tmpPrefix.'/';
-						$fileList[] = array($tmpPrefix, 'dir', self::fileSize($fullPath));
-						$fileList = array_merge($fileList, self::listDir($fullPath, $tmpPrefix));
+						$fileList[] = $fileNamesOnly ? $tmpPrefix : array($tmpPrefix, 'dir', self::fileSize($fullPath));
+						if ($recursive)
+						{
+							$fileList = array_merge($fileList, self::doListFiles($fullPath, $tmpPrefix));
+						}
 					}
 					else
 					{
-						$fileList[] = array($tmpPrefix, 'file', self::fileSize($fullPath));
+						$fileList[] = $fileNamesOnly ? $tmpPrefix : array($tmpPrefix, 'file', self::fileSize($fullPath));
 					}
 				}
 			}

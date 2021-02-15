@@ -260,14 +260,12 @@ abstract class KBatchBase implements IKalturaLogger
 		self::$kClientConfig->serviceUrl = self::$taskConfig->getServiceUrl();
 		self::$kClientConfig->curlTimeout = self::$taskConfig->getCurlTimeout();
 		self::$kClientConfig->max_print = self::$taskConfig->maxPrint;
-
 		if(isset(self::$taskConfig->clientConfig))
 		{
 			foreach(self::$taskConfig->clientConfig as $attr => $value)
 				self::$kClientConfig->$attr = $value;
 		}
 
-		self::setSharedStorageConfig();
 		self::$kClient = new KalturaClient(self::$kClientConfig);
 		self::$kClient->setPartnerId(self::$taskConfig->getPartnerId());
 
@@ -277,46 +275,14 @@ abstract class KBatchBase implements IKalturaLogger
 		//$ks = self::$kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
 		$ks = $this->createKS();
 		self::$kClient->setKs($ks);
-
+		kBatchUtils::tryLoadKconfConfig(true);
 		KDwhClient::setEnabled(self::$taskConfig->getDwhEnabled());
 		KDwhClient::setFileName(self::$taskConfig->getDwhPath());
 		$this->onBatchUp();
 
 		KScheduleHelperManager::saveRunningBatch($this->getName(), $this->getIndex());
 	}
-	
-	private static function setSharedStorageConfig()
-	{
-		//Load shared storage config
-		if(self::$taskConfig->getS3Arn())
-		{
-			kSharedFileSystemMgr::setFileSystemOptions("arnRole", self::$taskConfig->getS3Arn());
-		}
-		if(self::$taskConfig->getS3Region())
-		{
-			kSharedFileSystemMgr::setFileSystemOptions("s3Region", self::$taskConfig->getS3Region());
-		}
-		if(self::$taskConfig->getS3AccessKeyId())
-		{
-			kSharedFileSystemMgr::setFileSystemOptions("accessKeyId", self::$taskConfig->getS3AccessKeyId());
-		}
-		if(self::$taskConfig->getS3AccessKeySecret())
-		{
-			kSharedFileSystemMgr::setFileSystemOptions("accessKeySecret", self::$taskConfig->getS3AccessKeySecret());
-		}
-		
-		$storageTypeMap = self::$taskConfig->getStorageTypeMap();
-		if($storageTypeMap)
-		{
-			$maps = explode(":", $storageTypeMap);
-			foreach ($maps as $map)
-			{
-				list($pathPrefix, $storageType) = explode("=", $map);
-				kFile::setStorageTypeMap($pathPrefix, $storageType);
-			}
-		}
-	}
-
+  
 	protected function getParams($name)
 	{
 		return  self::$taskConfig->$name;
@@ -451,18 +417,14 @@ abstract class KBatchBase implements IKalturaLogger
 		return true;
 	}
 
-	protected static function foldersize($path)
-	{
-	  if(!file_exists($path)) return 0;
-	  if(is_file($path)) return kFile::fileSize($path);
-	  $ret = 0;
-	  foreach(glob($path."/*") as $fn)
-	    $ret += KBatchBase::foldersize($fn);
-	  return $ret;
-	}
-
 	protected function setFilePermissions($filePath)
 	{
+		// no need to chmod on shared cloud storage
+		if (kFile::isSharedPath($filePath))
+		{
+			return;
+		}
+
 		if(kFile::isDir($filePath))
 		{
 			$chmod = 0750;
@@ -639,7 +601,7 @@ abstract class KBatchBase implements IKalturaLogger
 		{
 			clearstatcache();
 			if($directorySync)
-				$size=KBatchBase::foldersize($file);
+				$size=kFile::folderSize($file);
 			else
 				$size = kFile::fileSize($file);
 			if($size === false)

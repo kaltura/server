@@ -508,6 +508,7 @@ ini_set("memory_limit","512M");
 			$semaphoreKey = $this->getSemaphoreKeyName($fetchIndex);
 			$semaphoreToken = getmypid().".".gethostname().".".rand();
 			$rvLock = null;
+			$attempts=10;
 			while(true) {
 						/*
 						 * Try to lock the next unread job object
@@ -532,12 +533,13 @@ ini_set("memory_limit","512M");
 					break;
 				}
 				
-				if($fetchIndex<$readIndex-1000) {
+				if($fetchIndex<$readIndex-1000 || $attempts==0) {
 					KalturaLog::log("Unable to access job($fetchIndex), while rdIdx($readIndex) moved on, skipping");
 					break;
 				}
-
-				KalturaLog::log("Unable to access job ($fetchIndex), retry");
+				
+				$attempts--;
+				KalturaLog::log("Unable to access job ($fetchIndex), retry ($attempts)");
 				usleep(rand(0,100000));
 			}
 			
@@ -548,7 +550,7 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * GetRunningJobs
 		 */
-		public function GetRunningJobs($lookBackward=3000) {
+		public function GetRunningJobs($lookBackward=500) {
 			KalturaLog::log("lookBackward:$lookBackward");
 			if($this->fetchReadWriteIndexes($writeIndex, $readIndex)===false){
 				KalturaLog::log("ERROR: Missing write or read index ");

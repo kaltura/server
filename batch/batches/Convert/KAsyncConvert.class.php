@@ -125,10 +125,22 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	protected function convert(KalturaBatchJob $job, KalturaConvartableJobData $data)
 	{
-			/*
-			 * When called for 'collections', the 'flavorParamsOutputId' is not set.
-			 * It is set in the 'flavors' array, but for collections the 'flavorParamsOutput' it is unrequired.
-			 */
+		//When working with shared mode enabled and shared file path is already provided we don't not need to move through api or run the isRemoteOutput closer
+		$isSharedOutputMode = isset($data->destFileSyncSharedPath) && kFile::isSharedPath($data->destFileSyncSharedPath);
+		if(isset(self::$taskConfig->params->isRemoteOutput))
+		{
+			self::$taskConfig->params->isRemoteOutput = self::$taskConfig->params->isRemoteOutput && !$isSharedOutputMode;
+		}
+
+		if(isset(self::$taskConfig->params->moveThroughApi))
+		{
+			self::$taskConfig->params->moveThroughApi = self::$taskConfig->params->moveThroughApi && !$isSharedOutputMode;
+		}
+
+		/*
+		 * When called for 'collections', the 'flavorParamsOutputId' is not set.
+		 * It is set in the 'flavors' array, but for collections the 'flavorParamsOutput' it is unrequired.
+		 */
 		if(isset($data->flavorParamsOutputId))
 			$data->flavorParamsOutput = self::$kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
@@ -136,15 +148,15 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
 			$srcFileSyncDescriptor->isRemote = false;
-			
 			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
-				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+				list($isRemote, $remoteUrl, $isDir) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)
 				{
-					$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+					$fileSyncLocalPath = kFile::fetchRemoteToLocal($fileSyncLocalPath, $remoteUrl, $isDir,
+						$this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 				}
-				
+				$srcFileSyncDescriptor->isDir = $isDir;
 				$srcFileSyncDescriptor->isRemote = $isRemote;
 			}
 			
@@ -189,9 +201,31 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		foreach ($srcFileSyncs as $srcFileSyncDescriptor)
 		{
-			if($srcFileSyncDescriptor->isRemote)
+			if(!$srcFileSyncDescriptor->isRemote)
+				continue;
+			
+			$fileTmpPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			if($srcFileSyncDescriptor->isDir)
 			{
-				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
+				$dir = dir($fileTmpPath);
+				if (!$dir)
+				{
+					return null;
+				}
+				
+				while($dirFile = $dir->read())
+				{
+					if ($dirFile != "." && $dirFile != "..")
+					{
+						unlink($fileTmpPath.DIRECTORY_SEPARATOR.$dirFile);
+					}
+				}
+				$dir->close();
+				kFile::rmdir($fileTmpPath);
+			}
+			else
+			{
+				kFile::unlink($fileTmpPath);
 			}
 		}
 	}
@@ -221,8 +255,10 @@ class KAsyncConvert extends KJobHandlerWorker
 //		}
 		$fetchFirst = null;
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
-		{		
-			if(self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
+		{
+			$localFileExists = isset($srcFileSyncDescriptor->actualFileSyncLocalPath) && file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath);
+			// if the file was already retrieved then we dont care if the isRemoteInput is on or off.
+			if(!$localFileExists && (self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))) // for distributed conversion
 			{
 				if(!strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))
 					$srcFileSyncDescriptor->actualFileSyncLocalPath = self::$taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
@@ -356,7 +392,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				clearstatcache();
 				$directorySync = kFile::isDir($data->destFileSyncLocalPath);
 				if($directorySync)
-					$fileSize = KBatchBase::foldersize($data->destFileSyncLocalPath);
+					$fileSize = $fileSize = kFile::folderSize($data->destFileSyncLocalPath);
 				else
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 
@@ -422,7 +458,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			clearstatcache();
 			$directorySync = kFile::isDir($destFileSync->fileSyncLocalPath);
 			if($directorySync)
-				$fileSize=KBatchBase::foldersize($destFileSync->fileSyncLocalPath);
+				$fileSize=kFile::folderSize($destFileSync->fileSyncLocalPath);
 			else
 				$fileSize = kFile::fileSize($destFileSync->fileSyncLocalPath);
 				

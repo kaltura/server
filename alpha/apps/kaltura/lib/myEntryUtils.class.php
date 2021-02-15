@@ -2142,8 +2142,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		if($syncKey)
 		{
-			$filePath = kAssetUtils::getLocalImagePath($syncKey);
+			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
 			$validContent = myXmlUtils::validateXmlFileContent($filePath);
+			if($isTempFile)
+			{
+				unlink($filePath);
+			}
+			
 			if(!$validContent)
 			{
 				throw new Exception ("content contains potential security risks");

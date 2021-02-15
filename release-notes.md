@@ -1,3 +1,13 @@
+# Propus-16.17.0  #
+
+## Version Highlight ##
+
+### New features ###
+Enhance Zoom registration UI, adding:
+    a. Reload existing configuration
+    b. Support CMS_USER_ID matching
+    c. New look + updated logo
+
 # Propus-16.16.0  #
 
 ## Version Highlight ##

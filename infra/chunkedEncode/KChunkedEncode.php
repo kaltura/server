@@ -68,6 +68,10 @@
 				return false;
 			}
 			
+// Workarround for long audio conversions of large MXF file stored on S3
+if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourcePath)) {
+	$params->sourceForAudio=kfile::buildDirectUrl($params->unResolvedSourcePath);
+}
 				/*
 				 * Setup work folders 
 				 */
@@ -294,7 +298,7 @@
 			
 				/*
 				 * Verify session duration - it should be at least twice the chunk duration
-				 */
+				 *
 			if(isset($height)) {
 				$minimalDuration = KChunkedEncodeSetup::calculateChunkDuration($height)*2;
 				if($duration<$minimalDuration){
@@ -305,7 +309,7 @@
 			else if($duration<180){
 				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 180sec");
 				return false;
-			}
+			}*/
 			
 			return true;
 		}
@@ -920,9 +924,12 @@
 			if(isset($params->httpHeaderExtPrefix)){
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
-			
-			kBatchUtils::addReconnectParams('http', $params->source, $cmdLine);
-			$cmdLine.= " -i \"$params->source\"";
+			if(isset($params->sourceForAudio))
+				$sourcePath = $params->sourceForAudio;
+			else
+				$sourcePath = $params->source;
+			kBatchUtils::addReconnectParams('http', $sourcePath, $cmdLine);
+			$cmdLine.= " -i \"$sourcePath\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
@@ -1606,7 +1613,8 @@
 				$this->formatParams = null;
 			
 			if(($key=array_search("-i", $cmdLineArr))!==false) {
-				$resolvedPath = kFile::realPath($cmdLineArr[$key+1]);
+				$this->unResolvedSourcePath = $cmdLineArr[$key+1];
+				$resolvedPath = kFile::realPath($this->unResolvedSourcePath);
 				$cmdLineArr[$key+1] = "\"$resolvedPath\"";
 				$this->source = $resolvedPath;
 			}

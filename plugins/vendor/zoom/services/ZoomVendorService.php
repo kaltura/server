@@ -84,7 +84,6 @@ class ZoomVendorService extends KalturaBaseService
 				ZoomHelper::setZoomIntegration($zoomIntegration);
 			}
 
-			$zoomIntegration->setStatus(VendorStatus::DISABLED);
 			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
 			$permissions = $permissions['permissions'];
