@@ -172,7 +172,12 @@
 				}
 				$elapsed = time()-$job->startTime;
 				if($elapsed>$maxExecutionTime) {
-					if(!array_key_exists($job->id, $this->failed)){
+					/*
+					 * The bellow cond was DISABLED to prevent endless loop and stuck chk on 2nd and further chk job retries.
+					 * Remarked and left as a reference, since the original need for that cond is unclear
+					 */
+//					if(!array_key_exists($job->id, $this->failed))
+					{
 						$this->retryJob($manager, $job);
 						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
 					}
