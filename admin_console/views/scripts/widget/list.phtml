@@ -70,18 +70,17 @@
 
 
 <script type="text/javascript">
-jQuery('#filter_type').change(function() {
-	if(this.value == "none") {
+jQuery('#filter_type').change(function()
+{
+	if(this.value == "by-uiconf-type")
+	{
 		$("#filter_text").css("display","none");
-		$("div.help").hide();
-	}
-	else {
+        $("#filter_obj_type_input").css("display","inline");
+    }
+	else
+	    {
 		$("#filter_text").css("display","inline");
-		$("#filter_text input").focus();
-		if(this.value == "free")
-			$("div.help").show();
-		else
-			$("div.help").hide();
+        $("#filter_obj_type_input").css("display","none");
 	}
 });
 
