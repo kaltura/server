@@ -365,6 +365,9 @@ $audMaxExecutionTime = 0;
 				if(isset($this->chunker->params->duration) && $this->chunker->params->duration>0)
 					$audMaxExecutionTime=round($this->chunker->params->duration/2);
 				else $audMaxExecutionTime = round($this->maxExecutionTime);
+					// Min execution timeout - at least 30s, to prevent TO's of very short contents
+				$vidMaxExecutionTime = max($vidMaxExecutionTime,30);
+				$audMaxExecutionTime = max($audMaxExecutionTime,30);
 			}
 // Workarround for long conversions of large MXF file stored on S3
 if($this->chunker->sourceFileDt->containerFormat=="mxf"){
