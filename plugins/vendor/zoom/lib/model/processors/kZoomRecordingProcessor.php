@@ -81,7 +81,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 			if (isset($recordingFilesPerTimeSlot[kRecordingFileType::CHAT]))
 			{
-				$chatFilesProcessor = new kZoomChatFilesProcessor();
+				$chatFilesProcessor = new kZoomChatFilesProcessor(kZoomClient::ZOOM_BASE_URL);
 				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
 				{
 					$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
