@@ -52,17 +52,6 @@ class ConfMapsPeer extends BaseConfMapsPeer {
 		return self::doSelectOne($c);
 	}
 
-	public static function addNewMapVersion($mapName, $hostNameRegex, $content, $newVersion)
-	{
-		$c = new Criteria();
-		$c->add(self::MAP_NAME ,$mapName );
-		$c->add(self::HOST_NAME ,$hostNameRegex );
-		$c->add(self::CONTENT ,$content );
-		$c->add(self::VERSION ,$newVersion );
-		$c->add(self::STATUS ,ConfMapsStatus::STATUS_ENABLED );
-		return self::doInsert($c);
-	}
-
 	public static function retrieveMapsNames()
 	{
 		$mapNames= array();

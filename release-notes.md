@@ -1,3 +1,19 @@
+# Propus-16.18.0  #
+## Version Highlight ##
+
+## Add Description to confMaps modifications ##
+- Issue Type: Task
+- Issue ID: FOUN-114
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2021_02_17_alter_config_maps_table.sql
+
+
 # Propus-16.17.0  #
 
 ## Version Highlight ##
