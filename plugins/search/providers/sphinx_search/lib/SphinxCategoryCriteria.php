@@ -71,12 +71,14 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_eq_manager'))
 		{
 			$puserId = $filter->get('_eq_manager');
+			$kuserId = Kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
 			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 			if($kuser)
 			{
-				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . '_' . $kuser->getid() . ')';
+				$kuserId = $kuser->getId();
 			}
+			$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
+			$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . '_' . $kuserId . ')';
 		}
 		$filter->unsetByName('_eq_manager');
 		
