@@ -30,7 +30,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	public function __construct($zoomBaseUrl)
 	{
 		$this->mainEntry = null;
-        $this->zoomBaseUrl = $zoomBaseUrl;
+		$this->zoomBaseUrl = $zoomBaseUrl;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
 		parent::__construct($zoomBaseUrl);
 	}
