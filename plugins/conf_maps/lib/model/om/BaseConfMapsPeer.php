@@ -3,7 +3,7 @@
 /**
  * Base static class for performing query and update operations on the 'conf_maps' table.
  *
- * 
+ *
  *
  * @package Core
  * @subpackage model.om
@@ -24,9 +24,9 @@ abstract class BaseConfMapsPeer {
 
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'ConfMapsTableMap';
-	
+
 	/** The total number of columns. */
-	const NUM_COLUMNS = 8;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -55,6 +55,9 @@ abstract class BaseConfMapsPeer {
 	/** the column name for the VERSION field */
 	const VERSION = 'conf_maps.VERSION';
 
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'conf_maps.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of ConfMaps objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -71,11 +74,11 @@ abstract class BaseConfMapsPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'MapName', 'HostName', 'Status', 'CreatedAt', 'Remarks', 'Content', 'Version', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'mapName', 'hostName', 'status', 'createdAt', 'remarks', 'content', 'version', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::MAP_NAME, self::HOST_NAME, self::STATUS, self::CREATED_AT, self::REMARKS, self::CONTENT, self::VERSION, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'map_name', 'host_name', 'status', 'created_at', 'remarks', 'content', 'version', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'MapName', 'HostName', 'Status', 'CreatedAt', 'Remarks', 'Content', 'Version', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'mapName', 'hostName', 'status', 'createdAt', 'remarks', 'content', 'version', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::MAP_NAME, self::HOST_NAME, self::STATUS, self::CREATED_AT, self::REMARKS, self::CONTENT, self::VERSION, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'map_name', 'host_name', 'status', 'created_at', 'remarks', 'content', 'version', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -85,11 +88,11 @@ abstract class BaseConfMapsPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'MapName' => 1, 'HostName' => 2, 'Status' => 3, 'CreatedAt' => 4, 'Remarks' => 5, 'Content' => 6, 'Version' => 7, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'mapName' => 1, 'hostName' => 2, 'status' => 3, 'createdAt' => 4, 'remarks' => 5, 'content' => 6, 'version' => 7, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::MAP_NAME => 1, self::HOST_NAME => 2, self::STATUS => 3, self::CREATED_AT => 4, self::REMARKS => 5, self::CONTENT => 6, self::VERSION => 7, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'map_name' => 1, 'host_name' => 2, 'status' => 3, 'created_at' => 4, 'remarks' => 5, 'content' => 6, 'version' => 7, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'MapName' => 1, 'HostName' => 2, 'Status' => 3, 'CreatedAt' => 4, 'Remarks' => 5, 'Content' => 6, 'Version' => 7, 'CustomData' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'mapName' => 1, 'hostName' => 2, 'status' => 3, 'createdAt' => 4, 'remarks' => 5, 'content' => 6, 'version' => 7, 'customData' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::MAP_NAME => 1, self::HOST_NAME => 2, self::STATUS => 3, self::CREATED_AT => 4, self::REMARKS => 5, self::CONTENT => 6, self::VERSION => 7, self::CUSTOM_DATA => 8, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'map_name' => 1, 'host_name' => 2, 'status' => 3, 'created_at' => 4, 'remarks' => 5, 'content' => 6, 'version' => 7, 'custom_data' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -167,6 +170,7 @@ abstract class BaseConfMapsPeer {
 		$criteria->addSelectColumn(ConfMapsPeer::REMARKS);
 		$criteria->addSelectColumn(ConfMapsPeer::CONTENT);
 		$criteria->addSelectColumn(ConfMapsPeer::VERSION);
+		$criteria->addSelectColumn(ConfMapsPeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -197,40 +201,40 @@ abstract class BaseConfMapsPeer {
 
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
-		
+
 		ConfMapsPeer::attachCriteriaFilter($criteria);
 
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteria,
 			kQueryCache::QUERY_TYPE_COUNT,
-			'ConfMapsPeer', 
-			$cacheKey, 
+			'ConfMapsPeer',
+			$cacheKey,
 			$queryDB);
 		if ($cachedResult !== null)
 		{
 			return $cachedResult;
 		}
-		
+
 		// select the connection for the query
 		$con = ConfMapsPeer::alternativeCon ($con, $queryDB);
-		
+
 		// BasePeer returns a PDOStatement
 		$stmt = BasePeer::doCount($criteria, $con);
-		
+
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
 			$count = 0; // no rows returned; we infer that means 0 matches.
 		}
 		$stmt->closeCursor();
-		
+
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $count);
 		}
-		
+
 		return $count;
 	}
 	/**
@@ -252,14 +256,14 @@ abstract class BaseConfMapsPeer {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Override in order to use the query cache.
 	 * Cache invalidation keys are used to determine when cached queries are valid.
 	 * Before returning a query result from the cache, the time of the cached query
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *  
+	 *
 	 * @return     array The invalidation keys that should be checked before returning a cached result for this criteria.
 	 *		 if an empty array is returned, the query cache won't be used - the query will be performed on the DB.
 	 */
@@ -270,18 +274,18 @@ abstract class BaseConfMapsPeer {
 
 	/**
 	 * Override in order to filter objects returned from doSelect.
-	 *  
+	 *
 	 * @param      array $selectResults The array of objects to filter.
 	 * @param	   Criteria $criteria
 	 */
 	public static function filterSelectResults(&$selectResults, Criteria $criteria)
 	{
 	}
-	
+
 	/**
 	 * Adds the supplied object array to the instance pool, objects already found in the pool
 	 * will be replaced with instance from the pool.
-	 *  
+	 *
 	 * @param      array $queryResult The array of objects to get / add to pool.
 	 */
 	public static function updateInstancePool(&$queryResult)
@@ -299,10 +303,10 @@ abstract class BaseConfMapsPeer {
 			}
 		}
 	}
-						
+
 	/**
 	 * Adds the supplied object array to the instance pool.
-	 *  
+	 *
 	 * @param      array $queryResult The array of objects to add to pool.
 	 */
 	public static function addInstancesToPool($queryResult)
@@ -310,7 +314,7 @@ abstract class BaseConfMapsPeer {
 		if (Propel::isInstancePoolingEnabled())
 		{
 			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
-			{  
+			{
 				foreach ($queryResult as $curResult)
 				{
 					ConfMapsPeer::addInstanceToPool($curResult);
@@ -318,7 +322,7 @@ abstract class BaseConfMapsPeer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method to do selects.
 	 *
@@ -329,16 +333,16 @@ abstract class BaseConfMapsPeer {
 	 *		 rethrown wrapped into a PropelException.
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
-	{		
+	{
 		$criteriaForSelect = ConfMapsPeer::prepareCriteriaForSelect($criteria);
-		
+
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteriaForSelect, 
+			$criteriaForSelect,
 			kQueryCache::QUERY_TYPE_SELECT,
-			'ConfMapsPeer', 
-			$cacheKey, 
+			'ConfMapsPeer',
+			$cacheKey,
 			$queryDB);
 		if ($cachedResult !== null)
 		{
@@ -347,22 +351,22 @@ abstract class BaseConfMapsPeer {
 			ConfMapsPeer::updateInstancePool($cachedResult);
 			return $cachedResult;
 		}
-		
+
 		$con = ConfMapsPeer::alternativeCon($con, $queryDB);
-		
+
 		$queryResult = ConfMapsPeer::populateObjects(BasePeer::doSelect($criteriaForSelect, $con));
-		
+
 		if($criteriaForSelect instanceof KalturaCriteria)
 			$criteriaForSelect->applyResultsSort($queryResult);
-		
+
 		if ($cacheKey !== null)
 		{
 			kQueryCache::cacheQueryResults($cacheKey, $queryResult);
 			$cacheKey = null;
 		}
-		
+
 		ConfMapsPeer::filterSelectResults($queryResult, $criteria);
-		
+
 		ConfMapsPeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
@@ -373,38 +377,38 @@ abstract class BaseConfMapsPeer {
 		{
 			switch ($queryDB)
 			{
-			case kQueryCache::QUERY_DB_MASTER:
-				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-				break;
+				case kQueryCache::QUERY_DB_MASTER:
+					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+					break;
 
-			case kQueryCache::QUERY_DB_SLAVE:
-				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-				break;
+				case kQueryCache::QUERY_DB_SLAVE:
+					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+					break;
 			}
 		}
-	
+
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
-			
+
 		if($con === null)
 			$con = Propel::getConnection(ConfMapsPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-		
+
 		return $con;
 	}
-		
+
 	/**
 	 * @var criteriaFilter The default criteria filter.
 	 */
 	protected static $s_criteria_filter;
-	
+
 	public static function  setUseCriteriaFilter ( $use )
 	{
 		$criteria_filter = ConfMapsPeer::getCriteriaFilter();
-		
-		if ( $use )  $criteria_filter->enable(); 
+
+		if ( $use )  $criteria_filter->enable();
 		else $criteria_filter->disable();
 	}
-	
+
 	/**
 	 * Returns the default criteria filter
 	 *
@@ -414,16 +418,16 @@ abstract class BaseConfMapsPeer {
 	{
 		if(self::$s_criteria_filter == null)
 			ConfMapsPeer::setDefaultCriteriaFilter();
-		
+
 		$partnerCriteria = myPartnerUtils::getPartnerCriteriaParams('ConfMaps');
 		if ($partnerCriteria)
 		{
 			call_user_func_array(array('ConfMapsPeer','addPartnerToCriteria'), $partnerCriteria);
 		}
-		
+
 		return self::$s_criteria_filter;
 	}
-	 
+
 	/**
 	 * Creates default criteria filter
 	 */
@@ -431,27 +435,27 @@ abstract class BaseConfMapsPeer {
 	{
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
-		
-		$c = new myCriteria(); 
+
+		$c = new myCriteria();
 		self::$s_criteria_filter->setFilter($c);
 	}
-	
-	
+
+
 	/**
 	 * the filterCriteria will filter out all the doSelect methods - ONLY if the filter is turned on.
 	 * IMPORTANT - the filter is turend on by default and when switched off - should be turned on again manually .
-	 * 
+	 *
 	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
 	{
 		ConfMapsPeer::getCriteriaFilter()->applyFilter($criteria);
 	}
-	
+
 	public static function addPartnerToCriteria($partnerId, $privatePartnerData = false, $partnerGroup = null, $kalturaNetwork = null)
 	{
 	}
-	
+
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
 	 *
@@ -469,17 +473,17 @@ abstract class BaseConfMapsPeer {
 	{
 		// attach default criteria
 		ConfMapsPeer::attachCriteriaFilter($criteria);
-		
+
 		// select the connection for the query
 		$con = ConfMapsPeer::alternativeCon ( $con );
-		
+
 		// BasePeer returns a PDOStatement
 		return BasePeer::doCount($criteria, $con);
 	}
-	
+
 	public static function prepareCriteriaForSelect(Criteria $criteria)
 	{
-		if ($criteria->hasSelectClause()) 
+		if ($criteria->hasSelectClause())
 		{
 			$asColumns = $criteria->getAsColumns();
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
@@ -493,7 +497,7 @@ abstract class BaseConfMapsPeer {
 			$criteria = clone $criteria;
 			ConfMapsPeer::addSelectColumns($criteria);
 		}
-		
+
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
 
@@ -502,7 +506,7 @@ abstract class BaseConfMapsPeer {
 
 		return $criteria;
 	}
-	
+
 	/**
 	 * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
 	 *
@@ -519,9 +523,9 @@ abstract class BaseConfMapsPeer {
 	public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
 	{
 		$con = ConfMapsPeer::alternativeCon($con);
-		
+
 		$criteria = ConfMapsPeer::prepareCriteriaForSelect($criteria);
-		
+
 		// BasePeer returns a PDOStatement
 		return BasePeer::doSelect($criteria, $con);
 	}
@@ -545,10 +549,10 @@ abstract class BaseConfMapsPeer {
 			{
 				$key = (string) $obj->getId();
 			}
-				
+
 			if ( isset( self::$instances[$key] )											// Instance is already mapped?
-					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
-				)
+				|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+			)
 			{
 				self::$instances[$key] = $obj;
 				kMemoryManager::registerPeer('ConfMapsPeer');
@@ -602,7 +606,7 @@ abstract class BaseConfMapsPeer {
 		}
 		return null; // just to be explicit
 	}
-	
+
 	/**
 	 * Clear the instance pool.
 	 *
@@ -616,7 +620,7 @@ abstract class BaseConfMapsPeer {
 		}
 		self::$instances = array();
 	}
-	
+
 	/**
 	 * Method to invalidate the instance pool of all tables related to conf_maps
 	 * by a foreign key with ON DELETE CASCADE
@@ -654,7 +658,7 @@ abstract class BaseConfMapsPeer {
 	public static function populateObjects(PDOStatement $stmt)
 	{
 		$results = array();
-	
+
 		// set the class once to avoid overhead in the loop
 		$cls = ConfMapsPeer::getOMClass(false);
 		// populate the object(s)
@@ -691,11 +695,11 @@ abstract class BaseConfMapsPeer {
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseConfMapsPeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseConfMapsPeer::TABLE_NAME))
-	  {
-	    $dbMap->addTableObject(new ConfMapsTableMap());
-	  }
+		$dbMap = Propel::getDatabaseMap(BaseConfMapsPeer::DATABASE_NAME);
+		if (!$dbMap->hasTable(BaseConfMapsPeer::TABLE_NAME))
+		{
+			$dbMap->addTableObject(new ConfMapsTableMap());
+		}
 	}
 
 	/**
@@ -706,7 +710,7 @@ abstract class BaseConfMapsPeer {
 	 * relative to a location on the PHP include_path.
 	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
 	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @param      boolean  Whether or not to return the path wit hthe class name
 	 * @return     string path.to.ClassName
 	 */
 	public static function getOMClass($withPrefix = true)
@@ -790,7 +794,7 @@ abstract class BaseConfMapsPeer {
 
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
 	}
-	
+
 	/**
 	 * Return array of columns that should change only if there is a real change.
 	 * @return array
@@ -799,7 +803,7 @@ abstract class BaseConfMapsPeer {
 	{
 		return array();
 	}
-	
+
 	/**
 	 * Return array of custom-data fields that shouldn't be auto-updated.
 	 * @return array
@@ -849,8 +853,8 @@ abstract class BaseConfMapsPeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	 public static function doDelete($values, PropelPDO $con = null)
-	 {
+	public static function doDelete($values, PropelPDO $con = null)
+	{
 		if ($con === null) {
 			$con = Propel::getConnection(ConfMapsPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
@@ -885,7 +889,7 @@ abstract class BaseConfMapsPeer {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
 			$con->beginTransaction();
-			
+
 			$affectedRows += BasePeer::doDelete($criteria, $con);
 			ConfMapsPeer::clearRelatedInstancePool();
 			$con->commit();

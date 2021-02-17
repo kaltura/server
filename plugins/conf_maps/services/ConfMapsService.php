@@ -70,7 +70,7 @@ class ConfMapsService extends KalturaBaseService
 		$map->validateContent();
 
 		$newMapVersion = new ConfMaps();
-		$newMapVersion->addNewMapVersion($dbMap, $map->content);
+		$newMapVersion->addNewMapVersion($dbMap, $map->content, $map->description);
 		$newMapVersion->syncMapsToCache();
 		$map->fromObject($newMapVersion);
 		return $map;

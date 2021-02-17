@@ -2182,6 +2182,7 @@
 		<column required="false" lazyLoad="false" name="remarks" type="varchar" size="255" />
 		<column required="false" lazyLoad="false" name="content" type="longvarchar" />
 		<column required="false" lazyLoad="false" name="version" type="integer" />
+		<column required="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="primary_map_index">
 			<index-column name="map_name" />
 			<index-column name="host_name" />

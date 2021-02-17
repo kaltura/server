@@ -2494,6 +2494,7 @@ CREATE TABLE `conf_maps`
 	`remarks` VARCHAR(255),
 	`content` MEDIUMTEXT,
 	`version` INTEGER,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `primary_map_index`(`map_name`, `host_name`, `version`),
 	KEY `id_index`(`id`)

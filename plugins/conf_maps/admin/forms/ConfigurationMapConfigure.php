@@ -55,6 +55,14 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 			'readonly' => $this->disableAttributes,
 		));
 
+		$this->addElement('text', 'description', array(
+			'label' => 'Change Description:',
+			'required' => true,
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+			'readonly' => $this->disableEdit,
+		));
+
 		$this->addElement('textarea', 'rawData', array(
 			'label' => 'Content:',
 			'filters' => array('StringTrim'),

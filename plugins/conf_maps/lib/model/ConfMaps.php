@@ -20,8 +20,11 @@ class ConfMaps extends BaseConfMaps
 
 	/**
 	 * @param ConfMaps $exstingMap
+	 * @param $content
+	 * @param $description
+	 * @throws PropelException
 	 */
-	public function addNewMapVersion(ConfMaps $exstingMap, $content)
+	public function addNewMapVersion(ConfMaps $exstingMap, $content, $description)
 	{
 		$this->setMapName($exstingMap->getMapName());
 		$this->setHostName($exstingMap->getHostName());
@@ -29,6 +32,7 @@ class ConfMaps extends BaseConfMaps
 		$this->setContent($content);
 		$this->setRemarks(kCurrentContext::$ks);
 		$this->setStatus($exstingMap->getStatus());
+		$this->setDescription($description);
 		$this->save();
 	} // ConfMaps
 
@@ -89,6 +93,16 @@ class ConfMaps extends BaseConfMaps
 	protected static function getMapNameInCache($mapName , $hostNameRegex)
 	{
 		return $mapName . kRemoteMemCacheConf::MAP_DELIMITER . $hostNameRegex;
+	}
+
+	public function getDescription()
+	{
+		return $this->getFromCustomData('description');
+	}
+
+	public function setDescription($v)
+	{
+		$this->putInCustomData('description', $v);
 	}
 }
 
