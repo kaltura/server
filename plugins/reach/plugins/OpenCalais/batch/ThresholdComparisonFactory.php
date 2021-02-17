@@ -3,7 +3,7 @@
 
 class ThresholdComparisonFactory
 {
-    const THRSHLD_GT_PROP = 'gte';
+    const THRSHLD_GT_PROP = 'gt';
     const THRSHLD_GTE_PROP = 'gte';
     const THRSHLD_LT_PROP = 'lt';
     const THRSHLD_LTE_PROP = 'lte';

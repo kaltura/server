@@ -65,7 +65,7 @@ class RuleEngine extends Constants
             ),
             'dynamicMetadata' => array(
                 'systemName' => $this->getTypeFromItemInApi($apiItemDetails),
-                'objectId' => $apiItemdetailsProperties[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]],
+                'objectId' => isset($apiItemdetailsProperties[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]]) ? $apiItemdetailsProperties[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]] : '',
                 'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]) ?  true : false,
             )
         );
