@@ -87,7 +87,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var string
 	 */
-	public $description;
+	public $changeDescription;
 
 	private static $map_between_objects = array
 	(
@@ -98,7 +98,7 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 		"createdAt",
 		"remarks",
 		"content",
-		"description"
+		"changeDescription"
 	);
 
 	public function getMapBetweenObjects()
@@ -131,9 +131,9 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 
 	public function validateContent()
 	{
-		if(!trim($this->description))
+		if(!trim($this->changeDescription))
 		{
-			throw new KalturaAPIException(KalturaErrors::DESCRIPTION_CANNOT_BE_EMPTY);
+			throw new KalturaAPIException(KalturaErrors::CHANGE_DESCRIPTION_CANNOT_BE_EMPTY);
 		}
 
 		$content = json_decode($this->content, true);

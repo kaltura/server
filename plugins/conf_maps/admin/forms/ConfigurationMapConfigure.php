@@ -41,7 +41,7 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 		));
 
 		$this->addElement('text', 'name', array(
-			'label' => 'Map Name:',
+			'label' => 'Map Name: (mandatory)',
 			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
@@ -49,14 +49,14 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 		));
 
 		$this->addElement('text', 'relatedHost', array(
-			'label' => 'Host Name:',
+			'label' => 'Host Name: ',
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 			'readonly' => $this->disableAttributes,
 		));
 
-		$this->addElement('text', 'description', array(
-			'label' => 'Change Description:',
+		$this->addElement('text', 'changeDescription', array(
+			'label' => 'Change Description: (mandatory)',
 			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',

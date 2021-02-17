@@ -78,7 +78,7 @@ class ConfigurationMapConfigureAction extends KalturaApplicationPlugin
 			}
 			else
 			{
-				$configurationMap->description = null;
+				$configurationMap->changeDescription = null;
 			}
 
 			$form = $this->initForm($action, $configurationMap);
