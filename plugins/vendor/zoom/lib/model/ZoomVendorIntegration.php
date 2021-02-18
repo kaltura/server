@@ -20,9 +20,13 @@ class ZoomVendorIntegration extends VendorIntegration
 	const USER_POSTFIX = 'UserPostfix';
 	const ENABLE_WEBINAR_UPLOADS = 'enableWebinarUploads';
 	const CONVERSION_PROFILE_ID = 'conversionProfileId';
+	const JWT_TOKEN = 'jwtToken';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
+	
+	public function setJwtToken ($v)	{ $this->putInCustomData ( self::JWT_TOKEN, $v);	}
+	public function getJwtToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
 
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}
