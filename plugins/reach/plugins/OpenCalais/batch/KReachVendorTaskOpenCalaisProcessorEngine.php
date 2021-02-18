@@ -185,7 +185,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             throw new Exception ('Kaltura data retrieval error: ' . $e->getMessage());
         }
 
-        $response = $this->openCalaisGetTags($transcript, $vendorTask->partnerId);
+        $response = $this->senOpenCalaisGetTagsRequest($transcript, $vendorTask->partnerId);
         $textCuePointsRelation = $this->getEntryJsonTranscript($vendorTask);
         $ruleEngine = new RuleEngine($this->getRules($mappingProfileId, $vendorTask->partnerId), $textCuePointsRelation);
 
@@ -222,7 +222,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         return (string)$content;
     }
 
-    protected function openCalaisGetTags ($transcript, $partnerId)
+    protected function senOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
         $apiKey = $this->getOpenCalaisApiKey($partnerId);
 
@@ -231,7 +231,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         curl_setopt($ch,CURLOPT_POST, true);
         curl_setopt($ch,CURLOPT_POSTFIELDS, $transcript);
         curl_setopt($ch,CURLOPT_HTTPHEADER,array (
-            "Content-Type: text/raw",
+            "Content-Type: text/xml",
             "charset:utf8",
             "x-ag-access-token: $apiKey",
             "outputFormat: application/json",
@@ -276,8 +276,9 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $mediaEntry = $this->getMediaEntry($vendorTask->entryId);
         $text = $this->getEntryTextTranscript($vendorTask);
 
-        return "$mediaEntry->name $mediaEntry->description $text";
+        return '<Document><Title>' . htmlspecialchars($mediaEntry->name) . '</Title><Description>' . htmlspecialchars($mediaEntry->description) . '</Description><Body>' . htmlspecialchars($text) . '</Body></Document>';
     }
+
 
     /**
      * @param KalturaEntryVendorTask $vendorTask
