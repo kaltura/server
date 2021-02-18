@@ -187,7 +187,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
         $response = $this->senOpenCalaisGetTagsRequest($transcript, $vendorTask->partnerId);
         $textCuePointsRelation = $this->getEntryJsonTranscript($vendorTask);
-        $ruleEngine = new RuleEngine($this->getRules($mappingProfileId, $vendorTask->partnerId), $textCuePointsRelation);
+        $ruleEngine = new RuleEngine($this->getMappingMetadataProfileRules($mappingProfileId, $vendorTask->partnerId), $textCuePointsRelation);
 
         return $ruleEngine->getValuesFromApiResponse($response);
     }
@@ -362,7 +362,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param int $partnerId
      * @return array
      */
-    protected function getMappingMetadataProfileIdgetRules($mappingProfileId, $partnerId) {
+    protected function getMappingMetadataProfileRules($mappingProfileId, $partnerId) {
         $metadataResponse = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($mappingProfileId, KalturaMetadataObjectType::PARTNER, $partnerId);
         $this->retrieveActiveMetadataFields($metadataResponse->objects[0]->xml);
 
@@ -459,28 +459,14 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     }
 
     /**
-     * Method removes the existing Dexter-related tags from the entry metadata
-     * @param string $metadata
-     *
-     * @return string
-     */
-    protected function clearPreviousContent($metadata)
-    {
-        $metadataXML = new SimpleXMLElement($metadata);
-        $fieldNames = array ("CompanyAutoMain" , "CategoryAutoMain", "CompanyAutoMentioned", "MentionedTagAuto", "GeographyAutoMentioned", "PersonAutoMentioned");
-        $this->clearFieldsInXml($metadataXML, $fieldNames);
-
-        return $metadataXML->saveXML();
-    }
-
-    /**
      * Removes specific list of fields from XML
      *
-     * @param SimpleXMLElement $metadataXML
+     * @param string $metadataXML
      * @param array $fieldNames
      */
-    protected function clearFieldsInXml(SimpleXMLElement $metadataXML, array $fieldNames)
+    protected function clearFieldsInXml($metadata, array $fieldNames)
     {
+        $metadataXML = new SimpleXMLElement($metadata);
         foreach ($fieldNames as $fieldName)
         {
             $tags = $metadataXML->xpath("//$fieldName");
