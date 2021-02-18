@@ -282,4 +282,9 @@ class LiveEntryServerNode extends EntryServerNode
 		$disableDcCheck = kConf::get('disable_dc_check_for_entryServerNode', 'runtime_config', 0);
 		return $disableDcCheck || $this->getDc() == kDataCenterMgr::getCurrentDcId();
 	}
+
+	public function getViewMode()
+	{
+		return $this->getLiveEntry()->getViewMode();
+	}
 }
