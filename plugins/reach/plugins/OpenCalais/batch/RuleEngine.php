@@ -18,7 +18,7 @@ class RuleEngine extends Constants
      * @param string $textTimes
      */
     public function __construct(array $kmsIntelliTagRules, $textTimes) {
-        $this->textTimes = json_decode($textTimes, TRUE);
+        $this->textTimes = json_decode($textTimes, true);
         $this->kmsIntelliTagRules = $this->setRulesWithKeys($kmsIntelliTagRules);
     }
     /**
@@ -37,7 +37,7 @@ class RuleEngine extends Constants
      * @return array
      */
     public function getValuesFromApiResponse($response){
-        $responseArray = json_decode($response, TRUE);
+        $responseArray = json_decode($response, true);
         $result = array();
         foreach ($responseArray as $key => $apiItemDetails){
             if(!$this->passedRuleConditions($apiItemDetails)){
@@ -63,6 +63,7 @@ class RuleEngine extends Constants
             $items = $apiItemDetails['resolutions'];
         }
         $result = $this->getFieldsArrayUsingRule($items, $rule, $this->getTypeFromItemInApi($apiItemDetails));
+
         if(!empty($cuePoints)){
             $result[0]['cuePoints_list'] = $cuePoints;
         }

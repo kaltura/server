@@ -31,7 +31,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"permissionItem" => objectType::PERMISSIONITEM,
 			"userRole" => objectType::USERROLE,
 			"categoryEntry" => objectType::CATEGORY_ENTRY,
-			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue('CaptionAsset'),);
+			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue('CaptionAsset'),
+            "TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue('TranscriptAsset'),
+        );
 
 		if (isset($mapObjectType[$eventObjectClassName]))
 		{
