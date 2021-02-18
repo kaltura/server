@@ -269,7 +269,7 @@ class LiveEntryServerNode extends EntryServerNode
 
 	public function getIsPlayableUser()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_IS_PLAYABLE_USER, null, true);
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_PLAYABLE_USER, null, false);
 	}
 
 	public function setIsPlayableUser($v)
