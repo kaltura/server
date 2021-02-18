@@ -79,11 +79,12 @@ class RuleEngine extends Constants
         foreach ($items as $item){
             $result[] =  array(
                 'entryMetadataShowTaxonomy' => array(
-                    $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $item[self::OPCAL_ENTT_NAME],
-                    $rule[self::RULE_KALTURA_GROUPROP][self::RULE_KALTURA_ID] => isset($item[self::OPCAL_PERM_ID]) ? $item[self::OPCAL_PERM_ID] : ''),
+                    $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $item[self::OPCAL_PERM_ID],
+                ),
                 'dynamicMetadata' => array(
-                    'SystemName' => $systemName,
+                    'systemName' => $this->getTypeFromItemInApi($item),
                     'objectId' => isset($item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]]) ? $item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]] : '',
+                    'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]),
                 )
             );
         }
