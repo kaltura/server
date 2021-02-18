@@ -317,4 +317,12 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		return $obj;
 	}
 	
+	
+	//////////////////
+	///
+	///
+	///
+	/// Get VenderoIntegrationObject ( z,partnerId)
+	/// KalturaVendroIntegrationSettingg out of VenderoIntegrationObject
+	/// this->refreshToekn = VenderoIntegrationObject->refresh
 }

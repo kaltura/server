@@ -34,6 +34,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 
 		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		kConf::getArrayValue('redirectUrl','ZoomAccount','vendor.ini');
 	}
 
 	/**

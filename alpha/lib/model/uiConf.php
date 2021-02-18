@@ -11,29 +11,29 @@
 class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 {
 	const MYSQL_CODE_DUPLICATE_KEY = 23000;
-	
-	const UI_CONF_TYPE_GENERIC = 0;
-	const UI_CONF_TYPE_WIDGET = 1;
-	const UI_CONF_TYPE_CW = 2;
-	const UI_CONF_TYPE_EDITOR = 3;
-	const UI_CONF_TYPE_ADVANCED_EDITOR = 4;
-	const UI_CONF_TYPE_PLAYLIST = 5;			// maybe this is in fact type WIDGET with some flags switched on ?!?
-	const UI_CONF_TYPE_KMC_APP_STUDIO = 6;
-	const UI_CONF_TYPE_KRECORD = 7;
-	const UI_CONF_TYPE_KDP3 = 8;
-	const UI_CONF_TYPE_KMC_ACCOUNT = 9;
-	const UI_CONF_TYPE_KMC_ANALYTICS = 10;
-	const UI_CONF_TYPE_KMC_CONTENT = 11;
-	const UI_CONF_TYPE_KMC_DASHBOARD = 12;
-	const UI_CONF_TYPE_KMC_LOGIN = 13;
-	const UI_CONF_TYPE_SLP = 14;
-	const UI_CONF_CLIENTSIDE_ENCODER = 15;
-	const UI_CONF_KMC_GENERAL = 16;
-	const UI_CONF_KMC_ROLES_AND_PERMISSIONS = 17;
-	const UI_CONF_CLIPPER = 18;
-	const UI_CONF_TYPE_KSR = 19;
-	const UI_CONF_TYPE_KUPLOAD = 20;
-	const UI_CONF_TYPE_WEBCASTING = 21;
+
+    const UI_CONF_TYPE_GENERIC              = 0;
+    const UI_CONF_TYPE_WIDGET               = 1;
+    const UI_CONF_TYPE_CW                   = 2;
+    const UI_CONF_TYPE_EDITOR               = 3;
+    const UI_CONF_TYPE_ADVANCED_EDITOR      = 4;
+    const UI_CONF_TYPE_PLAYLIST             = 5;            // maybe this is in fact type WIDGET with some flags switched on ?!?
+    const UI_CONF_TYPE_KMC_APP_STUDIO       = 6;
+    const UI_CONF_TYPE_KRECORD              = 7;
+    const UI_CONF_TYPE_KDP3                 = 8;
+    const UI_CONF_TYPE_KMC_ACCOUNT          = 9;
+    const UI_CONF_TYPE_KMC_ANALYTICS        = 10;
+    const UI_CONF_TYPE_KMC_CONTENT          = 11;
+    const UI_CONF_TYPE_KMC_DASHBOARD        = 12;
+    const UI_CONF_TYPE_KMC_LOGIN            = 13;
+    const UI_CONF_TYPE_SLP                  = 14;
+    const UI_CONF_CLIENTSIDE_ENCODER        = 15;
+    const UI_CONF_KMC_GENERAL               = 16;
+    const UI_CONF_KMC_ROLES_AND_PERMISSIONS = 17;
+    const UI_CONF_CLIPPER                   = 18;
+    const UI_CONF_TYPE_KSR                  = 19;
+    const UI_CONF_TYPE_KUPLOAD              = 20;
+    const UI_CONF_TYPE_WEBCASTING           = 21;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
@@ -52,13 +52,13 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	const FILE_SYNC_UICONF_SUB_TYPE_FEATURES = 2;
 	const FILE_SYNC_UICONF_SUB_TYPE_CONFIG = 3;
 
-	private static $UI_CONF_OBJ_TYPE_MAP = null;
-	private static $REQUIRE_UI_CONF_FILE_FOR_TYPE = null;
-	
-	private static $validSubTypes = array(self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG, self::FILE_SYNC_UICONF_SUB_TYPE_DATA, self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES);
-	private $content = array();
+    private static $UI_CONF_OBJ_TYPE_MAP = null;
+    private static $REQUIRE_UI_CONF_FILE_FOR_TYPE = null;
 
-	private $swf_url_version = null;
+    private static $validSubTypes = array(self::FILE_SYNC_UICONF_SUB_TYPE_CONFIG, self::FILE_SYNC_UICONF_SUB_TYPE_DATA, self::FILE_SYNC_UICONF_SUB_TYPE_FEATURES);
+    private $content = array();
+
+    private $swf_url_version = null;
 
 	//UI_CONF_TYPE_KSR:: This is a general path value the actual jar file should be symlinked under each KSR version dir
 	private static $swf_names = array ( self::UI_CONF_TYPE_WIDGET => "kdp.swf" ,
