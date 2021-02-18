@@ -47,7 +47,7 @@ class RuleEngine extends Constants
             if(isset($rule[self::RULE_OCM_GROUPROP][self::RULE_THRSHLD_PROP]) && !$this->passedRuleConditionThresholds($rule[self::RULE_OCM_GROUPROP][self::RULE_THRSHLD_PROP], $apiItemDetails)){
                 continue;
             }
-            $result[] = $this->getValuesByRuleAndApiResponse($rule, $apiItemDetails);
+            $result = array_merge($result, $this->getValuesByRuleAndApiResponse($rule, $apiItemDetails));
         }
         return $result;
     }
@@ -58,19 +58,36 @@ class RuleEngine extends Constants
      */
     private function getValuesByRuleAndApiResponse(array $rule, array $apiItemDetails){
         $cuePoints = $this->getValuesForCuePoints($apiItemDetails);
-        $apiItemdetailsProperties = isset($apiItemDetails['resolutions'][0]) ? $apiItemDetails['resolutions'][0] : $apiItemDetails;
-        $result =  array(
-            'entryMetadataShowTaxonomy' => array(
-                $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $apiItemdetailsProperties[self::OPCAL_PERM_ID],
-            ),
-            'dynamicMetadata' => array(
-                'fieldName' => $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP],
-                'objectId' => $apiItemdetailsProperties[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]],
-                'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]) ?  true : false,
-            )
-        );
+        $items[] = $apiItemDetails;
+        if(isset($apiItemDetails['resolutions']) && !empty($apiItemDetails['resolutions'])){
+            $items = $apiItemDetails['resolutions'];
+        }
+        $result = $this->getFieldsArrayUsingRule($items, $rule, $this->getTypeFromItemInApi($apiItemDetails));
+
         if(!empty($cuePoints)){
-            $result['cuePoints_list'] = $cuePoints;
+            $result[0]['cuePoints_list'] = $cuePoints;
+        }
+        return $result;
+    }
+    /**
+     * @param array $items
+     * @param array $rule
+     * @param string $systemName
+     * @return array
+     */
+    private function getFieldsArrayUsingRule(array $items, array $rule, $systemName){
+        $result = array();
+        foreach ($items as $item){
+            $result[] =  array(
+                'entryMetadataShowTaxonomy' => array(
+                    $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $item[self::OPCAL_PERM_ID],
+                ),
+                'dynamicMetadata' => array(
+                    'systemName' => $systemName,
+                    'objectId' => isset($item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]]) ? $item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]] : '',
+                    'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]),
+                )
+            );
         }
         return $result;
     }
