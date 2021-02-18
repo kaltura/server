@@ -60,15 +60,15 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
 
     protected function handleEntryChanged(entry $object, array $modifiedColumns)
     {
-        if (!($object instanceof LiveEntry) || !($object->getRecordedEntryId()))
+        if (!($object instanceof LiveEntry) || !($object->getRecordStatus()))
         {
-            KalturaLog::info("Entry {$object->getId()} is either not a live entry, or does not have recorded entry ID. Skipping.");
+            KalturaLog::info("Entry {$object->getId()} is either not a live entry, or does not have recording enabled. Skipping.");
             return true;
         }
 
         if(isset($modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES]['']['recorded_entry_id'])) // array_key_exists
         {
-            $this->removeThumbAssetFromRecordedEntry($object->getId());
+            $this->removeVODThumbAssetFromLiveEntry($object->getId());
         }
 
         /* @var $object LiveEntry */
@@ -105,7 +105,7 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
      * @param string $entryId
      * @throws PropelException
      */
-    public function removeThumbAssetFromRecordedEntry($entryId){
+    public function removeVODThumbAssetFromLiveEntry($entryId){
         $entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryId);
         foreach ($entryThumbAssets as $entryThumbAsset)
         {
@@ -128,7 +128,12 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
             return false;
         }
 
-        if ($object instanceof entry && (!($object instanceof LiveEntry) || !($object->getRecordedEntryId())))
+        if (!($object instanceof entry) && !($object instanceof asset))
+        {
+            return false;
+        }
+
+        if ($object instanceof entry && (!($object instanceof LiveEntry) || !($object->getRecordStatus())))
         {
             return false;
         }
@@ -151,7 +156,7 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
                 return false;
             }
 
-            $thumbAssetTags = explode($object->getTags());
+            $thumbAssetTags = $object->getTagsArray();
             $excludedTags = kConf::get('default_live_thumbasset_tags');
             $excludedTags[] = self::LIVE_STREAM_VOD_THUMBNAIL_TAG;
             if (count(array_intersect($thumbAssetTags, $excludedTags)))
@@ -163,9 +168,13 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
             if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE){ // its recorded entry
                 $liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
                 $liveEntryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($liveEntry->getId());// live entry has its own custom thumbnails
+
+                //Recalculate the excluded tag list
+                $excludedTags = kConf::get('default_live_thumbasset_tags');
                 foreach($liveEntryThumbAssets as $entryThumbAsset)
                 {
-                    if (count(array_intersect($entryThumbAsset, $excludedTags))) // tags its in the list
+                    /* @var $entryThumbAsset thumbAsset */
+                    if (!count(array_intersect($entryThumbAsset->getTagsArray(), $excludedTags))) // there is at least one thumbnail with no excluded tags.
                     {
                         return false;
                     }
