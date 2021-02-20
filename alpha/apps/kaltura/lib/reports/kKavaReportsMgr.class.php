@@ -337,6 +337,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_HOTSPOT_CLICKED,
 		self::EVENT_TYPE_NODE_SWITCH,
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -388,6 +389,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
 		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED => 'count_download_attachment_clicked',
 	);
 
 	//global transform
