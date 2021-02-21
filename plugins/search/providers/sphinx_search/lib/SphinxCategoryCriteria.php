@@ -71,12 +71,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_eq_manager'))
 		{
 			$puserId = $filter->get('_eq_manager');
-			$kuserId = Kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-			if($kuser)
-			{
-				$kuserId = $kuser->getId();
-			}
+			$kuserId = $this->getKuserIdForSearch($partnerId, $puserId);
 			$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
 			$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . '_' . $kuserId . ')';
 		}
@@ -85,12 +80,7 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_eq_member'))
 		{
 			$puserId = $filter->get('_eq_member');
-			$kuserId = Kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-			if($kuser)
-			{
-				$kuserId = $kuser->getid();
-			}
+			$kuserId = $this->getKuserIdForSearch($partnerId, $puserId);
 			$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
 			$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
 			$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
@@ -253,5 +243,15 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	protected function applyIds(array $ids)
 	{
 		return $ids;
+	}
+
+	protected function getKuserIdForSearch($partnerId, $puserId)
+	{
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		if($kuser)
+		{
+			return $kuser->getid();
+		}
+		return Kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
 	}
 }
