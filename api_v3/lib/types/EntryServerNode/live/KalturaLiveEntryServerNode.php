@@ -27,7 +27,6 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 
 	/**
 	 * @var KalturaViewMode
-	 * @readonly
 	 */
 	public $viewMode;
 

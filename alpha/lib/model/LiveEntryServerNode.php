@@ -13,6 +13,7 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_RECORDING_INFO = "recording_info";
 	const MAX_DURATIONS_TO_KEEP = 20;
 	const CUSTOM_DATA_IS_PLAYABLE_USER = "is_playable_user";
+	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
@@ -283,8 +284,13 @@ class LiveEntryServerNode extends EntryServerNode
 		return $disableDcCheck || $this->getDc() == kDataCenterMgr::getCurrentDcId();
 	}
 
+	public function setViewMode($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+	}
+
 	public function getViewMode()
 	{
-		return $this->getLiveEntry()->getViewMode();
+		return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::ALLOW_ALL);
 	}
 }
