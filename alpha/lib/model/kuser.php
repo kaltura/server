@@ -26,6 +26,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const TITLE = 'title';
 	const COMPANY = 'company';
 
+	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;
@@ -621,14 +622,14 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this->getFromCustomData('last_login_time');
 	}
 
-	public function setKsPrivileges($time)
+	public function setKsPrivileges($ksPrivileges)
 	{
-		$this->putInCustomData('ks_privileges', $time);
+		$this->putInCustomData(self::CUSTOM_DATA_KS_PRIVILEGES, $ksPrivileges);
 	}
 
 	public function getKsPrivileges()
 	{
-		return $this->getFromCustomData('ks_privileges');
+		return $this->getFromCustomData(self::CUSTOM_DATA_KS_PRIVILEGES);
 	}
 
 	/**
