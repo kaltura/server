@@ -620,7 +620,17 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return $this->getFromCustomData('last_login_time');
 	}
-	
+
+	public function setKsPrivileges($time)
+	{
+		$this->putInCustomData('ks_privileges', $time);
+	}
+
+	public function getKsPrivileges()
+	{
+		return $this->getFromCustomData('ks_privileges');
+	}
+
 	/**
 	 * Set allowed_partner_ids parameter to $allowedPartnerIds (in custom_data)
 	 * @param string $allowed_partner_ids
