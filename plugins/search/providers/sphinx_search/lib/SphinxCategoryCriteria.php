@@ -85,17 +85,18 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_eq_member'))
 		{
 			$puserId = $filter->get('_eq_member');
+			$kuserId = Kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
 			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 			if($kuser)
 			{
-				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
-				$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
-				$contributor = category::getPermissionLevelName(CategoryKuserPermissionLevel::CONTRIBUTOR);
 				$kuserId = $kuser->getid();
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . 
-					"({$member}_{$kuserId} | {$moderator}_{$kuserId} | {$contributor}_{$kuserId} ) !({$manager}_{$kuserId}))";
 			}
+			$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
+			$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
+			$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
+			$contributor = category::getPermissionLevelName(CategoryKuserPermissionLevel::CONTRIBUTOR);
+			$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' .
+				"({$member}_{$kuserId} | {$moderator}_{$kuserId} | {$contributor}_{$kuserId} ) !({$manager}_{$kuserId}))";
 		}
 		$filter->unsetByName('_eq_member');
 		
