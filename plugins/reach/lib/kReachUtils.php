@@ -184,7 +184,7 @@ class kReachUtils
 	public static function isDuplicationByResubmission($activeTask, $allowResubmission)
 	{
 		if (!$allowResubmission ||
-			(in_array($activeTask->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PROCESSING))))
+			(in_array($activeTask->getStatus(), array(EntryVendorTaskStatus::PENDING_ENTRY_READY, EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PROCESSING))))
 		{
 			return true;
 		}
