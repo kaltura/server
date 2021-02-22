@@ -607,7 +607,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 				if ($fileType == 'dir')
 				{
-					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject['Size']);
 					if( $recursive)
 					{
 						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
@@ -615,7 +615,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				}
 				else
 				{
-					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject['Size']);
 				}
 			}
 		}
@@ -761,6 +761,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$params['ServerSideEncryption'] = "AES256";
 		}
 		
+		$startTime = microtime(true);
 		$fp = fopen($src, 'r');
 		if(!$fp)
 		{
@@ -781,6 +782,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
+		
+		$timeTook = microtime(true) - $startTime;
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess($copy ? 'COPY' : 'RENAME', $timeTook, $success ? null : kFile::RENAME_FAILED_CODE);
+		}
+		
 		if (!$success)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");

@@ -1194,7 +1194,7 @@ class myEntryUtils
 		$entryDataPath = null;
 		$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
 		KalturaLog::info("file sync id: {$fileSync->getId()} found on DC: {$fileSync->getDc()} current dcId: $currentDcId is cloud dc: $isCloudDc");
-		if ($fileSync->getDc() === $currentDcId || ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))))
+		if ($fileSync->getDc() === $currentDcId || ($isCloudDc && (in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))))
 		{
 			$entryDataPath = $fileSync->getFullPath();
 			KalturaLog::info("path [$entryDataPath]");

@@ -1200,8 +1200,17 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		// TODO - see that if in strict mode - there are no duplicate keys -> update existing records AND set the other DC's records to PENDING
 		if(!$dcId)
 		{
-			$dc = kDataCenterMgr::getCurrentDc();
-			$dcId = $dc["id"];
+			if(kFile::isSharedPath($rootPath.$filePath))
+			{
+				$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+				$dcId = reset($sharedDcIds);
+			}
+			else
+			{
+				$dc = kDataCenterMgr::getCurrentDc();
+				$dcId = $dc["id"];
+			}
+			
 		}
 
 		// create a FileSync for the current DC with status READY
