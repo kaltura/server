@@ -26,7 +26,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
 	
 	public function setJwtToken ($v)	{ $this->putInCustomData ( self::JWT_TOKEN, $v);	}
-	public function getJwtToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
+	public function getJwtToken ( )	{ return $this->getFromCustomData(self::JWT_TOKEN);	}
 
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}
