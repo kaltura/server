@@ -182,6 +182,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $this->getFromCustomData("adStitchingEnabled", null, false);
 	}
 
+	public function setSimuliveSupport($v)
+	{
+		$this->putInCustomData("simuliveSupport", $v);
+	}
+
+	public function getSimuliveSupport()
+	{
+		return $this->getFromCustomData("simuliveSupport", null, false);
+	}
+
 	/**
 	 * This function returns the tokenizer this delivery profile is working with
 	 * @return kUrlRecognizer
