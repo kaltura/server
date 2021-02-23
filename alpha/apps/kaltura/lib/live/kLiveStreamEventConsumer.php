@@ -9,9 +9,9 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
      */
     public function objectChanged(BaseObject $object, array $modifiedColumns)
     {
-        if ($object instanceof entry)
+        if ($object instanceof LiveEntry)
         {
-            $this->handleEntryChanged($object, $modifiedColumns);
+            $this->handleLiveEntryChanged($object, $modifiedColumns);
         }
 
         if ($object instanceof asset)
@@ -58,11 +58,11 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
         return true;
     }
 
-    protected function handleEntryChanged(entry $object, array $modifiedColumns)
+    protected function handleLiveEntryChanged(entry $object, array $modifiedColumns)
     {
-        if (!($object instanceof LiveEntry) || !($object->getRecordStatus()))
+        if (!($object->getRecordStatus()))
         {
-            KalturaLog::info("Entry {$object->getId()} is either not a live entry, or does not have recording enabled. Skipping.");
+            KalturaLog::info("Entry {$object->getId()} does not have recording enabled. Skipping.");
             return true;
         }
 
@@ -105,7 +105,8 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
      * @param string $entryId
      * @throws PropelException
      */
-    public function removeVODThumbAssetFromLiveEntry($entryId){
+    public function removeVODThumbAssetFromLiveEntry($entryId)
+    {
         $entryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($entryId);
         foreach ($entryThumbAssets as $entryThumbAsset)
         {
@@ -165,7 +166,8 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
             }
             //if thumbAsset belongs to recorded entry but live entry has its own custom thumbnails with tags other than set list - return false
 
-            if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE){ // its recorded entry
+            if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+            { // its recorded entry
                 $liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
                 $liveEntryThumbAssets = assetPeer::retrieveThumbnailsByEntryId($liveEntry->getId());// live entry has its own custom thumbnails
 
