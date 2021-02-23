@@ -94,4 +94,14 @@ class kZoomClient
 		$data = json_decode($response, true);
 		return $data;
 	}
+	
+	public function getAccessToken($refreshToken)
+	{
+		KalturaLog::info('Refreshing tokens');
+		list($zoomBaseURL, , $header, $userPwd) = kZoomOauth::getZoomHeaderData();
+		$postFields = "grant_type=refresh_token&refresh_token=$refreshToken";
+		$response = kZoomOauth::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		$tokensData = kZoomOauth::retrieveTokenData($response);
+		return $tokensData[kZoomOauth::ACCESS_TOKEN];
+	}
 }
