@@ -246,8 +246,36 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     private function retrieveElasticClusterId()
     {
+	    $host = kConf::get('elasticHost', 'elastic', null);
+	    $shouldResolveClusterName = kConf::get('shouldResolveClusterName', 'elastic', false);
+	    $resolvedElasticClusterName = null;
+	    if ($shouldResolveClusterName)
+	    {
+		    $dnsRecords = dns_get_record($host);
+		    if (!empty($dnsRecords))
+		    {
+			    $dnsRecord = reset($dnsRecords);
+			    if (isset($dnsRecord['target']) && trim($dnsRecord['target']))
+			    {
+				    $res = explode('.', $dnsRecord['target'], 2);
+				    $resolvedElasticClusterName = $res[0];
+				    KalturaLog::debug("Resolved clusterName - $resolvedElasticClusterName");
+			    }
+			    else
+			    {
+				    //todo throw new Exception("Could not resolve elastic dns for $host");
+				    kalturaLog::debug("Elastic Dns Error - No Target CNAME for $host");
+			    }
+			}
+		    else
+		    {
+			    //todo throw new Exception("Could not resolve elastic dns for $host");
+			    kalturaLog::debug("Elastic Dns Error - Could not resolve elastic dns for $host");
+		    }
+	    }
+		$elasticClusterName = $resolvedElasticClusterName ? $resolvedElasticClusterName : kConf::get('elasticCluster', 'elastic', 0);
+
         $elasticClusterId = null;
-        $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
         $elasticClusterCacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
         if ($elasticClusterCacheStore)
         {
