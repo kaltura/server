@@ -1,7 +1,7 @@
 <?php
 
 
-class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
+class kLiveStreamCopyMetadataEventConsumer implements kObjectChangedEventConsumer
 {
     const LIVE_STREAM_VOD_THUMBNAIL_TAG = 'live_entry_vod';
     /**
@@ -14,15 +14,15 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
             $this->handleLiveEntryChanged($object, $modifiedColumns);
         }
 
-        if ($object instanceof asset)
+        if ($object instanceof thumbAsset)
         {
-            $this->handleAssetChanged($object);
+            $this->handleThumbAssetChanged($object);
         }
 
         return true;
     }
 
-    protected function handleAssetChanged (asset $object)
+    protected function handleThumbAssetChanged (asset $object)
     {
         if (!($object instanceof thumbAsset))
         {
@@ -66,7 +66,7 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
             return true;
         }
 
-        if(isset($modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES]['']['recorded_entry_id'])) // array_key_exists
+        if(isset($modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES][''][LiveEntry::RECORDED_ENTRY_ID])) // array_key_exists
         {
             $this->removeVODThumbAssetFromLiveEntry($object->getId());
         }
@@ -79,24 +79,13 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
             return true;
         }
 
-        $changesMade = false;
-        if ($recordedEntry->getDescription() != $object->getDescription())
-        {
-            $changesMade = true;
-            $recordedEntry->setDescription($object->getDescription());
-        }
-
+        $recordedEntry->setDescription($object->getDescription());
         if (strpos($recordedEntry->getName(), $object->getName()) !== 0)
         {
-            $changesMade = true;
             $recordedEntry->setName($object->getName());
         }
-
-        if ($changesMade)
-        {
-            KalturaLog::info("Resetting recorded entry ID {$object->getRecordedEntryId()} name/description");
-            $recordedEntry->save();
-        }
+        KalturaLog::info("Resetting recorded entry ID {$object->getRecordedEntryId()} name/description");
+        $recordedEntry->save();
 
         return true;
     }
@@ -123,29 +112,29 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
      */
     public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
     {
+        if (!($object instanceof LiveEntry) && !($object instanceof thumbAsset))
+        {
+            return false;
+        }
+
         if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_SYNC_VOD_LIVE_METADATA, kCurrentContext::getCurrentPartnerId()))
         {
             //This feature is dependent on a partner level permission
             return false;
         }
 
-        if (!($object instanceof entry) && !($object instanceof asset))
+        if ($object instanceof LiveEntry)
         {
-            return false;
-        }
-
-        if ($object instanceof entry && (!($object instanceof LiveEntry) || !($object->getRecordStatus())))
-        {
-            return false;
-        }
-
-        if ($object instanceof asset)
-        {
-            if (!($object instanceof thumbAsset))
+            if (!$object->getRecordStatus())
             {
                 return false;
             }
 
+            return true;
+        }
+
+        if ($object instanceof thumbAsset)
+        {
             if (!in_array(assetPeer::STATUS, $modifiedColumns) || $object->getStatus() != asset::ASSET_STATUS_READY)
             {
                 return false;
@@ -183,9 +172,11 @@ class kLiveStreamEventConsumer implements kObjectChangedEventConsumer
                 }
             }
 
+            return true;
+
         }
 
-        return true;
+        return false;
 
     }
 
