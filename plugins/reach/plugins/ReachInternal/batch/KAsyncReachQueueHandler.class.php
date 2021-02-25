@@ -102,7 +102,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
     {
         $responseProfile = new KalturaDetachedResponseProfile();
         $responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
-        $responseProfile->fields = 'id,partnerId,vendorPartnerId,createdAt,entryId,status,reachProfileId,catalogItemId,accessKey,notes,dictionary';
+        $responseProfile->fields = 'id,partnerId,vendorPartnerId,createdAt,entryId,status,reachProfileId,catalogItemId,taskJobData,accessKey,notes,dictionary';
         $responseProfile->relatedProfiles = array();
 
         $catalogItemProfile = new KalturaDetachedResponseProfile();
