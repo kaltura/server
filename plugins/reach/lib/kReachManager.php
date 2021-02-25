@@ -44,8 +44,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
 	{
-		$existingCatalogItemIds = EntryVendorTaskPeer::retrieveExistingTasksCatalogItemIds($entryId, $allowedCatalogItemIds);
-		$catalogItemIdsToAdd = array_unique(array_diff($allowedCatalogItemIds, $existingCatalogItemIds));
+        $catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
 		//If both the entry and reach profile don't exist, there's no need to hit the loop
         $entry = entryPeer::retrieveByPK($entryId);
@@ -216,6 +215,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 
+        if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+        {
+            $event = new kObjectCreatedEvent($object);
+
+            return $this->shouldConsumeEvent($event);
+        }
+
 		return false;
 	}
 
@@ -304,8 +310,22 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectCreated(BaseObject $object, BatchJob $raisedJob = null)
 	{
-		$this->updateReachProfileCreditUsage($object);
-		return true;
+        if ($object instanceof EntryVendorTask)
+        {
+            $this->updateReachProfileCreditUsage($object);
+        }
+
+        if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+        {
+            $this->initReachProfileForPartner($object->getPartnerId());
+            if (count(self::$booleanNotificationTemplatesFulfilled))
+            {
+                $event = new kObjectCreatedEvent($object);
+                $this->consumeEvent($event);
+            }
+        }
+
+        return true;
 	}
 
 	/* (non-PHPdoc)

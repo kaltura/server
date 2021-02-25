@@ -83,7 +83,7 @@ class RuleEngine extends Constants
                     $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $item[self::OPCAL_PERM_ID],
                 ),
                 'dynamicMetadata' => array(
-                    'systemName' => $systemName,
+                    'fieldName' => $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP],
                     'objectId' => isset($item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]]) ? $item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]] : '',
                     'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]),
                 )
