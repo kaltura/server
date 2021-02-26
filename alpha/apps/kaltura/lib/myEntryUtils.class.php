@@ -1005,6 +1005,11 @@ class myEntryUtils
 						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
 					}
 
+					if (!$width && !$height && $vid_slices > 0 && $imageSizeArray[0] > floor(65500 / $vid_slices))
+					{
+						$width = floor(65500 / $vid_slices);
+					}
+
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format, $forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))

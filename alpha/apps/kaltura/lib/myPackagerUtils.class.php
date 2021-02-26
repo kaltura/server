@@ -45,7 +45,7 @@ class myPackagerUtils
 		$flavorAssetId = $flavorAsset->getId();
 		KalturaLog::info("Found flavor asset {$flavorAssetId}");
 
-		if(!$width && $maxWidth && $flavorAsset->getWidth() > $maxWidth)
+		if(!$width && !$height && $maxWidth && $flavorAsset->getWidth() > $maxWidth)
 		{
 			$width = $maxWidth;
 		}
