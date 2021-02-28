@@ -14,6 +14,7 @@ class kZoomRecording implements iZoomObject
 	const OBJECT = 'object';
 	const START_TIME = 'start_time';
 	const TYPE = 'type';
+	const HOST_ID = 'host_id';
 
 	public $id;
 	public $uuid;
@@ -21,6 +22,7 @@ class kZoomRecording implements iZoomObject
 	public $hostEmail;
 	public $recordingFiles;
 	public $startTime;
+	public $hostId;
 
 	/**
 	 * @var kRecordingType
@@ -30,6 +32,7 @@ class kZoomRecording implements iZoomObject
 	public function parseData($data)
 	{
 		$this->hostEmail = $data[self::HOST_EMAIL];
+		$this->hostId = $data[self::HOST_ID];
 		$this->id = $data[self::RECORDING_ID];
 		$this->uuid = $data[self::RECORDING_UUID];
 		$this->topic = $data[self::TOPIC];

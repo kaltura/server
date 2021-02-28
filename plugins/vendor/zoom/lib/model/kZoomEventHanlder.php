@@ -47,24 +47,41 @@ class kZoomEventHanlder
 				KalturaLog::notice('This is an old Zoom event type - Not processing');
 				break;
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
-				/* @var kZoomRecording $recording */
-				$recording = $event->object;
-				$zoomBaseUrl = $this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
-				if($recording->recordingType == kRecordingType::WEBINAR)
-				{
-					$zoomRecordingProcessor = new kZoomWebinarProcessor($zoomBaseUrl);
-				}
-				else
-				{
-					$zoomRecordingProcessor = new kZoomMeetingProcessor($zoomBaseUrl);
-				}
-
-				$zoomRecordingProcessor->handleRecordingVideoComplete($event);
+				self::createZoomDropFolderFile($event);
 				break;
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
-				$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL]);
-				$transcriptProcessor->handleRecordingTranscriptComplete($event);
+				self::createZoomDropFolderFile($event);
 				break;
+		}
+	}
+	
+	protected static function createZoomDropFolderFile(kZoomEvent $event)
+	{
+		/* @var kZoomRecording $recording */
+		$recording = $event->object;
+		
+		$kMeetingMetaData = new kalturaMeetingMetadata();
+		$kMeetingMetaData->meetingId = $recording->id;
+		$kMeetingMetaData->uuid = $recording->uuid;
+		$kMeetingMetaData->topic = $recording->topic;
+		$kMeetingMetaData->meetingStartTime = $recording->startTime;
+		$kMeetingMetaData->accountId = $event->accountId;
+		$kMeetingMetaData->hostId = $recording->hostId;
+		$kMeetingMetaData->type = $recording->recordingType;
+		
+		/* @var kZoomRecordingFile $recordingFile*/
+		foreach ($recording->recordingFiles as $recordingFile)
+		{
+			$kRecordingFile = new kalturaRecordingFile();
+			$kRecordingFile->id = $recordingFile->id;
+			$kRecordingFile->downloadUrl = $recordingFile->download_url;
+			$kRecordingFile->fileType = $recordingFile->recordingFileType;
+			$kRecordingFile->recordingStart = $recordingFile->recordingStart;
+			
+			$zoomDropFolderFile = new ZoomDropFolderFile();
+			$zoomDropFolderFile->setMeetingMetadata($kMeetingMetaData);
+			$zoomDropFolderFile->setRecordingFile($kRecordingFile);
+			$zoomDropFolderFile->save();
 		}
 	}
 
