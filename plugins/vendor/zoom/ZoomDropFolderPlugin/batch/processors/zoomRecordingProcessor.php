@@ -6,7 +6,6 @@
 abstract class zoomRecordingProcessor extends zoomProcessor
 {
 	const ADMIN_TAG_ZOOM = 'zoomentry';
-	const FILE_TYPE_MP4 = 'MP4';
 	
 	/**
 	 * @var KalturaMediaEntry
@@ -71,7 +70,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $kUser->id);
-		if ($recording->recordingFile->fileType == self::FILE_TYPE_MP4)
+		if ($recording->recordingFile->fileType == kRecordingFileType::VIDEO)
 		{
 			$this->handleVideoRecord($recording, $kUser, $extraUsers);
 		}
