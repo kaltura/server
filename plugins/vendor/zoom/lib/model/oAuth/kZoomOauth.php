@@ -47,7 +47,7 @@ class kZoomOauth
 	 * @return array $tokensData
 	 * @throws Exception
 	 */
-	protected static function retrieveTokenData($response)
+	public static function retrieveTokenData($response)
 	{
 		$tokensData = self::parseTokensResponse($response);
 		self::validateToken($tokensData);
@@ -65,7 +65,7 @@ class kZoomOauth
 	 * @return mixed|string
 	 * @throws Exception
 	 */
-	private static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
+	public static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
@@ -136,7 +136,7 @@ class kZoomOauth
 	 * @return array
 	 * @throws Exception
 	 */
-	private static function getZoomHeaderData()
+	public static function getZoomHeaderData()
 	{
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
