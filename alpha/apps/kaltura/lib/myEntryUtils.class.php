@@ -933,7 +933,7 @@ class myEntryUtils
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
-						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight, floor(65500 / $vid_slices));
 						$packagerResizeFullPath = $destPath . self::TEMP_FILE_POSTFIX;
 						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
 						if(!$success)
@@ -1003,6 +1003,11 @@ class myEntryUtils
 					{
 						$processingThumbPath = kFile::replaceExt($processingThumbPath, "gif");
 						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
+					}
+
+					if (!$width && !$height && $vid_slices > 0 && $imageSizeArray[0] > floor(65500 / $vid_slices))
+					{
+						$width = floor(65500 / $vid_slices);
 					}
 
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format, $forceRotation);

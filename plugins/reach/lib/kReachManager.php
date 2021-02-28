@@ -454,6 +454,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		do
 		{
+			// Relevant only for Captions service
+			if($entryVendorTask->getServiceFeature() != VendorServiceFeature::CAPTIONS)
+			{
+				break;
+			}
+
 			$captionAssetId = $entryVendorTask->getOutputObjectId();
 			if(!$captionAssetId)
 			{
@@ -478,7 +484,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				break;
 			}
 
-			$newLabel = "{$dbCaptionAsset->getLabel()} ($labelAddition)";
+			$newLabel = "{$dbCaptionAsset->getLabel()} $labelAddition";
 			KalturaLog::debug("New label [{$newLabel}] for CaptionAsset ID [{$captionAssetId}]");
 
 			$dbCaptionAsset->setLabel($newLabel);
@@ -570,7 +576,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 		else
 		{
-			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING));
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
 			if($activeTasksOnOlderVersion)
 			{
 				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);

@@ -85,10 +85,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		}
 		else
 		{
-			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING));
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
 			if($activeTasksOnOlderVersion)
 			{
-				if ($activeTasksOnOlderVersion->getStatus() == EntryVendorTaskStatus::PENDING)
+				if (in_array($activeTasksOnOlderVersion->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY)))
 				{
 					kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
 				}

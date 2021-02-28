@@ -70,7 +70,7 @@ class S3DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalt
 			case 'kDropFolderXmlFileHandler':
 				if ($enumValue == self::getDropFolderTypeCoreValue(S3DropFolderType::S3DROPFOLDER))
 				{
-					return new kDropFolderXmlFileHandler();
+					return new kDropFolderS3XmlFileHandler();
 				}
 				break;
 		}

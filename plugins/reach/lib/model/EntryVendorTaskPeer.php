@@ -55,10 +55,12 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 				array(EntryVendorTaskStatus::PROCESSING,
 					EntryVendorTaskStatus::READY,
 					EntryVendorTaskStatus::PENDING,
-					EntryVendorTaskStatus::PENDING_MODERATION
+					EntryVendorTaskStatus::PENDING_MODERATION,
+					EntryVendorTaskStatus::PENDING_ENTRY_READY
 				), Criteria::IN);
 		}
 		$c->addDescendingOrderByColumn(EntryVendorTaskPeer::VERSION);
+		$c->addDescendingOrderByColumn(EntryVendorTaskPeer::ID);
 		return EntryVendorTaskPeer::doSelectOne($c);
 	}
 	

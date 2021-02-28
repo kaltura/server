@@ -336,15 +336,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		$livePackagerUrl = rtrim(str_replace('{DC}', $serverNode->getEnvDc(), $livePackagerUrl), '/');
 		
-		if(strpos($livePackagerUrl, "{m}") !== false)
+		//Used for ecdn mode
+		list($matchedPattern, $shouldRedirect) = $this->matchLivePackagerUrlRegexPattern($livePackagerUrl);
+		if($matchedPattern)
 		{
-			$this->shouldRedirect = true;
+			$this->shouldRedirect = $shouldRedirect;
 			
 			$hostname = $serverNode->getHostname();
 			if(!$serverNode->getIsExternalMediaServer())
 				$hostname = preg_replace('/\..*$/', '', $hostname);
 			
-			$livePackagerUrl = str_replace("{m}", $hostname, $livePackagerUrl);
+			$livePackagerUrl = str_replace($matchedPattern, $hostname, $livePackagerUrl);
 		}
 		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
@@ -380,6 +382,25 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		KalturaLog::debug("Live Packager base stream Url [$livePackagerUrl]");
 		return $livePackagerUrl;
+	}
+	
+	private function matchLivePackagerUrlRegexPattern($livePackagerUrl)
+	{
+		$matchedPattern = null;
+		$shouldRedirect = false;
+		
+		if (strpos($livePackagerUrl, "{m}") !== false)
+		{
+			$matchedPattern = "{m}";
+			$shouldRedirect = true;
+		}
+		
+		if (strpos($livePackagerUrl, "{mn}") !== false)
+		{
+			$matchedPattern = "{mn}";
+		}
+		
+		return array($matchedPattern, $shouldRedirect);
 	}
 	
 	private function generateLiveSecuredPackagerToken($url)
