@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @package plugins.vendor.Zoom.ZoomDropFolder
- * @subpackage model.enum
+ * @package plugins.zoomDropFolder
+ * @subpackage lib.enum
  */
 class ZoomDropFolderType implements IKalturaPluginEnum, DropFolderType
 {
