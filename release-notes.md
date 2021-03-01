@@ -1,5 +1,19 @@
 # Propus-16.18.0  #
 ## Version Highlight ##
+### Features ###
+    PLAT-9940 - Adminconsole::UiConf, add filter by tags\type\name
+    SUP-24898 - Reach, Allow reach vendors KS overcome access control
+    PLAT-11136 - Allow entry user (Viewer/Publisher/Editor) list all userEntries.
+    This can allow webcast app see all the users that joined the event, when activated 
+    by others than the owner.
+    PLAT-22617 - User::LoginByLoginId, Allow setting priviledge on user object ksPrivileges. 
+    For this user, Any new login will generate a session that will include the specific permsission.
+    The motivation is to create users that can only login and access specific actions (such as loginByLoginId) 
+
+### Bug fix ###
+    SUP-26142 - Zoom, Chat file was not added to the primary entry, fixed.
+    REACH2-1050 - Reach, Block adding new task when entry is not ready.
+
 
 ## Add Description to confMaps modifications ##
 - Issue Type: Task
