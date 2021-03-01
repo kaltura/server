@@ -3,7 +3,7 @@
 /**
  * Base class that represents a row from the 'conf_maps' table.
  *
- * 
+ *
  *
  * @package Core
  * @subpackage model.om
@@ -68,6 +68,12 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	protected $version;
 
 	/**
+	 * The value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data;
+
+	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -92,7 +98,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	 * @var        array
 	 */
 	protected $oldColumnsValues = array();
-	
+
 	/**
 	 * @return array
 	 */
@@ -100,7 +106,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	{
 		return $this->oldColumnsValues;
 	}
-	
+
 	/**
 	 * @return mixed field value or null
 	 */
@@ -108,13 +114,13 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	{
 		if(isset($this->oldColumnsValues[$name]))
 			return $this->oldColumnsValues[$name];
-			
+
 		return null;
 	}
 
 	/**
 	 * Get the [id] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getId()
@@ -124,7 +130,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [map_name] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getMapName()
@@ -134,7 +140,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [host_name] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getHostName()
@@ -144,7 +150,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [status] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getStatus()
@@ -154,7 +160,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [optionally formatted] temporal [created_at] column value.
-	 * 
+	 *
 	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
 	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
 	 *
@@ -194,7 +200,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [remarks] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getRemarks()
@@ -204,7 +210,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [content] column value.
-	 * 
+	 *
 	 * @return     string
 	 */
 	public function getContent()
@@ -214,7 +220,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Get the [version] column value.
-	 * 
+	 *
 	 * @return     int
 	 */
 	public function getVersion()
@@ -223,8 +229,18 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	}
 
 	/**
+	 * Get the [custom_data] column value.
+	 *
+	 * @return     string
+	 */
+	public function getCustomData()
+	{
+		return $this->custom_data;
+	}
+
+	/**
 	 * Set the value of [id] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -247,7 +263,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [map_name] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -270,7 +286,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [host_name] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -293,7 +309,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [status] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -316,7 +332,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-	 * 
+	 *
 	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
 	 *						be treated as NULL for temporal objects.
 	 * @return     ConfMaps The current object (for fluent API support)
@@ -352,8 +368,8 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			$currNorm = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
 			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
 
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
+			if ( ($currNorm !== $newNorm) // normalized values don't match
+			)
 			{
 				$this->created_at = ($dt ? $dt->format('Y-m-d H:i:s') : null);
 				$this->modifiedColumns[] = ConfMapsPeer::CREATED_AT;
@@ -365,7 +381,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [remarks] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -388,7 +404,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [content] column.
-	 * 
+	 *
 	 * @param      string $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -411,7 +427,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 	/**
 	 * Set the value of [version] column.
-	 * 
+	 *
 	 * @param      int $v new value
 	 * @return     ConfMaps The current object (for fluent API support)
 	 */
@@ -431,6 +447,26 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 		return $this;
 	} // setVersion()
+
+	/**
+	 * Set the value of [custom_data] column.
+	 *
+	 * @param      string $v new value
+	 * @return     ConfMaps The current object (for fluent API support)
+	 */
+	public function setCustomData($v)
+	{
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->custom_data !== $v) {
+			$this->custom_data = $v;
+			$this->modifiedColumns[] = ConfMapsPeer::CUSTOM_DATA;
+		}
+
+		return $this;
+	} // setCustomData()
 
 	/**
 	 * Indicates whether the columns in this object are only set to default values.
@@ -464,6 +500,9 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	{
 		$this->last_hydrate_time = time();
 
+		// Nullify cached objects
+		$this->m_custom_data = null;
+
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -474,6 +513,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			$this->remarks = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->content = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
 			$this->version = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -483,7 +523,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 8; // 8 = ConfMapsPeer::NUM_COLUMNS - ConfMapsPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 9; // 9 = ConfMapsPeer::NUM_COLUMNS - ConfMapsPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ConfMaps object", $e);
@@ -570,7 +610,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if ($con === null) {
 			$con = Propel::getConnection(ConfMapsPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		try {
 			$ret = $this->preDelete($con);
@@ -615,7 +655,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if ($con === null) {
 			$con = Propel::getConnection(ConfMapsPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-		
+
 		$con->beginTransaction();
 		$isInsert = $this->isNew();
 		try {
@@ -625,18 +665,84 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			} else {
 				$ret = $ret && $this->preUpdate($con);
 			}
-			if ($ret) {
-				$affectedRows = $this->doSave($con, $skipReload);
-				if ($isInsert) {
-					$this->postInsert($con);
-				} else {
-					$this->postUpdate($con);
-				}
-				$this->postSave($con);
-				ConfMapsPeer::addInstanceToPool($this);
-			} else {
-				$affectedRows = 0;
+
+			if (!$ret || !$this->isModified()) {
+				$con->commit();
+				return 0;
 			}
+
+			for ($retries = 1; $retries < KalturaPDO::SAVE_MAX_RETRIES; $retries++)
+			{
+				$affectedRows = $this->doSave($con);
+				if ($affectedRows || !$this->isColumnModified(ConfMapsPeer::CUSTOM_DATA)) //ask if custom_data wasn't modified to avoid retry with atomic column
+					break;
+
+				KalturaLog::debug("was unable to save! retrying for the $retries time");
+				$criteria = $this->buildPkeyCriteria();
+				$criteria->addSelectColumn(ConfMapsPeer::CUSTOM_DATA);
+				$stmt = BasePeer::doSelect($criteria, $con);
+				$cutsomDataArr = $stmt->fetchAll(PDO::FETCH_COLUMN);
+				$newCustomData = $cutsomDataArr[0];
+
+				$this->custom_data_md5 = is_null($newCustomData) ? null : md5($newCustomData);
+
+				$valuesToChangeTo = $this->m_custom_data->toArray();
+				$this->m_custom_data = myCustomData::fromString($newCustomData);
+
+				//set custom data column values we wanted to change to
+				$validUpdate = true;
+				$atomicCustomDataFields = ConfMapsPeer::getAtomicCustomDataFields();
+				foreach ($this->oldCustomDataValues as $namespace => $namespaceValues){
+					foreach($namespaceValues as $name => $oldValue)
+					{
+						$atomicField = false;
+						if($namespace) {
+							$atomicField = array_key_exists($namespace, $atomicCustomDataFields) && in_array($name, $atomicCustomDataFields[$namespace]);
+						} else {
+							$atomicField = in_array($name, $atomicCustomDataFields);
+						}
+						if($atomicField) {
+							$dbValue = $this->m_custom_data->get($name, $namespace);
+							if($oldValue != $dbValue) {
+								$validUpdate = false;
+								break;
+							}
+						}
+
+						$newValue = null;
+						if ($namespace)
+						{
+							if (isset ($valuesToChangeTo[$namespace][$name]))
+								$newValue = $valuesToChangeTo[$namespace][$name];
+						}
+						else
+						{
+							$newValue = $valuesToChangeTo[$name];
+						}
+
+						if (is_null($newValue)) {
+							$this->removeFromCustomData($name, $namespace);
+						}
+						else {
+							$this->putInCustomData($name, $newValue, $namespace);
+						}
+					}
+				}
+
+				if(!$validUpdate)
+					break;
+
+				$this->setCustomData($this->m_custom_data->toString());
+			}
+
+			if ($isInsert) {
+				$this->postInsert($con);
+			} else {
+				$this->postUpdate($con);
+			}
+			$this->postSave($con);
+			ConfMapsPeer::addInstanceToPool($this);
+
 			$con->commit();
 			return $affectedRows;
 		} catch (PropelException $e) {
@@ -644,7 +750,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			throw $e;
 		}
 	}
-	
+
 	public function wasObjectSaved()
 	{
 		return $this->objectSaved;
@@ -683,8 +789,8 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 						$reloadObject = true;
 					}
 					$affectedRows += 1; // we are assuming that there is only 1 row per doInsert() which
-										 // should always be true here (even though technically
-										 // BasePeer::doInsert() can insert multiple rows).
+					// should always be true here (even though technically
+					// BasePeer::doInsert() can insert multiple rows).
 
 					$this->setId($pk);  //[IMV] update autoincrement primary key
 
@@ -694,7 +800,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 					$affectedObjects = ConfMapsPeer::doUpdate($this, $con);
 					if($affectedObjects)
 						$this->objectSaved = true;
-						
+
 					$affectedRows += $affectedObjects;
 				}
 
@@ -717,14 +823,14 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	 * Before returning a query result from the cache, the time of the cached query
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *  
+	 *
 	 * @return     array Array of keys that will should be updated when this object is modified.
 	 */
 	public function getCacheInvalidationKeys()
 	{
 		return array();
 	}
-		
+
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
@@ -732,6 +838,8 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
+		$this->setCustomDataObj();
+
 		return parent::preSave($con);
 	}
 
@@ -739,13 +847,15 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	 * Code to be run after persisting the object
 	 * @param PropelPDO $con
 	 */
-	public function postSave(PropelPDO $con = null) 
+	public function postSave(PropelPDO $con = null)
 	{
 		kEventsManager::raiseEvent(new kObjectSavedEvent($this));
-		$this->oldColumnsValues = array(); 
+		$this->oldColumnsValues = array();
+		$this->oldCustomDataValues = array();
+
 		parent::postSave($con);
 	}
-	
+
 	/**
 	 * Code to be run before inserting to database
 	 * @param PropelPDO $con
@@ -756,20 +866,20 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		$this->setCreatedAt(time());
 		return parent::preInsert($con);
 	}
-	
+
 	/**
 	 * Code to be run after inserting to database
-	 * @param PropelPDO $con 
+	 * @param PropelPDO $con
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
 		kQueryCache::invalidateQueryCache($this);
-		
+
 		kEventsManager::raiseEvent(new kObjectCreatedEvent($this));
-		
+
 		if($this->copiedFrom)
 			kEventsManager::raiseEvent(new kObjectCopiedEvent($this->copiedFrom, $this));
-		
+
 		parent::postInsert($con);
 	}
 
@@ -783,16 +893,17 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		{
 			return;
 		}
-	
+
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
 			$modifiedColumns = $this->tempModifiedColumns;
+			$modifiedColumns[kObjectChangedEvent::CUSTOM_DATA_OLD_VALUES] = $this->oldCustomDataValues;
 			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
-			
+
 		$this->tempModifiedColumns = array();
-		
+
 		parent::postUpdate($con);
 	}
 	/**
@@ -800,7 +911,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	 * @var array
 	 */
 	private $tempModifiedColumns = array();
-	
+
 	/**
 	 * Returns whether the object has been modified.
 	 *
@@ -810,7 +921,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	{
 		if(!empty($this->tempModifiedColumns))
 			return true;
-			
+
 		return !empty($this->modifiedColumns);
 	}
 
@@ -824,7 +935,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 	{
 		if(in_array($col, $this->tempModifiedColumns))
 			return true;
-			
+
 		return in_array($col, $this->modifiedColumns);
 	}
 
@@ -838,13 +949,13 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if ($this->alreadyInSave)
 		{
 			return true;
-		}	
-		
-		
+		}
+
+
 		$this->tempModifiedColumns = $this->modifiedColumns;
 		return parent::preUpdate($con);
 	}
-	
+
 	/**
 	 * Array of ValidationFailed objects.
 	 * @var        array ValidationFailed[]
@@ -967,6 +1078,9 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			case 7:
 				return $this->getVersion();
 				break;
+			case 8:
+				return $this->getCustomData();
+				break;
 			default:
 				return null;
 				break;
@@ -996,6 +1110,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			$keys[5] => $this->getRemarks(),
 			$keys[6] => $this->getContent(),
 			$keys[7] => $this->getVersion(),
+			$keys[8] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1051,6 +1166,9 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 			case 7:
 				$this->setVersion($value);
 				break;
+			case 8:
+				$this->setCustomData($value);
+				break;
 		} // switch()
 	}
 
@@ -1083,6 +1201,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[5], $arr)) $this->setRemarks($arr[$keys[5]]);
 		if (array_key_exists($keys[6], $arr)) $this->setContent($arr[$keys[6]]);
 		if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
 	}
 
 	/**
@@ -1102,6 +1221,7 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ConfMapsPeer::REMARKS)) $criteria->add(ConfMapsPeer::REMARKS, $this->remarks);
 		if ($this->isColumnModified(ConfMapsPeer::CONTENT)) $criteria->add(ConfMapsPeer::CONTENT, $this->content);
 		if ($this->isColumnModified(ConfMapsPeer::VERSION)) $criteria->add(ConfMapsPeer::VERSION, $this->version);
+		if ($this->isColumnModified(ConfMapsPeer::CUSTOM_DATA)) $criteria->add(ConfMapsPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1170,6 +1290,8 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 
 		$copyObj->setVersion($this->version);
 
+		$copyObj->setCustomData($this->custom_data);
+
 
 		$copyObj->setNew(true);
 
@@ -1198,16 +1320,16 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		$copyObj->setCopiedFrom($this);
 		return $copyObj;
 	}
-	
+
 	/**
-	 * Stores the source object that this object copied from 
+	 * Stores the source object that this object copied from
 	 *
 	 * @var     ConfMaps Clone of current object.
 	 */
 	protected $copiedFrom = null;
-	
+
 	/**
-	 * Stores the source object that this object copied from 
+	 * Stores the source object that this object copied from
 	 *
 	 * @param      ConfMaps $copiedFrom Clone of current object.
 	 */
@@ -1248,6 +1370,153 @@ abstract class BaseConfMaps extends BaseObject  implements Persistent {
 		} // if ($deep)
 
 	}
+
+	/* ---------------------- CustomData functions ------------------------- */
+
+	/**
+	 * @var myCustomData
+	 */
+	protected $m_custom_data = null;
+
+	/**
+	 * The md5 value for the custom_data field.
+	 * @var        string
+	 */
+	protected $custom_data_md5;
+
+	/**
+	 * Store custom data old values before the changes
+	 * @var        array
+	 */
+	protected $oldCustomDataValues = array();
+
+	/**
+	 * @return array
+	 */
+	public function getCustomDataOldValues()
+	{
+		return $this->oldCustomDataValues;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $value
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function putInCustomData ( $name , $value , $namespace = null )
+	{
+		$customData = $this->getCustomDataObj( );
+
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
+
+		$customData->put ( $name , $value , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData ( $name , $namespace = null , $defaultValue = null )
+	{
+		$customData = $this->getCustomDataObj( );
+		$res = $customData->get ( $name , $namespace );
+		if ( $res === null ) return $defaultValue;
+		return $res;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 */
+	public function removeFromCustomData ( $name , $namespace = null)
+	{
+		$customData = $this->getCustomDataObj();
+
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+
+		return $customData->remove ( $name , $namespace );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function incInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj( );
+
+		$currentNamespace = '';
+		if($namespace)
+			$currentNamespace = $namespace;
+
+		if(!isset($this->oldCustomDataValues[$currentNamespace]))
+			$this->oldCustomDataValues[$currentNamespace] = array();
+		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+
+		return $customData->inc ( $name , $delta , $namespace  );
+	}
+
+	/**
+	 * @param string $name
+	 * @param int $delta
+	 * @param string $namespace
+	 * @return string
+	 */
+	public function decInCustomData ( $name , $delta = 1, $namespace = null)
+	{
+		$customData = $this->getCustomDataObj(  );
+		return $customData->dec ( $name , $delta , $namespace );
+	}
+
+	/**
+	 * @return myCustomData
+	 */
+	public function getCustomDataObj( )
+	{
+		if ( ! $this->m_custom_data )
+		{
+			$this->m_custom_data = myCustomData::fromString ( $this->getCustomData() );
+		}
+		return $this->m_custom_data;
+	}
+
+	/**
+	 * Must be called before saving the object
+	 */
+	public function setCustomDataObj()
+	{
+		if ( $this->m_custom_data != null )
+		{
+			$this->custom_data_md5 = is_null($this->custom_data) ? null : md5($this->custom_data);
+			$this->setCustomData( $this->m_custom_data->toString() );
+		}
+	}
+
+	/* ---------------------- CustomData functions ------------------------- */
 
 	protected $last_hydrate_time;
 

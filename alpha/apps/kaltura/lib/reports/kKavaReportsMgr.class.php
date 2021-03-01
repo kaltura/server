@@ -337,6 +337,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_HOTSPOT_CLICKED,
 		self::EVENT_TYPE_NODE_SWITCH,
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -388,6 +389,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
 		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED => 'count_download_attachment_clicked',
 	);
 
 	//global transform
@@ -2243,6 +2245,8 @@ class kKavaReportsMgr extends kKavaBase
 			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
 			'crm_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_CRM_ID),
 			'playlist_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYLIST_ID),
+			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
+			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

@@ -5,6 +5,13 @@
  */
 class S3DropFolderFile extends DropFolderFile
 {
+	public function __construct ()
+	{
+		parent::__construct();
+		$type = S3DropFolderPlugin::getDropFolderTypeCoreValue(S3DropFolderType::S3DROPFOLDER);
+		$this->setType($type);
+	}
+	
 	public function getNameForParsing ()
 	{
 		return $this->getFileName();

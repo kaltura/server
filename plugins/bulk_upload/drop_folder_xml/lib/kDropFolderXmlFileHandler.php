@@ -144,7 +144,7 @@ class kDropFolderXmlFileHandler
 	{
 		try
 	    {
-    	    $newFile = new DropFolderFile();
+	    	$newFile = $this->getDropFolderFileInstance();
     		$newFile->setDropFolderId($folder->getId());
     		$newFile->setFileName($fileName);
     		$newFile->setFileSize(0);
@@ -182,6 +182,11 @@ class kDropFolderXmlFileHandler
 				throw new Exception(DropFolderXmlBulkUploadPlugin::ERROR_ADD_CONTENT_RESOURCE_MESSAGE, DropFolderXmlBulkUploadPlugin::getErrorCodeCoreValue(DropFolderXmlBulkUploadErrorCode::ERROR_ADD_CONTENT_RESOURCE));
 			}		
 		}	
+	}
+	
+	protected function getDropFolderFileInstance()
+	{
+		return new DropFolderFile();
 	}
 	
 	/**

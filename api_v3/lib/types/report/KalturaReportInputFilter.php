@@ -257,6 +257,18 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $playlistIdIn;
 
+	/**
+	 * filter by domain
+	 * @var string
+	 */
+	public $domainIn;
+
+	/**
+	 * filter by canonical url
+	 * @var string
+	 */
+	public $canonicalUrlIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -294,7 +306,9 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'categoriesAncestorIdIn'=> 'categories_ancestor_ids',
 		'hotspotIdIn' => 'hotspot_ids',
 		'crmIdIn' => 'crm_ids',
-		'playlistIdIn' => 'playlist_ids'
+		'playlistIdIn' => 'playlist_ids',
+		'domainIn' => 'domains',
+		'canonicalUrlIn' => 'canonical_urls',
 	);
 
 	protected function getMapBetweenObjects()

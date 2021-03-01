@@ -777,6 +777,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
 			$dbLiveEntryServerNode->setDc($serverNode->getDc());
+			$dbLiveEntryServerNode->setViewMode($this->getViewMode());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -1117,6 +1118,13 @@ abstract class LiveEntry extends entry
 	public function setViewMode($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerTypes($this->getId(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP));
+		foreach ($entryServerNodes as $entryServerNode)
+		{
+			/* @var $entryServerNode LiveEntryServerNode */
+			$entryServerNode->setViewMode($v);
+			$entryServerNode->save();
+		}
 	}
 
 	public function getRecordingStatus()

@@ -1556,6 +1556,8 @@ class reportsInputFilter
 	public $hotspot_ids;
 	public $crm_ids;
 	public $playlist_ids;
+	public $domains;
+	public $canonical_urls;
 
 
 	public function getFilterBy() {
