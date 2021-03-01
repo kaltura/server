@@ -13,6 +13,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected $mainEntry;
 	
 	/**
+	 * @var string
+	 */
+	protected $zoomBaseUrl;
+	
+	/**
 	 * zoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
 	 * @param KalturaZoomDropFolder $folder
@@ -20,6 +25,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	public function __construct($zoomBaseUrl, KalturaZoomDropFolder $folder)
 	{
 		$this->mainEntry = null;
+		$this->zoomBaseUrl = $zoomBaseUrl;
 		parent::__construct($zoomBaseUrl, $folder);
 	}
 	
@@ -76,7 +82,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		else if($recording->recordingFile->fileType == kRecordingFileType::CHAT)
 		{
-			$chatFilesProcessor = new zoomChatFilesProcessor();
+			$chatFilesProcessor = new zoomChatFilesProcessor($this->zoomBaseUrl, $this->dropFolder);
 			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recording->recordingFile->downloadUrl);
 		}
 	}
@@ -111,10 +117,20 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$this->mainEntry = $entry;
 		}
 		
+		$kFlavorAsset = new KalturaFlavorAsset();
+		$kFlavorAsset->tags = array(flavorParams::TAG_SOURCE);
+		$kFlavorAsset->flavorParamsId = flavorParams::SOURCE_FLAVOR_ID;
+		$kFlavorAsset->fileExt = $recording->recordingFile->fileExtension;
+		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
+		
 		$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->accessToken;
 		$resource = new KalturaUrlResource();
 		$resource->url = $url;
 		$resource->forceAsyncDownload = true;
+		
+		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
+		$assetParamsResourceContainer->resource = $resource;
+		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
 		KBatchBase::$kClient->media->addContent($entry->id, $resource);
 		KBatchBase::unimpersonate();
 		return $entry;
