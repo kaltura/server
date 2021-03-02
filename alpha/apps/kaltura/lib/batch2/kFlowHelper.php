@@ -1333,7 +1333,7 @@ class kFlowHelper
 			$shouldSave = true;
 		}
 		
-		if($data->getLogFileSyncLocalPath())
+		if($data->getLogFileSyncLocalPath() && kFile::checkFileExists($data->getLogFileSyncLocalPath())
 		{
 			$flavorAsset->incLogFileVersion();
 			$shouldSave = true;
