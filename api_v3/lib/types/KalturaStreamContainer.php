@@ -8,7 +8,13 @@ class KalturaStreamContainer extends KalturaObject
 	/**
 	 * @var string
 	 */
+	public $id;
+
+	/**
+	 * @var string
+	 */
 	public $type;
+
 	/**
 	 * @var int
 	 */
@@ -36,6 +42,7 @@ class KalturaStreamContainer extends KalturaObject
 	
 	private static $mapBetweenObjects = array
 	(
+		"id",
 		"type",
 		"trackIndex",
 		"language",
