@@ -1317,7 +1317,7 @@ class kFlowHelper
 
 		if(!$dbBatchJob->getEntry())
 		{
-			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is probably deleted will return job instead of api exception");
 			return $dbBatchJob;
 		}
 
@@ -1326,8 +1326,21 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		if(!is_null($data->getEngineMessage())) {
+		
+		if(!is_null($data->getEngineMessage()))
+		{
 			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$shouldSave = true;
+		}
+		
+		if($data->getLogFileSyncLocalPath())
+		{
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
+		
+		if($shouldSave)
+		{
 			$flavorAsset->save();
 		}
 
