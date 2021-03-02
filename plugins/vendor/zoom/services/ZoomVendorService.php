@@ -73,8 +73,8 @@ class ZoomVendorService extends KalturaBaseService
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 			$client = new kZoomClient($zoomBaseURL);
-			$permissions = $client->retrieveTokenZoomUserPermissions($accessToken);
-			$user = $client->retrieveTokenZoomUser($accessToken);
+			$permissions = $client->retrieveTokenZoomUserPermissions();
+			$user = $client->retrieveTokenZoomUser();
 			$accountId = $user[ZoomHelper::ACCOUNT_ID];
 			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 			if(!$zoomIntegration)
@@ -141,7 +141,7 @@ class ZoomVendorService extends KalturaBaseService
 		$tokens = $this->handleEncryptTokens($tokensData, $iv, $zoomConfiguration);
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$client = new kZoomClient($zoomBaseURL);
-		$zoomUserData = $client->retrieveTokenZoomUser($tokens[kZoomOauth::ACCESS_TOKEN]);
+		$zoomUserData = $client->retrieveTokenZoomUser();
 		$accountId = $zoomUserData[ZoomHelper::ACCOUNT_ID];
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
 		$partnerId = kCurrentContext::getCurrentPartnerId();

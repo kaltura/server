@@ -17,49 +17,57 @@ class kZoomClient
 	const API_USERS_PERMISSIONS = '/v2/users/@userId@/permissions';
 	
 	protected $zoomBaseURL;
+	protected $refreshToken;
+	protected $jwtToken;
 	
 	/**
 	 * kZoomClient constructor.
 	 * @param $zoomBaseURL
 	 */
-	public function __construct($zoomBaseURL)
+	public function __construct($zoomBaseURL, $refreshToken = null, $jwtToken = null)
 	{
 		$this -> zoomBaseURL = $zoomBaseURL;
+		// check if at least one is available, otherwise throw exception
+		if ($refreshToken == null && $jwtToken == null) {
+			throw new KalturaAPIException (KalturaZoomErrors::UNABLE_TO_AUTHENTICATE);
+		}
+		$this -> refreshToken = $refreshToken;
+		$this -> jwtToken = $jwtToken;
 	}
 	
 	
-	public function retrieveTokenZoomUserPermissions($accessToken)
+	public function retrieveTokenZoomUserPermissions()
 	{
-		return $this -> retrieveZoomUserPermissions(self::API_USERS_ME, $accessToken);
+		return $this -> retrieveZoomUserPermissions(self::API_USERS_ME);
 	}
 	
-	public function retrieveTokenZoomUser($accessToken)
+	public function retrieveTokenZoomUser()
 	{
-		return $this -> retrieveZoomUser(self::API_USERS_ME, $accessToken);
+		return $this -> retrieveZoomUser(self::API_USERS_ME);
 	}
 	
-	public function retrieveMeetingParticipant($accessToken, $meetingId)
+	public function retrieveMeetingParticipant($meetingId)
 	{
 		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
-		return $this -> callZoom($apiPath, $accessToken);
+		return $this -> callZoom($apiPath);
 	}
 	
-	public function retrieveWebinarPanelists($accessToken, $webinarId)
+	public function retrieveWebinarPanelists($webinarId)
 	{
 		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
-		return $this -> callZoom($apiPath, $accessToken);
+		return $this -> callZoom($apiPath);
 	}
 	
-	public function retrieveZoomUser($userName, $accessToken)
+	public function retrieveZoomUser($userName)
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS);
-		return $this -> callZoom($apiPath, $accessToken);
+		return $this -> callZoom($apiPath);
 	}
 	
-	public function retrieveZoomUserPermissions($userName, $accessToken)
+	public function retrieveZoomUserPermissions($userName)
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS_PERMISSIONS);
-		return $this -> callZoom($apiPath, $accessToken);
+		return $this -> callZoom($apiPath);
 	}
 	
 	/**
@@ -84,11 +92,24 @@ class kZoomClient
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function callZoom($apiPath, $accessToken)
+	public function callZoom($apiPath)
 	{
 		KalturaLog ::info('Calling zoom api: ' . $apiPath);
 		$curlWrapper = new KCurlWrapper();
-		$url = $this -> zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
+		if ($this->jwtToken != null) // if we have a jwt we need to use it to make the call
+		{
+			$url = $this -> zoomBaseURL . $apiPath . '?';
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
+			                           "authorization: Bearer {$this->jwtToken}",
+				                     "content-type: application/json"
+			                     ));
+		}
+		else
+		{
+			$tokens = kZoomOauth::refreshTokensViaRefreshToken($this->refreshToken);
+			$accessToken = $tokens[kZoomOauth::REFRESH_TOKEN];
+			$url = $this -> zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
+		}
 		$response = $curlWrapper -> exec($url);
 		$httpCode = $curlWrapper -> getHttpCode();
 		$this -> handelCurlResponse($response, $httpCode, $curlWrapper, $apiPath);

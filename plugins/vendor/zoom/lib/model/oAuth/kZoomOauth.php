@@ -32,6 +32,16 @@ class kZoomOauth
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
+	
+	public static function refreshTokensViaRefreshToken($refreshToken)
+	{
+		KalturaLog::info('Refreshing tokens');
+		list($zoomBaseURL, , $header, $userPwd) = self::getZoomHeaderData();
+		$postFields = "grant_type=refresh_token&refresh_token=$refreshToken";
+		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+		$tokensData = self::retrieveTokenData($response);
+		return $tokensData;
+	}
 
 	public static function requestAccessToken($authCode)
 	{
