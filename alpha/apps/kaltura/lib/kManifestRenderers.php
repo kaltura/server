@@ -896,7 +896,12 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	* @var bool
 	*/
 	protected $hasAudioFlavors = false;
-	
+
+	/**
+	 * @var array
+	 */
+	protected $closedCaptions = array();
+
 	function __construct($flavors, $entryId = null, $baseUrl = '') 
 	{
 		parent::__construct($flavors, $entryId, $baseUrl);
@@ -908,36 +913,26 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				break;
 			}
 		}
+
+		$this->getClosedCaptions();
 	}
 
 	protected function getClosedCaptions()
 	{
-		$closedCaptionExt = array();
-		do
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		$streams = $dbEntry->getStreams();
+		if($streams)
 		{
-			$dbEntry = entryPeer::retrieveByPK($this->entryId);
-			if(!$dbEntry)
-			{
-				break;
-			}
-
-			$streams = $dbEntry->getStreams();
-			if(!$streams)
-			{
-				break;
-			}
-
 			/* @var $stream kStreamContainer */
 			foreach ($streams as $stream)
 			{
 				if($stream->getType() === self::STREAM_TYPE_CLOSED_CAPTIONS)
 				{
-					$closedCaptionExt[] = "#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID=\"CC\",LANGUAGE=\"{$stream->getLanguage()}\",NAME=\"{$stream->getLabel()}\",INSTREAM-ID=\"{$stream->getId()}\"";
+					$language = $stream->getLanguage() ? ",LANGUAGE=\"{$stream->getLanguage()}\"" : '';
+					$this->closedCaptions[] = "#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID=\"CC\"$language,NAME=\"{$stream->getLabel()}\",INSTREAM-ID=\"{$stream->getId()}\"";
 				}
 			}
-		}while(0);
-
-		return $closedCaptionExt;
+		}
 	}
 
 	/**
@@ -960,8 +955,6 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			$audio = ",AUDIO=\"audio\"";
 		}
 
-		$closedCaptionExt = $this->getClosedCaptions();
-
 		$flavorsArr = array();
 		foreach($this->flavors as $flavor)
 		{
@@ -981,13 +974,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$audioFlavorsArr[] = $content;
 			}
 			else {
-				$flavorsArr[] = $this->addExtXStreamInf($flavor, $audio, $closedCaptionExt);
+				$flavorsArr[] = $this->addExtXStreamInf($flavor, $audio);
 			}
 		}
 
-		if($flavorsArr && $closedCaptionExt)
+		if($flavorsArr && $this->closedCaptions)
 		{
-			$flavorsArr = array_merge($closedCaptionExt, $flavorsArr);
+			$flavorsArr = array_merge($this->closedCaptions, array(''), $flavorsArr);
 		}
 
 		if ((count($flavorsArr) == 0) && isset($firstAudioStream))
@@ -1004,7 +997,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	}
 
 
-	private function addExtXStreamInf($flavor, $audio, $closedCaptionExt = null)
+	private function addExtXStreamInf($flavor, $audio)
 	{
 		$bitrate = $this->calculateBitRate($flavor);
 		$codecs = "";
@@ -1022,8 +1015,8 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			$codecs = ',CODECS="mp4a.40.2"';
 		}
 
-		$closedCaption='';
-		if($closedCaptionExt)
+		$closedCaption = '';
+		if($this->closedCaptions)
 		{
 			$closedCaption = ",CLOSED-CAPTIONS=\"CC\"";
 		}
