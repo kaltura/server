@@ -7,6 +7,8 @@ abstract class kManifestRenderer
 	const PLAY_STREAM_TYPE_DVR = 'dvr';
 	const PLAY_STREAM_TYPE_ANY = 'any';
 
+	const STREAM_TYPE_CLOSED_CAPTIONS = 'closedCaptions';
+
 	const AUDIO_CODECS_BITRATE_THRESHOLD = 66960; // as 64KB * 188 \184
 
 	/**
@@ -907,7 +909,37 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			}
 		}
 	}
-    
+
+	protected function getClosedCaptions()
+	{
+		$closedCaptionExt = array();
+		do
+		{
+			$dbEntry = entryPeer::retrieveByPK($this->entryId);
+			if(!$dbEntry)
+			{
+				break;
+			}
+
+			$streams = $dbEntry->getStreams();
+			if(!$streams)
+			{
+				break;
+			}
+
+			/* @var $stream kStreamContainer */
+			foreach ($streams as $stream)
+			{
+				if($stream->getType() === self::STREAM_TYPE_CLOSED_CAPTIONS)
+				{
+					$closedCaptionExt[] = "#EXT-X-MEDIA:TYPE=CLOSED-CAPTIONS,GROUP-ID=\"CC\",LANGUAGE=\"{$stream->getLanguage()}\",NAME=\"{$stream->getLabel()}\",INSTREAM-ID=\"{$stream->getId()}\"";
+				}
+			}
+		}while(0);
+
+		return $closedCaptionExt;
+	}
+
 	/**
 	 * @return array<string>
 	 */
@@ -915,7 +947,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		return array("Content-Type: application/x-mpegurl");
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see kManifestRenderer::getManifestFlavors()
 	 */
@@ -927,7 +959,9 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		if ($this->hasAudioFlavors) {
 			$audio = ",AUDIO=\"audio\"";
 		}
-		
+
+		$closedCaptionExt = $this->getClosedCaptions();
+
 		$flavorsArr = array();
 		foreach($this->flavors as $flavor)
 		{
@@ -947,21 +981,30 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$audioFlavorsArr[] = $content;
 			}
 			else {
-				$flavorsArr[] = $this->addExtXStreamInf($flavor, $audio);
+				$flavorsArr[] = $this->addExtXStreamInf($flavor, $audio, $closedCaptionExt);
 			}
 		}
 
-		if ((count($flavorsArr) == 0) && isset($firstAudioStream))
-			$flavorsArr[] = $this->addExtXStreamInf($firstAudioStream, $audio);
+		if($flavorsArr && $closedCaptionExt)
+		{
+			$flavorsArr = array_merge($closedCaptionExt, $flavorsArr);
+		}
 
-		if (count($audioFlavorsArr) > 0) {
+		if ((count($flavorsArr) == 0) && isset($firstAudioStream))
+		{
+			$flavorsArr[] = $this->addExtXStreamInf($firstAudioStream, $audio);
+		}
+
+		if (count($audioFlavorsArr) > 0)
+		{
 			return array_merge($audioFlavorsArr, array(''), $flavorsArr);
-		}		
+		}
+
 		return $flavorsArr;
 	}
 
 
-	private function addExtXStreamInf($flavor, $audio)
+	private function addExtXStreamInf($flavor, $audio, $closedCaptionExt = null)
 	{
 		$bitrate = $this->calculateBitRate($flavor);
 		$codecs = "";
@@ -975,8 +1018,17 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				$resolution = ",RESOLUTION={$width}x{$height}";
 		}
 		else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
+		{
 			$codecs = ',CODECS="mp4a.40.2"';
-		$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}\n";
+		}
+
+		$closedCaption='';
+		if($closedCaptionExt)
+		{
+			$closedCaption = ",CLOSED-CAPTIONS=\"CC\"";
+		}
+
+		$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}{$closedCaption}\n";
 		$content .= $flavor['url'];
 		return $content;
 	}
