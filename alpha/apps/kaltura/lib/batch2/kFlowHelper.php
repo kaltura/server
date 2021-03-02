@@ -1326,14 +1326,15 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		
+		$shouldSave = false;
 		if(!is_null($data->getEngineMessage()))
 		{
 			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
 			$shouldSave = true;
 		}
 		
-		if($data->getLogFileSyncLocalPath() && kFile::checkFileExists($data->getLogFileSyncLocalPath()))
+		$logFileExists = $data->getLogFileSyncLocalPath() && kFile::checkFileExists($data->getLogFileSyncLocalPath());
+		if($logFileExists)
 		{
 			$flavorAsset->incLogFileVersion();
 			$shouldSave = true;
@@ -1347,7 +1348,7 @@ class kFlowHelper
 		// Creates the file sync
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
-		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
+		if($logFileExists)
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
