@@ -8,16 +8,16 @@ class kZoomTokens
 	const EXPIRES_IN = 'expires_in';
 	const SCOPE = 'scope';
 	
-//	protected $zoomBaseURL;
-//	protected $clientId;
-//	protected $clientSecret;
+	protected $zoomBaseURL;
+	protected $clientId;
+	protected $clientSecret;
 	
-//	public function __construct($zoomBaseURL, $clientId, $clientSecret)
-//	{
-//		$this->zoomBaseURL = $zoomBaseURL;
-//		$this->clientId = $clientId;
-//		$this->clientSecret = $clientSecret;
-//	}
+	public function __construct($zoomBaseURL, $clientId, $clientSecret)
+	{
+		$this->zoomBaseURL = $zoomBaseURL;
+		$this->clientId = $clientId;
+		$this->clientSecret = $clientSecret;
+	}
 	
 	public function generateAccessToken($refreshToken)
 	{
@@ -38,17 +38,15 @@ class kZoomTokens
 	
 	protected function curlRetrieveTokensData($postFields)
 	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$clientId = $zoomConfiguration['clientId'];
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
+		$clientId = $this->clientId;
+		$clientSecret = $this->clientSecret;
 		$userPwd = "$clientId:$clientSecret";
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
 		$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
-		return $curlWrapper->exec($zoomBaseURL . self::OAUTH_TOKEN_PATH);
+		return $curlWrapper->exec($this->zoomBaseURL . self::OAUTH_TOKEN_PATH);
 	}
 	
 }
