@@ -18,11 +18,14 @@ class kZoomClient
 	
 	protected $zoomBaseURL;
 	protected $refreshToken;
+	protected $accessToken;
 	protected $jwtToken;
 	
 	/**
 	 * kZoomClient constructor.
 	 * @param $zoomBaseURL
+	 * * @param $zoomBaseURL
+	 *
 	 */
 	public function __construct($zoomBaseURL, $refreshToken = null, $jwtToken = null)
 	{
@@ -33,6 +36,7 @@ class kZoomClient
 		}
 		$this -> refreshToken = $refreshToken;
 		$this -> jwtToken = $jwtToken;
+		$this->accessToken = null;
 	}
 	
 	
@@ -88,32 +92,48 @@ class kZoomClient
 	
 	/**
 	 * @param string $apiPath
-	 * @param string $accessToken
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function callZoom($apiPath)
+	public function callZoom(string $apiPath)
 	{
 		KalturaLog ::info('Calling zoom api: ' . $apiPath);
 		$curlWrapper = new KCurlWrapper();
+		$url = self::generateContextualUrl($apiPath);
 		if ($this->jwtToken != null) // if we have a jwt we need to use it to make the call
 		{
-			$url = $this -> zoomBaseURL . $apiPath . '?';
 			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
 			                           "authorization: Bearer {$this->jwtToken}",
 				                     "content-type: application/json"
 			                     ));
 		}
-		else
-		{
-			$tokens = kZoomOauth::refreshTokensViaRefreshToken($this->refreshToken);
-			$accessToken = $tokens[kZoomOauth::REFRESH_TOKEN];
-			$url = $this -> zoomBaseURL . $apiPath . '?' . 'access_token=' . $accessToken;
-		}
 		$response = $curlWrapper -> exec($url);
+		if (!$response)
+		{
+			if (strpos($curlWrapper->getErrorMsg(), 'expired') !== false)
+			{
+				$this->accessToken = kZoomTokens::generateAccessToken($this->refreshToken);
+				$url = self::generateContextualUrl($apiPath);
+				$response = $curlWrapper -> exec($url);
+			}
+		}
 		$httpCode = $curlWrapper -> getHttpCode();
 		$this -> handelCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
 		$data = json_decode($response, true);
 		return $data;
+	}
+	
+	private function generateContextualUrl($apiPath)
+	{
+		$url = $this -> zoomBaseURL . $apiPath . '?';
+		if ($this->refreshToken)
+		{
+			if (!$this->accessToken)
+			{
+				$this->accessToken = kZoomTokens::generateAccessToken($this->refreshToken);
+			}
+			$url .= 'access_token=' . $this->accessToken;
+		}
+		return $url;
 	}
 }
