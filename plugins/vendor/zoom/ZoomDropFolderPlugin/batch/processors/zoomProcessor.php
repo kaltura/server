@@ -30,7 +30,7 @@ abstract class zoomProcessor
 	 */
 	public function __construct($zoomBaseUrl, KalturaZoomDropFolder $folder)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl);
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $this->dropFolder->refreshToken, $this->dropFolder->jwtToken);
 		$this->dropFolder = $folder;
 		$this->accessToken = $this->zoomClient->getAccessToken($this->dropFolder->refreshToken);
 	}
@@ -63,7 +63,7 @@ abstract class zoomProcessor
 				
 				break;
 			case kZoomUsersMatching::CMS_MATCHING:
-				$zoomUser = $this->zoomClient->retrieveZoomUser($userName, $this->accessToken);
+				$zoomUser = $this->zoomClient->retrieveZoomUser($userName);
 				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
 				{
 					$result = $zoomUser[self::CMS_USER_FIELD];

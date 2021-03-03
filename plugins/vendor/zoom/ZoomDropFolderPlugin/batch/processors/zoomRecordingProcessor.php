@@ -61,7 +61,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	public function handleRecordingVideoComplete($recording)
 	{
 		$hostId = $recording->meetingMetadata->hostId;
-		$zoomUser = $this->zoomClient->retrieveZoomUser($hostId, $this->accessToken);
+		$zoomUser = $this->zoomClient->retrieveZoomUser($hostId);
 		$hostEmail = '';
 		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
 		{
@@ -242,13 +242,13 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		
 		$userToExclude = strtolower($userToExclude);
-		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($this->accessToken, $recordingId);
+		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($recordingId);
 		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse);
 		return $this->getValidatedUsers($additionalZoomUsers, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 		                                $userToExclude);
 	}
 	
-	protected abstract function getAdditionalUsersFromZoom($accessToken, $recordingId);
+	protected abstract function getAdditionalUsersFromZoom($recordingId);
 	
 	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse);
 	
