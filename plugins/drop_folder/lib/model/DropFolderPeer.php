@@ -92,4 +92,12 @@ class DropFolderPeer extends BaseDropFolderPeer
 	{
 		return array(array("dropFolder:id=%s", self::ID), array("dropFolder:dc=%s", self::DC));		
 	}
+	
+	public static function retrieveDropFoldersPerPartner($partnerId, $dropFolderType)
+	{
+		$c = new Criteria();
+		$c->add(DropFolderPeer::PARTNER_ID, $partnerId);
+		$c->add(DropFolderPeer::TYPE, $dropFolderType);
+		return self::doSelect($c);
+	}
 } // DropFolderPeer

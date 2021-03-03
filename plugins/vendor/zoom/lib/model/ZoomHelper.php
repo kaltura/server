@@ -11,6 +11,7 @@ class ZoomHelper
 
 	/** php body */
 	const PHP_INPUT = 'php://input';
+	const SUFFIX_ZOOM = '_zoom';
 
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
@@ -216,6 +217,21 @@ class ZoomHelper
 		if($zoomIntegration->getStatus() == VendorStatus::DISABLED)
 		{
 			self::exitWithError(kZoomErrorMessages::UPLOAD_DISABLED);
+		}
+	}
+	
+	public static function shouldHandleFileType($recordingFileType)
+	{
+		switch($recordingFileType)
+		{
+			case 'MP4':
+			case 'CHAT':
+			case 'TRANSCRIPT':
+				return true;
+				break;
+			default:
+				return false;
+				break;
 		}
 	}
 }
