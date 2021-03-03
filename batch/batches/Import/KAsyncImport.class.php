@@ -180,7 +180,6 @@ class KAsyncImport extends KJobHandlerWorker
 				//Not all servers support all the options so we need to remove them from our headers.
 				$curlWrapper->close();
 			}
-
 			if($resumeOffset)
 			{
 				$this->updateJob($job, "Resuming download, from ".$resumeOffset ." size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
@@ -188,7 +187,7 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl);;
+				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
@@ -375,7 +374,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$fileSize = $fileTransferMgr->fileSize($remotePath);
 				
 	            // create a temp file path
-				$destFile = $this->getTempFilePath($remotePath);
+				$destFile = $this->getTempFilePath($remotePath, $fileSize);
 				$data->destFileLocalPath = $destFile;
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				KalturaLog::debug("destFile [$destFile]");
@@ -493,10 +492,16 @@ class KAsyncImport extends KJobHandlerWorker
 		return $job;
 	}
 	
-	protected function getTempFilePath($remotePath)
+	protected function getTempFilePath($remotePath, $fileSize = null)
 	{
 	    // create a temp file path
 		$rootPath = self::$taskConfig->params->localTempPath;
+		$fileSizeThreshold = isset(self::$taskConfig->params->fileSizeThreshold) ? self::$taskConfig->params->fileSizeThreshold : null;
+		$shardTempPath = isset(self::$taskConfig->params->sharedTempPath) ? self::$taskConfig->params->sharedTempPath : null;
+		if ($fileSize && $fileSizeThreshold && $shardTempPath && $fileSize > $fileSizeThreshold )
+		{
+			$rootPath = $shardTempPath;
+		}
 
 		$res = self::createDir( $rootPath );
 		if ( !$res )
