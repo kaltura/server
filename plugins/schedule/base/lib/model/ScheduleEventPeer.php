@@ -17,7 +17,9 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
+	const MEETING_OM_CLASS = 'MeetingScheduleEvent';
 	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
+	
 	const BLACKOUT_SESSION_CACHE_START_DATE = 'start_date';
 	const BLACKOUT_SESSION_CACHE_END_DATE = 'end_date';
 	const BLACKOUT_SESSION_CACHE_RESULT = 'result';
@@ -30,6 +32,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
 		ScheduleEventType::RECORD => self::RECORD_OM_CLASS,
 		ScheduleEventType::BLACKOUT => self::BLACKOUT_OM_CLASS,
+		ScheduleEventType::MEETING => self::MEETING_OM_CLASS,
 	);
 	
 	/*
