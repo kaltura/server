@@ -2253,7 +2253,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
 		if(count($sharedStorageProfileIds))
 		{
-			$c->add(FileSyncPeer::DC, $sharedStorageProfileIds, $sharedStorageProfileIds);
+			$c->add(FileSyncPeer::DC, $sharedStorageProfileIds, Criteria::NOT_IN);
 		}
 		
 		return FileSyncPeer::doSelect($c);
