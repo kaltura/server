@@ -247,7 +247,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             $headers[] = "x-calais-EnableTickerExtraction: ". ($EnableTickerExtraction == 'Yes' ? 'True' : 'False');
         }
         if($OmitOutputtingOriginalText != ''){
-            $headers[] = "omitOutputtingOriginalText: ". ($OmitOutputtingOriginalText == 'Yes' ? 'True' : 'False');
+            $headers[] = "omitOutputtingOriginalText: ". ($OmitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
         }
         return $headers;
     }
