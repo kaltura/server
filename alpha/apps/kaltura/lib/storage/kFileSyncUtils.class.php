@@ -2229,14 +2229,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getReadyInternalFileSyncsForKey(FileSyncKey $syncKey)
 	{
-		$peridoicStorageFileSyncs = self::getFileSyncsFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
+		$periodicStorageFileSyncs = self::getFileSyncsFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
 
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $syncKey );
 		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
 		$localfileSyncs = FileSyncPeer::doSelect( $c );
 
-		return array_merge($peridoicStorageFileSyncs, $localfileSyncs);
+		return array_merge($periodicStorageFileSyncs, $localfileSyncs);
 	}
 
 	/**
