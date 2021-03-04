@@ -16,16 +16,22 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
     const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
 
-    const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalaisMapping';
+    const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
 
     const SHOWTAXONOMY_SYSTEM_NAME = 'ShowTaxonomy';
     // Mapping metadata constants
     const RULE_NAME = 'Rule';
+    const KALTURA_FIELD_NAME_XPATH = '/metadata/Rule/Kaltura/ShowTaxonomyElement';
 
     /**
      * @var array
      */
-    protected $showTaxonomyXsdFields;
+    protected $targetAllMetadataFields;
+
+    /**
+     * @var array
+     */
+    protected $targetSettableMetadataFields;
 
     /**
      * @var KalturaMetadataClientPlugin
@@ -66,6 +72,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param string $entryId
      */
     private function actionUpdate($values, $entryId){
+        $this->cleanCuePointsForEntry($entryId);
         $showTaxonomyId = $this->initMainMetadataFields(self::SHOWTAXONOMY_SYSTEM_NAME);
         $showTaxonomyXml = $this->initMainMetadataXml($entryId, $showTaxonomyId);
 
@@ -101,7 +108,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $initialXml = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($showTaxonomyId, KalturaMetadataObjectType::ENTRY, $entryId);
         if ($initialXml->totalCount)
         {
-            return $this->clearPreviousContent($initialXml->objects[0]->xml);
+            return $this->clearFieldsInXml($initialXml->objects[0]->xml, $this->targetSettableMetadataFields);
         }
 
         return '<metadata/>';
@@ -110,7 +117,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     private function initMainMetadataFields ($showTaxonomySystemName)
     {
         $metadataProfile = $this->getMetaDataProfile(self::SHOWTAXONOMY_SYSTEM_NAME);
-        $this->getShowTaxonomyMetadataFields($metadataProfile);
+        $this->getTargetMetadataFields($metadataProfile);
 
         return $metadataProfile->id;
     }
@@ -121,10 +128,10 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param $entryId
      */
     private function handleCuePoints($cuePointsList, $entryId){
-        $this->cleanCuePointsForEntry($entryId);
+
         foreach ($cuePointsList as $cuePoint){
-            $cuePointObj = new KalturaThumbCuePoint();
-            $cuePointObj->title = $cuePoint['title'];
+            $cuePointObj = new KalturaAnnotation();
+            $cuePointObj->text = $cuePoint['title'];
             $cuePointObj->startTime = $cuePoint['startTime'];
             $cuePointObj->entryId = $entryId;
 
@@ -136,13 +143,14 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      */
     protected function cleanCuePointsForEntry($entryId)
     {
-        $cuePointFilter = new KalturaThumbCuePointFilter();
+        $cuePointFilter = new KalturaAnnotationFilter();
         $cuePointFilter->entryIdEqual = $entryId;
         $cuePoints = KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint->listAction($cuePointFilter);
         if($cuePoints->totalCount > 0){
             /** @var KalturaCuePoint $cuePoint */
-            foreach ($cuePoints as $cuePoint){
-                CuePointPlugin::get($this->client)->getCuePointService()->delete($cuePoint->id);
+            foreach ($cuePoints->objects as $cuePoint)
+            {
+                KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint->delete($cuePoint->id);
             }
         }
 
@@ -151,7 +159,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     /**
      * @param KalturaThumbCuePoint $cuePointObj
      */
-    protected function addCuePoint(KalturaThumbCuePoint $cuePointObj)
+    protected function addCuePoint(KalturaAnnotation $cuePointObj)
     {
         KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint->add($cuePointObj);
     }
@@ -179,9 +187,9 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             throw new Exception ('Kaltura data retrieval error: ' . $e->getMessage());
         }
 
-        $response = $this->openCalaisGetTags($transcript, $vendorTask->partnerId);
+        $response = $this->senOpenCalaisGetTagsRequest($transcript, $vendorTask->partnerId);
         $textCuePointsRelation = $this->getEntryJsonTranscript($vendorTask);
-        $ruleEngine = new RuleEngine($this->getRules($mappingProfileId, $vendorTask->partnerId), $textCuePointsRelation);
+        $ruleEngine = new RuleEngine($this->getMappingMetadataProfileRules($mappingProfileId, $vendorTask->partnerId), $textCuePointsRelation);
 
         return $ruleEngine->getValuesFromApiResponse($response);
     }
@@ -216,7 +224,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         return (string)$content;
     }
 
-    protected function openCalaisGetTags ($transcript, $partnerId)
+    protected function senOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL, self::OPEN_CALAIS_URL);
@@ -237,7 +245,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $EnableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
         $OmitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
         $headers = array (
-            "Content-Type: text/raw",
+            "Content-Type: text/xml",
             "charset:utf8",
             "x-ag-access-token: $apiKey",
             "outputFormat: application/json",
@@ -321,8 +329,9 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $mediaEntry = $this->getMediaEntry($vendorTask->entryId);
         $text = $this->getEntryTextTranscript($vendorTask);
 
-        return "$mediaEntry->name $mediaEntry->description $text";
+        return '<Document><Title>' . htmlspecialchars($mediaEntry->name) . '</Title><Description>' . htmlspecialchars($mediaEntry->description) . '</Description><Body>' . htmlspecialchars($text) . '</Body></Document>';
     }
+
 
     /**
      * @param KalturaEntryVendorTask $vendorTask
@@ -406,32 +415,67 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param int $partnerId
      * @return array
      */
-    protected function getRules($mappingProfileId, $partnerId) {
-        $metadatas = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($mappingProfileId, KalturaMetadataObjectType::PARTNER, $partnerId);
+    protected function getMappingMetadataProfileRules($mappingProfileId, $partnerId) {
+        $metadataResponse = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($mappingProfileId, KalturaMetadataObjectType::PARTNER, $partnerId);
+        $this->retrieveActiveMetadataFields($metadataResponse->objects[0]->xml);
 
         $result = array();
-        if($metadatas->totalCount > 0){
-            $xml = json_decode(json_encode(simplexml_load_string($metadatas->objects[0]->xml)), true);
-            if(isset($xml[self::RULE_NAME])){
-                $result[] = $xml[self::RULE_NAME];
+        if($metadataResponse->totalCount > 0){
+            $xml = json_decode(json_encode(simplexml_load_string($metadataResponse->objects[0]->xml)), true);
+            if(isset($xml[self::RULE_NAME]))
+            {
+                foreach ($xml[self::RULE_NAME] as $rule)
+                {
+                    $result[] = $rule;
+                }
             }
         }
 
         return $result;
     }
 
-    protected function getShowTaxonomyMetadataFields (KalturaMetadataProfile $metadataProfile)
+    protected function retrieveActiveMetadataFields ($metadataMapping)
     {
-        $xsdElem = new SimpleXMLElement ($metadataProfile->xsd);
-        $xpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element/@name";
-        $fieldNamesElem = $xsdElem->xpath ($xpath);
+        $xml = new SimpleXMLElement($metadataMapping);
 
-        $this->showTaxonomyXsdFields = array();
-        foreach ($fieldNamesElem as $fieldNameElem){
-            $this->showTaxonomyXsdFields[] = strval($fieldNameElem[0]);
+        $nodeList = $xml->xpath(self::KALTURA_FIELD_NAME_XPATH);
+        foreach ($nodeList as $node)
+        {
+            $this->targetSettableMetadataFields[] = strval($node);
+        }
+    }
+
+    /**
+     * Method to set up $targetMetadataFields assoc array mapping the target metadata profile fields to their types.
+     * For dynamic metadata object type, mapping includes the metadata profile ID.
+     * @param KalturaMetadataProfile $metadataProfile
+     *
+     */
+    protected function getTargetMetadataFields (KalturaMetadataProfile $metadataProfile)
+    {
+        $xml = new SimpleXMLElement($metadataProfile->xsd);
+
+        $fields = $xml->xpath('/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element');
+
+        $this->targetAllMetadataFields = array();
+
+        foreach ($fields as $field)
+        {
+            $fieldName = strval($field->attributes()['name']);
+            $fieldType = strval($field->attributes()['type']);
+
+            $this->targetAllMetadataFields[$fieldName] = array();
+            $this->targetAllMetadataFields[$fieldName]['type'] = $fieldType;
+            if ($fieldType == 'metadataObjectType')
+            {
+                $metadataProfileIdXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/metadataProfileId";
+
+                $this->targetAllMetadataFields[$fieldName]['metadataProfileType'] = intval($xml->xpath($metadataProfileIdXpath)[0]);
+            }
+
         }
 
-        KalturaLog::info("Fields in the ShowTaxonomy XSD: " . print_r($this->showTaxonomyXsdFields, true));
+        KalturaLog::info("Fields in the target metadata profile XSD: " . print_r($this->targetAllMetadataFields, true));
 
     }
 
@@ -440,9 +484,11 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $domXpath = new DOMXPath($dom);
 
         $lastAutoElement= null;
-        for ($i = count($this->showTaxonomyXsdFields)-1; $i >=0; $i--)
+        $fieldNames = array_keys($this->targetAllMetadataFields);
+
+        for ($i = count($fieldNames)-1; $i >=0; $i--)
         {
-            if ($this->showTaxonomyXsdFields[$i] == $fieldNameToAdd)
+            if ($fieldNames[$i] == $fieldNameToAdd)
             {
                 $xpath = '//' . $fieldNameToAdd;
                 $autoList = $domXpath->query ($xpath);
@@ -451,7 +497,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
                     $lastAutoElement = $autoList->item ($autoList->length-1);
                     break;
                 }
-                $fieldNameToAdd = $i >= 1 ? $this->showTaxonomyXsdFields[$i-1] : $this->showTaxonomyXsdFields[0];
+                $fieldNameToAdd = $i >= 1 ? $fieldNames[$i-1] : $fieldNames[0];
             }
         }
 
@@ -466,28 +512,14 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     }
 
     /**
-     * Method removes the existing Dexter-related tags from the entry metadata
-     * @param string $metadata
-     *
-     * @return string
-     */
-    protected function clearPreviousContent($metadata)
-    {
-        $metadataXML = new SimpleXMLElement($metadata);
-        $fieldNames = array ("CompanyAutoMain" , "CategoryAutoMain", "CompanyAutoMentioned", "MentionedTagAuto", "GeographyAutoMentioned", "PersonAutoMentioned");
-        $this->clearFieldsInXml($metadataXML, $fieldNames);
-
-        return $metadataXML->saveXML();
-    }
-
-    /**
      * Removes specific list of fields from XML
      *
-     * @param SimpleXMLElement $metadataXML
+     * @param string $metadataXML
      * @param array $fieldNames
      */
-    protected function clearFieldsInXml(SimpleXMLElement $metadataXML, array $fieldNames)
+    protected function clearFieldsInXml($metadata, array $fieldNames)
     {
+        $metadataXML = new SimpleXMLElement($metadata);
         foreach ($fieldNames as $fieldName)
         {
             $tags = $metadataXML->xpath("//$fieldName");
@@ -505,29 +537,40 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     protected function validateDynamicObject (array $dynamicObjectDetails)
     {
         KalturaLog::info ('Validating dynamic object existence with following details: ' . print_r($dynamicObjectDetails, true));
-        $metadataProfileSystemName = $dynamicObjectDetails['systemName'];
-        $metadataProfileId = $this->getMetaDataProfileId($metadataProfileSystemName);
+        $metadataProfileFieldName = $dynamicObjectDetails['fieldName'];
 
-        $objectId = $dynamicObjectDetails['objectId'];
-
-        $objects = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, $objectId);
-        if ($objects->totalCount)
+        if ($this->targetAllMetadataFields[$metadataProfileFieldName]['type'] == 'metadataObjectType')
         {
-            return true;
+            if (!isset ($this->targetAllMetadataFields[$metadataProfileFieldName]['metadataProfileId']))
+            $metadataProfileId = $this->targetAllMetadataFields[$metadataProfileFieldName]['metadataProfileId'];
+
+            $objectId = $dynamicObjectDetails['objectId'];
+            if (!$objectId)
+            {
+                KalturaLog::err('Invalid object ID. Cannot validate.');
+                return false;
+            }
+
+            $objects = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, $objectId);
+            if ($objects->totalCount)
+            {
+                return true;
+            }
+
+            if ($dynamicObjectDetails['addIfNotExist'])
+            {
+
+            }
+
+            return false;
         }
 
-        if ($dynamicObjectDetails['addIfNotExist'])
-        {
-            // TODO - create logic to add the missing dynamic object
-        }
-
-        return false;
+        return true;
     }
 
     /**
-     * @param $entryMetadataShowTaxonomy
-     * @param $showTaxonomyId
-     * @param $entryId
+     * @param array $entryMetadataAdditions
+     * @param $initialMetadata
      */
     private function updateEntryMetadataXml(array $entryMetadataAdditions, $initialMetadata) {
 
@@ -553,7 +596,6 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
             $domElement = $dom->createElement($key, $value);
             $this->placeTagAccordingToXSD($key, $dom, $domElement);
-
         }
 
         return $dom->saveXML();
