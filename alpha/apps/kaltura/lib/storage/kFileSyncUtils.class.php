@@ -2238,6 +2238,26 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		return array_merge($periodicStorageFileSyncs, $localfileSyncs);
 	}
+	
+	public static function getReadyRemoteFileSyncsForAsset($id, $asset, $objectType, $objectSubType)
+	{
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, $objectType);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $objectSubType);
+		$c->add(FileSyncPeer::OBJECT_ID, $id);
+		$c->add(FileSyncPeer::VERSION, $asset->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $asset->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		
+		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+		if(count($sharedStorageProfileIds))
+		{
+			$c->add(FileSyncPeer::DC, $sharedStorageProfileIds, $sharedStorageProfileIds);
+		}
+		
+		return FileSyncPeer::doSelect($c);
+	}
 
 	/**
 	 * @param $partnerId
