@@ -1028,9 +1028,9 @@ class ThumbAssetService extends KalturaAssetService
 		}
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
-			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY, FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
 		
-		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($id, $assetDb);
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($id, $assetDb, FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
