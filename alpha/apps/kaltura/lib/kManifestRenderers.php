@@ -914,10 +914,10 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			}
 		}
 
-		$this->getClosedCaptions();
+		$this->setClosedCaptions();
 	}
 
-	protected function getClosedCaptions()
+	protected function setClosedCaptions()
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$streams = $dbEntry->getStreams();
