@@ -456,6 +456,10 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 				$object = new KalturaBlackoutScheduleEvent();
 				break;
 
+			case ScheduleEventType::MEETING:
+				$object = new KalturaBlackoutScheduleEvent();
+				break;
+
 			default:
 				$object = KalturaPluginManager::loadObject('KalturaScheduleEvent', $sourceObject->getType());
 				if(!$object)
