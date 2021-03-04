@@ -14,6 +14,19 @@ class KalturaIntelligentTaggingVendorTaskData extends KalturaVendorTaskData
      */
     public $assetId;
 
+    private static $map_between_objects = array
+    (
+        'assetId',
+    );
+
+    /* (non-PHPdoc)
+     * @see KalturaCuePoint::getMapBetweenObjects()
+     */
+    public function getMapBetweenObjects()
+    {
+        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+    }
+
     /* (non-PHPdoc)
     * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
     */

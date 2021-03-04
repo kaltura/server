@@ -187,14 +187,58 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             throw new Exception ('Kaltura data retrieval error: ' . $e->getMessage());
         }
 
-        $response = $this->senOpenCalaisGetTagsRequest($transcript, $vendorTask->partnerId);
+        $response = $this->sendOpenCalaisGetTagsRequest($transcript, $vendorTask->partnerId);
+
+        //Save Open Calais response as attachment asset on the entry
+        $this->saveResponseAsAttachment($vendorTask, $response);
+
         $textCuePointsRelation = $this->getEntryJsonTranscript($vendorTask);
         $ruleEngine = new RuleEngine($this->getMappingMetadataProfileRules($mappingProfileId, $vendorTask->partnerId), $textCuePointsRelation);
 
         return $ruleEngine->getValuesFromApiResponse($response);
     }
 
+    /**
+     * @param KalturaEntryVendorTask $vendorTask
+     * @param $response
+     * @throws KalturaClientException
+     */
+    protected function saveResponseAsAttachment (KalturaEntryVendorTask $vendorTask, $response)
+    {
+        $attachmentAssetFilter = new KalturaAttachmentAssetFilter();
+        $attachmentAssetFilter->tagsMultiLikeAnd = 'reach,ocm';
+        $attachmentAssetFilter->formatEqual = KalturaAttachmentType::JSON;
+        $attachmentAssetFilter->entryIdEqual = $vendorTask->entryId;
 
+        $attachments = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient)->attachmentAsset->listAction($attachmentAssetFilter);
+        $attachmentAssetId = null;
+        if($attachments->totalCount)
+        {
+            $attachmentAssetId = $attachments->objects[0]->id;
+        }
+
+        if(!$attachmentAssetId)
+        {
+            $attachmentAsset = new KalturaAttachmentAsset();
+            $attachmentAsset->format = KalturaAttachmentType::JSON;
+            $attachmentAsset->tags = 'reach,ocm';
+            $attachmentAsset->filename = 'ocm_response.json';
+            $attachmentAsset->fileExt = 'json';
+            $attachmentAsset = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient)->attachmentAsset->add($vendorTask->entryId, $attachmentAsset);
+            $attachmentAssetId = $attachmentAsset->id;
+        }
+
+        $ocmContentResource = new KalturaStringResource();
+        $ocmContentResource->content = $response;
+
+        try {
+            $attachmentAsset = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient)->attachmentAsset->setContent($attachmentAssetId, $ocmContentResource);
+        } catch (Exception $e)
+        {
+            KalturaLog::err ("OpenCalais response for entry {$vendorTask->entryId}, vendor task ID {$vendorTask->id} could not be saved as attachment asset for the entry.");
+        }
+
+    }
 
     /**
      * @param $entryId
@@ -208,12 +252,17 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $attachmentAssetFilter->entryIdEqual = $entryId;
         $attachmentAssetFilter->formatEqual = $format;
         $attachments = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient)->attachmentAsset->listAction($attachmentAssetFilter);
-        if($attachments->totalCount == 0)
+
+        $transcriptId = null;
+        foreach ($attachments->objects as $attachment)
         {
-            return '';
+            if ($attachment instanceof KalturaTranscriptAsset)
+            {
+                $transcriptId = $attachment->id;
+            }
         }
 
-        return $attachments->objects[0]->id;
+        return $transcriptId;
     }
 
     protected function retrieveAtachmentAssetContent ($assetId)
@@ -224,7 +273,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         return (string)$content;
     }
 
-    protected function senOpenCalaisGetTagsRequest ($transcript, $partnerId)
+    protected function sendOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL, self::OPEN_CALAIS_URL);
@@ -443,6 +492,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         {
             $this->targetSettableMetadataFields[] = strval($node);
         }
+
+        KalturaLog::info ('Settable fields: ' . print_r($this->targetSettableMetadataFields, true));
     }
 
     /**
@@ -470,7 +521,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             {
                 $metadataProfileIdXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/metadataProfileId";
 
-                $this->targetAllMetadataFields[$fieldName]['metadataProfileType'] = intval($xml->xpath($metadataProfileIdXpath)[0]);
+                $this->targetAllMetadataFields[$fieldName]['metadataProfileId'] = intval($xml->xpath($metadataProfileIdXpath)[0]);
             }
 
         }
@@ -514,7 +565,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     /**
      * Removes specific list of fields from XML
      *
-     * @param string $metadataXML
+     * @param string $metadata
      * @param array $fieldNames
      */
     protected function clearFieldsInXml($metadata, array $fieldNames)
@@ -528,6 +579,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
                 unset ($tag[0]);
             }
         }
+
+        return $metadataXML->saveXML();
     }
 
     /**
@@ -542,6 +595,10 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         if ($this->targetAllMetadataFields[$metadataProfileFieldName]['type'] == 'metadataObjectType')
         {
             if (!isset ($this->targetAllMetadataFields[$metadataProfileFieldName]['metadataProfileId']))
+            {
+                KalturaLog::err('Invalid metadata profile ID. Cannot validate.');
+                return false;
+            }
             $metadataProfileId = $this->targetAllMetadataFields[$metadataProfileFieldName]['metadataProfileId'];
 
             $objectId = $dynamicObjectDetails['objectId'];
