@@ -874,6 +874,7 @@ class myEntryUtils
 			$start_sec = 0;
 		}
 
+		$last_calc_vid_sec = $w = $h = null;
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
@@ -910,6 +911,13 @@ class myEntryUtils
 				else // default thumbnail was not created yet
 				{
 					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
+				}
+				
+				if(isset($last_calc_vid_sec) && $im && $h && $w && $last_calc_vid_sec == $calc_vid_sec)
+				{
+					imagecopy($im, $im, $w * $vid_slice, 0, $w * ($vid_slice - 1), 0, $w, $h);
+					++$vid_slice;
+					continue;
 				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
@@ -1017,9 +1025,7 @@ class myEntryUtils
 					unlink($packagerResizeFullPath);
 				}
 			}
-
-
-
+			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
@@ -1050,6 +1056,8 @@ class myEntryUtils
 					unlink($orig_image_path);
 				}
 			}
+			
+			$last_calc_vid_sec = $calc_vid_sec;
 		}
 		
 		if ($multi)

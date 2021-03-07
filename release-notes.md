@@ -1,5 +1,18 @@
 # Propus-16.19.0  #
 
+## Version Highlight ##
+### Features ###
+    PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
+        This new type will be used by KMS for NewRow scheduled meeting,
+        but customers can use if for anytype.
+
+    PLAT-22622 - Add close caption support to playManifest, the caption language
+        is from the related stream info
+
+### Bug fix ###
+    SUP-25895 - Zoom, Adding file extention to imported source files. 
+    PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
+
 ## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
 - Issue Type: Task
 - Issue ID: PLAT-22679
@@ -13,7 +26,7 @@
         
     Run deployment script:
         php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
-        
+
 # Propus-16.18.0  #
 ## Version Highlight ##
 ### Features ###
