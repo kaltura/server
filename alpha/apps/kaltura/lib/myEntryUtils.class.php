@@ -874,7 +874,7 @@ class myEntryUtils
 			$start_sec = 0;
 		}
 
-		$last_calc_vid_sec = $w = $h = null;
+		$last_calc_vid_sec = $w = $h = $calc_vid_sec = null;
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
@@ -1057,7 +1057,7 @@ class myEntryUtils
 				}
 			}
 			
-			$last_calc_vid_sec = $calc_vid_sec;
+			$last_calc_vid_sec = isset($calc_vid_sec) ? $calc_vid_sec : null;
 		}
 		
 		if ($multi)
