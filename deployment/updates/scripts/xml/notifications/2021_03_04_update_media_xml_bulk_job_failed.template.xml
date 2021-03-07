@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaHttpNotificationTemplateFilter">
+                <systemNameEqual>Media_XML_Bulk_Failure_Notification</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaHttpNotificationTemplate">
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>job_id</key>
+                        <description>Batch Job ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getBatchJob()->getId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>log_url</key>
+                        <description>Bulk upload log url</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null($scope->getEvent()->getBatchJob()) ? kFlowHelper::createBulkUploadLogUrl($scope->getEvent()->getBatchJob()) : ''</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>date_time</key>
+                        <description>Bulk upload creation time</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getBatchJob()->getCreatedAt()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>file_name</key>
+                        <description>Bulk upload file name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getBatchJob()->getData()->getFileName()</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+    </multirequest>
+</xml>
