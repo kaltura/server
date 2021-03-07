@@ -26,7 +26,7 @@ class kUsersCsvJobData extends kExportCsvJobData
 	private $additionalFields;
 	
 	/**
-	 * Dynamic mapping between kUser core fields and its actual headline
+	 * Dynamic mapping between kUser core fields and report columns
 	 * @var array
 	 */
 	private $mappedFields;

@@ -20,8 +20,8 @@ class ExportCsvService extends KalturaBaseService
 	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
 	 * @param int $metadataProfileId
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
-	 * @param KalturaKeyValueArray $mappedFields mapping between
-	 * fieldheadline and its mapped value
+	 * @param KalturaKeyValueArray $mappedFields mapping between field
+	 * headline and its mapped value
 	 * @return string
 	 *
 	 * @throws APIErrors::USER_EMAIL_NOT_FOUND

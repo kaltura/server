@@ -28,7 +28,7 @@ class KalturaUsersCsvJobData extends KalturaExportCsvJobData
 	public $additionalFields;
 	
 	/**
-	 * Array of header names and their mapped fields
+	 * Array of header names and their mapped user fields
 	 *
 	 * @var KalturaKeyValueArray
 	 */

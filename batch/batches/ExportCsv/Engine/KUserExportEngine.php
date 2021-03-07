@@ -14,6 +14,7 @@ class KUserExportEngine extends KObjectExportEngine
 		}
 		return $ret;
 	}
+	
 	public function fillCsv(&$csvFile, &$data)
 	{
 		KalturaLog::info ('Exporting content for user items');
