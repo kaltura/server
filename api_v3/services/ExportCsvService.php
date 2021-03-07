@@ -20,13 +20,19 @@ class ExportCsvService extends KalturaBaseService
 	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
 	 * @param int $metadataProfileId
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
+	 * @param KalturaKeyValueArray $mappedFields mapping between
+	 * fieldheadline and its mapped value
 	 * @return string
 	 *
 	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED
 	 */
-	public function userExportToCsvAction (KalturaUserFilter $filter = null, $metadataProfileId = null, $additionalFields = null)
+	public function userExportToCsvAction (KalturaUserFilter $filter = null,
+	                                       $metadataProfileId = null,
+	                                       $additionalFields = null,
+	                                       KalturaKeyValueArray $mappedFields
+	                                       = null)
 	{
 		if($metadataProfileId)
 		{
@@ -55,6 +61,7 @@ class ExportCsvService extends KalturaBaseService
 		$jobData->setAdditionalFields($additionalFields);
 		$jobData->setUserMail($kuser->getEmail());
 		$jobData->setUserName($kuser->getPuserId());
+		$jobData->setMappedFields($mappedFields);
 		
 		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), ExportObjectType::USER);
 		

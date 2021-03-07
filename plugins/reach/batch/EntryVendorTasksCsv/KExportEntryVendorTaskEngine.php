@@ -78,7 +78,8 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	/**
 	 * Generate the first csv row containing the fields
 	 */
-	protected function addHeaderRowToCsv($csvFile, $additionalFields)
+	protected function addHeaderRowToCsv($csvFile, $additionalFields,
+	                                     $mappedFields=null)
 	{
 		$headerRow = 'taskId,createdAt,finishTime,entryId,entryName,entryDuration,taskStatus,reachProfileId,reachProfileName,turnaroundTime,serviceType,serviceFeature,price,userId,moderatingUser,errDescription,notes,accuracy,context,partnerData,targetLanguage';
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
