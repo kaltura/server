@@ -31,8 +31,7 @@ class ExportCsvService extends KalturaBaseService
 	public function userExportToCsvAction (KalturaUserFilter $filter = null,
 	                                       $metadataProfileId = null,
 	                                       $additionalFields = null,
-	                                       KalturaKeyValueArray $mappedFields
-	                                       = null)
+	                                       KalturaKeyValueArray $mappedFields = null)
 	{
 		if($metadataProfileId)
 		{
