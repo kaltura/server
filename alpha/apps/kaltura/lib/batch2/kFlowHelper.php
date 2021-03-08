@@ -1317,7 +1317,7 @@ class kFlowHelper
 
 		if(!$dbBatchJob->getEntry())
 		{
-			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is probably deleted will return job instead of api exception");
 			return $dbBatchJob;
 		}
 
@@ -1326,15 +1326,29 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		if(!is_null($data->getEngineMessage())) {
+		$shouldSave = false;
+		if(!is_null($data->getEngineMessage()))
+		{
 			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$shouldSave = true;
+		}
+		
+		$logFileExists = $data->getLogFileSyncLocalPath() && kFile::checkFileExists($data->getLogFileSyncLocalPath());
+		if($logFileExists)
+		{
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
+		
+		if($shouldSave)
+		{
 			$flavorAsset->save();
 		}
 
 		// Creates the file sync
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
-		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
+		if($logFileExists)
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())

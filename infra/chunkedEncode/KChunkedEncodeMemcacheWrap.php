@@ -780,10 +780,10 @@ ini_set("memory_limit","512M");
 					break;
 				}
 					// No need to check for empties for 1st chunk and audio chunks
-				if($job->id>0 && !strstr($outFilename,'.vid')===false){
-					if(KFFMpegMediaParser::detectEmptyFrames("ffmpeg", "ffprobe", $outFilename)===false)
-						break;
-				}
+				if($job->id==0 || strstr($outFilename,'.vid')===false)
+					break;
+				if(KFFMpegMediaParser::detectEmptyFrames("ffmpeg", "ffprobe", $outFilename)===false)
+					break;
 			}
 
 			if($rv==0) {
