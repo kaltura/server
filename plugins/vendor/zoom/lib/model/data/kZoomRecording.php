@@ -62,7 +62,7 @@ class kZoomRecording implements iZoomObject
 		}
 	}
 
-	protected function parseType($recordingType)
+	public function parseType($recordingType)
 	{
 		/*
 		 * If the recording is of a meeting, the type can be one of the following Meeting types:

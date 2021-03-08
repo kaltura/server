@@ -40,6 +40,7 @@ class kZoomEventHanlder
 	 */
 	public function processEvent($event)
 	{
+		$zoomDropFolderId = self::getZoomDropFolderId($event);
 		switch($event->eventType)
 		{
 			case kEventType::RECORDING_VIDEO_COMPLETED:
@@ -47,28 +48,54 @@ class kZoomEventHanlder
 				KalturaLog::notice('This is an old Zoom event type - Not processing');
 				break;
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
+				if ($zoomDropFolderId)
+				{
+					self::createZoomDropFolderFile($event, $zoomDropFolderId);
+				}
+				else
+				{
+					/* @var kZoomRecording $recording */
+					$recording = $event->object;
+					$zoomBaseUrl = $this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
+					if($recording->recordingType == kRecordingType::WEBINAR)
+					{
+						$zoomRecordingProcessor = new kZoomWebinarProcessor($zoomBaseUrl);
+					}
+					else
+					{
+						$zoomRecordingProcessor = new kZoomMeetingProcessor($zoomBaseUrl);
+					}
+					
+					$zoomRecordingProcessor->handleRecordingVideoComplete($event);
+				}
+				break;
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
-				self::handleRecording($event);
+				if ($zoomDropFolderId)
+				{
+					self::createZoomDropFolderFile($event, $zoomDropFolderId);
+				}
+				else
+				{
+					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL]);
+					$transcriptProcessor->handleRecordingTranscriptComplete($event);
+				}
 				break;
 		}
 	}
 	
-	protected static function handleRecording(kZoomEvent $event)
+	protected static function getZoomDropFolderId(kZoomEvent $event)
 	{
-		
 		$zoomVendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($event->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
-		$dropFolders = DropFolderPeer::retrieveDropFoldersPerPartner($zoomVendorIntegration->getPartnerId(), $dropFolderType);
-		$dropFolderId = null;
+		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($zoomVendorIntegration->getPartnerId(), $dropFolderType);
 		foreach ($dropFolders as $dropFolder)
 		{
 			if ($dropFolder->zoomVendorIntegrationId == $zoomVendorIntegration->getId())
 			{
-				$dropFolderId = $zoomVendorIntegration->getId();
-				break;
+				return $zoomVendorIntegration->getId();
 			}
 		}
-		self::createZoomDropFolderFile($event, $dropFolderId);
+		return null;
 	}
 	
 	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId)

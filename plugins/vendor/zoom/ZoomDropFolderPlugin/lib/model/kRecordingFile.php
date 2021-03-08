@@ -19,7 +19,7 @@ class kRecordingFile
 	protected $recordingStart;
 	
 	/**
-	 * @var string
+	 * @var kRecordingFileType
 	 */
 	protected $fileType;
 
@@ -66,7 +66,7 @@ class kRecordingFile
 	}
 	
 	/**
-	 * @return string
+	 * @return kRecordingFileType
 	 */
 	public function getFileType()
 	{
@@ -74,7 +74,7 @@ class kRecordingFile
 	}
 
 	/**
-	 * @param string $fileType
+	 * @param kRecordingFileType $fileType
 	 */
 	public function setFileType($fileType)
 	{

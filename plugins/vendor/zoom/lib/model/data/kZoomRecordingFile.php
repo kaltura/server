@@ -34,7 +34,7 @@ class kZoomRecordingFile implements iZoomObject
 		}
 	}
 
-	protected function parseFileType($fileType)
+	public function parseFileType($fileType)
 	{
 		switch($fileType)
 		{
