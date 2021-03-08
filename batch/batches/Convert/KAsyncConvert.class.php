@@ -434,9 +434,10 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		if($data->logFileSyncLocalPath && kFile::checkFileExists($data->logFileSyncLocalPath))
 		{
-			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
-			$this->setFilePermissions("$sharedFile.log");
-			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+			$sharedLogName = "$sharedFile.conv.log";
+			kFile::moveFile($data->logFileSyncLocalPath, $sharedLogName);
+			$this->setFilePermissions($sharedLogName);
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared($sharedLogName);
 		
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
@@ -655,8 +656,9 @@ class KAsyncConvert extends KJobHandlerWorker
 
 		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
 		{
-			$this->doApiMove($data->logFileSyncLocalPath, "$sharedFile.log");
-			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+			$sharedLogName = "$sharedFile.conv.log";
+			$this->doApiMove($data->logFileSyncLocalPath, $sharedLogName);
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared($sharedLogName);
 
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);

@@ -1,3 +1,46 @@
+# Propus-16.19.0  #
+
+## Version Highlight ##
+### Features ###
+    PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
+        This new type will be used by KMS for NewRow scheduled meeting,
+        but customers can use if for anytype.
+
+    PLAT-22622 - Add close caption support to playManifest, the caption language
+        is from the related stream info
+
+### Bug fix ###
+    SUP-25895 - Zoom, Adding file extention to imported source files. 
+    PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
+
+## Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED (EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22606
+- Description: add the content parameter entry_reference_id to HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED
+
+### Deployment scripts ###
+- Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22679
+- Description: add the content parameter file_name to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_04_update_media_xml_bulk_job_failed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
+
 # Propus-16.18.0  #
 ## Version Highlight ##
 ### Features ###
