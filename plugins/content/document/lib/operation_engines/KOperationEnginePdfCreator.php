@@ -234,7 +234,8 @@ class KOperationEnginePdfCreator extends KOperationEngineDocument
 
 	protected function shouldHandleReadOnly()
 	{
-		return $this->data->flavorParamsOutput->readonly;
+		$res = isset($this->data->flavorParamsOutput->readonly) ? $this->data->flavorParamsOutput->readonly : true ;
+		return $res;
 	}
 	
 }
