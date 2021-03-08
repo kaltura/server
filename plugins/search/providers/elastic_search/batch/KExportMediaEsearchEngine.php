@@ -57,7 +57,8 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	/**
 	 * Generate the first csv row containing the fields
 	 */
-	protected function addHeaderRowToCsv($csvFile, $additionalFields)
+	protected function addHeaderRowToCsv($csvFile, $additionalFields,
+	                                     $mappedFileds = null)
 	{
 		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt ';
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));

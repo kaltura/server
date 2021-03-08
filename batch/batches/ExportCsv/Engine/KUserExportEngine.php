@@ -5,6 +5,15 @@
  */
 class KUserExportEngine extends KObjectExportEngine
 {
+	protected function getMappedFieldsAsAssociativeArray($mappedFields)
+	{
+		$ret = array();
+		foreach($mappedFields as $mappedField)
+		{
+			$ret[$mappedField->key] = $mappedField->value;
+		}
+		return $ret;
+	}
 	
 	public function fillCsv(&$csvFile, &$data)
 	{
@@ -13,10 +22,10 @@ class KUserExportEngine extends KObjectExportEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
-		
+		$mappedFields = $this->getMappedFieldsAsAssociativeArray($data->mappedFields);
 		$additionalFields = $data->additionalFields;
-		
-		$this->addHeaderRowToCsv($csvFile, $additionalFields);
+		$this->addHeaderRowToCsv($csvFile,$additionalFields, $mappedFields);
+
 		$lastCreatedAtObjectIdList = array();
 		$lastCreatedAt=0;
 		$totalCount=0;
@@ -57,7 +66,11 @@ class KUserExportEngine extends KObjectExportEngine
 					$newCreatedAtListObject[]=$user->id;
 			}
 			$lastCreatedAtObjectIdList = $newCreatedAtListObject;
-			$this->addUsersToCsv($uniqUsers, $csvFile, $data->metadataProfileId, $additionalFields);
+			$this->addUsersToCsv($uniqUsers,
+			                     $csvFile,
+			                     $data->metadataProfileId,
+			                     $additionalFields,
+			                     $mappedFields);
 			$totalCount+=count($uniqUsers);
 			KalturaLog::debug("Adding More  - ".count($uniqUsers). " totalCount - ". $totalCount);
 			unset($newCreatedAtListObject);
@@ -72,11 +85,18 @@ class KUserExportEngine extends KObjectExportEngine
 	/**
 	 * Generate the first csv row containing the fields
 	 */
-	protected function addHeaderRowToCsv($csvFile, $additionalFields)
+	protected function addHeaderRowToCsv($csvFile, $additionalFields,
+	                                     $mappedFields = null)
 	{
 		$headerRow = 'User ID,First Name,Last Name,Email';
 		foreach ($additionalFields as $field)
 			$headerRow .= ','.$field->fieldName;
+		
+		foreach ($mappedFields as $key => $value)
+		{
+			$headerRow .= ',' . $key;
+		}
+		
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
 		return $csvFile;
@@ -85,7 +105,11 @@ class KUserExportEngine extends KObjectExportEngine
 	/**
 	 * The function grabs all the fields values for each user and adding them as a new row to the csv file
 	 */
-	protected function addUsersToCsv(&$users, &$csvFile, $metadataProfileId, $additionalFields)
+	protected function addUsersToCsv(&$users,
+	                                 &$csvFile,
+	                                 $metadataProfileId,
+	                                 $additionalFields,
+	                                 $mappedFields)
 	{
 		if(!$users)
 			return ;
@@ -96,7 +120,10 @@ class KUserExportEngine extends KObjectExportEngine
 		foreach ($users as $user)
 		{
 			$userIds[] = $user->id;
-			$userIdToRow = $this->initializeCsvRowValues($user, $additionalFields, $userIdToRow);
+			$userIdToRow = $this->initializeCsvRowValues($user,
+			                                             $additionalFields,
+			                                             $userIdToRow,
+			                                             $mappedFields);
 		}
 		
 		if($metadataProfileId)
@@ -107,6 +134,8 @@ class KUserExportEngine extends KObjectExportEngine
 				$userIdToRow = $this->fillAdditionalFieldsFromMetadata($usersMetadataObjects, $additionalFields, $userIdToRow);
 			}
 		}
+		
+		
 		foreach ($userIdToRow as $key=>$val)
 		{
 			KCsvWrapper::sanitizedFputCsv($csvFile, $val);
@@ -116,7 +145,8 @@ class KUserExportEngine extends KObjectExportEngine
 	/**
 	 * adds the default fields values and the additional fields as nulls
 	 */
-	protected function initializeCsvRowValues($user, $additionalFields, $userIdToRow)
+	protected function initializeCsvRowValues($user, $additionalFields,
+	                                          $userIdToRow,$mappedFields)
 	{
 		$defaultRowValues = array(
 			'id' => $user->id,
@@ -125,11 +155,39 @@ class KUserExportEngine extends KObjectExportEngine
 			'email' =>$user->email
 		);
 		
+		//add mapped fields
+		foreach($mappedFields as $key=>$value)
+		{
+			if(!isset($value))//if only key
+			{
+				$defaultRowValues[$key] = $user->$key;
+			}
+			else
+			{
+				$fieldMap = explode(':',$value);
+				if(count($fieldMap)==1)//if simple value
+				{
+					$defaultRowValues[$key] = $user->$value;
+				}
+				else //if value maps to a sub fields
+				{
+					$fieldName = $fieldMap[0];
+					$subFieldName = $fieldMap[1];
+					$fieldValues = json_decode($user->$fieldName);
+					if($fieldValues)
+					{
+						$defaultRowValues[$key] = $fieldValues -> $subFieldName;
+					}
+				}
+			}
+		}
+		
 		$additionalKeys = array();
 		foreach ($additionalFields as $field)
 			$additionalKeys[] = $field->fieldName;
 		$additionalRowValues = array_fill_keys($additionalKeys, null);
 		$row = array_merge($defaultRowValues, $additionalRowValues);
+		
 		$userIdToRow[$user->id] = $row;
 		
 		return $userIdToRow;
