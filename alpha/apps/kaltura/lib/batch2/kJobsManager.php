@@ -873,14 +873,14 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-		$flavorParamsOutput = null;
-		if($flavorAsset && $flavorAsset->getEncryptionKey()) {
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
+		if($flavorAsset && $flavorAsset->getEncryptionKey() && (!$flavorParamsOutput || ($flavorParamsOutput && $flavorParamsOutput->getFormat() != "mpegts")))
+		{
 			$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 		}
 		
 		if($createThumb)
 		{
-			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 			if(!$flavorParamsOutput)
 			{
 				if($flavorAsset)
