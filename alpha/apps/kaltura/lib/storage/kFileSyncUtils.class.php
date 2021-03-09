@@ -2239,14 +2239,20 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return array_merge($periodicStorageFileSyncs, $localfileSyncs);
 	}
 	
-	public static function getReadyRemoteFileSyncsForAsset($id, $asset, $objectType, $objectSubType)
+	public static function getReadyRemoteFileSyncsForAsset($id, $object, $objectType, $objectSubType)
 	{
+		if(!($object instanceof entry) && !($object instanceof asset))
+		{
+			KalturaLog::debug("Object provided is not supported " . get_class($object));
+			return array();
+		}
+		
 		$c = new Criteria();
 		$c->add(FileSyncPeer::OBJECT_TYPE, $objectType);
 		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $objectSubType);
 		$c->add(FileSyncPeer::OBJECT_ID, $id);
-		$c->add(FileSyncPeer::VERSION, $asset->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $asset->getPartnerId());
+		$c->add(FileSyncPeer::VERSION, $object->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $object->getPartnerId());
 		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
 		$c->add(FileSyncPeer::DC, kDataCenterMgr::getDcIds(), Criteria::NOT_IN);
