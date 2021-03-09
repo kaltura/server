@@ -874,7 +874,9 @@ class kJobsManager
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
-		if($flavorAsset && $flavorAsset->getEncryptionKey() && (!$flavorParamsOutput || ($flavorParamsOutput && $flavorParamsOutput->getFormat() != "mpegts")))
+		$unsupportedEncryptionFormats = kConf::get('unsupported_encryption_formats', 'runtime_config', array(assetParams::CONTAINER_FORMAT_MPEGTS));
+		if($flavorAsset && $flavorAsset->getEncryptionKey() &&
+			(!$flavorParamsOutput || ($flavorParamsOutput && !in_array($flavorParamsOutput->getFormat(), $unsupportedEncryptionFormats))))
 		{
 			$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 		}
