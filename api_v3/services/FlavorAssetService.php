@@ -683,16 +683,8 @@ class FlavorAssetService extends KalturaAssetService
 
 		if ($assetDb->getStatus() != asset::FLAVOR_ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
-
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::FLAVOR_ASSET);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$c->add(FileSyncPeer::OBJECT_ID, $id);
-		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
-		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$fileSyncs = FileSyncPeer::doSelect($c);
+		
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($id, $assetDb, FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
@@ -917,7 +909,7 @@ class FlavorAssetService extends KalturaAssetService
 		if (!$externalFileSyncs)
 			throw new KalturaAPIException(KalturaErrors::NO_EXTERNAL_CONTENT_EXISTS);
 
-		$fileSyncs = kFileSyncUtils::getReadyInternalFileSyncForKey($srcSyncKey);
+		$fileSyncs = kFileSyncUtils::getReadyInternalFileSyncsForKey($srcSyncKey);
 		foreach ($fileSyncs as $fileSync){
 			/* @var $fileSync FileSync*/
 			$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_DELETED);
