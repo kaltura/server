@@ -72,7 +72,7 @@ class ZoomVendorService extends KalturaBaseService
 			$authCode = $_GET['code'];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
-			$client = new kZoomClient($zoomBaseURL);
+			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
 			$permissions = $client->retrieveTokenZoomUserPermissions();
 			$user = $client->retrieveTokenZoomUser();
 			$accountId = $user[ZoomHelper::ACCOUNT_ID];

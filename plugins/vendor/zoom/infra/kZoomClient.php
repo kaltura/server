@@ -33,8 +33,8 @@ class kZoomClient
 	 * @param null $refreshToken
 	 * @throws KalturaAPIException
 	 */
-	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null, $clientSecret
-	= null)
+	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
+	                            $clientSecret= null, $accessToken = null)
 	{
 		$this -> zoomBaseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
@@ -46,7 +46,7 @@ class kZoomClient
 		$this -> jwtToken = $jwtToken;
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
-		$this->accessToken = null;
+		$this->accessToken = $accessToken;
 		$this->zoomTokensHelper = new kZoomTokens($zoomBaseURL, $clientId, $clientSecret);
 	}
 	
