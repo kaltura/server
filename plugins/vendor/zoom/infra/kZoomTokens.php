@@ -32,6 +32,11 @@ class kZoomTokens
 	protected function parseTokensResponse($response)
 	{
 		$dataAsArray = json_decode($response, true);
+		if(strpos($response, 'error'))
+		{
+			KalturaLog::ERR('Error calling Zoom: ' . $dataAsArray['reason']);
+			throw new KalturaAPIException ('Error calling Zoom: ' . $dataAsArray['reason']);
+		}
 		KalturaLog::debug(print_r($dataAsArray, true));
 		return $dataAsArray;
 	}

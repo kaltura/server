@@ -22,7 +22,7 @@ class kZoomClient
 	protected $jwtToken;
 	protected $clientId;
 	protected $clientSecret;
-	protected $zoomTokesHelper;
+	protected $zoomTokensHelper;
 	
 	/**
 	 * kZoomClient constructor.
@@ -33,7 +33,8 @@ class kZoomClient
 	 * @param null $refreshToken
 	 * @throws KalturaAPIException
 	 */
-	public function __construct($zoomBaseURL, $clientId, $clientSecret, $refreshToken = null, $jwtToken = null)
+	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null, $clientSecret
+	= null)
 	{
 		$this -> zoomBaseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
@@ -46,7 +47,7 @@ class kZoomClient
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
 		$this->accessToken = null;
-		$this->zoomTokesHelper = new kZoomTokens($zoomBaseURL, $clientId, $clientSecret);
+		$this->zoomTokensHelper = new kZoomTokens($zoomBaseURL, $clientId, $clientSecret);
 	}
 	
 	
@@ -120,10 +121,11 @@ class kZoomClient
 		$response = $curlWrapper -> exec($url);
 		if (!$response)
 		{
-			if (strpos($curlWrapper->getErrorMsg(), 'expired') !== false)
+			if (strpos($curlWrapper->getErrorMsg(), 'Invalid access token') !== false)
 			{
+				KalturaLog::ERR('Error calling Zoom: ' . $curlWrapper->getErrorMsg());
 				KalturaLog::info('Access Token Expired. Refreshing the Access Token');
-				$this->accessToken = $this->zoomTokesHelper->generateAccessToken($this->refreshToken);
+				$this->accessToken = $this->zoomTokensHelper->generateAccessToken($this->refreshToken);
 				$url = $this->generateContextualUrl($apiPath);
 				$response = $curlWrapper -> exec($url);
 				if (!$response)
@@ -135,7 +137,14 @@ class kZoomClient
 		}
 		$httpCode = $curlWrapper -> getHttpCode();
 		$this -> handleCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
-		$data = json_decode($response, true);
+		if (!$response)
+		{
+			$data = $curlWrapper->getErrorMsg();
+		}
+		else
+		{
+			$data = json_decode($response, true);
+		}
 		return $data;
 	}
 	
@@ -146,7 +155,7 @@ class kZoomClient
 		{
 			if (!$this->accessToken)
 			{
-				$this->accessToken = $this->zoomTokesHelper->generateAccessToken($this->refreshToken);
+				$this->accessToken = $this->zoomTokensHelper->generateAccessToken($this->refreshToken);
 			}
 			$url .= 'access_token=' . $this->accessToken;
 		}
