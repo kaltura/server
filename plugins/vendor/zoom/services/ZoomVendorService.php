@@ -47,38 +47,6 @@ class ZoomVendorService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 	}
 	
-/********** For Testing Zoom Integration *******/
-	private function dummyAddZoomIntegration()
-	{
-
-		$zoomIntegration = new ZoomVendorIntegration();
-		$zoomIntegration->setAccountId('LtY7sEaRQaCGNzOqy5GEA');
-//		$zoomIntegration->setAccountSecret('temp');
-		$zoomIntegration->setExpiresIn('9999999999');
-		$zoomIntegration->setAccessToken('Access_Token');
-		$zoomIntegration->setRefreshToken('eyJhbGciOiJIUzUxMiIsInYiOiIyLjAiLCJraWQiOiJmODBmNDQxNi0zN2Q5LTRlNjQtYTc0My1jNDhiMjgzZjJmY2EifQ.eyJ2ZXIiOjcsImF1aWQiOiIzZjFkOTJjZDcxNDA2NGZlOGMxMDBkYThlNzdjZGQ3MiIsImNvZGUiOiJqRm5EOVF1T2FFX2JsTGJYU2pTU3pLd1JrNmRRTks2bWciLCJpc3MiOiJ6bTpjaWQ6THRZN3NFYVJRYUNHTnpPcXk1R0VBIiwiZ25vIjowLCJ0eXBlIjoxLCJ0aWQiOjExMiwiYXVkIjoiaHR0cHM6Ly9vYXV0aC56b29tLnVzIiwidWlkIjoiYmxMYlhTalNTekt3Ums2ZFFOSzZtZyIsIm5iZiI6MTYxNDgwOTk4OSwiZXhwIjoyMDg3ODQ5OTg5LCJpYXQiOjE2MTQ4MDk5ODksImFpZCI6Im9xZ2F0V0JkUUhhUlZVb2FtVHlOWXciLCJqdGkiOiJmYWNjNjhiYS00ZjYzLTRkMTYtYmQ2ZS1lYTMwMDI1Nzc3ZWUifQ.DeVhJi5S-81B5nnoDdWi5JNgH7dKd1zcEADjUsXaYSCBJFfZygDUsP0s7zn0nYVagWXmV6L6_tWb3PJPdgxkHg');
-		$zoomIntegration->setJwtToken('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOm51bGwsImlzcyI6IkU1NXk2eU5oVHlPRFg4OFk4Y2V3N0EiLCJleHAiOjE2MTUyNzY0MjksImlhdCI6MTYxNDY3MTYyOX0.L7vLT02hkjvNOHGA3Bcad78jcMxxawanYYv2CQP12fA');
-		$zoomIntegration->setPartnerId('102');
-		$zoomIntegration->setStatus('2');
-		$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
-		$zoomIntegration->save();
-		ZoomHelper::setZoomIntegration($zoomIntegration);
-
-	}
-	/*TODO:
-	public function jwtValidationAction($apiKey, $secret)
-	this function will generate the jwt token and create a zoomIntegrationObject
-	need to set: the correct accountId, partnerId, wanted status, expiration
-	should also get access and refresh token at this point or not?
-	
-	to generate the jwt_token we can use jwtHelper.php but it does not comply with zoom needs. need to check with
-	Moshe.
-	
-	Another question is how we get the api_key and secret. Will they be in an external file for each partner?
-	
-	*/
-	
-	
 	/**
 	 *
 	 * @action oauthValidation
@@ -87,10 +55,6 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function oauthValidationAction()
 	{
-		echo 'ppp';
-		return $this->dummyAddZoomIntegration();
-		
-		
 		KalturaResponseCacher::disableCache();
 		$zoomConfiguration = self::getZoomConfiguration();
 		$clientId = $zoomConfiguration['clientId'];
