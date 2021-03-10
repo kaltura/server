@@ -13,6 +13,20 @@
     SUP-25895 - Zoom, Adding file extention to imported source files. 
     PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
 
+## Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED (EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22606
+- Description: add the content parameter entry_reference_id to HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED
+
+### Deployment scripts ###
+- Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
+
 ## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
 - Issue Type: Task
 - Issue ID: PLAT-22679
