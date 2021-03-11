@@ -353,12 +353,22 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		if($this->getDynamicAttributes()->getServeVodFromLive())
 		{
-			$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-			$liveType = "/recording/";
-			$entry = entryPeer::retrieveByPK($entryId);
-			if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-				$liveType = "/clip/";
-			$livePackagerUrl = str_replace("/live/", $liveType, $livePackagerUrl);
+			if(strpos($livePackagerUrl, "front-live-service") !== false)
+			{
+				$recordingEntryId =  $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
+				$sourceEntryId =  $this->getDynamicAttributes()->getEntryId();
+				$entryId = "$sourceEntryId/tl/$recordingEntryId";
+			}
+			else
+			{
+				$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
+				$entry = entryPeer::retrieveByPK($entryId);
+
+				$liveType = "/recording/";
+				if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
+					$liveType = "/clip/";
+				$livePackagerUrl = str_replace("/live/", $liveType, $livePackagerUrl);
+			}
 		}
 		else
 		{
