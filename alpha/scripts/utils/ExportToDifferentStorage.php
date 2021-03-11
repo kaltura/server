@@ -29,6 +29,13 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 	$targetDcFileSync = null;
 	foreach ($fileSyncs as $fileSync)
 	{
+		if (is_null($fileSync->getFileType()))
+		{
+			KalturaLog::log("XXX $assetId: NULL_FILE_TYPE - setting to FILE");
+			$fileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+			$fileSync->save();
+		}
+
 		if (!in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL)))
 		{
 			KalturaLog::log("XXX $assetId: BAD_FILE_TYPE" . $fileSync->getFileType() . " - unexpected file type");
