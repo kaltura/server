@@ -304,7 +304,6 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 	$linkFileSync->setStatus($sourceFileSync->getStatus());
 	$linkFileSync->setOriginal($sourceFileSync->getOriginal());
 	$linkFileSync->setLinkedId($sourceFileSync->getId());
-	$linkFileSync->setPartnerID($sourceFileSync->getPartnerID());
 	$linkFileSync->setFileSize(-1);
 
 	if($sourceFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
