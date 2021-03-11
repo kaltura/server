@@ -13,6 +13,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
     const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
     const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
+    const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
+    const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
     const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
@@ -275,41 +277,46 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
     protected function sendOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
-        $apiKey = $this->getOpenCalaisApiKey($partnerId);
-
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL, self::OPEN_CALAIS_URL);
         curl_setopt($ch,CURLOPT_POST, true);
         curl_setopt($ch,CURLOPT_POSTFIELDS, $transcript);
-        curl_setopt($ch,CURLOPT_HTTPHEADER,array (
+        curl_setopt($ch,CURLOPT_HTTPHEADER,$this->getHeaders($partnerId));
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+
+        return curl_exec($ch);
+    }
+    /**
+     * @param string $partnerId
+     * @return string[]
+     * @throws Exception
+     */
+    private function getHeaders($partnerId) {
+        $apiKey = $this->getOpenCalaisApiKey($partnerId);
+        $EnableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
+        $OmitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
+        $headers = array (
             "Content-Type: text/xml",
             "charset:utf8",
             "x-ag-access-token: $apiKey",
             "outputFormat: application/json",
             "x-calais-language: English"
-        ));
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-
-        return curl_exec($ch);
+        );
+        if($EnableTickerExtraction != ''){
+            $headers[] = "x-calais-EnableTickerExtraction: ". ($EnableTickerExtraction == 'Yes' ? 'True' : 'False');
+        }
+        if($OmitOutputtingOriginalText != ''){
+            $headers[] = "omitOutputtingOriginalText: ". ($OmitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
+        }
+        return $headers;
     }
-
     /**
+     * @param $partnerId
      * @return string
+     * @throws Exception
      */
     protected function getOpenCalaisApiKey($partnerId) {
-        $openCalaisApiKeyProfileId = $this->getMetaDataProfileId(self::OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME);
-        $openCalaisApiMetadatas = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($openCalaisApiKeyProfileId, KalturaMetadataObjectType::PARTNER, $partnerId);
-        if(!$openCalaisApiMetadatas->totalCount){
-            throw new Exception("Required partner-level custom metadata could not be located.");
-        }
-
-        /* @var KalturaMetadata $metadataObject */
-        $metadataObject = $openCalaisApiMetadatas->objects[0];
-        if(empty($metadataObject->xml)){
-            throw new Exception("Required partner-level custom metadata could not be located.");
-        }
-
-        $xmlData = simplexml_load_string($metadataObject->xml, "SimpleXMLElement");
+        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
         if(property_exists($xmlData, self::OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME)) {
             return (string)$xmlData->OpenCalaisAPIKey;
         }
@@ -318,7 +325,53 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             throw new Exception("Required partner-level custom metadata could not be located.");
         }
     }
+    /**
+     * @param $partnerId
+     * @return string
+     * @throws Exception
+     */
+    protected function getEnableTickerExtraction($partnerId) {
+        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
+        if(property_exists($xmlData, self::ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME)) {
+            return (string)$xmlData->EnableTickerExtraction;
+        }
+        return '';
+    }
+    /**
+     * @param $partnerId
+     * @return string
+     * @throws Exception
+     */
+    protected function getOmitOutputtingOriginalText($partnerId) {
+        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
+        if(property_exists($xmlData, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME)) {
+            return (string)$xmlData->OmitOutputtingOriginalText;
+        }
+        return '';
+    }
+    /**
+     * @return SimpleXMLElement|null
+     * @throws Exception
+     */
+    private function getSimpleXMLElementFromPartnerMetadata($partnerId) {
+        static $xmlData = null;
+        if($xmlData === null){
+            $openCalaisApiKeyProfileId = $this->getMetaDataProfileId(self::OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME);
+            $openCalaisApiMetadatas = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($openCalaisApiKeyProfileId, KalturaMetadataObjectType::PARTNER, $partnerId);
+            if(!$openCalaisApiMetadatas->totalCount){
+                throw new Exception("Required partner-level custom metadata could not be located.");
+            }
 
+            /* @var KalturaMetadata $metadataObject */
+            $metadataObject = $openCalaisApiMetadatas->objects[0];
+            if(empty($metadataObject->xml)){
+                throw new Exception("Required partner-level custom metadata could not be located.");
+            }
+
+            $xmlData = simplexml_load_string($metadataObject->xml, "SimpleXMLElement");
+        }
+        return $xmlData;
+    }
     /**
      * @param KalturaEntryVendorTask $vendorTask
      * @return string
