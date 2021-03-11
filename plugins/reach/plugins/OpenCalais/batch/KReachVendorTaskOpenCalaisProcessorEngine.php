@@ -15,6 +15,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
+    const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
+    const OPEN_CALAIS_MAPPING_POSTFIX = '_OpenCalais';
 
     const SHOWTAXONOMY_SYSTEM_NAME = 'ShowTaxonomy';
     // Mapping metadata constants
@@ -263,7 +265,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         return $transcriptId;
     }
 
-    protected function retrieveAtachmentAssetContent ($assetId)
+    protected function retrieveAttachmentAssetContent ($assetId)
     {
         KBatchBase::$kClient->setReturnServedResult(true);
         $content = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient)->attachmentAsset->serve($assetId);
@@ -342,7 +344,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             return '';
         }
 
-        return $this->retrieveAtachmentAssetContent($transcriptAssetId);
+        return $this->retrieveAttachmentAssetContent($transcriptAssetId);
     }
 
     /**
@@ -360,7 +362,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             $transcriptAssetId = $this->retrieveEntryTranscriptAssetId($vendorTask->entryId, KalturaAttachmentType::JSON);
         }
 
-        return $this->retrieveAtachmentAssetContent($transcriptAssetId);
+        return $this->retrieveAttachmentAssetContent($transcriptAssetId);
     }
 
     /**
@@ -563,6 +565,14 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
             if ($dynamicObjectDetails['addIfNotExist'])
             {
+                //retrieve metadata profile
+                $metadataProfile = $this->metadataPlugin->metadataProfile->get($metadataProfileId);
+
+                $dynamicObjectMetadataMappingProfileId = $this->getMetadataProfileId(self::OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME);
+                $ocmDynamicObjectMetadataMappingId = $metadataProfile->systemName . self::OPEN_CALAIS_MAPPING_POSTFIX;
+                $mappingDynamicObject = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($dynamicObjectMetadataMappingProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, $ocmDynamicObjectMetadataMappingId);
+
+                return $this->createMissingDynamicObject($mappingDynamicObject->objects[0]->xml, $dynamicObjectDetails['fullItem'], $objectId, $metadataProfileId);
 
             }
 
@@ -570,6 +580,69 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         }
 
         return true;
+    }
+
+    protected function createMissingDynamicObject($xml, $fullData, $objectId, $targetMetadataProfileId)
+    {
+        $xmlElement = new SimpleXMLElement($xml);
+        $allFields = $xmlElement->xpath('./Field');
+
+        $newObject = new SimpleXMLElement('<metadata/>');
+        foreach ($allFields as $field)
+        {
+            $sourceField = strval($field->xpath('.//Source')[0]);
+            $targetField = strval($field->xpath('.//Target')[0]);
+            $targetValue = strval($field->xpath('.//Value')[0]);
+
+            $value = null;
+            if($sourceField)
+            {
+                $value = $this->getOcmValueRecursive($fullData, explode('/', $sourceField));
+            }
+            elseif ($targetValue)
+            {
+                $value = $targetValue;
+            }
+
+            if ($value)
+            {
+                $newObject->addChild($targetField, $value);
+            }
+        }
+
+        KalturaLog::info('Creating dynamic metadata object: ' . $newObject->saveXML());
+
+        try {
+            $this->metadataPlugin->metadata->add($targetMetadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, $objectId, $newObject->saveXML());
+            return $objectId;
+        }
+        catch (Exception $e)
+        {
+            KalturaLog::err("Unable to add new dynamic object with ID $objectId");
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $keyArray
+     */
+    private function getOcmValueRecursive ($value, $keyArray)
+    {
+        if (is_scalar($value))
+        {
+            return $value;
+        }
+
+        $key = array_shift($keyArray);
+        if (!isset($value[$key]))
+        {
+            return null;
+        }
+
+        return $this->getOcmValueRecursive($value[$key], $keyArray);
     }
 
     /**

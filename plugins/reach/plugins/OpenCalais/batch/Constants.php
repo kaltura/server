@@ -19,5 +19,5 @@ abstract class Constants
     const OPCAL_TYPE_GROUP_PROP = '_typeGroup';
     const OPCAL_INSTANCES_PROP = 'instances';
     const OPCAL_PERM_ID = 'permid';
-    const OP_OCM_ADD_DYNAMIC_OBJECT = 'addIfNotExists';
+    const OP_OCM_ADD_DYNAMIC_OBJECT = 'AddIfNotExists';
 }

@@ -36,7 +36,8 @@ class RuleEngine extends Constants
      * @param string $response
      * @return array
      */
-    public function getValuesFromApiResponse($response){
+    public function getValuesFromApiResponse($response)
+    {
         $responseArray = json_decode($response, true);
         $result = array();
         foreach ($responseArray as $key => $apiItemDetails){
@@ -58,11 +59,11 @@ class RuleEngine extends Constants
      */
     private function getValuesByRuleAndApiResponse(array $rule, array $apiItemDetails){
         $cuePoints = $this->getValuesForCuePoints($apiItemDetails);
-        $items[] = $apiItemDetails;
+        $resolutions[] = $apiItemDetails;
         if(isset($apiItemDetails['resolutions']) && !empty($apiItemDetails['resolutions'])){
-            $items = $apiItemDetails['resolutions'];
+            $resolutions = $apiItemDetails['resolutions'];
         }
-        $result = $this->getFieldsArrayUsingRule($items, $rule, $this->getTypeFromItemInApi($apiItemDetails));
+        $result = $this->getFieldsArrayUsingRule($resolutions, $rule, $this->getTypeFromItemInApi($apiItemDetails), $apiItemDetails);
 
         if(!empty($cuePoints)){
             $result[0]['cuePoints_list'] = $cuePoints;
@@ -75,17 +76,18 @@ class RuleEngine extends Constants
      * @param string $systemName
      * @return array
      */
-    private function getFieldsArrayUsingRule(array $items, array $rule, $systemName){
+    private function getFieldsArrayUsingRule(array $items, array $rule, $systemName, $fullItem){
         $result = array();
         foreach ($items as $item){
             $result[] =  array(
                 'entryMetadataShowTaxonomy' => array(
-                    $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $item[self::OPCAL_PERM_ID],
+                    $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP] => $item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]],
                 ),
                 'dynamicMetadata' => array(
                     'fieldName' => $rule[self::RULE_KALTURA_GROUPROP][self::RULE_SHO_TAX_ELE_PROP],
                     'objectId' => isset($item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]]) ? $item[$rule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_ID_PROP]] : '',
                     'addIfNotExist' => isset($rule[self::RULE_KALTURA_GROUPROP][self::OP_OCM_ADD_DYNAMIC_OBJECT]),
+                    'fullItem' => $fullItem,
                 )
             );
         }
