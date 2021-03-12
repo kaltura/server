@@ -40,6 +40,13 @@ class kVidSecAction extends kVidAction
 		$destPath = $this->getTempThumbnailPath();
 		$entry = $this->source->getEntry();
 		$this->captureThumb($entry, $destPath, $this->second);
-		return new kFileSource(KThumbnailCapture::getCapturePath($destPath));
+		$source = new kFileSource(KThumbnailCapture::getCapturePath($destPath));
+		if($this->rotation)
+		{
+			$source->getImage()->rotateImage(kRotateAction::DEFAULT_BG, $this->rotation);
+		}
+
+		return $source;
+
 	}
 }

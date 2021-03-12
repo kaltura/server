@@ -6,7 +6,8 @@
 class KFFMpegMediaParser extends KBaseMediaParser
 {
 	protected $cmdPath;
-	protected $ffmprobeBin;
+	protected $ffprobeBin;
+	protected $ffprobeBinCmd;
 	
 	public $checkScanTypeFlag=true;
 	
@@ -35,6 +36,12 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		else{
 			$this->ffprobeBin = "ffprobe";
 		}
+		
+		$this->ffprobeBinCmd = $this->ffprobeBin;
+		$resolvedFilePath  = kFile::realPath($filePath);
+		kBatchUtils::addReconnectParams("http", $resolvedFilePath, $this->ffprobeBin);
+		kBatchUtils::addReconnectParams("http", $resolvedFilePath, $this->cmdPath);
+		
 		if(strstr($filePath, "http")===false) {
 			if (!kFile::checkFileExists($filePath))
 				throw new kApplicativeException(KBaseMediaParser::ERROR_NFS_FILE_DOESNT_EXIST, "File not found at [$filePath]");
@@ -65,8 +72,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$filePath = kFile::realPath($filePath);
 		
 		$cmd = $this->getCommand($filePath);
-		KalturaLog::debug("Executing '$cmd'");
-		$output = shell_exec($cmd);
+		$output = kExecWrapper::shell_exec($cmd);
 		if (trim($output) === "")
 			throw new kApplicativeException(KBaseMediaParser::ERROR_EXTRACT_MEDIA_FAILED, "Failed to parse media using " . get_class($this));
 			
@@ -108,12 +114,12 @@ class KFFMpegMediaParser extends KBaseMediaParser
 
 //		list($silenceDetect, $blackDetect) = self::checkForSilentAudioAndBlackVideo($this->cmdPath, $this->filePath, $mediaInfo);
 		if(isset($this->checkScanTypeFlag) && $this->checkScanTypeFlag==true)
-			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->ffprobeBin, $this->filePath);
+			$mediaInfo->scanType = self::checkForScanType($this->cmdPath, $this->ffprobeBinCmd, $this->filePath);
 		else
 			$mediaInfo->scanType = 0; // Progressive
 		// mov,mp4,m4a,3gp,3g2,mj2 to check is format inside
 		if(in_array($mediaInfo->containerFormat, array("mov","mp4","m4a","3gp","3g2","mj2")) && isset($this->ffprobeBin)){
-			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBin, $this->filePath);
+			$mediaInfo->isFastStart = self::checkForFastStart($this->ffprobeBinCmd, $this->filePath);
 		}
 		
 		/*
@@ -122,11 +128,27 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 */
 		if(in_array($mediaInfo->videoCodecId,array("wvc1","wmv3"))){
 			$cmd = "$this->cmdPath -i \"$this->filePath\" 2>&1 ";
-			$output = shell_exec($cmd);
+			$output = kExecWrapper::shell_exec($cmd);
 			if(strstr($output,"Progressive Segmented")){
 				if(isset($mediaInfo->contentStreams) && count($mediaInfo->contentStreams['video'])>0){
 					$mediaInfo->contentStreams['video'][0]->progressiveSegmented=true;
 				}
+			}
+		}
+		/*
+		 * On missing stream durations (mostly for Webm/VP8), retrieve dur from last frame
+		 */
+		{
+$startFrom = ($mediaInfo->containerDuration-500)/1000;
+			if($startFrom<0) $startFrom = 0;
+			
+			if($this->isAudioSet($mediaInfo) and $mediaInfo->audioDuration==0){
+				$audDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom, "audio");
+				$mediaInfo->audioDuration = round($audDur*1000);
+			}
+			if($this->isVideoSet($mediaInfo) and $mediaInfo->videoDuration==0){
+				$vidDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom, "video");
+				$mediaInfo->videoDuration = round($vidDur*1000);
 			}
 		}
 		KalturaLog::log(print_r($mediaInfo,1));
@@ -518,12 +540,11 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine.= " -i \"$srcFileName\" $detectFiltersStr -nostats -f null dummyfilename 2>&1";
-		KalturaLog::log("Black/Silence detection cmdLine - $cmdLine");
 	
 		/*
 		 * Execute the black/silence detection
 		*/
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Black/Silence detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -592,8 +613,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		KalturaLog::log("srcFileName($srcFileName)");
 	
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("SceneCuts detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -631,8 +651,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -733,9 +752,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	{
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffmpegBin -t $seconds -i \"$srcFileName\" -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
-		KalturaLog::log("ScanType detection cmdLine - $cmdLine");
 
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
@@ -795,8 +813,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			return 1;
 		
 		$cmdLine = "dd if=$srcFileName count=1 | $ffprobeBin -i pipe:  2>&1";
-		KalturaLog::log("FastStart detection cmdLine - $cmdLine");
-		$lastLine=exec($cmdLine, $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine, $outputArr, $rv);
 		{
 			KalturaLog::log("FastStart detection results printout - lastLine($lastLine),output-\n".print_r($outputArr,1));
 		}
@@ -838,8 +855,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin \"$srcFileName\" -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -849,6 +865,87 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			return $jsonObj->frames;
 		else
 			return null;
+	}
+	
+	/**
+	 * detectEmptyFrames
+	 *	scan for very low frames pkt sizes (thresh) to detect empty frames 
+	 * 	threshold - empty frame size threshold (bellow considerd as empty)
+	 *		if not passed - calculated automatically from scanned file portion 
+	 */
+	public static function detectEmptyFrames($ffmpegBin, $ffprobeBin, $srcFileName, $threshold=0, $startFrom=0, $duration=4)
+	{
+		if($duration==0)
+			$duration=4;
+		KalturaLog::log("Src:$srcFileName, thresh:$threshold, start:$startFrom, dur:$duration");
+		
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -ss $startFrom -t ".($duration+1)." -i '$srcFileName' -copyts -c:v copy -f matroska -y -v quiet -vsync 0 - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=pkt_pts_time,pkt_duration_time,pkt_pos,pkt_size,pict_type,coded_picture_number,interlaced_frame -v quiet 2>&1";
+		KalturaLog::log("cmdLine: $cmdLine");
+
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::log("FAILED: to acquire list of frames - rv($rv),lastLine($lastLine)");
+			return false;
+		}
+
+		$dataArr = array();
+		$frmSizeAcc=0;
+		$frmSizeAccArr=array("I"=>0,"P"=>0,"B"=>0);
+		$cntArr=array("I"=>0,"P"=>0,"B"=>0);
+		foreach($outputArr as $line){
+			$valsArr = explode(',', $line);
+			if(count($valsArr)<8)
+				continue;
+			$stam=$pts=$pktDur=$pktPos=$pktSize=$pictType=$pictNum=$inter=0;
+			$data = list($stam,$pts,$pktDur,$pktPos,$pktSize,$pictType,$pictNum,$inter) = $valsArr;
+			$dataArr[] = $data;
+//KalturaLog::log(json_encode($data));
+			{
+				$cntArr[$pictType]+= 1;
+				$frmSizeAccArr[$pictType]+= $pktSize;
+				$frmSizeAcc+= $pktSize;
+			}
+		}
+		
+		if($frmSizeAcc==0 || count($outputArr)==0){
+			KalturaLog::log("FAILED: bad frames stat data");
+			return false;
+		}
+			// Evaluate threshold value, if unset
+		if($threshold==0){
+			$threshold = ($frmSizeAcc/count($outputArr)*0.02);
+			KalturaLog::log("auto calculated threshold:$threshold");
+		}
+			// Scan for empty frames
+		$emptyArr = array();
+		$fst=PHP_INT_MAX;$lst=0;
+		foreach($dataArr as $data){
+			if($data[4]<$threshold) {
+				$emptyArr[] = array("nm"=>$data[6],"sz"=>$data[4],"tp"=>$data[5]);
+				$fst = min($fst,$data[6]); $lst = max($lst,$data[6]);
+			}
+		}
+
+		$statStr = "TOT=av:".round($frmSizeAcc/count($outputArr)).",nm:".count($outputArr).",";
+		foreach($frmSizeAccArr as $tp=>$acc){
+			if($cntArr[$tp]==0)
+				$statStr.= "$tp=av:0,nm:0";
+			else
+				$statStr.= "$tp=av:".round($acc/$cntArr[$tp]).",nm:".$cntArr[$tp].",";
+		}
+
+		$emptyCnt=count($emptyArr);
+		$empIntervalSz = ($fst>$lst)?0:($lst-$fst+1);
+		if($emptyCnt>3 && $empIntervalSz>0 && $emptyCnt/$empIntervalSz>0.8) {
+			KalturaLog::log("Empty frames:".serialize($emptyArr));
+			KalturaLog::log("RESULT:detected empty frames - num:$emptyCnt, fst:$fst,lst:$lst, emptiness ratio:".($emptyCnt/$empIntervalSz)." ($statStr)");
+			return count($emptyArr);
+		}
+		else {
+			KalturaLog::log("RESULT:no empty frames! ($statStr)");
+			return false;
+		}
 	}
 	
 	/**
@@ -864,8 +961,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		
 		$srcFileName = kFile::realPath($srcFileName);
 		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
-		KalturaLog::log("$cmdLine");
-		$lastLine=exec($cmdLine , $outputArr, $rv);
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine)");
 			return null;
@@ -902,6 +998,55 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			return self::convertDuration2msec($stream->tags->duration);
 		else
 			return null;
+	}
+	
+	/**
+	 * 
+	 * @param $ffmpegBin
+	 * @param $ffprobeBin
+	 * @param $srcFileName
+	 * $param $startFrom
+	 * $param $stream
+	 * @return number
+	 */
+	private static function retrieveDurationFromLastFrame($ffmpegBin, $ffprobeBin, $srcFileName, $startFrom, $stream=null)
+	{
+		KalturaLog::log("src:$srcFileName,start:$startFrom,stream:$stream");
+		if($stream=="video"){
+			$selectStreams = "-select_streams v"; $copyStreams=":v";
+		}
+		else if($stream=="audio"){
+			$selectStreams = "-select_streams a"; $copyStreams=":a";
+		}
+		else {$selectStreams=null; $copyStreams=null;}
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -ss $startFrom -i \"$srcFileName\" -copyts -c$copyStreams copy -f matroska -y -v quiet - | $ffprobeBin - $selectStreams -show_frames $selectStreams -of csv -show_entries frame=media_type,pkt_pts_time,pkt_duration_time   2>&1";
+		KalturaLog::log($cmdLine);
+
+		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
+		if($rv!=0) {
+			KalturaLog::err("Duration retrieval detection failed on ffmpeg/ffprobe call - rv($rv),lastLine($lastLine)");
+			return 0;
+		}
+		
+		for (end($outputArr); key($outputArr)!==null; prev($outputArr)){
+			$line = current($outputArr);
+//KalturaLog::log($line);
+			$stam=$pts=$strm=$dur=0;
+			$valsArr=explode(',', $line);
+			if(count($valsArr)<4)
+				continue;
+			list($stam,$strm,$pts,$dur) = $valsArr;
+			if($stam!="frame")
+				continue;
+			if(isset($pts) && isset($dur)) {
+				$duration = $pts+$dur;
+				KalturaLog::log("$stam,pts:$pts,stream:$strm,dur:$dur");
+				return $duration;
+			}
+		}
+		KalturaLog::log("Missing last frame duration for stream($stream)");
+		return 0;
 	}
 	
 	/**

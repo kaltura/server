@@ -1554,6 +1554,11 @@ class reportsInputFilter
 	public $node_ids;
 	public $categories_ancestor_ids;
 	public $hotspot_ids;
+	public $crm_ids;
+	public $playlist_ids;
+	public $domains;
+	public $canonical_urls;
+
 
 	public function getFilterBy() {
 		return "";

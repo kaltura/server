@@ -25,7 +25,11 @@ class kExportCsvJobData extends kJobData
 	 * @var string
 	 */
 	private $userMail;
-	
+
+	/**
+	 * @var string
+	 */
+	public $sharedOutputPath;
 	
 	/**
 	 * @return string
@@ -58,7 +62,7 @@ class kExportCsvJobData extends kJobData
 	{
 		$this->userMail = $userMail;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -66,13 +70,29 @@ class kExportCsvJobData extends kJobData
 	{
 		return $this->userName;
 	}
-	
+
 	/**
 	 * @param string $userName
 	 */
 	public function setUserName($userName)
 	{
 		$this->userName = $userName;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSharedOutputPath()
+	{
+		return $this->sharedOutputPath;
+	}
+
+	/**
+	 * @param string $sharedOutputPath
+	 */
+	public function setSharedOutputPath($sharedOutputPath)
+	{
+		$this->sharedOutputPath = $sharedOutputPath;
 	}
 	
 }

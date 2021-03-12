@@ -417,10 +417,10 @@ class serveFlavorAction extends kalturaAction
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
 				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', 0) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
-				list($durations, $flavors, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
-				if ($flavors)
+				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				if ($assets)
 				{
-					$sequences = self::buildSequencesArray($flavors);
+					$sequences = self::buildSequencesArray($assets);
 					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
@@ -457,6 +457,15 @@ class serveFlavorAction extends kalturaAction
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
+
+		$dirFileName = $this->getRequestParameter( "dirFileName" );
+		$file_name = $this->getRequestParameter( "file_name" ); // backward compatibility for download action
+		if($file_name)
+		{
+			$dirFileName = $file_name;
+		}
+		$dirFileName =  basename($dirFileName);
+
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
@@ -500,7 +509,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), true, $dirFileName);
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -804,23 +813,28 @@ class serveFlavorAction extends kalturaAction
 
 	/**
 	 * @param string $path
-	 * @param flavorAsset $flavor
+	 * @param asset $asset
 	 * @param $sourceType
 	 * @return array
 	 */
-	public static function getClipData($path, $flavor, $sourceType)
+	public static function getClipData($path, $asset, $sourceType)
 	{
-		$flavorId = $flavor->getId();
-		$hasAudio = $flavor->getContainsAudio();
-		if (is_null($hasAudio))
+		$assetId = $asset->getId();
+		$addSilence = false;
+		if ($asset instanceof flavorAsset)
 		{
-			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorId);
-			$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+			$hasAudio = $asset->getContainsAudio();
+			if (is_null($hasAudio))
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($assetId);
+				$hasAudio = !$mediaInfo || $mediaInfo->isContainAudio();
+			}
+			$addSilence = !$hasAudio;
 		}
 		$clipDesc = self::getAssetFieldsArray(self::TYPE_SOURCE, $path, $sourceType);
-		if (!$hasAudio)
+		if ($addSilence)
 		{
-			KalturaLog::debug("$flavorId Audio Bit rate is null or 0 (taken from mediaInfo)");
+			KalturaLog::debug("$assetId Audio Bit rate is null or 0 (taken from mediaInfo)");
 			$silent = array_merge(array(array('type' => 'silence')),array($clipDesc));
 			$clipDesc = array('type' => 'mixFilter','sources' => $silent);
 		}
@@ -915,22 +929,36 @@ class serveFlavorAction extends kalturaAction
 	}
 
 	/**
-	 * @param array $flavors
+	 * @param array $assets
 	 * @return array
 	 */
-	public static function buildSequencesArray($flavors)
+	public static function buildSequencesArray($assets)
 	{
 		$sequences = array();
 
-		foreach ($flavors as $flavor)
+		foreach ($assets as $asset)
 		{
-			$syncKey = $flavor->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavor, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $asset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
 			if(!$path)
 			{
-				KalturaLog::debug('missing path for flavor ' . $flavor->getId() . ' version ' . $flavor->getVersion());
+				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 			}
-			$sequences[] = array('clips' => array(self::getClipData($path, $flavor, $sourceType)));
+			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
+			$sequence['id'] = $asset->getId();
+			if ($asset->getLanguage())
+			{
+				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
+				if ($languageCode && $languageCode !== 'und')
+				{
+					$sequence['language'] = $languageCode;
+				}
+				else
+				{
+					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
+				}
+			}
+			$sequences[] = $sequence;
 		}
 		return $sequences;
 	}

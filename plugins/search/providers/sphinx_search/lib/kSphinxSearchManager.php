@@ -511,9 +511,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	public function deleteFromSphinx(IIndexable $object)
 	{
 		$objectIndexClass = $object->getIndexObjectName();
-		$objectIndexName = $object->getSphinxIndexName();
-		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass);
-		$splitIndexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass, $objectIndexName);
+		$index = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
+		$splitIndexName = $object->getSphinxIndexName();
 		$id = $object->getIntId();
 		
 		KalturaLog::debug('Deleting sphinx document for object [' . get_class($object) . '] [' . $object->getId() . ']');

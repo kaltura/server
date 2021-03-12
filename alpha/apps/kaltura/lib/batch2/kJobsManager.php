@@ -549,7 +549,9 @@ class kJobsManager
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
-			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			
 			$convertData->setDestFileSyncSharedPath($sharedPath);
@@ -871,14 +873,16 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-		$flavorParamsOutput = null;
-		if($flavorAsset && $flavorAsset->getEncryptionKey()) {
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
+		$unsupportedEncryptionFormats = kConf::get('unsupported_encryption_formats', 'runtime_config', array(assetParams::CONTAINER_FORMAT_MPEGTS));
+		if($flavorAsset && $flavorAsset->getEncryptionKey() &&
+			(!$flavorParamsOutput || ($flavorParamsOutput && !in_array($flavorParamsOutput->getFormat(), $unsupportedEncryptionFormats))))
+		{
 			$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 		}
 		
 		if($createThumb)
 		{
-			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 			if(!$flavorParamsOutput)
 			{
 				if($flavorAsset)
@@ -1030,9 +1034,37 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-
-
-
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$importToShared = kConf::get('enable_import_to_shared', 'runtime_config', null);
+		$excludePartnersImportToShared = kConf::get('exclude_partners_import_to_shared', 'runtime_config', array());
+		if($importToShared && $partner->getSharedStorageProfileId() && !in_array($partnerId, $excludePartnersImportToShared))
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			
+			$sharedPath = null;
+			if($asset)
+			{
+				list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
+			}
+			elseif($entry)
+			{
+				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
+				$path = myContentStorage::getPathFromId($entry->getId()) . DIRECTORY_SEPARATOR . $entry->getId() . '_import';
+			}
+			else
+			{
+				//Not able to create any unique dir path based on asset or entry id so we will create random dir location
+				$randomId = kString::generateStringId();
+				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
+				$path = myContentStorage::getPathFromId($randomId) . DIRECTORY_SEPARATOR . $randomId . '_import';
+			}
+			
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+			$jobData->setDestFileSharedPath($sharedPath);
+		}
+		
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
@@ -1109,22 +1141,19 @@ class kJobsManager
 			$entry->save();
 		}
  	
-		/*
-		* TODO - AWS - Handle shared concat flow
-		* Add shared file destination when genrating the concat to stoareg output file to shared stoarge defined on the partner
-		*
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if($partner->getSharedStorageProfileId())
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 			$pathMgr = $sharedStorageProfile->getPathManager();
-			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
-			$root = $sharedStorageProfile->getStorageBaseDir();
+			
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = kFileSyncUtils::calcObjectNewVersion($asset->getId(), $asset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 		 
 			$jobData->setDestFilePath($sharedPath);
 		}
-		*/
  	
 		$batchJob = null;
 		if($parentJob)
@@ -1976,7 +2005,12 @@ class kJobsManager
 	{
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
-		
+		$shouldExportCsvToSharedStorage = kConf::get('should_export_csv_to_shared_storage','runtime_config', null);
+		if ($shouldExportCsvToSharedStorage)
+		{
+			$sharedPath = kPathManager::getExportCsvSharedPath($partnerId, null, true);
+			$jobData->setSharedOutputPath($sharedPath);
+		}
 		return self::addJob($batchJob, $jobData, BatchJobType::EXPORT_CSV, $exportObjectType);
 	}
 
@@ -1993,15 +2027,16 @@ class kJobsManager
 
 	protected static function shouldUseSharedStorageForEngine($conversionEngine)
 	{
-		$SharedSupportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
-						KalturaConversionEngineType::ON2,
-						KalturaConversionEngineType::FFMPEG,
-						KalturaConversionEngineType::MENCODER,
-						KalturaConversionEngineType::ENCODING_COM,
-						KalturaConversionEngineType::EXPRESSION_ENCODER3,
-						KalturaConversionEngineType::CHUNKED_FFMPEG,
-						KalturaConversionEngineType::FFMPEG_VP8,
-						KalturaConversionEngineType::FFMPEG_AUX);
+		$supportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
+			KalturaConversionEngineType::ON2,
+			KalturaConversionEngineType::FFMPEG,
+			KalturaConversionEngineType::MENCODER,
+			KalturaConversionEngineType::ENCODING_COM,
+			KalturaConversionEngineType::EXPRESSION_ENCODER3,
+			KalturaConversionEngineType::CHUNKED_FFMPEG,
+			KalturaConversionEngineType::FFMPEG_VP8,
+			KalturaConversionEngineType::FFMPEG_AUX);
+		$SharedSupportedEngines = Kconf::get('sharedStorageConversionEngines', 'cloud_storage', $supportedEngines);
 
 		if(in_array($conversionEngine, $SharedSupportedEngines))
 		{

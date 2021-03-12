@@ -424,7 +424,9 @@ class rawAction extends sfAction
 				if($downloadDeliveryProfile && $object)
 				{
 					$isDir = kFile::isDir($file_sync->getFullPath());
-					$url = $this->getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir, $file_sync);
+					$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
+					$fileName = $fileName. '.' .$ext;
+					$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir);
 					$this->redirect($url);
 				}
 			}
@@ -447,20 +449,6 @@ class rawAction extends sfAction
 		}
 		
 		return $file_sync;
-	}
-
-	protected function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir, $file_sync)
-	{
-		if($fileName)
-		{
-			$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
-			$fileName = kString::removeNewLine($fileName. '.' .$ext);
-			$fileName = kString::stripInvalidUrlChars($fileName);
-			$fileName = rawurlencode($fileName);
-		}
-		$url = $flavorAsset->getServeFlavorUrl(null, $fileName, $downloadDeliveryProfile, $isDir);
-		KalturaLog::log ("URL to redirect to [$url]" );
-		return $url;
 	}
 	
 	private function getAllowedFlavorAssets(KSecureEntryHelper $secureEntryHelper, $entryId, $format = null, $isOriginal = false, $isBestPlay = false)

@@ -36,7 +36,13 @@ class kConversionInfo
 		{
 			try
 			{
-				$duration_in_milliseconds = myFlvStaticHandler::getLastTimestamp( $source_file );
+				$duration_in_milliseconds = 0;
+				//myFlvStaticHandler uses fseek so until a proper solution will be found for shared stored content fallback to ffmpeg
+				if(!kFile::isSharedPath($source_file))
+				{
+					$duration_in_milliseconds = myFlvStaticHandler::getLastTimestamp( $source_file );
+				}
+				
 				if ( $duration_in_milliseconds > 0  )
 				{
 					$this->duration = $duration_in_milliseconds;

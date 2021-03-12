@@ -35,29 +35,40 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelect($c);
 	}
 
+
 	public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
     {
         $c = new Criteria();
         $c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
         $c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
         $c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-        $c->add(EntryVendorTaskPeer::VERSION, $version);
         $c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
+        if ($version)
+        {
+            $c->add(EntryVendorTaskPeer::VERSION, $version);
+        }
+
+        $c->addDescendingOrderByColumn(EntryVendorTaskPeer::VERSION);
+        $c->addDescendingOrderByColumn(EntryVendorTaskPeer::ID);
 
         return EntryVendorTaskPeer::doSelectOne($c);
     }
 
-	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version)
+	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version = null)
 	{
 	    $statusList = array(EntryVendorTaskStatus::PROCESSING,
             EntryVendorTaskStatus::READY,
             EntryVendorTaskStatus::PENDING,
             EntryVendorTaskStatus::PENDING_MODERATION,
+            EntryVendorTaskStatus::PENDING_MODERATION,
+            EntryVendorTaskStatus::PENDING_ENTRY_READY,
         );
-	    return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
-	}
 
-    public static function retrieveOneActiveTask($entryId, $catalogItemId, $partnerId, $version)
+	    return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
+    }
+	
+
+    public static function retrieveOneActiveTask($entryId, $catalogItemId, $partnerId, $version = null)
     {
         $statusList = array(EntryVendorTaskStatus::PROCESSING,
             EntryVendorTaskStatus::PENDING,

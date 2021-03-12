@@ -786,10 +786,13 @@ class myEntryUtils
 		foreach ($thumbDirs as $thumbDir)
 		{
 			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version);
+			KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
 			if (file_exists($currPath) && @filesize($currPath))
 			{
 				if(myCloudUtils::shouldExportThumbToCloud())
 				{
+					KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath], original file mtime: "
+						. date("Y-m-d H:i:s", filemtime($currPath)) );
 					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
 					if($moveFileSuccess)
 					{
@@ -871,6 +874,7 @@ class myEntryUtils
 			$start_sec = 0;
 		}
 
+		$last_calc_vid_sec = $w = $h = $calc_vid_sec = null;
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
@@ -908,6 +912,13 @@ class myEntryUtils
 				{
 					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
 				}
+				
+				if(isset($last_calc_vid_sec) && $im && $h && $w && $last_calc_vid_sec == $calc_vid_sec)
+				{
+					imagecopy($im, $im, $w * $vid_slice, 0, $w * ($vid_slice - 1), 0, $w, $h);
+					++$vid_slice;
+					continue;
+				}
 					
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
@@ -930,7 +941,7 @@ class myEntryUtils
 					{
 						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
-						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight);
+						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight, floor(65500 / $vid_slices));
 						$packagerResizeFullPath = $destPath . self::TEMP_FILE_POSTFIX;
 						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
 						if(!$success)
@@ -1002,6 +1013,11 @@ class myEntryUtils
 						$finalThumbPath = kFile::replaceExt($finalThumbPath, "gif");
 					}
 
+					if (!$width && !$height && $vid_slices > 0 && $imageSizeArray[0] > floor(65500 / $vid_slices))
+					{
+						$width = floor(65500 / $vid_slices);
+					}
+
 					$convertedImagePath = myFileConverter::convertImage($orig_image_path, $processingThumbPath, $width, $height, $type, $bgcolor, true, $quality, $src_x, $src_y, $src_w, $src_h, $density, $stripProfiles, $thumbParams, $format, $forceRotation);
 				}
 				if ($thumbCaptureByPackager && file_exists($packagerResizeFullPath))
@@ -1009,9 +1025,7 @@ class myEntryUtils
 					unlink($packagerResizeFullPath);
 				}
 			}
-
-
-
+			
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
@@ -1042,6 +1056,8 @@ class myEntryUtils
 					unlink($orig_image_path);
 				}
 			}
+			
+			$last_calc_vid_sec = isset($calc_vid_sec) ? $calc_vid_sec : null;
 		}
 		
 		if ($multi)
@@ -1149,7 +1165,7 @@ class myEntryUtils
 		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset, $entry->getId());
+		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset);
 		
 		if (!$entry_data_path)
 			return false;
@@ -1174,36 +1190,33 @@ class myEntryUtils
 		return true;
 	}
 
-	public static function getEntryDataPath($flavorSyncKey, $flavorAsset, $entryId)
+	public static function getEntryDataPath($flavorSyncKey, $flavorAsset)
 	{
 		$currentDcId = intval(kDataCenterMgr::getCurrentDcId());
 		$preferredStorageId = myPackagerUtils::getPreferredStorageId($currentDcId);
+		if(is_null($preferredStorageId))
+		{
+			$preferredStorageId = $currentDcId;
+		}
+		
 		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
 		if (!$fileSync)
 		{
 			return null;
 		}
 		$entryDataPath = null;
-		KalturaLog::info('file sync id: ' . $fileSync->getId() .  ' found on DC: '. $fileSync->getDc(). ' current DC is '. $currentDcId);
-		if ($fileSync->getDc() === $currentDcId)
+		$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
+		KalturaLog::info("file sync id: {$fileSync->getId()} found on DC: {$fileSync->getDc()} current dcId: $currentDcId is cloud dc: $isCloudDc");
+		if ($fileSync->getDc() === $currentDcId || ($isCloudDc && (in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))))
 		{
 			$entryDataPath = $fileSync->getFullPath();
 			KalturaLog::info("path [$entryDataPath]");
 		}
 		else
 		{
-			$isCloudDc = myCloudUtils::isCloudDc($currentDcId);
-			if ($isCloudDc && (in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds())))
-			{
-				KalturaLog::info('Current DC id: ' . $currentDcId . ' is cloud DC');
-				$entryDataPath = $fileSync->getExternalUrl($entryId, null, true);
-			}
-			else
-			{
-				$remoteDc = 1 - $currentDcId;
-				KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
-				kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
-			}
+			$remoteDc = 1 - $currentDcId;
+			KalturaLog::info("File wasn't found. Dumping the request to DC ID [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
 		}
 
 		return $entryDataPath;
@@ -2142,8 +2155,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		if($syncKey)
 		{
-			$filePath = kAssetUtils::getLocalImagePath($syncKey);
-			$validContent = myThumbUtils::validateImageContent($filePath);
+			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
+			$validContent = myXmlUtils::validateXmlFileContent($filePath);
+			if($isTempFile)
+			{
+				unlink($filePath);
+			}
+			
 			if(!$validContent)
 			{
 				throw new Exception ("content contains potential security risks");

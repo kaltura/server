@@ -50,12 +50,12 @@
 		/* ---------------------------
 		 *
 		 */
-		public function FetchNextJob();
+		public function FetchNextJob($fetchRangeRandMax);
 
 		/* ---------------------------
 		 *
 		 */
-		public function RefreshJobs($maxSlots, &$jobs);
+		public function RefreshJobs($maxSlots, $fetchRangeRandMax, &$jobs);
 
 		/* ---------------------------
 		 *

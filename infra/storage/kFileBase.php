@@ -236,6 +236,9 @@ class kFileBase
 	
 	static public function fixPath($file_name)
 	{
+		if(substr(PHP_OS, 0, 3) == "WIN" && preg_match('/(^[a-zA-Z]:)/m', $file_name, $matches))
+			return $file_name;
+		
 		return str_replace(array("//", "\\"), array("/", "/"), $file_name);
 	}
     
@@ -307,28 +310,39 @@ class kFileBase
     public static function mimeType($file_name)
     {
         if (!kFile::checkFileExists($file_name))
-            return false;
-        
-        if(kFile::isSharedPath($file_name))
         {
-	        $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
-	        return $kSharedFsMgr->mimeType($file_name);
+        	return false;
         }
+	
+	    if(kFile::isSharedPath($file_name))
+	    {
+		    $cmd = "file -b --mime-type -";
+		    list($return_value, $output, $errorDescription) = kExecWrapper::runWrapped($cmd, $file_name);
+		    $output = @explode(";", $output);
+		    $output = trim($output[0]);
+		
+		    if($return_value == 0 && $output != "")
+		    {
+			    return $output;
+		    }
+		    else
+		    {
+			    $kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($file_name);
+			    return $kSharedFsMgr->mimeType($file_name);
+		    }
+	    }
+	    if(!function_exists('mime_content_type'))
+	    {
+		    $type = null;
+		    exec('file -i -b ' . realpath($file_name), $type);
 
-        if(! function_exists('mime_content_type'))
-        {
-            $type = null;
-            exec('file -i -b ' . realpath($file_name), $type);
-
-            $parts = @ explode(";", $type[0]); // can be of format text/plain;  charset=us-ascii 
-
-
-            return trim($parts[0]);
-        }
-        else
-        {
-            return mime_content_type($file_name);
-        }
+		    $parts = @ explode(";", $type[0]); // can be of format text/plain;  charset=us-ascii
+		    return trim($parts[0]);
+	    }
+	    else
+	    {
+		    return mime_content_type($file_name);
+	    }
     }
 
     public static function copyFileMetadata($srcFile, $destFile)
@@ -372,9 +386,10 @@ class kFileBase
 		if(kFile::isSharedPath($path))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
-			return $kSharedFsMgr->checkFileExists($path);
+			// storage returns false on dir path so we need to check also dir
+			return $kSharedFsMgr->checkFileExists($path) || $kSharedFsMgr->isDir($path);
 		}
-		
+		// php returns true on dir path not only for file
 		return file_exists($path);
 	}
 	
@@ -460,7 +475,7 @@ class kFileBase
 		return filemtime($filePath);
 	}
 	
-	public static function getFolderSize($path)
+	public static function folderSize($path)
 	{
 		if(!kFile::checkFileExists($path))
 		{
@@ -473,11 +488,14 @@ class kFileBase
 		}
 		
 		$ret = 0;
-		foreach(glob($path."/*") as $fn)
+		foreach (kFile::listDir($path) as $file)
 		{
-			$ret += self::getFolderSize($fn);
+			//fileSize is saved under index 2 when listing dirs.
+			if (isset($file[1]) && $file[1] == 'dir' && isset($file[2]))
+			{
+				$ret += $file[2];
+			}
 		}
-		
 		return $ret;
 	}
 	
@@ -561,7 +579,6 @@ class kFileBase
 	{
 		if(self::$storageTypeMap)
 			return self::$storageTypeMap;
-		
 		self::$storageTypeMap = kConf::get('storage_type_map', 'cloud_storage', array());
 		return self::$storageTypeMap;
 	}
@@ -621,14 +638,26 @@ class kFileBase
 	public static function resolveFilePath($filePath)
 	{
 		$isRemote = false;
+		
 		$realFilePath = kFile::realPath($filePath);
+		$isDir = kFile::isDir($filePath);
 		
 		if(strpos($realFilePath, "http") !== false)// && kFile::checkFileExists($filePath))
 		{
 			$isRemote = true;
 		}
 		
-		return array($isRemote, $realFilePath);
+		return array($isRemote, $realFilePath, $isDir);
+	}
+	
+	public static function fetchRemoteToLocal($originalFilePath, $remoteFileUrl, $isDir, $localDirName = null, $localFileName = null)
+	{
+		if(!$isDir)
+		{
+			return self::getExternalFile($remoteFileUrl, $localDirName, $localFileName);
+		}
+		
+		return self::getExternalDir($originalFilePath, $localDirName . $localFileName . '/');
 	}
 	
 	public static function getExternalFile($externalUrl, $dirName = null, $baseName = null)
@@ -672,6 +701,25 @@ class kFileBase
 		}
 		
 		return $res;
+	}
+	
+	public static function getExternalDir($externalDirPath, $baseDirName = null)
+	{
+		if(!$baseDirName)
+		{
+			$baseDirName = sys_get_temp_dir() . '/' .
+				md5(microtime(true) . getmypid() . uniqid(rand(), true)) . '/';
+		}
+		
+		$remoteFiles = kFile::listDir($externalDirPath . '/', $externalDirPath. '/');
+		foreach ($remoteFiles as $remoteFile)
+		{
+			$filePath = $remoteFile[0];
+			$remoteFileUrl = kFile::realPath($filePath);
+			kFile::getExternalFile($remoteFileUrl, $baseDirName, basename($filePath));
+		}
+		
+		return $baseDirName;
 	}
 	
 	public static function setStorageTypeMap($key, $value)
@@ -725,5 +773,16 @@ class kFileBase
 		}
 		
 		return false;
+	}
+	
+	public static function shouldPollFileExists($path)
+	{
+		if (self::isSharedPath($path))
+		{
+			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($path);
+			return $kSharedFsMgr->shouldPollFileExists();
+		}
+		
+		return true;
 	}
 }

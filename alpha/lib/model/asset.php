@@ -820,4 +820,54 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		}
 		
 	}
+	
+	public function deleteLocalFileCopy()
+	{
+		$syncDeleteLocalFile = kConf::get('sync_delete_local_file', 'cloud_storage', null);
+		if(!$syncDeleteLocalFile)
+		{
+			return;
+		}
+		
+		$fileSyncKey = $this->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$origFileSync = kFileSyncUtils::getOriginFileSyncForKey($fileSyncKey, false);
+		if(!$origFileSync)
+		{
+			KalturaLog::debug("No original file sync found for key [" . print_r($fileSyncKey, true) . "]");
+			return;
+		}
+		
+		if(!myCloudUtils::isCloudDc($origFileSync->getDc()) || $origFileSync->getDc() != kDataCenterMgr::getCurrentDcId())
+		{
+			KalturaLog::debug("File sync found is not marked as cloud DC or DC is not current, [{$origFileSync->getDc()}]");
+			return;
+		}
+		
+		//In case file sync is a link print log and return
+		//TODO - Once learning all cases handle deleting the entire linked tree
+		$resolvedFileSync = kFileSyncUtils::resolve($origFileSync);
+		if($resolvedFileSync->getId() != $origFileSync->getId())
+		{
+			KalturaLog::debug("Check flow for {$resolvedFileSync->getId()} and original {$origFileSync->getId()}");
+			return;
+		}
+		
+		$fullPathToDelete = $origFileSync->getFullPath();
+		KalturaLog::debug("Deleting local file sync file [$fullPathToDelete] and purge [{$resolvedFileSync->getId()}]");
+		$success = unlink($fullPathToDelete);
+		if(!$success)
+		{
+			KalturaLog::debug("Failed to delete local file path [$fullPathToDelete], file sync will not be marked as purged");
+			return;
+		}
+		
+		//Mark file sync as purged
+		$origFileSync->setStatus(FileSync::FILE_SYNC_STATUS_PURGED);
+		$origFileSync->save();
+	}
+
+	public function getLanguage()
+	{
+		return null;
+	}
 }

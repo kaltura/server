@@ -71,29 +71,22 @@ class SphinxCategoryCriteria extends SphinxCriteria
 		if($filter->get('_eq_manager'))
 		{
 			$puserId = $filter->get('_eq_manager');
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-			if($kuser)
-			{
-				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . '_' . $kuser->getid() . ')';
-			}
+			$kuserId = $this->getKuserIdForSearch($partnerId, $puserId);
+			$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
+			$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . $manager . '_' . $kuserId . ')';
 		}
 		$filter->unsetByName('_eq_manager');
 		
 		if($filter->get('_eq_member'))
 		{
 			$puserId = $filter->get('_eq_member');
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-			if($kuser)
-			{
-				$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
-				$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
-				$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
-				$contributor = category::getPermissionLevelName(CategoryKuserPermissionLevel::CONTRIBUTOR);
-				$kuserId = $kuser->getid();
-				$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' . 
-					"({$member}_{$kuserId} | {$moderator}_{$kuserId} | {$contributor}_{$kuserId} ) !({$manager}_{$kuserId}))";
-			}
+			$kuserId = $this->getKuserIdForSearch($partnerId, $puserId);
+			$manager = category::getPermissionLevelName(CategoryKuserPermissionLevel::MANAGER);
+			$member = category::getPermissionLevelName(CategoryKuserPermissionLevel::MEMBER);
+			$moderator = category::getPermissionLevelName(CategoryKuserPermissionLevel::MODERATOR);
+			$contributor = category::getPermissionLevelName(CategoryKuserPermissionLevel::CONTRIBUTOR);
+			$this->matchClause[] = '(@(' . categoryFilter::MEMBERS . ') ' .
+				"({$member}_{$kuserId} | {$moderator}_{$kuserId} | {$contributor}_{$kuserId} ) !({$manager}_{$kuserId}))";
 		}
 		$filter->unsetByName('_eq_member');
 		
@@ -250,5 +243,15 @@ class SphinxCategoryCriteria extends SphinxCriteria
 	protected function applyIds(array $ids)
 	{
 		return $ids;
+	}
+
+	protected function getKuserIdForSearch($partnerId, $puserId)
+	{
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		if($kuser)
+		{
+			return $kuser->getid();
+		}
+		return Kuser::KUSER_ID_THAT_DOES_NOT_EXIST;
 	}
 }

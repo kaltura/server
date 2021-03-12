@@ -23,6 +23,7 @@ class KalturaMonitorClient
 	const EVENT_RABBIT         = 'rabbit';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
+	const EVENT_EXEC           = 'exec';
 
 
 	const FIELD_ACTION = 			'a';
@@ -36,6 +37,7 @@ class KalturaMonitorClient
 	const FIELD_CLIENT_TAG = 		'l';
 	const FIELD_MULTIREQUEST = 		'm';
 	const FIELD_LENGTH =			'n';
+	const FIELD_COMMAND =			'o';
 	const FIELD_PARTNER_ID = 		'p';
 	const FIELD_QUERY_TYPE = 		'q';
 	const FIELD_ERROR_CODE = 		'r';
@@ -189,7 +191,10 @@ class KalturaMonitorClient
 	
 	protected static function flushEvents()
 	{
-		kInfraMemcacheCacheWrapper::sendMonitorEvents();
+		if (class_exists('kInfraMemcacheCacheWrapper'))
+		{
+			kInfraMemcacheCacheWrapper::sendMonitorEvents();
+		}
 
 		if (self::$sleepCount > 0)
 		{
@@ -200,6 +205,9 @@ class KalturaMonitorClient
 			));
 
 			self::writeDeferredEvent($data);
+
+			self::$sleepTime = 0;
+			self::$sleepCount = 0;
 		}
 	}
 
@@ -226,13 +234,18 @@ class KalturaMonitorClient
 		
 		if (!$cached)
 		{
-			require_once(__DIR__ . '/../../../../../infra/log/UniqueId.php');
+			require_once(__DIR__ . '/../log/UniqueId.php');
 			self::$basicEventInfo[self::FIELD_UNIQUE_ID] = UniqueId::get();
 		}
 	}
 	
 	public static function monitorApiStart($cached, $action, $partnerId, $sessionType = null, $clientTag = null, $isInMultiRequest = false)
 	{
+		if (!$partnerId)
+		{
+			$partnerId = preg_match('#/p/(\d+)/#', $_SERVER['REQUEST_URI'], $matches) ? $matches[1] : null;
+		}
+
 		if ($partnerId == -1)		// cannot use BATCH_PARTNER_ID since this may run before the autoloader
 		{
 			$splittedClientTag = explode(' ', $clientTag);
@@ -284,13 +297,11 @@ class KalturaMonitorClient
 			return;		// handled by kApiCache
 		}
 
-		$partnerId = preg_match('#^/p/(\d+)/#', $_SERVER['REQUEST_URI'], $matches) ? $matches[1] : null;
-
 		$params = infraRequestUtils::getRequestParams();
 		$sessionType = isset($params['ks']) ? kSessionBase::SESSION_TYPE_USER : kSessionBase::SESSION_TYPE_NONE;	// assume user ks
 		$clientTag = isset($params['clientTag']) ? $params['clientTag'] : null;
 
-		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
+		self::monitorApiStart(false, $action, null, $sessionType, $clientTag);
 	}
 
 	public static function monitorApiEnd($errorCode)
@@ -322,7 +333,11 @@ class KalturaMonitorClient
 		$errorCode = null;
 		foreach ($_FILES as $curFile)
 		{
-			$size += $curFile['size'];
+			if (is_numeric($curFile['size']))
+			{
+				$size += $curFile['size'];
+			}
+
 			if ($curFile['error'])
 			{
 				$errorCode = strval($curFile['error']);
@@ -341,6 +356,24 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
+	protected static function getDsnHost($dsn)
+	{
+		$hostStart = strpos($dsn, 'host=');
+		if ($hostStart === false)
+		{
+			return $dsn;
+		}
+
+		$hostStart += 5;
+		$hostEnd = strpos($dsn, ';', $hostStart);
+		if ($hostEnd === false)
+		{
+			return $dsn;
+		}
+
+		return substr($dsn, $hostStart, $hostEnd - $hostStart);
+	}
+
 	public static function monitorDatabaseAccess($sql, $sqlTook, $hostName = null)
 	{
 		if (!self::$stream)
@@ -354,7 +387,15 @@ class KalturaMonitorClient
 			$comment = substr($sql, 0, $commentEndPos);			
 			$matches = null;
 			if (preg_match('~^/\* [^\]]+\[\d+\]\[([^\]]+)\] \*/~', $comment, $matches))
+			{
 				$hostName = $matches[1];
+
+				$config = kConf::getDB();
+				if (isset($config['datasources'][$hostName]['connection']['dsn']))
+				{
+					$hostName = self::getDsnHost($config['datasources'][$hostName]['connection']['dsn']);
+				}
+			}
 			$sql = trim(substr($sql, $commentEndPos));
 		}
 		else
@@ -460,19 +501,9 @@ class KalturaMonitorClient
 		if (!self::$stream)
 			return;
 		
-		$hostName = $dsn;
-		$hostStart = strpos($dsn, 'host=');
-		if ($hostStart !== false)
-		{
-			$hostStart += 5;
-			$hostEnd = strpos($dsn, ';', $hostStart);
-			if ($hostEnd !== false)
-				$hostName = substr($dsn, $hostStart, $hostEnd - $hostStart);
-		}
-		
 		$data = array_merge(self::$basicEventInfo, array(
 				self::FIELD_EVENT_TYPE 		=> self::EVENT_CONNTOOK,
-				self::FIELD_DATABASE		=> $hostName,
+				self::FIELD_DATABASE		=> self::getDsnHost($dsn),
 				self::FIELD_EXECUTION_TIME	=> $connTook,
 				self::FIELD_COUNT			=> $count,
 		));
@@ -604,5 +635,28 @@ class KalturaMonitorClient
 
 		self::$sleepTime += $micros / 1000000;
 		self::$sleepCount++;
+	}
+
+	public static function monitorExec($command, $startTime)
+	{
+		if (!self::$stream)
+			return;
+
+		$spacePos = strpos($command, ' ');
+		if ($spacePos !== false)
+		{
+			$command = substr($command, 0, $spacePos);
+		}
+
+		$command = trim($command, "'\"");
+		$command = basename($command);
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_EXEC,
+			self::FIELD_COMMAND			=> $command,
+			self::FIELD_EXECUTION_TIME	=> microtime(true) - $startTime,
+		));
+
+		self::writeDeferredEvent($data);
 	}
 }

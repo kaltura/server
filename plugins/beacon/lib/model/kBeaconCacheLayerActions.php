@@ -16,7 +16,7 @@ require_once (dirname(__FILE__) . '/../../../../plugins/queue/lib/QueueProvider.
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/providers/rabbit_mq/lib/RabbitMQProvider.php');
 require_once (dirname(__FILE__) . '/../../../../plugins/queue/providers/rabbit_mq/lib/MultiCentersRabbitMQProvider.php');
 
-require_once (dirname(__FILE__) . '/../../../../alpha/apps/kaltura/lib/monitor/KalturaMonitorClient.php');
+require_once (dirname(__FILE__) . '/../../../../infra/monitor/KalturaMonitorClient.php');
 
 
 class kBeaconCacheLayerActions

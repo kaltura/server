@@ -4,7 +4,7 @@
  * Enable Reach feature
  * @package plugins.reach
  */
-class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaApplicationTranslations
+class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaVersion, IKalturaAdminConsolePages, IKalturaPending, IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaApplicationTranslations, IKalturaAccessControlContributor
 {
 	const PLUGIN_NAME = 'reach';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -174,6 +174,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new ReachProfileCloneAction();
 		$pages[] = new ReachRequestsListAction();
 		$pages[] = new ReachRequestsExportAction();
+		$pages[] = new ReachRequestsAbortAction();
 
 		return $pages;
 	}
@@ -351,4 +352,18 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 
         return array($locale => $array);
     }
+
+	public static function shouldSkipRulesValidation($entryId, $ks)
+	{
+		if(	($ks->getRole() === UserRoleId::REACH_VENDOR_ROLE)			&&
+			($ks->getPrivilegeValue(kSessionBase::PRIVILEGE_VIEW) === $entryId)	&&
+			(ReachProfilePeer::retrieveByPartnerId($ks->getPartnerId())) )
+		{
+			KalturaLog::debug("Reach vendor KS, skip Access Control rules validation for entry ($entryId)");
+			return true;
+		}
+
+		return false;
+	}
+
 }

@@ -37,7 +37,7 @@
 		{
 			$this->setup = $setup;
 			$this->params  = new KChunkedEncodeParams();
-			KChunkedEncodeSetup::tryLoadSharedRemoteChunkConfig();
+			kBatchUtils::tryLoadKconfConfig();
 		}
 		
 		
@@ -68,6 +68,10 @@
 				return false;
 			}
 			
+// Workarround for long audio conversions of large MXF file stored on S3
+if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourcePath)) {
+	$params->sourceForAudio=kfile::buildDirectUrl($params->unResolvedSourcePath);
+}
 				/*
 				 * Setup work folders 
 				 */
@@ -107,7 +111,9 @@
 				 * Evaluate session duration 
 				 */
 			if($this->setup->duration==-1) {
-				$params->duration = round($this->sourceFileDt->containerDuration/1000,4);
+				$params->duration = ($this->sourceFileDt->videoDuration>0)? 
+					$this->sourceFileDt->videoDuration: $this->sourceFileDt->containerDuration;
+				$params->duration = round($params->duration/1000,4);
 			}
 			else $params->duration = $this->setup->duration;
 			
@@ -292,7 +298,7 @@
 			
 				/*
 				 * Verify session duration - it should be at least twice the chunk duration
-				 */
+				 *
 			if(isset($height)) {
 				$minimalDuration = KChunkedEncodeSetup::calculateChunkDuration($height)*2;
 				if($duration<$minimalDuration){
@@ -303,7 +309,7 @@
 			else if($duration<180){
 				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 180sec");
 				return false;
-			}
+			}*/
 			
 			return true;
 		}
@@ -574,7 +580,7 @@
 			$cmdLine = "";
 			$chunkData = $this->chunkDataArr[$chunkIdx];
 			{
-				self::addFfmpegReconnectParams("\"http", $this->cmdLine, $cmdLine);
+				kBatchUtils::addReconnectParams("\"http", $this->cmdLine, $cmdLine);
 				$cmdLine .= " -i ".$this->cmdLine." -t $chunkWithOverlap";
 				if(isset($params->httpHeaderExtPrefix)){
 					$cmdLine = " -headers \"$params->httpHeaderExtPrefix,chunk($chunkIdx)\"".$cmdLine;
@@ -769,7 +775,7 @@
 					$audioInputParams.= " -itsoffset -1.4";
 				
 				$resolvedAudioFileName = kfile::realPath($audioFilename);
-				self::addFfmpegReconnectParams("http", $resolvedAudioFileName, $audioInputParams);
+				kBatchUtils::addReconnectParams("http", $resolvedAudioFileName, $audioInputParams);
 				$audioInputParams.= " -i '$resolvedAudioFileName'";
 				$audioCopyParams = "-map 1:a -c:a copy";
 				if($params->acodec=="libfdk_aac" || $params->acodec=="libfaac")
@@ -853,7 +859,7 @@
 				$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
 			}
 			else {
-				self::addFfmpegReconnectParams("http", $resolvedFirstSegmentName, $cmdLine);
+				kBatchUtils::addReconnectParams("http", $resolvedFirstSegmentName, $cmdLine);
 				$cmdLine.= " -i \"$resolvedFirstSegmentName\"";
 			}
 				
@@ -918,9 +924,12 @@
 			if(isset($params->httpHeaderExtPrefix)){
 				$cmdLine.= " -headers \"$params->httpHeaderExtPrefix,audio\"";
 			}
-			
-			self::addFfmpegReconnectParams('http', $params->source, $cmdLine);
-			$cmdLine.= " -i \"$params->source\"";
+			if(isset($params->sourceForAudio))
+				$sourcePath = $params->sourceForAudio;
+			else
+				$sourcePath = $params->source;
+			kBatchUtils::addReconnectParams('http', $sourcePath, $cmdLine);
+			$cmdLine.= " -i \"$sourcePath\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
@@ -1332,18 +1341,6 @@
 			KalturaLog::log("$strVer");
 			return $strVer;
 		}
-		
-		public static function addFfmpegReconnectParams($pattern, $fileCmd, &$cmdLine)
-		{
-			if (strpos($fileCmd, $pattern) !== 0) {
-				return;
-			}
-			
-			$ffmpegReconnectParams = KChunkedEncodeSetup::getChunkConfigParam('ffmpegReconnectParams');
-			if ($ffmpegReconnectParams) {
-				$cmdLine .= " $ffmpegReconnectParams";
-			}
-		}
 	}
 	
 	/********************
@@ -1616,7 +1613,8 @@
 				$this->formatParams = null;
 			
 			if(($key=array_search("-i", $cmdLineArr))!==false) {
-				$resolvedPath = kFile::realPath($cmdLineArr[$key+1]);
+				$this->unResolvedSourcePath = $cmdLineArr[$key+1];
+				$resolvedPath = kFile::realPath($this->unResolvedSourcePath);
 				$cmdLineArr[$key+1] = "\"$resolvedPath\"";
 				$this->source = $resolvedPath;
 			}

@@ -440,6 +440,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $extendedFreeTrailEndsWarning;
 
+	/**
+	 * @var bool
+	 */
+	public $enforceHttpsApi;
+
 
 	private static $map_between_objects = array
 	(
@@ -526,6 +531,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"usageLimitWarning",
 		"lastFreeTrialNotificationDay",
 		"extendedFreeTrailEndsWarning",
+		'enforceHttpsApi'
 	);
 
 	public function getMapBetweenObjects()

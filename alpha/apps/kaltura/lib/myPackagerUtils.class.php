@@ -24,7 +24,7 @@ class myPackagerUtils
 	 * @return bool
 	 * @throws Exception
 	 */
-	public static function captureThumb($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null)
+	public static function captureThumb($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null, $maxWidth = null)
 	{
 		if(myEntryUtils::shouldServeVodFromLive($entry))
 		{
@@ -44,6 +44,11 @@ class myPackagerUtils
 
 		$flavorAssetId = $flavorAsset->getId();
 		KalturaLog::info("Found flavor asset {$flavorAssetId}");
+
+		if(!$width && !$height && $maxWidth && $flavorAsset->getWidth() > $maxWidth)
+		{
+			$width = $maxWidth;
+		}
 
 		if($flavorAsset->getEncryptionKey())
 		{
@@ -456,7 +461,7 @@ class myPackagerUtils
 			$preferredStorageId = myCloudUtils::getCloudPreferredStorage();
 		}
 
-		if(!$preferredStorageId)
+		if(!$preferredStorageId && myCloudUtils::isEnvironmentWithCloudStorage())
 		{
 			$preferredStorageId = $dcId;
 		}

@@ -6,6 +6,7 @@
  */
 class ESearchService extends KalturaBaseService
 {
+	const MAX_RESULT_WINDOW = 10000;
 	/**
 	 *
 	 * @action searchEntry
@@ -117,7 +118,12 @@ class ESearchService extends KalturaBaseService
 		$kPager = null;
 		if ($pager)
 		{
+			/* @var kPager $kPager */
 			$kPager = $pager->toObject();
+			if( ($kPager->getPageSize() * $kPager->getPageIndex()) > self::MAX_RESULT_WINDOW )
+			{
+				throw new KalturaAPIException(KalturaESearchErrors::CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
+			}
 		}
 
 		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations());

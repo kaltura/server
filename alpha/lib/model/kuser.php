@@ -23,7 +23,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const ANONYMOUS_PUSER_ID = "KALANONYM";
 	const REGISTRATION_INFO = "registration_info";
 	const ATTENDANCE_INFO = "attendance_info";
+	const TITLE = 'title';
+	const COMPANY = 'company';
 
+	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;
@@ -618,7 +621,17 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return $this->getFromCustomData('last_login_time');
 	}
-	
+
+	public function setKsPrivileges($ksPrivileges)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_KS_PRIVILEGES, $ksPrivileges);
+	}
+
+	public function getKsPrivileges()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_KS_PRIVILEGES);
+	}
+
 	/**
 	 * Set allowed_partner_ids parameter to $allowedPartnerIds (in custom_data)
 	 * @param string $allowed_partner_ids
@@ -1343,7 +1356,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'role_ids' => explode(',',$this->getRoleIds()), //todo - maybe add help to elastic here
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
 			'puser_id' => $this->getPuserId(),
-			'members_count' => $this->getMembersCount()
+			'members_count' => $this->getMembersCount(),
+			'picture' => $this->getPicture()
 		);
 		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);
@@ -1441,5 +1455,25 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function getAttendanceInfo()
 	{
 		return $this->getFromCustomData(self::ATTENDANCE_INFO);
+	}
+
+	public function getTitle()
+	{
+		return $this->getFromCustomData(self::TITLE);
+	}
+
+	public function setTitle($v)
+	{
+		return $this->putInCustomData(self::TITLE, $v);
+	}
+
+	public function getCompany()
+	{
+		return $this->getFromCustomData(self::COMPANY);
+	}
+
+	public function setCompany($v)
+	{
+		return $this->putInCustomData(self::COMPANY, $v);
 	}
 }

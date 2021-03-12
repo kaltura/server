@@ -1,144 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head >
-    <style>
-        .zoom-form {
-            border: 7px solid #f1f1f1;
-            margin-left: 0%;
-            margin-right: 0%;
-            margin: auto;
-            max-width: 600px;
-            max-height: 1000px;
-        }
-
-        /* Full-width inputs */
-        input[type=text]{
-            width: 100%;
-            padding: 8px 12px;
-            margin: 4px 0;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-
-        /* Set a style for all buttons */
-        button {
-            background-color: #3b60af;
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 35%;
-            border: none;
-            cursor: pointer;
-            width: auto;
-        }
-        p {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 14px;
-            margin: 2px 10px;
-            padding-top: 10px;
-        }
-
-        .small {
-            font-size: 12px;
-        }
-
-        a.big {
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .margin {
-            margin: 2px 10px;
-            padding-top: 2px;
-            padding-bottom: 2px;
-        }
-
-        .margin-top {
-            margin-top: 10px;
-        }
-
-        p.success {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-            font-size: large;
-        }
-
-        p.error {
-            background-color: #ccc;
-            color: rgba(202, 22, 40, 0.59);
-            border: 1px solid #ccc;
-            font-weight: bold;
-            font-size: large;
-        }
-
-        /* Add a hover effect for buttons */
-        button:hover {
-            opacity: 0.8;
-        }
-
-        /* Center the avatar image inside this container */
-        .imgcontainer {
-            text-align: center;
-            margin: 20px 0 12px 0;
-        }
-
-        /* Avatar image */
-        img.avatar {
-            width: 20%;
-        }
-
-        /* Add padding to containers */
-        .container {
-            padding: 10px;
-        }
-
-        label {
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-    </style>
+    <title>Kaltura Zoom connector</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         var ks = '@ks@';
-        var url = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/submitRegistration';
+        let baseServiceUrl = '@BaseServiceUrl@';
         var accountId = '@accountId@';
+        var partnerId= '@partnerId@';
+        var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
+        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
+        const CMS_USER_ID=3;
+        const RECORDING_OWNER_BASED_ON_ZOOM_USER_ID=1;
     </script>
     <script>
-        function trySubmit(event) {
-            $("body").css("cursor", "progress");
-            event.preventDefault();
-            var $defaultUserId = $('#defaultUserId');
-            var $zoomCategory  = $('#zoomCategory');
-            var $zoomWebinarCategory  = $('#zoomWebinarCategory');
-            var defaultUserId = $defaultUserId.val().trim();
-            var zoomCategory = $zoomCategory.val().trim();
-            var zoomWebinarCategory = $zoomWebinarCategory.val().trim();
-            var enableRecordingUploadObj = $(".enableRecordingUpload");
-            var enableWebinarUploadObj = $(".enableWebinarUpload");
-            var createUserIfNotExistObj = $(".createUserIfNotExist");
-            var enableRecordingUpload = enableRecordingUploadObj.is(":checked");
-            var enableWebinarUpload = enableWebinarUploadObj.is(":checked");
-            var createUserIfNotExist = createUserIfNotExistObj.is(":checked");
-            var handleParticipantsMode = $('[name=participantsHandler]:checked').val();
-            var zoomUserMatchingMode = $('[name=userMatchingHandler]:checked').val();
-            var zoomUserPostfix = $('#zoomUserPostfix').val().trim();
+        function trySubmit() {
+            $('body').css('cursor','progress');
+            let defaultUserId = $('#defaultUserId').val().trim();
+            let zoomCategory  = $('#zoomCategory').val().trim();
+            let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
+            let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
+            let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
+            let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
+            let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
+            let createUserIfNotExist = $('#createUserIfNotExist').is(':checked');
+            if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID) {
+                zoomUserMatchingMode = CMS_USER_ID;
+            }
+            let zoomUserPostfix = $('#zoomUserPostfix').val().trim();
 
             $.ajax({
-                url : url,
+                url : submitUrl,
                 type : 'post',
                 data: {"ks": ks, 'accountId' : accountId,
                     'integrationSetting:objectType' : 'KalturaZoomIntegrationSetting',
                     'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
                     'integrationSetting:enableRecordingUpload':enableRecordingUpload,
-                    'integrationSetting:createUserIfNotExist':createUserIfNotExist,
                     'integrationSetting:handleParticipantsMode':handleParticipantsMode,
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
-                    'integrationSetting:enableWebinarUploads':enableWebinarUpload,
+                    'integrationSetting:enableWebinarUploads':enableWebinarUploads,
+                    'integrationSetting:createUserIfNotExist':createUserIfNotExist,
                     'format': 1 },
                 success : function(res) {
-                    $("body").css("cursor", "default");
+                    $('body').css('cursor', 'default');
                     console.log(res);
                     if(res){
                         if(res.objectType == 'KalturaAPIException')
@@ -155,102 +66,198 @@
                     }
                 },
                 error: function() {
-                    $("body").css("cursor", "default");
+                    $('body').css('cursor', 'default');
                     console.log('err during api call');
                 }
             });
         }
         function  onSuccess() {
-            $('#submitError').hide();
-            $('#submitOK').show();
+            alert('Saved Successfully');
         }
         function onFail(errorMessage) {
-            $('#submitOK').hide();
-            $('#submitError').show();
-            $('#submitError').html(errorMessage);
+            alert('Data was Not Saved.\n'+errorMessage);
+        }
+        function onLoad() {
+            console.log(partnerId);
+            if(!partnerId)
+            {
+                return;
+            }
+            setDefaultValues();
+            $.ajax({
+                url: getUrl,
+                type: 'post',
+                data: {'ks': ks, 'accountId': accountId ,'partnerId':partnerId },
+                success: function (res) {
+                    console.log(res);
+                    if (res) {
+                        if (res.objectType == 'KalturaAPIException') {
+                            alert('Error loading page.\n'+res.message);
+                        } else {
+                            console.log(res);
+                            loadParameters(res);
+                        }
+                    }
+                },
+                error: function () {
+                    alert('Error loading page.\n');
+                    console.log('err during api call');
+                }
+            });
         }
 
-    </script>
-    <script>
-        (function() {
-            document.addEventListener('DOMContentLoaded', function () {
-                var submitButton = document.querySelector('.submit-button');
-                submitButton.addEventListener('click', trySubmit);
+        function setDefaultValues(){
+            $('#enableWebinarUploads').prop('checked',true);
+            $('#enableRecordingUpload').prop('checked',true);
+            $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
+            $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
+            $('#createUserIfNotExist').prop('checked',true);
+        }
+        function loadParameters(p) {
+         jQuery.each(p, function(i,v) {
+                console.log(i,v);
+                switch (i) {
+                    case 'defaultUserId':
+                    case 'zoomCategory':
+                    case 'zoomUserPostfix':
+                    case 'zoomWebinarCategory':
+                        $('#'+i).val(v);
+                        break;
+                    case 'enableWebinarUploads':
+                    case 'enableRecordingUpload':
+                    case 'createUserIfNotExist':
+                        $('#'+i).prop('checked', v);
+                        break;
+                    case 'zoomUserMatchingMode':
+                    {
+                        //check user matching mode
+                        if(v==3)
+                        {
+                            $('input:radio[name=recordingOwner][value="1"]').prop('checked', true);
+                            $('#matchingZoomUserBasedOnZoomUserId').hide();
+                        }
+                        else
+                        {
+                            $('input:radio[name=recordingOwner][value="0"]').prop('checked', true);
+                            $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
+                            $('#matchingZoomUserBasedOnZoomUserId').show();
+                        }
+                    }
+                    break;
+                    case 'handleParticipantsMode':
+                        $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
+                        break;
+                }
+
             });
-        })();
+        }
+
+        function recordingOwnerChanged(e) {
+            if(e) {
+                $('#matchingZoomUserBasedOnZoomUserId').show();
+            }
+            else {
+                $('#matchingZoomUserBasedOnZoomUserId').hide();
+            }
+        }
     </script>
+
     <title>Kaltura-Zoom registration</title>
 </head>
-<form action="" class="zoom-form">
-    <div class="imgcontainer">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/KalturaLogo_Updatedpng.png" alt="Avatar" class="avatar">
-    </div>
-
-    <p class="container">
-    <p>
-        <a class="big"><label for="defaultUserId"><b>Default User ID</b></label></a>
-        <input type="text" value="@defaultUserID@" id="defaultUserId" name="defaultUserId" required>
-    </p>
-    <p>
-        <a class="big"><label for="zoomCategory"><b>Zoom Category</b></label></a>
-        <input type="text" value="@zoomCategory@" id="zoomCategory" name="zoomCategory" required>
-    </p>
-    <p>
-        <a class="big"><label for="zoomWebinarCategory"><b>Zoom Webinar Category</b></label></a>
-        <input type="text" value="@zoomWebinarCategory@" id="zoomWebinarCategory" name="zoomWebinarCategory" required>
-    </p>
-
-    <p>
-        <input type="checkbox" class="enableRecordingUpload" @enableRecordingUpload@>
-        <label class="small">Enable recording upload</label>
-        <input type="checkbox" class="createUserIfNotExist" @createUserIfNotExist@>
-        <label class="small">Create users automatically if not exist</label>
-        <input type="checkbox" class="enableWebinarUpload" @enableWebinarUpload@>
-        <label class="small">Enable webinar upload</label>
-    </p>
-
-    <div class="margin-top">
-        <p class="small margin">Please select how meeting participants should be handled:</p>
-        <div class="margin">
-            <input type="radio" id="participantsChoice1"
-                   name="participantsHandler" value="0"  checked>
-            <label for="participantsChoice1" class="small">Add as Co publishers</label>
-
-            <input type="radio" id="participantsChoice2"
-                   name="participantsHandler" value="1">
-            <label for="participantsChoice2" class="small">Add as Co viewers</label>
-
-            <input type="radio" id="participantsChoice3"
-                   name="participantsHandler" value="2">
-            <label for="participantsChoice3" class="small">Ignore participants</label>
+<body onload="onLoad()" style="max-width: 600px;margin: auto">
+    <form>
+        <div class='imgcontainer'>
+            <img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
+        </div>
+        <div class='form-group  container p-2 my-2 border'>
+            <div class='form-group'>
+                <label><h7>Default User ID</h7></label>
+                <input type='text' value='@defaultUserID@' id='defaultUserId' class='form-control' name='defaultUserId' required>
+            </div>
+            <div class='form-group'>
+                <label for='zoomCategory'><h7>Zoom Category</h7></label>
+                <input type='text' value='@zoomCategory@' id='zoomCategory' class='form-control' name='zoomCategory' required>
+            </div>
+            <div class='form-group'>
+            <label for='zoomWebinarCategory'><h7>Zoom Webinar Category</h7></label>
+                <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
+            </div>
+            <h7>Settings</h7>
+            <div class='container p-2 my-2 border'>
+                <div class='custom-control custom-switch'>
+                    <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
+                    <label class='custom-control-label' for='enableRecordingUpload'>Enable recording upload</label>
+                </div>
+                <div class='custom-control custom-switch'>
+                    <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
+                    <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
+                </div>
+            </div>
         </div>
 
-        <p class="small margin">Please select how matching zoom users should be handled:</p>
-        <div class="margin">
-            <input type="radio" id="userMatchingHandler1"
-                   name="userMatchingHandler" value="0"  checked>
-            <label for="userMatchingHandler1" class="small">Do not modify</label>
+        <div class='form-group  container p-2 my-2 border'>
+            <h7 >Setting owner for recordings</h7>
+            <div>
+                <div class='container p-2 my-2 border'>
+                    <div class='custom-control custom-switch'>
+                        <input type='checkbox' class='custom-control-input' id='createUserIfNotExist' name='createUserIfNotExist'>
+                        <label class='custom-control-label' for='createUserIfNotExist'>Create new user if no match is found</label>
+                    </div>
+                </div>
+            </div>
+            <div class='form-check'>
+                <label class='form-check-label'>
+                <input type='radio'  id='recordingOwnerBasedOnZoomId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(this.checked)' value='0' checked>
+                    Based on Zoom User ID</label>
+            </div>
 
-            <input type="radio" id="userMatchingHandler2"
-                   name="userMatchingHandler" value="1">
-            <label for="userMatchingHandler2" class="small">Add postfix</label>
-
-            <input type="radio" id="userMatchingHandler3"
-                   name="userMatchingHandler" value="2">
-            <label for="userMatchingHandler3" class="small">Remove postfix</label>
+            <div id='matchingZoomUserBasedOnZoomUserId' class='container-fluid p-3 my-2 mx-auto border' style='width: 97%;'>
+                <p class='form-check-label'>How matching Zoom users should be handled:</p>
+                <div class='form-check-inline'>
+                    <input type='radio' class='form-check-input'
+                           name='zoomUserMatchingMode' value='0' >
+                    <label class='form-check-label'>Do not modify</label>
+                </div>
+                <div class='form-check-inline'>
+                    <input type='radio' class='form-check-input'
+                           name='zoomUserMatchingMode' value='1'>
+                    <label class='form-check-label'>Add postfix</label>
+                </div>
+                <div class='form-check-inline'>
+                    <input type='radio' class='form-check-input'
+                           name='zoomUserMatchingMode' value='2'>
+                    <label class='form-check-label'>Remove postfix</label>
+                </div>
+                <div class='form-group'>
+                    <label class='form-check-label'>Postfix</label>
+                    <input type='text' value='' id='zoomUserPostfix' class='form-control' name='zoomUserPostfix'>
+                </div>
+            </div>
+            <div class='form-check'>
+                <label class='form-check-label'>
+                    <input type='radio'  id='recordingOwnerBasedOnCmsUserId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(!this.checked)' value='1'>
+                    Based on cms_user_id (SAML mapping)</label>
+            </div>
         </div>
-    </div>
-    <p>
-        <a class="big"><label for="zoomUserPostfix"><b>User matching postfix</b></label></a>
-        <input type="text" value="" id="zoomUserPostfix" name="zoomUserPostfix">
-    </p>
-
-    <div align="center">
-        <button type="submit" class="submit-button">Submit</button>
-    </div>
-    <p id="submitError" class="error" style="display:none">Data was Not Saved , please check server logs'.</p>
-    <p id="submitOK" class="success" style="display:none">Saved Successfully</p>
-    </div>
-</form>
+        <div class='form-group container p-2 my-2 border'>
+            <p class='form-check-label'><h7>How meeting participants should be handled:</h7></p>
+            <div class='form-check-inline'>
+                <label class='form-check-label'>
+                <input type='radio' class='form-check-input'
+                       name='handleParticipantsMode' value='0'>Add as Co publishers </label>
+            </div>
+            <div class='form-check-inline'>
+                <label class='form-check-label'>
+                <input type='radio' class='form-check-input'
+                       name='handleParticipantsMode' value='1'>Add as Co viewers </label>
+            </div>
+            <div class='form-check-inline'>
+                <label class='form-check-label'>
+                <input type='radio' class='form-check-input'
+                       name='handleParticipantsMode' value='2'>Ignore participants </label>
+            </div>
+        </div>
+        <button type='button' id='submitBtn' class='btn btn-block btn-primary' onclick='trySubmit()'>Submit</button>
+    </form>
 </body>
 </html>

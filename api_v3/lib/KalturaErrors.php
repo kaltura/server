@@ -323,7 +323,7 @@ class KalturaErrors extends APIErrors
 
 	const THUMB_ASSET_ID_IS_NOT_TIMED_THUMB_TYPE = "THUMB_ASSET_IS_NOT_OF_TYPE_TIMED_THUMB;ASSET;Thumbnail asset \"@ASSET@\" is not of type timed thumb";
 
-	const IMAGE_CONTENT_NOT_SECURE = "IMAGE_CONTENT_NOT_SECURE;;Image content contains potential security risks";
+	const FILE_CONTENT_NOT_SECURE = "FILE_CONTENT_NOT_SECURE;;File content contains potential security risks";
 
 	/**
 	 * Category Service
@@ -774,7 +774,7 @@ class KalturaErrors extends APIErrors
 	const MAP_ALREADY_EXIST = "MAP_ALREADY_EXIST;NAME,HOST;Map already exist for this map name {@NAME@} and host {@HOST@}";
 	const MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM = "MAP_CANNOT_BE_CREATED_ON_FILE_SYSTEM;;Map cannnot be created on file system";
 	const HOST_NAME_CONTAINS_ASTRIX = "HOST_NAME_CONTAINS_ASTRIX;HOST_NAME;Host name contains *, use # instead {@HOST_NAME@}";
-
+	const CHANGE_DESCRIPTION_CANNOT_BE_EMPTY = "CHANGE_DESCRIPTION_CANNOT_BE_EMPTY;;Param changeDescription cannot be empty";
 	const SEARCH_ITEM_TYPE_NOT_FOUND = 'SEARCH_ITEM_TYPE_NOT_FOUND;SEARCH_ITEM_TYPE,ELASTIC_FIELD_NAME; Search item type [@SEARCH_ITEM_TYPE@] not found for field: [@ELASTIC_FIELD_NAME@]';
 }
 

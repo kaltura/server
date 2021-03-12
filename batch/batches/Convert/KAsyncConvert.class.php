@@ -125,10 +125,22 @@ class KAsyncConvert extends KJobHandlerWorker
 	
 	protected function convert(KalturaBatchJob $job, KalturaConvartableJobData $data)
 	{
-			/*
-			 * When called for 'collections', the 'flavorParamsOutputId' is not set.
-			 * It is set in the 'flavors' array, but for collections the 'flavorParamsOutput' it is unrequired.
-			 */
+		//When working with shared mode enabled and shared file path is already provided we don't not need to move through api or run the isRemoteOutput closer
+		$isSharedOutputMode = isset($data->destFileSyncSharedPath) && kFile::isSharedPath($data->destFileSyncSharedPath);
+		if(isset(self::$taskConfig->params->isRemoteOutput))
+		{
+			self::$taskConfig->params->isRemoteOutput = self::$taskConfig->params->isRemoteOutput && !$isSharedOutputMode;
+		}
+
+		if(isset(self::$taskConfig->params->moveThroughApi))
+		{
+			self::$taskConfig->params->moveThroughApi = self::$taskConfig->params->moveThroughApi && !$isSharedOutputMode;
+		}
+
+		/*
+		 * When called for 'collections', the 'flavorParamsOutputId' is not set.
+		 * It is set in the 'flavors' array, but for collections the 'flavorParamsOutput' it is unrequired.
+		 */
 		if(isset($data->flavorParamsOutputId))
 			$data->flavorParamsOutput = self::$kClient->flavorParamsOutput->get($data->flavorParamsOutputId);
 		
@@ -136,15 +148,15 @@ class KAsyncConvert extends KJobHandlerWorker
 		{
 			$fileSyncLocalPath = $this->translateSharedPath2Local($srcFileSyncDescriptor->fileSyncLocalPath);
 			$srcFileSyncDescriptor->isRemote = false;
-			
 			if(!in_array($job->jobSubType, $this->remoteConvertSupportedEngines))
 			{
-				list($isRemote, $remoteUrl) = kFile::resolveFilePath($fileSyncLocalPath);
+				list($isRemote, $remoteUrl, $isDir) = kFile::resolveFilePath($fileSyncLocalPath);
 				if($isRemote)
 				{
-					$fileSyncLocalPath = kFile::getExternalFile($remoteUrl, $this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
+					$fileSyncLocalPath = kFile::fetchRemoteToLocal($fileSyncLocalPath, $remoteUrl, $isDir,
+						$this->sharedTempPath . "/imports/", $job->id . "_" . basename($fileSyncLocalPath));
 				}
-				
+				$srcFileSyncDescriptor->isDir = $isDir;
 				$srcFileSyncDescriptor->isRemote = $isRemote;
 			}
 			
@@ -189,9 +201,31 @@ class KAsyncConvert extends KJobHandlerWorker
 	{
 		foreach ($srcFileSyncs as $srcFileSyncDescriptor)
 		{
-			if($srcFileSyncDescriptor->isRemote)
+			if(!$srcFileSyncDescriptor->isRemote)
+				continue;
+			
+			$fileTmpPath = $srcFileSyncDescriptor->actualFileSyncLocalPath;
+			if($srcFileSyncDescriptor->isDir)
 			{
-				kFile::unlink($srcFileSyncDescriptor->actualFileSyncLocalPath);
+				$dir = dir($fileTmpPath);
+				if (!$dir)
+				{
+					return null;
+				}
+				
+				while($dirFile = $dir->read())
+				{
+					if ($dirFile != "." && $dirFile != "..")
+					{
+						unlink($fileTmpPath.DIRECTORY_SEPARATOR.$dirFile);
+					}
+				}
+				$dir->close();
+				kFile::rmdir($fileTmpPath);
+			}
+			else
+			{
+				kFile::unlink($fileTmpPath);
 			}
 		}
 	}
@@ -221,8 +255,10 @@ class KAsyncConvert extends KJobHandlerWorker
 //		}
 		$fetchFirst = null;
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
-		{		
-			if(self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath))) // for distributed conversion
+		{
+			$localFileExists = isset($srcFileSyncDescriptor->actualFileSyncLocalPath) && file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath);
+			// if the file was already retrieved then we dont care if the isRemoteInput is on or off.
+			if(!$localFileExists && (self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))) // for distributed conversion
 			{
 				if(!strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))
 					$srcFileSyncDescriptor->actualFileSyncLocalPath = self::$taskConfig->params->localFileRoot . DIRECTORY_SEPARATOR . basename($srcFileSyncDescriptor->fileSyncRemoteUrl);
@@ -356,7 +392,7 @@ class KAsyncConvert extends KJobHandlerWorker
 				clearstatcache();
 				$directorySync = kFile::isDir($data->destFileSyncLocalPath);
 				if($directorySync)
-					$fileSize = KBatchBase::foldersize($data->destFileSyncLocalPath);
+					$fileSize = $fileSize = kFile::folderSize($data->destFileSyncLocalPath);
 				else
 					$fileSize = kFile::fileSize($data->destFileSyncLocalPath);
 
@@ -398,9 +434,10 @@ class KAsyncConvert extends KJobHandlerWorker
 		
 		if($data->logFileSyncLocalPath && kFile::checkFileExists($data->logFileSyncLocalPath))
 		{
-			kFile::moveFile($data->logFileSyncLocalPath, "$sharedFile.log");
-			$this->setFilePermissions("$sharedFile.log");
-			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+			$sharedLogName = "$sharedFile.conv.log";
+			kFile::moveFile($data->logFileSyncLocalPath, $sharedLogName);
+			$this->setFilePermissions($sharedLogName);
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared($sharedLogName);
 		
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);
@@ -422,7 +459,7 @@ class KAsyncConvert extends KJobHandlerWorker
 			clearstatcache();
 			$directorySync = kFile::isDir($destFileSync->fileSyncLocalPath);
 			if($directorySync)
-				$fileSize=KBatchBase::foldersize($destFileSync->fileSyncLocalPath);
+				$fileSize=kFile::folderSize($destFileSync->fileSyncLocalPath);
 			else
 				$fileSize = kFile::fileSize($destFileSync->fileSyncLocalPath);
 				
@@ -468,19 +505,47 @@ class KAsyncConvert extends KJobHandlerWorker
 		$this->operationEngine->setEncryptionKey($key);
 		if (!$key || is_dir($filePath))
 		{
-			$this->validateFileType($filePath);
+			try
+			{
+				$this->validateFileType($filePath);
+			}
+			catch (KOperationEngineException $e)
+			{
+				if(!is_dir($filePath))
+				{
+					$this->handleInvalidFile($filePath);
+				}
+				throw $e;
+			}
 			$res = $this->operationEngine->operate($operator, $filePath, $configFilePath);
 		}
 		else
 		{
 			$tempClearPath = self::createTempClearFile($filePath, $key);
-			$this->validateFileType($tempClearPath);
+			try
+			{
+				$this->validateFileType($tempClearPath);
+			}
+			catch (KOperationEngineException $e)
+			{
+				$this->handleInvalidFile($filePath);
+				kFile::unlink($tempClearPath);
+				throw $e;
+			}
 			$res = $this->operationEngine->operate($operator, $tempClearPath, $configFilePath);
 			kFile::unlink($tempClearPath);
 		}
 		return $res;
 	}
 
+	protected function handleInvalidFile($filePath)
+	{
+		if (isset(self::$taskConfig->params->isRemoteInput) && self::$taskConfig->params->isRemoteInput)
+		{
+			KalturaLog::debug("Deleting invalid file $filePath");
+			kFile::unlink($filePath);
+		}
+	}
 	/**
 	 * @param $filePath
 	 * @throws KOperationEngineException
@@ -591,8 +656,9 @@ class KAsyncConvert extends KJobHandlerWorker
 
 		if($data->logFileSyncLocalPath && file_exists($data->logFileSyncLocalPath))
 		{
-			$this->doApiMove($data->logFileSyncLocalPath, "$sharedFile.log");
-			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared("$sharedFile.log");
+			$sharedLogName = "$sharedFile.conv.log";
+			$this->doApiMove($data->logFileSyncLocalPath, $sharedLogName);
+			$data->logFileSyncLocalPath = $this->translateLocalPath2Shared($sharedLogName);
 
 			if(self::$taskConfig->params->isRemoteOutput) // for remote conversion
 				$data->logFileSyncRemoteUrl = $this->distributedFileManager->getRemoteUrl($data->logFileSyncLocalPath);

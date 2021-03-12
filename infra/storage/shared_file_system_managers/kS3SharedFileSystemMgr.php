@@ -46,6 +46,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $endPoint;
 	protected $accessKeySecret;
 	protected $accessKeyId;
+	protected $storageClass;
+	protected $concurrency;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -80,6 +82,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 		}
 		
+		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
+		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : 'INTELLIGENT_TIERING';
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
@@ -215,6 +219,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	private function doPutFileHelper($filePath , $fileContent, $params)
 	{
+		$params['StorageClass'] = $this->storageClass;
+		$params['concurrency'] = $this->concurrency;
+		
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		try
 		{
@@ -395,16 +402,14 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		// Example:
 		//  my_bucket/dir1/dir2/my_file.mp4
 		//  my_bucket/dir1/dir2/my_file.mp4.log
-		$path = $path . DIRECTORY_SEPARATOR;
+		$path = $path . '/';
 		list($bucket, $key) = $this->getBucketAndFilePath($path);
-		
 		try
 		{
 			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
 				'Bucket' => $bucket,
 				'Prefix' => $key
 			));
-			
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
 				$dirList[] = array (
@@ -417,8 +422,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
 		}
-		
-		return count($dirList) > 1;
+		return count($dirList) >= 1;
 	}
 	
 	protected function getHeadObjectForPath($path)
@@ -574,40 +578,44 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return $result['Location'];
 	}
-	
-	protected function doListFiles($filePath, $pathPrefix = '')
+
+	protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
 		$dirList = array();
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
-		
+
 		try
 		{
 			$dirListObjectsRaw = $this->s3Client->getIterator('ListObjects', array(
 				'Bucket' => $bucket,
 				'Prefix' => $filePath
 			));
-			
+
 			$originalFilePath = $bucket . '/' . $filePath . '/';
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
-				$objectPath = $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'];
-				if($originalFilePath == $objectPath)
+				$fullPath = '/' . $bucket . '/' . $dirListObject['Key'];
+				$fileName = $pathPrefix.basename($fullPath);
+				if($originalFilePath == $fullPath)
 					continue;
-				
+
 				$fileType = "file";
-				if($dirListObject['Size'] == 0 && substr_compare($objectPath, '/', -strlen('/')) === 0)
+				if($dirListObject['Size'] == 0 && substr_compare($fullPath, '/', -strlen('/')) === 0)
 				{
 					$fileType = 'dir';
 				}
-				
+
 				if ($fileType == 'dir')
 				{
-					$dirList[] = array($objectPath, 'dir', $dirListObject['Size']);
-					$dirList = array_merge($dirList, self::doListFiles($objectPath, $pathPrefix));
+					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject['Size']);
+					if( $recursive)
+					{
+						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
+					}
 				}
 				else
 				{
-					$dirList[] = array($objectPath, 'file', $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject['Size']);
 				}
 			}
 		}
@@ -615,10 +623,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			self::safeLog("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
 		}
-		
+
 		return $dirList;
 	}
-	
+
 	protected function doGetMaximumPartsNum()
 	{
 		return self::MAX_PARTS_NUMBER;
@@ -917,4 +925,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return false;
 	}
 	
+	protected function doShouldPollFileExists()
+	{
+		return false;
+	}
 }

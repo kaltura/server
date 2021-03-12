@@ -37,6 +37,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_PERCENTILES_RATIO = 'avg_completion_rate';
 	const METRIC_PLAYTHROUGH_RATIO = 'play_through_ratio';
 	const METRIC_UNIQUE_ENTRIES = 'unique_videos';
+	const METRIC_UNIQUE_PLAYED_ENTRIES = 'unique_played_videos';
 	const METRIC_UNIQUE_USERS = 'unique_known_users';
 	const METRIC_CARDINALITY = 'cardinality';
 	const METRIC_COUNT_UGC = 'count_ugc';
@@ -335,6 +336,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_REGISTRATION_IMPRESSION,
 		self::EVENT_TYPE_HOTSPOT_CLICKED,
 		self::EVENT_TYPE_NODE_SWITCH,
+		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -385,11 +388,14 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PLAYMANIFEST => 'count_play_manifest',
 		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
 		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
+		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED => 'count_download_attachment_clicked',
 	);
 
 	//global transform
 	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_PLAYED_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_CONTRIBUTORS => 'floor',
 		self::METRIC_VIEW_UNIQUE_AUDIENCE => 'floor',
@@ -424,6 +430,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_DROP_OFF => true,
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
+		self::METRIC_UNIQUE_PLAYED_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
 		self::METRIC_BUFFER_TIME_RATIO => true,
 		self::METRIC_AVG_BITRATE => true,
@@ -776,8 +783,14 @@ class kKavaReportsMgr extends kKavaBase
 			self::METRIC_UNIQUE_ENTRIES, 
 			array(self::DIMENSION_ENTRY_ID));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
+
 		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
 			self::getCardinalityAggregator(
 				self::METRIC_TOTAL_UNIQUE_PERCENTILES,
 				array(self::DIMENSION_PERCENTILES)));
@@ -2230,6 +2243,10 @@ class kKavaReportsMgr extends kKavaBase
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
 			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
+			'crm_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_CRM_ID),
+			'playlist_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYLIST_ID),
+			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
+			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

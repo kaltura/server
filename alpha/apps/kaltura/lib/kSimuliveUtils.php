@@ -39,8 +39,11 @@ class kSimuliveUtils
 		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
 		$endTime = $startTime + array_sum($durations);
 		// getting the flavors from source entry
-		$flavors = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
-		return array($durations, $flavors, $startTime, $endTime, $dvrWindowMs);
+		$flavorAssets = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
+		// getting the entry's caption assets
+		$captionAssets = myPlaylistUtils::getEntryIdsCaptions($sourceEntry->getId());
+		$assets = array_merge($captionAssets, $flavorAssets);
+		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
 	}
 
 	/**
@@ -134,4 +137,5 @@ class kSimuliveUtils
 		// conditional cache should expire when event start
 		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
 	}
+
 }

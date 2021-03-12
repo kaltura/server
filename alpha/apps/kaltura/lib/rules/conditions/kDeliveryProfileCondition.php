@@ -59,7 +59,7 @@ class kDeliveryProfileCondition extends kCondition
 			 * @var DeliveryProfile $deliveryProfile
 			 */
 			$recognizer = $deliveryProfile->getRecognizer();
-			if ($recognizer && $recognizer->isRecognized($requestOrigin))
+			if ($recognizer && $recognizer->isRecognized($requestOrigin) == kUrlRecognizer::RECOGNIZED_OK)
 			{
 				return true;
 			}

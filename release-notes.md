@@ -1,3 +1,177 @@
+# Propus-16.19.0  #
+
+## Version Highlight ##
+### Features ###
+    PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
+        This new type will be used by KMS for NewRow scheduled meeting,
+        but customers can use if for anytype.
+
+    PLAT-22622 - Add close caption support to playManifest, the caption language
+        is from the related stream info
+
+### Bug fix ###
+    SUP-25895 - Zoom, Adding file extention to imported source files. 
+    PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
+
+## Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED (EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22606
+- Description: add the content parameter entry_reference_id to HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED
+
+### Deployment scripts ###
+- Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22679
+- Description: add the content parameter file_name to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_04_update_media_xml_bulk_job_failed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
+
+# Propus-16.18.0  #
+## Version Highlight ##
+### Features ###
+    PLAT-9940 - Adminconsole::UiConf, add filter by tags\type\name
+    SUP-24898 - Reach, Allow reach vendors KS overcome access control
+    PLAT-11136 - Allow entry user (Viewer/Publisher/Editor) list all userEntries.
+    This can allow webcast app see all the users that joined the event, when activated 
+    by others than the owner.
+    PLAT-22617 - User::LoginByLoginId, Allow setting priviledge on user object ksPrivileges. 
+    For this user, Any new login will generate a session that will include the specific permsission.
+    The motivation is to create users that can only login and access specific actions (such as loginByLoginId) 
+
+### Bug fix ###
+    SUP-26142 - Zoom, Chat file was not added to the primary entry, fixed.
+    REACH2-1050 - Reach, Block adding new task when entry is not ready.
+
+
+## Add Description to confMaps modifications ##
+- Issue Type: Task
+- Issue ID: FOUN-114
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2021_02_17_alter_config_maps_table.sql
+
+
+# Propus-16.17.0  #
+
+## Version Highlight ##
+
+### New features ###
+Enhance Zoom registration UI, adding:
+    a. Reload existing configuration
+    b. Support CMS_USER_ID matching
+    c. New look + updated logo
+
+# Propus-16.16.0  #
+
+## Version Highlight ##
+
+### New features ###
+
+	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
+
+## Send http notification when registering new partner on the partner's template ##
+- Issue Type: Task
+- Issue ID: PLAT-22547
+- Description: You can use this http notification if you need to notify for every new partner created from the templates partners.
+    in this case we used the notification to call 1-kms-int.mediaspace.kaltura.com/latest/public/create_instance.php
+
+### Deployment scripts ###
+-Add kaftestme registration http request on partner creation:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET and PARTNER_ID) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_01_13_partner_Added_Kaftestme_Http_Notification.template
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
+
+## Ability to cancel tasks ##
+- Issue Type: Task
+- Issue ID: REACH2-989
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_25_add_permissions_entry_vendor_task_object.php
+
+## New drop folder type S3 ##
+- Issue Type: Task
+- Issue ID: PLAT-22575
+
+### Configuration ###
+
+Add S3DropFolder to your plugins.ini
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+# Propus-16.15.0  #
+
+## Version Highlight ##
+
+### New features ###
+	
+	- SUP-24887 : YouTube! Kaltura Distribution app is certified for authetication without warnings 
+	- PLAT-22514 : Zoom enhancement, link between cms_user_id and entry onwer upon new recording
+	- SUP-24551 : Support upload caption files using sshUrlContentResource 
+	- REACH2-990 : Ability to set label for caption by setting new properties on KalturaReachProfile
+		- labelAdditionForMachineServiceType  (to be set on Machine translated caption coming from this profile)
+		- labelAdditionForHumanServiceType    (to be set on Human translated coming from this profile)
+	- SUP-24759 : REACH Captions Dashboard - Filtering/Sorting/Report Indicating Target Language
+	- SUP-25144 : New exception is raised (CRITERIA EXCEEDED MAX MATCHES ALLOWED) when tring to access object index > 10000 in eSearch service
+
+### Bug fix ###
+
+	- PLAT-22564 : attachment_attachmentasset->get must be done with KS
+	- SUP-25087 : Clipping of old content is stuck	
+
+### SAAS related ###
+
+	- PLAT-11239 : Download of files via VOD packager  
+	- PLAT-10788 : Fix link https://kmc.kaltura.com/default
+	
+## Reach - update reach_vendor response profile ##
+- Issue Type: Task
+- Issue ID: REACH2-998
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+                - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2021_01_03_update_reach_vendor_response_profiles.template.xml
+
+Run deployment script:
+
+                - php /opt/kaltura/app/deployment/updates/scripts/2021_01_03_update_reach_vendor_response_profile.php
+
+
 # Propus 16.13.0  #
 
 ## Adjust Kaltura Capture transcoding profile ##

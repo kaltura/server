@@ -240,6 +240,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	public function setStorageId($storageId) {
 		return $this->params->setStorageId($storageId);
 	}
+
+	public function setFileExt($fileExt)
+	{
+		return $this->params->setFileExtension($fileExt);
+	}
 	
 	// -------------------------------------
 	// -----  DeliveryProfile functionality--------
@@ -392,7 +397,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					$audioLabel = $flavor->getLabel();
 				}
 				
-				$audioLanguageData = is_callable(array($flavor, 'getLanguage')) ? $this->getAudioLanguage($flavor) : null;
+				$audioLanguageData = $flavor->getLanguage() ? $this->getAudioLanguage($flavor) : null;
 				if (!$audioLanguageData) 
 				{
 					$audioLanguage = 'und';

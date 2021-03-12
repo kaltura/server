@@ -56,6 +56,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
             return true;
         }
 
+		$taskJobData = self::getTaskJobData($object);
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
 		    //Validate the existence of the catalog item
@@ -204,6 +205,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
 		}
+
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach()
+				&& $object->getStatus() == entryStatus::READY
+				&& $object->getLengthInMsecs())
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -243,7 +251,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return true;
 
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		if($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
@@ -256,6 +264,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				return true;
 			}
+		}
+
+		if ($object instanceof flavorAsset
+			&& in_array(assetPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == asset::ASSET_STATUS_READY
+			&& myEntryUtils::isEntryReady($object->getEntryId()))
+		{
+			return true;
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -302,6 +318,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->checkAutomaticRules($object);
 		}
 
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach()
+				&& $object->getStatus() == entryStatus::READY
+				&& $object->getLengthInMsecs())
+		{
+			$this->checkAutomaticRules($object, true);
+		}
+
 		return true;
 	}
 
@@ -345,14 +368,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
 		)
 			return $this->handleErrorTask($object);
-		
+
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::READY
 		)
+		{
+			$this->addLabelAddition($object);
 			return $this->invalidateAccessKey($object);
+		}
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))
@@ -375,6 +401,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					return $this->abortTasks($object);
 				}
 			}
+		}
+
+		if ($object instanceof flavorAsset)
+		{
+			return $this->handleEntryReady($object->getentry());
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -415,7 +446,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		
 		return true;
 	}
-	
+
 	protected function checkPendingEntryTasks($object)
 	{
 		//Check if there are any tasks that were created with pending entry ready status
@@ -448,7 +479,63 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
 	}
-	
+
+	protected function getLabelAdditionByType(ReachProfile $reachProfile, $serviceType)
+	{
+		switch ($serviceType)
+		{
+			case VendorServiceType::HUMAN:
+				return $reachProfile->getLabelAdditionForHumanServiceType();
+
+			case VendorServiceType::MACHINE:
+				return $reachProfile->getLabelAdditionForMachineServiceType();
+		}
+		return null;
+	}
+
+	protected function addLabelAddition(EntryVendorTask $entryVendorTask)
+	{
+		do
+		{
+			// Relevant only for Captions service
+			if($entryVendorTask->getServiceFeature() != VendorServiceFeature::CAPTIONS)
+			{
+				break;
+			}
+
+			$captionAssetId = $entryVendorTask->getOutputObjectId();
+			if(!$captionAssetId)
+			{
+				break;
+			}
+
+			$reachProfile = $entryVendorTask->getReachProfile();
+			if(!$reachProfile)
+			{
+				break;
+			}
+
+			$labelAddition = $this->getLabelAdditionByType($reachProfile, $entryVendorTask->getServiceType());
+			if(empty($labelAddition))
+			{
+				break;
+			}
+
+			$dbCaptionAsset = assetPeer::retrieveById($captionAssetId);
+			if (!$dbCaptionAsset || !($dbCaptionAsset instanceof CaptionAsset))
+			{
+				break;
+			}
+
+			$newLabel = "{$dbCaptionAsset->getLabel()} $labelAddition";
+			KalturaLog::debug("New label [{$newLabel}] for CaptionAsset ID [{$captionAssetId}]");
+
+			$dbCaptionAsset->setLabel($newLabel);
+			$dbCaptionAsset->save();
+
+		}while(0);
+	}
+
 	private function invalidateAccessKey(EntryVendorTask $entryVendorTask)
 	{
 		$ksString = $entryVendorTask->getAccessKey();
@@ -517,10 +604,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
         $targetVersion = $vendorCatalogItem->calculateEntryVendorTaskVersion($entry);
 		if ($vendorCatalogItem->isDuplicateTask($entry))
-
+		//if (EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
 		{
 			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$targetVersion]");
 			return true;
+		}
+		else
+		{
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
+			if($activeTasksOnOlderVersion)
+			{
+				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
+			}
 		}
 
 		//check if credit has expired
@@ -536,9 +631,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		if(!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
+		if (!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
+			return true;
+		}
+
+		if (!kReachUtils::areFlavorsReady($entry, $reachProfile))
+		{
+			KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
 			return true;
 		}
 
@@ -703,9 +804,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			case entryStatus::DELETED:
 				return "deleted";
 			case entryStatus::ERROR_CONVERTING:
-				return "error'd while converting";
+				return "error occurred while converting";
 			case entryStatus::ERROR_IMPORTING:
-				return "error'd while importing";
+				return "error occurred while importing";
 			default:
 				return "invalid status provided";
 		}

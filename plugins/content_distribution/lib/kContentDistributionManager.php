@@ -45,6 +45,19 @@ class kContentDistributionManager
 		$batchJob->setObjectId($asset->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		
+		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
+		$importToSharedLocation = kConf::get('enable_import_to_shared', 'runtime_config', null);
+		if($importToSharedLocation && $partner->getSharedStorageProfileId())
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			
+			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+			
+			$convertData->setDestFileSyncSharedPath($sharedPath);
+		}
+		
 		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::IMPORT);
 	}
 	

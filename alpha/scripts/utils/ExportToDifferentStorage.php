@@ -62,13 +62,13 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 				break;
 			}
 
-			if ($fileSync->getSrcPath() == $readyFileSync->getFullPath() && $fileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
+			if ($targetDcFileSync->getSrcPath() == $readyFileSync->getFullPath() && $targetDcFileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
 			{
 				KalturaLog::log("XXX $assetId: PENDING_WITH_PATH - pending file sync with valid src path");
 			}
 			else
 			{
-				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $fileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
+				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $targetDcFileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
 				$targetDcFileSync->setSrcPath($readyFileSync->getFullPath());
 				$targetDcFileSync->setSrcEncKey($readyFileSync->getSrcEncKey());
 				$targetDcFileSync->putInCustomData('srcDc', $readyFileSync->getDc());
@@ -83,7 +83,7 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 			break;
 
 		default:
-			KalturaLog::log("XXX $assetId: BAD_STATUS" . $fileSync->getStatus() . " - non ready file sync");
+			KalturaLog::log("XXX $assetId: BAD_STATUS" . $targetDcFileSync->getStatus() . " - non ready file sync");
 			break;
 		}
 

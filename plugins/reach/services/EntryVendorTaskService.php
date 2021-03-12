@@ -75,9 +75,28 @@ class EntryVendorTaskService extends KalturaBaseService
 
 	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem)
 	{
-		if (kReachUtils::isDuplicateTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion, $dbVendorCatalogItem->getAllowResubmission()))
+		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
+		if ($activeTask)
 		{
-			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $taskVersion);
+			if (kReachUtils::isDuplicationByResubmission($activeTask, $dbVendorCatalogItem->getAllowResubmission()))
+			{
+				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $activeTask->getVersion());
+			}
+		}
+		else
+		{
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
+			if($activeTasksOnOlderVersion)
+			{
+				if (in_array($activeTasksOnOlderVersion->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY)))
+				{
+					kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
+				}
+				else if ($activeTasksOnOlderVersion->getStatus() == EntryVendorTaskStatus::PROCESSING)
+				{
+					throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $activeTasksOnOlderVersion->getVersion());
+				}
+			}
 		}
 
 		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion);
@@ -86,7 +105,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		}
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
-		$dbEntryVendorTask->save();
+		self::tryToSave($dbEntryVendorTask);
 		return $dbEntryVendorTask;
 	}
 	
@@ -171,7 +190,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
-		$dbEntryVendorTask->save();
+		self::tryToSave($dbEntryVendorTask);
 		
 		// return the saved object
 		$entryVendorTask = new KalturaEntryVendorTask();
@@ -210,8 +229,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::PENDING);
-		$dbEntryVendorTask->save();
-		
+		self::tryToSave($dbEntryVendorTask);
+
 		// return the saved object
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
@@ -247,8 +266,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbEntryVendorTask->setModeratingUser($this->getKuser()->getPuserId());
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::REJECTED);
 		$dbEntryVendorTask->setErrDescription($rejectReason);
-		$dbEntryVendorTask->save();
-		
+		self::tryToSave($dbEntryVendorTask);
+
 		// return the saved object
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
@@ -298,8 +317,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		$this->setPartnerFilters($partnerId);
 		kCurrentContext::$partner_id = $partnerId;
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
-		$dbEntryVendorTask->save();
-		
+		self::tryToSave($dbEntryVendorTask);
+
 		// return the saved object
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
@@ -334,8 +353,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::ABORTED);
 		$dbEntryVendorTask->setErrDescription($abortReason);
-		$dbEntryVendorTask->save();
-		
+		self::tryToSave($dbEntryVendorTask);
+
 		// return the saved object
 		$entryVendorTask = new KalturaEntryVendorTask();
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
@@ -416,7 +435,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		try
 		{
 			$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, true));
-			$dbEntryVendorTask->save();
+			self::tryToSave($dbEntryVendorTask);
 		}
 		catch (Exception $e)
 		{
@@ -523,5 +542,17 @@ class EntryVendorTaskService extends KalturaBaseService
 		$finalPath .= 'ks/' . kCurrentContext::$ks;
 		$url = 'http://' . kConf::get('www_host') . $finalPath;
 		return $url;
+	}
+
+	public static function tryToSave($dbEntryVendorTask)
+	{
+		try
+		{
+			$dbEntryVendorTask->save();
+		}
+		catch (kCoreException $e)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED, $e->getMessage());
+		}
 	}
 }

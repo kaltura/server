@@ -28,5 +28,7 @@ abstract class KObjectExportEngine
 	/**
 	 * Generate the first csv row containing the fields
 	 */
-	abstract protected function addHeaderRowToCsv($csvFile, $additionalFields);
+	abstract protected function addHeaderRowToCsv($csvFile,
+	                                              $additionalFields,
+	                                              $mappedFields = null);
 }

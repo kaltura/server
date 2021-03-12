@@ -8,8 +8,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 {
 	const ADMIN_TAG_ZOOM = 'zoomentry';
 
-	protected $zoomClient;
-
 	/**
 	 * @var ZoomVendorIntegration
 	 */
@@ -20,15 +18,21 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected $mainEntry;
 
+    /**
+     * @var string
+     */
+    protected $zoomBaseUrl;
+
 	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
 	 */
 	public function __construct($zoomBaseUrl)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl);
 		$this->mainEntry = null;
+		$this->zoomBaseUrl = $zoomBaseUrl;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
+		parent::__construct($zoomBaseUrl);
 	}
 
 	/**
@@ -75,6 +79,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$extraUsers = $this->getAdditionalUsers($recording->id, $dbUser->getPuserId());
 		foreach ($recording->recordingFiles as $recordingFilesPerTimeSlot)
 		{
+			$this->mainEntry = null;
 			foreach ($recordingFilesPerTimeSlot[kRecordingFileType::VIDEO] as $recordingFile)
 			{
 				$this->handleVideoRecord($recording, $dbUser, $extraUsers, $recordingFile, $event);
@@ -82,7 +87,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 			if (isset($recordingFilesPerTimeSlot[kRecordingFileType::CHAT]))
 			{
-				$chatFilesProcessor = new kZoomChatFilesProcessor();
+				$chatFilesProcessor = new kZoomChatFilesProcessor($this->zoomBaseUrl);
 				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
 				{
 					$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
@@ -105,6 +110,11 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	protected function handleVideoRecord($recording, $owner, $validatedUsers, $recordingFile, $event)
 	{
 		$entry = $this->createEntryFromRecording($recording, $owner);
+		if($this->mainEntry)
+		{
+			$entry->setParentEntryId($this->mainEntry->getId());
+		}
+
 		$this->setEntryCategory($entry);
 		$this->handleParticipants($entry, $validatedUsers);
 		$entry->save();
@@ -115,7 +125,8 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
-		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
+		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($entry->getPartnerId(), $entry->getId(), $recordingFile->fileExtension);
+		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url, $flavorAsset);
 		return $entry;
 	}
 
@@ -221,7 +232,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected function getAdditionalUsers($recordingId, $userToExclude)
 	{
-		if ($this->zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE)
+		if ($this->zoomIntegration->getHandleParticipantsMode() == kHandleParticipantsMode::IGNORE || $this->zoomIntegration->getUserMatching() == kZoomUsersMatching::CMS_MATCHING)
 		{
 			return null;
 		}

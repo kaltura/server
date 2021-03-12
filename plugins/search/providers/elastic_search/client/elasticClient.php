@@ -159,7 +159,7 @@ class elasticClient
 		if ($body)
 		{
 			//bulk body is already in json
-			$jsonEncodedBody = (strpos($cmd, self::ELASTIC_ACTION_BULK) === false) ?  json_encode($body) : $body;
+			$jsonEncodedBody = ($monitorActionName !== self::ELASTIC_ACTION_BULK) ?  json_encode($body) : $body;
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $jsonEncodedBody);
 			if ($logQuery)
 				KalturaLog::debug("Elastic client request: ".$jsonEncodedBody);

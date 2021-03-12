@@ -35,4 +35,8 @@ class TranscriptAsset extends AttachmentAsset
 		return $this->getFilename();
 	}
 
+	public function getTypeFolderName()
+	{
+		return 'transcripts';
+	}
 }
