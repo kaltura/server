@@ -75,17 +75,17 @@ class EntryVendorTaskService extends KalturaBaseService
 
 	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem)
 	{
-		$activeTask = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
+		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
 		if ($activeTask)
 		{
-			if (kReachUtils::isDuplicationByResubmission($activeTask, $dbVendorCatalogItem->getAllowResubmission()))
+			if ($dbVendorCatalogItem->getAllowResubmission())
 			{
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $activeTask->getVersion());
 			}
 		}
 		else
 		{
-			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveOneActiveTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
 			if($activeTasksOnOlderVersion)
 			{
 				if (in_array($activeTasksOnOlderVersion->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY)))
