@@ -32,7 +32,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
-		$this->zoomClient = new kZoomClient($this->dropFolder->baseURL, $this->dropFolder->refreshToken, $this->dropFolder->jwtToken);
+		$this->zoomClient = new kZoomClient($this->dropFolder->baseURL, $this->dropFolder->jwtToken, null, null, null,
+		                                    $this->dropFolder->accessToken);
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();

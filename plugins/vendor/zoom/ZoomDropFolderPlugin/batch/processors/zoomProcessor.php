@@ -21,8 +21,6 @@ abstract class zoomProcessor
 	
 	protected $dropFolder;
 	
-	protected $accessToken;
-	
 	/**
 	 * zoomProcessor constructor.
 	 * @param string $zoomBaseUrl
@@ -32,7 +30,6 @@ abstract class zoomProcessor
 	{
 		$this->zoomClient = new kZoomClient($zoomBaseUrl, $this->dropFolder->refreshToken, $this->dropFolder->jwtToken);
 		$this->dropFolder = $folder;
-		$this->accessToken = $this->zoomClient->getAccessToken($this->dropFolder->refreshToken);
 	}
 	
 	/**

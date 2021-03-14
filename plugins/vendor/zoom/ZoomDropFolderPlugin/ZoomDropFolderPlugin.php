@@ -22,7 +22,7 @@ class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsume
 	public static function dependsOn()
 	{
 		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
-		$vendorDependency = new KalturaDependency(self::VENDOR_PLUGIN_NAME);
+		$vendorDependency = new KalturaDependency(VendorPlugin::PLUGIN_NAME);
 		return array($dropFolderDependency, $vendorDependency);
 	}
 	

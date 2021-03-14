@@ -42,7 +42,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 				infra_ClientHelper::impersonate($entry->partnerId);
 				$captionAsset = $this->createAssetForTranscription($entry, $captionPlugin);
 				$captionAssetResource = new KalturaUrlResource();
-				$captionAssetResource->url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->accessToken;
+				$captionAssetResource->url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->accessToken;
 				$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
 				infra_ClientHelper::unimpersonate();
 			}
