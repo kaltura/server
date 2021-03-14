@@ -76,11 +76,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $kUser->id);
-		if ($recording->recordingFile->fileType == kRecordingFileType::VIDEO)
+		if ($recording->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
 		{
 			$this->handleVideoRecord($recording, $kUser, $extraUsers);
 		}
-		else if($recording->recordingFile->fileType == kRecordingFileType::CHAT)
+		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
 		{
 			$chatFilesProcessor = new zoomChatFilesProcessor($this->zoomBaseUrl, $this->dropFolder);
 			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recording->recordingFile->downloadUrl);

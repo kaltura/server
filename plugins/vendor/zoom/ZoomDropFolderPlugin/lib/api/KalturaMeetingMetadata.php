@@ -37,7 +37,7 @@ class KalturaMeetingMetadata extends KalturaObject
 	public $meetingStartTime;
 	
 	/**
-	 * @var kRecordingType
+	 * @var KalturaRecordingType
 	 */
 	public $type;
 	

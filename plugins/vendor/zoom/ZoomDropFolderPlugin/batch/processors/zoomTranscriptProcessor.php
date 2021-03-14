@@ -29,7 +29,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 		}
 
 		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
-		if ($recording->recordingFile->fileType == kRecordingFileType::TRANSCRIPT)
+		if ($recording->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT)
 		{
 			if (!$resourceReservation->reserve($recording->meetingMetadata->meetingId))
 			{

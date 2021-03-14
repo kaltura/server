@@ -162,7 +162,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$kMeetingMetaData->meetingStartTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
 			$kMeetingMetaData->accountId = $meetingFile[self::ACCOUNT_ID];
 			$kMeetingMetaData->hostId = $meetingFile[self::HOST_ID];
-			$kMeetingMetaData->type = $meetingFile[self::TYPE];
 			$recording = new kZoomRecording();
 			$recording->parseType($meetingFile[self::TYPE]);
 			$kMeetingMetaData->type = $recording->recordingType;
@@ -273,19 +272,19 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				$matchedEntry = $this->getEntryByReferenceId($dropFolderFile);
 				if ($matchedEntry)
 				{
-					if ($dropFolderFile->recordingFile->fileType == kRecordingFileType::TRANSCRIPT)
+					if ($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT)
 					{
 						$transcriptProcessor = new zoomTranscriptProcessor($zoomBaseUrl, $this->dropFolder);
 						$transcriptProcessor->handleRecordingTranscriptComplete($dropFolderFile);
 					}
-					else if (in_array($dropFolderFile->recordingFile->fileType, array(kRecordingFileType::VIDEO, kRecordingFileType::CHAT)))
+					else if (in_array($dropFolderFile->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::CHAT)))
 					{
 						$zoomRecordingProcessor = new zoomMeetingProcessor($zoomBaseUrl, $this->dropFolder);
 						$zoomRecordingProcessor->mainEntry = $matchedEntry;
 						$zoomRecordingProcessor->handleRecordingVideoComplete($dropFolderFile);
 					}
 				}
-				else if ($dropFolderFile->recordingFile->fileType == kRecordingFileType::VIDEO)
+				else if ($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
 				{
 					$zoomRecordingProcessor = new zoomMeetingProcessor($zoomBaseUrl, $this->dropFolder);
 					$zoomRecordingProcessor->handleRecordingVideoComplete($dropFolderFile);

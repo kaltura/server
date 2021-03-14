@@ -4,7 +4,7 @@
  */
 class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending
 {
-	const PLUGIN_NAME = 'zoomDropFolder';
+	const PLUGIN_NAME = 'ZoomDropFolder';
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
 	const EVENT_ZOOM_DROP_FOLDER_FLOW_MANAGER = 'kZoomDropFolderFlowManager';
 	
