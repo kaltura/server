@@ -8,11 +8,17 @@ class ZoomDropFolder extends RemoteDropFolder
 {
 	
 	const ZOOM_VENDOR_INTEGRATION_ID = 'zoom_vendor_integration_id';
+	const LAST_HANDLED_MEETING_TIME = 'last_handled_meeting_time';
 	
 	/**
 	 * @var string
 	 */
 	protected $zoomVendorIntegrationId;
+	
+	/**
+	 * @var time
+	 */
+	protected $lastHandledMeetingTime;
 	
 	/**
 	 * return string
@@ -28,6 +34,22 @@ class ZoomDropFolder extends RemoteDropFolder
 	public function setZoomVendorIntegrationId($v)
 	{
 		$this->putInCustomData(self::ZOOM_VENDOR_INTEGRATION_ID, $v);
+	}
+	
+	/**
+	 * return time
+	 */
+	public function getLastHandledMeetingTime()
+	{
+		return $this->getFromCustomData(self::LAST_HANDLED_MEETING_TIME);
+	}
+	
+	/**
+	 * @param time $v
+	 */
+	public function setLastHandledMeetingTime($v)
+	{
+		$this->putInCustomData(self::LAST_HANDLED_MEETING_TIME, $v);
 	}
 	
 	public function getImportJobData()

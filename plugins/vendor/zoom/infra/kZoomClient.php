@@ -15,6 +15,9 @@ class kZoomClient
 	const API_PARTICIPANT       = '/v2/report/meetings/@meetingId@/participants';
 	const API_PANELISTS         = '/v2/webinars/@webinarId@/panelists';
 	const API_USERS_PERMISSIONS = '/v2/users/@userId@/permissions';
+	const API_DELETE_RECORDING_FILE = '/v2/meetings/@meetingId@/recordings/@recordingId@';
+	const API_LIST_RECORDING = '/v2/accounts/@accountId@/recordings';
+	const API_GET_MEETING_RECORDING = '/v2/meetings/@meetingId@/recordings';
 	
 	protected $zoomBaseURL;
 	protected $refreshToken;
@@ -83,6 +86,41 @@ class kZoomClient
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS_PERMISSIONS);
 		return $this -> callZoom($apiPath);
+	}
+	
+	public function deleteRecordingFile($meetingUUid, $recodingId)
+	{
+		$apiPath = str_replace('@meetingId@', $meetingUUid, self::API_DELETE_RECORDING_FILE);
+		$apiPath = str_replace('@recordingId@', $recodingId, $apiPath);
+		$apiPath .= '?action=trash';
+		return $this->callZoom($apiPath);
+	}
+	
+	public function listRecordings($accountId, $from, $to, $nextPageToken, $pageSize)
+	{
+		$apiPath = str_replace('@accountId@', $accountId, self::API_LIST_RECORDING);
+		$apiPath .= '?from=' . $from . '&to=' . $to . '&next_page_token=' . $nextPageToken . '&pageSize=' . $pageSize;
+		return $this->callZoom($apiPath);
+	}
+	
+	public function getMeetingRecordings($meetingUUid)
+	{
+		$apiPath = str_replace('@meetingId@', $meetingUUid, self::API_GET_MEETING_RECORDING);
+		return $this->callZoom($apiPath);
+	}
+	
+	public function getFileSize($meetingUUid, $recodingId)
+	{
+		$meetingRecordings = $this->getMeetingRecordings($meetingUUid);
+		$recordingFiles = json_decode($meetingRecordings, true)[kZoomRecording::RECORDING_FILES];
+		foreach ($recordingFiles as $recordingFile)
+		{
+			if ($recordingFile[kZoomRecordingFile::ID] === $recodingId)
+			{
+				return $recordingFile[kZoomRecordingFile::FILE_SIZE];
+			}
+		}
+		return 0;
 	}
 	
 	/**

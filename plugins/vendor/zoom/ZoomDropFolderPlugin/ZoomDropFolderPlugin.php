@@ -2,7 +2,7 @@
 /**
  * @package plugins.ZoomDropFolder
  */
-class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader
+class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending
 {
 	const PLUGIN_NAME = 'zoomDropFolder';
 	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
@@ -22,8 +22,8 @@ class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsume
 	public static function dependsOn()
 	{
 		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
-		
-		return array($dropFolderDependency);
+		$vendorDependency = new KalturaDependency(self::VENDOR_PLUGIN_NAME);
+		return array($dropFolderDependency, $vendorDependency);
 	}
 	
 	/**
@@ -66,12 +66,47 @@ class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsume
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if($baseClass == 'KalturaDropFolder' && self::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM) ==
-			$enumValue)
+		switch ($baseClass)
 		{
-			return new KalturaZoomDropFolder();
+			case 'KDropFolderEngine':
+				if ($enumValue == KalturaDropFolderType::ZOOM)
+				{
+					return new KZoomDropFolderEngine();
+				}
+				break;
+			case ('KalturaDropFolder'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM) )
+				{
+					return new KalturaZoomDropFolder();
+				}
+				break;
+			case ('KalturaDropFolderFile'):
+				if ($enumValue == self::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM) )
+				{
+					return new KalturaZoomDropFolderFile();
+				}
+				break;
+			case 'kDropFolderContentProcessorJobData':
+				if ($enumValue == self::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM))
+				{
+					return new kDropFolderContentProcessorJobData();
+				}
+				break;
+			case 'KalturaJobData':
+				$jobSubType = $constructorArgs["coreJobSubType"];
+				if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
+					$jobSubType == self::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM) )
+				{
+					return new KalturaDropFolderContentProcessorJobData();
+				}
+				break;
+			case 'Kaltura_Client_DropFolder_Type_DropFolder':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::ZOOM)
+				{
+					return new Kaltura_Client_ZoomDropFolder_Type_ZoomDropFolder();
+				}
+				break;
 		}
-		
 		return null;
 	}
 	
@@ -87,7 +122,11 @@ class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsume
 		{
 			return 'ZoomDropFolder';
 		}
-		
+		else if($baseClass == 'DropFolderFile' &&
+			$enumValue == self::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM))
+		{
+			return 'ZoomDropFolderFile';
+		}
 		return null;
 	}
 	
