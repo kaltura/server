@@ -325,6 +325,18 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		KalturaLog::debug("Live Stream base url [$baseUrl]");
 		return $baseUrl;
 	}
+
+	protected function getUrlFormat($serverNode = null)
+	{
+		if ($this->getDynamicAttributes()->getServeVodFromLive())
+		{
+			return $serverNode->getUrlFormat();
+		}
+		else
+		{
+			return LiveURLFormat::NO_RECORDING;
+		}
+	}
 	
 	protected function getLivePackagerUrl($entryServerNode, $streamFormat = null)
 	{
@@ -350,32 +362,33 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		}
 		
 		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
-		
-		if($this->getDynamicAttributes()->getServeVodFromLive())
+		$livePackagerUrl .= "/p/$partnerID";
+
+		$urlFormat = $this->getUrlFormat($serverNode);
+		switch ($urlFormat)
 		{
-			if(strpos($livePackagerUrl, "front-live-service") !== false)
-			{
-				$recordingEntryId =  $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-				$sourceEntryId =  $this->getDynamicAttributes()->getEntryId();
-				$entryId = "$sourceEntryId/tl/$recordingEntryId";
-			}
-			else
-			{
+			case LiveURLFormat::OLD_RECORDING_FORMAT:
 				$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
 				$entry = entryPeer::retrieveByPK($entryId);
+				$entryIdString = "/e/$entryId/";
 
 				$liveType = "/recording/";
 				if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
 					$liveType = "/clip/";
 				$livePackagerUrl = str_replace("/live/", $liveType, $livePackagerUrl);
-			}
+				break;
+			case LiveURLFormat::NEW_RECORDING_FORMAT:
+				$recordingEntryId =  $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
+				$entryId =  $this->getDynamicAttributes()->getEntryId();
+				$entryIdString = "/e/$entryId/tl/$recordingEntryId/";
+				break;
+			default:
+				$entryId = $this->getDynamicAttributes()->getEntryId();
+				$entryIdString = "/e/$entryId/";
+				break;
 		}
-		else
-		{
-			$entryId = $this->getDynamicAttributes()->getEntryId();
-		}
-		
-		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
+
+		$livePackagerUrl .= $entryIdString;
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
 

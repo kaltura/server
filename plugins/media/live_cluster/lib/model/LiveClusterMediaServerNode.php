@@ -49,4 +49,9 @@ class LiveClusterMediaServerNode extends MediaServerNode
     {
         return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() .'/';
     }
+
+	public function getUrlFormat()
+	{
+		return LiveURLFormat::NEW_RECORDING_FORMAT;
+	}
 }

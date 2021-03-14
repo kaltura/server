@@ -233,4 +233,9 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN, null, null);
 	}
 
+	public function getUrlFormat()
+	{
+		return LiveURLFormat::OLD_RECORDING_FORMAT;
+	}
+
 } // WowzaMediaServer
