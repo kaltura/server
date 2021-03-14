@@ -10,7 +10,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	/**
 	 * @var KalturaMediaEntry
 	 */
-	protected $mainEntry;
+	public $mainEntry;
 	
 	/**
 	 * @var string
@@ -76,11 +76,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $kUser->id);
-		if ($recording->recordingFile->fileType == kRecordingFileType::VIDEO)
+		if ($recording->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
 		{
 			$this->handleVideoRecord($recording, $kUser, $extraUsers);
 		}
-		else if($recording->recordingFile->fileType == kRecordingFileType::CHAT)
+		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
 		{
 			$chatFilesProcessor = new zoomChatFilesProcessor($this->zoomBaseUrl, $this->dropFolder);
 			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recording->recordingFile->downloadUrl);
@@ -123,7 +123,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$kFlavorAsset->fileExt = $recording->recordingFile->fileExtension;
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
 		
-		$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->accessToken;
+		$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->accessToken;
 		$resource = new KalturaUrlResource();
 		$resource->url = $url;
 		$resource->forceAsyncDownload = true;

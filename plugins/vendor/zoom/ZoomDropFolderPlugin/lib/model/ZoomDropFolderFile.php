@@ -9,12 +9,12 @@ class ZoomDropFolderFile extends DropFolderFile
 	const RECORDING_FILE = 'recordingFile';
 	
 	/**
-	 * @var KalturaMeetingMetadata
+	 * @var kMeetingMetadata
 	 */
 	protected $meetingMetadata;
 
 	/**
-	 * @var KalturaRecordingFile
+	 * @var kRecordingFile
 	 */
 	protected $recordingFile;
 	

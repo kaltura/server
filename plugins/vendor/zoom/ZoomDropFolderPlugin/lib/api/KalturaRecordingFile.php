@@ -16,7 +16,7 @@ class KalturaRecordingFile extends KalturaObject
 	public $recordingStart;
 
 	/**
-	 * @var kRecordingFileType
+	 * @var KalturaRecordingFileType
 	 */
 	public $fileType;
 
