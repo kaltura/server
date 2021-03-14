@@ -10,7 +10,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	/**
 	 * @var KalturaMediaEntry
 	 */
-	protected $mainEntry;
+	public $mainEntry;
 	
 	/**
 	 * @var string
