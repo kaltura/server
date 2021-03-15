@@ -13,8 +13,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 	const CUSTOM_DATA_LIVE_SERVICE_PROTOCOL = 'live_service_protocol';
 	const CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN = 'live_service_internal_domain';
 
-	const RECORDING_LIVE_TYPE = "/recording/";
-	const CLIPPING_LIVE_TYPE = "/clip/";
+	const RECORDING_LIVE_TYPE = '/recording/';
+	const CLIPPING_LIVE_TYPE = '/clip/';
 	const WEB_SERVICE_LIVE = 'live';
 	
 	static protected $webServices = array(
@@ -240,7 +240,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		if ($da->getServeVodFromLive())
 		{
 			$entryId = $da->getServeLiveAsVodEntryId();
-			return self::ENTRY_ID_URL_PARAM."$entryId/";
+			return '/' . self::ENTRY_ID_URL_PARAM . '/' . $entryId . '/';
 		}
 		return parent::getEntryIdUrl($da);
 	}

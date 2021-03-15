@@ -325,18 +325,6 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		KalturaLog::debug("Live Stream base url [$baseUrl]");
 		return $baseUrl;
 	}
-
-	protected function getUrlFormat($serverNode = null)
-	{
-		if ($this->getDynamicAttributes()->getServeVodFromLive())
-		{
-			return $serverNode->getUrlFormat();
-		}
-		else
-		{
-			return LiveURLFormat::NO_RECORDING;
-		}
-	}
 	
 	protected function getLivePackagerUrl($entryServerNode, $streamFormat = null)
 	{
