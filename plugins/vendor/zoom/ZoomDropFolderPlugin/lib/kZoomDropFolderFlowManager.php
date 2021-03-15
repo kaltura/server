@@ -30,9 +30,8 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 					$foundZoomDropFolder = true;
 					$partnerZoomDropFolder -> setStatus(self::getDropFolderStatus($object -> getStatus()));
 					$partnerZoomDropFolder -> save();
-					KalturaLog ::debug('ZoomDropFolder [id= ' . $currentVendorId . '] updated status to ' .
+					KalturaLog ::debug('ZoomDropFolder with vendorId ' . $currentVendorId . ' updated status to ' .
 					                   $partnerZoomDropFolder->getStatus());
-					//$testZoom = self::doDummyRequest($currentVendorId);
 					break;
 				}
 			}
@@ -43,7 +42,6 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 				// Create new Zoom Drop Folder
 				$newZoomDropFolder = new ZoomDropFolder();
 				$newZoomDropFolder->setZoomVendorIntegrationId($object->getId());
-				//$testZoom = self::doDummyRequest($newZoomDropFolder->getZoomVendorIntegrationId());
 				$newZoomDropFolder->setPartnerId($object->getPartnerId());
 				$newZoomDropFolder->setStatus(self::getDropFolderStatus($object -> getStatus()));
 				$newZoomDropFolder->setType(ZoomDropFolderPlugin::getCoreValue('DropFolderType',
@@ -57,7 +55,6 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 					throw new KalturaAPIException(KalturaZoomDropFolderErrors::EXCEEDED_MAX_ZOOM_DROP_FOLDERS);
 				}
 			}
-			
 		}
 	}
 	
@@ -121,24 +118,4 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		}
 	}
 	
-	/****** For testing calls to Zoom ********/
-//	private static function doDummyRequest($zoomVendorIntegrationId)
-//	{
-//
-//		$criteria = new Criteria();
-//		$criteria->add(VendorIntegrationPeer::ID, $zoomVendorIntegrationId);
-//		$zoomVendorIntegration = VendorIntegrationPeer::doSelect($criteria);
-//		/* @var $zoomVendorIntegration ZoomVendorIntegration */
-//		//$jwt = $zoomVendorIntegration[0]->getJwtToken();
-//		$refreshToken = $zoomVendorIntegration[0]->getRefreshToken();
-//		$accountId = $zoomVendorIntegration[0]->getAccountId();
-//		$accountSecret = $zoomVendorIntegration[0]->getAccountSecret();
-//		$myZoomClient = new kZoomClient("https://api.zoom.us", null, $refreshToken, $accountId, $accountSecret);
-//		$response = $myZoomClient->retrieveTokenZoomUserPermissions();
-//		KalturaLog ::debug('********* jwt call result: ' . $response);
-//		return $response;
-//		$curl = curl_init();
-//
-//	}
-
 }

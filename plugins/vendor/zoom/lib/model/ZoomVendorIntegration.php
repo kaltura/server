@@ -21,7 +21,6 @@ class ZoomVendorIntegration extends VendorIntegration
 	const ENABLE_WEBINAR_UPLOADS = 'enableWebinarUploads';
 	const CONVERSION_PROFILE_ID = 'conversionProfileId';
 	const JWT_TOKEN = 'jwtToken';
-	//const ACCOUNT_SECRET = 'accountSecret';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -31,9 +30,6 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}
-	
-//	public function setAccountSecret($v)     { $this->putInCustomData ( self::ACCOUNT_SECRET, $v);	}
-//	public function getAccountSecret ( )	{ return $this->getFromCustomData(self::ACCOUNT_SECRET);	}
 
 	public function setExpiresIn ($v)	{ $this->putInCustomData ( self::EXPIRES_IN, $v);	}
 	public function getExpiresIn( )	{ return $this->getFromCustomData(self::EXPIRES_IN);	}
@@ -85,7 +81,6 @@ class ZoomVendorIntegration extends VendorIntegration
 	 */
 	public function getTokens()
 	{
-		//TODO need to use KalturaZoomDropFolder here probably. need to be able to switch between mechanisms
 		return array(kZoomOauth::ACCESS_TOKEN => $this->getAccessToken(), kZoomOauth::REFRESH_TOKEN => $this->getRefreshToken(),
 			kZoomOauth::EXPIRES_IN => $this->getExpiresIn());
 	}
@@ -102,7 +97,6 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setTokensData($tokensDataAsArray)
 	{
-		//TODO: where do we get the jwtToken and the bellow from? when is this created?
 		$this->setExpiresIn($tokensDataAsArray[kZoomOauth::EXPIRES_IN]);
 		$this->setAccessToken($tokensDataAsArray[kZoomOauth::ACCESS_TOKEN]);
 		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);

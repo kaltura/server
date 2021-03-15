@@ -27,10 +27,11 @@ class kZoomClient
 	/**
 	 * kZoomClient constructor.
 	 * @param $zoomBaseURL
-	 * @param $clientId
-	 * @param $clientSecret
 	 * @param null $jwtToken
 	 * @param null $refreshToken
+	 * @param null $clientId
+	 * @param null $clientSecret
+	 * @param null $accessToken
 	 * @throws KalturaAPIException
 	 */
 	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
@@ -93,6 +94,11 @@ class kZoomClient
 	 */
 	protected function handleCurlResponse(&$response, $httpCode, $curlWrapper, $apiPath)
 	{
+		$JWTResponse = $this->checkJWTResponse($response);
+		if ($JWTResponse != $response)
+		{
+			return 'JWT error: ' . $JWTResponse;
+		}
 		if (!$response || $httpCode !== 200 || $curlWrapper -> getError())
 		{
 			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
@@ -119,22 +125,6 @@ class kZoomClient
 			                     ));
 		}
 		$response = $curlWrapper -> exec($url);
-		if (!$response)
-		{
-			if (strpos($curlWrapper->getErrorMsg(), 'Invalid access token') !== false)
-			{
-				KalturaLog::ERR('Error calling Zoom: ' . $curlWrapper->getErrorMsg());
-				KalturaLog::info('Access Token Expired. Refreshing the Access Token');
-				$this->accessToken = $this->zoomTokensHelper->generateAccessToken($this->refreshToken);
-				$url = $this->generateContextualUrl($apiPath);
-				$response = $curlWrapper -> exec($url);
-				if (!$response)
-				{
-					KalturaLog::ERR('Error calling Zoom: ' . $curlWrapper->getErrorMsg());
-					throw new KalturaAPIException ('Error calling Zoom: ' . $curlWrapper->getErrorMsg());
-				}
-			}
-		}
 		$httpCode = $curlWrapper -> getHttpCode();
 		$this -> handleCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
 		if (!$response)
@@ -148,6 +138,21 @@ class kZoomClient
 		return $data;
 	}
 	
+	protected function checkJWTResponse($response)
+	{
+		if ($this->jwtToken != null)
+		{
+			$decodedResponse = json_decode($response, true);
+			if ($decodedResponse['code'])
+			{
+				KalturaLog::ERR('Error calling Zoom - Code: ' . $decodedResponse['code'] . ' Reason: ' .
+				                $decodedResponse['message']);
+				return $decodedResponse['message'];
+			}
+		}
+		return $response;
+	}
+	
 	protected function generateContextualUrl($apiPath)
 	{
 		$url = $this -> zoomBaseURL . $apiPath . '?';
@@ -155,10 +160,33 @@ class kZoomClient
 		{
 			if (!$this->accessToken)
 			{
-				$this->accessToken = $this->zoomTokensHelper->generateAccessToken($this->refreshToken);
+				$this->refreshTokens();
 			}
 			$url .= 'access_token=' . $this->accessToken;
 		}
 		return $url;
+	}
+	
+	public function refreshTokens()
+	{
+		$tokens = null;
+		if (!$this->jwtToken)
+		{
+			$tokens = $this -> zoomTokensHelper -> refreshTokens($this -> refreshToken);
+			$this -> accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];
+			$this -> refreshToken = $tokens[kZoomTokens::REFRESH_TOKEN];
+		}
+		return $tokens;
+		
+	}
+	
+	public function getRefreshToken()
+	{
+		return $this->refreshToken;
+	}
+	
+	public function getAccessToken()
+	{
+		return $this->accessToken;
 	}
 }
