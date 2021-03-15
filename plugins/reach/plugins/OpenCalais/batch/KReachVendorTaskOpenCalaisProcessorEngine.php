@@ -13,8 +13,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
     const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
     const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
-    const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
-    const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
+    const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'omitOutputtingOriginalText';
+    const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'enableTickerExtraction';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
     const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
