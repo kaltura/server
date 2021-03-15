@@ -56,7 +56,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
             return true;
         }
 
-		$taskJobData = self::getTaskJobData($object);
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
 		    //Validate the existence of the catalog item
