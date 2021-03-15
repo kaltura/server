@@ -57,7 +57,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		{
 			$recordingEntryId = $da->getServeLiveAsVodEntryId();
 			$entryId =  $da->getEntryId();
-			return '/' . self::ENTRY_ID_URL_PARAM . '/' . $entryId . '/' . self::TIMELINE_URL_PARAM . '/' . $recordingEntryId . '/';
+			return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/" . self::TIMELINE_URL_PARAM . "/$recordingEntryId/";
 //			returns "/e/$entryId/tl/$recordingEntryId/"
 		}
 

@@ -13,8 +13,8 @@ class WowzaMediaServerNode extends MediaServerNode {
 	const CUSTOM_DATA_LIVE_SERVICE_PROTOCOL = 'live_service_protocol';
 	const CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN = 'live_service_internal_domain';
 
-	const RECORDING_LIVE_TYPE = '/recording/';
-	const CLIPPING_LIVE_TYPE = '/clip/';
+	const RECORDING_LIVE_TYPE_URL = '/recording/';
+	const CLIPPING_LIVE_TYPE_URL = '/clip/';
 	const WEB_SERVICE_LIVE = 'live';
 	
 	static protected $webServices = array(
@@ -240,7 +240,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		if ($da->getServeVodFromLive())
 		{
 			$entryId = $da->getServeLiveAsVodEntryId();
-			return '/' . self::ENTRY_ID_URL_PARAM . '/' . $entryId . '/';
+			return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/";
 		}
 		return parent::getEntryIdUrl($da);
 	}
@@ -250,9 +250,9 @@ class WowzaMediaServerNode extends MediaServerNode {
 		$entryId = $da->getServeLiveAsVodEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 
-		$liveType = self::RECORDING_LIVE_TYPE;
+		$liveType = self::RECORDING_LIVE_TYPE_URL;
 		if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-			$liveType = self::CLIPPING_LIVE_TYPE;
+			$liveType = self::CLIPPING_LIVE_TYPE_URL;
 		$liveUrl = str_replace("/live/", $liveType, $liveUrl);
 		return $liveUrl;
 	}

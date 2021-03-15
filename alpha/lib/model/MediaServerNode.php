@@ -101,7 +101,7 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$entryId = $da->getEntryId();
-		return '/' . self::ENTRY_ID_URL_PARAM . '/' . $entryId . '/';
+		return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/";
 	}
 
 	public function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
