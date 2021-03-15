@@ -2229,14 +2229,35 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getReadyInternalFileSyncsForKey(FileSyncKey $syncKey)
 	{
-		$peridoicStorageFileSyncs = self::getFileSyncsFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
+		$periodicStorageFileSyncs = self::getFileSyncsFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
 
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $syncKey );
 		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
 		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
 		$localfileSyncs = FileSyncPeer::doSelect( $c );
 
-		return array_merge($peridoicStorageFileSyncs, $localfileSyncs);
+		return array_merge($periodicStorageFileSyncs, $localfileSyncs);
+	}
+	
+	public static function getReadyRemoteFileSyncsForAsset($id, $object, $objectType, $objectSubType)
+	{
+		if(!($object instanceof entry) && !($object instanceof asset))
+		{
+			KalturaLog::debug("Object provided is not supported " . get_class($object));
+			return array();
+		}
+		
+		$c = new Criteria();
+		$c->add(FileSyncPeer::OBJECT_TYPE, $objectType);
+		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, $objectSubType);
+		$c->add(FileSyncPeer::OBJECT_ID, $id);
+		$c->add(FileSyncPeer::VERSION, $object->getVersion());
+		$c->add(FileSyncPeer::PARTNER_ID, $object->getPartnerId());
+		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
+		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
+		$c->add(FileSyncPeer::DC, kDataCenterMgr::getDcIds(), Criteria::NOT_IN);
+		
+		return FileSyncPeer::doSelect($c);
 	}
 
 	/**

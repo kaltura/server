@@ -24,7 +24,29 @@ class kUsersCsvJobData extends kExportCsvJobData
 	 * @var array
 	 */
 	private $additionalFields;
-
+	
+	/**
+	 * Dynamic mapping between kUser core fields and report columns
+	 * @var array
+	 */
+	private $mappedFields;
+	
+	/**
+	 * @return KalturaKeyValue
+	 */
+	public function getMappedFields ()
+	{
+		return $this->mappedFields;
+	}
+	
+	/**
+	 * @param array $mappedFields
+	 */
+	public function setMappedFields ($mappedFields)
+	{
+		$this->mappedFields=$mappedFields;
+	}
+	
 	/**
 	 * @return integer
 	 */

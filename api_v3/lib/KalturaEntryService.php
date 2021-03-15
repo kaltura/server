@@ -1219,16 +1219,8 @@ class KalturaEntryService extends KalturaBaseService
 
 		if ($dbEntry->getStatus() != entryStatus::READY)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $entryId);
-
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, kEntryFileSyncSubType::DATA);
-		$c->add(FileSyncPeer::OBJECT_ID, $entryId);
-		$c->add(FileSyncPeer::VERSION, $dbEntry->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $dbEntry->getPartnerId());
-		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$fileSyncs = FileSyncPeer::doSelect($c);
+		
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($entryId, $dbEntry, FileSyncObjectType::ENTRY, kEntryFileSyncSubType::DATA);
 
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());

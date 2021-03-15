@@ -27,12 +27,20 @@ class KalturaUsersCsvJobData extends KalturaExportCsvJobData
 	 */
 	public $additionalFields;
 	
+	/**
+	 * Array of header names and their mapped user fields
+	 *
+	 * @var KalturaKeyValueArray
+	 */
+	public $mappedFields;
+	
 	
 	private static $map_between_objects = array
 	(
 		'filter',
 		'metadataProfileId',
 		'additionalFields',
+		'mappedFields'
 	);
 	
 	/* (non-PHPdoc)
