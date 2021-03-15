@@ -360,35 +360,14 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			
 			$livePackagerUrl = str_replace($matchedPattern, $hostname, $livePackagerUrl);
 		}
-		
-		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
-		$livePackagerUrl .= "/p/$partnerID";
 
-		$urlFormat = $this->getUrlFormat($serverNode);
-		switch ($urlFormat)
+		if ($this->getDynamicAttributes()->getServeVodFromLive())
 		{
-			case LiveURLFormat::OLD_RECORDING_FORMAT:
-				$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-				$entry = entryPeer::retrieveByPK($entryId);
-				$entryIdString = "/e/$entryId/";
-
-				$liveType = "/recording/";
-				if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-					$liveType = "/clip/";
-				$livePackagerUrl = str_replace("/live/", $liveType, $livePackagerUrl);
-				break;
-			case LiveURLFormat::NEW_RECORDING_FORMAT:
-				$recordingEntryId =  $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-				$entryId =  $this->getDynamicAttributes()->getEntryId();
-				$entryIdString = "/e/$entryId/tl/$recordingEntryId/";
-				break;
-			default:
-				$entryId = $this->getDynamicAttributes()->getEntryId();
-				$entryIdString = "/e/$entryId/";
-				break;
+			$livePackagerUrl = $serverNode->modifyUrlForVodFromLive($livePackagerUrl, $this->getDynamicAttributes());
 		}
 
-		$livePackagerUrl .= $entryIdString;
+		$livePackagerUrl .= $serverNode->getPartnerIdUrl($this->getDynamicAttributes());
+		$livePackagerUrl .= $serverNode->getEntryIdUrl($this->getDynamicAttributes());
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
 

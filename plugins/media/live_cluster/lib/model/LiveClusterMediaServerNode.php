@@ -5,6 +5,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 {
     const ENVIRONMENT = 'env';
     const SESSION_TYPE = 'st';
+    const LIVE_AS_VOD_ID_URL_PARAM = '/tl/';
 
     /**
      * Applies default values to this object.
@@ -50,8 +51,16 @@ class LiveClusterMediaServerNode extends MediaServerNode
         return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() .'/';
     }
 
-	public function getUrlFormat()
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
-		return LiveURLFormat::NEW_RECORDING_FORMAT;
+		if ($da->getServeVodFromLive())
+		{
+			$recordingEntryId =  $da->getServeLiveAsVodEntryId();
+			$entryId =  $da->getEntryId();
+			return self::ENTRY_ID_URL_PARAM.$entryId.self::LIVE_AS_VOD_ID_URL_PARAM."$recordingEntryId/";
+//			returns "/e/$entryId/tl/$recordingEntryId/"
+		}
+
+		return parent::getEntryIdUrl($da);
 	}
 }
