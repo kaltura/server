@@ -623,16 +623,13 @@ class kEntitlementUtils
 			}
 		}
 
-		if (!$ks)
+		// entry that doesn't belong to any category is public
+		//when ks is not provided - the entry is still public (for example - download action)
+		$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
+		if (!$categoryEntry)
 		{
-			// entry that doesn't belong to any category is public
-			//when ks is not provided - the entry is still public (for example - download action)
-			$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
-			if (!$categoryEntry)
-			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
-				return true;
-			}
+			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
+			return true;
 		}
 
 		$ksPrivacyContexts = null;
