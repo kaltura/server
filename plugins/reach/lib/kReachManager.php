@@ -56,7 +56,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
             return true;
         }
 
-		$taskJobData = self::getTaskJobData($object);
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
 		    //Validate the existence of the catalog item
@@ -604,14 +603,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
         $targetVersion = $vendorCatalogItem->calculateEntryVendorTaskVersion($entry);
 		if ($vendorCatalogItem->isDuplicateTask($entry))
-		//if (EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), $sourceFlavorVersion))
 		{
 			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$targetVersion]");
 			return true;
 		}
 		else
 		{
-			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveTasksByStatus($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
 			if($activeTasksOnOlderVersion)
 			{
 				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
