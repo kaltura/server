@@ -117,6 +117,33 @@
 					<item objectType="KalturaOrCondition">
 						<conditions objectType="array">
 							<item objectType="KalturaFieldMatchCondition">
+								<description>Entry can be in any category</description>
+								<field objectType="KalturaEvalStringField">
+									<code>'*'</code>
+								</field>
+								<values objectType="array">
+									<item objectType="KalturaStringValue">
+										<value>{trigger_category_ids}</value>
+									</item>
+								</values>
+							</item>
+							<item objectType="KalturaEventFieldCondition">
+								<description>Check if trigger_category_ids field in a valid structure</description>
+								<field objectType="KalturaEvalBooleanField">
+									<code>count(explode(',',$scope->getDynamicValueByKey('trigger_category_ids')))==1</code>
+								</field>
+							</item>
+							<item objectType="KalturaEventFieldCondition">
+								<description>Entry is in one of the selected categories</description>
+								<field objectType="KalturaEvalBooleanField">
+									<code>count(categoryEntryPeer::retrieveActiveByEntryIdAndCategoryIds($scope->getObject()->getEntryId(), explode(',', $scope->getDynamicValueByKey('trigger_category_ids')))) > 0</code>
+								</field>
+							</item>
+						</conditions>
+					</item>
+					<item objectType="KalturaOrCondition">
+						<conditions objectType="array">
+							<item objectType="KalturaFieldMatchCondition">
 								<description>language equals</description>
 								<field objectType="KalturaEvalStringField">
 									<code>$scope->getObject()->getLanguage()</code>
@@ -178,6 +205,13 @@
 					<item objectType="KalturaEventNotificationParameter">
 						<key>trigger_format</key>
 						<description>Captions format that triggers the event (use asterisk to all formats), See:KalturaCaptionType:/api_v3/testmeDoc/?object=KalturaCaptionType</description>
+						<value objectType="KalturaStringValue">
+							<value>*</value>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>trigger_category_ids</key>
+						<description>Comma separated of category ids, it will trigger the event notification only for these categories instead of for each entry.</description>
 						<value objectType="KalturaStringValue">
 							<value>*</value>
 						</value>
