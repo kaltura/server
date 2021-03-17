@@ -6,9 +6,6 @@
 
 class KExportMediaEsearchEngine extends KObjectExportEngine
 {
-	
-	const LIMIT = 10000;
-	
 	const PAGE_SIZE = 500;
 	
 	public function fillCsv(&$csvFile, &$data)

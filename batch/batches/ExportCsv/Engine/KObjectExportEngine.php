@@ -6,6 +6,8 @@
  */
 abstract class KObjectExportEngine
 {
+	const LIMIT = 10000;
+
 	/**
 	 * @param int $objectType of enum KalturaExportObjectType
 	 * @return KObjectExportEngine
@@ -16,8 +18,10 @@ abstract class KObjectExportEngine
 		{
 			case KalturaExportObjectType::USER:
 				return new KUserExportEngine();
-			
-			
+
+			case KalturaExportObjectType::ENTRY:
+				return new KEntryExportEngine();
+
 			default:
 				return KalturaPluginManager::loadObject('KObjectExportEngine', $objectType);
 		}

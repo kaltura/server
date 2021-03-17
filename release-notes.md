@@ -1,3 +1,16 @@
+# Propus-16.20.0  #
+
+## Version Highlight ##
+
+## Export entries to CSV ##
+- Issue Type: Task
+- Issue ID: KMCNG-2296
+- Description: new API- baseEntry.exportToCsv
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_10_add_entry_export_csv_permissions.php
+
 # Propus-16.19.0  #
 
 ## Version Highlight ##
