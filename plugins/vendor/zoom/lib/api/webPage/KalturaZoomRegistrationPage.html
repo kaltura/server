@@ -13,6 +13,12 @@
         let baseServiceUrl = '@BaseServiceUrl@';
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
+        var showJWT = '@showJWT@';
+
+        // var ks = 'MjVmZWFjMDMwOTQ4ZmZjNjllNDEyYzY4N2JlNjc4ODU2MDkwMWM2OXwxMDI7MTAyOzE2MTU4MDkxNTA7MjsxNjE1NzIyNzUwLjE1NzthZG1pbjtkaXNhYmxlZW50aXRsZW1lbnQ7Ow==';
+        // let baseServiceUrl = "daniels";
+        // var accountId = 'LtY7sEaRQaCGNzOqy5GEA';
+        // var partnerId= '102';
 
         var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
         var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
@@ -25,6 +31,7 @@
             let defaultUserId = $('#defaultUserId').val().trim();
             let zoomCategory  = $('#zoomCategory').val().trim();
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
+            let jwtToken  = $('#jwtToken').val().trim();
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
@@ -45,6 +52,7 @@
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
+                    'integrationSetting:jwtToken':jwtToken,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
                     'format': 1 },
                 success : function(res) {
@@ -82,6 +90,10 @@
             {
                 return;
             }
+            if(showJWT === 'false')
+            {
+                $('#jwtController').hide();
+            }
             setDefaultValues();
             $.ajax({
                 url: getUrl,
@@ -118,6 +130,7 @@
                     case 'defaultUserId':
                     case 'zoomCategory':
                     case 'zoomUserPostfix':
+                    case 'zoomJWT':
                     case 'zoomWebinarCategory':
                         $('#'+i).val(v);
                         break;
@@ -177,6 +190,10 @@
                 <div class='form-group'>
                 <label for='zoomWebinarCategory'><h6>Zoom Webinar Category</h6></label>
                     <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
+                </div>
+                <div class='form-group' id='jwtController'>
+                    <label for='jwtToken'><h6>Zoom JWT</h6></label>
+                    <input type='text' value='@zoomJWT@' id='jwtToken' class='form-control' name='jwtToken' required>
                 </div>
                 <h6>Settings</h6>
                 <div class='container p-2 my-2 border'>

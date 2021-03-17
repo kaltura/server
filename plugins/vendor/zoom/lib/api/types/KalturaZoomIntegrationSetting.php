@@ -60,6 +60,11 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	* @var int
 	 */
 	public $conversionProfileId;
+	
+	/**
+	 * @var string
+	 */
+	public $jwtToken;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -77,6 +82,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'enableRecordingUpload' => 'status',
 		'conversionProfileId',
 		'defaultUserId' => 'defaultUserEMail',
+		'jwtToken',
 	);
 
 	public function getMapBetweenObjects()
