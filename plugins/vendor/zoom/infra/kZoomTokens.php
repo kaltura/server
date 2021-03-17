@@ -4,6 +4,7 @@ class kZoomTokens
 {
 	const OAUTH_TOKEN_PATH = '/oauth/token';
 	const ACCESS_TOKEN = 'access_token';
+	const REFRESH_TOKEN = 'refresh_token';
 	const AUTHORIZATION_HEADER = 'Authorization';
 	const EXPIRES_IN = 'expires_in';
 	const SCOPE = 'scope';
@@ -29,6 +30,38 @@ class kZoomTokens
 		return $tokensData[self::ACCESS_TOKEN];
 	}
 	
+	public function refreshTokens($oldRefreshToken)
+	{
+		KalturaLog::info('Refreshing Zoom Tokens');
+		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
+		$response = $this->curlRetrieveTokensData($postFields);
+		$tokensData = $this->retrieveTokenData($response);
+		return $tokensData;
+	}
+	
+	protected function retrieveTokenData($response)
+	{
+		$tokensData = $this->parseTokensResponse($response);
+		$this->validateToken($tokensData);
+		$tokensData = $this->extractTokensFromData($tokensData);
+		return $tokensData;
+	}
+	
+	protected function validateToken($tokensData)
+	{
+		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
+			!isset($tokensData[self::EXPIRES_IN]))
+		{
+			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData));
+		}
+	}
+	
+	public function extractTokensFromData($data)
+	{
+		return array(self::ACCESS_TOKEN => $data[self::ACCESS_TOKEN], self::REFRESH_TOKEN => $data[self::REFRESH_TOKEN],
+		             self::EXPIRES_IN => $data[self::EXPIRES_IN]);
+	}
+	
 	protected function parseTokensResponse($response)
 	{
 		$dataAsArray = json_decode($response, true);
@@ -49,6 +82,7 @@ class kZoomTokens
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
+		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, "authorization: Basic {$userPwd}");
 		$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		return $curlWrapper->exec($this->zoomBaseURL . self::OAUTH_TOKEN_PATH);
