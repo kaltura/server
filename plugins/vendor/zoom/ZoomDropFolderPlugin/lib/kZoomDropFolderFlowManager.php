@@ -110,6 +110,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	
 	protected static function createNewZoomDropFolder($zoomVendorIntegrationObject)
 	{
+		/* @var $zoomVendorIntegrationObject ZoomVendorIntegration */
 		KalturaLog::debug('Creating new ZoomDropFolder');
 		// Create new Zoom Drop Folder
 		$newZoomDropFolder = new ZoomDropFolder();
@@ -133,18 +134,11 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		$fileHandler->setContentMatchPolicy(DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW);
 		$newZoomDropFolder->setFileHandlerType(DropFolderFileHandlerType::CONTENT);
 		$newZoomDropFolder->setFileHandlerConfig($fileHandler);
-		
 		$newZoomDropFolder->setDc(kDataCenterMgr::getCurrentDcId());
 		$newZoomDropFolder->setPath(0);
 		$newZoomDropFolder->setFileSizeCheckInterval(30);
-//              TODO get the info from the ZoomRegistrationPage
-//				if ($automaticDeletePolicyInDays)
-//				{
-//					$newZoomDropFolder->setAutoFileDeleteDays($automaticDeletePolicyInDays);
-//				}
-//				$newZoomDropFolder->setFileDeletePolicy();
 		$newZoomDropFolder->setAutoFileDeleteDays(DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE);
-		$newZoomDropFolder->setFileDeletePolicy(3);
+		$newZoomDropFolder->setFileDeletePolicy($zoomVendorIntegrationObject->getDeletionPolicy());
 		$newZoomDropFolder->setLastFileTimestamp(0);
 		$newZoomDropFolder->setMetadataProfileId(0);
 		$newZoomDropFolder->save();

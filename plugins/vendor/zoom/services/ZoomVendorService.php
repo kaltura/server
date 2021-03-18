@@ -176,7 +176,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function localRegistrationPageAction($zoomAccountId)
 	{
-		$isOAuthVerification = self::getInstanceContext();
+		$isOAuthVerification = self::shouldUseOAuthAuthenticationMethod();
 		
 		if ($isOAuthVerification)
 		{
