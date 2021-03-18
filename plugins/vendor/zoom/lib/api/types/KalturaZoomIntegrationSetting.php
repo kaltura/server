@@ -60,6 +60,16 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	* @var int
 	 */
 	public $conversionProfileId;
+	
+	/**
+	 * @var string
+	 */
+	public $jwtToken;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $deletionPolicy;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -77,6 +87,8 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'enableRecordingUpload' => 'status',
 		'conversionProfileId',
 		'defaultUserId' => 'defaultUserEMail',
+		'jwtToken',
+		'deletionPolicy',
 	);
 
 	public function getMapBetweenObjects()
@@ -93,6 +105,8 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 
 		parent::toObject($dbObject, $skip);
 		$dbObject->setStatus($this->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED);
+		$dbObject->setJwtToken($this->jwtToken);
+		$dbObject->setDeletionPolicy($this->deletionPolicy);
 		return $dbObject;
 	}
 

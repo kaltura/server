@@ -13,7 +13,7 @@
         let baseServiceUrl = '@BaseServiceUrl@';
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
-
+        var showJWT = '@showJWT@';
         var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
         var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
         const CMS_USER_ID=3;
@@ -25,6 +25,8 @@
             let defaultUserId = $('#defaultUserId').val().trim();
             let zoomCategory  = $('#zoomCategory').val().trim();
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
+            let jwtToken  = $('#jwtToken').val().trim();
+            let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
@@ -45,6 +47,8 @@
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
+                    'integrationSetting:jwtToken':jwtToken,
+                    'integrationSetting:deletionPolicy':deletionPolicy,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
                     'format': 1 },
                 success : function(res) {
@@ -82,6 +86,10 @@
             {
                 return;
             }
+            if(showJWT === 'false')
+            {
+                $('#jwtController').hide();
+            }
             setDefaultValues();
             $.ajax({
                 url: getUrl,
@@ -118,10 +126,12 @@
                     case 'defaultUserId':
                     case 'zoomCategory':
                     case 'zoomUserPostfix':
+                    case 'zoomJWT':
                     case 'zoomWebinarCategory':
                         $('#'+i).val(v);
                         break;
                     case 'enableWebinarUploads':
+                    case 'deletionPolicy':
                     case 'enableRecordingUpload':
                         $('#'+i).prop('checked', v);
                         break;
@@ -178,6 +188,10 @@
                 <label for='zoomWebinarCategory'><h6>Zoom Webinar Category</h6></label>
                     <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
                 </div>
+                <div class='form-group' id='jwtController'>
+                    <label for='jwtToken'><h6>Zoom JWT</h6></label>
+                    <input type='text' value='@zoomJWT@' id='jwtToken' class='form-control' name='jwtToken' required>
+                </div>
                 <h6>Settings</h6>
                 <div class='container p-2 my-2 border'>
                     <div class='custom-control custom-switch'>
@@ -187,6 +201,10 @@
                     <div class='custom-control custom-switch'>
                         <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
                         <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
+                    </div>
+                    <div class='custom-control custom-switch'>
+                        <input type='checkbox' class='custom-control-input' id='deletionPolicy' name='deletionPolicy' >
+                        <label class='custom-control-label' for='deletionPolicy'>Enable automatic deletion of files</label>
                     </div>
                 </div>
             </div>

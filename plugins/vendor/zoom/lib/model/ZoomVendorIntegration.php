@@ -21,12 +21,16 @@ class ZoomVendorIntegration extends VendorIntegration
 	const ENABLE_WEBINAR_UPLOADS = 'enableWebinarUploads';
 	const CONVERSION_PROFILE_ID = 'conversionProfileId';
 	const JWT_TOKEN = 'jwtToken';
+	const DELETE_POLICY = 'deletionPolicy';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
 	
 	public function setJwtToken ($v)	{ $this->putInCustomData ( self::JWT_TOKEN, $v);	}
 	public function getJwtToken ( )	{ return $this->getFromCustomData(self::JWT_TOKEN);	}
+	
+	public function setDeletionPolicy ($v)	{ $this->putInCustomData ( self::DELETE_POLICY, $v);	}
+	public function getDeletionPolicy ( )	{ return $this->getFromCustomData(self::DELETE_POLICY);	}
 	
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}
@@ -82,7 +86,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function getTokens()
 	{
 		return array(kZoomOauth::ACCESS_TOKEN => $this->getAccessToken(), kZoomOauth::REFRESH_TOKEN => $this->getRefreshToken(),
-			kZoomOauth::EXPIRES_IN => $this->getExpiresIn());
+			kZoomOauth::EXPIRES_IN => $this->getExpiresIn(), self::JWT_TOKEN => $this->getJwtToken());
 	}
 
 	/**
@@ -100,6 +104,7 @@ class ZoomVendorIntegration extends VendorIntegration
 		$this->setExpiresIn($tokensDataAsArray[kZoomOauth::EXPIRES_IN]);
 		$this->setAccessToken($tokensDataAsArray[kZoomOauth::ACCESS_TOKEN]);
 		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);
+		$this->setJwtToken($tokensDataAsArray[self::JWT_TOKEN]);
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 	}
 }

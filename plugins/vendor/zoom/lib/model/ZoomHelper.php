@@ -115,7 +115,7 @@ class ZoomHelper
 	 * @param $ks
 	 * @throws Exception
 	 */
-	public static function loadSubmitPage($zoomIntegration, $accountId, $ks)
+	public static function loadSubmitPage($zoomIntegration, $accountId, $ks, $isOAuthVerivication)
 	{
 		$file_path = dirname(__FILE__) . '/../api/webPage/KalturaZoomRegistrationPage.html';
 		if (file_exists($file_path))
@@ -126,6 +126,8 @@ class ZoomHelper
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace( '@partnerId@',$zoomIntegration->getPartnerId(),$page);
 			$page = str_replace('@accountId@', $accountId , $page);
+			$showJWT = $isOAuthVerivication ? 'false' : 'true';
+			$page = str_replace('@showJWT@', $showJWT , $page);
 
 			echo $page;
 			die();
