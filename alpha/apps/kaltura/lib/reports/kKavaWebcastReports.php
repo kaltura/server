@@ -162,11 +162,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-					'peer' => 'kuserPeer',
-				)
+				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_REGISTERED,

@@ -143,7 +143,7 @@ class ZoomVendorService extends KalturaBaseService
 		$client = new kZoomClient($zoomBaseURL);
 		$zoomUserData = $client->retrieveTokenZoomUser($tokens[kZoomOauth::ACCESS_TOKEN]);
 		$accountId = $zoomUserData[ZoomHelper::ACCOUNT_ID];
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if($zoomIntegration && intval($partnerId) !==  $zoomIntegration->getPartnerId() && $partnerId !== 0)
 		{
@@ -194,7 +194,7 @@ class ZoomVendorService extends KalturaBaseService
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 
 		/** @var ZoomVendorIntegration $zoomIntegration */
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
