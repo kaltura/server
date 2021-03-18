@@ -449,8 +449,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $passwordStructureValidations;
-
-
+	
+	/**
+	 * @var string
+	 */
+	public $passwordStructureValidationsDescription;
+	
+	
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -537,7 +543,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"lastFreeTrialNotificationDay",
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
-		'passwordStructureValidations'
 	);
 
 	public function getMapBetweenObjects()
@@ -580,8 +585,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$passwordValidation = $source_object->getPasswordStructureValidations();
-		$this->passwordStructureValidations = isset($passwordValidation[0][0]) ?
-			$passwordValidation[0][0] : null;
+		if(isset($passwordValidation[0]))
+		{
+			$this->passwordStructureValidations = $passwordValidation[0][0];
+			$this->passwordStructureValidationsDescription = $passwordValidation[0][1];
+		}
+
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -755,8 +764,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if(!is_null($this->passwordStructureValidations))
 		{
 			$object_to_fill->setPasswordStructureValidations(
-				array(array($this -> passwordStructureValidations,
-				            kCurrentContext ::getCurrentKsKuser()->getPuserId())));
+				array(array($this->passwordStructureValidations,
+				            $this->passwordStructureValidationsDescription)));
 		}
 		else
 		{
