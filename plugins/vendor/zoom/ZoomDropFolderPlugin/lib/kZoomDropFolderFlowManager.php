@@ -37,16 +37,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 			}
 			if (!$foundZoomDropFolder && $partnerZoomDropFoldersCount < self::MAX_ZOOM_DROP_FOLDERS)
 			{
-				/* @var $object ZoomVendorIntegration */
-				KalturaLog::debug('Creating new ZoomDropFolder');
-				// Create new Zoom Drop Folder
-				$newZoomDropFolder = new ZoomDropFolder();
-				$newZoomDropFolder->setZoomVendorIntegrationId($object->getId());
-				$newZoomDropFolder->setPartnerId($object->getPartnerId());
-				$newZoomDropFolder->setStatus(self::getDropFolderStatus($object -> getStatus()));
-				$newZoomDropFolder->setType(ZoomDropFolderPlugin::getCoreValue('DropFolderType',
-				                                                               ZoomDropFolderType::ZOOM));
-				$newZoomDropFolder->save();
+				self::createNewZoomDropFolder($object);
 			}
 			else
 			{
@@ -75,8 +66,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	
 	public static function wasStatusChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ( ($object instanceof ZoomVendorIntegration)  //
-			//&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
+		if ( ($object instanceof ZoomVendorIntegration)
 			&& in_array('vendor_integration.STATUS', $modifiedColumns) )
 		{
 			return true;
@@ -116,6 +106,48 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 				return DropFolderStatus::ERROR;
 			}
 		}
+	}
+	
+	protected static function createNewZoomDropFolder($zoomVendorIntegrationObject)
+	{
+		KalturaLog::debug('Creating new ZoomDropFolder');
+		// Create new Zoom Drop Folder
+		$newZoomDropFolder = new ZoomDropFolder();
+		$newZoomDropFolder->setZoomVendorIntegrationId($zoomVendorIntegrationObject->getId());
+		$newZoomDropFolder->setPartnerId($zoomVendorIntegrationObject->getPartnerId());
+		$newZoomDropFolder->setStatus(self::getDropFolderStatus($zoomVendorIntegrationObject -> getStatus()));
+		$newZoomDropFolder->setType(ZoomDropFolderPlugin::getCoreValue('DropFolderType',
+		                                                               ZoomDropFolderType::ZOOM));
+		$newZoomDropFolder->setName('zoom_' . $zoomVendorIntegrationObject->getPartnerId() . '_' . $zoomVendorIntegrationObject->getAccountId());
+		$newZoomDropFolder->setTags('zoom');
+		$conversionProfileId = $zoomVendorIntegrationObject->getConversionProfileId();
+		if (!$conversionProfileId)
+		{
+			$partner = PartnerPeer::retrieveByPK($newZoomDropFolder->getPartnerId());
+			$conversionProfileId = $partner->getDefaultConversionProfileId();
+		}
+		$newZoomDropFolder->setConversionProfileId($conversionProfileId);
+		$fileHandler = new DropFolderContentFileHandlerConfig();
+		$fileHandler->setSlugRegex('/(?P<referenceId>.+)[.]\w{2,}/');
+		$fileHandler->setHandlerType(DropFolderFileHandlerType::CONTENT);
+		$fileHandler->setContentMatchPolicy(DropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW);
+		$newZoomDropFolder->setFileHandlerType(DropFolderFileHandlerType::CONTENT);
+		$newZoomDropFolder->setFileHandlerConfig($fileHandler);
+		
+		$newZoomDropFolder->setDc(kDataCenterMgr::getCurrentDcId());
+		$newZoomDropFolder->setPath(0);
+		$newZoomDropFolder->setFileSizeCheckInterval(30);
+//              TODO get the info from the ZoomRegistrationPage
+//				if ($automaticDeletePolicyInDays)
+//				{
+//					$newZoomDropFolder->setAutoFileDeleteDays($automaticDeletePolicyInDays);
+//				}
+//				$newZoomDropFolder->setFileDeletePolicy();
+		$newZoomDropFolder->setAutoFileDeleteDays(DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE);
+		$newZoomDropFolder->setFileDeletePolicy(3);
+		$newZoomDropFolder->setLastFileTimestamp(0);
+		$newZoomDropFolder->setMetadataProfileId(0);
+		$newZoomDropFolder->save();
 	}
 	
 }
