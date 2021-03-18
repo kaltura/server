@@ -17,6 +17,7 @@
         <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
             <filter objectType="KalturaHttpNotificationTemplateFilter">
                 <systemNameEqual>Media_XML_Bulk_Failure_Notification</systemNameEqual>
+                <type>httpNotification.Http</type>
             </filter>
             <pager objectType="KalturaFilterPager">
                 <pageSize>1</pageSize>
