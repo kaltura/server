@@ -41,7 +41,7 @@ class ZoomVendorService extends KalturaBaseService
 	 * @throws KalturaAPIException
 	 * @throws Exception
 	 */
-	public static function getInstanceContext()
+	public static function shouldUseOAuthAuthenticationMethod()
 	{
 		$zoomConfiguration = self::getZoomConfiguration();
 		return isset($zoomConfiguration['clientSecret']);
@@ -164,7 +164,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->save();
 		}
 
-		ZoomHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs(), self::getInstanceContext());
+		ZoomHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs(), self::shouldUseOAuthAuthenticationMethod());
 	}
 	
 	/**
@@ -191,7 +191,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->save();
 		}
 		
-		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::getInstanceContext());
+		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::shouldUseOAuthAuthenticationMethod());
 	}
 
 	/**
