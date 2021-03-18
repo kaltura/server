@@ -14,12 +14,6 @@
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
         var showJWT = '@showJWT@';
-
-        // var ks = 'MjVmZWFjMDMwOTQ4ZmZjNjllNDEyYzY4N2JlNjc4ODU2MDkwMWM2OXwxMDI7MTAyOzE2MTU4MDkxNTA7MjsxNjE1NzIyNzUwLjE1NzthZG1pbjtkaXNhYmxlZW50aXRsZW1lbnQ7Ow==';
-        // let baseServiceUrl = "daniels";
-        // var accountId = 'LtY7sEaRQaCGNzOqy5GEA';
-        // var partnerId= '102';
-
         var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
         var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
         const CMS_USER_ID=3;
@@ -32,6 +26,7 @@
             let zoomCategory  = $('#zoomCategory').val().trim();
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
             let jwtToken  = $('#jwtToken').val().trim();
+            let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
@@ -53,6 +48,7 @@
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
                     'integrationSetting:jwtToken':jwtToken,
+                    'integrationSetting:deletionPolicy':deletionPolicy,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
                     'format': 1 },
                 success : function(res) {
@@ -135,6 +131,7 @@
                         $('#'+i).val(v);
                         break;
                     case 'enableWebinarUploads':
+                    case 'deletionPolicy':
                     case 'enableRecordingUpload':
                         $('#'+i).prop('checked', v);
                         break;
@@ -204,6 +201,10 @@
                     <div class='custom-control custom-switch'>
                         <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
                         <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
+                    </div>
+                    <div class='custom-control custom-switch'>
+                        <input type='checkbox' class='custom-control-input' id='deletionPolicy' name='deletionPolicy' >
+                        <label class='custom-control-label' for='deletionPolicy'>Enable automatic deletion of files</label>
                     </div>
                 </div>
             </div>

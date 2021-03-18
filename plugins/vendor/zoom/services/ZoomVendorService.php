@@ -44,7 +44,7 @@ class ZoomVendorService extends KalturaBaseService
 	public static function getInstanceContext()
 	{
 		$zoomConfiguration = self::getZoomConfiguration();
-		return $zoomConfiguration['clientSecret'];
+		return isset($zoomConfiguration['clientSecret']);
 	}
 
 	/**
@@ -191,7 +191,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->save();
 		}
 		
-		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), false);
+		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::getInstanceContext());
 	}
 
 	/**
