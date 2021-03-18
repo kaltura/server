@@ -444,6 +444,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $enforceHttpsApi;
+	
+	/**
+	 * @var string
+	 */
+	public $passwordStructureValidations;
 
 
 	private static $map_between_objects = array
@@ -531,14 +536,18 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"usageLimitWarning",
 		"lastFreeTrialNotificationDay",
 		"extendedFreeTrailEndsWarning",
-		'enforceHttpsApi'
+		'enforceHttpsApi',
+		'passwordStructureValidations'
 	);
 
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+	/**
+	 * @param $source_object Partner
+	 *
+	 */
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
@@ -572,6 +581,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if($this->eSearchLanguages) {
 			$this->eSearchLanguages = json_encode($this->eSearchLanguages);
 		}
+		
+		$passwordValidation = $source_object->getPasswordStructureValidations();
+		$this->passwordStructureValidations = isset($passwordValidation[0][0]) ?
+			$passwordValidation[0][0] : null;
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -723,7 +736,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			
 			//Raise template partner's conversion profiles (so far) and check whether the partner now has permissions for them.
 			$this->copyMissingConversionProfiles($object_to_fill);
-		
 		}
 		
 		if (!is_null($this->limits))
@@ -742,6 +754,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
+		
+		if(!is_null($this->passwordStructureValidations))
+		{
+			$object_to_fill->setPasswordStructureValidations(
+				array(array($this -> passwordStructureValidations,
+				            kCurrentContext ::getCurrentKsKuser()->getPuserId())));
+		}
+		else
+		{
+			$object_to_fill->setPasswordStructureValidations(null);
+		}
 		
 		return $object_to_fill;
 	}
