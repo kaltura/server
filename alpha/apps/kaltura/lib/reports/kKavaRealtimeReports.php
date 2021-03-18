@@ -170,11 +170,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-					'peer' => 'kuserPeer',
-				)
+				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
 			),
 			self::REPORT_METRICS => array(
 				self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
@@ -216,11 +212,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID'),
-					'peer' => 'kuserPeer',
-				)
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
 			)
 		),
 
@@ -323,11 +315,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-					self::REPORT_ENRICH_CONTEXT => array(
-						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-						'peer' => 'kuserPeer',
-					)
+					self::REPORT_ENRICH_FUNC => 'self::getUserFullNameWithFallback',
 				),
 			),
 			self::REPORT_EDIT_FILTER_FUNC => 'self::includeOnlyLiveNowEntriesEditFilter',
