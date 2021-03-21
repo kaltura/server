@@ -61,7 +61,15 @@ class KalturaCaptionAsset extends KalturaAsset
 	 * @filter eq,in,notin
 	 */
 	public $status;
-
+	
+	/**
+	 * The source of the asset
+	 *
+	 * @var KalturaCaptionSource
+	 * @readonly
+	 */
+	public $source;
+	
 	/**
 	 * The parent id of the asset
 	 * @var string
@@ -100,6 +108,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"accuracy",
 		"displayOnPlayer",
 		"associatedTranscriptIds",
+		"source",
 	);
 	
 	public function getMapBetweenObjects ( )
