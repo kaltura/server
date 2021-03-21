@@ -54,6 +54,15 @@ class KalturaCaptionAsset extends KalturaAsset
 	public $format;
 	
 	/**
+	 * The source of the asset
+	 *
+	 * @var KalturaCaptionSource
+	 * @filter eq,in
+	 * @insertonly
+	 */
+	public $source;
+	
+	/**
 	 * The status of the asset
 	 * 
 	 * @var KalturaCaptionAssetStatus
@@ -62,13 +71,6 @@ class KalturaCaptionAsset extends KalturaAsset
 	 */
 	public $status;
 	
-	/**
-	 * The source of the asset
-	 *
-	 * @var KalturaCaptionSource
-	 * @readonly
-	 */
-	public $source;
 	
 	/**
 	 * The parent id of the asset
@@ -143,6 +145,11 @@ class KalturaCaptionAsset extends KalturaAsset
 			$object_to_fill->getContainerFormat() === null)		// not already set by setFromAssetParams
 		{
 			$this->format = KalturaCaptionType::SRT;
+		}
+
+		if ($this->source === null)		// not already set by setFromAssetParams
+		{
+			$this->source = KalturaCaptionSource::UNKNOWN;
 		}
 		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
