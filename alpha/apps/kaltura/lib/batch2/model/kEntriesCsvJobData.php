@@ -3,25 +3,24 @@
  * @package Core
  * @subpackage model.data
  */
-class kUsersCsvJobData extends kMappedObjectsCsvJobData
+class kEntriesCsvJobData extends kMappedObjectsCsvJobData
 {
 	/**
-	 * The filter should return the list of users that need to be specified in the csv.
-	 * @var kuserFilter
+	 * The filter should return the list of entries that need to be specified in the csv.
+	 * @var entryFilter
 	 */
 	protected $filter;
 
 	/**
-	 *
-	 * @return kuserFilter $filter
+	 * @return entryFilter
 	 */
 	public function getFilter()
 	{
 		return $this->filter;
 	}
-	
+
 	/**
-	 * @param kuserFilter $filter
+	 * @param entryFilter $filter
 	 */
 	public function setFilter($filter)
 	{
