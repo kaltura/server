@@ -46,12 +46,12 @@ class LiveClusterMediaServerNode extends MediaServerNode
         return self::ENVIRONMENT . '/' . $this->getEnvironment();
     }
 
-    public function getSessionType($entryServerNode)
+    public static function getSessionType($entryServerNode)
     {
         return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() . '/';
     }
 
-	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		if ($da->getServeVodFromLive())
 		{

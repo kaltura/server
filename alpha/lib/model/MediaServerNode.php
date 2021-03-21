@@ -82,29 +82,29 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
 
-    public function getSegmentDurationUrlString($sd)
+    public static function getSegmentDurationUrlString($sd)
     {
         return '';
     }
 
-	public function getSessionType($entryServerNode)
+	public static function getSessionType($entryServerNode)
 	{
 		return '';
 	}
 
-	public function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
+	public static function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$partnerId = $da->getEntry()->getPartnerId();
 		return '/' . self::PARTNER_ID_URL_PARAM . '/' . $partnerId;
 	}
 
-	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$entryId = $da->getEntryId();
 		return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/";
 	}
 
-	public function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
+	public static function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
 	{
 		return $liveUrl;
 	}

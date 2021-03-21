@@ -121,7 +121,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return 'dc-' . $this->getDc();
 	}
 
-    public function getSegmentDurationUrlString($sd)
+    public static function getSegmentDurationUrlString($sd)
     {
         return "sd/$sd/";
     }
@@ -235,7 +235,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN, null, null);
 	}
 
-	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		if ($da->getServeVodFromLive())
 		{
@@ -245,15 +245,17 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return parent::getEntryIdUrl($da);
 	}
 
-	public function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
+	public static function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
 	{
 		$entryId = $da->getServeLiveAsVodEntryId();
 		$entry = entryPeer::retrieveByPK($entryId);
 
 		$liveType = self::RECORDING_LIVE_TYPE_URL;
 		if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
+		{
 			$liveType = self::CLIPPING_LIVE_TYPE_URL;
-		$liveUrl = str_replace("/live/", $liveType, $liveUrl);
+		}
+		$liveUrl = str_replace('/live/', $liveType, $liveUrl);
 		return $liveUrl;
 	}
 
