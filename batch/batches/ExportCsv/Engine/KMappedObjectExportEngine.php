@@ -51,7 +51,6 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 			catch(Exception $e)
 			{
 				KalturaLog::info('Could not list items' . $e->getMessage());
-				$this->apiError = $e; //WHAT IS THAT ????
 				return;
 			}
 
@@ -80,12 +79,6 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 				}
 			}
 
-			if($totalCount + count($uniqItems) > self::LIMIT)
-			{
-				KalturaLog::debug('Reached the limit. Slicing...');
-				$uniqItems = array_slice($uniqItems, 0, self::LIMIT - $totalCount);
-			}
-
 			$lastCreatedAtObjectIdList = $newCreatedAtListObject;
 			$this->addItemsToCsv($uniqItems, $csvFile, $data->metadataProfileId, $data->additionalFields, $mappedFields);
 			$totalCount += count($uniqItems);
@@ -99,7 +92,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 			{
 				gc_collect_cycles();
 			}
-		} while ( ($pager->pageSize == $returnedSize) && ($totalCount < self::LIMIT) );
+		} while ($pager->pageSize == $returnedSize);
 	}
 
 	protected function addHeaderRowToCsv($csvFile, $additionalFields, $mappedFields = null)
@@ -127,7 +120,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 	/**
 	 * The function grabs all the fields values for each item and adding them as a new row to the csv file
 	 */
-	private function addItemsToCsv($items, &$csvFile, $metadataProfileId, $additionalFields, $mappedFields)
+	protected function addItemsToCsv($items, &$csvFile, $metadataProfileId, $additionalFields, $mappedFields)
 	{
 		$itemIds = array();
 		$csvRows = array();
@@ -156,7 +149,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 	/**
 	 * adds the default fields values and the additional fields as nulls
 	 */
-	private function initializeCsvRowValues($item, $additionalFields, $csvRows, $mappedFields)
+	protected function initializeCsvRowValues($item, $additionalFields, $csvRows, $mappedFields)
 	{
 		$defaultRowValues = $this->getDefaultRowValues($item);
 
@@ -211,7 +204,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 	/**
 	 * Retrieve all the metadata objects for all the users in specific page
 	 */
-	private function retrieveUsersMetadata($itemIds, $metadataProfileId)
+	protected function retrieveUsersMetadata($itemIds, $metadataProfileId)
 	{
 		$result = array();
 
@@ -236,7 +229,6 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 			catch (Exception $e)
 			{
 				KalturaLog::info("Couldn't list metadata objects for metadataProfileId: [$metadataProfileId]" . $e->getMessage());
-				$this->apiError = $e;
 				break;
 			}
 
@@ -254,7 +246,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 	/**
 	 * Extract specific value from xml using given xpath
 	 */
-	private function getValueFromXmlElement($xml, $xpath)
+	protected function getValueFromXmlElement($xml, $xpath)
 	{
 		$strValue = null;
 		try
@@ -282,7 +274,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 	/**
 	 * the function run over each additional field and returns the value for the given field xpath
 	 */
-	private function fillAdditionalFieldsFromMetadata($itemsMetadataObjects, $additionalFields, $csvRows)
+	protected function fillAdditionalFieldsFromMetadata($itemsMetadataObjects, $additionalFields, $csvRows)
 	{
 		foreach($itemsMetadataObjects as $metadataObj)
 		{

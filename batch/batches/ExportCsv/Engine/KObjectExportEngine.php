@@ -6,8 +6,6 @@
  */
 abstract class KObjectExportEngine
 {
-	const LIMIT = 10000;
-
 	/**
 	 * @param int $objectType of enum KalturaExportObjectType
 	 * @return KObjectExportEngine
