@@ -22,6 +22,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	const CONVERSION_PROFILE_ID = 'conversionProfileId';
 	const JWT_TOKEN = 'jwtToken';
 	const DELETE_POLICY = 'deletionPolicy';
+	const ENABLE_ZOOM_TRANSCRIPTION =  'enableZoomTranscription';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -31,6 +32,9 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function setDeletionPolicy ($v)	{ $this->putInCustomData ( self::DELETE_POLICY, $v);	}
 	public function getDeletionPolicy ( )	{ return $this->getFromCustomData(self::DELETE_POLICY);	}
+	
+	public function setEnableZoomTranscription ($v)	{ $this->putInCustomData ( self::ENABLE_ZOOM_TRANSCRIPTION, $v);	}
+	public function getEnableZoomTranscription ( )	{ return $this->getFromCustomData(self::ENABLE_ZOOM_TRANSCRIPTION);	}
 	
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}

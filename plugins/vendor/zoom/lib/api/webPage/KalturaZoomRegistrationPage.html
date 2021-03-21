@@ -28,6 +28,7 @@
             let jwtToken  = $('#jwtToken').val().trim();
             let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
+            let enableZoomTranscription = $('#enableZoomTranscription').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
             let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
@@ -50,6 +51,7 @@
                     'integrationSetting:jwtToken':jwtToken,
                     'integrationSetting:deletionPolicy':deletionPolicy,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
+                    'integrationSetting:enableZoomTranscription':enableZoomTranscription,
                     'format': 1 },
                 success : function(res) {
                     $('body').css('cursor', 'default');
@@ -132,6 +134,7 @@
                         break;
                     case 'enableWebinarUploads':
                     case 'deletionPolicy':
+                    case 'enableZoomTranscription':
                     case 'enableRecordingUpload':
                         $('#'+i).prop('checked', v);
                         break;
@@ -205,6 +208,10 @@
                     <div class='custom-control custom-switch'>
                         <input type='checkbox' class='custom-control-input' id='deletionPolicy' name='deletionPolicy' >
                         <label class='custom-control-label' for='deletionPolicy'>Enable automatic deletion of files</label>
+                    </div>
+                    <div class='custom-control custom-switch'>
+                        <input type='checkbox' class='custom-control-input' id='enableZoomTranscription' name='enableZoomTranscription' >
+                        <label class='custom-control-label' for='enableZoomTranscription'>Enable Transcriptions</label>
                     </div>
                 </div>
             </div>
