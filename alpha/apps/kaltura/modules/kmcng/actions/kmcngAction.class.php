@@ -102,6 +102,10 @@ class kmcngAction extends kalturaAction
 		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
 		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
 
+		$this->playerV3BetaVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "beta");
+		$this->content_uiconfs_player_v3_beta_versions = isset($this->playerV3BetaVersionsUiConf) ? array_values($this->playerV3BetaVersionsUiConf) : null;
+		$this->content_uiconf_player_v3_beta_versions = (is_array($this->content_uiconfs_player_v3_beta_versions) && reset($this->content_uiconfs_player_v3_beta_versions)) ? reset($this->content_uiconfs_player_v3_beta_versions) : null;
+
 
 		$studio = null;
 		if (kConf::hasParam("studio_version") && kConf::hasParam("html5_version"))
@@ -121,6 +125,7 @@ class kmcngAction extends kalturaAction
 				"html5_version" => kConf::get("html5_version"),
 				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
+				"playerBetaVersionsMap" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfig() : '',
 				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : ''
 			);
 		}
