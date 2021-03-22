@@ -22,11 +22,13 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var string
 	 * @filter like,likex
+	 * @utf8truncate 127
 	 */
 	public $screenName;
 
 	/**
 	 * @var string
+	 * @utf8truncate 40
 	 * @deprecated
 	 */
 	public $fullName;
@@ -44,16 +46,19 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var string
+	 * @utf8truncate 16
 	 */
 	public $state;
 
 	/**
 	 * @var string
+	 * @utf8truncate 30
 	 */
 	public $city;
 
 	/**
 	 * @var string
+	 * @utf8truncate 10
 	 */
 	public $zip;
 

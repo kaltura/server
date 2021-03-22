@@ -219,7 +219,7 @@ class KalturaRequestDeserializer
 		return $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
 	}
 	
-	protected function validateParameter($name, $value, $constraintsObj) {
+	protected function validateParameter($name, &$value, $constraintsObj) {
 		$constraints = $constraintsObj->getConstraints();
 		if(array_key_exists(KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT, $constraints))
 			$this->validateMinLength($name, $value, $constraints[KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT]);
@@ -229,6 +229,8 @@ class KalturaRequestDeserializer
 			$this->validateMinValue($name, $value, $constraints[KalturaDocCommentParser::MIN_VALUE_CONSTRAINT]);
 		if(array_key_exists(KalturaDocCommentParser::MAX_VALUE_CONSTRAINT, $constraints))
 			$this->validateMaxValue($name, $value, $constraints[KalturaDocCommentParser::MAX_VALUE_CONSTRAINT]);
+		if(array_key_exists(KalturaDocCommentParser::UTF8_TRUNCATE, $constraints))
+			$this->truncateUTF8String($name,$value, $constraints[KalturaDocCommentParser::UTF8_TRUNCATE]);
 	}
 	
 	protected function validateMinLength($name, $objectValue, $constraint) {
@@ -239,6 +241,17 @@ class KalturaRequestDeserializer
 	protected function validateMaxLength($name, $objectValue, $constraint) {
 		if(strlen($objectValue) > $constraint)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $name, $constraint);
+	}
+	
+	protected function truncateUTF8String($name, &$objectValue, $constraint) {
+		if(strlen($objectValue) > $constraint)
+		{
+			$truncatedValue = kString::alignUtf8String($objectValue, $constraint);
+			KalturaLog::log("UTF8 string of field [".$name."] was safely truncated from [".$objectValue."] to ["
+			                .$truncatedValue."]");
+			$objectValue = $truncatedValue;
+			$this->params['user']['city'] = $objectValue;
+		}
 	}
 	
 	protected function validateMinValue($name, $objectValue, $constraint) {
