@@ -823,7 +823,6 @@ class ks extends kSessionBase
 
 	public static function retrieveAllowedAppSessionPrivileges($privilegesArray, $appSessionPrivileges)
 	{
-		$allowedAppSessionPrivileges = array();
 		$serverPrivileges = kSessionBase::getServerPrivileges();
 		$privilegesKeys = array_map('trim', array_keys($privilegesArray));
 		$forbidenSessionPrivileges = array_merge_recursive($serverPrivileges , $privilegesKeys);
@@ -831,11 +830,13 @@ class ks extends kSessionBase
 		// allow adding privileges to app token only if they are not in use by the server and were not set on the original app token
 		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
 		{
-			if(!in_array(trim($privilegeName), $forbidenSessionPrivileges))
-				$allowedAppSessionPrivileges[$privilegeName] = $privilegeValue;
+			if( !in_array(trim($privilegeName), $forbidenSessionPrivileges) || (in_array('*', $privilegesArray[$privilegeName])) )
+			{
+				$privilegesArray[$privilegeName] = $privilegeValue;
+			}
 		}
 
-		return $allowedAppSessionPrivileges;
+		return $privilegesArray;
 	}
 
 }
