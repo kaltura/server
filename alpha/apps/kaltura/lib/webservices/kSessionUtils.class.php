@@ -830,7 +830,7 @@ class ks extends kSessionBase
 		// allow adding privileges to app token only if they are not in use by the server and were not set on the original app token
 		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
 		{
-			if( !in_array(trim($privilegeName), $forbidenSessionPrivileges) || (in_array('*', $privilegesArray[$privilegeName])) )
+			if( !in_array(trim($privilegeName), $forbidenSessionPrivileges) || (in_array(self::PRIVILEGE_WILDCARD, $privilegesArray[$privilegeName])) )
 			{
 				$privilegesArray[$privilegeName] = $privilegeValue;
 			}
