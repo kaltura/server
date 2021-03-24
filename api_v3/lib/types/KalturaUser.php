@@ -59,12 +59,14 @@ class KalturaUser extends KalturaBaseUser
 	/**
 	 * @var string
 	 * @filter likex
+	 * @utf8truncate 40
 	 */
 	public $firstName;
 
 	/**
 	 * @var string
 	 * @filter likex
+	 * @utf8truncate 40
 	 */
 	public $lastName;
 
