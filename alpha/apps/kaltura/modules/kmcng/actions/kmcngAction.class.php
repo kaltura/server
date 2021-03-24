@@ -126,7 +126,8 @@ class kmcngAction extends kalturaAction
 				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
 				"playerBetaVersionsMap" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfig() : '',
-				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : ''
+				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : '',
+				"playerBetaConfVars" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfVars() : ''
 			);
 		}
 
