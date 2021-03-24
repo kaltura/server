@@ -9,6 +9,8 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	const CUSTOM_DATA_APPLICATION_NAME = 'application_name';
 	const CUSTOM_DATA_APP_PREFIX = 'app_prefix';
 	const DEFAULT_APPLICATION = 'kLive';
+	const ENTRY_ID_URL_PARAM = 'e';
+	const PARTNER_ID_URL_PARAM = 'p';
 	
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
@@ -80,14 +82,31 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_APP_PREFIX, null, null);
 	}
 
-    public function getSegmentDurationUrlString($sd)
+    public static function getSegmentDurationUrlString($sd)
     {
         return '';
     }
 
-	public function getSessionType($entryServerNode)
+	public static function getSessionType($entryServerNode)
 	{
 		return '';
+	}
+
+	public static function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
+	{
+		$partnerId = $da->getEntry()->getPartnerId();
+		return '/' . self::PARTNER_ID_URL_PARAM . '/' . $partnerId;
+	}
+
+	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	{
+		$entryId = $da->getEntryId();
+		return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/";
+	}
+
+	public static function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
+	{
+		return $liveUrl;
 	}
 
 } // MediaServerNode
