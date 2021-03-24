@@ -247,10 +247,9 @@ class KalturaRequestDeserializer
 		if(strlen($objectValue) > $constraint)
 		{
 			$truncatedValue = kString::alignUtf8String($objectValue, $constraint);
-			KalturaLog::log("UTF8 string of field [".$name."] was safely truncated from [".$objectValue."] to ["
-			                .$truncatedValue."]");
+			KalturaLog::log('UTF8 string of field ['.$name.'] was safely truncated from ['.$objectValue.'] to ['
+			                .$truncatedValue.']');
 			$objectValue = $truncatedValue;
-			$this->params['user']['city'] = $objectValue;
 		}
 	}
 	
