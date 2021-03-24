@@ -63,4 +63,13 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
 		return parent::getEntryIdUrl($da);
 	}
+
+	public static function getExplicitLiveUrl(DeliveryProfileDynamicAttributes $da)
+	{
+		if ($da->getServeVodFromLive())
+		{
+			return '';
+		}
+		return parent::getExplicitLiveUrl($da);
+	}
 }

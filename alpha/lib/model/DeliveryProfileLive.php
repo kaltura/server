@@ -1,8 +1,6 @@
 <?php
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
-	const USER_TYPE_ADMIN = 'admin';
-	const USER_TYPE_USER = 'user';
 	const DEFAULT_MAINTENANCE_DC = -1;
 
 	/**
@@ -362,10 +360,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$entry = $this->getDynamicAttributes()->getEntry();
 		if ($entry->getExplicitLive())
 		{
-			$userType = self::USER_TYPE_ADMIN;
-		 	if (!$entry->canViewExplicitLive())
-				$userType = self::USER_TYPE_USER;
-			$livePackagerUrl .= "type/$userType/";
+			$livePackagerUrl .= $serverNode->getExplicitLiveUrl($this->getDynamicAttributes());
 		}
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
 		$livePackagerUrl .= "t/$secureToken/";

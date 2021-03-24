@@ -11,6 +11,9 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	const DEFAULT_APPLICATION = 'kLive';
 	const ENTRY_ID_URL_PARAM = 'e';
 	const PARTNER_ID_URL_PARAM = 'p';
+	const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'type';
+	const USER_TYPE_ADMIN = 'admin';
+	const USER_TYPE_USER = 'user';
 	
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
@@ -107,6 +110,17 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	public static function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
 	{
 		return $liveUrl;
+	}
+
+	public static function getExplicitLiveUrl(DeliveryProfileDynamicAttributes $da)
+	{
+		$entry = $da->getEntry();
+		$userType = self::USER_TYPE_ADMIN;
+		if (!$entry->canViewExplicitLive())
+		{
+			$userType = self::USER_TYPE_USER;
+		}
+		return self::EXPLICIT_LIVE_VIEWER_TYPE_URL . "/$userType/";
 	}
 
 } // MediaServerNode
