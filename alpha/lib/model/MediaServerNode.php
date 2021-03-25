@@ -115,12 +115,12 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	public static function getExplicitLiveUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$entry = $da->getEntry();
-		$userType = self::USER_TYPE_ADMIN;
+		$userType = static::USER_TYPE_ADMIN;
 		if (!$entry->canViewExplicitLive())
 		{
-			$userType = self::USER_TYPE_USER;
+			$userType = static::USER_TYPE_USER;
 		}
-		return self::EXPLICIT_LIVE_VIEWER_TYPE_URL . "/$userType/";
+		return static::EXPLICIT_LIVE_VIEWER_TYPE_URL . "/$userType/";
 	}
 
 } // MediaServerNode

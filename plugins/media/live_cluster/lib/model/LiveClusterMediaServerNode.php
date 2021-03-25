@@ -6,6 +6,9 @@ class LiveClusterMediaServerNode extends MediaServerNode
     const ENVIRONMENT = 'env';
     const SESSION_TYPE = 'st';
     const TIMELINE_URL_PARAM = 'tl';
+	const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'tl';
+	const USER_TYPE_ADMIN = 'main';
+	const USER_TYPE_USER = 'viewer';
 
     /**
      * Applies default values to this object.
