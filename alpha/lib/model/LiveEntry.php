@@ -30,7 +30,18 @@ abstract class LiveEntry extends entry
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
-
+	
+	protected $isPlayable=null;
+	protected $redirectToVod=null;
+	protected $currentEvent=null;
+	
+	public function __construct ()
+	{
+		$this->isPlayable=null;
+		$this->currentEvent=null;
+		parent::__construct();
+	}
+	
 	public function copyInto($copyObj, $deepcopy = false)
 	{
 		parent::copyInto($copyObj, $deepcopy);
@@ -501,7 +512,9 @@ abstract class LiveEntry extends entry
 		foreach ($pluginInstances as $instance)
 		{
 			/* @var $instance IKalturaScheduleEventProvider */
-			$pluginEvents = $instance->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $startTime, $endTime);
+			$pluginEvents = $instance->getScheduleEvents($this->getId(),
+			                                             array
+			                                             (ScheduleEventType::LIVE_STREAM,ScheduleEventType::LIVE_REDIRECT), $startTime, $endTime);
 			if ($pluginEvents)
 			{
 				KalturaLog::debug('IKalturaScheduleEventProvider pluginEvents = ' . print_r($pluginEvents, true));
@@ -616,13 +629,26 @@ abstract class LiveEntry extends entry
 		}
 		return null;
 	}
-
-
+	
+	
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
+		if(is_null($this->currentEvent))
+		{
+			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
+			$this -> currentEvent ? $this -> currentEvent : array();
+		}
+		
+		/* @param ILiveStreamScheduleEvent $currentEvent*/
+		$currentEvent->decoratorExecute($this);
+		if($this->isPlayable)
 		{
 			return EntryServerNodeStatus::PLAYABLE;
+		}
+		if($this->redirectToVod)
+		{
+			$this->setRedirectEntryId($this->redirectToVod);
+			return EntryServerNodeStatus::STOPPED;
 		}
 
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
@@ -1151,13 +1177,23 @@ abstract class LiveEntry extends entry
 		{
 			return null;
 		}
-
+		else
+		{
+			//Get all schedule events of now.
+			//check if one the contains redirect entry ID
+		}
+		
 		return parent::getRedirectEntryId();
 	}
 
 	public function isPlayable()
 	{
-		return $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+		if(is_null($this->isPlayale))
+		{
+			$this->isPlayale = $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+		}
+		
+		return $this->isPlayale;
 	}
 
 	public function getRecordedEntryConversionProfile()
