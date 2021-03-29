@@ -9,7 +9,4 @@ interface ILiveStreamScheduleEvent extends IScheduleEvent
 	public function getSourceEntryId();
 	
 	public function decoratorExecute(LiveEntry $e);
-	
-	public function getAffectedProperty();
-	
 }
