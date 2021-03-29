@@ -67,12 +67,17 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		return parent::getEntryIdUrl($da);
 	}
 
-	public static function getExplicitLiveUrl(DeliveryProfileDynamicAttributes $da)
+	public static function getExplicitLiveUrl($liveUrl, DeliveryProfileDynamicAttributes $da, LiveStreamEntry $entry)
 	{
-		if ($da->getServeVodFromLive())
+		if (strpos($liveUrl, self::TIMELINE_URL_PARAM) !== false)
 		{
 			return '';
 		}
-		return parent::getExplicitLiveUrl($da);
+		if ($entry->getExplicitLive())
+		{
+			return parent::getExplicitLiveUrl($liveUrl, $da, $entry);
+		}
+		// when not explicitLive and no timeline inserted before - we want to request for the main timeline
+		return static::EXPLICIT_LIVE_VIEWER_TYPE_URL . '/' . self::USER_TYPE_ADMIN . '/';
 	}
 }
