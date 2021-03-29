@@ -61,21 +61,14 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	{
 		return parent::getCalculatedStartTime() - $this->getPreStartTime();
 	}
-
+	
 	public function getCalculatedEndTime()
 	{
 		return parent::getCalculatedEndTime() + $this->getPostEndTime();
 	}
 	
-	public function getAffectedProperty()
-	{
-		return array('isPlayable');
-	}
 	public function decoratorExecute (LiveEntry $e)
 	{
-		foreach ($this->getAffectedProperty() as $prop)
-		{
-			$e->$prop = true;
-		}
+		$e->isPlayable = true;
 	}
 }

@@ -17,16 +17,9 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 		$this->putInCustomData(self::REDIRECT_ENTRY_ID,$v);
 	}
 
-	public function getAffectedProperty()
-	{
-		return array('redirectToVod');
-	}
 	public function decoratorExecute (LiveEntry $e)
 	{
-		foreach ($this->getAffectedProperty() as $prop)
-		{
-			$e->$prop = $this->getRedirectEntryId();
-		}
+		$e->redirectToVod=$this->getRedirectEntryId ();
 	}
 	
 	/* (non-PHPdoc)

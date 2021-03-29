@@ -633,6 +633,7 @@ abstract class LiveEntry extends entry
 	
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
+		//caching to reduce multiple access to db
 		if(is_null($this->currentEvent))
 		{
 			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
@@ -642,17 +643,18 @@ abstract class LiveEntry extends entry
 		/* @param ILiveStreamScheduleEvent $currentEvent*/
 		if($this->currentEvent)
 		{
-			$this->currentEvent->decoratorExecute($this);
-		}
-		if($this->isPlayable)
-		{
-			return EntryServerNodeStatus::PLAYABLE;
-		}
-		if($this->redirectToVod)
-		{
-			$this->setRedirectEntryId($this->redirectToVod);
-			$this->setRecordedEntryId($this->redirectToVod);
-			return EntryServerNodeStatus::STOPPED;
+			//The decorator can change the status of isPlayable & redirectToVod
+			$this -> currentEvent -> decoratorExecute($this);
+			if ($this -> isPlayable)
+			{
+				return EntryServerNodeStatus::PLAYABLE;
+			}
+			if ($this -> redirectToVod)
+			{
+				$this -> setRedirectEntryId($this -> redirectToVod);
+				$this -> setRecordedEntryId($this -> redirectToVod);
+				return EntryServerNodeStatus::STOPPED;
+			}
 		}
 
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
@@ -1187,6 +1189,7 @@ abstract class LiveEntry extends entry
 
 	public function isPlayable()
 	{
+		//Calculate isPlayable only once in session
 		if(is_null($this->isPlayale))
 		{
 			$this->isPlayale = $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
