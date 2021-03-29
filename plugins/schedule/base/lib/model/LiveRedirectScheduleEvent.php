@@ -10,7 +10,7 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 	
 	public function getRedirectEntryId ()
 	{
-		$this->getFromCustomData(self::REDIRECT_ENTRY_ID);
+		return $this->getFromCustomData(self::REDIRECT_ENTRY_ID);
 	}
 	public function setRedirectEntryId ($v)
 	{
@@ -27,5 +27,14 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 		{
 			$e->$prop = $this->getRedirectEntryId();
 		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see ScheduleEvent::applyDefaultValues()
+	 */
+	public function applyDefaultValues()
+	{
+		parent::applyDefaultValues();
+		$this->setType(ScheduleEventType::LIVE_REDIRECT);
 	}
 }

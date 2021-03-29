@@ -69,7 +69,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	
 	public function getAffectedProperty()
 	{
-		return array('isPlayble');
+		return array('isPlayable');
 	}
 	public function decoratorExecute (LiveEntry $e)
 	{

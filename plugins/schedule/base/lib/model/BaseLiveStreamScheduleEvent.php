@@ -25,15 +25,6 @@ abstract class BaseLiveStreamScheduleEvent extends EntryScheduleEvent
 		return $this->getFromCustomData(self::SOURCE_ENTRY_ID);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see ScheduleEvent::applyDefaultValues()
-	 */
-	public function applyDefaultValues()
-	{
-		parent::applyDefaultValues();
-		$this->setType(ScheduleEventType::LIVE_STREAM);
-	}
-	
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);

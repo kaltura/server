@@ -31,8 +31,8 @@ abstract class LiveEntry extends entry
 	
 	protected $decidingLiveProfile = false;
 	
-	protected $isPlayable=null;
-	protected $redirectToVod=null;
+	public $isPlayable=null;
+	public $redirectToVod=null;
 	protected $currentEvent=null;
 	
 	public function __construct ()
@@ -640,7 +640,10 @@ abstract class LiveEntry extends entry
 		}
 		
 		/* @param ILiveStreamScheduleEvent $currentEvent*/
-		$currentEvent->decoratorExecute($this);
+		if($this->currentEvent)
+		{
+			$this->currentEvent->decoratorExecute($this);
+		}
 		if($this->isPlayable)
 		{
 			return EntryServerNodeStatus::PLAYABLE;
@@ -648,6 +651,7 @@ abstract class LiveEntry extends entry
 		if($this->redirectToVod)
 		{
 			$this->setRedirectEntryId($this->redirectToVod);
+			$this->setRecordedEntryId($this->redirectToVod);
 			return EntryServerNodeStatus::STOPPED;
 		}
 
@@ -1176,11 +1180,6 @@ abstract class LiveEntry extends entry
 		if ($this->isPlayable())
 		{
 			return null;
-		}
-		else
-		{
-			//Get all schedule events of now.
-			//check if one the contains redirect entry ID
 		}
 		
 		return parent::getRedirectEntryId();
