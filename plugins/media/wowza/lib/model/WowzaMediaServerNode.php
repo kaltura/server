@@ -259,11 +259,11 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $liveUrl;
 	}
 
-	public static function getExplicitLiveUrl($liveUrl, DeliveryProfileDynamicAttributes $da, LiveStreamEntry $entry)
+	public static function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
 	{
 		if ($entry->getExplicitLive())
 		{
-			return parent::getExplicitLiveUrl($liveUrl, $da, $entry);
+			return parent::getExplicitLiveUrl($liveUrl, $entry);
 		}
 		return '';
 	}
