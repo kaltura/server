@@ -3,10 +3,9 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamScheduleEvent
+class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILiveStreamScheduleEvent
 {
 	const PROJECTED_AUDIENCE = 'projected_audience';
-	const SOURCE_ENTRY_ID = 'source_entry_id';
 	const PRE_START_TIME = 'pre_start_time';
 	const POST_END_TIME = 'post_end_time';
 
@@ -25,23 +24,7 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	{
 		return $this->getFromCustomData(self::PROJECTED_AUDIENCE);
 	}
-
-	/**
-	 * @param string $v
-	 */
-	public function setSourceEntryId($v)
-	{
-		$this->putInCustomData(self::SOURCE_ENTRY_ID, $v);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSourceEntryId()
-	{
-		return $this->getFromCustomData(self::SOURCE_ENTRY_ID);
-	}
-
+	
 	/**
 	 * @param int $v
 	 */
@@ -73,59 +56,28 @@ class LiveStreamScheduleEvent extends EntryScheduleEvent implements ILiveStreamS
 	{
 		return $this->getFromCustomData(self::POST_END_TIME, null, 0);
 	}
-
+	
+	public function getCalculatedStartTime()
+	{
+		return parent::getCalculatedStartTime() - $this->getPreStartTime();
+	}
+	
+	public function getCalculatedEndTime()
+	{
+		return parent::getCalculatedEndTime() + $this->getPostEndTime();
+	}
+	
+	public function decoratorExecute (LiveEntry $e)
+	{
+		return EntryServerNodeStatus::PLAYABLE;
+	}
+	
 	/* (non-PHPdoc)
-	 * @see ScheduleEvent::applyDefaultValues()
-	 */
+ * @see ScheduleEvent::applyDefaultValues()
+ */
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
 		$this->setType(ScheduleEventType::LIVE_STREAM);
 	}
-
-	public function postInsert(PropelPDO $con = null)
-	{
-		parent::postInsert($con);
-		$this->addCapabilityToTemplateEntry($con);
-	}
-
-	public function postUpdate(PropelPDO $con = null)
-	{
-		parent::postUpdate($con);
-		$this->addCapabilityToTemplateEntry($con);
-	}
-
-	protected function addCapabilityToTemplateEntry($con)
-	{
-			$liveEntry = entryPeer::retrieveByPK($this->getTemplateEntryId());
-			if ($liveEntry)
-			{
-				$shouldSave = false;
-				if (!$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
-				{
-					$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
-					$shouldSave = true;
-				}
-				if ($this->getSourceEntryId() && !$liveEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY))
-				{
-					$liveEntry->addCapability(LiveEntry::SIMULIVE_CAPABILITY);
-					$shouldSave = true;
-				}
-				if ($shouldSave)
-				{
-					$liveEntry->save($con);
-				}
-			}
-	}
-
-	public function getCalculatedStartTime()
-	{
-		return parent::getCalculatedStartTime() - $this->getPreStartTime();
-	}
-
-	public function getCalculatedEndTime()
-	{
-		return parent::getCalculatedEndTime() + $this->getPostEndTime();
-	}
-
 }
