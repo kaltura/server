@@ -18,8 +18,10 @@ class kImageUtils
 		if(!$fileSync->getEncryptionKey())
 		{
 			$key = kFileSyncUtils::getKeyForFileSync($fileSync);
-			$filePath = kFileSyncUtils::getLocalFilePathForKey($key);
+			$filePath = kFile::realPath(kFileSyncUtils::getLocalFilePathForKey($key));
+			kSharedFileSystemMgr::restoreStreamWrappers();
 			list($width, $height, $type, $attr) = getimagesize($filePath);
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 		}
 		else
 		{
