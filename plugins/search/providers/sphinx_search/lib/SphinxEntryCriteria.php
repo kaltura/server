@@ -47,7 +47,7 @@ class SphinxEntryCriteria extends SphinxCriteria
 				{
 					if (!empty($redirectedEntry) && 
 						($redirectedEntry->getStatus() == entryStatus::READY || 
-							myEntryUtils::shouldServodFromLive($redirectEntryId)
+							myEntryUtils::shouldServeVodFromLive($redirectEntryId)
 						)
 					)
 					{

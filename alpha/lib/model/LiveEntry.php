@@ -31,16 +31,8 @@ abstract class LiveEntry extends entry
 	
 	protected $decidingLiveProfile = false;
 	
-	public $isPlayable=null;
-	public $redirectToVod=null;
-	protected $currentEvent=null;
-	
-	public function __construct ()
-	{
-		$this->isPlayable=null;
-		$this->currentEvent=null;
-		parent::__construct();
-	}
+	protected $isPlayable = null;
+	protected $currentEvent = null;
 	
 	public function copyInto($copyObj, $deepcopy = false)
 	{
@@ -513,8 +505,9 @@ abstract class LiveEntry extends entry
 		{
 			/* @var $instance IKalturaScheduleEventProvider */
 			$pluginEvents = $instance->getScheduleEvents($this->getId(),
-			                                             array
-			                                             (ScheduleEventType::LIVE_STREAM,ScheduleEventType::LIVE_REDIRECT), $startTime, $endTime);
+			                                             array(ScheduleEventType::LIVE_STREAM,ScheduleEventType::LIVE_REDIRECT),
+			                                             $startTime,
+			                                             $endTime);
 			if ($pluginEvents)
 			{
 				KalturaLog::debug('IKalturaScheduleEventProvider pluginEvents = ' . print_r($pluginEvents, true));
@@ -637,7 +630,7 @@ abstract class LiveEntry extends entry
 		if(is_null($this->currentEvent))
 		{
 			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
-			$this -> currentEvent ? $this -> currentEvent : array();
+			$this -> currentEvent ? $this -> currentEvent : false;
 		}
 		
 		/* @param ILiveStreamScheduleEvent $currentEvent*/
