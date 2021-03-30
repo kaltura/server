@@ -71,4 +71,13 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	{
 		return EntryServerNodeStatus::PLAYABLE;
 	}
+	
+	/* (non-PHPdoc)
+ * @see ScheduleEvent::applyDefaultValues()
+ */
+	public function applyDefaultValues()
+	{
+		parent::applyDefaultValues();
+		$this->setType(ScheduleEventType::LIVE_STREAM);
+	}
 }

@@ -78,7 +78,8 @@ class KalturaLiveRedirectScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 */
 	protected function validateLiveStreamEventFields ()
 	{
-		if (!entryPeer ::retrieveByPK($this -> redirectEntryId))
+		if($this -> redirectEntryId && !entryPeer ::retrieveByPK($this ->
+			redirectEntryId))
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND,
 			                              $this -> redirectEntryId);

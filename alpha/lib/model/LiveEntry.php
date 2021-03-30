@@ -256,6 +256,7 @@ abstract class LiveEntry extends entry
 	
 	public function getRecordedEntryId()
 	{
+		
 		return $this->getFromCustomData("recorded_entry_id");
 	}
 	
