@@ -644,17 +644,7 @@ abstract class LiveEntry extends entry
 		if($this->currentEvent)
 		{
 			//The decorator can change the status of isPlayable & redirectToVod
-			$this -> currentEvent -> decoratorExecute($this);
-			if ($this -> isPlayable)
-			{
-				return EntryServerNodeStatus::PLAYABLE;
-			}
-			if ($this -> redirectToVod)
-			{
-				$this -> setRedirectEntryId($this -> redirectToVod);
-				$this -> setRecordedEntryId($this -> redirectToVod);
-				return EntryServerNodeStatus::STOPPED;
-			}
+			return $this -> currentEvent -> decoratorExecute($this);
 		}
 
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
@@ -1190,12 +1180,13 @@ abstract class LiveEntry extends entry
 	public function isPlayable()
 	{
 		//Calculate isPlayable only once in session
-		if(is_null($this->isPlayale))
+		if(is_null($this->isPlayable))
 		{
-			$this->isPlayale = $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+			$this->isPlayable = $this->getViewMode() == ViewMode::ALLOW_ALL
+				&& in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
 		}
 		
-		return $this->isPlayale;
+		return $this->isPlayable;
 	}
 
 	public function getRecordedEntryConversionProfile()

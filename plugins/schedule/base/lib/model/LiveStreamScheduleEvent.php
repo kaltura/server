@@ -69,6 +69,6 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	
 	public function decoratorExecute (LiveEntry $e)
 	{
-		$e->isPlayable = true;
+		return EntryServerNodeStatus::PLAYABLE;
 	}
 }

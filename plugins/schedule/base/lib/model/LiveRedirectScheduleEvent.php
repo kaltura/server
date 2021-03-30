@@ -19,7 +19,9 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 
 	public function decoratorExecute (LiveEntry $e)
 	{
-		$e->redirectToVod=$this->getRedirectEntryId ();
+		$e -> setRedirectEntryId($this -> redirectToVod);
+		$e -> setRecordedEntryId($this -> redirectToVod);
+		return EntryServerNodeStatus::STOPPED;
 	}
 	
 	/* (non-PHPdoc)
