@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * @package plugins.schedule
+ * @subpackage api.objects
+ * @abstract
+ */
 abstract class KalturaBaseLiveScheduleEvent extends KalturaEntryScheduleEvent
 {
 	/**
