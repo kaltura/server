@@ -54,7 +54,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
         return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() . '/';
     }
 
-	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		if ($da->getServeVodFromLive())
 		{
@@ -67,7 +67,18 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		return parent::getEntryIdUrl($da);
 	}
 
-	public static function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
+	protected function getUserType($isAdmin)
+	{
+		return $isAdmin ? self::USER_TYPE_ADMIN : self::USER_TYPE_USER;
+	}
+
+	protected function getUrlType()
+	{
+		return self::EXPLICIT_LIVE_VIEWER_TYPE_URL;
+	}
+
+
+	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
 	{
 		if (strpos($liveUrl, self::TIMELINE_URL_PARAM) !== false)
 		{

@@ -235,7 +235,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN, null, null);
 	}
 
-	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		if ($da->getServeVodFromLive())
 		{
@@ -259,7 +259,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $liveUrl;
 	}
 
-	public static function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
+	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
 	{
 		if ($entry->getExplicitLive())
 		{
