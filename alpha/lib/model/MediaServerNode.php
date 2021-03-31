@@ -11,6 +11,9 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	const DEFAULT_APPLICATION = 'kLive';
 	const ENTRY_ID_URL_PARAM = 'e';
 	const PARTNER_ID_URL_PARAM = 'p';
+	const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'type';
+	const USER_TYPE_ADMIN = 'admin';
+	const USER_TYPE_USER = 'user';
 	
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
@@ -92,13 +95,13 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return '';
 	}
 
-	public static function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
+	public function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$partnerId = $da->getEntry()->getPartnerId();
 		return '/' . self::PARTNER_ID_URL_PARAM . '/' . $partnerId;
 	}
 
-	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$entryId = $da->getEntryId();
 		return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/";
@@ -107,6 +110,26 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	public static function modifyUrlForVodFromLive($liveUrl, DeliveryProfileDynamicAttributes $da)
 	{
 		return $liveUrl;
+	}
+
+	protected function getUserType($isAdmin)
+	{
+		return $isAdmin ? self::USER_TYPE_ADMIN : self::USER_TYPE_USER;
+	}
+
+	protected function getUrlType()
+	{
+		return self::EXPLICIT_LIVE_VIEWER_TYPE_URL;
+	}
+
+	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
+	{
+		$userType = $this->getUserType(true);
+		if ($entry->getExplicitLive() && !$entry->canViewExplicitLive())
+		{
+			$userType = $this->getUserType(false);
+		}
+		return $this->getUrlType() . "/$userType/";
 	}
 
 } // MediaServerNode

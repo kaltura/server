@@ -235,7 +235,7 @@ class WowzaMediaServerNode extends MediaServerNode {
 		return $this->getFromCustomData(self::CUSTOM_DATA_LIVE_SERVICE_INTERNAL_DOMAIN, null, null);
 	}
 
-	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		if ($da->getServeVodFromLive())
 		{
@@ -257,6 +257,15 @@ class WowzaMediaServerNode extends MediaServerNode {
 		}
 		$liveUrl = str_replace('/live/', $liveType, $liveUrl);
 		return $liveUrl;
+	}
+
+	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
+	{
+		if ($entry->getExplicitLive())
+		{
+			return parent::getExplicitLiveUrl($liveUrl, $entry);
+		}
+		return '';
 	}
 
 } // WowzaMediaServer

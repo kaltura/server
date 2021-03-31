@@ -6,6 +6,9 @@ class LiveClusterMediaServerNode extends MediaServerNode
     const ENVIRONMENT = 'env';
     const SESSION_TYPE = 'st';
     const TIMELINE_URL_PARAM = 'tl';
+    const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'tl';
+    const USER_TYPE_ADMIN = 'main';
+    const USER_TYPE_USER = 'viewer';
 
     /**
      * Applies default values to this object.
@@ -51,7 +54,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
         return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() . '/';
     }
 
-	public static function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		if ($da->getServeVodFromLive())
 		{
@@ -62,5 +65,25 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		}
 
 		return parent::getEntryIdUrl($da);
+	}
+
+	protected function getUserType($isAdmin)
+	{
+		return $isAdmin ? self::USER_TYPE_ADMIN : self::USER_TYPE_USER;
+	}
+
+	protected function getUrlType()
+	{
+		return self::EXPLICIT_LIVE_VIEWER_TYPE_URL;
+	}
+
+
+	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
+	{
+		if (strpos($liveUrl, self::TIMELINE_URL_PARAM) !== false)
+		{
+			return '';
+		}
+		return parent::getExplicitLiveUrl($liveUrl, $entry);
 	}
 }
