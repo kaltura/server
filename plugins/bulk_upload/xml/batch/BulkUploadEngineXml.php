@@ -8,7 +8,7 @@
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	/**
-	 * The defalut thumbnail tag
+	 * The default thumbnail tag
 	 * @var string
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
