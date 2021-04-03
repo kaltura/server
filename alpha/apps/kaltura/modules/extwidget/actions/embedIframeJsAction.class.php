@@ -10,6 +10,9 @@ class embedIframeJsAction extends sfAction
 	 */
 	public function execute()
 	{
+		// prevent indexing of direct player urls
+		header('X-Robots-Tag: noindex');
+
 		$partner_id = $this->getRequestParameter('partner_id');
 		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
 		
