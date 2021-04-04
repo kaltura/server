@@ -4804,7 +4804,7 @@ class kKavaReportsMgr extends kKavaBase
 			$dimension_ids = array();
 			foreach ($rows as $row)
 			{
-				$dimension_ids[] = $row[$dimension];
+				$dimension_ids[] = $row[$dimension] !== null ? $row[$dimension] : '';
 			}
 
 			// issue a second topN query
