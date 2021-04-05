@@ -182,8 +182,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$entryPager = new KalturaFilterPager();
 			$entryPager->pageSize = 1;
 			$entryPager->pageIndex = 1;
+			KBatchBase::impersonate($this->dropFolder->partnerId);
 			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
-			
+			KBatchBase::unimpersonate();
 			if (is_array($entryList->objects) && isset($entryList->objects[0]) )
 			{
 				return $entryList->objects[0];
