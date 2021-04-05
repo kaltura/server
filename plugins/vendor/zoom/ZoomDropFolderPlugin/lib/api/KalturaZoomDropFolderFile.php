@@ -14,6 +14,16 @@ class KalturaZoomDropFolderFile extends KalturaDropFolderFile
 	 * @var KalturaRecordingFile
 	 */
 	public $recordingFile;
+	
+	/**
+	 * @var string
+	 */
+	public $parentEntryId;
+	
+	/**
+	 * @var bool
+	 */
+	public $isParentEntry;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -21,6 +31,8 @@ class KalturaZoomDropFolderFile extends KalturaDropFolderFile
 	private static $map_between_objects = array(
 		'meetingMetadata',
 		'recordingFile',
+		'parentEntryId',
+		'isParentEntry'
 	);
 
 	public function getMapBetweenObjects()

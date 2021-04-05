@@ -1178,7 +1178,8 @@ return array(
     'Kaltura_Client_DropFolder_Enum_DropFolderType::SCP' => 'Remote SCP',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::WEBEX' => 'Webex',
     'Kaltura_Client_DropFolder_Enum_DropFolderType::S3DROPFOLDER' => 'S3',
-
+	'Kaltura_Client_DropFolder_Enum_DropFolderType::ZOOM' => 'Zoom',
+	
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::CONTENT' => 'Content',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::XML' => 'XML',
 	'Kaltura_Client_DropFolder_Enum_DropFolderFileHandlerType::ICAL' => 'ICAL',

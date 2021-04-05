@@ -100,6 +100,12 @@ class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsume
 					return new KalturaDropFolderContentProcessorJobData();
 				}
 				break;
+			case 'Form_DropFolderConfigureExtend_SubForm':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::ZOOM)
+				{
+					return new Form_ZoomDropFolderConfigureExtend_SubForm();
+				}
+				break;
 			case 'Kaltura_Client_DropFolder_Type_DropFolder':
 				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::ZOOM)
 				{

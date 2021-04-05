@@ -60,7 +60,7 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 	{
 		if ($this->dropFolder->zoomVendorIntegration->zoomWebinarCategory)
 		{
-			$entry->categories = $this->dropFolder->zoomVendorIntegration->zoomWebinarCategory();
+			$entry->categories = $this->dropFolder->zoomVendorIntegration->zoomWebinarCategory;
 		}
 	}
 }
