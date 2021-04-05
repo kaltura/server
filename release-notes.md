@@ -8,7 +8,20 @@
     PLAT-22694 - appToken - add the ability to set weaker privileges on the KS,
         if the privileges are already allowed on the appToken
     
+    VIRTC-2021 - Admin Console, add ability to set custom password policy per partner.
+      Once policy for partner is set, the system policy is ignored.
+     
+    PLAT-22722 - Add mpeg ts files to the allowed files list
+    
+    PLAT-22714 - Add new type of Live-Schedulued event - KalturaLiveRedirectScheduleEvent, once its time has come it will rediret the live entry to another entry (live or vod)
+    
+    PLAT-22698 - ThumbAsset::add, Abilty to add Thumbnails to image entry.
+    
 ### Bug fix ###
+
+    PLAT-22724 - Admin console, storage profile, when flavor param source only was not displayed - fixed. 
+    
+    PLAT-22696 - Trancate utf8 strings in the following entry properties :state,city,zip,screen_name,first_name,last_name,full_name
 
 ## Export entries to CSV ##
 - Issue Type: Task
