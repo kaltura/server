@@ -229,6 +229,7 @@ class ZoomHelper
 			case 'MP4':
 			case 'CHAT':
 			case 'TRANSCRIPT':
+			case 'M4A':
 				return true;
 				break;
 			default:
@@ -244,6 +245,7 @@ class ZoomHelper
 			case kRecordingFileType::VIDEO:
 			case kRecordingFileType::CHAT:
 			case kRecordingFileType::TRANSCRIPT:
+			case kRecordingFileType::AUDIO:
 				return true;
 				break;
 			default:

@@ -50,6 +50,9 @@ class kZoomRecordingFile implements iZoomObject
 			case 'TRANSCRIPT':
 				$this->recordingFileType = kRecordingFileType::TRANSCRIPT;
 				break;
+			case 'M4A':
+				$this->recordingFileType = kRecordingFileType::AUDIO;
+				break;
 			default:
 				$this->recordingFileType = kRecordingFileType::UNDEFINED;
 		}

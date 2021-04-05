@@ -393,11 +393,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				if ($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT)
 				{
 					$transcriptProcessor = new zoomTranscriptProcessor($zoomBaseUrl, $dropFolder);
-					
 					$transcriptProcessor->handleRecordingTranscriptComplete($dropFolderFile, $entry);
 					$this->updateDropFolderFile($dropFolderFile->parentEntryId , $dropFolderFile);
 				}
-				else if (in_array($dropFolderFile->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::CHAT)))
+				else if (in_array($dropFolderFile->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::AUDIO,
+				                                                                  KalturaRecordingFileType::CHAT)))
 				{
 					$zoomRecordingProcessor = new zoomMeetingProcessor($zoomBaseUrl, $dropFolder);
 					$zoomRecordingProcessor->mainEntry = $entry;
