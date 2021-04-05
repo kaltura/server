@@ -3795,6 +3795,36 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getUserIdAndFullNameBase($ids, $partner_id)
+	{
+		$context = array(
+			'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
+		);
+		return self::getUsersInfo($ids, $partner_id, $context);
+	}
+
+	protected static function getUserFullNameWithFallback($ids, $partner_id)
+	{
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		foreach ($result as $id => $row)
+		{
+			$result[$id] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
+	protected static function getUserIdAndFullNameWithFallback($ids, $partner_id)
+	{
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		foreach ($result as $id => &$row)
+		{
+			$row[1] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
 	protected static function getEntriesSource($ids, $partner_id, $context)
 	{
 		$context['peer'] = 'entryPeer';

@@ -444,8 +444,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $enforceHttpsApi;
-
-
+	
+	/**
+	 * @var string
+	 */
+	public $passwordStructureValidations;
+	
+	/**
+	 * @var string
+	 */
+	public $passwordStructureValidationsDescription;
+	
+	
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -531,14 +542,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"usageLimitWarning",
 		"lastFreeTrialNotificationDay",
 		"extendedFreeTrailEndsWarning",
-		'enforceHttpsApi'
+		'enforceHttpsApi',
 	);
 
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
@@ -572,6 +583,14 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if($this->eSearchLanguages) {
 			$this->eSearchLanguages = json_encode($this->eSearchLanguages);
 		}
+		
+		$passwordValidation = $source_object->getPasswordStructureValidations();
+		if(isset($passwordValidation[0]))
+		{
+			$this->passwordStructureValidations = $passwordValidation[0][0];
+			$this->passwordStructureValidationsDescription = $passwordValidation[0][1];
+		}
+
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -723,7 +742,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			
 			//Raise template partner's conversion profiles (so far) and check whether the partner now has permissions for them.
 			$this->copyMissingConversionProfiles($object_to_fill);
-		
 		}
 		
 		if (!is_null($this->limits))
@@ -742,6 +760,17 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
+		
+		if(!is_null($this->passwordStructureValidations))
+		{
+			$object_to_fill->setPasswordStructureValidations(
+				array(array($this->passwordStructureValidations,
+				            $this->passwordStructureValidationsDescription)));
+		}
+		else
+		{
+			$object_to_fill->setPasswordStructureValidations(null);
+		}
 		
 		return $object_to_fill;
 	}

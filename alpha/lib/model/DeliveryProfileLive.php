@@ -348,24 +348,14 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			
 			$livePackagerUrl = str_replace($matchedPattern, $hostname, $livePackagerUrl);
 		}
-		
-		$partnerID = $this->getDynamicAttributes()->getEntry()->getPartnerId();
-		
-		if($this->getDynamicAttributes()->getServeVodFromLive())
+
+		if ($this->getDynamicAttributes()->getServeVodFromLive())
 		{
-			$entryId = $this->getDynamicAttributes()->getServeLiveAsVodEntryId();
-			$liveType = "/recording/";
-			$entry = entryPeer::retrieveByPK($entryId);
-			if ($entry && $entry->getFlowType() == EntryFlowType::LIVE_CLIPPING)
-				$liveType = "/clip/";
-			$livePackagerUrl = str_replace("/live/", $liveType, $livePackagerUrl);
+			$livePackagerUrl = $serverNode->modifyUrlForVodFromLive($livePackagerUrl, $this->getDynamicAttributes());
 		}
-		else
-		{
-			$entryId = $this->getDynamicAttributes()->getEntryId();
-		}
-		
-		$livePackagerUrl = "$livePackagerUrl/p/$partnerID/e/$entryId/";
+
+		$livePackagerUrl .= $serverNode->getPartnerIdUrl($this->getDynamicAttributes());
+		$livePackagerUrl .= $serverNode->getEntryIdUrl($this->getDynamicAttributes());
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
 

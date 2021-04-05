@@ -3,35 +3,34 @@
  * @package Scheduler
  * @subpackage ExportCsv
  */
-class KUserExportEngine extends KMappedObjectExportEngine
+
+class KEntryExportEngine extends KMappedObjectExportEngine
 {
 	protected function getFilterOrderBy()
 	{
-		return KalturaUserOrderBy::CREATED_AT_ASC;
+		return KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 	}
 
 	protected function getItemList($filter, $pager)
 	{
-		return KBatchBase::$kClient->user->listAction($filter, $pager);
+		return KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
 	}
 
 	protected function getDefaultHeaderRowToCsv()
 	{
-		return 'User ID,First Name,Last Name,Email';
+		return 'id,name';
 	}
 
 	protected function getDefaultRowValues($item)
 	{
 		return array(
 			'id' => $item->id,
-			'firstName' => $item->firstName,
-			'lastName' => $item->lastName,
-			'email' =>$item->email
+			'name' => $item->name ? $item->name : 'N/A',
 		);
 	}
 
 	protected function getMetadataObjectType()
 	{
-		return MetadataObjectType::USER;
+		return MetadataObjectType::ENTRY;
 	}
 }

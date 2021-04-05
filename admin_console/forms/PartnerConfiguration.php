@@ -334,6 +334,20 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Password replacement frequency (seconds):',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('text', 'password_structure_validations', array(
+			'label'			=> 'Password structure validations (regex):',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'password_structure_validations_description',
+		                  array(
+			'label'			=> 'Password structure validations description:',
+			'filters'		=> array('StringTrim'),
+		));
+
+
+
 //--------------------------- Single Sign On ---------------------------
 		
 		$this->addElement('text', 'logout_url', array(
@@ -969,7 +983,9 @@ class Form_PartnerConfiguration extends Infra_Form
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
-									 'pass_replace_freq'),
+									 'pass_replace_freq',
+									 'password_structure_validations',
+									 'password_structure_validations_description'),
 									 $permissionNames[self::SECURITY_OPTIONS],
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
