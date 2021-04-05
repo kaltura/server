@@ -67,7 +67,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		/* @var KalturaUser $kUser */
 		$kUser = $this->getEntryOwner($hostEmail);
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $kUser->id);
-		if ($recording->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
+		if (in_array($recording->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::AUDIO)))
 		{
 			$entry = $this->handleVideoRecord($recording, $kUser, $extraUsers);
 			
@@ -216,7 +216,14 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
-		$newEntry->mediaType = KalturaMediaType::VIDEO;
+		if ($recording->recordingFile->fileType == KalturaRecordingFileType::AUDIO)
+		{
+			$newEntry->mediaType = KalturaMediaType::AUDIO;
+		}
+		else
+		{
+			$newEntry->mediaType = KalturaMediaType::VIDEO;
+		}
 		$newEntry->description = $this->createEntryDescriptionFromRecording($recording);
 		$newEntry->name = $recording->meetingMetadata->topic;
 		$newEntry->userId = $owner->id;

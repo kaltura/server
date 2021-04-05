@@ -141,6 +141,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		$newZoomDropFolder->setFileDeletePolicy($zoomVendorIntegrationObject->getDeletionPolicy());
 		$newZoomDropFolder->setLastFileTimestamp(0);
 		$newZoomDropFolder->setMetadataProfileId(0);
+		$newZoomDropFolder->setLastHandledMeetingTime(time());
 		$newZoomDropFolder->save();
 	}
 	

@@ -89,7 +89,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 			$zoomClient = new kZoomClient($this->baseURL, $this->jwtToken, $this->refreshToken, $this->clientId,
 			                              $this->clientSecret, $this->accessToken);
 			
-			if (kCurrentContext::$ks_partner_id ==  Partner::BATCH_PARTNER_ID &&
+			if ($this->accessToken && $this->refreshToken && kCurrentContext::$ks_partner_id ==  Partner::BATCH_PARTNER_ID &&
 				$vendorIntegration->getExpiresIn() <= time() +
 				kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
 			{
