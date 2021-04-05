@@ -139,7 +139,15 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 							if ($firstDFFileOnTimeSlot)
 							{
 								$firstDFFileOnTimeSlot = false;
-								$entry = $this->createEntry($meetingFile[self::UUID]);
+								$entry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
+								if ($entry)
+								{
+									$isParentEntry = true;
+								}
+								else
+								{
+									$entry = $this->createEntry($meetingFile[self::UUID]);
+								}
 							}
 							if (!$isParentEntry && $recordingFile[self::RECORDING_FILE_TYPE] == 'MP4')
 							{
@@ -161,6 +169,33 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 					}
 				}
 			}
+		}
+	}
+	
+	protected function getEntryByReferenceId($referenceId)
+	{
+		try
+		{
+			$entryFilter = new KalturaBaseEntryFilter();
+			$entryFilter->referenceIdEqual = $referenceId;
+			
+			$entryPager = new KalturaFilterPager();
+			$entryPager->pageSize = 1;
+			$entryPager->pageIndex = 1;
+			KBatchBase::impersonate($this->dropFolder->partnerId);
+			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
+			KBatchBase::unimpersonate();
+			if (is_array($entryList->objects) && isset($entryList->objects[0]) )
+			{
+				return $entryList->objects[0];
+			}
+			
+			return null;
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err('Failed to get entry by reference id: '. $referenceId . $e->getMessage() );
+			return null;
 		}
 	}
 	
