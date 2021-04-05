@@ -28,7 +28,12 @@ abstract class zoomProcessor
 	 */
 	public function __construct($zoomBaseUrl, KalturaZoomDropFolder $folder)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl, $this->dropFolder->refreshToken, $this->dropFolder->jwtToken);
+		$jwtToken = isset($folder->jwtToken) ? $folder->jwtToken : null;
+		$refreshToken = isset($folder->refreshToken) ? $folder->refreshToken : null;
+		$clientId = isset($folder->clientId) ? $folder->clientId : null;
+		$clientSecret = isset($folder->clientSecret) ? $folder->clientSecret : null;
+		$accessToken = isset($folder->accessToken) ? $folder->accessToken : null;
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
 		$this->dropFolder = $folder;
 	}
 	
@@ -39,12 +44,12 @@ abstract class zoomProcessor
 	protected function processZoomUserName($userName)
 	{
 		$result = $userName;
-		switch ($this->dropFolder->zoomVendorIntegration->userMatching)
+		switch ($this->dropFolder->zoomVendorIntegration->zoomUserMatchingMode)
 		{
 			case kZoomUsersMatching::DO_NOT_MODIFY:
 				break;
 			case kZoomUsersMatching::ADD_POSTFIX:
-				$postFix = $this->dropFolder->zoomVendorIntegration->userPostfix;
+				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
 				if (!kString::endsWith($result, $postFix, false))
 				{
 					$result = $result . $postFix;
@@ -52,7 +57,7 @@ abstract class zoomProcessor
 				
 				break;
 			case kZoomUsersMatching::REMOVE_POSTFIX:
-				$postFix = $this->dropFolder->zoomVendorIntegration->userPostfix;
+				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
 				if (kString::endsWith($result, $postFix, false))
 				{
 					$result = substr($result, 0, strlen($result) - strlen($postFix));
@@ -92,7 +97,7 @@ abstract class zoomProcessor
 			$kalturaEntry = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
 			KBatchBase::unimpersonate();
 		}
-		catch (KalturaException $e)
+		catch (Exception $e)
 		{
 			KalturaLog::debug($e->getMessage());
 			$kalturaEntry = null;
@@ -102,7 +107,7 @@ abstract class zoomProcessor
 		{
 			KalturaLog::debug('Found entry:' . $kalturaEntry->objects[0]->id);
 		}
-		return $kalturaEntry;
+		return $kalturaEntry->objects;
 	}
 	
 	/**
@@ -123,7 +128,7 @@ abstract class zoomProcessor
 			{
 				$kalturaUser = $this->createNewUser($partnerId, $zoomUser->getProcessedName());
 			}
-			else
+			else if ($this->dropFolder->zoomVendorIntegration->defaultUserId)
 			{
 				$pager = new KalturaFilterPager();
 				$pager->pageSize = 1;
@@ -131,7 +136,7 @@ abstract class zoomProcessor
 				
 				$filter = new KalturaUserFilter();
 				$filter->partnerIdEqual = $partnerId;
-				$filter->idEqual = $this->dropFolder->zoomVendorIntegration->defaultUserEMail;
+				$filter->idEqual = $this->dropFolder->zoomVendorIntegration->defaultUserId;
 				$kalturaUser = KBatchBase::$kClient->user->listAction($filter, new KalturaFilterPager());
 				if ($kalturaUser->objects)
 				{
@@ -193,10 +198,41 @@ abstract class zoomProcessor
 		$user->id = $puserId;
 		$user->screenName = $puserId;
 		$user->firstName = $puserId;
-		$user->partnerId = $partnerId;
 		$user->isAdmin = false;
 		$user->type = KalturaUserType::USER;
 		$kalturaUser = KBatchBase::$kClient->user->add($user);
 		return $kalturaUser;
+	}
+	
+	protected function getRedirectUrl($recording)
+	{
+		$url = null;
+		$redirectUrl = null;
+		if (isset($recording->recordingFile->downloadToken))
+		{
+			$redirectUrl = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
+		}
+		else if (isset($this->dropFolder->accessToken))
+		{
+			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->accessToken;
+		}
+		else if (isset($this->dropFolder->jwtToken))
+		{
+			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->jwtToken;
+		}
+		
+		if ($url)
+		{
+			$redirectUrl = $url;
+			$curl = curl_init($url);
+			curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
+			$result = curl_exec($curl);
+			if ($result !== false)
+			{
+				$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+			}
+		}
+		return $redirectUrl;
 	}
 }

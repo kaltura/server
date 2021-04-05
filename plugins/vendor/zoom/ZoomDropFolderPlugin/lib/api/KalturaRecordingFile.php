@@ -30,6 +30,11 @@ class KalturaRecordingFile extends KalturaObject
 	 */
 	public $fileExtension;
 	
+	/**
+	 * @var string
+	 */
+	public $downloadToken;
+	
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -39,7 +44,8 @@ class KalturaRecordingFile extends KalturaObject
 		'recordingStart',
 		'fileType',
 		'downloadUrl',
-		'fileExtension'
+		'fileExtension',
+		'downloadToken'
 	);
 
 	public function getMapBetweenObjects()

@@ -91,10 +91,15 @@ class kZoomClient
 	
 	public function deleteRecordingFile($meetingUUid, $recodingId)
 	{
+		if ($meetingUUid[0] == '/' || strpos($meetingUUid, '//') !== false)
+		{
+			$meetingUUid = urlencode(urlencode($meetingUUid));
+		}
 		$apiPath = str_replace('@meetingId@', $meetingUUid, self::API_DELETE_RECORDING_FILE);
 		$apiPath = str_replace('@recordingId@', $recodingId, $apiPath);
 		$apiPath .= '?action=trash';
-		return $this->callZoom($apiPath);
+		$options = array(CURLOPT_CUSTOMREQUEST => 'DELETE');
+		return $this->callZoom($apiPath, $options);
 	}
 	
 	public function listRecordings($accountId, $from, $to, $nextPageToken, $pageSize)
@@ -106,6 +111,10 @@ class kZoomClient
 	
 	public function getMeetingRecordings($meetingUUid)
 	{
+		if ($meetingUUid[0] == '/' || strpos($meetingUUid, '//') !== false)
+		{
+			$meetingUUid = urlencode(urlencode($meetingUUid));
+		}
 		$apiPath = str_replace('@meetingId@', $meetingUUid, self::API_GET_MEETING_RECORDING);
 		return $this->callZoom($apiPath);
 	}
@@ -113,12 +122,15 @@ class kZoomClient
 	public function getFileSize($meetingUUid, $recodingId)
 	{
 		$meetingRecordings = $this->getMeetingRecordings($meetingUUid);
-		$recordingFiles = json_decode($meetingRecordings, true)[kZoomRecording::RECORDING_FILES];
-		foreach ($recordingFiles as $recordingFile)
+		if ($meetingRecordings && isset($meetingRecordings[kZoomRecording::RECORDING_FILES]))
 		{
-			if ($recordingFile[kZoomRecordingFile::ID] === $recodingId)
+			$recordingFiles = $meetingRecordings[kZoomRecording::RECORDING_FILES];
+			foreach ($recordingFiles as $recordingFile)
 			{
-				return $recordingFile[kZoomRecordingFile::FILE_SIZE];
+				if ($recordingFile[kZoomRecordingFile::ID] === $recodingId)
+				{
+					return $recordingFile[kZoomRecordingFile::FILE_SIZE];
+				}
 			}
 		}
 		return 0;
@@ -137,7 +149,7 @@ class kZoomClient
 		{
 			return 'JWT error: ' . $JWTResponse;
 		}
-		if (!$response || $httpCode !== 200 || $curlWrapper -> getError())
+		if (!$response || KCurlHeaderResponse::isError($httpCode) || $curlWrapper -> getError())
 		{
 			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
 			KalturaLog ::debug($errMsg);
@@ -150,18 +162,25 @@ class kZoomClient
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function callZoom(string $apiPath)
+	public function callZoom(string $apiPath, array $options = array())
 	{
 		KalturaLog::info('Calling zoom api: ' . $apiPath);
 		$curlWrapper = new KCurlWrapper();
+		$curlWrapper->setOpts($options);
+		
 		$url = $this->generateContextualUrl($apiPath);
 		if ($this->jwtToken != null) // if we have a jwt we need to use it to make the call
 		{
-			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
-			                           "authorization: Bearer {$this->jwtToken}",
-				                     "content-type: application/json"
-			                     ));
+			$token = $this->jwtToken;
 		}
+		else
+		{
+			$token = $this->accessToken;
+		}
+		$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
+			"authorization: Bearer {$token}",
+			"content-type: application/json"
+		));
 		$response = $curlWrapper -> exec($url);
 		$httpCode = $curlWrapper -> getHttpCode();
 		$this -> handleCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
@@ -181,7 +200,7 @@ class kZoomClient
 		if ($this->jwtToken != null)
 		{
 			$decodedResponse = json_decode($response, true);
-			if ($decodedResponse['code'])
+			if (isset($decodedResponse['code']))
 			{
 				KalturaLog::ERR('Error calling Zoom - Code: ' . $decodedResponse['code'] . ' Reason: ' .
 				                $decodedResponse['message']);
@@ -200,7 +219,6 @@ class kZoomClient
 			{
 				$this->refreshTokens();
 			}
-			$url .= 'access_token=' . $this->accessToken;
 		}
 		return $url;
 	}

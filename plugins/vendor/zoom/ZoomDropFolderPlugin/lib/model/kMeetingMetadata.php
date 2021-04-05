@@ -8,14 +8,6 @@
  */
 class kMeetingMetadata
 {
-	const UUID = 'uuid';
-	const MEETING_ID = 'meetingId';
-	const ACCOUNT_ID = 'accountId';
-	const HOST_ID = 'hostId';
-	const TOPIC = 'topic';
-	const MEETING_START_TIME = 'meetingStartTime';
-	const TYPE = 'type';
-	
 	/**
 	 * @var string
 	 */
@@ -54,71 +46,112 @@ class kMeetingMetadata
 	/**
 	 * return string
 	 */
-	public function getUuid() {return $this->getFromCustomData(self::UUID);}
+	public function getUuid()
+	{
+		return $this->uuid;
+	}
 	
 	/**
 	 * @param string $v
 	 */
-	public function setUuid ($v){$this->putInCustomData(self::UUID, $v);}
+	public function setUuid ($v)
+	{
+		$this->uuid = $v;
+	}
 	
 	/**
 	 * return string
 	 */
-	public function getMeetingId() {return $this->getFromCustomData(self::MEETING_ID);}
+	public function getMeetingId()
+	{
+		return $this->meetingId;
+	}
 	
 	/**
 	 * @param string $v
 	 */
-	public function setMeetingId ($v){$this->putInCustomData(self::MEETING_ID, $v);}
-	
+	public function setMeetingId($v)
+	{
+		$this->meetingId = $v;
+	}
 	
 	/**
 	 * return string
 	 */
-	public function getAccountId (){return $this->getFromCustomData(self::ACCOUNT_ID);}
+	public function getAccountId()
+	{
+		return $this->accountId;
+	}
 	
 	/**
 	 * @param string $v
 	 */
-	public function setAccountId ($v){$this->putInCustomData(self::ACCOUNT_ID, $v);}
+	public function setAccountId($v)
+	{
+		$this->accountId = $v;
+	}
 	
 	/**
 	 * return string
 	 */
-	public function getHostId (){return $this->getFromCustomData(self::HOST_ID);}
+	public function getHostId()
+	{
+		return $this->hostId;
+	}
 	
 	/**
 	 * @param string $v
 	 */
-	public function setHostId ($v){$this->putInCustomData(self::HOST_ID, $v);}
+	public function setHostId($v)
+	{
+		$this->hostId = $v;
+	}
 	
 	/**
 	 * return string
 	 */
-	public function getTopic() {return $this->getFromCustomData(self::TOPIC);}
+	public function getTopic()
+	{
+		return $this->topic;
+	}
 	
 	/**
 	 * @param string string
 	 */
-	public function setTopic ($v){$this->putInCustomData(self::TOPIC, $v);}
+	public function setTopic($v)
+	{
+		$this->topic = $v;
+	}
 	
 	/**
 	 * return string
 	 */
-	public function getMeetingStartTime() {return $this->getFromCustomData(self::MEETING_START_TIME);}
+	public function getMeetingStartTime()
+	{
+		return $this->meetingStartTime;
+	}
 	
 	/**
 	 * @param string $v
 	 */
-	public function setMeetingStartTime ($v){$this->putInCustomData(self::MEETING_START_TIME, $v);}
+	public function setMeetingStartTime($v)
+	{
+		$this->meetingStartTime = $v;
+	}
 	
 	/**
 	 * return kRecordingType
 	 */
-	public function getType() {return $this->getFromCustomData(self::TYPE);}
+	public function getType()
+	{
+		return $this->type;
+	}
 	
 	/**
 	 * @param kRecordingType $v
 	 */
-	public function setType ($v){$this->putInCustomData(self::TYPE, $v);}
+	public function setType($v)
+	{
+		$this->type = $v;
+	}
 }

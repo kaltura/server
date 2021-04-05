@@ -34,6 +34,11 @@ class kRecordingFile
 	protected $fileExtension;
 	
 	/**
+	 * @var string
+	 */
+	protected $downloadToken;
+	
+	/**
 	 * @return string
 	 */
 	public function getId()
@@ -111,6 +116,22 @@ class kRecordingFile
 	public function setFileExtension($fileExtension)
 	{
 		$this->fileExtension = $fileExtension;
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getDownloadToken()
+	{
+		return $this->downloadToken;
+	}
+	
+	/**
+	 * @param string $downloadToken
+	 */
+	public function setDownloadToken($downloadToken)
+	{
+		$this->downloadToken = $downloadToken;
 	}
 
 }

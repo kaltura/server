@@ -11,7 +11,7 @@ class ZoomHelper
 
 	/** php body */
 	const PHP_INPUT = 'php://input';
-	const SUFFIX_ZOOM = '_zoom';
+	const SUFFIX_ZOOM = '.zoom';
 
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
@@ -229,6 +229,21 @@ class ZoomHelper
 			case 'MP4':
 			case 'CHAT':
 			case 'TRANSCRIPT':
+				return true;
+				break;
+			default:
+				return false;
+				break;
+		}
+	}
+	
+	public static function shouldHandleFileTypeEnum($recordingFileType)
+	{
+		switch($recordingFileType)
+		{
+			case kRecordingFileType::VIDEO:
+			case kRecordingFileType::CHAT:
+			case kRecordingFileType::TRANSCRIPT:
 				return true;
 				break;
 			default:

@@ -6,6 +6,8 @@
 abstract class zoomRecordingProcessor extends zoomProcessor
 {
 	const ADMIN_TAG_ZOOM = 'zoomentry';
+	const TAG_SOURCE = "source";
+	const SOURCE_FLAVOR_ID = 0;
 	
 	/**
 	 * @var KalturaMediaEntry
@@ -37,13 +39,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	 */
 	protected function wasEventHandled($recording)
 	{
-		$resourceReservation = new kResourceReservation(self::ZOOM_LOCK_TTL, true);
-		if(!$resourceReservation->reserve($recording->meetingMetadata->uuid))
-		{
-			KalturaLog::debug("Recording {$recording->meetingMetadata->uuid} is being processed");
-			return true;
-		}
-		
 		if($this->getZoomEntryByRecordingId($recording->meetingMetadata->uuid, $recording->partnerId))
 		{
 			KalturaLog::debug("Recording {$recording->meetingMetadata->uuid} already processed");
@@ -55,6 +50,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param KalturaZoomDropFolderFile $recording
+	 * @return KalturaMediaEntry
 	 * @throws kCoreException
 	 * @throws PropelException
 	 */
@@ -70,21 +66,19 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		
 		/* @var KalturaUser $kUser */
 		$kUser = $this->getEntryOwner($hostEmail);
-		if($this->wasEventHandled($recording))
-		{
-			return;
-		}
-		
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $kUser->id);
 		if ($recording->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
 		{
-			$this->handleVideoRecord($recording, $kUser, $extraUsers);
+			$entry = $this->handleVideoRecord($recording, $kUser, $extraUsers);
+			
 		}
 		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
 		{
 			$chatFilesProcessor = new zoomChatFilesProcessor($this->zoomBaseUrl, $this->dropFolder);
 			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recording->recordingFile->downloadUrl);
+			$entry = $this->mainEntry;
 		}
+		return $entry;
 	}
 	
 	/**
@@ -99,33 +93,41 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected function handleVideoRecord($recording, $owner, $validatedUsers)
 	{
 		/* @var KalturaMediaEntry $entry*/
-		$entry = $this->createEntryFromRecording($recording, $owner);
+		if (!$recording->isParentEntry)
+		{
+			$entry = $this->createEntryFromRecording($recording, $owner);
+		}
+		else
+		{
+			$entry = $this->updateParentEntry($recording, $owner);
+		}
 		
 		$updatedEntry = new KalturaMediaEntry();
 		if($this->mainEntry)
 		{
-			$updatedEntry->parentEntryId = $this->mainEntry->id;
+			if (!$recording->isParentEntry)
+			{
+				$updatedEntry->parentEntryId = $this->mainEntry->id;
+			}
+			else
+			{
+				$this->setEntryCategory($updatedEntry);
+			}
 		}
 		
-		$this->setEntryCategory($entry);
 		$this->handleParticipants($updatedEntry, $validatedUsers);
 		KBatchBase::impersonate($entry->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->update($entry->id, $updatedEntry);
 		
-		if(!$this->mainEntry)
-		{
-			$this->mainEntry = $entry;
-		}
-		
 		$kFlavorAsset = new KalturaFlavorAsset();
-		$kFlavorAsset->tags = array(flavorParams::TAG_SOURCE);
-		$kFlavorAsset->flavorParamsId = flavorParams::SOURCE_FLAVOR_ID;
-		$kFlavorAsset->fileExt = $recording->recordingFile->fileExtension;
+		$kFlavorAsset->tags = self::TAG_SOURCE;
+		$kFlavorAsset->flavorParamsId = self::SOURCE_FLAVOR_ID;
+		$kFlavorAsset->fileExt = strtolower($recording->recordingFile->fileExtension);
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
 		
-		$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->accessToken;
 		$resource = new KalturaUrlResource();
-		$resource->url = $url;
+		$redirectUrl = $this->getRedirectUrl($recording);
+		$resource->url = $redirectUrl;
 		$resource->forceAsyncDownload = true;
 		
 		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
@@ -194,7 +196,8 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	 */
 	protected function createEntryDescriptionFromRecording($recording)
 	{
-		return "Zoom Recording ID: {$recording->meetingMetadata->meetingId}\nUUID: {$recording->meetingMetadata->uuid}\nMeeting Time: {$recording->meetingMetadata->meetingStartTime}";
+		$meetingStartTime = gmdate("Y-m-d h:i:sa", $recording->meetingMetadata->meetingStartTime);
+		return "Zoom Recording ID: {$recording->meetingMetadata->meetingId}\nUUID: {$recording->meetingMetadata->uuid}\nMeeting Time: {$meetingStartTime}";
 	}
 	
 	/**
@@ -216,14 +219,32 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
 		$newEntry->description = $this->createEntryDescriptionFromRecording($recording);
 		$newEntry->name = $recording->meetingMetadata->topic;
-		$newEntry->partnerId = $owner->partnerId;
-		$newEntry->status = KalturaEntryStatus::NO_CONTENT;
 		$newEntry->userId = $owner->id;
 		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		$newEntry->adminTags = self::ADMIN_TAG_ZOOM;
 		$newEntry->referenceId = self::ZOOM_PREFIX . $recording->meetingMetadata->uuid;
 		KBatchBase::impersonate($owner->partnerId);
 		$kalturaEntry = KBatchBase::$kClient->baseEntry->add($newEntry);
+		KBatchBase::unimpersonate();
+		return $kalturaEntry;
+	}
+	
+	/**
+	 * @param kalturaZoomDropFolderFile $recording
+	 * @param KalturaUser $owner
+	 * @return entry
+	 * @throws Exception
+	 */
+	protected function updateParentEntry($recording, $owner)
+	{
+		$updatedEntry = new KalturaMediaEntry();
+		$updatedEntry->description = $this->createEntryDescriptionFromRecording($recording);
+		$updatedEntry->name = $recording->meetingMetadata->topic;
+		$updatedEntry->userId = $owner->id;
+		$updatedEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
+		$updatedEntry->adminTags = self::ADMIN_TAG_ZOOM;
+		KBatchBase::impersonate($owner->partnerId);
+		$kalturaEntry = KBatchBase::$kClient->baseEntry->update($recording->parentEntryId, $updatedEntry);
 		KBatchBase::unimpersonate();
 		return $kalturaEntry;
 	}
@@ -236,7 +257,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected function getAdditionalUsers($recordingId, $userToExclude)
 	{
 		if ($this->dropFolder->zoomVendorIntegration->handleParticipantsMode == kHandleParticipantsMode::IGNORE ||
-			$this->dropFolder->zoomVendorIntegration->userMatching == kZoomUsersMatching::CMS_MATCHING)
+			$this->dropFolder->zoomVendorIntegration->zoomUserMatchingMode == kZoomUsersMatching::CMS_MATCHING)
 		{
 			return null;
 		}

@@ -44,6 +44,8 @@ class kZoomTokens
 		$tokensData = $this->parseTokensResponse($response);
 		$this->validateToken($tokensData);
 		$tokensData = $this->extractTokensFromData($tokensData);
+		$expiresIn = $tokensData[self::EXPIRES_IN];
+		$tokensData[self::EXPIRES_IN] = kZoomOauth::getTokenExpiryRelativeTime($expiresIn);
 		return $tokensData;
 	}
 	
