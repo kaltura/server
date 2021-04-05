@@ -1,6 +1,14 @@
 # Propus-16.20.0  #
 
 ## Version Highlight ##
+### Features ###
+    KMCNG-2296 - Add a new API (baseEntry.exportToCsv) that exports entries data according to a supplied filter.
+        The data will be send to the KS admin email in a CSV format.
+    
+    PLAT-22694 - appToken - add the ability to set weaker privileges on the KS,
+        if the privileges are already allowed on the appToken
+    
+### Bug fix ###
 
 ## Export entries to CSV ##
 - Issue Type: Task
