@@ -1,5 +1,96 @@
+# Propus-16.20.0  #
+
+## Version Highlight ##
+### Features ###
+    KMCNG-2296 - Add a new API (baseEntry.exportToCsv) that exports entries data according to a supplied filter.
+        The data will be send to the KS admin email in a CSV format.
+    
+    PLAT-22694 - appToken - add the ability to set weaker privileges on the KS,
+        if the privileges are already allowed on the appToken
+    
+    VIRTC-2021 - Admin Console, add ability to set custom password policy per partner.
+      Once policy for partner is set, the system policy is ignored.
+     
+    PLAT-22722 - Add mpeg ts files to the allowed files list
+    
+    PLAT-22714 - Add new type of Live-Schedulued event - KalturaLiveRedirectScheduleEvent, once its time has come it will rediret the live entry to another entry (live or vod)
+    
+    PLAT-22698 - ThumbAsset::add, Abilty to add Thumbnails to image entry.
+    
+### Bug fix ###
+
+    PLAT-22724 - Admin console, storage profile, when flavor param source only was not displayed - fixed. 
+    
+    PLAT-22696 - Trancate utf8 strings in the following entry properties :state,city,zip,screen_name,first_name,last_name,full_name
+
+## Export entries to CSV ##
+- Issue Type: Task
+- Issue ID: KMCNG-2296
+- Description: new API- baseEntry.exportToCsv
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_10_add_entry_export_csv_permissions.php
+
+# Propus-16.19.0  #
+
+## Version Highlight ##
+### Features ###
+    PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
+        This new type will be used by KMS for NewRow scheduled meeting,
+        but customers can use if for anytype.
+
+    PLAT-22622 - Add close caption support to playManifest, the caption language
+        is from the related stream info
+
+### Bug fix ###
+    SUP-25895 - Zoom, Adding file extention to imported source files. 
+    PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
+
+## Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED (EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22606
+- Description: add the content parameter entry_reference_id to HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED
+
+### Deployment scripts ###
+- Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22679
+- Description: add the content parameter file_name to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_04_update_media_xml_bulk_job_failed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
+
 # Propus-16.18.0  #
 ## Version Highlight ##
+### Features ###
+    PLAT-9940 - Adminconsole::UiConf, add filter by tags\type\name
+    SUP-24898 - Reach, Allow reach vendors KS overcome access control
+    PLAT-11136 - Allow entry user (Viewer/Publisher/Editor) list all userEntries.
+    This can allow webcast app see all the users that joined the event, when activated 
+    by others than the owner.
+    PLAT-22617 - User::LoginByLoginId, Allow setting priviledge on user object ksPrivileges. 
+    For this user, Any new login will generate a session that will include the specific permsission.
+    The motivation is to create users that can only login and access specific actions (such as loginByLoginId) 
+
+### Bug fix ###
+    SUP-26142 - Zoom, Chat file was not added to the primary entry, fixed.
+    REACH2-1050 - Reach, Block adding new task when entry is not ready.
+
 
 ## Add Description to confMaps modifications ##
 - Issue Type: Task

@@ -73,7 +73,10 @@ class ThumbAssetService extends KalturaAssetService
     function addAction($entryId, KalturaThumbAsset $thumbAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || ($dbEntry->getType() == entryType::MEDIA_CLIP && !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO, KalturaMediaType::LIVE_STREAM_FLASH))))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || ($dbEntry->getType() ==
+			    entryType::MEDIA_CLIP && !in_array($dbEntry->getMediaType(), array
+			    (KalturaMediaType::IMAGE, KalturaMediaType::VIDEO, KalturaMediaType::AUDIO,
+			     KalturaMediaType::LIVE_STREAM_FLASH))))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
     	if($thumbAsset->thumbParamsId)
@@ -1029,16 +1032,8 @@ class ThumbAssetService extends KalturaAssetService
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
-
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$c->add(FileSyncPeer::OBJECT_ID, $id);
-		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
-		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$fileSyncs = FileSyncPeer::doSelect($c);
+		
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($id, $assetDb, FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());

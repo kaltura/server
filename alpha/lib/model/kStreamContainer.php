@@ -5,7 +5,13 @@ class kStreamContainer
 	/**
 	 * @var string
 	 */
+	protected $id;
+
+	/**
+	 * @var string
+	 */
 	protected $type;
+
 	/**
 	 * @var int
 	 */
@@ -125,5 +131,21 @@ class kStreamContainer
 	public function setChannelIndex($channelIndex)
 	{
 		$this->channelIndex = $channelIndex;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
+
+	/**
+	 * @param string $id
+	 */
+	public function setId($id)
+	{
+		$this->id = $id;
 	}
 }

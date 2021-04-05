@@ -59,12 +59,14 @@ class KalturaUser extends KalturaBaseUser
 	/**
 	 * @var string
 	 * @filter likex
+	 * @utf8truncate 40
 	 */
 	public $firstName;
 
 	/**
 	 * @var string
 	 * @filter likex
+	 * @utf8truncate 40
 	 */
 	public $lastName;
 
@@ -94,6 +96,11 @@ class KalturaUser extends KalturaBaseUser
 	 */
 	public $company;
 
+	/**
+	 * @var string
+	 */
+	public $ksPrivileges;
+
 	private static $map_between_objects = array (
 		"type",
 		"dateOfBirth",
@@ -107,7 +114,8 @@ class KalturaUser extends KalturaBaseUser
 		"registrationInfo",
 		"attendanceInfo",
 		"title",
-		"company"
+		"company",
+		"ksPrivileges",
 	);
 
 	public function getMapBetweenObjects ( )

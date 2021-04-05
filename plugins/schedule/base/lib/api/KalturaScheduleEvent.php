@@ -295,11 +295,16 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 
 		$this->validatePropertyNotNull('endDate');
 		$this->validate($this->startDate, $this->endDate);
-		$maxSingleEventDuration = SchedulePlugin::getSingleScheduleEventMaxDuration();
+		$maxSingleEventDuration = $this->getSingleScheduleEventMaxDuration();
 		if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
 			throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
 
 		parent::validateForInsert($propertiesToSkip);
+	}
+	
+	protected function getSingleScheduleEventMaxDuration()
+	{
+		return SchedulePlugin::getSingleScheduleEventMaxDuration();
 	}
 
 	private function validateRecurringEventForInsert()
@@ -456,6 +461,14 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 				$object = new KalturaBlackoutScheduleEvent();
 				break;
 
+			case ScheduleEventType::MEETING:
+				$object = new KalturaMeetingScheduleEvent();
+				break;
+
+			case ScheduleEventType::LIVE_REDIRECT:
+				$object = new KalturaLiveRedirectScheduleEvent();
+				break;
+				
 			default:
 				$object = KalturaPluginManager::loadObject('KalturaScheduleEvent', $sourceObject->getType());
 				if(!$object)

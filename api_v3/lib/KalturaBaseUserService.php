@@ -258,6 +258,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		$ks = null;
 		
 		$admin = $user->getIsAdmin() ? KalturaSessionType::ADMIN : KalturaSessionType::USER;
+		$privileges = $user->getKsPrivileges() ? $user->getKsPrivileges() : $privileges;
 		// create a ks for this admin_kuser as if entered the admin_secret using the API
 		kSessionUtils::createKSessionNoValidations ( $partner->getId() ,  $user->getPuserId() , $ks , $expiry , $admin , "" , $privileges );
 		

@@ -23,6 +23,11 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected $zoomBaseUrl;
 
+    /**
+     * @var string
+     */
+    protected $zoomBaseUrl;
+
 	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
@@ -30,6 +35,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	public function __construct($zoomBaseUrl)
 	{
 		$this->mainEntry = null;
+		$this->zoomBaseUrl = $zoomBaseUrl;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
 		$this->zoomBaseUrl = $zoomBaseUrl;
 		parent::__construct($zoomBaseUrl, $this->zoomIntegration->getJwtToken(), $this->zoomIntegration->getRefreshToken(), null, null,
@@ -90,6 +96,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 			{
 				$chatFilesProcessor = new kZoomChatFilesProcessor($this->zoomBaseUrl, $this->zoomIntegration->getJwtToken(),
 				                                                  $this->zoomIntegration->getRefreshToken(), null, null, $this->zoomIntegration->getAccessToken());
+
 				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
 				{
 					$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recordingFile->download_url, $event->downloadToken, $dbUser);
@@ -127,7 +134,8 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 
 		$url = $recordingFile->download_url . self::URL_ACCESS_TOKEN . $event->downloadToken;
-		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url);
+		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($entry->getPartnerId(), $entry->getId(), $recordingFile->fileExtension);
+		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url, $flavorAsset);
 		return $entry;
 	}
 

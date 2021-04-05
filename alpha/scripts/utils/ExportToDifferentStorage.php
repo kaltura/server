@@ -29,6 +29,13 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 	$targetDcFileSync = null;
 	foreach ($fileSyncs as $fileSync)
 	{
+		if (is_null($fileSync->getFileType()))
+		{
+			KalturaLog::log("XXX $assetId: NULL_FILE_TYPE - setting to FILE");
+			$fileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+			$fileSync->save();
+		}
+
 		if (!in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL)))
 		{
 			KalturaLog::log("XXX $assetId: BAD_FILE_TYPE" . $fileSync->getFileType() . " - unexpected file type");
@@ -62,13 +69,13 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 				break;
 			}
 
-			if ($fileSync->getSrcPath() == $readyFileSync->getFullPath() && $fileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
+			if ($targetDcFileSync->getSrcPath() == $readyFileSync->getFullPath() && $targetDcFileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
 			{
 				KalturaLog::log("XXX $assetId: PENDING_WITH_PATH - pending file sync with valid src path");
 			}
 			else
 			{
-				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $fileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
+				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $targetDcFileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
 				$targetDcFileSync->setSrcPath($readyFileSync->getFullPath());
 				$targetDcFileSync->setSrcEncKey($readyFileSync->getSrcEncKey());
 				$targetDcFileSync->putInCustomData('srcDc', $readyFileSync->getDc());
@@ -83,7 +90,7 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 			break;
 
 		default:
-			KalturaLog::log("XXX $assetId: BAD_STATUS" . $fileSync->getStatus() . " - non ready file sync");
+			KalturaLog::log("XXX $assetId: BAD_STATUS" . $targetDcFileSync->getStatus() . " - non ready file sync");
 			break;
 		}
 
@@ -297,7 +304,6 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 	$linkFileSync->setStatus($sourceFileSync->getStatus());
 	$linkFileSync->setOriginal($sourceFileSync->getOriginal());
 	$linkFileSync->setLinkedId($sourceFileSync->getId());
-	$linkFileSync->setPartnerID($sourceFileSync->getPartnerID());
 	$linkFileSync->setFileSize(-1);
 
 	if($sourceFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)

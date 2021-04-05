@@ -12,7 +12,7 @@ class kZoomRecordingFile implements iZoomObject
 	const RECORDING_START = 'recording_start';
 	const FILE_EXTENSION = 'file_extension';
 	const FILE_SIZE = 'file_size';
-	
+
 	public $recordingFileType;
 	public $download_url;
 	public $id;

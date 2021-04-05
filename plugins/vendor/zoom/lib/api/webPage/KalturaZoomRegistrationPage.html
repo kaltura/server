@@ -32,6 +32,7 @@
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
             let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
+            let createUserIfNotExist = $('#createUserIfNotExist').is(':checked');
             if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID) {
                 zoomUserMatchingMode = CMS_USER_ID;
             }
@@ -52,6 +53,8 @@
                     'integrationSetting:deletionPolicy':deletionPolicy,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
                     'integrationSetting:enableZoomTranscription':enableZoomTranscription,
+                    'integrationSetting:createUserIfNotExist':createUserIfNotExist,
+
                     'format': 1 },
                 success : function(res) {
                     $('body').css('cursor', 'default');
@@ -120,6 +123,7 @@
             $('#enableRecordingUpload').prop('checked',true);
             $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
             $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
+            $('#createUserIfNotExist').prop('checked',true);
         }
         function loadParameters(p) {
          jQuery.each(p, function(i,v) {
@@ -136,6 +140,7 @@
                     case 'deletionPolicy':
                     case 'enableZoomTranscription':
                     case 'enableRecordingUpload':
+                    case 'createUserIfNotExist':
                         $('#'+i).prop('checked', v);
                         break;
                     case 'zoomUserMatchingMode':
@@ -171,39 +176,53 @@
             }
         }
     </script>
+
     <title>Kaltura-Zoom registration</title>
 </head>
-<body onload="onLoad()" style="max-width: 600px;margin: auto;">
+<body onload="onLoad()" style="max-width: 600px;margin: auto">
     <form>
-            <div class='imgcontainer'>
-                <img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
+        <div class='imgcontainer'>
+            <img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
+        </div>
+        <div class='form-group  container p-2 my-2 border'>
+            <div class='form-group'>
+                <label><h7>Default User ID</h7></label>
+                <input type='text' value='@defaultUserID@' id='defaultUserId' class='form-control' name='defaultUserId' required>
             </div>
-            <div class='form-group  container p-2 my-2 border'>
-                <div class='form-group'>
-                    <label><h6>Default User ID</h6></label>
-                    <input type='text' value='@defaultUserID@' id='defaultUserId' class='form-control' name='defaultUserId' required>
+            <div class='form-group'>
+                <label for='zoomCategory'><h7>Zoom Category</h7></label>
+                <input type='text' value='@zoomCategory@' id='zoomCategory' class='form-control' name='zoomCategory' required>
+            </div>
+            <div class='form-group'>
+            <label for='zoomWebinarCategory'><h7>Zoom Webinar Category</h7></label>
+                <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
+            </div>
+            <h7>Settings</h7>
+            <div class='container p-2 my-2 border'>
+                <div class='custom-control custom-switch'>
+                    <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
+                    <label class='custom-control-label' for='enableRecordingUpload'>Enable recording upload</label>
                 </div>
-                <div class='form-group'>
-                    <label for='zoomCategory'><h6>Zoom Category</h6></label>
-                    <input type='text' value='@zoomCategory@' id='zoomCategory' class='form-control' name='zoomCategory' required>
-                </div>
-                <div class='form-group'>
-                <label for='zoomWebinarCategory'><h6>Zoom Webinar Category</h6></label>
-                    <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
+                <div class='custom-control custom-switch'>
+                    <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
+                    <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
                 </div>
                 <div class='form-group' id='jwtController'>
                     <label for='jwtToken'><h6>Zoom JWT</h6></label>
                     <input type='text' value='@zoomJWT@' id='jwtToken' class='form-control' name='jwtToken' required>
                 </div>
                 <h6>Settings</h6>
+
+            </div>
+        </div>
+
+        <div class='form-group  container p-2 my-2 border'>
+            <h7 >Setting owner for recordings</h7>
+            <div>
                 <div class='container p-2 my-2 border'>
                     <div class='custom-control custom-switch'>
-                        <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
-                        <label class='custom-control-label' for='enableRecordingUpload'>Enable recording upload</label>
-                    </div>
-                    <div class='custom-control custom-switch'>
-                        <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
-                        <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
+                        <input type='checkbox' class='custom-control-input' id='createUserIfNotExist' name='createUserIfNotExist'>
+                        <label class='custom-control-label' for='createUserIfNotExist'>Create new user if no match is found</label>
                     </div>
                     <div class='custom-control custom-switch'>
                         <input type='checkbox' class='custom-control-input' id='deletionPolicy' name='deletionPolicy' >
@@ -215,62 +234,59 @@
                     </div>
                 </div>
             </div>
+            <div class='form-check'>
+                <label class='form-check-label'>
+                <input type='radio'  id='recordingOwnerBasedOnZoomId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(this.checked)' value='0' checked>
+                    Based on Zoom User ID</label>
+            </div>
 
-            <div class='form-group  container p-2 my-2 border'>
-                <h6 >Setting owner for recordings</h6>
-                <div class='form-check'>
-                    <label class='form-check-label'>
-                    <input type='radio'  id='recordingOwnerBasedOnZoomId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(this.checked)' value='0' checked>
-                        Based on Zoom User ID</label>
+            <div id='matchingZoomUserBasedOnZoomUserId' class='container-fluid p-3 my-2 mx-auto border' style='width: 97%;'>
+                <p class='form-check-label'>How matching Zoom users should be handled:</p>
+                <div class='form-check-inline'>
+                    <input type='radio' class='form-check-input'
+                           name='zoomUserMatchingMode' value='0' >
+                    <label class='form-check-label'>Do not modify</label>
                 </div>
-                <div id='matchingZoomUserBasedOnZoomUserId' class='container-fluid p-3 my-2 mx-auto border' style='width: 97%;'>
-                    <p class='form-check-label'>How matching Zoom users should be handled:</p>
-                    <div class='form-check-inline'>
-                        <input type='radio' class='form-check-input'
-                               name='zoomUserMatchingMode' value='0' >
-                        <label class='form-check-label'>Do not modify</label>
-                    </div>
-                    <div class='form-check-inline'>
-                        <input type='radio' class='form-check-input'
-                               name='zoomUserMatchingMode' value='1'>
-                        <label class='form-check-label'>Add postfix</label>
-                    </div>
-                    <div class='form-check-inline'>
-                        <input type='radio' class='form-check-input'
-                               name='zoomUserMatchingMode' value='2'>
-                        <label class='form-check-label'>Remove postfix</label>
-                    </div>
-                    <div class='form-group'>
-                        <label class='form-check-label'>Postfix</label>
-                        <input type='text' value='' id='zoomUserPostfix' class='form-control' name='zoomUserPostfix'>
-                    </div>
+                <div class='form-check-inline'>
+                    <input type='radio' class='form-check-input'
+                           name='zoomUserMatchingMode' value='1'>
+                    <label class='form-check-label'>Add postfix</label>
                 </div>
-                <div class='form-check'>
-                    <label class='form-check-label'>
-                        <input type='radio'  id='recordingOwnerBasedOnCmsUserId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(!this.checked)' value='1'>
-                        Based on cms_user_id (SAML mapping)</label>
+                <div class='form-check-inline'>
+                    <input type='radio' class='form-check-input'
+                           name='zoomUserMatchingMode' value='2'>
+                    <label class='form-check-label'>Remove postfix</label>
+                </div>
+                <div class='form-group'>
+                    <label class='form-check-label'>Postfix</label>
+                    <input type='text' value='' id='zoomUserPostfix' class='form-control' name='zoomUserPostfix'>
                 </div>
             </div>
-            <div class='form-group container p-2 my-2 border'>
-                <p class='form-check-label'><h6>How meeting participants should be handled:</h6></p>
-                <div class='form-check-inline'>
-                    <label class='form-check-label'>
-                    <input type='radio' class='form-check-input'
-                           name='handleParticipantsMode' value='0'>Add as Co publishers </label>
-                </div>
-                <div class='form-check-inline'>
-                    <label class='form-check-label'>
-                    <input type='radio' class='form-check-input'
-                           name='handleParticipantsMode' value='1'>Add as Co viewers </label>
-                </div>
-                <div class='form-check-inline'>
-                    <label class='form-check-label'>
-                    <input type='radio' class='form-check-input'
-                           name='handleParticipantsMode' value='2'>Ignore participants </label>
-                </div>
+            <div class='form-check'>
+                <label class='form-check-label'>
+                    <input type='radio'  id='recordingOwnerBasedOnCmsUserId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(!this.checked)' value='1'>
+                    Based on cms_user_id (SAML mapping)</label>
             </div>
-            <button type='button' id='submitBtn' class='btn btn-block btn-primary' onclick='trySubmit()'>Submit</button>
         </div>
+        <div class='form-group container p-2 my-2 border'>
+            <p class='form-check-label'><h7>How meeting participants should be handled:</h7></p>
+            <div class='form-check-inline'>
+                <label class='form-check-label'>
+                <input type='radio' class='form-check-input'
+                       name='handleParticipantsMode' value='0'>Add as Co publishers </label>
+            </div>
+            <div class='form-check-inline'>
+                <label class='form-check-label'>
+                <input type='radio' class='form-check-input'
+                       name='handleParticipantsMode' value='1'>Add as Co viewers </label>
+            </div>
+            <div class='form-check-inline'>
+                <label class='form-check-label'>
+                <input type='radio' class='form-check-input'
+                       name='handleParticipantsMode' value='2'>Ignore participants </label>
+            </div>
+        </div>
+        <button type='button' id='submitBtn' class='btn btn-block btn-primary' onclick='trySubmit()'>Submit</button>
     </form>
 </body>
 </html>
