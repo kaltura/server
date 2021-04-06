@@ -939,7 +939,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			return;
 		}
 
-		$host = requestUtils::getUrlHost();
+		$host = infraRequestUtils::getUrlHost();
 		if($host)
 		{
 			$this->accessControlAllowOriginDomains = $host;

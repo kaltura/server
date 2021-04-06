@@ -447,7 +447,7 @@ class infraRequestUtils
 
 	public static function getUrlHost()
 	{
-		$requestParams = infraRequestUtils::getRequestParams();
+		$requestParams = self::getRequestParams();
 		if(!array_key_exists('referrer', $requestParams))
 		{
 			return null;
@@ -459,7 +459,7 @@ class infraRequestUtils
 			return null;
 		}
 
-		return requestUtils::parseUrlHost($referrer);
+		return self::parseUrlHost($referrer);
 	}
 
 	public static function buildRequestParams(array $parameters)
