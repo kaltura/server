@@ -934,33 +934,16 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	protected function setAccessControlAllowOriginDomain()
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		do
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $dbEntry->getPartnerId()))
 		{
-			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $dbEntry->getPartnerId()))
-			{
-				break;
-			}
+			return;
+		}
 
-			$requestParams = infraRequestUtils::getRequestParams();
-			if(!array_key_exists('referrer', $requestParams))
-			{
-				break;
-			}
-
-			$referrer = base64_decode($requestParams['referrer']);
-			if(!is_string($referrer))
-			{
-				break;
-			}
-
-			$host = requestUtils::parseUrlHost($referrer);
-			if(!$host)
-			{
-				break;
-			}
-
+		$host = requestUtils::getUrlHost();
+		if($host)
+		{
 			$this->accessControlAllowOriginDomains = $host;
-		}while(0);
+		}
 	}
 
 	protected function getAccessControlAllowOriginDomains()
