@@ -354,5 +354,20 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return true;
 	}
+
+	protected function doIsArchived($filePath)
+	{
+		return true;
+	}
+
+	protected function doInitiateRestoreFromArchive($filePath, $days = null, $restoreType = null)
+	{
+		return true;
+	}
+
+	protected function getIsRestoreFromArchiveStatus($filePath)
+	{
+		return true;
+	}
 	
 }

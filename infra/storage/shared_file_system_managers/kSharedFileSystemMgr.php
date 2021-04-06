@@ -280,7 +280,7 @@ abstract class kSharedFileSystemMgr
 	 * @return int
 	 */
 	abstract protected function doRealPath($filePath, $getRemote = true);
-	
+
 	/**
 	 * Returns the mime_type of the file.
 	 *
@@ -289,6 +289,35 @@ abstract class kSharedFileSystemMgr
 	 * @return string
 	 */
 	abstract protected function doMimeType($filePath);
+
+	/**
+	 * Returns whether the file is archived or not
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return string
+	 */
+	abstract protected function doIsArchived($filePath);
+
+	/**
+	 * Restore object from archive tier
+	 *
+	 * @param $filePath file path
+	 * @param $days int
+	 * @param $restoreType string
+	 *
+	 * @return string
+	 */
+	abstract protected function doInitiateRestoreFromArchive($filePath, $days = null, $restoreType = null);
+
+	/**
+	 * get the restore progress status
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return string
+	 */
+	abstract protected function getIsRestoreFromArchiveStatus($filePath);
 	
 	/**
 	 * dump file in parts
@@ -542,8 +571,25 @@ abstract class kSharedFileSystemMgr
 		$filePath = kFileBase::fixPath($filePath);
 		return $this->doMimeType($filePath);
 	}
-	
-	
+
+	public function isArchived($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doIsArchived($filePath);
+	}
+
+	public function initiateRestoreFromArchive($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doInitiateRestoreFromArchive($filePath);
+	}
+
+	public function getRestoreFromArchiveStatus($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->getIsRestoreFromArchiveStatus($filePath);
+	}
+
 	public function shouldPollFileExists()
 	{
 		return $this->doShouldPollFileExists();

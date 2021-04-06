@@ -227,16 +227,29 @@ class kFlowHelper
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
 		{
-			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
-			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
-			if(!$storageProfile)
+			if(kFile::isSharedPath($data->getSrcFileUrl()))
 			{
-				KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
-				throw new Exception ( "Shared storage [$partnerSharedStorageProfileId] Not found");
+				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, 62);
+				if($fileSync)
+				{
+					$fileSync->setDc($partnerSharedStorageProfileId);
+					$fileSync->setFileType(fileSync::FILE_SYNC_FILE_TYPE_FILE);
+					$fileSync->save();
+				}
 			}
-			
-			$localFilePath = $data->getDestFileSharedPath();
-			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+			else
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if (!$storageProfile)
+				{
+					KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
+					throw new Exception ("Shared storage [$partnerSharedStorageProfileId] Not found");
+				}
+
+				$localFilePath = $data->getDestFileSharedPath();
+				kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+			}
 		}
 		else
 		{

@@ -424,16 +424,44 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return count($dirList) >= 1;
 	}
-	
+
 	protected function getHeadObjectForPath($path)
 	{
 		$res = $this->s3Call('headObject', null, $path, array(self::AWS_404_ERROR));
-		
+
 		if(!$res)
 		{
 			return false;
 		}
 		return $res;
+	}
+
+	protected function restoreObjectForPath($path, $days = 1, $restoreType = null)
+	{
+		$params = $this->initBasicS3Params($path);
+		if($days)
+		{
+			$params['Days'] = $days;
+		}
+
+		if ($restoreType)
+		{
+			// restore types: 'Standard|Bulk|Expedited'
+			$params['Tier'] = $restoreType;
+		}
+		$res = $this->s3Call('restoreObject', $params);
+
+		if(!$res)
+		{
+			return false; KalturaLog::debug("Restore object result could not be initiated");
+		}
+		//RequestCharged => (string)
+		//If present, indicates that the requester was successfully charged for the request.
+		//RequestId => ()
+		//Request ID of the operation
+
+		KalturaLog::debug("Restore object result is " . print_r($res,true));
+		return true;
 	}
 	
 	protected function doMkdir($path, $mode, $recursive)
@@ -677,6 +705,56 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		return $res->get('ContentType');
+	}
+
+	protected function doIsArchived($filePath)
+	{
+		$res = $this->getHeadObjectForPath($filePath);
+		if($res)
+		{
+			if (in_array($res->get('StorageClass'), array("GLACIER", "DEEP_ARCHIVE")))
+			{
+				return true;
+			}
+			if(in_array($res->get('ArchiveStatus'),array("ARCHIVE_ACCESS", "DEEP_ARCHIVE_ACCESS")))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function doInitiateRestoreFromArchive($filePath, $days = null, $restoreType = null)
+	{
+		$res = $this->restoreObjectForPath($filePath, $days, $restoreType);
+		if(!$res)
+		{
+			return false;
+		}
+		KalturaLog::debug("Initiate restore result is: " .print_r($res,true));
+		return true;
+	}
+
+	protected function getIsRestoreFromArchiveStatus($filePath)
+	{
+		$res = $this->getHeadObjectForPath($filePath);
+		if(!$res)
+		{
+			return kFile::ARHCHIVE_FILE_RESTORE_UNKOWN;
+		}
+		KalturaLog::debug("get restore status is: {$res->get('Restore')} and ID {$res->get('RequestId')} , " .print_r($res,true));
+
+		if(strpos($res->get("Restore"), 'ongoing-request="true"') === 0 )
+		{
+			return kFile::ARHCHIVE_FILE_RESTORE_IN_PROGRESS;
+		}
+
+		if(strpos($res->get("Restore"), 'ongoing-request="false"') === 0 )
+		{
+			return kFile::ARHCHIVE_FILE_RESTORE_DONE;
+		}
+
+		return kFile::ARHCHIVE_FILE_RESTORE_UNKOWN;
 	}
 	
 	protected function doDumpFilePart($filePath, $range_from, $range_length)

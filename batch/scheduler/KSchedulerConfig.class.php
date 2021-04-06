@@ -126,6 +126,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		catch (Zend_Config_Exception $e)
 		{
 			$hostNamePrefix = preg_replace('/\d+$/', self::HOSTNAME_WILDCARD , $hostname);
+			KalturaLog::debug("Trying to load $hostNamePrefix from config");
 			parent::__construct($configFileName, $hostNamePrefix, true);
 		}
 
