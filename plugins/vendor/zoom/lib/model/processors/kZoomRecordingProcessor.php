@@ -23,11 +23,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected $zoomBaseUrl;
 
-    /**
-     * @var string
-     */
-    protected $zoomBaseUrl;
-
 	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
@@ -37,7 +32,6 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$this->mainEntry = null;
 		$this->zoomBaseUrl = $zoomBaseUrl;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
-		$this->zoomBaseUrl = $zoomBaseUrl;
 		parent::__construct($zoomBaseUrl, $this->zoomIntegration->getJwtToken(), $this->zoomIntegration->getRefreshToken(), null, null,
 		                    $this->zoomIntegration->getAccessToken());
 	}
