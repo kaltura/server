@@ -210,7 +210,7 @@ class myUploadUtils
 	{
 		$fileType = kFileUtils::getMimeType($uploadFilePath);
 
-		KalturaLog::info("File type: $fileType");
+		KalturaLog::debug("File type: $fileType");
 
 		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
 		{
