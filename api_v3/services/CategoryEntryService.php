@@ -38,13 +38,13 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
-		
-		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry();
+		$containsPrivacyContext = $category->getPrivacyContexts();
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry(isset($containsPrivacyContext));
 			
 		if (count($categoryEntries) >= $maxCategoriesPerEntry)
 			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
 			
-		//validate user is entiteld to assign entry to this category 
+		//validate user is entitled to assign entry to this category
 		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
 		{
 			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
