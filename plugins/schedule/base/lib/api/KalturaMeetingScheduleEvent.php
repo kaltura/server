@@ -12,10 +12,7 @@ class KalturaMeetingScheduleEvent extends KalturaEntryScheduleEvent
 	 * @var int
 	 */
 	public $preStartTime;
-
-	/*
-	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
-	 */
+	
 	private static $map_between_objects = array
 	(
 		'preStartTime',
