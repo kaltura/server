@@ -13,6 +13,19 @@ class KalturaMeetingScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	public $preStartTime;
 	
+	private static $map_between_objects = array
+	(
+		'preStartTime',
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
