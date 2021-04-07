@@ -229,7 +229,13 @@ class kFlowHelper
 		{
 			if(kFile::isSharedPath($data->getSrcFileUrl()))
 			{
-				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, 62);
+				$sharedArchivedDc = kConf::get('shared_archive_dc' ,'cloud_storage', null );
+				if(!$sharedArchivedDc)
+				{
+					KalturaLog::err("Shared Archive dc Not found in configureation");
+					throw new Exception ("Shared Archive dc Not found in configureation");
+				}
+				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, $sharedArchivedDc);
 				if($fileSync)
 				{
 					$fileSync->setDc($partnerSharedStorageProfileId);

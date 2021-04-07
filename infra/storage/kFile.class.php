@@ -304,6 +304,12 @@ class kFile extends kFileBase
 		return $kSharedFsMgr->getRestoreFromArchiveStatus($filePath);
 	}
 
+	public static function handleRestoreDone($filePath)
+	{
+		$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+		return $kSharedFsMgr->handleRestoreDone($filePath);
+	}
+
 	public static function copySingleFile($src, $dest, $deleteSrc)
 	{
 		if (kFile::isSharedPath($dest))

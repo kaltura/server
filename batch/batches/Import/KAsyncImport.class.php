@@ -566,6 +566,8 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	private function handleSharedPathImport(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
+		$data->destFileLocalPath = $data->srcFileUrl;
+		$data->destFileSharedPath = $data->srcFileUrl;
 		if (kFile::isArchived($data->srcFileUrl))
 		{
 			switch (kFile::getRestoreFromArchiveStatus($data->srcFileUrl))
@@ -576,9 +578,7 @@ class KAsyncImport extends KJobHandlerWorker
 				}
 				case kFile::ARHCHIVE_FILE_RESTORE_DONE:
 				{
-					$this->handleRestoreDone($job, $data);
-					$data->destFileLocalPath = $data->srcFileUrl;
-					$data->destFileSharedPath = $data->srcFileUrl;
+					kFile::handleRestoreDone($data->srcFileUrl);
 					$this->closeJob($job, null, null, 'Successfully done', KalturaBatchJobStatus::FINISHED, $data);
 					return $job;
 					break;
@@ -591,16 +591,11 @@ class KAsyncImport extends KJobHandlerWorker
 				default:
 					break;
 			}
-			//todo set wait timeout for job
-			//todo check about number of retries
-			$job->checkAgainTimeout = time() + 600;
 			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::FILE_IS_ARCHIVED, "Restore archive file in progress", KalturaBatchJobStatus::RETRY);
 			return $job;
 		}
 		else
 		{
-			$data->destFileLocalPath = $data->srcFileUrl;
-			$data->destFileSharedPath = $data->srcFileUrl;
 			$this->closeJob($job, null, null, 'Successfully done', KalturaBatchJobStatus::FINISHED, $data);
 			return $job;
 		}

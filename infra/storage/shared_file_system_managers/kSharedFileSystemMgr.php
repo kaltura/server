@@ -318,7 +318,17 @@ abstract class kSharedFileSystemMgr
 	 * @return string
 	 */
 	abstract protected function getIsRestoreFromArchiveStatus($filePath);
-	
+
+	/**
+	 * get the restore progress status
+	 *
+	 * @param $filePath file path
+	 *
+	 * @return bool
+	 */
+	abstract protected function doHandleRestoreDone($filePath);
+
+
 	/**
 	 * dump file in parts
 	 *
@@ -588,6 +598,12 @@ abstract class kSharedFileSystemMgr
 	{
 		$filePath = kFileBase::fixPath($filePath);
 		return $this->getIsRestoreFromArchiveStatus($filePath);
+	}
+
+	public function handleRestoreDone($filePath)
+	{
+		$filePath = kFileBase::fixPath($filePath);
+		return $this->doHandleRestoreDone($filePath);
 	}
 
 	public function shouldPollFileExists()

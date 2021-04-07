@@ -436,34 +436,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $res;
 	}
 
-	protected function restoreObjectForPath($path, $days = 1, $restoreType = null)
-	{
-		$params = $this->initBasicS3Params($path);
-		if($days)
-		{
-			$params['Days'] = $days;
-		}
-
-		if ($restoreType)
-		{
-			// restore types: 'Standard|Bulk|Expedited'
-			$params['Tier'] = $restoreType;
-		}
-		$res = $this->s3Call('restoreObject', $params);
-
-		if(!$res)
-		{
-			return false; KalturaLog::debug("Restore object result could not be initiated");
-		}
-		//RequestCharged => (string)
-		//If present, indicates that the requester was successfully charged for the request.
-		//RequestId => ()
-		//Request ID of the operation
-
-		KalturaLog::debug("Restore object result is " . print_r($res,true));
-		return true;
-	}
-	
 	protected function doMkdir($path, $mode, $recursive)
 	{
 		return true;
@@ -724,14 +696,21 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return false;
 	}
 
-	protected function doInitiateRestoreFromArchive($filePath, $days = null, $restoreType = null)
+	protected function doInitiateRestoreFromArchive($filePath, $days = 1, $restoreType = 'STANDARD')
 	{
-		$res = $this->restoreObjectForPath($filePath, $days, $restoreType);
-		if(!$res)
+		$params = $this->initBasicS3Params($filePath);
+		$params['Days'] = $days;
+		// restore types: 'STANDARD|BULK|EXPEDITED' supported from s3 api version 3.19.32
+		$params['GlacierJobParameters'] = array('Tier' => $restoreType);
+		$res = $this->s3Call('restoreObject', $params);
+
+		if (!$res)
 		{
+			KalturaLog::debug("Restore object result could not be initiated");
 			return false;
 		}
-		KalturaLog::debug("Initiate restore result is: " .print_r($res,true));
+
+		KalturaLog::debug("Restore object result is " . print_r($res, true));
 		return true;
 	}
 
@@ -756,7 +735,28 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 		return kFile::ARHCHIVE_FILE_RESTORE_UNKOWN;
 	}
-	
+
+	protected function doHandleRestoreDone($filePath)
+	{
+		$res = $this->getHeadObjectForPath($filePath);
+		if (!$res || !in_array($res->get('StorageClass'), array("GLACIER", "DEEP_ARCHIVE")))
+		{
+			return true;
+		}
+		KalturaLog::debug("Copying restored file $filePath from S3 Glacier to intelligent-teir storage class");
+		$params = $this->initBasicS3Params($filePath);
+		$params['CopySource'] = $filePath;
+		$params['Metadata'] = array('force-glacier-transfer' => 1);
+		$params['StorageClass'] = 'INTELLIGENT_TIERING';
+		$response = $this->s3Call('copyObject', $params);
+		if($response)
+		{
+			KalturaLog::debug("Copy from S3 Glacier to intelligent-teir storage classf for $filePath finished succesfully");
+			return true;
+		}
+		return false;
+	}
+
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
 		$fileUrl = $this->doRealPath($filePath);
@@ -973,7 +973,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			}
 		}
 		
-		return false;
 	}
 	
 	public function initBasicS3Params($filePath)
