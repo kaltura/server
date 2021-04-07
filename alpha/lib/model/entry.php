@@ -1247,13 +1247,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $dynamicAttributes;
 	}
 	
-	public function getMaxCategoriesPerEntry($shouldLimitMaxCategories)
+	public function getMaxCategoriesPerEntry($numberOfPrivacyContext)
 	{
 		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if (!$shouldLimitMaxCategories)
+		if (PermissionPeer ::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT,
+		                                       $this -> getPartnerId()))
 		{
-			if (PermissionPeer ::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT,
-			                                       $this -> getPartnerId()))
+			if ($numberOfPrivacyContext < 2)
 			{
 				$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
 			}

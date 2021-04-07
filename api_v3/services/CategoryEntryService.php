@@ -38,8 +38,8 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
 			
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
-		$containsPrivacyContext = $category->getPrivacyContexts();
-		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry(isset($containsPrivacyContext));
+		$numberOfPrivacyContext = count(explode(',', $category->getPrivacyContexts()));
+		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry($numberOfPrivacyContext);
 			
 		if (count($categoryEntries) >= $maxCategoriesPerEntry)
 			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
