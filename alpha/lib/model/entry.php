@@ -103,7 +103,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const MAX_NORMALIZED_RANK = 5;
 
 	const MAX_CATEGORIES_PER_ENTRY = 32;
-	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 200;
+	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 1000;
 	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
@@ -1247,11 +1247,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $dynamicAttributes;
 	}
 	
-	public function getMaxCategoriesPerEntry()
+	public function getMaxCategoriesPerEntry($numberOfPrivacyContext)
 	{
 		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+		if (PermissionPeer ::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT,
+		                                       $this -> getPartnerId()))
+		{
+			if ($numberOfPrivacyContext < 2)
+			{
+				$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+			}
+		}
 			
 		// When batch move entry between categories it's adding the new category before deleting the old one
 		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
