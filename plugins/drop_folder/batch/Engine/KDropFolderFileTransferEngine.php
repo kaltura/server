@@ -13,7 +13,6 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 	public function watchFolder (KalturaDropFolder $folder)
 	{
-		$this->physicalFilesByPath = array();
 		$this->dropFolder = $folder;
 		$this->fileTransferMgr =  self::getFileTransferManager($this->dropFolder);
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
