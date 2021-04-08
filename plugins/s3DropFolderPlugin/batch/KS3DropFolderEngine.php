@@ -15,13 +15,13 @@ class KS3DropFolderEngine extends KDropFolderFileTransferEngine
 	protected function getLastModificationTime($fullPath)
 	{
 		//Since using object storage, modification time does not increase when client writes it.
-		return $this->physicalFilesByPath[$fullPath]['modificationTime'];
+		return $this->physicalFilesByPath[$fullPath]->modificationTime;
 	}
 
 	protected function getFileSize($fullPath)
 	{
 		//Since using object storage, file size does not increase when client writes it.
-		return $this->physicalFilesByPath[$fullPath]['fileSize'];
+		return $this->physicalFilesByPath[$fullPath]->fileSize;
 	}
 
 	protected function logPhysicalFile($fullPath,$physicalFileInfo)
