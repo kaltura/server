@@ -722,7 +722,7 @@ ini_set("memory_limit","512M");
 			if($job===false)
 				return false;
 			
-			kBatchUtils::tryLoadKconfConfig();
+			kBatchUtils::tryLoadSharedStorageKconfConfig();
 			
 			$job->startTime = time();
 			$job->process = getmypid();

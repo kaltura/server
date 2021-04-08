@@ -37,7 +37,7 @@
 		{
 			$this->setup = $setup;
 			$this->params  = new KChunkedEncodeParams();
-			kBatchUtils::tryLoadKconfConfig();
+			kBatchUtils::tryLoadSharedStorageKconfConfig();
 		}
 		
 		

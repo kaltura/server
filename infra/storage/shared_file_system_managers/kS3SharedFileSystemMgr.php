@@ -61,11 +61,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		parent::__construct($options);
 		
-		$arnRole = getenv(self::S3_ARN_ROLE_ENV_NAME);
+		$s3Arn = getenv(self::S3_ARN_ROLE_ENV_NAME);
 		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
-			$arnRole = kConf::get("s3Arn" , "cloud_storage", null);
+			$s3Arn = kConf::get("s3Arn" , "cloud_storage", null);
 		}
 		
 		if($options)
@@ -79,7 +79,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
-			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
+			$this->s3Arn = isset($options['s3Arn']) ? $options['s3Arn'] : $s3Arn;
 		}
 		
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;

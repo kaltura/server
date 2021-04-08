@@ -7,80 +7,48 @@ class kBatchUtils
 {
 	/**
 	 * @param $param
-	 * @param bool $useBatchClient
-	 * @return mixed|null
+	 * @param string $mapName
+	 * @param null $defaultValue
+	 * @return bool|mixed|null
 	 * @throws Exception
 	 */
-	public static function getKconfParam($param, $useBatchClient = false, $defaultValue = null )
+	public static function getKconfParam($param, $mapName ='local', $defaultValue = false)
 	{
-		$chunkConfig = self::tryLoadKconfConfig($useBatchClient);
-		if(!$chunkConfig || !isset($chunkConfig[$param])) {
-			return $defaultValue;
-		}
-		
-		return $chunkConfig[$param];
-	}
-
-	/**
-	 * @param bool $useBatchClient
-	 * @return array|mixed
-	 * @throws Exception
-	 */
-	public static function tryLoadKconfConfig($useBatchClient = false)
-	{
-		$configCacheFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'sharedStorageConfig_serialized.txt';
-		if(!kFile::checkFileExists($configCacheFileName))
+		if (class_exists('KBatchBase'))
 		{
-			$sharedStorageClientConfig = self::loadAndSaveKconfConfig($configCacheFileName, $useBatchClient);
-			self::setStorageRunParams($sharedStorageClientConfig);
-			return $sharedStorageClientConfig;
-		}
-		
-		$sharedStorageClientConfig = unserialize(kFile::getFileContent($configCacheFileName));
-		if(time() > $sharedStorageClientConfig['expirationTime'])
-		{
-			KalturaLog::debug("Config cache file no longer valid, Will reload config");
-			$sharedStorageClientConfig = self::loadAndSaveKconfConfig($configCacheFileName, $useBatchClient);
-			self::setStorageRunParams($sharedStorageClientConfig);
-			return $sharedStorageClientConfig;
+			$config = self::tryLoadKconfConfig($mapName, true);
+			if (!$config || !isset($config[$param]))
+			{
+				return $defaultValue;
+			}
+			return $config[$param];
 		}
 		else
 		{
-			KalturaLog::debug("Config cache file valid, returning cached config");
+			return kConf::get($param, $mapName, $defaultValue);
 		}
-		
-		self::setStorageRunParams($sharedStorageClientConfig);
-		return $sharedStorageClientConfig;
 	}
 
 	/**
-	 * @param $configCacheFileName
 	 * @param bool $useBatchClient
 	 * @return array
+	 * @throws Exception
 	 */
-	public static function loadAndSaveKconfConfig($configCacheFileName, $useBatchClient = false)
+	public static function tryLoadSharedStorageKconfConfig($useBatchClient = false)
 	{
-		if ($useBatchClient)
-		{
-			list($cloudStorage, $runtimeConfig) = self::loadConfFromApi();
-		}
-		else
-		{
-			list($cloudStorage, $runtimeConfig)  = self::loadConfFromKConf();
-		}
+		$cloudStorage = self::tryLoadKconfConfig("cloud_storage", $useBatchClient);
+		$runtimeConfig = self::tryLoadKconfConfig("runtime_config", $useBatchClient);
 
 		$s3Arn = isset($cloudStorage['s3Arn']) ? $cloudStorage['s3Arn'] : null;
 		$storageOptions = isset($cloudStorage['storage_options']) ? $cloudStorage['storage_options'] : array();
 		$storageTypeMap = isset($cloudStorage['storage_type_map']) ? $cloudStorage['storage_type_map'] : array();
-		$remoteChunkConfigStaticFileCacheTime = isset($runtimeConfig['remote_chunk_config_static_file_cache_time']) ? $runtimeConfig['remote_chunk_config_static_file_cache_time'] : 120;
 		$ffmpegReconnectParams = isset($runtimeConfig['ffmpeg_reconnect_params']) ? $runtimeConfig['ffmpeg_reconnect_params'] : null;
 
 		$sharedStorageConfig = array(
-			'arnRole' => $s3Arn,
+			's3Arn' => $s3Arn,
 			'storageTypeMap' => $storageTypeMap,
 			'ffmpegReconnectParams' => $ffmpegReconnectParams,
 			's3Region' => isset($storageOptions['s3Region']) ? $storageOptions['s3Region'] : null,
-			'expirationTime' => time() + $remoteChunkConfigStaticFileCacheTime
 		);
 
 		$sharedStorageConfig['endPoint'] = isset($storageOptions['endPoint']) ? $storageOptions['endPoint'] : null;
@@ -89,10 +57,60 @@ class kBatchUtils
 		$sharedStorageConfig['concurrency'] = isset($storageOptions['concurrency']) ? $storageOptions['concurrency'] : null;
 		$sharedStorageConfig['maxConcurrentUploadConnections'] = isset($storageOptions['maxConcurrentUploadConnections']) ? $storageOptions['maxConcurrentUploadConnections'] : null;
 
-		KalturaLog::debug("Config loaded: " . print_r($sharedStorageConfig, true));
-		kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageConfig));
-		kCacheConfFactory::close();
+		self::setStorageRunParams($sharedStorageConfig);
+
 		return $sharedStorageConfig;
+	}
+
+	/**
+	 * @param $mapName
+	 * @param bool $useBatchClient
+	 * @return array|mixed
+	 * @throws Exception
+	 */
+	public static function tryLoadKconfConfig($mapName, $useBatchClient = false )
+	{
+		$configCacheFileName = kEnvironment::get('cache_root_path') . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . "confMaps" . DIRECTORY_SEPARATOR . "$mapName.txt";
+		if(!kFile::checkFileExists($configCacheFileName))
+		{
+			return self::loadAndSaveKconfConfig($configCacheFileName, $mapName, $useBatchClient);
+		}
+		
+		$configData = unserialize(kFile::getFileContent($configCacheFileName));
+		if(time() > $configData['expirationTime'])
+		{
+			KalturaLog::debug("Config cache file no longer valid, Will reload config");
+			$configData = self::loadAndSaveKconfConfig($configCacheFileName, $mapName, $useBatchClient);
+		}
+		else
+		{
+			KalturaLog::debug("Config cache file valid, returning cached config");
+		}
+		return $configData;
+	}
+
+	/**
+	 * @param $configCacheFileName
+	 * @param $mapName
+	 * @param bool $useBatchClient
+	 * @return array|mixed
+	 */
+	public static function loadAndSaveKconfConfig($configCacheFileName, $mapName, $useBatchClient = false)
+	{
+		if ($useBatchClient)
+		{
+			$map = self::getConfigMap($mapName);
+		}
+		else
+		{
+			$map = kConf::getMap($mapName);
+		}
+		$expirationTime = isset($map['static_file_cache_expirtation_time']) ? $map['static_file_cache_expirtation_time'] : 120;
+		$map['expirationTime'] = time() + $expirationTime;
+		KalturaLog::debug("Config loaded: " . print_r($map, true));
+		kFile::safeFilePutContents($configCacheFileName, serialize($map));
+		kCacheConfFactory::close();
+		return $map;
 	}
 
 	/**
@@ -122,7 +140,7 @@ class kBatchUtils
 	 */
 	private static function setStorageRunParams($storageRunParams)
 	{
-		kSharedFileSystemMgr::setFileSystemOptions('arnRole', $storageRunParams['arnRole']);
+		kSharedFileSystemMgr::setFileSystemOptions('s3Arn', $storageRunParams['s3Arn']);
 		kSharedFileSystemMgr::setFileSystemOptions('s3Region', $storageRunParams['s3Region']);
 
 		if(isset($storageRunParams['endPoint'])) {
@@ -154,8 +172,9 @@ class kBatchUtils
 		if (strpos($fileCmd, $pattern) !== 0) {
 			return;
 		}
-		
-		$ffmpegReconnectParams = self::getKconfParam('ffmpegReconnectParams');
+
+		$ffmpegReconnectParams = self::getKconfParam('ffmpegReconnectParams', 'runtime_config');
+
 		if ($ffmpegReconnectParams) {
 			$cmdLine .= " $ffmpegReconnectParams";
 		}
