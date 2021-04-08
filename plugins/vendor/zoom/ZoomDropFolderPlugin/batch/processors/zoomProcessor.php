@@ -91,17 +91,9 @@ abstract class zoomProcessor
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = self::ZOOM_PREFIX . $recordingUuId;
 		
-		try
-		{
-			KBatchBase::impersonate($recordingPartnerId);
-			$kalturaEntry = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
-			KBatchBase::unimpersonate();
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::debug($e->getMessage());
-			$kalturaEntry = null;
-		}
+		KBatchBase::impersonate($recordingPartnerId);
+		$kalturaEntry = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
+		KBatchBase::unimpersonate();
 		
 		if($kalturaEntry->objects)
 		{

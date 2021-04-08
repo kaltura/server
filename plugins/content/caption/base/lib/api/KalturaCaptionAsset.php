@@ -146,11 +146,6 @@ class KalturaCaptionAsset extends KalturaAsset
 		{
 			$this->format = KalturaCaptionType::SRT;
 		}
-
-		if ($this->source === null)		// not already set by setFromAssetParams
-		{
-			$this->source = KalturaCaptionSource::UNKNOWN;
-		}
 		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
