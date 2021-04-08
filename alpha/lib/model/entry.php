@@ -1286,7 +1286,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$this->trimCategories($newCats);
 		
-		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
+		$numberOfPrivacyContext = $newCats[0]->getPrivacyContexts();
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry($numberOfPrivacyContext);
 		if (count($newCats) > $maxCategoriesPerEntry)
 			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
@@ -1308,7 +1309,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$this->trimCategories($newCats);
 		
-		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
+		$numberOfPrivacyContext = $newCats[0]->getPrivacyContexts();
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry($numberOfPrivacyContext);
 		if (count($newCats) > $maxCategoriesPerEntry)
 			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
