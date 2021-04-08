@@ -20,15 +20,7 @@ class zoomChatFilesProcessor extends zoomProcessor
 		$attachmentAsset->filename = "Recording {$recordingId} chat file." . self::ZOOM_CHAT_FILE_TYPE;
 		$attachmentAsset->format = KalturaAttachmentType::TEXT;
 		$attachmentAsset->fileExt = self::ZOOM_CHAT_FILE_TYPE;
-		try
-		{
-			$attachmentAsset = $attachmentPlugin->attachmentAsset->add($entry->id, $attachmentAsset);
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::debug($e);
-			throw new Exception(KalturaZoomErrorMessages::ERROR_HANDLING_CHAT);
-		}
+		$attachmentAsset = $attachmentPlugin->attachmentAsset->add($entry->id, $attachmentAsset);
 		return $attachmentAsset;
 	}
 	
@@ -49,15 +41,7 @@ class zoomChatFilesProcessor extends zoomProcessor
 		$attachmentAsset = $this->createAttachmentAssetForChatFile($recording->meetingMetadata->meetingId, $entry, $attachmentPlugin);
 		$attachmentAssetResource = new KalturaUrlResource();
 		$attachmentAssetResource->url = $this->getRedirectUrl($recording);
-		try
-		{
-			$attachmentPlugin->attachmentAsset->setContent($attachmentAsset->id, $attachmentAssetResource);
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::debug($e);
-			throw new Exception(KalturaZoomErrorMessages::ERROR_HANDLING_CHAT);
-		}
+		$attachmentPlugin->attachmentAsset->setContent($attachmentAsset->id, $attachmentAssetResource);
 		KBatchBase::unimpersonate();
 	}
 }

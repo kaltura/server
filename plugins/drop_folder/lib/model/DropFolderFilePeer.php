@@ -85,16 +85,6 @@ class DropFolderFilePeer extends BaseDropFolderFilePeer implements IRelatedObjec
 		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
 		return $dropFolderFiles;
 	}
-	
-	public static function retrieveByFolderIdOrderAndStatuses($dropFolderId, $order, $statuses)
-	{
-		$c = new Criteria();
-		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
-		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::NOT_IN);
-		$c->addAscendingOrderByColumn($order);
-		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
-		return $dropFolderFiles;
-	}
 
 	/* (non-PHPdoc)
 	 * @see BaseDropFolderFilePeer::getOMClass()

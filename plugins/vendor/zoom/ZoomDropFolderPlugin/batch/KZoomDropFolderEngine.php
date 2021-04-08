@@ -33,13 +33,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
-		$jwtToken = isset($dropFolder->jwtToken) ? $dropFolder->jwtToken : null;
-		$refreshToken = isset($dropFolder->refreshToken) ? $dropFolder->refreshToken : null;
-		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
-		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
-		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
-		$this->zoomClient = new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
-
+		$this->zoomClient = $this->initZoomClient($dropFolder);
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
@@ -62,6 +56,16 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		{
 			self::updateDropFolderLastMeetingHandled(self::$lastHandledMeetingTime);
 		}
+	}
+	
+	protected function initZoomClient(KalturaDropFolder $dropFolder)
+	{
+		$jwtToken = isset($dropFolder->jwtToken) ? $dropFolder->jwtToken : null;
+		$refreshToken = isset($dropFolder->refreshToken) ? $dropFolder->refreshToken : null;
+		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
+		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
+		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
+		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
 	}
 	
 	protected function getMeetingsInStartTimeOrder()
@@ -110,7 +114,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$meetings = array();
 		}
 		
-		KalturaLog::info("physical files: ");
+		KalturaLog::info('physical files: ');
 		foreach ($meetings as $meeting)
 		{
 			KalturaLog::info('Meeting UUID: '. $meeting[self::UUID]);
@@ -122,13 +126,15 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		foreach ($meetingFiles as $meetingFile)
 		{
-			KalturaLog::debug("meeting file is: " . print_r($meetingFile, true));
+			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$recordingFilesOrdered = self::orderRecordingFiles($meetingFile[self::RECORDING_FILES]);
-			KalturaLog::debug("recording files are: " . print_r($recordingFilesOrdered, true));
+			KalturaLog::debug('recording files are: ' . print_r($recordingFilesOrdered, true));
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
 				$firstDFFileOnTimeSlot = true;
 				$isParentEntry = false;
+				$parentEntry = null;
+				$wasParentEntryFound = false;
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
@@ -139,24 +145,24 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 							if ($firstDFFileOnTimeSlot)
 							{
 								$firstDFFileOnTimeSlot = false;
-								$entry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
-								if ($entry)
+								$parentEntry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
+								if ($parentEntry)
 								{
-									$isParentEntry = true;
+									$wasParentEntryFound = true;
 								}
 								else
 								{
-									$entry = $this->createEntry($meetingFile[self::UUID]);
+									$parentEntry = $this->createEntry($meetingFile[self::UUID]);
 								}
 							}
-							if (!$isParentEntry && $recordingFile[self::RECORDING_FILE_TYPE] == 'MP4')
+							if (!$wasParentEntryFound && !$isParentEntry && $recordingFile[self::RECORDING_FILE_TYPE] == 'MP4')
 							{
 								$isParentEntry = true;
-								$this->addDropFolderFile($meetingFile, $recordingFile, $entry->id, true);
+								$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 							}
 							else
 							{
-								$this->addDropFolderFile($meetingFile, $recordingFile, $entry->id);
+								$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 							}
 							self::$lastHandledMeetingTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
 						}
@@ -174,29 +180,21 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getEntryByReferenceId($referenceId)
 	{
-		try
+		$entryFilter = new KalturaBaseEntryFilter();
+		$entryFilter->referenceIdEqual = $referenceId;
+		
+		$entryPager = new KalturaFilterPager();
+		$entryPager->pageSize = 1;
+		$entryPager->pageIndex = 1;
+		
+		KBatchBase::impersonate($this->dropFolder->partnerId);
+		$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
+		KBatchBase::unimpersonate();
+		if (is_array($entryList->objects) && isset($entryList->objects[0]) )
 		{
-			$entryFilter = new KalturaBaseEntryFilter();
-			$entryFilter->referenceIdEqual = $referenceId;
-			
-			$entryPager = new KalturaFilterPager();
-			$entryPager->pageSize = 1;
-			$entryPager->pageIndex = 1;
-			KBatchBase::impersonate($this->dropFolder->partnerId);
-			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
-			KBatchBase::unimpersonate();
-			if (is_array($entryList->objects) && isset($entryList->objects[0]) )
-			{
-				return $entryList->objects[0];
-			}
-			
-			return null;
+			return $entryList->objects[0];
 		}
-		catch (Exception $e)
-		{
-			KalturaLog::err('Failed to get entry by reference id: '. $referenceId . $e->getMessage() );
-			return null;
-		}
+		return null;
 	}
 	
 	protected function createEntry($uuid)
@@ -257,50 +255,18 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		$updateDropFolder = new KalturaZoomDropFolder();
 		$updateDropFolder->lastHandledMeetingTime = $lastHandledMeetingTime;
-		try
-		{
-			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
-			KalturaLog::debug('Last handled meetings time is: '. $lastHandledMeetingTime);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::debug('Cannot update drop folder with last Meeting Handled Time - '.$e->getMessage());
-			return null;
-		}
+		$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
+		KalturaLog::debug('Last handled meetings time is: '. $lastHandledMeetingTime);
 	}
 
-	protected function addDropFolderFile($meetingFile, $recordingFile, $entryId, $isParentEntry = false)
+	protected function addDropFolderFile($meetingFile, $recordingFile, $parentEntryId, $isParentEntry = false)
 	{
 		try
 		{
-			$kMeetingMetaData = new kalturaMeetingMetadata();
-			$kMeetingMetaData->meetingId = $meetingFile[self::ID];
-			$kMeetingMetaData->uuid = $meetingFile[self::UUID];
-			$kMeetingMetaData->topic = $meetingFile[self::TOPIC];
-			$kMeetingMetaData->meetingStartTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
-			$kMeetingMetaData->accountId = $meetingFile[self::ACCOUNT_ID];
-			$kMeetingMetaData->hostId = $meetingFile[self::HOST_ID];
-			$kZoomRecording = new kZoomRecording();
-			$kZoomRecording->parseType($meetingFile[self::TYPE]);
-			$kMeetingMetaData->type = $kZoomRecording->recordingType;
-			
-			$kRecordingFile = new kalturaRecordingFile();
-			$kRecordingFile->id = $recordingFile[self::ID];
-			$kRecordingFile->downloadUrl = $recordingFile[self::DOWNLOAD_URL];
-			$kRecordingFile->fileExtension = $recordingFile[self::FILE_EXTENSION];
-			$kRecordingFile->recordingStart = self::convertTimeToUnix($recordingFile[self::RECORDING_START]);
-			$kZoomRecordingFile = new kZoomRecordingFile();
-			$kZoomRecordingFile->parseFileType($recordingFile[self::RECORDING_FILE_TYPE]);
-			$kRecordingFile->fileType = $kZoomRecordingFile->recordingFileType;
-			
-			$zoomDropFolderFile = new KalturaZoomDropFolderFile();
-			$zoomDropFolderFile->dropFolderId = $this->dropFolder->id;
-			$zoomDropFolderFile->fileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-			$zoomDropFolderFile->fileSize = $recordingFile[self::FILE_SIZE];
-			$zoomDropFolderFile->meetingMetadata = $kMeetingMetaData;
-			$zoomDropFolderFile->recordingFile = $kRecordingFile;
-			$zoomDropFolderFile->parentEntryId = $entryId;
-			$zoomDropFolderFile->isParentEntry = $isParentEntry;
+			$kMeetingMetaData = self::allocateMeetingMetaData($meetingFile);
+			$kRecordingFile = self::allocateZoomRecordingFile($recordingFile);
+			$zoomDropFolderFile = $this->allocateZoomDropFolderFile($meetingFile, $recordingFile, $kMeetingMetaData, $kRecordingFile, $parentEntryId,
+			                                               $isParentEntry);
 
 			KalturaLog::debug("Adding new ZoomDropFolderFile: " . print_r($zoomDropFolderFile, true));
 			$dropFolderFile = $this->dropFolderFileService->add($zoomDropFolderFile);
@@ -314,7 +280,48 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 	}
 
-	public function convertTimeToUnix($time)
+	protected static function allocateMeetingMetaData($meetingFile)
+	{
+		$kMeetingMetaData = new kalturaMeetingMetadata();
+		$kMeetingMetaData->meetingId = $meetingFile[self::ID];
+		$kMeetingMetaData->uuid = $meetingFile[self::UUID];
+		$kMeetingMetaData->topic = $meetingFile[self::TOPIC];
+		$kMeetingMetaData->meetingStartTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
+		$kMeetingMetaData->accountId = $meetingFile[self::ACCOUNT_ID];
+		$kMeetingMetaData->hostId = $meetingFile[self::HOST_ID];
+		$kZoomRecording = new kZoomRecording();
+		$kZoomRecording->parseType($meetingFile[self::TYPE]);
+		$kMeetingMetaData->type = $kZoomRecording->recordingType;
+		return $kMeetingMetaData;
+	}
+	
+	protected static function allocateZoomRecordingFile($recordingFile)
+	{
+		$kRecordingFile = new kalturaRecordingFile();
+		$kRecordingFile->id = $recordingFile[self::ID];
+		$kRecordingFile->downloadUrl = $recordingFile[self::DOWNLOAD_URL];
+		$kRecordingFile->fileExtension = $recordingFile[self::FILE_EXTENSION];
+		$kRecordingFile->recordingStart = self::convertTimeToUnix($recordingFile[self::RECORDING_START]);
+		$kZoomRecordingFile = new kZoomRecordingFile();
+		$kZoomRecordingFile->parseFileType($recordingFile[self::RECORDING_FILE_TYPE]);
+		$kRecordingFile->fileType = $kZoomRecordingFile->recordingFileType;
+		return $kRecordingFile;
+	}
+	
+	protected function allocateZoomDropFolderFile($meetingFile, $recordingFile, $kMeetingMetaData, $kRecordingFile, $parentEntryId, $isParentEntry)
+	{
+		$zoomDropFolderFile = new KalturaZoomDropFolderFile();
+		$zoomDropFolderFile->dropFolderId = $this->dropFolder->id;
+		$zoomDropFolderFile->fileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
+		$zoomDropFolderFile->fileSize = $recordingFile[self::FILE_SIZE];
+		$zoomDropFolderFile->meetingMetadata = $kMeetingMetaData;
+		$zoomDropFolderFile->recordingFile = $kRecordingFile;
+		$zoomDropFolderFile->parentEntryId = $parentEntryId;
+		$zoomDropFolderFile->isParentEntry = $isParentEntry;
+		return $zoomDropFolderFile;
+	}
+	
+	public static function convertTimeToUnix($time)
 	{
 		$newTime = str_replace(array('T','Z'),array(' ',''),$time);
 		return strtotime($newTime);
@@ -407,7 +414,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				break;
 			default:
 				throw new kApplicativeException(KalturaDropFolderErrorCode::CONTENT_MATCH_POLICY_UNDEFINED, 'No content match policy is defined for drop folder');
-				break;
 		}
 		
 		KBatchBase::unimpersonate();

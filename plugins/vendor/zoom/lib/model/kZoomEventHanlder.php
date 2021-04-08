@@ -108,20 +108,14 @@ class kZoomEventHanlder
 		
 		$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
 		
-		$kMeetingMetaData = new kMeetingMetadata();
-		$kMeetingMetaData->setMeetingId($recording->id);
-		$kMeetingMetaData->setUuid($recording->uuid);
-		$kMeetingMetaData->setTopic($recording->topic);
-		$kMeetingMetaData->setMeetingStartTime(strtotime(str_replace(array('T','Z'),array(' ',''), $recording->startTime)));
-		$kMeetingMetaData->setAccountId($event->accountId);
-		$kMeetingMetaData->setHostId($recording->hostId);
-		$kMeetingMetaData->setType($recording->recordingType);
-		
+		$kMeetingMetaData = self::allocateMeetingMetaData($recording, $event);
 		$recordingFilesOrdered = self::orderRecordingFiles($recording->recordingFiles);
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$firstDFFileOnTimeSlot = true;
 			$isParentEntry = false;
+			$parentEntry = null;
+			$wasParentEntryFound = false;
 			/* @var kZoomRecordingFile $recordingFile*/
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
@@ -132,32 +126,25 @@ class kZoomEventHanlder
 					{
 						continue;
 					}
-					$kRecordingFile = new kRecordingFile();
-					$kRecordingFile->setId($recordingFile->id);
-					$kRecordingFile->setDownloadUrl($recordingFile->download_url);
-					$kRecordingFile->setFileType($recordingFile->recordingFileType);
-					$kRecordingFile->setRecordingStart(strtotime(str_replace(array('T','Z'),array(' ',''), $recordingFile->recordingStart)));
-					$kRecordingFile->setFileExtension($recordingFile->fileExtension);
-					$kRecordingFile->setDownloadToken($event->downloadToken);
-					
-					$zoomDropFolderFile = new ZoomDropFolderFile();
-					$zoomDropFolderFile->setDropFolderId($dropFolderId);
-					$zoomDropFolderFile->setPartnerId($partnerId);
-					$zoomDropFolderFile->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
-					$zoomDropFolderFile->setFileName($fileName);
-					$zoomDropFolderFile->setFileSize($recordingFile->fileSize);
-					$zoomDropFolderFile->setMeetingMetadata($kMeetingMetaData);
-					$zoomDropFolderFile->setRecordingFile($kRecordingFile);
-					$zoomDropFolderFile->setStatus(DropFolderFileStatus::UPLOADING);
-					
+					$kRecordingFile = self::allocateZoomRecordingFile($recordingFile, $event);
+					$zoomDropFolderFile = self::allocateZoomDropFolderFile($dropFolderId, $partnerId, $fileName, $recordingFile->fileSize,
+					                                                      $kMeetingMetaData, $kRecordingFile);
 					if ($firstDFFileOnTimeSlot)
 					{
 						$firstDFFileOnTimeSlot = false;
-						$newEntry = self::createEntry($recording->uuid, $partnerId);
+						$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(), $partnerId);
+						if ($parentEntry)
+						{
+							$wasParentEntryFound = true;
+						}
+						else
+						{
+							$parentEntry = self::createEntry($recording->uuid, $partnerId);
+						}
 					}
 					
-					$zoomDropFolderFile->setParentEntryId($newEntry->getId());
-					if (!$isParentEntry && $recordingFile->recordingFileType == kRecordingFileType::VIDEO)
+					$zoomDropFolderFile->setParentEntryId($parentEntry->getId());
+					if (!$wasParentEntryFound && !$isParentEntry && $recordingFile->recordingFileType == kRecordingFileType::VIDEO)
 					{
 						$isParentEntry = true;
 						$zoomDropFolderFile->setIsParentEntry(true);
@@ -178,6 +165,65 @@ class kZoomEventHanlder
 				}
 			}
 		}
+	}
+	
+	protected static function allocateMeetingMetaData($recording, $event)
+	{
+		$kMeetingMetaData = new kMeetingMetadata();
+		$kMeetingMetaData->setMeetingId($recording->id);
+		$kMeetingMetaData->setUuid($recording->uuid);
+		$kMeetingMetaData->setTopic($recording->topic);
+		$kMeetingMetaData->setMeetingStartTime(strtotime(str_replace(array('T','Z'),array(' ',''), $recording->startTime)));
+		$kMeetingMetaData->setAccountId($event->accountId);
+		$kMeetingMetaData->setHostId($recording->hostId);
+		$kMeetingMetaData->setType($recording->recordingType);
+		return $kMeetingMetaData;
+	}
+	
+	protected static function allocateZoomRecordingFile($recordingFile, $event)
+	{
+		$kRecordingFile = new kRecordingFile();
+		$kRecordingFile->setId($recordingFile->id);
+		$kRecordingFile->setDownloadUrl($recordingFile->download_url);
+		$kRecordingFile->setFileType($recordingFile->recordingFileType);
+		$kRecordingFile->setRecordingStart(strtotime(str_replace(array('T','Z'),array(' ',''), $recordingFile->recordingStart)));
+		$kRecordingFile->setFileExtension($recordingFile->fileExtension);
+		$kRecordingFile->setDownloadToken($event->downloadToken);
+		return $kRecordingFile;
+	}
+	
+	protected static function allocateZoomDropFolderFile($dropFolderId, $partnerId, $fileName, $recordingFileSize, $kMeetingMetaData, $kRecordingFile)
+	{
+		$zoomDropFolderFile = new ZoomDropFolderFile();
+		$zoomDropFolderFile->setDropFolderId($dropFolderId);
+		$zoomDropFolderFile->setPartnerId($partnerId);
+		$zoomDropFolderFile->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
+		$zoomDropFolderFile->setFileName($fileName);
+		$zoomDropFolderFile->setFileSize($recordingFileSize);
+		$zoomDropFolderFile->setMeetingMetadata($kMeetingMetaData);
+		$zoomDropFolderFile->setRecordingFile($kRecordingFile);
+		$zoomDropFolderFile->setStatus(DropFolderFileStatus::UPLOADING);
+		return $zoomDropFolderFile;
+	}
+	
+	protected static function getEntryByReferenceId($referenceId, $partnerId)
+	{
+		
+		$entryFilter = new entryFilter();
+		$entryFilter->setPartnerIdEquel($partnerId);
+		$entryFilter->set('_eq_reference_id', $referenceId);
+		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
+		$entryFilter->attachToCriteria($c);
+		$pager = new KalturaFilterPager();
+		$pager->attachToCriteria($c);
+		
+		$entry = entryPeer::doSelectOne($c);
+		if($entry)
+		{
+			KalturaLog::debug('Found entry:' . $entry->getId());
+		}
+		
+		return $entry;
 	}
 	
 	protected static function createEntry($uuid, $partnerId)
@@ -213,15 +259,25 @@ class kZoomEventHanlder
 	
 	protected static function loadDropFolderFiles($dropFolderId)
 	{
-		$statuses = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
+		$statuses = array(KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED);
 		$order = DropFolderFilePeer::CREATED_AT;
-		$dropFolderFiles = DropFolderFilePeer::retrieveByFolderIdOrderAndStatuses($dropFolderId, $order, $statuses);
+		$dropFolderFiles = self::retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses);
 		$dropFolderFilesMap = array();
 		foreach ($dropFolderFiles as $dropFolderFile)
 		{
 			$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
 		}
 		return $dropFolderFilesMap;
+	}
+	
+	protected static function retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses)
+	{
+		$c = new Criteria();
+		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
+		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::NOT_IN);
+		$c->addAscendingOrderByColumn($order);
+		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
+		return $dropFolderFiles;
 	}
 
 	/**
