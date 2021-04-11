@@ -122,6 +122,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_NODE_SWITCH = 'nodeSwitch';
 	const EVENT_TYPE_ADD_TO_CALENDAR_CLICKED = 'addToCalendarClicked';
 	const EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED = 'downloadAttachmentClicked';
+	const EVENT_TYPE_REACTION_CLICKED = 'reactionClicked';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';

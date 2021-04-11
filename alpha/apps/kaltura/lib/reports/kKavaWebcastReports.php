@@ -206,6 +206,28 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
 		),
 
+		ReportType::ENGAGEMENT_TOOLS_WEBCAST => array(
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+				self::EVENT_TYPE_REACTION_CLICKED,
+			),
+		),
+
+		ReportType::REACTIONS_BREAKDOWN_WEBCAST => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'reaction' => self::DIMENSION_EVENT_VAR1,
+			),
+			self::REPORT_FILTER => array(
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_REACTION_CLICKED)
+				)
+			),
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_REACTION_CLICKED,
+			),
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
