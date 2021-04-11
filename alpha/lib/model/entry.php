@@ -1247,13 +1247,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $dynamicAttributes;
 	}
 	
-	public function getMaxCategoriesPerEntry($numberOfPrivacyContext)
+	public function getMaxCategoriesPerEntry($numberOfPrivacyContext = null)
 	{
 		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
 		if (PermissionPeer ::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT,
 		                                       $this -> getPartnerId()))
 		{
-			if ($numberOfPrivacyContext < 2)
+			if (!is_null($numberOfPrivacyContext) && $numberOfPrivacyContext < 2)
 			{
 				$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
 			}
@@ -1286,8 +1286,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$this->trimCategories($newCats);
 		
-		$numberOfPrivacyContext = $newCats[0]->getPrivacyContexts();
-		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry($numberOfPrivacyContext);
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
 		if (count($newCats) > $maxCategoriesPerEntry)
 			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
@@ -1309,8 +1308,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$this->trimCategories($newCats);
 		
-		$numberOfPrivacyContext = $newCats[0]->getPrivacyContexts();
-		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry($numberOfPrivacyContext);
+		$maxCategoriesPerEntry = $this->getMaxCategoriesPerEntry();
 		if (count($newCats) > $maxCategoriesPerEntry)
 			throw new kCoreException("Max number of allowed entries per category was reached", kCoreException::MAX_CATEGORIES_PER_ENTRY, $maxCategoriesPerEntry);
 
