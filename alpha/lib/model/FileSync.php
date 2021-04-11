@@ -251,6 +251,12 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getFullPath ()
 	{
 		$fileRoot = $this->getFileRoot();
+		return $fileRoot . $this->getFilePath();
+	}
+
+	public function getFileRoot()
+	{
+		$fileRoot = parent::getFileRoot();
 
 		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
 		{
@@ -260,9 +266,9 @@ class FileSync extends BaseFileSync implements IBaseObject
 				$fileRoot = $sharedStorageProfile->getStorageBaseDir();
 			}
 		}
-		return $fileRoot . $this->getFilePath();
+		return $fileRoot;
 	}
-	
+
 	public function getFileType()
 	{
 		$fileType = parent::getFileType();
