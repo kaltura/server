@@ -585,6 +585,7 @@ maximumExecutionTime								= 3000
 curlTimeout											= 3000
 scriptPath											= ../plugins/drop_folder/batch/DropFolderContentProcessor/KAsyncDropFolderContentProcessorExe.php
 params.maxTimeBeforeFail 							= 1000000
+params.accuracy                                     = 85%
 
 [KAsyncTransformMetadata : JobHandlerWorker]
 id													= 220
