@@ -958,6 +958,12 @@ class serveFlavorAction extends kalturaAction
 					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
 				}
 			}
+
+			if (method_exists($asset, 'getLabel') && $asset->getLabel())
+			{
+				$sequence['label'] = $asset->getLabel();
+			}
+
 			$sequences[] = $sequence;
 		}
 		return $sequences;
