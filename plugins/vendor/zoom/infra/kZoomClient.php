@@ -89,12 +89,18 @@ class kZoomClient
 		return $this -> callZoom($apiPath);
 	}
 	
-	public function deleteRecordingFile($meetingUUid, $recodingId)
+	protected function resolveMeetingUUId($meetingUUid)
 	{
 		if ($meetingUUid[0] == '/' || strpos($meetingUUid, '//') !== false)
 		{
 			$meetingUUid = urlencode(urlencode($meetingUUid));
 		}
+		return $meetingUUid;
+	}
+	
+	public function deleteRecordingFile($meetingUUid, $recodingId)
+	{
+		$meetingUUid = self::resolveMeetingUUId($meetingUUid);
 		$apiPath = str_replace('@meetingId@', $meetingUUid, self::API_DELETE_RECORDING_FILE);
 		$apiPath = str_replace('@recordingId@', $recodingId, $apiPath);
 		$apiPath .= '?action=trash';
@@ -111,10 +117,7 @@ class kZoomClient
 	
 	public function getMeetingRecordings($meetingUUid)
 	{
-		if ($meetingUUid[0] == '/' || strpos($meetingUUid, '//') !== false)
-		{
-			$meetingUUid = urlencode(urlencode($meetingUUid));
-		}
+		$meetingUUid = self::resolveMeetingUUId($meetingUUid);
 		$apiPath = str_replace('@meetingId@', $meetingUUid, self::API_GET_MEETING_RECORDING);
 		return $this->callZoom($apiPath);
 	}

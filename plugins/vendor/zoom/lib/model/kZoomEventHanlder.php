@@ -112,10 +112,7 @@ class kZoomEventHanlder
 		$recordingFilesOrdered = self::orderRecordingFiles($recording->recordingFiles);
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
-			$firstDFFileOnTimeSlot = true;
-			$isParentEntry = false;
 			$parentEntry = null;
-			$wasParentEntryFound = false;
 			/* @var kZoomRecordingFile $recordingFile*/
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
@@ -129,31 +126,25 @@ class kZoomEventHanlder
 					$kRecordingFile = self::allocateZoomRecordingFile($recordingFile, $event);
 					$zoomDropFolderFile = self::allocateZoomDropFolderFile($dropFolderId, $partnerId, $fileName, $recordingFile->fileSize,
 					                                                      $kMeetingMetaData, $kRecordingFile);
-					if ($firstDFFileOnTimeSlot)
+					if (!$parentEntry)
 					{
-						$firstDFFileOnTimeSlot = false;
 						$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(), $partnerId);
 						if ($parentEntry)
 						{
-							$wasParentEntryFound = true;
+							$zoomDropFolderFile->setIsParentEntry(false);
 						}
 						else
 						{
 							$parentEntry = self::createEntry($recording->uuid, $partnerId);
+							$zoomDropFolderFile->setIsParentEntry(true);
 						}
-					}
-					
-					$zoomDropFolderFile->setParentEntryId($parentEntry->getId());
-					if (!$wasParentEntryFound && !$isParentEntry && $recordingFile->recordingFileType == kRecordingFileType::VIDEO)
-					{
-						$isParentEntry = true;
-						$zoomDropFolderFile->setIsParentEntry(true);
 					}
 					else
 					{
 						$zoomDropFolderFile->setIsParentEntry(false);
 					}
 					
+					$zoomDropFolderFile->setParentEntryId($parentEntry->getId());
 					$zoomDropFolderFile->save();
 					$zoomDropFolderFile->setStatus(DropFolderFileStatus::PENDING);
 					$zoomDropFolderFile->save();
@@ -169,7 +160,7 @@ class kZoomEventHanlder
 	
 	protected static function allocateMeetingMetaData($recording, $event)
 	{
-		$kMeetingMetaData = new kMeetingMetadata();
+		$kMeetingMetaData = new ZoomMeetingMetadata();
 		$kMeetingMetaData->setMeetingId($recording->id);
 		$kMeetingMetaData->setUuid($recording->uuid);
 		$kMeetingMetaData->setTopic($recording->topic);
@@ -182,7 +173,7 @@ class kZoomEventHanlder
 	
 	protected static function allocateZoomRecordingFile($recordingFile, $event)
 	{
-		$kRecordingFile = new kRecordingFile();
+		$kRecordingFile = new ZoomRecordingFile();
 		$kRecordingFile->setId($recordingFile->id);
 		$kRecordingFile->setDownloadUrl($recordingFile->download_url);
 		$kRecordingFile->setFileType($recordingFile->recordingFileType);
@@ -241,18 +232,21 @@ class kZoomEventHanlder
 	
 	protected static function orderRecordingFiles($recordingFiles)
 	{
-		$orderedFiles = array();
 		foreach($recordingFiles as $time => $recordingFileByTimeStamp)
 		{
-			ksort($recordingFileByTimeStamp);
-			foreach ($recordingFileByTimeStamp as $recordingFileByTypes)
+			$filesOrderByRecordingType = array();
+			foreach ($recordingFileByTimeStamp as $recordingFileByType)
 			{
-				foreach ($recordingFileByTypes as $recordingFileByType)
+				foreach ($recordingFileByType as $recordingFile)
 				{
-					$orderedFiles[] = $recordingFileByType;
+					if(!isset($filesOrderByRecordingType[$recordingFile->recordingType]))
+					{
+						$filesOrderByRecordingType[$recordingFile->recordingType] = array();
+					}
+					$filesOrderByRecordingType[$recordingFile->recordingType][] = $recordingFile;
 				}
 			}
-			$recordingFiles[$time] = $orderedFiles;
+			$recordingFiles[$time] = ZoomHelper::sortArrayByValuesArray($filesOrderByRecordingType, ZoomHelper::ORDER_RECORDING_TYPE);
 		}
 		return $recordingFiles;
 	}

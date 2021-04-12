@@ -21,6 +21,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const FILE_SIZE = 'file_size';
 	const FILE_EXTENSION = 'file_extension';
 	const RECORDING_FILE_TYPE = 'file_type';
+	const RECORDING_TYPE = 'recording_type';
 	const NEXT_PAGE_TOKEN = 'next_page_token';
 	const ME = 'me';
 	
@@ -127,14 +128,12 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		foreach ($meetingFiles as $meetingFile)
 		{
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
-			$recordingFilesOrdered = self::orderRecordingFiles($meetingFile[self::RECORDING_FILES]);
-			KalturaLog::debug('recording files are: ' . print_r($recordingFilesOrdered, true));
+			$recordingFilesOrdered = ZoomHelper::orderRecordingFiles($meetingFile[self::RECORDING_FILES], self::RECORDING_START,
+			                                                         self::RECORDING_TYPE);
+			KalturaLog::debug('recording files ordered are: ' . print_r($recordingFilesOrdered, true));
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
-				$firstDFFileOnTimeSlot = true;
-				$isParentEntry = false;
 				$parentEntry = null;
-				$wasParentEntryFound = false;
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
@@ -142,23 +141,18 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 					{
 						if (ZoomHelper::shouldHandleFileType($recordingFile[self::RECORDING_FILE_TYPE]))
 						{
-							if ($firstDFFileOnTimeSlot)
+							if (!$parentEntry)
 							{
-								$firstDFFileOnTimeSlot = false;
 								$parentEntry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
 								if ($parentEntry)
 								{
-									$wasParentEntryFound = true;
+									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 								}
 								else
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID]);
+									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
-							}
-							if (!$wasParentEntryFound && !$isParentEntry && $recordingFile[self::RECORDING_FILE_TYPE] == 'MP4')
-							{
-								$isParentEntry = true;
-								$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 							}
 							else
 							{
@@ -208,48 +202,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		KBatchBase::unimpersonate();
 		return $entry;
 	}
-	
-	protected static function orderRecordingFiles($recordingFiles)
-	{
-		$recordingFilesOrdered = array();
-		foreach($recordingFiles as $recordingFile)
-		{
-			if(!isset($recordingFilesOrdered[$recordingFile[self::RECORDING_START]]))
-			{
-				$recordingFilesOrdered[$recordingFile[self::RECORDING_START]] = array();
-			}
-			$recordingFilesOrdered[$recordingFile[self::RECORDING_START]][] = $recordingFile;
-		}
-		ksort($recordingFilesOrdered);
-		return self::orderRecordingFilesByType($recordingFilesOrdered);
-	}
-	
-	protected static function orderRecordingFilesByType($recordingFilesOrdered)
-	{
-		foreach ($recordingFilesOrdered as $time => $recordingFilesPerTimeSlot)
-		{
-			$filesOrderByType = array();
-			foreach ($recordingFilesPerTimeSlot as $recordingFile)
-			{
-				if(!isset($filesOrderByType[$recordingFile[self::RECORDING_FILE_TYPE]]))
-				{
-					$filesOrderByType[$recordingFile[self::RECORDING_FILE_TYPE]] = array();
-				}
-				$filesOrderByType[$recordingFile[self::RECORDING_FILE_TYPE]][] = $recordingFile;
-			}
-			ksort($filesOrderByType);
-			$byTime = array();
-			foreach ($filesOrderByType as $fileOrderByType)
-			{
-				foreach ($fileOrderByType as $file)
-				{
-					$byTime[] = $file; //flatten the array - removing the key type
-				}
-			}
-			$recordingFilesOrdered[$time] = $byTime;
-		}
-		return $recordingFilesOrdered;
-	}
 
 	protected function updateDropFolderLastMeetingHandled($lastHandledMeetingTime)
 	{
@@ -282,7 +234,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 
 	protected static function allocateMeetingMetaData($meetingFile)
 	{
-		$kMeetingMetaData = new kalturaMeetingMetadata();
+		$kMeetingMetaData = new kalturaZoomMeetingMetadata();
 		$kMeetingMetaData->meetingId = $meetingFile[self::ID];
 		$kMeetingMetaData->uuid = $meetingFile[self::UUID];
 		$kMeetingMetaData->topic = $meetingFile[self::TOPIC];
@@ -297,7 +249,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected static function allocateZoomRecordingFile($recordingFile)
 	{
-		$kRecordingFile = new kalturaRecordingFile();
+		$kRecordingFile = new KalturaZoomRecordingFile();
 		$kRecordingFile->id = $recordingFile[self::ID];
 		$kRecordingFile->downloadUrl = $recordingFile[self::DOWNLOAD_URL];
 		$kRecordingFile->fileExtension = $recordingFile[self::FILE_EXTENSION];
