@@ -64,12 +64,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
 		
-		/* @var KalturaUser $kUser */
-		$kUser = $this->getEntryOwner($hostEmail);
-		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $kUser->id);
+		$userId = $this->getEntryOwnerId($hostEmail);
+		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $userId);
 		if (in_array($recording->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::AUDIO)))
 		{
-			$entry = $this->handleVideoRecord($recording, $kUser, $extraUsers);
+			$entry = $this->handleVideoRecord($recording, $userId, $extraUsers);
 			
 		}
 		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
@@ -83,23 +82,23 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param kalturaZoomDropFolderFile $recording
-	 * @param KalturaUser $owner
+	 * @param string $ownerId
 	 * @param $validatedUsers
 	 * @return KalturaMediaEntry
 	 * @throws PropelException
 	 * @throws kCoreException
 	 * @throws Exception
 	 */
-	protected function handleVideoRecord($recording, $owner, $validatedUsers)
+	protected function handleVideoRecord($recording, $ownerId, $validatedUsers)
 	{
 		/* @var KalturaMediaEntry $entry*/
 		if (!$recording->isParentEntry)
 		{
-			$entry = $this->createEntryFromRecording($recording, $owner);
+			$entry = $this->createEntryFromRecording($recording, $ownerId);
 		}
 		else
 		{
-			$entry = $this->updateParentEntry($recording, $owner);
+			$entry = $this->updateParentEntry($recording, $ownerId);
 		}
 		
 		$updatedEntry = new KalturaMediaEntry();
@@ -156,6 +155,9 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 				case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
 					$entry->entitledUsersView = implode(',', array_unique($validatedUsers));
 					break;
+				case kHandleParticipantsMode::IGNORE:
+				default:
+					break;
 			}
 		}
 	}
@@ -208,11 +210,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param kalturaZoomDropFolderFile $recording
-	 * @param KalturaUser $owner
+	 * @param string $ownerId
 	 * @return entry
 	 * @throws Exception
 	 */
-	protected function createEntryFromRecording($recording, $owner)
+	protected function createEntryFromRecording($recording, $ownerId)
 	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
@@ -226,11 +228,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		$newEntry->description = $this->createEntryDescriptionFromRecording($recording);
 		$newEntry->name = $recording->meetingMetadata->topic;
-		$newEntry->userId = $owner->id;
+		$newEntry->userId = $ownerId;
 		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		$newEntry->adminTags = self::ADMIN_TAG_ZOOM;
 		$newEntry->referenceId = self::ZOOM_PREFIX . $recording->meetingMetadata->uuid;
-		KBatchBase::impersonate($owner->partnerId);
+		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$kalturaEntry = KBatchBase::$kClient->baseEntry->add($newEntry);
 		KBatchBase::unimpersonate();
 		return $kalturaEntry;
@@ -238,19 +240,19 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param kalturaZoomDropFolderFile $recording
-	 * @param KalturaUser $owner
+	 * @param string $ownerId
 	 * @return entry
 	 * @throws Exception
 	 */
-	protected function updateParentEntry($recording, $owner)
+	protected function updateParentEntry($recording, $ownerId)
 	{
 		$updatedEntry = new KalturaMediaEntry();
 		$updatedEntry->description = $this->createEntryDescriptionFromRecording($recording);
 		$updatedEntry->name = $recording->meetingMetadata->topic;
-		$updatedEntry->userId = $owner->id;
+		$updatedEntry->userId = $ownerId;
 		$updatedEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		$updatedEntry->adminTags = self::ADMIN_TAG_ZOOM;
-		KBatchBase::impersonate($owner->partnerId);
+		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$kalturaEntry = KBatchBase::$kClient->baseEntry->update($recording->parentEntryId, $updatedEntry);
 		KBatchBase::unimpersonate();
 		return $kalturaEntry;

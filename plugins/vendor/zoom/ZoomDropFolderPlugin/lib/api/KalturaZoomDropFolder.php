@@ -93,6 +93,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 				$vendorIntegration->getExpiresIn() <= time() +
 				kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
 			{
+				KalturaLog::debug('Token expired for account id: '. $vendorIntegration->getAccountId() . ' renewing with the new tokens');
 				$freshTokens = $zoomClient->refreshTokens();
 				$this->accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
 				$this->refreshToken = $freshTokens[kZoomTokens::REFRESH_TOKEN];
@@ -111,7 +112,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		
 	}
 	
-	private static function getZoomHeaderData()
+	protected static function getZoomHeaderData()
 	{
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];

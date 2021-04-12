@@ -12,6 +12,7 @@ class kZoomRecordingFile implements iZoomObject
 	const RECORDING_START = 'recording_start';
 	const FILE_EXTENSION = 'file_extension';
 	const FILE_SIZE = 'file_size';
+	const RECORDING_TYPE = 'recording_type';
 
 	public $recordingFileType;
 	public $download_url;
@@ -19,6 +20,7 @@ class kZoomRecordingFile implements iZoomObject
 	public $recordingStart;
 	public $fileExtension;
 	public $fileSize;
+	public $recordingType;
 
 	public function parseData($data)
 	{
@@ -27,6 +29,7 @@ class kZoomRecordingFile implements iZoomObject
 		$this->recordingStart = $data[self::RECORDING_START];
 		$this->fileExtension = $data[self::FILE_EXTENSION];
 		$this->fileSize = $data[self::FILE_SIZE];
+		$this->recordingType = $data[self::RECORDING_TYPE];
 		if(isset($data[self::ID]))
 		{
 			$this->id = $data[self::ID];

@@ -11,12 +11,12 @@ class ZoomDropFolderFile extends DropFolderFile
 	const IS_PARENT_ENTRY = 'isParentEntry';
 		
 		/**
-	 * @var kMeetingMetadata
+	 * @var ZoomMeetingMetadata
 	 */
 	protected $meetingMetadata;
 
 	/**
-	 * @var kRecordingFile
+	 * @var ZoomRecordingFile
 	 */
 	protected $recordingFile;
 	
@@ -31,22 +31,22 @@ class ZoomDropFolderFile extends DropFolderFile
 	protected $isParentEntry;
 	
 	/**
-	 * return kMeetingMetadata
+	 * return ZoomMeetingMetadata
 	 */
 	public function getMeetingMetadata() {return $this->getFromCustomData(self::MEETING_METADATA);}
 	
 	/**
-	 * @param kMeetingMetadata $v
+	 * @param ZoomMeetingMetadata $v
 	 */
 	public function setMeetingMetadata ($v){$this->putInCustomData(self::MEETING_METADATA, $v);}
 	
 	/**
-	 * return kRecordingFile
+	 * return ZoomRecordingFile
 	 */
 	public function getRecordingFile() {return $this->getFromCustomData(self::RECORDING_FILE);}
 
 	/**
-	 * @param kRecordingFile $v
+	 * @param ZoomRecordingFile $v
 	 */
 	public function setRecordingFile ($v){$this->putInCustomData(self::RECORDING_FILE, $v);}
 	

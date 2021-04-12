@@ -3,36 +3,49 @@
  * @package plugins.ZoomDropFolder
  * @subpackage api.objects
  */
-class KalturaZoomDropFolderFile extends KalturaDropFolderFile
+class KalturaZoomRecordingFile extends KalturaObject
 {
 	/**
-	 * @var KalturaZoomMeetingMetadata
+	 * @var string
 	 */
-	public $meetingMetadata;
-	
+	public $id;
+
 	/**
-	 * @var KalturaZoomRecordingFile
+	 * @var string
 	 */
-	public $recordingFile;
+	public $recordingStart;
+
+	/**
+	 * @var KalturaRecordingFileType
+	 */
+	public $fileType;
+
+	/**
+	 * @var string
+	 */
+	public $downloadUrl;
 	
 	/**
 	 * @var string
 	 */
-	public $parentEntryId;
+	public $fileExtension;
 	
 	/**
-	 * @var bool
+	 * @var string
 	 */
-	public $isParentEntry;
+	public $downloadToken;
+	
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array(
-		'meetingMetadata',
-		'recordingFile',
-		'parentEntryId',
-		'isParentEntry'
+		'id',
+		'recordingStart',
+		'fileType',
+		'downloadUrl',
+		'fileExtension',
+		'downloadToken'
 	);
 
 	public function getMapBetweenObjects()
@@ -43,7 +56,7 @@ class KalturaZoomDropFolderFile extends KalturaDropFolderFile
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (!$dbObject)
-			$dbObject = new ZoomDropFolderFile();
+			$dbObject = new ZoomRecordingFile();
 
 		return parent::toObject($dbObject, $skip);
 	}
