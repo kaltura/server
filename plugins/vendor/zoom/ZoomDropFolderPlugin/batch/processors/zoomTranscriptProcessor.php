@@ -20,7 +20,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 		if ($this->isTranscriptionAlreadyHandled($entry, $captionPlugin))
 		{
-			KalturaLog::debug("Zoom transcription for entry {$entry->getId()} was already handled");
+			KalturaLog::debug("Zoom transcription for entry {$entry->id} was already handled");
 			return;
 		}
 

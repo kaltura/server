@@ -203,6 +203,7 @@ class kZoomEventHanlder
 	protected static function getEntryByReferenceId($referenceId, $partnerId)
 	{
 		KalturaLog::debug('searching entry');
+		kCurrentContext::$partner_id = $partnerId;
 		$entryFilter = new entryFilter();
 		$entryFilter->setPartnerIdEquel($partnerId);
 		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
