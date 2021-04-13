@@ -263,7 +263,6 @@ abstract class kCaptionsContentManager
 	public function createCaptionsFile($content, $clipStartTime, $clipEndTime, $timeCode, $globalOffset)
 	{
 		$newFileContent = '';
-		$newLineIndex = 1;
 		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($content);
 		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
 		{
@@ -286,10 +285,7 @@ abstract class kCaptionsContentManager
 				$line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray);
 			}
 			if($shouldAddBlockToNewFile)
-			{
-				$currentBlock[0] = $newLineIndex++;
-				$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
-			}
+				$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;;
 		}
 		return $newFileContent;
 	}
