@@ -109,7 +109,7 @@ class kZoomEventHanlder
 		$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
 		
 		$kMeetingMetaData = self::allocateMeetingMetaData($recording, $event);
-		$recordingFilesOrdered = self::orderRecordingFiles($recording->recordingFiles);
+		$recordingFilesOrdered = $recording->orderRecordingFiles($recording->recordingFiles);
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$parentEntry = null;
@@ -167,7 +167,10 @@ class kZoomEventHanlder
 		$kMeetingMetaData->setMeetingStartTime(strtotime(str_replace(array('T','Z'),array(' ',''), $recording->startTime)));
 		$kMeetingMetaData->setAccountId($event->accountId);
 		$kMeetingMetaData->setHostId($recording->hostId);
-		$kMeetingMetaData->setType($recording->recordingType);
+		if (isset($recording->recordingType))
+		{
+			$kMeetingMetaData->setType($recording->recordingType);
+		}
 		return $kMeetingMetaData;
 	}
 	
@@ -199,21 +202,21 @@ class kZoomEventHanlder
 	
 	protected static function getEntryByReferenceId($referenceId, $partnerId)
 	{
-		
+		KalturaLog::debug('searching entry');
 		$entryFilter = new entryFilter();
 		$entryFilter->setPartnerIdEquel($partnerId);
+		$entryFilter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$entryFilter->set('_eq_reference_id', $referenceId);
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$entryFilter->attachToCriteria($c);
 		$pager = new KalturaFilterPager();
 		$pager->attachToCriteria($c);
-		
+		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$entry = entryPeer::doSelectOne($c);
 		if($entry)
 		{
 			KalturaLog::debug('Found entry:' . $entry->getId());
 		}
-		
 		return $entry;
 	}
 	
@@ -230,27 +233,6 @@ class kZoomEventHanlder
 		return $newEntry;
 	}
 	
-	protected static function orderRecordingFiles($recordingFiles)
-	{
-		foreach($recordingFiles as $time => $recordingFileByTimeStamp)
-		{
-			$filesOrderByRecordingType = array();
-			foreach ($recordingFileByTimeStamp as $recordingFileByType)
-			{
-				foreach ($recordingFileByType as $recordingFile)
-				{
-					if(!isset($filesOrderByRecordingType[$recordingFile->recordingType]))
-					{
-						$filesOrderByRecordingType[$recordingFile->recordingType] = array();
-					}
-					$filesOrderByRecordingType[$recordingFile->recordingType][] = $recordingFile;
-				}
-			}
-			$recordingFiles[$time] = ZoomHelper::sortArrayByValuesArray($filesOrderByRecordingType, ZoomHelper::ORDER_RECORDING_TYPE);
-		}
-		return $recordingFiles;
-	}
-	
 	protected static function loadDropFolderFiles($dropFolderId)
 	{
 		$statuses = array(KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED);
@@ -259,7 +241,7 @@ class kZoomEventHanlder
 		$dropFolderFilesMap = array();
 		foreach ($dropFolderFiles as $dropFolderFile)
 		{
-			$dropFolderFilesMap[$dropFolderFile->fileName] = $dropFolderFile;
+			$dropFolderFilesMap[$dropFolderFile->getFileName()] = $dropFolderFile;
 		}
 		return $dropFolderFilesMap;
 	}
