@@ -150,7 +150,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								}
 								else
 								{
-									$parentEntry = $this->createEntry($meetingFile[self::UUID]);
+									$parentEntry = $this->createEntry($meetingFile[self::UUID], $this->dropFolder->zoomVendorIntegration->enableZoomTranscription);
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -191,12 +191,13 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return null;
 	}
 	
-	protected function createEntry($uuid)
+	protected function createEntry($uuid, $enableTranscriptionViaZoom)
 	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
 		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid;
+		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
 		KBatchBase::unimpersonate();
