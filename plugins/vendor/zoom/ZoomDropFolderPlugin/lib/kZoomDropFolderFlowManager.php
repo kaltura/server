@@ -47,6 +47,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 				}
 			}
 		}
+		return true;
 	}
 	
 	/**
@@ -58,7 +59,8 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		{
 			return true;
 		}
-		if ( self::hasRefreshTokenChanged($object, $modifiedColumns)){
+		if ( self::hasRefreshTokenChanged($object, $modifiedColumns))
+		{
 			return true;
 		}
 		return false;
@@ -66,38 +68,29 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	
 	public static function wasStatusChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ( ($object instanceof ZoomVendorIntegration)
-			&& in_array('vendor_integration.STATUS', $modifiedColumns) )
-		{
-			return true;
-		}
-		return false;
+		return ($object instanceof ZoomVendorIntegration) && in_array('vendor_integration.STATUS', $modifiedColumns);
 	}
 	
 	public static function hasRefreshTokenChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ( ($object instanceof ZoomVendorIntegration)
+		return ($object instanceof ZoomVendorIntegration)
 			&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
-			&& $object->isColumnModified('refreshToken'))
-		{
-			return true;
-		}
-		return false;
+			&& $object->isColumnModified('refreshToken');
 	}
 	
 	private static function getDropFolderStatus($v)
 	{
 		switch ($v)
 		{
-			case 1:
+			case VendorStatus::DISABLED:
 			{
 				return DropFolderStatus::DISABLED;
 			}
-			case 2:
+			case VendorStatus::ACTIVE:
 			{
 				return DropFolderStatus::ENABLED;
 			}
-			case 3:
+			case VendorStatus::DELETED:
 			{
 				return DropFolderStatus::DELETED;
 			}
@@ -136,7 +129,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		$newZoomDropFolder->setFileHandlerConfig($fileHandler);
 		$newZoomDropFolder->setDc(kDataCenterMgr::getCurrentDcId());
 		$newZoomDropFolder->setPath(0);
-		$newZoomDropFolder->setFileSizeCheckInterval(30);
+		$newZoomDropFolder->setFileSizeCheckInterval(0);
 		$newZoomDropFolder->setAutoFileDeleteDays(DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE);
 		$newZoomDropFolder->setFileDeletePolicy($zoomVendorIntegrationObject->getDeletionPolicy());
 		$newZoomDropFolder->setLastFileTimestamp(0);

@@ -34,7 +34,7 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 		$panelistsEmails = $panelists->getPanelistsEmails();
 		if($panelistsEmails)
 		{
-			KalturaLog::debug('Found the following panelists: ' . implode(", ", $panelistsEmails));
+			KalturaLog::debug('Found the following panelists: ' . implode(', ', $panelistsEmails));
 			$result = array();
 			foreach ($panelistsEmails as $panelistEmail)
 			{

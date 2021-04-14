@@ -6,7 +6,7 @@
  * @subpackage model
  *
  */
-class kMeetingMetadata
+class ZoomMeetingMetadata
 {
 	/**
 	 * @var string

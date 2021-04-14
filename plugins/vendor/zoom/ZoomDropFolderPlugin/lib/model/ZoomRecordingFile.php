@@ -6,7 +6,7 @@
  * @subpackage model
  *
  */
-class kRecordingFile
+class ZoomRecordingFile
 {
 	/**
 	 * @var string

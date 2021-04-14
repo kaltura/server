@@ -93,4 +93,25 @@ class kZoomRecording implements iZoomObject
 				$this->recordingType = kRecordingType::MEETING;
 		}
 	}
+	
+	public function orderRecordingFiles($recordingFiles)
+	{
+		foreach($recordingFiles as $time => $recordingFileByTimeStamp)
+		{
+			$filesOrderByRecordingType = array();
+			foreach ($recordingFileByTimeStamp as $recordingFileByType)
+			{
+				foreach ($recordingFileByType as $recordingFile)
+				{
+					if(!isset($filesOrderByRecordingType[$recordingFile->recordingType]))
+					{
+						$filesOrderByRecordingType[$recordingFile->recordingType] = array();
+					}
+					$filesOrderByRecordingType[$recordingFile->recordingType][] = $recordingFile;
+				}
+			}
+			$recordingFiles[$time] = ZoomHelper::sortArrayByValuesArray($filesOrderByRecordingType, ZoomHelper::ORDER_RECORDING_TYPE);
+		}
+		return $recordingFiles;
+	}
 }

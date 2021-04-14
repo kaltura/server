@@ -3,68 +3,61 @@
  * @package plugins.ZoomDropFolder
  * @subpackage api.objects
  */
-
-class KalturaMeetingMetadata extends KalturaObject
+class KalturaZoomRecordingFile extends KalturaObject
 {
 	/**
 	 * @var string
 	 */
-	public $uuid;
+	public $id;
+
+	/**
+	 * @var string
+	 */
+	public $recordingStart;
+
+	/**
+	 * @var KalturaRecordingFileType
+	 */
+	public $fileType;
+
+	/**
+	 * @var string
+	 */
+	public $downloadUrl;
 	
 	/**
 	 * @var string
 	 */
-	public $meetingId;
+	public $fileExtension;
 	
 	/**
 	 * @var string
 	 */
-	public $accountId;
+	public $downloadToken;
 	
-	/**
-	 * @var string
-	 */
-	public $hostId;
-	
-	/**
-	 * @var string
-	 */
-	public $topic;
-	
-	/**
-	 * @var string
-	 */
-	public $meetingStartTime;
-	
-	/**
-	 * @var KalturaRecordingType
-	 */
-	public $type;
-	
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array(
-		'uuid',
-		'meetingId',
-		'accountId',
-		'hostId',
-		'topic',
-		'meetingStartTime',
-		'type'
+		'id',
+		'recordingStart',
+		'fileType',
+		'downloadUrl',
+		'fileExtension',
+		'downloadToken'
 	);
-	
+
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (!$dbObject)
-			$dbObject = new kMeetingMetadata();
-		
+			$dbObject = new ZoomRecordingFile();
+
 		return parent::toObject($dbObject, $skip);
 	}
-	
 }

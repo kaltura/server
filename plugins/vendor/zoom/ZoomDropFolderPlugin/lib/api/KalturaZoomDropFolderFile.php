@@ -6,12 +6,12 @@
 class KalturaZoomDropFolderFile extends KalturaDropFolderFile
 {
 	/**
-	 * @var KalturaMeetingMetadata
+	 * @var KalturaZoomMeetingMetadata
 	 */
 	public $meetingMetadata;
 	
 	/**
-	 * @var KalturaRecordingFile
+	 * @var KalturaZoomRecordingFile
 	 */
 	public $recordingFile;
 	
