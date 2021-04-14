@@ -106,7 +106,7 @@ class KAsyncImport extends KJobHandlerWorker
 			return $this->fetchFileSsh($job, $data);
 		}
 
-		if (kfile::isSharedPath($data->srcFileUrl))
+		if ($jobSubType == kFileTransferMgrType::ARCHIVED && kFile::isSharedPath($data->srcFileUrl))
 		{
 			return $this->handleSharedPathImport($job, $data);
 		}
@@ -596,6 +596,7 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		else
 		{
+			kFile::handleRestoreDone($data->srcFileUrl);
 			$this->closeJob($job, null, null, 'Successfully done', KalturaBatchJobStatus::FINISHED, $data);
 			return $job;
 		}

@@ -220,19 +220,17 @@ class kFlowHelper
 			$flavorAsset->setHeight($height);
 			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
 		}
-		$flavorAsset->save();
-		
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
 		{
-			if(kFile::isSharedPath($data->getSrcFileUrl()))
+			if(kFile::isSharedPath($data->getSrcFileUrl()) && $dbBatchJob->getJobSubType() == kFileTransferMgrType::ARCHIVED)
 			{
 				$sharedArchivedDc = kConf::get('shared_archive_dc' ,'cloud_storage', null );
 				if(!$sharedArchivedDc)
 				{
-					KalturaLog::err("Shared Archive dc Not found in configureation");
+					KalturaLog::err("Shared Archive dc Not found in configuration");
 					throw new Exception ("Shared Archive dc Not found in configureation");
 				}
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, $sharedArchivedDc);
@@ -242,6 +240,7 @@ class kFlowHelper
 					$fileSync->setFileType(fileSync::FILE_SYNC_FILE_TYPE_FILE);
 					$fileSync->save();
 				}
+				$flavorAsset->removeTags(array('archived'));
 			}
 			else
 			{
@@ -266,7 +265,7 @@ class kFlowHelper
 			$data->setDestFileLocalPath($localFilePath);
 			$dbBatchJob->setData($data);
 		}
-
+		$flavorAsset->save();
 		
 		$data->setFlavorAssetId($flavorAsset->getId());
 		$dbBatchJob->save();

@@ -739,22 +739,26 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doHandleRestoreDone($filePath)
 	{
 		$res = $this->getHeadObjectForPath($filePath);
-		if (!$res || !in_array($res->get('StorageClass'), array("GLACIER", "DEEP_ARCHIVE")))
+		if (!$res)
 		{
-			return true;
+			return false;
 		}
-		KalturaLog::debug("Copying restored file $filePath from S3 Glacier to intelligent-teir storage class");
-		$params = $this->initBasicS3Params($filePath);
-		$params['CopySource'] = $filePath;
-		$params['Metadata'] = array('force-glacier-transfer' => 1);
-		$params['StorageClass'] = 'INTELLIGENT_TIERING';
-		$response = $this->s3Call('copyObject', $params);
-		if($response)
+
+		if (in_array($res->get('StorageClass'), array("GLACIER", "DEEP_ARCHIVE")))
 		{
-			KalturaLog::debug("Copy from S3 Glacier to intelligent-teir storage classf for $filePath finished succesfully");
-			return true;
+			KalturaLog::debug("Copying restored file $filePath from S3 Glacier to intelligent-teir storage class");
+			$params = $this->initBasicS3Params($filePath);
+			$params['CopySource'] = $filePath;
+			$params['Metadata'] = array('force-glacier-transfer' => 1);
+			$params['StorageClass'] = 'INTELLIGENT_TIERING';
+			$response = $this->s3Call('copyObject', $params);
+			if ($response)
+			{
+				KalturaLog::debug("Copy from S3 Glacier to intelligent-teir storage classf for $filePath finished succesfully");
+			}
 		}
-		return false;
+		//todo add remove the archive tag for s3 object
+		return true;
 	}
 
 	protected function doDumpFilePart($filePath, $range_from, $range_length)

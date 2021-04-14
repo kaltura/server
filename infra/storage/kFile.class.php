@@ -17,7 +17,6 @@ class kFile extends kFileBase
 	const ARHCHIVE_FILE_RESTORE_IN_PROGRESS = 1;
 	const ARHCHIVE_FILE_RESTORE_DONE = 2;
 	const ARHCHIVE_FILE_RESTORE_UNKOWN = 3;
-	
 	/**
 	 * Returns directory $path contents as an array of :
 	 *  array[0] = name
