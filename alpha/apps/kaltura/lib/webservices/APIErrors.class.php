@@ -329,6 +329,25 @@ class APIErrors
 	// FLAV_ASSET_ID - flavor asset id
 	const INVALID_FLAVOR_ASSET_ID = "INVALID_FLAVOR_ASSET_ID;FLAV_ASSET_ID; Invalid flavor asset id @FLAV_ASSET_ID@";
 
+	// FLAV_ASSET_ID - flavor asset id
+	const FLVAOR_IS_NOT_ARCHIVED = "FLVAOR_IS_NOT_ARCHIVED;FLAV_ASSET_ID; Flavor asset id @FLAV_ASSET_ID@ is not archived";
+
+	// FLAV_ASSET_ID - flavor asset id
+	const FLVAOR_ALREADY_ARCHIVED = "FLVAOR_ALREADY_ARCHIVED;FLAV_ASSET_ID; Flavor asset id @FLAV_ASSET_ID@ is already archived";
+
+	// FLAV_ASSET_ID - flavor asset id
+	const ARCHIVED_FILE_SYNC_IS_NOT_IN_SHARED_DC = "ARCHIVED_FILE_SYNC_IS_NOT_IN_SHARED_DC;FLAV_ASSET_ID; Flavor asset id @FLAV_ASSET_ID@ is not is not in shared dc";
+
+	// ARCHIVE_STORAGE_DC_UNDEFINED
+	const ARCHIVE_STORAGE_DC_UNDEFINED = "ARCHIVE_STORAGE_DC_UNDEFINED;; archive_storage_dc param is undefined. Please modify configuration";
+
+	// ARCHIVED_FILE_SYNC_NOT_FOUND
+	const ARCHIVED_FILE_SYNC_NOT_FOUND = "ARCHIVED_FILE_SYNC_NOT_FOUND;FLAV_ASSET_ID; archived file sync not found for flavor @FLAV_ASSET_ID@ ";
+
+	// ARCHIVED_FILE_SYNC_NOT_FOUND
+	const FILE_SYNC_FOR_ARCHIVING_FLAVOR_NOT_FOUND = "FILE_SYNC_NOT_FOUND;FLAV_ASSET_ID; file sync for archiving not found fro flavor @FLAV_ASSET_ID@";
+
+
 	// THUMB_ASSET_ID - thumb asset id
 	const INVALID_THUMB_ASSET_ID = "INVALID_THUMB_ASSET_ID;THUMB_ASSET_ID;Invalid thumbnail asset id @THUMB_ASSET_ID@";
 

@@ -13,7 +13,10 @@ class kFile extends kFileBase
 	
 	const COPY_FAILED_CODE = "COPY_FAILED";
 	const RENAME_FAILED_CODE = "RENAME_FAILED";
-	
+
+	const ARHCHIVE_FILE_RESTORE_IN_PROGRESS = 1;
+	const ARHCHIVE_FILE_RESTORE_DONE = 2;
+	const ARHCHIVE_FILE_RESTORE_UNKOWN = 3;
 	/**
 	 * Returns directory $path contents as an array of :
 	 *  array[0] = name
@@ -281,8 +284,31 @@ class kFile extends kFileBase
 		}
 		return true;
 	}
-	
-	
+
+	public static function isArchived($filePath)
+	{
+		$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+		return $kSharedFsMgr->isArchived($filePath);
+	}
+
+	public static function initiateRestoreFromArchive($filePath)
+	{
+		$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+		return $kSharedFsMgr->initiateRestoreFromArchive($filePath);
+	}
+
+	public static function getRestoreFromArchiveStatus($filePath)
+	{
+		$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+		return $kSharedFsMgr->getRestoreFromArchiveStatus($filePath);
+	}
+
+	public static function handleRestoreDone($filePath)
+	{
+		$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($filePath);
+		return $kSharedFsMgr->handleRestoreDone($filePath);
+	}
+
 	public static function copySingleFile($src, $dest, $deleteSrc)
 	{
 		if (kFile::isSharedPath($dest))
