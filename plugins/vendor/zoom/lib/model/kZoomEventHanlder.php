@@ -51,7 +51,8 @@ class kZoomEventHanlder
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
 				if ($zoomDropFolderId)
 				{
-					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId());
+					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(),
+					                               $zoomVendorIntegration->getEnableZoomTranscription());
 				}
 				else
 				{
@@ -73,7 +74,7 @@ class kZoomEventHanlder
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
 				if ($zoomDropFolderId)
 				{
-					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId());
+					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration->getEnableZoomTranscription());
 				}
 				else
 				{
@@ -101,7 +102,7 @@ class kZoomEventHanlder
 		return null;
 	}
 	
-	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId)
+	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, $enableZoomTranscription)
 	{
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
@@ -135,7 +136,7 @@ class kZoomEventHanlder
 						}
 						else
 						{
-							$parentEntry = self::createEntry($recording->uuid, $partnerId);
+							$parentEntry = self::createEntry($recording->uuid, $partnerId, $enableZoomTranscription);
 							$zoomDropFolderFile->setIsParentEntry(true);
 						}
 					}
@@ -221,7 +222,7 @@ class kZoomEventHanlder
 		return $entry;
 	}
 	
-	protected static function createEntry($uuid, $partnerId)
+	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom)
 	{
 		$newEntry = new entry();
 		$newEntry->setType(entryType::MEDIA_CLIP);
@@ -230,6 +231,7 @@ class kZoomEventHanlder
 		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid);
 		$newEntry->setStatus(entryStatus::NO_CONTENT);
 		$newEntry->setPartnerId($partnerId);
+		$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);
 		$newEntry->save();
 		return $newEntry;
 	}
