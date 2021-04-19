@@ -1853,7 +1853,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setSourceVersion( $v ) {	$this->putInCustomData ( "sourceVersion" , $v);	}
 	public function getSourceVersion() 	{	return $this->getFromCustomData( "sourceVersion", null, null);	}
-
+	
+	public function setBlockAutoTranscript($v)  {$this->putInCustomData('blockAutoTranscript', $v);}
+	public function getBlockAutoTranscript()    {return $this->getFromCustomData('blockAutoTranscript', null, false);}
+	
+	
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())

@@ -14,6 +14,7 @@ class kZoomRecording implements iZoomObject
 	const OBJECT = 'object';
 	const START_TIME = 'start_time';
 	const TYPE = 'type';
+	const HOST_ID = 'host_id';
 
 	public $id;
 	public $uuid;
@@ -21,6 +22,7 @@ class kZoomRecording implements iZoomObject
 	public $hostEmail;
 	public $recordingFiles;
 	public $startTime;
+	public $hostId;
 
 	/**
 	 * @var kRecordingType
@@ -30,6 +32,7 @@ class kZoomRecording implements iZoomObject
 	public function parseData($data)
 	{
 		$this->hostEmail = $data[self::HOST_EMAIL];
+		$this->hostId = $data[self::HOST_ID];
 		$this->id = $data[self::RECORDING_ID];
 		$this->uuid = $data[self::RECORDING_UUID];
 		$this->topic = $data[self::TOPIC];
@@ -59,7 +62,7 @@ class kZoomRecording implements iZoomObject
 		}
 	}
 
-	protected function parseType($recordingType)
+	public function parseType($recordingType)
 	{
 		/*
 		 * If the recording is of a meeting, the type can be one of the following Meeting types:
@@ -89,5 +92,26 @@ class kZoomRecording implements iZoomObject
 			default:
 				$this->recordingType = kRecordingType::MEETING;
 		}
+	}
+	
+	public function orderRecordingFiles($recordingFiles)
+	{
+		foreach($recordingFiles as $time => $recordingFileByTimeStamp)
+		{
+			$filesOrderByRecordingType = array();
+			foreach ($recordingFileByTimeStamp as $recordingFileByType)
+			{
+				foreach ($recordingFileByType as $recordingFile)
+				{
+					if(!isset($filesOrderByRecordingType[$recordingFile->recordingType]))
+					{
+						$filesOrderByRecordingType[$recordingFile->recordingType] = array();
+					}
+					$filesOrderByRecordingType[$recordingFile->recordingType][] = $recordingFile;
+				}
+			}
+			$recordingFiles[$time] = ZoomHelper::sortArrayByValuesArray($filesOrderByRecordingType, ZoomHelper::ORDER_RECORDING_TYPE);
+		}
+		return $recordingFiles;
 	}
 }
