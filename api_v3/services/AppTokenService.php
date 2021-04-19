@@ -161,6 +161,7 @@ class AppTokenService extends KalturaBaseService
 	 * @param string $sessionPrivileges session privileges, will be ignored if a similar privilege is already defined on the application token or the privilege is server reserved
 	 * @throws KalturaErrors::APP_TOKEN_ID_NOT_FOUND
 	 * @return KalturaSessionInfo
+	 * @ksIgnored
 	 */
 	function startSessionAction($id, $tokenHash, $userId = null, $type = null, $expiry = null, $sessionPrivileges = null)
 	{

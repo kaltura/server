@@ -368,8 +368,13 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		header("Etag: " . $this->getOutputHash($content));
-		// always set cross orgin headers:
+
+		// always set cross origin headers:
 		header("Access-Control-Allow-Origin: *");
+
+		// prevent indexing of direct player urls
+		header('X-Robots-Tag: noindex');
+
 		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
 	}
 

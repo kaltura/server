@@ -3867,6 +3867,16 @@ return array (
                     'location' => 'header',
                     'sentAs' => 'x-amz-request-id',
                 ),
+                'StorageClass' => array(
+                    'type' => 'string',
+                    'location' => 'header',
+                    'sentAs' => 'x-amz-storage-class',
+                ),
+                'ArchiveStatus' => array(
+                    'type' => 'string',
+                    'location' => 'header',
+                    'sentAs' => 'x-amz-archive-status',
+                ),
             ),
         ),
         'ListBucketsOutput' => array(
