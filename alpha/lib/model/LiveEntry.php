@@ -630,6 +630,11 @@ abstract class LiveEntry extends entry
 		//caching to reduce multiple access to db
 		if(is_null($this->currentEvent))
 		{
+			
+			//get All events that relate to this entry
+			//
+			
+			
 			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
 			$this -> currentEvent ? $this -> currentEvent : false;
 		}

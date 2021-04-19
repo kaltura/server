@@ -181,6 +181,20 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		if(!($dbObject instanceof LiveStreamEntry))
 			return;
 
+		//load all events that affects this  type of object
+		// execute all decorators
+		
+		// current time
+		
+		// optimization - only if there are capabilties on the live entry
+		
+		//1. challage - place the call of the peer
+		//2. Only if there are capabilties
+		
+		$events = ScheduleEventPeer::retrieveByTemplateEntryIdAndTime($dbObject->getId);
+		$events = $dbObject->getCurrentEvent();
+		$events->decoratorExecute($dbObject);
+		
 		/**
 		 * @var LiveStreamEntry @dbObject
 		 */

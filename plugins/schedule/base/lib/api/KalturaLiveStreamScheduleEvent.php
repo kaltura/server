@@ -3,8 +3,14 @@
  * @package plugins.schedule
  * @subpackage api.objects
  */
-class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
+class KalturaLiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 {
+	/**
+	 * The entry ID of the source entry (for simulive)
+	 * @var string
+	 */
+	public $sourceEntryId;
+	
 	/**
 	 * Defines the expected audience.
 	 * @var int
@@ -24,7 +30,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 */
 	public $postEndTime;
 	
-
+	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
 	 */
@@ -43,6 +49,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 */
 	private static $map_between_objects = array
 	(
+		'sourceEntryId',
 		'projectedAudience',
 		'preStartTime',
 		'postEndTime',
@@ -95,6 +102,10 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		if (isset($this->postEndTime) && $this->postEndTime < 0)
 		{
 		    throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'postEndTime');
+		}
+		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
 		}
 	}
 }

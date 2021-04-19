@@ -6,11 +6,6 @@
  */
 abstract class KalturaBaseLiveScheduleEvent extends KalturaEntryScheduleEvent
 {
-	/**
-	 * The entry ID of the source entry (for simulive)
-	 * @var string
-	 */
-	public $sourceEntryId;
 	
 	/*
 	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -52,9 +47,5 @@ abstract class KalturaBaseLiveScheduleEvent extends KalturaEntryScheduleEvent
 	 */
 	protected function validateLiveStreamEventFields()
 	{
-		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
-		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
-		}
 	}
 }

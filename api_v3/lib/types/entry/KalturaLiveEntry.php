@@ -208,6 +208,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		if(!($dbObject instanceof LiveEntry))
 			return;
 			
+		//
+		
+		
 		parent::doFromObject($dbObject, $responseProfile);
 
 		if($this->shouldGet('recordingOptions', $responseProfile) && !is_null($dbObject->getRecordingOptions()))
@@ -216,9 +219,13 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 			$this->recordingOptions->fromObject($dbObject->getRecordingOptions());
 		}
 
-		if ($dbObject->isPlayable())
+		//if its live - set cache expiry
+		if($this->viewMode == KalturaViewMode::ALLOW_ALL
+			&& in_array($this->liveStatus, array(KalturaEntryServerNodeStatus::PLAYABLE,
+												 KalturaEntryServerNodeStatus::BROADCASTING,
+												 KalturaEntryServerNodeStatus::AUTHENTICATED)))
 		{
-			kApiCache::setExpiry( kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY );
+			kApiCache ::setExpiry(kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY);
 		}
 	}
 
