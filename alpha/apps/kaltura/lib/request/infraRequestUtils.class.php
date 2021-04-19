@@ -444,7 +444,24 @@ class infraRequestUtils
 		}
 		return $result;
 	}
-	
+
+	public static function getUrlHost()
+	{
+		$requestParams = self::getRequestParams();
+		if(!array_key_exists('referrer', $requestParams))
+		{
+			return null;
+		}
+
+		$referrer = base64_decode($requestParams['referrer']);
+		if(!is_string($referrer))
+		{
+			return null;
+		}
+
+		return self::parseUrlHost($referrer);
+	}
+
 	public static function buildRequestParams(array $parameters)
 	{
 		$pieces = array();

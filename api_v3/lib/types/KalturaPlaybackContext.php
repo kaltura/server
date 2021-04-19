@@ -33,7 +33,7 @@ class KalturaPlaybackContext extends KalturaObject{
 	public $messages;
 
 	/**
-	* @var KalturaTypedArray
+	* @var KalturaObjectArray
 	*/
 	public $bumperData;
 

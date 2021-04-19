@@ -89,7 +89,15 @@ abstract class kManifestRenderer
 	{
 		return array();
 	}
-	
+
+	/**
+	 * @return string
+	 */
+	protected function getAccessControlAllowOriginDomains()
+	{
+		return '*';
+	}
+
 	/**
 	 * @return string
 	 */
@@ -306,7 +314,7 @@ abstract class kManifestRenderer
 		$this->applyDomainPrefix();
 	
 		$headers = $this->getHeaders();
-		$headers[] = 'Access-Control-Allow-Origin:*';
+		$headers[] = 'Access-Control-Allow-Origin:' . $this->getAccessControlAllowOriginDomains();
 		$headers[] = 'Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range';
 		$headers[] = 'Timing-Allow-Origin:*';
 		foreach ($headers as $header)
@@ -902,6 +910,11 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	 */
 	protected $closedCaptions = array();
 
+	/**
+	 * @var string
+	 */
+	protected $accessControlAllowOriginDomains = '*';
+
 	function __construct($flavors, $entryId = null, $baseUrl = '') 
 	{
 		parent::__construct($flavors, $entryId, $baseUrl);
@@ -915,6 +928,27 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		$this->setClosedCaptions();
+		$this->setAccessControlAllowOriginDomain();
+	}
+
+	protected function setAccessControlAllowOriginDomain()
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $dbEntry->getPartnerId()))
+		{
+			return;
+		}
+
+		$host = infraRequestUtils::getUrlHost();
+		if($host)
+		{
+			$this->accessControlAllowOriginDomains = $host;
+		}
+	}
+
+	protected function getAccessControlAllowOriginDomains()
+	{
+		return $this->accessControlAllowOriginDomains;
 	}
 
 	protected function setClosedCaptions()

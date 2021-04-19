@@ -10,7 +10,6 @@ Add ZoomDropFolder to your plugins.ini
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
 
-
 # Quasar-17.0.0 #
 ## Version Highlight ##
 ### Features ###
