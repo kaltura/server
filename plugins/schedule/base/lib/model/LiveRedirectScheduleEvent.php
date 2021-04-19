@@ -3,8 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
-	ILiveStreamScheduleEvent
+class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
 {
 	const REDIRECT_ENTRY_ID = 'redirect_entry_id';
 	
@@ -17,11 +16,14 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 		$this->putInCustomData(self::REDIRECT_ENTRY_ID,$v);
 	}
 
-	public function decoratorExecute (LiveEntry $e)
+	public function decoratorExecute ($entry)
 	{
-		$e -> setRedirectEntryId($this -> getRedirectEntryId());
-		$e -> setRecordedEntryId($this -> getRedirectEntryId());
-		return EntryServerNodeStatus::STOPPED;
+		if($entry instanceof LiveEntry)
+		{
+			$entry -> setRedirectEntryId($this -> getRedirectEntryId());
+			$entry -> setRecordedEntryId($this -> getRedirectEntryId());
+			return EntryServerNodeStatus::STOPPED;
+		}
 	}
 	
 	/* (non-PHPdoc)

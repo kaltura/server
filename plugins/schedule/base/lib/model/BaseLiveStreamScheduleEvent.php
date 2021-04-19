@@ -4,8 +4,6 @@
  * @subpackage model
  */
 abstract class BaseLiveStreamScheduleEvent extends EntryScheduleEvent
-	implements
-	ILiveStreamScheduleEvent
 {
 	const SOURCE_ENTRY_ID = 'source_entry_id';
 	

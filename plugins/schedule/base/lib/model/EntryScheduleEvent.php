@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-abstract class EntryScheduleEvent extends ScheduleEvent
+abstract class EntryScheduleEvent extends ScheduleEvent implements ILiveStreamScheduleEvent
 {
 	const CUSTOM_DATA_FIELD_TEMPLATE_ENTRY_ID = 'template_entry_id';
 	const CUSTOM_DATA_FIELD_ENTRY_IDS = 'entry_ids';
@@ -119,5 +119,10 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 			+ $duration);
 
 		return $events;
+	}
+	
+	public function decoratorExecute ($entry)
+	{
+		//do nothing.
 	}
 }

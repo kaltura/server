@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILiveStreamScheduleEvent
+class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 {
 	const PROJECTED_AUDIENCE = 'projected_audience';
 	const PRE_START_TIME = 'pre_start_time';
@@ -67,9 +67,12 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		return parent::getCalculatedEndTime() + $this->getPostEndTime();
 	}
 	
-	public function decoratorExecute (LiveEntry $e)
+	public function decoratorExecute ($entry)
 	{
-		return EntryServerNodeStatus::PLAYABLE;
+		if($entry instanceof LiveEntry)
+		{
+			return EntryServerNodeStatus::PLAYABLE;
+		}
 	}
 	
 	/* (non-PHPdoc)

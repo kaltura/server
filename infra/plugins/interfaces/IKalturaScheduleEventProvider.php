@@ -15,4 +15,11 @@ interface IKalturaScheduleEventProvider extends IKalturaBase
 	 * @return array<IScheduleEvent>
 	 */
 	public function getScheduleEvents($entryId, $types, $startTime, $endTime);
+	
+	/**
+	 * @param string $entryId
+	 * @return ScheduleEvent
+	 */
+	public function getCurrentEvent($entryId);
+
 }

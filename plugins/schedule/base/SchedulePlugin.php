@@ -113,4 +113,16 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		}
 		return $events;
 	}
+	
+	/**
+	 * @param string $entryId
+	 * @return ScheduleEvent
+	 */
+	public function getCurrentEvent($entryId)
+	{
+		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTime($entryId);
+		$scheduleEvents = is_array($scheduleEvents) ? reset($scheduleEvents) : array();
+		return $scheduleEvents;
+	}
+	
 }
