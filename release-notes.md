@@ -1,3 +1,40 @@
+# Quasar-17.1.0 #
+## Zoom as a polling engine ##
+- Issue Type: Task
+- Issue ID: PLAT-22641
+
+#### Configuration ####
+Add ZoomDropFolder to your plugins.ini
+
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
+
+
+# Quasar-17.0.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22719 - Add 'Restrict Access Control Allow Origin Domains' under partner configuration,
+        to allow only the requested site in the response header 'access-control-allow-origin',
+        for M3U8 PlayManifest request.
+
+### Bug fix ###
+
+## Restrict Access Control Allow Origin Domains ##
+- Issue Type: Task
+- Issue ID: PLAT-22719
+
+#### Configuration ####
+- Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.restrictOriginDomains.enabled = true
+    moduls.restrictOriginDomains.permissionType = 2
+    moduls.restrictOriginDomains.label = Restrict Access Control Allow Origin Domains
+    moduls.restrictOriginDomains.permissionName = FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS
+    moduls.restrictOriginDomains.basePermissionType =
+    moduls.restrictOriginDomains.basePermissionName =
+    moduls.restrictOriginDomains.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Propus-16.20.0  #
 
 ## Version Highlight ##
