@@ -180,20 +180,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	{
 		if(!($dbObject instanceof LiveStreamEntry))
 			return;
-		
-		if($dbObject->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
-		{
-			$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
-			foreach ($pluginInstances as $instance)
-			{
-				/* @var $instance IKalturaScheduleEventProvider */
-				$pluginEvent = $instance -> getCurrentEvent($this -> getId());
-				if ($pluginEvent)
-				{
-					$pluginEvent -> decoratorExecute($dbObject);
-				}
-			}
-		}
 		/**
 		 * @var LiveStreamEntry @dbObject
 		 */

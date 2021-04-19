@@ -15,14 +15,14 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		$this->putInCustomData(self::REDIRECT_ENTRY_ID,$v);
 	}
-
-	public function decoratorExecute ($entry)
+	
+	public function decoratorExecute($targetObject,$sourceObject)
 	{
-		if($entry instanceof LiveEntry)
+		if($sourceObject instanceof LiveEntry)
 		{
-			$entry -> setRedirectEntryId($this -> getRedirectEntryId());
-			$entry -> setRecordedEntryId($this -> getRedirectEntryId());
-			return EntryServerNodeStatus::STOPPED;
+			$targetObject->redirectEntryId=$this->getRedirectEntryId();
+			$targetObject->recordedEntryId=$this->getRedirectEntryId();
+			$targetObject->liveStatus = EntryServerNodeStatus::STOPPED;
 		}
 	}
 	

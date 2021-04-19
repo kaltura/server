@@ -67,17 +67,18 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		return parent::getCalculatedEndTime() + $this->getPostEndTime();
 	}
 	
-	public function decoratorExecute ($entry)
+	
+	public function decoratorExecute($targetObject,$sourceObject)
 	{
-		if($entry instanceof LiveEntry)
+		if($sourceObject instanceof LiveEntry)
 		{
-			return EntryServerNodeStatus::PLAYABLE;
+			$targetObject->liveStatus = EntryServerNodeStatus::PLAYABLE;
 		}
 	}
 	
 	/* (non-PHPdoc)
- * @see ScheduleEvent::applyDefaultValues()
- */
+	 * @see ScheduleEvent::applyDefaultValues()
+	 */
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
