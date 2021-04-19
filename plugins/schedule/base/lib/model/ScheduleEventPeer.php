@@ -260,7 +260,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		return self::doSelect($c);
 	}
 	
-	public static function retrieveTemplateEntryIdAndTime($templateEntryId,
+	public static function retrieveByTemplateEntryIdAndTime($templateEntryId,
 	                                                      $time = null)
 	{
 		$types = array	(self::LIVE_STREAM_OM_CLASS,

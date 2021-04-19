@@ -180,21 +180,20 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	{
 		if(!($dbObject instanceof LiveStreamEntry))
 			return;
-
-		//load all events that affects this  type of object
-		// execute all decorators
 		
-		// current time
-		
-		// optimization - only if there are capabilties on the live entry
-		
-		//1. challage - place the call of the peer
-		//2. Only if there are capabilties
-		
-		$events = ScheduleEventPeer::retrieveByTemplateEntryIdAndTime($dbObject->getId);
-		$events = $dbObject->getCurrentEvent();
-		$events->decoratorExecute($dbObject);
-		
+		if($dbObject->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		{
+			$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
+			foreach ($pluginInstances as $instance)
+			{
+				/* @var $instance IKalturaScheduleEventProvider */
+				$pluginEvent = $instance -> getCurrentEvent($this -> getId());
+				if ($pluginEvent)
+				{
+					$pluginEvent -> decoratorExecute($dbObject);
+				}
+			}
+		}
 		/**
 		 * @var LiveStreamEntry @dbObject
 		 */

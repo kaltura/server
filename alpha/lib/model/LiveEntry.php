@@ -1197,6 +1197,14 @@ abstract class LiveEntry extends entry
         }
 	    return $conversionProfileId;
     }
+    
+    public function getCurrentEvent()
+    {
+    	
+    	
+    	
+    	return ScheduleEventPeer::retrieveByTemplateEntryIdAndTime($this->getId);
+    }
 
 
 }
