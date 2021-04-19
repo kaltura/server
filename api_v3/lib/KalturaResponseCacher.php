@@ -73,7 +73,8 @@ class KalturaResponseCacher extends kApiCache
 			{
 				continue;
 			}
-			
+
+			$referrer = null;
 			$referrerKey = "{$prefix}contextDataParams:referrer";
 			if (isset($this->_params[$referrerKey]))
 			{
@@ -85,7 +86,8 @@ class KalturaResponseCacher extends kApiCache
 				$referrer = $this->_params[$i]['contextDataParams']['referrer'];
 				unset($this->_params[$i]['contextDataParams']['referrer']);
 			}
-			else
+
+			if (!$referrer)
 			{
 				$referrer = self::getHttpReferrer();
 			}
