@@ -42,7 +42,7 @@ class kZoomClient
 	{
 		$this -> zoomBaseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
-		if ($refreshToken == null && $jwtToken == null)
+		if ($refreshToken == null && $jwtToken == null && $accessToken == null)
 		{
 			throw new KalturaAPIException (KalturaZoomErrors::UNABLE_TO_AUTHENTICATE);
 		}
