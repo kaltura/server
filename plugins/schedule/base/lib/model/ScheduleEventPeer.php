@@ -263,10 +263,10 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	public static function retrieveByTemplateEntryIdAndTime($templateEntryId,
 	                                                      $time = null)
 	{
-		$types = array	(self::LIVE_STREAM_OM_CLASS,
-														 self::RECORD_OM_CLASS,
-														 self::MEETING_OM_CLASS,
-														 self::LIVE_REDIRECT_OM_CLASS);
+		$types = array	(ScheduleEventType::LIVE_STREAM,
+		                   ScheduleEventType::LIVE_REDIRECT,
+		                   ScheduleEventType::MEETING,
+		                   ScheduleEventType::RECORD);
 		
 		$time = $time ? $time : time();
 		
