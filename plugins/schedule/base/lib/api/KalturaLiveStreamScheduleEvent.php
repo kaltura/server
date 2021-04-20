@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage api.objects
  */
-class KalturaLiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
+class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 {
 	/**
 	 * The entry ID of the source entry (for simulive)

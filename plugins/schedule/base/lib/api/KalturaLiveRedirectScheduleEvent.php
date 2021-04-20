@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage api.objects
  */
-class KalturaLiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
+class KalturaLiveRedirectScheduleEvent extends KalturaBaseLiveScheduleEvent
 {
 	/**
 	 * The vod entry to redirect
