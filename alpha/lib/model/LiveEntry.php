@@ -627,19 +627,19 @@ abstract class LiveEntry extends entry
 	
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-		//caching to reduce multiple access to db
-		if(is_null($this->currentEvent))
-		{
-			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
-			$this -> currentEvent ? $this -> currentEvent : false;
-		}
-		
-		/* @param ILiveStreamScheduleEvent $currentEvent*/
-		if($this->currentEvent)
-		{
-			//The decorator can change the status of isPlayable & redirectToVod
-			return $this -> currentEvent -> decoratorExecute($this);
-		}
+//		//caching to reduce multiple access to db
+//		if(is_null($this->currentEvent))
+//		{
+//			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
+//			$this -> currentEvent ? $this -> currentEvent : false;
+//		}
+//
+//		/* @param ILiveStreamScheduleEvent $currentEvent*/
+//		if($this->currentEvent)
+//		{
+//			//The decorator can change the status of isPlayable & redirectToVod
+//			return $this -> currentEvent -> decoratorExecute($this);
+//		}
 
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;

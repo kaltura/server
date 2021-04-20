@@ -208,8 +208,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		if(!($dbObject instanceof LiveEntry))
 			return;
 		
-		parent::doFromObject($dbObject, $responseProfile);
-		
 		if($dbObject->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
 		{
 			$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
@@ -223,7 +221,9 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 				}
 			}
 		}
-
+		
+		parent::doFromObject($dbObject, $responseProfile);
+		
 		if($this->shouldGet('recordingOptions', $responseProfile) && !is_null($dbObject->getRecordingOptions()))
 		{
 			$this->recordingOptions = new KalturaLiveEntryRecordingOptions();
