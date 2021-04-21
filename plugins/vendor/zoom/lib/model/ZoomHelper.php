@@ -13,10 +13,10 @@ class ZoomHelper
 	const PHP_INPUT = 'php://input';
 	const SUFFIX_ZOOM = '.zoom';
 	const ORDER_RECORDING_TYPE =  array(
-		'shared_screen',
 		'shared_screen_with_speaker_view(CC)',
 		'shared_screen_with_speaker_view',
 		'shared_screen_with_gallery_view',
+		'shared_screen',
 		'speaker_view',
 		'active_speaker',
 		'gallery_view',
