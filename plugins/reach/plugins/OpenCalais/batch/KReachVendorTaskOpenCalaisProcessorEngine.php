@@ -13,8 +13,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
     const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
     const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
-    const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'omitOutputtingOriginalText';
-    const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'enableTickerExtraction';
+    const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
+    const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
     const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
@@ -312,8 +312,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      */
     private function getHeaders($partnerId) {
         $apiKey = $this->getOpenCalaisApiKey($partnerId);
-        $EnableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
-        $OmitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
+        $enableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
+        $omitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
         $headers = array (
             "Content-Type: text/xml",
             "charset:utf8",
@@ -321,11 +321,11 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             "outputFormat: application/json",
             "x-calais-language: English"
         );
-        if($EnableTickerExtraction != ''){
-            $headers[] = "x-calais-EnableTickerExtraction: ". ($EnableTickerExtraction == 'Yes' ? 'True' : 'False');
+        if($enableTickerExtraction != ''){
+            $headers[] = "x-calais-EnableTickerExtraction: ". ($enableTickerExtraction == 'Yes' ? 'True' : 'False');
         }
-        if($OmitOutputtingOriginalText != ''){
-            $headers[] = "omitOutputtingOriginalText: ". ($OmitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
+        if($omitOutputtingOriginalText != ''){
+            $headers[] = "omitOutputtingOriginalText: ". ($omitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
         }
         return $headers;
     }
