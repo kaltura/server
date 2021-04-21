@@ -68,12 +68,20 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	}
 	
 	
-	public function decoratorExecute($targetObject,$sourceObject)
+	public function decoratorExecute($context,&$output) :bool
 	{
-		if($sourceObject instanceof LiveEntry)
+		switch ($context)
 		{
-			$targetObject->liveStatus = EntryServerNodeStatus::PLAYABLE;
+			case 'getLiveStatus':
+				$output = EntryServerNodeStatus::PLAYABLE;
+				break;
+			case 'getRedirectEntryId':
+				$output = null;
+				break;
+			default:
+				return false;
 		}
+		return true;
 	}
 	
 	/* (non-PHPdoc)

@@ -17,9 +17,11 @@ interface IKalturaScheduleEventProvider extends IKalturaBase
 	public function getScheduleEvents($entryId, $types, $startTime, $endTime);
 	
 	/**
-	 * @param string $entryId
-	 * @return ScheduleEvent
+	 * @param $entryId - template entry ID
+	 * @param $context - binding string between the caller and the final
+	 * executor
+	 * @param $output - the new output value
+	 * @return bool - continue execute true/false
 	 */
-	public function getCurrentEvent($entryId);
-
+	public function applyEvents($entryId,$context,&$output) : bool;
 }

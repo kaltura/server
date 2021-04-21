@@ -11,6 +11,8 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	const SCHEDULE_EVENTS_CONSUMER = 'kScheduleEventsConsumer';
 	const ICAL_RESPONSE_TYPE = 'ical';
 	
+	static $currentEvents = array();
+	
 	public static function dependsOn()
 	{
 		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME);
@@ -118,11 +120,29 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	 * @param string $entryId
 	 * @return ScheduleEvent
 	 */
-	public function getCurrentEvent($entryId)
+	protected function getCurrentEvent($entryId)
 	{
-		$scheduleEvents = ScheduleEventPeer::retrieveByTemplateEntryIdAndTime($entryId);
-		$scheduleEvents = is_array($scheduleEvents) ? reset($scheduleEvents) : array();
-		return $scheduleEvents;
+		if(!isset(self::$currentEvents[$entryId]))
+		{
+			$scheduleEvents = ScheduleEventPeer ::retrieveByTemplateEntryIdAndTime($entryId);
+			self::$currentEvents[$entryId] = is_array($scheduleEvents) ? reset($scheduleEvents) : array();
+		}
+		return self::$currentEvents[$entryId];
+	}
+	
+	public function applyEvents($entryId,$context,&$output) :bool
+	{
+		if(kCurrentContext::$activationScope === activationScope::INDEXING)
+		{
+			return false;
+		}
+		
+		$currentEvents = $this -> getCurrentEvent($entryId);
+		if(!$currentEvents)
+		{
+			return false;
+		}
+		return $currentEvents -> decoratorExecute($context, $output);
 	}
 	
 }

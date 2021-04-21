@@ -208,20 +208,6 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 		if(!($dbObject instanceof LiveEntry))
 			return;
 		
-		if($dbObject->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
-		{
-			$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
-			foreach ($pluginInstances as $instance)
-			{
-				/* @var $instance IKalturaScheduleEventProvider */
-				$pluginEvent = $instance -> getCurrentEvent($this -> id);
-				if ($pluginEvent)
-				{
-					$pluginEvent -> decoratorExecute($this,$dbObject);
-				}
-			}
-		}
-		
 		parent::doFromObject($dbObject, $responseProfile);
 		
 		if($this->shouldGet('recordingOptions', $responseProfile) && !is_null($dbObject->getRecordingOptions()))

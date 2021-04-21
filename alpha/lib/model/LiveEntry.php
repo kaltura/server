@@ -256,8 +256,12 @@ abstract class LiveEntry extends entry
 
 	public function getRecordedEntryId()
 	{
-	    //Notice, default values were added to force reloading this property from the object (no extra db access).
-	    return $this->getFromCustomData("recorded_entry_id", null, null);
+		if($this->virtualGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+
+	    return $this->getFromCustomData("recorded_entry_id");
 	}
 	
 	public function setRecordedEntryId($v)
@@ -517,9 +521,36 @@ abstract class LiveEntry extends entry
 		}
 		return $events;
 	}
-
+	
+	/**
+	 * @param $context string - used for binding the getter to the final
+	 * decorator
+	 * @param $output any - a new value for the caller
+	 * @return boolean - indicating for the caller to stop the processing and
+	 * use the new output
+	 */
+	protected function virtualGetter($context, &$output)
+	{
+		$stopProcessing = false;
+		if ($this -> hasCapability(self::LIVE_SCHEDULE_CAPABILITY))
+		{
+			$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
+			foreach ($pluginInstances as $instance)
+			{
+				$stopProcessing |= $instance -> applyEvents($this->getId(),
+				                                            $context,$output);
+			}
+		}
+		return $stopProcessing;
+	}
+	
 	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
 	{
+		if($this->virtualGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+		
 		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
 		{
 			return EntryServerNodeStatus::STOPPED;
@@ -627,20 +658,6 @@ abstract class LiveEntry extends entry
 	
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-//		//caching to reduce multiple access to db
-//		if(is_null($this->currentEvent))
-//		{
-//			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
-//			$this -> currentEvent ? $this -> currentEvent : false;
-//		}
-//
-//		/* @param ILiveStreamScheduleEvent $currentEvent*/
-//		if($this->currentEvent)
-//		{
-//			//The decorator can change the status of isPlayable & redirectToVod
-//			return $this -> currentEvent -> decoratorExecute($this);
-//		}
-
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
 
@@ -1163,9 +1180,9 @@ abstract class LiveEntry extends entry
 
 	public function getRedirectEntryId()
 	{
-		if ($this->isPlayable())
+		if($this->virtualGetter( __FUNCTION__, $output))
 		{
-			return null;
+			return $output;
 		}
 		
 		return parent::getRedirectEntryId();
