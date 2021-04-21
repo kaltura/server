@@ -28,7 +28,7 @@ class RuleEngine extends Constants
     private function setRulesWithKeys(array $kmsIntelliTagRules) {
         $kmsIntelliTagRulesKeys = array();
         foreach ($kmsIntelliTagRules as $kmsIntelliTagRule){
-            $kmsIntelliTagRulesKeys[$kmsIntelliTagRule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_KEY_PROP]] = $kmsIntelliTagRule;
+            $kmsIntelliTagRulesKeys[$kmsIntelliTagRule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_KEY_PROP]][] = $kmsIntelliTagRule;
         }
         return $kmsIntelliTagRulesKeys;
     }
@@ -44,11 +44,13 @@ class RuleEngine extends Constants
             if(!$this->passedRuleConditions($apiItemDetails)){
                 continue;
             }
-            $rule = $this->getRule($apiItemDetails);
-            if(isset($rule[self::RULE_OCM_GROUPROP][self::RULE_THRSHLD_PROP]) && !$this->passedRuleConditionThresholds($rule[self::RULE_OCM_GROUPROP][self::RULE_THRSHLD_PROP], $apiItemDetails)){
-                continue;
+            $rules = $this->getRulesForEntity($apiItemDetails);
+            foreach ($rules as $rule) {
+                if(isset($rule[self::RULE_OCM_GROUPROP][self::RULE_THRSHLD_PROP]) && !$this->passedRuleConditionThresholds($rule[self::RULE_OCM_GROUPROP][self::RULE_THRSHLD_PROP], $apiItemDetails)){
+                    continue;
+                }
+                $result = array_merge($result, $this->getValuesByRuleAndApiResponse($rule, $apiItemDetails));
             }
-            $result = array_merge($result, $this->getValuesByRuleAndApiResponse($rule, $apiItemDetails));
         }
         return $result;
     }
@@ -144,7 +146,7 @@ class RuleEngine extends Constants
         if($this->getTypeFromItemInApi($apiItemDetails) == ''){ // no type property
             return FALSE;
         }
-        if($this->getRule($apiItemDetails) == ''){ // this type not exists on KMS Rules
+        if(empty($this->getRulesForEntity($apiItemDetails))){ // this type not exists on KMS Rules
             return FALSE;
         }
         return TRUE;
@@ -153,10 +155,10 @@ class RuleEngine extends Constants
      * @param array $apiItemDetails
      * @return mixed|string
      */
-    private function getRule(array $apiItemDetails) {
+    private function getRulesForEntity(array $apiItemDetails) {
         $type = $this->getTypeFromItemInApi($apiItemDetails);
         if(!isset($this->kmsIntelliTagRules[$type])){ // this type not exists on KMS Rules
-            return '';
+            return array();
         }
         return $this->kmsIntelliTagRules[$type];
     }
