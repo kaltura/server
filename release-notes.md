@@ -6,6 +6,15 @@
 #### Configuration ####
 Add ZoomDropFolder to your plugins.ini
 
+Add the following to batch.ini:
+
+	enabledWorkers.KAsyncDropFolderWatcherRemoteZoom = 1
+
+	[KAsyncDropFolderWatcherRemoteZoom : KAsyncDropFolderWatcherRemote]
+	id                              = @ID@
+	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
+	params.tags                     = zoom
+
 ### Deployment scripts ###
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
