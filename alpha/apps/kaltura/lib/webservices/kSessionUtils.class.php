@@ -52,6 +52,7 @@ class kSessionUtils
 		$ks->user = $puser_id;
 		$ks->privileges = $privileges;
 		$ks->additional_data = $additional_data;
+		$ks->setInitialSecret($partner_secret);
 		
 		return $ks;
 	}
@@ -296,6 +297,10 @@ class ks extends kSessionBase
 		list($ksVersion, $secrets) = $this->getKSVersionAndSecret($this->partner_id);
 		$secretsArray = explode(',', $secrets);
 		$secret = $secretsArray[0]; // first element is always the main Admin Secret
+		if ($this->type == SessionType::ADMIN)
+		{
+			$secret = $this->initialSecret;
+		}
 		return kSessionBase::generateSession(
 			$ksVersion,
 			$secret,

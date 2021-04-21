@@ -1147,7 +1147,9 @@ class Partner extends BasePartner
 	public function setMaxConcurrentLiveByAdminTag($limitsArray)			{
 		$this->putInCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG, $limitsArray);
 	}
-
+	public function setSecondarySecretRoleId($v)        {$this->putInCustomData('secondary_secret_role', $v);}
+	
+	public function getSecondarySecretRoleId()          {return $this->getFromCustomData('secondary_secret_role');}
 	public function getMaxConcurrentLiveByAdminTag()			{
 		$defaultValues = kConf::get('ConcurrentLiveLimitByAdminTag_DefaultValues', 'local', array());
 		return array_replace($defaultValues, (array)$this->getFromCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG));
@@ -1189,9 +1191,11 @@ class Partner extends BasePartner
 	public function getTemplateCustomMetadataNum()		{return $this->getFromCustomData('template_custom_metadata_num', null, 0);}
 	public function getInitialPasswordSet()				{return $this->getFromCustomData('initial_password_set', null, 0);}
 	public function getMarketoCampaignId()				{return $this->getFromCustomData('marketo_campaign_id', null, 0);}
-
-
-    public function setLiveStreamBroadcastUrlConfigurations($key, $value)
+	
+	
+	
+	
+	public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
     	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
     }

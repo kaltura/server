@@ -101,6 +101,8 @@ class kSessionBase
 	protected $hash = null;
 	protected $real_str = null;
 	protected $original_str = "";
+	protected $matchedSecretIndex = 0;
+	protected $initialSecret = "";
 
 	public $partner_id = null;
 	public $partner_pattern = null;
@@ -640,7 +642,21 @@ class kSessionBase
 
 		return $serverPrivileges;
 	}
-
+	
+	public function getMatchedSecreteIndex()
+	{
+		return $this->matchedSecretIndex;
+	}
+	
+	public function setInitialSecret($secret)
+	{
+		$this->initialSecret = $secret;
+	}
+	
+	public function getInitialSecret()
+	{
+		return $this->initialSecret;
+	}
 	/**
 	 * @param $encKs
 	 * @param $adminSecrets
@@ -649,6 +665,7 @@ class kSessionBase
 	private function matchAdminSecretV2($encKs, $adminSecrets)
 	{
 		$adminSecretsArray = explode(',', $adminSecrets);
+		$secretIndex = 0;
 		foreach ($adminSecretsArray as $adminSecret)
 		{
 			$decKs = self::aesDecrypt($adminSecret, $encKs);
@@ -657,7 +674,11 @@ class kSessionBase
 			$hash = substr($decKs, 0, self::SHA1_SIZE);
 			$fields = substr($decKs, self::SHA1_SIZE);
 			if ($hash === sha1($fields, true))
+			{
+				$this->matchedSecretIndex = $secretIndex;
 				return array($hash, $fields);
+			}
+			$secretIndex++;
 		}
 		return false;
 	}
@@ -670,11 +691,16 @@ class kSessionBase
 	 */
 	private function matchAdminSecretV1($hash, $real_str, $adminSecrets)
 	{
+		$secretIndex = 0;
 		$adminSecretsArray = explode(',', $adminSecrets);
 		foreach ($adminSecretsArray as $adminSecret)
 		{
 			if (sha1($adminSecret . $real_str) === $hash)
+			{
+				$this->matchedSecretIndex = $secretIndex;
 				return true;
+			}
+			$secretIndex++;
 		}
 		return false;
 	}

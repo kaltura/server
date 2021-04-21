@@ -456,6 +456,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $passwordStructureValidationsDescription;
 	
 	
+	/**
+	 * @var int
+	 */
+	public $secondarySecretRoleId;
+	
+	
 	
 	private static $map_between_objects = array
 	(
@@ -543,6 +549,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"lastFreeTrialNotificationDay",
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
+		'secondarySecretRoleId',
 	);
 
 	public function getMapBetweenObjects()
