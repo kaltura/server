@@ -260,8 +260,7 @@ abstract class LiveEntry extends entry
 		{
 			return $output;
 		}
-
-	    return $this->getFromCustomData("recorded_entry_id");
+		return $this->getFromCustomData("recorded_entry_id");
 	}
 	
 	public function setRecordedEntryId($v)
@@ -1182,7 +1181,6 @@ abstract class LiveEntry extends entry
 		{
 			return $output;
 		}
-		
 		return parent::getRedirectEntryId();
 	}
 
