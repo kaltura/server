@@ -137,7 +137,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	
 	public function getter($object, $context, &$output)
 	{
-		if(kCurrentContext::$activationScope === executionScope::INDEXING)
+		if(kCurrentContext::$executionScope === executionScope::INDEXING)
 		{
 			return false;
 		}
