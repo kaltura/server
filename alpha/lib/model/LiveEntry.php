@@ -531,10 +531,10 @@ abstract class LiveEntry extends entry
 	 */
 	protected function pluginableGetter($context, &$output)
 	{
-		$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
+		$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaDynamicGetter');
 		foreach ($pluginInstances as $instance)
 		{
-			if($instance -> applyEvents($this, $context, $output))
+			if($instance -> getter($this, $context, $output))
 			{
 				return true;
 			}
