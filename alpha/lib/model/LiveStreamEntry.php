@@ -166,7 +166,9 @@ class LiveStreamEntry extends LiveEntry
 	public function setLiveStatusCache()
 	{
 		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
+		{
 			KalturaResponseCacher::setConditionalCacheExpiry(self::LIVE_STATUS_CONDITIONAL_CACHE_EXPIRY);
+		}
 		
 		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($this);
 		if ($simuliveCondCacheTime)
