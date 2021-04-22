@@ -256,7 +256,7 @@ abstract class LiveEntry extends entry
 
 	public function getRecordedEntryId()
 	{
-		if($this->virtualGetter(__FUNCTION__, $output))
+		if($this->pluginableGetter(__FUNCTION__, $output))
 		{
 			return $output;
 		}
@@ -529,24 +529,22 @@ abstract class LiveEntry extends entry
 	 * @return boolean - indicating for the caller to stop the processing and
 	 * use the new output
 	 */
-	protected function virtualGetter($context, &$output)
+	protected function pluginableGetter($context, &$output)
 	{
-		$stopProcessing = false;
-		if ($this -> hasCapability(self::LIVE_SCHEDULE_CAPABILITY))
+		$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
+		foreach ($pluginInstances as $instance)
 		{
-			$pluginInstances = KalturaPluginManager ::getPluginInstances('IKalturaScheduleEventProvider');
-			foreach ($pluginInstances as $instance)
+			if($instance -> applyEvents($this, $context, $output))
 			{
-				$stopProcessing |= $instance -> applyEvents($this->getId(),
-				                                            $context,$output);
+				return true;
 			}
 		}
-		return $stopProcessing;
+		return false;
 	}
 	
 	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
 	{
-		if($this->virtualGetter(__FUNCTION__, $output))
+		if($this->pluginableGetter(__FUNCTION__, $output))
 		{
 			return $output;
 		}
@@ -1180,7 +1178,7 @@ abstract class LiveEntry extends entry
 
 	public function getRedirectEntryId()
 	{
-		if($this->virtualGetter( __FUNCTION__, $output))
+		if($this->pluginableGetter(__FUNCTION__, $output))
 		{
 			return $output;
 		}
