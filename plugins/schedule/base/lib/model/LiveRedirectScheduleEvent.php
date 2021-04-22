@@ -16,7 +16,7 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
 		$this->putInCustomData(self::REDIRECT_ENTRY_ID,$v);
 	}
 	
-	public function decoratorExecute($context, &$output) : bool
+	public function dynamicGetter($context, &$output)
 	{
 			switch ($context)
 			{

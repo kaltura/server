@@ -68,7 +68,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	}
 	
 	
-	public function decoratorExecute($context,&$output) :bool
+	public function dynamicGetter($context, &$output)
 	{
 		switch ($context)
 		{
