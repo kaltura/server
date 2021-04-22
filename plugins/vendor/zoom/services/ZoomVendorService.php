@@ -315,4 +315,31 @@ class ZoomVendorService extends KalturaBaseService
 		throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 	}
 	
+	/**
+	 * List KalturaZoomIntegrationSetting objects
+	 *
+	 * @action list
+	 * @param KalturaFilterPager $pager Pager
+	 * @return KalturaZoomIntegrationSettingResponse
+	 */
+	public function listAction(KalturaFilterPager $pager = null)
+	{
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+		
+		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
+		$c->addAnd(VendorIntegrationPeer::VENDOR_TYPE,VendorTypeEnum::ZOOM_ACCOUNT);
+		$c->addAnd(VendorIntegrationPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
+		$totalCount = VendorIntegrationPeer::doCount($c);
+		$pager->attachToCriteria($c);
+		$list = VendorIntegrationPeer::doSelect($c);
+		$newList = KalturaZoomIntegrationSettingArray::fromDbArray($list);
+		$response = new KalturaZoomIntegrationSettingResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		return $response;
+	}
+	
 }
