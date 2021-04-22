@@ -121,7 +121,26 @@ class ZoomHelper
 			die();
 		}
 	}
-
+	
+	/**
+	 * @param $authCode
+	 * @throws Exception
+	 */
+	public static function loadRegionalCloudRedirectionPage($authCode)
+	{
+		$file_path = dirname(__FILE__) . '/../api/webPage/kalturaRegionalRedirectPage.html';
+		if (file_exists($file_path))
+		{
+			$page = file_get_contents($file_path);
+			$page = str_replace('@authCode@', $authCode, $page);
+			
+			echo $page;
+			die();
+		}
+		
+		throw new KalturaAPIException('unable to find regional redirect page, please contact support');
+	}
+	
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param $accountId
