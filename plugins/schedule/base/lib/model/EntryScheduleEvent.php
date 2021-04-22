@@ -121,7 +121,7 @@ abstract class EntryScheduleEvent extends ScheduleEvent implements ILiveStreamSc
 		return $events;
 	}
 	
-	public function decoratorExecute($context,&$output) :bool
+	public function dynamicGetter($context, &$output)
 	{
 		return false;
 	}
