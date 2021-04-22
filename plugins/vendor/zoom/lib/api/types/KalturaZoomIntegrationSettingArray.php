@@ -21,6 +21,6 @@ class KalturaZoomIntegrationSettingArray extends KalturaTypedArray
 	
 	public function __construct( )
 	{
-		return parent::__construct ( "KalturaZoomIntegrationSetting" );
+		return parent::__construct ( 'KalturaZoomIntegrationSetting' );
 	}
 }
