@@ -222,7 +222,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 												 KalturaEntryServerNodeStatus::BROADCASTING,
 												 KalturaEntryServerNodeStatus::AUTHENTICATED)))
 		{
-			kApiCache ::setExpiry(kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY);
+			kApiCache::setExpiry(kApiCache::REDIRECT_ENTRY_CACHE_EXPIRY);
 		}
 	}
 
