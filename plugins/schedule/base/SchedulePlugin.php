@@ -147,18 +147,17 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 			return false;
 		}
 		
-		if (! $this -> hasCapability(self::LIVE_SCHEDULE_CAPABILITY))
+		if (! $this->hasCapability(self::LIVE_SCHEDULE_CAPABILITY))
 		{
 			return false;
 		}
 		
-		
-		$currentEvents = $this -> getCurrentEvent($object->getId());
-		if(!$currentEvents)
+		$currentEvents = $this->getCurrentEvent($object->getId());
+		if(! $currentEvents)
 		{
 			return false;
 		}
-		return $currentEvents -> dynamicGetter($context, $output);
+		return $currentEvents->dynamicGetter($context, $output);
 	}
 	
 }
