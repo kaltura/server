@@ -7,5 +7,5 @@ interface ILiveStreamScheduleEvent extends IScheduleEvent
 	 * @param $output - the new output value
 	 * @return bool - stop processing true / false
 	 */
-	public function decoratorExecute($context,&$output) : bool;
+	public function dynamicGetter($context, &$output);
 }
