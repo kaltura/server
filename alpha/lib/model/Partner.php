@@ -91,7 +91,9 @@ class Partner extends BasePartner
 	const LIVE_CONCURRENT_BY_ADMIN_TAG = 'live_concurrent_by_admin_tag';
 
 	const ALL_PARTNERS_WILD_CHAR = "*";
-  
+	
+	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
+ 
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -1147,9 +1149,9 @@ class Partner extends BasePartner
 	public function setMaxConcurrentLiveByAdminTag($limitsArray)			{
 		$this->putInCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG, $limitsArray);
 	}
-	public function setSecondarySecretRoleId($v)        {$this->putInCustomData('secondary_secret_role', $v);}
+	public function setSecondarySecretRoleId($v)        {$this->putInCustomData(self::SECONDARY_SECRET_ROLE, $v);}
 	
-	public function getSecondarySecretRoleId()          {return $this->getFromCustomData('secondary_secret_role');}
+	public function getSecondarySecretRoleId()          {return $this->getFromCustomData(self::SECONDARY_SECRET_ROLE);}
 	public function getMaxConcurrentLiveByAdminTag()			{
 		$defaultValues = kConf::get('ConcurrentLiveLimitByAdminTag_DefaultValues', 'local', array());
 		return array_replace($defaultValues, (array)$this->getFromCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG));

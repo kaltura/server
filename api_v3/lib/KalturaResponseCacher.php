@@ -430,10 +430,10 @@ class KalturaResponseCacher extends kApiCache
 		$expiry = isset($params['expiry']) ? $params['expiry'] : 86400;
 		$privileges = isset($params['privileges']) ? $params['privileges'] : null;
 		
-		$secretToUse = $paramSecret;
-		if ($type == 0)
+		$secretToUse = $adminSecret;
+		if ($type == 2)
 		{
-			$secretToUse = $adminSecret;
+			$secretToUse = $paramSecret;
 		}
 		$result = kSessionBase::generateSession($ksVersion, $secretToUse, $userId, $type, $partnerId, $expiry, $privileges);
 		

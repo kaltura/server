@@ -102,7 +102,7 @@ class kSessionBase
 	protected $real_str = null;
 	protected $original_str = "";
 	protected $matchedSecretIndex = 0;
-	protected $initialSecret = "";
+	protected $initialSecret = '';
 
 	public $partner_id = null;
 	public $partner_pattern = null;
@@ -675,10 +675,9 @@ class kSessionBase
 			$fields = substr($decKs, self::SHA1_SIZE);
 			if ($hash === sha1($fields, true))
 			{
-				$this->matchedSecretIndex = $secretIndex;
+				$this->matchedSecretIndex = $secretIndex++;
 				return array($hash, $fields);
 			}
-			$secretIndex++;
 		}
 		return false;
 	}
@@ -697,10 +696,9 @@ class kSessionBase
 		{
 			if (sha1($adminSecret . $real_str) === $hash)
 			{
-				$this->matchedSecretIndex = $secretIndex;
+				$this->matchedSecretIndex = $secretIndex++;
 				return true;
 			}
-			$secretIndex++;
 		}
 		return false;
 	}
