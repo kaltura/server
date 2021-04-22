@@ -147,7 +147,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 			return false;
 		}
 		
-		if (! $this->hasCapability(self::LIVE_SCHEDULE_CAPABILITY))
+		if (! $object->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
 		{
 			return false;
 		}

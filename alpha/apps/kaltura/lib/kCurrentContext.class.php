@@ -134,7 +134,7 @@ class kCurrentContext
 	/**
 	 * @var executionScope
 	 */
-	public static $executionScope = executionScope::NONE;
+	public static $executionScope = null;
 
 	public static function getEntryPoint()
 	{

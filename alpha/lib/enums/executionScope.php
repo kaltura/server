@@ -6,5 +6,5 @@
 interface executionScope extends BaseEnum
 {
 	const INDEXING = 'indexing';
-	const NONE = 'NONE';
+	const NONE = null;
 }
