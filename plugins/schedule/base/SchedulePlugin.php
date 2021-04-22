@@ -2,7 +2,12 @@
 /**
  * @package plugins.schedule
  */
-class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion, IKalturaObjectLoader, IKalturaScheduleEventProvider
+class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
+                                                      IKalturaEventConsumers,
+                                                      IKalturaVersion,
+                                                      IKalturaObjectLoader,
+                                                      IKalturaScheduleEventProvider,
+                                                      IKalturaDynamicGetter
 {
 	const PLUGIN_NAME = 'schedule';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -130,19 +135,30 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		return self::$currentEvents[$entryId];
 	}
 	
-	public function applyEvents($entryId,$context,&$output) :bool
+	public function getter($object, $context, &$output)
 	{
-		if(kCurrentContext::$activationScope === activationScope::INDEXING)
+		if(kCurrentContext::$activationScope === executionScope::INDEXING)
 		{
 			return false;
 		}
 		
-		$currentEvents = $this -> getCurrentEvent($entryId);
+		if(! $object instanceof LiveEntry)
+		{
+			return false;
+		}
+		
+		if (! $this -> hasCapability(self::LIVE_SCHEDULE_CAPABILITY))
+		{
+			return false;
+		}
+		
+		
+		$currentEvents = $this -> getCurrentEvent($object->getId());
 		if(!$currentEvents)
 		{
 			return false;
 		}
-		return $currentEvents -> decoratorExecute($context, $output);
+		return $currentEvents -> dynamicGetter($context, $output);
 	}
 	
 }
