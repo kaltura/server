@@ -132,7 +132,7 @@ class kCurrentContext
 	public static $isInMultiRequest = false;
 	
 	/**
-	 * @var activationScope
+	 * @var executionScope
 	 */
 	public static $activationScope = null;
 
