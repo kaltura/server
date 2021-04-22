@@ -863,7 +863,10 @@ class myEntryUtils
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
 
 		if ($servingVODfromLive)
+		{
+			$temp_orig_path = $orig_image_path;
 			$orig_image_path = null;
+		}
 
 		if(($end_sec != -1 && (($end_sec * 1000) > $entryLengthInMsec)) || ($start_sec != -1 && $end_sec == -1))
 		{
@@ -957,6 +960,12 @@ class myEntryUtils
 						if ($entry->getType() == entryType::PLAYLIST)
 						{
 							$success = self::capturePlaylistThumbUsingFirstEntry($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing);
+						}
+
+						if(!$success && $servingVODfromLive)
+						{
+							$orig_image_path = $temp_orig_path;
+							$success = true;
 						}
 
 						if (!$success)
