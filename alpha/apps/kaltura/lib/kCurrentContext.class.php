@@ -130,6 +130,11 @@ class kCurrentContext
 	public static $HTMLPurifierBaseListOnlyUsage = null;
 
 	public static $isInMultiRequest = false;
+	
+	/**
+	 * @var executionScope
+	 */
+	public static $executionScope = null;
 
 	public static function getEntryPoint()
 	{
