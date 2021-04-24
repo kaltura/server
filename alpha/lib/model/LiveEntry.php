@@ -509,7 +509,7 @@ abstract class LiveEntry extends entry
 		{
 			/* @var $instance IKalturaScheduleEventProvider */
 			$pluginEvents = $instance->getScheduleEvents($this->getId(),
-			                                             array(ScheduleEventType::LIVE_STREAM,ScheduleEventType::LIVE_REDIRECT),
+			                                             array(ScheduleEventType::LIVE_STREAM),
 			                                             $startTime,
 			                                             $endTime);
 			if ($pluginEvents)
