@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-abstract class EntryScheduleEvent extends ScheduleEvent implements ILiveStreamScheduleEvent
+abstract class EntryScheduleEvent extends ScheduleEvent
 {
 	const CUSTOM_DATA_FIELD_TEMPLATE_ENTRY_ID = 'template_entry_id';
 	const CUSTOM_DATA_FIELD_ENTRY_IDS = 'entry_ids';
@@ -121,6 +121,11 @@ abstract class EntryScheduleEvent extends ScheduleEvent implements ILiveStreamSc
 		return $events;
 	}
 	
+	/**
+	 * @param $context - binding string from the caller to the action
+	 * @param $output - the new output value
+	 * @return bool - stop processing true / false
+	 */
 	public function dynamicGetter($context, &$output)
 	{
 		return false;

@@ -8,7 +8,24 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	const PROJECTED_AUDIENCE = 'projected_audience';
 	const PRE_START_TIME = 'pre_start_time';
 	const POST_END_TIME = 'post_end_time';
-
+	const SOURCE_ENTRY_ID = 'source_entry_id';
+	
+	/**
+	 * @param string $v
+	 */
+	public function setSourceEntryId($v)
+	{
+		$this->putInCustomData(self::SOURCE_ENTRY_ID, $v);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getSourceEntryId()
+	{
+		return $this->getFromCustomData(self::SOURCE_ENTRY_ID);
+	}
+	
 	/**
 	 * @param int $v
 	 */
@@ -70,18 +87,19 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	
 	public function dynamicGetter($context, &$output)
 	{
+		$output = null;
+		
 		switch ($context)
 		{
 			case 'getLiveStatus':
-				$output = EntryServerNodeStatus::PLAYABLE;
-				break;
-			case 'getRedirectEntryId':
-				$output = null;
-				break;
+				if($this->getSourceEntryId())
+				{
+					$output = EntryServerNodeStatus::PLAYABLE;
+					return true;
+				}
 			default:
 				return false;
 		}
-		return true;
 	}
 	
 	/* (non-PHPdoc)

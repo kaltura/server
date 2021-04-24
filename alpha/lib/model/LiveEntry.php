@@ -543,16 +543,16 @@ abstract class LiveEntry extends entry
 	
 	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
 	{
+		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
+		{
+			return EntryServerNodeStatus::STOPPED;
+		}
+		
 		if($this->pluginableGetter(__FUNCTION__, $output))
 		{
 			return $output;
 		}
 		
-		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
-		{
-			return EntryServerNodeStatus::STOPPED;
-		}
-
 		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 		{
 			return $this->getInternalLiveStatus($checkExplicitLive);
@@ -1181,6 +1181,12 @@ abstract class LiveEntry extends entry
 		{
 			return $output;
 		}
+		
+		if($this->isPlayable())
+		{
+			return null;
+		}
+		
 		return parent::getRedirectEntryId();
 	}
 
