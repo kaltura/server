@@ -102,6 +102,29 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		}
 	}
 	
+	protected function addCapabilityToTemplateEntry($con)
+	{
+		$liveEntry = entryPeer::retrieveByPK($this->getTemplateEntryId());
+		if ($liveEntry)
+		{
+			$shouldSave = false;
+			if (!$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+			{
+				$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
+				$shouldSave = true;
+			}
+			if ($this->getSourceEntryId() && !$liveEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY))
+			{
+				$liveEntry->addCapability(LiveEntry::SIMULIVE_CAPABILITY);
+				$shouldSave = true;
+			}
+			if ($shouldSave)
+			{
+				$liveEntry->save($con);
+			}
+		}
+	}
+	
 	/* (non-PHPdoc)
 	 * @see ScheduleEvent::applyDefaultValues()
 	 */

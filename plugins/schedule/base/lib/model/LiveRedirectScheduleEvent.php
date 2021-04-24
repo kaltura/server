@@ -24,7 +24,7 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
 				case 'getRecordedEntryId':
 					$output = $this->getRedirectEntryId();
 					break;
-				case 'liveStatus':
+				case 'getLiveStatus':
 					$output = EntryServerNodeStatus::STOPPED;
 					break;
 				default:
@@ -40,5 +40,18 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		parent::applyDefaultValues();
 		$this->setType(ScheduleEventType::LIVE_REDIRECT);
+	}
+	
+	protected function addCapabilityToTemplateEntry($con)
+	{
+		$liveEntry = entryPeer::retrieveByPK($this->getTemplateEntryId());
+		if ($liveEntry)
+		{
+			if (!$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+			{
+				$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
+				$liveEntry->save($con);
+			}
+		}
 	}
 }
