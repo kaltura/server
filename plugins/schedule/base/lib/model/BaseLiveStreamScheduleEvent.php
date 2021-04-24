@@ -5,24 +5,6 @@
  */
 abstract class BaseLiveStreamScheduleEvent extends EntryScheduleEvent
 {
-	const SOURCE_ENTRY_ID = 'source_entry_id';
-	
-	/**
-	 * @param string $v
-	 */
-	public function setSourceEntryId($v)
-	{
-		$this->putInCustomData(self::SOURCE_ENTRY_ID, $v);
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getSourceEntryId()
-	{
-		return $this->getFromCustomData(self::SOURCE_ENTRY_ID);
-	}
-	
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
