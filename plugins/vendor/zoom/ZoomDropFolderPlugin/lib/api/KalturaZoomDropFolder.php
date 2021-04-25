@@ -126,7 +126,11 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	{
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($dbObject->getZoomVendorIntegrationId());
-		$vendorIntegration->setZoomAccountDescription($dbObject->getDescription());
+		if (!$vendorIntegration)
+		{
+			throw new KalturaAPIException(KalturaZoomDropFolderErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
+		}
+		$vendorIntegration->setZoomAccountDescription($this->description);
 		$vendorIntegration->save();
 		
 		if (!$dbObject)
