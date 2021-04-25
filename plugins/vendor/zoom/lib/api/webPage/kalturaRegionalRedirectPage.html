@@ -9,8 +9,7 @@
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js'></script>
 		<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
 		<script>
-			//var authCode = '@authCode@';R20ofbHzHc_blLbXSjSSzKwRk6dQNK6mg
-            var authCode = 'R20ofbHzHc_blLbXSjSSzKwRk6dQNK6mg';
+			var authCode = '@authCode@';R20ofbHzHc_blLbXSjSSzKwRk6dQNK6mg
 		</script>
 		<script>
 			function submitKMCUrl(event)
@@ -19,7 +18,12 @@
 				event.preventDefault();
 				let kmcUrl = $('#kmcUrl');
                 let regionStartIndex = 0;
-                let regionEndIndex = kmcUrl.val().indexOf("kaltura.com") + 11;
+                let regionEndIndex = kmcUrl.val().indexOf("kaltura.com");
+                if (regionEndIndex < 0)
+				{
+					return onFail('Invalid URL');
+				}
+                regionEndIndex = regionEndIndex + 11;
                 let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
 
 				$.ajax(
@@ -33,8 +37,12 @@
 							{
                                 if(registrationPage.objectType == 'KalturaAPIException')
                                 {
-                                    onFail(registrationPage.message);
+                                    return onFail(registrationPage.message);
                                 }
+                                if (registrationPage.includes('Invalid authorization code'))
+								{
+									return onFail('Invalid authorization code');
+								}
                                 let newDoc = document.open('text/html', 'replace');
 								newDoc.write(registrationPage);
 								newDoc.close();
@@ -42,25 +50,27 @@
 						},
 						error: function (err)
 						{
-							$('body').css('cursor', 'default');
-                            alert('Error while redirecting\n'+err);
-							console.log('err during api call');
+							onFail(err);
 						}
 					});
 			}
             function onFail(errorMessage)
             {
+				$('body').css('cursor', 'default');
+				console.log('err during api call '+ errorMessage);
                 alert('Error\n'+errorMessage);
             }
 		</script>
 		<script>
 			(function()
 			{
-				document.addEventListener('DOMContentLoaded', function ()
-				{
-                    let submitButton = document.querySelector('#submit-button');
-					submitButton.addEventListener('click', submitKMCUrl);
-				});
+				document.addEventListener('DOMContentLoaded',
+						function ()
+						{
+							let submitButton = document.querySelector('#submit-button');
+							submitButton.addEventListener('click', submitKMCUrl);
+						}
+				);
 			})();
 		</script>
 		<title>Kaltura Zoom preloader</title>
