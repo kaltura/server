@@ -124,13 +124,10 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if ($this->description)
-		{
-			/* @var ZoomVendorIntegration $vendorIntegration */
-			$vendorIntegration = VendorIntegrationPeer::retrieveByPK($dbObject->getZoomVendorIntegrationId());
-			$vendorIntegration->setZoomAccountDescription($dbObject->getDescription());
-			$vendorIntegration->save();
-		}
+		/* @var ZoomVendorIntegration $vendorIntegration */
+		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($dbObject->getZoomVendorIntegrationId());
+		$vendorIntegration->setZoomAccountDescription($dbObject->getDescription());
+		$vendorIntegration->save();
 		
 		if (!$dbObject)
 		{
