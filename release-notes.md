@@ -2,6 +2,7 @@
 ## Zoom as a polling engine ##
 - Issue Type: Task
 - Issue ID: PLAT-22641
+- Drop Folder checkbox was removed from partner configuration, drop folder is allowed to all.
 
 #### Configuration ####
 Add ZoomDropFolder to your plugins.ini
