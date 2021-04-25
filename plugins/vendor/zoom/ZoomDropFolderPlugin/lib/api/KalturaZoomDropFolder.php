@@ -87,6 +87,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 				$this -> jwtToken = $vendorIntegration -> getJwtToken();
 				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
 				$this -> accessToken = $vendorIntegration -> getAccessToken();
+				$this -> description = $vendorIntegration->getZoomAccountDescription();
 				$zoomClient = new kZoomClient($this -> baseURL, $this -> jwtToken, $this -> refreshToken, $this -> clientId,
 				                              $this -> clientSecret, $this -> accessToken);
 				
@@ -119,6 +120,26 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 			$this->errorDescription = $e->getMessage();
 		}
 		
+	}
+	
+	public function toObject($dbObject = null, $skip = array())
+	{
+		/* @var ZoomVendorIntegration $vendorIntegration */
+		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($dbObject->getZoomVendorIntegrationId());
+		if (!$vendorIntegration)
+		{
+			throw new KalturaAPIException(KalturaZoomDropFolderErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
+		}
+		$vendorIntegration->setZoomAccountDescription($this->description);
+		$vendorIntegration->save();
+		
+		if (!$dbObject)
+		{
+			$dbObject = new ZoomDropFolder();
+		}
+		
+		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
+		return parent::toObject($dbObject, $skip);
 	}
 	
 	protected static function getZoomHeaderData()
