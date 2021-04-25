@@ -9,7 +9,7 @@ class ZoomVendorService extends KalturaBaseService
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 
-	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete');
+	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'oauthRedirectionAction');
 
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
