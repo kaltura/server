@@ -525,10 +525,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 
 		$ks = ks::fromSecureString($ksString);
-		$isUsingSecondarySecret = $ks -> getMatchedSecreteIndex() > 0;
 		$ksSetRoleId = $ks -> getRole();
 		if(isset($operatingPartner))
 		{
+			$isUsingSecondarySecret = $ks -> getMatchedSecreteIndex() > 0;
 			$partnerHasSecondarySecretRoleId = $operatingPartner -> getSecondarySecretRoleId();
 			if ($isUsingSecondarySecret && $partnerHasSecondarySecretRoleId)
 			{

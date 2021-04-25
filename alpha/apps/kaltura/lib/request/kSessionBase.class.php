@@ -102,7 +102,7 @@ class kSessionBase
 	protected $real_str = null;
 	protected $original_str = "";
 	protected $matchedSecretIndex = 0;
-	protected $initialSecret = '';
+	protected $initialSecret = null;
 
 	public $partner_id = null;
 	public $partner_pattern = null;
@@ -665,7 +665,6 @@ class kSessionBase
 	private function matchAdminSecretV2($encKs, $adminSecrets)
 	{
 		$adminSecretsArray = explode(',', $adminSecrets);
-		$secretIndex = 0;
 		foreach ($adminSecretsArray as $adminSecret)
 		{
 			$decKs = self::aesDecrypt($adminSecret, $encKs);
@@ -675,7 +674,7 @@ class kSessionBase
 			$fields = substr($decKs, self::SHA1_SIZE);
 			if ($hash === sha1($fields, true))
 			{
-				$this->matchedSecretIndex = $secretIndex++;
+				$this->matchedSecretIndex++;
 				return array($hash, $fields);
 			}
 		}
@@ -690,13 +689,12 @@ class kSessionBase
 	 */
 	private function matchAdminSecretV1($hash, $real_str, $adminSecrets)
 	{
-		$secretIndex = 0;
 		$adminSecretsArray = explode(',', $adminSecrets);
 		foreach ($adminSecretsArray as $adminSecret)
 		{
 			if (sha1($adminSecret . $real_str) === $hash)
 			{
-				$this->matchedSecretIndex = $secretIndex++;
+				$this->matchedSecretIndex++;
 				return true;
 			}
 		}
