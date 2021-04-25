@@ -5,6 +5,8 @@
  */
 class LiveStreamEntry extends LiveEntry
 {
+	const LIVE_STATUS_CONDITIONAL_CACHE_EXPIRY = 10;
+	
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
@@ -161,4 +163,17 @@ class LiveStreamEntry extends LiveEntry
 		$copyObj->setStreamPassword(self::generateStreamPassword()); //password should be re-generated on copy
 	}
 
+	public function setLiveStatusCache()
+	{
+		if (!in_array($this->getSource(), self::$kalturaLiveSourceTypes))
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry(self::LIVE_STATUS_CONDITIONAL_CACHE_EXPIRY);
+		}
+		
+		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($this);
+		if ($simuliveCondCacheTime)
+		{
+			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
+		}
+	}
 }

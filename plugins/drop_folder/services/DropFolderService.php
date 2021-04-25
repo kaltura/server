@@ -281,8 +281,7 @@ class DropFolderService extends KalturaBaseService
 	private static function isValidForWatch(DropFolder $dropFolder)
 	{
 		$partner = PartnerPeer::retrieveByPK($dropFolder->getPartnerId());
-		if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE
-			|| !$partner->getPluginEnabled(DropFolderPlugin::PLUGIN_NAME))
+		if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
 			return false;
 
 		return true;

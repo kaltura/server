@@ -2,9 +2,19 @@
 ## Zoom as a polling engine ##
 - Issue Type: Task
 - Issue ID: PLAT-22641
+- Drop Folder checkbox was removed from partner configuration, drop folder is allowed to all.
 
 #### Configuration ####
 Add ZoomDropFolder to your plugins.ini
+
+Add the following to batch.ini:
+
+	enabledWorkers.KAsyncDropFolderWatcherRemoteZoom = 1
+
+	[KAsyncDropFolderWatcherRemoteZoom : KAsyncDropFolderWatcherRemote]
+	id                              = @ID@
+	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
+	params.tags                     = zoom
 
 ### Deployment scripts ###
 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php

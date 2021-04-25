@@ -2,7 +2,12 @@
 /**
  * @package plugins.schedule
  */
-class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKalturaEventConsumers, IKalturaVersion, IKalturaObjectLoader, IKalturaScheduleEventProvider
+class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
+                                                      IKalturaEventConsumers,
+                                                      IKalturaVersion,
+                                                      IKalturaObjectLoader,
+                                                      IKalturaScheduleEventProvider,
+                                                      IKalturaDynamicGetter
 {
 	const PLUGIN_NAME = 'schedule';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -10,6 +15,8 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 	const PLUGIN_VERSION_BUILD = 0;
 	const SCHEDULE_EVENTS_CONSUMER = 'kScheduleEventsConsumer';
 	const ICAL_RESPONSE_TYPE = 'ical';
+	
+	static $currentEvents = array();
 	
 	public static function dependsOn()
 	{
@@ -113,4 +120,44 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices, IKaltura
 		}
 		return $events;
 	}
+	
+	/**
+	 * @param string $entryId
+	 * @return ScheduleEvent
+	 */
+	protected function getCurrentEvent($entryId)
+	{
+		if(!isset(self::$currentEvents[$entryId]))
+		{
+			$scheduleEvents = ScheduleEventPeer ::retrieveByTemplateEntryIdAndTime($entryId);
+			self::$currentEvents[$entryId] = is_array($scheduleEvents) ? reset($scheduleEvents) : array();
+		}
+		return self::$currentEvents[$entryId];
+	}
+	
+	public function getter($object, $context, &$output)
+	{
+		if(kCurrentContext::$executionScope === executionScope::INDEXING)
+		{
+			return false;
+		}
+		
+		if(! $object instanceof LiveEntry)
+		{
+			return false;
+		}
+		
+		if (! $object->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+		{
+			return false;
+		}
+		
+		$currentEvents = $this->getCurrentEvent($object->getId());
+		if(! $currentEvents)
+		{
+			return false;
+		}
+		return $currentEvents->dynamicGetter($context, $output);
+	}
+	
 }
