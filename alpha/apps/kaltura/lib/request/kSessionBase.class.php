@@ -101,6 +101,8 @@ class kSessionBase
 	protected $hash = null;
 	protected $real_str = null;
 	protected $original_str = "";
+	protected $matchedSecretIndex = 0;
+	protected $initialSecret = null;
 
 	public $partner_id = null;
 	public $partner_pattern = null;
@@ -640,7 +642,21 @@ class kSessionBase
 
 		return $serverPrivileges;
 	}
-
+	
+	public function getMatchedSecreteIndex()
+	{
+		return $this->matchedSecretIndex;
+	}
+	
+	public function setInitialSecret($secret)
+	{
+		$this->initialSecret = $secret;
+	}
+	
+	public function getInitialSecret()
+	{
+		return $this->initialSecret;
+	}
 	/**
 	 * @param $encKs
 	 * @param $adminSecrets
@@ -657,7 +673,10 @@ class kSessionBase
 			$hash = substr($decKs, 0, self::SHA1_SIZE);
 			$fields = substr($decKs, self::SHA1_SIZE);
 			if ($hash === sha1($fields, true))
+			{
+				$this->matchedSecretIndex++;
 				return array($hash, $fields);
+			}
 		}
 		return false;
 	}
@@ -674,7 +693,10 @@ class kSessionBase
 		foreach ($adminSecretsArray as $adminSecret)
 		{
 			if (sha1($adminSecret . $real_str) === $hash)
+			{
+				$this->matchedSecretIndex++;
 				return true;
+			}
 		}
 		return false;
 	}
