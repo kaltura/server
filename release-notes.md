@@ -17,8 +17,9 @@ Add the following to batch.ini:
 	params.tags                     = zoom
 
 ### Deployment scripts ###
-php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
+- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
 
 # Quasar-17.0.0 #
 ## Version Highlight ##
