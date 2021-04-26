@@ -25,6 +25,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     const RULE_NAME = 'Rule';
     const KALTURA_FIELD_NAME_XPATH = '/metadata/Rule/Kaltura/ShowTaxonomyElement';
 
+    const OPEN_CALAIS_TOO_MANY_REQUESTS = 429;
+
     /**
      * @var array
      */
@@ -59,7 +61,12 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             $values = $this->getValuesUsingRuleEngine($vendorTask, $mappingProfileId);
 
             KalturaLog::info('Rule engine result values: ' . print_r($values, true));
-            $this->actionUpdate($values, $vendorTask->entryId);
+            $isUnique = $this->ensureUniqueness($vendorTask);
+
+            if ($isUnique)
+            {
+                $this->actionUpdate($values, $vendorTask->entryId);
+            }
         }catch (Exception $e)
         {
             KalturaLog::err('An error occurred processing the task: ' . $e->getMessage());
@@ -191,6 +198,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
         $response = $this->sendOpenCalaisGetTagsRequest($transcript, $vendorTask->partnerId);
 
+
         //Save Open Calais response as attachment asset on the entry
         $this->saveResponseAsAttachment($vendorTask, $response);
 
@@ -277,14 +285,25 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
     protected function sendOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
-        $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL, self::OPEN_CALAIS_URL);
-        curl_setopt($ch,CURLOPT_POST, true);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $transcript);
-        curl_setopt($ch,CURLOPT_HTTPHEADER,$this->getHeaders($partnerId));
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+        $retryCounter = 0;
+        do
+        {
+            usleep(750000);
+            $ch = curl_init();
+            curl_setopt($ch,CURLOPT_URL, self::OPEN_CALAIS_URL);
+            curl_setopt($ch,CURLOPT_POST, true);
+            curl_setopt($ch,CURLOPT_POSTFIELDS, $transcript);
+            curl_setopt($ch,CURLOPT_HTTPHEADER,$this->getHeaders($partnerId));
+            curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
 
-        return curl_exec($ch);
+            $response =  curl_exec($ch);
+            $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            $retryCounter++;
+            curl_close($ch);
+        } while($responseCode == self::OPEN_CALAIS_TOO_MANY_REQUESTS && $retryCounter < 2);
+
+        return $response;
     }
     /**
      * @param string $partnerId

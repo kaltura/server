@@ -65,7 +65,7 @@ class RuleEngine extends Constants
         if(isset($apiItemDetails['resolutions']) && !empty($apiItemDetails['resolutions'])){
             $resolutions = $apiItemDetails['resolutions'];
         }
-        $result = $this->getFieldsArrayUsingRule($resolutions, $rule, $this->getTypeFromItemInApi($apiItemDetails), $apiItemDetails);
+        $result = $this->getFieldsArrayUsingRule($resolutions, $rule, $apiItemDetails);
 
         if(!empty($cuePoints)){
             $result[0]['cuePoints_list'] = $cuePoints;
@@ -78,7 +78,7 @@ class RuleEngine extends Constants
      * @param string $systemName
      * @return array
      */
-    private function getFieldsArrayUsingRule(array $items, array $rule, $systemName, $fullItem){
+    private function getFieldsArrayUsingRule(array $items, array $rule, $fullItem){
         $result = array();
         foreach ($items as $item){
             $result[] =  array(
