@@ -9,7 +9,7 @@ class ZoomVendorService extends KalturaBaseService
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 
-	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete');
+	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'oauthRedirectionAction');
 
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
@@ -56,6 +56,18 @@ class ZoomVendorService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
+	}
+	
+	/**
+	 * load html page the that will ask the user for its KMC URL, derive the region of the user from it,
+	 * and redirect to the registration page in the correct region, while forwarding the necessary code for registration
+	 * @action preOauthValidation
+	 * @throws Exception
+	 */
+	public function oauthRedirectionAction()
+	{
+		$authCode = $_GET['code'];
+		ZoomHelper::loadRegionalCloudRedirectionPage($authCode);
 	}
 	
 	/**
