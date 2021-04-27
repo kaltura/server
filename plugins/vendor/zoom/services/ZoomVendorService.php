@@ -8,6 +8,7 @@ class ZoomVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
+	const ACCOUNT_ID = 'account_id';
 
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'oauthRedirectionAction');
 
@@ -181,12 +182,12 @@ class ZoomVendorService extends KalturaBaseService
 	
 	/**
 	 * @action localRegistrationPage
-	 * @param string $zoomAccountId
+	 * @param string $jwt
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 * @throws Exception
 	 */
-	public function localRegistrationPageAction($zoomAccountId)
+	public function localRegistrationPageAction($jwt)
 	{
 		$isOAuth2Authentication = self::shouldUseOAuth2AuthenticationMethod();
 		
@@ -194,6 +195,10 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NOT_ALLOWED_ON_THIS_INSTANCE);
 		}
+		$zoomConfiguration = self::getZoomConfiguration();
+		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
+		$client = new kZoomClient($zoomBaseURL,$jwt,null,null,null,null);
+		$zoomAccountId = self::getAccountId($client->retrieveTokenZoomUser());
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId);
 		if(!$zoomIntegration)
 		{
@@ -205,7 +210,14 @@ class ZoomVendorService extends KalturaBaseService
 		
 		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::shouldUseOAuth2AuthenticationMethod());
 	}
-
+	
+	protected function getAccountId($jsonDataAsArray)
+	{
+		$accountId =
+		KalturaLog::debug(print_r($dataAsArray, true));
+		return $dataAsArray;
+	}
+	
 	/**
 	 * @param string $tokensData
 	 * @param string $iv
