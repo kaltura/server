@@ -215,7 +215,7 @@ class kZoomEventHanlder
 		$pager->attachToCriteria($c);
 		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
 		$c->add(entryPeer::UPDATED_AT, time() - (dateUtils::HOUR * 3), Criteria::GREATER_EQUAL);
-		$entryStatuses =  entryStatus::DELETED . ',' . entryStatus::ERROR_CONVERTING . ',' . entryStatus::ERROR_IMPORTING;
+		$entryStatuses =  array(entryStatus::DELETED . ',' . entryStatus::ERROR_CONVERTING . ',' . entryStatus::ERROR_IMPORTING);
 		$c->add(entryPeer::STATUS, $entryStatuses, Criteria::NOT_IN);
 		$entry = entryPeer::doSelectOne($c);
 		if($entry)
