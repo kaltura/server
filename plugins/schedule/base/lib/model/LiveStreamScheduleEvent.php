@@ -83,12 +83,12 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	
 	public function setEndScreenTime($v)
 	{
-		$this->putInCustomData(self::SCREENING_END_TIME, $v);
+		$this->putInCustomData (self::SCREENING_END_TIME, $v);
 	}
 	
 	public function getStartScreenTime()
 	{
-		return $this->getFromCustomData(self::SCREENING_START_TIME);
+		return $this->getFromCustomData (self::SCREENING_START_TIME);
 	}
 	
 	public function setStartScreenTime($v)
