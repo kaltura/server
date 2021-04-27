@@ -145,4 +145,15 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		parent::applyDefaultValues();
 		$this->setType(ScheduleEventType::LIVE_STREAM);
 	}
+	
+	public function preSave(PropelPDO $con = null)
+	{
+		if($this->getRecurrenceType() != ScheduleEventRecurrenceType::RECURRING)
+		{
+			$this->setDuration($this->getEndScreenTime() - $this->getStartScreenTime());
+		}
+		
+		$this->setCustomDataObj();
+		return true;
+	}
 }
