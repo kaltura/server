@@ -537,7 +537,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 					$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
 
 					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
-					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime < $dbLiveEntry->getCurrentBroadcastStartTime();
+					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$maxAppendTimeReached = ($recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS) < time();
 
 					KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
