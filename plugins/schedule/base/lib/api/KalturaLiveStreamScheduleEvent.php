@@ -111,6 +111,14 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		}
 	}
 	
+	/**
+	 * @param LiveStreamScheduleEvent $object_to_fill
+	 * @param array $props_to_skip
+	 * @return LiveStreamScheduleEvent|mixed|null
+	 * @throws PropelException
+	 *
+	 * Created a new LiveStreamScheduleEvent
+	 */
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$object_to_fill = parent ::toInsertableObject($object_to_fill, $props_to_skip);
@@ -134,6 +142,8 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 * @param array $props_to_skip
 	 * @return LiveStreamScheduleEvent|mixed|null
 	 * @throws PropelException
+	 *
+	 * Updates an existing LiveStreamScheduleEvent
 	 */
 	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
 	{
@@ -144,7 +154,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		{
 			$preStartTime = isset($this->preStartTime) ? $this->preStartTime : $object_to_fill->getPreStartTime();
 			$startDate = isset($this->startDate) ? isset($this->startDate) : $object_to_fill->getStartScreenTime();
-			$object_to_fill-> setStartDate($startDate - $preStartTime);
+			$object_to_fill->setStartDate($startDate - $preStartTime);
 		}
 		
 		//Adjust end time
@@ -152,7 +162,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		{
 			$postEndTime = isset($this->postEndTime) ? $this->postEndTime : $object_to_fill->getPostEndTime();
 			$endDate = isset($this->endDate) ? isset($this->endDate) : $object_to_fill->getEndScreenTime();
-			$object_to_fill-> setEndDate($endDate + $postEndTime);
+			$object_to_fill->setEndDate($endDate + $postEndTime);
 		}
 		
 		$object_to_fill = parent ::toUpdatableObject($object_to_fill, $props_to_skip);
