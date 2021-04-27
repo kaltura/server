@@ -53,6 +53,8 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		'projectedAudience',
 		'preStartTime',
 		'postEndTime',
+		'startDate' => 'startScreenTime',
+		'endDate' => 'endScreenTime',
 	);
 
 	/* (non-PHPdoc)
@@ -60,7 +62,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 */
 	public function getMapBetweenObjects()
 	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+		return array_merge(parent::getMapBetweenObjects(),self::$map_between_objects);
 	}
 
 	/**
@@ -119,10 +121,6 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			$object_to_fill = new LiveStreamScheduleEvent();
 		}
 		
-		$object_to_fill->setPreStartTime($this->preStartTime);
-		$object_to_fill->setPostEndTime($this->postEndTime);
-		$object_to_fill->setStartScreenTime($this->startDate);
-		$object_to_fill->setEndScreenTime($this->endDate);
 		$object_to_fill->setStartDate($this->startDate - $this->preStartTime);
 		$object_to_fill->setEndDate($this->endDate + $this->postEndTime);
 		
@@ -131,51 +129,33 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		
 	}
 	
+	/**
+	 * @param LiveStreamScheduleEvent $object_to_fill
+	 * @param array $props_to_skip
+	 * @return LiveStreamScheduleEvent|mixed|null
+	 * @throws PropelException
+	 */
 	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
 	{
-		$class = get_class($this);
 		
-		/* @var $object_to_fill LiveStreamScheduleEvent */
-		if(is_null($object_to_fill))
-		{
-			KalturaLog::err("No object supplied for type [$class]");
-			return null;
-		}
+		
 		//Adjust start time
-		if (isset($this->preStartTime) && isset($this->startDate))
+		if (isset($this->preStartTime) || isset($this->startDate))
 		{
-			$object_to_fill->setPreStartTime($this->preStartTime);
-			$object_to_fill->setStartScreenTime($this->startDate);
-			$object_to_fill->setStartDate($this->startDate - $this->preStartTime);
-		}
-		elseif (isset($this -> preStartTime))
-		{
-			$object_to_fill->setPreStartTime($this->preStartTime);
-			$object_to_fill->setStartDate($object_to_fill->getStartScreenTime() - $this->preStartTime);
-		}
-		elseif (isset($this->startDate))
-		{
-			$object_to_fill->setStartScreenTime($this->startDate);
-			$object_to_fill->setStartDate($this->startDate - $object_to_fill->getPreStartTime());
+			$preStartTime = isset($this->preStartTime) ? $this->preStartTime : $object_to_fill->getPreStartTime();
+			$startDate = isset($this->startDate) ? isset($this->startDate) : $object_to_fill->getStartScreenTime();
+			$object_to_fill->setStartDate($startDate - $preStartTime);
 		}
 		
 		//Adjust end time
-		if (isset($this->postEndTime) && isset($this->endDate))
+		if (isset($this->postEndTime) || isset($this->endDate))
 		{
-			$object_to_fill->setPostEndTime($this->postEndTime);
-			$object_to_fill->setEndScreenTime($this->endDate);
-			$object_to_fill->setEndDate($this->endDate + $this->postEndTime);
+			$postEndTime = isset($this->postEndTime) ? $this->postEndTime : $object_to_fill->getPostEndTime();
+			$endDate = isset($this->endDate) ? isset($this->endDate) : $object_to_fill->getEndScreenTime();
+			$object_to_fill->setEndDate($endDate + $postEndTime);
 		}
-		elseif (isset($this -> postEndTime))
-		{
-			$object_to_fill->setPostEndTime($this->postEndTime);
-			$object_to_fill->setEndDate($object_to_fill->getEndScreenTime() + $this->postEndTime);
-		}
-		elseif (isset($this->endDate))
-		{
-			$object_to_fill->setEndScreenTime($this->endDate);
-			$object_to_fill->setEndDate($this->endDate + $object_to_fill->getPostEndTime());
-		}
+		
+		$object_to_fill = parent ::toUpdatableObject($object_to_fill, $props_to_skip);
 		
 		return $object_to_fill;
 	}
