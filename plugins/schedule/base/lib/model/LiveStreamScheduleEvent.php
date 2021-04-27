@@ -96,16 +96,6 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		$this->putInCustomData(self::SCREENING_START_TIME, $v);
 	}
 	
-	public function getCalculatedStartTime()
-	{
-		return parent::getCalculatedStartTime() - $this->getPreStartTime();
-	}
-	
-	public function getCalculatedEndTime()
-	{
-		return parent::getCalculatedEndTime() + $this->getPostEndTime();
-	}
-	
 	
 	public function dynamicGetter($context, &$output)
 	{
