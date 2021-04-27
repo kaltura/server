@@ -205,17 +205,18 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration = new ZoomVendorIntegration();
 			$zoomIntegration->setAccountId($zoomAccountId);
 			$zoomIntegration->setPartnerId(kCurrentContext::$partner_id);
-			$zoomIntegration->save();
 		}
+		$zoomIntegration->setJwtToken($jwt);
+		$zoomIntegration->save();
 		
 		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::shouldUseOAuth2AuthenticationMethod());
 	}
 	
 	protected function getAccountId($jsonDataAsArray)
 	{
-		$accountId =
-		KalturaLog::debug(print_r($dataAsArray, true));
-		return $dataAsArray;
+		$accountId = $jsonDataAsArray[self::ACCOUNT_ID];
+		KalturaLog::debug(print_r($accountId, true));
+		return $accountId;
 	}
 	
 	/**
