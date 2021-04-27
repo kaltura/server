@@ -108,4 +108,75 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
 		}
 	}
+	
+	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
+	{
+		$object_to_fill = parent ::toInsertableObject($object_to_fill, $props_to_skip);
+		
+		/* @var $object_to_fill LiveStreamScheduleEvent */
+		if(is_null($object_to_fill))
+		{
+			$object_to_fill = new LiveStreamScheduleEvent();
+		}
+		
+		$object_to_fill->setPreStartTime($this->preStartTime);
+		$object_to_fill->setPostEndTime($this->postEndTime);
+		$object_to_fill->setStartScreenTime($this->startDate);
+		$object_to_fill->setEndScreenTime($this->endDate);
+		$object_to_fill->setStartDate($this->startDate - $this->preStartTime);
+		$object_to_fill->setEndDate($this->endDate + $this->postEndTime);
+		
+		
+		return $object_to_fill;
+		
+	}
+	
+	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
+	{
+		$class = get_class($this);
+		
+		/* @var $object_to_fill LiveStreamScheduleEvent */
+		if(is_null($object_to_fill))
+		{
+			KalturaLog::err("No object supplied for type [$class]");
+			return null;
+		}
+		//Adjust start time
+		if (isset($this->preStartTime) && isset($this->startDate))
+		{
+			$object_to_fill->setPreStartTime($this->preStartTime);
+			$object_to_fill->setStartScreenTime($this->startDate);
+			$object_to_fill->setStartDate($this->startDate - $this->preStartTime);
+		}
+		elseif (isset($this -> preStartTime))
+		{
+			$object_to_fill->setPreStartTime($this->preStartTime);
+			$object_to_fill->setStartDate($object_to_fill->getStartScreenTime() - $this->preStartTime);
+		}
+		elseif (isset($this->startDate))
+		{
+			$object_to_fill->setStartScreenTime($this->startDate);
+			$object_to_fill->setStartDate($this->startDate - $object_to_fill->getPreStartTime());
+		}
+		
+		//Adjust end time
+		if (isset($this->postEndTime) && isset($this->endDate))
+		{
+			$object_to_fill->setPostEndTime($this->postEndTime);
+			$object_to_fill->setEndScreenTime($this->endDate);
+			$object_to_fill->setEndDate($this->endDate + $this->postEndTime);
+		}
+		elseif (isset($this -> postEndTime))
+		{
+			$object_to_fill->setPostEndTime($this->postEndTime);
+			$object_to_fill->setEndDate($object_to_fill->getEndScreenTime() + $this->postEndTime);
+		}
+		elseif (isset($this->endDate))
+		{
+			$object_to_fill->setEndScreenTime($this->endDate);
+			$object_to_fill->setEndDate($this->endDate + $object_to_fill->getPostEndTime());
+		}
+		
+		return $object_to_fill;
+	}
 }
