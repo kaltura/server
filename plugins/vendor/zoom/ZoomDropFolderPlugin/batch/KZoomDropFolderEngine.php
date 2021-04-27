@@ -176,6 +176,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
+		$entryFilter->updatedAtGreaterThanOrEqual = time() - (dateUtils::HOUR * 3);
 		
 		$entryPager = new KalturaFilterPager();
 		$entryPager->pageSize = 1;

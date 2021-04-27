@@ -6,6 +6,8 @@
 class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 {
 	const MAX_ZOOM_DROP_FOLDERS = 4; //Temporary
+	const AUTO_FILE_DELETE_DAYS_DF = 3;
+	
 	/**
 	 * @inheritDoc
 	 */
@@ -130,8 +132,15 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		$newZoomDropFolder->setDc(kDataCenterMgr::getCurrentDcId());
 		$newZoomDropFolder->setPath(0);
 		$newZoomDropFolder->setFileSizeCheckInterval(0);
-		$newZoomDropFolder->setAutoFileDeleteDays(DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE);
-		$newZoomDropFolder->setFileDeletePolicy($zoomVendorIntegrationObject->getDeletionPolicy());
+		if ($zoomVendorIntegrationObject->getDeletionPolicy())
+		{
+			$newZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
+			$newZoomDropFolder->setAutoFileDeleteDays(self::AUTO_FILE_DELETE_DAYS_DF);
+		}
+		else
+		{
+			$newZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
+		}
 		$newZoomDropFolder->setLastFileTimestamp(0);
 		$newZoomDropFolder->setMetadataProfileId(0);
 		$newZoomDropFolder->setLastHandledMeetingTime(time());
