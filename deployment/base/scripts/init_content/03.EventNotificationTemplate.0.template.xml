@@ -605,7 +605,7 @@
 						<conditions objectType="array">
 							<item objectType="KalturaEventFieldCondition">
 								<field objectType="KalturaEvalBooleanField">
-									<code>!$scope->getObject()->getReplacedEntryId()</code>
+									<code>!$scope->getObject()->getIsTemporary()</code> <!-- Ignore temporary entries -->
 								</field>
 							</item>
 							<item objectType="KalturaEventFieldCondition">
