@@ -6,6 +6,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
 	const MAX_DATE_RANGE_DAYS = 14;
 	const ONE_DAY = 86400;
+	const HOUR = 3600;
 	const MAX_PAGE_SIZE = 300;
 	const MEETINGS = 'meetings';
 	const RECORDING_FILES = 'recording_files';
@@ -176,7 +177,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
-		$entryFilter->updatedAtGreaterThanOrEqual = time() - (dateUtils::HOUR * 3);
+		$entryFilter->updatedAtGreaterThanOrEqual = time() - (self::HOUR * 3);
+		$entryFilter->statusNotIn = KalturaEntryStatus::DELETED . ',' . KalturaEntryStatus::ERROR_CONVERTING . ',' .
+			KalturaEntryStatus::ERROR_IMPORTING;
 		
 		$entryPager = new KalturaFilterPager();
 		$entryPager->pageSize = 1;
