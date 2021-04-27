@@ -8,6 +8,8 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	const PROJECTED_AUDIENCE = 'projected_audience';
 	const PRE_START_TIME = 'pre_start_time';
 	const POST_END_TIME = 'post_end_time';
+	const SCREENING_START_TIME = 'screening_start_time';
+	const SCREENING_END_TIME = 'screening_end_time';
 	const SOURCE_ENTRY_ID = 'source_entry_id';
 	
 	/**
@@ -72,6 +74,26 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	public function getPostEndTime()
 	{
 		return $this->getFromCustomData(self::POST_END_TIME, null, 0);
+	}
+	
+	public function getEndScreenTime()
+	{
+		return $this->getFromCustomData(self::SCREENING_END_TIME);
+	}
+	
+	public function setEndScreenTime($v)
+	{
+		$this->putInCustomData (self::SCREENING_END_TIME, $v);
+	}
+	
+	public function getStartScreenTime()
+	{
+		return $this->getFromCustomData (self::SCREENING_START_TIME);
+	}
+	
+	public function setStartScreenTime($v)
+	{
+		$this->putInCustomData(self::SCREENING_START_TIME, $v);
 	}
 	
 	public function getCalculatedStartTime()
