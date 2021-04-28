@@ -110,7 +110,10 @@ class kZoomEventHanlder
 		$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
 		
 		$kMeetingMetaData = self::allocateMeetingMetaData($recording, $event);
+		KalturaLog::debug('meeting recording files are: ' . print_r($recording->recordingFiles, true));
 		$recordingFilesOrdered = $recording->orderRecordingFiles($recording->recordingFiles);
+		KalturaLog::debug('recording files ordered are: ' . print_r($recordingFilesOrdered, true));
+		$firstLoop = true;
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$parentEntry = null;
@@ -129,7 +132,10 @@ class kZoomEventHanlder
 					                                                      $kMeetingMetaData, $kRecordingFile);
 					if (!$parentEntry)
 					{
-						$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(), $partnerId);
+						if ($firstLoop)
+						{
+							$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(), $partnerId);
+						}
 						if ($parentEntry)
 						{
 							$zoomDropFolderFile->setIsParentEntry(false);
@@ -156,6 +162,7 @@ class kZoomEventHanlder
 					KalturaLog::notice('Drop folder file already existed: ' . print_r($dropFolderFilesMap[$fileName], true));
 				}
 			}
+			$firstLoop = false;
 		}
 	}
 	

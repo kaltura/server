@@ -132,6 +132,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$recordingFilesOrdered = ZoomHelper::orderRecordingFiles($meetingFile[self::RECORDING_FILES], self::RECORDING_START,
 			                                                         self::RECORDING_TYPE);
 			KalturaLog::debug('recording files ordered are: ' . print_r($recordingFilesOrdered, true));
+			$firstLoop = true;
+			$dropFolderFilesMap = $this->loadDropFolderFiles();
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
 				$parentEntry = null;
@@ -144,7 +146,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 						{
 							if (!$parentEntry)
 							{
-								$parentEntry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
+								if ($firstLoop)
+								{
+									$parentEntry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
+								}
 								if ($parentEntry)
 								{
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
@@ -169,6 +174,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 						$this->handleExistingDropFolderFile($dropFolderFile);
 					}
 				}
+				$firstLoop = false;
 			}
 		}
 	}
