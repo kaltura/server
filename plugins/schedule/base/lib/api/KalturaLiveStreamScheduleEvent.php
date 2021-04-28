@@ -124,10 +124,6 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		$object_to_fill = parent ::toInsertableObject($object_to_fill, $props_to_skip);
 		
 		/* @var $object_to_fill LiveStreamScheduleEvent */
-		if(is_null($object_to_fill))
-		{
-			$object_to_fill = new LiveStreamScheduleEvent();
-		}
 		
 		$object_to_fill->setStartDate($this->startDate - $this->preStartTime);
 		$object_to_fill->setEndDate($this->endDate + $this->postEndTime);
@@ -165,8 +161,6 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			$object_to_fill->setEndDate($endDate + $postEndTime);
 		}
 		
-		$object_to_fill = parent ::toUpdatableObject($object_to_fill, $props_to_skip);
-		
-		return $object_to_fill;
+		return parent ::toUpdatableObject($object_to_fill, $props_to_skip);
 	}
 }

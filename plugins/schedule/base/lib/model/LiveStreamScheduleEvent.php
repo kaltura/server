@@ -96,16 +96,6 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		$this->putInCustomData(self::SCREENING_START_TIME, $v);
 	}
 	
-	public function getCalculatedStartTime()
-	{
-		return parent::getCalculatedStartTime() - $this->getPreStartTime();
-	}
-	
-	public function getCalculatedEndTime()
-	{
-		return parent::getCalculatedEndTime() + $this->getPostEndTime();
-	}
-	
 	
 	public function dynamicGetter($context, &$output)
 	{
@@ -154,5 +144,16 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		parent::applyDefaultValues();
 		$this->setType(ScheduleEventType::LIVE_STREAM);
+	}
+	
+	public function preSave(PropelPDO $con = null)
+	{
+		if($this->getRecurrenceType() != ScheduleEventRecurrenceType::RECURRING)
+		{
+			$this->setDuration($this->getEndScreenTime() - $this->getStartScreenTime());
+		}
+		
+		$this->setCustomDataObj();
+		return true;
 	}
 }
