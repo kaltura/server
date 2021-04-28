@@ -143,7 +143,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 */
 	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
 	{
-		
+		$object_to_fill = parent ::toUpdatableObject($object_to_fill, $props_to_skip);
 		
 		//Adjust start time
 		if (isset($this->preStartTime) || isset($this->startDate))
@@ -161,6 +161,6 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			$object_to_fill->setEndDate($endDate + $postEndTime);
 		}
 		
-		return parent ::toUpdatableObject($object_to_fill, $props_to_skip);
+		return $object_to_fill;
 	}
 }
