@@ -8,7 +8,6 @@ class ZoomVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const ACCOUNT_ID = 'account_id';
 
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'oauthRedirectionAction');
 
@@ -165,8 +164,7 @@ class ZoomVendorService extends KalturaBaseService
 		$tokens = $this->handleEncryptTokens($tokensData, $iv, $zoomConfiguration);
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$client = new kZoomClient($zoomBaseURL,null,$tokens[kZoomTokens::REFRESH_TOKEN],null,null,$tokens[kZoomTokens::ACCESS_TOKEN]);
-		$zoomUserData = $client->retrieveTokenZoomUser();
-		$accountId = $zoomUserData[ZoomHelper::ACCOUNT_ID];
+		$accountId = $this->getAccountId($client->retrieveTokenZoomUser());
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if($zoomIntegration && intval($partnerId) !==  $zoomIntegration->getPartnerId() && $partnerId !== 0)
@@ -177,7 +175,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->save();
 		}
 
-		ZoomHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs(), self::shouldUseOAuth2AuthenticationMethod());
+		ZoomHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs());
 	}
 	
 	/**
@@ -198,7 +196,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomConfiguration = self::getZoomConfiguration();
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$client = new kZoomClient($zoomBaseURL,$jwt,null,null,null,null);
-		$zoomAccountId = self::getAccountId($client->retrieveTokenZoomUser());
+		$zoomAccountId = $this->getAccountId($client->retrieveTokenZoomUser());
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId);
 		if(!$zoomIntegration)
 		{
@@ -209,12 +207,12 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration->setJwtToken($jwt);
 		$zoomIntegration->save();
 		
-		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::shouldUseOAuth2AuthenticationMethod());
+		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs());
 	}
 	
 	protected function getAccountId($jsonDataAsArray)
 	{
-		$accountId = $jsonDataAsArray[self::ACCOUNT_ID];
+		$accountId = $jsonDataAsArray[ZoomHelper::ACCOUNT_ID];
 		KalturaLog::debug(print_r($accountId, true));
 		return $accountId;
 	}

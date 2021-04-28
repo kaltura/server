@@ -13,7 +13,6 @@
         let baseServiceUrl = '@BaseServiceUrl@';
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
-        var showJWT = '@showJWT@';
         var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
         var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
         const CMS_USER_ID=3;
@@ -25,7 +24,6 @@
             let defaultUserId = $('#defaultUserId').val().trim();
             let zoomCategory  = $('#zoomCategory').val().trim();
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
-            let jwtToken  = $('#jwtToken').val().trim();
             let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
             let enableZoomTranscription = $('#enableZoomTranscription').is(':checked');
@@ -49,7 +47,6 @@
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
-                    'integrationSetting:jwtToken':jwtToken,
                     'integrationSetting:deletionPolicy':deletionPolicy,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
                     'integrationSetting:enableZoomTranscription':enableZoomTranscription,
@@ -91,10 +88,6 @@
             {
                 return;
             }
-            if(showJWT === 'false')
-            {
-                $('#jwtController').hide();
-            }
             setDefaultValues();
             $.ajax({
                 url: getUrl,
@@ -132,7 +125,6 @@
                     case 'defaultUserId':
                     case 'zoomCategory':
                     case 'zoomUserPostfix':
-                    case 'zoomJWT':
                     case 'zoomWebinarCategory':
                         $('#'+i).val(v);
                         break;
@@ -207,12 +199,6 @@
                     <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
                     <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
                 </div>
-                <div class='form-group' id='jwtController'>
-                    <label for='jwtToken'><h6>Zoom JWT</h6></label>
-                    <input type='text' value='' id='jwtToken' class='form-control' name='jwtToken' required>
-                </div>
-                <h6>Settings</h6>
-
             </div>
         </div>
 
