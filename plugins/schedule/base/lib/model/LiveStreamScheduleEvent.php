@@ -91,7 +91,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		//For backwards compatibility
 		if ($this->isOldWorkflow())
 		{
-			return $this->getEndDate();
+			return $this->getEndDate(null);
 		}
 		return $this->getFromCustomData(self::SCREENING_END_TIME);
 	}
@@ -106,7 +106,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		//For backwards compatibility
 		if ($this->isOldWorkflow())
 		{
-			return $this->getStartDate();
+			return $this->getStartDate(null);
 		}
 		return $this->getFromCustomData(self::SCREENING_START_TIME);
 	}
@@ -116,7 +116,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		//For backwards compatibility
 		if ($this->isOldWorkflow())
 		{
-			return $this->getStartDate() - $this->getPreStartTime();
+			return $this->getStartDate(null) - $this->getPreStartTime();
 		}
 		return parent::getCalculatedStartTime();
 	}
@@ -126,7 +126,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		//For backwards compatibility
 		if ($this->isOldWorkflow())
 		{
-			return $this->getEndDate() + $this->getPostEndTime();
+			return $this->getEndDate(null) + $this->getPostEndTime();
 		}
 		return parent::getCalculatedEndTime();
 	}
