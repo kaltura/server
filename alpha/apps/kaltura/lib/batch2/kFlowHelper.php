@@ -178,6 +178,17 @@ class kFlowHelper
 			}
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();
+
+			if($data->getFlavorAssetId())
+			{
+				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+				if($flavorAsset)
+				{
+					$flavorAsset->setStatus(asset::ASSET_STATUS_READY);
+					$flavorAsset->save();
+				}
+			}
+
 			return $dbBatchJob;
 		}
 
