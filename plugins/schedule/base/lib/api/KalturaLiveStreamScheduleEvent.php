@@ -149,7 +149,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		if (isset($this->preStartTime) || isset($this->startDate))
 		{
 			$preStartTime = isset($this->preStartTime) ? $this->preStartTime : $object_to_fill->getPreStartTime();
-			$startDate = isset($this->startDate) ? isset($this->startDate) : $object_to_fill->getStartScreenTime();
+			$startDate = isset($this->startDate) ? $this->startDate : $object_to_fill->getStartScreenTime();
 			$object_to_fill->setStartDate($startDate - $preStartTime);
 		}
 		
@@ -157,7 +157,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		if (isset($this->postEndTime) || isset($this->endDate))
 		{
 			$postEndTime = isset($this->postEndTime) ? $this->postEndTime : $object_to_fill->getPostEndTime();
-			$endDate = isset($this->endDate) ? isset($this->endDate) : $object_to_fill->getEndScreenTime();
+			$endDate = isset($this->endDate) ? $this->endDate : $object_to_fill->getEndScreenTime();
 			$object_to_fill->setEndDate($endDate + $postEndTime);
 		}
 		
