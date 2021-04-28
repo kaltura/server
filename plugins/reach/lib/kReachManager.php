@@ -360,7 +360,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof flavorAsset)
+		if ($object instanceof flavorAsset && !$object->getBlockAutoTranscript())
 		{
 			return $this->handleEntryReady($object->getentry());
 		}
