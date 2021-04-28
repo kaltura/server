@@ -128,7 +128,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		{
 			return $this->getEndDate() + $this->getPostEndTime();
 		}
-		return parent::getCalculatedStartTime();
+		return parent::getCalculatedEndTime();
 	}
 	
 	public function setStartScreenTime($v)
