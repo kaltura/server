@@ -75,9 +75,24 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		return $this->getFromCustomData(self::POST_END_TIME, null, 0);
 	}
+	// In the old workflow, we did not save on the db the absolut start/end times.
+	// we had the actual start/end times and the "paddings"
+	// in the new workflow, start\end are mapped to the absolut and the actual play dates are
+	// saved in custom data.
+	// the bellow functions do the above mappings depending on the workflow for backwards compatibility
+	// Objects created in the old workflow will not have 'screenEndTime' in custom data, therefore will return null
+	protected function isOldWorkflow()
+	{
+		return is_null($this->getFromCustomData(self::SCREENING_END_TIME));
+	}
 	
 	public function getEndScreenTime()
 	{
+		//For backwards compatibility
+		if ($this->isOldWorkflow())
+		{
+			return $this->getEndDate();
+		}
 		return $this->getFromCustomData(self::SCREENING_END_TIME);
 	}
 	
@@ -88,7 +103,32 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	
 	public function getStartScreenTime()
 	{
-		return $this->getFromCustomData (self::SCREENING_START_TIME);
+		//For backwards compatibility
+		if ($this->isOldWorkflow())
+		{
+			return $this->getStartDate();
+		}
+		return $this->getFromCustomData(self::SCREENING_START_TIME);
+	}
+	
+	public function getCalculatedStartTime()
+	{
+		//For backwards compatibility
+		if ($this->isOldWorkflow())
+		{
+			return $this->getStartDate() - $this->getPreStartTime();
+		}
+		return parent::getCalculatedStartTime();
+	}
+	
+	public function getCalculatedEndTime()
+	{
+		//For backwards compatibility
+		if ($this->isOldWorkflow())
+		{
+			return $this->getEndDate() + $this->getPostEndTime();
+		}
+		return parent::getCalculatedEndTime();
 	}
 	
 	public function setStartScreenTime($v)
