@@ -81,7 +81,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	// saved in custom data.
 	// the bellow functions do the above mappings depending on the workflow for backwards compatibility
 	// Objects created in the old workflow will not have 'screenEndTime' in custom data, therefore will return null
-	protected function isOldWorkflow()
+	public function isOldWorkflow()
 	{
 		return is_null($this->getFromCustomData(self::SCREENING_END_TIME));
 	}
