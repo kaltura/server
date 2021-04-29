@@ -1,8 +1,8 @@
 <?php
-require_once (__DIR__ . DIRECTORY_SEPARATOR . 'Constants.php');
+require_once (__DIR__ . DIRECTORY_SEPARATOR . 'OpenCalaisConstants.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'ThresholdComparisonFactory.php');
 
-class RuleEngine extends Constants
+class RuleEngine extends OpenCalaisConstants
 {
     /**
      * @var array

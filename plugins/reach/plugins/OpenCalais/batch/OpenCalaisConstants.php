@@ -1,7 +1,7 @@
 <?php
 
 
-abstract class Constants
+abstract class OpenCalaisConstants
 {
     const THRSHLD_VAL_PROP = 'ThresholdValue';
     const THRSHLD_COMPARISON_PROP = 'Comparison';
