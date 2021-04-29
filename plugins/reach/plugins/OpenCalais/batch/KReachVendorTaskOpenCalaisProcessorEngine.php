@@ -80,7 +80,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param array $values
      * @param string $entryId
      */
-    private function actionUpdate($values, $entryId){
+    protected function actionUpdate($values, $entryId){
         $this->cleanCuePointsForEntry($entryId);
         $showTaxonomyId = $this->initMainMetadataFields(self::SHOWTAXONOMY_SYSTEM_NAME);
         $showTaxonomyXml = $this->initMainMetadataXml($entryId, $showTaxonomyId);
@@ -112,7 +112,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param string $entryId
      * @param int $showTaxonomyId
      */
-    private function initMainMetadataXml ($entryId, $showTaxonomyId)
+    protected function initMainMetadataXml ($entryId, $showTaxonomyId)
     {
         $initialXml = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($showTaxonomyId, KalturaMetadataObjectType::ENTRY, $entryId);
         if ($initialXml->totalCount)
@@ -123,7 +123,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         return '<metadata/>';
     }
 
-    private function initMainMetadataFields ($showTaxonomySystemName)
+    protected function initMainMetadataFields ($showTaxonomySystemName)
     {
         $metadataProfile = $this->getMetaDataProfile(self::SHOWTAXONOMY_SYSTEM_NAME);
         $this->getTargetMetadataFields($metadataProfile);
@@ -136,7 +136,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param $cuePointsList
      * @param $entryId
      */
-    private function handleCuePoints($cuePointsList, $entryId){
+    protected function handleCuePoints($cuePointsList, $entryId){
 
         foreach ($cuePointsList as $cuePoint){
             $cuePointObj = new KalturaAnnotation();
@@ -187,7 +187,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
 
 
-    private function getValuesUsingRuleEngine(KalturaEntryVendorTask $vendorTask, $mappingProfileId) {
+    protected function getValuesUsingRuleEngine(KalturaEntryVendorTask $vendorTask, $mappingProfileId) {
 
         try {
             $transcript = $this->getEntryTranscript($vendorTask);
@@ -310,7 +310,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @return string[]
      * @throws Exception
      */
-    private function getHeaders($partnerId) {
+    protected function getHeaders($partnerId) {
         $apiKey = $this->getOpenCalaisApiKey($partnerId);
         $enableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
         $omitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
@@ -372,7 +372,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @return SimpleXMLElement|null
      * @throws Exception
      */
-    private function getSimpleXMLElementFromPartnerMetadata($partnerId) {
+    protected function getSimpleXMLElementFromPartnerMetadata($partnerId) {
         static $xmlData = null;
         if($xmlData === null){
             $openCalaisApiKeyProfileId = $this->getMetaDataProfileId(self::OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME);
@@ -701,7 +701,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param mixed $value
      * @param array $keyArray
      */
-    private function getOcmValueRecursive ($value, $keyArray)
+    protected function getOcmValueRecursive ($value, $keyArray)
     {
         if (is_scalar($value))
         {
@@ -721,7 +721,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param array $entryMetadataAdditions
      * @param $initialMetadata
      */
-    private function updateEntryMetadataXml(array $entryMetadataAdditions, $initialMetadata) {
+    protected function updateEntryMetadataXml(array $entryMetadataAdditions, $initialMetadata) {
 
         $dom = new KDOMDocument();
         $dom->loadXML($initialMetadata);
