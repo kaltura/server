@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Kaltura Zoom preloader</title>
-		<meta charset='utf-8'>
-		<meta name='viewport' content='width=device-width, initial-scale=1'>
-		<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>
-		<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
-		<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js'></script>
-		<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
-		<script>
-			var authCode = '@authCode@';R20ofbHzHc_blLbXSjSSzKwRk6dQNK6mg
-		</script>
-		<script>
-			function submitKMCUrl(event)
+<head>
+	<title>Kaltura Zoom preloader</title>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>
+	<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js'></script>
+	<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
+	<script>
+		var authCode = '@authCode@';
+	</script>
+	<script>
+		function submitKMCUrl(event)
+		{
+			$('body').css('cursor', 'progress');
+			event.preventDefault();
+			let kmcUrl = $('#kmcUrl');
+			let regionStartIndex = 0;
+			let regionEndIndex = kmcUrl.val().indexOf("kaltura.com");
+			if (regionEndIndex < 0)
 			{
-				$('body').css('cursor', 'progress');
-				event.preventDefault();
-				let kmcUrl = $('#kmcUrl');
-                let regionStartIndex = 0;
-                let regionEndIndex = kmcUrl.val().indexOf("kaltura.com");
-                if (regionEndIndex < 0)
-				{
-					return onFail('Invalid URL');
-				}
-                regionEndIndex = regionEndIndex + 11;
-                let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
+				return onFail('Invalid URL');
+			}
+			regionEndIndex = regionEndIndex + 11;
+			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
 
-				$.ajax(
+			$.ajax(
 					{
 						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/oauthValidation',
 						type: 'get',
@@ -35,15 +35,15 @@
 							$('body').css('cursor', 'default');
 							if (registrationPage)
 							{
-                                if(registrationPage.objectType == 'KalturaAPIException')
-                                {
-                                    return onFail(registrationPage.message);
-                                }
-                                if (registrationPage.includes('Invalid authorization code'))
+								if(registrationPage.objectType == 'KalturaAPIException')
+								{
+									return onFail(registrationPage.message);
+								}
+								if (registrationPage.includes('Invalid authorization code'))
 								{
 									return onFail('Invalid authorization code');
 								}
-                                let newDoc = document.open('text/html', 'replace');
+								let newDoc = document.open('text/html', 'replace');
 								newDoc.write(registrationPage);
 								newDoc.close();
 							}
@@ -53,45 +53,45 @@
 							onFail(err);
 						}
 					});
-			}
-            function onFail(errorMessage)
-            {
-				$('body').css('cursor', 'default');
-				console.log('err during api call '+ errorMessage);
-                alert('Error\n'+errorMessage);
-            }
-		</script>
-		<script>
-			(function()
-			{
-				document.addEventListener('DOMContentLoaded',
-						function ()
-						{
-							let submitButton = document.querySelector('#submit-button');
-							submitButton.addEventListener('click', submitKMCUrl);
-						}
-				);
-			})();
-		</script>
-		<title>Kaltura Zoom preloader</title>
-	</head>
+		}
+		function onFail(errorMessage)
+		{
+			$('body').css('cursor', 'default');
+			console.log('err during api call '+ errorMessage);
+			alert('Error\n'+errorMessage);
+		}
+	</script>
+	<script>
+		(function()
+		{
+			document.addEventListener('DOMContentLoaded',
+					function ()
+					{
+						let submitButton = document.querySelector('#submit-button');
+						submitButton.addEventListener('click', submitKMCUrl);
+					}
+			);
+		})();
+	</script>
+	<title>Kaltura Zoom preloader</title>
+</head>
 
-	<body>
-		<div style='width: 500px;margin: auto; padding-top: 200px'>
-			<form>
-				<div class='form-group  container p-2 my-3 border'>
-					<div class='imgcontainer'>
-						<img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
-					</div>
-					<div class='container'>
-						<div class='form-group'>
-							<label><h6>Please submit the URL of your KMC</h6></label>
-							<input type='text' placeholder='http://...' id='kmcUrl' class='form-control' name='defaultUserId' required>
-						</div>
-						<button type='submit' id='submit-button' class='btn btn-primary'>Submit</button>
-					</div>
+<body>
+<div style='width: 500px;margin: auto; padding-top: 200px'>
+	<form>
+		<div class='form-group  container p-2 my-3 border'>
+			<div class='imgcontainer'>
+				<img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
+			</div>
+			<div class='container'>
+				<div class='form-group'>
+					<label><h6>Please submit the URL of your KMC</h6></label>
+					<input type='text' placeholder='http://...' id='kmcUrl' class='form-control' name='defaultUserId' required>
 				</div>
-			</form>
+				<button type='submit' id='submit-button' class='btn btn-primary'>Submit</button>
+			</div>
 		</div>
-	</body>
+	</form>
+</div>
+</body>
 </html>
