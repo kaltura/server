@@ -11,6 +11,10 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
+		if(kConf::get('DisableZoomDropFolder','vendor',true))
+		{
+			return true;
+		}
 		if ( self::wasStatusChanged($object, $modifiedColumns))
 		{
 			//Update the status of the Drop Folder
