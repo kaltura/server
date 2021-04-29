@@ -80,7 +80,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
      * @param array $values
      * @param string $entryId
      */
-    protected function actionUpdate($values, $entryId){
+    protected function actionUpdate($values, $entryId)
+    {
         $this->cleanCuePointsForEntry($entryId);
         $showTaxonomyId = $this->initMainMetadataFields(self::SHOWTAXONOMY_SYSTEM_NAME);
         $showTaxonomyXml = $this->initMainMetadataXml($entryId, $showTaxonomyId);
