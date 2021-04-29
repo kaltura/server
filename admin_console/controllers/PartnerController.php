@@ -398,7 +398,7 @@ class PartnerController extends Zend_Controller_Action
 			Infra_ClientHelper::unimpersonate();
 			
 			$flavorParamsIds = array();
-			if($storage->flavorParamsIds)
+			if(strlen($storage->flavorParamsIds))
 				$flavorParamsIds = explode(',', $storage->flavorParamsIds);
 			
 			$form->getElement('partnerId')->setAttrib('readonly',true);

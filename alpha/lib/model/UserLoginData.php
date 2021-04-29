@@ -66,6 +66,17 @@ class UserLoginData extends BaseUserLoginData{
 	
 	
 	/**
+	 * Code to be run after deleting the object in database
+	 * @param PropelPDO $con
+	 */
+	public function postDelete(PropelPDO $con = null)
+	{
+		parent::postDelete($con);
+		kQueryCache::invalidateQueryCache($this);
+		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
+	}
+	
+	/**
 	 * @return int
 	 */
 	public function getLoginAttempts()

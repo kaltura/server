@@ -66,6 +66,8 @@ class KalturaDocCommentParser
     const MAX_VALUE_CONSTRAINT = "maxValue";
 
     const RELATED_SERVICE = "/\\@relatedService (.*)/";
+	
+	const UTF8_TRUNCATE = "utf8truncate";
 
     /**
      * @var bool
@@ -235,6 +237,11 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $beta = false;
+	
+	/**
+	 * @var int
+	 */
+	public $utf8truncate;
 
     /**
      * Parse a docComment
@@ -361,6 +368,7 @@ class KalturaDocCommentParser
         self::fillConstraint($comment, self::MAX_LENGTH_CONSTRAINT);
         self::fillConstraint($comment, self::MIN_VALUE_CONSTRAINT);
         self::fillConstraint($comment, self::MAX_VALUE_CONSTRAINT);
+	    self::fillConstraint($comment, self::UTF8_TRUNCATE);
 
         $result = null;
         $error_array = array();

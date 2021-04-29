@@ -338,6 +338,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_NODE_SWITCH,
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
 		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
+		self::EVENT_TYPE_REACTION_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -390,6 +391,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
 		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED => 'count_download_attachment_clicked',
+		self::EVENT_TYPE_REACTION_CLICKED => 'count_reaction_clicked',
 	);
 
 	//global transform
@@ -3795,6 +3797,36 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getUserIdAndFullNameBase($ids, $partner_id)
+	{
+		$context = array(
+			'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
+		);
+		return self::getUsersInfo($ids, $partner_id, $context);
+	}
+
+	protected static function getUserFullNameWithFallback($ids, $partner_id)
+	{
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		foreach ($result as $id => $row)
+		{
+			$result[$id] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
+	protected static function getUserIdAndFullNameWithFallback($ids, $partner_id)
+	{
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		foreach ($result as $id => &$row)
+		{
+			$row[1] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
 	protected static function getEntriesSource($ids, $partner_id, $context)
 	{
 		$context['peer'] = 'entryPeer';
@@ -4774,7 +4806,7 @@ class kKavaReportsMgr extends kKavaBase
 			$dimension_ids = array();
 			foreach ($rows as $row)
 			{
-				$dimension_ids[] = $row[$dimension];
+				$dimension_ids[] = !is_null($row[$dimension]) ? $row[$dimension] : '';
 			}
 
 			// issue a second topN query

@@ -854,9 +854,11 @@ class kJobsManager
 	 */
 	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $fileSyncKey, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey);
+
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setPostConvertAssetType($postConvertAssetType);
-		$postConvertData->setSrcFileSyncLocalPath(kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey));
+		$postConvertData->setSrcFileSyncLocalPath($fileSync);
 		$postConvertData->setFlavorParamsOutputId($flavorParamsOutputId);
 		$postConvertData->setFlavorAssetId($flavorAssetId);
 		$postConvertData->setThumbOffset($thumbOffset);
@@ -873,14 +875,16 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-		$flavorParamsOutput = null;
-		if($flavorAsset && $flavorAsset->getEncryptionKey()) {
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
+		$unsupportedEncryptionFormats = kConf::get('unsupported_encryption_formats', 'runtime_config', array(assetParams::CONTAINER_FORMAT_MPEGTS));
+		if($flavorAsset && $flavorAsset->getEncryptionKey() &&
+			(!$flavorParamsOutput || ($flavorParamsOutput && !in_array($flavorParamsOutput->getFormat(), $unsupportedEncryptionFormats))))
+		{
 			$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 		}
 		
 		if($createThumb)
 		{
-			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 			if(!$flavorParamsOutput)
 			{
 				if($flavorAsset)

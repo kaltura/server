@@ -397,6 +397,13 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @insertonly
 	 */
 	public $applicationVersion;
+	
+	/**
+	 * Block auto transcript on Entry
+	 *
+	 * @var bool
+	 */
+	public $blockAutoTranscript;
 
 
 	/*
@@ -449,6 +456,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"displayInSearch",
 		"application",
 		"applicationVersion",
+		"blockAutoTranscript"
 	 );
 		 
 	public function getMapBetweenObjects()

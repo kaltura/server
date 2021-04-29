@@ -19,7 +19,10 @@ class kImageUtils
 		{
 			$key = kFileSyncUtils::getKeyForFileSync($fileSync);
 			$filePath = kFileSyncUtils::getLocalFilePathForKey($key);
-			list($width, $height, $type, $attr) = getimagesize($filePath);
+			$realPath =  kFile::realPath($filePath);
+			kSharedFileSystemMgr::restoreStreamWrappers();
+			list($width, $height, $type, $attr) = getimagesize($realPath);
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
 		}
 		else
 		{

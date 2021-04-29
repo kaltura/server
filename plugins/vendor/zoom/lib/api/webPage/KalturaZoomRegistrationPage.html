@@ -24,7 +24,9 @@
             let defaultUserId = $('#defaultUserId').val().trim();
             let zoomCategory  = $('#zoomCategory').val().trim();
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
+            let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
+            let enableZoomTranscription = $('#enableZoomTranscription').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
             let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
@@ -45,8 +47,11 @@
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
                     'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
+                    'integrationSetting:deletionPolicy':deletionPolicy,
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
+                    'integrationSetting:enableZoomTranscription':enableZoomTranscription,
                     'integrationSetting:createUserIfNotExist':createUserIfNotExist,
+
                     'format': 1 },
                 success : function(res) {
                     $('body').css('cursor', 'default');
@@ -124,6 +129,8 @@
                         $('#'+i).val(v);
                         break;
                     case 'enableWebinarUploads':
+                    case 'deletionPolicy':
+                    case 'enableZoomTranscription':
                     case 'enableRecordingUpload':
                     case 'createUserIfNotExist':
                         $('#'+i).prop('checked', v);
@@ -202,6 +209,14 @@
                     <div class='custom-control custom-switch'>
                         <input type='checkbox' class='custom-control-input' id='createUserIfNotExist' name='createUserIfNotExist'>
                         <label class='custom-control-label' for='createUserIfNotExist'>Create new user if no match is found</label>
+                    </div>
+                    <div class='custom-control custom-switch'>
+                        <input type='checkbox' class='custom-control-input' id='deletionPolicy' name='deletionPolicy' >
+                        <label class='custom-control-label' for='deletionPolicy'>Enable automatic deletion of files</label>
+                    </div>
+                    <div class='custom-control custom-switch'>
+                        <input type='checkbox' class='custom-control-input' id='enableZoomTranscription' name='enableZoomTranscription' >
+                        <label class='custom-control-label' for='enableZoomTranscription'>Enable Transcriptions</label>
                     </div>
                 </div>
             </div>

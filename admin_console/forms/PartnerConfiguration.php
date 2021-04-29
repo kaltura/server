@@ -317,7 +317,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'bulk_upload_notifications_email', array(
 			'label'	  => 'Bulk Upload Notifications Email (Legacy)',
 		));
-			
+
+//--------------------------- Security ------------------------------------
+		$this->addElement('text', 'secondary_secret_role_id', array(
+			'label'			=> 'Secondary Secret Role Id:',
+			'filters'		=> array('StringTrim'),
+		));
 //--------------------------- Password Security ---------------------------
 		
 		$this->addElement('text', 'login_block_period', array(
@@ -334,6 +339,20 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Password replacement frequency (seconds):',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('text', 'password_structure_validations', array(
+			'label'			=> 'Password structure validations (regex):',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'password_structure_validations_description',
+		                  array(
+			'label'			=> 'Password structure validations description:',
+			'filters'		=> array('StringTrim'),
+		));
+
+
+
 //--------------------------- Single Sign On ---------------------------
 		
 		$this->addElement('text', 'logout_url', array(
@@ -969,11 +988,15 @@ class Form_PartnerConfiguration extends Infra_Form
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
-									 'pass_replace_freq'),
+									 'pass_replace_freq',
+									 'password_structure_validations',
+									 'password_structure_validations_description'),
 									 $permissionNames[self::SECURITY_OPTIONS],
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
-
+		
+		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
+		                                   array('crossLine')), 'security', array('legend' => 'Security'));
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login'), array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 

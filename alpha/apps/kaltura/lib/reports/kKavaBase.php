@@ -122,6 +122,7 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_NODE_SWITCH = 'nodeSwitch';
 	const EVENT_TYPE_ADD_TO_CALENDAR_CLICKED = 'addToCalendarClicked';
 	const EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED = 'downloadAttachmentClicked';
+	const EVENT_TYPE_REACTION_CLICKED = 'reactionClicked';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -246,6 +247,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
+			self::DIMENSION_POSITION => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,

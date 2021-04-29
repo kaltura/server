@@ -349,7 +349,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 			if (in_array(entryPeer::STATUS, $modifiedColumns))
 			{
-				if ($object->getStatus() == entryStatus::READY)
+				if ($object->getStatus() == entryStatus::READY && !$object->getBlockAutoTranscript())
 				{
 					return $this->handleEntryReady($object);
 				}
@@ -360,7 +360,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof flavorAsset)
+		if ($object instanceof flavorAsset && !$object->getentry()->getBlockAutoTranscript())
 		{
 			return $this->handleEntryReady($object->getentry());
 		}
@@ -576,7 +576,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 		else
 		{
-			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING));
+			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
 			if($activeTasksOnOlderVersion)
 			{
 				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);

@@ -162,11 +162,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-					'peer' => 'kuserPeer',
-				)
+				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_REGISTERED,
@@ -208,6 +204,28 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::METRIC_LIVE_ENGAGED_USERS_RATIO),
 			self::REPORT_EDIT_FILTER_FUNC => 'self::editWebcastEngagementTimelineFilter',
 			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
+		),
+
+		ReportType::ENGAGEMENT_TOOLS_WEBCAST => array(
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+				self::EVENT_TYPE_REACTION_CLICKED,
+			),
+		),
+
+		ReportType::REACTIONS_BREAKDOWN_WEBCAST => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'reaction' => self::DIMENSION_EVENT_VAR1,
+			),
+			self::REPORT_FILTER => array(
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_REACTION_CLICKED)
+				)
+			),
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_REACTION_CLICKED,
+			),
 		),
 
 	);

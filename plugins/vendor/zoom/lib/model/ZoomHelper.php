@@ -11,6 +11,20 @@ class ZoomHelper
 
 	/** php body */
 	const PHP_INPUT = 'php://input';
+	const SUFFIX_ZOOM = '.zoom';
+	const ORDER_RECORDING_TYPE =  array(
+		'shared_screen_with_speaker_view(CC)',
+		'shared_screen_with_speaker_view',
+		'shared_screen_with_gallery_view',
+		'shared_screen',
+		'speaker_view',
+		'active_speaker',
+		'gallery_view',
+		'audio_only',
+		'audio_transcript',
+		'chat_file',
+		'poll'
+	);
 
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
@@ -107,7 +121,26 @@ class ZoomHelper
 			die();
 		}
 	}
-
+	
+	/**
+	 * @param $authCode
+	 * @throws Exception
+	 */
+	public static function loadRegionalCloudRedirectionPage($authCode)
+	{
+		$file_path = dirname(__FILE__) . '/../api/webPage/kalturaRegionalRedirectPage.html';
+		if (file_exists($file_path))
+		{
+			$page = file_get_contents($file_path);
+			$page = str_replace('@authCode@', $authCode, $page);
+			
+			echo $page;
+			die();
+		}
+		
+		throw new KalturaAPIException('unable to find regional redirect page, please contact support');
+	}
+	
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param $accountId
@@ -217,5 +250,96 @@ class ZoomHelper
 		{
 			self::exitWithError(kZoomErrorMessages::UPLOAD_DISABLED);
 		}
+	}
+	
+	public static function shouldHandleFileType($recordingFileType)
+	{
+		switch($recordingFileType)
+		{
+			case 'MP4':
+			case 'CHAT':
+			case 'TRANSCRIPT':
+			case 'M4A':
+				return true;
+			default:
+				return false;
+		}
+	}
+	
+	public static function shouldHandleFileTypeEnum($recordingFileType)
+	{
+		switch($recordingFileType)
+		{
+			case kRecordingFileType::VIDEO:
+			case kRecordingFileType::CHAT:
+			case kRecordingFileType::TRANSCRIPT:
+			case kRecordingFileType::AUDIO:
+				return true;
+			default:
+				return false;
+		}
+	}
+	
+	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType)
+	{
+		$recordingFilesOrdered = array();
+		foreach($recordingFiles as $recordingFile)
+		{
+			if(!isset($recordingFilesOrdered[$recordingFile[$recordingStart]]))
+			{
+				$recordingFilesOrdered[$recordingFile[$recordingStart]] = array();
+			}
+			$recordingFilesOrdered[$recordingFile[$recordingStart]][] = $recordingFile;
+		}
+		ksort($recordingFilesOrdered);
+		return self::orderRecordingFilesByRecordingType($recordingFilesOrdered, $recordingType);
+	}
+	
+	public static function orderRecordingFilesByRecordingType($recordingFilesOrdered, $recordingType)
+	{
+		foreach ($recordingFilesOrdered as $time => $recordingFilesPerTimeSlot)
+		{
+			$filesOrderByRecordingType = array();
+			foreach ($recordingFilesPerTimeSlot as $recordingFile)
+			{
+				if(!isset($filesOrderByRecordingType[$recordingFile[$recordingType]]))
+				{
+					$filesOrderByRecordingType[$recordingFile[$recordingType]] = array();
+				}
+				$filesOrderByRecordingType[$recordingFile[$recordingType]][] = $recordingFile;
+			}
+			$recordingFilesOrdered[$time] = self::sortArrayByValuesArray($filesOrderByRecordingType, self::ORDER_RECORDING_TYPE);
+		}
+		return $recordingFilesOrdered;
+	}
+	
+	public static function sortArrayByValuesArray(array $filesOrderByRecordingType, array $orderArray)
+	{
+		$ordered = [];
+		foreach ($orderArray as $item)
+		{
+			$filesByRecordingType = self::getFilesByRecordingType($filesOrderByRecordingType, $item);
+			foreach ($filesByRecordingType as $fileByRecordingType)
+			{
+				foreach ($fileByRecordingType as $file)
+				{
+					$ordered[] = $file;
+				}
+			}
+		}
+		return $ordered;
+	}
+	
+	public static function getFilesByRecordingType($filesOrderByRecordingType, $item)
+	{
+		$filesByRecordingType = array();
+		foreach ($filesOrderByRecordingType as $recordingType => $value)
+		{
+			if ($recordingType === $item)
+			{
+				$filesByRecordingType[$recordingType] = $value;
+			}
+		}
+		return $filesByRecordingType;
 	}
 }

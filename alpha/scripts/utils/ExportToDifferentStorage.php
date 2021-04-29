@@ -2,6 +2,8 @@
 
 require_once(__DIR__ . '/../bootstrap.php');
 
+define('ORIGINAL_ONLY', 0);
+
 
 function partnerIdAllowed($partnerId)
 {
@@ -29,6 +31,13 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 	$targetDcFileSync = null;
 	foreach ($fileSyncs as $fileSync)
 	{
+		if (is_null($fileSync->getFileType()))
+		{
+			KalturaLog::log("XXX $assetId: NULL_FILE_TYPE - setting to FILE");
+			$fileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+			$fileSync->save();
+		}
+
 		if (!in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL)))
 		{
 			KalturaLog::log("XXX $assetId: BAD_FILE_TYPE" . $fileSync->getFileType() . " - unexpected file type");
@@ -62,13 +71,13 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 				break;
 			}
 
-			if ($fileSync->getSrcPath() == $readyFileSync->getFullPath() && $fileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
+			if ($targetDcFileSync->getSrcPath() == $readyFileSync->getFullPath() && $targetDcFileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
 			{
 				KalturaLog::log("XXX $assetId: PENDING_WITH_PATH - pending file sync with valid src path");
 			}
 			else
 			{
-				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $fileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
+				KalturaLog::log("XXX $assetId: PENDING_PATH_ADDED - pending file sync with bad src path " . $targetDcFileSync->getSrcPath() . ", setting from " . $readyFileSync->getId());
 				$targetDcFileSync->setSrcPath($readyFileSync->getFullPath());
 				$targetDcFileSync->setSrcEncKey($readyFileSync->getSrcEncKey());
 				$targetDcFileSync->putInCustomData('srcDc', $readyFileSync->getDc());
@@ -83,7 +92,7 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 			break;
 
 		default:
-			KalturaLog::log("XXX $assetId: BAD_STATUS" . $fileSync->getStatus() . " - non ready file sync");
+			KalturaLog::log("XXX $assetId: BAD_STATUS" . $targetDcFileSync->getStatus() . " - non ready file sync");
 			break;
 		}
 
@@ -115,15 +124,66 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 	}
 }
 
+function getOriginalDc($syncKey)
+{
+	global $sourceDcIds;
+
+	$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+	$c->add(FileSyncPeer::DC, $sourceDcIds, Criteria::IN);
+	$fileSyncs = FileSyncPeer::doSelect($c);
+
+	$result = array();
+	foreach ($fileSyncs as $fileSync)
+	{
+		if ($fileSync->getLinkedId())
+		{
+			$fileSync = FileSyncPeer::retrieveByPK($fileSync->getLinkedId());
+			if(!$fileSync || !in_array($fileSync->getDc(), $sourceDcIds))
+			{
+				continue;
+			}
+		}
+
+		if ($fileSync->getOriginal())
+		{
+			$result[] = $fileSync->getDc();
+		}
+	}
+
+	if (count($result) != 1)
+	{
+		return false;
+	}
+
+	return min($result);
+}
+
 function handleSyncKey($assetId, $syncKey, $depth = 0)
 {
 	global $targetDcId, $allDcIds;
 
 	KalturaLog::log("$assetId - handling file sync key " . $syncKey);
 
+	if (ORIGINAL_ONLY)
+	{
+		$originalDcId = getOriginalDc($syncKey);
+		if ($originalDcId === false)
+		{
+			KalturaLog::log("XXX $assetId: NO_ORIGINAL_DC - failed to get original dc");
+			return;
+		}
+
+		KalturaLog::log("$assetId - using dc $originalDcId");
+		$dcIds = array(strval($originalDcId), $targetDcId);
+	}
+	else
+	{
+		$dcIds = $allDcIds;
+	}
+
 	// get the file syncs
 	$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
-	$c->add(FileSyncPeer::DC, $allDcIds, Criteria::IN);
+	$c->add(FileSyncPeer::DC, $dcIds, Criteria::IN);
 	$c->addDescendingOrderByColumn(FileSyncPeer::ORIGINAL);
 	$c->addAscendingOrderByColumn(FileSyncPeer::DC);
 	$fileSyncs = FileSyncPeer::doSelect($c);
@@ -297,7 +357,6 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 	$linkFileSync->setStatus($sourceFileSync->getStatus());
 	$linkFileSync->setOriginal($sourceFileSync->getOriginal());
 	$linkFileSync->setLinkedId($sourceFileSync->getId());
-	$linkFileSync->setPartnerID($sourceFileSync->getPartnerID());
 	$linkFileSync->setFileSize(-1);
 
 	if($sourceFileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)

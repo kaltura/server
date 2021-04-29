@@ -11,7 +11,6 @@ class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
-	const ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY = 10;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -360,7 +359,22 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
+	
+	
 	public function isLiveAction ($id, $protocol = null)
+	{
+		$liveStreamEntry = $this->fetchLiveEntry($id);
+		$liveStreamEntry->setLiveStatusCache();
+		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
+		
+		if ($isLive !== null)
+		{
+			return $this->responseHandlingIsLive($isLive);
+		}
+		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+	}
+	
+	protected function fetchLiveEntry($id)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -368,7 +382,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
+			
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 		}
@@ -379,28 +393,11 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
-		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
-			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
-
-		/* @var $liveStreamEntry LiveStreamEntry */
-	
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
-
-		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
-		if ($isLive !== null)
-		{
-			return $this->responseHandlingIsLive($isLive);
-		}
-		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+		
+		return $liveStreamEntry;
 	}
-
-
-
+	
+	
 	private function responseHandlingIsLive($isLive)
 	{
 		if (!$isLive){
@@ -578,35 +575,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function getDetailsAction($id)
 	{
-		if (!kCurrentContext::$ks)
-		{
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
-			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
-			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
-				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
-			// enforce entitlement
-			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-		}
-		else
-		{
-			$liveStreamEntry = entryPeer::retrieveByPK($id);
-		}
-
-		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
-		/** @var LiveStreamEntry $liveStreamEntry */
-
-		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
-			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
-
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
-
+		$liveStreamEntry = $this->fetchLiveEntry($id);
+		$liveStreamEntry->setLiveStatusCache();
 		$res = new KalturaLiveStreamDetails();
 		$isLive = $liveStreamEntry->isCurrentlyLive();
 		$res->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
