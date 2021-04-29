@@ -52,4 +52,29 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+    public function validate($startDate, $endDate)
+    {
+        if ($this->recurrenceType === ScheduleEventRecurrenceType::RECURRENCE) {
+            throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $this->recurrenceType, 'recurrenceType', 'KalturaScheduleEventRecurrenceType');
+        }
+
+        if ($startDate > $endDate) {
+            throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_END_BEFORE_START, $startDate, $endDate);
+        }
+
+        $maxDuration = SchedulePlugin::getScheduleEventmaxDuration();
+        if (($endDate - $startDate) > $maxDuration) {
+            throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxDuration);
+        }
+
+        if ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
+        {
+            $events = ScheduleEventPeer::retrieveOtherEvents($this->templateEntryId, $startDate, $endDate, array($this->id));
+
+            if (count($events) > 0) {
+                throw new KalturaAPIException(KalturaScheduleErrors::SCHEDULE_TIME_IN_USE);
+            }
+        }
+    }
 }
