@@ -104,7 +104,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
             }
         }
 
-        KalturaLog::info ("Set entry metadata to " . $showTaxonomyXml);
+        KalturaLog::info ('Set entry metadata to ' . $showTaxonomyXml);
         $this->addOrUpdateMetadata($showTaxonomyId, $entryId, KalturaMetadataObjectType::ENTRY, $showTaxonomyXml);
     }
 
@@ -166,7 +166,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     }
 
     /**
-     * @param KalturaThumbCuePoint $cuePointObj
+     * @param KalturaAnnotation $cuePointObj
      */
     protected function addCuePoint(KalturaAnnotation $cuePointObj)
     {

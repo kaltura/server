@@ -31,8 +31,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"permissionItem" => objectType::PERMISSIONITEM,
 			"userRole" => objectType::USERROLE,
 			"categoryEntry" => objectType::CATEGORY_ENTRY,
-			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue('CaptionAsset'),
-            "TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue('TranscriptAsset'),
+			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(CaptionAssetEventNotificationEventObjectType::CAPTION_ASSET),
+            "TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(TranscriptAssetEventNotificationEventObjectType::TRANSCRIPT_ASSET),
         );
 
 		if (isset($mapObjectType[$eventObjectClassName]))
@@ -52,7 +52,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
         if(!$entry || !$reachProfile)
         {
-            KalturaLog::log("Not all mandatory objects were found, tasks will not be added");
+            KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
             return true;
         }
 
@@ -89,7 +89,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
 			{
-				KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
+				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds) . ']');
 				continue;
 			}
 			$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object);
@@ -205,7 +205,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		if ($object instanceof entry && $object->isEntryTypeSupportedForReach()
+		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())
 				&& $object->getStatus() == entryStatus::READY
 				&& $object->getLengthInMsecs())
 		{
@@ -250,7 +250,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		)
 			return true;
 
-		if($object instanceof entry && $object->isEntryTypeSupportedForReach())
+		if($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
@@ -317,7 +317,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->checkAutomaticRules($object);
 		}
 
-		if ($object instanceof entry && $object->isEntryTypeSupportedForReach()
+		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())
 				&& $object->getStatus() == entryStatus::READY
 				&& $object->getLengthInMsecs())
 		{
@@ -377,7 +377,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return $this->invalidateAccessKey($object);
 		}
 
-		if ($object instanceof entry && $object->isEntryTypeSupportedForReach())
+		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))
@@ -473,7 +473,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		//Refund credit for tasks which could not be handled by the service provider
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 		
-		//Rest task price so that reports will be alligned with the total used credit
+		//Rest task price so that reports will be aligned with the total used credit
 		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
@@ -545,7 +545,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 		catch(Exception $ex)
 		{
-			KalturaLog::debug("Failed to crackKs with error message [" . $ex->getMessage() . "], accessKey won't be invalidated");
+			KalturaLog::debug('Failed to crack KS with error message [' . $ex->getMessage() . '], accessKey will not be invalidated');
 		}
 		
 		$ksObj->kill();
@@ -629,7 +629,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 		
-		if (!kReachUtils::isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
+		if (!$vendorCatalogItem->isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
 		{
 			KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
 			return true;
@@ -711,8 +711,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
 		}
 		
-		//KalturaRecorded entries are ready on creation so make sure the vendors wont fetch the job until it receive its assets
-		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
+		//Kaltura Recorded entries are ready on creation so make sure the vendors wont fetch the job until it gets its assets
+		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $vendorCatalogItem->requiresEntryReady())
 		{
 			$entryAssets = assetPeer::retrieveReadyByEntryId($entry->getId());
 			if(!count($entryAssets))
@@ -772,7 +772,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
 				if(!count($allowedCatalogItemIds))
 				{
-					KalturaLog::debug("None of the fullfield catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
+					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
 					continue;
 				}
 				$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profile->getId(), $object);

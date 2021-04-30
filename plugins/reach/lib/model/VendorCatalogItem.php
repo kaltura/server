@@ -122,37 +122,37 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
 		if (!$vendorCatalogItem)
 		{
-			return "";
+			return '';
 		}
 
 		switch ($vendorCatalogItem->getServiceFeature())
 		{
 			case VendorServiceFeature::CAPTIONS:
-				$serviceFeatureName = "captions";
+				$serviceFeatureName = 'captions';
 				break;
 
 			case VendorServiceFeature::TRANSLATION:
-				$serviceFeatureName = "translation";
+				$serviceFeatureName = 'translation';
 				break;
 
 			case VendorServiceFeature::ALIGNMENT:
-				$serviceFeatureName = "alignment";
+				$serviceFeatureName = 'alignment';
 				break;
 
 			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$serviceFeatureName = "audio description";
+				$serviceFeatureName = 'audio description';
 				break;
 
 			case VendorServiceFeature::CHAPTERING:
-				$serviceFeatureName = "chaptering";
+                $serviceFeatureName = 'chaptering';
 				break;
 
             case VendorServiceFeature::INTELLIGENT_TAGGING:
-                $serviceFeatureName = "intelligent tagging";
+                $serviceFeatureName = 'intelligent tagging';
                 break;
 
 			default:
-				$serviceFeatureName = "";
+				$serviceFeatureName = '';
 		}
 
 		return $serviceFeatureName;
@@ -181,6 +181,18 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
         $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 
         return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+    }
+
+    public function isEntryTypeSupported($type, $mediaType = null)
+    {
+        $supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
+        $supported = in_array($type, $supportedTypes);
+        if($mediaType && $supported)
+        {
+            $supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
+        }
+
+        return $supported;
     }
 
     public function getTaskJobData($object)

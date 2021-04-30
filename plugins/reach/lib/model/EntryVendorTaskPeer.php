@@ -55,20 +55,9 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 
 	public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
     {
-        $c = new Criteria();
-        $c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
-        $c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
-        $c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-        $c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
-        if ($version)
-        {
-            $c->add(EntryVendorTaskPeer::VERSION, $version);
-        }
+        $tasks = self::retrieveTasksByStatus($entryId, $catalogItemId, $partnerId, $version, $statuses);
 
-        $c->addDescendingOrderByColumn(EntryVendorTaskPeer::VERSION);
-        $c->addDescendingOrderByColumn(EntryVendorTaskPeer::ID);
-
-        return EntryVendorTaskPeer::doSelectOne($c);
+        return $tasks[0];
     }
 
 	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version = null)

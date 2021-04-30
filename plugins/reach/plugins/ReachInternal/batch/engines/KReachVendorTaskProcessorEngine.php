@@ -51,7 +51,7 @@ abstract class KReachVendorTaskProcessorEngine
     {
         KBatchBase::unimpersonate();
 
-        KBatchBase::impersonate($vendorTask->vendorPartnerId);
+        KBatchBase::impersonate($vendorTask->partnerId);
 
         $filter = new KalturaEntryVendorTaskFilter();
         $filter->entryIdEqual = $vendorTask->entryId;

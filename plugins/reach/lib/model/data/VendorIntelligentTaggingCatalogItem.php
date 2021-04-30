@@ -43,4 +43,12 @@ class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
 
         return null;
     }
+
+    public function isEntryTypeSupported($type, $mediaType = null)
+    {
+        $supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
+        $supportedTypes[] = entryType::LIVE_STREAM;
+
+        return in_array($type, $supportedTypes);
+    }
 }

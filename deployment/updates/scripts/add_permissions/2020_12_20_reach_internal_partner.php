@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage orion.roles_and_permissions
+ * @subpackage quazar.roles_and_permissions
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../') . '/base/scripts/insertDefaults.php';
