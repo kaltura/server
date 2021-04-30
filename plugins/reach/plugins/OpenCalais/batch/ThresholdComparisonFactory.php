@@ -31,7 +31,7 @@ class ThresholdComparisonFactory
         elseif($valToVerify != $valLimit && $comparisonType == self::THRSHLD_EQUAL_PROP){// check equal threshold
             return FALSE;
         }
-        elseif($valToVerify === $valLimit && $comparisonType == self::THRSHLD_NOT_EQUAL_PROP){// check not equal threshold
+        elseif($valToVerify == $valLimit && $comparisonType == self::THRSHLD_NOT_EQUAL_PROP){// check not equal threshold
             return FALSE;
         }
         return TRUE;

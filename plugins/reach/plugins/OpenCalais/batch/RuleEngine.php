@@ -1,8 +1,8 @@
 <?php
-require_once (__DIR__ . DIRECTORY_SEPARATOR . 'Constants.php');
+require_once (__DIR__ . DIRECTORY_SEPARATOR . 'OpenCalaisConstants.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'ThresholdComparisonFactory.php');
 
-class RuleEngine extends Constants
+class RuleEngine extends OpenCalaisConstants
 {
     /**
      * @var array
@@ -25,7 +25,7 @@ class RuleEngine extends Constants
      * @param array $kmsIntelliTagRules
      * @return array
      */
-    private function setRulesWithKeys(array $kmsIntelliTagRules) {
+    protected function setRulesWithKeys(array $kmsIntelliTagRules) {
         $kmsIntelliTagRulesKeys = array();
         foreach ($kmsIntelliTagRules as $kmsIntelliTagRule){
             $kmsIntelliTagRulesKeys[$kmsIntelliTagRule[self::RULE_OCM_GROUPROP][self::RULE_ENTT_KEY_PROP]][] = $kmsIntelliTagRule;
@@ -59,7 +59,7 @@ class RuleEngine extends Constants
      * @param array $apiItemDetails
      * @return array[]
      */
-    private function getValuesByRuleAndApiResponse(array $rule, array $apiItemDetails){
+    protected function getValuesByRuleAndApiResponse(array $rule, array $apiItemDetails){
         $cuePoints = $this->getValuesForCuePoints($apiItemDetails);
         $resolutions[] = $apiItemDetails;
         if(isset($apiItemDetails['resolutions']) && !empty($apiItemDetails['resolutions'])){
@@ -78,7 +78,7 @@ class RuleEngine extends Constants
      * @param string $systemName
      * @return array
      */
-    private function getFieldsArrayUsingRule(array $items, array $rule, $fullItem){
+    protected function getFieldsArrayUsingRule(array $items, array $rule, $fullItem){
         $result = array();
         foreach ($items as $item){
             $result[] =  array(
@@ -99,7 +99,7 @@ class RuleEngine extends Constants
      * @param array $apiItemdetails
      * @return array
      */
-    private function getValuesForCuePoints(array $apiItemdetails){
+    protected function getValuesForCuePoints(array $apiItemdetails){
         if(!isset($apiItemdetails[self::OPCAL_INSTANCES_PROP]) || count($apiItemdetails[self::OPCAL_INSTANCES_PROP]) < 1){
             return array();
         }
@@ -121,7 +121,7 @@ class RuleEngine extends Constants
      * @param int $key
      * @param array $nameArray
      */
-    private function handleCuePoints(array &$cuePoints, $key, array $nameArray) {
+    protected function handleCuePoints(array &$cuePoints, $key, array $nameArray) {
         $textTimes = $this->textTimes;
         $fullName = '';
         $startFrom = $textTimes[$key]['s'];
@@ -142,7 +142,7 @@ class RuleEngine extends Constants
      * @param array $apiItemDetails
      * @return bool
      */
-    private function passedRuleConditions(array $apiItemDetails) {
+    protected function passedRuleConditions(array $apiItemDetails) {
         if($this->getTypeFromItemInApi($apiItemDetails) == ''){ // no type property
             return FALSE;
         }
@@ -155,7 +155,7 @@ class RuleEngine extends Constants
      * @param array $apiItemDetails
      * @return mixed|string
      */
-    private function getRulesForEntity(array $apiItemDetails) {
+    protected function getRulesForEntity(array $apiItemDetails) {
         $type = $this->getTypeFromItemInApi($apiItemDetails);
         if(!isset($this->kmsIntelliTagRules[$type])){ // this type not exists on KMS Rules
             return array();
@@ -166,7 +166,7 @@ class RuleEngine extends Constants
      * @param array $apiItemDetails
      * @return mixed|string
      */
-    private function getTypeFromItemInApi(array $apiItemDetails){
+    protected function getTypeFromItemInApi(array $apiItemDetails){
         if(isset($apiItemDetails[self::OPCAL_TYPE_PROP])){
             return $apiItemDetails[self::OPCAL_TYPE_PROP];
         }
@@ -180,7 +180,7 @@ class RuleEngine extends Constants
      * @param array $apiItemdetails
      * @return bool
      */
-    private function passedRuleConditionThresholds(array $thresholds, array $apiItemdetails) {
+    protected function passedRuleConditionThresholds(array $thresholds, array $apiItemdetails) {
         $thresholds = isset($thresholds[self::THRSHLD_GROUPPROP][self::THRSHLD_NAME_PROP]) ? $thresholds : $thresholds[self::THRSHLD_GROUPPROP];
         foreach ($thresholds as $threshold){
             if(!isset($apiItemdetails[$threshold[self::THRSHLD_NAME_PROP]])){  // no such item in the API response
