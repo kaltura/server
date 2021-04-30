@@ -158,7 +158,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			$object_to_fill -> setStartDate($startDate - $preStartTime);
 		}
 		//Adjust end time
-		if (isset($this -> postEndTime) || isset($this -> endDate) && $object_to_fill->getFromCustomData(LiveStreamScheduleEvent::SCREENING_END_TIME))
+		if (isset($this -> endDate) || isset($this -> postEndTime) && $object_to_fill->getFromCustomData(LiveStreamScheduleEvent::SCREENING_END_TIME))
 		{
 			$postEndTime = isset($this -> postEndTime) ? $this -> postEndTime : $object_to_fill -> getPostEndTime();
 			$endDate = isset($this -> endDate) ? $this -> endDate : $object_to_fill -> getEndScreenTime();
