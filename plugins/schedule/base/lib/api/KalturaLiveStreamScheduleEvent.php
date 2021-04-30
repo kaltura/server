@@ -147,23 +147,22 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		
 		/* @var $object_to_fill LiveStreamScheduleEvent */
 		
-		if (!$object_to_fill->isOldWorkflow())
+		//For old records update, we only update startDate if it was changed
+		// for new record we update the start date as relative to the screenTime
+
+		//Adjust start time
+		if (isset($this -> startDate) || isset($this -> preStartTime) && $object_to_fill->getFromCustomData(LiveStreamScheduleEvent::SCREENING_START_TIME))
 		{
-			//Adjust start time
-			if (isset($this -> preStartTime) || isset($this -> startDate))
-			{
-				$preStartTime = isset($this -> preStartTime) ? $this -> preStartTime : $object_to_fill -> getPreStartTime();
-				$startDate = isset($this -> startDate) ? $this -> startDate : $object_to_fill -> getStartScreenTime();
-				$object_to_fill -> setStartDate($startDate - $preStartTime);
-			}
-			
-			//Adjust end time
-			if (isset($this -> postEndTime) || isset($this -> endDate))
-			{
-				$postEndTime = isset($this -> postEndTime) ? $this -> postEndTime : $object_to_fill -> getPostEndTime();
-				$endDate = isset($this -> endDate) ? $this -> endDate : $object_to_fill -> getEndScreenTime();
-				$object_to_fill -> setEndDate($endDate + $postEndTime);
-			}
+			$preStartTime = isset($this -> preStartTime) ? $this -> preStartTime : $object_to_fill -> getPreStartTime();
+			$startDate = isset($this -> startDate) ? $this -> startDate : $object_to_fill -> getStartScreenTime();
+			$object_to_fill -> setStartDate($startDate - $preStartTime);
+		}
+		//Adjust end time
+		if (isset($this -> postEndTime) || isset($this -> endDate) && $object_to_fill->getFromCustomData(LiveStreamScheduleEvent::SCREENING_END_TIME))
+		{
+			$postEndTime = isset($this -> postEndTime) ? $this -> postEndTime : $object_to_fill -> getPostEndTime();
+			$endDate = isset($this -> endDate) ? $this -> endDate : $object_to_fill -> getEndScreenTime();
+			$object_to_fill -> setEndDate($endDate + $postEndTime);
 		}
 		
 		return $object_to_fill;
