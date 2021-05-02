@@ -513,18 +513,18 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     protected function getMappingMetadataProfileRules($mappingProfileId, $partnerId)
     {
         $metadataResponse = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($mappingProfileId, KalturaMetadataObjectType::PARTNER, $partnerId);
+        if($metadataResponse->totalCount === 0){
+            return array();
+        }
         $this->retrieveActiveMetadataFields($metadataResponse->objects[0]->xml);
 
         $result = array();
-        if($metadataResponse->totalCount > 0)
+        $xml = json_decode(json_encode(simplexml_load_string($metadataResponse->objects[0]->xml)), true);
+        if(isset($xml[self::RULE_NAME]))
         {
-            $xml = json_decode(json_encode(simplexml_load_string($metadataResponse->objects[0]->xml)), true);
-            if(isset($xml[self::RULE_NAME]))
+            foreach ($xml[self::RULE_NAME] as $rule)
             {
-                foreach ($xml[self::RULE_NAME] as $rule)
-                {
-                    $result[] = $rule;
-                }
+                $result[] = $rule;
             }
         }
 
