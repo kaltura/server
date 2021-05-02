@@ -10,7 +10,7 @@ None.
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name:
 
-	- deployment/updates/scripts/xml/2021_04_27_EmailEventNotificationEntryStatusEqual.template.xml
+	- deployment/updates/scripts/xml/notifications/2021_04_27_email_event_notification_entry_status_equal.template.xml
 
 Run deployment script:
 
