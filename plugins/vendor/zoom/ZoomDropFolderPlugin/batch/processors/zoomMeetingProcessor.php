@@ -12,13 +12,21 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 
 	/**
 	 * @param KalturaMediaEntry $entry
+	 * @param string $meetingId
 	 * @throws kCoreException
 	 */
-	protected function setEntryCategory($entry)
+	protected function setEntryCategory($entry, $meetingId)
 	{
+		$categories = $this->dropFolder->zoomVendorIntegration->zoomCategory;
+		
+		$categoryTrackingField = $this->zoomClient->retrieveTrackingField($meetingId);
+		if ($categoryTrackingField)
+		{
+			$categories .= ',' . $categoryTrackingField;
+		}
 		if ($this->dropFolder->zoomVendorIntegration->zoomCategory)
 		{
-			$entry->categories = $this->dropFolder->zoomVendorIntegration->zoomCategory;
+			$entry->categories = $categories;
 		}
 	}
 
