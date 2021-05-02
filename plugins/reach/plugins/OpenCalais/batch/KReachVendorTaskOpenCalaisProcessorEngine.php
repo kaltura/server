@@ -1,6 +1,6 @@
 <?php
 
-require_once (__DIR__ . DIRECTORY_SEPARATOR . 'Constants.php');
+require_once (__DIR__ . DIRECTORY_SEPARATOR . 'OpenCalaisConstants.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'RuleEngine.php');
 
 /**

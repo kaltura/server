@@ -14,6 +14,9 @@ abstract class OpenCalaisConstants
     const RULE_KALTURA_GROUPROP = 'Kaltura';
     const RULE_OCM_GROUPROP = 'OpenCalais';
     const RULE_KALTURA_ID = 'KalturaId';
+    const ENTRY_METADATA_SHOW_TAXONOMY = 'entryMetadataShowTaxonomy';
+    const DYNAMIC_METADATA = 'dynamicMetadata';
+    const OPCAL_RESOLUTIONS = 'resolutions';
     const OPCAL_ENTT_NAME = 'name';
     const OPCAL_TYPE_PROP = '_type';
     const OPCAL_TYPE_GROUP_PROP = '_typeGroup';
