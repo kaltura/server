@@ -6,7 +6,7 @@ require_once (__DIR__ . '/../../bootstrap.php');
 
 $script = realpath(dirname(__FILE__) . "/../../../tests/standAloneClient/exec.php");
 
-$newTemplateUpdate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2021_04_27_EmailEventNotificationEntryStatusEqual.xml");
+$newTemplateUpdate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/2021_04_27_email_event_notification_entry_status_equal.xml");
 
 if(!file_exists($newTemplateUpdate) || !file_exists($script))
 {
