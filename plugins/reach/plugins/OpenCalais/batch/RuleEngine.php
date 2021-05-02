@@ -70,15 +70,15 @@ class RuleEngine extends OpenCalaisConstants
     {
         $cuePoints = $this->getValuesForCuePoints($apiItemDetails);
         $resolutions[] = $apiItemDetails;
-        if(isset($apiItemDetails['resolutions']) && !empty($apiItemDetails['resolutions']))
+        if(isset($apiItemDetails[self::OPCAL_RESOLUTIONS]) && !empty($apiItemDetails[self::OPCAL_RESOLUTIONS]))
         {
-            $resolutions = $apiItemDetails['resolutions'];
+            $resolutions = $apiItemDetails[self::OPCAL_RESOLUTIONS];
         }
         $result = $this->getFieldsArrayUsingRule($resolutions, $rule, $apiItemDetails);
 
         if(!empty($cuePoints))
         {
-            $result[0]['cuePoints_list'] = $cuePoints;
+            $result[0][self::CUEPOINTS_LIST] = $cuePoints;
         }
         return $result;
     }

@@ -16,22 +16,22 @@ class ThresholdComparisonFactory
      * @return bool
      */
     public static function verify($valToVerify, $valLimit, $comparisonType){
-        if($valToVerify < $valLimit && $comparisonType == self::THRSHLD_GTE_PROP) { // check Greater&Equal threshold
+        if($valToVerify < $valLimit && $comparisonType === self::THRSHLD_GTE_PROP) { // check Greater&Equal threshold
             return FALSE;
         }
-        if($valToVerify <= $valLimit && $comparisonType == self::THRSHLD_GT_PROP) { // check Greater threshold
+        if($valToVerify <= $valLimit && $comparisonType === self::THRSHLD_GT_PROP) { // check Greater threshold
             return FALSE;
         }
-        elseif($valToVerify > $valLimit && $comparisonType == self::THRSHLD_LTE_PROP){// check Less&Equal threshold
+        if($valToVerify > $valLimit && $comparisonType === self::THRSHLD_LTE_PROP){// check Less&Equal threshold
             return FALSE;
         }
-        elseif($valToVerify >= $valLimit && $comparisonType == self::THRSHLD_LT_PROP){// check Less threshold
+        if($valToVerify >= $valLimit && $comparisonType === self::THRSHLD_LT_PROP){// check Less threshold
             return FALSE;
         }
-        elseif($valToVerify != $valLimit && $comparisonType == self::THRSHLD_EQUAL_PROP){// check equal threshold
+        if($valToVerify != $valLimit && $comparisonType === self::THRSHLD_EQUAL_PROP){// check equal threshold
             return FALSE;
         }
-        elseif($valToVerify == $valLimit && $comparisonType == self::THRSHLD_NOT_EQUAL_PROP){// check not equal threshold
+        if($valToVerify == $valLimit && $comparisonType === self::THRSHLD_NOT_EQUAL_PROP){// check not equal threshold
             return FALSE;
         }
         return TRUE;
