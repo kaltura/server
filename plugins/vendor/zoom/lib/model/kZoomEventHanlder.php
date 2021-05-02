@@ -134,11 +134,12 @@ class kZoomEventHanlder
 					{
 						if ($shouldSearchParentEntry)
 						{
-							$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(), $partnerId);
-						}
-						if ($parentEntry)
-						{
-							$zoomDropFolderFile->setIsParentEntry(false);
+							$parentEntry = self::getParentEntry($kMeetingMetaData->getUuid(),$partnerId, $zoomDropFolderFile,
+							                                  $recordingFile->recordingFileType, $enableZoomTranscription);
+							if (!$parentEntry)
+							{
+								continue;
+							}
 						}
 						else
 						{
@@ -164,6 +165,28 @@ class kZoomEventHanlder
 			}
 			$shouldSearchParentEntry = false;
 		}
+	}
+	
+	protected static function getParentEntry($uuid, $partnerId, ZoomDropFolderFile $zoomDropFolderFile, $recordingFileType, $enableZoomTranscription)
+	{
+		$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid, $partnerId);
+		if ($parentEntry)
+		{
+			$zoomDropFolderFile->setIsParentEntry(false);
+		}
+		else
+		{
+			if ($recordingFileType == kRecordingFileType::TRANSCRIPT)
+			{
+				KalturaLog::debug('Recording file type transcript cannot be created without a parent');
+			}
+			else
+			{
+				$parentEntry = self::createEntry($uuid, $partnerId, $enableZoomTranscription);
+				$zoomDropFolderFile->setIsParentEntry(true);
+			}
+		}
+		return $parentEntry;
 	}
 	
 	protected static function allocateMeetingMetaData($recording, $event)
