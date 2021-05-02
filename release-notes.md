@@ -1,4 +1,21 @@
 # Quasar-17.1.0 #
+
+## Update EmailEventNotificationEntryStatusEqual ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_04_27_email_event_notification_entry_status_equal.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_04_27_deploy_email_event_notification_entry_status_equal.php
+
 ## Zoom as a polling engine ##
 - Issue Type: Task
 - Issue ID: PLAT-22641
