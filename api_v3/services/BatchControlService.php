@@ -238,7 +238,7 @@ class BatchControlService extends KalturaBaseService
 		$c = new Criteria();
 		$c->addDescendingOrderByColumn(SchedulerPeer::CONFIGURED_ID);
 		$c->setLimit(1);
-		$latestScheduler = SchedulerPeer::doSelectOne($c, myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2));
+		$latestScheduler = SchedulerPeer::doSelectOne($c);
 		if(!$latestScheduler || !$latestScheduler->getConfiguredId())
 		{
 			throw new KalturaAPIException(KalturaErrors::MAX_CONFIGURED_ID_NOT_FOUND);
