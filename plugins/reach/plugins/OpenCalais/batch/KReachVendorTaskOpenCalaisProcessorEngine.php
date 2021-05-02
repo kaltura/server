@@ -574,7 +574,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
         }
 
-        KalturaLog::info("Fields in the target metadata profile XSD: " . print_r($this->targetAllMetadataFields, true));
+        KalturaLog::info('Fields in the target metadata profile XSD: ' . print_r($this->targetAllMetadataFields, true));
 
     }
 
