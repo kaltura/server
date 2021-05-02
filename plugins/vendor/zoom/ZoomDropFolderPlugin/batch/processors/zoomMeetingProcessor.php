@@ -17,14 +17,19 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 	 */
 	protected function setEntryCategory($entry, $meetingId)
 	{
-		$categories = $this->dropFolder->zoomVendorIntegration->zoomCategory;
-		
+		$categories = '';
 		$categoryTrackingField = $this->zoomClient->retrieveTrackingField($meetingId);
 		if ($categoryTrackingField)
 		{
-			$categories .= ',' . $categoryTrackingField;
+			$categories = $categoryTrackingField;
 		}
 		if ($this->dropFolder->zoomVendorIntegration->zoomCategory)
+		{
+			$categories = $categories ? $categories . ',' . $this->dropFolder->zoomVendorIntegration->zoomCategory :
+				$this->dropFolder->zoomVendorIntegration->zoomCategory;
+		}
+		
+		if ($categories)
 		{
 			$entry->categories = $categories;
 		}
