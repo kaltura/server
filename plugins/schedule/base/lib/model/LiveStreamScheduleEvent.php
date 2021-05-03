@@ -106,8 +106,12 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 			case 'getLiveStatus':
 				if($this->getSourceEntryId())
 				{
-					$output = EntryServerNodeStatus::PLAYABLE;
-					return true;
+					//Allow play only if we are x seconds before then end
+					if((time() < $this->getEndDate(null) - kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC))
+					{
+						$output = EntryServerNodeStatus::PLAYABLE;
+						return true;
+					}
 				}
 			default:
 				return false;
