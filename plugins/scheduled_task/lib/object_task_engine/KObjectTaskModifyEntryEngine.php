@@ -51,7 +51,7 @@ class KObjectTaskModifyEntryEngine extends KObjectTaskEntryEngineBase
 		$entryObj->userId = is_null($entryObj->userId) ? $objectTask->inputUserId : null;
 		$entryObj->entitledUsersEdit = is_null($entryObj->entitledUsersEdit) ? $objectTask->inputEntitledUsersEdit : null;
 		$entryObj->entitledUsersPublish = is_null($entryObj->entitledUsersPublish) ? $objectTask->inputEntitledUsersPublish : null;
-		$entryObj->entitledUsersView = is_null($entryObj->entitledUsersPublish) ? $objectTask->inputEntitledUsersView : null;
+		$entryObj->entitledUsersView = is_null($entryObj->entitledUsersView) ? $objectTask->inputEntitledUsersView : null;
 
 		$client->baseEntry->update($entryId, $entryObj);
 
