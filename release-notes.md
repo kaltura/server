@@ -1,4 +1,17 @@
 # Quasar-17.1.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
+    Zoom as polling engine (type of drop folder ) - includes the following:
+        a. Deltetion of content from Zoom
+        b. Import of old content - by changing scanning time in the drop folder UI (admin console)
+        c. Authetication from OnPrems - using JWT token supplied by the caller 
+        * Notice - the full release of these feature including documenation is due Quasar-17.2.0, 
+        currently, it is enabled on SAAS for internal accounts (testing only).
+
+### Bug fix ###
+
+
 ## Zoom as a polling engine ##
 - Issue Type: Task
 - Issue ID: PLAT-22641
