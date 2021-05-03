@@ -5,7 +5,6 @@ class kUploadTokenMgr
 	const AUTO_FINALIZE_CACHE_TTL = 2592000; //Thirty days in seconds
 	const MAX_AUTO_FINALIZE_RETIRES = 5;
 	const MAX_APPEND_TIME = 5;
-	const MAX_SYNC_APPEND_TIME = 10;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	const CHUNK_SIZE = 2097152;
 
@@ -469,11 +468,10 @@ class kUploadTokenMgr
 		fseek($targetFileResource, 0, SEEK_END);
 		$targetFileSize = ftell($targetFileResource);
 		
-		$appendStartTime = microtime(true);
 		for ($maxSyncedConcat; $maxSyncedConcat > 0; $maxSyncedConcat--)
 		{
 			$nextChunkPath = "$uploadFilePath.chunk.$targetFileSize";
-			if(((microtime(true) - $appendStartTime) > self::MAX_SYNC_APPEND_TIME) || !self::checkChunkExists($nextChunkPath))
+			if(!self::checkChunkExists($nextChunkPath))
 			{
 				break;
 			}
@@ -573,7 +571,8 @@ class kUploadTokenMgr
 
 	static protected function appendAvailableChunks($uploadFilePath, $targetFileResource, $verifyFinalChunk, $uploadTokenId, $expectedFileSize = null)
 	{
-		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, 1000, $expectedFileSize);
+		$maxSyncedConcat = $verifyFinalChunk ? 1000 : 10;
+		$targetFileSize = self::syncAppendAvailableChunks($uploadFilePath, $targetFileResource, $maxSyncedConcat, $expectedFileSize);
 		
 		fseek($targetFileResource, 0, SEEK_END);
 		
