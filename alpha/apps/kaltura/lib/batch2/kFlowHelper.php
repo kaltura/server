@@ -160,9 +160,22 @@ class kFlowHelper
 				$dbEntry->setData("." . $ext);
 			else				
 				$dbEntry->setData(".jpg");
-			
-			
-			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+
+
+			$flavorAsset = null;
+			if($data->getFlavorAssetId())
+			{
+				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			}
+
+			if($flavorAsset && ($flavorAsset instanceof thumbAsset))
+			{
+				$syncKey = $flavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			}
+			else
+			{
+				$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+			}
 
 			try
 			{
@@ -178,6 +191,13 @@ class kFlowHelper
 			}
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();
+
+			if($flavorAsset)
+			{
+				$flavorAsset->setStatus(asset::ASSET_STATUS_READY);
+				$flavorAsset->save();
+			}
+
 			return $dbBatchJob;
 		}
 

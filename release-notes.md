@@ -1,3 +1,39 @@
+# Quasar-17.1.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
+    Zoom as polling engine (type of drop folder ) - includes the following:
+        a. Deltetion of content from Zoom
+        b. Import of old content - by changing scanning time in the drop folder UI (admin console)
+        c. Authetication from OnPrems - using JWT token supplied by the caller 
+        * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
+        currently, it is enabled on SAAS for internal accounts (testing only).
+
+### Bug fix ###
+
+
+## Zoom as a polling engine ##
+- Issue Type: Task
+- Issue ID: PLAT-22641
+- Drop Folder checkbox was removed from partner configuration, drop folder is allowed to all.
+
+#### Configuration ####
+Add ZoomDropFolder to your plugins.ini
+
+Add the following to batch.ini:
+
+	enabledWorkers.KAsyncDropFolderWatcherRemoteZoom = 1
+
+	[KAsyncDropFolderWatcherRemoteZoom : KAsyncDropFolderWatcherRemote]
+	id                              = @ID@
+	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
+	params.tags                     = zoom
+
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
+
 # Quasar-17.0.0 #
 ## Version Highlight ##
 ### Features ###

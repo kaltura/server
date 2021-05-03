@@ -1093,12 +1093,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalFilePathArrForKey ( FileSyncKey $key , $strict = false )
 	{
 		KalturaLog::debug("key [$key], strict [$strict]");
-		$file_sync = self::getLocalFileSyncForKey( $key , $strict );
-		if ( $file_sync )
+		list($fileSync, $local) = self::getReadyFileSyncForKey($key, false, $strict);
+		if ($fileSync)
 		{
-			$parent_file_sync = self::resolve($file_sync);
-			$pathArr = array($parent_file_sync->getFileRoot() , $parent_file_sync->getFilePath());
-			return $pathArr;
+			return array($fileSync->getFileRoot(), $fileSync->getFilePath());
 		}
 
 		// TODO - should return null if doesn't exists

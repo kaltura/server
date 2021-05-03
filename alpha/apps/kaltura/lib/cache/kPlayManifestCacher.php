@@ -41,7 +41,7 @@ class kPlayManifestCacher extends kApiCache
 		$this->_deliveryCode = isset($this->_params['deliveryCode']) ? $this->_params['deliveryCode'] : null;
 		unset($this->_params['deliveryCode']);
 		
-		// take only the hostname part of the referrer parameter of baseEntry.getContextData
+		$referrer = null;
 		if (isset($this->_params['referrer']))
 		{
 			$referrer = base64_decode(str_replace(" ", "+", $this->_params['referrer']));
@@ -49,8 +49,12 @@ class kPlayManifestCacher extends kApiCache
 				$referrer = "";				
 			unset($this->_params['referrer']);
 		}
-		else
+
+		if (!$referrer)
+		{
 			$referrer = self::getHttpReferrer();
+		}
+
 		$this->_referrers[] = $referrer;
 		
 		$this->finalizeCacheKey();

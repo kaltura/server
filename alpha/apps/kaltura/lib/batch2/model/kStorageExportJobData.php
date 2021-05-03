@@ -64,8 +64,12 @@ class kStorageExportJobData extends kStorageJobData
 			$assetId = $srcFileSync->getObjectId();
 			$asset = assetPeer::retrieveById($assetId);
 
-			$this->setAssetId($assetId);
-			$this->setExternalUrl($srcFileSync->getExternalUrl($asset->getEntryId(), null, true));
+			if($asset)
+			{
+				$this->setAssetId($assetId);
+				$this->setExternalUrl($srcFileSync->getExternalUrl($asset->getEntryId(), null, true));
+
+			}
 		}
 	}
 	

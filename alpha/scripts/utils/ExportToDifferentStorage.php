@@ -2,6 +2,8 @@
 
 require_once(__DIR__ . '/../bootstrap.php');
 
+define('ORIGINAL_ONLY', 0);
+
 
 function partnerIdAllowed($partnerId)
 {
@@ -122,15 +124,66 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 	}
 }
 
+function getOriginalDc($syncKey)
+{
+	global $sourceDcIds;
+
+	$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+	$c->add(FileSyncPeer::DC, $sourceDcIds, Criteria::IN);
+	$fileSyncs = FileSyncPeer::doSelect($c);
+
+	$result = array();
+	foreach ($fileSyncs as $fileSync)
+	{
+		if ($fileSync->getLinkedId())
+		{
+			$fileSync = FileSyncPeer::retrieveByPK($fileSync->getLinkedId());
+			if(!$fileSync || !in_array($fileSync->getDc(), $sourceDcIds))
+			{
+				continue;
+			}
+		}
+
+		if ($fileSync->getOriginal())
+		{
+			$result[] = $fileSync->getDc();
+		}
+	}
+
+	if (count($result) != 1)
+	{
+		return false;
+	}
+
+	return min($result);
+}
+
 function handleSyncKey($assetId, $syncKey, $depth = 0)
 {
 	global $targetDcId, $allDcIds;
 
 	KalturaLog::log("$assetId - handling file sync key " . $syncKey);
 
+	if (ORIGINAL_ONLY)
+	{
+		$originalDcId = getOriginalDc($syncKey);
+		if ($originalDcId === false)
+		{
+			KalturaLog::log("XXX $assetId: NO_ORIGINAL_DC - failed to get original dc");
+			return;
+		}
+
+		KalturaLog::log("$assetId - using dc $originalDcId");
+		$dcIds = array(strval($originalDcId), $targetDcId);
+	}
+	else
+	{
+		$dcIds = $allDcIds;
+	}
+
 	// get the file syncs
 	$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
-	$c->add(FileSyncPeer::DC, $allDcIds, Criteria::IN);
+	$c->add(FileSyncPeer::DC, $dcIds, Criteria::IN);
 	$c->addDescendingOrderByColumn(FileSyncPeer::ORIGINAL);
 	$c->addAscendingOrderByColumn(FileSyncPeer::DC);
 	$fileSyncs = FileSyncPeer::doSelect($c);

@@ -256,8 +256,11 @@ abstract class LiveEntry extends entry
 
 	public function getRecordedEntryId()
 	{
-	    //Notice, default values were added to force reloading this property from the object (no extra db access).
-	    return $this->getFromCustomData("recorded_entry_id", null, null);
+		if($this->pluginableGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+		return $this->getFromCustomData("recorded_entry_id");
 	}
 	
 	public function setRecordedEntryId($v)
@@ -506,7 +509,7 @@ abstract class LiveEntry extends entry
 		{
 			/* @var $instance IKalturaScheduleEventProvider */
 			$pluginEvents = $instance->getScheduleEvents($this->getId(),
-			                                             array(ScheduleEventType::LIVE_STREAM,ScheduleEventType::LIVE_REDIRECT),
+			                                             array(ScheduleEventType::LIVE_STREAM),
 			                                             $startTime,
 			                                             $endTime);
 			if ($pluginEvents)
@@ -517,14 +520,39 @@ abstract class LiveEntry extends entry
 		}
 		return $events;
 	}
-
+	
+	/**
+	 * @param $context string - used for binding the getter to the final
+	 * decorator
+	 * @param $output any - a new value for the caller
+	 * @return boolean - indicating for the caller to stop the processing and
+	 * use the new output
+	 */
+	protected function pluginableGetter($context, &$output)
+	{
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicGetter');
+		foreach ($pluginInstances as $instance)
+		{
+			if($instance->getter($this, $context, $output))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
 	{
 		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
 		{
 			return EntryServerNodeStatus::STOPPED;
 		}
-
+		
+		if($this->pluginableGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+		
 		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 		{
 			return $this->getInternalLiveStatus($checkExplicitLive);
@@ -627,20 +655,6 @@ abstract class LiveEntry extends entry
 	
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-		//caching to reduce multiple access to db
-		if(is_null($this->currentEvent))
-		{
-			$this -> currentEvent = kSimuliveUtils ::getPlayableSimuliveEvent($this);
-			$this -> currentEvent ? $this -> currentEvent : false;
-		}
-		
-		/* @param ILiveStreamScheduleEvent $currentEvent*/
-		if($this->currentEvent)
-		{
-			//The decorator can change the status of isPlayable & redirectToVod
-			return $this -> currentEvent -> decoratorExecute($this);
-		}
-
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
 
@@ -1163,7 +1177,12 @@ abstract class LiveEntry extends entry
 
 	public function getRedirectEntryId()
 	{
-		if ($this->isPlayable())
+		if($this->pluginableGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+		
+		if($this->isPlayable())
 		{
 			return null;
 		}
@@ -1192,6 +1211,4 @@ abstract class LiveEntry extends entry
         }
 	    return $conversionProfileId;
     }
-
-
 }

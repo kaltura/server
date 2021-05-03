@@ -342,7 +342,7 @@ class kFile extends kFileBase
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		KalturaLog::debug("moveFile from [$from] to [$to] override_if_exists [$override_if_exists] copy [$copy]");
+		kSharedFileSystemMgr::safeLog("moveFile from [$from] to [$to] override_if_exists [$override_if_exists] copy [$copy]");
 		$from = kFile::fixPath($from);
 		$to = kFile::fixPath($to);
 		

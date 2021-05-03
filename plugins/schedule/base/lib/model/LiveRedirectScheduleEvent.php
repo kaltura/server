@@ -3,8 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
-	ILiveStreamScheduleEvent
+class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent
 {
 	const REDIRECT_ENTRY_ID = 'redirect_entry_id';
 	
@@ -16,12 +15,22 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 	{
 		$this->putInCustomData(self::REDIRECT_ENTRY_ID,$v);
 	}
-
-	public function decoratorExecute (LiveEntry $e)
+	
+	public function dynamicGetter($context, &$output)
 	{
-		$e -> setRedirectEntryId($this -> getRedirectEntryId());
-		$e -> setRecordedEntryId($this -> getRedirectEntryId());
-		return EntryServerNodeStatus::STOPPED;
+			switch ($context)
+			{
+				case 'getRedirectEntryId':
+				case 'getRecordedEntryId':
+					$output = $this->getRedirectEntryId();
+					break;
+				case 'getLiveStatus':
+					$output = EntryServerNodeStatus::STOPPED;
+					break;
+				default:
+					return false;
+			}
+			return true;
 	}
 	
 	/* (non-PHPdoc)
@@ -31,5 +40,18 @@ class LiveRedirectScheduleEvent extends BaseLiveStreamScheduleEvent implements
 	{
 		parent::applyDefaultValues();
 		$this->setType(ScheduleEventType::LIVE_REDIRECT);
+	}
+	
+	protected function addCapabilityToTemplateEntry($con)
+	{
+		$liveEntry = entryPeer::retrieveByPK($this->getTemplateEntryId());
+		if ($liveEntry)
+		{
+			if (!$liveEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
+			{
+				$liveEntry->addCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY);
+				$liveEntry->save($con);
+			}
+		}
 	}
 }

@@ -55,7 +55,7 @@ class kContentDistributionManager
 			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			
-			$convertData->setDestFileSyncSharedPath($sharedPath);
+			$jobData->setDestFileSharedPath($sharedPath);
 		}
 		
 		return kJobsManager::addJob($batchJob, $jobData, BatchJobType::IMPORT);
