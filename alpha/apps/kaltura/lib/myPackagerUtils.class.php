@@ -146,6 +146,15 @@ class myPackagerUtils
 
 		if($flavorAsset->hasTag(flavorParams::TAG_WEB) && myEntryUtils::isSupportedContainerFormat($flavorAsset))
 		{
+			// Validate that container format is not mp3 also via MediaInfo
+			if(!$excludeAudioFlavors)
+			{
+				$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($flavorAsset->getId());
+				if($mediaInfo && $mediaInfo->getContainerFormat() === assetParams::CONTAINER_FORMAT_MP3)
+				{
+					return false;
+				}
+			}
 			return true;
 		}
 
