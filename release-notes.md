@@ -6,7 +6,7 @@
         a. Deltetion of content from Zoom
         b. Import of old content - by changing scanning time in the drop folder UI (admin console)
         c. Authetication from OnPrems - using JWT token supplied by the caller 
-        * Notice - the full release of these feature including documenation is due Quasar-17.2.0, 
+        * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
         currently, it is enabled on SAAS for internal accounts (testing only).
 
 ### Bug fix ###
