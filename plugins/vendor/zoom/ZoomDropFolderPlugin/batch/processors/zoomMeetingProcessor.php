@@ -29,7 +29,7 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
         }
 		if ($categories)
 		{
-			$entry -> categories = implode(',', $categories);
+			$entry->categories = implode(',', $categories);
 		}
 	}
 
