@@ -6,9 +6,6 @@
  */
 class KalturaCaptionAsset extends KalturaAsset
 {
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
-	
 	/**
 	 * The Caption Params used to create this Caption Asset
 	 * 
@@ -150,11 +147,6 @@ class KalturaCaptionAsset extends KalturaAsset
 			$this->format = KalturaCaptionType::SRT;
 		}
 		
-		if ($this->accuracy === null)		//set default value
-		{
-			$this->accuracy = $this->getConfigData()['accuracy'];
-		}
-		
 		return parent::toInsertableObject ($object_to_fill, $props_to_skip);
 	}
 
@@ -165,12 +157,5 @@ class KalturaCaptionAsset extends KalturaAsset
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		parent::validateForInsert($propertiesToSkip);
-	}
-	
-	private static function getConfigData()
-	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$accuracy = $zoomConfiguration['accuracy'];
-		return array('accuracy' => $accuracy);
 	}
 }

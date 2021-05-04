@@ -28,6 +28,9 @@ Add the following to batch.ini:
 	id                              = @ID@
 	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
 	params.tags                     = zoom
+    
+	[KAsyncDropFolderContentProcessor : JobHandlerWorker]
+	params.accuracy                 = 85%
 
 ### Deployment scripts ###
 - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
