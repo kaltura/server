@@ -24,6 +24,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     // Mapping metadata constants
     const RULE_NAME = 'Rule';
     const KALTURA_FIELD_NAME_XPATH = '/metadata/Rule/Kaltura/ShowTaxonomyElement';
+    const DYNAMIC_OBJECT_ID_XPATH = '/*[local-name()="metadata"]/*[local-name()="ID"]';
+    const DYNAMIC_OBJECT_IS_RETIRED_XPATH = '/*[local-name()="metadata"]/*[local-name()="IsRetired"]';
 
     const OPEN_CALAIS_TOO_MANY_REQUESTS = 429;
 
@@ -656,7 +658,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
                 return false;
             }
 
-            $objects = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, $objectId);
+            $objects = $this->retrieveDynamicObjectByMetadataProfileAndXpath($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, self::DYNAMIC_OBJECT_ID_XPATH, $objectId);
             if ($objects->totalCount)
             {
                 return true;
@@ -799,6 +801,31 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $metadataFilter->metadataProfileIdEqual = $metadataProfileId;
         $metadataFilter->metadataObjectTypeEqual = $objectType;
         $metadataFilter->objectIdEqual = $objectId;
+
+        return $this->metadataPlugin->metadata->listAction($metadataFilter);
+    }
+
+    protected function retrieveDynamicObjectByMetadataProfileAndXpath ($metadataProfileId, $objectType, $xpath, $value, $hasIsRetiredField = true)
+    {
+        $metadataFilter = new KalturaMetadataFilter();
+        $metadataFilter->metadataProfileIdEqual = $metadataProfileId;
+        $metadataFilter->metadataObjectTypeEqual = $objectType;
+
+        $advancedFilter = new KalturaMetadataSearchItem();
+        $advancedFilter->metadataProfileId = $metadataProfileId;
+
+        $conditionId = new KalturaSearchMatchCondition();
+        $conditionId->field = $xpath;
+        $conditionId->value = $value;
+
+        if ($hasIsRetiredField)
+        {
+            $conditionRetired = new KalturaSearchMatchCondition();
+            $conditionRetired->field = self::DYNAMIC_OBJECT_IS_RETIRED_XPATH;
+            $conditionRetired->value = 'False';
+        }
+
+        $metadataFilter->advancedSearch = $advancedFilter;
 
         return $this->metadataPlugin->metadata->listAction($metadataFilter);
     }

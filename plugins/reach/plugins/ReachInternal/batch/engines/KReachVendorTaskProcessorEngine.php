@@ -56,6 +56,7 @@ abstract class KReachVendorTaskProcessorEngine
         $filter = new KalturaEntryVendorTaskFilter();
         $filter->entryIdEqual = $vendorTask->entryId;
         $filter->catalogItemIdEqual = $vendorTask->catalogItemId;
+        $filter->idNotIn = $vendorTask->id;
         $filter->statusIn = KalturaEntryVendorTaskStatus::PENDING . ',' . KalturaEntryVendorTaskStatus::PENDING_MODERATION . ',' . KalturaEntryVendorTaskStatus::PROCESSING;
         $filter->createdAtGreaterThanOrEqual = $vendorTask->createdAt;
 
