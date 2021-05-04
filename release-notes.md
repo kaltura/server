@@ -1,3 +1,7 @@
+# Quasar-17.2.0 #
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_05_04_Partner_RegistrationValidationPermission.php
+
 # Quasar-17.1.0 #
 ## Zoom as a polling engine ##
 - Issue Type: Task
