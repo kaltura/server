@@ -24,8 +24,8 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     // Mapping metadata constants
     const RULE_NAME = 'Rule';
     const KALTURA_FIELD_NAME_XPATH = '/metadata/Rule/Kaltura/ShowTaxonomyElement';
-    const DYNAMIC_OBJECT_ID_XPATH = '/*[local-name()="metadata"]/*[local-name()="ID"]';
-    const DYNAMIC_OBJECT_IS_RETIRED_XPATH = '/*[local-name()="metadata"]/*[local-name()="IsRetired"]';
+    const DYNAMIC_OBJECT_ID_XPATH = "/*[local-name()='metadata']/*[local-name()='ID']";
+    const DYNAMIC_OBJECT_IS_RETIRED_XPATH = "/*[local-name()='metadata']/*[local-name()='IsRetired']";
 
     const OPEN_CALAIS_TOO_MANY_REQUESTS = 429;
 
@@ -814,6 +814,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
         $advancedFilter = new KalturaMetadataSearchItem();
         $advancedFilter->metadataProfileId = $metadataProfileId;
+        $advancedFilter->type = KalturaESearchOperatorType::AND_OP;
         $advancedFilter->items = array();
 
         $conditionId = new KalturaSearchMatchCondition();
