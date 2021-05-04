@@ -25,6 +25,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const RECORDING_TYPE = 'recording_type';
 	const NEXT_PAGE_TOKEN = 'next_page_token';
 	const ME = 'me';
+	const TRANSCRIPT = 'TRANSCRIPT';
 	
 	/**
 	 * @var kZoomClient
@@ -150,7 +151,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 								}
-								else if ($recordingFile[self::RECORDING_FILE_TYPE] !== 'TRANSCRIPT')
+								else if ($recordingFile[self::RECORDING_FILE_TYPE] !== self::TRANSCRIPT)
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START]);
