@@ -107,13 +107,12 @@ class kZoomEventHanlder
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
 		
-		$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
+		
 		
 		$kMeetingMetaData = self::allocateMeetingMetaData($recording, $event);
 		KalturaLog::debug('meeting recording files are: ' . print_r($recording->recordingFiles, true));
 		$recordingFilesOrdered = $recording->orderRecordingFiles($recording->recordingFiles);
 		KalturaLog::debug('recording files ordered are: ' . print_r($recordingFilesOrdered, true));
-		$shouldSearchParentEntry = true;
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$parentEntry = null;
@@ -121,6 +120,7 @@ class kZoomEventHanlder
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
 				$fileName = $kMeetingMetaData->getUuid() . '_' . $recordingFile->id . ZoomHelper::SUFFIX_ZOOM;
+				$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
 				if(!array_key_exists($fileName, $dropFolderFilesMap))
 				{
 					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType))
@@ -132,17 +132,14 @@ class kZoomEventHanlder
 					                                                      $kMeetingMetaData, $kRecordingFile);
 					if (!$parentEntry)
 					{
-						if ($shouldSearchParentEntry)
-						{
-							$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(), $partnerId);
-						}
+						$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(). $recordingFile->recordingStart , $partnerId);
 						if ($parentEntry)
 						{
 							$zoomDropFolderFile->setIsParentEntry(false);
 						}
-						else
+						else if($recordingFile->recordingFileType != kRecordingFileType::TRANSCRIPT)
 						{
-							$parentEntry = self::createEntry($recording->uuid, $partnerId, $enableZoomTranscription);
+							$parentEntry = self::createEntry($recording->uuid, $partnerId, $enableZoomTranscription, $recordingFile->recordingStart);
 							$zoomDropFolderFile->setIsParentEntry(true);
 						}
 					}
@@ -162,7 +159,6 @@ class kZoomEventHanlder
 					KalturaLog::notice('Drop folder file already existed: ' . print_r($dropFolderFilesMap[$fileName], true));
 				}
 			}
-			$shouldSearchParentEntry = false;
 		}
 	}
 	
@@ -232,13 +228,13 @@ class kZoomEventHanlder
 		return $entry;
 	}
 	
-	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom)
+	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime)
 	{
 		$newEntry = new entry();
 		$newEntry->setType(entryType::MEDIA_CLIP);
 		$newEntry->setSourceType(EntrySourceType::URL);
 		$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid);
+		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid. $recordingStartTime);
 		$newEntry->setStatus(entryStatus::NO_CONTENT);
 		$newEntry->setPartnerId($partnerId);
 		$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);
