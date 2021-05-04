@@ -160,6 +160,7 @@ class kZoomClient
 				}
 			}
 		}
+		return null;
 	}
 	
 	/**
