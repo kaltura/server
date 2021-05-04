@@ -64,6 +64,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
             KalturaLog::info('Rule engine result values: ' . print_r($values, true));
             $isUnique = $this->ensureUniqueness($vendorTask);
+            KBatchBase::impersonate($vendorTask->partnerId);
 
             if ($isUnique)
             {
@@ -813,16 +814,19 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
         $advancedFilter = new KalturaMetadataSearchItem();
         $advancedFilter->metadataProfileId = $metadataProfileId;
+        $advancedFilter->items = array();
 
         $conditionId = new KalturaSearchMatchCondition();
         $conditionId->field = $xpath;
         $conditionId->value = $value;
+        $advancedFilter->items[] = $conditionId;
 
         if ($hasIsRetiredField)
         {
             $conditionRetired = new KalturaSearchMatchCondition();
             $conditionRetired->field = self::DYNAMIC_OBJECT_IS_RETIRED_XPATH;
             $conditionRetired->value = 'False';
+            $advancedFilter->items[] = $conditionRetired;
         }
 
         $metadataFilter->advancedSearch = $advancedFilter;
