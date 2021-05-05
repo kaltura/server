@@ -132,7 +132,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
 		$assetParamsResourceContainer->resource = $resource;
 		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
-		KBatchBase::$kClient->media->addContent($entry->id, $resource);
+		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
 		KBatchBase::unimpersonate();
 		return $entry;
 	}
@@ -251,7 +251,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$updatedEntry->description = $this->createEntryDescriptionFromRecording($recording);
 		$updatedEntry->name = $recording->meetingMetadata->topic;
 		$updatedEntry->userId = $ownerId;
-		$updatedEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		$updatedEntry->adminTags = self::ADMIN_TAG_ZOOM;
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$kalturaEntry = KBatchBase::$kClient->baseEntry->update($recording->parentEntryId, $updatedEntry);
