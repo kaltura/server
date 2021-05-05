@@ -10,6 +10,8 @@
  */
 abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 
+	const ROW_DATA_EXTENSION = "row_data_extension";
+	const ROW_DATA_MAX_LENGTH = 1023;
 
 	/**
 	 * The Peer class.
@@ -457,7 +459,7 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function getRowData()
 	{
-		return $this->row_data;
+		return $this->row_data . $this->getRowDataExtension();
 	}
 
 	/**
@@ -1033,15 +1035,20 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	 */
 	public function setRowData($v)
 	{
+		$currentRowData = $this->getRowData();
 		if(!isset($this->oldColumnsValues[BulkUploadResultPeer::ROW_DATA]))
-			$this->oldColumnsValues[BulkUploadResultPeer::ROW_DATA] = $this->row_data;
+			$this->oldColumnsValues[BulkUploadResultPeer::ROW_DATA] = $currentRowData;
 
-		if ($v !== null) {
+		if ($v !== null)
+		{
 			$v = (string) $v;
 		}
 
-		if ($this->row_data !== $v) {
-			$this->row_data = $v;
+		if ($currentRowData !== $v)
+		{
+			$this->row_data = substr($v, 0, self::ROW_DATA_MAX_LENGTH);
+			$this->setRowDataExtension( substr($v, self::ROW_DATA_MAX_LENGTH) );
+
 			$this->modifiedColumns[] = BulkUploadResultPeer::ROW_DATA;
 		}
 
@@ -2802,5 +2809,8 @@ abstract class BaseBulkUploadResult extends BaseObject  implements Persistent {
 	{
 		return $this->last_hydrate_time;
 	}
+
+	protected function getRowDataExtension()    {return $this->getFromCustomData(self::ROW_DATA_EXTENSION, null, '');}
+	protected function setRowDataExtension($v)  {$this->putInCustomData(self::ROW_DATA_EXTENSION, ($v === false) ? '' : $v);}
 
 } // BaseBulkUploadResult
