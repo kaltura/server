@@ -547,7 +547,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		if(is_null($this->conversionProfileId))
 			return;
 			
-		if($sourceObject && $sourceObject->getStatus() != entryStatus::NO_CONTENT && (substr( $sourceObject->getReferenceID(), 0, 4 ) !== 'Zoom'))
+		if($sourceObject && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
 		
 		if($this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)

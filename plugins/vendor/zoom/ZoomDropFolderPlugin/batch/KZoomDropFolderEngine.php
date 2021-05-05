@@ -205,6 +205,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
 		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
 		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
+		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
 		KBatchBase::unimpersonate();
