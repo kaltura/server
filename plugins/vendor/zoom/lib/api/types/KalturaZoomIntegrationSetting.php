@@ -80,6 +80,16 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	 * @var string
 	 */
 	public $zoomAccountDescription;
+	
+	/**
+	 * @var string
+	 */
+	public $createdAt;
+	
+	/**
+	 * @var string
+	 */
+	public $updatedAt;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -101,6 +111,8 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'deletionPolicy',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
+		'createdAt',
+		'updatedAt'
 	);
 
 	public function getMapBetweenObjects()
