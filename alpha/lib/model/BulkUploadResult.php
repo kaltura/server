@@ -10,7 +10,7 @@
  */ 
 class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 {
-	const ROW_DATA_EXTENSION = "row_data_extension";
+	const ROW_DATA_EXTENSION = 'row_data_extension';
 	const ROW_DATA_MAX_LENGTH = 1023;
 
 	/**
