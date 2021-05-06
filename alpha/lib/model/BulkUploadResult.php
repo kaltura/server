@@ -9,7 +9,10 @@
  * @subpackage model
  */ 
 class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
-{   
+{
+	const ROW_DATA_EXTENSION = "row_data_extension";
+	const ROW_DATA_MAX_LENGTH = 1023;
+
 	/**
 	 * Get the [plugins_data] column value.
 	 * 
@@ -72,5 +75,18 @@ class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 	{
 	    
 	}
-	
+
+	public function setRowData($v)
+	{
+		$this->setRowDataExtension( substr($v, self::ROW_DATA_MAX_LENGTH) );
+		return parent::setRowData($v);
+	}
+
+	public function getRowData()
+	{
+		return parent::getRowData() . $this->getRowDataExtension();
+	}
+
+	protected function getRowDataExtension()    {return $this->getFromCustomData(self::ROW_DATA_EXTENSION, null, '');}
+	protected function setRowDataExtension($v)  {$this->putInCustomData(self::ROW_DATA_EXTENSION, ($v === false) ? '' : $v);}
 }
