@@ -77,7 +77,7 @@ class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 
 	public function setRowData($v)
 	{
-		PeerUtils::setExtension($this, $v, self::ROW_DATA_MAX_LENGTH,__FUNCTION__);
+		PeerUtils::setExtension($this, $v, self::ROW_DATA_MAX_LENGTH, __FUNCTION__);
 		return parent::setRowData($v);
 	}
 

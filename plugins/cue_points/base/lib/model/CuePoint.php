@@ -564,7 +564,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 
 	public function setName($v)
 	{
-		PeerUtils::setExtension($this, $v, self::NAME_MAX_LENGTH,__FUNCTION__);
+		PeerUtils::setExtension($this, $v, self::NAME_MAX_LENGTH, __FUNCTION__);
 		return parent::setName($v);
 	}
 
