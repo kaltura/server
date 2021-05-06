@@ -10,7 +10,6 @@
  */ 
 class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 {
-	const ROW_DATA_EXTENSION = 'row_data_extension';
 	const ROW_DATA_MAX_LENGTH = 1023;
 
 	/**
@@ -78,15 +77,12 @@ class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 
 	public function setRowData($v)
 	{
-		$this->setRowDataExtension( substr($v, self::ROW_DATA_MAX_LENGTH) );
+		PeerUtils::setExtension($this, $v, self::ROW_DATA_MAX_LENGTH,__FUNCTION__);
 		return parent::setRowData($v);
 	}
 
 	public function getRowData()
 	{
-		return parent::getRowData() . $this->getRowDataExtension();
+		return parent::getRowData() . PeerUtils::getExtension($this, __FUNCTION__);
 	}
-
-	protected function getRowDataExtension()    {return $this->getFromCustomData(self::ROW_DATA_EXTENSION, null, '');}
-	protected function setRowDataExtension($v)  {$this->putInCustomData(self::ROW_DATA_EXTENSION, ($v === false) ? '' : $v);}
 }

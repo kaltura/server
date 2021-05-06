@@ -25,6 +25,8 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 
 	const COPIED_FROM = 'copiedFrom';
 
+	const NAME_MAX_LENGTH = 255;
+
 	public function getIndexObjectName() {
 		return "CuePointIndex";
 	}
@@ -560,5 +562,15 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		return $this->children_count;
 	}
 
+	public function setName($v)
+	{
+		PeerUtils::setExtension($this, $v, self::NAME_MAX_LENGTH,__FUNCTION__);
+		return parent::setName($v);
+	}
+
+	public function getName()
+	{
+		return parent::getName() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
 
 } // CuePoint
