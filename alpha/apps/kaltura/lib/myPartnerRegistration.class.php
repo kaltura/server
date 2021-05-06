@@ -433,11 +433,11 @@ class myPartnerRegistration
 		}
 		catch (SignupException $se)
 		{
-			if (strpos($se->getMessage(),'Invalid'))
+			if ($se->getCode() == SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL)
 			{
 				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_WRONG_PASSWORD, $partner);
 			}
-			else
+			else if ($se->getCode() == SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL)
 			{
 				$this -> addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_MISSING_PASSWORD, $partner);
 			}

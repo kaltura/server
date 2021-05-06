@@ -35,8 +35,7 @@ class PartnerService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		
-		$tmpPartner = clone $partner;
-		$dbPartner = $tmpPartner->toPartner();
+		$dbPartner = $partner->toPartner();
 		
 		$c = new Criteria();
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
@@ -116,7 +115,6 @@ class PartnerService extends KalturaBaseService
 			$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
 			$existingUser = UserLoginDataPeer::doSelectOne($c);
 			/* @var $exisitingUser UserLoginData */
-			$this->registrationValidationAction($partner, $cmsPassword, $templatePartnerId, $silent);
 			$dbPartner = $partner->toPartner();
 			$parentPartnerInfo = $this->getParentPartnerId($templatePartnerId);
 			$parentPartnerId = $parentPartnerInfo['parentPartnerInfo'];
