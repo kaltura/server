@@ -1313,7 +1313,7 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$renderer = null;
-
+		
 		switch($this->entry->getType())
 		{
 			case entryType::PLAYLIST:
@@ -1365,6 +1365,7 @@ class playManifestAction extends kalturaAction
 		$renderer->partnerId = $this->entry->getPartnerId();
 		$renderer->entryType = $entryType;
 		$renderer->duration = $this->duration;
+		
 		if ($this->deliveryProfile)
 		{
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
@@ -1407,6 +1408,12 @@ class playManifestAction extends kalturaAction
 		{
 			$cache = kPlayManifestCacher::getInstance();
 			$cache->storeRendererToCache($renderer);
+		}
+		
+		$accessControlAllowOriginDomains = $this->getRequestParameter('AccessControlAllowOriginDomains');
+		if($accessControlAllowOriginDomains)
+		{
+			$renderer -> setAccessControlAllowOriginDomains(base64_decode($accessControlAllowOriginDomains));
 		}
 
 		// Output the response

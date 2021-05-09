@@ -76,6 +76,8 @@ abstract class kManifestRenderer
 	 * @var string
 	 */
 	protected $internalIP = null;
+	
+	protected $accessControlAllowOriginDomain = '*';
 
 
 	protected function prepareFlavors()
@@ -95,9 +97,14 @@ abstract class kManifestRenderer
 	 */
 	protected function getAccessControlAllowOriginDomains()
 	{
-		return '*';
+		return $this->accessControlAllowOriginDomain;
 	}
-
+	
+	public function setAccessControlAllowOriginDomains($v)
+	{
+		$this->accessControlAllowOriginDomain = $v;
+	}
+	
 	/**
 	 * @return string
 	 */
