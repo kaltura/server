@@ -79,7 +79,6 @@ abstract class kManifestRenderer
 	
 	protected $accessControlAllowOriginDomain = '*';
 
-
 	protected function prepareFlavors()
 	{
 	}
@@ -935,27 +934,6 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		$this->setClosedCaptions();
-		$this->setAccessControlAllowOriginDomain();
-	}
-
-	protected function setAccessControlAllowOriginDomain()
-	{
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $dbEntry->getPartnerId()))
-		{
-			return;
-		}
-
-		$host = infraRequestUtils::getUrlHost();
-		if($host)
-		{
-			$this->accessControlAllowOriginDomains = $host;
-		}
-	}
-
-	protected function getAccessControlAllowOriginDomains()
-	{
-		return $this->accessControlAllowOriginDomains;
 	}
 
 	protected function setClosedCaptions()

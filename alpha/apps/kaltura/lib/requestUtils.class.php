@@ -10,6 +10,8 @@ class requestUtils extends infraRequestUtils
 {
 	const SECURE_COOKIE_PREFIX = "___";
 	
+	const ORIGIN_HEADER = 'HTTP_ORIGIN';
+	
 	private static $s_cookies_to_be_set = array();
 	
 	public static function resolve($targetUrl, $referenceUrl)
@@ -328,5 +330,10 @@ class requestUtils extends infraRequestUtils
 		$ip_country_list = explode ( "," , $ip_country_list_str );
 		$current_country = self::getIpCountry() ;
 		return ( in_array ( $current_country , $ip_country_list ) );
+	}
+	
+	public static function getOrigin()
+	{
+		return isset($_SERVER[self::ORIGIN_HEADER]) ? $_SERVER[self::ORIGIN_HEADER] : null;
 	}
 }

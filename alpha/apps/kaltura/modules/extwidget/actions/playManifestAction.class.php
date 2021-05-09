@@ -62,7 +62,6 @@ class playManifestAction extends kalturaAction
 		"storageId" => 'si',
 		"tags" => 't',
 		"uiConfId" => 'ui',
-		"accessControlAllowOriginDomains" => 'acod'
 	);
 
 	const KALTURA_TOKEN_MARKER = '{kt}';
@@ -1411,10 +1410,14 @@ class playManifestAction extends kalturaAction
 			$cache->storeRendererToCache($renderer);
 		}
 		
-		$accessControlAllowOriginDomains = $this->getRequestParameter('accessControlAllowOriginDomains');
-		if($accessControlAllowOriginDomains)
+		
+		//set origin on Access-Control-Allow-Origin
+		if(requestUtils::getOrigin())
 		{
-			$renderer -> setAccessControlAllowOriginDomains(base64_decode($accessControlAllowOriginDomains));
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $renderer->partnerId))
+			{
+				$renderer -> setAccessControlAllowOriginDomains(requestUtils::getOrigin());
+			}
 		}
 
 		// Output the response
