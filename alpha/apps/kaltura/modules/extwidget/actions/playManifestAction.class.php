@@ -1410,15 +1410,10 @@ class playManifestAction extends kalturaAction
 			$cache->storeRendererToCache($renderer);
 		}
 		
-		
-		//set origin on Access-Control-Allow-Origin
-		if(requestUtils::getOrigin())
-		{
-			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $renderer->partnerId))
-			{
-				$renderer -> setAccessControlAllowOriginDomains(requestUtils::getOrigin());
-			}
-		}
+		//set origin on Access-Control-Allow-Origin-Domains
+		$renderer->setRestrictAccessControlAllowOriginDomains( PermissionPeer::isValidForPartner
+															 ( PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS,
+																$renderer->partnerId));
 
 		// Output the response
 		KExternalErrors::terminateDispatch();

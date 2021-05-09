@@ -77,7 +77,7 @@ abstract class kManifestRenderer
 	 */
 	protected $internalIP = null;
 	
-	protected $accessControlAllowOriginDomain = '*';
+	protected $restrictAccessControlAllowOriginDomains = false;
 
 	protected function prepareFlavors()
 	{
@@ -96,12 +96,16 @@ abstract class kManifestRenderer
 	 */
 	protected function getAccessControlAllowOriginDomains()
 	{
-		return $this->accessControlAllowOriginDomain;
+		if(!$this->restrictAccessControlAllowOriginDomains)
+		{
+			return '*';
+		}
+		return infraRequestUtils::getOrigin();
 	}
 	
-	public function setAccessControlAllowOriginDomains($v)
+	public function setRestrictAccessControlAllowOriginDomains($v)
 	{
-		$this->accessControlAllowOriginDomain = $v;
+		$this->restrictAccessControlAllowOriginDomains = $v;
 	}
 	
 	/**
