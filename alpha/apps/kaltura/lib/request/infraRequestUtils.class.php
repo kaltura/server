@@ -13,7 +13,8 @@ class infraRequestUtils
 	const PROTOCOL_HTTPS = 'https';
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	const CLIENT_TAG = 'clientTag';
-
+	const ORIGIN_HEADER = 'HTTP_ORIGIN';
+	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = array();
 	protected static $requestParams = null;
@@ -587,5 +588,10 @@ class infraRequestUtils
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 
 		$result = curl_exec($ch);
+	}
+	
+	public static function getOrigin()
+	{
+		return isset( $_SERVER [ self::ORIGIN_HEADER ] ) ? $_SERVER [ self::ORIGIN_HEADER ] : null;
 	}
 }
