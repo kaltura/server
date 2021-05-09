@@ -1,17 +1,8 @@
 <?php
 
 require_once (dirname(__FILE__).'/../bootstrap.php');
-
 ini_set("memory_limit", "1024M");
-
 define('ENTRIES_CHUNK', 500);
-define('TMP_FILE_PATH', '/tmp/playsviewsDump.txt');
-
-KalturaLog::log('Copy Script Started');
-$dbConf = kConf::getDB();
-DbManager::setConfig($dbConf);
-DbManager::initialize();
-$connection = Propel::getConnection();
 
 function handleChunk($currIdsMap)
 {
@@ -39,14 +30,29 @@ function handleChunk($currIdsMap)
 	}
 }
 
-$map = array();
-$currIdsMap = array();
-$f = fopen('php://stdin', 'r');
-$fp = fopen(TMP_FILE_PATH, 'w');
+// parse the command line
+if ($argc < 2)
+{
+	echo "Usage:\n\t" . basename(__file__) . " <output file name>\n";
+	echo "For example, php " . basename(__file__) . " /tmp/playsviewsDump.txt\n";
+	exit(1);
+}
+
+$fp = fopen($argv[1], 'w');
 if (!$fp)
 {
 	die('Failed to open tmp file');
 }
+
+KalturaLog::log('Copy Script Started');
+$dbConf = kConf::getDB();
+DbManager::setConfig($dbConf);
+DbManager::initialize();
+$connection = Propel::getConnection();
+
+$map = array();
+$currIdsMap = array();
+$f = fopen('php://stdin', 'r');
 
 while ($s = trim(fgets($f)))
 {
