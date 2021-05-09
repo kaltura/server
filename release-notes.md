@@ -1,3 +1,18 @@
+# Quasar-17.2.0 #
+
+## Add missing permission to PLAYBACK_BASE_ROLE ##
+- Issue Type: Task
+- Issue ID: FOUN-132
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "PLAYBACK BASE ROLE" WIDGET_SESSION_PERMISSION realrun
+
+#### Known Issues & Limitations ####
+	None
+
 # Quasar-17.1.0 #
 ## Version Highlight ##
 ### Features ###
