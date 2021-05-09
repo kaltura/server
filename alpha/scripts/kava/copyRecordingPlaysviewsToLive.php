@@ -2,7 +2,7 @@
 
 require_once (dirname(__FILE__).'/../bootstrap.php');
 
-ini_set( "memory_limit","1024M" );
+ini_set("memory_limit", "1024M");
 
 define('ENTRIES_CHUNK', 500);
 define('TMP_FILE_PATH', '/tmp/playsviewsDump.txt');
@@ -62,12 +62,12 @@ if (!$fp)
 	die('Failed to open tmp file');
 }
 
-foreach ($map as $entryId => $assocValues)
+foreach ($map as $entryId => $values)
 {
 	//write row as is
-	if (count($assocValues) == 1)
+	if (count($values) == 1)
 	{
-		fwrite($fp, reset($assocValues) . "\n");
+		fwrite($fp, reset($values) . "\n");
 		continue;
 	}
 
@@ -75,7 +75,7 @@ foreach ($map as $entryId => $assocValues)
 		0 => $entryId
 	);
 
-	foreach ($assocValues as $entryStr)
+	foreach ($values as $entryStr)
 	{
 		$sep = strpos($entryStr, "\t") ? "\t" : " ";
 		$currEntryValues = explode($sep, $entryStr);
