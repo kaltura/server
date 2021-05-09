@@ -96,11 +96,13 @@ abstract class kManifestRenderer
 	 */
 	protected function getAccessControlAllowOriginDomains()
 	{
-		if(!$this->restrictAccessControlAllowOriginDomains)
+		if( ! $this->restrictAccessControlAllowOriginDomains ||
+			! isset( $_SERVER [ infraRequestUtils::ORIGIN_HEADER ] ) )
 		{
 			return '*';
 		}
-		return infraRequestUtils::getOrigin();
+		
+		return $_SERVER [ infraRequestUtils::ORIGIN_HEADER ];
 	}
 	
 	public function setRestrictAccessControlAllowOriginDomains($v)
