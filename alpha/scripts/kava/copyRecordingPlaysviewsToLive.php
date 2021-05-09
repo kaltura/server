@@ -7,7 +7,6 @@ ini_set("memory_limit", "1024M");
 define('ENTRIES_CHUNK', 500);
 define('TMP_FILE_PATH', '/tmp/playsviewsDump.txt');
 
-$f = fopen("php://stdin", "r");
 KalturaLog::log('Copy Script Started');
 $dbConf = kConf::getDB();
 DbManager::setConfig($dbConf);
@@ -16,23 +15,38 @@ $connection = Propel::getConnection();
 
 function handleChunk($currIdsMap)
 {
-	global $map;
+	global $fp, $map;
 
-	myPartnerUtils::resetAllFilters();
-	myPartnerUtils::resetPartnerFilter('entry');
-	$entries = entryPeer::retrieveByPKS(array_keys($currIdsMap));
+	$entries = entryPeer::retrieveByPKsNoFilter(array_keys($currIdsMap));
 	foreach ($entries as $entry)
 	{
+		$entryId = $entry->getId();
 		if ($entry->getIsRecordedEntry())
 		{
 			$liveEntryId = $entry->getRootEntryId();
-			$map[$liveEntryId][] = $currIdsMap[$entry->getId()];
+			$map[$liveEntryId][] = $currIdsMap[$entryId];
+		}
+
+		if ($entry->getType() != entryType::LIVE_STREAM)
+		{
+			// if entry is not live no need to keep it in map
+			fwrite($fp, $currIdsMap[$entryId] . "\n");
+		}
+		else
+		{
+			$map[$entryId][] = $currIdsMap[$entryId];
 		}
 	}
 }
 
 $map = array();
 $currIdsMap = array();
+$f = fopen('php://stdin', 'r');
+$fp = fopen(TMP_FILE_PATH, 'w');
+if (!$fp)
+{
+	die('Failed to open tmp file');
+}
 
 while ($s = trim(fgets($f)))
 {
@@ -40,7 +54,6 @@ while ($s = trim(fgets($f)))
 	$curEntryArr = explode($sep, $s);
 	$entryId = reset($curEntryArr);
 	$currIdsMap[$entryId] = $s;
-	$map[$entryId][] = $s;
 
 	if (count($currIdsMap) == ENTRIES_CHUNK)
 	{
@@ -56,12 +69,6 @@ if (count($currIdsMap) > 0)
 }
 
 //write output
-$fp = fopen(TMP_FILE_PATH, 'w');
-if (!$fp)
-{
-	die('Failed to open tmp file');
-}
-
 foreach ($map as $entryId => $values)
 {
 	//write row as is
@@ -91,7 +98,7 @@ foreach ($map as $entryId => $values)
 		}
 
 		// update the rest of the metrics
-		for ($i = 2; $i < 10; $i++)
+		for ($i = 2; $i < count($currEntryValues); $i++)
 		{
 			if (isset($entryValues[$i]))
 			{
