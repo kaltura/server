@@ -10,7 +10,6 @@ class requestUtils extends infraRequestUtils
 {
 	const SECURE_COOKIE_PREFIX = "___";
 	
-	
 	private static $s_cookies_to_be_set = array();
 	
 	public static function resolve($targetUrl, $referenceUrl)
@@ -330,6 +329,4 @@ class requestUtils extends infraRequestUtils
 		$current_country = self::getIpCountry() ;
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
-	
-
 }
