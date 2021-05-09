@@ -112,9 +112,9 @@ class ScheduleEventFilter extends baseObjectFilter
 		$this->set('_mlikeor_resource_ids', $ids);
 	}
 
-    public function setIdsNotIn(array $ids)
-    {
-        $this->set('_notin_id', $ids);
-    }
+	public function setIdsNotIn(array $ids)
+	{
+		$this->set('_notin_id', $ids);
+	}
 }
 
