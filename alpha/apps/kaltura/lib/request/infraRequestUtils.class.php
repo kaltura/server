@@ -589,9 +589,4 @@ class infraRequestUtils
 
 		$result = curl_exec($ch);
 	}
-	
-	public static function getOrigin()
-	{
-		return isset( $_SERVER [ self::ORIGIN_HEADER ] ) ? $_SERVER [ self::ORIGIN_HEADER ] : null;
-	}
 }
