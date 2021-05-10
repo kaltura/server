@@ -91,7 +91,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		else
 		{
-			$ks = isset($_GET['integrationCode']) ? ks::fromSecureString ($_GET['integrationCode']) : null;$tokens  = kZoomOauth::requestAccessToken($authCode);
+			$ks = isset($_GET['integrationCode']) ? ks::fromSecureString ($_GET['integrationCode']) : null;
 			$authCode = $_GET['code'];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
