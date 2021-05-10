@@ -142,6 +142,25 @@ class ZoomHelper
 	}
 	
 	/**
+	 * @param $authCode
+	 * @throws Exception
+	 */
+	public static function loadZoomLoginPage($authCode)
+	{
+		$file_path = dirname(__FILE__) . '/../api/webPage/kalturaZoomLoginPage.html';
+		if (file_exists($file_path))
+		{
+			$page = file_get_contents($file_path);
+			$page = str_replace('@authCode@', $authCode, $page);
+			
+			echo $page;
+			die();
+		}
+		
+		throw new KalturaAPIException('unable to find zoom login page, please contact support');
+	}
+	
+	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @param $accountId
 	 * @param $ks

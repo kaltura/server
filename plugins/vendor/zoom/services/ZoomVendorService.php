@@ -59,15 +59,15 @@ class ZoomVendorService extends KalturaBaseService
 	}
 	
 	/**
-	 * load html page the that will ask the user for its KMC URL, derive the region of the user from it,
-	 * and redirect to the registration page in the correct region, while forwarding the necessary code for registration
+	 * load html page the that will ask the user for its KMC URL and Integration code, derive the region of the user from it,
+	 * and redirect to the zoom login page in the correct region, while forwarding the necessary code for registration
 	 * @action preOauthValidation
 	 * @throws Exception
 	 */
 	public function preOauthValidation()
 	{
 		$authCode = $_GET['code'];
-		ZoomHelper::loadRegionalCloudRedirectionPage($authCode);
+		ZoomHelper::loadZoomLoginPage($authCode);
 	}
 	
 	/**
