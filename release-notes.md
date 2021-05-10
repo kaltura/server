@@ -1,4 +1,11 @@
+
 # Quasar-17.2.0 #
+## Version Highlight ##
+ - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
+ immidatly or fail. Websites can call it before register, to predict success or fail of register.
+ 
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_05_04_Partner_RegistrationValidationPermission.php
 
 ## Add missing permission to PLAYBACK_BASE_ROLE ##
 - Issue Type: Task
