@@ -87,6 +87,7 @@ foreach ($assetIds as $assetId)
         sleep($sleepTime);
     }
 }
+KalturaLog::debug(' Script Finished');
 
 /* ===================== FUNCTIONS ===================== */
 
