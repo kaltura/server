@@ -78,6 +78,7 @@ class kZoomTranscriptProcessor extends kZoomProcessor
 		$caption->setStatus(CaptionAsset::ASSET_STATUS_QUEUED);
 		$caption->setFileExt(self::ZOOM_TRANSCRIPT_FILE_EXT);
 		$caption->setSource(CaptionSource::ZOOM);
+		$caption->setAccuracy(KBatchBase::$taskConfig->params->accuracy);
 		$caption->save();
 		return $caption;
 	}

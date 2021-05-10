@@ -202,7 +202,8 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			$zoomIntegration = new ZoomVendorIntegration();
 			$zoomIntegration->setAccountId($zoomAccountId);
-			$zoomIntegration->setPartnerId(kCurrentContext::$partner_id);
+			$zoomIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
+			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 		}
 		$zoomIntegration->setJwtToken($jwt);
 		$zoomIntegration->save();

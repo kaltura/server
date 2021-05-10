@@ -25,6 +25,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const RECORDING_TYPE = 'recording_type';
 	const NEXT_PAGE_TOKEN = 'next_page_token';
 	const ME = 'me';
+	const TRANSCRIPT = 'TRANSCRIPT';
 	
 	/**
 	 * @var kZoomClient
@@ -132,31 +133,28 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$recordingFilesOrdered = ZoomHelper::orderRecordingFiles($meetingFile[self::RECORDING_FILES], self::RECORDING_START,
 			                                                         self::RECORDING_TYPE);
 			KalturaLog::debug('recording files ordered are: ' . print_r($recordingFilesOrdered, true));
-			$shouldSearchParentEntry = true;
-			$dropFolderFilesMap = $this->loadDropFolderFiles();
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
 				$parentEntry = null;
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
+					$dropFolderFilesMap = $this->loadDropFolderFiles();
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
 						if (ZoomHelper::shouldHandleFileType($recordingFile[self::RECORDING_FILE_TYPE]))
 						{
 							if (!$parentEntry)
 							{
-								if ($shouldSearchParentEntry)
-								{
-									$parentEntry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]);
-								}
+								$parentEntry = $this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID] . $recordingFile[self::RECORDING_START]);
 								if ($parentEntry)
 								{
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 								}
-								else
+								else if ($recordingFile[self::RECORDING_FILE_TYPE] !== self::TRANSCRIPT)
 								{
-									$parentEntry = $this->createEntry($meetingFile[self::UUID], $this->dropFolder->zoomVendorIntegration->enableZoomTranscription);
+									$parentEntry = $this->createEntry($meetingFile[self::UUID],
+									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START]);
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -174,7 +172,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 						$this->handleExistingDropFolderFile($dropFolderFile);
 					}
 				}
-				$shouldSearchParentEntry = false;
 			}
 		}
 	}
@@ -201,13 +198,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return null;
 	}
 	
-	protected function createEntry($uuid, $enableTranscriptionViaZoom)
+	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime)
 	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
-		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid;
+		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
 		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
+		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
 		KBatchBase::unimpersonate();
@@ -292,28 +290,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
-		try
+		$fileSize = $this->zoomClient->getFileSize($dropFolderFile->meetingMetadata->uuid, $dropFolderFile->recordingFile->id);
+		if (!$fileSize)
 		{
-			$fullPath = $dropFolderFile->fileName;
-			$fileSize = $this->zoomClient->getFileSize($dropFolderFile->meetingMetadata->uuid, $dropFolderFile->recordingFile->id);
-		}
-		catch (Exception $e)
-		{
-			$closedStatuses = array(
-				KalturaDropFolderFileStatus::HANDLED,
-				KalturaDropFolderFileStatus::PURGED,
-				KalturaDropFolderFileStatus::DELETED
-			);
-			
-			//In cases drop folder is not configured with auto delete we want to verify that the status file is not in one of the closed statuses so
-			//we won't update it to error status
-			if(!in_array($dropFolderFile->status, $closedStatuses))
-			{
-				KalturaLog::err('Failed to get file size for file ['.$fullPath.']');
-				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
-				                       DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);
-			}
-			return false;
+			KalturaLog::info('Current file size is empty');
+			return;
 		}
 		
 		if($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)

@@ -1,8 +1,39 @@
+
 # Quasar-17.2.0 #
+## Version Highlight ##
+ - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
+ immidatly or fail. Websites can call it before register, to predict success or fail of register.
+ 
 ### Deployment scripts ###
 - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_05_04_Partner_RegistrationValidationPermission.php
 
+## Add missing permission to PLAYBACK_BASE_ROLE ##
+- Issue Type: Task
+- Issue ID: FOUN-132
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "PLAYBACK BASE ROLE" WIDGET_SESSION_PERMISSION realrun
+
+#### Known Issues & Limitations ####
+	None
+
 # Quasar-17.1.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
+    Zoom as polling engine (type of drop folder ) - includes the following:
+        a. Deltetion of content from Zoom
+        b. Import of old content - by changing scanning time in the drop folder UI (admin console)
+        c. Authetication from OnPrems - using JWT token supplied by the caller 
+        * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
+        currently, it is enabled on SAAS for internal accounts (testing only).
+
+### Bug fix ###
+
+
 ## Zoom as a polling engine ##
 - Issue Type: Task
 - Issue ID: PLAT-22641
@@ -19,6 +50,9 @@ Add the following to batch.ini:
 	id                              = @ID@
 	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
 	params.tags                     = zoom
+    
+	[KAsyncDropFolderContentProcessor : JobHandlerWorker]
+	params.accuracy                 = 85%
 
 ### Deployment scripts ###
 - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
