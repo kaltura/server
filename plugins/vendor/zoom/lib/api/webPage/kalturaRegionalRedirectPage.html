@@ -17,6 +17,7 @@
 			$('body').css('cursor', 'progress');
 			event.preventDefault();
 			let kmcUrl = $('#kmcUrl');
+			let integrationCode = $('#integrationCode').val();
 			let regionStartIndex = 0;
 			let regionEndIndex = kmcUrl.val().indexOf("kaltura.com");
 			if (regionEndIndex < 0)
@@ -25,12 +26,11 @@
 			}
 			regionEndIndex = regionEndIndex + 11;
 			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
-
 			$.ajax(
 					{
 						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/oauthValidation',
 						type: 'get',
-						data: {'code': authCode},
+						data: {'code': authCode, 'integrationCode' :  integrationCode},
 						success: function (registrationPage) {
 							$('body').css('cursor', 'default');
 							if (registrationPage)
@@ -85,8 +85,12 @@
 			</div>
 			<div class='container'>
 				<div class='form-group'>
+					<label><h6>Integration code</h6></label>
+					<input type='text' placeholder='Integration code' id='integrationCode' class='form-control' required>
+				</div>
+				<div class='form-group'>
 					<label><h6>Please submit the URL of your KMC</h6></label>
-					<input type='text' placeholder='http://...' id='kmcUrl' class='form-control' name='defaultUserId' required>
+					<input type='text' placeholder='https://...' value='https://www.kaltura.com' id='kmcUrl' class='form-control' required>
 				</div>
 				<button type='submit' id='submit-button' class='btn btn-primary'>Submit</button>
 			</div>

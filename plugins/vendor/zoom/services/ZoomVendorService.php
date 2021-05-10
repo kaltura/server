@@ -83,15 +83,15 @@ class ZoomVendorService extends KalturaBaseService
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
-		$isAdmin = false;
 		$tokens = null;
-		if(!array_key_exists('code', $_GET))
+		if(!array_key_exists('code', $_GET) || !$_GET['code'])
 		{
 			$url = $zoomBaseURL . '/oauth/authorize?' . 'response_type=code' . '&client_id=' . $clientId .  '&redirect_uri=' . $redirectUrl;
 			ZoomHelper::redirect($url);
 		}
 		else
 		{
+			$ks = isset($_GET['integrationCode']) ? ks::fromSecureString ($_GET['integrationCode']) : null;$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$authCode = $_GET['code'];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
@@ -111,13 +111,22 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->save();
 			$permissions = $permissions['permissions'];
 			$isAdmin = ZoomHelper::canConfigureEventSubscription($permissions);
+			if($isAdmin)
+			{
+				if($ks)
+				{
+					$zoomIntegration->setPartnerId($ks->getPartnerId());
+					$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+					$zoomIntegration->save();
+					ZoomHelper::loadSubmitPage($zoomIntegration,$accountId,$ks);
+				}
+				else
+				{
+					ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
+				}
+			}
 		}
-		
-		if($isAdmin)
-		{
-			ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
-		}
-		
+
 		throw new KalturaAPIException(KalturaZoomErrors::ZOOM_ADMIN_REQUIRED);
 	}
 	
