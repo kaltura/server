@@ -93,14 +93,13 @@ class ZoomVendorService extends KalturaBaseService
 		else
 		{
 			$ks = isset($_GET[self::INTEGRATION_CODE]) ? ks::fromSecureString ($_GET[self::INTEGRATION_CODE]) : null;
-//			$authCode = $_GET[self::AUTH_CODE];
-//			$tokens  = kZoomOauth::requestAccessToken($authCode);
-//			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
-//			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
-//			$permissions = $client->retrieveTokenZoomUserPermissions();
-//			$user = $client->retrieveTokenZoomUser();
-//			$accountId = $user[ZoomHelper::ACCOUNT_ID];
-            $accountId = $_GET[self::AUTH_CODE];
+			$authCode = $_GET[self::AUTH_CODE];
+			$tokens  = kZoomOauth::requestAccessToken($authCode);
+			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
+			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
+			$permissions = $client->retrieveTokenZoomUserPermissions();
+			$user = $client->retrieveTokenZoomUser();
+			$accountId = $user[ZoomHelper::ACCOUNT_ID];
 			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 			if(!$zoomIntegration)
 			{
@@ -109,11 +108,11 @@ class ZoomVendorService extends KalturaBaseService
 				ZoomHelper::setZoomIntegration($zoomIntegration);
 			}
 			
-	///		$zoomIntegration->setTokensData($tokens);
+			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
-	//		$permissions = $permissions['permissions'];
-	//		$isAdmin = ZoomHelper::canConfigureEventSubscription($permissions);
-	//		if($isAdmin)
+			$permissions = $permissions['permissions'];
+			$isAdmin = ZoomHelper::canConfigureEventSubscription($permissions);
+			if($isAdmin)
 			{
 				if($ks)
 				{
