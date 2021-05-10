@@ -8,6 +8,8 @@ class ZoomVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
+	const INTEGRATION_CODE = 'integrationCode';
+	const AUTH_CODE = 'code';
 	
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'preOauthValidation');
 	
@@ -66,7 +68,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function preOauthValidation()
 	{
-		$authCode = $_GET['code'];
+		$authCode = $_GET[self::AUTH_CODE];
 		ZoomHelper::loadRegionalCloudRedirectionPage($authCode);
 	}
 	
@@ -84,15 +86,15 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
 		$tokens = null;
-		if(!array_key_exists('code', $_GET) || !$_GET['code'])
+		if(!array_key_exists(self::AUTH_CODE, $_GET) || !$_GET[self::AUTH_CODE])
 		{
 			$url = $zoomBaseURL . '/oauth/authorize?' . 'response_type=code' . '&client_id=' . $clientId .  '&redirect_uri=' . $redirectUrl;
 			ZoomHelper::redirect($url);
 		}
 		else
 		{
-			$ks = isset($_GET['integrationCode']) ? ks::fromSecureString ($_GET['integrationCode']) : null;
-			$authCode = $_GET['code'];
+			$ks = isset($_GET[self::INTEGRATION_CODE]) ? ks::fromSecureString ($_GET[self::INTEGRATION_CODE]) : null;
+			$authCode = $_GET[self::AUTH_CODE];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
