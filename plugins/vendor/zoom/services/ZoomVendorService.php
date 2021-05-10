@@ -73,7 +73,7 @@ class ZoomVendorService extends KalturaBaseService
 	/**
 	 *
 	 * @action oauthValidation
-	 * @return string
+	 * @return int
 	 * @throws Exception
 	 */
 	public function oauthValidationAction()
@@ -115,7 +115,7 @@ class ZoomVendorService extends KalturaBaseService
 		
 		if($isAdmin)
 		{
-			ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
+			return $zoomIntegration->getId();
 		}
 		
 		throw new KalturaAPIException(KalturaZoomErrors::ZOOM_ADMIN_REQUIRED);
@@ -149,29 +149,21 @@ class ZoomVendorService extends KalturaBaseService
 	
 	/**
 	 * @action fetchRegistrationPage
-	 * @param string $tokensData
-	 * @param string $iv
+	 * @param int $vendorIntegrationId
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 * @throws Exception
 	 */
-	public function fetchRegistrationPageAction($tokensData, $iv)
+	public function fetchRegistrationPageAction($vendorIntegrationId)
 	{
 		KalturaResponseCacher::disableCache();
-		$tokensData = base64_decode($tokensData);
-		$iv = base64_decode($iv);
-		$zoomConfiguration = self::getZoomConfiguration();
-		$tokens = $this->handleEncryptTokens($tokensData, $iv, $zoomConfiguration);
-		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
-		$client = new kZoomClient($zoomBaseURL,null,$tokens[kZoomTokens::REFRESH_TOKEN],null,null,$tokens[kZoomTokens::ACCESS_TOKEN]);
-		$accountId = $this->getAccountId($client->retrieveTokenZoomUser());
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
+		$zoomIntegration = VendorIntegrationPeer::retrieveByPK($vendorIntegrationId);
+		$accountId = $zoomIntegration->getAccountId();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if($zoomIntegration && intval($partnerId) !==  $zoomIntegration->getPartnerId() && $partnerId !== 0)
 		{
 			KalturaLog::info("Zoom changing account id: $accountId partner to $partnerId");
 			$zoomIntegration->setPartnerId($partnerId);
-			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
 		}
 		
@@ -202,8 +194,7 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			$zoomIntegration = new ZoomVendorIntegration();
 			$zoomIntegration->setAccountId($zoomAccountId);
-			$zoomIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
-			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+			$zoomIntegration->setPartnerId(kCurrentContext::$partner_id);
 		}
 		$zoomIntegration->setJwtToken($jwt);
 		$zoomIntegration->save();
