@@ -85,7 +85,6 @@ class ZoomVendorService extends KalturaBaseService
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
-		$tokens = null;
 		if(!array_key_exists(self::AUTH_CODE, $_GET) || !$_GET[self::AUTH_CODE])
 		{
 			$url = $zoomBaseURL . '/oauth/authorize?' . 'response_type=code' . '&client_id=' . $clientId .  '&redirect_uri=' . $redirectUrl;

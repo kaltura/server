@@ -14,7 +14,7 @@
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
         var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
-        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
+        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/list?format=1';
         const CMS_USER_ID=3;
         const RECORDING_OWNER_BASED_ON_ZOOM_USER_ID=1;
     </script>
@@ -92,7 +92,7 @@
             $.ajax({
                 url: getUrl,
                 type: 'post',
-                data: {'ks': ks, 'accountId': accountId ,'partnerId':partnerId },
+                data: { 'ks': ks },
                 success: function (res) {
                     console.log(res);
                     if (res) {
@@ -100,7 +100,18 @@
                             alert('Error loading page.\n'+res.message);
                         } else {
                             console.log(res);
-                            loadParameters(res);
+                            if(res.objects)
+                            {
+                                for (let i = 0; i < res.objects.length; i++)
+                                {
+                                    console.log(res.objects[i].accountId );
+                                    if(res.objects[i].accountId === accountId)
+                                    {
+                                        console.log("Found " + accountId);
+                                        loadParameters(res.objects[i]);
+                                    }
+                                }
+                            }
                         }
                     }
                 },
