@@ -22,10 +22,11 @@
 			let regionEndIndex = kmcUrl.val().indexOf("kaltura.com");
 			if (regionEndIndex < 0)
 			{
-				return onFail('Invalid URL');
+	//			return onFail('Invalid URL');
 			}
 			regionEndIndex = regionEndIndex + 11;
-			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
+	//		let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
+			let regionUrl = kmcUrl.val();
 			$.ajax(
 					{
 						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/oauthValidation',
