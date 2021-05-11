@@ -35,9 +35,9 @@
 							$('body').css('cursor', 'default');
 							if (registrationPage)
 							{
-								if(registrationPage.objectType == 'KalturaAPIException')
+								if(registrationPage.firstElementChild && registrationPage.firstElementChild.textContent.includes('KalturaAPIException'))
 								{
-									return onFail(registrationPage.message);
+									return onFail('The code is incorrect. Please check your code and try again.');
 								}
 								if (registrationPage.includes('Invalid authorization code'))
 								{
