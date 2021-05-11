@@ -37,11 +37,13 @@ KalturaStatement::setDryRun($dryRun);
 KalturaLog::info($dryRun ? 'DRY RUN' : 'REAL RUN');
 
 $totalAssets = count($assetIds);
-$assetCount = 0;
+$updatedAssetCount = 0;
+$currentAssetNumber = 0;
 $sleepTime = 15;
 
 foreach ($assetIds as $assetId)
 {
+    $currentAssetNumber++;
     $assetId = trim($assetId);
 
     /* @var  asset $flavorAsset */
@@ -72,7 +74,7 @@ foreach ($assetIds as $assetId)
     try
     {
         $flavorAsset->save();
-        $assetCount++;
+        $updatedAssetCount++;
         KalturaLog::debug('SCRIPT - entry_id: ' . $flavorAsset->getEntryId() . ' asset_id: ' . $flavorAsset->getId() . ' successfully-updated-sizeInBytes = ' . $flavorAsset->getSizeInBytes());
     }
     catch (PropelException $e)
@@ -80,13 +82,14 @@ foreach ($assetIds as $assetId)
         KalturaLog::debug('SCRIPT - entry_id: ' . $flavorAsset->getEntryId() . ' asset_id: ' . $flavorAsset->getId() . ' failed-to-save-asset');
     }
 
-    if ($assetCount % 1000 === 0)
+    if ($updatedAssetCount % 1000 === 0)
     {
-        KalturaLog::debug('SCRIPT - sleeping for ' . $sleepTime . ' sec (asset-count / total-assets): ' . $assetCount . '/'. $totalAssets);
+        KalturaLog::debug('SCRIPT - sleeping for ' . $sleepTime . ' sec (updated-asset-count / current-asset-number / total-assets): ' . $updatedAssetCount . '/' . $currentAssetNumber . '/'. $totalAssets);
         kMemoryManager::clearMemory();
         sleep($sleepTime);
     }
 }
+KalturaLog::debug(' Statistics: updated assets = ' . $updatedAssetCount . ' | skipped assets = ' . ($totalAssets - $updatedAssetCount) . ' | total assets = ' . $totalAssets);
 KalturaLog::debug(' Script Finished');
 
 /* ===================== FUNCTIONS ===================== */
