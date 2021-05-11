@@ -35,10 +35,10 @@
 							$('body').css('cursor', 'default');
 							if (registrationPage)
 							{
-							    if(registrationPage.objectType == 'KalturaAPIException')
-							    {
-							        return onFail(registrationPage.code + ' ' + registrationPage.message);
-							    }
+								if(registrationPage.objectType == 'KalturaAPIException')
+								{
+									return onFail(registrationPage.code + ' ' + registrationPage.message);
+								}
 								if (registrationPage.includes('Invalid authorization code'))
 								{
 									return onFail('Invalid authorization code');
