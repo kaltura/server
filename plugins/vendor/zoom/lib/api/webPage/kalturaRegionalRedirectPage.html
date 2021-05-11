@@ -37,7 +37,11 @@
 							{
 								if(registrationPage.firstElementChild && registrationPage.firstElementChild.textContent.includes('KalturaAPIException'))
 								{
-									return onFail('The code is incorrect. Please check your code and try again.');
+									textFirstElement = new XMLSerializer().serializeToString(registrationPage.firstElementChild);
+									parser = new DOMParser();
+									xmlDoc = parser.parseFromString(textFirstElement, 'text/xml');
+									message = xmlDoc.getElementsByTagName('message')[0].childNodes[0].nodeValue;
+									return onFail('The code is incorrect. Please check your code and try again. ' + message);
 								}
 								if (registrationPage.includes('Invalid authorization code'))
 								{
