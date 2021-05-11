@@ -98,7 +98,7 @@ class ZoomVendorService extends KalturaBaseService
 			}
 			catch (Exception $e)
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_STR, ks::getErrorStr(ks::INVALID_STR));
+				throw new KalturaAPIException($e->getMessage());
 			}
 			$authCode = $_GET[self::AUTH_CODE];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
