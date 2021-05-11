@@ -72,14 +72,14 @@ foreach ($assetIds as $assetId)
     try
     {
         $flavorAsset->save();
+        $assetCount++;
         KalturaLog::debug('SCRIPT - entry_id: ' . $flavorAsset->getEntryId() . ' asset_id: ' . $flavorAsset->getId() . ' successfully-updated-sizeInBytes = ' . $flavorAsset->getSizeInBytes());
     }
     catch (PropelException $e)
     {
         KalturaLog::debug('SCRIPT - entry_id: ' . $flavorAsset->getEntryId() . ' asset_id: ' . $flavorAsset->getId() . ' failed-to-save-asset');
     }
-    
-    $assetCount++;
+
     if ($assetCount % 1000 === 0)
     {
         KalturaLog::debug('SCRIPT - sleeping for ' . $sleepTime . ' sec (asset-count / total-assets): ' . $assetCount . '/'. $totalAssets);
