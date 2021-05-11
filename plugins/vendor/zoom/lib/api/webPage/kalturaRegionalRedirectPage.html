@@ -28,7 +28,7 @@
 			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
 			$.ajax(
 					{
-						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/oauthValidation',
+						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/oauthValidation?format=1',
 						type: 'get',
 						data: {'code': authCode, 'integrationCode' :  integrationCode},
 						success: function (registrationPage) {
@@ -37,7 +37,7 @@
 							{
 								if(registrationPage.objectType == 'KalturaAPIException')
 								{
-									return onFail(registrationPage.message);
+									return onFail('The code is incorrect. Please check your code and try again. ' + registrationPage.code + ' ' + registrationPage.message);
 								}
 								if (registrationPage.includes('Invalid authorization code'))
 								{
