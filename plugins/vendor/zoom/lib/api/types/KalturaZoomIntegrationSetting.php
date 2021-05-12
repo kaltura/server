@@ -146,7 +146,16 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		
 		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
 		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
-		if (!$dropFolders)
+		$relatedDropFolder = null;
+		foreach ($dropFolders as $dropFolder)
+		{
+			if ($dropFolder->getZoomVendorIntegrationId() == $sourceObject->getId())
+			{
+				$relatedDropFolder = $dropFolder;
+				break;
+			}
+		}
+		if (!$relatedDropFolder)
 		{
 			$this->enableZoomTranscription = null;
 			$this->deletionPolicy = null;
