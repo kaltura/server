@@ -123,7 +123,8 @@ class kZoomEventHanlder
 				$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
 				if(!array_key_exists($fileName, $dropFolderFilesMap))
 				{
-					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType))
+					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType) ||
+						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $enableZoomTranscription === 0))
 					{
 						continue;
 					}

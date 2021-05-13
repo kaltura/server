@@ -142,6 +142,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 					$dropFolderFilesMap = $this->loadDropFolderFiles();
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
+						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
+							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
+						{
+							continue;
+						}
 						if (ZoomHelper::shouldHandleFileType($recordingFile[self::RECORDING_FILE_TYPE]))
 						{
 							if (!$parentEntry)
