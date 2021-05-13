@@ -16,10 +16,10 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 		$panelists = new kZoomPanelists();
 		$panelists->parseData($additionalUsersZoomResponse);
 		$panelistsEmails = $panelists->getPanelistsEmails();
+		$result = array();
 		if($panelistsEmails)
 		{
 			KalturaLog::debug('Found the following panelists: ' . implode(", ", $panelistsEmails));
-			$result = array();
 			foreach ($panelistsEmails as $panelistEmail)
 			{
 				$zoomUser = new kZoomUser();
@@ -27,10 +27,6 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 				$zoomUser->setProcessedName($this->processZoomUserName($panelistEmail));
 				$result[] = $zoomUser;
 			}
-		}
-		else
-		{
-			$result = null;
 		}
 		
 		return $result;
