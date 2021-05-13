@@ -26,7 +26,7 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 		if ($this->dropFolder->zoomVendorIntegration->zoomCategory)
 		{
 			$categories[] = $this->dropFolder->zoomVendorIntegration->zoomCategory;
-        }
+		}
 		if ($categories)
 		{
 			$entry->categories = implode(',', $categories);
