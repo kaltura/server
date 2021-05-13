@@ -143,5 +143,22 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 
 		parent::doFromObject($sourceObject, $responseProfile);
 		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorStatus::ACTIVE ? 1 : 0;
+		
+		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
+		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
+		$relatedDropFolder = null;
+		foreach ($dropFolders as $dropFolder)
+		{
+			if ($dropFolder->getZoomVendorIntegrationId() == $sourceObject->getId())
+			{
+				$relatedDropFolder = $dropFolder;
+				break;
+			}
+		}
+		if (!$relatedDropFolder)
+		{
+			$this->enableZoomTranscription = null;
+			$this->deletionPolicy = null;
+		}
 	}
 }
