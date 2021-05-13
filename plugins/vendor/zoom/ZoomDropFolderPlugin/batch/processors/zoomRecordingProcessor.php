@@ -110,7 +110,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			else
 			{
-				$this->setEntryCategory($updatedEntry, $recording->meetingMetadata);
+				$this->setEntryCategory($updatedEntry, $recording->meetingMetadata->meetingId);
 			}
 		}
 		
