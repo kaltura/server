@@ -77,7 +77,12 @@ class elasticClient
 		$this->bulkSize = kConf::get('bulkSize', 'elastic', self::DEFAULT_BULK_SIZE);
 		$this->initBulkBuffer();
 	}
-
+	
+	public function setBulkSize($bulkSize)
+	{
+		$this->bulkSize = $bulkSize;
+	}
+	
 	private function initBulkBuffer()
 	{
 		$this->bulkBuffer = '';
