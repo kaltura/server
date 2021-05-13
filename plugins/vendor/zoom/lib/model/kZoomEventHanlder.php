@@ -52,8 +52,7 @@ class kZoomEventHanlder
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
 				if ($zoomDropFolderId)
 				{
-					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(),
-					                               $zoomVendorIntegration->getEnableZoomTranscription(), $zoomDropFolder->getConversionProfileId());
+					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomDropFolder->getConversionProfileId());
 				}
 				else
 				{
@@ -75,8 +74,7 @@ class kZoomEventHanlder
 			case kEventType::NEW_RECORDING_TRANSCRIPT_COMPLETED:
 				if ($zoomDropFolderId)
 				{
-					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(),
-					                               $zoomVendorIntegration->getEnableZoomTranscription(), $zoomDropFolder->getConversionProfileId());
+					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomDropFolder->getConversionProfileId());
 				}
 				else
 				{
@@ -104,11 +102,15 @@ class kZoomEventHanlder
 		return null;
 	}
 	
-	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, $enableZoomTranscription, $conversionProfileId)
+	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, ZoomVendorIntegration $zoomVendorIntegration, $conversionProfileId)
 	{
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
-		
+		if ($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads())
+		{
+			KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $zoomVendorIntegration->getId());
+			return;
+		}
 		$kMeetingMetaData = self::allocateMeetingMetaData($recording, $event);
 		KalturaLog::debug('meeting recording files are: ' . print_r($recording->recordingFiles, true));
 		$recordingFilesOrdered = $recording->orderRecordingFiles($recording->recordingFiles);
@@ -124,7 +126,7 @@ class kZoomEventHanlder
 				if(!array_key_exists($fileName, $dropFolderFilesMap))
 				{
 					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType) ||
-						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $enableZoomTranscription === 0))
+						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $zoomVendorIntegration->getEnableZoomTranscription() === 0))
 					{
 						continue;
 					}
@@ -140,7 +142,7 @@ class kZoomEventHanlder
 						}
 						else if($recordingFile->recordingFileType != kRecordingFileType::TRANSCRIPT)
 						{
-							$parentEntry = self::createEntry($recording->uuid, $partnerId, $enableZoomTranscription,
+							$parentEntry = self::createEntry($recording->uuid, $partnerId, $zoomVendorIntegration->getEnableZoomTranscription(),
 							                                 $recordingFile->recordingStart, $conversionProfileId);
 							$zoomDropFolderFile->setIsParentEntry(true);
 						}

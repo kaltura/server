@@ -110,7 +110,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			else
 			{
-				$this->setEntryCategory($updatedEntry, $recording->meetingMetadata->meetingId);
+				$this->setEntryCategory($updatedEntry, $recording->meetingMetadata);
 			}
 		}
 		
@@ -204,10 +204,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param KalturaMediaEntry $entry
-	 * @param string $meetingId
+	 * @param KalturaZoomMeetingMetadata $meetingMetadata
 	 * @throws kCoreException
 	 */
-	protected abstract function setEntryCategory($entry, $meetingId);
+	protected abstract function setEntryCategory($entry, $meetingMetadata);
 	
 	/**
 	 * @param kalturaZoomDropFolderFile $recording
