@@ -204,10 +204,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param KalturaMediaEntry $entry
-	 * @param KalturaZoomMeetingMetadata $meetingMetadata
+	 * @param string $meetingId
 	 * @throws kCoreException
 	 */
-	protected abstract function setEntryCategory($entry, $meetingMetadata);
+	protected abstract function setEntryCategory($entry, $meetingId);
 	
 	/**
 	 * @param kalturaZoomDropFolderFile $recording

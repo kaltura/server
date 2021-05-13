@@ -12,13 +12,13 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 
 	/**
 	 * @param KalturaMediaEntry $entry
-	 * @param KalturaZoomMeetingMetadata $meetingMetadata
+	 * @param string $meetingId
 	 * @throws kCoreException
 	 */
-	protected function setEntryCategory($entry, $meetingMetadata)
+	protected function setEntryCategory($entry, $meetingId)
 	{
 		$categories = array();
-		$categoryTrackingField = $this->zoomClient->retrieveTrackingField($meetingMetadata->meetingId);
+		$categoryTrackingField = $this->zoomClient->retrieveTrackingField($meetingId);
 		if ($categoryTrackingField)
 		{
 			$categories[] = $categoryTrackingField;
