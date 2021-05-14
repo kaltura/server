@@ -16,6 +16,7 @@ abstract class OpenCalaisConstants
     const RULE_KALTURA_ID = 'KalturaId';
     const ENTRY_METADATA_SHOW_TAXONOMY = 'entryMetadataShowTaxonomy';
     const DYNAMIC_METADATA = 'dynamicMetadata';
+    const CUEPOINTS_LIST = 'cuePoints_list';
     const OPCAL_RESOLUTIONS = 'resolutions';
     const OPCAL_ENTT_NAME = 'name';
     const OPCAL_TYPE_PROP = '_type';
