@@ -4,7 +4,7 @@
  * @package plugins.eventNotification
  * @subpackage Scheduler
  */
-abstract class KReachVendorTaskProcessorEngine
+abstract class kReachVendorTaskProcessorEngine
 {
 
     /**
@@ -20,18 +20,18 @@ abstract class KReachVendorTaskProcessorEngine
 
     /**
      * @param $engineType
-     * @return KReachVendorTaskProcessorEngine
+     * @return kReachVendorTaskProcessorEngine
      */
     public static function getInstance ($engineType)
     {
         switch ($engineType)
         {
             case KalturaReachVendorEngineType::HELLO_WORLD:
-                return new KReachVendorTaskHelloWorldProcessorEngine();
+                return new kReachVendorTaskHelloWorldProcessorEngine();
             break;
         }
 
-        return KalturaPluginManager::loadObject('KReachVendorTaskProcessorEngine', $engineType);
+        return KalturaPluginManager::loadObject('kReachVendorTaskProcessorEngine', $engineType);
 
     }
 

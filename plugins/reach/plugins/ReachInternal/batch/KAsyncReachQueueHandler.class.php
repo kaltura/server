@@ -46,24 +46,25 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
         $responseProfile = $this->constructResponseProfile();
         KBatchBase::$kClient->setResponseProfile($responseProfile);
 
-        $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
-
-        if ($response->totalCount == 0)
-        {
-            KalturaLog::info('No jobs found to handle at this time. Exiting');
-            KBatchBase::unimpersonate();
-            return;
-        }
-
         $handledTasksCounter = 0;
-        while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit) {
+        do
+        {
+            $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
+
+            if ($response->totalCount == 0)
+            {
+                KalturaLog::info('No jobs found to handle at this time. Exiting');
+                KBatchBase::unimpersonate();
+                return;
+            }
+
             foreach ($response->objects as $entryVendorTask) {
                 /* @var $entryVendorTask KalturaEntryVendorTask */
 
                 //retrieve associated catalog item and retrieve appropriate engine based on the engineType property
                 $catalogItem = $entryVendorTask->relatedObjects[0]->objects[0];
                 /* @var $catalogItem KalturaVendorCatalogItem */
-                $engine = KReachVendorTaskProcessorEngine::getInstance($catalogItem->engineType);
+                $engine = kReachVendorTaskProcessorEngine::getInstance($catalogItem->engineType);
                 if (!$engine)
                 {
                     KalturaLog::info('No engine type found to process entry vendor task ID: ' . $entryVendorTask->id);
@@ -90,7 +91,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
             KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
             KBatchBase::$kClient->setResponseProfile($responseProfile);
             $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
-        }
+        } while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit);
 
         KBatchBase::unimpersonate();
     }

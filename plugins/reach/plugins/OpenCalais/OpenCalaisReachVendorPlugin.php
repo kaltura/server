@@ -73,9 +73,9 @@ class OpenCalaisReachVendorPlugin extends KalturaPlugin implements IKalturaPendi
      */
     public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
     {
-        if ($baseClass == 'KReachVendorTaskProcessorEngine' && $enumValue == KalturaReachVendorEngineType::OPEN_CALAIS)
+        if ($baseClass === 'kReachVendorTaskProcessorEngine' && $enumValue == KalturaReachVendorEngineType::OPEN_CALAIS)
         {
-            return new KReachVendorTaskOpenCalaisProcessorEngine();
+            return new kReachVendorTaskOpenCalaisProcessorEngine();
         }
     }
 

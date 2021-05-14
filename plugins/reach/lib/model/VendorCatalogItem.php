@@ -180,7 +180,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
     {
         $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 
-        return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+        return !is_null($sourceFlavor) ? $sourceFlavor->getVersion() : 0;
     }
 
     public function isEntryTypeSupported($type, $mediaType = null)
