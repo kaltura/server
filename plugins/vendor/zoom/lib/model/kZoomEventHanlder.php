@@ -106,7 +106,8 @@ class kZoomEventHanlder
 	{
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
-		if ($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads())
+		if (($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads()) ||
+			$recording->recordingType == kRecordingType::MEETING && $zoomVendorIntegration->getEnableMeetingUpload() === 0)
 		{
 			KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $zoomVendorIntegration->getId());
 			return;
