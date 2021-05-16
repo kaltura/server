@@ -92,7 +92,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	public $updatedAt;
 	
 	/**
-	 * @var bool
+	 * @var KalturaNullableBoolean
 	 */
 	public $enableMeetingUpload;
 
@@ -165,6 +165,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		{
 			$this->enableZoomTranscription = null;
 			$this->deletionPolicy = null;
+			$this->enableMeetingUpload = null;
 		}
 	}
 }

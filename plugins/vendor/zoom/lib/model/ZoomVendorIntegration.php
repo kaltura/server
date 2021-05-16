@@ -77,7 +77,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function getZoomAccountDescription ( )	{ return $this->getFromCustomData(self::ZOOM_ACCOUNT_DESCRIPTION);	}
 	
 	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
-	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD, null, true);	}
+	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD);	}
 
 	public function setLastError($v)
 	{
