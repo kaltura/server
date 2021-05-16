@@ -26,6 +26,7 @@
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
             let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
+            let enableMeetingUpload = $('#enableMeetingUpload').is(':checked');
             let enableZoomTranscription = $('#enableZoomTranscription').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
@@ -43,6 +44,7 @@
                     'integrationSetting:objectType' : 'KalturaZoomIntegrationSetting',
                     'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
                     'integrationSetting:enableRecordingUpload':enableRecordingUpload,
+                    'integrationSetting:enableMeetingUpload':enableMeetingUpload,
                     'integrationSetting:handleParticipantsMode':handleParticipantsMode,
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
@@ -125,6 +127,7 @@
         function setDefaultValues(){
             $('#enableWebinarUploads').prop('checked',true);
             $('#enableRecordingUpload').prop('checked',true);
+            $('#enableMeetingUpload').prop('checked',true);
             $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
             $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
             $('#createUserIfNotExist').prop('checked',true);
@@ -143,6 +146,7 @@
                     case 'deletionPolicy':
                     case 'enableZoomTranscription':
                     case 'enableRecordingUpload':
+                    case 'enableMeetingUpload':
                     case 'createUserIfNotExist':
                         $('#'+i).prop('checked', v);
                         break;
@@ -205,6 +209,10 @@
                 <div class='custom-control custom-switch'>
                     <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
                     <label class='custom-control-label' for='enableRecordingUpload'>Enable recording upload</label>
+                </div>
+                <div class='custom-control custom-switch'>
+                    <input type='checkbox' class='custom-control-input' id='enableMeetingUpload' name='enableMeetingUpload'>
+                    <label class='custom-control-label' for='enableMeetingUpload'>Enable meeting upload</label>
                 </div>
                 <div class='custom-control custom-switch'>
                     <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
