@@ -151,7 +151,7 @@ class serveFlavorAction extends kalturaAction
 			$mediaSet['liveWindowDuration'] = $dvrWindow;
 		}
 
-		$mediaSet['timeOffset'] = $offset;
+		$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = intval($offset / 1000);
 
 		return $mediaSet;
 	}
