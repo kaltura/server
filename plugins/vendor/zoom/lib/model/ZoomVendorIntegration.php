@@ -24,6 +24,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	const DELETE_POLICY = 'deletionPolicy';
 	const ENABLE_ZOOM_TRANSCRIPTION =  'enableZoomTranscription';
 	const ZOOM_ACCOUNT_DESCRIPTION = 'zoomAccountDescription';
+	const ENABLE_MEETING_UPLOAD = 'enableMeetingUpload';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -74,6 +75,9 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function setZoomAccountDescription ($v)	{ $this->putInCustomData ( self::ZOOM_ACCOUNT_DESCRIPTION, $v);	}
 	public function getZoomAccountDescription ( )	{ return $this->getFromCustomData(self::ZOOM_ACCOUNT_DESCRIPTION);	}
+	
+	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
+	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD, null, true);	}
 
 	public function setLastError($v)
 	{
