@@ -36,7 +36,7 @@ class OpenCalaisReachVendorPlugin extends KalturaPlugin implements IKalturaPendi
         if(is_null($baseEnumName))
             return array('OpenCalaisVendorEngineType');
 
-        if($baseEnumName == 'ReachVendorEngineType')
+        if($baseEnumName === 'ReachVendorEngineType')
             return array('OpenCalaisVendorEngineType');
 
         return array();
