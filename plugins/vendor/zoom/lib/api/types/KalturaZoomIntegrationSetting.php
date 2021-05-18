@@ -90,6 +90,11 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	 * @var string
 	 */
 	public $updatedAt;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableMeetingUpload;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -112,7 +117,8 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'enableZoomTranscription',
 		'zoomAccountDescription',
 		'createdAt',
-		'updatedAt'
+		'updatedAt',
+		'enableMeetingUpload'
 	);
 
 	public function getMapBetweenObjects()
@@ -159,6 +165,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		{
 			$this->enableZoomTranscription = null;
 			$this->deletionPolicy = null;
+			$this->enableMeetingUpload = null;
 		}
 	}
 }

@@ -132,7 +132,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
-			if ($kZoomRecording->recordingType == kRecordingType::WEBINAR && !$this->dropFolder->zoomVendorIntegration->enableWebinarUploads)
+			if (($kZoomRecording->recordingType == KalturaRecordingType::WEBINAR && !$this->dropFolder->zoomVendorIntegration->enableWebinarUploads)||
+				($kZoomRecording->recordingType == KalturaRecordingType::MEETING && $this->dropFolder->zoomVendorIntegration->enableMeetingUpload === 0))
 			{
 				KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $this->dropFolder->zoomVendorIntegration->id);
 				continue;
