@@ -513,18 +513,10 @@ class infraRequestUtils
 				}
 				elseif (preg_match('/^\{(.|\s)*\}$/', $requestBody))
 				{
+					$requestBody = str_replace("\\\n", "\n", $requestBody);
 					$post = json_decode($requestBody, true);
-					if ($post)
-					{
+					if($post)
 						self::$jsonData = $requestBody;
-					}
-					else
-					{
-						$requestBody = str_replace("\\\n", "\n", $requestBody);
-						$post = json_decode($requestBody, true);
-						if ($post)
-							self::$jsonData = $requestBody;
-					}
 				}
 			}
 			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
