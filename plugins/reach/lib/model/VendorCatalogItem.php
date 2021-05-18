@@ -144,12 +144,12 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				break;
 
 			case VendorServiceFeature::CHAPTERING:
-                $serviceFeatureName = 'chaptering';
+				$serviceFeatureName = 'chaptering';
 				break;
 
-            case VendorServiceFeature::INTELLIGENT_TAGGING:
-                $serviceFeatureName = 'intelligent tagging';
-                break;
+			case VendorServiceFeature::INTELLIGENT_TAGGING:
+				$serviceFeatureName = 'intelligent tagging';
+				break;
 
 			default:
 				$serviceFeatureName = '';
@@ -163,47 +163,47 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
-    public function isDuplicateTask(entry $entry)
-    {
-        $version = $this->calculateEntryVendorTaskVersion($entry);
+	public function isDuplicateTask(entry $entry)
+	{
+		$version = $this->calculateEntryVendorTaskVersion($entry);
 
-        $activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
-        if($activeTask)
-        {
-            return true;
-        }
+		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
+		if($activeTask)
+		{
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public function calculateEntryVendorTaskVersion ($entry)
-    {
-        $sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+	public function calculateEntryVendorTaskVersion ($entry)
+	{
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 
-        return !is_null($sourceFlavor) ? $sourceFlavor->getVersion() : 0;
-    }
+		return !is_null($sourceFlavor) ? $sourceFlavor->getVersion() : 0;
+	}
 
-    public function isEntryTypeSupported($type, $mediaType = null)
-    {
-        $supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
-        $supported = in_array($type, $supportedTypes);
-        if($mediaType && $supported)
-        {
-            $supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
-        }
+	public function isEntryTypeSupported($type, $mediaType = null)
+	{
+		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
+		$supported = in_array($type, $supportedTypes);
+		if($mediaType && $supported)
+		{
+			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
+		}
 
-        return $supported;
-    }
+		return $supported;
+	}
 
-    public function getTaskJobData($object)
-    {
-        return null;
-    }
+	public function getTaskJobData($object)
+	{
+		return null;
+	}
 
-    public function requiresEntryReady()
-    {
-        return true;
-    }
+	public function requiresEntryReady()
+	{
+		return true;
+	}
 
 
 } // VendorCatalogItem
