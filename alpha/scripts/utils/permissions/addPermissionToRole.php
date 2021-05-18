@@ -83,7 +83,7 @@ function addPermissionsToRole($role, $permissionList)
 	
 	if (!count($tempArray))
 	{
-		KalturaLog::log('Role name [' . $role->getName() . '] already has all new permissions [' . print_r($permissionList, true) . ']');
+		KalturaLog::log('Role name [' . $role->getId() . '] already has all new permissions [' . $permissionList . ']');
 		return;
 	}
 	
