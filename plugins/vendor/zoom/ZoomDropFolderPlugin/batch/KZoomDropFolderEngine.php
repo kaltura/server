@@ -130,6 +130,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		foreach ($meetingFiles as $meetingFile)
 		{
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
+			$kZoomRecording = new kZoomRecording();
+			$kZoomRecording->parseType($meetingFile[self::TYPE]);
+			if (($kZoomRecording->recordingType == KalturaRecordingType::WEBINAR && !$this->dropFolder->zoomVendorIntegration->enableWebinarUploads)||
+				($kZoomRecording->recordingType == KalturaRecordingType::MEETING && $this->dropFolder->zoomVendorIntegration->enableMeetingUpload === 0))
+			{
+				KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $this->dropFolder->zoomVendorIntegration->id);
+				continue;
+			}
 			$recordingFilesOrdered = ZoomHelper::orderRecordingFiles($meetingFile[self::RECORDING_FILES], self::RECORDING_START,
 			                                                         self::RECORDING_TYPE);
 			KalturaLog::debug('recording files ordered are: ' . print_r($recordingFilesOrdered, true));
@@ -142,6 +150,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 					$dropFolderFilesMap = $this->loadDropFolderFiles();
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
+						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
+							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
+						{
+							continue;
+						}
 						if (ZoomHelper::shouldHandleFileType($recordingFile[self::RECORDING_FILE_TYPE]))
 						{
 							if (!$parentEntry)
@@ -350,7 +363,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				else if (in_array($dropFolderFile->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::AUDIO,
 				                                                                  KalturaRecordingFileType::CHAT)))
 				{
-					$zoomRecordingProcessor = new zoomMeetingProcessor($zoomBaseUrl, $dropFolder);
+					if ($dropFolderFile->meetingMetadata->type == KalturaRecordingType::WEBINAR)
+					{
+						$zoomRecordingProcessor = new zoomWebinarProcessor($zoomBaseUrl, $dropFolder);
+					}
+					else
+					{
+						$zoomRecordingProcessor = new zoomMeetingProcessor($zoomBaseUrl, $dropFolder);
+					}
 					$zoomRecordingProcessor->mainEntry = $entry;
 					$entry = $zoomRecordingProcessor->handleRecordingVideoComplete($dropFolderFile);
 					$this->updateDropFolderFile($entry->id , $dropFolderFile);

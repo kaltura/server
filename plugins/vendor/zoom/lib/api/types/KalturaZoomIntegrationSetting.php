@@ -90,6 +90,11 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	 * @var string
 	 */
 	public $updatedAt;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableMeetingUpload;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -112,7 +117,8 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'enableZoomTranscription',
 		'zoomAccountDescription',
 		'createdAt',
-		'updatedAt'
+		'updatedAt',
+		'enableMeetingUpload'
 	);
 
 	public function getMapBetweenObjects()
@@ -143,5 +149,23 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 
 		parent::doFromObject($sourceObject, $responseProfile);
 		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorStatus::ACTIVE ? 1 : 0;
+		
+		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
+		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
+		$relatedDropFolder = null;
+		foreach ($dropFolders as $dropFolder)
+		{
+			if ($dropFolder->getZoomVendorIntegrationId() == $sourceObject->getId())
+			{
+				$relatedDropFolder = $dropFolder;
+				break;
+			}
+		}
+		if (!$relatedDropFolder)
+		{
+			$this->enableZoomTranscription = null;
+			$this->deletionPolicy = null;
+			$this->enableMeetingUpload = null;
+		}
 	}
 }

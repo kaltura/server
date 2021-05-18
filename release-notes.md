@@ -2,7 +2,9 @@
 # Quasar-17.2.0 #
 ## Version Highlight ##
  - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
- immidatly or fail. Websites can call it before register, to predict success or fail of register.
+ immediately or fail. Websites can call it before register, to predict success or fail of register.
+ - SUP-25858: Add new partner configuration 'Block Thumbnail Capture When Entry Out Of Schedule'.
+ When enabled, all thumbnails capture requests will be blocked while the entry is not in schedule.
  - PLAT-22844: Add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP), for more information about the failure.
  
 ### Deployment scripts ###
@@ -21,6 +23,21 @@
 
     Run deployment script:
         php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+
+## Block thumbnails capture when entry is not in schedule ##
+- Issue Type: Task
+- Issue ID: SUP-25858
+
+#### Configuration ####
+- Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.blockThumbnailCaptureOutSchedule.enabled = true
+    moduls.blockThumbnailCaptureOutSchedule.permissionType = 2
+    moduls.blockThumbnailCaptureOutSchedule.label = Block Thumbnail Capture When Entry Out Of Schedule
+    moduls.blockThumbnailCaptureOutSchedule.permissionName = FEATURE_BLOCK_THUMBNAIL_CAPTURE_OUT_SCHEDULE
+    moduls.blockThumbnailCaptureOutSchedule.basePermissionType =
+    moduls.blockThumbnailCaptureOutSchedule.basePermissionName =
+    moduls.blockThumbnailCaptureOutSchedule.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ## Add missing permission to PLAYBACK_BASE_ROLE ##
 - Issue Type: Task
