@@ -83,15 +83,15 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $this->getFromCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID);
 	}
 
-    public function setEngineType($engineType)
-    {
-        $this->putInCustomData(self::CUSTOM_DATA_ENGINE_TYPE, $engineType);
-    }
+	public function setEngineType($engineType)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ENGINE_TYPE, $engineType);
+	}
 
-    public function getEngineType()
-    {
-        return $this->getFromCustomData(self::CUSTOM_DATA_ENGINE_TYPE);
-    }
+	public function getEngineType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENGINE_TYPE);
+	}
 	
 	public function getPartnerId()
 	{
