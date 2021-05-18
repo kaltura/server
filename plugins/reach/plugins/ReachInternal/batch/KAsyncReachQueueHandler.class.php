@@ -34,9 +34,6 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
      */
     public function run($jobs = null)
     {
-        //retrieve all entry vendor tasks using the response profile.
-        KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
-
         //init filter
         $filter = new KalturaEntryVendorTaskFilter();
         $pager = new KalturaFilterPager();
@@ -44,12 +41,14 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
 
         //Set response profile in order to add the vendor catalog item and/or reach profile to the entry vendor task response.
         $responseProfile = $this->constructResponseProfile();
-        KBatchBase::$kClient->setResponseProfile($responseProfile);
 
-        $handledTasksCounter = 0;
-        do
-        {
-            $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
+	    $handledTasksCounter = 0;
+	    do
+	    {
+		    //retrieve all entry vendor tasks using the response profile.
+		    KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
+		    KBatchBase::$kClient->setResponseProfile($responseProfile);
+		    $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
 
             if ($response->totalCount == 0)
             {
@@ -88,9 +87,6 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
                 }
             }
 
-            KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
-            KBatchBase::$kClient->setResponseProfile($responseProfile);
-            $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
         } while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit);
 
         KBatchBase::unimpersonate();
