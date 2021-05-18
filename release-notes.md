@@ -3,9 +3,24 @@
 ## Version Highlight ##
  - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
  immidatly or fail. Websites can call it before register, to predict success or fail of register.
+ - PLAT-22844: Add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP), for more information about the failure.
  
 ### Deployment scripts ###
 - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_05_04_Partner_RegistrationValidationPermission.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22844
+- Description: add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_05_13_update_media_xml_bulk_job_failed.template.xml
+
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
 
 ## Add missing permission to PLAYBACK_BASE_ROLE ##
 - Issue Type: Task
