@@ -266,7 +266,7 @@ class kZoomEventHanlder
 		$c = new Criteria();
 		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
 		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::NOT_IN);
-		$c->addAnd(DropFolderFilePeer::CREATED_AT, time() - dateUtils::DAY, Criteria::GREATER_EQUAL);
+		$c->addAnd(DropFolderFilePeer::CREATED_AT, time() - dateUtils::DAY * 3, Criteria::GREATER_EQUAL);
 		$c->addAscendingOrderByColumn($order);
 		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
 		return $dropFolderFiles;

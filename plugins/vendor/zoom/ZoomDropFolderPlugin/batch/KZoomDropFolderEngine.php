@@ -40,7 +40,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
-		$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY);
+		$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
 		if ($meetingFilesOrdered)
 		{
 			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap);
@@ -147,7 +147,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY);
+					$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
