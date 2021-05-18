@@ -165,7 +165,7 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					break;
 			}
 
-            $form->resetUnUpdatebleAttributes($catalogItem);
+			$form->resetUnUpdatebleAttributes($catalogItem);
 			if($catalogItemId)
 				$catalogItem = $reachPluginClient->vendorCatalogItem->update($catalogItemId, $catalogItem);
 			else
