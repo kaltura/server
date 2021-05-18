@@ -144,26 +144,26 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			}
 
 			switch ($formData['type'])
-            {
-                case Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS:
-                    $catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-                    break;
-                case Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION:
-                    $catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
-                    break;
-                case Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT:
-                    $catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAlignmentCatalogItem', $formData, false, true);
-                    break;
-                case Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION:
-                    $catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
-                    break;
-                case Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING:
-                    $catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorChapteringCatalogItem', $formData, false, true);
-                    break;
-                case Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING:
-                    $catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorIntelligentTaggingCatalogItem', $formData, false, true);
-                    break;
-            }
+			{
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
+				    break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
+					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAlignmentCatalogItem', $formData, false, true);
+					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
+					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorChapteringCatalogItem', $formData, false, true);
+					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorIntelligentTaggingCatalogItem', $formData, false, true);
+					break;
+			}
 
             $form->resetUnUpdatebleAttributes($catalogItem);
 			if($catalogItemId)
