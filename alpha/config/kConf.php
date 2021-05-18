@@ -14,6 +14,7 @@ $include_path = realpath(__DIR__ . '/../../vendor/ZendFramework/library') . PATH
 set_include_path($include_path);
 
 require_once __DIR__ . '/../../infra/kEnvironment.php';
+require_once __DIR__ . '/../../infra/general/kString.class.php';
 require_once __DIR__ . '/kConfCacheManager.php';
 
 /**

@@ -505,15 +505,9 @@ class infraRequestUtils
 			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
 			{
 				$requestBody = file_get_contents("php://input");
-				if(preg_match('/^\{.*\}$/', $requestBody))
+				$requestBody = trim($requestBody);
+				if(kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
 				{
-					$post = json_decode($requestBody, true);
-					if($post)
-						self::$jsonData = $requestBody;
-				}
-				elseif (preg_match('/^\{(.|\s)*\}$/', $requestBody))
-				{
-					$requestBody = str_replace("\\\n", "\n", $requestBody);
 					$post = json_decode($requestBody, true);
 					if($post)
 						self::$jsonData = $requestBody;
