@@ -114,6 +114,10 @@ class ZoomVendorService extends KalturaBaseService
 				$zoomIntegration->setAccountId($accountId);
 				ZoomHelper::setZoomIntegration($zoomIntegration);
 			}
+			else if ($zoomIntegration->getStatus() == VendorStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
+			{
+				throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
+			}
 			
 			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
