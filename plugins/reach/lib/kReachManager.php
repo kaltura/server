@@ -32,8 +32,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"userRole" => objectType::USERROLE,
 			"categoryEntry" => objectType::CATEGORY_ENTRY,
 			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(CaptionAssetEventNotificationEventObjectType::CAPTION_ASSET),
-            "TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(TranscriptAssetEventNotificationEventObjectType::TRANSCRIPT_ASSET),
-        );
+			"TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(TranscriptAssetEventNotificationEventObjectType::TRANSCRIPT_ASSET),
+			);
 
 		if (isset($mapObjectType[$eventObjectClassName]))
 		{
@@ -222,12 +222,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 
-        if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
-        {
-            $event = new kObjectCreatedEvent($object);
+		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		{
+			$event = new kObjectCreatedEvent($object);
 
-            return $this->shouldConsumeEvent($event);
-        }
+			return $this->shouldConsumeEvent($event);
+		}
 
 		return false;
 	}
