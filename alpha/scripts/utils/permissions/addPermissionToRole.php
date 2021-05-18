@@ -81,6 +81,12 @@ function addPermissionsToRole($role, $permissionList)
 		}
 	}
 	
+	if (!count($tempArray))
+	{
+		KalturaLog::log('Role name [' . $role->getId() . '] already has all new permissions [' . $permissionList . ']');
+		return;
+	}
+	
 	$tempString = trim(implode(',', $tempArray), ',');
 	$currentPermissions .= ','.$tempString;
 	$role->setPermissionNames($currentPermissions);
