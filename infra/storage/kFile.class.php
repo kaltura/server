@@ -46,12 +46,12 @@ class kFile extends kFileBase
 					if (is_dir($fullPath))
 					{
 						$tmpPrefix = $tmpPrefix.'/';
-						$fileList[] = array($tmpPrefix, 'dir', self::fileSize($fullPath));
+						$fileList[] = array("filePath" => $tmpPrefix, "fileType" => 'dir', "fileSize" => self::fileSize($fullPath));
 						$fileList = array_merge($fileList, self::listDir($fullPath, $tmpPrefix));
 					}
 					else
 					{
-						$fileList[] = array($tmpPrefix, 'file', self::fileSize($fullPath));
+						$fileList[] = array("filePath" => $tmpPrefix, "fileType" => 'file', "fileSize" => self::fileSize($fullPath));
 					}
 				}
 			}

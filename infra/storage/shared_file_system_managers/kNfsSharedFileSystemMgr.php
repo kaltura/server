@@ -238,7 +238,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 					if (is_dir($fullPath))
 					{
 						$tmpPrefix = $tmpPrefix.'/';
-						$fileList[] = $fileNamesOnly ? $tmpPrefix : array($tmpPrefix, 'dir', self::fileSize($fullPath));
+						$fileList[] = $fileNamesOnly ? $tmpPrefix : array("path" => $tmpPrefix, "fileType" => 'dir', "fileSize" => self::fileSize($fullPath));
 						if ($recursive)
 						{
 							$fileList = array_merge($fileList, self::doListFiles($fullPath, $tmpPrefix));
@@ -246,7 +246,7 @@ class kNfsSharedFileSystemMgr extends kSharedFileSystemMgr
 					}
 					else
 					{
-						$fileList[] = $fileNamesOnly ? $tmpPrefix : array($tmpPrefix, 'file', self::fileSize($fullPath));
+						$fileList[] = $fileNamesOnly ? $tmpPrefix : array("path" => $tmpPrefix, "fileType" => 'file', "fileSize" => self::fileSize($fullPath));
 					}
 				}
 			}
