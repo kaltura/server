@@ -393,6 +393,11 @@ class thumbnailAction extends sfAction
 				if ($actionList)
 					KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
 			}
+
+			if(!$entry->isScheduledNow())
+			{
+				KalturaLog::info("Capture thumbnail request when entry is not in schedule: entryID [{$entry->getId()}], partnerId [{$entry->getPartnerId()}]");
+			}
 		}
 
 		if ($partner)
