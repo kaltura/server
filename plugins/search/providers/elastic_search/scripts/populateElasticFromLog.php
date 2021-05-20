@@ -51,11 +51,11 @@ $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
-$explicitPartnerIds = null;
-if (isset($config['explicitPartnerIds']))
+$explicitPartnerIdsString = kConf::get('explicitPartnerIds','elasticDynamicMap',null);
+if ($explicitPartnerIdsString)
 {
-	$explicitPartnerIdsArray = explode(',',$config['explicitPartnerIds']);
-	$explicitPartnerIds = array_map('trim',$explicitPartnerIds);
+        $explicitPartnerIdsArray = explode(',',$explicitPartnerIdsString);
+        $explicitPartnerIds = array_map('trim',$explicitPartnerIdsArray);
 }
 
 if (!$systemSettings || !$systemSettings['LOG_DIR'])
