@@ -54,8 +54,8 @@ $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster
 $explicitPartnerIds = null;
 if (isset($config['explicitPartnerIds']))
 {
-	$explicitPartnerIdsString = preg_replace("/\s+/", "", $config['explicitPartnerIds']);
-	$explicitPartnerIds = explode(',',$explicitPartnerIdsString);
+	$explicitPartnerIdsArray = explode(',',$config['explicitPartnerIds']);
+	$explicitPartnerIds = array_map('trim',$explicitPartnerIds);
 }
 
 if (!$systemSettings || !$systemSettings['LOG_DIR'])
@@ -191,7 +191,7 @@ while (true)
 				$partnerId = $elasticLog->getPartnerId();
 				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
 				{
-					if (is_null($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
+					if (is_null($explicitPartnerIds) || empty($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
 					{
 						$response = $elasticClient->addToBulk($command);
 					}
