@@ -1132,18 +1132,18 @@ HTML;
 
 	/**
 	 * @param $entryIds
-	 * @param $readyOnly
+	 * @param $captionAssetStatuses
 	 * @return array
 	 * @throws PropelException
 	 */
-	public static function getEntryIdsCaptions($entryIds, $readyOnly = false)
+	public static function getEntryIdsCaptions($entryIds, $captionAssetStatuses = array())
 	{
 		$c = new Criteria();
 		$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
 		$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
-		if ($readyOnly)
+		if ($captionAssetStatuses)
 		{
-			$c->addAnd(assetPeer::STATUS, CaptionAsset::ASSET_STATUS_READY);
+			$c->addAnd(assetPeer::STATUS, $captionAssetStatuses, Criteria::IN);
 		}
 		$captionAssets = assetPeer::doSelect($c);
 		return $captionAssets;
