@@ -135,9 +135,14 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 
 		parent::toObject($dbObject, $skip);
 		$dbObject->setStatus($this->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED);
-		$dbObject->setJwtToken($this->jwtToken);
-		$dbObject->setDeletionPolicy($this->deletionPolicy);
-		$dbObject->setEnableZoomTranscription($this->enableZoomTranscription);
+		if ($this->createdAt)
+		{
+			unset($this->{"createdAt"});
+		}
+		if ($this->updatedAt)
+		{
+			unset($this->{"updatedAt"});
+		}
 		
 		return $dbObject;
 	}
