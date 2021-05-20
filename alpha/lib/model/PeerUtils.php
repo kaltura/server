@@ -47,7 +47,10 @@ class PeerUtils
 	}
 	static public function setExtension($obj, $v, $maxLengthInDb, $setterFuncStr)
 	{
-		$ext = substr($v, $maxLengthInDb);
-		$obj->putInCustomData(self::getName($setterFuncStr), ($ext === false) ? '' : $ext);
+		if($obj->getCustomData())
+		{
+			$ext = substr($v, $maxLengthInDb);
+			$obj->putInCustomData(self::getName($setterFuncStr), ($ext === false) ? '' : $ext);
+		}
 	}
 }
