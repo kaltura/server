@@ -24,9 +24,11 @@ class embedPlaykitJsAction extends sfAction
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
 	const PLAYKIT_KAVA = 'playkit-kava';
 	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
+	const PLAYKIT_SHARE = 'playkit-share';
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
+	const NO_SHARE_PLAYER_VERSION = '1.7.2';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -574,6 +576,33 @@ class embedPlaykitJsAction extends sfAction
 		}
 	}
 
+	private function maybeAddUIPlugins()
+	{
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
+		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
+		if (!isset($this->bundleConfig[self::PLAYKIT_SHARE]) && ($ovpPlayerConfig || $tvPlayerConfig))
+		{
+			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
+			list($latestVersionMap) = $this->getConfigByVersion("latest");
+			list($betaVersionMap) = $this->getConfigByVersion("beta");
+			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
+			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+
+			// For player latest/beta >= 1.7.2 or canary
+			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_SHARE_PLAYER_VERSION) >= 0) ||
+				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_SHARE_PLAYER_VERSION) >= 0) ||
+				$playerVersion == self::CANARY)
+			{
+				$this->bundleConfig[self::PLAYKIT_SHARE] = $playerVersion;
+			}
+			// For specific version >= 1.7.2
+			else if (version_compare($playerVersion, self::NO_SHARE_PLAYER_VERSION) >= 0)
+			{
+				$this->bundleConfig[self::PLAYKIT_SHARE] = $latestVersionMap[self::PLAYKIT_SHARE];
+			}
+		}
+	}
+
 	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -712,6 +741,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$this->maybeAddAnalyticsPlugins();
+		$this->maybeAddUIPlugins();
 		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
