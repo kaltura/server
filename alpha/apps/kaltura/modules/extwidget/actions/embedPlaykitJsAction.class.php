@@ -29,6 +29,19 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_SHARE_PLAYER_VERSION = '1.7.2';
+	const ADD_MISSING_LIB_MAP = array(
+     self::PLAYKIT_KAVA => array(
+        self::KALTURA_OVP_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION,
+        self::KALTURA_TV_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION
+     ),
+     self::PLAYKIT_OTT_ANALYTICS => array(
+        self::KALTURA_TV_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION
+     ),
+     self::PLAYKIT_SHARE => array(
+        self::KALTURA_OVP_PLAYER => self::NO_SHARE_PLAYER_VERSION,
+        self::KALTURA_TV_PLAYER => self::NO_SHARE_PLAYER_VERSION
+     )
+    );
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -541,67 +554,41 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion);
 	}
 
-	private function maybeAddAnalyticsPlugins()
+	private function maybeAddPlugins()
 	{
-		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
-		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
-		if (!isset($this->bundleConfig[self::PLAYKIT_KAVA]) && ($ovpPlayerConfig || $tvPlayerConfig))
-		{
-			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
-			list($latestVersionMap) = $this->getConfigByVersion("latest");
-			list($betaVersionMap) = $this->getConfigByVersion("beta");
-			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
-			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+        foreach (self::ADD_MISSING_LIB_MAP as $pluginName => $pluginMap)
+        {
+            if (!isset($this->bundleConfig[$pluginName]))
+            {
+                $playerVersion = $latestVersion = $betaVersion = $comparedVersion = null;
+                list($latestVersionMap) = $this->getConfigByVersion("latest");
+                list($betaVersionMap) = $this->getConfigByVersion("beta");
 
-			// For player latest/beta >= 0.56.0 or canary
-			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
-				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
-				$playerVersion == self::CANARY)
-			{
-				$this->bundleConfig[self::PLAYKIT_KAVA] = $playerVersion;
-				if ($tvPlayerConfig)
-				{
-					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $playerVersion;
-				}
-			}
-			// For specific version >= 0.56.0
-			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
-			{
-				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
-				if ($tvPlayerConfig)
-				{
-					$this->bundleConfig[self::PLAYKIT_OTT_ANALYTICS] = $latestVersionMap[self::PLAYKIT_OTT_ANALYTICS];
-				}
-			}
-		}
-	}
-
-	private function maybeAddUIPlugins()
-	{
-		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
-		$tvPlayerConfig = isset($this->bundleConfig[self::KALTURA_TV_PLAYER]) ? $this->bundleConfig[self::KALTURA_TV_PLAYER] : '';
-		if (!isset($this->bundleConfig[self::PLAYKIT_SHARE]) && ($ovpPlayerConfig || $tvPlayerConfig))
-		{
-			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
-			list($latestVersionMap) = $this->getConfigByVersion("latest");
-			list($betaVersionMap) = $this->getConfigByVersion("beta");
-			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
-			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
-
-			// For player latest/beta >= 1.7.2 or canary
-			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_SHARE_PLAYER_VERSION) >= 0) ||
-				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_SHARE_PLAYER_VERSION) >= 0) ||
-				$playerVersion == self::CANARY)
-			{
-				$this->bundleConfig[self::PLAYKIT_SHARE] = $playerVersion;
-			}
-			// For specific version >= 1.7.2
-			else if (version_compare($playerVersion, self::NO_SHARE_PLAYER_VERSION) >= 0)
-			{
-				$this->bundleConfig[self::PLAYKIT_SHARE] = $latestVersionMap[self::PLAYKIT_SHARE];
-			}
-		}
-	}
+                foreach ($pluginMap as $depName => $depVersion)
+                {
+                    $playerVersion = isset($this->bundleConfig[$depName]) ? $this->bundleConfig[$depName] : $playerVersion;
+                    $latestVersion = isset($latestVersionMap[$depName]) ? $latestVersionMap[$depName] : $latestVersion;
+                    $betaVersion = isset($betaVersionMap[$depName]) ? $betaVersionMap[$depName] : $betaVersion;
+                    $comparedVersion = isset($comparedVersion) ? $comparedVersion : $depVersion;
+                }
+            }
+            //all comparing version exist
+            if(isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion))
+            {
+                if (($playerVersion == self::LATEST && version_compare($latestVersion, $comparedVersion) >= 0) ||
+                    ($playerVersion == self::BETA && version_compare($betaVersion, $comparedVersion) >= 0) ||
+                    $playerVersion == self::CANARY)
+                {
+                    $this->bundleConfig[$pluginName] = $playerVersion;
+                }
+                // For specific version
+                else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName])
+                {
+                    $this->bundleConfig[$pluginName] = $latestVersionMap[$pluginName];
+                }
+            }
+        }
+    }
 
 	private function setFixVersionsNumber()
 	{
@@ -740,8 +727,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
-		$this->maybeAddAnalyticsPlugins();
-		$this->maybeAddUIPlugins();
+		$this->maybeAddPlugins();
 		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
