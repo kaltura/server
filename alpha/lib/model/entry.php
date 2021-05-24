@@ -4437,12 +4437,4 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return false;
 	}
 
-	public function isEntryTypeSupportedForReach()
-	{
-		if ($this->getType() == entryType::MEDIA_CLIP)
-		{
-			return true;
-		}
-		return false;
-	}
 }

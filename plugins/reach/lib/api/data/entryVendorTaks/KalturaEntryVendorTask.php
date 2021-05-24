@@ -9,7 +9,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var bigint
 	 * @readonly
-	 * @filter eq,in,order
+	 * @filter eq,in,notin,order
 	 */
 	public $id;
 	
