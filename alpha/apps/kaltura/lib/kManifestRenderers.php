@@ -76,7 +76,8 @@ abstract class kManifestRenderer
 	 * @var string
 	 */
 	protected $internalIP = null;
-
+	
+	protected $restrictAccessControlAllowOriginDomains = false;
 
 	protected function prepareFlavors()
 	{
@@ -95,9 +96,20 @@ abstract class kManifestRenderer
 	 */
 	protected function getAccessControlAllowOriginDomains()
 	{
-		return '*';
+		if( ! $this->restrictAccessControlAllowOriginDomains ||
+			! isset( $_SERVER [ infraRequestUtils::ORIGIN_HEADER ] ) )
+		{
+			return '*';
+		}
+		
+		return $_SERVER [ infraRequestUtils::ORIGIN_HEADER ];
 	}
-
+	
+	public function setRestrictAccessControlAllowOriginDomains($v)
+	{
+		$this->restrictAccessControlAllowOriginDomains = $v;
+	}
+	
 	/**
 	 * @return string
 	 */
@@ -928,27 +940,6 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		$this->setClosedCaptions();
-		$this->setAccessControlAllowOriginDomain();
-	}
-
-	protected function setAccessControlAllowOriginDomain()
-	{
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $dbEntry->getPartnerId()))
-		{
-			return;
-		}
-
-		$host = infraRequestUtils::getUrlHost();
-		if($host)
-		{
-			$this->accessControlAllowOriginDomains = $host;
-		}
-	}
-
-	protected function getAccessControlAllowOriginDomains()
-	{
-		return $this->accessControlAllowOriginDomains;
 	}
 
 	protected function setClosedCaptions()

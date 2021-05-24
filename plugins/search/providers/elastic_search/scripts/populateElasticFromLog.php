@@ -51,6 +51,12 @@ $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
+$explicitPartnerIdsString = kConf::get('explicitPartnerIds','elasticDynamicMap',null);
+if ($explicitPartnerIdsString)
+{
+        $explicitPartnerIdsArray = explode(',',$explicitPartnerIdsString);
+        $explicitPartnerIds = array_map('trim',$explicitPartnerIdsArray);
+}
 
 if (!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -182,10 +188,13 @@ while (true)
 				$command = unserialize($command);
 				$index = $command['index'];
 				$action = $command['action'];
-
+				$partnerId = $elasticLog->getPartnerId();
 				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
 				{
-					$response = $elasticClient->addToBulk($command);
+					if (is_null($explicitPartnerIds) || empty($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
+					{
+						$response = $elasticClient->addToBulk($command);
+					}
 				}
 
 				unset($objectIdElasticLog[$objectId]);

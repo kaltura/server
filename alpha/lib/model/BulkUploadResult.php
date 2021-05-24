@@ -9,7 +9,9 @@
  * @subpackage model
  */ 
 class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
-{   
+{
+	const ROW_DATA_MAX_LENGTH = 1023;
+
 	/**
 	 * Get the [plugins_data] column value.
 	 * 
@@ -72,5 +74,15 @@ class BulkUploadResult extends BaseBulkUploadResult implements IBaseObject
 	{
 	    
 	}
-	
+
+	public function setRowData($v)
+	{
+		PeerUtils::setExtension($this, $v, self::ROW_DATA_MAX_LENGTH, __FUNCTION__);
+		return parent::setRowData($v);
+	}
+
+	public function getRowData()
+	{
+		return parent::getRowData() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
 }

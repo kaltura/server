@@ -52,4 +52,19 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	public function validate($startDate, $endDate)
+	{
+		parent::validate($startDate, $endDate);
+
+		if ($this->templateEntryId && $this->recurrenceType === KalturaScheduleEventRecurrenceType::NONE)
+		{
+			$events = ScheduleEventPeer::retrieveOtherEvents($this->templateEntryId, $startDate, $endDate, array($this->id));
+
+			if ($events)
+			{
+				throw new KalturaAPIException(KalturaScheduleErrors::SCHEDULE_TIME_IN_USE);
+			}
+		}
+	}
 }

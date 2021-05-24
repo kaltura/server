@@ -122,18 +122,21 @@ class serveFlavorAction extends kalturaAction
 										 $firstClipStartTime, $initialClipIndex, $initialSegmentIndex,
 										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null)
 	{
+		$mpegtsWrapValue = 1 << 33;
+		$offset = intval(($mpegtsWrapValue / 2 - ($firstClipStartTime * 90) % $mpegtsWrapValue) / 90);
+
 		$mediaSet['playlistType'] = 'live';
-		$mediaSet['firstClipTime'] = $firstClipStartTime;
+		$mediaSet['firstClipTime'] = $firstClipStartTime + $offset;
 		$mediaSet['discontinuity'] = $discontinuity;
 
 		if (!is_null($endTime))
 		{
-			$mediaSet['presentationEndTime'] = $endTime;
+			$mediaSet['presentationEndTime'] = $endTime + $offset;
 		}
 
 		if($repeat)
 		{
-			$mediaSet['segmentBaseTime'] = (int)$playlistStartTime;
+			$mediaSet['segmentBaseTime'] = (int)$playlistStartTime + $offset;
 		}
 		else
 		{
@@ -147,6 +150,8 @@ class serveFlavorAction extends kalturaAction
 		{
 			$mediaSet['liveWindowDuration'] = $dvrWindow;
 		}
+
+		$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = intval($offset / 1000);
 
 		return $mediaSet;
 	}
@@ -427,7 +432,7 @@ class serveFlavorAction extends kalturaAction
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
 					if ($offset)
 					{
-						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = $offset;
+						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] += $offset;
 					}
 					$this->sendJson($mediaSet, false, true, $entry);
 				}

@@ -57,9 +57,10 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
+	 * @param $timeFrame
 	 * @return array
 	 */
-	protected function loadDropFolderFiles()
+	protected function loadDropFolderFiles($timeFrame = null)
 	{
 		$dropFolderFiles =null;
 
@@ -67,6 +68,10 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
+		if ($timeFrame)
+		{
+			$dropFolderFileFilter->createdAtGreaterThanOrEqual = time() - $timeFrame;
+		}
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;

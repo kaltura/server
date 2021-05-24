@@ -80,6 +80,21 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	 * @var string
 	 */
 	public $zoomAccountDescription;
+	
+	/**
+	 * @var string
+	 */
+	public $createdAt;
+	
+	/**
+	 * @var string
+	 */
+	public $updatedAt;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableMeetingUpload;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -101,6 +116,9 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		'deletionPolicy',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
+		'createdAt',
+		'updatedAt',
+		'enableMeetingUpload'
 	);
 
 	public function getMapBetweenObjects()
@@ -114,12 +132,17 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 		{
 			$dbObject = new ZoomVendorIntegration();
 		}
-
+		
+		if ($this->createdAt)
+		{
+			unset($this->createdAt);
+		}
+		if ($this->updatedAt)
+		{
+			unset($this->updatedAt);
+		}
 		parent::toObject($dbObject, $skip);
 		$dbObject->setStatus($this->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED);
-		$dbObject->setJwtToken($this->jwtToken);
-		$dbObject->setDeletionPolicy($this->deletionPolicy);
-		$dbObject->setEnableZoomTranscription($this->enableZoomTranscription);
 		
 		return $dbObject;
 	}
@@ -131,5 +154,23 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 
 		parent::doFromObject($sourceObject, $responseProfile);
 		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorStatus::ACTIVE ? 1 : 0;
+		
+		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
+		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
+		$relatedDropFolder = null;
+		foreach ($dropFolders as $dropFolder)
+		{
+			if ($dropFolder->getZoomVendorIntegrationId() == $sourceObject->getId())
+			{
+				$relatedDropFolder = $dropFolder;
+				break;
+			}
+		}
+		if (!$relatedDropFolder)
+		{
+			$this->enableZoomTranscription = null;
+			$this->deletionPolicy = null;
+			$this->enableMeetingUpload = null;
+		}
 	}
 }
