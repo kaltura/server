@@ -63,7 +63,7 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 
 			if ($events)
 			{
-				throw new KalturaAPIException(KalturaScheduleErrors::SCHEDULE_TIME_IN_USE);
+				//throw new KalturaAPIException(KalturaScheduleErrors::SCHEDULE_TIME_IN_USE);
 			}
 		}
 	}
