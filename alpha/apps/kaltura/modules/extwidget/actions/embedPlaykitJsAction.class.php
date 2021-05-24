@@ -41,7 +41,7 @@ class embedPlaykitJsAction extends sfAction
             self::KALTURA_OVP_PLAYER => self::NO_SHARE_PLAYER_VERSION,
             self::KALTURA_TV_PLAYER => self::NO_SHARE_PLAYER_VERSION
         )
-    );
+	);
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
