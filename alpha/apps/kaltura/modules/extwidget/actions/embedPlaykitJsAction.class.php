@@ -30,17 +30,17 @@ class embedPlaykitJsAction extends sfAction
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_SHARE_PLAYER_VERSION = '1.7.2';
 	const ADD_MISSING_LIB_MAP = array(
-     self::PLAYKIT_KAVA => array(
-        self::KALTURA_OVP_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION,
-        self::KALTURA_TV_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION
-     ),
-     self::PLAYKIT_OTT_ANALYTICS => array(
-        self::KALTURA_TV_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION
-     ),
-     self::PLAYKIT_SHARE => array(
-        self::KALTURA_OVP_PLAYER => self::NO_SHARE_PLAYER_VERSION,
-        self::KALTURA_TV_PLAYER => self::NO_SHARE_PLAYER_VERSION
-     )
+        self::PLAYKIT_KAVA => array(
+            self::KALTURA_OVP_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION,
+            self::KALTURA_TV_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION
+        ),
+        self::PLAYKIT_OTT_ANALYTICS => array(
+            self::KALTURA_TV_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION
+        ),
+        self::PLAYKIT_SHARE => array(
+            self::KALTURA_OVP_PLAYER => self::NO_SHARE_PLAYER_VERSION,
+            self::KALTURA_TV_PLAYER => self::NO_SHARE_PLAYER_VERSION
+        )
     );
 
 	private $bundleCache = null;
