@@ -1,3 +1,12 @@
+# Quasar-17.3.0 # 
+## Version Highlight ##  
+### Features ###  
+ - PSVAMB-18194 : add new feature to support Intelligent Tagging, specifically using OpenCalais  
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+- php /opt/kaltura/app/deployment/deployment/updates/scripts/add_permissions/2021_01_06_reach_permission_update.php
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_12_20_reach_internal_partner.php
+
 
 # Quasar-17.2.0 #
 ## Version Highlight ##
@@ -25,7 +34,7 @@
 ### Features ###
     PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
     Zoom as polling engine (type of drop folder ) - includes the following:
-        a. Deltetion of content from Zoom
+        a. Deletion of content from Zoom
         b. Import of old content - by changing scanning time in the drop folder UI (admin console)
         c. Authetication from OnPrems - using JWT token supplied by the caller 
         * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
