@@ -52,6 +52,7 @@ $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['proce
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
 $explicitPartnerIdsString = kConf::get('explicitPartnerIds','elasticDynamicMap',null);
+$explicitPartnerIds = array();
 if ($explicitPartnerIdsString)
 {
         $explicitPartnerIdsArray = explode(',',$explicitPartnerIdsString);
