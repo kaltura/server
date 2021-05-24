@@ -556,39 +556,33 @@ class embedPlaykitJsAction extends sfAction
 
 	private function maybeAddPlugins()
 	{
-        foreach (self::ADD_MISSING_LIB_MAP as $pluginName => $pluginMap)
-        {
-            if (!isset($this->bundleConfig[$pluginName]))
-            {
-                $playerVersion = $latestVersion = $betaVersion = $comparedVersion = null;
-                list($latestVersionMap) = $this->getConfigByVersion("latest");
-                list($betaVersionMap) = $this->getConfigByVersion("beta");
+		foreach (self::ADD_MISSING_LIB_MAP as $pluginName => $pluginMap) {
+			if (!isset($this->bundleConfig[$pluginName])) {
+				$playerVersion = $latestVersion = $betaVersion = $comparedVersion = null;
+				list($latestVersionMap) = $this->getConfigByVersion("latest");
+				list($betaVersionMap) = $this->getConfigByVersion("beta");
 
-                foreach ($pluginMap as $depName => $depVersion)
-                {
-                    $playerVersion = isset($this->bundleConfig[$depName]) ? $this->bundleConfig[$depName] : $playerVersion;
-                    $latestVersion = isset($latestVersionMap[$depName]) ? $latestVersionMap[$depName] : $latestVersion;
-                    $betaVersion = isset($betaVersionMap[$depName]) ? $betaVersionMap[$depName] : $betaVersion;
-                    $comparedVersion = isset($comparedVersion) ? $comparedVersion : $depVersion;
-                }
-            }
-            //all comparing version exist
-            if(isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion))
-            {
-                if (($playerVersion == self::LATEST && version_compare($latestVersion, $comparedVersion) >= 0) ||
-                    ($playerVersion == self::BETA && version_compare($betaVersion, $comparedVersion) >= 0) ||
-                    $playerVersion == self::CANARY)
-                {
-                    $this->bundleConfig[$pluginName] = $playerVersion;
-                }
-                // For specific version
-                else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName])
-                {
-                    $this->bundleConfig[$pluginName] = $latestVersionMap[$pluginName];
-                }
-            }
-        }
-    }
+				foreach ($pluginMap as $depName => $depVersion) {
+					$playerVersion = isset($this->bundleConfig[$depName]) ? $this->bundleConfig[$depName] : $playerVersion;
+					$latestVersion = isset($latestVersionMap[$depName]) ? $latestVersionMap[$depName] : $latestVersion;
+					$betaVersion = isset($betaVersionMap[$depName]) ? $betaVersionMap[$depName] : $betaVersion;
+					$comparedVersion = isset($comparedVersion) ? $comparedVersion : $depVersion;
+				}
+			}
+			//all comparing version exist
+			if(isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion)) {
+				if (($playerVersion == self::LATEST && version_compare($latestVersion, $comparedVersion) >= 0) ||
+					($playerVersion == self::BETA && version_compare($betaVersion, $comparedVersion) >= 0) ||
+					$playerVersion == self::CANARY) {
+					$this->bundleConfig[$pluginName] = $playerVersion;
+				}
+				// For specific version
+				else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName]) {
+					$this->bundleConfig[$pluginName] = $latestVersionMap[$pluginName];
+				}
+			}
+		}
+	}
 
 	private function setFixVersionsNumber()
 	{
