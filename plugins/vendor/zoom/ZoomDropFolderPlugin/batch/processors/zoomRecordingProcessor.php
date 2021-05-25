@@ -133,6 +133,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$assetParamsResourceContainer->resource = $resource;
 		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
 		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+		$this->approveEntryIfNeeded($recording->parentEntryId);
 		KBatchBase::unimpersonate();
 		return $entry;
 	}
@@ -276,6 +277,15 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse);
 		return $this->getValidatedUsers($additionalZoomUsers, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 		                                $userToExclude);
+	}
+	
+	protected function approveEntryIfNeeded($parentEntryId)
+	{
+		$parentEntry =  KBatchBase::$kClient->baseEntry->get($parentEntryId);
+		if ($parentEntry && $parentEntry->replacementStatus  == KalturaEntryReplacementStatus::NOT_READY_AND_NOT_APPROVED)
+		{
+			KBatchBase::$kClient->media->approveReplace($parentEntryId);
+		}
 	}
 	
 	protected abstract function getAdditionalUsersFromZoom($recordingId);
