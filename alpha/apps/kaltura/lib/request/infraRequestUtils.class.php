@@ -7,6 +7,8 @@
  * @package server-infra
  * @subpackage request
  */
+require_once __DIR__ . '/../../infra/general/kString.class.php';
+
 class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
