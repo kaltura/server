@@ -7,6 +7,8 @@
  * @package server-infra
  * @subpackage request
  */
+require_once __DIR__ . '/../../infra/general/kString.class.php';
+
 class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
@@ -505,7 +507,8 @@ class infraRequestUtils
 			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
 			{
 				$requestBody = file_get_contents("php://input");
-				if(preg_match('/^\{.*\}$/', $requestBody))
+				$requestBody = trim($requestBody);
+				if(kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
 				{
 					$post = json_decode($requestBody, true);
 					if($post)
