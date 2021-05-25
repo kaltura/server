@@ -314,34 +314,33 @@ class myPartnerRegistration
 		return array($password, $loginData->getPasswordHashKey(), $kuser->getId());
 	}
 
-	public function validateNewPartner ($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement,
-		$description, $website_url , $password = null , $partner = null, $ignorePassword = false, $templatePartnerId = null)
+	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false, $templatePartnerId = null)
 	{
 		// Validate input fields
 		if( $partner_name == "" )
 			throw new SignupException("Please fill in the Partner's name" , SignupException::INVALID_FIELD_VALUE);
-		
+			
 		if ($contact == "")
 			throw new SignupException('Please fill in Administrator\'s details', SignupException::INVALID_FIELD_VALUE);
-		
+
 		if ($email == "")
 			throw new SignupException('Please fill in Administrator\'s Email Address', SignupException::INVALID_FIELD_VALUE);
 		
-		
+			
 		if(!kString::isEmailString($email))
 			throw new SignupException('Invalid email address', SignupException::INVALID_FIELD_VALUE);
-		
+
 		if ($description == "")
 			throw new SignupException('Please fill in description', SignupException::INVALID_FIELD_VALUE);
-		
+
 		if ( ($ID_is_for !== CommercialUseType::COMMERCIAL_USE) && ($ID_is_for !== CommercialUseType::NON_COMMERCIAL_USE) &&
-			($ID_is_for !== "commercial_use") && ($ID_is_for !== "non-commercial_use") ) //string values left for backward compatibility
+			 ($ID_is_for !== "commercial_use") && ($ID_is_for !== "non-commercial_use") ) //string values left for backward compatibility
 			throw new SignupException('Invalid field value.\nSorry.', SignupException::UNKNOWN_ERROR);
-		
+
 		if ($SDK_terms_agreement != "yes")
 			throw new SignupException('You haven`t approved Terms & Conds.', SignupException::INVALID_FIELD_VALUE);
-		
-		
+
+
 		if ($partner->getPartnerPackage() == PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL)
 		{
 			$internalTrialAllowedDomains = kConf::get('internal_trial_allowed_domains', 'local', null);
@@ -352,13 +351,15 @@ class myPartnerRegistration
 					throw new SignupException('The email domain is not allowed', SignupException::INVALID_FIELD_VALUE);
 			}
 		}
-		
+
 		$existingLoginData = UserLoginDataPeer::getByEmail($email);
 		if ($existingLoginData && !$ignorePassword)
 		{
 			// if a another user already existing with the same adminEmail, new account will be created only if the right password was given
+			$existingPartner = PartnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
 			if (!$password)
 			{
+				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_MISSING_PASSWORD, $partner);
 				throw new SignupException("User with email [$email] already exists in system.", SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL );
 			}
 			else if ($existingLoginData->isPasswordValid($password))
@@ -367,36 +368,23 @@ class myPartnerRegistration
 			}
 			else
 			{
+				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_WRONG_PASSWORD, $partner);
 				throw new SignupException("Invalid password for user with email [$email].", SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL );
 			}
-		}
-		
-		try
-		{
-			$templatePartner = PartnerPeer::retrieveByPK($templatePartnerId ? $templatePartnerId : kConf::get('template_partner_id'));
-			$this->validateTemplatePartner($templatePartner);
-		}
-		catch (Exception $e) {
-			//TODO: revert all changes, depending where and why we failed
 			
-			throw $e;
+			// for now allow multiple accounts using the same user
+			//$this->allowOnlyOneActiveFreeTrialAccountCreation($partner, $email);
 		}
-	}
-	
-	public function initNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password = null , $partner = null, $ignorePassword = false, $templatePartnerId = null)
-	{
+
+
+			
 		// TODO: log request
 		$newPartner = NULL;
 		$newSubPartner = NULL;
-		$existingLoginData = UserLoginDataPeer::getByEmail($email);
-		if ($existingLoginData)
-		{
-			$existingPartner = PartnerPeer::retrieveByPK($existingLoginData->getConfigPartnerId());
-		}
 		try {
-			$this->validateNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement,
-				$description, $website_url, $password, $partner, $ignorePassword, $templatePartnerId);
-
+		    //validate that the template partner object counts do not exceed the limits stated in the local.ini
+		    $templatePartner = PartnerPeer::retrieveByPK($templatePartnerId ? $templatePartnerId : kConf::get('template_partner_id'));
+		    $this->validateTemplatePartner($templatePartner);
 			// create the new partner
 			$newPartner = $this->createNewPartner($partner_name , $contact, $email, $ID_is_for, $SDK_terms_agreement, $description, $website_url , $password , $partner , $templatePartnerId);
 
@@ -430,18 +418,6 @@ class myPartnerRegistration
 			kEventsManager::raiseEvent(new kObjectAddedEvent($newPartner));
 
 			return array($newPartner->getId(), $newSubPartnerId, $newAdminKuserPassword, $newPassHashKey);
-		}
-		catch (SignupException $se)
-		{
-			if ($se->getCode() == SignupException::INCORRECT_PASSWORD_FOR_EXISTING_EMAIL)
-			{
-				$this->addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_WRONG_PASSWORD, $partner);
-			}
-			else if ($se->getCode() == SignupException::MISSING_PASSWORD_FOR_EXISTING_EMAIL)
-			{
-				$this -> addMarketoCampaignId($existingPartner, myPartnerUtils::MARKETO_MISSING_PASSWORD, $partner);
-			}
-			throw $se;
 		}
 		catch (Exception $e) {
 			//TODO: revert all changes, depending where and why we failed
