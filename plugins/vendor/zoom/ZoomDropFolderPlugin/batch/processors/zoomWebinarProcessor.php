@@ -39,19 +39,16 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 	 */
 	protected function setEntryCategory($entry, $meetingId)
 	{
-		$categories = array();
 		$categoryTrackingField = $this->zoomClient->retrieveTrackingField($meetingId);
+		KBatchBase::impersonate($this->dropFolder->partnerId);
 		if ($categoryTrackingField)
 		{
-			$categories[] = $categoryTrackingField;
+			$this->addEntryToCategory($categoryTrackingField, $entry->id);
 		}
 		if ($this->dropFolder->zoomVendorIntegration->zoomWebinarCategory)
 		{
-			$categories[] = $this->dropFolder->zoomVendorIntegration->zoomWebinarCategory;
+			$this->addEntryToCategory($this->dropFolder->zoomVendorIntegration->zoomWebinarCategory, $entry->id);
 		}
-		if ($categories)
-		{
-			$entry->categories = implode(',', $categories);
-		}
+		KBatchBase::unimpersonate();
 	}
 }
