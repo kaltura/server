@@ -139,14 +139,14 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	protected function addEntryToCategory($categoryName, $entryId)
 	{
-		$categoryId = $this->foundCategoryIdByName($categoryName);
+		$categoryId = $this->findCategoryIdByName($categoryName);
 		if ($categoryId)
 		{
 			$this->addCategoryEntry($categoryId, $entryId);
 		}
 	}
 	
-	protected function foundCategoryIdByName($categoryName)
+	protected function findCategoryIdByName($categoryName)
 	{
 		$categoryFilter = new KalturaCategoryFilter();
 		$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
@@ -157,7 +157,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		
 		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
 		$categoryId = null;
-		if ($categoryResponse->objects && count($categoryResponse->objects))
+		if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
 		{
 			$categoryId = $categoryResponse->objects[0]->id;
 		}
