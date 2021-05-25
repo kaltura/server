@@ -556,14 +556,18 @@ class embedPlaykitJsAction extends sfAction
 
 	private function maybeAddPlugins()
 	{
-		foreach (self::ADD_MISSING_LIB_MAP as $pluginName => $pluginMap) {
-			if (!isset($this->bundleConfig[$pluginName])) {
+		foreach (self::ADD_MISSING_LIB_MAP as $pluginName => $pluginMap)
+		{
+			if (!isset($this->bundleConfig[$pluginName]))
+			{
 				$playerVersion = $latestVersion = $betaVersion = $comparedVersion = null;
 				list($latestVersionMap) = $this->getConfigByVersion("latest");
 				list($betaVersionMap) = $this->getConfigByVersion("beta");
 
-				foreach ($pluginMap as $depName => $depVersion) {
-					if(isset($this->bundleConfig[$depName])){
+				foreach ($pluginMap as $depName => $depVersion)
+				{
+					if (isset($this->bundleConfig[$depName]))
+					{
 						$playerVersion = $this->bundleConfig[$depName];
 						$latestVersion = isset($latestVersionMap[$depName]) ? $latestVersionMap[$depName] : null;
 						$betaVersion = isset($betaVersionMap[$depName]) ? $betaVersionMap[$depName] : null;
@@ -571,14 +575,17 @@ class embedPlaykitJsAction extends sfAction
 					}
 				}
 				//all comparing version exist
-				if(isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion)) {
+				if (isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion))
+				{
 					if (($playerVersion == self::LATEST && version_compare($latestVersion, $comparedVersion) >= 0) ||
 						($playerVersion == self::BETA && version_compare($betaVersion, $comparedVersion) >= 0) ||
-						$playerVersion == self::CANARY) {
+						$playerVersion == self::CANARY)
+					{
 						$this->bundleConfig[$pluginName] = $playerVersion;
 					}
 					// For specific version
-					else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName]) {
+					else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName])
+					{
 						$this->bundleConfig[$pluginName] = $latestVersionMap[$pluginName];
 					}
 				}
