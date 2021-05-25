@@ -28,7 +28,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
-	const NO_SHARE_PLAYER_VERSION = '1.7.2';
+	const NO_SHARE_PLAYER_VERSION = '1.8.0';
 	const ADD_MISSING_LIB_MAP = array(
 		self::PLAYKIT_KAVA => array(
 			self::KALTURA_OVP_PLAYER => self::NO_ANALYTICS_PLAYER_VERSION,
@@ -563,22 +563,24 @@ class embedPlaykitJsAction extends sfAction
 				list($betaVersionMap) = $this->getConfigByVersion("beta");
 
 				foreach ($pluginMap as $depName => $depVersion) {
-					$playerVersion = isset($this->bundleConfig[$depName]) ? $this->bundleConfig[$depName] : $playerVersion;
-					$latestVersion = isset($latestVersionMap[$depName]) ? $latestVersionMap[$depName] : $latestVersion;
-					$betaVersion = isset($betaVersionMap[$depName]) ? $betaVersionMap[$depName] : $betaVersion;
-					$comparedVersion = isset($comparedVersion) ? $comparedVersion : $depVersion;
+					if(isset($this->bundleConfig[$depName])){
+						$playerVersion = $this->bundleConfig[$depName];
+						$latestVersion = isset($latestVersionMap[$depName]) ? $latestVersionMap[$depName] : null;
+						$betaVersion = isset($betaVersionMap[$depName]) ? $betaVersionMap[$depName] : null;
+						$comparedVersion = $depVersion;
+					}
 				}
-			}
-			//all comparing version exist
-			if(isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion)) {
-				if (($playerVersion == self::LATEST && version_compare($latestVersion, $comparedVersion) >= 0) ||
-					($playerVersion == self::BETA && version_compare($betaVersion, $comparedVersion) >= 0) ||
-					$playerVersion == self::CANARY) {
-					$this->bundleConfig[$pluginName] = $playerVersion;
-				}
-				// For specific version
-				else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName]) {
-					$this->bundleConfig[$pluginName] = $latestVersionMap[$pluginName];
+				//all comparing version exist
+				if(isset($playerVersion) && isset($latestVersion) && isset($betaVersion) && isset($comparedVersion)) {
+					if (($playerVersion == self::LATEST && version_compare($latestVersion, $comparedVersion) >= 0) ||
+						($playerVersion == self::BETA && version_compare($betaVersion, $comparedVersion) >= 0) ||
+						$playerVersion == self::CANARY) {
+						$this->bundleConfig[$pluginName] = $playerVersion;
+					}
+					// For specific version
+					else if (version_compare($playerVersion, $comparedVersion) >= 0 && $latestVersionMap[$pluginName]) {
+						$this->bundleConfig[$pluginName] = $latestVersionMap[$pluginName];
+					}
 				}
 			}
 		}
