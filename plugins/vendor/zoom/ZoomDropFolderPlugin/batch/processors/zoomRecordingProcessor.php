@@ -110,7 +110,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			else
 			{
-				$this->setEntryCategory($updatedEntry, $recording->meetingMetadata->meetingId);
+				$this->setEntryCategory($entry, $recording->meetingMetadata->meetingId);
 			}
 		}
 		
@@ -135,6 +135,41 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
 		KBatchBase::unimpersonate();
 		return $entry;
+	}
+	
+	protected function addEntryToCategory($categoryName, $entryId)
+	{
+		$categoryId = $this->findCategoryIdByName($categoryName);
+		if ($categoryId)
+		{
+			$this->addCategoryEntry($categoryId, $entryId);
+		}
+	}
+	
+	protected function findCategoryIdByName($categoryName)
+	{
+		$categoryFilter = new KalturaCategoryFilter();
+		$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
+		
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = 1;
+		
+		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
+		$categoryId = null;
+		if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
+		{
+			$categoryId = $categoryResponse->objects[0]->id;
+		}
+		return $categoryId;
+	}
+	
+	protected function addCategoryEntry($categoryId, $entryId)
+	{
+		$categoryEntry = new KalturaCategoryEntry();
+		$categoryEntry->categoryId = $categoryId;
+		$categoryEntry->entryId = $entryId;
+		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
 	}
 	
 	/**
