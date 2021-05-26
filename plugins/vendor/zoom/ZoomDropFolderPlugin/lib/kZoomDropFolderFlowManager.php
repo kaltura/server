@@ -158,7 +158,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		}
 		if ($zoomVendorIntegrationObject->getEnableZoomTranscription() === null)
 		{
-			$zoomVendorIntegrationObject->setEnableZoomTranscription(false);
+			$zoomVendorIntegrationObject->setEnableZoomTranscription(true);
 		}
 		$zoomVendorIntegrationObject->save();
 	}
