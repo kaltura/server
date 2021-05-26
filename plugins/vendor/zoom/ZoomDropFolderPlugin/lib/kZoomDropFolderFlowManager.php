@@ -103,8 +103,16 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	
 	public static function wasDeletionPolicyChanged(BaseObject $object, array $modifiedColumns)
 	{
-		return ($object instanceof ZoomVendorIntegration) && in_array('vendor_integration.CUSTOM_DATA', $modifiedColumns)
-			&& ($object->isColumnModified('deletionPolicy'));
+		if ($object instanceof ZoomVendorIntegration && in_array('vendor_integration.CUSTOM_DATA', $modifiedColumns))
+		{
+			$oldCustomDataValues = $object->getCustomDataOldValues();
+			$oldDeletionPolicy = isset ($oldCustomDataValues['']['deletionPolicy']) ? $oldCustomDataValues['']['deletionPolicy'] : '';
+			if ($oldDeletionPolicy != $object->getDeletionPolicy())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static function hasRefreshTokenChanged(BaseObject $object, array $modifiedColumns)
