@@ -137,7 +137,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($zoomVendorIntegrationObject->getDeletionPolicy())
 		{
 			$newZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-			$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', dateUtils::DAY*3);
+			$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', 1);
 			$newZoomDropFolder->setAutoFileDeleteDays($daysToDelete);
 		}
 		else
