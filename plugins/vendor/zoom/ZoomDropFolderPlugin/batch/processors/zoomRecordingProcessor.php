@@ -149,7 +149,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected function findCategoryIdByName($categoryName)
 	{
 		$categoryFilter = new KalturaCategoryFilter();
-		$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
+		$categoryFilter->fullNameEqual = $categoryName;
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageIndex = 1;
