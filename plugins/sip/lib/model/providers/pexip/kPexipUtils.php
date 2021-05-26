@@ -423,6 +423,22 @@ class kPexipUtils
 				return $virtualRoomId;
 			}
 		}
+
+		// Try to match the path only without the full url as a fallback
+		$url=parse_url($url,PHP_URL_PATH);
+		$locationPattern = "(?<=Location: $url)(.*)(?=/)";
+		$locationPattern = str_replace('/', '\/', $locationPattern);
+		foreach ($headerData as $part)
+		{
+			preg_match("/$locationPattern/", $part, $matches);
+			if (!empty($matches))
+			{
+				$virtualRoomId = $matches[0];
+				KalturaLog::info("Pexip created ID: $virtualRoomId");
+				return $virtualRoomId;
+			}
+		}
+		
 		KalturaLog::info('Could not extract ID from headers');
 		return null;
 	}
