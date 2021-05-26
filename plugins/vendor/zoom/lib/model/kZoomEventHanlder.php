@@ -134,7 +134,7 @@ class kZoomEventHanlder
 					$kRecordingFile = self::allocateZoomRecordingFile($recordingFile, $event);
 					$zoomDropFolderFile = self::allocateZoomDropFolderFile($dropFolderId, $partnerId, $fileName, $recordingFile->fileSize,
 					                                                      $kMeetingMetaData, $kRecordingFile);
-					if (!$parentEntry)
+					if (!$parentEntry || ($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT))
 					{
 						$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(). $recordingFile->recordingStart , $partnerId);
 						if ($parentEntry)
