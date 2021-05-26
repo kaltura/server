@@ -6,6 +6,7 @@
 class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 {
 	const MAX_ZOOM_DROP_FOLDERS = 4; //Temporary
+	const DELETION_POLICY = 'deletionPolicy';
 	/**
 	 * @inheritDoc
 	 */
@@ -106,7 +107,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($object instanceof ZoomVendorIntegration && in_array('vendor_integration.CUSTOM_DATA', $modifiedColumns))
 		{
 			$oldCustomDataValues = $object->getCustomDataOldValues();
-			$oldDeletionPolicy = isset ($oldCustomDataValues['']['deletionPolicy']) ? $oldCustomDataValues['']['deletionPolicy'] : '';
+			$oldDeletionPolicy = isset ($oldCustomDataValues[''][self::DELETION_POLICY]) ? $oldCustomDataValues[''][self::DELETION_POLICY] : '';
 			if ($oldDeletionPolicy != $object->getDeletionPolicy())
 			{
 				return true;
