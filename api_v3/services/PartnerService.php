@@ -116,8 +116,8 @@ class PartnerService extends KalturaBaseService
 			$existingUser = UserLoginDataPeer::doSelectOne($c);
 			/* @var $exisitingUser UserLoginData */
 			$dbPartner = $partner->toPartner();
-			$parentPartnerInfo = $this->getParentPartnerId($templatePartnerId);
-			$parentPartnerId = $parentPartnerInfo['parentPartnerInfo'];
+			$parentPartnerInfo = $this->getParentPartnerInfo($templatePartnerId);
+			$parentPartnerId = $parentPartnerInfo['parentPartnerId'];
 			$isAdminOrVarConsole = $parentPartnerInfo['isAdminOrVarConsole'];
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
 			$ignorePassword = $this->getIgnorePassword($existingUser, $isAdminOrVarConsole, $partner->adminEmail,
@@ -153,7 +153,7 @@ class PartnerService extends KalturaBaseService
 		return $partner;
 	}
 
-	protected function getParentPartnerId($templatePartnerId = null)
+	protected function getParentPartnerInfo($templatePartnerId = null)
 	{
 		$parentPartnerId = null;
 		$isAdminOrVarConsole = false;
