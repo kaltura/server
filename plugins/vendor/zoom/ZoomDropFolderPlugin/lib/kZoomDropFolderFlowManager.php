@@ -17,6 +17,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		}
 		if ( self::wasStatusChanged($object, $modifiedColumns))
 		{
+			self::setDefaultValuesIntegration($object);
 			//Update the status of the Drop Folder
 			$criteria = new Criteria();
 			$criteria->add(DropFolderPeer::PARTNER_ID, $object->getPartnerId());
@@ -102,6 +103,22 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 			{
 				return DropFolderStatus::ERROR;
 			}
+		}
+	}
+	
+	protected static function setDefaultValuesIntegration(ZoomVendorIntegration $zoomVendorIntegrationObject)
+	{
+		if ($zoomVendorIntegrationObject->getEnableMeetingUpload() === null)
+		{
+			$zoomVendorIntegrationObject->setEnableMeetingUpload(true);
+		}
+		if ($zoomVendorIntegrationObject->getDeletionPolicy() === null)
+		{
+			$zoomVendorIntegrationObject->setDeletionPolicy(false);
+		}
+		if ($zoomVendorIntegrationObject->getEnableZoomTranscription())
+		{
+			$zoomVendorIntegrationObject->setEnableZoomTranscription(false);
 		}
 	}
 	
