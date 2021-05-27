@@ -82,6 +82,12 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $engineType;
 
 	/**
+	 * @var KalturaCatalogItemLanguage
+	 * @filter eq,in
+	 */
+	public $sourceLanguage;
+
+	/**
 	 * @var bool
 	 */
 	public $allowResubmission = false;
@@ -101,6 +107,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'pricing',
 		'engineType',
 		'allowResubmission',
+		'sourceLanguage',
 	);
 
 	abstract protected function getServiceFeature();
