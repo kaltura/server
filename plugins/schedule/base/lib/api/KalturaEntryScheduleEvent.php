@@ -67,4 +67,15 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 			}
 		}
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (is_null($this->templateEntryId))
+			$this->templateEntryId = $sourceObject->getTemplateEntryId();
+
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
 }
