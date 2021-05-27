@@ -612,7 +612,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveTasksByStatus($entryId, $vendorCatalogItemId, $entry->getPartnerId(), null, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY));
 			if($activeTasksOnOlderVersion)
 			{
-				kReachUtils::tryToCancelTask($activeTasksOnOlderVersion);
+				foreach ($activeTasksOnOlderVersion as $activeTaskOnOlderVersion)
+				{
+					kReachUtils::tryToCancelTask($activeTaskOnOlderVersion);
+				}
 			}
 		}
 
