@@ -74,8 +74,10 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		if (is_null($this->templateEntryId))
+		{
 			$this->templateEntryId = $sourceObject->getTemplateEntryId();
-
+		}
+		
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
