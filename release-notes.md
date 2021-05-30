@@ -4,7 +4,7 @@
  - PSVAMB-18194 : add new feature to support Intelligent Tagging, specifically using OpenCalais  
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-	php /opt/kaltura/app/deployment/deployment/updates/scripts/add_permissions/2021_01_06_reach_permission_update.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_06_reach_permission_update.php
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_12_20_reach_internal_partner.php
 
 
