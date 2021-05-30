@@ -150,17 +150,23 @@ class kZoomClient
 	public function retrieveTrackingField($meetingId)
 	{
 		$meeting = $this->retrieveMeeting($meetingId);
+		$categoryName = '';
+		$categoryPath = '';
 		if ($meeting && isset($meeting[kZoomRecording::TRACKING_FIELDS]))
 		{
 			foreach ($meeting[kZoomRecording::TRACKING_FIELDS] as $trackingField)
 			{
 				if ($trackingField[kZoomRecording::FIELD] === kZoomRecording::KALTURA_CATEGORY)
 				{
-					return $trackingField[kZoomRecording::VALUE];
+					$categoryName = $trackingField[kZoomRecording::VALUE];
+				}
+				if ($trackingField[kZoomRecording::FIELD] === kZoomRecording::KALTURA_CATEGORY_PATH)
+				{
+					$categoryPath = $trackingField[kZoomRecording::VALUE];
 				}
 			}
 		}
-		return null;
+		return $categoryPath . $categoryName;
 	}
 	
 	/**
