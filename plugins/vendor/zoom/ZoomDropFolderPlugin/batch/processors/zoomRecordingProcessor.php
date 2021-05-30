@@ -186,11 +186,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected function isFullPath($categoryName)
 	{
 		$numCategories = count(explode('>', $categoryName));
-		if($numCategories > 1)
-		{
-			return true;
-		}
-		return false;
+		return ($numCategories > 1);
 	}
 	
 	protected function addCategoryEntry($categoryId, $entryId)
