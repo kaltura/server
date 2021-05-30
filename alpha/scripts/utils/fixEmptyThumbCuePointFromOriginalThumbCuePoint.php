@@ -4,9 +4,7 @@
 // Meaning, thumb_asset does not have a file sync - this script will fetch the original thumb_asset linked to the original
 // cue point from source entry (Live / VOD) and will update it on the matching cue_point in the destination entry
 
-// TODO: switch
-require_once ('/opt/kaltura/app/alpha/scripts/bootstrap.php');
-//require_once (__DIR__ . '/../bootstrap.php');
+require_once (__DIR__ . '/../bootstrap.php');
 
 if ($argc < 2)
 {
