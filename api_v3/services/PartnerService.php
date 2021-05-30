@@ -45,10 +45,7 @@ class PartnerService extends KalturaBaseService
 		
 		try
 		{
-			if ($cmsPassword == "")
-			{
-				$cmsPassword = null;
-			}
+			$cmsPassword = ($cmsPassword == "") ? null : $cmsPassword;
 			
 			$parentPartnerInfo = $this->getParentPartnerInfo($templatePartnerId);
 			$parentPartnerId = $parentPartnerInfo[self::PARENT_PARTNER_ID];
@@ -112,6 +109,8 @@ class PartnerService extends KalturaBaseService
 		
 		try
 		{
+			$cmsPassword = ($cmsPassword == "") ? null : $cmsPassword;
+			
 			$c = new Criteria();
 			$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
 			$existingUser = UserLoginDataPeer::doSelectOne($c);
