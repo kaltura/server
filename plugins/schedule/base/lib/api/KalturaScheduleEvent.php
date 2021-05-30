@@ -341,10 +341,19 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			$startDate = $this->startDate;
 		if ($this->endDate)
 			$endDate = $this->endDate;
-
-		$this->validate($startDate, $endDate);
-
+		
+		if (is_null($this->id))
+		{
+			$this->id = $sourceObject->getId();
+		}
+		
 		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());
+		if (is_null($this->recurrenceType))
+		{
+			$this->recurrenceType = $sourceObject->getRecurrenceType();
+		}
+		
+		$this->validate($startDate, $endDate);
 
 		if ($this->isNull('sequence') || $this->sequence <= $sourceObject->getSequence())
 		{

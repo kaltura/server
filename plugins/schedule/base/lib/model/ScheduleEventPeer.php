@@ -291,11 +291,11 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 
-		$criterion1 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::LESS_EQUAL);
-		$criterion1->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_EQUAL));
+		$criterion1 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::LESS_THAN);
+		$criterion1->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN));
 
-		$criterion2 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_EQUAL);
-		$criterion2->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::GREATER_EQUAL));
+		$criterion2 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$criterion2->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::GREATER_THAN));
 
 		$criterion3 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::GREATER_EQUAL);
 		$criterion3->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::LESS_EQUAL));
