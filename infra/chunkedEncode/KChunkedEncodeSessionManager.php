@@ -320,7 +320,12 @@
 			$videoJobs = $this->getVideoJobs();
 			foreach($videoJobs as $job) {
 				$chunker->updateChunkFileStatData($job->id,$job->stat,isset($job->outFileSizes) ? $job->outFileSizes : array());
-				$logFilename = $chunker->getChunkName($job->id,".log");
+				if(isset($chunker->setup->sharedChunkPath)){
+					$logFilename = $chunker->getChunkName($job->id,"shared_base").".log";
+				}
+				else
+					$logFilename = $chunker->getChunkName($job->id,".log");
+
 				$execData = new KProcessExecutionData($job->process, $logFilename);
 				$execData->startedAt = $job->startTime;
 				$this->chunkExecutionDataArr[$job->id] = $execData;
