@@ -534,7 +534,7 @@ class embedPlaykitJsAction extends sfAction
 			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
 			}
-			if($tag === self::PLAYER_V3_VERSIONS_TAG){
+			if ($tag === self::PLAYER_V3_VERSIONS_TAG) {
 				$corePackages = $versionConfig;
 				$productVersion = $tagVersionNumber;
 			}
