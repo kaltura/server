@@ -525,6 +525,8 @@ class embedPlaykitJsAction extends sfAction
 
 	private function getConfigByVersion($version){
 		$config = array();
+		$corePackages = array();
+		$productVersion = null;
 		foreach ($this->uiConfTags as $tag) {
 			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
 			list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
@@ -532,11 +534,12 @@ class embedPlaykitJsAction extends sfAction
 			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
 			}
-			if(!isset($productVersion)) {
+			if($tag === self::PLAYER_V3_VERSIONS_TAG){
+				$corePackages = $versionConfig;
 				$productVersion = $tagVersionNumber;
 			}
 		}
-		return array($config,$productVersion);
+		return array($config,$productVersion,$corePackages);
 	}
 
 	private function maybeAddAnalyticsPlugins()
@@ -582,15 +585,13 @@ class embedPlaykitJsAction extends sfAction
 		$isCanaryVersionRequired = array_search(self::CANARY, $this->bundleConfig) !== false;
 
 		$isAllPackagesSameVersion = true;
+        $packageVersion = null;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
 
-			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
+			list($latestVersionMap, $latestProductVersion, $corePackages) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
 			list($canaryVersionMap, $canaryProductVersion) = $this->getConfigByVersion("canary");
-
-			//package version to compare, product version will save jut if all the versions in uiConf similar
-			$packageVersion = reset( $this->bundleConfig );
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
@@ -606,8 +607,12 @@ class embedPlaykitJsAction extends sfAction
 					$this->bundleConfig[$key] = $canaryVersionMap[$key];
 				}
 
-				if($packageVersion !== $val) {
-					$isAllPackagesSameVersion = false;
+				if ($corePackages != null && isset($corePackages[$key])) {
+					if (is_null($packageVersion)) {
+						$packageVersion = $val;
+					} else if ($packageVersion != $val) {
+						$isAllPackagesSameVersion = false;
+					}
 				}
 			}
 
