@@ -33,6 +33,7 @@
 		public $hostname = 0;
 		
 		public $attempt = 0; //Job execution attempt
+		public $history = null; //job execution history in case of failures
 		
 		/* ---------------------------
 		 *
@@ -614,6 +615,10 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 			$this->storeManager->SaveJob($job);
 	
 			$job->state = $job::STATE_PENDING;
+			
+			//Reset job time stamps to avoid exec timeout when retrying failed job
+			$this->resetJobParams($job);
+			
 			$job->attempt++;
 			if($this->storeManager->AddJob($job)===false) {
 				KalturaLog::log("FAILED to retry job($job->id)");
@@ -621,6 +626,15 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 			}
 			KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
 			return true;
+		}
+		
+		protected function resetJobParams(&$job)
+		{
+			$job->history[] = array('h' => $job->hostname, 'id' => $job->id, 'st' =>$job->startTime);
+			
+			//Reset job timestamps
+			$job->queueTime = 0;
+			$job->startTime = 0;
 		}
 
 		/* ---------------------------
