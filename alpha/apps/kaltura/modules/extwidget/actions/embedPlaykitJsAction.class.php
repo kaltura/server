@@ -585,7 +585,7 @@ class embedPlaykitJsAction extends sfAction
 		$isCanaryVersionRequired = array_search(self::CANARY, $this->bundleConfig) !== false;
 
 		$isAllPackagesSameVersion = true;
-        $packageVersion = null;
+		$packageVersion = null;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
 
