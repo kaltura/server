@@ -201,13 +201,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
-		if ($newPassword && 
+		if ($newPassword &&
 				  !UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
 				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
 				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
 				  (stripos($newPassword, $loginData->getFullName()) !== false)    ||
 				  ($newPassword == $loginData->getLoginEmail())   ){
 			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
+		}
+		
+		if ($loginData->isCommonPassword($newPassword))
+		{
+			throw new kUserException('', kUserException::COMMON_PASSWORD_NOT_ALLOWED);
 		}
 		
 		// check that password hasn't been used before by this user
