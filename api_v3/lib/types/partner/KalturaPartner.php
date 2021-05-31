@@ -402,7 +402,37 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $monitorUsage;
-
+	
+	/**
+	 * @var string
+	 */
+	public $passwordStructureValidations;
+	
+	/**
+	 * @var string
+	 */
+	public $passwordStructureValidationsDescription;
+	
+	/**
+	 * @var int
+	 */
+	public $passReplaceFreq;
+	
+	/**
+	 * @var int
+	 */
+	public $maxLoginAttempts;
+	
+	/**
+	 * @var int
+	 */
+	public $loginBlockPeriod;
+	
+	/**
+	 * @var int
+	 */
+	public $numPrevPassToKeep;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
@@ -413,7 +443,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
-		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams'
+		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
+		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -429,6 +460,13 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	public function doFromObject($partner, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$passwordValidation = $partner->getPasswordStructureValidations();
+		if(isset($passwordValidation[0]))
+		{
+			$this->passwordStructureValidations = $passwordValidation[0][0];
+			$this->passwordStructureValidationsDescription = $passwordValidation[0][1];
+		}
+		
 		parent::doFromObject($partner);
 		
 		$this->name = kString::stripUtf8InvalidChars($this->name);
@@ -496,8 +534,31 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validateForInsert();
 
 		$partner = new Partner();
-		return parent::toObject($partner);
+		return toObject($partner);
 	}
+	
+	public function toObject($dbObject = null, $propsToSkip = array())
+	{
+		if (!$dbObject)
+		{
+			$dbObject = new Partner();
+		}
+		$dbObject = parent::toObject($dbObject);
+		
+		if(!is_null($this->passwordStructureValidations))
+		{
+			$dbObject->setPasswordStructureValidations(
+				array(array($this->passwordStructureValidations,
+					$this->passwordStructureValidationsDescription)));
+		}
+		else
+		{
+			$dbObject->setPasswordStructureValidations(null);
+		}
+		
+		return $dbObject;
+	}
+	
 
 	public function getExtraFilters()
 	{
