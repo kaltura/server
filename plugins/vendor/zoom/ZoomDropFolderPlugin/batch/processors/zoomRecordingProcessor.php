@@ -149,20 +149,46 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	protected function findCategoryIdByName($categoryName)
 	{
+		$isFullPath = self::isFullPath($categoryName);
+		
 		$categoryFilter = new KalturaCategoryFilter();
-		$categoryFilter->fullNameEqual = $categoryName;
-		
-		$pager = new KalturaFilterPager();
-		$pager->pageIndex = 1;
-		$pager->pageSize = 1;
-		
-		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, $pager);
-		$categoryId = null;
-		if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
+		if ($isFullPath)
 		{
-			$categoryId = $categoryResponse->objects[0]->id;
+			$categoryFilter->fullNameEqual = $categoryName;
+		}
+		else
+		{
+			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
+		}
+		
+		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+		$categoryId = null;
+		if ($isFullPath)
+		{
+			if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
+			{
+				$categoryId = $categoryResponse->objects[0]->id;
+			}
+		}
+		else
+		{
+			$categoryIds = array();
+			foreach ($categoryResponse->objects as $category)
+			{
+				if ($category->name === $categoryName)
+				{
+					$categoryIds[] = $category->id;
+				}
+			}
+			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
 		}
 		return $categoryId;
+	}
+	
+	protected function isFullPath($categoryName)
+	{
+		$numCategories = count(explode('>', $categoryName));
+		return ($numCategories > 1);
 	}
 	
 	protected function addCategoryEntry($categoryId, $entryId)

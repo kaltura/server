@@ -150,17 +150,33 @@ class kZoomClient
 	public function retrieveTrackingField($meetingId)
 	{
 		$meeting = $this->retrieveMeeting($meetingId);
+		$categoryName = '';
+		$categoryPath = '';
 		if ($meeting && isset($meeting[kZoomRecording::TRACKING_FIELDS]))
 		{
 			foreach ($meeting[kZoomRecording::TRACKING_FIELDS] as $trackingField)
 			{
 				if ($trackingField[kZoomRecording::FIELD] === kZoomRecording::KALTURA_CATEGORY)
 				{
-					return $trackingField[kZoomRecording::VALUE];
+					$categoryName = $trackingField[kZoomRecording::VALUE];
+				}
+				if ($trackingField[kZoomRecording::FIELD] === kZoomRecording::KALTURA_CATEGORY_PATH)
+				{
+					$categoryPath = $trackingField[kZoomRecording::VALUE];
+					if(trim($categoryPath))
+					{
+						$categoryPath = (substr($categoryPath, -1) !== '>') ? $categoryPath . '>' : $categoryPath;
+					}
 				}
 			}
 		}
-		return null;
+		KalturaLog::debug('Tracking field are: path: ' . $categoryPath . ' name: ' . $categoryName);
+		if ($categoryPath && !$categoryName)
+		{
+			KalturaLog::debug('Tracking field path without category name could not be published');
+			return null;
+		}
+		return $categoryPath . $categoryName;
 	}
 	
 	/**

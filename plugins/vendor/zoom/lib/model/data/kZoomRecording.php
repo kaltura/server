@@ -19,6 +19,7 @@ class kZoomRecording implements iZoomObject
 	const FIELD = 'field';
 	const VALUE = 'value';
 	const KALTURA_CATEGORY = 'KalturaCategory';
+	const KALTURA_CATEGORY_PATH = 'KalturaCategoryPath';
 
 	public $id;
 	public $uuid;
