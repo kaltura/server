@@ -171,14 +171,15 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 		else
 		{
+			$categoryIds = array();
 			foreach ($categoryResponse->objects as $category)
 			{
 				if ($category->name === $categoryName)
 				{
-					$categoryId = $category->id;
-					break;
+					$categoryIds[] = $category->id;
 				}
 			}
+			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
 		}
 		return $categoryId;
 	}
