@@ -171,20 +171,20 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
-        $confNS = "window.__kalturaplayerdata";
-        $content .= "
-        $confNS = ($confNS || {});
-        ";
-        $kalturaPlayerVersion = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : $this->bundleConfig[self::KALTURA_TV_PLAYER];
-        // For player latest/beta/canary or >= 1.8.0
-        if ($kalturaPlayerVersion == self::LATEST ||
-            $kalturaPlayerVersion == self::BETA ||
-            $kalturaPlayerVersion == self::CANARY ||
-            version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0)
-        {
-            $content .= "$confNS=$uiConfJson;";
-        } else {
-            $content .= "$confNS.UIConf = ($confNS.UIConf||{}); $confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;";
+		$confNS = "window.__kalturaplayerdata";
+		$content .= "
+		$confNS = ($confNS || {});
+		";
+		$kalturaPlayerVersion = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : $this->bundleConfig[self::KALTURA_TV_PLAYER];
+		// For player latest/beta/canary or >= 1.8.0
+		if ($kalturaPlayerVersion == self::LATEST ||
+			$kalturaPlayerVersion == self::BETA ||
+			$kalturaPlayerVersion == self::CANARY ||
+			version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0)
+		{
+			$content .= "$confNS=$uiConfJson;";
+		} else {
+			$content .= "$confNS.UIConf = ($confNS.UIConf||{}); $confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;";
 		}
 		return $content;
 	}
