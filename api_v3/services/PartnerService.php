@@ -8,8 +8,8 @@
  */
 class PartnerService extends KalturaBaseService 
 {
-    const PARENT_PARTNER_ID = 'parentPartnerId';
-    const IS_ADMIN_OR_VAR_CONSOLE = 'isAdminOrVarConsole';
+	const PARENT_PARTNER_ID = 'parentPartnerId';
+	const IS_ADMIN_OR_VAR_CONSOLE = 'isAdminOrVarConsole';
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'register') {
@@ -78,8 +78,7 @@ class PartnerService extends KalturaBaseService
 		if ($existingUser && $isAdminOrVarConsole)
 		{
 			kuserPeer ::setUseCriteriaFilter(false);
-			$kuserOfLoginData = kuserPeer ::getKuserByEmail($adminEmail,
-			                                                $existingUser -> getConfigPartnerId());
+			$kuserOfLoginData = kuserPeer ::getKuserByEmail($adminEmail, $existingUser -> getConfigPartnerId());
 			kuserPeer ::setUseCriteriaFilter(true);
 			if ($kuserOfLoginData &&
 				(!$parentPartnerId || ($parentPartnerId == $existingUser -> getConfigPartnerId())))
@@ -120,8 +119,7 @@ class PartnerService extends KalturaBaseService
 			$parentPartnerId = $parentPartnerInfo[self::PARENT_PARTNER_ID];
 			$isAdminOrVarConsole = $parentPartnerInfo[self::IS_ADMIN_OR_VAR_CONSOLE];
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
-			$ignorePassword = $this->getIgnorePassword($existingUser, $isAdminOrVarConsole, $partner->adminEmail,
-			                                           $parentPartnerId);
+			$ignorePassword = $this->getIgnorePassword($existingUser, $isAdminOrVarConsole, $partner->adminEmail,$parentPartnerId);
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName(),
 				$dbPartner->getAdminName(), $dbPartner->getAdminEmail(), $dbPartner->getCommercialUse(), "yes",
 				$dbPartner->getDescription(), $dbPartner->getUrl1(), $cmsPassword, $dbPartner, $ignorePassword,
