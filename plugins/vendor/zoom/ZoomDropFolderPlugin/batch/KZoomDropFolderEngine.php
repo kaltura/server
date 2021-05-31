@@ -129,6 +129,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		foreach ($meetingFiles as $meetingFile)
 		{
+			if($this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]))
+			{
+				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
+				continue;
+			}
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
