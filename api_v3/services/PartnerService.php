@@ -8,7 +8,8 @@
  */
 class PartnerService extends KalturaBaseService 
 {
-    
+	const PARENT_PARTNER_ID = 'parentPartnerId';
+	const IS_ADMIN_OR_VAR_CONSOLE = 'isAdminOrVarConsole';
 	protected function partnerRequired($actionName)
 	{
 		if ($actionName === 'register') {
@@ -44,14 +45,11 @@ class PartnerService extends KalturaBaseService
 		
 		try
 		{
-			if ($cmsPassword == "")
-			{
-				$cmsPassword = null;
-			}
+			$cmsPassword = ($cmsPassword == "") ? null : $cmsPassword;
 			
-			$parentPartnerInfo = $this->getParentPartnerId($templatePartnerId);
-			$parentPartnerId = $parentPartnerInfo['parentPartnerInfo'];
-			$isAdminOrVarConsole = $parentPartnerInfo['isAdminOrVarConsole'];
+			$parentPartnerInfo = $this->getParentPartnerInfo($templatePartnerId);
+			$parentPartnerId = $parentPartnerInfo[self::PARENT_PARTNER_ID];
+			$isAdminOrVarConsole = $parentPartnerInfo[self::IS_ADMIN_OR_VAR_CONSOLE];
 			
 			$partner_registration = new myPartnerRegistration ($parentPartnerId);
 			
@@ -80,8 +78,7 @@ class PartnerService extends KalturaBaseService
 		if ($existingUser && $isAdminOrVarConsole)
 		{
 			kuserPeer ::setUseCriteriaFilter(false);
-			$kuserOfLoginData = kuserPeer ::getKuserByEmail($adminEmail,
-			                                                $existingUser -> getConfigPartnerId());
+			$kuserOfLoginData = kuserPeer ::getKuserByEmail($adminEmail, $existingUser -> getConfigPartnerId());
 			kuserPeer ::setUseCriteriaFilter(true);
 			if ($kuserOfLoginData &&
 				(!$parentPartnerId || ($parentPartnerId == $existingUser -> getConfigPartnerId())))
@@ -111,17 +108,18 @@ class PartnerService extends KalturaBaseService
 		
 		try
 		{
+			$cmsPassword = ($cmsPassword == "") ? null : $cmsPassword;
+			
 			$c = new Criteria();
 			$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
 			$existingUser = UserLoginDataPeer::doSelectOne($c);
 			/* @var $exisitingUser UserLoginData */
 			$dbPartner = $partner->toPartner();
-			$parentPartnerInfo = $this->getParentPartnerId($templatePartnerId);
-			$parentPartnerId = $parentPartnerInfo['parentPartnerInfo'];
-			$isAdminOrVarConsole = $parentPartnerInfo['isAdminOrVarConsole'];
+			$parentPartnerInfo = $this->getParentPartnerInfo($templatePartnerId);
+			$parentPartnerId = $parentPartnerInfo[self::PARENT_PARTNER_ID];
+			$isAdminOrVarConsole = $parentPartnerInfo[self::IS_ADMIN_OR_VAR_CONSOLE];
 			$partner_registration = new myPartnerRegistration ( $parentPartnerId );
-			$ignorePassword = $this->getIgnorePassword($existingUser, $isAdminOrVarConsole, $partner->adminEmail,
-			                                           $parentPartnerId);
+			$ignorePassword = $this->getIgnorePassword($existingUser, $isAdminOrVarConsole, $partner->adminEmail,$parentPartnerId);
 			list($pid, $subpid, $pass, $hashKey) = $partner_registration->initNewPartner( $dbPartner->getName(),
 				$dbPartner->getAdminName(), $dbPartner->getAdminEmail(), $dbPartner->getCommercialUse(), "yes",
 				$dbPartner->getDescription(), $dbPartner->getUrl1(), $cmsPassword, $dbPartner, $ignorePassword,
@@ -153,7 +151,7 @@ class PartnerService extends KalturaBaseService
 		return $partner;
 	}
 
-	protected function getParentPartnerId($templatePartnerId = null)
+	protected function getParentPartnerInfo($templatePartnerId = null)
 	{
 		$parentPartnerId = null;
 		$isAdminOrVarConsole = false;
