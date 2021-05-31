@@ -460,9 +460,9 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	public function doFromObject($partner, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$this->updatePasswordStructureFromPartner($partner);
-		
 		parent::doFromObject($partner);
+		
+		$this->updatePasswordStructureFromPartner($partner);
 		
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
