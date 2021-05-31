@@ -460,12 +460,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	public function doFromObject($partner, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$passwordValidation = $partner->getPasswordStructureValidations();
-		if(isset($passwordValidation[0]))
-		{
-			$this->passwordStructureValidations = $passwordValidation[0][0];
-			$this->passwordStructureValidationsDescription = $passwordValidation[0][1];
-		}
+		$this->updatePasswordStructureFromPartner($partner);
 		
 		parent::doFromObject($partner);
 		
@@ -548,12 +543,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		if(!is_null($this->passwordStructureValidations))
 		{
 			$dbObject->setPasswordStructureValidations(
-				array(array($this->passwordStructureValidations,
-					$this->passwordStructureValidationsDescription)));
-		}
-		else
-		{
-			$dbObject->setPasswordStructureValidations(null);
+				array(array(trim($this->passwordStructureValidations),
+					trim($this->passwordStructureValidationsDescription))));
 		}
 		
 		return $dbObject;
@@ -583,4 +574,18 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, 'partnerPackage');
 	}
 	
+	public function updatePasswordStructureFromPartner($partner)
+	{
+		$passwordValidation = $partner->getPasswordStructureRegex();
+		if (isset($passwordValidation[0]))
+		{
+			$this->passwordStructureValidations = $passwordValidation[0];
+			$this->passwordStructureValidationsDescription = $partner->getInvalidPasswordStructureMessage();
+		}
+		else
+		{
+			$this->passwordStructureValidations = kConf::get('user_login_password_structure');
+			$this->passwordStructureValidationsDescription = kConf::get('invalid_password_structure_message');
+		}
+	}
 }
