@@ -163,7 +163,10 @@ class kZoomClient
 				if ($trackingField[kZoomRecording::FIELD] === kZoomRecording::KALTURA_CATEGORY_PATH)
 				{
 					$categoryPath = $trackingField[kZoomRecording::VALUE];
-					$categoryPath = (substr($categoryPath, -1) !== '>') ? $categoryPath . '>' : $categoryPath;
+					if(trim($categoryPath))
+					{
+						$categoryPath = (substr($categoryPath, -1) !== '>') ? $categoryPath . '>' : $categoryPath;
+					}
 				}
 			}
 		}
