@@ -405,31 +405,37 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $passwordStructureValidations;
 	
 	/**
 	 * @var string
+	 * @requiresPermission insert,update
 	 */
 	public $passwordStructureValidationsDescription;
 	
 	/**
 	 * @var int
+	 * @requiresPermission insert,update
 	 */
 	public $passReplaceFreq;
 	
 	/**
 	 * @var int
+	 * @requiresPermission insert,update
 	 */
 	public $maxLoginAttempts;
 	
 	/**
 	 * @var int
+	 * @requiresPermission insert,update
 	 */
 	public $loginBlockPeriod;
 	
 	/**
 	 * @var int
+	 * @requiresPermission insert,update
 	 */
 	public $numPrevPassToKeep;
 	
