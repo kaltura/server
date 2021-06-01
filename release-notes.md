@@ -1,5 +1,16 @@
 # Quasar-17.3.0 # 
 ## Version Highlight ##  
+
+## Reach - update reach_vendor response profile ##
+- Issue Type: Task
+- Issue ID: REACH2-1062
+
+#### Configuration ####
+First replace all tokens in the XML file below and remove ".template" from the file name:
+	deployment/updates/scripts/xml/responseProfiles/2021_06_06_update_reach_vendor_response_profiles.template.xml
+### Deployment scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/2021_06_06_update_reach_vendor_response_profile.php
+
 ### Features ###  
  - PSVAMB-18194 : add new feature to support Intelligent Tagging, specifically using OpenCalais  
 ### Deployment scripts ###
