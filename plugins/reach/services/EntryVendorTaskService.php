@@ -78,7 +78,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
 		if ($activeTask)
 		{
-			if ($dbVendorCatalogItem->getAllowResubmission())
+			if (!$dbVendorCatalogItem->getAllowResubmission())
 			{
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $activeTask->getVersion());
 			}
