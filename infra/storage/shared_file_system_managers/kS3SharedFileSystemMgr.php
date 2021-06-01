@@ -37,6 +37,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	const AWS_404_ERROR = 404;
 	
 	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
+	const DEFAULT_S3_APP_NAME = "Kaltura-Server";
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -48,6 +49,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $accessKeyId;
 	protected $storageClass;
 	protected $concurrency;
+	protected $userAgentRegex;
+	protected $userAgentPartner;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -80,12 +83,26 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
+			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
 		}
 		
+		$this->userAgentPartner = isset($options['userAgentPartner']) ? $options['userAgentPartner'] : "Kaltura";
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
 		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : 'INTELLIGENT_TIERING';
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
+	}
+	
+	private function setClientUserAgent()
+	{
+		$appName = self::DEFAULT_S3_APP_NAME;
+		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
+		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches['hostname']))
+		{
+			$appName = $matches['hostname'];
+		}
+		
+		$this->s3Client->setUserAgent("APN/1.0 $this->userAgentPartner/1.0 $appName/1.0");
 	}
 	
 	private function login()
@@ -121,6 +138,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$config['endpoint'] = $this->endPoint;
 		
 		$this->s3Client = S3Client::factory($config);
+		$this->setClientUserAgent();
 		
 		/**
 		 * There is no way of "checking the credentials" on s3.
@@ -148,6 +166,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'signature' => 'v4',
 			'version' => '2006-03-01'
 		));
+		
+		$this->setClientUserAgent();
 		
 		return true;
 	}
