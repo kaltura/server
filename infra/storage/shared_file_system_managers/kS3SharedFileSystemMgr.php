@@ -97,9 +97,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		$appName = self::DEFAULT_S3_APP_NAME;
 		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
-		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches['hostname']))
+		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches[0]))
 		{
-			$appName = $matches['hostname'];
+			$appName = $matches[0];
 		}
 		
 		$this->s3Client->setUserAgent("APN/1.0 $this->userAgentPartner/1.0 $appName/1.0");
