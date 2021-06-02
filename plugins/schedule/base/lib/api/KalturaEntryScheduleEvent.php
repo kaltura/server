@@ -55,7 +55,7 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 
 	public function validate($startDate, $endDate)
 	{
-		parent::validate($startDate, $endDate);
+		$this->validateDates($startDate, $endDate);
 
 		if ($this->templateEntryId && $this->recurrenceType === KalturaScheduleEventRecurrenceType::NONE)
 		{
