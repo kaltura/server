@@ -899,7 +899,7 @@ ini_set("memory_limit","512M");
 				}
 				elseif(isset($storeManagers[$memcacheToken]))
 				{
-					KalturaLog::log("Stoarge manager found will reuse it");
+					KalturaLog::log("Storage manager found will reuse it");
 					$storeManager = $storeManagers[$memcacheToken];
 				}
 				else
