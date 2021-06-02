@@ -239,7 +239,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $this->recurrenceType, 'recurrenceType', 'KalturaScheduleEventRecurrenceType');
 		}
 		
-		validateDates($startDate, $endDate);
+		$this->validateDates($startDate, $endDate);
 	}
 	
 	protected function validateDates($startDate, $endDate)
