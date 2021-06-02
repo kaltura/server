@@ -966,7 +966,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						}
 						else
 						{
-							$this->addMatch('@' .  $sphinxField . ' "^'.$val.'"');
+							$this->addMatch('@' .  $sphinxField . ' "'.$val.'"');
 						}
 						$filter->unsetByName($field);
 					}
