@@ -1,6 +1,5 @@
 # Quasar-17.3.0 # 
-## Version Highlight ##  
-
+## Version Highlight ## 
 ### Features ###  
  - PSVAMB-18194 : add new feature to support Intelligent Tagging, specifically using OpenCalais  
  - PLAT-22844: Add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP), for more information about the failure.
@@ -23,17 +22,6 @@
 
 	Run deployment script:
 		php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
-    
-## Reach - update reach_vendor response profile ##
-- Issue Type: Task
-- Issue ID: REACH2-1062
-
-#### Configuration ####
-First replace all tokens in the XML file below and remove ".template" from the file name:
-	deployment/updates/scripts/xml/responseProfiles/2021_06_06_update_reach_vendor_response_profiles.template.xml
-  
-### Deployment scripts ###
-php /opt/kaltura/app/deployment/updates/scripts/2021_06_06_update_reach_vendor_response_profile.php    
         
 # Quasar-17.2.0 #
 ## Version Highlight ##
