@@ -40,7 +40,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
-		$dropFolderFilesMap = $this->loadDropFolderFiles();
+		$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
 		if ($meetingFilesOrdered)
 		{
 			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap);
@@ -73,9 +73,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-		$lastHandledDate = $this->dropFolder->lastHandledMeetingTime ? date('Y-m-d', $this->dropFolder->lastHandledMeetingTime) : 0;
-		$from = $lastHandledDate ? $lastHandledDate : date('Y-m-d',time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY);
-		$to = date('Y-m-d', time());
+		$fromInSec = $this->dropFolder->lastHandledMeetingTime ? $this->dropFolder->lastHandledMeetingTime : time() -
+			self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
+		$from = date('Y-m-d', $fromInSec);
+		$to = date('Y-m-d', $toInSec);
 		$nextPageToken = '';
 		$pageSize = self::MAX_PAGE_SIZE;
 		$pageIndex = 0;
@@ -129,6 +131,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		foreach ($meetingFiles as $meetingFile)
 		{
+			if($this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]))
+			{
+				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
+				continue;
+			}
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
@@ -147,7 +154,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->loadDropFolderFiles();
+					$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&

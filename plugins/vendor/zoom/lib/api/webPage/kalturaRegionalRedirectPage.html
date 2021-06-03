@@ -28,7 +28,7 @@
 			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
 			$.ajax(
 					{
-						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/oauthValidation?format=1',
+						url: regionUrl + '/api_v3/service/vendor_zoomvendor/action/preOauthValidation?format=1',
 						type: 'get',
 						data: {'code': authCode, 'integrationCode' :  integrationCode},
 						success: function (registrationPage) {

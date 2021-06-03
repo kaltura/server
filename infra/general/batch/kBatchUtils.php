@@ -88,6 +88,8 @@ class kBatchUtils
 		$sharedStorageConfig['accessKeySecret'] = isset($storageOptions['accessKeySecret']) ? $storageOptions['accessKeySecret'] : null;
 		$sharedStorageConfig['concurrency'] = isset($storageOptions['concurrency']) ? $storageOptions['concurrency'] : null;
 		$sharedStorageConfig['maxConcurrentUploadConnections'] = isset($storageOptions['maxConcurrentUploadConnections']) ? $storageOptions['maxConcurrentUploadConnections'] : null;
+		$sharedStorageConfig['userAgentRegex'] = isset($storageOptions['userAgentRegex']) ? $storageOptions['userAgentRegex'] : null;
+		$sharedStorageConfig['userAgentPartner'] = isset($storageOptions['userAgentPartner']) ? $storageOptions['userAgentPartner'] : null;
 
 		KalturaLog::debug("Config loaded: " . print_r($sharedStorageConfig, true));
 		kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageConfig));
@@ -136,7 +138,15 @@ class kBatchUtils
 		if(isset($storageRunParams['accessKeySecret'])) {
 			kSharedFileSystemMgr::setFileSystemOptions('accessKeySecret', $storageRunParams['accessKeySecret']);
 		}
-
+		
+		if(isset($storageRunParams['userAgentRegex'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('userAgentRegex', $storageRunParams['userAgentRegex']);
+		}
+		
+		if(isset($storageRunParams['userAgentPartner'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('userAgentPartner', $storageRunParams['userAgentPartner']);
+		}
+		
 		$storageTypeMap = $storageRunParams['storageTypeMap'];
 		foreach ($storageTypeMap as $key => $value) {
 			kFile::setStorageTypeMap($key, $value);

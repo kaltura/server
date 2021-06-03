@@ -63,10 +63,10 @@ class ZoomVendorService extends KalturaBaseService
 	/**
 	 * load html page the that will ask the user for its KMC URL, derive the region of the user from it,
 	 * and redirect to the registration page in the correct region, while forwarding the necessary code for registration
-	 * @action preOauthValidation
+	 * @action oauthValidation
 	 * @throws Exception
 	 */
-	public function preOauthValidation()
+	public function oauthValidationAction()
 	{
 		$authCode = $_GET[self::AUTH_CODE];
 		ZoomHelper::loadRegionalCloudRedirectionPage($authCode);
@@ -74,11 +74,11 @@ class ZoomVendorService extends KalturaBaseService
 	
 	/**
 	 *
-	 * @action oauthValidation
+	 * @action preOauthValidation
 	 * @return string
 	 * @throws Exception
 	 */
-	public function oauthValidationAction()
+	public function preOauthValidation()
 	{
 		KalturaResponseCacher::disableCache();
 		$zoomConfiguration = self::getZoomConfiguration();
@@ -113,6 +113,10 @@ class ZoomVendorService extends KalturaBaseService
 				$zoomIntegration = new ZoomVendorIntegration();
 				$zoomIntegration->setAccountId($accountId);
 				ZoomHelper::setZoomIntegration($zoomIntegration);
+			}
+			else if ($zoomIntegration->getStatus() == VendorStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
+			{
+				throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
 			}
 			
 			$zoomIntegration->setTokensData($tokens);

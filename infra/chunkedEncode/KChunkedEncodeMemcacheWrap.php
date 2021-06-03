@@ -859,7 +859,8 @@ ini_set("memory_limit","512M");
 		public static function KillJobsCommand()
 		{
 			KalturaLog::log("Starting re-queue process for all active jobs");
-			$storeManager = $memcacheHost = $memcachePort =  $memcacheToken = null;
+			$storeManagers = array();
+			$memcacheHost = $memcachePort =  $memcacheToken = null;
 			
 			//Command to fetch all the jobs that are currently running on the machine.
 			KalturaLog::log("Fetching all keys for running chunk jobs");
@@ -885,17 +886,26 @@ ini_set("memory_limit","512M");
 					continue;
 				}
 				
-				if(!$memcacheHost || !$memcachePort || !$memcacheToken || !$storeManager)
+				$memcacheHost = $matches['memcache_host'][0];
+				$memcachePort = $matches['memcache_port'][0];
+				//memcacheToken is not mandatory the general worker may run with empty token key
+				$memcacheToken = isset($matches['memcache_token'][0]) ? $matches['memcache_token'][0] : null;
+				if(!isset($storeManagers[$memcacheToken]) && $memcachePort && $memcacheHost)
 				{
-					$memcacheHost = $matches['memcache_host'][0];
-					$memcachePort = $matches['memcache_port'][0];
-					$memcacheToken = $matches ['memcache_token'][0];
-					if($memcacheHost && $memcachePort && $memcacheToken)
-					{
-						KalturaLog::log("host:$memcacheHost, port:$memcachePort, token:$memcacheToken");
-						$storeManager = new KChunkedEncodeMemcacheWrap($memcacheToken);
-						$storeManager->Setup(array('host'=>$memcacheHost, 'port'=>$memcachePort, 'flags'=>1));
-					}
+					KalturaLog::log("host:$memcacheHost, port:$memcachePort, token:$memcacheToken");
+					$storeManager = new KChunkedEncodeMemcacheWrap($memcacheToken);
+					$storeManager->Setup(array('host'=>$memcacheHost, 'port'=>$memcachePort, 'flags'=>1));
+					$storeManagers[$memcacheToken] = $storeManager;
+				}
+				elseif(isset($storeManagers[$memcacheToken]))
+				{
+					KalturaLog::log("Storage manager found will reuse it");
+					$storeManager = $storeManagers[$memcacheToken];
+				}
+				else
+				{
+					KalturaLog::log("Missing Storage manager token [$memcacheToken] params[$memcacheHost] [$memcachePort]");
+					continue;
 				}
 				
 				$jobIndex = $matches['job_idx'][0];

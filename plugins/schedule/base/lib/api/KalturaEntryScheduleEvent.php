@@ -55,7 +55,7 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 
 	public function validate($startDate, $endDate)
 	{
-		parent::validate($startDate, $endDate);
+		$this->validateDates($startDate, $endDate);
 
 		if ($this->templateEntryId && $this->recurrenceType === KalturaScheduleEventRecurrenceType::NONE)
 		{
@@ -66,5 +66,18 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 				throw new KalturaAPIException(KalturaScheduleErrors::SCHEDULE_TIME_IN_USE);
 			}
 		}
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (is_null($this->templateEntryId))
+		{
+			$this->templateEntryId = $sourceObject->getTemplateEntryId();
+		}
+		
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

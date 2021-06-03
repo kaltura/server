@@ -11,6 +11,7 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"idNotIn" => "_notin_id",
 		"vendorPartnerIdEqual" => "_eq_vendor_partner_id",
 		"vendorPartnerIdIn" => "_in_vendor_partner_id",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
@@ -30,6 +31,8 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 		"catalogItemIdIn" => "_in_catalog_item_id",
 		"userIdEqual" => "_eq_user_id",
 		"contextEqual" => "_eq_context",
+		"expectedFinishTimeGreaterThanOrEqual" => "_gte_expected_finish_time",
+		"expectedFinishTimeLessThanOrEqual" => "_lte_expected_finish_time",
 	);
 
 	static private $order_by_map = array
@@ -48,6 +51,8 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 		"-status" => "-status",
 		"+price" => "+price",
 		"-price" => "-price",
+		"+expectedFinishTime" => "+expected_finish_time",
+		"-expectedFinishTime" => "-expected_finish_time",
 	);
 
 	public function getMapBetweenObjects()
@@ -69,6 +74,11 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * @var string
+	 */
+	public $idNotIn;
 
 	/**
 	 * @var int
@@ -164,4 +174,14 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $contextEqual;
+
+	/**
+	 * @var time
+	 */
+	public $expectedFinishTimeGreaterThanOrEqual;
+
+	/**
+	 * @var time
+	 */
+	public $expectedFinishTimeLessThanOrEqual;
 }

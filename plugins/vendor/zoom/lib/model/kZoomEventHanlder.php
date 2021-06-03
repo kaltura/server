@@ -134,7 +134,7 @@ class kZoomEventHanlder
 					$kRecordingFile = self::allocateZoomRecordingFile($recordingFile, $event);
 					$zoomDropFolderFile = self::allocateZoomDropFolderFile($dropFolderId, $partnerId, $fileName, $recordingFile->fileSize,
 					                                                      $kMeetingMetaData, $kRecordingFile);
-					if (!$parentEntry)
+					if (!$parentEntry || ($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT))
 					{
 						$parentEntry = self::getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $kMeetingMetaData->getUuid(). $recordingFile->recordingStart , $partnerId);
 						if ($parentEntry)
@@ -266,6 +266,7 @@ class kZoomEventHanlder
 		$c = new Criteria();
 		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
 		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::NOT_IN);
+		$c->addAnd(DropFolderFilePeer::CREATED_AT, time() - dateUtils::DAY * 3, Criteria::GREATER_EQUAL);
 		$c->addAscendingOrderByColumn($order);
 		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
 		return $dropFolderFiles;
