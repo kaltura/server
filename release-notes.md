@@ -7,7 +7,7 @@
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_06_reach_permission_update.php
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_12_20_reach_internal_partner.php
-  php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+	php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
 
 ## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
 - Issue Type: Task
@@ -17,11 +17,11 @@
 ### Deployment scripts ###
 - Update Media_XML_Bulk_Failure_Notification:
 
-    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
-        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_05_13_update_media_xml_bulk_job_failed.template.xml
+	First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_05_13_update_media_xml_bulk_job_failed.template.xml
 
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
         
 # Quasar-17.2.0 #
 ## Version Highlight ##
