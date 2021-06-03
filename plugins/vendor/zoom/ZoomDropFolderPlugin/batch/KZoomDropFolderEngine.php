@@ -73,9 +73,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-		$lastHandledDate = $this->dropFolder->lastHandledMeetingTime ? date('Y-m-d', $this->dropFolder->lastHandledMeetingTime) : 0;
-		$from = $lastHandledDate ? $lastHandledDate : date('Y-m-d',time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY);
-		$to = date('Y-m-d', time());
+		$fromInSec = $this->dropFolder->lastHandledMeetingTime ? $this->dropFolder->lastHandledMeetingTime : time() -
+			self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
+		$from = date('Y-m-d', $fromInSec);
+		$to = date('Y-m-d', $toInSec);
 		$nextPageToken = '';
 		$pageSize = self::MAX_PAGE_SIZE;
 		$pageIndex = 0;
