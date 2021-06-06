@@ -343,8 +343,6 @@ class s3Mgr extends kFileTransferMgr
 
 	private function isDirectory($remote_file)
 	{
-		$dirList = array();
-		
 		//When checking if path is Dir in s3 add a trailing slash to the path to avoid considering files with the same name but different ext as dir's
 		// Example:
 		//  my_bucket/dir1/dir2/my_file.mp4
@@ -357,19 +355,17 @@ class s3Mgr extends kFileTransferMgr
 				'Bucket' => $bucket,
 				'Prefix' => $key
 			));
+			
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
-				$dirList[] = array (
-					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
-					"fileSize" => $dirListObject['Size']
-				);
+				return true;
 			}
 		}
 		catch ( Exception $e )
 		{
 			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
 		}
-		return count($dirList) >= 1;
+		return false;
 	}
 
 	// return the current working directory
