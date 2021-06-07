@@ -607,8 +607,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 		}
 		
-		
-		$this->handlePluginAddedData($item, $existingEntry);
+		if ($this->currentPartnerId != 3089623 && $this->currentPartnerId != 3089633) // check if Astro
+		{
+			$this->handlePluginAddedData($item, $existingEntry); 
+		}
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
 		
 		switch($contentAssetsAction)
@@ -629,6 +631,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $item->categories, $updatedEntryBulkUploadResult, true);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
+
+		// update plugin data again because we need a entryDistribution.update (previous one)
+		// this will repeat the previous plugin data update (entrydisribution, custom meta data) but for update action we need re-distribution to reflect new thumbs/entries.
+		if (($this->currentPartnerId == 3089623 || $this->currentPartnerId == 3089633) && $contentAssetsAction == self::$actionsMap[KalturaBulkUploadAction::REPLACE]) // Check if Astro
+		{
+			sleep(10);
+			$this->handlePluginAddedData($item, $existingEntry);
+		}
 		
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$updatedEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
