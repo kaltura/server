@@ -344,18 +344,31 @@ class PlaylistService extends KalturaEntryService
 		if (is_null($detailed))
 			 $detailed = true ;
 
-		try
-		{
-			$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed, $pager);
-		}
-		catch (kCoreException $ex)
-		{   		
-			throw $ex;
-		}
+		if($filter)
+                {
+                        try
+                        {
+                                $entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed, $pager);
+                        }
+                        catch (kCoreException $ex)
+                        {
+                                throw $ex;
+                        }
 
-		myEntryUtils::updatePuserIdsForEntries ( $entryList );
-			
-		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
+                        myEntryUtils::updatePuserIdsForEntries ( $entryList );
+
+                        return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
+
+                }
+                else
+                {
+                        $tempPlaylist = new KalturaPlaylist();
+                        $tempPlaylist->playlistContent = $playlist->getDataContent();
+                        $tempPlaylist->playlistType = $playlist->getMediaType();
+
+                        return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager);
+                }
+
 	}
 	
 
