@@ -26,6 +26,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const NEXT_PAGE_TOKEN = 'next_page_token';
 	const ME = 'me';
 	const TRANSCRIPT = 'TRANSCRIPT';
+	const MP4 = 'MP4';
+	const M4A = 'M4A';
 	
 	/**
 	 * @var kZoomClient
@@ -151,6 +153,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
 				$parentEntry = null;
+				$this->handleAudioFiles($recordingFilesPerTimeSlot, $meetingFile[self::UUID]);
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
@@ -238,6 +241,37 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$updateDropFolder->lastHandledMeetingTime = $lastHandledMeetingTime;
 		$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		KalturaLog::debug('Last handled meetings time is: '. $lastHandledMeetingTime);
+	}
+	
+	protected function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid)
+	{
+		$foundMP4 = false;
+		$audioKeys = array();
+		foreach ($recordingFilesPerTimeSlot as $key => $recordingFile)
+		{
+			if ($recordingFile[self::RECORDING_FILE_TYPE] === self::MP4)
+			{
+				$foundMP4 = true;
+			}
+			if ($recordingFile[self::RECORDING_FILE_TYPE] === self::M4A)
+			{
+				$audioKeys[] = $key;
+			}
+		}
+		if ($foundMP4)
+		{
+			foreach ($audioKeys as $audioKey)
+			{
+				$audioRecordingFile = $recordingFilesPerTimeSlot[$audioKey];
+				KalturaLog::debug('Video and Audio files were found. audio file is ' . print_r($audioRecordingFile, true) . ' , unsetting Audio');
+				unset($recordingFilesPerTimeSlot[$audioKey]);
+				if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
+				{
+					KalturaLog::debug('Deleting Audio File From Zoom ');
+					$this->zoomClient->deleteRecordingFile($meetingFileUuid, $audioRecordingFile[self::ID]);
+				}
+			}
+		}
 	}
 
 	protected function addDropFolderFile($meetingFile, $recordingFile, $parentEntryId, $isParentEntry = false)
