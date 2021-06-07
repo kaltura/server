@@ -52,6 +52,7 @@ $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['proce
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
 $explicitPartnerIdsString = kConf::get('explicitPartnerIds','elasticDynamicMap',null);
+$explicitPartnerIds = array();
 if ($explicitPartnerIdsString)
 {
         $explicitPartnerIdsArray = explode(',',$explicitPartnerIdsString);
@@ -191,7 +192,7 @@ while (true)
 				$partnerId = $elasticLog->getPartnerId();
 				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
 				{
-					if (is_null($explicitPartnerIds) || empty($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
+					if (empty($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
 					{
 						$response = $elasticClient->addToBulk($command);
 					}

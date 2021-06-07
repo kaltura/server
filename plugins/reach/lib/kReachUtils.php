@@ -181,16 +181,6 @@ class kReachUtils
 	}
 
 
-	public static function isDuplicationByResubmission($activeTask, $allowResubmission)
-	{
-		if (!$allowResubmission ||
-			(in_array($activeTask->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PROCESSING))))
-		{
-			return true;
-		}
-		return false;
-	}
-
 	public static function tryToCancelTask($entryVendorTask)
 	{
 		$entryVendorTask->setStatus(EntryVendorTaskStatus::ABORTED);
@@ -198,18 +188,6 @@ class kReachUtils
 		EntryVendorTaskService::tryToSave($entryVendorTask);
 	}
 
-	public static function isEntryTypeSupported($type, $mediaType = null)
-	{
-		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
-		$supported = in_array($type, $supportedTypes);
-		if($mediaType && $supported)
-		{
-			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
-		}
-		
-		return $supported;
-		
-	}
 
 	public static function reachStrToTime($offset , $value)
 	{

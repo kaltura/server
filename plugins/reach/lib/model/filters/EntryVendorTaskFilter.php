@@ -12,6 +12,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
+			"_notin_id",
 			"_gte_created_at",
 			"_lte_created_at",
 			"_gte_updated_at",
