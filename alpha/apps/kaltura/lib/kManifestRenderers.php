@@ -94,15 +94,23 @@ abstract class kManifestRenderer
 	/**
 	 * @return string
 	 */
-	protected function getAccessControlAllowOriginDomains()
+	protected function getAccessControlAllowOriginHeaders()
 	{
+		$headers = array();
+
 		if( ! $this->restrictAccessControlAllowOriginDomains ||
 			! isset( $_SERVER [ infraRequestUtils::ORIGIN_HEADER ] ) )
 		{
-			return '*';
+			$allowOrigin = '*';
 		}
-		
-		return $_SERVER [ infraRequestUtils::ORIGIN_HEADER ];
+		else
+		{
+			$allowOrigin = $_SERVER [ infraRequestUtils::ORIGIN_HEADER ];
+			$headers[] = 'Access-Control-Allow-Credentials: true';
+		}
+
+		$headers[] = 'Access-Control-Allow-Origin:' . $allowOrigin;
+		return $headers;
 	}
 	
 	public function setRestrictAccessControlAllowOriginDomains($v)
@@ -326,7 +334,7 @@ abstract class kManifestRenderer
 		$this->applyDomainPrefix();
 	
 		$headers = $this->getHeaders();
-		$headers[] = 'Access-Control-Allow-Origin:' . $this->getAccessControlAllowOriginDomains();
+		$headers = array_merge($headers, $this->getAccessControlAllowOriginHeaders());
 		$headers[] = 'Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range';
 		$headers[] = 'Timing-Allow-Origin:*';
 		foreach ($headers as $header)
