@@ -1011,7 +1011,7 @@ class kJobsManager
  		}
  			
  		$entry = entryPeer::retrieveByPK($entryId);
- 		if($entry)
+		if($entry !$asset instanceof CaptionAsset)
  		{
  			$higherStatuses = array(
  				entryStatus::PRECONVERT,
