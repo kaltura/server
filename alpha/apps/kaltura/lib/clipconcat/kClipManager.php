@@ -654,16 +654,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		/** @var kConcatJobData $concatJobData */
 		$concatJobData = $batchJob->getParentJob()->getData();
-//		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
+		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		$concatAssetsArray = assetPeer::retrieveByEntryId($clipConcatJobData->getTempEntryId());
-		$fixedAssetsArray = $this->cleanConcatAssetsArray($concatAssetsArray);
-		$flavorParamsId = 0;
-		foreach ($fixedAssetsArray as $concatAsset)
-		{
+//		$concatAssetsArray = assetPeer::retrieveByEntryId($clipConcatJobData->getTempEntryId());
+//		$fixedAssetsArray = $this->cleanConcatAssetsArray($concatAssetsArray);
+//		$flavorParamsId = 0;
+//		foreach ($fixedAssetsArray as $concatAsset)
+//		{
 			$this -> addDestinationEntryAsset($clipConcatJobData -> getDestEntryId(), $concatAsset, $flavorParamsId);
-		}
+//		}
 		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 //		$this->deleteEntry($clipConcatJobData->getTempEntryId());
 	}
