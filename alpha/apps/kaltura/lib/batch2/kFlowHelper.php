@@ -23,8 +23,11 @@ class kFlowHelper
 
 	const DAYS = 'days';
 	const HOURS = 'hours';
-
-
+	
+	const TRUE = true;
+	const FALSE = false;
+	
+	
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -36,32 +39,68 @@ class kFlowHelper
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
 			return $flavorAsset;
-
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
 		{
 			KalturaLog::err("Entry [$entryId] not found");
 			return null;
 		}
-
+		
 		// creates the flavor asset
+		return self::createFlavorAsset($partnerId, $entryId, self::TRUE, array(flavorParams::TAG_SOURCE),
+		                               flavorParams::SOURCE_FLAVOR_ID, $fileExt);
+//		$flavorAsset = flavorAsset::getInstance();
+//		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
+//		$flavorAsset->incrementVersion();
+//		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
+//		$flavorAsset->setIsOriginal(true);
+//		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+//		$flavorAsset->setPartnerId($partnerId);
+//		$flavorAsset->setEntryId($entryId);
+//
+//		if ($fileExt)
+//		{
+//			$flavorAsset->setFileExt($fileExt);
+//		}
+//
+//		$flavorAsset->save();
+
+//		 return $flavorAsset;
+	}
+	
+	private static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
+	                                          $fileExt = null)
+	{
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
-		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
-		$flavorAsset->setIsOriginal(true);
-		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+		$flavorAsset->addTags($tags);
+		$flavorAsset->setIsOriginal($isOriginal);
+		$flavorAsset->setFlavorParamsId($sourceFlavorId);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-
+		
 		if ($fileExt)
 		{
 			$flavorAsset->setFileExt($fileExt);
 		}
-
+		
 		$flavorAsset->save();
-
+		
 		return $flavorAsset;
+	}
+	
+	public static function createAdditionalFlavorAsset($partnerId, $entryId, $fileExt = null, &$flavorParamsId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+		{
+			KalturaLog::err("Entry [$entryId] not found");
+			return null;
+		}
+		$flavorParamsId++;
+		return self::createFlavorAsset($partnerId, $entryId,self::FALSE, Array(), $flavorParamsId, $fileExt);
 	}
 
 	/**
