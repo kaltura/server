@@ -330,15 +330,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	
 	protected function filterByAssetId($files, $assetId)
 	{
-		$assetFiles = array();
-		foreach ($files as $key => $value)
-		{
-			if ($key == $assetId)
-			{
-				$assetFiles[] = $value;
-			}
-		}
-		return $assetFiles;
+		return $files[$assetId];
+//		$assetFiles = array();
+//		foreach ($files as $key => $value)
+//		{
+//			if ($key == $assetId)
+//			{
+//				$assetFiles[] = $value;
+//			}
+//		}
+//		return $assetFiles;
 	}
 
 	/**
@@ -412,7 +413,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		//TODO distinguish between assets we want to handle and those we dont
 		$flavorAssetsToBeProcessed = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId());
-		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getSourceEntryId());
+//		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getSourceEntryId());
+		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
 		array_unshift($flavorAssetsToBeProcessed, $originalFlavorAsset);
 		foreach($flavorAssetsToBeProcessed as $asset)
 		{
@@ -553,7 +555,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if ($fileSync[0]->getFullPath())
 			{
 //				$files[] = $fileSync[0]->getFullPath();
-				$files[$asset->getActualSourceAssetParamsIds()] =  $fileSync[0]->getFullPath();
+				if (!isset($files[$asset->getActualSourceAssetParamsIds()])) //Avichay's idea
+				{
+					$files[$asset->getActualSourceAssetParamsIds()] = array();
+				}
+				$files[$asset->getActualSourceAssetParamsIds()][] =  $fileSync[0]->getFullPath();
 			}
 		}
 		return $files;
