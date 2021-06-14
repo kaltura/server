@@ -91,7 +91,7 @@ class kFlowHelper
 		return $flavorAsset;
 	}
 	
-	public static function createAdditionalFlavorAsset($partnerId, $entryId, $fileExt = null, &$flavorParamsId)
+	public static function createAdditionalFlavorAsset($partnerId, $entryId, $fileExt = null, $flavorParamsId)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
@@ -99,7 +99,6 @@ class kFlowHelper
 			KalturaLog::err("Entry [$entryId] not found");
 			return null;
 		}
-		$flavorParamsId++;
 		return self::createFlavorAsset($partnerId, $entryId,self::FALSE, Array(), $flavorParamsId, $fileExt);
 	}
 

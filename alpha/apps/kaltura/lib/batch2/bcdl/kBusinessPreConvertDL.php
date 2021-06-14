@@ -419,14 +419,7 @@ class kBusinessPreConvertDL
 			array $dynamicAttributes = array(), $priority = 0, $currentFlavorAsset = null)
 	{
 		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
-
-//		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-//		if (is_null($originalFlavorAsset))
-//		{
-//			$errDescription = 'Original flavor asset not found';
-//			KalturaLog::err($errDescription);
-//			return null;
-//		}
+		
 		if (is_null($currentFlavorAsset))
 		{
 			$currentFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
@@ -437,8 +430,7 @@ class kBusinessPreConvertDL
 				return null;
 			}
 		}
-
-//		if ($originalFlavorAsset->getId() != $flavorAssetId && !$originalFlavorAsset->isLocalReadyStatus())
+		
 		if ($currentFlavorAsset->getId() != $flavorAssetId && !$currentFlavorAsset->isLocalReadyStatus())
 		{
 			$errDescription = 'Original flavor asset not ready';
@@ -447,17 +439,13 @@ class kBusinessPreConvertDL
 		}
 
 		$mediaInfoId = null;
-//		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 		if($mediaInfo){
 			$mediaInfoId = $mediaInfo->getId();
 			/*
 			 * Auto decrypt
 			 */
-//			if($originalFlavorAsset->getEncryptionKey()){
 			if($currentFlavorAsset->getEncryptionKey()){
-//				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$originalFlavorAsset->getEncryptionKey().")");
-//				$mediaInfo->decryptionKey = bin2hex(base64_decode($originalFlavorAsset->getEncryptionKey()));
 				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$currentFlavorAsset->getEncryptionKey().")");
 				$mediaInfo->decryptionKey = bin2hex(base64_decode($currentFlavorAsset->getEncryptionKey()));
 			}
@@ -503,7 +491,6 @@ class kBusinessPreConvertDL
 		if ($parentJob) // prefer the partner id from the parent job, although it should be the same
 			$partnerId = $parentJob->getPartnerId();
 		else
-//			$partnerId = $originalFlavorAsset->getPartnerId();
 			$partnerId = $currentFlavorAsset->getPartnerId();
 		if(is_null($flavorAssetId))
 		{
@@ -592,12 +579,10 @@ class kBusinessPreConvertDL
 				KalturaLog::log("Updating Collection flavor [" . $flavor->getId() . "] for asset [" . $tagedFlavorAsset->getId() . "]");
 				$flavors[$flavorAssetId] = $flavor;
 			}
-//			return self::decideCollectionConvert($collectionTag, $originalFlavorAsset, $entry, $parentJob, $flavors);
 			return self::decideCollectionConvert($collectionTag, $currentFlavorAsset, $entry, $parentJob, $flavors);
 		}
 		else
 		{
-//			return self::decideFlavorConvert($flavorAsset, $flavor, $originalFlavorAsset, $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
 			return self::decideFlavorConvert($flavorAsset, $flavor, $currentFlavorAsset, $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
 		}
 	}

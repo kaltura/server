@@ -62,12 +62,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$this->handleClipConcatParentJob($batchJob);
 			}
-			elseif ($this->isExtractMediaFinished($batchJob))
-			{
-				//$this->handleClipConcatParentJob($batchJob);
-				//TODO handleExtractMediaFinished
-				$this->handleExtractMediaFinished($batchJob);
-			}
 			elseif ($this->isImportFinished($batchJob))
 			{
 				$this->handleImportFinished($batchJob->getRootJob());
@@ -98,26 +92,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return 	$batchJob->getJobType() == BatchJobType::IMPORT && $batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED;
 	}
 	
-	protected function handleExtractMediaFinished(BatchJob $batchJob)
-	{
-		$parentJobData = $batchJob->getParentJob()->getData();
-		$extractMediaJobData = $batchJob->getData();
-		/**@var kExtractMediaJobData $extractMediaJobData */
-		$assetId = $extractMediaJobData->getFlavorAssetId();
-//		$jobData = new kClipConcatJobData();
-//
-//		$jobData->setTempEntryId($parentJobData->getTempEntryId());
-//		$jobData->setPartnerId($parentJobData->getPartnerId());
-//		$jobData->setOperationAttributes($parentJobData->getOperationAttributes());
-		$this->addClipJobsOnFlavor($batchJob, $parentJobData, $assetId);
-	}
-	
-	protected function isExtractMediaFinished(BatchJob $batchJob)
-	{
-		return 	$batchJob->getJobType() == BatchJobType::EXTRACT_MEDIA &&
-			$batchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED &&
-			$batchJob->getParentJob()->getJobType() == BatchJobType::CLIP_CONCAT;
-	}
 	
 	protected function isImportFailed(BatchJob $batchJob)
 	{
@@ -135,6 +109,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		return 	$batchJob->getParentJob() &&
 				$batchJob->getParentJob()->getJobType() == BatchJobType::CONCAT;
+	}
+	
+	protected function isConcatOfAllAssetsDone(BatchJob $batchJob)
+	{
+		$parent = $batchJob->getRootJob();
+		$childrenStatus = true;
+		foreach ($parent->getChildJobs() as $job)
+		{
+			/** @var BatchJob $job */
+			KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
+			if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+			{
+				$childrenStatus = false;
+			}
+		}
+		return $childrenStatus;
 	}
 
 	protected function handleImportFinished($rootJob)
@@ -164,12 +154,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return true;
 		}
 		
-		if (($batchJob->getJobType() == BatchJobType::EXTRACT_MEDIA) && ($batchJob->getParentJob()->getJobType() ==
-	BatchJobType::CLIP_CONCAT))
-		{
-			return true;
-		}
-
 		if(!$batchJob->getRootJob())
 		{
 			return false;
@@ -308,15 +292,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$tempEntry = entryPeer::retrieveByPK($jobData->getTempEntryId());
 		$assets = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
 		usort($assets, array("kClipManager","cmpByOrder"));
-
-		//TODO need to distinguish between assets so that to do concat on groups of files. use
+		
 		$files = $this->getFilesPath($assets);
 		$sourceAssetIds = array_keys($files);
 		foreach ($sourceAssetIds as $assetId)
 		{
 			$relatedFiles = $this->filterByAssetId($files, $assetId);
 			
-			$flavorAsset = $this -> addNewAssetToTargetEntry($tempEntry);
+			$flavorAsset = $this -> addNewAssetToTargetEntry($tempEntry, $assetId);
 			
 			//calling addConcatJob only if lock succeeds
 			$store = kCacheManager ::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
@@ -331,15 +314,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	protected function filterByAssetId($files, $assetId)
 	{
 		return $files[$assetId];
-//		$assetFiles = array();
-//		foreach ($files as $key => $value)
-//		{
-//			if ($key == $assetId)
-//			{
-//				$assetFiles[] = $value;
-//			}
-//		}
-//		return $assetFiles;
 	}
 
 	/**
@@ -388,12 +362,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 				else
 				{
-					//TODO get all the sources (mp4 + all audio)
-					//TODO check if each has mediaINfo, if not launch extractMediaJob
-					//TODO once all extract media is complete, run the below
-					//TODO create new function clip flavor that extracts the flavors and call addClipJobs:
-					// addClipJobsFromBatchJob extract needed info from batch and injects to addClipJobsOnFlavor
-					//Get all flavor or additional assets connected to the source entry that are missing mediaInfo
 					$this->addClipJobsFromBatchJob($batchJob, $jobData);
 				}
 				break;
@@ -411,25 +379,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function addClipJobsFromBatchJob($batchJob, $jobData)
 	{
-		//TODO distinguish between assets we want to handle and those we dont
 		$flavorAssetsToBeProcessed = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId());
-//		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getSourceEntryId());
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
 		array_unshift($flavorAssetsToBeProcessed, $originalFlavorAsset);
 		foreach($flavorAssetsToBeProcessed as $asset)
 		{
 			/** @var flavorAsset $asset */
-			if (is_null($this->isFlavorAssetMissingMediaInfo($asset)))
-			{
-				$syncKey = $asset -> getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-				$filePath = kFileSyncUtils ::getLocalFilePathForKey($syncKey);
-				kJobsManager ::addExtractMediaJob($batchJob, $filePath, $asset -> getId());
-			}
-			else
-			{
-				//start child clip jobs
-				$this -> addClipJobsOnFlavor($batchJob, $jobData, $asset -> getId());
-			}
+			$this -> addClipJobsOnFlavor($batchJob, $jobData, $asset -> getId());
 		}
 		kJobsManager ::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
@@ -440,8 +396,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		//start child clip jobs
 		$errDesc = '';
 		$this -> addClipJobs($batchJob, $jobData -> getTempEntryId(), $errDesc, $jobData -> getPartnerId(),
-		                     $jobData -> getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $assetId);
-//		kJobsManager ::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
+					$jobData -> getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $assetId);
 	}
 
 	/**
@@ -463,8 +418,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$originalConversionEnginesExtraParams =
 			assetParamsPeer::retrieveByPK(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)->getConversionEnginesExtraParams();
 		
-		//TODO run over the injected asset including the source
-//		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		$injectedFlavorAsset = assetPeer::retrieveById($assetId);
 		$encryptionKey = null;
 		if ($injectedFlavorAsset)
@@ -554,8 +507,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			/*** @var array $fileSync */
 			if ($fileSync[0]->getFullPath())
 			{
-//				$files[] = $fileSync[0]->getFullPath();
-				if (!isset($files[$asset->getActualSourceAssetParamsIds()])) //Avichay's idea
+				if (!isset($files[$asset->getActualSourceAssetParamsIds()]))
 				{
 					$files[$asset->getActualSourceAssetParamsIds()] = array();
 				}
@@ -570,7 +522,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @return flavorAsset
 	 * @throws kCoreException
 	 */
-	private function addNewAssetToTargetEntry($tempEntry)
+	private function addNewAssetToTargetEntry($tempEntry, $assetId)
 	{
 
 		/** @var flavorAsset $flavorAsset */
@@ -579,7 +531,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset->setPartnerId($tempEntry->getPartnerId());
 		$flavorAsset->setEntryId($tempEntry->getId());
 		$flavorAsset->setStatus(asset::ASSET_STATUS_QUEUED);
-		$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
+		$asset = assetPeer::retrieveById($assetId);
+		if ($asset->getFlavorParamsId() != kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)
+		{
+			$flavorAsset->setFlavorParamsId($asset->getFlavorParamsId());
+		}
+		else
+		{
+			$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
+		}
 		$flavorAsset->setIsOriginal(false);
 		/*
 		 * TODO - AWS - Handle shared concat flow
@@ -622,7 +582,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	private function addDestinationEntryAsset($entryId, $concatAsset, &$flavorParamsId)
+	private function addDestinationEntryAsset($entryId, $concatAsset)
 	{
 		$concatSyncKey = $concatAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$dbAsset = assetPeer::retrieveOriginalByEntryId($entryId);
@@ -640,7 +600,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		else
 		{
-			$dbAsset = kFlowHelper::createAdditionalFlavorAsset($dbEntry->getPartnerId(), $entryId,$concatAsset->getFileExt(), $flavorParamsId);
+			$dbAsset = kFlowHelper::createAdditionalFlavorAsset($dbEntry->getPartnerId(), $entryId,$concatAsset->getFileExt(), $concatAsset->getFlavorParamsId());
 		}
 
 		if(!$dbAsset)
@@ -664,40 +624,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-//		$concatAssetsArray = assetPeer::retrieveByEntryId($clipConcatJobData->getTempEntryId());
-//		$fixedAssetsArray = $this->cleanConcatAssetsArray($concatAssetsArray);
-//		$flavorParamsId = 0;
-//		foreach ($fixedAssetsArray as $concatAsset)
-//		{
-			$this -> addDestinationEntryAsset($clipConcatJobData -> getDestEntryId(), $concatAsset, $flavorParamsId);
-//		}
+		$this -> addDestinationEntryAsset($clipConcatJobData -> getDestEntryId(), $concatAsset);
 		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
-//		$this->deleteEntry($clipConcatJobData->getTempEntryId());
+		if ($this->isConcatOfAllAssetsDone($batchJob))
+		{
+			$this -> deleteEntry($clipConcatJobData -> getTempEntryId());
+		}
 	}
 	
-	private function cleanConcatAssetsArray($concatAsstArray)
-	{
-		$fixedAssetsArray = array();
-		/** @var FlavorAsset $asset */
-		foreach ($concatAsstArray as $asset)
-		{
-			if ($asset->getSize() > 0)
-			{
-				if ($asset->getFlavorParamsId() == -1)
-				{
-					array_unshift($fixedAssetsArray, $asset);
-				}
-				else
-				{
-					if (strpos($asset->getDescription(), 'video warnings') === false)
-					{
-						array_push($fixedAssetsArray, $asset);
-					}
-				}
-			}
-		}
-		return $fixedAssetsArray;
-	}
 
 	/**
 	 * @param $entryId
