@@ -188,7 +188,7 @@ class kZoomEventHanlder
 			}
 		}
 	}
-
+	
 	protected static function allocateMeetingMetaData($recording, $event)
 	{
 		$kMeetingMetaData = new ZoomMeetingMetadata();
