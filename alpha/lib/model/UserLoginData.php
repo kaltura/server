@@ -347,17 +347,7 @@ class UserLoginData extends BaseUserLoginData{
 	public function isCommonPassword($password)
 	{
 		$commonPasswordsMap = kConf::getMap(kConfMapNames::COMMON_PASSWORDS);
-		if (!$commonPasswordsMap)
-		{
-			return false;
-		}
-		
-		if (isset($commonPasswordsMap[$password]))
-		{
-			return true;
-		}
-		
-		return false;
+		return $commonPasswordsMap and isset($commonPasswordsMap[$password]);
 	}
 		
 	public function getCacheInvalidationKeys()
