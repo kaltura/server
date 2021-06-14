@@ -17,9 +17,8 @@ class kMetadataKavaUtils
 	
 	protected static function getMetadataReadyFileSyncs($objectIds, $partnerId, $metadataProfileId)
 	{
-		$currentDcId = kDataCenterMgr::getCurrentDcId();
-		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds();
-		$currentDcIds[] = $currentDcId;
+		$dcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$dcIds[] = kDataCenterMgr::getCurrentDcId();
 
 		$criteria = new Criteria();
 
@@ -35,7 +34,7 @@ class kMetadataKavaUtils
 		$criteria->add(MetadataPeer::PARTNER_ID, $partnerId);
 		$criteria->add(MetadataPeer::STATUS, Metadata::STATUS_VALID);
 		
-		$criteria->add(FileSyncPeer::DC, $currentDcIds, Criteria::IN);
+		$criteria->add(FileSyncPeer::DC, $dcIds, Criteria::IN);
 		$criteria->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 		$criteria->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_FILE);
 		$criteria->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::METADATA);
@@ -94,9 +93,7 @@ class kMetadataKavaUtils
 				else
 				{
 					$fullPath = kFile::realPath($fileSync['FILE_ROOT'] . $fileSync['FILE_PATH']);
-					kSharedFileSystemMgr::restoreStreamWrappers();
-					$source = file_get_contents($fullPath);
-					kSharedFileSystemMgr::unRegisterStreamWrappers();
+					$source = kFile::getFileContent($fullPath);
 				}
 				
 				if (!$source)
