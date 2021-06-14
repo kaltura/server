@@ -48,25 +48,7 @@ class kFlowHelper
 		}
 		
 		// creates the flavor asset
-		return self::createFlavorAsset($partnerId, $entryId, self::TRUE, array(flavorParams::TAG_SOURCE),
-		                               flavorParams::SOURCE_FLAVOR_ID, $fileExt);
-//		$flavorAsset = flavorAsset::getInstance();
-//		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
-//		$flavorAsset->incrementVersion();
-//		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
-//		$flavorAsset->setIsOriginal(true);
-//		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
-//		$flavorAsset->setPartnerId($partnerId);
-//		$flavorAsset->setEntryId($entryId);
-//
-//		if ($fileExt)
-//		{
-//			$flavorAsset->setFileExt($fileExt);
-//		}
-//
-//		$flavorAsset->save();
-
-//		 return $flavorAsset;
+		return self::createFlavorAsset($partnerId, $entryId, self::TRUE, array(flavorParams::TAG_SOURCE),flavorParams::SOURCE_FLAVOR_ID, $fileExt);
 	}
 	
 	private static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
