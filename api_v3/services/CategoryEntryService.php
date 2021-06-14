@@ -22,95 +22,35 @@ class CategoryEntryService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 * @throws KalturaErrors::CATEGORY_NOT_FOUND
 	 * @throws KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY
+	 * @throws KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED
 	 * @throws KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS
+	 * @throws Exception
 	 * @return KalturaCategoryEntry
 	 */
 	function addAction(KalturaCategoryEntry $categoryEntry)
 	{
 		$categoryEntry->validateForInsert();
-		
-		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);
-		if (!$entry)
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $categoryEntry->entryId);
-			
-		$category = categoryPeer::retrieveByPK($categoryEntry->categoryId);
-		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryEntry->categoryId);
-			
-		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($categoryEntry->entryId);
-		$numberOfPrivacyContext = count(explode(',', $category->getPrivacyContexts()));
-		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry($numberOfPrivacyContext);
-			
-		if (count($categoryEntries) >= $maxCategoriesPerEntry)
-			throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $maxCategoriesPerEntry);
-			
-		//validate user is entitled to assign entry to this category
-		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getContributionPolicy() != ContributionPolicyType::ALL)
-		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser)
-			{
-				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] is not a member of the category [{$categoryEntry->categoryId}]");
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-			if($categoryKuser->getPermissionLevel() == CategoryKuserPermissionLevel::MEMBER)
-			{
-				KalturaLog::err("User [" . kCurrentContext::getCurrentKsKuserId() . "] permission level [" . $categoryKuser->getPermissionLevel() . "] on category [{$categoryEntry->categoryId}] is not member [" . CategoryKuserPermissionLevel::MEMBER . "]");
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
-			}
-				
-			if(!$categoryKuser->hasPermission(PermissionName::CATEGORY_EDIT) && !$categoryKuser->hasPermission(PermissionName::CATEGORY_CONTRIBUTE) &&
-				!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
-				$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
-				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);				
-		}
-		
-		$categoryEntryExists = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryEntry->categoryId, $categoryEntry->entryId);
-		if($categoryEntryExists && $categoryEntryExists->getStatus() == CategoryEntryStatus::ACTIVE)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
-		
-		if(!$categoryEntryExists)
+
+		try
 		{
 			$dbCategoryEntry = new categoryEntry();
+			$dbCategoryEntry->add($categoryEntry->entryId, $categoryEntry->categoryId);
+			$categoryEntry->toInsertableObject($dbCategoryEntry);
+			$dbCategoryEntry->save();
 		}
-		else
+		catch (Exception $ex)
 		{
-			$dbCategoryEntry = $categoryEntryExists;
+			if ($ex instanceof kCoreException)
+			{
+				$this->handleCoreException($ex);
+			}
+			else
+			{
+				throw $ex;
+			}
+
 		}
-		
-		$categoryEntry->toInsertableObject($dbCategoryEntry);
-		
-		/* @var $dbCategoryEnry categoryEntry */
-		$dbCategoryEntry->setStatus(CategoryEntryStatus::ACTIVE);
-		
-		if (kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
-		{
-			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryEntry->categoryId, kCurrentContext::getCurrentKsKuserId());
-			if(!$categoryKuser ||
-				($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER && 
-				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
-				$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
-		}
-		
-		if ($category->getModeration() && 
-		   (kEntitlementUtils::getCategoryModeration() || $this->getPartner()->getEnabledService(KalturaPermissionName::FEATURE_BLOCK_CATEGORY_MODERATION_SELF_APPROVE)))
-		{
-			$dbCategoryEntry->setStatus(CategoryEntryStatus::PENDING);
-		}
-		
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$dbCategoryEntry->setPartnerId($partnerId);
-		
-		$kuser = kCurrentContext::getCurrentKsKuser();
-		
-		if ($kuser)
-		{
-			$dbCategoryEntry->setCreatorKuserId($kuser->getId());
-			$dbCategoryEntry->setCreatorPuserId($kuser->getPuserId());
-		}
-		
-		$dbCategoryEntry->save();
-		
+
 		//need to select the entry again - after update
 		$entry = entryPeer::retrieveByPK($categoryEntry->entryId);		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
@@ -421,5 +361,34 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$dbCategoryEntry->setPrivacyContext($category->getPrivacyContexts());
 		$dbCategoryEntry->save();
+	}
+
+	/**
+	 * @param kCoreException $ex
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 */
+	private function handleCoreException(kCoreException $ex)
+	{
+		switch ($ex->getCode())
+		{
+			case kCoreException::INVALID_ENTRY_ID:
+				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $ex->getData());
+
+			case kCoreException::CATEGORY_NOT_FOUND:
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $ex->getData());
+
+			case kCoreException::MAX_CATEGORIES_PER_ENTRY:
+				throw new KalturaAPIException(KalturaErrors::MAX_CATEGORIES_FOR_ENTRY_REACHED, $ex->getData());
+
+			case kCoreException::CANNOT_ASSIGN_ENTRY_TO_CATEGORY:
+				throw new KalturaAPIException(KalturaErrors::CANNOT_ASSIGN_ENTRY_TO_CATEGORY);
+
+			case kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS:
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+
+			default:
+				throw $ex;
+		}
 	}
 }
