@@ -92,7 +92,7 @@ class kMetadataKavaUtils
 				}
 				else
 				{
-					$fullPath = kFile::realPath($fileSync['FILE_ROOT'] . $fileSync['FILE_PATH']);
+					$fullPath = kFile::realPath($fileSync['FILE_ROOT'] . $fileSync['FILE_PATH'], false);
 					$source = kFile::getFileContent($fullPath);
 				}
 				
