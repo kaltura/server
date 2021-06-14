@@ -100,6 +100,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 	protected function shouldPurgeFile(KalturaDropFolderFile $dropFolderFile)
 	{
+		if($this->dropFolder->fileDeleteRegex && !preg_match($this->dropFolder->fileDeleteRegex, $dropFolderFile->fileName))
+		{
+			return false;
+		}
+
 		if($dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
 		{
 			return true;
@@ -108,8 +113,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		$purgeTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays * 86400;
 		if( ($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
 			&& ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
-			&& (time() > $purgeTime)
-			&& ((!$this->dropFolder->fileDeleteRegex) || preg_match($this->dropFolder->fileDeleteRegex, $dropFolderFile->fileName)))
+			&& (time() > $purgeTime) )
 		{
 			return true;
 		}
