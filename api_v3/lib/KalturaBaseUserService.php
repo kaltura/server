@@ -77,6 +77,9 @@ class KalturaBaseUserService extends KalturaBaseService
 				else
 					throw new KalturaAPIException(KalturaErrors::WRONG_OLD_PASSWORD);
 			}
+			else if ($code == kUserException::COMMON_PASSWORD_NOT_ALLOWED) {
+				throw new KalturaAPIException(KalturaErrors::COMMON_PASSWORD_NOT_ALLOWED);
+			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$c = new Criteria(); 
 				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
