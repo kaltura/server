@@ -352,14 +352,11 @@ class UserLoginData extends BaseUserLoginData{
 			return false;
 		}
 		
-		$commonPasswordsArray = explode(',', $commonPasswordsMap['passwordsList']);
-		foreach ($commonPasswordsArray as $commonPassword)
+		if (isset($commonPasswordsMap[$password]))
 		{
-			if ($password === $commonPassword)
-			{
-				return true;
-			}
+			return true;
 		}
+		
 		return false;
 	}
 		

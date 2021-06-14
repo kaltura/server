@@ -498,7 +498,7 @@ class KalturaBaseUserService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 			else if ($code == kUserException::COMMON_PASSWORD_NOT_ALLOWED) {
-				throw new KalturaAPIException(KalturaErrors::COMMON_PASSWORD);
+				throw new KalturaAPIException(KalturaErrors::COMMON_PASSWORD_NOT_ALLOWED);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$partner = $dbUser->getPartner();
