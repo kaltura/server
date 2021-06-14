@@ -194,6 +194,11 @@ class Form_DropFolderConfigure extends Infra_Form
 		$fileDeletePolicies->setValue(Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy::AUTO_DELETE);
 		$this->addElement($fileDeletePolicies);
 
+		$this->addElement('text', 'fileDeleteRegex', array(
+			'label' 		=> 'File Deletion Regular Expression:',
+			'filters'		=> array('StringTrim'),
+		));
+
 		$this->addElement('text', 'autoFileDeleteDays', array(
 			'label' 		=> 'Auto delete files after (days):',
 			'required'		=> true,
