@@ -122,10 +122,17 @@ class KalturaDropFolderFileResource extends KalturaGenericDataCenterContentResou
 			if(!$dropFolder) {
 				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $dropFolderFile->getDropFolderId());
 			}
-			if($dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE && $dropFolder->getAutoFileDeleteDays() == 0)
-    			$dropFolderFile->setStatus(DropFolderFileStatus::PURGED);
-    		else
-    			$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+			KalturaLog::debug("HERE. Changing...{$dropFolder->getFileDeleteRegex()}, {$dropFolderFile->getFileName()}");
+			if( ($dropFolder->getFileDeletePolicy() == DropFolderFileDeletePolicy::AUTO_DELETE)
+				&& ($dropFolder->getAutoFileDeleteDays() == 0)
+				&& (!$dropFolder->getFileDeleteRegex() || preg_match($dropFolder->getFileDeleteRegex(), $dropFolderFile->getFileName())) )
+			{
+				$dropFolderFile->setStatus(DropFolderFileStatus::PURGED);
+			}
+			else
+			{
+				$dropFolderFile->setStatus(DropFolderFileStatus::HANDLED);
+			}
 		}
 		$dropFolderFile->setEntryId($dbEntry->getId());
 		$dropFolderFile->save();		
