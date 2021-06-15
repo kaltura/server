@@ -134,8 +134,9 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		switch ($context)
 		{
 			case 'getLiveStatus':
-				if($this->getSourceEntryId())
+				if ($this->getSourceEntryId() && ($this->getCalculatedStartTime() + kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC < time()))
 				{
+					// Simulive flow (and event is playable)
 					$output = EntryServerNodeStatus::PLAYABLE;
 					return true;
 				}
