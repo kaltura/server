@@ -24,9 +24,6 @@ class kFlowHelper
 	const DAYS = 'days';
 	const HOURS = 'hours';
 	
-	const TRUE = true;
-	const FALSE = false;
-	
 	
 	/**
 	 * @param int $partnerId
@@ -48,7 +45,7 @@ class kFlowHelper
 		}
 		
 		// creates the flavor asset
-		return self::createFlavorAsset($partnerId, $entryId, self::TRUE, array(flavorParams::TAG_SOURCE),flavorParams::SOURCE_FLAVOR_ID, $fileExt);
+		return self::createFlavorAsset($partnerId, $entryId, true, array(flavorParams::TAG_SOURCE),flavorParams::SOURCE_FLAVOR_ID, $fileExt);
 	}
 	
 	private static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
@@ -81,7 +78,7 @@ class kFlowHelper
 			KalturaLog::err("Entry [$entryId] not found");
 			return null;
 		}
-		return self::createFlavorAsset($partnerId, $entryId,self::FALSE, Array(), $flavorParamsId, $fileExt);
+		return self::createFlavorAsset($partnerId, $entryId,false, array(), $flavorParamsId, $fileExt);
 	}
 
 	/**

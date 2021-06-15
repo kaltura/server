@@ -111,7 +111,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$batchJob->getParentJob()->getJobType() == BatchJobType::CONCAT;
 	}
 	
-	protected function isConcatOfAllAssetsDone(BatchJob $batchJob)
+	protected function isConcatOfAllChildrenDone(BatchJob $batchJob)
 	{
 		$parent = $batchJob->getRootJob();
 		$childrenStatus = true;
@@ -122,6 +122,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 			{
 				$childrenStatus = false;
+				return $childrenStatus;
 			}
 		}
 		return $childrenStatus;
@@ -294,16 +295,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		usort($assets, array("kClipManager","cmpByOrder"));
 		
 		$files = $this->getFilesPath($assets);
-		$sourceAssetIds = array_keys($files);
-		foreach ($sourceAssetIds as $assetId)
+		foreach ($files as $assetId => $relatedFiles)
 		{
-			$relatedFiles = $this->filterByAssetId($files, $assetId);
 			
 			$flavorAsset = $this -> addNewAssetToTargetEntry($tempEntry, $assetId);
 			
 			//calling addConcatJob only if lock succeeds
 			$store = kCacheManager ::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
-			$lockKey = "kclipManager_add_concat_job" . $batchJob -> getId() . $assetId;
+			$lockKey = 'kclipManager_add_concat_job' . $batchJob -> getId() . $assetId;
 			if (!$store || $store -> add($lockKey, true, self::LOCK_EXPIRY))
 			{
 				kJobsManager ::addConcatJob($batchJob, $flavorAsset, $relatedFiles, false);
@@ -377,7 +376,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 * Prepare Extract Media jobs for additional flavors if exist, and run the clipping
 	 */
-	private function addClipJobsFromBatchJob($batchJob, $jobData)
+	protected function addClipJobsFromBatchJob($batchJob, $jobData)
 	{
 		$flavorAssetsToBeProcessed = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId());
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
@@ -385,19 +384,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		foreach($flavorAssetsToBeProcessed as $asset)
 		{
 			/** @var flavorAsset $asset */
-			$this -> addClipJobsOnFlavor($batchJob, $jobData, $asset -> getId());
+			//start child clip jobs
+			$errDesc = '';
+			$this -> addClipJobs($batchJob, $jobData -> getTempEntryId(), $errDesc, $jobData -> getPartnerId(),
+								 $jobData -> getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $asset -> getId());
 		}
 		kJobsManager ::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
 	
-	//function that runs addClipJobs on a flavor
-	private function addClipJobsOnFlavor($batchJob, $jobData, $assetId)
-	{
-		//start child clip jobs
-		$errDesc = '';
-		$this -> addClipJobs($batchJob, $jobData -> getTempEntryId(), $errDesc, $jobData -> getPartnerId(),
-					$jobData -> getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $assetId);
-	}
 
 	/**
 	 * @param BatchJob $parentJob clipConcat job
@@ -593,7 +587,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err("Flavor asset not created for entry [ $entryId ]");
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
-		if(!$dbAsset)
+		if($concatAsset->getFlavorParamsId() == 0)
 		{
 			$isNewAsset = true;
 			$dbAsset = kFlowHelper::createOriginalFlavorAsset($dbEntry->getPartnerId(), $entryId, $concatAsset->getFileExt());
@@ -626,7 +620,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
 		$this -> addDestinationEntryAsset($clipConcatJobData -> getDestEntryId(), $concatAsset);
 		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
-		if ($this->isConcatOfAllAssetsDone($batchJob))
+		if ($this->isConcatOfAllChildrenDone($batchJob))
 		{
 			$this -> deleteEntry($clipConcatJobData -> getTempEntryId());
 		}
@@ -794,11 +788,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return false;
 	}
 	
-	private function isFlavorAssetMissingMediaInfo($asset)
-	{
-		/* @var flavorAsset $asset */
-		return mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
-	}
 
 
 

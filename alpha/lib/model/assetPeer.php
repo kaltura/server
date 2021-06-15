@@ -822,20 +822,14 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	
 	public static function retrieveAudioFlavorsByEntryID($entryId)
 	{
-		$audiCodecsArray = self::createAudioCodecsArray();
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$c->add(assetPeer::IS_ORIGINAL, "0");
-		$c->add(assetPeer::FILE_EXT, $audiCodecsArray, Criteria::IN);
+		$c->add(assetPeer::IS_ORIGINAL, 0);
+		$idCriterion = $c->getNewCriterion(assetPeer::TAGS, '%' . assetParams::TAG_ALT_AUDIO . '%', Criteria::LIKE);
+		$idCriterion->addOr($c->getNewCriterion(assetPeer::TAGS, '%' . assetParams::TAG_AUDIO_ONLY. '%',Criteria::LIKE));
+		$c->addAnd($idCriterion);
 		
 		return assetPeer::doSelect($c);
 	}
 	
-	private static function createAudioCodecsArray()
-	{
-		return array(KalturaAudioCodec::MP3, KalturaAudioCodec::AAC, KalturaAudioCodec::AACHE,
-		             KalturaAudioCodec::AC3, KalturaAudioCodec::AMRNB, KalturaAudioCodec::EAC3,
-		             KalturaAudioCodec::VORBIS, KalturaAudioCodec::MPEG2, KalturaAudioCodec::WMA,
-		             KalturaAudioCodec::WMAPRO, KalturaAudioCodec::PCM);
-	}
 }
