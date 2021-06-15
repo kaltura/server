@@ -368,7 +368,7 @@ class CategoryEntryService extends KalturaBaseService
 	 * @throws KalturaAPIException
 	 * @throws kCoreException
 	 */
-	private function handleCoreException(kCoreException $ex)
+	protected function handleCoreException(kCoreException $ex)
 	{
 		switch ($ex->getCode())
 		{
