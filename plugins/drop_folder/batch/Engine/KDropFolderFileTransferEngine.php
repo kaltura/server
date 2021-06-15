@@ -98,6 +98,29 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		return $this->fileTransferMgr->fileExists($this->dropFolder->path);
 	}
 
+	protected function shouldPurgeFile(KalturaDropFolderFile $dropFolderFile)
+	{
+		if($this->dropFolder->fileDeleteRegex && !preg_match($this->dropFolder->fileDeleteRegex, $dropFolderFile->fileName))
+		{
+			return false;
+		}
+
+		if($dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
+		{
+			return true;
+		}
+
+		$purgeTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays * 86400;
+		if( ($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
+			&& ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
+			&& (time() > $purgeTime) )
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
 		try
@@ -141,9 +164,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			}
 			else
 			{
-				$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays*86400;
-				if(($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE && time() > $deleteTime) ||
-					$dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
+				if($this->shouldPurgeFile($dropFolderFile))
 				{
 					$this->purgeFile($dropFolderFile);
 				}
