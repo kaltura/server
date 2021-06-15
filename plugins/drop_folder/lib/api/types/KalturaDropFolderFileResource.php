@@ -128,7 +128,7 @@ class KalturaDropFolderFileResource extends KalturaGenericDataCenterContentResou
 				&& ($dropFolder->getAutoFileDeleteDays() == 0)
 				&& (!$dropFolder->getFileDeleteRegex() || preg_match($dropFolder->getFileDeleteRegex(), $dropFolderFile->getFileName())) )
 			{
-				$dropFolderFile->setStatus(DropFolderFileStatus::PURGED);
+				$newStatus = DropFolderFileStatus::PURGED;
 			}
 
 			KalturaLog::debug("Changing status of drop folder file ID {$this->dropFolderFileId} to {$newStatus}");
