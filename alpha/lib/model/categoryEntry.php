@@ -324,7 +324,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		if(kEntitlementUtils::getEntitlementEnforcement() && $category->getModeration())
 		{
 			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($category->getId(), $currentKsKuserId);
-			if(!$categoryKuser || ($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MEMBER &&
+			if(!$categoryKuser || ($categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&
 				$categoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MODERATOR))
 			{
 				$this->setStatus(CategoryEntryStatus::PENDING);
