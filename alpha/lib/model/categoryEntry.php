@@ -261,7 +261,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	protected function validateMaxCategoriesPerEntry(entry $entry, category $category)
 	{
 		$categoryEntries = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
-		$numberOfPrivacyContext = count(expload(',', $category->getPrivacyContexts()));
+		$numberOfPrivacyContext = count(explode(',', $category->getPrivacyContexts()));
 		$maxCategoriesPerEntry = $entry->getMaxCategoriesPerEntry($numberOfPrivacyContext);
 
 		if(count($categoryEntries) >= $maxCategoriesPerEntry)
