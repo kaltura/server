@@ -535,7 +535,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validateForInsert();
 
 		$partner = new Partner();
-		return toObject($partner);
+		return $this->toObject($partner);
 	}
 	
 	public function toObject($dbObject = null, $propsToSkip = array())
