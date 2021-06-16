@@ -580,7 +580,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, 'partnerPackage');
 	}
 	
-	public function updatePasswordStructureFromPartner($partner)
+	protected function updatePasswordStructureFromPartner(Partner $partner)
 	{
 		$passwordValidation = $partner->getPasswordStructureRegex();
 		if (isset($passwordValidation[0]))
