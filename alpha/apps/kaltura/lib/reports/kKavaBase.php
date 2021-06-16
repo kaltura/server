@@ -149,6 +149,9 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_LIVE_REAL_MEDIA = 'Live stream real media';
 	const MEDIA_TYPE_LIVE_QUICKTIME = 'Live stream quicktime';
 
+	// source type
+	const SOURCE_INTERACTIVE_VIDEO = 'Interactive Video';
+
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
 

@@ -209,6 +209,78 @@ class kKavaVpaasReports extends kKavaReports
 			),
 		),
 
+		ReportType::SELF_SERVED_USAGE_VPAAS => array(
+			self::REPORT_JOIN_REPORTS => array(
+				// unique users
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+				),
+				// playmanifest and live view time
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+				),
+				// total entries and interactive videos
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::SOURCE_INTERACTIVE_VIDEO),
+				),
+				// bandwidth
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+				),
+				// transcoding
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+				// storage
+				array(
+					self::REPORT_JOIN_GRAPHS => array(
+						array(
+							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+							self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+							),
+							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+						),
+						array(
+							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+							self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+							),
+							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+							self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+						),
+					),
+					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+				),
+			),
+			self::REPORT_COLUMN_MAP => array(
+				'unique_known_users' => self::METRIC_UNIQUE_USERS,
+				'total_entries' => self::METRIC_COUNT_TOTAL,
+				'video_streams' => self::EVENT_TYPE_PLAYMANIFEST,
+				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'total_interactive_video_entries' => self::SOURCE_INTERACTIVE_VIDEO,
+				'live_view_time' => self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
+			),
+		)
 	);
 
 	protected static function getValidEnrichedPartners($partner_id, $partner_ids)
@@ -327,6 +399,13 @@ class kKavaVpaasReports extends kKavaReports
 		{
 			foreach ($report_def[self::REPORT_JOIN_REPORTS] as &$cur_report)
 			{
+				if (isset($cur_report[self::REPORT_JOIN_GRAPHS]))
+				{
+					foreach ($cur_report[self::REPORT_JOIN_GRAPHS] as &$cur_graph_report)
+					{
+						$cur_graph_report[self::REPORT_PARENT_PARTNER_FILTER] = true;
+					}
+				}
 				$cur_report[self::REPORT_PARENT_PARTNER_FILTER] = true;
 			}
 		}
