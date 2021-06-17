@@ -442,10 +442,6 @@ class kPexipUtils
 			$url=parse_url($url,PHP_URL_PATH);
 			$virtualRoomId = getVirtualRoomId($url, $headerData);
 		}
-
-		// Try to match the path only without the full url as a fallback
-		$url=parse_url($url,PHP_URL_PATH);
-		$virtualRoomId = getVirtualRoomId($url, $headerData);
 		
 		return $virtualRoomId;
 	}
