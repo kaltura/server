@@ -430,7 +430,7 @@ class kPexipUtils
 	 * @param $headerSize
 	 * @return int|null
 	 */
-	public static function extractIdFromCreatedResult($result,$url ,$headerSize)
+	public static function extractIdFromCreatedResult($result, $url ,$headerSize)
 	{
 		$header = substr($result, 0, $headerSize);
 		$headerData = explode('\n', $header);
