@@ -352,8 +352,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::SOURCE_INTERACTIVE_VIDEO,
 	);
 
-
-
 	protected static $playthrough_event_types = array(
 		self::EVENT_TYPE_PLAYTHROUGH_25,
 		self::EVENT_TYPE_PLAYTHROUGH_50,
@@ -696,8 +694,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, $source_type),
 				self::getLongSumAggregator($source_type, self::METRIC_DELTA));
 		}
-
-
+		
 		$user_type_metrics = array(
 			self::METRIC_COUNT_UGC => 'User', 
 			self::METRIC_COUNT_ADMIN => 'Admin');
