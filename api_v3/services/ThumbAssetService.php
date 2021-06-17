@@ -289,7 +289,7 @@ class ThumbAssetService extends KalturaAssetService
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 		
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($newSyncKey, false, false);
 		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$thumbAsset->setWidth($width);

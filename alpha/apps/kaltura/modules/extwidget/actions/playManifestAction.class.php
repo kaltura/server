@@ -1403,6 +1403,11 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
 			$renderer->cachingHeadersAge = 0;
 
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS,
+			$renderer->partnerId))
+		{
+			$renderer->setRestrictAccessControlAllowOriginDomains(true);
+		}
 		
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
@@ -1410,11 +1415,6 @@ class playManifestAction extends kalturaAction
 			$cache->storeRendererToCache($renderer);
 		}
 		
-		//mark if origin set is allowed
-		$renderer->setRestrictAccessControlAllowOriginDomains( PermissionPeer::isValidForPartner
-															 ( PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS,
-																$renderer->partnerId));
-
 		// Output the response
 		KExternalErrors::terminateDispatch();
 

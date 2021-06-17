@@ -70,7 +70,12 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	 * @var KalturaDropFolderFileDeletePolicy
 	 */
 	public $fileDeletePolicy;
-	
+
+	/**
+	 * @var string
+	 */
+	public $fileDeleteRegex;
+
 	/**
 	 * @var int
 	 */
@@ -180,6 +185,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'path',
 		'fileSizeCheckInterval',
 		'fileDeletePolicy',
+		'fileDeleteRegex',
 		'autoFileDeleteDays',
 		'fileHandlerType',
 		'fileNamePatterns',

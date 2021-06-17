@@ -966,7 +966,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						}
 						else
 						{
-							$this->addMatch('@' .  $sphinxField . ' "^'.$val.'"');
+							$this->addMatch('@' .  $sphinxField . ' "'.$val.'"');
 						}
 						$filter->unsetByName($field);
 					}
@@ -1283,7 +1283,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$freeText = "^$freeText$";
 			$condition = "@(" . $matchFields . ") $freeText";
 			if($isLikeExpr)
-				$condition .= " | $freeText\\\*";
+				$condition .= " | ^$freeText\\\*";
 			$additionalConditions[] = $condition;
 		}
 		else
@@ -1313,7 +1313,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					$condition = "@(" . $matchFields . ") $freeText";
 					if($isLikeExpr)
-						$condition .= " | $freeText\\\*";
+						$condition .= " | ^$freeText\\\*";
 					$additionalConditions[] = $condition;
 				}
 			}
@@ -1323,7 +1323,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 				$condition = "@(" . $matchFields . ") $freeTextExpr";
 				if($isLikeExpr)
-					$condition .= " | $freeTextExpr\\\*";
+					$condition .= " | ^$freeTextExpr\\\*";
 				$additionalConditions[] = $condition;
 			}
 		}

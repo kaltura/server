@@ -318,8 +318,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $this->entryId);
 		}
-		
-		if(!kReachUtils::isEntryTypeSupported($dbEntry->getType(), $dbEntry->getMediaType()))
+		if(!ReachPlugin::isEntryTypeSupportedForReach($dbEntry->getType()))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
 		}
