@@ -435,12 +435,12 @@ class kPexipUtils
 		$header = substr($result, 0, $headerSize);
 		$headerData = explode('\n', $header);
 		KalturaLog::info('Checking Headers ' . print_r($headerData, true));
-		$virtualRoomId = getVirtualRoomId($url, $headerData);
+		$virtualRoomId = self::getVirtualRoomId($url, $headerData);
 		if (is_null($virtualRoomId))
 		{
 			// Try to match the path only without the full url as a fallback
 			$url=parse_url($url,PHP_URL_PATH);
-			$virtualRoomId = getVirtualRoomId($url, $headerData);
+			$virtualRoomId = self::getVirtualRoomId($url, $headerData);
 		}
 		
 		return $virtualRoomId;
