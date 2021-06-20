@@ -36,7 +36,7 @@ if (isset($argv[2]) && $argv[2] == 'realrun')
 KalturaStatement::setDryRun($dryRun);
 KalturaLog::info($dryRun ? 'DRY RUN' : 'REAL RUN');
 
-$count = 1;
+$count = 0;
 $totalEntries = count($entriesIds);
 
 foreach ($entriesIds as $deletedEntryId)
@@ -91,24 +91,16 @@ foreach ($entriesIds as $deletedEntryId)
 		/* @var $deletedAsset asset */
 		if ($deletedAsset->getStatus() == asset::ASSET_STATUS_DELETED)
 		{
-			if ($deletedAsset->getSize())
-			{
-				$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
-				$deletedAsset->save();
-				KalturaLog::debug('Asset id: ' . $deletedAsset->getId() . ' set to READY');
-
-				$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-				restoreFileSyncByKey($assetSyncKey);
-				$assetConvertLogSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
-				restoreFileSyncByKey($assetConvertLogSyncKey);
-			}
-			else
-			{
-				$deletedAsset->setStatus(asset::ASSET_STATUS_NOT_APPLICABLE);
-				$deletedAsset->save();
-				KalturaLog::debug('Asset id: ' . $deletedAsset->getId() . ' set to NOT_APPLICABLE');
-			}
+			$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
+			$deletedAsset->save();
+			KalturaLog::debug('Asset id: ' . $deletedAsset->getId() . ' set to READY');
 		}
+
+		$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		restoreFileSyncByKey($assetSyncKey);
+
+		$assetConvertLogSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
+		restoreFileSyncByKey($assetConvertLogSyncKey);
 	}
 	kEventsManager::flushEvents();
 	kMemoryManager::clearMemory();
@@ -121,6 +113,8 @@ foreach ($entriesIds as $deletedEntryId)
 		sleep(30);
 	}
 }
+
+KalturaLog::debug('Script Finished');
 
 function restoreFileSyncByKey(FileSyncKey $fileSyncKey)
 {
