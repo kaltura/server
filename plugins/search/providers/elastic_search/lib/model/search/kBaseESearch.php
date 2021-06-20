@@ -80,7 +80,7 @@ abstract class kBaseESearch extends kBaseSearch
 		kEventsManager::raiseEventDeferred(new kESearchSearchHistoryInfoEvent($searchHistoryInfo));
 	}
 
-	public static function getElasticIndexNamePerPartner($indexName, $partnerId)
+	public static function getElasticIndexNamePerPartner($indexName, $partnerId, $useSplitIndexName = true)
 	{
 		//Legacy support of dedicated entry table
 		if($indexName===ElasticIndexMap::ELASTIC_ENTRY_INDEX)
@@ -107,9 +107,32 @@ abstract class kBaseESearch extends kBaseSearch
 			}
 		}
 
+		if($useSplitIndexName)
+		{
+			$indexName = self::getSplitIndexNamePerPartner($indexName, $partnerId);
+		}
+
 		KalturaLog::debug("Using index name $indexName for $partnerId");
 
 		return $indexName;
 	}
 
+	public static function getSplitIndexNamePerPartner($indexName, $partnerId)
+	{
+		$clusterName = kConf::get('elasticHost', 'elastic', null);
+		if(!$clusterName)
+		{
+			KalturaLog::debug("Could not get elastic cluster name");
+			return $indexName;
+		}
+
+		$elasticSplitIndexMap = kConf::get($clusterName,'elasticSplitIndexMap',array());
+		if(!empty($elasticSplitIndexMap) && isset($elasticSplitIndexMap[$indexName]))
+		{
+			$splitFactor = $elasticSplitIndexMap[$indexName];
+			$index = abs(($partnerId / $splitFactor) % $splitFactor);
+			$indexName = $indexName .'_' . $index;
+		}
+		return $indexName;
+	}
 }
