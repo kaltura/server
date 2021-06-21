@@ -62,7 +62,7 @@ class kSiteCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return ($field === $value) || (strpos($field, ".".$value) !== false);
+        return ($field === $value) || (kString::endsWith($field, ".".$value) !== false);
 	}
 
 	/* (non-PHPdoc)
