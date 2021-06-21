@@ -461,7 +461,6 @@ class myPartnerRegistration
 			return;
 		}
 		
-		
 		//if an additional account was register we want to check if the additional is free trial and update the existing lead
 		$additionalParams = $partnerToCheck->getAdditionalParams();
 		$additionalParams = array_change_key_case($additionalParams);
