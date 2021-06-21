@@ -402,7 +402,43 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $monitorUsage;
-
+	
+	/**
+	 * @var string
+	 * @requiresPermission insert,update
+	 */
+	public $passwordStructureValidations;
+	
+	/**
+	 * @var string
+	 * @requiresPermission insert,update
+	 */
+	public $passwordStructureValidationsDescription;
+	
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $passReplaceFreq;
+	
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $maxLoginAttempts;
+	
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $loginBlockPeriod;
+	
+	/**
+	 * @var int
+	 * @requiresPermission insert,update
+	 */
+	public $numPrevPassToKeep;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
@@ -413,7 +449,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
-		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams'
+		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
+		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -430,6 +467,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public function doFromObject($partner, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($partner);
+		
+		$this->updatePasswordStructureFromPartner($partner);
 		
 		$this->name = kString::stripUtf8InvalidChars($this->name);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
@@ -496,8 +535,27 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->validateForInsert();
 
 		$partner = new Partner();
-		return parent::toObject($partner);
+		return $this->toObject($partner);
 	}
+	
+	public function toObject($dbObject = null, $propsToSkip = array())
+	{
+		if (!$dbObject)
+		{
+			$dbObject = new Partner();
+		}
+		$dbObject = parent::toObject($dbObject);
+		
+		if(!is_null($this->passwordStructureValidations))
+		{
+			$dbObject->setPasswordStructureValidations(
+				array(array(trim($this->passwordStructureValidations),
+					trim($this->passwordStructureValidationsDescription))));
+		}
+		
+		return $dbObject;
+	}
+	
 
 	public function getExtraFilters()
 	{
@@ -522,4 +580,18 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_INSERT_PERMISSION, 'partnerPackage');
 	}
 	
+	protected function updatePasswordStructureFromPartner(Partner $partner)
+	{
+		$passwordValidation = $partner->getPasswordStructureRegex();
+		if (isset($passwordValidation[0]))
+		{
+			$this->passwordStructureValidations = $passwordValidation[0];
+			$this->passwordStructureValidationsDescription = $partner->getInvalidPasswordStructureMessage();
+		}
+		else
+		{
+			$this->passwordStructureValidations = kConf::get('user_login_password_structure');
+			$this->passwordStructureValidationsDescription = kConf::get('invalid_password_structure_message');
+		}
+	}
 }

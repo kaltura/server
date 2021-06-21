@@ -1,3 +1,8 @@
+# Quasar-17.4.0 #
+## Version Highlight ##
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_06_01_partner_update_partner_permission.php
+
 # Quasar-17.3.0 # 
 ## Version Highlight ## 
 ### Features ###  
