@@ -450,8 +450,18 @@ class myPartnerRegistration
 		}
 	}
 
-	private function addMarketoCampaignId($partnerToUpdate, $campaignName, $partnerToCheck)
+	private function addMarketoCampaignId(Partner $partnerToUpdate, $campaignName, $partnerToCheck)
 	{
+	
+		$partnerParentId = $partnerToUpdate->getPartnerParentId();
+		if($partnerParentId && $partnerParentId != $partnerToUpdate->getId())
+		{
+			//Ignoring sub accounts from reaching Marketo
+			KalturaLog::info("Avoid partner {$partnerToUpdate->getId()} that is child of {$partnerParentId}");
+			return;
+		}
+		
+		
 		//if an additional account was register we want to check if the additional is free trial and update the existing lead
 		$additionalParams = $partnerToCheck->getAdditionalParams();
 		$additionalParams = array_change_key_case($additionalParams);
