@@ -49,7 +49,7 @@ class kFlowHelper
 	}
 	
 	protected static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
-	                                          $fileExt = null)
+											$fileExt = null)
 	{
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
