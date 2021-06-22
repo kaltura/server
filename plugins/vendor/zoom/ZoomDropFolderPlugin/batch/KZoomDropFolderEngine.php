@@ -60,7 +60,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			}
 		}
 		
-		foreach ($dropFolderFilesMap as $dropFolderFile)
+		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
 		{
 			$this->handleExistingDropFolderFile($dropFolderFile);
 		}
