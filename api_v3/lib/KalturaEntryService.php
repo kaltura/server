@@ -857,17 +857,21 @@ class KalturaEntryService extends KalturaBaseService
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
-			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
-    			{
-    				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-    			}
+    		    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
 
-    			KalturaLog::err("Failed downloading file[$url]");
-    			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
-    			$dbEntry->save();
+                if(!$this->isSftp($url))
+    		    {
+                    if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
+                    {
+                        return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+                    }
 
-    			return null;
+                    KalturaLog::err("Failed downloading file[$url]");
+                    $dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+                    $dbEntry->save();
+
+                    return null;
+                }
     		}
 
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
@@ -891,6 +895,26 @@ class KalturaEntryService extends KalturaBaseService
 
 		return $dbAsset;
 	}
+
+    /**
+     * @param $sourceUrl
+     * @return bool
+     */
+    protected function isSftp($sourceUrl){
+        $sourceUrl = trim($sourceUrl);
+        if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
+        {
+            $sourceUrl = 'http://' . $sourceUrl;
+        }
+
+        //Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
+        //https://bugs.php.net/bug.php?id=73754
+        $sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
+
+        // extract information from URL and job data
+        $parts = parse_url($sourceUrl);
+        return (strcmp($parts['scheme'], 'sftp')==0);
+    }
 
 	/**
 	 * @param kAssetsParamsResourceContainers $resource
