@@ -93,6 +93,8 @@ class Partner extends BasePartner
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
+	
+	const ADMIN_ONLY_2FA = 'admin_only_2fa';
  
 	private $cdnWhiteListCache = array();
 
@@ -2185,6 +2187,16 @@ class Partner extends BasePartner
 	public function setAvoidIndexingSearchHistory($v)
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
+	}
+	
+	public function getAdminOnly2fa()
+	{
+		return $this->getFromCustomData(self::ADMIN_ONLY_2FA);
+	}
+	
+	public function setAdminOnly2fa($v)
+	{
+		$this->putInCustomData(self::ADMIN_ONLY_2FA, $v);
 	}
 	
 	public function getSharedStorageProfileId()
