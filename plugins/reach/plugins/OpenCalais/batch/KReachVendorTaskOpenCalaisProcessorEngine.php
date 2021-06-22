@@ -15,6 +15,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
     const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
     const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
     const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
+    const CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME = 'CalaisSelectiveTags';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
     const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
@@ -325,6 +326,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         $apiKey = $this->getOpenCalaisApiKey($partnerId);
         $enableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
         $omitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
+        $calaisSelectiveTags = $this->getCalaisSelectiveTags($partnerId);
         $headers = array (
             "Content-Type: text/xml",
             "charset:utf8",
@@ -339,6 +341,10 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         if($omitOutputtingOriginalText != '')
         {
             $headers[] = "omitOutputtingOriginalText: ". ($omitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
+        }
+        if($calaisSelectiveTags != '')
+        {
+            $headers[] = "x-calais-selectiveTags: $calaisSelectiveTags";
         }
         return $headers;
     }
@@ -384,6 +390,20 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
         if(property_exists($xmlData, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME))
         {
             return (string)$xmlData->OmitOutputtingOriginalText;
+        }
+        return '';
+    }
+    /**
+     * @param $partnerId
+     * @return string
+     * @throws Exception
+     */
+    protected function getCalaisSelectiveTags($partnerId)
+    {
+        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
+        if(property_exists($xmlData, self::CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME))
+        {
+            return (string)$xmlData->CalaisSelectiveTags;
         }
         return '';
     }
