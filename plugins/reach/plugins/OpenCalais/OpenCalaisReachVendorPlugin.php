@@ -36,7 +36,7 @@ class OpenCalaisReachVendorPlugin extends KalturaPlugin implements IKalturaPendi
         if(is_null($baseEnumName))
             return array('OpenCalaisVendorEngineType');
 
-        if($baseEnumName == 'ReachVendorEngineType')
+        if($baseEnumName === 'ReachVendorEngineType')
             return array('OpenCalaisVendorEngineType');
 
         return array();
@@ -73,9 +73,9 @@ class OpenCalaisReachVendorPlugin extends KalturaPlugin implements IKalturaPendi
      */
     public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
     {
-        if ($baseClass == 'KReachVendorTaskProcessorEngine' && $enumValue == KalturaReachVendorEngineType::OPEN_CALAIS)
+        if ($baseClass === 'kReachVendorTaskProcessorEngine' && $enumValue == KalturaReachVendorEngineType::OPEN_CALAIS)
         {
-            return new KReachVendorTaskOpenCalaisProcessorEngine();
+            return new kReachVendorTaskOpenCalaisProcessorEngine();
         }
     }
 

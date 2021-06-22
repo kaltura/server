@@ -6,12 +6,6 @@
 class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 {
 	/**
-	 * @var KalturaCatalogItemLanguage
-	 * @filter eq,in
-	 */
-	public $sourceLanguage;
-	
-	/**
 	 * @var int
 	 */
 	public $flavorParamsId;
@@ -23,7 +17,6 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 
 	private static $map_between_objects = array
 	(
-		'sourceLanguage',
 		'flavorParamsId',
 		'clearAudioFlavorParamsId',
 	);

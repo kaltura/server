@@ -7,7 +7,7 @@ require_once (__DIR__ . DIRECTORY_SEPARATOR . 'RuleEngine.php');
  * @package plugins.openCalaisReachVendor
  * @subpackage batch
  */
-class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcessorEngine
+class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcessorEngine
 {
     const OPEN_CALAIS_URL = 'https://api-eit.refinitiv.com/permid/calais';
 
@@ -588,7 +588,7 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
 
             $this->targetAllMetadataFields[$fieldName] = array();
             $this->targetAllMetadataFields[$fieldName]['type'] = $fieldType;
-            if ($fieldType == 'metadataObjectType')
+            if ($fieldType === 'metadataObjectType')
             {
                 $metadataProfileIdXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/metadataProfileId";
 
@@ -693,6 +693,11 @@ class KReachVendorTaskOpenCalaisProcessorEngine extends KReachVendorTaskProcesso
                 $dynamicObjectMetadataMappingProfileId = $this->getMetadataProfileId(self::OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME);
                 $ocmDynamicObjectMetadataMappingId = $metadataProfile->systemName . self::OPEN_CALAIS_MAPPING_POSTFIX;
                 $mappingDynamicObject = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($dynamicObjectMetadataMappingProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, $ocmDynamicObjectMetadataMappingId);
+                if (!$mappingDynamicObject->totalCount)
+                {
+                    KalturaLog::info("OCM Mapping Object with ID could not be retrieved. Missing object will not be added.");
+                    return false;
+                }
 
                 return $this->createMissingDynamicObject($mappingDynamicObject->objects[0]->xml, $dynamicObjectDetails['fullItem'], $objectId, $metadataProfileId);
 

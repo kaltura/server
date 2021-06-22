@@ -34,9 +34,6 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
      */
     public function run($jobs = null)
     {
-        //retrieve all entry vendor tasks using the response profile.
-        KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
-
         //init filter
         $filter = new KalturaEntryVendorTaskFilter();
         $pager = new KalturaFilterPager();
@@ -44,26 +41,29 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
 
         //Set response profile in order to add the vendor catalog item and/or reach profile to the entry vendor task response.
         $responseProfile = $this->constructResponseProfile();
-        KBatchBase::$kClient->setResponseProfile($responseProfile);
 
-        $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
+	    $handledTasksCounter = 0;
+	    do
+	    {
+		    //retrieve all entry vendor tasks using the response profile.
+		    KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
+		    KBatchBase::$kClient->setResponseProfile($responseProfile);
+		    $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
 
-        if ($response->totalCount == 0)
-        {
-            KalturaLog::info('No jobs found to handle at this time. Exiting');
-            KBatchBase::unimpersonate();
-            return;
-        }
+            if ($response->totalCount == 0)
+            {
+                KalturaLog::info('No jobs found to handle at this time. Exiting');
+                KBatchBase::unimpersonate();
+                return;
+            }
 
-        $handledTasksCounter = 0;
-        while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit) {
             foreach ($response->objects as $entryVendorTask) {
                 /* @var $entryVendorTask KalturaEntryVendorTask */
 
                 //retrieve associated catalog item and retrieve appropriate engine based on the engineType property
                 $catalogItem = $entryVendorTask->relatedObjects[0]->objects[0];
                 /* @var $catalogItem KalturaVendorCatalogItem */
-                $engine = KReachVendorTaskProcessorEngine::getInstance($catalogItem->engineType);
+                $engine = kReachVendorTaskProcessorEngine::getInstance($catalogItem->engineType);
                 if (!$engine)
                 {
                     KalturaLog::info('No engine type found to process entry vendor task ID: ' . $entryVendorTask->id);
@@ -87,10 +87,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
                 }
             }
 
-            KBatchBase::impersonate(KBatchBase::$taskConfig->params->reachInternalVendorPartner);
-            KBatchBase::$kClient->setResponseProfile($responseProfile);
-            $response = $this->reachPlugin->entryVendorTask->getJobs($filter, $pager);
-        }
+        } while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit);
 
         KBatchBase::unimpersonate();
     }
