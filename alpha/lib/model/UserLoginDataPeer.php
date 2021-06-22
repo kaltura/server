@@ -574,7 +574,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		if(is_null($kuser))
 		{
-			$kuser = kuserPeer ::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
 		}
 		
 		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
