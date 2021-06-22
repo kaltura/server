@@ -464,7 +464,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
 		$requestedPartner = $partnerId;
-		$kUser = null;
+		$kuser = null;
 		
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
@@ -520,10 +520,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		//Check if partner ignore OTP for non-admin users
 		if($otpRequired && $partner->getAdminOnly2fa())
 		{
-			$kUser = kuserPeer ::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
-			if ($kUser)
+			$kuser = kuserPeer ::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+			if ($kuser)
 			{
-				$otpRequired = $kUser -> getIsAdmin();
+				$otpRequired = $kuser -> getIsAdmin();
 			}
 		}
 		
@@ -572,19 +572,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
 		}
 
-		if(is_null($kUser))
+		if(is_null($kuser))
 		{
-			$kUser = kuserPeer ::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+			$kuser = kuserPeer ::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
 		}
 		
-		if (!$kUser || $kUser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
 		{
 			// if a specific partner was requested - throw error
 			if ($requestedPartner) {
 				if ($partner && $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE) {
 					throw new kUserException('Partner is blocked', kUserException::USER_IS_BLOCKED);
 				}
-				else if ($kUser && $kUser->getStatus() == KuserStatus::BLOCKED) {
+				else if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
 					throw new kUserException('User is blocked', kUserException::USER_IS_BLOCKED);
 				}
 				else {
@@ -592,14 +592,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				}
 			}
 			
-			// if kUser was found, keep status for following exception message
-			$kuserStatus = $kUser ? $kUser->getStatus() : null;
+			// if kuser was found, keep status for following exception message
+			$kuserStatus = $kuser ? $kuser->getStatus() : null;
 			
 			// if no specific partner was requested, but last logged in partner is not available, login to first found partner
-			$kUser = null;
-			$kUser = self::findFirstValidKuser($loginData->getId(), $partnerId);
+			$kuser = null;
+			$kuser = self::findFirstValidKuser($loginData->getId(), $partnerId);
 			
-			if (!$kUser) {
+			if (!$kuser) {
 				if ($kuserStatus === KuserStatus::BLOCKED) {
 					throw new kUserException('', kUserException::USER_IS_BLOCKED);
 				}
@@ -607,7 +607,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 		}
 
-		return self::setLastLoginFields($loginData, $kUser);
+		return self::setLastLoginFields($loginData, $kuser);
 	}
 
 	public static function loginAttemptsLogic($loginData)
