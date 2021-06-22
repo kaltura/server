@@ -558,6 +558,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Block direct login',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
+		
+		$this->addElement('checkbox', 'admin_only_two_factor_authentication', array(
+			'label'	  => 'Admin only two factor authentication',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+		
 
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
@@ -997,7 +1003,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
 		                                   array('crossLine')), 'security', array('legend' => 'Security'));
-		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login'), array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
+		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'admin_only_two_factor_authentication') ,
+		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
