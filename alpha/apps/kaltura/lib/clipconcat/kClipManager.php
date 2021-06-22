@@ -113,19 +113,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	
 	protected function isConcatOfAllChildrenDone(BatchJob $batchJob)
 	{
-		$parent = $batchJob->getRootJob();
-		$childrenStatus = true;
-		foreach ($parent->getChildJobs() as $job)
+		$root = $batchJob->getRootJob();
+		foreach ($root->getChildJobs() as $job)
 		{
 			/** @var BatchJob $job */
 			KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
 			if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 			{
 				$childrenStatus = false;
-				return $childrenStatus;
+				return false;
 			}
 		}
-		return $childrenStatus;
+		return true;
 	}
 
 	protected function handleImportFinished($rootJob)

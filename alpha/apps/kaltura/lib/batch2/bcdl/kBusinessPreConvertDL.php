@@ -1507,7 +1507,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		return true;
 	}
 
-	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, $originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
+	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, flavorAsset
+	$originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
 	{
 		if(strlen(trim($flavor->getSourceAssetParamsIds())))
 		{

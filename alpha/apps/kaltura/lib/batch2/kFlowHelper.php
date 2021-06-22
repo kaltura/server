@@ -48,7 +48,7 @@ class kFlowHelper
 		return self::createFlavorAsset($partnerId, $entryId, true, array(flavorParams::TAG_SOURCE),flavorParams::SOURCE_FLAVOR_ID, $fileExt);
 	}
 	
-	private static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
+	protected static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
 	                                          $fileExt = null)
 	{
 		$flavorAsset = flavorAsset::getInstance();
