@@ -66,7 +66,20 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	 * @filter eq,in
 	 */
 	public $referenceId;
-
+	
+	
+	/**
+	 * Contains the Id of the event that influences the timing of this event and the offset of time.
+	 * @var KalturaLinkedScheduleEvent
+	 */
+	public $linkedTo;
+	
+	/**
+	 * An array of Schedule Event Ids that their start time depends on the end of the current.
+	 * @var string
+	 */
+	public $linkedBy;
+	
 	/**
 	 * @var KalturaScheduleEventClassificationType
 	 */
@@ -201,6 +214,8 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		'createdAt',
 		'updatedAt',
 		'recurrence',
+	    'linkedBy',
+	    'linkedTo',
 	 );
 		 
 	/* (non-PHPdoc)
@@ -292,19 +307,52 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	{
 		$this->validatePropertyNotNull('recurrenceType');
 		$this->validatePropertyNotNull('summary');
-		$this->validatePropertyNotNull('startDate');
+		if (is_null($this->startDate) && is_null($this->linkedTo))
+		{
+			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_CONFLICT);
+		}
+		if (!is_null($this->startDate) && is_null($this->endtDate))
+		{
+			$this->validatePropertyNotNull('endDate');
+		}
+		if (!is_null($this->linkedTo))
+		{
+			// retrieve relevant event's start time and calculate the current event start and end time
+			$this->validatePropertyNotNull('duration');
+			$this->setTimingFromLinkedToEvent($this->linkedTo->getLinkedByEventId());
+		}
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
 		{
 			$this->validateRecurringEventForInsert();
 		}
-
-		$this->validatePropertyNotNull('endDate');
+		
 		$this->validate($this->startDate, $this->endDate);
 		$maxSingleEventDuration = $this->getSingleScheduleEventMaxDuration();
 		if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
 			throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
 
 		parent::validateForInsert($propertiesToSkip);
+	}
+	
+	protected function setTimingFromLinkedToEvent($linkedToEventId)
+	{
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		/* @var $linkedToEvent BaseScheduleEvent */
+		$this->startDate = $linkedToEvent->getStartDate() + $this->linkedTo->getOffset();
+		$this->endDate = $this->startDate + $this->duration;
+		
+	}
+	
+	public function updateLinkedByEventOfNewFollower($linkedToEventId)
+	{
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		$linkedToEvent->addAnotherLinkedBy($this->id);
+	}
+	
+	protected function removeLinkedByEventOfExistingFollower($linkedToEventId)
+	{
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		$linkedToEvent->removeFromLinkedByArray($this->id);
 	}
 	
 	protected function getSingleScheduleEventMaxDuration()
@@ -350,6 +398,18 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		if (is_null($this->id))
 		{
 			$this->id = $sourceObject->getId();
+		}
+		
+		$linkedTo = $sourceObject->getLinkedTo();
+		if ($this->linkedTo)
+		{
+			$linkedTo = $this->linkedTo;
+			$this->setTimingFromLinkedToEvent($linkedTo->getLinkedByEventId());
+		}
+		elseif (!is_null($linkedTo))
+		{
+			$this->removeLinkedByEventOfExistingFollower($linkedTo->getLinkedByEventId());
+			$linkedTo = null;
 		}
 		
 		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());

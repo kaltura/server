@@ -20,12 +20,72 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	const RESOURCE_PARENT_SEARCH_PERFIX = 'r';
 	const RESOURCES_INDEXED_FIELD_PREFIX = 'pid';
 	
+	
+	/**
+	 * Contains the Id of the event that influences the timing of this event and the offset of time.
+	 * @var     KalturaLinkedScheduleEvent
+	 */
+	public $linked_to;
+	
+	/**
+	 * An array of Schedule Event Ids that their start time depends on the end of the current.
+	 * @var     string
+	 */
+	public $linked_by;
+	
 	public function __construct() 
 	{
 		parent::__construct();
 		$this->applyDefaultValues();
 	}
-
+	
+	
+	public function getLinkedTo()
+	{
+		return $this->linked_to;
+	}
+	
+	public function getLinkedBy()
+	{
+		return $this->linked_by;
+	}
+	
+	public function setLinkedTo($v)
+	{
+		$this->linked_to = $v;
+		return $this;
+	}
+	
+	public function setLinkedByArray($v)
+	{
+		$this->linked_by = $v;
+		return $this;
+	}
+	
+	public function addAnotherLinkedBy($v)
+	{
+		if (!strpos($this->linked_by, $v))
+		{
+			$this->linked_by = $this->linked_by . ',' . $v;
+		}
+		return $v;
+	}
+	
+	public function removeFromLinkedByArray($v)
+	{
+		if (strpos($this->linked_by, $v))
+		{
+			str_replace(',' . $v, '', $this->linked_by);
+		}
+		return $v;
+//		$key = array_search((int) $v, $this->linked_by[]);
+//		if ($key)
+//		{
+//			unset($this->linked_by[$key]);
+//		}
+//		return $v;
+	}
+	
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or equivalent initialization method).
