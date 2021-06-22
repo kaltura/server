@@ -185,6 +185,7 @@ class kReachUtils
 	{
 		$entryVendorTask->setStatus(EntryVendorTaskStatus::ABORTED);
 		$entryVendorTask->setErrDescription('Aborted following cancel request');
+
 		EntryVendorTaskService::tryToSave($entryVendorTask);
 	}
 
