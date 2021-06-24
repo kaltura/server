@@ -94,7 +94,7 @@ class Partner extends BasePartner
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
 	
-	const ADMIN_ONLY_2FA = 'admin_only_2fa';
+	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
  
 	private $cdnWhiteListCache = array();
 
@@ -2189,14 +2189,14 @@ class Partner extends BasePartner
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
 	
-	public function getAdminOnly2fa()
+	public function getTwoFactorAuthenticationMode()
 	{
-		return $this->getFromCustomData(self::ADMIN_ONLY_2FA);
+		return $this->getFromCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE);
 	}
 	
-	public function setAdminOnly2fa($v)
+	public function setTwoFactorAuthenticationMode($v)
 	{
-		$this->putInCustomData(self::ADMIN_ONLY_2FA, $v);
+		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
 	}
 	
 	public function getSharedStorageProfileId()

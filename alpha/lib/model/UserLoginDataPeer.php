@@ -518,12 +518,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		//Check if partner ignore OTP for non-admin users
-		if($otpRequired && $partner->getAdminOnly2fa())
+		if($otpRequired && !$partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ALL)
 		{
-			$kuser = kuserPeer::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 			if ($kuser)
 			{
-				$otpRequired = $kuser -> getIsAdmin();
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
+				{
+					$otpRequired = $kuser->getIsAdmin();
+				}
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
+				{
+					$otpRequired = !$kuser->getIsAdmin();
+				}
 			}
 		}
 		
