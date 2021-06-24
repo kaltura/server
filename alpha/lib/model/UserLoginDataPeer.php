@@ -515,18 +515,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			$otpRequired = true;
 		}
-		if($otpRequired && !$partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ALL)
+		if($otpRequired && !$partner->getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::ALL)
 		{
-			$kuser = kuserPeer ::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 			if ($kuser)
 			{
-				if ($partner -> getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
+				if ($partner->getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
 				{
-					$otpRequired = $kuser -> getIsAdmin();
+					$otpRequired = $kuser->getIsAdmin();
 				}
-				if ($partner -> getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
+				if ($partner->getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
 				{
-					$otpRequired = !$kuser -> getIsAdmin();
+					$otpRequired = !$kuser->getIsAdmin();
 				}
 			}
 		}
