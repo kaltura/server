@@ -517,7 +517,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$otpRequired = true;
 		}
 		
-		if($otpRequired && !$partner->getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::ALL)
+		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
 		{
 			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 			if ($kuser)
