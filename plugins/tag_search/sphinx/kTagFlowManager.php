@@ -17,7 +17,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     {
     	if (! ($object instanceof categoryEntry))
     	{
-        	self::decrementExistingTagsInstanceCount($object->getTags(), $object->getPartnerId(), get_class($object));  
+        	self::decrementExistingTagsInstanceCount($object->getTags(), $object->getPartnerId(), get_class($object));
     	}
     	else 
     	{
@@ -192,7 +192,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    {
 	        return;
 	    }
-	    
+
 	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
 		if (!is_null($privacyContexts))
 		{
@@ -206,7 +206,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		TagPeer::setUseCriteriaFilter(false);
 	    $foundTagObjects = TagPeer::doSelect($c);
 	    TagPeer::setUseCriteriaFilter(true);
-	    
+
 	    if (!$foundTagObjects || !count($foundTagObjects))
 	    {
 	        $tagsToAdd = array();
@@ -216,22 +216,26 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 				$tagsToAdd[$tag] = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
 			}
 	        return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
-	    	
+
 	    }
-	    
+
 	    $foundTagsToPc = array();
 		$tagsToAdd = array();
-		
+        $time = (new DateTime())->format('Y-m-d H:i:s');
+        kTagFlowManager::updateInstanceCountList($foundTagObjects,$time,true);
 	    foreach ($foundTagObjects as $foundTag)
 	    {
 	    	/* @var $foundTag Tag */
-	        $foundTag->incrementInstanceCount();
+//            $foundTag->incrementInstanceCount();
+            $foundTag->setInstanceCount($foundTag->getInstanceCount()+1);
+            $foundTag->setUpdatedAt($time);
+	        $foundTag->indexToSearchIndex();
 	        if (!isset($foundTagsToPc[$foundTag->getTag()]))
 	        {
 	        	$foundTagsToPc[$foundTag->getTag()] = array();
-	        }	
+	        }
 	        $foundTagsToPc[$foundTag->getTag()][] = $foundTag->getPrivacyContext();
-	      	
+
 	    }
         foreach (array_diff($objectTags, array_keys($foundTagsToPc)) as $missingTag)
         {
@@ -254,15 +258,57 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
 
 	}
-	
-	
-	/**
-	 * Decrements instance count of tags found on a deleted object
-	 * @param string $tagsToCheck
-	 * @param int $partnerId
-	 * @param string $objectClass
-	 * @param array $privacyContexts
-	 */
+
+
+    private static function updateInstanceCountList(array $foundTagObjects, $time, $toIncrement)
+    {
+        $foundTagIds = array();
+        try {
+            $connection = Propel::getConnection();
+            foreach ($foundTagObjects as $tag)
+            {
+                array_push($foundTagIds,$tag->getId());
+            }
+            $idsString= "('".implode( "','",$foundTagIds)."')";
+            if($toIncrement==true)
+            {
+                $updateSql = "update tag set instance_count=instance_count+1 , updated_at = '".$time."' where id in ".$idsString.";";
+            }
+            else
+            {
+                $updateSql = "update tag set instance_count=instance_count-1 , updated_at = '".$time."' where id in ".$idsString."and instance_count>0;";
+            }
+            $stmt = $connection->prepare($updateSql);
+            $stmt->execute();
+            }
+        catch (PropelException $e)
+        {
+            KalturaLog::err($e);
+        }
+    }
+
+    /**
+     * @param array $foundTagObjects
+     */
+    private static function decrementTagsInstanceCountIndex(array $foundTagObjects)
+    {
+        $time = (new DateTime())->format('Y-m-d H:i:s');
+        kTagFlowManager::updateInstanceCountList($foundTagObjects,$time,false);
+        foreach ($foundTagObjects as $foundTag)
+        {
+            $foundTag->setInstanceCount(max($foundTag->getInstanceCount()-1,0));
+            $foundTag->setUpdatedAt($time);
+            $foundTag->indexToSearchIndex();
+        }
+    }
+
+    /**
+     * Decrements instance count of tags found on a deleted object
+     * @param string $tagsToCheck
+     * @param int $partnerId
+     * @param string $objectClass
+     * @param array $privacyContexts
+     */
 	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, $privacyContexts = null)
 	{
 	    $objectTags = self::trimObjectTags($tagsToCheck);
@@ -285,12 +331,10 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		TagPeer::setUseCriteriaFilter(false);
 		$tagsToDecrement = TagPeer::doSelect($c);
 		TagPeer::setUseCriteriaFilter(true);
-		foreach ($tagsToDecrement as $tag)
-		{
-			/* @var $tag Tag */
-			$tag->decrementInstanceCount();
-		}
-	
+		if(count($tagsToDecrement))
+        {
+            self:: decrementTagsInstanceCountIndex($tagsToDecrement);
+        }
 	}
 	 
 	/**
@@ -316,7 +360,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    	}
 	    }
 	}
-	
+
 	/**
 	 * Get class name and returns the class's enum
 	 * @param string $className
