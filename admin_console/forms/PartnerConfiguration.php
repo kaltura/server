@@ -560,12 +560,11 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$twoFactorAuthenticationMode = array (
-			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ALL => 'All',
+			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ALL => 'On all users',
 			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ADMIN_USERS_ONLY => 'Admin users only',
 			Kaltura_Client_Enum_TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY => 'Non admin users only'
 		);
 		$this->addElement('select', 'two_factor_authentication_mode', array(
-			'label' => 'two factor authentication mode',
 			'filters' => array('StringTrim')));
 		$this->getElement('two_factor_authentication_mode')->setMultiOptions($twoFactorAuthenticationMode);
 		
