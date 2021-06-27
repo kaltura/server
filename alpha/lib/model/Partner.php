@@ -93,7 +93,9 @@ class Partner extends BasePartner
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
- 
+	
+	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2187,6 +2189,16 @@ class Partner extends BasePartner
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
 	
+	public function getTwoFactorAuthenticationMode()
+	{
+		return $this->getFromCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE);
+	}
+	
+	public function setTwoFactorAuthenticationMode($v)
+	{
+		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
+	}
+
 	public function getSharedStorageProfileId()
 	{
 		$sharedStorageId = null;

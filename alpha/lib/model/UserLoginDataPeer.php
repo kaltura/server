@@ -467,10 +467,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
-		}		
+		}
 		
 		// check if password is valid
-		if ($validatePassword && !$loginData->isPasswordValid($password)) 
+		if ($validatePassword && !$loginData->isPasswordValid($password))
 		{
 			return self::loginAttemptsLogic($loginData);
 		}
@@ -481,7 +481,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		//Check if the user's ip address is in the right range to ignore the otp
 		$otpRequired = false;
-		if(kConf::hasParam ('otp_required_partners') && 
+		if(kConf::hasParam ('otp_required_partners') &&
 			in_array ($partnerId, kConf::get ('otp_required_partners')) &&
 			kConf::hasParam ('partner_otp_internal_ips'))
 		{
@@ -511,11 +511,28 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
 		}
+		
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
 			$otpRequired = true;
 		}
-
+		
+		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
+		{
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+			if ($kuser)
+			{
+				if ($partner->getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
+				{
+					$otpRequired = $kuser->getIsAdmin();
+				}
+				if ($partner->getTwoFactorAuthenticationMode() == TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
+				{
+					$otpRequired = !$kuser->getIsAdmin();
+				}
+			}
+		}
+		
 		if ($otpRequired)
 		{
 			if(!$otp)
