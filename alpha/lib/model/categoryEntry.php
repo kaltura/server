@@ -81,7 +81,6 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		categoryPeer::setUseCriteriaFilter(true);
 		if(!$category)
 			throw new kCoreException('category id [' . $this->getCategoryId() . 'was not found', kCoreException::ID_NOT_FOUND);
-			
 		$entry = entryPeer::retrieveByPK($this->getEntryId());
 		if(!$entry && $this->getStatus() != CategoryEntryStatus::DELETED)
 			throw new kCoreException('entry id [' . $this->getEntryId() . 'was not found', kCoreException::ID_NOT_FOUND);
@@ -143,9 +142,11 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 				$category->decrementPendingEntriesCount();
 		}
 		$category->save();
-		
 		if($entry && !categoryEntryPeer::getSkipSave())
+		{
+			$entry->reload();
 			$entry->indexToSearchIndex();
+		}
 	}
 	
 	private function setEntryOnCategory(category $category, $entry = null)
