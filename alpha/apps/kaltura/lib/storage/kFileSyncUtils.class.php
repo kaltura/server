@@ -1189,7 +1189,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
         }
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
-		return $fileSync;
+
+        return $fileSync;
 	}
 
 	/**
