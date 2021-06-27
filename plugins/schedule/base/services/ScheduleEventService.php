@@ -42,10 +42,6 @@ class ScheduleEventService extends KalturaBaseService
 
 		// return the saved object
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
-		if (!is_null($scheduleEvent->linkedTo))
-		{
-			$scheduleEvent->updateLinkedByEventOfNewFollower($scheduleEvent->linkedTo->getLinkedByEventId());
-		}
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
 		return $scheduleEvent;
 
@@ -193,7 +189,7 @@ class ScheduleEventService extends KalturaBaseService
 		}
 
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::DELETED);
-		$eventToUnlinkId = $dbScheduleEvent->getLinkedTo()->getLinkedByEventId();
+		$eventToUnlinkId = $dbScheduleEvent->getLinkedTo()->getEventId();
 		if(isset($eventToUnlinkId))
 		{
 			$eventToUnlink = ScheduleEventPeer::retrieveByPK($eventToUnlinkId);

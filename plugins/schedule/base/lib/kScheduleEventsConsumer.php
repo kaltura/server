@@ -7,6 +7,10 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
             return true;
         if ($object instanceof ScheduleEventResource )
             return true;
+		if ($object instanceof ScheduleEvent)
+		{
+			return true;
+		}
 
         return false;
     }
@@ -15,17 +19,33 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
     {
         if ($object instanceof categoryEntry)
             return true;
+		if ($object instanceof ScheduleEvent)
+		{
+			return true;
+		}
 
         return false;
     }
 
     public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
     {
-        if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
+		if ($object instanceof ScheduleEvent && in_array(ScheduleEventPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), array(ScheduleEventStatus::DELETED, ScheduleEventStatus::CANCELLED)))
+		{
+			return true;
+		}
+		
+    	if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
             return true;
-
-        if ($object instanceof ScheduleEvent && in_array(ScheduleEventPeer::STATUS, $modifiedColumns) && in_array($object->getStatus(), array(ScheduleEventStatus::DELETED, ScheduleEventStatus::CANCELLED)))
-            return true;
+        
+		if ($object instanceof ScheduleEvent && in_array(ScheduleEventPeer::END_DATE, $modifiedColumns))
+		{
+			return true;
+		}
+	// Unlink use case
+		if ($object instanceof ScheduleEvent && in_array(ScheduleEventPeer::CUSTOM_DATA, $modifiedColumns))
+		{
+			return true;
+		}
 
         return false;
     }
@@ -34,6 +54,10 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
     {
         if ($object instanceof ScheduleEventResource)
             return true;
+		if ($object instanceof ScheduleEvent)
+		{
+			return true;
+		}
         return false;
     }
 
@@ -58,6 +82,10 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
     {
         if ($object instanceof categoryEntry)
             $this->reindexScheduleEvents($object->getEntryId());
+		if ($object instanceof ScheduleEvent)
+		{
+			$this->scheduleEventChanged($object);
+		}
 
         return true;
     }
@@ -72,6 +100,10 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
             $this->reindexScheduleEvents($object->getEntryId());
         elseif ($object instanceof ScheduleEventResource)
             $this->updateScheduleEvent($object->getEventId());
+		elseif ($object instanceof ScheduleEvent && !is_null($object->getLinkedTo()))
+		{
+			$object->addLinkedByEventOfNewFollower($object->getLinkedTo()->getEventId());
+		}
 
         return true;
     }
@@ -83,7 +115,11 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
     {
         if ($object instanceof ScheduleEventResource)
             $this->updateScheduleEvent($object->getEventId());
-
+	
+		if ($object instanceof ScheduleEvent)
+		{
+			$this->scheduleEventChanged($object);
+		}
         return true;
     }
 
@@ -120,7 +156,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
         }
     }
 
-    protected function scheduleEventChanged(ScheduleEvent $scheduleEvent, $modifiedColumns)
+    protected function scheduleEventChanged(ScheduleEvent $scheduleEvent, $modifiedColumns = null)
     {
         if (in_array($scheduleEvent->getStatus(), array(ScheduleEventStatus::DELETED, ScheduleEventStatus::CANCELLED)))
         {
@@ -132,7 +168,44 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
                  */
                 $currScheduleEvent->delete();
             }
-        }
-    }
+			if ($scheduleEvent->getLinkedTo() && !is_null($scheduleEvent->getLinkedTo()->getEventId()))
+			{
+				$scheduleEvent->removeCurrentEventFromPrecedingEvent();
+			}
+			if ($scheduleEvent->getLinkedBy())
+			{
+				$scheduleEvent->unlinkFollowerEvents();
+			}
+		}
+		if ($modifiedColumns)
+		{
+			if (in_array(ScheduleEventPeer::END_DATE, $modifiedColumns))
+			{
+				//update start & end date for all linked by events
+				$scheduleEvent->updateStartEndTimeOfFollowerEvents();
+				if ($scheduleEvent->getLinkedTo() && $scheduleEvent->getLinkedTo()->getEventId())
+				{
+					$linkedToStartDate = $scheduleEvent->getLinkedToEndTime();
+					$offset = $scheduleEvent->getLinkedTo()->getOffset();
+					if (strtotime($scheduleEvent->getStartDate()) != strtotime($linkedToStartDate) + $offset)
+					{
+						$scheduleEvent->removeCurrentEventFromPrecedingEvent();
+						$scheduleEvent->setLinkedTo(null);
+						$scheduleEvent->save();
+					}
+				}
+			}
+			if (in_array(ScheduleEventPeer::CUSTOM_DATA, $modifiedColumns) && in_array(ScheduleEventPeer::UPDATED_AT, $modifiedColumns))
+			{
+				$oldCustomData = $scheduleEvent->getCustomDataOldValues();
+				if ($scheduleEvent->getLinkedTo() && is_null($scheduleEvent->getLinkedTo()->getEventId()) &&
+					(array_key_exists('linkedTo', $oldCustomData['']) && !is_null($oldCustomData['']['linkedTo']->getEventId())))
+				{
+					$scheduleEvent->removeCurrentEventFromPrecedingEvent($oldCustomData['']['linkedTo']->getEventId());
+				}
+			}
+		}
+	}
+	
 
 }

@@ -20,70 +20,26 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	const RESOURCE_PARENT_SEARCH_PERFIX = 'r';
 	const RESOURCES_INDEXED_FIELD_PREFIX = 'pid';
 	
+	const CUSTOM_DATA_FIELD_LINKED_TO = 'linkedTo';
+	const CUSTOM_DATA_FIELD_LINKED_BY = 'linkedBy';
 	
-	/**
-	 * Contains the Id of the event that influences the timing of this event and the offset of time.
-	 * @var     KalturaLinkedScheduleEvent
-	 */
-	public $linked_to;
 	
-	/**
-	 * An array of Schedule Event Ids that their start time depends on the end of the current.
-	 * @var     string
-	 */
-	public $linked_by;
+//	/**
+//	 * Contains the Id of the event that influences the timing of this event and the offset of time.
+//	 * @var kLinkedScheduleEvent
+//	 */
+//	public $linked_to;
+//
+//	/**
+//	 * An array of Schedule Event Ids that their start time depends on the end of the current.
+//	 * @var string
+//	 */
+//	public $linked_by;
 	
 	public function __construct() 
 	{
 		parent::__construct();
 		$this->applyDefaultValues();
-	}
-	
-	
-	public function getLinkedTo()
-	{
-		return $this->linked_to;
-	}
-	
-	public function getLinkedBy()
-	{
-		return $this->linked_by;
-	}
-	
-	public function setLinkedTo($v)
-	{
-		$this->linked_to = $v;
-		return $this;
-	}
-	
-	public function setLinkedByArray($v)
-	{
-		$this->linked_by = $v;
-		return $this;
-	}
-	
-	public function addAnotherLinkedBy($v)
-	{
-		if (!strpos($this->linked_by, $v))
-		{
-			$this->linked_by = $this->linked_by . ',' . $v;
-		}
-		return $v;
-	}
-	
-	public function removeFromLinkedByArray($v)
-	{
-		if (strpos($this->linked_by, $v))
-		{
-			str_replace(',' . $v, '', $this->linked_by);
-		}
-		return $v;
-//		$key = array_search((int) $v, $this->linked_by[]);
-//		if ($key)
-//		{
-//			unset($this->linked_by[$key]);
-//		}
-//		return $v;
 	}
 	
 	/**
@@ -220,6 +176,106 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function getRecurrence()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE);
+	}
+	
+	public function getLinkedTo()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_TO);
+	}
+	
+	public function getLinkedBy()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
+	}
+	
+	public function setLinkedTo($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_TO, $v);
+	}
+	
+	public function setLinkedByString($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $v);
+	}
+	
+	public function addAnotherLinkedBy($v)
+	{
+		$linkedByString = $this->getLinkedBy();
+		if (!strpos($linkedByString, $v))
+		{
+			$linkedByString = $linkedByString . $v . ',';
+			$this->removeFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
+			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
+		}
+	}
+	
+	public function removeFromLinkedByArray($v)
+	{
+		$linkedByString = $this->getLinkedBy();
+		if (strpos($linkedByString, strval($v) . ',') !== false)
+		{
+			$linkedByString = str_replace(strval($v) . ',', '', $linkedByString);
+			$this->removeFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
+			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
+		}
+	}
+	
+	public function addLinkedByEventOfNewFollower($linkedToEventId)
+	{
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		$linkedToEvent->addAnotherLinkedBy($this->id);
+		$linkedToEvent->save();
+	}
+	
+	public function updateStartEndTimeOfFollowerEvents()
+	{
+		$linkedByEventIds = explode(',', $this->getLinkedBy());
+			foreach ($linkedByEventIds as $linkedByEventId)
+			{
+			//update start & end date for all linked by events
+				if($linkedByEventId == '') continue;
+				$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+				$linkedEvent->setStartDate(strtotime($this->getEndDate()) + $linkedEvent->getLinkedTo()->getOffset());
+				$linkedEvent->setEndDate(strtotime($linkedEvent->getStartDate()) + $linkedEvent->getDuration());
+				$linkedEvent->save();
+			}
+		
+	}
+	
+	public function getOffset()
+	{
+		return $this->getLinkedTo()->getOffset();
+	}
+	
+	public function unlinkFollowerEvents()
+	{
+		$linkedByEventIds = explode(',', $this->getLinkedBy());
+		foreach ($linkedByEventIds as $linkedByEventId)
+		{
+			if($linkedByEventId == '') continue;
+			$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+			$linkedEvent->setLinkedTo(null);
+			$linkedEvent->save();
+		}
+		
+	}
+	
+	public function removeCurrentEventFromPrecedingEvent($linkedToEventId = null)
+	{
+		if (is_null($linkedToEventId))
+		{
+			$linkedToEventId = $this->getLinkedTo()->getEventId();
+		}
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		$linkedToEvent->removeFromLinkedByArray($this->getId());
+		$linkedToEvent->save();
+	}
+	
+	public function getLinkedToEndTime()
+	{
+		$linkedToEventId = $this->getLinkedTo()->getEventId();
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		return $linkedToEvent->getEndDate();
 	}
 	
 	/**
