@@ -1182,10 +1182,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$fileSync->save();
 
 		if ($fileSync->getObjectType() == FileSyncObjectType::ASSET &&
-            $fileSync->getObjectSubType() == asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET &&
-            $fileSync->getFileSize())
+			$fileSync->getObjectSubType() == asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET &&
+			$fileSync->getFileSize())
 		{
-		    self::setSizeInBytesOnAsset($fileSync);
+			self::setSizeInBytesOnAsset($fileSync);
 		}
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($fileSync));
