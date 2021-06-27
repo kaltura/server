@@ -559,12 +559,16 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
 		
-		$this->addElement('checkbox', 'admin_only_two_factor_authentication', array(
-			'label'	  => 'Admin only two factor authentication',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
-		));
+		$twoFactorAuthenticationMode = array (
+			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ALL => 'All',
+			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ADMIN_USERS_ONLY => 'Admin users only',
+			Kaltura_Client_Enum_TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY => 'Non admin users only'
+		);
+		$this->addElement('select', 'two_factor_authentication_mode', array(
+			'label' => 'two factor authentication mode',
+			'filters' => array('StringTrim')));
+		$this->getElement('two_factor_authentication_mode')->setMultiOptions($twoFactorAuthenticationMode);
 		
-
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
@@ -1003,7 +1007,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
 		                                   array('crossLine')), 'security', array('legend' => 'Security'));
-		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'admin_only_two_factor_authentication') ,
+		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'two_factor_authentication_mode') ,
 		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 
