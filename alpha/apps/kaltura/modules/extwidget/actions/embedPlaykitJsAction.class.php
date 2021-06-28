@@ -518,7 +518,7 @@ class embedPlaykitJsAction extends sfAction
 		$uiconfs_content = isset($uiConfs) ? array_values($uiConfs) : null;
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
-        $productVersion = isset($last_uiconf_content) ? $this->getProductVersionFromUiConf($last_uiconf_content->getConfVars()) : null;
+		$productVersion = isset($last_uiconf_content) ? $this->getProductVersionFromUiConf($last_uiconf_content->getConfVars()) : null;
 		return array($last_uiconf_config, $productVersion);
 	}
 
@@ -629,20 +629,20 @@ class embedPlaykitJsAction extends sfAction
 
 
 		} else {
-            $productVersion = isset($this->uiConf) ? $this->getProductVersionFromUiConf($this->uiConf->getHtml5Url()) : null;
-            if($productVersion != null)
-            {
-                $this->setProductVersion($this->playerConfig, $productVersion);
-            }
-        }
+			$productVersion = isset($this->uiConf) ? $this->getProductVersionFromUiConf($this->uiConf->getHtml5Url()) : null;
+			if($productVersion != null)
+			{
+				$this->setProductVersion($this->playerConfig, $productVersion);
+			}
+		}
 	}
 
-    private function getProductVersionFromUiConf($productVersionString)
-    {
-        $productVersionJson = isset($productVersionString) ? json_decode($productVersionString) : null;
-        $productVersion = $productVersionJson ? $productVersionJson->version : null;
-        return $productVersion;
-    }
+	private function getProductVersionFromUiConf($productVersionString)
+	{
+		$productVersionJson = isset($productVersionString) ? json_decode($productVersionString) : null;
+		$productVersion = $productVersionJson ? $productVersionJson->version : null;
+		return $productVersion;
+	}
 
 	private function initMembers()
 	{
