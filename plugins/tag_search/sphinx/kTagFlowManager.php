@@ -183,81 +183,73 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param string $tagsForUpdate
      * @param int $partnerId
      * @param string $objectClass
+     */
+    public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = array(self::NULL_PC))
+    {
+        if (empty($tagsForUpdate))
+        {
+            return;
+        }
+        $objectTags = self::trimObjectTags($tagsForUpdate);
+        $foundTagObjects =  kTagFlowManager::getFoundTags($objectTags, $partnerId, $objectClass,$privacyContexts);
+        $tagsToAddList = kTagFlowManager::getTagsToAdd($foundTagObjects,$objectTags,$privacyContexts);
+        if(count($tagsToAddList))
+        {
+            self::addTags($tagsToAddList, self::getObjectTypeByClassName($objectClass), $partnerId);
+        }
+        if(count($foundTagObjects))
+        {
+            self::updateTagsInstanceCount($foundTagObjects,true);
+        }
+    }
+
+    /**
+     * @param array $objectTags
+     * @param int $partnerId
+     * @param string $objectClass
+     * @param array $privacyContexts
      * @return array
      */
-	public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = null)
-	{
-	    $objectTags = self::trimObjectTags($tagsForUpdate);
-	    if (!count($objectTags))
-	    {
-	        return;
-	    }
-
-	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
-		if (!is_null($privacyContexts))
-		{
-			if (count($privacyContexts))
-				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
-			}
-		else
-		{
-			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
-		}
-		TagPeer::setUseCriteriaFilter(false);
-	    $foundTagObjects = TagPeer::doSelect($c);
-	    TagPeer::setUseCriteriaFilter(true);
-
-	    if (!$foundTagObjects || !count($foundTagObjects))
-	    {
-	        $tagsToAdd = array();
-			foreach ($objectTags as $tag)
-			{
-				$tagsToAdd[$tag] = array();
-				$tagsToAdd[$tag] = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
-			}
-	        return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
-
-	    }
-
-	    $foundTagsToPc = array();
-		$tagsToAdd = array();
-        $time = (new DateTime())->format('Y-m-d H:i:s');
-        kTagFlowManager::updateInstanceCountList($foundTagObjects,$time,true);
-	    foreach ($foundTagObjects as $foundTag)
-	    {
-	    	/* @var $foundTag Tag */
-//            $foundTag->incrementInstanceCount();
-            $foundTag->setInstanceCount($foundTag->getInstanceCount()+1);
-            $foundTag->setUpdatedAt($time);
-	        $foundTag->indexToSearchIndex();
-	        if (!isset($foundTagsToPc[$foundTag->getTag()]))
-	        {
-	        	$foundTagsToPc[$foundTag->getTag()] = array();
-	        }
-	        $foundTagsToPc[$foundTag->getTag()][] = $foundTag->getPrivacyContext();
-
-	    }
-        foreach (array_diff($objectTags, array_keys($foundTagsToPc)) as $missingTag)
+    private static function getFoundTags(array $objectTags, $partnerId, $objectClass,array $privacyContexts)
+    {
+        $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
+        if(count($privacyContexts))
         {
-        	$missingPrivacyContexts = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
-        	//If the tag itself is missing from the DB, we must add it with all the specified privacy contexts
-        	$tagsToAdd[$missingTag] = $missingPrivacyContexts;
+            $c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
         }
-        if (!is_null($privacyContexts) && count($privacyContexts))
+        TagPeer::setUseCriteriaFilter(false);
+        $foundTagObjects = TagPeer::doSelect($c);
+        TagPeer::setUseCriteriaFilter(true);
+        return $foundTagObjects;
+    }
+
+    /**
+     * @param array $foundTagObjects
+     * @param array $objectTags
+     * @param array $privacyContexts
+     * @return array
+     */
+    private static function getTagsToAdd (array $foundTagObjects , array $objectTags, array $privacyContexts)
+    {
+        $privacyContextByTag = array();
+        foreach ($foundTagObjects as $tag)
         {
-	        foreach ($foundTagsToPc as $tag=>$foundPrivacyContexts)
-	        {
-	        	$missingPrivacyContexts = array_diff($privacyContexts, $foundPrivacyContexts);
-	        	if (!is_null($missingPrivacyContexts) && count($missingPrivacyContexts))
-	        	{
-	        		$tagsToAdd [$tag] = $missingPrivacyContexts;
-	        	}
-	        }
+            $tagName = $tag->getTag();
+            $privacyContextByTag[$tagName][] = $tag->getPrivacyContext();
         }
-
-	    return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
-
-	}
+        $tagsToAddList = array();
+        foreach ($objectTags as $tag)
+        {
+            foreach ($privacyContexts ? $privacyContexts : array(self::NULL_PC) as $privacyContext)
+            {
+                if(!isset($privacyContextByTag[$tag])||!in_array($privacyContext,$privacyContextByTag[$tag]))
+                {
+                    $tagsToAddList[$tag][] = $privacyContext;
+                }
+            }
+        }
+        return $tagsToAddList;
+    }
 
 
     private static function updateInstanceCountList(array $foundTagObjects, $time, $toIncrement)
@@ -287,16 +279,24 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         }
     }
 
+
     /**
      * @param array $foundTagObjects
      */
-    private static function decrementTagsInstanceCountIndex(array $foundTagObjects)
+    private static function updateTagsInstanceCount(array $foundTagObjects,$toIncrement)
     {
         $time = (new DateTime())->format('Y-m-d H:i:s');
-        kTagFlowManager::updateInstanceCountList($foundTagObjects,$time,false);
+        kTagFlowManager::updateInstanceCountList($foundTagObjects,$time,$toIncrement);
         foreach ($foundTagObjects as $foundTag)
         {
-            $foundTag->setInstanceCount(max($foundTag->getInstanceCount()-1,0));
+            if($toIncrement)
+            {
+                $foundTag->setInstanceCount($foundTag->getInstanceCount()+1);
+            }
+            else
+            {
+                $foundTag->setInstanceCount(max($foundTag->getInstanceCount()-1,0));
+            }
             $foundTag->setUpdatedAt($time);
             $foundTag->indexToSearchIndex();
         }
@@ -316,24 +316,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    {
 	        return;
 	    }
-		$c = self::getTagObjectsByTagStringsCriteria($objectTags,  self::getObjectTypeByClassName($objectClass), $partnerId);
-		if (!is_null($privacyContexts))
-		{
-			if (count($privacyContexts))
-				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
-		}
-		else
-		{
-			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
-		}
-		$c->addGroupByColumn(TagPeer::PRIVACY_CONTEXT);
-
-		TagPeer::setUseCriteriaFilter(false);
-		$tagsToDecrement = TagPeer::doSelect($c);
+		$tagsToDecrement = self::getFoundTags($objectTags, $partnerId, $objectClass, $privacyContexts);
 		TagPeer::setUseCriteriaFilter(true);
 		if(count($tagsToDecrement))
         {
-            self:: decrementTagsInstanceCountIndex($tagsToDecrement);
+            self:: updateTagsInstanceCount($tagsToDecrement,false);
         }
 	}
 	 
