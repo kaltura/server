@@ -309,7 +309,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param string $objectClass
      * @param array $privacyContexts
      */
-	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, $privacyContexts = null)
+	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, array $privacyContexts = array(self::NULL_PC))
 	{
 	    $objectTags = self::trimObjectTags($tagsToCheck);
 	 	if (!count($objectTags))
