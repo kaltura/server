@@ -186,13 +186,13 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = array(self::NULL_PC))
     {
-        if (empty($tagsForUpdate))
-        {
-            return;
-        }
-        $objectTags = self::trimObjectTags($tagsForUpdate);
-        $foundTagObjects =  kTagFlowManager::getFoundTags($objectTags, $partnerId, $objectClass,$privacyContexts);
-        $tagsToAddList = kTagFlowManager::getTagsToAdd($foundTagObjects,$objectTags,$privacyContexts);
+	    $objectTags = self::trimObjectTags($tagsForUpdate);
+	    if (!count($objectTags))
+	    {
+		    return;
+	    }
+        $foundTagObjects =  self::getFoundTags($objectTags, $partnerId, $objectClass,$privacyContexts);
+        $tagsToAddList = self::getTagsToAdd($foundTagObjects,$objectTags,$privacyContexts);
         if(count($tagsToAddList))
         {
             self::addTags($tagsToAddList, self::getObjectTypeByClassName($objectClass), $partnerId);
@@ -213,7 +213,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     private static function getFoundTags(array $objectTags, $partnerId, $objectClass,array $privacyContexts)
     {
         $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
-        if(count($privacyContexts))
+        if (count($privacyContexts))
         {
             $c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
         }
@@ -234,8 +234,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         $privacyContextByTag = array();
         foreach ($foundTagObjects as $tag)
         {
-            $tagName = $tag->getTag();
-            $privacyContextByTag[$tagName][] = $tag->getPrivacyContext();
+            $privacyContextByTag[$tag->getTag()][] = $tag->getPrivacyContext();
         }
         $tagsToAddList = array();
         foreach ($objectTags as $tag)
@@ -259,9 +258,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             $connection = Propel::getConnection();
             foreach ($foundTagObjects as $tag)
             {
-                array_push($foundTagIds,$tag->getId());
+	            $foundTagIds[]=$tag->getId();
             }
-            $idsString= "('".implode( "','",$foundTagIds)."')";
+            $idsString= "(".implode( ",",$foundTagIds).")";
             if($toIncrement==true)
             {
                 $updateSql = "update tag set instance_count=instance_count+1 , updated_at = '".$time."' where id in ".$idsString.";";
@@ -286,7 +285,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     private static function updateTagsInstanceCount(array $foundTagObjects,$toIncrement)
     {
         $time = (new DateTime())->format('Y-m-d H:i:s');
-        kTagFlowManager::updateInstanceCountList($foundTagObjects,$time,$toIncrement);
+        self::updateInstanceCountList($foundTagObjects,$time,$toIncrement);
         foreach ($foundTagObjects as $foundTag)
         {
             if($toIncrement)
