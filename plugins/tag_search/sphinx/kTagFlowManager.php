@@ -237,15 +237,21 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             $privacyContextByTag[$tag->getTag()][] = $tag->getPrivacyContext();
         }
         $tagsToAddList = array();
-        foreach ($objectTags as $tag)
+	    $privacyContexts = $privacyContexts  ? $privacyContexts : array(self::NULL_PC);
+	    foreach ($objectTags as $tag)
         {
-            foreach ($privacyContexts ? $privacyContexts : array(self::NULL_PC) as $privacyContext)
-            {
-                if(!isset($privacyContextByTag[$tag])||!in_array($privacyContext,$privacyContextByTag[$tag]))
-                {
-                    $tagsToAddList[$tag][] = $privacyContext;
-                }
-            }
+	        if(!isset($privacyContextByTag[$tag]))
+	        {
+		        $tagsToAddList[$tag] = $privacyContexts;
+	        }
+	        else
+	        {
+		        $privacyContextsDiff = array_diff($privacyContexts,$privacyContextByTag[$tag]);
+		        if(count($privacyContextsDiff))
+		        {
+			        $tagsToAddList[$tag] = $privacyContextsDiff;
+		        }
+	        }
         }
         return $tagsToAddList;
     }
