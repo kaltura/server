@@ -176,7 +176,7 @@ class embedPlaykitJsAction extends sfAction
 		$confNS = ($confNS || {});
 		";
 
-        $versionMap = $this->bundleConfig;
+		$versionMap = $this->bundleConfig;
 		if ($kalturaPlayerVersion == self::LATEST ||
 			$kalturaPlayerVersion == self::BETA ||
 			$kalturaPlayerVersion == self::CANARY) {
