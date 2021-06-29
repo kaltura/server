@@ -27,7 +27,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
-	const NO_UICONF_FOR_KALTURA_DATA = '1.8.0';
+	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -175,13 +175,17 @@ class embedPlaykitJsAction extends sfAction
 		$content .= "
 		$confNS = ($confNS || {});
 		";
-		$kalturaPlayerVersion = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : $this->bundleConfig[self::KALTURA_TV_PLAYER];
-		// For player latest/beta/canary or >= 1.8.0
+
+        $versionMap = $this->bundleConfig;
 		if ($kalturaPlayerVersion == self::LATEST ||
 			$kalturaPlayerVersion == self::BETA ||
-			$kalturaPlayerVersion == self::CANARY ||
-			version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0)
-		{
+			$kalturaPlayerVersion == self::CANARY) {
+			$versionMap = $this->getConfigByVersion($kalturaPlayerVersion);
+		}
+
+		$kalturaPlayerVersion = isset($versionMap[self::KALTURA_OVP_PLAYER]) ? $versionMap[self::KALTURA_OVP_PLAYER] : $versionMap[self::KALTURA_TV_PLAYER];
+		// For player latest/beta/canary or >= 1.9.0
+		if (version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0) {
 			$content .= "$confNS=$uiConfJson;";
 		} else {
 			$content .= "$confNS.UIConf = ($confNS.UIConf||{}); $confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;";
