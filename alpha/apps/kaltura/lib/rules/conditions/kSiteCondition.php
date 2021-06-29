@@ -62,7 +62,9 @@ class kSiteCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		return ($field === $value) || (kString::endsWith($field, ".".$value) !== false);
+		KalturaLog::debug("kSiteCondition - checks if the field [$field] is aligns with the domain value [$value]");
+//		return ($field === $value) || (kString::endsWith($field, ".".$value) !== false);
+		return ($field === $value) || (strpos($field, ".".$value) !== false);
 	}
 
 	/* (non-PHPdoc)
