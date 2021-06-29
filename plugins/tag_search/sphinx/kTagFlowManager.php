@@ -189,7 +189,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
 	    if (!count($objectTags))
 	    {
-		    return;
+	    	return;
 	    }
 	    $foundTagObjects = self::getFoundTags($objectTags, $partnerId, $objectClass, $privacyContexts);
 	    $tagsToAddList = self::getTagsToAdd($foundTagObjects, $objectTags, $privacyContexts);
