@@ -307,11 +307,19 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	{
 		$this->validatePropertyNotNull('recurrenceType');
 		$this->validatePropertyNotNull('summary');
-		if (is_null($this->startDate) && is_null($this->linkedTo) || !is_null($this->startDate) && !is_null($this->linkedTo))
+		if (is_null($this->startDate) && is_null($this->linkedTo))
 		{
 			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_CONFLICT);
 		}
-		if (!is_null($this->startDate) && is_null($this->endtDate))
+		if (!is_null($this->startDate) && !is_null($this->linkedTo))
+		{
+			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_NOT_SET);
+		}
+		if (!is_null($this->linkedTo) && $this->recurrenceType != KalturaScheduleEventRecurrenceType::NONE)
+		{
+			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LIKED_EVENT_CONFLICT);
+		}
+		if (!is_null($this->startDate))
 		{
 			$this->validatePropertyNotNull('endDate');
 		}
@@ -334,16 +342,20 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
-	protected function setTimingFromLinkedToEvent($linkedToEventId)
+	protected function setTimingFromLinkedToEvent($linkedToEventId, $duration)
 	{
 		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
 		/* @var $linkedToEvent BaseScheduleEvent */
 		if($linkedToEvent)
 		{
 			$this->startDate = strtotime($linkedToEvent->getEndDate()) + $this->linkedTo->getOffset();
-			$this->endDate = $this->startDate + $this->duration;
+			$duration = $this->duration ? $this->duration : $duration;
+			$this->endDate = $this->startDate + $duration;
 		}
-		
+		else
+		{
+			throw new KalturaAPIException(KalturaScheduleErrors::LINKED_TO_EVENT_NOT_FOUND_OR_NOT_ACCESSIBLE);
+		}
 	}
 	
 	protected function getSingleScheduleEventMaxDuration()
@@ -398,12 +410,16 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		}
 		elseif ($this->linkedTo)
 		{
-			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId());
+			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId(), $sourceObject->getDuration());
 			if ($this->startDate && $this->endDate)
 			{
 				$startDate = $this->startDate;
 				$endDate = $this->endDate;
 			}
+		}
+		if ((!is_null($this->linkedTo) || $sourceObject->getLinkedTo()) && $this->recurrenceType != KalturaScheduleEventRecurrenceType::NONE)
+		{
+			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LIKED_EVENT_CONFLICT);
 		}
 		
 		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());

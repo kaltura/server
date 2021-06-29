@@ -201,7 +201,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function addAnotherLinkedBy($v)
 	{
 		$linkedByString = $this->getLinkedBy();
-		if (!strpos($linkedByString, $v))
+		if (strpos($linkedByString, strval($v)) === false)
 		{
 			$linkedByString = $linkedByString . $v . ',';
 			$this->removeFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
