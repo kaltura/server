@@ -24,17 +24,6 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	const CUSTOM_DATA_FIELD_LINKED_BY = 'linkedBy';
 	
 	
-//	/**
-//	 * Contains the Id of the event that influences the timing of this event and the offset of time.
-//	 * @var kLinkedScheduleEvent
-//	 */
-//	public $linked_to;
-//
-//	/**
-//	 * An array of Schedule Event Ids that their start time depends on the end of the current.
-//	 * @var string
-//	 */
-//	public $linked_by;
 	
 	public function __construct() 
 	{
@@ -200,22 +189,27 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 	public function addAnotherLinkedBy($v)
 	{
-		$linkedByString = $this->getLinkedBy();
-		if (strpos($linkedByString, strval($v)) === false)
+		$linkedByArray = explode(',', $this->getLinkedBy());
+		if (!in_array($v, $linkedByArray))
+//		if (strpos($linkedByString, strval($v)) === false)
 		{
-			$linkedByString = $linkedByString . $v . ',';
-			$this->removeFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
+			$linkedByArray[] = $v;
+			$linkedByString = implode(',', $linkedByArray);
+//			$linkedByString = $linkedByString . $v . ',';
 			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
 		}
 	}
 	
 	public function removeFromLinkedByArray($v)
 	{
-		$linkedByString = $this->getLinkedBy();
-		if (strpos($linkedByString, strval($v) . ',') !== false)
+//		$linkedByString = $this->getLinkedBy();
+		$linkedByArray = explode(',', $this->getLinkedBy());
+//		if (strpos($linkedByString, strval($v) . ',') !== false)
+		if ($key = array_search($v, $linkedByArray) !== false)
 		{
-			$linkedByString = str_replace(strval($v) . ',', '', $linkedByString);
-			$this->removeFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
+			unset($linkedByArray[$key]);
+			$linkedByString = implode(',', $linkedByArray);
+//			$linkedByString = str_replace(strval($v) . ',', '', $linkedByString);
 			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
 		}
 	}
@@ -223,6 +217,11 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function addLinkedByEventOfNewFollower($linkedToEventId)
 	{
 		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		if (!$linkedToEvent)
+		{
+			KalturaLog::err("Event $linkedToEventId not found");
+			return;
+		}
 		$linkedToEvent->addAnotherLinkedBy($this->id);
 		$linkedToEvent->save();
 	}
@@ -233,8 +232,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 			foreach ($linkedByEventIds as $linkedByEventId)
 			{
 			//update start & end date for all linked by events
-				if($linkedByEventId == '') continue;
+				if(trim($linkedByEventId) == '')
+				{
+					continue;
+				}
 				$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+				if (!$linkedEvent)
+				{
+					KalturaLog::err("Event $linkedByEventId not found");
+					continue;
+				}
 				$linkedEvent->setStartDate(strtotime($this->getEndDate()) + $linkedEvent->getLinkedTo()->getOffset());
 				$linkedEvent->setEndDate(strtotime($linkedEvent->getStartDate()) + $linkedEvent->getDuration());
 				$linkedEvent->save();
@@ -252,21 +259,30 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		$linkedByEventIds = explode(',', $this->getLinkedBy());
 		foreach ($linkedByEventIds as $linkedByEventId)
 		{
-			if($linkedByEventId == '') continue;
+			if(trim($linkedByEventId) == '')
+			{
+				continue;
+			}
 			$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+			if (!$linkedEvent)
+			{
+				KalturaLog::err("Event $linkedByEventId not found");
+				continue;
+			}
 			$linkedEvent->setLinkedTo(null);
 			$linkedEvent->save();
 		}
 		
 	}
 	
-	public function removeCurrentEventFromPrecedingEvent($linkedToEventId = null)
+	public function removeCurrentEventFromPrecedingEvent($linkedToEventId)
 	{
-		if (is_null($linkedToEventId))
-		{
-			$linkedToEventId = $this->getLinkedTo()->getEventId();
-		}
 		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		if (!$linkedToEvent)
+		{
+			KalturaLog::err("Event $linkedToEventId not found");
+			return;
+		}
 		$linkedToEvent->removeFromLinkedByArray($this->getId());
 		$linkedToEvent->save();
 	}
@@ -275,6 +291,11 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		$linkedToEventId = $this->getLinkedTo()->getEventId();
 		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		if (!$linkedToEvent)
+		{
+			KalturaLog::err("Event $linkedToEventId not found");
+			return;
+		}
 		return $linkedToEvent->getEndDate();
 	}
 	

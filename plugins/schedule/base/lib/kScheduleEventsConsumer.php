@@ -176,56 +176,70 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 	{
 		if (in_array($scheduleEvent->getStatus(), array(ScheduleEventStatus::DELETED, ScheduleEventStatus::CANCELLED)))
 		{
-			$scheduleEvents = ScheduleEventResourcePeer::retrieveByEventId($scheduleEvent->getId());
-			foreach ($scheduleEvents as $currScheduleEvent)
-			{
-				/**
-				 * @var ScheduleEventResource $currScheduleEvent
-				 */
-				$currScheduleEvent->delete();
-			}
-			if ($scheduleEvent->getLinkedTo() && !is_null($scheduleEvent->getLinkedTo()->getEventId()))
-			{
-				$scheduleEvent->removeCurrentEventFromPrecedingEvent();
-			}
-			if ($scheduleEvent->getLinkedBy())
-			{
-				$scheduleEvent->unlinkFollowerEvents();
-			}
+			$this->scheduleEventChangedEventDeletedOrCanceled($scheduleEvent, $modifiedColumns);
 		}
 		if ($modifiedColumns)
 		{
 			if (in_array(ScheduleEventPeer::END_DATE, $modifiedColumns))
 			{
-				//update start & end date for all linked by events
-				$scheduleEvent->updateStartEndTimeOfFollowerEvents();
-				if ($scheduleEvent->getLinkedTo() && $scheduleEvent->getLinkedTo()->getEventId())
-				{
-					$linkedToStartDate = $scheduleEvent->getLinkedToEndTime();
-					$offset = $scheduleEvent->getLinkedTo()->getOffset();
-					if (strtotime($scheduleEvent->getStartDate()) != strtotime($linkedToStartDate) + $offset)
-					{
-						$scheduleEvent->removeCurrentEventFromPrecedingEvent();
-						$scheduleEvent->setLinkedTo(null);
-						$scheduleEvent->save();
-					}
-				}
+				$this->scheduleEventChangedEndDateChanged($scheduleEvent, $modifiedColumns);
 			}
-			if (in_array(ScheduleEventPeer::CUSTOM_DATA, $modifiedColumns) && in_array(ScheduleEventPeer::UPDATED_AT, $modifiedColumns))
+			if (in_array(ScheduleEventPeer::CUSTOM_DATA, $modifiedColumns))
 			{
-				$oldCustomData = $scheduleEvent->getCustomDataOldValues();
-				if ($scheduleEvent->getLinkedTo() && is_null($scheduleEvent->getLinkedTo()->getEventId()) &&
-					(array_key_exists('linkedTo', $oldCustomData['']) && !is_null($oldCustomData['']['linkedTo']->getEventId())))
-				{
-					$scheduleEvent->removeCurrentEventFromPrecedingEvent($oldCustomData['']['linkedTo']->getEventId());
-				}
-				if ($scheduleEvent->getLinkedTo() && $scheduleEvent->getLinkedTo()->getEventId())
-				{
-					$scheduleEvent->addLinkedByEventOfNewFollower($scheduleEvent->getLinkedTo()->getEventId());
-				}
+				$this->scheduleEventChangedLinkedToChanged($scheduleEvent, $modifiedColumns);
 			}
 		}
 	}
 	
+	protected function scheduleEventChangedEventDeletedOrCanceled(ScheduleEvent $scheduleEvent, $modifiedColumns = null)
+	{
+		$scheduleEvents = ScheduleEventResourcePeer::retrieveByEventId($scheduleEvent->getId());
+		foreach ($scheduleEvents as $currScheduleEvent)
+		{
+			/**
+			 * @var ScheduleEventResource $currScheduleEvent
+			 */
+			$currScheduleEvent->delete();
+		}
+		if ($scheduleEvent->getLinkedTo() && !is_null($scheduleEvent->getLinkedTo()->getEventId()))
+		{
+			$scheduleEvent->removeCurrentEventFromPrecedingEvent($scheduleEvent->getLinkedTo()->getEventId());
+		}
+		if ($scheduleEvent->getLinkedBy())
+		{
+			$scheduleEvent->unlinkFollowerEvents();
+		}
+	}
+	
+	protected function scheduleEventChangedEndDateChanged(ScheduleEvent $scheduleEvent, $modifiedColumns = null)
+	{
+		//update start & end date for all linked by events
+		$scheduleEvent->updateStartEndTimeOfFollowerEvents();
+		if ($scheduleEvent->getLinkedTo() && $scheduleEvent->getLinkedTo()->getEventId())
+		{
+			$linkedToStartDate = $scheduleEvent->getLinkedToEndTime();
+			$offset = $scheduleEvent->getLinkedTo()->getOffset();
+			if (strtotime($scheduleEvent->getStartDate()) != strtotime($linkedToStartDate) + $offset)
+			{
+				$scheduleEvent->removeCurrentEventFromPrecedingEvent();
+				$scheduleEvent->setLinkedTo(null);
+				$scheduleEvent->save();
+			}
+		}
+	}
+	
+	protected function scheduleEventChangedLinkedToChanged(ScheduleEvent $scheduleEvent, $modifiedColumns = null)
+	{
+		$oldCustomData = $scheduleEvent->getCustomDataOldValues();
+		if ($scheduleEvent->getLinkedTo() && is_null($scheduleEvent->getLinkedTo()->getEventId()) &&
+			(array_key_exists('linkedTo', $oldCustomData['']) && !is_null($oldCustomData['']['linkedTo']->getEventId())))
+		{
+			$scheduleEvent->removeCurrentEventFromPrecedingEvent($oldCustomData['']['linkedTo']->getEventId());
+		}
+		if ($scheduleEvent->getLinkedTo() && $scheduleEvent->getLinkedTo()->getEventId())
+		{
+			$scheduleEvent->addLinkedByEventOfNewFollower($scheduleEvent->getLinkedTo()->getEventId());
+		}
+	}
 
 }

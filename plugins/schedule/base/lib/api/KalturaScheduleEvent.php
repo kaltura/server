@@ -309,15 +309,15 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		$this->validatePropertyNotNull('summary');
 		if (is_null($this->startDate) && is_null($this->linkedTo))
 		{
-			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_CONFLICT);
+			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_NOT_SET);
 		}
 		if (!is_null($this->startDate) && !is_null($this->linkedTo))
 		{
-			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_NOT_SET);
+			throw new KalturaAPIException(KalturaScheduleErrors::START_TIME_AND_LINKED_TO_CONFLICT);
 		}
 		if (!is_null($this->linkedTo) && $this->recurrenceType != KalturaScheduleEventRecurrenceType::NONE)
 		{
-			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LIKED_EVENT_CONFLICT);
+			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LINKED_EVENT_CONFLICT);
 		}
 		if (!is_null($this->startDate))
 		{
@@ -342,19 +342,22 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
-	protected function setTimingFromLinkedToEvent($linkedToEventId, $duration)
+	protected function setTimingFromLinkedToEvent($linkedToEventId, $duration = null)
 	{
-		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
-		/* @var $linkedToEvent BaseScheduleEvent */
-		if($linkedToEvent)
+		if (!is_null($linkedToEventId)) //if it is null we are unlinking
 		{
-			$this->startDate = strtotime($linkedToEvent->getEndDate()) + $this->linkedTo->getOffset();
-			$duration = $this->duration ? $this->duration : $duration;
-			$this->endDate = $this->startDate + $duration;
-		}
-		else
-		{
-			throw new KalturaAPIException(KalturaScheduleErrors::LINKED_TO_EVENT_NOT_FOUND_OR_NOT_ACCESSIBLE);
+			$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+			/* @var $linkedToEvent BaseScheduleEvent */
+			if ($linkedToEvent)
+			{
+				$this->startDate = strtotime($linkedToEvent->getEndDate()) + $this->linkedTo->getOffset();
+				$duration = $this->duration?$this->duration:$duration;
+				$this->endDate = $this->startDate + $duration;
+			}
+			else
+			{
+				throw new KalturaAPIException(KalturaScheduleErrors::LINKED_TO_EVENT_NOT_FOUND_OR_NOT_ACCESSIBLE);
+			}
 		}
 	}
 	
