@@ -184,23 +184,23 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param int $partnerId
      * @param string $objectClass
      */
-    public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = array(self::NULL_PC))
+    public static function addOrIncrementTags($tagsForUpdate, $partnerId, $objectClass, $privacyContexts = array(self::NULL_PC))
     {
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
 	    if (!count($objectTags))
 	    {
 		    return;
 	    }
-        $foundTagObjects =  self::getFoundTags($objectTags, $partnerId, $objectClass,$privacyContexts);
-        $tagsToAddList = self::getTagsToAdd($foundTagObjects,$objectTags,$privacyContexts);
-        if(count($tagsToAddList))
-        {
-            self::addTags($tagsToAddList, self::getObjectTypeByClassName($objectClass), $partnerId);
-        }
-        if(count($foundTagObjects))
-        {
-            self::updateTagsInstanceCount($foundTagObjects,true);
-        }
+	    $foundTagObjects = self::getFoundTags($objectTags, $partnerId, $objectClass, $privacyContexts);
+	    $tagsToAddList = self::getTagsToAdd($foundTagObjects, $objectTags, $privacyContexts);
+	    if (count($tagsToAddList))
+	    {
+		    self::addTags($tagsToAddList, self::getObjectTypeByClassName($objectClass), $partnerId);
+	    }
+	    if (count($foundTagObjects))
+	    {
+		    self::updateTagsInstanceCount($foundTagObjects, true);
+	    }
     }
 
     /**
@@ -352,7 +352,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    	}
 	    }
 	}
-
+	
 	/**
 	 * Get class name and returns the class's enum
 	 * @param string $className
