@@ -184,7 +184,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param int $partnerId
      * @param string $objectClass
      */
-    public static function addOrIncrementTags($tagsForUpdate, $partnerId, $objectClass, $privacyContexts = array(self::NULL_PC))
+    public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, $privacyContexts = array(self::NULL_PC))
     {
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
 	    if (!count($objectTags))
