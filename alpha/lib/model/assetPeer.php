@@ -831,20 +831,4 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		
 		return assetPeer::doSelect($c);
 	}
-	
-	/**
-	 * @param string $entryId
-	 * @return flavorAsset
-	 */
-	public static function retrieveConcatSourceByEntryId($entryId)
-	{
-		$c = new Criteria();
-		$c->add(assetPeer::ENTRY_ID, $entryId);
-		$newCriterion = $c->getNewCriterion(assetPeer::FRAME_RATE,0, Criteria::NOT_EQUAL);
-		$c->add($newCriterion);
-		$c->add(assetPeer::FLAVOR_PARAMS_ID, 0);
-		
-		return assetPeer::doSelectOne($c);
-	}
-	
 }
