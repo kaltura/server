@@ -27,6 +27,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
+	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -173,8 +174,14 @@ class embedPlaykitJsAction extends sfAction
 		$confNS = "window.__kalturaplayerdata";
 		$content .= "
 		$confNS = ($confNS || {});
-		$confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
 		";
+
+		$kalturaPlayerVersion = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : $this->bundleConfig[self::KALTURA_TV_PLAYER];
+		if (version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0) {
+			$content .= "$confNS=$uiConfJson;";
+		} else {
+			$content .= "$confNS.UIConf = ($confNS.UIConf||{}); $confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;";
+		}
 		return $content;
 	}
 
