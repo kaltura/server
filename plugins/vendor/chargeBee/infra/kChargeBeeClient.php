@@ -31,13 +31,10 @@ class kChargeBeeClient
 		$this->siteApiKey = $siteApiKey;
 	}
 
-	public function createSubscription($planId, $autoCollection, $customerFirstName, $customerLastName, $customerEmail,
-								   $billingFirstName, $billingLastName, $line1, $city, $state, $zip, $country)
+	public function createSubscription($planId, $autoCollection, $firstName, $lastName, $email)
 	{
 		$apiPath = self::API_CREATE_SUBSCRIPTION;
-		$apiPath .= '?plan_id=' . $planId . '&auto_collection=' . $autoCollection . '&customer[first_name]=' . $customerFirstName . '&customer[last_name]=' . $customerLastName
-			. '&customer[email]=' . $customerEmail . '&billing_address[first_name]=' . $billingFirstName . '&billing_address[last_name]=' . $billingLastName . '&billing_address[line1]=' . $line1
-			. '&billing_address[city]=' . $city . '&billing_address[state]=' . $state. '&billing_address[zip]=' . $zip. '&billing_address[country]=' . $country;
+		$apiPath .= '?plan_id=' . $planId . '&auto_collection=' . $autoCollection . '&customer[first_name]=' . $firstName . '&customer[last_name]=' . $lastName . '&customer[email]=' . $email;
 		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
 		return $this->callChargeBee($apiPath, $options);
 	}
@@ -48,10 +45,10 @@ class kChargeBeeClient
 		return $this->callChargeBee($apiPath);
 	}
 	
-	public function updateFreeTrial($customerId, $amount, $description)
+	public function updateFreeTrial($subscriptionId, $amount, $description)
 	{
 		$apiPath = self::API_UPDATE_FREE_TRIAL;
-		$apiPath .= '?customer_id=' . $customerId . '&amount=' . $amount . '&description=' . $description;
+		$apiPath .= '?customer_id=' . $subscriptionId . '&amount=' . $amount . '&description=' . $description;
 		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
 		return $this->callChargeBee($apiPath, $options);
 	}
@@ -65,7 +62,7 @@ class kChargeBeeClient
 	}
 	
 	
-	public function updateInvoice($invoiceId, $chargesAmount, $chargesDescription)
+	public function estimateInvoice($invoiceId, $chargesAmount, $chargesDescription)
 	{
 		$apiPath = self::API_UPDATE_INVOICE;
 		$apiPath .= '?invoice[customer_id]=' . $invoiceId . '&charges[amount][0]=' . $chargesAmount . '&charges[description][0]=' . $chargesDescription;
