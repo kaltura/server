@@ -5,7 +5,7 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 	function __construct()
 	{
 		parent::__construct();
-		$this->DEFAULT_RENDERER_CLASS = 'kDashRedirectManifestRenderer';
+		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 	}
 	
 	public function checkIsLive($url)
