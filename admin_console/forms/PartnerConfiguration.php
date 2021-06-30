@@ -198,8 +198,14 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	=> 'Avoid indexing search history ',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
-
-
+		
+		
+		$this->addElement('checkbox', 'avoid_indexing_search_history', array(
+			'label'	=> 'Avoid indexing search history ',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+		
+		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
 			'decorators'	=> array('ViewHelper'),

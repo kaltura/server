@@ -461,6 +461,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $secondarySecretRoleId;
 	
+	/**
+	 * @var int
+	 */
+	public $trigramPercentage;
+	
+	/**
+	 * @var int
+	 */
+	public $maxWordForNgram;
 	
 	
 	private static $map_between_objects = array
@@ -550,6 +559,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
+		'trigramPercentage',
+		'maxWordForNgram'
 	);
 
 	public function getMapBetweenObjects()
