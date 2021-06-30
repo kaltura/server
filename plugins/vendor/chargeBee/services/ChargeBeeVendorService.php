@@ -111,6 +111,62 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$chargeBeeVendorIntegration->fromObject($dbChargeBeeVendorIntegration, $this->getResponseProfile());
 		return $chargeBeeVendorIntegration;
 	}
+	
+	
+	/**
+	 * Handle notifications from ChargeBee
+	 *
+	 * @action handle
+	 * @return KalturaChargeBeeVendorIntegration
+	 * @throws KalturaChargeBeeErrors::CHARGE_BEE_VENDOR_INTEGRATION_NOT_FOUND
+	 */
+	public function handleNotificationAction()
+	{
+		if (!isset($_SERVER['PHP_AUTH_USER']) or !isset($_SERVER['PHP_AUTH_PW']))
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
+		}
+		
+		$chargeBeeConfiguration = self::getChargeBeeConfiguration();
+		if (!isset($chargeBeeConfiguration['user']) or !isset($chargeBeeConfiguration['password']))
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_USER_PASSWORD_CONFIGURATION);
+		}
+		
+		if ($_SERVER['PHP_AUTH_USER'] != $chargeBeeConfiguration['user'] or $_SERVER['PHP_AUTH_PW'] != $chargeBeeConfiguration['password'])
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
+		}
+		
+		$eventType = $this->getPostData();
+	}
+	
+	protected function getPostData()
+	{
+		$data = json_decode(file_get_contents('php://input'));
+		
+		if (!isset($data) or !isset($data->event_type))
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
+		}
+		$eventType = $data->event_type;
+		if ($eventType == 'payment_source_added')
+		{
+			return $eventType;
+		}
+		else if ($eventType == 'payment_failed')
+		{
+			return $eventType;
+		}
+		else if ($eventType == 'subscription_trial_end_reminder')
+		{
+			return $eventType;
+		}
+		else
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
+		}
+	}
 
 	/**
 	 * @return array
