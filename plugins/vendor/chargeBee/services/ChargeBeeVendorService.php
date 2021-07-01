@@ -116,7 +116,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 	/**
 	 * Handle notifications from ChargeBee
 	 *
-	 * @action handle
+	 * @action handleNotification
 	 * @return KalturaChargeBeeVendorIntegration
 	 * @throws KalturaChargeBeeErrors::CHARGE_BEE_VENDOR_INTEGRATION_NOT_FOUND
 	 */
@@ -130,7 +130,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$chargeBeeConfiguration = self::getChargeBeeConfiguration();
 		if (!isset($chargeBeeConfiguration['user']) or !isset($chargeBeeConfiguration['password']))
 		{
-			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_USER_PASSWORD_CONFIGURATION);
+			throw new KalturaAPIException(KalturaChargeBeedErrors::MISSING_USER_PASSWORD_CONFIGURATION);
 		}
 		
 		if ($_SERVER['PHP_AUTH_USER'] != $chargeBeeConfiguration['user'] or $_SERVER['PHP_AUTH_PW'] != $chargeBeeConfiguration['password'])
