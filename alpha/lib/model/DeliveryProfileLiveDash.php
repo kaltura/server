@@ -16,17 +16,7 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 			return false;
 		}
 		
-		$mediaUrls = $this->getDashUrls($content);
-		foreach($mediaUrls as $mediaUrl)
-		{
-			$mediaUrl = requestUtils::resolve($mediaUrl, $url);
-			if($this->urlExists($mediaUrl, array('audio/mp4', 'video/mp4'), '0-1') !== false)
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		return $this->doesMinimumUpdatePeriodExist($content);
 	}
 
 	protected function getHttpUrl($entryServerNode)
@@ -37,23 +27,13 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 	
 	/**
 	 * @param string $content
-	 * @return array
+	 * @return bool
 	 */
-	protected function getDashUrls($content)
+	protected function doesMinimumUpdatePeriodExist($content)
 	{
 		$xml = new SimpleXMLElement($content);
-		$mediaItems = $xml->xpath('//*[@media]');
-		if(!count($mediaItems))
-			return array();
-		
-		$mediaUrls = array();
-		foreach($mediaItems as $mediaItem)
-		{
-			/* @var $mediaItem SimpleXMLElement */
-			$mediaUrls[] = strval($mediaItem->attributes()->media);
-		}
-		
-		return $mediaUrls;
+		$minimumUpdatePeriod = $xml->xpath('//*[@minimumUpdatePeriod]');
+		return $minimumUpdatePeriod ? true : false;
 	}
 }
 
