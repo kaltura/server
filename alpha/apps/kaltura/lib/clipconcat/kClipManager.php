@@ -125,6 +125,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		return true;
 	}
+	
+	protected function getAllConcatJobsFlavors(BatchJob  $batchJob)
+	{
+		$root = $batchJob->getRootJob();
+		$flavors = array();
+		foreach ($root->getChildJobs() as $job)
+		{
+			/** @var BatchJob $job */
+			if ($job->getJobType() == BatchJobType::CONCAT)
+			{
+				$flavors[] = assetPeer::retrieveById($job->getData()->getFlavorAssetId());
+			}
+		}
+		return $flavors;
+	}
 
 	protected function handleImportFinished($rootJob)
 	{
@@ -611,16 +626,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	private function concatDone(BatchJob $batchJob)
 	{
-		/** @var kConcatJobData $concatJobData */
-		$concatJobData = $batchJob->getParentJob()->getData();
-		$concatAsset = assetPeer::retrieveById($concatJobData->getFlavorAssetId());
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		$this -> addDestinationEntryAsset($clipConcatJobData->getDestEntryId(), $concatAsset);
 		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 		if ($this->isConcatOfAllChildrenDone($batchJob))
 		{
-			$this -> deleteEntry($clipConcatJobData->getTempEntryId());
+			$destinationEntry = $clipConcatJobData->getDestEntryId();
+			$listOfFlavorAssets = $this->getAllConcatJobsFlavors($batchJob);
+			//collect all assets from temp entry and add them to the dest entry
+			foreach ($listOfFlavorAssets as $flavorAsset)
+			{
+				$this->addDestinationEntryAsset($destinationEntry, $flavorAsset);
+			}
+			$this->deleteEntry($clipConcatJobData->getTempEntryId());
 		}
 	}
 	
@@ -786,7 +804,4 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return false;
 	}
 	
-
-
-
 }
