@@ -32,7 +32,7 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 	protected function doesMinimumUpdatePeriodExist($content)
 	{
 		$xml = new SimpleXMLElement($content);
-		$minimumUpdatePeriod = $xml->xpath('//*[@minimumUpdatePeriod]');
+		$minimumUpdatePeriod = $xml->attributes()->minimumUpdatePeriod;
 		return $minimumUpdatePeriod ? true : false;
 	}
 }
