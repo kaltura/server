@@ -461,6 +461,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $secondarySecretRoleId;
 	
+	/**
+	 * @var KalturaTwoFactorAuthenticationMode
+	 */
+	public $twoFactorAuthenticationMode;
 	
 	
 	private static $map_between_objects = array
@@ -550,6 +554,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
+		'twoFactorAuthenticationMode'
 	);
 
 	public function getMapBetweenObjects()

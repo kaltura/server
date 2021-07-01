@@ -401,16 +401,12 @@ class kPexipUtils
 	}
 
 	/**
-	 * @param $result
 	 * @param $url
-	 * @param $headerSize
-	 * @return null
+	 * @param $headerData
+	 * @return int|null
 	 */
-	public static function extractIdFromCreatedResult($result,$url ,$headerSize)
+	protected static function getVirtualRoomId($url, $headerData)
 	{
-		$header = substr($result, 0, $headerSize);
-		$headerData = explode('\n', $header);
-		KalturaLog::info('Checking Headers ' . print_r($headerData, true));
 		$locationPattern = "(?<=Location: $url)(.*)(?=/)";
 		$locationPattern = str_replace('/', '\/', $locationPattern);
 		foreach ($headerData as $part)
@@ -423,8 +419,31 @@ class kPexipUtils
 				return $virtualRoomId;
 			}
 		}
-		KalturaLog::info('Could not extract ID from headers');
+
+		KalturaLog::info("Could not extract ID from headers with url: $url");
 		return null;
+	}
+
+	/**
+	 * @param $result
+	 * @param $url
+	 * @param $headerSize
+	 * @return int|null
+	 */
+	public static function extractIdFromCreatedResult($result, $url ,$headerSize)
+	{
+		$header = substr($result, 0, $headerSize);
+		$headerData = explode('\n', $header);
+		KalturaLog::info('Checking Headers ' . print_r($headerData, true));
+		$virtualRoomId = self::getVirtualRoomId($url, $headerData);
+		if (is_null($virtualRoomId))
+		{
+			// Try to match the path only without the full url as a fallback
+			$url=parse_url($url,PHP_URL_PATH);
+			$virtualRoomId = self::getVirtualRoomId($url, $headerData);
+		}
+		
+		return $virtualRoomId;
 	}
 
 	/**
