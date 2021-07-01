@@ -95,7 +95,7 @@ class Partner extends BasePartner
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
 	
 	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
-	
+ 
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2198,7 +2198,7 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
 	}
-
+	
 	public function getSharedStorageProfileId()
 	{
 		$sharedStorageId = null;

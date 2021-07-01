@@ -285,6 +285,10 @@ class ZoomHelper
 		$recordingFilesOrdered = array();
 		foreach($recordingFiles as $recordingFile)
 		{
+			if(!isset($recordingFile[$recordingType]))
+			{
+				continue;
+			}
 			if(!isset($recordingFilesOrdered[$recordingFile[$recordingStart]]))
 			{
 				$recordingFilesOrdered[$recordingFile[$recordingStart]] = array();
