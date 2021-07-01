@@ -553,7 +553,21 @@ class kJobsManager
 			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-			
+			if($parentJob)
+			{
+				try
+				{
+					$temp_storage = kConf::get('temp_storage', 'cloud_storage' , "no_temp_storage");
+					if($parentJob->getJobType()== BatchJobType::CLIP_CONCAT && $temp_storage!="no_temp_storage"){
+						$sharedPath = str_replace($root,$temp_storage,$sharedPath);
+					};
+				}
+				catch (Exception $ex)
+				{
+					KalturaLog::err($ex);
+				}
+				
+			}
 			$convertData->setDestFileSyncSharedPath($sharedPath);
 		}
 		
