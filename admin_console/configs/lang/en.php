@@ -1442,6 +1442,7 @@ return array(
     'Kaltura_Client_Enum_VideoCodec::VP6' => 'VP6',
     'Kaltura_Client_Enum_VideoCodec::VP8' => 'VP8',
     'Kaltura_Client_Enum_VideoCodec::VP9' => 'VP9',
+    'Kaltura_Client_Enum_VideoCodec::AV1' => 'AV1',
     'Kaltura_Client_Enum_VideoCodec::WMV2' => 'WMV2',
     'Kaltura_Client_Enum_VideoCodec::WMV3' => 'WMV3',
     'Kaltura_Client_Enum_VideoCodec::WVC1A' => 'WVC1A',

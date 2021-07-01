@@ -33,9 +33,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	 * @var kZoomClient
 	 */
 	protected $zoomClient;
-	
-	protected static $lastHandledMeetingTime;
-	
+
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->zoomClient = $this->initZoomClient($dropFolder);
@@ -46,23 +44,38 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		if ($meetingFilesOrdered)
 		{
 			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap);
+			$lastHandledMeetingTime = $this->getLastHandledMeetingTime($meetingFilesOrdered);
+			if(($this->dropFolder->lastHandledMeetingTime >= $lastHandledMeetingTime) && ($lastHandledMeetingTime + self::ONE_DAY <= time()))
+			{
+				$lastHandledMeetingTime += self::ONE_DAY;
+			}
+			self::updateDropFolderLastMeetingHandled($lastHandledMeetingTime);
 		}
 		else
 		{
 			KalturaLog::info('No new files to handle at this time');
+			if ($this->dropFolder->lastHandledMeetingTime + self::ONE_DAY <= time())
+			{
+				self::updateDropFolderLastMeetingHandled($this->dropFolder->lastHandledMeetingTime + self::ONE_DAY);
+			}
 		}
 		
 		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
 		{
 			$this->handleExistingDropFolderFile($dropFolderFile);
 		}
-		
-		if (self::$lastHandledMeetingTime)
-		{
-			self::updateDropFolderLastMeetingHandled(self::$lastHandledMeetingTime);
-		}
 	}
-	
+
+	protected function getLastHandledMeetingTime($meetingFilesOrdered)
+	{
+		$lastMeeting = end($meetingFilesOrdered);
+		$lastHandledMeetingTime = self::convertTimeToUnix($lastMeeting[self::START_TIME]);
+		KalturaLog::info('Last meeting is: '. print_r($lastMeeting, true));
+		KalturaLog::info('Last handled meeting time from DF is: '. $this->dropFolder->lastHandledMeetingTime);
+		KalturaLog::info('Last meeting time'. $lastHandledMeetingTime);
+		return $lastHandledMeetingTime;
+	}
+
 	protected function initZoomClient(KalturaDropFolder $dropFolder)
 	{
 		$jwtToken = isset($dropFolder->jwtToken) ? $dropFolder->jwtToken : null;
@@ -185,7 +198,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 							{
 								$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 							}
-							self::$lastHandledMeetingTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
 						}
 					}
 					else

@@ -29,5 +29,6 @@ class KalturaVideoCodec extends KalturaStringEnum
 	const DV = "dv";
 	const VP9 = "vp9";
 	const H265 = "h265";
+	const AV1  = "AV1";
 	const COPY = "copy";
 }
