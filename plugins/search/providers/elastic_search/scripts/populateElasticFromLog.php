@@ -188,8 +188,9 @@ while (true)
 				$command = $elasticLog->getSql();
 				$command = unserialize($command);
 				$action = $command['action'];
+				$index = $command['index'];
 				$partnerId = $elasticLog->getPartnerId();
-				$command['index'] = kBaseESearch::getSplitIndexNamePerPartner($command['index'], $partnerId);;
+				$command['index'] = kBaseESearch::getSplitIndexNamePerPartner($command['index'], $partnerId);
 
 				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!== false && $action == ElasticMethodType::UPDATE)))
 				{
