@@ -31,7 +31,16 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 	 */
 	protected function doesMinimumUpdatePeriodExist($content)
 	{
-		$xml = new SimpleXMLElement($content);
+		try
+		{
+			$xml = new SimpleXMLElement($content);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::debug('Failed to parse MPD content as XML: ' . $e->getMessage());
+			return false;
+		}
+
 		$minimumUpdatePeriod = $xml->attributes()->minimumUpdatePeriod;
 		return $minimumUpdatePeriod ? true : false;
 	}
