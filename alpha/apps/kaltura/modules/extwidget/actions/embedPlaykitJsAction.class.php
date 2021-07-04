@@ -176,8 +176,14 @@ class embedPlaykitJsAction extends sfAction
 		$confNS = ($confNS || {});
 		";
 
-		$kalturaPlayerVersion = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : $this->bundleConfig[self::KALTURA_TV_PLAYER];
-		if (version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0) {
+		$kalturaPlayerVersion = null;
+		if (isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ) {
+			$kalturaPlayerVersion = $this->bundleConfig[self::KALTURA_OVP_PLAYER];
+		} else if (isset($this->bundleConfig[self::KALTURA_TV_PLAYER])) {
+			$kalturaPlayerVersion = $this->bundleConfig[self::KALTURA_TV_PLAYER];
+		}
+
+		if (!is_null($kalturaPlayerVersion) && version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0) {
 			$content .= "$confNS=$uiConfJson;";
 		} else {
 			$content .= "$confNS.UIConf = ($confNS.UIConf||{}); $confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;";
