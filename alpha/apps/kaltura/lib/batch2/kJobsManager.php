@@ -546,29 +546,7 @@ class kJobsManager
 
 		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-			$pathMgr = $sharedStorageProfile->getPathManager();
-			
-			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
-			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
-			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-			if($parentJob && $parentJob->getJobType()== BatchJobType::CLIP_CONCAT)
-			{
-				try
-				{
-					$temp_storage = kConf::get('temp_storage', myCloudUtils::CLOUD_STORAGE_MAP, null);
-					if(isset($temp_storage)){
-						$sharedPath = str_replace($root,$temp_storage,$sharedPath);
-					}
-				}
-				catch (Exception $ex)
-				{
-					KalturaLog::err($ex);
-				}
-				
-			}
-			$convertData->setDestFileSyncSharedPath($sharedPath);
+			$convertData->setDestFileSyncSharedPath(self::getSharedPath($partner,$parentJob,$flavor));
 		}
 		
 		// creats a child convert job
@@ -639,6 +617,32 @@ class kJobsManager
 		}
 		
 		return $fileSync;		
+	}
+	
+	private static function getSharedPath ($partner,$parentJob,$flavorAsset)
+	{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+			if($parentJob && $parentJob->getJobType()== BatchJobType::CLIP_CONCAT)
+			{
+				try
+				{
+					$temp_storage = kConf::get('temp_storage', myCloudUtils::CLOUD_STORAGE_MAP, null);
+					if(isset($temp_storage)){
+						$sharedPath = str_replace($root,$temp_storage,$sharedPath);
+					}
+				}
+				catch (Exception $ex)
+				{
+					KalturaLog::err($ex);
+				}
+				
+			}
+			return $sharedPath;
 	}
 	
 	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData &$convertData)
