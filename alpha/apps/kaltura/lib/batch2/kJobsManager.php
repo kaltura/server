@@ -553,12 +553,12 @@ class kJobsManager
 			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-			if($parentJob)
+			if($parentJob && $parentJob->getJobType()== BatchJobType::CLIP_CONCAT)
 			{
 				try
 				{
 					$temp_storage = kConf::get('temp_storage', myCloudUtils::CLOUD_STORAGE_MAP, null);
-					if($parentJob->getJobType()== BatchJobType::CLIP_CONCAT && isset($temp_storage)){
+					if(isset($temp_storage)){
 						$sharedPath = str_replace($root,$temp_storage,$sharedPath);
 					}
 				}
