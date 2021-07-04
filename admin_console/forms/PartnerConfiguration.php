@@ -199,12 +199,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
 		
-		
-		$this->addElement('checkbox', 'avoid_indexing_search_history', array(
-			'label'	=> 'Avoid indexing search history ',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		$this->addElement('text', 'trigram_percentage', array(
+			'label'	  => 'Trigram Percentage',
 		));
 		
+		$this->addElement('text', 'max_word_for_ngram', array(
+			'label'	  => 'Max word for ngram',
+		));
 		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
@@ -215,7 +216,14 @@ class Form_PartnerConfiguration extends Infra_Form
 		'label'		=> 'Add Languages',
 		'decorators'	=> array('ViewHelper'),
 		));
-
+		
+		$this->addElement('button', 'editESearchLanguages', array(
+			'label'		=> 'Add Languages',
+			'decorators'	=> array('ViewHelper'),
+		));
+		
+		
+		
 		$this->getElement('editESearchLanguages')->setAttrib('onClick', 'addESearchLanguage()');
 
 		$this->addElement('checkbox', 'checkbox_cache_flavor_version', array(
@@ -1004,7 +1012,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
 		                                   array('crossLine')), 'security', array('legend' => 'Security'));
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login'), array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
-		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
@@ -1030,6 +1038,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
+		
 		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
 		{
 			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag" . '_max';
