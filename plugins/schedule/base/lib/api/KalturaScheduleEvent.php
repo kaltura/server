@@ -327,7 +327,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		{
 			// retrieve relevant event's start time and calculate the current event start and end time
 			$this->validatePropertyNotNull('duration');
-			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId());
+			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId(), $this->duration);
 		}
 		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
 		{
@@ -342,7 +342,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
-	protected function setTimingFromLinkedToEvent($linkedToEventId, $duration = null)
+	protected function setTimingFromLinkedToEvent($linkedToEventId, $duration)
 	{
 		if (!is_null($linkedToEventId)) //if it is null we are unlinking
 		{
@@ -351,7 +351,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			if ($linkedToEvent)
 			{
 				$this->startDate = strtotime($linkedToEvent->getEndDate()) + $this->linkedTo->getOffset();
-				$duration = $this->duration?$this->duration:$duration;
 				$this->endDate = $this->startDate + $duration;
 			}
 			else
@@ -422,7 +421,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		}
 		if ((!is_null($this->linkedTo) || $sourceObject->getLinkedTo()) && $this->recurrenceType != KalturaScheduleEventRecurrenceType::NONE)
 		{
-			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LIKED_EVENT_CONFLICT);
+			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LINKED_EVENT_CONFLICT);
 		}
 		
 		$this->validateScheduleEventType($this->recurrenceType, $sourceObject->getRecurrenceType());

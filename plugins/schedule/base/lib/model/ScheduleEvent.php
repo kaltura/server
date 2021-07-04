@@ -191,11 +191,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		$linkedByArray = explode(',', $this->getLinkedBy());
 		if (!in_array($v, $linkedByArray))
-//		if (strpos($linkedByString, strval($v)) === false)
 		{
 			$linkedByArray[] = $v;
 			$linkedByString = implode(',', $linkedByArray);
-//			$linkedByString = $linkedByString . $v . ',';
 			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
 		}
 	}
@@ -229,29 +227,23 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function updateStartEndTimeOfFollowerEvents()
 	{
 		$linkedByEventIds = explode(',', $this->getLinkedBy());
-			foreach ($linkedByEventIds as $linkedByEventId)
+		foreach ($linkedByEventIds as $linkedByEventId)
+		{
+		//update start & end date for all linked by events
+			if(trim($linkedByEventId) == '')
 			{
-			//update start & end date for all linked by events
-				if(trim($linkedByEventId) == '')
-				{
-					continue;
-				}
-				$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
-				if (!$linkedEvent)
-				{
-					KalturaLog::err("Event $linkedByEventId not found");
-					continue;
-				}
-				$linkedEvent->setStartDate(strtotime($this->getEndDate()) + $linkedEvent->getLinkedTo()->getOffset());
-				$linkedEvent->setEndDate(strtotime($linkedEvent->getStartDate()) + $linkedEvent->getDuration());
-				$linkedEvent->save();
+				continue;
 			}
-		
-	}
-	
-	public function getOffset()
-	{
-		return $this->getLinkedTo()->getOffset();
+			$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+			if (!$linkedEvent)
+			{
+				KalturaLog::err("Event $linkedByEventId not found");
+				continue;
+			}
+			$linkedEvent->setStartDate(strtotime($this->getEndDate()) + $linkedEvent->getLinkedTo()->getOffset());
+			$linkedEvent->setEndDate(strtotime($linkedEvent->getStartDate()) + $linkedEvent->getDuration());
+			$linkedEvent->save();
+		}
 	}
 	
 	public function unlinkFollowerEvents()
