@@ -557,10 +557,10 @@ class kJobsManager
 			{
 				try
 				{
-					$temp_storage = kConf::get('temp_storage', 'cloud_storage' , "no_temp_storage");
-					if($parentJob->getJobType()== BatchJobType::CLIP_CONCAT && $temp_storage!="no_temp_storage"){
+					$temp_storage = kConf::get('temp_storage', myCloudUtils::CLOUD_STORAGE_MAP, null);
+					if($parentJob->getJobType()== BatchJobType::CLIP_CONCAT && isset($temp_storage)){
 						$sharedPath = str_replace($root,$temp_storage,$sharedPath);
-					};
+					}
 				}
 				catch (Exception $ex)
 				{
