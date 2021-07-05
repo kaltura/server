@@ -217,13 +217,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		'decorators'	=> array('ViewHelper'),
 		));
 		
-		$this->addElement('button', 'editESearchLanguages', array(
-			'label'		=> 'Add Languages',
-			'decorators'	=> array('ViewHelper'),
-		));
-		
-		
-		
 		$this->getElement('editESearchLanguages')->setAttrib('onClick', 'addESearchLanguage()');
 
 		$this->addElement('checkbox', 'checkbox_cache_flavor_version', array(
