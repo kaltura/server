@@ -268,6 +268,9 @@ class kAssetUtils
 			case assetParams::CONTAINER_FORMAT_MPEG:
 				$result = assetParams::MPG_FILE_EXTENSION;
 				break;
+			case assetParams::CONTAINER_FORMAT_QT:
+				$result = assetParams::CONTAINER_FORMAT_MOV;
+				break;
 			case assetParams::CONTAINER_FORMAT_FLV:
 			case assetParams::CONTAINER_FORMAT_MP4:
 			case assetParams::CONTAINER_FORMAT_AVI:
