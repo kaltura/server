@@ -565,7 +565,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
 		'trigramPercentage',
-		'maxWordForNgram'
+		'maxWordForNgram',
 		'twoFactorAuthenticationMode'
 	);
 
