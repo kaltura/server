@@ -563,8 +563,8 @@ class embedPlaykitJsAction extends sfAction
 			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
 			list($latestVersionMap) = $this->getConfigByVersion("latest");
 			list($betaVersionMap) = $this->getConfigByVersion("beta");
-			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
-			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+			$latestVersion = isset($latestVersionMap[self::KALTURA_OVP_PLAYER]) ? $latestVersionMap[self::KALTURA_OVP_PLAYER] : null;
+			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null
 
 			// For player latest/beta >= 0.56.0 or canary
 			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
@@ -578,7 +578,8 @@ class embedPlaykitJsAction extends sfAction
 				}
 			}
 			// For specific version >= 0.56.0
-			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
+			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0 &&
+					!is_null($latestVersionMap))
 			{
 				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
 				if ($tvPlayerConfig)
