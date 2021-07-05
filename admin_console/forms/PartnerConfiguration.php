@@ -35,6 +35,8 @@ class Form_PartnerConfiguration extends Infra_Form
     
 	public function init()
 	{
+		$intValidator = new Zend_Validate_Int();
+		
 		$permissionNames = array();
 		$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES] = array();
 		$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS] = array();
@@ -203,9 +205,15 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Trigram Percentage',
 		));
 		
+		$trigramPercentage = $this->getElement('trigram_percentage');
+		$trigramPercentage->addValidator($intValidator) ;
+		
 		$this->addElement('text', 'max_word_for_ngram', array(
 			'label'	  => 'Max word for ngram',
 		));
+		
+		$maxWordsForNgram = $this->getElement('max_word_for_ngram');
+		$maxWordsForNgram->addValidator($intValidator) ;
 		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
