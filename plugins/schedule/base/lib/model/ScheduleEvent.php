@@ -200,14 +200,12 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 	public function removeFromLinkedByArray($v)
 	{
-//		$linkedByString = $this->getLinkedBy();
 		$linkedByArray = explode(',', $this->getLinkedBy());
-//		if (strpos($linkedByString, strval($v) . ',') !== false)
-		if ($key = array_search($v, $linkedByArray) !== false)
+		$key = array_search($v, $linkedByArray);
+		if ($key !== false)
 		{
 			unset($linkedByArray[$key]);
 			$linkedByString = implode(',', $linkedByArray);
-//			$linkedByString = str_replace(strval($v) . ',', '', $linkedByString);
 			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
 		}
 	}
@@ -240,10 +238,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 				KalturaLog::err("Event $linkedByEventId not found");
 				continue;
 			}
-			$linkedEvent->setStartDate(strtotime($this->getEndDate()) + $linkedEvent->getLinkedTo()->getOffset());
-			$linkedEvent->setEndDate(strtotime($linkedEvent->getStartDate()) + $linkedEvent->getDuration());
+			$linkedEvent->shiftEvent(strtotime($this->getEndDate()), $linkedEvent->getLinkedTo()->getOffset(), $linkedEvent->getDuration());
 			$linkedEvent->save();
 		}
+	}
+	
+	public function shiftEvent ($parentEndDate, $offset, $duration)
+	{
+		$newStartDate = $parentEndDate + $offset;
+		$this->setStartDate($newStartDate);
+		$this->setEndDate($newStartDate + $duration);
 	}
 	
 	public function unlinkFollowerEvents()
