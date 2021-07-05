@@ -564,7 +564,7 @@ class embedPlaykitJsAction extends sfAction
 			list($latestVersionMap) = $this->getConfigByVersion("latest");
 			list($betaVersionMap) = $this->getConfigByVersion("beta");
 			$latestVersion = isset($latestVersionMap[self::KALTURA_OVP_PLAYER]) ? $latestVersionMap[self::KALTURA_OVP_PLAYER] : null;
-			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null
+			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null;
 
 			// For player latest/beta >= 0.56.0 or canary
 			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
