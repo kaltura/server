@@ -22,7 +22,7 @@ class KAsyncDeleteFile extends KJobHandlerWorker
 		$jobData = $job->data;
 		
 		/* @var $jobData KalturaDeleteFileJobData */
-		$result = kFile::unlink($jobData->localFileSyncPath);
+		$result = unlink($jobData->localFileSyncPath);
 		
 		if (!$result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to delete file from disk", KalturaBatchJobStatus::FAILED);
