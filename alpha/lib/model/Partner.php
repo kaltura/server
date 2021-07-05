@@ -98,6 +98,7 @@ class Partner extends BasePartner
 	
 	const MAX_WORDS_FOR_NGRAM = 'max_words_for_ngram';
 	
+	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
  
 	private $cdnWhiteListCache = array();
 
@@ -2190,6 +2191,16 @@ class Partner extends BasePartner
 	public function setAvoidIndexingSearchHistory($v)
 	{
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
+	}
+	
+	public function getTwoFactorAuthenticationMode()
+	{
+		return $this->getFromCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE);
+	}
+	
+	public function setTwoFactorAuthenticationMode($v)
+	{
+		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
 	}
 	
 	public function getSharedStorageProfileId()

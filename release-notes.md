@@ -1,3 +1,23 @@
+# Quasar-17.5.0 #
+
+## Update EmailEventNotificationEntryWasAddedToChannel ##
+* Issue Type: Task
+* Issue ID: SUP-27690
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/2021_06_13_updateEntryWasAddedToChannelEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_06_13_deploy_update_entry_was_added_to_channel_email_notification.php
+
+
+
 # Quasar-17.4.0 #
 ## Version Highlight ##
 ### Deployment scripts ###

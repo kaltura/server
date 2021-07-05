@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class KalturaUserFilter extends KalturaUserBaseFilter
+class BlockThumbnailCaptureKalturaUserFilter extends KalturaUserBaseFilter
 {
 	
 	static private $map_between_objects = array

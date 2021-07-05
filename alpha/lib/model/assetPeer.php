@@ -819,4 +819,16 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->addDescendingOrderByColumn(assetPeer::INT_ID);
 		return self::doSelect($c);
 	}
+	
+	public static function retrieveAudioFlavorsByEntryID($entryId)
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		$c->add(assetPeer::IS_ORIGINAL, 0);
+		$idCriterion = $c->getNewCriterion(assetPeer::TAGS, '%' . assetParams::TAG_ALT_AUDIO . '%', Criteria::LIKE);
+		$idCriterion->addOr($c->getNewCriterion(assetPeer::TAGS, '%' . assetParams::TAG_AUDIO_ONLY. '%',Criteria::LIKE));
+		$c->addAnd($idCriterion);
+		
+		return assetPeer::doSelect($c);
+	}
 }

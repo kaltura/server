@@ -470,6 +470,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $maxWordForNgram;
+	 
+	/**
+	 * @var KalturaTwoFactorAuthenticationMode
+	 */
+	public $twoFactorAuthenticationMode;
 	
 	
 	private static $map_between_objects = array
@@ -561,6 +566,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'secondarySecretRoleId',
 		'trigramPercentage',
 		'maxWordForNgram'
+		'twoFactorAuthenticationMode'
 	);
 
 	public function getMapBetweenObjects()

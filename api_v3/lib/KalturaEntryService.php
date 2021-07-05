@@ -638,8 +638,13 @@ class KalturaEntryService extends KalturaBaseService
 	  	if(!$dbAsset)
 	  	{
 	  		$isNewAsset = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
-
+			$fileExt = Null;
+			$assetObject = assetPeer::retrieveById($srcSyncKey->getObjectId());
+			if($assetObject)
+			{
+				$fileExt = $assetObject->getFileExt();
+			}
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $fileExt);
 	  	}
 	  	
 		if(!$dbAsset)
