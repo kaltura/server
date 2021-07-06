@@ -865,7 +865,7 @@ class KalturaEntryService extends KalturaBaseService
     		    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
 
                  //curl does not supports sftp protocol, therefore we will use 'addImportJob'
-                if (!kString::beginsWith( $url , "sftp" ))
+                if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
     		    {
                     if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
                     {

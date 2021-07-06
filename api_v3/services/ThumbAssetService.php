@@ -243,11 +243,13 @@ class ThumbAssetService extends KalturaAssetService
         $fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
 
         //curl does not supports sftp protocol, therefore we will use 'addImportJob'
-        if (!kString::beginsWith( $url , "sftp" ))
+        if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
         {
             if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
-                return $this->attachFile($thumbAsset, $fullPath);
-
+            {
+	            return $this->attachFile($thumbAsset, $fullPath);
+            }
+            
             if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
             {
                 $thumbAsset->setDescription("Failed downloading file[$url]");
