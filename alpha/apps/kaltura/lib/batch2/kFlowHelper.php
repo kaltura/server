@@ -259,7 +259,7 @@ class kFlowHelper
 		}
 		$flavorAsset->save();
 
-        if($flavorAsset instanceof AttachmentAsset)
+		if($flavorAsset instanceof AttachmentAsset)
         {
             $flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
         }
