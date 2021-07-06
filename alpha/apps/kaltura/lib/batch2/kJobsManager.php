@@ -1633,7 +1633,8 @@ class kJobsManager
 		if(kDataCenterMgr::isDcIdShared($dc))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
-		}else
+		}
+		else
 		{
 			$batchJob->setDc($dc);
 		}
