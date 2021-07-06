@@ -72,8 +72,8 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 				}
 				break;
 			case 'KalturaIntegrationSetting':
-				if ($enumValue == self::getDropFolderTypeCoreValue(MicrosoftTeamsDropFolderType::MS_TEAMS)) {
-					return new KalturaMicrosoftTeamsDropFolderFile();
+				if ($enumValue == self::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS)) {
+					return new KalturaMiscrosoftTeamsIntegrationSetting();
 				}
 				break;
 		}
