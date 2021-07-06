@@ -238,16 +238,16 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 				KalturaLog::err("Event $linkedByEventId not found");
 				continue;
 			}
-			$linkedEvent->shiftEvent(strtotime($this->getEndDate()), $linkedEvent->getLinkedTo()->getOffset(), $linkedEvent->getDuration());
+			$linkedEvent->shiftEvent(strtotime($this->getEndDate()));
 			$linkedEvent->save();
 		}
 	}
 	
-	public function shiftEvent ($parentEndDate, $offset, $duration)
+	public function shiftEvent ($parentEndDate)
 	{
-		$newStartDate = $parentEndDate + $offset;
+		$newStartDate = $parentEndDate + $this->getLinkedTo()->offset;
 		$this->setStartDate($newStartDate);
-		$this->setEndDate($newStartDate + $duration);
+		$this->setEndDate($newStartDate + $this->duration);
 	}
 	
 	public function unlinkFollowerEvents()
