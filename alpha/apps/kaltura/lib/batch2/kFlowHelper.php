@@ -255,9 +255,14 @@ class kFlowHelper
 			
 			$flavorAsset->setWidth($width);
 			$flavorAsset->setHeight($height);
-			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
+			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
 		}
 		$flavorAsset->save();
+
+        if($flavorAsset instanceof AttachmentAsset)
+        {
+            $flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
+        }
 		
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
