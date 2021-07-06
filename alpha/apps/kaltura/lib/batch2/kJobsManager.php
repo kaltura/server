@@ -631,9 +631,10 @@ class kJobsManager
 			{
 				try
 				{
-					$temp_storage = kConf::get('temp_storage', myCloudUtils::CLOUD_STORAGE_MAP, null);
-					if(isset($temp_storage)){
-						$sharedPath = str_replace($root,$temp_storage,$sharedPath);
+					$temp_storage_bucket = kConf::get('temp_storage_bucket', myCloudUtils::CLOUD_STORAGE_MAP, null);
+					if(isset($temp_storage_bucket))
+					{
+						$sharedPath = str_replace($root,$temp_storage_bucket,$sharedPath);
 					}
 				}
 				catch (Exception $ex)
