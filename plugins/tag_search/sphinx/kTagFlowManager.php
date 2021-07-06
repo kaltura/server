@@ -17,7 +17,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     {
     	if (! ($object instanceof categoryEntry))
     	{
-        	self::decrementExistingTagsInstanceCount($object->getTags(), $object->getPartnerId(), get_class($object));  
+        	self::decrementExistingTagsInstanceCount($object->getTags(), $object->getPartnerId(), get_class($object));
     	}
     	else 
     	{
@@ -183,114 +183,150 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param string $tagsForUpdate
      * @param int $partnerId
      * @param string $objectClass
-     * @return array
      */
-	public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, array $privacyContexts = null)
-	{
+    public static function addOrIncrementTags ($tagsForUpdate, $partnerId, $objectClass, $privacyContexts = array(self::NULL_PC))
+    {
 	    $objectTags = self::trimObjectTags($tagsForUpdate);
 	    if (!count($objectTags))
 	    {
-	        return;
+	    	return;
 	    }
-	    
-	    $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
-		if (!is_null($privacyContexts))
-		{
-			if (count($privacyContexts))
-				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
-			}
-		else
-		{
-			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
-		}
-		TagPeer::setUseCriteriaFilter(false);
-	    $foundTagObjects = TagPeer::doSelect($c);
-	    TagPeer::setUseCriteriaFilter(true);
-	    
-	    if (!$foundTagObjects || !count($foundTagObjects))
+	    $foundTagObjects = self::getFoundTags($objectTags, $partnerId, $objectClass, $privacyContexts);
+	    $tagsToAddList = self::getTagsToAdd($foundTagObjects, $objectTags, $privacyContexts);
+	    if (count($tagsToAddList))
 	    {
-	        $tagsToAdd = array();
-			foreach ($objectTags as $tag)
-			{
-				$tagsToAdd[$tag] = array();
-				$tagsToAdd[$tag] = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
-			}
-	        return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
-	    	
+		    self::addTags($tagsToAddList, self::getObjectTypeByClassName($objectClass), $partnerId);
 	    }
-	    
-	    $foundTagsToPc = array();
-		$tagsToAdd = array();
-		
-	    foreach ($foundTagObjects as $foundTag)
+	    if (count($foundTagObjects))
 	    {
-	    	/* @var $foundTag Tag */
-	        $foundTag->incrementInstanceCount();
-	        if (!isset($foundTagsToPc[$foundTag->getTag()]))
-	        {
-	        	$foundTagsToPc[$foundTag->getTag()] = array();
-	        }	
-	        $foundTagsToPc[$foundTag->getTag()][] = $foundTag->getPrivacyContext();
-	      	
+		    self::updateTagsInstanceCount($foundTagObjects, true);
 	    }
-        foreach (array_diff($objectTags, array_keys($foundTagsToPc)) as $missingTag)
+    }
+
+    /**
+     * @param array $objectTags
+     * @param int $partnerId
+     * @param string $objectClass
+     * @param array $privacyContexts
+     * @return array
+     */
+    private static function getFoundTags(array $objectTags, $partnerId, $objectClass,array $privacyContexts)
+    {
+        $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
+        if (count($privacyContexts))
         {
-        	$missingPrivacyContexts = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
-        	//If the tag itself is missing from the DB, we must add it with all the specified privacy contexts
-        	$tagsToAdd[$missingTag] = $missingPrivacyContexts;
+            $c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
         }
-        if (!is_null($privacyContexts) && count($privacyContexts))
-        {
-	        foreach ($foundTagsToPc as $tag=>$foundPrivacyContexts)
+        TagPeer::setUseCriteriaFilter(false);
+        $foundTagObjects = TagPeer::doSelect($c);
+        TagPeer::setUseCriteriaFilter(true);
+        return $foundTagObjects;
+    }
+
+    /**
+     * @param array $foundTagObjects
+     * @param array $objectTags
+     * @param array $privacyContexts
+     * @return array
+     */
+    private static function getTagsToAdd (array $foundTagObjects , array $objectTags, array $privacyContexts)
+    {//Any requested tag should be added with all privacy contexts as long as it does not exist (the tag with this privacy context).
+	    $privacyContextByTag = array();
+	    foreach ($foundTagObjects as $tag)
+	    {
+		    $privacyContextByTag[$tag->getTag()][] = $tag->getPrivacyContext();
+	    }
+	    $tagsToAddList = array();
+	    $privacyContexts = $privacyContexts ? $privacyContexts : array(self::NULL_PC);
+	    foreach ($objectTags as $tag)
+	    {
+		    if (!isset($privacyContextByTag[$tag]))
 	        {
-	        	$missingPrivacyContexts = array_diff($privacyContexts, $foundPrivacyContexts);
-	        	if (!is_null($missingPrivacyContexts) && count($missingPrivacyContexts))
-	        	{
-	        		$tagsToAdd [$tag] = $missingPrivacyContexts;
-	        	}
+		        $tagsToAddList[$tag] = $privacyContexts;
+	        }
+	        else
+	        {
+		        $privacyContextsDiff = array_diff($privacyContexts,$privacyContextByTag[$tag]);
+		        if(count($privacyContextsDiff))
+		        {
+			        $tagsToAddList[$tag] = $privacyContextsDiff;
+		        }
 	        }
         }
+        return $tagsToAddList;
+    }
 
-	    return self::addTags($tagsToAdd, self::getObjectTypeByClassName($objectClass), $partnerId);
 
-	}
-	
-	
-	/**
-	 * Decrements instance count of tags found on a deleted object
-	 * @param string $tagsToCheck
-	 * @param int $partnerId
-	 * @param string $objectClass
-	 * @param array $privacyContexts
-	 */
-	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, $privacyContexts = null)
+    private static function updateInstanceCountList(array $foundTagObjects, $time, $toIncrement)
+    {
+        $foundTagIds = array();
+        try {
+            $connection = Propel::getConnection();
+            foreach ($foundTagObjects as $tag)
+            {
+	            $foundTagIds[]=$tag->getId();
+            }
+            $idsString= "(".implode( ",",$foundTagIds).")";
+            if($toIncrement==true)
+            {
+                $updateSql = "update tag set instance_count=instance_count+1 , updated_at = '".$time."' where id in ".$idsString.";";
+            }
+            else
+            {
+                $updateSql = "update tag set instance_count=instance_count-1 , updated_at = '".$time."' where id in ".$idsString."and instance_count>0;";
+            }
+            $stmt = $connection->prepare($updateSql);
+            $stmt->execute();
+            }
+        catch (PropelException $e)
+        {
+            KalturaLog::err($e);
+        }
+    }
+
+
+    /**
+     * @param array $foundTagObjects
+     */
+    private static function updateTagsInstanceCount(array $foundTagObjects,$toIncrement)
+    {
+        $time = (new DateTime())->format('Y-m-d H:i:s');
+        self::updateInstanceCountList($foundTagObjects,$time,$toIncrement);
+        foreach ($foundTagObjects as $foundTag)
+        {
+            if($toIncrement)
+            {
+                $foundTag->setInstanceCount($foundTag->getInstanceCount()+1);
+            }
+            else
+            {
+                $foundTag->setInstanceCount(max($foundTag->getInstanceCount()-1,0));
+            }
+            $foundTag->setUpdatedAt($time);
+            $foundTag->indexToSearchIndex();
+        }
+    }
+
+    /**
+     * Decrements instance count of tags found on a deleted object
+     * @param string $tagsToCheck
+     * @param int $partnerId
+     * @param string $objectClass
+     * @param array $privacyContexts
+     */
+	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, array $privacyContexts = array(self::NULL_PC))
 	{
 	    $objectTags = self::trimObjectTags($tagsToCheck);
 	 	if (!count($objectTags))
 	    {
 	        return;
 	    }
-		$c = self::getTagObjectsByTagStringsCriteria($objectTags,  self::getObjectTypeByClassName($objectClass), $partnerId);
-		if (!is_null($privacyContexts))
-		{
-			if (count($privacyContexts))
-				$c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
-		}
-		else
-		{
-			$c->addAnd(TagPeer::PRIVACY_CONTEXT, self::NULL_PC);
-		}
-		$c->addGroupByColumn(TagPeer::PRIVACY_CONTEXT);
-
-		TagPeer::setUseCriteriaFilter(false);
-		$tagsToDecrement = TagPeer::doSelect($c);
+		$tagsToDecrement = self::getFoundTags($objectTags, $partnerId, $objectClass, $privacyContexts);
 		TagPeer::setUseCriteriaFilter(true);
-		foreach ($tagsToDecrement as $tag)
-		{
-			/* @var $tag Tag */
-			$tag->decrementInstanceCount();
-		}
-	
+		if(count($tagsToDecrement))
+        {
+            self:: updateTagsInstanceCount($tagsToDecrement,false);
+        }
 	}
 	 
 	/**
