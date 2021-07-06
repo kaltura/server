@@ -1630,10 +1630,11 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
-		if(kDataCenterMgr::isDcIdShared($dc)) {
-			$dc_id = kDataCenterMgr::getCurrentDcId();
-			$batchJob->setDc($dc_id);
-		}else{
+		if(kDataCenterMgr::isDcIdShared($dc))
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}else
+		{
 			$batchJob->setDc($dc);
 		}
 		
