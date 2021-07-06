@@ -260,9 +260,9 @@ class kFlowHelper
 		$flavorAsset->save();
 
 		if($flavorAsset instanceof AttachmentAsset)
-        {
-            $flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
-        }
+		{
+			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
+		}
 		
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
