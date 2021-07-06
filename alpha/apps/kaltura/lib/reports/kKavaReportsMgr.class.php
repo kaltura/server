@@ -115,6 +115,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
 	const METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC = 'live_view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
+	const METRIC_TOTAL_JOBS = 'total_jobs';
+
 
 	// non druid metrics
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
@@ -1044,6 +1046,8 @@ class kKavaReportsMgr extends kKavaBase
 				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$good_engagement, array(self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN))))),
 			self::getLongSumAggregator(self::METRIC_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COUNT));
 
+		self::$aggregations_def[self::METRIC_TOTAL_JOBS] = self::getLongSumAggregator(
+			self::METRIC_TOTAL_JOBS, self::METRIC_COUNT);
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation

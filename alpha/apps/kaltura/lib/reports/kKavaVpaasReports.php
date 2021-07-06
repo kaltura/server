@@ -211,6 +211,15 @@ class kKavaVpaasReports extends kKavaReports
 
 		ReportType::SELF_SERVED_USAGE_VPAAS => array(
 			self::REPORT_JOIN_REPORTS => array(
+				// reach credit
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+					self::REPORT_METRICS => array(self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_STATUS,
+						self::DRUID_VALUES => array(self::TASK_READY)
+					),
+				),
 				// unique users
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
@@ -279,6 +288,8 @@ class kKavaVpaasReports extends kKavaReports
 				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
 				'total_interactive_video_entries' => self::SOURCE_INTERACTIVE_VIDEO,
 				'live_view_time' => self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
+				'total_credits' => self::METRIC_SUM_PRICE,
+				'total_jobs_completed' => self::METRIC_TOTAL_JOBS,
 			),
 		)
 	);
