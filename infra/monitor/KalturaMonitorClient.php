@@ -304,6 +304,14 @@ class KalturaMonitorClient
 		self::monitorApiStart(false, $action, null, $sessionType, $clientTag);
 	}
 
+	public static function checkRateLimit()
+	{
+		$request = sfContext::getInstance()->getRequest();
+		$params= $request->getParameterHolder()->getAll();
+		$instance = KalturaDispatcher::getInstance();
+		return $instance->rateLimit($params["module"],$params["action"],$params);
+	}
+
 	public static function monitorApiEnd($errorCode)
 	{
 		if (!self::$stream)

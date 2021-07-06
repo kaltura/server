@@ -313,7 +313,7 @@ class KalturaDispatcher
 		return null;
 	}
 	
-	protected function rateLimit($service, $action, $params)
+	public function rateLimit($service, $action, $params)
 	{
 		if (!kConf::hasMap('api_rate_limit') ||
 			kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
