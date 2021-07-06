@@ -1630,7 +1630,14 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$batchJob->setDc($dc);
+		if(kDataCenterMgr::isDcIdShared($dc))
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}
+		else
+		{
+			$batchJob->setDc($dc);
+		}
 		
 		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
