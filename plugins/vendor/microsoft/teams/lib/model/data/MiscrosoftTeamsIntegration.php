@@ -1,6 +1,6 @@
 <?php
 /*
-* @package plugins.microsoftTeamsDropFolder
+* @package plugins.MicrosoftTeamsDropFolder
 * @subpackage model
 */
 class MiscrosoftTeamsIntegration extends VendorIntegration

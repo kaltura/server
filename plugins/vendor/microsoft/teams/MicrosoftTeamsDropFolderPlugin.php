@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.microsoftTeamsDropFolder
+ * @package plugins.MicrosoftTeamsDropFolder
  */
 class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaObjectLoader, IKalturaPermissions
 {
@@ -73,7 +73,7 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 				break;
 			case 'KalturaIntegrationSetting':
 				if ($enumValue == self::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS)) {
-					return new KalturaMiscrosoftTeamsIntegrationSetting();
+					return new KalturaMicrosoftTeamsIntegrationSetting();
 				}
 				break;
 		}

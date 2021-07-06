@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package plugins.microsoftTeamsDropFolder
+ * @package plugins.MicrosoftTeamsDropFolder
  * @subpackage api.objects
  */
-class KalturaMiscrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
+class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 {
 	/**
 	 * @var string

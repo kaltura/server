@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.microsoftTeamsDropFolder
+ * @package plugins.MicrosoftTeamsDropFolder
  * @subpackage api.objects
  */
 class KalturaMicrosoftTeamsDropFolder extends KalturaRemoteDropFolder
