@@ -114,7 +114,7 @@ class ZoomVendorService extends KalturaBaseService
 				$zoomIntegration->setAccountId($accountId);
 				ZoomHelper::setZoomIntegration($zoomIntegration);
 			}
-			else if ($zoomIntegration->getStatus() == VendorStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
+			else if ($zoomIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
 			{
 				throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
 			}
@@ -162,7 +162,7 @@ class ZoomVendorService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
 		
-		$zoomIntegration->setStatus(VendorStatus::DELETED);
+		$zoomIntegration->setStatus(VendorIntegrationStatus::DELETED);
 		$zoomIntegration->save();
 		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
 		return true;

@@ -3,38 +3,17 @@
  * @package plugins.vendor
  * @subpackage api.objects
  */
-class KalturaZoomIntegrationSetting extends KalturaObject
+class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 {
-	/**
-	 * @var string
-	 */
-	public $defaultUserId;
-
 	/**
 	 * @var string
 	 */
 	public $zoomCategory;
 
 	/**
-	 * @var string
-	 * @readonly
-	 */
-	public $accountId;
-
-	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableRecordingUpload;
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $createUserIfNotExist;
-
-	/**
-	 * @var KalturaHandleParticipantsMode
-	 */
-	public $handleParticipantsMode;
 
 	/**
 	 * @var KalturaZoomUsersMatching
@@ -57,19 +36,9 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	public $enableWebinarUploads;
 
 	/**
-	* @var int
-	 */
-	public $conversionProfileId;
-	
-	/**
 	 * @var string
 	 */
 	public $jwtToken;
-	
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $deletionPolicy;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -82,16 +51,6 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	public $zoomAccountDescription;
 	
 	/**
-	 * @var string
-	 */
-	public $createdAt;
-	
-	/**
-	 * @var string
-	 */
-	public $updatedAt;
-	
-	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableMeetingUpload;
@@ -102,22 +61,14 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 	private static $map_between_objects = array
 	(
 		'zoomCategory',
-		'accountId',
-		'createUserIfNotExist',
-		'handleParticipantsMode',
 		'zoomUserMatchingMode' => 'UserMatching',
 		'zoomUserPostfix' => 'UserPostfix',
 		'zoomWebinarCategory',
 		'enableWebinarUploads',
 		'enableRecordingUpload' => 'status',
-		'conversionProfileId',
-		'defaultUserId' => 'defaultUserEMail',
 		'jwtToken',
-		'deletionPolicy',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
-		'createdAt',
-		'updatedAt',
 		'enableMeetingUpload'
 	);
 
@@ -133,16 +84,8 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 			$dbObject = new ZoomVendorIntegration();
 		}
 		
-		if ($this->createdAt)
-		{
-			unset($this->createdAt);
-		}
-		if ($this->updatedAt)
-		{
-			unset($this->updatedAt);
-		}
 		parent::toObject($dbObject, $skip);
-		$dbObject->setStatus($this->enableRecordingUpload ? VendorStatus::ACTIVE : VendorStatus::DISABLED);
+		$dbObject->setStatus($this->enableRecordingUpload ? VendorIntegrationStatus::ACTIVE : VendorIntegrationStatus::DISABLED);
 		
 		return $dbObject;
 	}
@@ -153,7 +96,7 @@ class KalturaZoomIntegrationSetting extends KalturaObject
 			return;
 
 		parent::doFromObject($sourceObject, $responseProfile);
-		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorStatus::ACTIVE ? 1 : 0;
+		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorIntegrationStatus::ACTIVE ? 1 : 0;
 		
 		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
 		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
