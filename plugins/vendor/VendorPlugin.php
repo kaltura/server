@@ -17,6 +17,7 @@ class VendorPlugin extends KalturaPlugin implements  IKalturaServices
 	{
 		$map = array(
 			'zoomVendor' => 'ZoomVendorService',
+			'vendorIntegration' => 'VendorIntegrationService',
 		);
 		return $map;
 	}
