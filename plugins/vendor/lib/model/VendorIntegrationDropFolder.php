@@ -13,4 +13,9 @@ abstract class VendorIntegrationDropFolder extends RemoteDropFolder
 		$this->getFromCustomData(self::INTEGRATION_SETTING_ID);
 	}
 
+	public function setIntegrationId ($integrationId)
+	{
+		$this->getFromCustomData(self::INTEGRATION_SETTING_ID, $integrationId);
+	}
+
 }
