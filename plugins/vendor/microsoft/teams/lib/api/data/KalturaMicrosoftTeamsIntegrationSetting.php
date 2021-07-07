@@ -67,7 +67,7 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	public function toInsertableObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject)) {
-			$dbObject = new MiscrosoftTeamsIntegration();
+			$dbObject = new MicrosoftTeamsIntegration();
 		}
 		$dbObject->setVendorType(MicrosoftTeamsDropFolderPlugin::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS));
 
