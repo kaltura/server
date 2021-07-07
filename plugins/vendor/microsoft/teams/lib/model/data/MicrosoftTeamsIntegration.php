@@ -3,13 +3,14 @@
 * @package plugins.MicrosoftTeamsDropFolder
 * @subpackage model
 */
-class MiscrosoftTeamsIntegration extends VendorIntegration
+class MicrosoftTeamsIntegration extends VendorIntegration
 {
 	const CLIENT_SECRET = 'client_secret';
 	const CLIENT_ID = 'client_id';
 	const SITES = 'sites';
 	const DRIVES = 'drives';
 	const DRIVE_TOKENS = 'drive_tokens';
+	const SECRET_EXPIRATION_DATE = 'secret_expiration_date';
 
 	/**
 	 * @return string
@@ -24,7 +25,23 @@ class MiscrosoftTeamsIntegration extends VendorIntegration
 	 */
 	public function setClientSecret($clientSecret)
 	{
-		$this->putInCustomData(self::CLIENT_SECRET);
+		$this->putInCustomData(self::CLIENT_SECRET, $clientSecret);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getSecretExpirationDate()
+	{
+		return $this->getFromCustomData(self::SECRET_EXPIRATION_DATE);
+	}
+
+	/**
+	 * @param int $secretExpirationDate
+	 */
+	public function setSecretExpirationDate($secretExpirationDate)
+	{
+		$this->putInCustomData(self::SECRET_EXPIRATION_DATE, $secretExpirationDate);
 	}
 
 	/**
@@ -40,7 +57,7 @@ class MiscrosoftTeamsIntegration extends VendorIntegration
 	 */
 	public function setClientId($clientId)
 	{
-		$this->putInCustomData(self::CLIENT_ID);
+		$this->putInCustomData(self::CLIENT_ID, $clientId);
 	}
 
 	/**
@@ -56,7 +73,7 @@ class MiscrosoftTeamsIntegration extends VendorIntegration
 	 */
 	public function setSites($sites)
 	{
-		$this->putInCustomData(self::SITES);
+		$this->putInCustomData(self::SITES, $sites);
 	}
 
 	/**
@@ -72,7 +89,7 @@ class MiscrosoftTeamsIntegration extends VendorIntegration
 	 */
 	public function setDrives($drives)
 	{
-		$this->putInCustomData(self::DRIVES);
+		$this->putInCustomData(self::DRIVES, $drives);
 	}
 
 	/**
@@ -88,7 +105,7 @@ class MiscrosoftTeamsIntegration extends VendorIntegration
 	 */
 	public function setDriveTokens($driveTokens)
 	{
-		$this->putInCustomData(self::DRIVE_TOKENS);
+		$this->putInCustomData(self::DRIVE_TOKENS, $driveTokens);
 	}
 
 }
