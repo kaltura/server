@@ -227,7 +227,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	protected function attachUrl(AttachmentAsset $attachmentAsset, kUrlResource $contentResource)
 	{
-        $url = $contentResource->getUrl();
+		$url = $contentResource->getUrl();
 		$fileName = basename($url);
 		if(strlen($fileName) > self::MAX_FILE_NAME_LENGTH)
 		{
