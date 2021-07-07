@@ -2258,7 +2258,7 @@ CREATE TABLE  IF NOT EXISTS `vendor_integration` (
 	`id` int  NOT NULL AUTO_INCREMENT,
 	`account_id` varchar(64) NOT NULL,
 	`partner_id` int NOT NULL,
-	`vendor_Type` smallint(6) NOT NULL,
+	`vendor_type` smallint(6) NOT NULL,
 	`custom_data` text,
 	`status` TINYINT NOT NULL,
 	`created_at` DATETIME,
