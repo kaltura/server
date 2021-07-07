@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @service vendor
+ * @service vendorIntegration
  * @package plugins.vendor
  * @subpackage api.services
  */
@@ -21,7 +21,7 @@ class VendorIntegrationService extends KalturaBaseService
 	 * @action get
 	 * @param int $integrationId
 	 * @return KalturaIntegrationSetting
-	 * @throws APIErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function getAction($integrationId)
 	{
@@ -42,7 +42,7 @@ class VendorIntegrationService extends KalturaBaseService
 	 * @action add
 	 * @param KalturaIntegrationSetting $integration
 	 * @return KalturaIntegrationSetting
-	 * @throws APIErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function addAction(KalturaIntegrationSetting $integration)
 	{
@@ -65,7 +65,7 @@ class VendorIntegrationService extends KalturaBaseService
 	 * @action delete
 	 * @param int $integrationId
 	 * @return KalturaIntegrationSetting
-	 * @throws APIErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function deleteAction($integrationId)
 	{
@@ -87,7 +87,7 @@ class VendorIntegrationService extends KalturaBaseService
 	 * @param KalturaIntegrationSetting $vendorCatalogItem
 	 * @return KalturaIntegrationSetting
 	 *
-	 * @throws APIErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function updateAction($id, KalturaIntegrationSetting $integrationSetting)
 	{
@@ -115,7 +115,7 @@ class VendorIntegrationService extends KalturaBaseService
 	 * @param KalturaIntegrationSetting $status
 	 * @return KalturaIntegrationSetting
 	 *
-	 * @throws APIErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
 	public function updateStatusAction($id, $status)
 	{
