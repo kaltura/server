@@ -103,6 +103,7 @@ class KalturaUser extends KalturaBaseUser
 	
 	/**
 	 * @var string
+	 * @readonly
 	 */
 	public $encryptedSeed;
 

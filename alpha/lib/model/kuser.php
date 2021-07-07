@@ -1026,8 +1026,6 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			$this->setEmail($loginId);
 		}
 		
-		$this->setEncryptedSeed($loginData->getSeedFor2FactorAuth());
-		
 		if ($sendEmail)
 		{
 			if ($loginDataExisted) {
@@ -1042,13 +1040,6 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this;
 	}
 	
-	public function setEncryptedSeed($seedFor2FactorAuth)
-	{
-		$encryptionKey = $this->getPartner()->getAdminSecret();
-		$encryptedSeed = base64_encode($this->encryptSeed($encryptionKey, $seedFor2FactorAuth));
-		$this->putInCustomData(self::CUSTOM_DATA_ENCRYPTED_SEED, $encryptedSeed);
-	}
-	
 	protected function encryptSeed($key, $message)
 	{
 		return OpenSSLWrapper::encrypt_aes($message, $key, self::CIPHER_IV);
@@ -1056,7 +1047,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	public function getEncryptedSeed()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_ENCRYPTED_SEED);
+		$encryptionKey = $this->getPartner()->getAdminSecret();
+		$loginData = UserLoginDataPeer::retrieveByPK($this->login_data_id);
+		$encryptedSeed = base64_encode($this->encryptSeed($encryptionKey, $loginData->getSeedFor2FactorAuth()));
+		return $encryptedSeed;
 	}
 	
 	public function getIsAccountOwner()
