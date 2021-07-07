@@ -100,6 +100,11 @@ class KalturaUser extends KalturaBaseUser
 	 * @var string
 	 */
 	public $ksPrivileges;
+	
+	/**
+	 * @var string
+	 */
+	public $encryptedSeed;
 
 	private static $map_between_objects = array (
 		"type",
@@ -116,6 +121,7 @@ class KalturaUser extends KalturaBaseUser
 		"title",
 		"company",
 		"ksPrivileges",
+		"encryptedSeed",
 	);
 
 	public function getMapBetweenObjects ( )

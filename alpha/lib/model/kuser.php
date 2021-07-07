@@ -27,6 +27,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const COMPANY = 'company';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
+	
+	const CUSTOM_DATA_ENCRYPTED_SEED = 'encryptedSeed';
+	const CIPHER_IV = '0000000000000000';
+	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;
@@ -1022,6 +1026,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			$this->setEmail($loginId);
 		}
 		
+		$this->setEncryptedSeed($loginData->getSeedFor2FactorAuth());
+		
 		if ($sendEmail)
 		{
 			if ($loginDataExisted) {
@@ -1036,6 +1042,22 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this;
 	}
 	
+	public function setEncryptedSeed($seedFor2FactorAuth)
+	{
+		$encryptionKey = $this->getPartner()->getAdminSecret();
+		$encryptedSeed = base64_encode($this->encryptSeed($encryptionKey, $seedFor2FactorAuth));
+		$this->putInCustomData(self::CUSTOM_DATA_ENCRYPTED_SEED, $encryptedSeed);
+	}
+	
+	protected function encryptSeed($key, $message)
+	{
+		return OpenSSLWrapper::encrypt_aes($message, $key, self::CIPHER_IV);
+	}
+	
+	public function getEncryptedSeed()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENCRYPTED_SEED);
+	}
 	
 	public function getIsAccountOwner()
 	{
