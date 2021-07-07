@@ -1037,20 +1037,6 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this;
 	}
 	
-	protected function encryptSeed($key, $message)
-	{
-		return OpenSSLWrapper::encrypt_aes($message, $key, '');
-	}
-	
-	public function getEncryptedSeed()
-	{
-		$loginData = UserLoginDataPeer::retrieveByPK($this->login_data_id);
-		if (is_null($loginData))
-		{
-			return null;
-		}
-		return base64_encode($this->encryptSeed($this->getPartner()->getAdminSecret(), $loginData->getSeedFor2FactorAuth()));
-	}
 	
 	public function getIsAccountOwner()
 	{

@@ -539,7 +539,16 @@ class UserService extends KalturaBaseUserService
 		
 		$apiUser = new KalturaUser();
 		$apiUser->fromObject($user, $this->getResponseProfile());
+		if(!$user->getIsAdmin())
+		{
+			$apiUser->encryptedSeed = base64_encode($this->encryptSeed($user->getPartner()->getAdminSecret(), $user->getLoginData()->getSeedFor2FactorAuth()));
+		}
 		return $apiUser;
+	}
+	
+	protected function encryptSeed($key, $message)
+	{
+		return OpenSSLWrapper::encrypt_aes($message, $key, '');
 	}
 	
 	
