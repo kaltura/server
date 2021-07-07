@@ -13,7 +13,7 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 	public $id;
 
 	/**
-	 * @var
+	 * @var KalturaVendorIntegrationStatus
 	 * @readonly
 	 */
 	public $status;
@@ -70,6 +70,7 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 	private static $map_between_objects = array
 	(
 		'id',
+		'status',
 		'accountId',
 		'createUserIfNotExist',
 		'handleParticipantsMode',
