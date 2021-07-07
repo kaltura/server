@@ -63,6 +63,7 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 
 	/**
 	 * @var int
+	 * @readonly
 	 */
 	public $partnerId;
 
@@ -77,7 +78,7 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 		'deletionPolicy',
 		'createdAt',
 		'updatedAt',
-		'partnerId'
+		'partnerId',
 	);
 
 	public function getMapBetweenObjects()
@@ -124,5 +125,16 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 		}
 
 		return $object;
+	}
+
+	public function toInsertableObject($dbObject = null, $skip = array())
+	{
+		if (is_null($dbObject))
+		{
+			$dbObject = new VendorIntegration();
+		}
+		$dbObject->setPartnerId(kCurrentContext::getCurrentPartnerId());
+
+		return parent::toInsertableObject($dbObject, $skip);
 	}
 }

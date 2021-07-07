@@ -41,14 +41,16 @@ class VendorIntegrationService extends KalturaBaseService
 	 *
 	 * @action add
 	 * @param KalturaIntegrationSetting $integration
+	 * @param string $remoteId
 	 * @return KalturaIntegrationSetting
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
 	 */
-	public function addAction(KalturaIntegrationSetting $integration)
+	public function addAction(KalturaIntegrationSetting $integration, $remoteId)
 	{
 		$dbObject = $integration->toInsertableObject();
 
 		/* @var $dbObject VendorIntegration */
+		$dbObject->setAccountId($remoteId);
 		$dbObject->setStatus(VendorIntegrationStatus::ACTIVE);
 		$dbObject->save();
 
