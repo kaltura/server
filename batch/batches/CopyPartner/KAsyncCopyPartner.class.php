@@ -117,7 +117,6 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 
 	public function handleSubscriptionInChargeBee($toPartner)
 	{
-
 		list($chargeBeeConfMap, $site, $siteApiKey) = $this->getSiteConfig($toPartner->country);
 		$chargeBeeClient = new kChargeBeeClient($chargeBeeConfMap[$site], $chargeBeeConfMap[$siteApiKey]);
 		$responseSubscription = $chargeBeeClient->createSubscription($chargeBeeConfMap[self::PLAN_ID], $chargeBeeConfMap[self::AUTO_COLLECTION], $toPartner->firstName, $toPartner->lastName, $toPartner->adminEmail);
@@ -125,7 +124,11 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$subscriptionId = isset($responseSubscription[self::SUBSCRIPTION]) ?  $responseSubscription[self::SUBSCRIPTION][self::ID] : null;
 		$chargeBeePlugin = KalturaChargeBeeClientPlugin::get(KBatchBase::$kClient);
 		$chargeBeeVendor = $this->createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin);
+		$this->handleSubscriptionResult($subscriptionId, $chargeBeeClient, $chargeBeeConfMap, $chargeBeeVendor, $chargeBeePlugin);
+	}
 
+	public function handleSubscriptionResult($subscriptionId, $chargeBeeClient, $chargeBeeConfMap, $chargeBeeVendor, $chargeBeePlugin)
+	{
 		if ($subscriptionId)
 		{
 			$updatedAmount = $chargeBeeClient->updateFreeTrial($subscriptionId, $chargeBeeConfMap[self::FREE_TRIAL_AMOUNT], 'add promotional credits');
