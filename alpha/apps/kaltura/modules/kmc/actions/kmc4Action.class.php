@@ -163,7 +163,7 @@ class kmc4Action extends kalturaAction
 		$playerApps = isset($embedPlaykitConf['playerApps']) ? $embedPlaykitConf['playerApps'] : null;
 		$html5_version = isset($playerApps['html5_version']) ? $playerApps['html5_version'] : null;
 		$studio_version = isset($playerApps['studio_version']) ? $playerApps['studio_version'] : null;
-		$studio_v3_version = isset($playerApps['studio_version']) ? $playerApps['studio_v3_version'] : null;
+		$studio_v3_version = isset($playerApps['studio_v3_version']) ? $playerApps['studio_v3_version'] : null;
 
 		if (!is_null($studio_version)) {
 			$this->studioUiConf = uiConfPeer::getUiconfByTagAndVersion(self::HTML5_STUDIO_TAG, $studio_version);
