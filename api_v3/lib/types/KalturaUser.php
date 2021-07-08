@@ -122,7 +122,6 @@ class KalturaUser extends KalturaBaseUser
 		"title",
 		"company",
 		"ksPrivileges",
-		"encryptedSeed",
 	);
 
 	public function getMapBetweenObjects ( )
