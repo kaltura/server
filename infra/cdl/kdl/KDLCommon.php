@@ -304,6 +304,7 @@
 		const DV = "dv";
 		const VP9 = "vp9";
 		const H265 = "h265";
+		const AV1  = "av1";
 		const COPY = "copy";
 	}
 

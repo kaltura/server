@@ -767,7 +767,17 @@ class KCurlWrapper
 			$sourceUrl = 'http://' . $sourceUrl;
 		}
 
-		$parts = parse_url($sourceUrl);
+        //Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
+        //https://bugs.php.net/bug.php?id=73754
+        $sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
+
+        // extract information from URL and job data
+        $parts = parse_url($sourceUrl);
+        if($replaceCount)
+        {
+            $parts = preg_replace("/_kHash_/", "#", $parts);
+        }
+
 		if (!isset($parts['scheme']) || !isset($parts['host']))
 		{
 			KalturaLog::log("Failed to parse url [$sourceUrl]");

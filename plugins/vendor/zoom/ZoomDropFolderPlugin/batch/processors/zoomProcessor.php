@@ -157,7 +157,7 @@ abstract class zoomProcessor
 			$filterUser = new KalturaUserFilter();
 			$filterUser->partnerIdEqual = $partnerId;
 			$filterUser->emailStartsWith = $email;
-			$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
+			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
 			if (!$kalturaUser->objects || $kalturaUser->objects[0]->email != $email)
 			{
 				return null;

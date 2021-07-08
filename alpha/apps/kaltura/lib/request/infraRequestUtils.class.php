@@ -13,6 +13,7 @@ class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
 	const PROTOCOL_HTTPS = 'https';
+	const PROTOCOL_SFTP = 'sftp';
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	const CLIENT_TAG = 'clientTag';
 	const ORIGIN_HEADER = 'HTTP_ORIGIN';
