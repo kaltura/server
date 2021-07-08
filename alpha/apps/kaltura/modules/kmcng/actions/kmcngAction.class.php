@@ -108,22 +108,27 @@ class kmcngAction extends kalturaAction
 
 
 		$studio = null;
-		if (kConf::hasParam("studio_version") && kConf::hasParam("html5_version"))
+        $embedPlaykitConf = kConf::getMap(kConfMapNames::APP_VERSIONS);
+        $playerApps = isset($embedPlaykitConf['playerApps']) ? $embedPlaykitConf['playerApps'] : null;
+        $html5_version = isset($playerApps['html5_version']) ? $playerApps['html5_version'] : null;
+        $studio_version = isset($playerApps['studio_version']) ? $playerApps['studio_version'] : null;
+        $studio_v3_version = isset($playerApps['studio_v3_version']) ? $playerApps['studio_v3_version'] : null;
+		if ($studio_version && $html5_version)
 		{
 			$studio = array(
-				"uri" => '/apps/studio/' . kConf::get("studio_version") . "/index.html",
-				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php"
+				"uri" => '/apps/studio/' . $studio_version . "/index.html",
+				"html5_version" => $html5_version,
+				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . $html5_version . "/mwEmbedLoader.php"
 			);
 		}
 
 		$studioV3 = null;
-		if (kConf::hasParam("studio_v3_version") && kConf::hasParam("html5_version"))
+		if ($studio_v3_version && $html5_version)
 		{
 			$studioV3 = array(
-				"uri" => '/apps/studioV3/' . kConf::get("studio_v3_version") . "/index.html",
-				"html5_version" => kConf::get("html5_version"),
-				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . kConf::get("html5_version") . "/mwEmbedLoader.php",
+				"uri" => '/apps/studioV3/' . $studio_v3_version . "/index.html",
+				"html5_version" => $html5_version,
+				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . $html5_version . "/mwEmbedLoader.php",
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
 				"playerBetaVersionsMap" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfig() : '',
 				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : '',
