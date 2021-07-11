@@ -130,7 +130,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$chargeBeeConfiguration = self::getChargeBeeConfiguration();
 		if (!isset($chargeBeeConfiguration['user']) or !isset($chargeBeeConfiguration['password']))
 		{
-			throw new KalturaAPIException(KalturaChargeBeedErrors::MISSING_USER_PASSWORD_CONFIGURATION);
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_USER_PASSWORD_CONFIGURATION);
 		}
 		
 		if ($_SERVER['PHP_AUTH_USER'] != $chargeBeeConfiguration['user'] or $_SERVER['PHP_AUTH_PW'] != $chargeBeeConfiguration['password'])
@@ -138,34 +138,162 @@ class ChargeBeeVendorService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
 		}
 		
-		$eventType = $this->getPostData();
+		$this->handlePostData();
 	}
 	
-	protected function getPostData()
+	protected function handlePostData()
 	{
 		$data = json_decode(file_get_contents('php://input'));
-		
 		if (!isset($data) or !isset($data->event_type))
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
 		}
+		
 		$eventType = $data->event_type;
-		if ($eventType == 'payment_source_added')
+		switch ($eventType)
 		{
-			return $eventType;
+			case 'payment_source_added':
+				$this->handlePaymentSourceAdded($data);
+				break;
+			case 'payment_failed':
+				$this->handlePaymentFailed($data);
+				break;
+			case 'subscription_trial_end_reminder':
+				$this->handleSubscriptionTrialEndReminder($data);
+				break;
+			case 'subscription_canceled':
+				$this->handleSubscriptionCanceled($data);
+				break;
+			case 'pending_invoice_created':
+				$this->handlePendingInvoiceCreated($data);
+				break;
+			default:
+				throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
 		}
-		else if ($eventType == 'payment_failed')
+		
+//		if ($eventType == 'payment_source_added')
+//		{
+//			$this->handlePaymentSourceAdded($data);
+//		}
+//		else if ($eventType == 'payment_failed')
+//		{
+//			$this->handlePaymentFailed($data);
+//		}
+//		else if ($eventType == 'subscription_trial_end_reminder')
+//		{
+//			$this->handleSubscriptionTrialEndReminder($data);
+//		}
+//		else if ($eventType == 'subscription_canceled')
+//		{
+//			$this->handleSubscriptionCanceled($data);
+//		}
+//		else if ($eventType == 'pending_invoice_created')
+//		{
+//			$this->handlePendingInvoiceCreated($data);
+//		}
+//		else
+//		{
+//			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
+//		}
+	}
+	
+	protected function handlePaymentSourceAdded($data)
+	{
+		if (!isset($data->content->customer->id))
 		{
-			return $eventType;
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_SUBSCRIPTION_ID);
 		}
-		else if ($eventType == 'subscription_trial_end_reminder')
+		
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
+		if (!$vendorIntegration)
 		{
-			return $eventType;
+			//throw exception
+		}
+		
+		$partnerId = $vendorIntegration->getPartnerId();
+		if ($partnerId)
+		{
+			$permissions = PermissionPeer::getByNameAndPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, array($partnerId));
+			if (!$permissions)
+			{
+				PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $data->id);
+			}
 		}
 		else
 		{
-			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
+			//throw exception
 		}
+		
+		$vendorIntegration->setVendorType(KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
+		
+		// Call ChargeBeeAPI - Change Trial End ($currentDay)
+	}
+	
+	protected function handlePaymentFailed($data)
+	{
+		if (!isset($data->content->customer->id))
+		{
+			//throw exception
+		}
+		
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
+		$partnerId = $vendorIntegration->getPartnerId();
+		if ($partnerId)
+		{
+			PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
+		}
+		else
+		{
+			//throw exception1
+		}
+	}
+	
+	// Function: handleErrors - put in log, send email, etc... w
+	
+	protected function handleSubscriptionTrialEndReminder($data)
+	{
+		if (!isset($data->id))
+		{
+			//throw exception
+		}
+		
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
+		$partnerId = $vendorIntegration->getPartnerId();
+		if ($partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			$partner->setStatus(KalturaPartnerStatus::FULL_BLOCK);
+			$partner->save();
+		}
+		else
+		{
+			//throw exception1
+		}
+	}
+	
+	protected function handleSubscriptionCanceled($data)
+	{
+		if (!isset($data->content->customer->id))
+		{
+			//throw exception
+		}
+		
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
+		$partnerId = $vendorIntegration->getPartnerId();
+		if ($partnerId)
+		{
+			PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
+		}
+		else
+		{
+			//throw exception
+		}
+	}
+	
+	protected function handlePendingInvoiceCreated($data)
+	{
+		// save the invoiceId on the VendorIntegration
+		// requires adding InvoiceId on VendorIntegration
 	}
 
 	/**

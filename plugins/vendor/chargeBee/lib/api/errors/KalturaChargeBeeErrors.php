@@ -10,4 +10,6 @@ class KalturaChargeBeeErrors extends KalturaErrors
 	const UNAUTHORIZED_USER_PASSWORD = 'UNAUTHORIZED_USER_PASSWORD;;Unauthorized user or password';
 	const MISSING_USER_PASSWORD_CONFIGURATION = 'MISSING_USER_PASSWORD_CONFIGURATION;;Missing configured user or password';
 	const MISSING_EVENT_TYPE = 'MISSING_EVENT_TYPE;;Missing event type in the request';
+	const MISSING_SUBSCRIPTION_ID = 'MISSING_SUBSCRIPTION_ID;;Missing subscription id in the request';
+	const FAILED_RETRIEVING_PARTNER = 'FAILED_RETRIEVING_PARTNER;;Failed to retrieve the partner according to subscription';
 }
