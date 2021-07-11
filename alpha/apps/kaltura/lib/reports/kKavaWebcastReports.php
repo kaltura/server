@@ -6,6 +6,12 @@ class kKavaWebcastReports extends kKavaReportsMgr
 	protected static $reports_def = array(
 
 		ReportType::HIGHLIGHTS_WEBCAST => array(
+			self::REPORT_GRAPH_METRICS => array(
+				self::EVENT_TYPE_PLAY,
+				self::METRIC_UNIQUE_VIEWERS,
+				self::METRIC_VIEW_PERIOD_PLAY_TIME,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
+			),
 			self::REPORT_TOTAL_METRICS => array(
 				self::EVENT_TYPE_PLAY,
 				self::METRIC_UNIQUE_VIEWERS,
