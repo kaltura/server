@@ -740,7 +740,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$loginData->setLoginBlockedUntil(null);
 			$loginData->resetPreviousPasswords();
 			
-			self::checkPasswordValidation($password, $loginData);
+			if ($checkPasswordStructure)
+			{
+				self::checkPasswordValidation($password, $loginData);
+			}
 			
 			$loginData->save();
 			// now $loginData has an id and hash key can be generated
