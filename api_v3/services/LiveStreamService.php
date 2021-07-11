@@ -577,21 +577,21 @@ class LiveStreamService extends KalturaLiveEntryService
 	{
 		$liveStreamEntry = $this->fetchLiveEntry($id);
 		$liveStreamEntry->setLiveStatusCache();
-		$res = new KalturaLiveStreamDetails();
+		$liveStreamDetails = new KalturaLiveStreamDetails();
 		$isLive = $liveStreamEntry->isCurrentlyLive();
-		$res->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
+		$liveStreamDetails->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
 		if (in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
-			$this->updateInternalLiveStreamDetails($liveStreamEntry, $res);
+			$this->updateInternalLiveStreamDetails($liveStreamEntry, $liveStreamDetails);
 		}
 
-		if ($isLive && $res->broadcastStatus == KalturaLiveStreamBroadcastStatus::OFFLINE) //Simulive flow
+		if ($isLive && $liveStreamDetails->broadcastStatus == KalturaLiveStreamBroadcastStatus::OFFLINE) //Simulive flow
 		{
-			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+			$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 		}
 
 		$this->responseHandlingIsLive($isLive);
-		return $res;
+		return $liveStreamDetails;
 	}
 
 	/**
