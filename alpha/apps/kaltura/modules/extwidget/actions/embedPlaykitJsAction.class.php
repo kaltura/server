@@ -23,11 +23,14 @@ class embedPlaykitJsAction extends sfAction
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
 	const PLAYKIT_KAVA = 'playkit-kava';
+	const PLAYKIT_PATH_OLD_NAME = 'rapt';
+	const PLAYKIT_PATH_NEW_NAME = 'playkit-path';
 	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+	const PATH_RENAME_VERSION = '0.4.5';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -554,6 +557,16 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion,$corePackages);
 	}
 
+	private function maybeAdjustPath()
+	{
+		$pathVersion = isset($this->bundleConfig[self::PLAYKIT_PATH_OLD_NAME]) ? $this->bundleConfig[self::PLAYKIT_PATH_OLD_NAME] : '';
+		if(version_compare($pathVersion, self::PATH_RENAME_VERSION) >= 0)
+		{
+			$this->bundleConfig[self::PLAYKIT_PATH_NEW_NAME] = $this->bundleConfig[self::PLAYKIT_PATH_OLD_NAME];
+			unset($this->bundleConfig[self::PLAYKIT_PATH_OLD_NAME]);
+		}
+	}
+
 	private function maybeAddAnalyticsPlugins()
 	{
 		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
@@ -745,6 +758,7 @@ class embedPlaykitJsAction extends sfAction
 
 		$this->maybeAddAnalyticsPlugins();
 		$this->setFixVersionsNumber();
+		$this->maybeAdjustPath();
 		$this->setBundleName();
 	}
 
