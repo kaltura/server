@@ -470,6 +470,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		if (!$flavorParamsId)
 		{
+			if (!$this->getPartner()->getDefaultRecordingConversionProfile())
+			{
+				$recordedEntry->setConversionProfileId($this->getPartner()->getDefaultConversionProfileId());
+			}
 			$service = new MediaService();
 			$service->initService('media', 'media', 'updateContent');
 			$service->updateContentAction($recordedEntry->getId(), $resource);
