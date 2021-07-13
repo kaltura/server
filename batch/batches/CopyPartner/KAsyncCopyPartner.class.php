@@ -9,16 +9,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 {
 	protected $fromPartnerId;
 	protected $toPartnerId;
-
-	const MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'chargeBee';
-	const COUNTRY_CODE_EUROPE = 'countryCodeEurope';
-	const SITE_US = 'siteUS';
-	const SITE_API_KEY_US = 'siteApiKeyUS';
-	const SITE_EU = 'siteEU';
-	const SITE_API_KEY_EU = 'siteApiKeyEU';
-	const PLAN_ID = 'planId';
-	const AUTO_COLLECTION = 'autoCollection';
+	
 	const EMAIL_ADDRESSES = 'emailAddresses';
 	const SUBSCRIPTION = 'subscription';
 	const FREE_TRIAL_AMOUNT = 'freeTrialAmount';
@@ -117,9 +108,9 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 
 	public function handleSubscriptionInChargeBee($toPartner)
 	{
-		list($chargeBeeConfMap, $site, $siteApiKey) = $this->getSiteConfig($toPartner->country);
+		list($chargeBeeConfMap, $site, $siteApiKey) = kChargeBeeUtils::getSiteConfig($toPartner->country);
 		$chargeBeeClient = new kChargeBeeClient($chargeBeeConfMap[$site], $chargeBeeConfMap[$siteApiKey]);
-		$responseSubscription = $chargeBeeClient->createSubscription($chargeBeeConfMap[self::PLAN_ID], $chargeBeeConfMap[self::AUTO_COLLECTION], $toPartner->firstName, $toPartner->lastName, $toPartner->adminEmail);
+		$responseSubscription = $chargeBeeClient->createSubscription($chargeBeeConfMap[kChargeBeeUtils::PLAN_ID], $chargeBeeConfMap[kChargeBeeUtils::AUTO_COLLECTION], $toPartner->firstName, $toPartner->lastName, $toPartner->adminEmail);
 		$this->log('Response from chargeBee createSubscription: ' . print_r($responseSubscription, true));
 		$subscriptionId = isset($responseSubscription[self::SUBSCRIPTION]) ?  $responseSubscription[self::SUBSCRIPTION][self::ID] : null;
 		$chargeBeePlugin = KalturaChargeBeeClientPlugin::get(KBatchBase::$kClient);
@@ -144,29 +135,6 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			}
 			$this->updateChargeBeeVendorIntegration($chargeBeeVendor->id, $chargeBeePlugin);
 		}
-	}
-
-	public function getSiteConfig($country)
-	{
-		$chargeBeeConfMap = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME, array());
-		$countryCodeEurope = array_map('trim', explode(',', $chargeBeeConfMap[self::COUNTRY_CODE_EUROPE]));
-		$isEuropeCountry = array_key_exists($country, $countryCodeEurope);
-		if ($isEuropeCountry)
-		{
-			$site = self::SITE_EU;
-			$siteApiKey = self::SITE_API_KEY_EU;
-		}
-		else
-		{
-			$site = self::SITE_US;
-			$siteApiKey = self::SITE_API_KEY_US;
-		}
-		if (!$chargeBeeConfMap || !isset($chargeBeeConfMap[$site] )|| !isset($chargeBeeConfMap[$siteApiKey]) || !isset($chargeBeeConfMap[self::PLAN_ID]) || !isset($chargeBeeConfMap[self::AUTO_COLLECTION]))
-		{
-			$this->log('Could not find the map: ' . self::MAP_NAME . ' param name: ' . self::CONFIGURATION_PARAM_NAME);
-		}
-		return array($chargeBeeConfMap, $site, $siteApiKey);
-
 	}
 
 	public function createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin)
