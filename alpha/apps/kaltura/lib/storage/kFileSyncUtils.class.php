@@ -1018,7 +1018,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds();
 
 		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
-		$skipFileSyncTypeMap = kConf::get("skip_file_sync_type_map", "runtime_config", array());
+		$fileSyncAllowFilePattern = kConf::get("file_sync_allow_file_pattern", "runtime_config", array());
 		
 		foreach ($file_sync_list as $file_sync)
 		{
@@ -1036,8 +1036,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
 			if($isCloudDc && $tmp_file_sync->getDc() == $dc_id &&
-				array_key_exists($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) &&
-				!preg_match($skipFileSyncTypeMap[$fileSyncTypeSubTypeKey], $tmp_file_sync->getFullPath()))
+				array_key_exists($fileSyncTypeSubTypeKey, $fileSyncAllowFilePattern) &&
+				!preg_match($fileSyncAllowFilePattern[$fileSyncTypeSubTypeKey], $tmp_file_sync->getFullPath()))
 			{
 				continue;
 			}
@@ -1050,7 +1050,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 			// If file sync type is in skipFileSyncTypeMap we can also return teh cloud storage file sync
 			if($isCloudDc &&
-				array_key_exists($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) &&
+				array_key_exists($fileSyncTypeSubTypeKey, $fileSyncAllowFilePattern) &&
 				in_array($tmp_file_sync->getDc(), $sharedStorageProfileId))
 			{
 				return array($tmp_file_sync);
