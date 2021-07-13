@@ -470,7 +470,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		if (!$flavorParamsId)
 		{
-			if (!$this->getPartner()->getDefaultRecordingConversionProfile())
+			if ($recordedEntry->getconversionProfile2()->getType() == ConversionProfileType::LIVE_STREAM)
 			{
 				$recordedEntry->setConversionProfileId($this->getPartner()->getDefaultConversionProfileId());
 			}
