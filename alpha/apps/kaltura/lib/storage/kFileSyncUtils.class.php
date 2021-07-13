@@ -1014,12 +1014,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
-		$periodicFileSyncs = array();
-		$periodicStorageIds = kStorageExporter::getPeriodicStorageIds();
-
+		$sharedFileSyncs = array();
+		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds();
+		
 		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
-		$skipFileSyncTypeMap = kConf::get("skip_file_sync_type_map", "runtime_config", null);
-		$skipFileSyncPattern = kConf::get("skip_file_sync_pattern", "runtime_config", null);
+		$fileSyncAllowFilePattern = kConf::get("file_sync_allow_file_pattern", "runtime_config", array());
 		
 		foreach ($file_sync_list as $file_sync)
 		{
@@ -1029,15 +1028,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$tmp_file_sync = self::resolve($file_sync);
 			}
-
+			
 			if ($tmp_file_sync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 			{
 				continue;
 			}
-
+			
 			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
-			if($isCloudDc && $skipFileSyncTypeMap && $skipFileSyncPattern && $tmp_file_sync->getDc() == $dc_id &&
-				in_array($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) && !preg_match($skipFileSyncPattern, $tmp_file_sync->getFullPath()))
+			if($isCloudDc && $tmp_file_sync->getDc() == $dc_id &&
+				array_key_exists($fileSyncTypeSubTypeKey, $fileSyncAllowFilePattern) &&
+				!preg_match($fileSyncAllowFilePattern[$fileSyncTypeSubTypeKey], $tmp_file_sync->getFullPath()))
 			{
 				continue;
 			}
@@ -1047,10 +1047,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				return array($tmp_file_sync);
 			}
-
+			
 			// If file sync type is in skipFileSyncTypeMap we can also return teh cloud storage file sync
-			if($isCloudDc && $skipFileSyncTypeMap && $skipFileSyncPattern &&
-				in_array($fileSyncTypeSubTypeKey, $skipFileSyncTypeMap) && in_array($tmp_file_sync->getDc(), $periodicStorageIds))
+			if($isCloudDc &&
+				array_key_exists($fileSyncTypeSubTypeKey, $fileSyncAllowFilePattern) &&
+				in_array($tmp_file_sync->getDc(), $sharedStorageProfileId))
 			{
 				return array($tmp_file_sync);
 			}
@@ -1059,18 +1060,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$dcFileSyncs[] = $tmp_file_sync;
 			}
-			else if(in_array($tmp_file_sync->getDc(), $periodicStorageIds))
+			else if(in_array($tmp_file_sync->getDc(), $sharedStorageProfileId))
 			{
-				$periodicFileSyncs[] = $tmp_file_sync;
+				$sharedFileSyncs[] = $tmp_file_sync;
 			}
 			else
 			{
 				$remoteFileSyncs[] = $tmp_file_sync;
 			}
 		}
-
+		
 		// always prefer local file syncs, then periodic and lastly remote
-		return array_merge($dcFileSyncs, $periodicFileSyncs, $remoteFileSyncs);
+		return array_merge($dcFileSyncs, $sharedFileSyncs, $remoteFileSyncs);
 	}
 
 	/**
