@@ -141,6 +141,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$this->handlePostData();
 	}
 	
+	
 	protected function handlePostData()
 	{
 		$data = json_decode(file_get_contents('php://input'));
@@ -170,131 +171,129 @@ class ChargeBeeVendorService extends KalturaBaseService
 			default:
 				throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
 		}
-		
-//		if ($eventType == 'payment_source_added')
-//		{
-//			$this->handlePaymentSourceAdded($data);
-//		}
-//		else if ($eventType == 'payment_failed')
-//		{
-//			$this->handlePaymentFailed($data);
-//		}
-//		else if ($eventType == 'subscription_trial_end_reminder')
-//		{
-//			$this->handleSubscriptionTrialEndReminder($data);
-//		}
-//		else if ($eventType == 'subscription_canceled')
-//		{
-//			$this->handleSubscriptionCanceled($data);
-//		}
-//		else if ($eventType == 'pending_invoice_created')
-//		{
-//			$this->handlePendingInvoiceCreated($data);
-//		}
-//		else
-//		{
-//			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
-//		}
 	}
+	
 	
 	protected function handlePaymentSourceAdded($data)
 	{
-		if (!isset($data->content->customer->id))
-		{
-			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_SUBSCRIPTION_ID);
-		}
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
 		
-		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
-		if (!$vendorIntegration)
-		{
-			//throw exception
-		}
+		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
 		
-		$partnerId = $vendorIntegration->getPartnerId();
-		if ($partnerId)
+		PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $partnerId);
+		
+		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
+		foreach ($childPartners as $childPartner)
 		{
-			$permissions = PermissionPeer::getByNameAndPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, array($partnerId));
-			if (!$permissions)
-			{
-				PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $data->id);
-			}
-		}
-		else
-		{
-			//throw exception
+			PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $childPartner->getPartnerId());
 		}
 		
 		$vendorIntegration->setVendorType(KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
 		
-		// Call ChargeBeeAPI - Change Trial End ($currentDay)
+		$chargeBeeClient = new kChargeBeeClient('https://kalturausinc-test.chargebee.com/api', 'dGVzdF9jZDVZRmtDd0EwcXUwd3JCS0tWUkF1eVV0b2NkUzJ2NEZwOg==');
+		$chargeBeeClient->updateSubscriptionTrialEnd($data->content->customer->id, 0);
 	}
+	
 	
 	protected function handlePaymentFailed($data)
 	{
-		if (!isset($data->content->customer->id))
-		{
-			//throw exception
-		}
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
 		
-		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		$partnerId = $vendorIntegration->getPartnerId();
-		if ($partnerId)
+		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		
+		PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
+		$partner->setStatus(KalturaPartnerStatus::READ_ONLY);
+		$partner->save();
+		
+		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
+		foreach ($childPartners as $childPartner)
 		{
-			PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
-		}
-		else
-		{
-			//throw exception1
+			PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $childPartner->getPartnerId());
+			$childPartner->setStatus(KalturaPartnerStatus::READ_ONLY);
+			$childPartner->save();
 		}
 	}
 	
-	// Function: handleErrors - put in log, send email, etc... w
 	
 	protected function handleSubscriptionTrialEndReminder($data)
 	{
-		if (!isset($data->id))
-		{
-			//throw exception
-		}
+		$vendorIntegration = $this->retrieveVendorIntegration($data->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
 		
-		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		$partnerId = $vendorIntegration->getPartnerId();
-		if ($partnerId)
+		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		
+		$partner->setStatus(KalturaPartnerStatus::FULL_BLOCK);
+		$partner->save();
+		
+		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
+		foreach ($childPartners as $childPartner)
 		{
-			$partner = PartnerPeer::retrieveByPK($partnerId);
-			$partner->setStatus(KalturaPartnerStatus::FULL_BLOCK);
-			$partner->save();
-		}
-		else
-		{
-			//throw exception1
+			$childPartner->setStatus(KalturaPartnerStatus::FULL_BLOCK);
+			$childPartner->save();
 		}
 	}
+	
 	
 	protected function handleSubscriptionCanceled($data)
 	{
-		if (!isset($data->content->customer->id))
-		{
-			//throw exception
-		}
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
 		
-		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		$partnerId = $vendorIntegration->getPartnerId();
-		if ($partnerId)
+		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
+		
+		PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, $partnerId);
+		
+		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
+		foreach ($childPartners as $childPartner)
 		{
-			PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
-		}
-		else
-		{
-			//throw exception
+			PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $childPartner->getPartnerId());
 		}
 	}
 	
+	
 	protected function handlePendingInvoiceCreated($data)
 	{
-		// save the invoiceId on the VendorIntegration
-		// requires adding InvoiceId on VendorIntegration
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
+		
+		if (!$data->content->transaction->linked_invoices[0]->invoice_id)
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_INVOICE_ID);
+		}
+		
+		$vendorIntegration->setInvoiceId($data->content->transaction->linked_invoices[0]->invoice_id);
 	}
+	
+	
+	protected function retrieveVendorIntegration($id, $vendorType)
+	{
+		if (!$id)
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_SUBSCRIPTION_ID);
+		}
+		
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($id, $vendorType);
+		if (!$vendorIntegration)
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_PARTNER);
+		}
+		
+		return $vendorIntegration;
+	}
+	
+	
+	protected function retrievePartnerIdByVendorIntegration($vendorIntegration)
+	{
+		$partnerId = $vendorIntegration->getPartnerId();
+		if (!$partnerId)
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_PARTNER);
+		}
+		
+		return $partnerId;
+	}
+	
 
 	/**
 	 * @return array

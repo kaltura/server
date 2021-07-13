@@ -1,8 +1,7 @@
 <?php
 
 /**
- * @package plugins.vendor
- * @subpackage zoom.model
+ * @package plugins.chargeBee
  */
 class kChargeBeeClient
 {
@@ -18,9 +17,8 @@ class kChargeBeeClient
 	protected $chargeBeeBaseURL;
 	protected $siteApiKey;
 	
-	
 	/**
-	 * kZoomClient constructor.
+	 * kChargeBeeClient constructor.
 	 * @param $chargeBeeBaseURL
 	 * @param $siteApiKey
 	 * @throws KalturaAPIException
@@ -30,7 +28,7 @@ class kChargeBeeClient
 		$this->chargeBeeBaseURL = $chargeBeeBaseURL;
 		$this->siteApiKey = $siteApiKey;
 	}
-
+	
 	public function createSubscription($planId, $autoCollection, $firstName, $lastName, $email)
 	{
 		$apiPath = self::API_CREATE_SUBSCRIPTION;
@@ -45,10 +43,10 @@ class kChargeBeeClient
 		return $this->callChargeBee($apiPath);
 	}
 	
-	public function updateFreeTrial($subscriptionId, $amount, $description)
+	public function updateFreeTrial($customerId, $amount, $description)
 	{
 		$apiPath = self::API_UPDATE_FREE_TRIAL;
-		$apiPath .= '?customer_id=' . $subscriptionId . '&amount=' . $amount . '&description=' . $description;
+		$apiPath .= '?customer_id=' . $customerId . '&amount=' . $amount . '&description=' . $description;
 		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
 		return $this->callChargeBee($apiPath, $options);
 	}
@@ -62,10 +60,10 @@ class kChargeBeeClient
 	}
 	
 	
-	public function estimateInvoice($invoiceId, $chargesAmount, $chargesDescription)
+	public function estimateInvoice($customerId, $chargesAmount, $chargesDescription)
 	{
 		$apiPath = self::API_UPDATE_INVOICE;
-		$apiPath .= '?invoice[customer_id]=' . $invoiceId . '&charges[amount][0]=' . $chargesAmount . '&charges[description][0]=' . $chargesDescription;
+		$apiPath .= '?invoice[customer_id]=' . $customerId . '&charges[amount][0]=' . $chargesAmount . '&charges[description][0]=' . $chargesDescription;
 		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
 		return $this->callChargeBee($apiPath, $options);
 	}
@@ -77,7 +75,16 @@ class kChargeBeeClient
 		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
 		return $this->callChargeBee($apiPath, $options);
 	}
-	
+
+	public function updateSubscriptionTrialEnd($subscriptionId, $trialEnd)
+	{
+		$apiPath = str_replace('@subscriptionId@', $subscriptionId, self::API_RETRIEVE_SUBSCRIPTION);
+		$apiPath .= '?trial_end=' . $trialEnd;
+		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
+		return $this->callChargeBee($apiPath, $options);
+	}
+
+
 	/**
 	 * @param $response
 	 * @param int $httpCode
@@ -113,7 +120,7 @@ class kChargeBeeClient
 		$curlWrapper->setOpts($options);
 		
 		$url = $this->generateContextualUrl($apiPath);
-		$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
+		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, array(
 			"Authorization: Basic {$this->siteApiKey}:",
 			"Content-Type: Application/Json"
 		));
