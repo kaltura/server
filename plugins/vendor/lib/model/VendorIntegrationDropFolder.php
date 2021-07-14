@@ -10,12 +10,12 @@ abstract class VendorIntegrationDropFolder extends RemoteDropFolder
 
 	public function getIntegrationId ()
 	{
-		$this->getFromCustomData(self::INTEGRATION_SETTING_ID);
+		return $this->getFromCustomData(self::INTEGRATION_SETTING_ID);
 	}
 
 	public function setIntegrationId ($integrationId)
 	{
-		$this->getFromCustomData(self::INTEGRATION_SETTING_ID, $integrationId);
+		$this->putInCustomData(self::INTEGRATION_SETTING_ID, $integrationId);
 	}
 
 }
