@@ -468,8 +468,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 	private function handleRecording(LiveEntry $dbLiveEntry, entry $recordedEntry, KalturaDataCenterContentResource $resource, $flavorParamsId = null)
 	{
+		// in case we get null in the $flavorParamsId it mean that live will upload the source and let the BE convert it.
 		if (!$flavorParamsId)
 		{
+			// check if the conversion profile is already VOD if not set it to default.
 			if ($recordedEntry->getconversionProfile2()->getType() == ConversionProfileType::LIVE_STREAM)
 			{
 				$recordedEntry->setConversionProfileId($this->getPartner()->getDefaultConversionProfileId());
