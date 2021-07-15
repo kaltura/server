@@ -31,25 +31,6 @@ class KalturaMicrosoftTeamsDropFolder extends KalturaRemoteDropFolder
 	 */
 	public $clientId;
 
-	/**
-	 * @var KalturaStringArray
-	 * @readonly
-	 */
-	public $sites;
-
-	/**
-	 * @var KalturaStringArray
-	 * @readonly
-	 */
-	public $drives;
-
-	/**
-	 * Associative array, connecting each drive ID with the token for its most recent items.
-	 * @var KalturaKeyValueArray
-	 * @readonly
-	 */
-	public $driveTokens;
-
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */

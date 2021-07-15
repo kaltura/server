@@ -30,9 +30,6 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 		'clientSecret',
 		'clientId',
 		'secretExpirationDate',
-		'sites',
-		'drives',
-		'driveTokens',
 	);
 
 	public function getMapBetweenObjects()
