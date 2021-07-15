@@ -120,7 +120,7 @@ class KalturaMicrosoftTeamsDropFolder extends KalturaRemoteDropFolder
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		if (!MicrosoftTeamsDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !MicrosoftTeamsDropFolderPlugin::isAllowedPartner($this->partnerId))
+		if (!MicrosoftTeamsDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !MicrosoftTeamsDropFolderPlugin::isAllowedPartner($sourceObject->getPartnerId()))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
