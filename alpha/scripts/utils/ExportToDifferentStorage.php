@@ -38,7 +38,7 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 			$fileSync->save();
 		}
 
-		if (!in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL)))
+		if (!in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_CACHE)))
 		{
 			KalturaLog::log("XXX $assetId: BAD_FILE_TYPE" . $fileSync->getFileType() . " - unexpected file type");
 			return;
@@ -73,7 +73,7 @@ function handleRegularFileSyncs($assetId, $fileSyncs)
 
 			if ($targetDcFileSync->getSrcPath() == $readyFileSync->getFullPath() && $targetDcFileSync->getFromCustomData('srcDc', null, -1) == $readyFileSync->getDc())
 			{
-				KalturaLog::log("XXX $assetId: PENDING_WITH_PATH - pending file sync with valid src path");
+				KalturaLog::log("XXX $assetId: PENDING_WITH_PATH - pending file sync with valid src path, " . $readyFileSync->getDc() . " " . $readyFileSync->getFullPath() . " " . $targetDcFileSync->getId());
 			}
 			else
 			{
@@ -133,6 +133,7 @@ function getOriginalDc($syncKey)
 	$fileSyncs = FileSyncPeer::doSelect($c);
 
 	$result = array();
+	$all = array();
 	foreach ($fileSyncs as $fileSync)
 	{
 		if ($fileSync->getLinkedId())
@@ -142,20 +143,33 @@ function getOriginalDc($syncKey)
 			{
 				continue;
 			}
-		}
 
-		if ($fileSync->getOriginal())
+			$all[] = $fileSync->getDc();
+			if ($fileSync->getOriginal())
+			{
+				$result[] = $fileSync->getDc();
+			}
+		}
+		else
 		{
-			$result[] = $fileSync->getDc();
+			array_unshift($all, $fileSync->getDc());
+			if ($fileSync->getOriginal())
+			{
+				array_unshift($result, $fileSync->getDc());
+			}
 		}
 	}
 
-	if (count($result) != 1)
+	if (count($result))
 	{
-		return false;
+		return reset($result);
+	}
+	else if (count($all))
+	{
+		return reset($all);
 	}
 
-	return min($result);
+	return false;
 }
 
 function handleSyncKey($assetId, $syncKey, $depth = 0)
@@ -216,12 +230,6 @@ function handleSyncKey($assetId, $syncKey, $depth = 0)
 		else
 		{
 			$resolvedFileSync = $fileSync;
-		}
-
-		if ($resolvedFileSync->getIsDir())
-		{
-			KalturaLog::log("XXX $assetId: DIR_FILE_SYNC - dir file sync");
-			return;
 		}
 
 		if ($resolvedFileSync->getDc() != $fileSync->getDc())
@@ -415,6 +423,43 @@ function handleFileSyncKeys($handle)
 	}
 }
 
+function printPaths($assetId, $syncKey)
+{
+	global $allDcIds;
+
+	$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+	$c->add(FileSyncPeer::DC, $allDcIds, Criteria::IN);
+	$fileSyncs = FileSyncPeer::doSelect($c);
+
+	foreach ($fileSyncs as $fileSync)
+	{
+		if ($fileSync->getLinkedId())
+		{
+			$fileSync = FileSyncPeer::retrieveByPK($fileSync->getLinkedId());
+			if(!$fileSync)
+			{
+				continue;
+			}
+		}
+
+		if (!is_null($fileSync->getFileType()) && !in_array($fileSync->getFileType(), array(FileSync::FILE_SYNC_FILE_TYPE_FILE, FileSync::FILE_SYNC_FILE_TYPE_URL, FileSync::FILE_SYNC_FILE_TYPE_CACHE)))
+		{
+			continue;
+		}
+
+		$paths[$fileSync->getDc()] = array($fileSync->getId(), $fileSync->getFullPath());
+	}
+
+	$msg = 'YYY ' . $assetId;
+	foreach ($allDcIds as $dc)
+	{
+		$path = isset($paths[$dc]) ? $paths[$dc] : array('', '');
+		$msg .= "\t" . $path[0] . "\t" . $path[1];
+	}
+
+	KalturaLog::log($msg);
+}
+
 function handleAssets($handle)
 {
 	$count = 0;
@@ -449,9 +494,23 @@ function handleAssets($handle)
 			continue;
 		}
 
+		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
+		if (!$partner)
+		{
+			KalturaLog::log("XXX $assetId: LOAD_PID_FAILED - failed to load pid " . $asset->getPartnerId());
+			continue;
+		}
+
+		if ($partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+		{
+			KalturaLog::log("XXX $assetId: INACTIVE_PID - inactive pid " . $asset->getPartnerId());
+			continue;
+		}
+
 		// process
 		$syncKey = $asset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		handleSyncKey($assetId, $syncKey);
+		printPaths($assetId, $syncKey);
 	}
 }
 
