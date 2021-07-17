@@ -1469,13 +1469,34 @@ class myPartnerUtils
  		
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
  		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
+ 		
+ 		self::copyReachProfiles($fromPartner, $toPartner);
 
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
  		// Launch a batch job that will copy the heavy load as an async operation 
   		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
  	}
- 	
+	
+	public static function copyReachProfiles(Partner $fromPartner, Partner $toPartner)
+	{
+		KalturaLog::log('Copying Reach profiles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
+		
+		$c = new Criteria();
+		
+		$c->add(ReachProfilePeer::PARTNER_ID, $fromPartner->getId());
+		
+		$partnerReachProfiles = ReachProfilePeer::doSelect($c);
+		foreach($partnerReachProfiles as $reachProfile)
+		{
+			$newReachProfile = $reachProfile->copy();
+			$newReachProfile->setPartnerId($toPartner->getId());
+			$newReachProfile->save();
+			
+			KalturaLog::log("Copied [".$reachProfile->getId()."], new id is [".$newReachProfile->getId()."]");
+		}
+	}
+ 
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
  	{
  		KalturaLog::log('Copying user roles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
