@@ -132,8 +132,7 @@ function getOriginalDc($syncKey)
 	$c->add(FileSyncPeer::DC, $sourceDcIds, Criteria::IN);
 	$fileSyncs = FileSyncPeer::doSelect($c);
 
-	$result = array();
-	$all = array();
+	$resolved = array();
 	foreach ($fileSyncs as $fileSync)
 	{
 		if ($fileSync->getLinkedId())
@@ -143,33 +142,57 @@ function getOriginalDc($syncKey)
 			{
 				continue;
 			}
-
-			$all[] = $fileSync->getDc();
-			if ($fileSync->getOriginal())
-			{
-				$result[] = $fileSync->getDc();
-			}
 		}
-		else
+
+		$resolved[] = $fileSync;
+	}
+
+	if (!count($resolved))
+	{
+		return false;
+	}
+
+	$best = reset($resolved);
+	foreach ($resolved as $cur)
+	{
+		// prefer ready
+		$isReadyBest = $best->getStatus() == FileSync::FILE_SYNC_STATUS_READY;
+		$isReadyCur = $cur->getStatus() == FileSync::FILE_SYNC_STATUS_READY;
+		if ($isReadyBest != $isReadyCur)
 		{
-			array_unshift($all, $fileSync->getDc());
-			if ($fileSync->getOriginal())
+			if ($isReadyCur)
 			{
-				array_unshift($result, $fileSync->getDc());
+				$best = $cur;
 			}
+			continue;
+		}
+
+		// prefer original
+		$isOriginalBest = $best->getOriginal();
+		$isOriginalCur = $cur->getOriginal();
+		if ($isOriginalBest != $isOriginalCur)
+		{
+			if ($isOriginalCur)
+			{
+				$best = $cur;
+			}
+			continue;
+		}
+
+		// prefer direct (non-link)
+		$isDirectBest = $best->getObjectId() == $syncKey->getObjectId();
+		$isDirectCur = $cur->getObjectId() == $syncKey->getObjectId();
+		if ($isDirectBest != $isDirectCur)
+		{
+			if ($isDirectCur)
+			{
+				$best = $cur;
+			}
+			continue;
 		}
 	}
 
-	if (count($result))
-	{
-		return reset($result);
-	}
-	else if (count($all))
-	{
-		return reset($all);
-	}
-
-	return false;
+	return $best->getDc();
 }
 
 function handleSyncKey($assetId, $syncKey, $depth = 0)
