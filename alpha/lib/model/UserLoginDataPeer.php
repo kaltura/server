@@ -204,10 +204,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		// check that new password structure is valid
 		if ($newPassword &&
 				  !UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
-				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
-				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
-				  (stripos($newPassword, $loginData->getFullName()) !== false)    ||
-				  ($newPassword == $loginData->getLoginEmail())   ){
+					strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName()) !== false) ||
+					strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName()) !== false) ||
+					(stripos($newPassword, $loginData->getFullName()) !== false) ||
+					($newPassword == $loginData->getLoginEmail()))
+		{
 			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
