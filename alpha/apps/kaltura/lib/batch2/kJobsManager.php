@@ -546,15 +546,7 @@ class kJobsManager
 
 		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-			$pathMgr = $sharedStorageProfile->getPathManager();
-			
-			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
-			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
-			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-			
-			$convertData->setDestFileSyncSharedPath($sharedPath);
+			$convertData->setDestFileSyncSharedPath(self::getSharedPath($partner,$parentJob,$flavorAsset));
 		}
 		
 		// creats a child convert job
@@ -625,6 +617,25 @@ class kJobsManager
 		}
 		
 		return $fileSync;		
+	}
+	
+	private static function getSharedPath ($partner,$parentJob,$flavorAsset)
+	{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
+			if($parentJob && $parentJob->getJobType()== BatchJobType::CLIP_CONCAT)
+			{
+				$temp_storage_bucket = kConf::get('temp_storage_bucket', myCloudUtils::CLOUD_STORAGE_MAP, null);
+				if($temp_storage_bucket)
+				{
+					$root = $temp_storage_bucket;
+				}
+			}
+			
+			return kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 	}
 	
 	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData &$convertData)
@@ -1630,7 +1641,14 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$batchJob->setDc($dc);
+		if(kDataCenterMgr::isDcIdShared($dc))
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}
+		else
+		{
+			$batchJob->setDc($dc);
+		}
 		
 		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );

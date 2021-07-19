@@ -462,6 +462,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $secondarySecretRoleId;
 	
 	/**
+	 * @var int
+	 */
+	public $trigramPercentage;
+	
+	/**
+	 * @var int
+	 */
+	public $maxWordForNgram;
+	 
+	/**
 	 * @var KalturaTwoFactorAuthenticationMode
 	 */
 	public $twoFactorAuthenticationMode;
@@ -554,6 +564,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
+		'trigramPercentage',
+		'maxWordForNgram',
 		'twoFactorAuthenticationMode'
 	);
 
