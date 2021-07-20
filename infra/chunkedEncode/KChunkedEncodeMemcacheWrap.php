@@ -381,6 +381,7 @@ ini_set("memory_limit","512M");
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
 			$setup->sharedChunkPath = $sharedChunkPath;
+
 			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName);
 			
 			if(($rv=$session->Initialize())!=true) {
@@ -516,7 +517,7 @@ ini_set("memory_limit","512M");
 						 */
 				if(is_null($rvLock)) $rvLock = $this->lock($semaphoreKey, $semaphoreToken, 0);
 				if($rvLock!==true){
-					KalturaLog::log("Unable to lock fetchIndex($fetchIndex), retry ");
+					KalturaLog::log("Unable to lock fetchIndex($fetchIndex), retry");
 				}
 				else {
 						/*
@@ -537,7 +538,7 @@ ini_set("memory_limit","512M");
 					KalturaLog::log("Unable to access job($fetchIndex), while rdIdx($readIndex) moved on, skipping");
 					break;
 				}
-				
+
 				$attempts--;
 				KalturaLog::log("Unable to access job ($fetchIndex), retry ($attempts)");
 				usleep(rand(0,100000));
@@ -664,8 +665,9 @@ ini_set("memory_limit","512M");
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
 ///////////////
 // DEBUG ONLY
-//$dirName = "/web2/content/shared/tmp/qualityTest/TestBench.11";
-//$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
+// $dirName = dirname(__FILE__); //"/web2/content/shared/tmp/qualityTest/TestBench.11";
+// $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
+// $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
 //$cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
 ///////////////
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
@@ -788,13 +790,17 @@ ini_set("memory_limit","512M");
 
 			if($rv==0) {
 				if(isset($outFilename) && strstr($outFilename,'.vid')) {
-					$stat = new KChunkFramesStat($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
+					$stat = new KChunkFramesStat();
+						// VP9 / AV1 requires MP4 file container, they don't comply w/MPEGTS
+						// X264 / X265 comply w/both MP4 & MPEGTS, but meanwhile we'll continue w/MPEGTS
+					if((strstr($cmdLine,"libvpx-vp9")!==false) || (strstr($cmdLine,"libaom-av1")!==false))
+						$rv = $stat->getDataMP4($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
+					else
+						$rv = $stat->getDataMpegts($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
 					$job->stat = $stat;
 				}
 
-				if(isset($stat) && 
-					(is_null($stat->finish) || is_null($stat->finish) || is_null($stat->frame) 
-						|| $stat->start==0 || $stat->finish==0 || $stat->frame==0) ){
+				if(isset($stat) && $stat->isEmpty()){
 					$job->state = $job::STATE_FAIL;
 					$rvStr = "FAILED - missing chunk stat,";
 					$job->msg = "missing chunk stat";
@@ -833,12 +839,12 @@ ini_set("memory_limit","512M");
 					$rv=-1;
 				}
 			}
-			
+
 			$job->outFileSizes = $outFileSizes;
 			$storeManager->SaveJob($job);
 			
 			KalturaLog::log("$rvStr elap(".($job->finishTime-$job->startTime)."),process($job->process),".print_r($job,1));
-			// Move the PHP script log  from the local /tmp to the final storage
+				// Move the PHP script log  from the local /tmp to the final storage
 			if(isset($moveToFilenames)){
 				$tmpFilenameInfo = pathinfo($outFilenames[0]);
 				$movetToFilenameInfo = pathinfo($moveToFilenames[0]);
