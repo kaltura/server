@@ -142,8 +142,8 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 
 	public function createCaptionsFile($content, $clipStartTime, $clipEndTime, $timeCode, $globalOffset)
 	{
+		static $newLineIndex = 1;
 		$newFileContent = '';
-		$newLineIndex = 1;
 		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($content);
 		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
 		{
