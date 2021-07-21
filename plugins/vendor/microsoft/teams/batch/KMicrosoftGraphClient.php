@@ -1,6 +1,9 @@
 <?php
 
-
+/**
+ * @package plugins.microsoftTeamsDropFolder
+ * @subpackage batch
+ */
 class KMicrosoftGraphClient
 {
 	const AUTH_URL = 'https://login.microsoftonline.com/{tenantId}/oauth2/token';
@@ -14,6 +17,8 @@ class KMicrosoftGraphClient
 	public $clientId;
 
 	public $bearerToken;
+
+	public $bearerTokenExpiry;
 
 	function __construct($tenantId, $apiUrl, $clientId, $clientSecret)
 	{
@@ -33,60 +38,78 @@ class KMicrosoftGraphClient
 		$fields = array('grant_type' => 'client_credentials', 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'resource' => $this->apiUrl);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_close($ch);
 
 		$response = json_decode(curl_exec($ch), true);
+		curl_close($ch);
 
 		KalturaLog::info('Auth token generated: [' . $response['access_token'] . '], expiry: ' . date('c', $response['expires_on']));
 		$this->bearerToken = $response['access_token'];
+		$this->bearerTokenExpiry = $response['expires_on'];
 	}
 
-	public function listSites ()
+	public function getCallRecord($callRecordId)
 	{
-		$service = 'sites';
+		$service = $this->apiUrl . "/v1.0/communications/callRecords/$callRecordId";
 		return $this->sendGraphRequest($service);
 	}
 
-	public function listUsers ()
+	public function getUser($userId)
 	{
-		$service = 'users';
+		$service = $this->apiUrl . "/v1.0/users/$userId";
 		return $this->sendGraphRequest($service);
-	}
-
-	public function listDrives ($siteId)
-	{
-		$service = "sites/$siteId/drives";
-	}
-
-	public function listRecentDriveItems ($driveId)
-	{
-		$service = "drives/$driveId/root/delta";
-		do{
-			$response = $this->sendGraphRequest($service);
-
-		}while (isset($response['nextLink']));
-
-
-
 	}
 
 	public function getDriveItem($driveId, $driveItemId)
 	{
-		$service = "drives/$driveId/items/$driveItemId";
-		return $this->sendGraphRequest($service);
+		$service = $this->apiUrl .  "/v1.0/drives/$driveId/items/$driveItemId";
+		$response = $this->sendGraphRequest($service);
+
+		if ($response)
+		{
+			if (isset ($response['source']) &&
+				$response['source']['application'] == 'Teams' &&
+				isset ($response['media']) && isset ($response['media']['mediaSource'])
+				&& isset ($response['media']['mediaSource']['contentCategory']) && $response['media']['mediaSource']['contentCategory'] == 'Meeting')
+			{
+				return $response;
+			}
+			else
+			{
+				KalturaLog::info("Drive item $driveItemId is not a recorded meeting, and will be ignored.");
+				return null;
+			}
+		}
 	}
 
-	protected function sendGraphRequest ($service, $requestType = 'GET', $parameters = array(), $contentType = null)
+	public function sendGraphRequest ($url, $requestType = 'GET', $parameters = array(), $contentType = null)
 	{
-		$serviceUrl = $this->apiUrl . "/$service";
+		if (!$this->bearerToken || $this->bearerTokenExpiry < time())
+		{
+			$this->authenticate();
+		}
+
+		$serviceUrl = $url;
 		$ch = curl_init($serviceUrl);
 
 		$authHeader = "Authorization: Bearer {$this->bearerToken}";
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array($authHeader));
 		$result = curl_exec($ch);
+		$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		//TODO add handling for 427 and 503 errors.
+
 		curl_close($ch);
 
-		return json_decode($result, true);
+		if ($responseCode == 200)
+		{
+			return json_decode($result, true);
+		}
+		else
+		{
+			KalturaLog::info("Error occurred executing Graph API call: $result");
+			return null;
+		}
+
+
 	}
 }

@@ -68,4 +68,23 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (!MicrosoftTeamsDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !MicrosoftTeamsDropFolderPlugin::isAllowedPartner($sourceObject->getPartnerId()))
+		{
+			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
+		}
+
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if (!MicrosoftTeamsDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !MicrosoftTeamsDropFolderPlugin::isAllowedPartner($this->partnerId)) {
+			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
+		}
+
+		parent::validateForUpdate($propertiesToSkip);
+	}
 }

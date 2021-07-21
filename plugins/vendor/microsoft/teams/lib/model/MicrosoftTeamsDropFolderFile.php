@@ -139,12 +139,6 @@ class MicrosoftTeamsDropFolderFile extends DropFolderFile
 
 	public function getNameForParsing ()
 	{
-		return str_replace('_'.$this->getRecordingId(), '', $this->getFileName());
-	}
-
-	public function setParsedSlug ($v)
-	{
-		$v .= '_'.$this->getRecordingId();
-		parent::setParsedSlug($v);
+		return $this->getName();
 	}
 }
