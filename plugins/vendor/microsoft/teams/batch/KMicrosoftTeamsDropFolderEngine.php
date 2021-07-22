@@ -57,6 +57,12 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			}
 		}
 
+		if (!$currentFile)
+		{
+			KalturaLog::info('No iterable file found. Skipping.');
+			return;
+		}
+
 		KalturaLog::info("On this iteration, processing file $currentFile");
 
 		$currentFilePieces = explode('.', $currentFile, 2);
@@ -219,19 +225,11 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		return $userInfo['id'];
 	}
 
-	protected function listAllRecordings()
-	{
-		//List all sites
-
-		$sites = $this->graphClient->listSites();
-
-	}
-
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
 		KBatchBase::impersonate ($job->partnerId);
 
-		/* @var $data KalturaWebexDropFolderContentProcessorJobData */
+		/* @var $data KalturaDropFolderContentProcessorJobData */
 		$dropFolder = $this->dropFolderPlugin->dropFolder->get ($data->dropFolderId);
 		//In the case of the microsoft teams drop folder engine, the only possible contentMatch policy is ADD_AS_NEW.
 		//Any other policy should cause an error.
