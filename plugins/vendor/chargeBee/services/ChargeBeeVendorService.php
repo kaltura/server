@@ -7,8 +7,7 @@
 class ChargeBeeVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'chargeBee';
-	
+
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('handleNotification');
 	
 	/**
@@ -35,7 +34,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 
 		$dbChargeBeeVendorIntegration->setAccountId($chargeBeeVendorIntegration->subscriptionId);
 		$dbChargeBeeVendorIntegration->setVendorType($chargeBeeVendorIntegration->type);
-		$dbChargeBeeVendorIntegration->setPartnerId($chargeBeeVendorIntegration->partnerId);
+		$dbChargeBeeVendorIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
 		$dbChargeBeeVendorIntegration->setStatus(VendorStatus::ACTIVE);
 		$dbChargeBeeVendorIntegration->save();
 
@@ -112,17 +111,4 @@ class ChargeBeeVendorService extends KalturaBaseService
 		return $chargeBeeVendorIntegration;
 	}
 
-	/**
-	 * @return array
-	 * @throws KalturaAPIException
-	 * @throws Exception
-	 */
-	public static function getChargeBeeConfiguration()
-	{
-		if(!kConf::hasMap(self::MAP_NAME))
-		{
-			throw new KalturaAPIException(KalturaChargeBeeErrors::NO_VENDOR_CONFIGURATION);
-		}
-		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-	}
 }
