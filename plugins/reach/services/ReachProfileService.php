@@ -107,15 +107,18 @@ class ReachProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
 
 		// save the object
-		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
-		$credit = $dbReachProfile->getCredit();
-		if ($credit)
+		$currentCredit = $dbReachProfile->getCredit();
+		$updatedCredit = $reachProfile->credit;
+		
+		if ($updatedCredit)
 		{
-			if ($credit instanceof kReoccurringVendorCredit)
+			if ($currentCredit instanceof kReoccurringVendorCredit && $this->wasCreditUpdated($currentCredit, $updatedCredit))
 			{
-				/* @var $credit kReoccurringVendorCredit */
-				$credit->setPeriodDates();
-				$dbReachProfile->setCredit($credit);
+				$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
+				$currentCredit = $dbReachProfile->getCredit();
+				/* @var $updatedCredit kReoccurringVendorCredit */
+				$currentCredit->setPeriodDates();
+				$dbReachProfile->setCredit($currentCredit);
 			}
 			$dbReachProfile->calculateCreditPercentUsage();
 		}
@@ -183,7 +186,7 @@ class ReachProfileService extends KalturaBaseService
 	}
 
 	/**
-	 * sync vednor profile credit
+	 * sync vendor profile credit
 	 *
 	 * @action syncCredit
 	 * @param int $reachProfileId
@@ -209,5 +212,17 @@ class ReachProfileService extends KalturaBaseService
 		$reachProfile = new KalturaReachProfile();
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
 		return $reachProfile;
+	}
+	
+	protected function wasCreditUpdated ($currentCredit,  $updatedCredit)
+	{
+		$result = $currentCredit->getCredit() != $updatedCredit->credit;
+		$result = $result | $currentCredit->getFromDate() != $updatedCredit->fromDate;
+		$result = $result | $currentCredit->getToDate() != $updatedCredit->toDate;
+		$result = $result | $currentCredit->getOverageCredit() != $updatedCredit->overageCredit;
+		$result = $result | $currentCredit->getAddOn() != $updatedCredit->addOn;
+		$result = $result | $currentCredit->getFrequency() != $updatedCredit->frequency;
+		
+		return $result;
 	}
 }
