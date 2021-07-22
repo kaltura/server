@@ -11,6 +11,18 @@ class ChargeBeeVendorService extends KalturaBaseService
 	
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('handleNotification');
 	
+	const REQUEST_USER = 'PHP_AUTH_USER';
+	const REQUEST_PASSWORD = 'PHP_AUTH_PW';
+	
+	const CONFIGURATION_USER = 'user';
+	const CONFIGURATION_PASSWORD = 'password';
+
+	const REQUEST_PAYMENT_SOURCE_ADDED = 'payment_source_added';
+	const REQUEST_PAYMENT_FAILED = 'payment_failed';
+	const REQUEST_SUBSCRIPTION_TRIAL_END_REMINDER = 'subscription_trial_end_reminder';
+	const REQUEST_SUBSCRIPTION_CANCELED = 'subscription_canceled';
+	const REQUEST_INVOICE_CREATED = 'pending_invoice_created';
+	
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
 	 * @param string $actionName
@@ -122,18 +134,18 @@ class ChargeBeeVendorService extends KalturaBaseService
 	 */
 	public function handleNotificationAction()
 	{
-		if (!isset($_SERVER['PHP_AUTH_USER']) or !isset($_SERVER['PHP_AUTH_PW']))
+		if (!isset($_SERVER[self::REQUEST_USER]) || !isset($_SERVER[self::REQUEST_PASSWORD]))
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
 		}
 		
 		$chargeBeeConfiguration = self::getChargeBeeConfiguration();
-		if (!isset($chargeBeeConfiguration['user']) or !isset($chargeBeeConfiguration['password']))
+		if (!isset($chargeBeeConfiguration[self::CONFIGURATION_USER]) || !isset($chargeBeeConfiguration[self::CONFIGURATION_PASSWORD]))
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_USER_PASSWORD_CONFIGURATION);
 		}
 		
-		if ($_SERVER['PHP_AUTH_USER'] != $chargeBeeConfiguration['user'] or $_SERVER['PHP_AUTH_PW'] != $chargeBeeConfiguration['password'])
+		if ($_SERVER[self::REQUEST_USER] != $chargeBeeConfiguration[self::CONFIGURATION_USER] || $_SERVER[self::REQUEST_PASSWORD] != $chargeBeeConfiguration[self::CONFIGURATION_PASSWORD])
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
 		}
@@ -145,7 +157,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 	protected function handlePostData()
 	{
 		$data = json_decode(file_get_contents('php://input'));
-		if (!isset($data) or !isset($data->event_type))
+		if (!isset($data) || !isset($data->event_type))
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
 		}
@@ -153,23 +165,23 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$eventType = $data->event_type;
 		switch ($eventType)
 		{
-			case 'payment_source_added':
+			case self::REQUEST_PAYMENT_SOURCE_ADDED:
 				$this->handlePaymentSourceAdded($data);
 				break;
-			case 'payment_failed':
+			case self::REQUEST_PAYMENT_FAILED:
 				$this->handlePaymentFailed($data);
 				break;
-			case 'subscription_trial_end_reminder':
+			case self::REQUEST_SUBSCRIPTION_TRIAL_END_REMINDER:
 				$this->handleSubscriptionTrialEndReminder($data);
 				break;
-			case 'subscription_canceled':
+			case self::REQUEST_SUBSCRIPTION_CANCELED:
 				$this->handleSubscriptionCanceled($data);
 				break;
-			case 'pending_invoice_created':
+			case self::REQUEST_INVOICE_CREATED:
 				$this->handlePendingInvoiceCreated($data);
 				break;
 			default:
-				throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_EVENT_TYPE);
+				KalturaLog::info('ChargeBee request event_type not recognized: ' + $eventType);
 		}
 	}
 	
@@ -190,7 +202,10 @@ class ChargeBeeVendorService extends KalturaBaseService
 		
 		$vendorIntegration->setVendorType(KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
 		
-		$chargeBeeClient = new kChargeBeeClient('https://kalturausinc-test.chargebee.com/api', 'dGVzdF9jZDVZRmtDd0EwcXUwd3JCS0tWUkF1eVV0b2NkUzJ2NEZwOg==');
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		list($chargeBeeConfMap, $site, $siteApiKey) = kChargeBeeUtils::getSiteConfig($partner->country);
+		
+		$chargeBeeClient = new kChargeBeeClient($site, $siteApiKey);
 		$chargeBeeClient->updateSubscriptionTrialEnd($data->content->customer->id, 0);
 	}
 	
