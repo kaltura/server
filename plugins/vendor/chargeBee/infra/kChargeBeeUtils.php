@@ -18,6 +18,11 @@ class kChargeBeeUtils
 	public static function getSiteConfig($country)
 	{
 		$chargeBeeConfMap = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME, array());
+		if (!$chargeBeeConfMap)
+		{
+			KalturaLog::log('Could not find the map: ' . self::MAP_NAME . ' param name: ' . self::CONFIGURATION_PARAM_NAME);
+			return array($chargeBeeConfMap, null, null);
+		}
 		$countryCodeEurope = array_map('trim', explode(',', $chargeBeeConfMap[self::COUNTRY_CODE_EUROPE]));
 		$isEuropeCountry = array_key_exists($country, $countryCodeEurope);
 		if ($isEuropeCountry)
@@ -30,9 +35,9 @@ class kChargeBeeUtils
 			$site = self::SITE_US;
 			$siteApiKey = self::SITE_API_KEY_US;
 		}
-		if (!$chargeBeeConfMap || !isset($chargeBeeConfMap[$site] )|| !isset($chargeBeeConfMap[$siteApiKey]) || !isset($chargeBeeConfMap[self::PLAN_ID]) || !isset($chargeBeeConfMap[self::AUTO_COLLECTION]))
+		if (!isset($chargeBeeConfMap[$site])|| !isset($chargeBeeConfMap[$siteApiKey]) || !isset($chargeBeeConfMap[self::PLAN_ID]) || !isset($chargeBeeConfMap[self::AUTO_COLLECTION]))
 		{
-			KalturaLog::log('Could not find the map: ' . self::MAP_NAME . ' param name: ' . self::CONFIGURATION_PARAM_NAME);
+			KalturaLog::log('Could not find the map: ' . self::MAP_NAME . ' params');
 		}
 		return array($chargeBeeConfMap, $site, $siteApiKey);
 	}
@@ -40,6 +45,11 @@ class kChargeBeeUtils
 	public static function getChargeBeeClient($country)
 	{
 		list($chargeBeeConfMap, $site, $siteApiKey) = self::getSiteConfig($country);
+		if (!$chargeBeeConfMap || !$site || !$siteApiKey)
+		{
+			KalturaLog::log('Could not find the map: ' . self::MAP_NAME . ' params');
+			return null;
+		}
 		return new kChargeBeeClient($chargeBeeConfMap[$site], $chargeBeeConfMap[$siteApiKey]);
 	}
 }

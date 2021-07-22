@@ -109,6 +109,10 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	public function handleSubscriptionInChargeBee($toPartner)
 	{
 		list($chargeBeeConfMap, $site, $siteApiKey) = kChargeBeeUtils::getSiteConfig($toPartner->country);
+		if (!$chargeBeeConfMap || !$site || !$siteApiKey)
+		{
+			return;
+		}
 		$chargeBeeClient = new kChargeBeeClient($chargeBeeConfMap[$site], $chargeBeeConfMap[$siteApiKey]);
 		$responseSubscription = $chargeBeeClient->createSubscription($chargeBeeConfMap[kChargeBeeUtils::PLAN_ID], $chargeBeeConfMap[kChargeBeeUtils::AUTO_COLLECTION], $toPartner->firstName, $toPartner->lastName, $toPartner->adminEmail);
 		$this->log('Response from chargeBee createSubscription: ' . print_r($responseSubscription, true));
@@ -128,12 +132,12 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		else
 		{
 			$addresses = isset($chargeBeeConfMap[self::EMAIL_ADDRESSES]) ? array_map('trim', explode(',', $chargeBeeConfMap[self::EMAIL_ADDRESSES])) : null;
-			$success = kSendMail::sendMail($addresses, "Create Subscription to ChargeBee has failed", "Create Subscription to ChargeBee has failed on partner id: [$this->toPartnerId]");
+			$success = kSendMail::sendMail($addresses, 'Create Subscription to ChargeBee has failed', "Create Subscription to ChargeBee has failed on partner id: [$this->toPartnerId]");
 			if (!$success)
 			{
-				KalturaLog::info("Mail for Create Subscription did not send successfully");
+				KalturaLog::info('Mail for Create Subscription did not send successfully');
 			}
-			$this->updateChargeBeeVendorIntegration($chargeBeeVendor->id, $chargeBeePlugin);
+			$this->updateChargeBeeVendorIntegrationStatus($chargeBeeVendor->id, $chargeBeePlugin, KalturaVendorStatus::ERROR);
 		}
 	}
 
@@ -142,15 +146,17 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$chargeBeeVendorIntegration = new KalturaChargeBeeVendorIntegration();
 		$chargeBeeVendorIntegration->subscriptionId = $subscriptionId;
 		$chargeBeeVendorIntegration->type = KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL;
-		$chargeBeeVendorIntegration->partnerId = $this->toPartnerId;
-		return $chargeBeePlugin->chargeBeeVendor->add($chargeBeeVendorIntegration);
+		self::impersonate( $this->toPartnerId );
+		$chargeBeeVendor =  $chargeBeePlugin->chargeBeeVendor->add($chargeBeeVendorIntegration);
+		self::unimpersonate();
+		return $chargeBeeVendor;
 	}
 
 
-	public function updateChargeBeeVendorIntegration($chargeBeeVendorId, $chargeBeePlugin)
+	public function updateChargeBeeVendorIntegrationStatus($chargeBeeVendorId, $chargeBeePlugin, $status)
 	{
 		$chargeBeeVendorIntegration = new KalturaChargeBeeVendorIntegration();
-		$chargeBeeVendorIntegration->status = KalturaVendorStatus::ERROR;
+		$chargeBeeVendorIntegration->status = $status;
 		$chargeBeePlugin->chargeBeeVendor->update($chargeBeeVendorId, $chargeBeeVendorIntegration);
 	}
 }
