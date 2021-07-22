@@ -149,7 +149,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $params['id'] = $object->getElasticId();
         $params['action'] = $action;
 
-        KalturaLog::debug('Using elastic Index:' . $object->getElasticIndexName() . ' ,actual index name:' . $genericIndexName );
+        KalturaLog::debug('Using elastic Index:' . $splitIndexName . ' ,actual index name:' . $genericIndexName );
 
 
         try
