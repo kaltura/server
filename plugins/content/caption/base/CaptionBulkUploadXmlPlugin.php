@@ -71,11 +71,13 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 					<xs:documentation>
 						The action to apply:<br/>
 						Update - Update existing subtitles<br/>
+						Replace - Replace all subtitles
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
 						<xs:enumeration value="update" />
+						<xs:enumeration value="replace"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -307,6 +309,33 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 			$captionAssetPlugin->captionAsset->setContent($captionAssetId, $captionAssetResource);
 	}
 
+	protected function deleteCurrentCaptions($entryId)
+	{
+		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
+
+		$filter = new KalturaAssetFilter();
+		$filter->entryIdEqual = $entryId;
+		$captionsList = KBatchBase::$kClient->captionAsset->listAction($filter);
+
+		KBatchBase::$kClient->startMultiRequest();
+		foreach($captionsList->objects as $captionAsset)
+		{
+			KBatchBase::$kClient->captionAsset->delete($captionAsset->id);
+		}
+
+		$results = KBatchBase::$kClient->doMultiRequest();
+
+		foreach($results as $result)
+		{
+			if (is_array($result) && isset($result['code']))
+			{
+				KalturaLog::info("Failed to delete caption asset with error ({$result['code']}) ({$result['message']})");
+			}
+		}
+
+		KBatchBase::unimpersonate();
+	}
+
 	/* (non-PHPdoc)
 	 * @see IKalturaBulkUploadXmlHandler::handleItemUpdated()
 	*/
@@ -324,6 +353,8 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 			
 		switch ($action)
 		{
+			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]:
+				$this->deleteCurrentCaptions($object->id);
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
 				$this->handleItemAdded($object, $item);
 				break;
