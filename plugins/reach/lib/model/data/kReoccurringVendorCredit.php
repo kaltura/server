@@ -184,4 +184,16 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		
 		return parent::getSyncCreditStartDate();
 	}
+	
+	public function wasCreditUpdated ($updatedCredit)
+	{
+		$result = $this->getCredit() != $updatedCredit->credit;
+		$result = $result | $this->getFromDate() != $updatedCredit->fromDate;
+		$result = $result | $this->getToDate() != $updatedCredit->toDate;
+		$result = $result | $this->getOverageCredit() != $updatedCredit->overageCredit;
+		$result = $result | $this->getAddOn() != $updatedCredit->addOn;
+		$result = $result | $this->getFrequency() != $updatedCredit->frequency;
+		
+		return $result;
+	}
 }

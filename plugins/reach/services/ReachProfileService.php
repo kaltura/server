@@ -107,14 +107,14 @@ class ReachProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
 
 		// save the object
-		$currentCredit = $dbReachProfile->getCredit();
+		$dbCurrentCredit = $dbReachProfile->getCredit();
 		$updatedCredit = $reachProfile->credit;
+		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
 		
 		if ($updatedCredit)
 		{
-			if ($currentCredit instanceof kReoccurringVendorCredit && $this->wasCreditUpdated($currentCredit, $updatedCredit))
+			if ($dbCurrentCredit instanceof kReoccurringVendorCredit && $dbCurrentCredit->wasCreditUpdated($updatedCredit))
 			{
-				$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
 				$currentCredit = $dbReachProfile->getCredit();
 				/* @var $updatedCredit kReoccurringVendorCredit */
 				$currentCredit->setPeriodDates();
@@ -214,15 +214,4 @@ class ReachProfileService extends KalturaBaseService
 		return $reachProfile;
 	}
 	
-	protected function wasCreditUpdated ($currentCredit,  $updatedCredit)
-	{
-		$result = $currentCredit->getCredit() != $updatedCredit->credit;
-		$result = $result | $currentCredit->getFromDate() != $updatedCredit->fromDate;
-		$result = $result | $currentCredit->getToDate() != $updatedCredit->toDate;
-		$result = $result | $currentCredit->getOverageCredit() != $updatedCredit->overageCredit;
-		$result = $result | $currentCredit->getAddOn() != $updatedCredit->addOn;
-		$result = $result | $currentCredit->getFrequency() != $updatedCredit->frequency;
-		
-		return $result;
-	}
 }
