@@ -16,10 +16,13 @@
 class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 
 	const ZOOM_VENDOR_INTEGRATION = 'ZoomVendorIntegration';
+	const CHARGE_BEE_VENDOR_INTEGRATION = 'kChargeBeeVendorIntegration';
 
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		VendorTypeEnum::ZOOM_ACCOUNT => self::ZOOM_VENDOR_INTEGRATION,
+		VendorTypeEnum::CHARGE_BEE_FREE_TRIAL => self::CHARGE_BEE_VENDOR_INTEGRATION,
+		VendorTypeEnum::CHARGE_BEE_FREE_PAYGO => self::CHARGE_BEE_VENDOR_INTEGRATION,
 	);
 
 	/**
