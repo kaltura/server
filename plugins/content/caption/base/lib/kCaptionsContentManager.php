@@ -38,7 +38,7 @@ abstract class kCaptionsContentManager
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
 		if (!$content)
 		{
-			KalturaLog::debug("Failed to retrieve the content for caption ID {$captionAsset->getId()}");
+			KalturaLog::crit("Failed to retrieve the content for caption ID {$captionAsset->getId()}");
 			return false;
 		}
 

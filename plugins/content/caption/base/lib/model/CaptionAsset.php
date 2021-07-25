@@ -88,7 +88,7 @@ class CaptionAsset extends asset
 		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($this->getContainerFormat());
 		if (!$captionsContentManager)
 		{
-			KalturaLog::debug("Failed to find content manager for caption ID {$this->getId()} and container format {$this->getContainerFormat()}");
+			KalturaLog::warning("Failed to find content manager for caption ID {$this->getId()} and container format {$this->getContainerFormat()}");
 			return false;
 		}
 
@@ -103,7 +103,7 @@ class CaptionAsset extends asset
 		$validatedCaption = $captionsContentManager->validate($content);
 		if (!$validatedCaption)
 		{
-			KalturaLog::debug("Failed to validate the content for caption ID {$this->getId()}");
+			KalturaLog::info("Failed to validate the content for caption ID {$this->getId()}");
 		}
 		return $validatedCaption;
 	}
