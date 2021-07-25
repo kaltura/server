@@ -1050,11 +1050,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 
-		$mergedArray = array_merge($dcFileSyncs, $sharedFileSyncs);
+		$localFileSyncs = array_merge($dcFileSyncs, $sharedFileSyncs);
 		if ($isCloudDc)
 		{
 			//Sort order - first sharedStorages, then current dc , then remote dc
-			usort($mergedArray, function($a, $b) use ($sharedStorageProfileIds) {
+			usort($localFileSyncs, function($a, $b) use ($sharedStorageProfileIds) {
 				/* @var $a FileSync */
 				/* @var $b FileSync */
 				$aValue = in_array($a->getDc(), $sharedStorageProfileIds) ? 0 : ( $a->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
@@ -1063,7 +1063,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			});
 		}
 		// always prefer local file syncs, then periodic and lastly remote
-		return array_merge($mergedArray, $remoteFileSyncs);
+		return array_merge($localFileSyncs, $remoteFileSyncs);
 	}
 
 	/**
