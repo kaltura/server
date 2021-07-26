@@ -324,13 +324,11 @@ class KalturaDispatcher
 		{
 			return true;
 		}
-		$rateLimitMap = kConf::getMap("api_rate_limit");
-		if (array_key_exists('skip_enforce_internal_ip', $rateLimitMap ))
-		{
-			$skipEnforceInternalIp = $rateLimitMap['skip_enforce_internal_ip'];
-		}
+
+		$skipEnforceInternalIp = kConf::get('skip_enforce_internal_ip', 'api_rate_limit', null);
+
 		// if 'api_rate_limit' map contains param 'skip_enforce_internal_ip' with value 1, we will ignore the IP check
-		if(!$skipEnforceInternalIp==1 && kIpAddressUtils::isInternalIp())
+		if(!$skipEnforceInternalIp && kIpAddressUtils::isInternalIp())
 		{
 			// if api request is internal IP, the source is a batch machine, and we won't block the action
 			return true;

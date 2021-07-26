@@ -27,6 +27,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const COMPANY = 'company';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
+	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
 	const KUSER_KALTURA = 0;

@@ -100,6 +100,12 @@ class KalturaUser extends KalturaBaseUser
 	 * @var string
 	 */
 	public $ksPrivileges;
+	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $encryptedSeed;
 
 	private static $map_between_objects = array (
 		"type",

@@ -983,7 +983,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addLimitSubForm($liveRtcStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS);
 
 		//Add dynamic limits from admin.ini
-		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
+		$limitLiveByAdminTag = Zend_Registry::get('config')->limitLiveByAdminTag ? Zend_Registry::get('config')->limitLiveByAdminTag : array();
+		foreach($limitLiveByAdminTag as $limit)
 		{
 			$limitType = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag";
 			$limitSubForm = new Form_PartnerConfigurationLimitByAdminTagSubForm($limitType, $limit->label, $limit->adminTag);
@@ -1049,8 +1050,8 @@ class Form_PartnerConfiguration extends Infra_Form
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
-		
-		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
+		$limitLiveByAdminTag = Zend_Registry::get('config')->limitLiveByAdminTag ? Zend_Registry::get('config')->limitLiveByAdminTag : array();
+		foreach($limitLiveByAdminTag as $limit)
 		{
 			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag" . '_max';
 		}
