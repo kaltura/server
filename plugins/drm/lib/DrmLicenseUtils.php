@@ -107,7 +107,7 @@ class DrmLicenseUtils {
 
 		if(!$flavorAssets)
 		{
-			$customData[''] = array('custom_data' => $innerDataJsonEncoded, 'signature' => $innerDataSignature);
+			$customData[] = array('custom_data' => $innerDataJsonEncoded, 'signature' => $innerDataSignature);
 		}
 
 		kApiCache::limitConditionalCacheTimeToKs();
