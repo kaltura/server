@@ -140,39 +140,13 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		return $content . $toAppend;
 	}
 
-	public function createCaptionsFile($content, $clipStartTime, $clipEndTime, $timeCode, $globalOffset)
+	protected function addBlockToNewFile($newFileContent, $currentBlock)
 	{
 		static $newLineIndex = 1;
-		$newFileContent = '';
-		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($content);
-		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
-		{
-			$currentBlock = '';
-			$shouldAddBlockToNewFile = true;
-			while (trim($line) !== '' and $line !== false)
-			{
-				$matches = array();
-				$timecode_match = preg_match($timeCode, $line, $matches);
-				if ($timecode_match)
-				{
-					$adjustedTimeLine = $this->createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset);
-					if($adjustedTimeLine)
-						$currentBlock .=$adjustedTimeLine;
-					else
-						$shouldAddBlockToNewFile = false;
-				}
-				else
-					$currentBlock .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
-				$line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray);
-			}
-			if($shouldAddBlockToNewFile)
-			{
-				$blockArray = explode("\n", $currentBlock, 2);
-				$blockArray[0] = $newLineIndex++;
-				$currentBlock = implode("\n", $blockArray);
-				$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
-			}
-		}
+		$blockArray = explode("\n", $currentBlock, 2);
+		$blockArray[0] = $newLineIndex++;
+		$currentBlock = implode("\n", $blockArray);
+		$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $newFileContent;
 	}
 }
