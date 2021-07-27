@@ -1018,8 +1018,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
 
 		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
-		$fileSyncAllowFilePattern = kConf::get("file_sync_allow_file_pattern", "runtime_config", array());
-		
+				
 		foreach ($file_sync_list as $file_sync)
 		{
 			// make sure not link and work on original
@@ -1034,8 +1033,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				continue;
 			}
 
-			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
-
+			// always prefer files from current dc
+			if(!$isCloudDc && $tmp_file_sync->getDc() == $dc_id)
+			{
+				return array($tmp_file_sync);
+			}
+			
 			if(in_array($tmp_file_sync->getDc(), kDataCenterMgr::getDcIds()))
 			{
 				$dcFileSyncs[] = $tmp_file_sync;
@@ -1051,17 +1054,15 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		$localFileSyncs = array_merge($dcFileSyncs, $sharedFileSyncs);
-		if ($isCloudDc)
-		{
-			//Sort order - first sharedStorages, then current dc , then remote dc
-			usort($localFileSyncs, function($a, $b) use ($sharedStorageProfileIds) {
-				/* @var $a FileSync */
-				/* @var $b FileSync */
-				$aValue = in_array($a->getDc(), $sharedStorageProfileIds) ? 0 : ( $a->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
-				$bValue = in_array($b->getDc(), $sharedStorageProfileIds) ? 0 : ( $b->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
-				return $aValue - $bValue;
-			});
-		}
+		//Sort order - first sharedStorages, then current dc , then remote dc
+		usort($localFileSyncs, function($a, $b) use ($sharedStorageProfileIds) {
+			/* @var $a FileSync */
+			/* @var $b FileSync */
+			$aValue = in_array($a->getDc(), $sharedStorageProfileIds) ? 0 : ( $a->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
+			$bValue = in_array($b->getDc(), $sharedStorageProfileIds) ? 0 : ( $b->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
+			return $aValue - $bValue;
+		});
+		
 		// always prefer local file syncs, then periodic and lastly remote
 		return array_merge($localFileSyncs, $remoteFileSyncs);
 	}
