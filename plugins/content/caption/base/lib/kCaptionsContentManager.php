@@ -32,6 +32,28 @@ abstract class kCaptionsContentManager
 		return $contentArray;
 	}
 
+	public static function extractContent(CaptionAsset $captionAsset)
+	{
+		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		$content = kFileSyncUtils::file_get_contents($syncKey, true, false);
+		if (!$content)
+		{
+			KalturaLog::crit("Failed to retrieve the content for caption ID {$captionAsset->getId()}");
+			return false;
+		}
+
+		$content = str_replace(
+			array(
+				self::WINDOWS_LINE_ENDING,
+				self::MAC_LINE_ENDING,
+			),
+			self::UNIX_LINE_ENDING,
+			$content
+		);
+
+		return $content;
+	}
+
 	/**
 	 * @param array $array
 	 * @return mixed
@@ -60,7 +82,16 @@ abstract class kCaptionsContentManager
 	 * @return array
 	 */
 	public abstract function parse($content);
-	
+
+	/**
+	 * @param string $content
+	 * @return bool
+	 */
+	public function validate($content)
+	{
+		return $this->parse($content) ? true : false;
+	}
+
 	/**
 	 * @param string $content
 	 * @return string
