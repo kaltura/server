@@ -3,21 +3,23 @@
 * @package plugins.Vendor
 * @subpackage zoom
 */
-class kZoomFlowManager implements kObjectChangedEventConsumer
+
+class kZoomFlowManager implements kObjectCreatedEventConsumer
 {
-	
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'Zoom';
 	
+	
 	/**
-	 * @inheritDoc
+	 * @param BaseObject $object
+	 * @return bool
 	 */
-	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	public function objectCreated (BaseObject $object)
 	{
 		/* @var $captionAsset $object CaptionAsset */
 		/* @var $object CaptionAsset */
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$captionAsset = CaptionAssetItemPeer::retrieveByAssetId($object->getId());
+		$captionAsset = assetPeer::retrieveById($object->getId());
 		$captionAsset->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
 		$captionAsset->save();
 		
@@ -26,12 +28,11 @@ class kZoomFlowManager implements kObjectChangedEventConsumer
 	
 	/**
 	 * @param BaseObject $object
-	 * @param array $modifiedColumns
 	 * @return bool
 	 */
-	public function shouldConsumeChangedEvent (BaseObject $object, array $modifiedColumns)
+	public function shouldConsumeCreatedEvent (BaseObject $object)
 	{
-		if($object instanceof CaptionAsset && $object->getSource() === CaptionSource::ZOOM)
+		if($object instanceof CaptionAsset && $object->getSource() == CaptionSource::ZOOM)
 		{
 			return true;
 		}
