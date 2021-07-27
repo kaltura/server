@@ -316,10 +316,16 @@ abstract class kCaptionsContentManager
 				$line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray);
 			}
 			if($shouldAddBlockToNewFile)
-				$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;;
+			{
+				$newFileContent = $this->addBlockToNewFile($newFileContent, $currentBlock);
+			}
 		}
 		return $newFileContent;
 	}
 
-
+	protected function addBlockToNewFile($newFileContent, $currentBlock)
+	{
+		$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
+		return $newFileContent;
+	}
 }
