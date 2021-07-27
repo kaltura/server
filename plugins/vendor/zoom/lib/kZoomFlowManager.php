@@ -14,12 +14,13 @@ class kZoomFlowManager implements kObjectChangedEventConsumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
+		/* @var $captionAsset $object CaptionAsset */
 		/* @var $object CaptionAsset */
-		if($object->getSource() === CaptionSource::ZOOM)
-		{
-			$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-			$object->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
-		}
+		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$captionAsset = CaptionAssetItemPeer::retrieveByAssetId($object->getId());
+		$captionAsset->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
+		$captionAsset->save();
+		
 		return true;
 	}
 	
@@ -30,6 +31,9 @@ class kZoomFlowManager implements kObjectChangedEventConsumer
 	 */
 	public function shouldConsumeChangedEvent (BaseObject $object, array $modifiedColumns)
 	{
-		// TODO: Implement shouldConsumeChangedEvent() method.
+		if($object instanceof CaptionAsset && $object->getSource() === CaptionSource::ZOOM)
+		{
+			return true;
+		}
 	}
 }
