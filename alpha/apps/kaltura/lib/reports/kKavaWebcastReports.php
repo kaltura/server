@@ -18,6 +18,8 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				self::METRIC_VIEW_PERIOD_PLAY_TIME,
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 			),
+			// add partner id as filter dimension (objectIds param) since we are using this report for salesforce sync integration
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 		),
 
 		ReportType::ENGAGEMENT_WEBCAST => array(
