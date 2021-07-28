@@ -2,7 +2,7 @@
 /**
  * @package plugins.vendor
  */
-class VendorPlugin extends KalturaPlugin implements  IKalturaServices, IKalturaEnumerator
+class VendorPlugin extends KalturaPlugin implements  IKalturaServices
 {
 	const PLUGIN_NAME = 'vendor';
 	const VENDOR_MANAGER = 'kVendorManager';
@@ -20,26 +20,6 @@ class VendorPlugin extends KalturaPlugin implements  IKalturaServices, IKalturaE
 			'vendorIntegration' => 'VendorIntegrationService',
 		);
 		return $map;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public static function getEnums($baseEnumName = null)
-	{
-		if (!$baseEnumName)
-		{
-			return array('VendorIntegrationPrepBatchJobType');
-		}
-
-		switch ($baseEnumName)
-		{
-			case 'BatchJobType':
-				return array('VendorIntegrationPrepBatchJobType');
-				break;
-		}
-
-		return array();
 	}
 
 	/**

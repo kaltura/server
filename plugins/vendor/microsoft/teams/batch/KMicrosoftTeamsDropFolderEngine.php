@@ -46,7 +46,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		$currentFile = null;
 		foreach ($files as $file)
 		{
-			if ($file == "." || $file == ".." || strpos($file,self::LOCKED_FILE_MIDFIX) || strpos($file, $driveLocationsFileNamePrefix . $this->dropFolder->id) === false)
+			if ($file == '.' || $file == '..' || strpos($file,self::LOCKED_FILE_MIDFIX) || strpos($file, $driveLocationsFileNamePrefix . $this->dropFolder->id) === false)
 			{
 				continue;
 			}
@@ -84,28 +84,28 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			$items = $this->graphClient->sendGraphRequest($driveLastPageUrl);
 			foreach ($items['value'] as $item)
 			{
-				if (isset($item['folder']))
+				if (isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]))
 				{
-					KalturaLog::info('Item ' . $item['id'] . ' is a folder. Skipping');
+					KalturaLog::info('Item ' . $item[MicrosoftGraphFieldNames::ID_FIELD] . ' is a folder. Skipping');
 					continue;
 				}
 
-				if (isset($item['deleted']))
+				if (isset($item[MicrosoftGraphFieldNames::DELETED_FACET]))
 				{
-					KalturaLog::info('Item ' . $item['id'] . ' is deleted. Skipping');
+					KalturaLog::info('Item ' . $item[MicrosoftGraphFieldNames::ID_FIELD] . ' is deleted. Skipping');
 					continue;
 				}
 
 				//Get extended item (provided it is a recorded meeting) and its download URL
-				$extendedItem = $this->graphClient->getDriveItem($item['parentReference']['driveId'], $item['id']);
+				$extendedItem = $this->graphClient->getDriveItem($item[MicrosoftGraphFieldNames::PARENT_REFERENCE][MicrosoftGraphFieldNames::DRIVE_ID], $item[MicrosoftGraphFieldNames::ID_FIELD]);
 				if ($extendedItem)
 				{
-					$this->singleRunFoundItems[$extendedItem['id']] = $extendedItem;
+					$this->singleRunFoundItems[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]] = $extendedItem;
 					$result = null;
-					if (in_array($extendedItem['id'], array_keys($existingDropFolderFiles)))
+					if (in_array($extendedItem[MicrosoftGraphFieldNames::ID_FIELD], array_keys($existingDropFolderFiles)))
 					{
-						$currentDropFolderFile = $existingDropFolderFiles[$extendedItem['id']];
-						unset ($existingDropFolderFiles[$extendedItem['id']]);
+						$currentDropFolderFile = $existingDropFolderFiles[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]];
+						unset ($existingDropFolderFiles[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]]);
 						$result = $this->handleExistingDropFolderFile($currentDropFolderFile);
 					}
 					else
@@ -149,20 +149,20 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 
 	protected function handleFileAdded($extendedItem, $dropFolderId, KalturaIntegrationSetting $integrationData)
 	{
-		KalturaLog::info('Handling drive item with ID ' . $extendedItem['id']);
+		KalturaLog::info('Handling drive item with ID ' . $extendedItem[MicrosoftGraphFieldNames::ID_FIELD]);
 		$dropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
 		$dropFolderFile->dropFolderId = $dropFolderId;
-		$dropFolderFile->fileSize = $extendedItem['size'];
-		$dropFolderFile->fileName = $extendedItem['id'];
-		$dropFolderFile->remoteId = $extendedItem['id'];
-		$dropFolderFile->name = $extendedItem['name'];
-		$dropFolderFile->contentUrl = $extendedItem['@microsoft.graph.downloadUrl'];
-		if (isset($extendedItem['description']))
+		$dropFolderFile->fileSize = $extendedItem[MicrosoftGraphFieldNames::SIZE];
+		$dropFolderFile->fileName = $extendedItem[MicrosoftGraphFieldNames::ID_FIELD];
+		$dropFolderFile->remoteId = $extendedItem[MicrosoftGraphFieldNames::ID_FIELD];
+		$dropFolderFile->name = $extendedItem[MicrosoftGraphFieldNames::NAME];
+		$dropFolderFile->contentUrl = $extendedItem[MicrosoftGraphFieldNames::DOWNLOAD_URL];
+		if (isset($extendedItem[MicrosoftGraphFieldNames::DESCRIPTION]))
 		{
-			$dropFolderFile->description = $extendedItem['description'];
+			$dropFolderFile->description = $extendedItem[MicrosoftGraphFieldNames::DESCRIPTION];
 		}
 
-		$dropFolderFile->ownerId = $this->retrieveUserId($extendedItem['createdBy']);
+		$dropFolderFile->ownerId = $this->retrieveUserId($extendedItem[MicrosoftGraphFieldNames::CREATED_BY]);
 		$dropFolderFile->additionalUserIds = $this->retrieveParticipants($extendedItem);
 
 		try
@@ -174,7 +174,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err('Cannot add new drop folder file with name ['.$extendedItem['id'].'] - '.$e->getMessage());
+			KalturaLog::err('Cannot add new drop folder file with name ['.$extendedItem[MicrosoftGraphFieldNames::ID_FIELD].'] - '.$e->getMessage());
 			return null;
 		}
 
@@ -184,18 +184,18 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 	{
 		$participants = array();
 
-		$callRecordId = $item['source']['externalId'];
+		$callRecordId = $item[MicrosoftGraphFieldNames::SOURCE][MicrosoftGraphFieldNames::EXTERNAL_ID];
 		$callRecord = $this->graphClient->getCallRecord($callRecordId);
 
 		if ($callRecord)
 		{
-			foreach ($callRecord['participants'] as $participant)
+			foreach ($callRecord[MicrosoftGraphFieldNames::PARTICIPANTS] as $participant)
 			{
-				$userId = $participant['user']['id'];
+				$userId = $participant[MicrosoftGraphFieldNames::USER][MicrosoftGraphFieldNames::ID_FIELD];
 				$user = $this->graphClient->getUser($userId);
 				if ($user)
 				{
-					$participants[] = $user['mail'];
+					$participants[] = $user[MicrosoftGraphFieldNames::MAIL];
 				}
 			}
 		}
@@ -208,7 +208,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		if (isset($this->singleRunFoundItems[$dropFolderFile->fileName]))
 		{
 			$item = $this->singleRunFoundItems[$dropFolderFile->fileName];
-			return $item['size'];
+			return $item[MicrosoftGraphFieldNames::SIZE];
 		}
 
 		return null;
@@ -216,13 +216,13 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 
 	protected function retrieveUserId ($creatorInfo)
 	{
-		$userInfo = $creatorInfo['user'];
-		if(isset($userInfo['email']))
+		$userInfo = $creatorInfo[MicrosoftGraphFieldNames::USER];
+		if(isset($userInfo[MicrosoftGraphFieldNames::EMAIL]))
 		{
-			return $userInfo['email'];
+			return $userInfo[MicrosoftGraphFieldNames::EMAIL];
 		}
 
-		return $userInfo['id'];
+		return $userInfo[MicrosoftGraphFieldNames::ID_FIELD];
 	}
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
@@ -260,9 +260,9 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		$newEntry->creatorId = $newEntry->userId;
 		$newEntry->referenceId = $dropFolderFile->remoteId;
 		$newEntry->adminTags = self::ADMIN_TAG_TEAMS;
-		$newEntry->entitledUsersPublish = $dropFolderFile->additionalUserIds;
-		$newEntry->entitledUsersView = $dropFolderFile->additionalUserIds;
-		$newEntry->entitledUsersEdit = $dropFolderFile->additionalUserIds;
+		//$newEntry->entitledUsersPublish = $dropFolderFile->additionalUserIds;
+		//$newEntry->entitledUsersView = $dropFolderFile->additionalUserIds;
+		//$newEntry->entitledUsersEdit = $dropFolderFile->additionalUserIds;
 
 		KBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->media->add($newEntry, null);

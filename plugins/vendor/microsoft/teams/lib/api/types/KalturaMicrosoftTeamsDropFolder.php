@@ -67,7 +67,8 @@ class KalturaMicrosoftTeamsDropFolder extends KalturaRemoteDropFolder
 
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if (is_null($dbObject)) {
+		if (is_null($dbObject))
+		{
 			$dbObject = new MicrosoftTeamsDropFolder();
 		}
 

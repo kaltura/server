@@ -8,6 +8,10 @@ class KMicrosoftGraphClient
 {
 	const AUTH_URL = 'https://login.microsoftonline.com/{tenantId}/oauth2/token';
 
+	const TEAMS_APPLICATION_VALUE = 'Teams';
+
+	const MEETING_SOURCE_VALUE = 'Meeting';
+
 	public $apiUrl;
 
 	public $tenantId;
@@ -42,9 +46,9 @@ class KMicrosoftGraphClient
 		$response = json_decode(curl_exec($ch), true);
 		curl_close($ch);
 
-		KalturaLog::info('Auth token generated: [' . $response['access_token'] . '], expiry: ' . date('c', $response['expires_on']));
-		$this->bearerToken = $response['access_token'];
-		$this->bearerTokenExpiry = $response['expires_on'];
+		KalturaLog::info('Auth token generated: [' . $response[MicrosoftGraphFieldNames::ACCESS_TOKEN] . '], expiry: ' . date('c', $response[MicrosoftGraphFieldNames::EXPIRES_ON]));
+		$this->bearerToken = $response[MicrosoftGraphFieldNames::ACCESS_TOKEN];
+		$this->bearerTokenExpiry = $response[MicrosoftGraphFieldNames::EXPIRES_ON];
 	}
 
 	public function getCallRecord($callRecordId)
@@ -66,10 +70,10 @@ class KMicrosoftGraphClient
 
 		if ($response)
 		{
-			if (isset ($response['source']) &&
-				$response['source']['application'] == 'Teams' &&
-				isset ($response['media']) && isset ($response['media']['mediaSource'])
-				&& isset ($response['media']['mediaSource']['contentCategory']) && $response['media']['mediaSource']['contentCategory'] == 'Meeting')
+			if (isset ($response[MicrosoftGraphFieldNames::SOURCE]) &&
+				$response[MicrosoftGraphFieldNames::SOURCE][MicrosoftGraphFieldNames::APPLICATION] === self::TEAMS_APPLICATION_VALUE &&
+				isset ($response[MicrosoftGraphFieldNames::MEDIA]) && isset ($response[MicrosoftGraphFieldNames::MEDIA][MicrosoftGraphFieldNames::MEDIA_SOURCE])
+				&& isset ($response[MicrosoftGraphFieldNames::MEDIA][MicrosoftGraphFieldNames::MEDIA_SOURCE][MicrosoftGraphFieldNames::CONTENT_CATEGORY]) && $response[MicrosoftGraphFieldNames::MEDIA][MicrosoftGraphFieldNames::MEDIA_SOURCE][MicrosoftGraphFieldNames::CONTENT_CATEGORY] === self::MEETING_SOURCE_VALUE)
 			{
 				return $response;
 			}
