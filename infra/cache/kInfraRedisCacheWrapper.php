@@ -10,7 +10,6 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 {
 	protected $hostName;
 	protected $port;
-	protected $scheme;
 	protected $timeout;
 	protected $statsKey;
 
@@ -18,6 +17,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	protected $gotError = false;
 	protected static $_stats = array();
 	protected $connectAttempts = 0;
+	protected $persistent = false;
 
 	const STAT_CONN = 'conn';
 	const STAT_OP = 'op';
@@ -30,39 +30,25 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
      */
 	protected function doInit ($config)
 	{
+		if (!class_exists('Redis'))
+		{
+			self::safeLog("Redis class doesn't exists, can't connect without it");
+			return false;
+		}
+
 		if (!isset($config['host']) || !isset($config['port']))
 		{
 			self::safeLog("Missing host or port in config, can't connect without it");
 			return false;
 		}
 
-		require './../../vendor/predis/autoload.php';
-
-		$this->scheme = $config['scheme'];
 		$this->hostName = $config['host'];
 		$this->port = $config['port'];
 		$this->timeout = $config['timeout'];
+		if (isset($config['persistent']) && $config['persistent'])
+			$this->persistent = true;
 
-		$redis = new Redis();
-		try
-		{
-			$redis->connect($this->hostName,$this->port,$this->timeout);
-		}
-		catch(Exception $e)
-		{
-			self::safeLog("failed to connect to redis");
-		}
-
-		$connection = $redis->isConnected();
-
-		if (!$connection)
-		{
-			self::safeLog("failed to connect to redis");
-			return false;
-		}
-
-		$this-> redis = $redis;
-		return true;
+		return $this->reconnect();
 	}
 
 	public function __destruct()
@@ -84,9 +70,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
      */
 	protected function doGet ($key)
 	{
-		return $this->callAndDetectErrors(function($key) {
-			return $this->redis->get($key);
-		}, array($key));
+		return $this->callAndDetectErrors('get',array($key));
 	}
 
 	/* (non-PHPdoc)
@@ -94,9 +78,14 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
      */
 	protected function doSet ($key, $var, $expiry = 0)
 	{
-		return $this->callAndDetectErrors(function($key, $var, $expiry = 0) {
-			return $this->redis->setex($key, $expiry, $var);
-		}, array($key, $var, $expiry));
+		if($expiry>0)
+		{
+			return $this->callAndDetectErrors('setex',array($key, $expiry, $var));
+		}
+		else
+		{
+			return $this->callAndDetectErrors('set',array($key, $var));
+		}
 	}
 
 	/* (non-PHPdoc)
@@ -104,14 +93,12 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
      */
 	protected function doAdd ($key, $var, $expiry = 0)
 	{
-		return $this->callAndDetectErrors(function($key, $var, $expiry = 0) {
-			$res =  $this->redis->setnx($key, $var);
-			if($res)
-			{
-				$this->redis->expire($key, $expiry);
-			}
-			return $res;
-		}, array($key, $var, $expiry));
+		$res = $this->callAndDetectErrors('setnx',array($key, $var));
+		if($res)
+		{
+			$this->callAndDetectErrors('expire',array($key, $expiry));
+		}
+		return $res;
 	}
 
 	/* (non-PHPdoc)
@@ -119,9 +106,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doDelete ($key)
 	{
-		return $this->callAndDetectErrors(function($key) {
-			return $this->redis->del($key);
-		}, array($key));
+		return $this->callAndDetectErrors('del',array($key));
 	}
 
 	/* (non-PHPdoc)
@@ -129,9 +114,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function doIncrement($key, $delta = 1)
 	{
-		return $this->callAndDetectErrors(function($key, $delta = 1) {
-			return $this->redis->incrby($key, $delta);
-		}, array($key, $delta));
+		return $this->callAndDetectErrors('incrby',array($key, $delta));
 	}
 
 	/* (non-PHPdoc)
@@ -139,9 +122,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function doDecrement($key, $delta = 1)
 	{
-		return $this->callAndDetectErrors(function($key, $delta = 1) {
-			return $this->redis->decrby($key, $delta);
-		}, array($key, $delta));
+		return $this->callAndDetectErrors('decrby',array($key, $delta));
 	}
 
 	/* (non-PHPdoc)
@@ -149,9 +130,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
     */
 	public function doMultiGet($keys)
 	{
-		return $this->callAndDetectErrors(function($keys) {
-			return $this->redis->mget($keys);
-		}, array($keys));
+		return $this->callAndDetectErrors('mget',array($keys));
 	}
 
 	public static function sendMonitorEvents()
@@ -231,7 +210,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		return false;
 	}
 
-	protected function callAndDetectErrors($method, $params)
+	protected function callAndDetectErrors($methodName, $params)
 	{
 		while ($this->redis)
 		{
@@ -239,7 +218,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 
 			set_error_handler(array($this, 'errorHandler'));
 			$start = microtime(true);
-			$result = $method(...$params);
+			$result = call_user_func_array(array($this->redis, $methodName), $params);
 			$end = microtime(true);
 			restore_error_handler();
 
@@ -280,7 +259,10 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 			$curConnStart = microtime(true);
 			try
 			{
-				$redis->connect($this->hostName,$this->port,$this->timeout);
+				if ($this->persistent)
+					$redis->pconnect($this->hostName, $this->port,$this->timeout);
+				else
+					$redis->connect($this->hostName, $this->port,$this->timeout);
 			}
 			catch(Exception $e)
 			{
@@ -307,6 +289,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 			return false;
 		}
 
+		$this->connectAttempts = 0;
 		$this->redis = $redis;
 		return true;
 	}
