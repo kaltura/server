@@ -441,7 +441,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaTwoFactorAuthenticationMode
-	 * @readonly 
+	 * @readonly
 	 */
 	public $twoFactorAuthenticationMode;
 	

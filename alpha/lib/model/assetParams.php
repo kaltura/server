@@ -28,7 +28,6 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_MPEG_AUDIO = "mpeg audio";
 	const CONTAINER_FORMAT_MPEG_TS = "mpeg-ts";
 	const CONTAINER_FORMAT_MPEGTS = "mpegts";
-	const CONTAINER_FORMAT_MPEG_TS = "mpeg-ts";
 	const CONTAINER_FORMAT_M2TS = "m2ts";
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	const CONTAINER_FORMAT_WAV = "wav";
