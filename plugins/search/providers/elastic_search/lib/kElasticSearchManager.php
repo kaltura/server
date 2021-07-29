@@ -141,15 +141,15 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         if($object->getElasticParentId())
             $params['parent'] = $object->getElasticParentId();
 
-        $indexName = kBaseESearch::getElasticIndexNamePerPartner($object->getElasticIndexName(),$object->getPartnerId());
+        $genericIndexName = kBaseESearch::getElasticIndexNamePerPartner($object->getElasticIndexName(),$object->getPartnerId(),false);
+        $splitIndexName = kBaseESearch::getElasticIndexNamePerPartner($object->getElasticIndexName(),$object->getPartnerId());
 
-
-        $params['index'] = $indexName;
+        $params['index'] = $genericIndexName;
         $params['type'] = $object->getElasticObjectType();
         $params['id'] = $object->getElasticId();
         $params['action'] = $action;
 
-        KalturaLog::debug('Using elastic Index:' . $object->getElasticIndexName() . ' ,actual index name:' . $indexName );
+        KalturaLog::debug('Using elastic Index:' . $splitIndexName . ' ,actual index name:' . $genericIndexName );
 
 
         try
@@ -158,10 +158,13 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 return true;
 
             $shouldSyncElastic = $this->shouldSyncElastic($object);
-            $this->saveToSphinxLog($object, $params, $shouldSyncElastic);
+            $this->saveToSphinxLog($object, $params, $shouldSyncElastic, $splitIndexName);
 
             if(!$shouldSyncElastic)
                 return true;
+
+            //Must be after the saveToSphinxLog in order to save the generic command
+            $params['index'] = $splitIndexName;
 
             $client = new elasticClient();
             $ret = $client->$action($params);
@@ -179,7 +182,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         return true;
     }
 
-    private function saveToSphinxLog($object, $params, $shouldSyncElastic)
+    private function saveToSphinxLog($object, $params, $shouldSyncElastic, $splitIndexName = null)
     {
         $command = serialize($params);
         $skipSave = $this->shouldSkipSaveToSphinxLog($object, $command);
@@ -194,6 +197,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $elasticLog->setObjectType($object->getElasticObjectName());
         $elasticLog->setEntryId($object->getElasticEntryId());
         $elasticLog->setPartnerId($object->getPartnerId());
+        $elasticLog->setIndexName($splitIndexName);
         $elasticLog->setType(SphinxLogType::ELASTIC);
         $elasticLog->save(myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG));
     }

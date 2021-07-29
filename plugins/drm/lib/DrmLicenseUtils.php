@@ -68,12 +68,12 @@ class DrmLicenseUtils {
 	public static function createCustomData($entryId, $flavorAssets, $signingKey)
 	{
 		$flavorIds = "";
-        $first = true;
+		$first = true;
 		foreach ($flavorAssets as $flavor)
 		{
-            /**
-             * @var asset $flavor
-             */
+			/**
+			 * @var asset $flavor
+			 */
 			if ($first)
 			{
 				$first = false;
@@ -85,12 +85,16 @@ class DrmLicenseUtils {
 			$flavorIds .= $flavor->getId();
 		}
 
-        $innerData = array();
-        $innerData["ca_system"] = self::SYSTEM_NAME;
-        $innerData["user_token"] = kCurrentContext::$ks;
-        $innerData["account_id"] = kCurrentContext::getCurrentPartnerId();
-        $innerData["content_id"] = $entryId;
-        $innerData["files"] = $flavorIds;
+		$innerData = array();
+		$innerData["ca_system"] = self::SYSTEM_NAME;
+		$innerData["user_token"] = kCurrentContext::$ks;
+		$innerData["account_id"] = kCurrentContext::getCurrentPartnerId();
+		$innerData["content_id"] = $entryId;
+		$innerData["files"] = $flavorIds;
+
+		$innerDataJson = json_encode($innerData);
+		$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
+		$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
 
 		$customData = array();
 		foreach ($flavorAssets as $flavor)
@@ -98,13 +102,12 @@ class DrmLicenseUtils {
 			/*
 			* we sign for each flavor asset in case that in the future someone will want to add data per flavor asset
 			*/
-			$innerDataJson = json_encode($innerData);
-			$innerDataSignature = self::signDataWithKey($innerDataJson, $signingKey);
-			$innerDataJsonEncoded = rawurlencode(base64_encode($innerDataJson));
+			$customData[$flavor->getId()] = array('custom_data' => $innerDataJsonEncoded, 'signature' => $innerDataSignature);
+		}
 
-			$customData[$flavor->getId()] = array();
-			$customData[$flavor->getId()]["custom_data"] = $innerDataJsonEncoded;
-			$customData[$flavor->getId()]["signature"] = $innerDataSignature;
+		if(!$flavorAssets)
+		{
+			$customData[] = array('custom_data' => $innerDataJsonEncoded, 'signature' => $innerDataSignature);
 		}
 
 		kApiCache::limitConditionalCacheTimeToKs();

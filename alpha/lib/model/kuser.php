@@ -55,6 +55,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	const UNIVERSAL_PERMISSION = '__ALL__';
 	
+	const MAX_NAME_LEN = 40;
+	
 	private $roughcut_count = -1;
 	
 	public static function getColumnNames()	{	return array ( 
@@ -1477,4 +1479,27 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return $this->putInCustomData(self::COMPANY, $v);
 	}
+	
+	public function setFirstName($v)
+	{
+		PeerUtils::setExtension($this, $v, self::MAX_NAME_LEN, __FUNCTION__);
+		return parent::setFirstName(kString::alignUtf8String($v, self::MAX_NAME_LEN));
+	}
+	
+	public function getFirstName()
+	{
+		return parent::getFirstName() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
+	
+	public function setLastName($v)
+	{
+		PeerUtils::setExtension($this, $v, self::MAX_NAME_LEN, __FUNCTION__);
+		return parent::setLastName(kString::alignUtf8String($v, self::MAX_NAME_LEN));
+	}
+	
+	public function getLastName()
+	{
+		return parent::getLastName() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
+	
 }
