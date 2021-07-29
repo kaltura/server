@@ -12,8 +12,10 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	
 	const EMAIL_ADDRESSES = 'emailAddresses';
 	const SUBSCRIPTION = 'subscription';
-	const FREE_TRIAL_AMOUNT = 'freeTrialAmount';
 	const ID = 'id';
+	const FREE_TRIAL_AMOUNT_DESC = 'add free trial amount';
+	const FREE_TRIAL_CREDIT = 'cf_free_trial_credits';
+	const PLAN = 'plan';
 	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
@@ -126,8 +128,12 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	{
 		if ($subscriptionId)
 		{
-			$updatedAmount = $chargeBeeClient->updateFreeTrial($subscriptionId, $chargeBeeConfMap[self::FREE_TRIAL_AMOUNT], 'add promotional credits');
-			$this->log('Response from chargeBee updateFreeTrial: ' . print_r($updatedAmount, true));
+			$freeTrialAmount =  $this->getFreeTrialAmount($chargeBeeClient, $chargeBeeConfMap[kChargeBeeUtils::PLAN_ID]);
+			if ($freeTrialAmount)
+			{
+				$updatedAmount = $chargeBeeClient->updateFreeTrial($subscriptionId, $freeTrialAmount, self::FREE_TRIAL_AMOUNT_DESC);
+				$this->log('Response from chargeBee updateFreeTrial: ' . print_r($updatedAmount, true));
+			}
 		}
 		else
 		{
@@ -139,6 +145,19 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			}
 			$this->updateChargeBeeVendorIntegrationStatus($chargeBeeVendor->id, $chargeBeePlugin, KalturaVendorStatus::ERROR);
 		}
+	}
+
+	protected function getFreeTrialAmount($chargeBeeClient, $planId)
+	{
+		$plan = $this->getPlan($chargeBeeClient, $planId);
+		return isset($plan[self::PLAN][self::FREE_TRIAL_CREDIT]) ? $plan[self::PLAN][self::FREE_TRIAL_CREDIT] : 0;
+	}
+
+	protected function getPlan($chargeBeeClient, $planId)
+	{
+		$responsePlan = $chargeBeeClient->retrievePlan($planId);
+		KalturaLog::log('Response from chargeBee plan: ' . print_r($responsePlan, true));
+		return $responsePlan;
 	}
 
 	public function createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin)
