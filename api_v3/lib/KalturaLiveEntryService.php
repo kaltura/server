@@ -290,6 +290,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setTags($dbEntry->getTags());
 			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
 
+			$recordedEntry->setEntitledPusersEdit($dbEntry->getEntitledPusersEdit());
+			$recordedEntry->setEntitledPusersPublish($dbEntry->getEntitledPusersPublish());
+			$recordedEntry->setEntitledPusersView($dbEntry->getEntitledPusersView());
+
 			$recordedEntry->setConversionProfileId($dbEntry->getRecordedEntryConversionProfile());
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action
