@@ -90,7 +90,7 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 
 	protected function handlePartnersUsage($vendorIntegrationList)
 	{
-		$vendorIntegrationOrdered = $this->orderVendorIntegration($vendorIntegrationList);
+		$vendorIntegrationOrdered = kChargeBeeUtils::orderVendorIntegration($vendorIntegrationList->objects);
 		foreach ($vendorIntegrationOrdered as $vendorIntegrationsPerTimeSlot)
 		{
 			//todo get report from analytics with all the vendors integration on the time slot.
@@ -159,7 +159,7 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 
 	protected function getAmountDueByEstimateInvoice($chargeBeeClient, $vendorIntegration)
 	{
-		$responseEstimate = $chargeBeeClient->estimateInvoice($vendorIntegration->subscriptionId, 200, 'this is description');
+		$responseEstimate = $chargeBeeClient->estimateInvoice($vendorIntegration->subscriptionId, 200, 'this is description'); //todo:change this
 		KalturaLog::log('Response from chargeBee estimation: ' . print_r($responseEstimate, true));
 		return (isset($responseEstimate[self::ESTIMATE][self::INVOICE_ESTIMATE][self::AMOUNT_DUE])) ?
 			$responseEstimate[self::ESTIMATE][self::INVOICE_ESTIMATE][self::AMOUNT_DUE] : 0;
@@ -178,22 +178,6 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 		$partner = KBatchBase::$kClient->partner->get($partnerId);
 		KBatchBase::unimpersonate();
 		return $partner;
-	}
-
-	protected function orderVendorIntegration($vendorIntegrationList)
-	{
-		$vendorIntegrationOrdered = array();
-		foreach ($vendorIntegrationList->objects as $vendorIntegrationItem)
-		{
-			$createdAt = gmdate("Y-m-d", $vendorIntegrationItem->createdAt);
-			if(!isset($vendorIntegrationOrdered[$createdAt]))
-			{
-				$vendorIntegrationOrdered[$createdAt] = array();
-			}
-			$vendorIntegrationOrdered[$createdAt][] = $vendorIntegrationItem;
-		}
-		KalturaLog::debug('vendorIntegrationOrdered are' . print_r($vendorIntegrationOrdered, true));
-		return $vendorIntegrationOrdered;
 	}
 
 }
