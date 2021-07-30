@@ -3,7 +3,7 @@
 /**
  * @package plugins.MicrosoftTeamsDropFolder
  */
-class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaObjectLoader, IKalturaPermissions
+class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
 {
 
 	const PLUGIN_NAME = 'MicrosoftTeamsDropFolder';
@@ -74,6 +74,19 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 			case 'KalturaIntegrationSetting':
 				if ($enumValue == self::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS)) {
 					return new KalturaMicrosoftTeamsIntegrationSetting();
+				}
+				break;
+
+			case 'Form_DropFolderConfigureExtend_SubForm':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MS_TEAMS)
+				{
+					return new Form_MicrosoftTeamsDropFolderConfigureExtend_SubForm();
+				}
+				break;
+			case 'Kaltura_Client_DropFolder_Type_DropFolder':
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MS_TEAMS)
+				{
+					return new Kaltura_Client_ZoomDropFolder_Type_MicrosoftTeamsDropFolder();
 				}
 				break;
 		}
@@ -155,5 +168,25 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function getTranslations($locale)
+	{
+		$array = array();
+
+		$langFilePath = __DIR__ . "/config/lang/$locale.php";
+		if(!file_exists($langFilePath))
+		{
+			$default = 'en';
+			$langFilePath = __DIR__ . "/config/lang/$default.php";
+		}
+
+		KalturaLog::info("Loading file [$langFilePath]");
+		$array = include($langFilePath);
+
+		return array($locale => $array);
 	}
 }

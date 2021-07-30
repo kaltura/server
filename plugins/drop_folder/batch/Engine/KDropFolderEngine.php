@@ -369,7 +369,8 @@ abstract class KDropFolderEngine implements IKalturaLogger
 			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
 
 			// check if fileSizeCheckInterval time has passed since the last file size update
-			if ($time > $fileSizeLastSetAt) {
+			if ($time > $fileSizeLastSetAt)
+			{
 				try {
 					return $this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
 				} catch (KalturaException $e) {
