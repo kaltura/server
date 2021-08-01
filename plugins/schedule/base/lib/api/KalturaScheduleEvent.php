@@ -463,6 +463,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING)
 			{
 				$this->endDate = $startDate + $this->duration;
+				$this->startDate = $startDate;
 				$this->duration = null;
 			}
 
@@ -476,7 +477,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
 				}
 			}
-			elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE && is_null($sourceObject->getLinkedTo()))
+			elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE /*&& is_null($sourceObject->getLinkedTo())*/)
 			{
 				if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
 				{
