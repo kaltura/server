@@ -70,8 +70,8 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply:<br/>
-						Update - Update existing subtitles<br/>
-						Replace - Replace all subtitles
+						Update - Update existing subtitle(s). Requires captionAssetId or captionParamsId<br/>
+						Replace - Replace all subtitles. When "lang" is provided, replace only subtitles with the given language. If "tags" are also provided, replace only subtitles with the given language and tags. 
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
@@ -309,7 +309,54 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 			$captionAssetPlugin->captionAsset->setContent($captionAssetId, $captionAssetResource);
 	}
 
-	protected function deleteCurrentCaptions($entryId)
+	protected function getCaptionsToDelete($captionAssets, SimpleXMLElement $item)
+	{
+		if(!$captionAssets)
+		{
+			return $captionAssets;
+		}
+
+		$captionsToDelete = array();
+
+		foreach($item->subTitles->subTitle as $xmlCaption)
+		{
+			if(!isset($xmlCaption['lang']))
+			{
+				return $captionAssets;
+			}
+
+
+			$tags = $this->xmlBulkUploadEngine->implodeChildElements($xmlCaption->tags);
+			$xmlCaptionTags = $tags ? explode(',', $tags) : array();
+
+			foreach($captionAssets as $captionAsset)
+			{
+
+				if($captionAsset->language != $xmlCaption['lang'])
+				{
+					continue;
+				}
+
+				$foundAllTags = true;
+				foreach($xmlCaptionTags as $xmlCaptionTag)
+				{
+					if(strpos($captionAsset->tags, $xmlCaptionTag) === false)
+					{
+						$foundAllTags = false;
+						break;
+					}
+				}
+
+				if($foundAllTags)
+				{
+					$captionsToDelete[] = $captionAsset;
+				}
+			}
+		}
+		return $captionsToDelete;
+	}
+
+	protected function deleteCurrentCaptions($entryId, SimpleXMLElement $item)
 	{
 		KBatchBase::impersonate($this->xmlBulkUploadEngine->getCurrentPartnerId());
 
@@ -317,19 +364,24 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		$filter->entryIdEqual = $entryId;
 		$captionsList = KBatchBase::$kClient->captionAsset->listAction($filter);
 
-		KBatchBase::$kClient->startMultiRequest();
-		foreach($captionsList->objects as $captionAsset)
+		$captionsToDelete = $this->getCaptionsToDelete($captionsList->objects, $item);
+		if($captionsToDelete)
 		{
-			KBatchBase::$kClient->captionAsset->delete($captionAsset->id);
-		}
-
-		$results = KBatchBase::$kClient->doMultiRequest();
-
-		foreach($results as $result)
-		{
-			if (is_array($result) && isset($result['code']))
+			KBatchBase::$kClient->startMultiRequest();
+			foreach($captionsToDelete as $caption)
 			{
-				KalturaLog::info("Failed to delete caption asset with error ({$result['code']}) ({$result['message']})");
+				KalturaLog::info("Deleting caption asset with ID ({$caption->id})");
+				KBatchBase::$kClient->captionAsset->delete($caption->id);
+			}
+
+			$results = KBatchBase::$kClient->doMultiRequest();
+
+			foreach($results as $result)
+			{
+				if (is_array($result) && isset($result['code']))
+				{
+					KalturaLog::info("Failed to delete caption asset with error ({$result['code']}) ({$result['message']})");
+				}
 			}
 		}
 
@@ -354,7 +406,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		switch ($action)
 		{
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]:
-				$this->deleteCurrentCaptions($object->id);
+				$this->deleteCurrentCaptions($object->id, $item);
 			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
 				$this->handleItemAdded($object, $item);
 				break;
