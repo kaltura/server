@@ -349,7 +349,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			 */
 			if($i==$filesArrCnt)
 			{
-				$concatStr = "concat:\"$concateStr$fileName\"";
+				$concatStr = "concat:\"$concatStr$fileName\"";
 				break;
 			}
 			else {
