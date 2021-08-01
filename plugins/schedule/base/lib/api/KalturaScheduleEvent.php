@@ -477,7 +477,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
 				}
 			}
-			elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE /*&& is_null($sourceObject->getLinkedTo())*/)
+			elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
 			{
 				if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
 				{
