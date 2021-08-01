@@ -311,7 +311,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
 			}
 			
-			$cmdStr .= "-i $concatStr $videoParamStr $audioParamStr";
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr -i $concatStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	
