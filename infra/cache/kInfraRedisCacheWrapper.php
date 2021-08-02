@@ -18,6 +18,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	protected static $_stats = array();
 	protected $connectAttempts = 0;
 	protected $persistent = false;
+	protected $cluster = false;
 
 	const STAT_CONN = 'conn';
 	const STAT_OP = 'op';
@@ -47,6 +48,8 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		$this->timeout = $config['timeout'];
 		if (isset($config['persistent']) && $config['persistent'])
 			$this->persistent = true;
+		if (isset($config['cluster']) && $config['cluster'])
+			$this->cluster = true;
 
 		return $this->reconnect();
 	}
@@ -251,29 +254,44 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 
 		$connectResult = false;
 		$connStart = microtime(true);
-		while ($this->connectAttempts < self::MAX_CONNECT_ATTEMPTS)
+		if(!$this->cluster)
 		{
-			$this->connectAttempts++;
+			while ($this->connectAttempts < self::MAX_CONNECT_ATTEMPTS)
+			{
+				$redis = new Redis();
+				$curConnStart = microtime(true);
+				try
+				{
+					if ($this->persistent)
+						$redis->pconnect($this->hostName, $this->port, $this->timeout);
+					else
+						$redis->connect($this->hostName, $this->port, $this->timeout);
+				} catch (Exception $e)
+				{
+					self::safeLog("failed to connect to redis");
+				}
 
-			$redis = new Redis();
-			$curConnStart = microtime(true);
+				$connectResult = $redis->isConnected();
+				if ($connectResult || microtime(true) - $curConnStart < .5)        // retry only if there's an error and it's a timeout error
+					break;
+
+
+				self::safeLog("got timeout error while connecting to redis...");
+			}
+		}
+
+		else
+		{
 			try
 			{
 				if ($this->persistent)
-					$redis->pconnect($this->hostName, $this->port,$this->timeout);
+					$redis = new RedisCluster(null, array("$this->hostName". ":". "$this->port"), $this->timeout,true);
 				else
-					$redis->connect($this->hostName, $this->port,$this->timeout);
-			}
-			catch(Exception $e)
+					$redis = new RedisCluster(null, array("$this->hostName". ":". "$this->port"), $this->timeout);
+			} catch (Exception $e)
 			{
 				self::safeLog("failed to connect to redis");
 			}
-
-			$connectResult = $redis->isConnected();
-			if ($connectResult || microtime(true) - $curConnStart < .5)		// retry only if there's an error and it's a timeout error
-				break;
-
-			self::safeLog("got timeout error while connecting to redis...");
 		}
 
 		$connTook = microtime(true) - $connStart;
