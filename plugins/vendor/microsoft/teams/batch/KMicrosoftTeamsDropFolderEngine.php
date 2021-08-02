@@ -82,7 +82,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			list ($userId, $driveLastPageUrl) = $line;
 			KalturaLog::info("Handling drive for user ID: $userId, drive URL: $driveLastPageUrl");
 			$items = $this->graphClient->sendGraphRequest($driveLastPageUrl);
-			foreach ($items['value'] as $item)
+			foreach ($items[MicrosoftGraphFieldNames::VALUE] as $item)
 			{
 				if (isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]))
 				{

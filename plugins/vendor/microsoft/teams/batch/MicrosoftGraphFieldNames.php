@@ -34,4 +34,7 @@ class MicrosoftGraphFieldNames
 	//Bearer token field names
 	const ACCESS_TOKEN = 'access_token';
 	const EXPIRES_ON = 'expires_on';
+
+	//List response field names
+	const VALUE = 'value';
 }
