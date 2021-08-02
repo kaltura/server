@@ -2339,7 +2339,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 		elseif (in_array('msteams', $adminTags))
 		{
-			return self::EXPRESS_RECORDER_CONVERSION_KEY;
+			return self::MS_TEAMS_CONVERSION_KEY;
 		}
 		return null;
 	}
