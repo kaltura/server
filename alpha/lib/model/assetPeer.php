@@ -831,5 +831,4 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		
 		return assetPeer::doSelect($c);
 	}
-	
 }

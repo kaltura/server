@@ -139,4 +139,14 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	{
 		return $content . $toAppend;
 	}
+
+	protected function addBlockToNewFile($newFileContent, $currentBlock)
+	{
+		static $newLineIndex = 1;
+		$blockArray = explode("\n", $currentBlock, 2);
+		$blockArray[0] = $newLineIndex++;
+		$currentBlock = implode("\n", $blockArray);
+		$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
+		return $newFileContent;
+	}
 }

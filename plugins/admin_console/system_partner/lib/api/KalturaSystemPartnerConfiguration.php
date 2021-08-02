@@ -462,9 +462,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $secondarySecretRoleId;
 	
 	/**
-	 * @var bool
+	 * @var int
 	 */
-	public $adminOnlyTwoFactorAuthentication;
+	public $trigramPercentage;
+	
+	/**
+	 * @var int
+	 */
+	public $maxWordForNgram;
+	 
+	/**
+	 * @var KalturaTwoFactorAuthenticationMode
+	 */
+	public $twoFactorAuthenticationMode;
 	
 	
 	private static $map_between_objects = array
@@ -554,7 +564,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
-		'adminOnlyTwoFactorAuthentication' => 'adminOnly2fa'
+		'trigramPercentage',
+		'maxWordForNgram',
+		'twoFactorAuthenticationMode'
 	);
 
 	public function getMapBetweenObjects()

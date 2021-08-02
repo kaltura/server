@@ -107,15 +107,18 @@ class ReachProfileService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $id);
 
 		// save the object
+		$dbCurrentCredit = $dbReachProfile->getCredit();
+		$updatedCredit = $reachProfile->credit;
 		$dbReachProfile = $reachProfile->toUpdatableObject($dbReachProfile);
-		$credit = $dbReachProfile->getCredit();
-		if ($credit)
+		
+		if ($updatedCredit)
 		{
-			if ($credit instanceof kReoccurringVendorCredit)
+			if ($dbCurrentCredit instanceof kReoccurringVendorCredit && $dbCurrentCredit->wasCreditUpdated($updatedCredit))
 			{
-				/* @var $credit kReoccurringVendorCredit */
-				$credit->setPeriodDates();
-				$dbReachProfile->setCredit($credit);
+				$currentCredit = $dbReachProfile->getCredit();
+				/* @var $updatedCredit kReoccurringVendorCredit */
+				$currentCredit->setPeriodDates();
+				$dbReachProfile->setCredit($currentCredit);
 			}
 			$dbReachProfile->calculateCreditPercentUsage();
 		}
@@ -183,7 +186,7 @@ class ReachProfileService extends KalturaBaseService
 	}
 
 	/**
-	 * sync vednor profile credit
+	 * sync vendor profile credit
 	 *
 	 * @action syncCredit
 	 * @param int $reachProfileId
@@ -210,4 +213,5 @@ class ReachProfileService extends KalturaBaseService
 		$reachProfile->fromObject($dbReachProfile, $this->getResponseProfile());
 		return $reachProfile;
 	}
+	
 }

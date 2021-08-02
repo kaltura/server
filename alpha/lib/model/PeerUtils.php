@@ -47,9 +47,12 @@ class PeerUtils
 	}
 	static public function setExtension($obj, $v, $maxLengthInDb, $setterFuncStr)
 	{
+		
 		$ext = substr($v, $maxLengthInDb);
 		if($ext || $obj->getCustomData())
 		{
+			$alignedUtf8Str = kString::alignUtf8String($v, $maxLengthInDb);
+			$ext = substr($v, strlen($alignedUtf8Str));
 			$obj->putInCustomData(self::getName($setterFuncStr), ($ext === false) ? '' : $ext);
 		}
 	}

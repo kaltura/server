@@ -203,11 +203,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
 		if ($newPassword &&
-				  !UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
-				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
-				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
-				  (stripos($newPassword, $loginData->getFullName()) !== false)    ||
-				  ($newPassword == $loginData->getLoginEmail())   ){
+			!UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
+			(strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
+			(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
+			(stripos($newPassword, $loginData->getFullName()) !== false) ||
+			($newPassword == $loginData->getLoginEmail()))
+		{
 			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
@@ -517,13 +518,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$otpRequired = true;
 		}
 
-		//Check if partner ignore OTP for non-admin users
-		if($otpRequired && $partner->getAdminOnly2fa())
+		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
 		{
-			$kuser = kuserPeer::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 			if ($kuser)
 			{
-				$otpRequired = $kuser -> getIsAdmin();
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
+				{
+					$otpRequired = $kuser->getIsAdmin();
+				}
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
+				{
+					$otpRequired = !$kuser->getIsAdmin();
+				}
 			}
 		}
 		
@@ -734,7 +741,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$loginData->setLoginBlockedUntil(null);
 			$loginData->resetPreviousPasswords();
 			
-			self::checkPasswordValidation($password, $loginData);
+			if ($checkPasswordStructure)
+			{
+				self::checkPasswordValidation($password, $loginData);
+			}
 			
 			$loginData->save();
 			// now $loginData has an id and hash key can be generated
