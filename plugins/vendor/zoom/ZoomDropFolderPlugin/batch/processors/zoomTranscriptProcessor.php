@@ -59,7 +59,6 @@ class zoomTranscriptProcessor extends zoomProcessor
 		$newCaptionAsset->fileExt = self::ZOOM_TRANSCRIPT_FILE_EXT;
 		$newCaptionAsset->source = KalturaCaptionSource::ZOOM;
 		$newCaptionAsset->accuracy = KBatchBase::$taskConfig->params->accuracy;
-		
 		$caption = $captionPlugin->captionAsset->add($entry->id, $newCaptionAsset);
 		return $caption;
 	}
