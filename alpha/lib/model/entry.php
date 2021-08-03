@@ -4418,7 +4418,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		foreach($tags as $tag)
 		{
 			$tag = trim($tag);
-			if ($tag){
+			if($tag)
+			{
 				$tagsToReturn[] = $tag;
 			}
 		}

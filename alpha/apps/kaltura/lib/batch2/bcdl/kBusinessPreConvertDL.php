@@ -14,21 +14,12 @@ class kBusinessPreConvertDL
 			EntrySourceType::LECTURE_CAPTURE => "LECTURE_CAPTURE_PROFILE",
 	);
 
-	const KALTURA_CLASSROOM_CONVERSION_KEY = 'KALTURA_CLASSROOM';
-	const KALTURA_CAPTURE_CONVERSION_KEY = 'KALTURA_CAPTURE';
-	const ZOOM_ENTRY_CONVERSION_KEY = 'ZOOM_ENTRY';
-	const EXPRESS_RECORDER_CONVERSION_KEY = 'EXPRESS_RECORDER';
-	const KALTURA_MEETING_CONVERSION_KEY = 'KALTURA_MEETING';
-	const MS_TEAMS_CONVERSION_KEY = 'MS_TEAMS';
-
-	public static $staticContentConditionalMapBySourceType = array(
-		self::KALTURA_CLASSROOM_CONVERSION_KEY => "STATIC_CONTENT_PROFILE",
-		self::KALTURA_CAPTURE_CONVERSION_KEY => "STATIC_CONTENT_PROFILE",
-		self::EXPRESS_RECORDER_CONVERSION_KEY => "STATIC_CONTENT_PROFILE",
-		self::MS_TEAMS_CONVERSION_KEY => "STATIC_CONTENT_PROFILE",
-		self::KALTURA_MEETING_CONVERSION_KEY => "KALTURA_MEETING_CONVERSION_PROFILE",
-		self::ZOOM_ENTRY_CONVERSION_KEY => "ZOOM_CONTENT_PROFILE"
-	);
+	const KALTURA_CLASSROOM_CONVERSION_KEY = 'kaltura_classroom';
+	const KALTURA_CAPTURE_CONVERSION_KEY = 'kaltura_capture';
+	const ZOOM_ENTRY_CONVERSION_KEY = 'zoom_entry';
+	const EXPRESS_RECORDER_CONVERSION_KEY = 'express_recorder';
+	const KALTURA_MEETING_CONVERSION_KEY = 'kaltura_meeting';
+	const MS_TEAMS_CONVERSION_KEY = 'ms_teams';
 
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
@@ -2288,16 +2279,18 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
 		{
 			$key = self::getConversionProfileKey($entry);
-			if ($key && isset(self::$staticContentConditionalMapBySourceType[$key]))
+			$staticContentConversionProfiles = kConf::get('staticContentConverionProfiles','runtime_config',array());
+			if ($key && isset($staticContentConversionProfiles[$key]))
 			{
-				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$staticContentConditionalMapBySourceType[$key], ConversionProfileType::MEDIA, true);
+				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
 			}
 		}
 		elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 		{
 			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
 		}
-		else
+
+		if(!$profile)
 		{
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
 		}
@@ -2316,14 +2309,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$adminTags = $entry->getAdminTagsArr();
 		if ($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 		{
-			if (in_array('kalturacapture', $adminTags))
-			{
-				return self::KALTURA_CAPTURE_CONVERSION_KEY;
-			}
 			if (in_array('kalturaclassroom', $adminTags))
 			{
 				return self::KALTURA_CLASSROOM_CONVERSION_KEY;
 			}
+			return self::KALTURA_CAPTURE_CONVERSION_KEY;
 		}
 		elseif (in_array('zoomentry', $adminTags))
 		{
