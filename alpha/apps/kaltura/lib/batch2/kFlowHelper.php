@@ -2358,7 +2358,8 @@ class kFlowHelper
 			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
 			{
 				$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
-				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[$conversionProfileKey], ConversionProfileType::MEDIA, true);
+				$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$conversionProfileKey], ConversionProfileType::MEDIA, true);
 				if ($profile)
 				{
 					$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
