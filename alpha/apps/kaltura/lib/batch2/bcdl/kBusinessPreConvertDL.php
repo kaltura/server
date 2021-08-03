@@ -2279,7 +2279,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
 		{
 			$key = self::getConversionProfileKey($entry);
-			$staticContentConversionProfiles = kConf::get('staticContentConverionProfiles','runtime_config',array());
+			$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
 			if ($key && isset($staticContentConversionProfiles[$key]))
 			{
 				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
