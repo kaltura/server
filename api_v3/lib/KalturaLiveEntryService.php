@@ -586,6 +586,10 @@ class KalturaLiveEntryService extends KalturaEntryService
 	{
 		$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
 		$isKalturaRecordedLive = $dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE; // probably can be removed
+		if (!$isKalturaRecordedLive)
+		{
+			KalturaLog::debug("recorded entry source type is not KALTURA_RECORDED_LIVE [recordedEntryId = {$dbRecordedEntry->getId()}]");
+		}
 		$maxAppendTimeReached = ($recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS) < time();
 		$recordingMoreThanLimit = $dbRecordedEntry->getDuration() > kConf::get('recording_limit_length', 'local', self::DAY_IN_SECONDS);
 
