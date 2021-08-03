@@ -120,7 +120,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$this->log('Response from chargeBee createSubscription: ' . print_r($responseSubscription, true));
 		$subscriptionId = isset($responseSubscription[self::SUBSCRIPTION]) ?  $responseSubscription[self::SUBSCRIPTION][self::ID] : null;
 		$chargeBeePlugin = KalturaChargeBeeClientPlugin::get(KBatchBase::$kClient);
-		$chargeBeeVendor = $this->createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin);
+		$chargeBeeVendor = $this->createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin, $chargeBeeConfMap[kChargeBeeUtils::PLAN_ID]);
 		$this->handleSubscriptionResult($subscriptionId, $chargeBeeClient, $chargeBeeConfMap, $chargeBeeVendor, $chargeBeePlugin);
 	}
 
@@ -160,11 +160,12 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		return $responsePlan;
 	}
 
-	public function createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin)
+	public function createChargeBeeVendorIntegration($subscriptionId, $chargeBeePlugin, $planId)
 	{
 		$chargeBeeVendorIntegration = new KalturaChargeBeeVendorIntegration();
 		$chargeBeeVendorIntegration->subscriptionId = $subscriptionId;
 		$chargeBeeVendorIntegration->type = KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL;
+		$chargeBeeVendorIntegration->planId = $planId;
 		self::impersonate( $this->toPartnerId );
 		$chargeBeeVendor =  $chargeBeePlugin->chargeBeeVendor->add($chargeBeeVendorIntegration);
 		self::unimpersonate();
