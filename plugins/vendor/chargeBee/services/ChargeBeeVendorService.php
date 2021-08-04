@@ -7,6 +7,7 @@
 class ChargeBeeVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
+	const PREFIX_LOCK_KEY = '_vendor_integration';
 
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('handleNotification');
 	
@@ -111,4 +112,37 @@ class ChargeBeeVendorService extends KalturaBaseService
 		return $chargeBeeVendorIntegration;
 	}
 
+	/**
+	 * List and Lock KalturaChargeBeeVendorIntegration objects
+	 *
+	 * @action listAndLock
+	 * @param KalturaFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @param int $workerId The id of the periodic worker
+	 * @param int $lockExpiryTimeout The expiry timeout of the lock
+	 * @return KalturaChargeBeeVendorIntegrationResponse
+	 */
+	public function listAndLockAction(KalturaFilter $filter ,KalturaFilterPager $pager, $workerId, $lockExpiryTimeout)
+	{
+		// need to explicitly disable the cache since this action may not perform any queries
+		kApiCache::disableConditionalCache(); //todo do I need this
+		$items = $this->listAction($filter, $pager);
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		foreach ($items->objects as $itemKey => $item)
+		{
+			//$workerId = 890;
+			$resourceReservation = new ResourceReservation($cache, $lockExpiryTimeout, $workerId);
+			$key = self::PREFIX_LOCK_KEY . '_objectId_' . $item->id;
+			if ($resourceReservation->reserve($key))
+			{
+				KalturaLog::debug('locked successfully, key: '. $key);
+			}
+			else
+			{
+				KalturaLog::debug('could not locked, key: '. $key);
+				unset($items->objects[$itemKey]);
+			}
+		}
+		return $items;
+	}
 }
