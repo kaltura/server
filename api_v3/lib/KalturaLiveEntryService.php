@@ -472,9 +472,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$flavorParamsId)
 		{
 			// check if the conversion profile is already VOD if not set it to default.
+			KalturaLog::info("In handleRecording with flavor params id null entry ".$dbLiveEntry->getId());
 			if ($recordedEntry->getconversionProfile2()->getType() == ConversionProfileType::LIVE_STREAM)
 			{
 				$recordedEntry->setConversionProfileId($this->getPartner()->getDefaultConversionProfileId());
+				$recordedEntry->save();
 			}
 			$service = new MediaService();
 			$service->initService('media', 'media', 'updateContent');
@@ -545,17 +547,19 @@ class KalturaLiveEntryService extends KalturaEntryService
 					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
 					$maxAppendTimeReached = ($recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS) < time();
+					$recordingMoreThenLimit = $dbRecordedEntry->getDuration() > kConf::get('recording_limit_length', 'local', 86400);
 
 					KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
 					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
 					KalturaLog::debug("maxAppendTimeReached [$maxAppendTimeReached] recordedEntryCreationTime [$recordedEntryCreationTime]");
+					KalturaLog::debug("recordingMoreThenLimit [$recordingMoreThenLimit]");
 
 					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION && $isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
 					{
 						$createRecordedEntry = true;
 					}
 
-					if($dbLiveEntry->getRecordStatus() == RecordStatus::APPENDED && $dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $maxAppendTimeReached)
+					if($dbLiveEntry->getRecordStatus() == RecordStatus::APPENDED && $dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && ($maxAppendTimeReached || $recordingMoreThenLimit))
 					{
 						$createRecordedEntry = true;
 						$dbLiveEntry->setRecordedEntryId(null);
