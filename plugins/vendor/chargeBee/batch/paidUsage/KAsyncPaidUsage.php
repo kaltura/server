@@ -3,7 +3,7 @@
  * Going over all the PAID vendor_integration:
  *
  * @package plugins.chargeBee
- * @subpackage freeTrialUsage
+ * @subpackage paidUsage
  */
 
 class KAsyncPaidUsage extends KPeriodicWorker
@@ -75,7 +75,7 @@ class KAsyncPaidUsage extends KPeriodicWorker
 	protected static function prepareFilterAndPager()
 	{
 		$chargeBeeFilter = new KalturaChargeBeeVendorIntegrationFilter();
-		$chargeBeeFilter->typeEqual = KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO;
+		$chargeBeeFilter->typeEqual = KalturaVendorTypeEnum::CHARGE_BEE_PAYGO;
 		$chargeBeeFilter->statusEqual = KalturaVendorStatus::ACTIVE;
 		$chargeBeeFilter->orderBy = KalturaChargeBeeVendorIntegrationOrderBy::CREATED_AT_ASC;
 
@@ -108,7 +108,6 @@ class KAsyncPaidUsage extends KPeriodicWorker
 
 	protected function handleSubscriptionInvoice($chargeBeeClient, $vendorIntegration, $addonId, $addonQuantity)
 	{
-		//$updatedAmount = $chargeBeeClient->updateFreeTrial('16BjmwSd2Gsdi1tHw', 1000, 'add promotional credits');
 		$invoiceId = $vendorIntegration->invoiceId;
 		if (isset($invoiceId))
 		{

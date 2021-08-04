@@ -22,7 +22,7 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	protected static $class_types_cache = array(
 		VendorTypeEnum::ZOOM_ACCOUNT => self::ZOOM_VENDOR_INTEGRATION,
 		VendorTypeEnum::CHARGE_BEE_FREE_TRIAL => self::CHARGE_BEE_VENDOR_INTEGRATION,
-		VendorTypeEnum::CHARGE_BEE_FREE_PAYGO => self::CHARGE_BEE_VENDOR_INTEGRATION,
+		VendorTypeEnum::CHARGE_BEE_PAYGO => self::CHARGE_BEE_VENDOR_INTEGRATION,
 	);
 
 	/**

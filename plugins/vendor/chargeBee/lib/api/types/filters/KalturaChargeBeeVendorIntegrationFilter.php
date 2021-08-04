@@ -15,7 +15,7 @@ class KalturaChargeBeeVendorIntegrationFilter extends KalturaChargeBeeVendorInte
 	{
 		if (!$this->typeIn && !$this->typeEqual)
 		{
-			$this->typeIn = KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL . ',' . KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO;
+			$this->typeIn = KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL . ',' . KalturaVendorTypeEnum::CHARGE_BEE_PAYGO;
 		}
 
 		$c = new Criteria();
