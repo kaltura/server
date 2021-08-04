@@ -9,13 +9,15 @@
 class KAsyncFreeTrialUsage extends KPeriodicWorker
 {
 	const MAX_PAGE_SIZE = 500;
-	const MAX_MATCHES = 10000;
 	const ESTIMATE = 'estimate';
 	const INVOICE_ESTIMATE = 'invoice_estimate';
 	const AMOUNT_DUE = 'amount_due';
 	const SUBSCRIPTION = 'subscription';
 	const TRIAL_END = 'trial_end';
 	const IMMEDIATE = 0;
+	const LOCK_EXPIRY = 'lock_expiry';
+	const VENDOR_MAP = 'vendor';
+	const DEFAULT_LOCK_EXPIRY = 36000;
 
 	/*
 	* @var KalturaChargeBeeClientPlugin
@@ -51,7 +53,8 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 			try
 			{
 				KalturaLog::debug('Getting all the charge bee free trial items');
-				$vendorIntegrationList = $this->chargeBeeClientPlugin->chargeBeeVendor->listAction($chargeBeeFilter, $pager);
+				$lockExpiryTimeout = kconf::get(self::LOCK_EXPIRY, self::VENDOR_MAP, self::DEFAULT_LOCK_EXPIRY);
+				$vendorIntegrationList = $this->chargeBeeClientPlugin->chargeBeeVendor->listAndLock($chargeBeeFilter, $pager, $this->getId(), $lockExpiryTimeout);
 			}
 			catch (Exception $e)
 			{
@@ -61,7 +64,7 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 
 			if ($shouldCalculateTotalCount)
 			{
-				$totalCount = min($vendorIntegrationList->totalCount, self::MAX_MATCHES - 1); //todo:do I really need this? this limitation is for sphinx
+				$totalCount = $vendorIntegrationList->totalCount;
 				$shouldCalculateTotalCount = false;
 			}
 
@@ -70,7 +73,7 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 			$totalCount = $totalCount - $pager->pageSize;
 			$pager->pageSize = min(self::MAX_PAGE_SIZE, $totalCount);
 
-		} while ($totalCount > 0 && $pager->pageIndex <= 20);
+		} while ($totalCount > 0);
 		KalturaLog::debug('Done');
 	}
 
