@@ -1041,5 +1041,29 @@ class BaseEntryService extends KalturaEntryService
 
 		return $result;
 	}
+	
+	/**
+	 * This action serves HLS encrypted key if access control is validated
+	 * @action serveHLSKey
+	 * @param string $entryId
+	 * @param int $partnerId
+	 * @ksOptional
+	 *
+	 * @return string
+	 */
+	public function serveHLSKeyAction($entryId, $partnerId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
 
+		$securityEntryHelper = new KSecureEntryHelper($entry, null, self::getReferrer(), ContextType::PLAY);
+		$securityEntryHelper->validateForPlay();
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return base64_encode(md5(md5($partner->getSecret() . $partnerId) . $entryId, true));
+	}
+	
+	public static function getReferrer()
+	{
+		return kApiCache::getHttpReferrer();
+	}
 }
