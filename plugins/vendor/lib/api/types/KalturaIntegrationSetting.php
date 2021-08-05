@@ -136,6 +136,6 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 		}
 		$dbObject->setPartnerId(kCurrentContext::getCurrentPartnerId());
 
-		return parent::toInsertableObject($dbObject, $skip);
+		return parent::toInsertableObject($dbObject,array('createdAt','updatedAt')) ;
 	}
 }
