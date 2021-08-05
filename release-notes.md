@@ -11,8 +11,8 @@
 
 	moduls.enableStaticContentConversion.enabled = true
 	moduls.enableStaticContentConversion.permissionType = 2
-	moduls.enableStaticContentConversion.label = Enable Static Content Conversion
-	moduls.enableStaticContentConversion.permissionName = FEATURE_STATIC_CONTENT_CONVERSION
+	moduls.enableStaticContentConversion.label = Disable Static Content Conversion
+	moduls.enableStaticContentConversion.permissionName = FEATURE_DISABLE_STATIC_CONTENT_CONVERSION
 	moduls.enableStaticContentConversion.basePermissionType =
 	moduls.enableStaticContentConversion.basePermissionName =
 	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
