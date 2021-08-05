@@ -1,3 +1,20 @@
+# Quasar-17.7.0 #
+
+## Microsoft Teams Drop Folder  ##
+
+* Issue Type: Task
+* Issue ID: PSVAMB-25152
+
+### Configuration ###  
+* Update plugins.ini configuration file
+* Update admin.ini configuration file
+* Generate clients
+
+### Deployment Scripts ### 
+	php deployment/base/scripts/installPlugins.php
+	php deployment/updates/scripts/add_permissions/2021_07_02_add_vendor_service_permissions.php
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2021_06_02_alter_vendor_integration_column_name.sql
+
 # Quasar-17.5.0 #
 
 ## Update EmailEventNotificationEntryWasAddedToChannel ##
