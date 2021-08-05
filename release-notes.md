@@ -1,3 +1,29 @@
+# Quasar-17.8.0 #
+
+## Static Content Conversion Profiles ##
+
+* Issue Type: Task
+* Issue ID: FOUN-174
+
+### Configuration ###  
+* Update confmaps to activate the static conversion profiles
+* Update admin.ini configuration file:
+
+	moduls.enableStaticContentConversion.enabled = true
+	moduls.enableStaticContentConversion.permissionType = 2
+	moduls.enableStaticContentConversion.label = Enable Static Content Conversion
+	moduls.enableStaticContentConversion.permissionName = FEATURE_STATIC_CONTENT_CONVERSION
+	moduls.enableStaticContentConversion.basePermissionType =
+	moduls.enableStaticContentConversion.basePermissionName =
+	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment Scripts ### 
+	 deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
+	
+	
 # Quasar-17.7.0 #
 
 ## Microsoft Teams Drop Folder  ##
