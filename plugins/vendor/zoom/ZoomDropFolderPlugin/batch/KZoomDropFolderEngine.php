@@ -350,6 +350,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	public static function convertTimeToUnix($time)
 	{
+		date_default_timezone_set('Zulu');
 		$newTime = str_replace(array('T','Z'),array(' ',''),$time);
 		return strtotime($newTime);
 	}
