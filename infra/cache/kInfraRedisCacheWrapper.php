@@ -29,7 +29,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::doInit()
      */
-	protected function doInit ($config)
+	protected function doInit($config)
 	{
 		if (!class_exists('Redis'))
 		{
@@ -71,35 +71,35 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::get()
      */
-	protected function doGet ($key)
+	protected function doGet($key)
 	{
-		return $this->callAndDetectErrors('get',array($key));
+		return $this->callAndDetectErrors('get', array($key));
 	}
 
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::set()
      */
-	protected function doSet ($key, $var, $expiry = 0)
+	protected function doSet($key, $var, $expiry = 0)
 	{
 		if($expiry>0)
 		{
-			return $this->callAndDetectErrors('setex',array($key, $expiry, $var));
+			return $this->callAndDetectErrors('setex', array($key, $expiry, $var));
 		}
 		else
 		{
-			return $this->callAndDetectErrors('set',array($key, $var));
+			return $this->callAndDetectErrors('set', array($key, $var));
 		}
 	}
 
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::add()
      */
-	protected function doAdd ($key, $var, $expiry = 0)
+	protected function doAdd($key, $var, $expiry = 0)
 	{
-		$res = $this->callAndDetectErrors('setnx',array($key, $var));
+		$res = $this->callAndDetectErrors('setnx', array($key, $var));
 		if($res)
 		{
-			$this->callAndDetectErrors('expire',array($key, $expiry));
+			$this->callAndDetectErrors('expire', array($key, $expiry));
 		}
 		return $res;
 	}
@@ -107,9 +107,9 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::delete()
 	 */
-	protected function doDelete ($key)
+	protected function doDelete($key)
 	{
-		return $this->callAndDetectErrors('del',array($key));
+		return $this->callAndDetectErrors('del', array($key));
 	}
 
 	/* (non-PHPdoc)
@@ -117,7 +117,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function doIncrement($key, $delta = 1)
 	{
-		return $this->callAndDetectErrors('incrby',array($key, $delta));
+		return $this->callAndDetectErrors('incrby', array($key, $delta));
 	}
 
 	/* (non-PHPdoc)
@@ -125,7 +125,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function doDecrement($key, $delta = 1)
 	{
-		return $this->callAndDetectErrors('decrby',array($key, $delta));
+		return $this->callAndDetectErrors('decrby', array($key, $delta));
 	}
 
 	/* (non-PHPdoc)
@@ -133,7 +133,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
     */
 	public function doMultiGet($keys)
 	{
-		return $this->callAndDetectErrors('mget',array($keys));
+		return $this->callAndDetectErrors('mget', array($keys));
 	}
 
 	public static function sendMonitorEvents()
@@ -254,44 +254,38 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 
 		$connectResult = false;
 		$connStart = microtime(true);
-		if(!$this->cluster)
+
+		while ($this->connectAttempts < self::MAX_CONNECT_ATTEMPTS)
 		{
-			while ($this->connectAttempts < self::MAX_CONNECT_ATTEMPTS)
+			$this->connectAttempts++;
+			$curConnStart = microtime(true);
+			try
 			{
-				$redis = new Redis();
-				$curConnStart = microtime(true);
-				try
+				if (!$this->cluster)
 				{
+					$redis = new Redis();
+
 					if ($this->persistent)
 						$redis->pconnect($this->hostName, $this->port, $this->timeout);
 					else
 						$redis->connect($this->hostName, $this->port, $this->timeout);
-				} catch (Exception $e)
+
+					$connectResult = $redis->isConnected();
+				}
+				else
 				{
-					self::safeLog("failed to connect to redis");
+					$redis = new RedisCluster(null, array("$this->hostName" . ":" . "$this->port"), $this->timeout, $this->timeout, $this->persistent);
 				}
 
-				$connectResult = $redis->isConnected();
-				if ($connectResult || microtime(true) - $curConnStart < .5)        // retry only if there's an error and it's a timeout error
-					break;
-
-
-				self::safeLog("got timeout error while connecting to redis...");
 			}
-		}
-
-		else
-		{
-			try
-			{
-				if ($this->persistent)
-					$redis = new RedisCluster(null, array("$this->hostName". ":". "$this->port"), $this->timeout,true);
-				else
-					$redis = new RedisCluster(null, array("$this->hostName". ":". "$this->port"), $this->timeout);
-			} catch (Exception $e)
+			catch (Exception $e)
 			{
 				self::safeLog("failed to connect to redis");
 			}
+
+			if ($connectResult || microtime(true) - $curConnStart < .5)        // retry only if there's an error and it's a timeout error
+				break;
+			self::safeLog("got timeout error while connecting to redis...");
 		}
 
 		$connTook = microtime(true) - $connStart;
