@@ -4408,6 +4408,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return in_array($adminTag, explode(',', $this->getAdminTags()));
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getAdminTagsArr()
+	{
+		$tags = explode(",", $this->getAdminTags());
+		$tagsToReturn = array();
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			if($tag)
+			{
+				$tagsToReturn[] = $tag;
+			}
+		}
+		return array_unique($tagsToReturn);
+	}
 
 	/**
 	 * allow edit or change related metadata

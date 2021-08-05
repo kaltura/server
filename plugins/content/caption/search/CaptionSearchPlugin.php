@@ -197,11 +197,37 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		return null;
 	}
 
+	public static function filterCaptionsByLangAndLabel($captionAssetsList)
+	{
+		$accuracies = array();
+		$captionAssets = array();
+		foreach($captionAssetsList as $captionAsset)
+		{
+			/* @var $captionAsset CaptionAsset */
+			$captionLabel = $captionAsset->getLabel() ? $captionAsset->getLabel() : '';
+			$captionLanguage = $captionAsset->getLanguage() ? $captionAsset->getLanguage() : '';
+			$captionAccuracy = $captionAsset->getAccuracy() ? $captionAsset->getAccuracy() : 0;
+
+			$key = "{$captionLanguage}_{$captionLabel}";
+
+			if(isset($accuracies[$key]) && ($captionAccuracy <= $accuracies[$key]))
+			{
+				continue;
+			}
+			$accuracies[$key] = $captionAccuracy;
+			$captionAssets[$key] = $captionAsset;
+		}
+
+		return $captionAssets;
+	}
+
 	public static function getCaptionElasticSearchData($entry)
 	{
 		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
 		if(!$captionAssets || !count($captionAssets))
 			return null;
+
+		$captionAssets = self::filterCaptionsByLangAndLabel($captionAssets);
 
 		$data = array();
 		$captionData = array();
@@ -209,6 +235,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		foreach($captionAssets as $captionAsset)
 		{
 			/* @var $captionAsset CaptionAsset */
+			KalturaLog::info("Caption asset id: {$captionAsset->getId()}");
 
 			$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_CAPTION_FILE_SIZE_FOR_INDEXING);

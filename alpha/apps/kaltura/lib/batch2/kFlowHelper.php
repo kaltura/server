@@ -2355,6 +2355,26 @@ class kFlowHelper
 
 		if($entry)
 		{
+			if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
+			{
+				$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
+				$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$conversionProfileKey], ConversionProfileType::MEDIA, true);
+				if ($profile)
+				{
+					$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+					$higestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
+					if ($higestBitrateFlavor && $sourceFlavor && $higestBitrateFlavor->getId() != $sourceFlavor->getId())
+					{
+						$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
+						$sourceFlavor->save();
+						$higestBitrateFlavor->setIsOriginal(true);
+						$higestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
+						$higestBitrateFlavor->save();
+					}
+				}
+			}
+
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
 
 			$clonePendingEntriesArray = $entry->getClonePendingEntries();

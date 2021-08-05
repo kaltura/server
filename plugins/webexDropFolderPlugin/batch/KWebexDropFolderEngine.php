@@ -311,58 +311,9 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
-	protected function handleExistingDropFolderFile (KalturaWebexDropFolderFile $dropFolderFile)
+	protected function getUpdatedFileSize (KalturaDropFolderFile $dropFolderFile)
 	{
-		try
-		{
-			$updatedFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
-		}
-		catch (Exception $e)
-		{
-			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
-					DropFolderPlugin::ERROR_READING_FILE_MESSAGE, $e);
-			return null;
-		}
-
-		if (!$dropFolderFile->fileSize)
-		{
-			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
-				DropFolderPlugin::ERROR_READING_FILE_MESSAGE . '[' . $dropFolderFile->contentUrl . ']');
-		}
-		else if ($dropFolderFile->fileSize < $updatedFileSize)
-		{
-			try
-			{
-				$updateDropFolderFile = new KalturaDropFolderFile();
-				$updateDropFolderFile->fileSize = $updatedFileSize;
-
-				return $this->dropFolderFileService->update($dropFolderFile->id, $updateDropFolderFile);
-			}
-			catch (Exception $e)
-			{
-				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
-					DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
-				return null;
-			}
-		}
-		else // file sizes are equal
-		{
-			$time = time();
-			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
-
-			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
-
-			// check if fileSizeCheckInterval time has passed since the last file size update
-			if ($time > $fileSizeLastSetAt) {
-				try {
-					return $this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
-				} catch (KalturaException $e) {
-					$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
-						DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
-					return null;
-				}
-			}
-		}
+		return $updatedFileSize = WebexPlugin::getSizeFromWebexContentUrl($dropFolderFile->contentUrl);
 	}
 
 	protected function addAsNewContent (KalturaBatchJob $job, KalturaWebexDropFolderContentProcessorJobData $data, KalturaWebexDropFolder $folder)
