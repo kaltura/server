@@ -3,17 +3,10 @@
 /**
  * @package plugins.MicrosoftTeamsDropFolder
  */
-class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaAdminConsolePages, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
+class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
 {
 
 	const PLUGIN_NAME = 'MicrosoftTeamsDropFolder';
-	/**
-	 * @inheritDoc
-	 */
-	public static function getApplicationPages()
-	{
-		// TODO: Implement getApplicationPages() method.
-	}
 
 	/**
 	 * @inheritDoc
