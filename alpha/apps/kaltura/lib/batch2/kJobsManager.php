@@ -1694,7 +1694,7 @@ class kJobsManager
 			{
 				$extractMediaData->setExtractId3Tags(true);
 			}
-			elseif(PermissionPeer::isValidForPartner(PermissionName::FEATURE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
+			elseif(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
 			{
 				$profileLC = kBusinessPreConvertDL::retrieveConversionProfileByType($entry);
 				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;

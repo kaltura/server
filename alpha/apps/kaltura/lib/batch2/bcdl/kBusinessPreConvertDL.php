@@ -2276,14 +2276,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	public static function retrieveConversionProfileByType($entry)
 	{
 		$profile = null;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
+		if(self::shouldCheckStaticContentFlow($entry))
 		{
 			$key = self::getConversionProfileKey($entry);
 			$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
-			if ($key && isset($staticContentConversionProfiles[$key]))
-			{
-				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
-			}
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
 		}
 		elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 		{
@@ -2296,8 +2293,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		}
 
 		return $profile;
-
-
+	}
+	
+	/**
+	 * @param $entry
+	 * @return bool
+	 */
+	public static function shouldCheckStaticContentFlow($entry)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
+			return false;
+			
+		$key = self::getConversionProfileKey($entry);
+		$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+		return $key && isset($staticContentConversionProfiles[$key]);
 	}
 
 	/**
