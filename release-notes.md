@@ -18,7 +18,7 @@
 	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment Scripts ### 
-	 deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
