@@ -1,3 +1,7 @@
+# Quasar-17.8.0 #
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_03_service_baseentry.php
+
 # Quasar-17.5.0 #
 
 ## Update EmailEventNotificationEntryWasAddedToChannel ##
