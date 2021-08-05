@@ -127,15 +127,15 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	{
 		switch ($v)
 		{
-			case VendorStatus::DISABLED:
+			case VendorIntegrationStatus::DISABLED:
 			{
 				return DropFolderStatus::DISABLED;
 			}
-			case VendorStatus::ACTIVE:
+			case VendorIntegrationStatus::ACTIVE:
 			{
 				return DropFolderStatus::ENABLED;
 			}
-			case VendorStatus::DELETED:
+			case VendorIntegrationStatus::DELETED:
 			{
 				return DropFolderStatus::DELETED;
 			}

@@ -159,6 +159,8 @@ class kKavaBase extends kDruidBase
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
 	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
 	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
+	const PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME = 'hasSegmentDownloadTime';
+	const PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME = 'hasManifestDownloadTime';
 
 	//user engagement values
 	const USER_SOUND_ON_TAB_FOCUSED = 'SoundOnTabFocused';
