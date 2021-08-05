@@ -15,6 +15,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	const PLUGIN_VERSION_BUILD = 0;
 	const SCHEDULE_EVENTS_CONSUMER = 'kScheduleEventsConsumer';
 	const ICAL_RESPONSE_TYPE = 'ical';
+	const NO_EVENT_CACHE_TIME = 60;
 	
 	static $currentEvents = array();
 	
@@ -155,8 +156,12 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 		$currentEvents = $this->getCurrentEvent($object->getId());
 		if(! $currentEvents)
 		{
+			KalturaResponseCacher::setConditionalCacheExpiry(self::NO_EVENT_CACHE_TIME);
 			return false;
 		}
+		
+		$cacheTime = max(self::NO_EVENT_CACHE_TIME,$currentEvents->getCalculatedEndTime() - time());
+		KalturaResponseCacher::setConditionalCacheExpiry($cacheTime);
 		return $currentEvents->dynamicGetter($context, $output);
 	}
 	
