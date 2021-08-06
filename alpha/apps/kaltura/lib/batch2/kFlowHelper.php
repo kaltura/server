@@ -2355,7 +2355,6 @@ class kFlowHelper
 
 		if($entry)
 		{
-			KalturaLog::debug("TTT: handleConvertProfileFinished" . kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry));
 			if(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
 			{
 				$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
