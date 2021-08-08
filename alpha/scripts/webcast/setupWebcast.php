@@ -89,8 +89,8 @@ $annotationEnumId = getDynamicEnumId('CuePointType', 'Annotation', 'annotation')
 setWebcastEventNotificationTemplateParams('THUMB_CUE_POINT_READY_NOTIFICATION', $partner, 'KalturaThumbCuePoint', $thumbEnumId);
 setWebcastEventNotificationTemplateParams('SLIDE_VIEW_CHANGE_CODE_CUE_POINT',   $partner, 'KalturaCodeCuePoint',  $codeEnumId);
 setWebcastEventNotificationTemplateParams('POLLS_PUSH_NOTIFICATIONS',           $partner, 'KalturaCodeCuePoint',  $codeEnumId,       'pollVoteResponseProfile');
-setWebcastEventNotificationTemplateParams('CODE_QNA_NOTIFICATIONS',             $partner, 'KalturaCodeCuePoint',  $codeEnumId,       'QandA');
-setWebcastEventNotificationTemplateParams('PUBLIC_QNA_NOTIFICATIONS',           $partner, 'KalturaAnnotation',    $annotationEnumId, 'QandA');
-setWebcastEventNotificationTemplateParams('USER_QNA_NOTIFICATIONS',             $partner, 'KalturaAnnotation',    $annotationEnumId, 'QandA');
+setWebcastEventNotificationTemplateParams('CODE_QNA_NOTIFICATIONS',             $partner, 'KalturaCodeCuePoint',  $codeEnumId,       'QandA_for_push');
+setWebcastEventNotificationTemplateParams('PUBLIC_QNA_NOTIFICATIONS',           $partner, 'KalturaAnnotation',    $annotationEnumId, 'QandA_for_push');
+setWebcastEventNotificationTemplateParams('USER_QNA_NOTIFICATIONS',             $partner, 'KalturaAnnotation',    $annotationEnumId, 'QandA_for_push');
 
 KalturaLog::notice('Script Done');
