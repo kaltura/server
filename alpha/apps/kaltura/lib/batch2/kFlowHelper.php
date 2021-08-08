@@ -2355,6 +2355,27 @@ class kFlowHelper
 
 		if($entry)
 		{
+			if(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+			{
+				$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
+				$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+				$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$conversionProfileKey], ConversionProfileType::MEDIA, true);
+				if ($profile)
+				{
+					$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+					$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
+					//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
+					if (!$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $sourceFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
+					{
+						$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
+						$sourceFlavor->save();
+						$highestBitrateFlavor->setIsOriginal(true);
+						$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
+						$highestBitrateFlavor->save();
+					}
+				}
+			}
+
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
 
 			$clonePendingEntriesArray = $entry->getClonePendingEntries();

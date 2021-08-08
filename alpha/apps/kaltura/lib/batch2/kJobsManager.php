@@ -1694,7 +1694,12 @@ class kJobsManager
 			{
 				$extractMediaData->setExtractId3Tags(true);
 			}
-			else if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+			elseif(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+			{
+				$profileLC = kBusinessPreConvertDL::retrieveConversionProfileByType($entry);
+				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
+			}
+			elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 			{
 				$profileLC = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
 				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;

@@ -14,6 +14,13 @@ class kBusinessPreConvertDL
 			EntrySourceType::LECTURE_CAPTURE => "LECTURE_CAPTURE_PROFILE",
 	);
 
+	const KALTURA_CLASSROOM_CONVERSION_KEY = 'kaltura_classroom';
+	const KALTURA_CAPTURE_CONVERSION_KEY = 'kaltura_capture';
+	const ZOOM_ENTRY_CONVERSION_KEY = 'zoom_entry';
+	const EXPRESS_RECORDER_CONVERSION_KEY = 'express_recorder';
+	const KALTURA_MEETING_CONVERSION_KEY = 'kaltura_meeting';
+	const MS_TEAMS_CONVERSION_KEY = 'ms_teams';
+
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
 	 *
@@ -2216,16 +2223,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	public static function checkConditionalProfiles($entry, $mediaInfo)
 	{
-		if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
-		{
-			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
-		}
-		else 
-		{
-			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
-		}
-		
-		if(!$profile) 
+		$profile = self::retrieveConversionProfileByType($entry);
+		if(!$profile)
 		{
 			KalturaLog::log("No profile for entry(".($entry->getId())."), cannot check profile conditions ");
 			return;
@@ -2267,5 +2266,80 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		KalturaLog::log("None of the conditions are met.");
 		return;
+	}
+
+	/**
+	 * @param $entry
+	 * @return conversionProfile2|null
+	 * @throws Exception
+	 */
+	public static function retrieveConversionProfileByType($entry)
+	{
+		$profile = null;
+		if(self::shouldCheckStaticContentFlow($entry))
+		{
+			$key = self::getConversionProfileKey($entry);
+			$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
+		}
+		elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
+		{
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
+		}
+
+		if(!$profile)
+		{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+		}
+
+		return $profile;
+	}
+	
+	/**
+	 * @param $entry
+	 * @return bool
+	 */
+	public static function shouldCheckStaticContentFlow($entry)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
+			return false;
+		
+		$key = self::getConversionProfileKey($entry);
+		$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+		return $key && isset($staticContentConversionProfiles[$key]);
+	}
+
+	/**
+	 * @param Entry $entry
+	 * @return string|null
+	 */
+	public static function getConversionProfileKey(Entry $entry)
+	{
+		$adminTags = $entry->getAdminTagsArr();
+		if ($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
+		{
+			if (in_array('kalturaclassroom', $adminTags))
+			{
+				return self::KALTURA_CLASSROOM_CONVERSION_KEY;
+			}
+			return self::KALTURA_CAPTURE_CONVERSION_KEY;
+		}
+		elseif (in_array('zoomentry', $adminTags))
+		{
+			return self::ZOOM_ENTRY_CONVERSION_KEY;
+		}
+		elseif (in_array('kalturameeting', $adminTags))
+		{
+			return self::KALTURA_MEETING_CONVERSION_KEY;
+		}
+		elseif (in_array('expressrecorder', $adminTags))
+		{
+			return self::EXPRESS_RECORDER_CONVERSION_KEY;
+		}
+		elseif (in_array('msteams', $adminTags))
+		{
+			return self::MS_TEAMS_CONVERSION_KEY;
+		}
+		return null;
 	}
 }
