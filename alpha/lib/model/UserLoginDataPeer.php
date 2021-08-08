@@ -804,7 +804,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$generateNewSeed = false;
 		if ($partner->getUseTwoFactorAuthentication())
 		{
-			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 			switch($partner->getTwoFactorAuthenticationMode())
 			{
 				case TwoFactorAuthenticationMode::ALL:
@@ -826,6 +825,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 			if($generateNewSeed)
 			{
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
 				$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
 			}
 		}
