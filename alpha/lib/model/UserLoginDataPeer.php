@@ -802,7 +802,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	protected static function add2faSeed($partner, $isAdminUser, $userLoginData)
 	{
 		$generateNewSeed = false;
-		
 		if ($partner->getUseTwoFactorAuthentication())
 		{
 			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
@@ -822,6 +821,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				
 				default:
 					$generateNewSeed=false;
+					break;
 			}
 
 			if($generateNewSeed)
