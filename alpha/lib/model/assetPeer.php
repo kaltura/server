@@ -826,7 +826,8 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->add(assetPeer::ENTRY_ID, $entryId);
 		$c->add(assetPeer::IS_ORIGINAL, 0);
 
-		if(count($flavorStatuses)) {
+		if(count($flavorStatuses))
+		{
 			$c->add(assetPeer::STATUS, $flavorStatuses, Criteria::IN);
 		}
 
