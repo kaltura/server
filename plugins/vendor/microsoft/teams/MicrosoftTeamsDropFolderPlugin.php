@@ -79,7 +79,7 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 			case 'Kaltura_Client_DropFolder_Type_DropFolder':
 				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::MS_TEAMS)
 				{
-					return new Kaltura_Client_ZoomDropFolder_Type_MicrosoftTeamsDropFolder();
+					return new Kaltura_Client_MicrosoftTeamsDropFolder_Type_MicrosoftTeamsDropFolder();
 				}
 				break;
 		}
