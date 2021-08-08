@@ -18,6 +18,8 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 	const LOCK_EXPIRY = 'lock_expiry';
 	const VENDOR_MAP = 'vendor';
 	const DEFAULT_LOCK_EXPIRY = 36000;
+	const EXTEND_LOCK = 'extend_lock';
+	const EXTEND_LOCK_EXPIRY = 86400;
 
 	/*
 	* @var KalturaChargeBeeClientPlugin
@@ -77,12 +79,16 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 		KalturaLog::debug('Done');
 	}
 
-	protected static function prepareFilterAndPager()
+	protected static function prepareFilterAndPager($objectId = null)
 	{
 		$chargeBeeFilter = new KalturaChargeBeeVendorIntegrationFilter();
 		$chargeBeeFilter->typeEqual = KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL;
 		$chargeBeeFilter->statusEqual = KalturaVendorStatus::ACTIVE;
 		$chargeBeeFilter->orderBy = KalturaChargeBeeVendorIntegrationOrderBy::CREATED_AT_ASC;
+		if ($objectId)
+		{
+			$chargeBeeFilter->idEqual = $objectId;
+		}
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::MAX_PAGE_SIZE;
@@ -106,10 +112,18 @@ class KAsyncFreeTrialUsage extends KPeriodicWorker
 					if ($chargeBeeClient)
 					{
 						$this->checkSubscriptionCredit($chargeBeeClient, $vendorIntegration, $partner);
+						$this->extendLockExpiryOnVendorIntegration($vendorIntegration);
 					}
 				}
 			}
 		}
+	}
+
+	protected function extendLockExpiryOnVendorIntegration($vendorIntegration)
+	{
+		$extendLockExpiryTimeout = kconf::get(self::EXTEND_LOCK, self::VENDOR_MAP, self::EXTEND_LOCK_EXPIRY);
+		list($chargeBeeFilter, $pager) = self::prepareFilterAndPager($vendorIntegration->id);
+		$this->chargeBeeClientPlugin->chargeBeeVendor->listAndLock($chargeBeeFilter, $pager, $this->getId(), $extendLockExpiryTimeout);
 	}
 
 	protected function checkSubscriptionCredit($chargeBeeClient, $vendorIntegration, $partner)
