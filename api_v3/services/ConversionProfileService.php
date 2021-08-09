@@ -29,7 +29,7 @@ class ConversionProfileService extends KalturaBaseService
 			return $this->partnerGroup . ',0';
 		}
 		
-		if(in_array($this->actionName, array('list', 'get')))
+		if(kCurrentContext::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER && in_array($this->actionName, array('list', 'get')))
 		{
 			return $this->partnerGroup . ',0';
 		}
