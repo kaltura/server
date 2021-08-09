@@ -23,12 +23,14 @@ class ConversionProfileService extends KalturaBaseService
 	 */
 	protected function partnerGroup($peer = null)
 	{
-		if(
-			$this->actionName == 'add' ||
-			$this->actionName == 'update'
-			)
+		if($this->actionName == 'add' || $this->actionName == 'update')
 		{
 			assetParamsPeer::setIsDefaultInDefaultCriteria(false);
+			return $this->partnerGroup . ',0';
+		}
+		
+		if(in_array($this->actionName, array('list', 'get')))
+		{
 			return $this->partnerGroup . ',0';
 		}
 		
@@ -173,7 +175,7 @@ class ConversionProfileService extends KalturaBaseService
 	public function updateAction($id, KalturaConversionProfile $conversionProfile)
 	{
 		$conversionProfileDb = conversionProfile2Peer::retrieveByPK($id);
-		if (!$conversionProfileDb)
+		if (!$conversionProfileDb || $conversionProfileDb->getPartnerId() == PartnerPeer::GLOBAL_PARTNER)
 			throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $id);
 			
 		$conversionProfile->toUpdatableObject($conversionProfileDb);
