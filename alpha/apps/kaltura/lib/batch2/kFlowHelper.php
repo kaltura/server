@@ -3555,7 +3555,7 @@ class kFlowHelper
 	protected static function handleStaticContent(entry $entry)
 	{
 		$disableStaticContentSourceDeletionPartners = kConf::get('disableStaticContentSourceDeletionPartners', 'runtime_config', array());
-		if (in_array($entry->getPartnerId(), $disableStaticContentSourceDeletionPartners) || !kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+		if (in_array($entry->getPartnerId(), $disableStaticContentSourceDeletionPartners) || in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $disableStaticContentSourceDeletionPartners) || !kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
 		{
 			return;
 		}
