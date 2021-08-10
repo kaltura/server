@@ -2111,7 +2111,7 @@ class kKavaReportsMgr extends kKavaBase
 		return array($from_date . '/' . $to_date);
 	}
 
-	protected static function getKuserIds($report_def, $puser_ids, $partner_id, $delimiter = ',')
+	protected static function getKuserIds($data_source, $dimension, $puser_ids, $partner_id, $delimiter = ',')
 	{
 		$result = array();
 
@@ -2128,14 +2128,9 @@ class kKavaReportsMgr extends kKavaBase
 		
 		// extract ids from hashes
 		$hash_conf = array();
-		foreach (self::getEnrichDefs($report_def) as $enrich_def)
+		if (isset(self::$datasources_hash_dimensions[$data_source]) && isset(self::$datasources_hash_dimensions[$data_source][$dimension]))
 		{
-			if ($enrich_def[self::REPORT_ENRICH_FUNC] == 'self::getUsersInfo' &&
-				(!isset($enrich_def[self::REPORT_ENRICH_CONTEXT]['hash']) || $enrich_def[self::REPORT_ENRICH_CONTEXT]['hash']))
-			{
-				$hash_conf = kConf::get('kava_hash_user_ids', 'local', array());
-				break;
-			}
+			$hash_conf = kConf::get('kava_hash_user_ids', 'local', array());
 		}
 		
 		if (isset($hash_conf[$partner_id]))
@@ -2145,6 +2140,7 @@ class kKavaReportsMgr extends kKavaBase
 				$kuser_id = self::getKuserIdFromHash($id);
 				if ($kuser_id === false)
 				{
+					unset($puser_ids[$index]);
 					continue;
 				}
 				
@@ -2244,12 +2240,13 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		$input_filter->addReportsDruidFilters($partner_id, $report_def, $druid_filter);
+		$data_source = self::getDataSource($report_def);
 		//Calculating druid filter userIds uses core logic which we don't want to move to the filter
 		if ($input_filter instanceof endUserReportsInputFilter && $input_filter->userIds != null)
 		{
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => self::DIMENSION_KUSER_ID,
-				self::DRUID_VALUES => self::getKuserIds($report_def, $input_filter->userIds, $partner_id, $response_options->getDelimiter()),
+				self::DRUID_VALUES => self::getKuserIds($data_source, self::DIMENSION_KUSER_ID, $input_filter->userIds, $partner_id, $response_options->getDelimiter()),
 			);
 		}
 
@@ -2461,9 +2458,10 @@ class kKavaReportsMgr extends kKavaBase
 		$data_source = self::getDataSource($report_def);
 		if ($input_filter->owners != null)
 		{
+			$dimension = self::getEntryKuserDimension($data_source);
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::getEntryKuserDimension($data_source),
-				self::DRUID_VALUES => self::getKuserIds(array(), $input_filter->owners, $partner_id, $response_options->getDelimiter()),
+				self::DRUID_DIMENSION => $dimension,
+				self::DRUID_VALUES => self::getKuserIds($data_source, $dimension, $input_filter->owners, $partner_id, $response_options->getDelimiter()),
 			);
 		}
 
