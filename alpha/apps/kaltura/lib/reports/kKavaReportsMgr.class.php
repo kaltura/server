@@ -2135,11 +2135,19 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (isset($hash_conf[$partner_id]))
 		{
+			$partner_conf = $hash_conf[$partner_id];
 			foreach ($puser_ids as $index => $id)
 			{
 				$kuser_id = self::getKuserIdFromHash($id);
 				if ($kuser_id === false)
 				{
+					if (isset($partner_conf['userIdPattern']))
+					{
+						if (!preg_match($partner_conf['userIdPattern'], $id))
+						{
+							continue;
+						}
+					}
 					unset($puser_ids[$index]);
 					continue;
 				}
