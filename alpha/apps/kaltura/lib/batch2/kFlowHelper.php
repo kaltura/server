@@ -3569,19 +3569,21 @@ class kFlowHelper
 		}
 
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
-		if (count($nonSourceFlavors) >= 2)
+		if (count($nonSourceFlavors) < 2)
 		{
-			$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
-			$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
-			//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
-			if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor &&  $highestBitrateFlavor->getId() != $sourceFlavor->getId())
-			{
-				$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
-				$sourceFlavor->save();
-				$highestBitrateFlavor->setIsOriginal(true);
-				$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
-				$highestBitrateFlavor->save();
-			}
+			return;
+		}
+
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
+		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
+		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
+		{
+			$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
+			$sourceFlavor->save();
+			$highestBitrateFlavor->setIsOriginal(true);
+			$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
+			$highestBitrateFlavor->save();
 		}
 	}
 }
