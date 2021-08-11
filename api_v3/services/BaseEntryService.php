@@ -1041,5 +1041,30 @@ class BaseEntryService extends KalturaEntryService
 
 		return $result;
 	}
+	
+	/**
+	 * This action serves HLS encrypted key if access control is validated
+	 * @action servePlaybackKey
+	 * @param string $entryId
+	 * @ksOptional
+	 * @return file
+	 */
+	public function servePlaybackKeyAction($entryId)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$entry || $entry->getStatus() === entryStatus::DELETED)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		
+		$securityEntryHelper = new KSecureEntryHelper($entry, null, kApiCache::getHttpReferrer(), ContextType::PLAY);
+		http_response_code(KCurlHeaderResponse::HTTP_STATUS_FORBIDDEN);
+		$securityEntryHelper->validateForPlay();
+		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
+		
+		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
+		$key = base64_encode(md5(md5(kConf::get('playback_secret') . $partner->getId()) . $entryId, true));
+		return new kRendererString($key, 'text/plain');
+	}
 
 }

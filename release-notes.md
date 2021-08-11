@@ -16,12 +16,16 @@
 	moduls.enableStaticContentConversion.basePermissionType =
 	moduls.enableStaticContentConversion.basePermissionName =
 	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
+  
+* Update local.ini configuration file:
+    playback_secret = "9d355e9e5b87b8a0983aec5bd8a7db6f"
 
 ### Deployment Scripts ### 
 	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_03_service_baseentry.php
 	
 	
 # Quasar-17.7.0 #
