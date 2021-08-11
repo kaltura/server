@@ -17,8 +17,6 @@
 	moduls.enableStaticContentConversion.basePermissionName =
 	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
   
-* Update local.ini configuration file:
-    playback_secret = "9d355e9e5b87b8a0983aec5bd8a7db6f"
 
 ### Deployment Scripts ### 
 	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
