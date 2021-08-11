@@ -103,16 +103,16 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 					$this->singleRunFoundItems[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]] = $extendedItem;
 					$result = null;
 					if (in_array($extendedItem[MicrosoftGraphFieldNames::ID_FIELD], array_keys($existingDropFolderFiles))) {
-                        $currentDropFolderFile = $existingDropFolderFiles[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]];
-                        unset ($existingDropFolderFiles[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]]);
-                        if ($currentDropFolderFile->fileSize == $extendedItem[MicrosoftGraphFieldNames::SIZE]) {
-                            KalturaLog::info('Drive item with ID ' . $extendedItem[MicrosoftGraphFieldNames::ID_FIELD] . ' already exists in the system, and the content size remains the same. Skipping.');
-                        }
-                        else
-                        {
-                            $currentDropFolderFile = $this->updateDropFolderFile($currentDropFolderFile, $extendedItem);
-                            $result = $this->handleExistingDropFolderFile($currentDropFolderFile);
-                        }
+						$currentDropFolderFile = $existingDropFolderFiles[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]];
+						unset ($existingDropFolderFiles[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]]);
+						if ($currentDropFolderFile->fileSize == $extendedItem[MicrosoftGraphFieldNames::SIZE]) {
+							KalturaLog::info('Drive item with ID ' . $extendedItem[MicrosoftGraphFieldNames::ID_FIELD] . ' already exists in the system, and the content size remains the same. Skipping.');
+						}
+						else
+						{
+							$currentDropFolderFile = $this->updateDropFolderFile($currentDropFolderFile, $extendedItem);
+							$result = $this->handleExistingDropFolderFile($currentDropFolderFile);
+						}
 					}
 					else
 					{
@@ -152,35 +152,35 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		fclose($drivesFileHandle);
 
 		if (!file_exists($newFileName))
-        {
-            KalturaLog::info("New filename $newFileName was NOT created!");
-            KalturaLog::info(print_r($newDriveUrlAssoc, true));
-        }
+		{
+			KalturaLog::info("New filename $newFileName was NOT created!");
+			KalturaLog::info(print_r($newDriveUrlAssoc, true));
+		}
 
 		unlink($driveLocationsDir . DIRECTORY_SEPARATOR . $lockedFileName);
 	}
 
 	protected function updateDropFolderFile (KalturaDropFolderFile $currentDropFolderFile, array $driveItem)
-    {
-        KalturaLog::info("Updating drop folder file $currentDropFolderFile->id");
+	{
+		KalturaLog::info("Updating drop folder file $currentDropFolderFile->id");
 
-        $updateDropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
-        $updateDropFolderFile->name = $driveItem[MicrosoftGraphFieldNames::NAME];
-        $updateDropFolderFile->description = $driveItem[MicrosoftGraphFieldNames::DESCRIPTION];
-        $updateDropFolderFile->fileSize = $driveItem[MicrosoftGraphFieldNames::SIZE];
-        $updateDropFolderFile->contentUrl = $driveItem[MicrosoftGraphFieldNames::DOWNLOAD_URL];
+		$updateDropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
+		$updateDropFolderFile->name = $driveItem[MicrosoftGraphFieldNames::NAME];
+		$updateDropFolderFile->description = $driveItem[MicrosoftGraphFieldNames::DESCRIPTION];
+		$updateDropFolderFile->fileSize = $driveItem[MicrosoftGraphFieldNames::SIZE];
+		$updateDropFolderFile->contentUrl = $driveItem[MicrosoftGraphFieldNames::DOWNLOAD_URL];
 
-        try
-        {
-            $dropFolderFile = $this->dropFolderFileService->update($currentDropFolderFile->id, $updateDropFolderFile);
-            return $dropFolderFile;
-        }
-        catch(Exception $e)
-        {
-            KalturaLog::err('Cannot update drop folder file with name ['.$driveItem[MicrosoftGraphFieldNames::ID_FIELD].'] - '.$e->getMessage());
-            return null;
-        }
-    }
+		try
+		{
+			$dropFolderFile = $this->dropFolderFileService->update($currentDropFolderFile->id, $updateDropFolderFile);
+			return $dropFolderFile;
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Cannot update drop folder file with name ['.$driveItem[MicrosoftGraphFieldNames::ID_FIELD].'] - '.$e->getMessage());
+			return null;
+		}
+	}
 
 	protected function handleFileAdded($extendedItem, $dropFolderId, KalturaIntegrationSetting $integrationData)
 	{
