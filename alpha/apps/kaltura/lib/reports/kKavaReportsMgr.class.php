@@ -4350,7 +4350,7 @@ class kKavaReportsMgr extends kKavaBase
 			foreach ($report_defs as $cur_report_def)
 			{
 				$data_source = self::getDataSource($cur_report_def);
-				continue;
+				break;
 			}
 		}
 		$dim_mapping = $report_def[self::REPORT_DIMENSION_MAP];
