@@ -1219,6 +1219,7 @@ class playManifestAction extends kalturaAction
 
 	public function execute()
 	{
+		kCurrentContext::$executionScope = executionScope::PLAY_MANIFEST;
 		if($this->getRequestParameter("format", "Empty") !== PlaybackProtocol::APPLE_HTTP_TO_MC)
 			KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 		
