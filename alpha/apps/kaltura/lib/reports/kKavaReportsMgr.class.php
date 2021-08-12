@@ -3834,12 +3834,14 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function getUserScreenNameWithFallback($ids, $partner_id)
+	protected static function getUserScreenNameWithFallback($ids, $partner_id, $context)
 	{
-		$context = array(
-			'columns' => array('PUSER_ID', 'SCREEN_NAME'),
-			'hash' => false,
-		);
+		if (is_null($context))
+		{
+			$context = array();
+		}
+		$context['columns'] = array('PUSER_ID', 'SCREEN_NAME');
+
 		$result = self::getUsersInfo($ids, $partner_id, $context);
 		foreach ($result as $id => $row)
 		{
@@ -3849,17 +3851,20 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function getUserIdAndFullNameBase($ids, $partner_id)
+	protected static function getUserIdAndFullNameBase($ids, $partner_id, $context)
 	{
-		$context = array(
-			'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-		);
+		if (is_null($context))
+		{
+			$context = array();
+		}
+		$context['columns'] = array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)');
+
 		return self::getUsersInfo($ids, $partner_id, $context);
 	}
 
-	protected static function getUserFullNameWithFallback($ids, $partner_id)
+	protected static function getUserFullNameWithFallback($ids, $partner_id, $context)
 	{
-		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id, $context);
 		foreach ($result as $id => $row)
 		{
 			$result[$id] = $row[1] ? $row[1] : $row[0];
@@ -3868,9 +3873,9 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function getUserIdAndFullNameWithFallback($ids, $partner_id)
+	protected static function getUserIdAndFullNameWithFallback($ids, $partner_id, $context)
 	{
-		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id, $context);
 		foreach ($result as $id => &$row)
 		{
 			$row[1] = $row[1] ? $row[1] : $row[0];
@@ -3906,7 +3911,11 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$columns = isset($context['columns']) ? $context['columns'] : array('PUSER_ID');
 		$skip_partner_filter = isset($context['skip_partner_filter']) ? $context['skip_partner_filter'] : false;
-		if (!isset($context['hash']) || $context['hash'])
+		$data_source = isset($context['datasource']) ? $context['datasource'] : '';
+		$dimension = isset($context['dimension']) ? $context['dimension'] : '';
+
+		if (isset(self::$datasources_hash_dimensions[$data_source]) &&
+			isset(self::$datasources_hash_dimensions[$data_source][$dimension]))
 		{
 			$hash_conf = kConf::get('kava_hash_user_ids', 'local', array());
 		}
@@ -4335,6 +4344,17 @@ class kKavaReportsMgr extends kKavaBase
 		// get the enrichment specification
 		$enrich_specs = array();
 		$enrich_defs = self::getEnrichDefs($report_def);
+		$data_source = self::getDataSource($report_def);
+		if (isset($report_def[self::REPORT_JOIN_REPORTS])) {
+			$report_defs = $report_def[self::REPORT_JOIN_REPORTS];
+			foreach ($report_defs as $cur_report_def)
+			{
+				$data_source = self::getDataSource($cur_report_def);
+				continue;
+			}
+		}
+		$dim_mapping = $report_def[self::REPORT_DIMENSION_MAP];
+
 		foreach ($enrich_defs as $enrich_def)
 		{
 			// func
@@ -4347,6 +4367,26 @@ class kKavaReportsMgr extends kKavaBase
 			if (!is_array($cur_fields))
 			{
 				$cur_fields = array($cur_fields);
+			}
+
+			foreach ($cur_fields as $enriched_field)
+			{
+				if (isset($dim_mapping[$enriched_field]))
+				{
+					$context = array(
+						'dimension' => $dim_mapping[$enriched_field],
+						'datasource' => $data_source,
+					);
+					if ($enrich_context)
+					{
+						$enrich_context = array_merge($enrich_context, $context);
+					}
+					else
+					{
+						$enrich_context = $context;
+					}
+					break;
+				}
 			}
 
 			$enriched_indexes = self::arrayGetIndexes($headers, $cur_fields);
