@@ -130,6 +130,11 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 
+		$adminTags = $dbEntry->getAdminTagsArr();
+		$staticContentAdminTags = kConf::get('staticContentAdminTags','runtime_config',array());
+		$tempAdminTags = array_intersect($adminTags,$staticContentAdminTags);
+		$tempDbEntry->setAdminTags(implode(',',$tempAdminTags));
+
 		$kResource = $resource->toObject();
 		if ($kResource->getType() == 'kOperationResource')
 			$tempDbEntry->setTempTrimEntry(true);
