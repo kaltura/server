@@ -10,22 +10,11 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 	 */
 	public $freeText;
 
-	/**
-	 * @var time
-	 */
-	public $expectedFinishTimeGreaterThanOrEqual;
-
-	/**
-	 * @var time
-	 */
-	public $expectedFinishTimeLessThanOrEqual;
 	
 	static private $map_between_objects = array
 	(
 		"userIdEqual" => "_eq_kuser_id",
 		"freeText" => "_free_text",
-		"expectedFinishTimeGreaterThanOrEqual" => "_gte_expected_finish_time",
-		"expectedFinishTimeLessThanOrEqual" => "_lte_expected_finish_time",
 	);
 
 	static private $order_by_map = array
