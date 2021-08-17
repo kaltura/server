@@ -139,7 +139,7 @@ class PartnerService extends KalturaBaseService
 		{
 			KalturaLog::CRIT($ex);
 			// this assumes the partner name is unique - TODO - remove key from DB !
-			$exceptionMessage = (($pos = strpos($ex->getMessage(), 'KalturaPartner::')) !== FALSE) ? str_replace('KalturaPartner::', '', $ex->getMessage()) : $ex->getMessage();
+			$exceptionMessage = (str_replace('KalturaPartner::', '', $ex->getMessage()));
 			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $exceptionMessage);
 		}
 		
