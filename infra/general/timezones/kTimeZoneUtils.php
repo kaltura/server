@@ -12,7 +12,7 @@ class kTimeZoneUtils
      * @param string $timeZone
      * @return int|false a timestamp on success, false otherwise
      */
-    public static function TimeZoneStrToTime($datetime , $baseTimestamp=NULL, $timeZone=NULL)
+    public static function timeZoneStrToTime($datetime , $baseTimestamp=NULL, $timeZone=NULL)
     {
         $original = date_default_timezone_get();
         if($timeZone)

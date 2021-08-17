@@ -351,7 +351,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	public static function convertTimeToUnix($time)
 	{
 		$newTime = str_replace(array('T','Z'),array(' ',''),$time);
-		return kTimeZoneUtils::TimeZoneStrToTime($newTime, Null, 'Zulu');
+		return kTimeZoneUtils::timeZoneStrToTime($newTime, Null, 'Zulu');
 	}
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
