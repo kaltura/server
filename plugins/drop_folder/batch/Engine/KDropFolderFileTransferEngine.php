@@ -502,10 +502,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)
 	{
-		try 
+		try
 		{
 			$entryFilter = new KalturaBaseEntryFilter();
 			$entryFilter->referenceIdEqual = $data->parsedSlug;
+			$entryFilter->conversionProfileIdEqual = $data->conversionProfileId;
 			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;		
 			
 			$entryPager = new KalturaFilterPager();

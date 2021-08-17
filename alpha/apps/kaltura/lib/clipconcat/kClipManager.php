@@ -395,7 +395,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	protected function addClipJobsFromBatchJob($batchJob, $jobData)
 	{
-		$flavorAssetsToBeProcessed = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId());
+		$flavorAssetsToBeProcessed = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId(), array(asset::ASSET_STATUS_READY));
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
 		array_unshift($flavorAssetsToBeProcessed, $originalFlavorAsset);
 		foreach($flavorAssetsToBeProcessed as $asset)

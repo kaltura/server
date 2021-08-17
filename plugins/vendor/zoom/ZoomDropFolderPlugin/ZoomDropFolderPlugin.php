@@ -5,7 +5,6 @@
 class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsumers, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending
 {
 	const PLUGIN_NAME = 'ZoomDropFolder';
-	const DROP_FOLDER_PLUGIN_NAME = 'dropFolder';
 	const EVENT_ZOOM_DROP_FOLDER_FLOW_MANAGER = 'kZoomDropFolderFlowManager';
 	
 	
@@ -21,7 +20,7 @@ class ZoomDropFolderPlugin extends KalturaPlugin implements IKalturaEventConsume
 	
 	public static function dependsOn()
 	{
-		$dropFolderDependency = new KalturaDependency(self::DROP_FOLDER_PLUGIN_NAME);
+		$dropFolderDependency = new KalturaDependency(DropFolderPlugin::PLUGIN_NAME);
 		$vendorDependency = new KalturaDependency(VendorPlugin::PLUGIN_NAME);
 		return array($dropFolderDependency, $vendorDependency);
 	}
