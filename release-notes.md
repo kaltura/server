@@ -5,6 +5,14 @@
 * Issue Type: Task
 * Issue ID: FOUN-174
 
+## Add action for serving Playback key ##
+An encrypted key served to make sure videos are not shared outside the customers domain
+* Issue Type: Task
+* Issue ID: PLAT-22731
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
+
 ### Configuration ###  
 * Update confmaps to activate the static conversion profiles
 * Update admin.ini configuration file:
@@ -23,7 +31,6 @@
 	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
 	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_03_service_baseentry.php
 	
 	
 # Quasar-17.7.0 #

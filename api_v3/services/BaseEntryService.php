@@ -8,6 +8,8 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
+	
+	const PLAYBACK_SECRET = 'playback_secret';
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
      */
@@ -1063,8 +1065,8 @@ class BaseEntryService extends KalturaEntryService
 		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
 		
 		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
-		$key = base64_encode(md5(md5(kConf::get('playback_secret') . $partner->getId()) . $entryId, true));
-		return new kRendererString($key, 'text/plain');
+		$key = base64_encode(md5(md5(kConf::get(self::PLAYBACK_SECRET) . $partner->getId()) . $entryId, true));
+		return new kRendererString($key, Zend_Mime::TYPE_TEXT);
 	}
 
 }
