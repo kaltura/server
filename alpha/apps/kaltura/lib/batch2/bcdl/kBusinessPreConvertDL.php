@@ -1453,6 +1453,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		// create a convert job per each flavor
 		foreach($finalFlavors as $flavor)
 		{
+			$sourceFlavorParamsOutput = assetParamsOutputPeer::retrieveByAssetId($originalFlavorAsset->getId());
+			$staticContentAdminTags = kConf::get('staticContentAdminTags','runtime_config',array());
+			$tempAdminTags = array_intersect( $entry->getAdminTagsArr(), $staticContentAdminTags);
+			if ($sourceFlavorParamsOutput && !empty($tempAdminTags) && $sourceFlavorParamsOutput->getFlavorParamsId() == $flavor->getFlavorParamsId() && $sourceFlavorParamsOutput->getFlavorParamsId() !=0 )
+			{
+				continue;
+			}
+
 			$flavorAsset = kBatchManager::createFlavorAsset($flavor, $entry->getPartnerId(), $entry->getId());
 			if(!$flavorAsset)
 			{
