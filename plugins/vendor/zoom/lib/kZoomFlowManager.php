@@ -6,7 +6,6 @@
 
 class kZoomFlowManager implements kObjectCreatedEventConsumer
 {
-	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'Zoom';
 	
 	
@@ -16,12 +15,10 @@ class kZoomFlowManager implements kObjectCreatedEventConsumer
 	 */
 	public function objectCreated (BaseObject $object)
 	{
-		/* @var $captionAsset $object CaptionAsset */
 		/* @var $object CaptionAsset */
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$captionAsset = assetPeer::retrieveById($object->getId());
-		$captionAsset->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
-		$captionAsset->save();
+		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, kConfMapNames::MAP_NAME);
+		$object->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
+		$object->save();
 		
 		return true;
 	}
@@ -32,7 +29,7 @@ class kZoomFlowManager implements kObjectCreatedEventConsumer
 	 */
 	public function shouldConsumeCreatedEvent (BaseObject $object)
 	{
-		if($object instanceof CaptionAsset && $object->getSource() == CaptionSource::ZOOM)
+		if($object instanceof CaptionAsset && $object->getSource() === CaptionSource::ZOOM)
 		{
 			return true;
 		}
