@@ -97,7 +97,7 @@ class kPexipUtils
 		{
 			$data = self::generateNonEncryptedSipToken($dbLiveEntry);
 			$cipherData = KCryptoWrapper::encrypt_aes($data, $secret, $iv);
-			$encryptedToken = bin2hex($cipherData);
+			$encryptedToken = self::base64url_encode($cipherData);
 			$retries--;
 		} while (is_numeric($encryptedToken) && $retries > 0);
 
@@ -122,8 +122,18 @@ class kPexipUtils
 
 		$secret = $pexipConfig["pexip_secret"];
 		$iv = $pexipConfig["pexip_iv"];
-		$ecncrypted = hex2bin($encryptedString);
+		$ecncrypted = self::base64url_decode($encryptedString);
 		return rtrim(KCryptoWrapper::decrypt_aes($ecncrypted, $secret, $iv),"\0");
+	}
+	
+	private static function base64url_encode($data) 
+	{
+		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+	}
+
+	private static function base64url_decode($data) 
+	{
+		return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
 	}
 
 	/**
@@ -330,7 +340,7 @@ class kPexipUtils
 	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams, $pexipConfig)
 	{
 		KalturaLog::debug('Extracting entry sip token from local_alias: ' . $queryParams[self::PARAM_LOCAL_ALIAS]);
-		$alphaNumericPattern = '/(?<=sip:)[a-zA-Z0-9].*@' . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL] . '/';
+		$alphaNumericPattern = '/(?<=sip:)[a-zA-Z0-9_-]' . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL] . '/';
 		$intIdPattern = '/[0-9]{8,15}' . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL] . '/';
 		preg_match($intIdPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
 		if (!empty($matches))
