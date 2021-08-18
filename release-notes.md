@@ -1,3 +1,11 @@
+# Quasar-17.9.0 #
+## Partner registration - Move all time consuming jobs to run in batch ##
+Cloning of UICONF and Category takes 4 seconds, moving them to batch
+* Issue Type: Task
+* Issue ID: PLAT-23082
+
+### Deployment Scripts ### 
+    php deployment/updates/scripts/2021_08_17_allow_clone_uiconf_from_batch.php
 # Quasar-17.8.0 #
 
 ## Static Content Conversion Profiles ##
