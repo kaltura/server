@@ -22,7 +22,8 @@ CREATE TABLE `vendor_integration`
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_vendor_Type_status_index`(`partner_id`, `vendor_Type`, `status`),
-	KEY `account_id_vendor_Type_index`(`account_id`, `vendor_Type`)
+	KEY `account_id_vendor_Type_index`(`account_id`, `vendor_Type`),
+	KEY `vendor_Type_status_index`(`vendor_Type`,`status`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

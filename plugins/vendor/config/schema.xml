@@ -18,5 +18,9 @@
 			<index-column name="account_id" />
 			<index-column name="vendor_Type" />
 		</index>
+		<index name="vendor_type_status_index">
+			<index-column name="vendor_type" />
+			<index-column name="status" />
+		</index>
 	</table>
 </database>
