@@ -32,6 +32,23 @@ class EventNotificationTemplatesListAction extends KalturaApplicationPlugin impl
 	 * @param Zend_Controller_Request_Abstract $request
 	 * @return Kaltura_Client_Type_PartnerFilter
 	 */
+	protected function getEventNotificationTemplatesFilterFromRequest(Zend_Controller_Request_Abstract $request)
+	{
+		$filter = new Kaltura_Client_EventNotification_Type_EventNotificationTemplateFilter();
+		$filterInput = $request->getParam('filter_input');
+		if(!strlen($filterInput))
+			return $filter;
+		
+		$filterType = $request->getParam('filter_type');
+		$filter->$filterType = $filterInput;
+		
+		return $filter;
+	}
+	
+	/**
+	 * @param Zend_Controller_Request_Abstract $request
+	 * @return Kaltura_Client_Type_PartnerFilter
+	 */
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
 		$filterInput = $request->getParam('filter_input');
@@ -63,31 +80,30 @@ class EventNotificationTemplatesListAction extends KalturaApplicationPlugin impl
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
 		
-		$form = new Form_PartnerIdFilter();
+		$form = new Form_EventNotificationTemplatesFilter();
 		$form->populate($request->getParams());
-		
-		$newForm = new Form_NewEventNotificationTemplate();
-		
 		$actionUrl = $action->view->url(array('controller' => 'plugin', 'action' => 'EventNotificationTemplatesListAction'), null, true);
 		$form->setAction($actionUrl);
 		
 		// init filter
-		$partnerFilter = $this->getPartnerFilterFromRequest($request);
+		$eventNotificationTemplatesFilter = $this->getEventNotificationTemplatesFilterFromRequest($request);
 		
 		$client = Infra_ClientHelper::getClient();
 		$eventNotificationPlugin = Kaltura_Client_EventNotification_Plugin::get($client);
 		
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($eventNotificationPlugin->eventNotificationTemplate, "listByPartner", null, $partnerFilter);
+		$paginatorAdapter = new Infra_FilterPaginator($eventNotificationPlugin->eventNotificationTemplate, "listAction", null, $eventNotificationTemplatesFilter);
 		$paginator = new Infra_Paginator($paginatorAdapter, $request);
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-		if ($partnerFilter)
-		    $newForm->getElement('newPartnerId')->setValue($partnerFilter->idIn);
 		
-		$listTemplatespager = new Kaltura_Client_Type_FilterPager();
-		$listTemplatespager->pageSize = 500;
-		$templatesList = $eventNotificationPlugin->eventNotificationTemplate->listTemplates(null, $listTemplatespager);
+		$newForm = new Form_NewEventNotificationTemplate();
+		if ($eventNotificationTemplatesFilter && isset($dropFolderFilter->idIn))
+		    $newForm->getElement('newPartnerId')->setValue($eventNotificationTemplatesFilter->idIn);
+		
+		$listTemplatesPager = new Kaltura_Client_Type_FilterPager();
+		$listTemplatesPager->pageSize = 500;
+		$templatesList = $eventNotificationPlugin->eventNotificationTemplate->listTemplates(null, $listTemplatesPager);
 		
 		$templates = array();
 		foreach($templatesList->objects as $template)
