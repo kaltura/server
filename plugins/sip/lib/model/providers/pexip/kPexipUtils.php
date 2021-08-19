@@ -22,6 +22,7 @@ class kPexipUtils
 	const LICENSES_PER_CALL = 3;
 	const SCREEN_SHARE = 'Screen Share';
 	const TALKING_HEADS = 'Talking Heads';
+	const ENCRYPTED_SIP_TOKEN_PARTNER_IDS = 'encrypted_sip_token_partner_ids';
 
 	protected static $allowedSourceTypes = array( KalturaSipSourceType::PICTURE_IN_PICTURE, KalturaSipSourceType::SCREEN_SHARE, KalturaSipSourceType::TALKING_HEADS );
 
@@ -42,17 +43,97 @@ class kPexipUtils
 
 	/**
 	 * @param LiveStreamEntry $dbLiveEntry
+	 * @param $pexipConfig
 	 * @param bool $regenerate
 	 * @return string
+	 * @throws KalturaAPIException
 	 */
 	public static function generateSipToken(LiveStreamEntry $dbLiveEntry, $pexipConfig, $regenerate = false)
 	{
 		if (!$dbLiveEntry->getSipToken() || $regenerate)
 		{
-			$addition = str_pad(substr((string)microtime(true) * 10000, -5), 5, '0', STR_PAD_LEFT);
-			return $dbLiveEntry->getPartnerId() . $addition . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL];
+			$partnerIds = isset($pexipConfig[kPexipUtils::ENCRYPTED_SIP_TOKEN_PARTNER_IDS]) ? $pexipConfig[kPexipUtils::ENCRYPTED_SIP_TOKEN_PARTNER_IDS] : array();
+			$shouldEncryptToken = (in_array($dbLiveEntry->getPartnerId(), $partnerIds) || in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $partnerIds)) ? true : false;
+
+			if ($shouldEncryptToken)
+			{
+				return self::generateEncrypedtSipToken($dbLiveEntry, $pexipConfig) . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL];
+			}
+			else
+			{
+				return self::generateNonEncryptedSipToken($dbLiveEntry) . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL];
+			}
 		}
 		return $dbLiveEntry->getSipToken();
+	}
+
+	/**
+	 * @param $dbLiveEntry
+	 * @return string
+	 */
+	private static function generateNonEncryptedSipToken($dbLiveEntry)
+	{
+		$addition = str_pad(substr((string)microtime(true) * 10000, -5), 5, '0', STR_PAD_LEFT);
+		return $dbLiveEntry->getPartnerId() . $addition;
+	}
+
+	/**
+	 * @param $dbLiveEntry
+	 * @param $pexipConfig
+	 * @return string
+	 * @throws KalturaAPIException
+	 */
+	private static function generateEncrypedtSipToken($dbLiveEntry, $pexipConfig)
+	{
+		if (!isset($pexipConfig["pexip_secret"]) || !isset( $pexipConfig["pexip_iv"]))
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_SIP_CONFIGURATIONS);
+		}
+
+		$secret = $pexipConfig["pexip_secret"];
+		$iv = $pexipConfig["pexip_iv"];
+		$retries = 3;
+		do
+		{
+			$data = self::generateNonEncryptedSipToken($dbLiveEntry);
+			$cipherData = KCryptoWrapper::encrypt_aes($data, $secret, $iv);
+			$encryptedToken = self::base64url_encode($cipherData);
+			$retries--;
+		} while (is_numeric($encryptedToken) && $retries > 0);
+
+		if (!$encryptedToken || is_numeric($encryptedToken))//ensure encrypted token is alphanumeric
+		{
+			throw new KalturaAPIException(KalturaErrors::PEXIP_FAILED_TO_GENERATE_TOKEN);
+		}
+		return $encryptedToken;
+	}
+
+	/**
+	 * @param $encryptedString
+	 * @param $pexipConfig
+	 * @return string
+	 */
+	private static function decryptSipToken($encryptedString, $pexipConfig)
+	{
+		if (!isset($pexipConfig["pexip_secret"]) || !isset( $pexipConfig["pexip_iv"]))
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_SIP_CONFIGURATIONS);
+		}
+
+		$secret = $pexipConfig["pexip_secret"];
+		$iv = $pexipConfig["pexip_iv"];
+		$ecncrypted = self::base64url_decode($encryptedString);
+		return rtrim(KCryptoWrapper::decrypt_aes($ecncrypted, $secret, $iv),"\0");
+	}
+	
+	private static function base64url_encode($data) 
+	{
+		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+	}
+
+	private static function base64url_decode($data) 
+	{
+		return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
 	}
 
 	/**
@@ -147,6 +228,7 @@ class kPexipUtils
 	 * @param $queryParams
 	 * @param $pexipConfig
 	 * @return bool|entry
+	 * @throws PropelException
 	 */
 	public static function retrieveAndValidateEntryForSipCall($queryParams, $pexipConfig)
 	{
@@ -258,21 +340,41 @@ class kPexipUtils
 	protected static function extractPartnerIdAndSipTokenFromAddress($queryParams, $pexipConfig)
 	{
 		KalturaLog::debug('Extracting entry sip token from local_alias: ' . $queryParams[self::PARAM_LOCAL_ALIAS]);
-		$intIdPattern = '/[0-9]{8,15}'. self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL].'/';
+		$alphaNumericPattern = '/(?<=sip:)[a-zA-Z0-9_-=]*' . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL] . '/';
+		$intIdPattern = '/[0-9]{8,15}' . self::SIP_URL_DELIMITER . $pexipConfig[self::CONFIG_HOST_URL] . '/';
 		preg_match($intIdPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
 		if (!empty($matches))
 		{
-			$parts = explode(self::SIP_URL_DELIMITER, $matches[0]);
-			if (!empty($parts))
-			{
-				$partnerId = substr($parts[0], 0, -5);
-				KalturaLog::debug("Extracted partnerId and sipToken : [$partnerId ,$matches[0]]");
-				return array($partnerId, $matches[0]);
-			}
+			return self::extractPartnerIdAndSipTokenInternal($matches, $pexipConfig);
+		}
+		preg_match($alphaNumericPattern, $queryParams[self::PARAM_LOCAL_ALIAS], $matches);
+		if (!empty($matches))
+		{
+			return self::extractPartnerIdAndSipTokenInternal($matches, $pexipConfig, true);
 		}
 		KalturaLog::err('Could not extract PartnerId and SipToken from local_alias');
 		return array();
+	}
 
+	/**
+	 * @param $matches
+	 * @param $pexipConfig
+	 * @param bool $shouldDecrypt
+	 * @return array
+	 */
+	protected static function extractPartnerIdAndSipTokenInternal($matches, $pexipConfig, $shouldDecrypt = false)
+	{
+		$parts = explode(self::SIP_URL_DELIMITER, $matches[0]);
+		if (!empty($parts))
+		{
+			if ($shouldDecrypt)
+			{
+				$parts[0] = self::decryptSipToken($parts[0], $pexipConfig);
+			}
+			$partnerId = substr($parts[0], 0, -5);
+			KalturaLog::debug("Extracted partnerId and sipToken : [$partnerId ,$matches[0]]");
+			return array($partnerId, $matches[0]);
+		}
 	}
 
 	/**
@@ -468,4 +570,6 @@ class kPexipUtils
 			$params
 		);
 	}
+
+
 }
