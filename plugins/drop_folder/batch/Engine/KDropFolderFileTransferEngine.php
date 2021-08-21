@@ -513,6 +513,13 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$entryPager->pageSize = 1;
 			$entryPager->pageIndex = 1;
 			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
+
+			if (is_array($entryList->objects) && !isset($entryList->objects[0]))
+			{
+				KalturaLog::debug('No matching entry with drop folder conversion profile, searching without conversion profile');
+				$entryFilter->conversionProfileIdEqual = null;
+				$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
+			}
 			
 			if (is_array($entryList->objects) && isset($entryList->objects[0]) ) 
 			{
