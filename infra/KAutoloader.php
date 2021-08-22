@@ -56,11 +56,14 @@ class KAutoloader
 				if (is_string($classPath))
 				{
 					require_once($classPath);
+					if(!class_exists($class, false))
+						error_log(">>> apc_fetch class not found [$class] [$classPath]");
 					return;
 				}
 
 				if (is_null($classPath))
 				{
+					error_log(">>> apc_fetch Class path not found [$class]");
 					return;
 				}
 				
@@ -78,7 +81,15 @@ class KAutoloader
 			apc_store(self::$_classMapCacheKey . $class, $classPath);
 		
 		if ($classPath)
+		{
 			require_once($classPath);
+			if(!class_exists($class, false))
+				error_log(">>> class not found [$class] [$classPath]");
+		}
+		else
+		{
+			error_log(">>> Class path not found [$class]");
+		}
 	}
 
 	static function scanDirectory($directory, $recursive)
