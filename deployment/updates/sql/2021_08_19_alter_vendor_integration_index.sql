@@ -1,0 +1,1 @@
+alter table vendor_integration add index vendor_Type_status_index (vendor_Type,status);
