@@ -49,4 +49,18 @@ class myCloudUtils
 	{
 		return kConf::hasMap(self::CLOUD_STORAGE_MAP);
 	}
+
+	public static function getPartnerSharedStoargeBaseDir($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSharedStorageProfileId())
+		{
+			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			if($storageProfile && $storageProfile->getStorageBaseDir())
+			{
+				return $storageProfile->getStorageBaseDir();
+			}
+		}
+		return null;
+	}
 }

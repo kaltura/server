@@ -259,7 +259,7 @@ class UiConfService extends KalturaBaseService
 			$typesInfo->filename = isset($swfNames[$objType]) ? $swfNames[$objType] : '';
 			$versions = array();
 			$path = $flashPath . '/' . $dir . '/';
-			if(!file_exists($path) || !is_dir($path))
+			if(!kFile::checkFileExists($path) || !kFile::isDir($path))
 			{
 				KalturaLog::err("Path [$path] does not exist");
 				continue;
@@ -275,7 +275,7 @@ class UiConfService extends KalturaBaseService
 				
 			foreach($files as $file)
 			{
-				if (is_dir(realpath($path . '/' . $file)) && strpos($file, 'v') === 0)
+				if (kFile::isDir(realpath($path . '/' . $file)) && strpos($file, 'v') === 0)
 					$versions[] = $file;
 			}
 			rsort($versions);
