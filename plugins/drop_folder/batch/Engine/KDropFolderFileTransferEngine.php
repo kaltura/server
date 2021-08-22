@@ -506,19 +506,25 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			$entryFilter = new KalturaBaseEntryFilter();
 			$entryFilter->referenceIdEqual = $data->parsedSlug;
-			$entryFilter->conversionProfileIdEqual = $data->conversionProfileId;
-			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;		
+			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;
 			
 			$entryPager = new KalturaFilterPager();
-			$entryPager->pageSize = 1;
+			$entryPager->pageSize = 2;
 			$entryPager->pageIndex = 1;
 			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
 			
-			if (is_array($entryList->objects) && isset($entryList->objects[0]) ) 
+			if (is_array($entryList->objects) && isset($entryList->objects[0]))
 			{
 				$result = $entryList->objects[0];
-				if ($result->referenceId === $data->parsedSlug) 
-					return $result;
+				foreach ($entryList->objects as $entry)
+				{
+					if($entry->conversionProfileId === $data->conversionProfileId)
+					{
+						$result = $entry;
+						break;
+					}
+				}
+				return $result;
 			}
 			
 			return false;			
