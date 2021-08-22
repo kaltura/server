@@ -61,6 +61,11 @@ class KalturaChargeBeeVendorIntegration extends KalturaObject implements IFilter
 	 */
 	public $partnerId;
 
+	/**
+	 * @var string
+	 */
+	public $planId;
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
@@ -75,6 +80,7 @@ class KalturaChargeBeeVendorIntegration extends KalturaObject implements IFilter
 		'createdAt',
 		'updatedAt',
 		'partnerId',
+		'planId',
 	);
 
 	public function getMapBetweenObjects()
