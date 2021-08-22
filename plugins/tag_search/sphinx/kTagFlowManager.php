@@ -260,7 +260,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     private static function updateInstanceCountList(array $foundTagObjects, $time, $toIncrement)
     {
         $foundTagIds = array();
-        try {
+        try
+        {
             $connection = Propel::getConnection();
             foreach ($foundTagObjects as $tag)
             {
@@ -277,7 +278,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             }
             $stmt = $connection->prepare($updateSql);
             $stmt->execute();
-            }
+        }
         catch (PropelException $e)
         {
             KalturaLog::err($e);
@@ -396,16 +397,18 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 */
 	protected static function trimObjectTags ($tagsString)
 	{
-	    $tags = explode(",", $tagsString);
+		$tags = explode(",", $tagsString);
 		$tagsToReturn = array();
-        foreach($tags as $tag)
-        {
-        	$tag = trim($tag);
-            if ($tag){
-            	$tagsToReturn[] = $tag;
-            }
-        }
-        return array_unique($tagsToReturn);
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			if ($tag)
+			{
+				$tagsToReturn[] = $tag;
+			}
+		}
+		
+		return array_unique($tagsToReturn);
 	}
 
 	
