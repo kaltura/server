@@ -10,7 +10,7 @@ passthru("php $script $config");
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
 
-$config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-10.ini';
+$config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-11.ini';
 passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.appToken.ini';
