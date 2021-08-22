@@ -506,7 +506,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			$entryFilter = new KalturaBaseEntryFilter();
 			$entryFilter->referenceIdEqual = $data->parsedSlug;
-			$entryFilter->typeIn = KalturaEntryType::AUTOMATIC.','.KalturaEntryType::MEDIA_CLIP.','.KalturaEntryType::MIX.','.KalturaEntryType::PLAYLIST.','.KalturaEntryType::DATA.','.KalturaEntryType::DOCUMENT;
+			$entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP;
 			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;
 			
 			$entryPager = new KalturaFilterPager();
