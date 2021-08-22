@@ -106,6 +106,11 @@ class KAsyncImport extends KJobHandlerWorker
 			return $this->fetchFileSsh($job, $data);
 		}
 
+		if ($jobSubType == kFileTransferMgrType::ARCHIVED && kFile::isSharedPath($data->srcFileUrl))
+		{
+			return $this->handleSharedPathImport($job, $data);
+		}
+
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
@@ -557,5 +562,58 @@ class KAsyncImport extends KJobHandlerWorker
 		
 		$data->destFileLocalPath = $sharedTempFilePath;
 		return array($partialFileSize, $data);
+	}
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @param KalturaImportJobData $data
+	 * @return array|KalturaBatchJob
+	 */
+	private function handleSharedPathImport(KalturaBatchJob $job, KalturaImportJobData $data)
+	{
+		$data->destFileLocalPath = $data->srcFileUrl;
+		$data->destFileSharedPath = $data->srcFileUrl;
+		if (kFile::isArchived($data->srcFileUrl))
+		{
+			switch (kFile::getRestoreFromArchiveStatus($data->srcFileUrl))
+			{
+				case kFile::ARHCHIVE_FILE_RESTORE_IN_PROGRESS:
+				{
+					break;
+				}
+				case kFile::ARHCHIVE_FILE_RESTORE_DONE:
+				{
+					kFile::handleRestoreDone($data->srcFileUrl);
+					$this->closeJob($job, null, null, 'Successfully done', KalturaBatchJobStatus::FINISHED, $data);
+					return $job;
+					break;
+				}
+				case kFile::ARHCHIVE_FILE_RESTORE_UNKOWN:
+				{
+					kFile::initiateRestoreFromArchive($data->srcFileUrl);
+					break;
+				}
+				default:
+					break;
+			}
+			$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::FILE_IS_ARCHIVED, "Restore archive file in progress", KalturaBatchJobStatus::RETRY);
+			return $job;
+		}
+		else
+		{
+			kFile::handleRestoreDone($data->srcFileUrl);
+			$this->closeJob($job, null, null, 'Successfully done', KalturaBatchJobStatus::FINISHED, $data);
+			return $job;
+		}
+	}
+
+	/**
+	 * @param KalturaBatchJob $job
+	 * @param KalturaImportJobData $data
+	 */
+	private function handleRestoreDone(KalturaBatchJob $job, KalturaImportJobData $data)
+	{
+		//TODO - in case of glacier archive / deep archive we will need to download the file and upload it again
+		return true;
 	}
 }

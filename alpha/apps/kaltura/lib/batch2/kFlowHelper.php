@@ -220,23 +220,41 @@ class kFlowHelper
 			$flavorAsset->setHeight($height);
 			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
 		}
-		$flavorAsset->save();
-		
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
 		{
-			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
-			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
-			if(!$storageProfile)
+			if(kFile::isSharedPath($data->getSrcFileUrl()) && $dbBatchJob->getJobSubType() == kFileTransferMgrType::ARCHIVED)
 			{
-				KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
-				throw new Exception ( "Shared storage [$partnerSharedStorageProfileId] Not found");
+				$sharedArchivedDc = kConf::get('shared_archive_dc' ,'cloud_storage', null );
+				if(!$sharedArchivedDc)
+				{
+					KalturaLog::err("Shared Archive dc Not found in configuration");
+					throw new Exception ("Shared Archive dc Not found in configureation");
+				}
+				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($syncKey, $sharedArchivedDc);
+				if($fileSync)
+				{
+					$fileSync->setDc($partnerSharedStorageProfileId);
+					$fileSync->setFileType(fileSync::FILE_SYNC_FILE_TYPE_FILE);
+					$fileSync->save();
+				}
+				$flavorAsset->removeTags(array('archived'));
 			}
-			
-			$localFilePath = $data->getDestFileSharedPath();
-			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+			else
+			{
+				KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+				$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+				if (!$storageProfile)
+				{
+					KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
+					throw new Exception ("Shared storage [$partnerSharedStorageProfileId] Not found");
+				}
+
+				$localFilePath = $data->getDestFileSharedPath();
+				kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+			}
 		}
 		else
 		{
@@ -247,7 +265,7 @@ class kFlowHelper
 			$data->setDestFileLocalPath($localFilePath);
 			$dbBatchJob->setData($data);
 		}
-
+		$flavorAsset->save();
 		
 		$data->setFlavorAssetId($flavorAsset->getId());
 		$dbBatchJob->save();

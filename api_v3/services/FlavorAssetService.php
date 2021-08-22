@@ -982,5 +982,95 @@ class FlavorAssetService extends KalturaAssetService
 		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
 	}
+
+	/**
+	 * Restore flavor filesyncs from archived storage
+	 * @action restoreArchived
+	 * @param string $flavorId
+	 * @param string $urgency
+	 * @param bool $notifyOnDone
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public function restoreArchivedAction($flavorId, $urgency = 'STANDARD', $notifyOnDone = false)
+	{
+		$archiveStorageId = kConf::get('shared_archive_dc', 'cloud_storage', null);
+		if(!$archiveStorageId)
+		{
+			throw new KalturaAPIException(KalturaErrors::ARCHIVE_STORAGE_DC_UNDEFINED, $flavorId);
+		}
+
+		$flavorAsset = assetPeer::retrieveById($flavorId);
+		if (!$flavorAsset || !($flavorAsset instanceof flavorAsset))
+		{
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorId);
+		}
+
+		$sync_key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$archivedFileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($sync_key, $archiveStorageId);
+		if(!$archivedFileSync)
+		{
+			throw new KalturaAPIException(KalturaErrors::ARCHIVED_FILE_SYNC_NOT_FOUND, $flavorId);
+		}
+
+		if(!kFile::isSharedPath($archivedFileSync->getFullPath()))
+		{
+			throw new KalturaAPIException(KalturaErrors::ARCHIVED_FILE_SYNC_IS_NOT_IN_SHARED_DC, $flavorId);
+		}
+
+		if (!kFile::isArchived($archivedFileSync->getFullPath()))
+		{
+			throw new KalturaAPIException(KalturaErrors::FLVAOR_IS_NOT_ARCHIVED, $flavorId);
+		}
+
+		kJobsManager::addImportJob(null, $flavorAsset->getEntryId(), $this->getPartnerId(), $archivedFileSync->getFullPath() , $flavorAsset, kFileTransferMgrType::ARCHIVED, null, true);
+	}
+
+	/**
+	 * @action archive
+	 * @param string $flavorId
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 * @return KalturaFlavorAsset
+	 */
+	public function archiveAction($flavorId)
+	{
+		$archiveStorageId = kConf::get('shared_archive_dc', 'cloud_storage', null);
+		if(!$archiveStorageId)
+		{
+			throw new KalturaAPIException(KalturaErrors::ARCHIVE_STORAGE_DC_UNDEFINED, $flavorId);
+		}
+
+		$flavorAsset = assetPeer::retrieveById($flavorId);
+		if (!$flavorAsset || !($flavorAsset instanceof flavorAsset))
+		{
+			throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $flavorId);
+		}
+
+		$sync_key = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$fileSyncToArchive = kFileSyncUtils::getReadyFileSyncForKey($sync_key);
+		if (!$fileSyncToArchive)
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_SYNC_FOR_ARCHIVING_FLAVOR_NOT_FOUND, $flavorId);
+		}
+
+		if (in_array('archived', $flavorAsset->getTagsArray()) && kFile::isArchived($fileSyncToArchive->getFullPath()))
+		{
+			throw new KalturaAPIException(KalturaErrors::FLVAOR_ALREADY_ARCHIVED, $flavorId);
+		}
+
+		$fileSyncToArchive->setDc($archiveStorageId);
+		$fileSyncToArchive->setFileType(fileSync::FILE_SYNC_FILE_TYPE_URL);
+		$fileSyncToArchive->save();
+
+		$flavorAsset->addTags(array('archived'));
+		$flavorAsset->save();
+
+		//todo add tags to the s3 object
+
+		$flavorAsset = KalturaFlavorAsset::getInstance($flavorAssetDb, $this->getResponseProfile());
+		return $flavorAsset;
+
+	}
 }
 

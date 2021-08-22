@@ -46,4 +46,6 @@ interface BatchJobAppErrors extends BaseEnum
 	const MISSING_ASSETS = 101;
 
 	const MEDIA_REPURPOSING_FAILED = 201;
+
+	const FILE_IS_ARCHIVED = 202;
 }

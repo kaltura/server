@@ -956,73 +956,75 @@ class kJobsManager
 		
 		return kJobsManager::addJob($batchJob, $postConvertData, BatchJobType::POSTCONVERT, $mediaParserType);
 	}
-	
+
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null, $keepCurrentVersion = false)
 	{
+		$fileUrl = $entryUrl;
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
-		
-		if (is_null($subType)) 
+
+		if (is_null($subType))
 		{
-    		if (stripos($entryUrl, 'sftp:') === 0) 
-    		{
-    		    $subType = kFileTransferMgrType::SFTP;
-    		}
-    		elseif (stripos($entryUrl, 'scp:') === 0) 
-    		{
-    		    $subType = kFileTransferMgrType::SCP;
-    		}
-    		elseif (stripos($entryUrl, 'ftp:') === 0) 
-    		{
-    		    $subType = kFileTransferMgrType::FTP;
-    		}
-    		elseif (stripos($entryUrl, 'https:') === 0) 
-    		{
-    		    $subType = kFileTransferMgrType::HTTPS;
-    		}
-    		else 
-    		{
-    		    $subType = kFileTransferMgrType::HTTP;
-    		}
+			if (stripos($entryUrl, 'sftp:') === 0)
+			{
+				$subType = kFileTransferMgrType::SFTP;
+			}
+			elseif (stripos($entryUrl, 'scp:') === 0)
+			{
+				$subType = kFileTransferMgrType::SCP;
+			}
+			elseif (stripos($entryUrl, 'ftp:') === 0)
+			{
+				$subType = kFileTransferMgrType::FTP;
+			}
+			elseif (stripos($entryUrl, 'https:') === 0)
+			{
+				$subType = kFileTransferMgrType::HTTPS;
+			}
+			else
+			{
+				$subType = kFileTransferMgrType::HTTP;
+			}
+
 		}
-		
+
 		if (!$jobData) {
- 		    $jobData = new kImportJobData();
+			$jobData = new kImportJobData();
 		}
- 		$jobData->setSrcFileUrl($entryUrl);
- 		
- 		if($asset)
- 		{
- 			if($keepCurrentVersion)
- 			{
- 				if(!$asset->isLocalReadyStatus())
-	 				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
- 			}
- 			else 
- 			{
- 				$asset->incrementVersion();
-	 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
- 			}
-	 		$asset->save();
- 			
- 			$jobData->setFlavorAssetId($asset->getId());
- 		}
- 			
- 		$entry = entryPeer::retrieveByPK($entryId);
- 		if($entry)
- 		{
- 			$higherStatuses = array(
- 				entryStatus::PRECONVERT,
- 				entryStatus::READY,
- 			);
- 			
- 			if(!in_array($entry->getStatus(), $higherStatuses))
- 			{
-	 			$entry->setStatus(entryStatus::IMPORT);
-	 			$entry->save();
- 			}
- 		}
- 		
+		$jobData->setSrcFileUrl($entryUrl);
+
+		if($asset)
+		{
+			if($keepCurrentVersion)
+			{
+				if(!$asset->isLocalReadyStatus())
+					$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+			}
+			else
+			{
+				$asset->incrementVersion();
+				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
+			}
+			$asset->save();
+
+			$jobData->setFlavorAssetId($asset->getId());
+		}
+
+		$entry = entryPeer::retrieveByPK($entryId);
+		if($entry)
+		{
+			$higherStatuses = array(
+				entryStatus::PRECONVERT,
+				entryStatus::READY,
+			);
+
+			if(!in_array($entry->getStatus(), $higherStatuses))
+			{
+				$entry->setStatus(entryStatus::IMPORT);
+				$entry->save();
+			}
+		}
+
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -1034,7 +1036,7 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-		
+
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$importToShared = kConf::get('enable_import_to_shared', 'runtime_config', null);
 		$excludePartnersImportToShared = kConf::get('exclude_partners_import_to_shared', 'runtime_config', array());
@@ -1042,7 +1044,7 @@ class kJobsManager
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 			$pathMgr = $sharedStorageProfile->getPathManager();
-			
+
 			$sharedPath = null;
 			if($asset)
 			{
@@ -1060,16 +1062,20 @@ class kJobsManager
 				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
 				$path = myContentStorage::getPathFromId($randomId) . DIRECTORY_SEPARATOR . $randomId . '_import';
 			}
-			
+
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			$jobData->setDestFileSharedPath($sharedPath);
 		}
-		
+
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
+		if(kFile::isSharedPath($fileUrl))
+		{
+			return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, kFileTransferMgrType::ARCHIVED);
+		}
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
-	}
-	
+}
+
 	/**
 	 * @param BatchJob $parentJob
 	 * @param liveAsset $asset
