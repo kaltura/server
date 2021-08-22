@@ -230,7 +230,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @return array
      */
     private static function getTagsToAdd (array $foundTagObjects , array $objectTags, array $privacyContexts)
-    {//Any requested tag should be added with all privacy contexts as long as it does not exist (the tag with this privacy context).
+    {
+    	//Any requested tag should be added with all privacy contexts as long as it does not exist (the tag with this privacy context).
 	    $privacyContextByTag = array();
 	    foreach ($foundTagObjects as $tag)
 	    {
