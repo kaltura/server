@@ -506,25 +506,17 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			$entryFilter = new KalturaBaseEntryFilter();
 			$entryFilter->referenceIdEqual = $data->parsedSlug;
+			$entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP;
 			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;
 			
 			$entryPager = new KalturaFilterPager();
-			$entryPager->pageSize = 2;
+			$entryPager->pageSize = 1;
 			$entryPager->pageIndex = 1;
 			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
 			
 			if (is_array($entryList->objects) && isset($entryList->objects[0]))
 			{
-				$result = $entryList->objects[0];
-				foreach ($entryList->objects as $entry)
-				{
-					if($entry->conversionProfileId === $data->conversionProfileId)
-					{
-						$result = $entry;
-						break;
-					}
-				}
-				return $result;
+				return $entryList->objects[0];
 			}
 			
 			return false;			
