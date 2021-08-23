@@ -87,4 +87,16 @@ class PartnerPeer extends BasePartnerPeer
 		
 		return $partner;
 	}
+	
+	public static function retrieveChildsOfPartner($partnerId)
+	{
+		$c = new Criteria();
+		
+		$subCriterion1 = $c->getNewCriterion(PartnerPeer::PARTNER_PARENT_ID, $partnerId);
+		$subCriterion2 = $c->getNewCriterion(PartnerPeer::ID, $partnerId, Criteria::NOT_EQUAL);
+		$subCriterion1->addAnd($subCriterion2);
+		$c->add($subCriterion1);
+		
+		return PartnerPeer::doSelect($c);
+	}
 }
