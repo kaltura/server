@@ -9,10 +9,9 @@ require_once (__DIR__ . DIRECTORY_SEPARATOR . 'RuleEngine.php');
  */
 class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcessorEngine
 {
-    const OPEN_CALAIS_URL = 'https://api-eit.refinitiv.com/permid/calais';
-
-    const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
-    const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
+	const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
+	const OPEN_CALAIS_API_URL_FIELD_NAME = 'OpenCalaisAPIEndpoint';
+	const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
     const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
     const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
 
@@ -121,7 +120,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
     protected function initMainMetadataXml ($entryId, $showTaxonomyId)
     {
         $initialXml = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($showTaxonomyId, KalturaMetadataObjectType::ENTRY, $entryId);
-        if ($initialXml->totalCount)
+        if ($initialXml->totalCount && $initialXml->objects[0]->xml)
         {
             return $this->clearFieldsInXml($initialXml->objects[0]->xml, $this->targetSettableMetadataFields);
         }
@@ -295,15 +294,18 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
 
     protected function sendOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
+	    $openCalaisData = $this->getOpenCalaisSimpleXMLElementFromPartnerMetadata($partnerId);
+	    $url = $this->retrieveValueFromXml($openCalaisData, self::OPEN_CALAIS_API_URL_FIELD_NAME);
+
         $retryCounter = 0;
         do
         {
             usleep(750000);
             $ch = curl_init();
-            curl_setopt($ch,CURLOPT_URL, self::OPEN_CALAIS_URL);
+            curl_setopt($ch,CURLOPT_URL, $url);
             curl_setopt($ch,CURLOPT_POST, true);
             curl_setopt($ch,CURLOPT_POSTFIELDS, $transcript);
-            curl_setopt($ch,CURLOPT_HTTPHEADER,$this->getHeaders($partnerId));
+            curl_setopt($ch,CURLOPT_HTTPHEADER, $this->getHeaders($openCalaisData));
             curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
 
             $response =  curl_exec($ch);
@@ -316,15 +318,15 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         return $response;
     }
     /**
-     * @param string $partnerId
+     * @param SimpleXMLElement $data
      * @return string[]
      * @throws Exception
      */
-    protected function getHeaders($partnerId)
+    protected function getHeaders($data)
     {
-        $apiKey = $this->getOpenCalaisApiKey($partnerId);
-        $enableTickerExtraction = $this->getEnableTickerExtraction($partnerId);
-        $omitOutputtingOriginalText = $this->getOmitOutputtingOriginalText($partnerId);
+        $apiKey = $this->retrieveValueFromXml($data, self::OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME);
+        $enableTickerExtraction = $this->retrieveValueFromXml($data, self::ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME);
+        $omitOutputtingOriginalText = $this->retrieveValueFromXml($data, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME);
         $headers = array (
             "Content-Type: text/xml",
             "charset:utf8",
@@ -342,56 +344,31 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         }
         return $headers;
     }
-    /**
-     * @param $partnerId
-     * @return string
-     * @throws Exception
-     */
-    protected function getOpenCalaisApiKey($partnerId)
+
+	/**
+	 * @param SimpleXMLElement $xmlData
+	 * @param string $fieldName
+	 *
+	 * @return string
+	 */
+    protected function retrieveValueFromXml ($xmlData, $fieldName)
     {
-        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
-        if(property_exists($xmlData, self::OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME))
-        {
-            return (string)$xmlData->OpenCalaisAPIKey;
-        }
-        else
-        {
-            throw new Exception("Required partner-level custom metadata could not be located.");
-        }
+	    $result = $xmlData->xpath("//$fieldName");
+
+	    if (count($result))
+	    {
+			return strval($result[0]);
+	    }
+
+	    return '';
     }
-    /**
-     * @param $partnerId
-     * @return string
-     * @throws Exception
-     */
-    protected function getEnableTickerExtraction($partnerId)
-    {
-        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
-        if(property_exists($xmlData, self::ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME))
-        {
-            return (string)$xmlData->EnableTickerExtraction;
-        }
-        return '';
-    }
-    /**
-     * @param $partnerId
-     * @return string
-     * @throws Exception
-     */
-    protected function getOmitOutputtingOriginalText($partnerId)
-    {
-        $xmlData = $this->getSimpleXMLElementFromPartnerMetadata($partnerId);
-        if(property_exists($xmlData, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME))
-        {
-            return (string)$xmlData->OmitOutputtingOriginalText;
-        }
-        return '';
-    }
+
+
     /**
      * @return SimpleXMLElement|null
      * @throws Exception
      */
-    protected function getSimpleXMLElementFromPartnerMetadata($partnerId)
+    protected function getOpenCalaisSimpleXMLElementFromPartnerMetadata($partnerId)
     {
         static $xmlData = null;
         if($xmlData === null)
@@ -412,6 +389,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
 
             $xmlData = simplexml_load_string($metadataObject->xml, "SimpleXMLElement");
         }
+
         return $xmlData;
     }
     /**

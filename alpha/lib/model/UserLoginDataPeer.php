@@ -464,6 +464,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
 		$requestedPartner = $partnerId;
+		$kuser = null;
 		
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
@@ -516,6 +517,22 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$otpRequired = true;
 		}
 
+		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
+		{
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+			if ($kuser)
+			{
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
+				{
+					$otpRequired = $kuser->getIsAdmin();
+				}
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
+				{
+					$otpRequired = !$kuser->getIsAdmin();
+				}
+			}
+		}
+		
 		if ($otpRequired)
 		{
 			if(!$otp)
@@ -561,7 +578,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
 		}
 
-		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+		if(is_null($kuser))
+		{
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+		}
 		
 		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
 		{
