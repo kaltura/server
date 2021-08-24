@@ -85,7 +85,7 @@ class kWebVTTGenerator
 				continue;
 
 			// calculate line-level styling
-			$styling = '';
+			$styling = array();
 			$firstChunk = reset($curCaption['content']);
 			if ($firstChunk && isset($firstChunk['style']))
 			{
@@ -94,16 +94,34 @@ class kWebVTTGenerator
 				$aligmentMapping = array('left' => 'start', 'right' => 'end', 'center' => 'middle', 'full' => 'middle');
 				if (isset($style['textAlign']))
 				{
-					$styling .= ' align:';
 					if (isset($aligmentMapping[$style['textAlign']]))
-						$styling .= $aligmentMapping[$style['textAlign']];
+						$styling['align'] = $aligmentMapping[$style['textAlign']];
 					else
-						$styling .= $style['align'];
+						$styling['align'] = $style['align'];
 				}
 
 				$aligmentMapping = array('before' => '0%', 'center' => '50%', 'after' => '100%');
 				if (isset($style['displayAlign']) && isset($aligmentMapping[$style['displayAlign']]))
-					$styling .= ' line:' . $aligmentMapping[$style['displayAlign']];
+					$styling['line'] = $aligmentMapping[$style['displayAlign']];
+
+				if (isset($style['origin']))
+				{
+					$origin = explode(' ', $style['origin']);
+					$styling['position'] = $origin[0];
+					$styling['line'] = $origin[1];
+					$styling['align'] = 'start';
+				}
+				if (isset($style['extent']))
+				{
+					$extent = explode(' ', $style['extent']);
+					$styling['size'] = $extent[0];
+				}
+			}
+
+			$stylingStr = '';
+			foreach($styling as $key => $value)
+			{
+				$stylingStr .= " $key:$value";
 			}
 
 			// calculate the line content
@@ -127,7 +145,7 @@ class kWebVTTGenerator
 
 			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
 				self::formatWebVTTTimeStamp($curCaption["endTime"]) .
-				$styling . "\n";
+				$stylingStr . "\n";
 			$result .= trim($content) . "\n\n";
 		}
 		$result .="\n\n\n";

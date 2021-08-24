@@ -203,11 +203,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
 		if ($newPassword &&
-				  !UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
-				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
-				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
-				  (stripos($newPassword, $loginData->getFullName()) !== false)    ||
-				  ($newPassword == $loginData->getLoginEmail())   ){
+			!UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
+			(strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
+			(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
+			(stripos($newPassword, $loginData->getFullName()) !== false) ||
+			($newPassword == $loginData->getLoginEmail()))
+		{
 			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
@@ -740,7 +741,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$loginData->setLoginBlockedUntil(null);
 			$loginData->resetPreviousPasswords();
 			
-			self::checkPasswordValidation($password, $loginData);
+			if ($checkPasswordStructure)
+			{
+				self::checkPasswordValidation($password, $loginData);
+			}
 			
 			$loginData->save();
 			// now $loginData has an id and hash key can be generated
@@ -755,6 +759,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$seed = GoogleAuthenticator::createSecret();
 				$loginData->setSeedFor2FactorAuth($seed);
 			}
+			else
+			{
+				self::add2faSeed($partner,$isAdminUser,$loginData);
+			}
+			
 			
 			$loginData->save();
 			$alreadyExisted = false;
@@ -778,7 +787,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$existingData->save();
 			}
 			
-						
 			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
@@ -789,6 +797,39 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			
 			return $existingData;
 		}	
+	}
+	
+	protected static function add2faSeed($partner, $isAdminUser, $userLoginData)
+	{
+		$generateNewSeed = false;
+		if ($partner->getUseTwoFactorAuthentication())
+		{
+			switch($partner->getTwoFactorAuthenticationMode())
+			{
+				case TwoFactorAuthenticationMode::ALL:
+					$generateNewSeed=true;
+					break;
+				
+				case TwoFactorAuthenticationMode::ADMIN_USERS_ONLY:
+					$generateNewSeed = $isAdminUser;
+					break;
+				
+				case TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY;
+					$generateNewSeed = !$isAdminUser;
+					break;
+				
+				default:
+					$generateNewSeed=false;
+					break;
+			}
+
+			if($generateNewSeed)
+			{
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
+				$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+			}
+		}
+		return $generateNewSeed;
 	}
 	
 	/**

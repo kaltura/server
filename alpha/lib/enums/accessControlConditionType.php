@@ -23,4 +23,5 @@ interface ConditionType extends BaseEnum
 	const ASSET_TYPE = 16;
 	const BOOLEAN = 17;
 	const HTTP_HEADER = 18;
+	const ENTRY_SCHEDULED = 19;
 }

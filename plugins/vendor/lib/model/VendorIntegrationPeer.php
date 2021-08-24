@@ -60,7 +60,7 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		}
 
 		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
-		$c->addAnd ( VendorIntegrationPeer::STATUS, VendorStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd ( VendorIntegrationPeer::STATUS, VendorIntegrationStatus::DELETED, Criteria::NOT_EQUAL);
 
 		self::$s_criteria_filter->setFilter($c);
 	}

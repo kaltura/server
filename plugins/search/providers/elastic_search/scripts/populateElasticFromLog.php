@@ -187,10 +187,12 @@ while (true)
 				//we save the elastic command as serialized object in the sql field
 				$command = $elasticLog->getSql();
 				$command = unserialize($command);
-				$index = $command['index'];
 				$action = $command['action'];
+				$index = $command['index'];
 				$partnerId = $elasticLog->getPartnerId();
-				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
+				$command['index'] = kBaseESearch::getSplitIndexNamePerPartner($command['index'], $partnerId);
+
+				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!== false && $action == ElasticMethodType::UPDATE)))
 				{
 					if (empty($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
 					{

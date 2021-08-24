@@ -1,0 +1,1 @@
+ALTER TABLE vendor_integration CHANGE vendor_Type TO vendor_type;
