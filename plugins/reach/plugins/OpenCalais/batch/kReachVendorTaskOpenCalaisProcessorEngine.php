@@ -329,7 +329,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         $omitOutputtingOriginalText = $this->retrieveValueFromXml($data, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME);
         $headers = array (
             "Content-Type: text/xml",
-            "charset:utf8",
+            "charset: utf8",
             "x-ag-access-token: $apiKey",
             "outputFormat: application/json",
             "x-calais-language: English"
@@ -401,7 +401,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         $mediaEntry = $this->getMediaEntry($vendorTask->entryId);
         $text = $this->getEntryTextTranscript($vendorTask);
 
-        return '<Document><Title>' . htmlspecialchars($mediaEntry->name) . '</Title><Description>' . htmlspecialchars($mediaEntry->description) . '</Description><Body>' . htmlspecialchars($text) . '</Body></Document>';
+        return '<Document><Title>' . htmlspecialchars($mediaEntry->name) . '</Title><Body>' . htmlspecialchars($mediaEntry->description) . ' ' . htmlspecialchars($text) . '</Body></Document>';
     }
 
 

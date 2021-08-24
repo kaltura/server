@@ -266,7 +266,17 @@ class kDropFolderEventsConsumer implements kBatchJobStatusEventConsumer, kObject
 	{
 		// Handle only files that are still in the PROCESSING state, which were left
 		// in this state due to AUTO_DELETE_WHEN_ENTRY_IS_READY delete policy.
-		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryIdPartnerIdAndStatuses($entry->getId(), $entry->getPartnerId(), array(DropFolderFileStatus::PROCESSING));
+		if ($entry->getIsTemporary() && $entry->getReplacedEntryId())
+		{
+			$entryId = $entry->getReplacedEntryId();
+			KalturaLog::debug('Replaced entry found - Using replacedEntryId: ' . $entryId . ' instead of entryId: ' . $entry->getId());
+		}
+		else
+		{
+			$entryId = $entry->getId();
+		}
+
+		$dropFolderFiles = DropFolderFilePeer::retrieveByEntryIdPartnerIdAndStatuses($entryId, $entry->getPartnerId(), array(DropFolderFileStatus::PROCESSING));
 		$dropFolderIdToDropFolderCache = array();
 
 		$entryStatus = $entry->getStatus();

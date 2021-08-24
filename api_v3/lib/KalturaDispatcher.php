@@ -280,6 +280,10 @@ class KalturaDispatcher
 		foreach (kConf::getMap('api_rate_limit') as $rateLimitRule)
 		{
 			$matches = true;
+			if(!is_array($rateLimitRule))
+			{
+				continue;
+			}
 			foreach ($rateLimitRule as $key => $value)
 			{
 				if ($key[0] == '_')
@@ -296,7 +300,7 @@ class KalturaDispatcher
 					
 					continue;
 				}
-					
+				
 				if ($this->getApiParamValue($params, $key) != $value)
 				{
 					$matches = false;
@@ -320,7 +324,15 @@ class KalturaDispatcher
 		{
 			return true;
 		}
-		
+
+		$skipEnforceInternalIp = kConf::get('skip_enforce_internal_ip', 'api_rate_limit', null);
+
+		// if 'api_rate_limit' map contains param 'skip_enforce_internal_ip' with value 1, we will ignore the IP check
+		if(!$skipEnforceInternalIp && kIpAddressUtils::isInternalIp())
+		{
+			// if api request is internal IP, the source is a batch machine, and we won't block the action
+			return true;
+		}
 		$rule = $this->getRateLimitRule($params);
 		if (!$rule)
 		{

@@ -67,7 +67,15 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		$this->putInCustomData(self::POST_END_TIME, $v);
 	}
-
+	
+	public function shiftEvent ($parentEndDate)
+	{
+		$newStartDate = $parentEndDate + $this->getLinkedTo()->offset;
+		$this->setStartScreenTime($newStartDate);
+		$this->setEndScreenTime($newStartDate + $this->duration);
+		parent::shiftEvent($parentEndDate);
+	}
+	
 	/**
 	 * @return int
 	 */

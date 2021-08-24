@@ -27,6 +27,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
+	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -173,8 +174,20 @@ class embedPlaykitJsAction extends sfAction
 		$confNS = "window.__kalturaplayerdata";
 		$content .= "
 		$confNS = ($confNS || {});
-		$confNS.UIConf = ($confNS.UIConf||{});$confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;
 		";
+
+		$kalturaPlayerVersion = null;
+		if (isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ) {
+			$kalturaPlayerVersion = $this->bundleConfig[self::KALTURA_OVP_PLAYER];
+		} else if (isset($this->bundleConfig[self::KALTURA_TV_PLAYER])) {
+			$kalturaPlayerVersion = $this->bundleConfig[self::KALTURA_TV_PLAYER];
+		}
+
+		if (!is_null($kalturaPlayerVersion) && version_compare($kalturaPlayerVersion, self::NO_UICONF_FOR_KALTURA_DATA) >= 0) {
+			$content .= "$confNS=$uiConfJson;";
+		} else {
+			$content .= "$confNS.UIConf = ($confNS.UIConf||{}); $confNS.UIConf[\"" . $this->uiconfId . "\"]=$uiConfJson;";
+		}
 		return $content;
 	}
 
@@ -518,13 +531,14 @@ class embedPlaykitJsAction extends sfAction
 		$uiconfs_content = isset($uiConfs) ? array_values($uiConfs) : null;
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
-		$productVersionJson = isset($last_uiconf_content) ? json_decode($last_uiconf_content->getConfVars()) : null;
-		$productVersion = $productVersionJson ? $productVersionJson->version : null;
+		$productVersion = isset($last_uiconf_content) ? $this->getProductVersionFromUiConf($last_uiconf_content->getConfVars()) : null;
 		return array($last_uiconf_config, $productVersion);
 	}
 
 	private function getConfigByVersion($version){
 		$config = array();
+		$corePackages = array();
+		$productVersion = null;
 		foreach ($this->uiConfTags as $tag) {
 			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
 			list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
@@ -532,11 +546,12 @@ class embedPlaykitJsAction extends sfAction
 			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
 			}
-			if(!isset($productVersion)) {
+			if ($tag === self::PLAYER_V3_VERSIONS_TAG) {
+				$corePackages = $versionConfig;
 				$productVersion = $tagVersionNumber;
 			}
 		}
-		return array($config,$productVersion);
+		return array($config,$productVersion,$corePackages);
 	}
 
 	private function maybeAddAnalyticsPlugins()
@@ -548,8 +563,8 @@ class embedPlaykitJsAction extends sfAction
 			$playerVersion = $ovpPlayerConfig ? $ovpPlayerConfig : $tvPlayerConfig;
 			list($latestVersionMap) = $this->getConfigByVersion("latest");
 			list($betaVersionMap) = $this->getConfigByVersion("beta");
-			$latestVersion = $latestVersionMap[self::KALTURA_OVP_PLAYER];
-			$betaVersion = $betaVersionMap[self::KALTURA_OVP_PLAYER];
+			$latestVersion = isset($latestVersionMap[self::KALTURA_OVP_PLAYER]) ? $latestVersionMap[self::KALTURA_OVP_PLAYER] : null;
+			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null;
 
 			// For player latest/beta >= 0.56.0 or canary
 			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0) ||
@@ -563,7 +578,8 @@ class embedPlaykitJsAction extends sfAction
 				}
 			}
 			// For specific version >= 0.56.0
-			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0)
+			else if (version_compare($playerVersion, self::NO_ANALYTICS_PLAYER_VERSION) >= 0 &&
+					!is_null($latestVersionMap))
 			{
 				$this->bundleConfig[self::PLAYKIT_KAVA] = $latestVersionMap[self::PLAYKIT_KAVA];
 				if ($tvPlayerConfig)
@@ -582,15 +598,13 @@ class embedPlaykitJsAction extends sfAction
 		$isCanaryVersionRequired = array_search(self::CANARY, $this->bundleConfig) !== false;
 
 		$isAllPackagesSameVersion = true;
+		$packageVersion = null;
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
 
-			list($latestVersionMap, $latestProductVersion) = $this->getConfigByVersion("latest");
+			list($latestVersionMap, $latestProductVersion, $corePackages) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
 			list($canaryVersionMap, $canaryProductVersion) = $this->getConfigByVersion("canary");
-
-			//package version to compare, product version will save jut if all the versions in uiConf similar
-			$packageVersion = reset( $this->bundleConfig );
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
@@ -606,8 +620,12 @@ class embedPlaykitJsAction extends sfAction
 					$this->bundleConfig[$key] = $canaryVersionMap[$key];
 				}
 
-				if($packageVersion !== $val) {
-					$isAllPackagesSameVersion = false;
+				if ($corePackages != null && isset($corePackages[$key])) {
+					if (is_null($packageVersion)) {
+						$packageVersion = $val;
+					} else if ($packageVersion != $val) {
+						$isAllPackagesSameVersion = false;
+					}
 				}
 			}
 
@@ -623,7 +641,21 @@ class embedPlaykitJsAction extends sfAction
 				}
 			}
 
+
+		} else {
+			$productVersion = isset($this->uiConf) ? $this->getProductVersionFromUiConf($this->uiConf->getHtml5Url()) : null;
+			if($productVersion != null)
+			{
+				$this->setProductVersion($this->playerConfig, $productVersion);
+			}
 		}
+	}
+
+	private function getProductVersionFromUiConf($productVersionString)
+	{
+		$productVersionJson = isset($productVersionString) ? json_decode($productVersionString) : null;
+		$productVersion = $productVersionJson ? $productVersionJson->version : null;
+		return $productVersion;
 	}
 
 	private function initMembers()
@@ -706,6 +738,7 @@ class embedPlaykitJsAction extends sfAction
 		if (isset($confVarsArr[self::LANGS_PARAM_NAME])) {
 			$this->uiConfLangs = $confVarsArr[self::LANGS_PARAM_NAME];
 		}
+
 		$this->mergeVersionsParamIntoConfig();
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");

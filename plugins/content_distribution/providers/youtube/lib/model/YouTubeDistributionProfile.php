@@ -375,6 +375,7 @@ class YouTubeDistributionProfile extends ConfigurableDistributionProfile
 	public function getProductListingAds()		{return $this->getFromCustomData(self::CUSTOM_DATA_PRODUCT_LISTING_ADS);}
 	public function getDomainWhitelist($v)		{return $this->getFromCustomData(self::CUSTOM_DATA_DOMAIN_WHITELIST);}
 	public function getNotifySubscribers($v)	{return $this->getFromCustomData(self::CUSTOM_DATA_NOTIFY_SUBSCRIBERS);}
+	public function getSupportImageEntry()		{return true;}
 
 	public function setFeedSpecVersion($v)		{$this->putInCustomData(self::CUSTOM_DATA_FEED_SPEC_VERSION, $v);}
 	public function setUsername($v)				{$this->putInCustomData(self::CUSTOM_DATA_USERNAME, $v);}

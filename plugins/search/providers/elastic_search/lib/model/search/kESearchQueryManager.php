@@ -116,7 +116,15 @@ class kESearchQueryManager
 		{
 			$trigramFieldName = $fieldName.'.'.self::NGRAMS_FIELD_SUFFIX;
 			$matchQuery = new kESearchMatchQuery($trigramFieldName, $searchItem->getSearchTerm());
-			$trigramPercentage = kConf::get('ngramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+			if($partner->getTrigramPercentage())
+			{
+				$trigramPercentage = $partner->getTrigramPercentage();
+			}
+			else
+			{
+				$trigramPercentage = kConf ::get('ngramPercentage', 'elastic', self::DEFAULT_TRIGRAM_PERCENTAGE);
+			}
 			$matchQuery->setMinimumShouldMatch("$trigramPercentage%");
 			if($searchItem->getAddHighlight())
 				$queryAttributes->getQueryHighlightsAttributes()->addFieldToHighlight($fieldName, $trigramFieldName);
@@ -135,7 +143,18 @@ class kESearchQueryManager
 	{
 		if ($shouldReduceResults)
 		{
-			$maxWordsForNgram = kConf::get(ElasticSearchPlugin::MAX_WORDS_NGRAM,ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP, ElasticSearchPlugin::MAX_WORDS_NGRAM_DEFAULT);
+			//todo try to get the values from partner level
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+			if($partner->getMaxWordForNgram())
+			{
+				$maxWordsForNgram = $partner->getMaxWordForNgram();
+			}
+			else
+			{
+				$maxWordsForNgram = kConf ::get(ElasticSearchPlugin::MAX_WORDS_NGRAM,
+				                                ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP,
+				                                ElasticSearchPlugin::MAX_WORDS_NGRAM_DEFAULT);
+			}
 			$splitedSearchTerms = preg_split('/\s+/', $searchTerm);
 			if(count($splitedSearchTerms) <= $maxWordsForNgram)
 			{

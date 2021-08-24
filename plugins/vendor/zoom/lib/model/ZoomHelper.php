@@ -246,7 +246,7 @@ class ZoomHelper
 			self::exitWithError(kZoomErrorMessages::NO_INTEGRATION_DATA);
 		}
 
-		if($zoomIntegration->getStatus() == VendorStatus::DISABLED)
+		if($zoomIntegration->getStatus() == VendorIntegrationStatus::DISABLED)
 		{
 			self::exitWithError(kZoomErrorMessages::UPLOAD_DISABLED);
 		}
