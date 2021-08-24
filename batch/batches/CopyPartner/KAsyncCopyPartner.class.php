@@ -44,7 +44,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	 */
 	protected function doCopyPartner(KalturaBatchJob $job, KalturaCopyPartnerJobData $jobData)
 	{
-		$this->log( "doCopyPartner job id [$job->id], From PID: $jobData->fromPartnerId, To PID: $jobData->toPartnerId" );
+		$this->log("doCopyPartner job id [$job->id], From PID: $jobData->fromPartnerId, To PID: $jobData->toPartnerId");
 
 		$this->fromPartnerId = $jobData->fromPartnerId;
 		$this->toPartnerId = $jobData->toPartnerId;
@@ -74,12 +74,12 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		{
 			// Get the source partner's entries list
 			self::impersonate($this->fromPartnerId);
-			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter);
+			$entriesList = $this->getClient()->baseEntry->listAction($entryFilter, $pageFilter);
 
 			$receivedObjectsCount = $entriesList->objects ? count($entriesList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
-			if ($receivedObjectsCount > 0 )
+			if ($receivedObjectsCount > 0)
 			{
 				// Write the source partner's entries to the destination partner 
 				self::impersonate( $this->toPartnerId);
@@ -189,7 +189,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				self::impersonate($this->toPartnerId);
 				foreach ($uiConfList->objects as $uiConf)
 				{
-					$result = $this->getClient()->uiConf->add( $this->cloneUiConf($uiConf));
+					$result = $this->getClient()->uiConf->add($this->cloneUiConf($uiConf));
 					$this->log('created uiConf [' . $result->id . ']');
 				}
 			}
