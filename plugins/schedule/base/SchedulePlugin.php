@@ -156,12 +156,12 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 		$currentEvents = $this->getCurrentEvent($object->getId());
 		if(! $currentEvents)
 		{
-			KalturaResponseCacher::setConditionalCacheExpiry(self::NO_EVENT_CACHE_TIME);
+			kApiCache::setConditionalCacheExpiry(self::NO_EVENT_CACHE_TIME);
 			return false;
 		}
 		
 		$cacheTime = max(self::NO_EVENT_CACHE_TIME,$currentEvents->getCalculatedEndTime() - time());
-		KalturaResponseCacher::setConditionalCacheExpiry($cacheTime);
+		kApiCache::setConditionalCacheExpiry($cacheTime);
 		return $currentEvents->dynamicGetter($context, $output);
 	}
 	

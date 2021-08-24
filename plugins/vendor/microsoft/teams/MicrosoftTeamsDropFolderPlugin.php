@@ -90,7 +90,7 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass == VendorIntegrationPeer::OM_CLASS &&
+		if ($baseClass == 'VendorIntegration' &&
 			$enumValue == self::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS))
 		{
 			return 'MicrosoftTeamsIntegration';

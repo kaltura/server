@@ -1,4 +1,5 @@
 # Quasar-17.9.0 #
+
 ## Partner registration - Move all time consuming jobs to run in batch ##
 Moving functionality to batch, in order to enable a shorter partner registration action
 * Issue Type: Task
@@ -6,6 +7,18 @@ Moving functionality to batch, in order to enable a shorter partner registration
 
 ### Deployment Scripts ### 
     php deployment/updates/scripts/2021_08_17_allow_clone_uiconf_from_batch.php
+
+## Add partner for CNC server ##
+
+* Issue Type: Task
+* Issue ID: PLAT-23018
+
+### Configuration ###
+First replace all tokens from the ini file below (under cnc section) and remove".template" from the file name : deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
+
 # Quasar-17.8.0 #
 
 ## Static Content Conversion Profiles ##
