@@ -7,9 +7,6 @@
  */
 class KAsyncCopyPartner extends KJobHandlerWorker
 {
-	const CATEGORY_STATUS_ACTIVE = 2;
-	const CATEGORY_SEPARATOR = ">";
-	
 	const UI_CONF_TYPE_WIDGET = 1;
 	const UI_CONF_TYPE_KDP3 = 8;
 	
@@ -76,22 +73,22 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		do
 		{
 			// Get the source partner's entries list
-			self::impersonate( $this->fromPartnerId );
-			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter );
+			self::impersonate($this->fromPartnerId);
+			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter);
 
 			$receivedObjectsCount = $entriesList->objects ? count($entriesList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
-			if ( $receivedObjectsCount > 0 )
+			if ($receivedObjectsCount > 0 )
 			{
 				// Write the source partner's entries to the destination partner 
-				self::impersonate( $this->toPartnerId );
-				foreach ( $entriesList->objects as $entry )
+				self::impersonate( $this->toPartnerId);
+				foreach ($entriesList->objects as $entry)
 				{
-					$newEntry = $this->getClient()->baseEntry->cloneAction( $entry->id );
+					$newEntry = $this->getClient()->baseEntry->cloneAction($entry->id);
 				}
 			}			
-		} while ( $receivedObjectsCount );
+		} while ($receivedObjectsCount);
 	
 		self::unimpersonate();
 	}
@@ -101,7 +98,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$this->log("Copying categories from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId . "]");
 		
 		$categoryFilter = new KalturaCategoryFilter();
-		$categoryFilter->status = self::CATEGORY_STATUS_ACTIVE;
+		$categoryFilter->status = KalturaCategoryStatus::ACTIVE;
 		
 		$pageFilter = new KalturaFilterPager();
 		$pageFilter->pageSize = 50;
@@ -121,13 +118,14 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				// Write the source partner's entries to the destination partner
 				foreach ($categoryList->objects as $category)
 				{
-					self::impersonate($this->toPartnerId );
+					self::impersonate($this->toPartnerId);
 					$result = $this->getClient()->category->add($this->cloneCategory($category, $parentCategoryIdMapping));
 					$parentCategoryIdMapping[$category->id] = $result->id;
 					$this->log('created category [' . $result->id . ']');
 				}
 			}
-		} while ($receivedObjectsCount);
+		}
+		while ($receivedObjectsCount);
 		
 		self::unimpersonate();
 		$this->log("Copied categories from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId . "]");
@@ -185,17 +183,18 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			$receivedObjectsCount = $uiConfList->objects ? count($uiConfList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
-			if ( $receivedObjectsCount > 0 )
+			if ($receivedObjectsCount > 0)
 			{
 				// Write the source partner's entries to the destination partner
-				self::impersonate( $this->toPartnerId );
-				foreach ( $uiConfList->objects as $uiConf )
+				self::impersonate($this->toPartnerId);
+				foreach ($uiConfList->objects as $uiConf)
 				{
 					$result = $this->getClient()->uiConf->add( $this->cloneUiConf($uiConf));
 					$this->log('created uiConf [' . $result->id . ']');
 				}
 			}
-		} while ( $receivedObjectsCount );
+		}
+		while ($receivedObjectsCount);
 		
 		self::unimpersonate();
 	}
