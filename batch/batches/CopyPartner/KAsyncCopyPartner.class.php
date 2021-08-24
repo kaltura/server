@@ -7,24 +7,11 @@
  */
 class KAsyncCopyPartner extends KJobHandlerWorker
 {
-	const UPDATING = 1;
-	const ACTIVE = 2;
-	const DELETED = 3;
-	const PURGED = 4;
-	/** the column name for the DEPTH field */
-	const DEPTH = 'category.DEPTH';
-	/** the column name for the CREATED_AT field */
-	const CREATED_AT = 'category.CREATED_AT';
-	/** the column name for the ID field */
-	const ID = 'category.ID';
+	const CATEGORY_STATUS_ACTIVE = 2;
 	const CATEGORY_SEPARATOR = ">";
 	
 	const UI_CONF_TYPE_WIDGET = 1;
 	const UI_CONF_TYPE_KDP3 = 8;
-	
-	/** inheritance type */
-	const INHERIT = 1;
-	const MANUAL = 2;
 	
 	protected $fromPartnerId;
 	protected $toPartnerId;
@@ -114,8 +101,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$this->log("Copying categories from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId . "]");
 		
 		$categoryFilter = new KalturaCategoryFilter();
-		$categoryFilter->order = self::ID;
-		$categoryFilter->status = self::ACTIVE;
+		$categoryFilter->status = self::CATEGORY_STATUS_ACTIVE;
 		
 		$pageFilter = new KalturaFilterPager();
 		$pageFilter->pageSize = 50;
@@ -129,19 +115,19 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			$receivedObjectsCount = $categoryList->objects ? count($categoryList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
-			if ( $receivedObjectsCount > 0 )
+			if ($receivedObjectsCount > 0)
 			{
 				$parentCategoryIdMapping = array();
 				// Write the source partner's entries to the destination partner
-				foreach ( $categoryList->objects as $category )
+				foreach ($categoryList->objects as $category)
 				{
-					self::impersonate( $this->toPartnerId );
-					$result = $this->getClient()->category->add( $this->cloneCategory($category, $parentCategoryIdMapping));
-					$parentCategoryIdMapping[ $category->id] = $result->id;
+					self::impersonate($this->toPartnerId );
+					$result = $this->getClient()->category->add($this->cloneCategory($category, $parentCategoryIdMapping));
+					$parentCategoryIdMapping[$category->id] = $result->id;
 					$this->log('created category [' . $result->id . ']');
 				}
 			}
-		} while ( $receivedObjectsCount );
+		} while ($receivedObjectsCount);
 		
 		self::unimpersonate();
 		$this->log("Copied categories from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId . "]");
@@ -180,7 +166,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	
 	protected function copyUiConfsByType($uiConfType)
 	{
-		$this->log("Copying uiconfs from partner [".$this->fromPartnerId."] to partner [".$this->toPartnerId."] with type [".$uiConfType."]");
+		$this->log("Copying uiconfs from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId."] with type [" . $uiConfType."]");
 		
 		$uiConfFilter = new KalturaUiConfFilter();
 		$uiConfFilter->objTypeEqual = $uiConfType;

@@ -1,6 +1,6 @@
 # Quasar-17.9.0 #
 ## Partner registration - Move all time consuming jobs to run in batch ##
-Cloning of UICONF and Category takes 4 seconds, moving them to batch
+Moving functionality to batch, in order to enable a shorter partner registration action
 * Issue Type: Task
 * Issue ID: PLAT-23082
 
