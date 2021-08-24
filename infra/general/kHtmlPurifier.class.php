@@ -85,7 +85,7 @@ class kHtmlPurifier
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
 			$defaultAllowedHtmlTags = 'p[],img[src,title,alt],a[href,rel,target],span[class],div[],br[],b[],i[],u[],ol[],ul[],li[],blockquote[]';
-			$allowedHtmlTags = kConf::get('html_purifier_allowed_html_tags', $defaultValue=$defaultAllowedHtmlTags);
+			$allowedHtmlTags = kConf::get('html_purifier_allowed_html_tags', $defaultAllowedHtmlTags);
 			$config->set('HTML.Allowed',$allowedHtmlTags);
 			self::$purifier = new HTMLPurifier($config);
 			if ( $cacheKey )
