@@ -1,3 +1,8 @@
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `kaltura_sphinx_log` /*!40100 DEFAULT CHARACTER SET latin1 */;
+
+USE `kaltura_sphinx_log`;
+
 SET GLOBAL sql_mode = '';
 /*Table structure for table `sphinx_log` */
 CREATE TABLE IF NOT EXISTS `sphinx_log` (
