@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `sphinx_log` (
   KEY `sphinx_log_FI_1` (`partner_id`),
   KEY `created_at` (`created_at`),
   KEY `dc_id` (`dc`,`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Table structure for table `sphinx_log_server` */
 CREATE TABLE IF NOT EXISTS `sphinx_log_server` (
