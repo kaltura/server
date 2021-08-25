@@ -5,7 +5,6 @@
 class KWebexDropFolderEngine extends KDropFolderEngine
 {
 	const ZERO_DATE = '12/31/1971 00:00:01';
-	const WEEK_IN_SECONDS = 604800;
 	const ARF_FORMAT = 'ARF';
 	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
 	const MIN_TIME_BEFORE_HANDLING_UPLOADING = 60; //the time in seconds
@@ -57,14 +56,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			}
 			else
 			{
-				$startTime = time();
+				$startTime = time() - $pastPeriod;
 			}
 			$endTime = time();
 			
-			for ($i = $startTime; $i < $endTime; $i = $i + self::WEEK_IN_SECONDS)
+			for ($i = $startTime; $i < $endTime; $i = $i + Time::WEEK)
 			{
 				$startDate = date('m/j/Y H:i:s', $i);
-				$endDateEpoch = min($i + self::WEEK_IN_SECONDS, $endTime);
+				$endDateEpoch = min($i + Time::WEEK, $endTime);
 				$endDate = date('m/j/Y H:i:s', $endDateEpoch);
 				
 				$this->getFilesFromWebex($startDate, $endDate);
@@ -94,7 +93,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
-	private function getDropFolderFilesMap()
+	protected function getDropFolderFilesMap()
 	{
 		if(!$this->dropFolderFilesMap)
 		{
