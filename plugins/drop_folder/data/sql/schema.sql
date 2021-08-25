@@ -25,16 +25,16 @@ CREATE TABLE `drop_folder`
 	`file_handler_type` INTEGER,
 	`file_name_patterns` TEXT  NOT NULL,
 	`file_handler_config` TEXT  NOT NULL,
-	`tags` TEXT,
+    `tags` varchar(30) DEFAULT NULL,
 	`error_code` INTEGER,
 	`error_description` TEXT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY `partner_id_index`(`partner_id`),
-	KEY `status_index`(`status`),
-	KEY `dc_index`(`dc`)
+    KEY `partner_id_index` (`partner_id`),
+    KEY `dc_status` (`dc`,`status`),
+    KEY `dc_tags_status` (`dc`,`tags`,`status`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
