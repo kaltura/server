@@ -292,7 +292,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     private static function updateTagsInstanceCount(array $foundTagObjects,$toIncrement)
     {
-	    $date_time = new DateTime();
+        $date_time = new DateTime();
         $time = $date_time->format('Y-m-d H:i:s');
         self::updateInstanceCountList($foundTagObjects,$time,$toIncrement);
         foreach ($foundTagObjects as $foundTag)
