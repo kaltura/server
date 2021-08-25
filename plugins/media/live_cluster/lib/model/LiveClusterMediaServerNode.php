@@ -80,7 +80,8 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
 	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
 	{
-		if (strpos($liveUrl, self::TIMELINE_URL_PARAM) !== false)
+		$tlUrlParam = '/' . self::TIMELINE_URL_PARAM . '/';
+		if (strpos($liveUrl, $tlUrlParam) !== false)
 		{
 			return '';
 		}

@@ -8,6 +8,8 @@ class ZoomVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
+	const INTEGRATION_CODE = 'integrationCode';
+	const AUTH_CODE = 'code';
 	
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'preOauthValidation');
 	
@@ -61,38 +63,44 @@ class ZoomVendorService extends KalturaBaseService
 	/**
 	 * load html page the that will ask the user for its KMC URL, derive the region of the user from it,
 	 * and redirect to the registration page in the correct region, while forwarding the necessary code for registration
-	 * @action preOauthValidation
+	 * @action oauthValidation
 	 * @throws Exception
 	 */
-	public function preOauthValidation()
+	public function oauthValidationAction()
 	{
-		$authCode = $_GET['code'];
+		$authCode = $_GET[self::AUTH_CODE];
 		ZoomHelper::loadRegionalCloudRedirectionPage($authCode);
 	}
 	
 	/**
 	 *
-	 * @action oauthValidation
+	 * @action preOauthValidation
 	 * @return string
 	 * @throws Exception
 	 */
-	public function oauthValidationAction()
+	public function preOauthValidation()
 	{
 		KalturaResponseCacher::disableCache();
 		$zoomConfiguration = self::getZoomConfiguration();
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
-		$isAdmin = false;
-		$tokens = null;
-		if(!array_key_exists('code', $_GET))
+		if(!array_key_exists(self::AUTH_CODE, $_GET) || !$_GET[self::AUTH_CODE])
 		{
 			$url = $zoomBaseURL . '/oauth/authorize?' . 'response_type=code' . '&client_id=' . $clientId .  '&redirect_uri=' . $redirectUrl;
 			ZoomHelper::redirect($url);
 		}
 		else
 		{
-			$authCode = $_GET['code'];
+			try
+			{
+				$ks = isset($_GET[self::INTEGRATION_CODE]) ? ks::fromSecureString ($_GET[self::INTEGRATION_CODE]) : null;
+			}
+			catch (Exception $e)
+			{
+				throw new KalturaAPIException($e->getMessage());
+			}
+			$authCode = $_GET[self::AUTH_CODE];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
 			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
@@ -106,18 +114,31 @@ class ZoomVendorService extends KalturaBaseService
 				$zoomIntegration->setAccountId($accountId);
 				ZoomHelper::setZoomIntegration($zoomIntegration);
 			}
+			else if ($zoomIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
+			{
+				throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
+			}
 			
 			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
 			$permissions = $permissions['permissions'];
 			$isAdmin = ZoomHelper::canConfigureEventSubscription($permissions);
+			if($isAdmin)
+			{
+				if($ks)
+				{
+					$zoomIntegration->setPartnerId($ks->getPartnerId());
+					$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+					$zoomIntegration->save();
+					ZoomHelper::loadSubmitPage($zoomIntegration,$accountId,$ks);
+				}
+				else
+				{
+					ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
+				}
+			}
 		}
-		
-		if($isAdmin)
-		{
-			ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
-		}
-		
+
 		throw new KalturaAPIException(KalturaZoomErrors::ZOOM_ADMIN_REQUIRED);
 	}
 	
@@ -141,7 +162,7 @@ class ZoomVendorService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
 		
-		$zoomIntegration->setStatus(VendorStatus::DELETED);
+		$zoomIntegration->setStatus(VendorIntegrationStatus::DELETED);
 		$zoomIntegration->save();
 		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
 		return true;
@@ -202,7 +223,8 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			$zoomIntegration = new ZoomVendorIntegration();
 			$zoomIntegration->setAccountId($zoomAccountId);
-			$zoomIntegration->setPartnerId(kCurrentContext::$partner_id);
+			$zoomIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
+			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 		}
 		$zoomIntegration->setJwtToken($jwt);
 		$zoomIntegration->save();

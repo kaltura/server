@@ -67,7 +67,15 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		$this->putInCustomData(self::POST_END_TIME, $v);
 	}
-
+	
+	public function shiftEvent ($parentEndDate)
+	{
+		$newStartDate = $parentEndDate + $this->getLinkedTo()->offset;
+		$this->setStartScreenTime($newStartDate);
+		$this->setEndScreenTime($newStartDate + $this->duration);
+		parent::shiftEvent($parentEndDate);
+	}
+	
 	/**
 	 * @return int
 	 */
@@ -75,21 +83,11 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		return $this->getFromCustomData(self::POST_END_TIME, null, 0);
 	}
-	// In the old workflow, we did not save on the db the absolut start/end times.
-	// we had the actual start/end times and the "paddings"
-	// in the new workflow, start\end are mapped to the absolut and the actual play dates are
-	// saved in custom data.
-	// the bellow functions do the above mappings depending on the workflow for backwards compatibility
-	// Objects created in the old workflow will not have 'screenEndTime' in custom data, therefore will return null
-	protected function isOldWorkflow()
-	{
-		return is_null($this->getFromCustomData(self::SCREENING_END_TIME));
-	}
 	
 	public function getEndScreenTime()
 	{
 		//For backwards compatibility
-		if ($this->isOldWorkflow())
+		if (is_null($this->getFromCustomData(self::SCREENING_END_TIME)))
 		{
 			return $this->getEndDate(null);
 		}
@@ -104,7 +102,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	public function getStartScreenTime()
 	{
 		//For backwards compatibility
-		if ($this->isOldWorkflow())
+		if (is_null($this->getFromCustomData(self::SCREENING_START_TIME)))
 		{
 			return $this->getStartDate(null);
 		}
@@ -114,7 +112,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	public function getCalculatedStartTime()
 	{
 		//For backwards compatibility
-		if ($this->isOldWorkflow())
+		if (is_null($this->getFromCustomData(self::SCREENING_START_TIME)))
 		{
 			return $this->getStartDate(null) - $this->getPreStartTime();
 		}
@@ -124,7 +122,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	public function getCalculatedEndTime()
 	{
 		//For backwards compatibility
-		if ($this->isOldWorkflow())
+		if (is_null($this->getFromCustomData(self::SCREENING_END_TIME)))
 		{
 			return $this->getEndDate(null) + $this->getPostEndTime();
 		}
@@ -144,8 +142,9 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		switch ($context)
 		{
 			case 'getLiveStatus':
-				if($this->getSourceEntryId())
+				if ($this->getSourceEntryId() && ($this->getCalculatedStartTime() + kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC < time()))
 				{
+					// Simulive flow (and event is playable)
 					$output = EntryServerNodeStatus::PLAYABLE;
 					return true;
 				}

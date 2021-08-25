@@ -330,19 +330,41 @@ class s3Mgr extends kFileTransferMgr
 	// return true/false according to existence of file on the server
 	protected function doFileExists($remote_file)
 	{
-		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		if($this->isDirectory($remote_file))
 		{
 			return true;
 		}
+		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		KalturaLog::debug("remote_file: ".$remote_file);
 
 		$exists = $this->s3->doesObjectExist($bucket, $remote_file);
 		return $exists;
 	}
 
-	private function isDirectory($file_name) {
-		if(strpos($file_name,'.') === false) return TRUE;
+	private function isDirectory($remote_file)
+	{
+		//When checking if path is Dir in s3 add a trailing slash to the path to avoid considering files with the same name but different ext as dir's
+		// Example:
+		//  my_bucket/dir1/dir2/my_file.mp4
+		//  my_bucket/dir1/dir2/my_file.mp4.log
+		$remote_file = $remote_file . '/';
+		list($bucket, $key) = explode("/",ltrim($remote_file,"/"),2);
+		try
+		{
+			$dirListObjectsRaw = $this->s3->getIterator('ListObjects', array(
+				'Bucket' => $bucket,
+				'Prefix' => $key
+			));
+			
+			foreach ($dirListObjectsRaw as $dirListObject)
+			{
+				return true;
+			}
+		}
+		catch ( Exception $e )
+		{
+			self::safeLog("Couldn't determine if path [$remote_file] is dir: {$e->getMessage()}");
+		}
 		return false;
 	}
 

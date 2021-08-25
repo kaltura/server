@@ -279,7 +279,38 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$filter->attachToCriteria($c);
 		return self::doSelect($c);
 	}
-	
+
+	/**
+	 * @param string $templateEntryId
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @param array $types
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveOtherEvents($templateEntryId, $startDate, $endDate, array $idsToIgnore)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+
+		$criterion1 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::LESS_THAN);
+		$criterion1->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN));
+
+		$criterion2 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$criterion2->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::GREATER_THAN));
+
+		$criterion3 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::GREATER_EQUAL);
+		$criterion3->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::LESS_EQUAL));
+		
+		$c->addOr($criterion1);
+		$c->addOr($criterion2);
+		$c->addOr($criterion3);
+		
+		$filter = new ScheduleEventFilter();
+		$filter->setTemplateEntryIdEqual($templateEntryId);
+		$filter->setIdsNotIn($idsToIgnore);
+		$filter->attachToCriteria($c);
+
+		return self::doSelect($c);
+	}
 	
 	/**
 	 * @param string $resourceIds

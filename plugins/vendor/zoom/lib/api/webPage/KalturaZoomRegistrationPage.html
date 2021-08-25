@@ -14,7 +14,7 @@
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
         var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
-        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/get?format=1';
+        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/list?format=1';
         const CMS_USER_ID=3;
         const RECORDING_OWNER_BASED_ON_ZOOM_USER_ID=1;
     </script>
@@ -26,6 +26,7 @@
             let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
             let deletionPolicy = $('#deletionPolicy').is(':checked');
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
+            let enableMeetingUpload = $('#enableMeetingUpload').is(':checked');
             let enableZoomTranscription = $('#enableZoomTranscription').is(':checked');
             let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
@@ -43,6 +44,7 @@
                     'integrationSetting:objectType' : 'KalturaZoomIntegrationSetting',
                     'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
                     'integrationSetting:enableRecordingUpload':enableRecordingUpload,
+                    'integrationSetting:enableMeetingUpload':enableMeetingUpload,
                     'integrationSetting:handleParticipantsMode':handleParticipantsMode,
                     'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
                     'integrationSetting:zoomUserPostfix':zoomUserPostfix,
@@ -92,7 +94,7 @@
             $.ajax({
                 url: getUrl,
                 type: 'post',
-                data: {'ks': ks, 'accountId': accountId ,'partnerId':partnerId },
+                data: { 'ks': ks },
                 success: function (res) {
                     console.log(res);
                     if (res) {
@@ -100,7 +102,18 @@
                             alert('Error loading page.\n'+res.message);
                         } else {
                             console.log(res);
-                            loadParameters(res);
+                            if(res.objects)
+                            {
+                                for (let i = 0; i < res.objects.length; i++)
+                                {
+                                    console.log(res.objects[i].accountId );
+                                    if(res.objects[i].accountId === accountId)
+                                    {
+                                        console.log("Found " + accountId);
+                                        loadParameters(res.objects[i]);
+                                    }
+                                }
+                            }
                         }
                     }
                 },
@@ -114,6 +127,7 @@
         function setDefaultValues(){
             $('#enableWebinarUploads').prop('checked',true);
             $('#enableRecordingUpload').prop('checked',true);
+            $('#enableMeetingUpload').prop('checked',true);
             $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
             $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
             $('#createUserIfNotExist').prop('checked',true);
@@ -132,6 +146,7 @@
                     case 'deletionPolicy':
                     case 'enableZoomTranscription':
                     case 'enableRecordingUpload':
+                    case 'enableMeetingUpload':
                     case 'createUserIfNotExist':
                         $('#'+i).prop('checked', v);
                         break;
@@ -193,7 +208,11 @@
             <div class='container p-2 my-2 border'>
                 <div class='custom-control custom-switch'>
                     <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
-                    <label class='custom-control-label' for='enableRecordingUpload'>Enable recording upload</label>
+                    <label class='custom-control-label' for='enableRecordingUpload'>Enable Integration</label>
+                </div>
+                <div class='custom-control custom-switch'>
+                    <input type='checkbox' class='custom-control-input' id='enableMeetingUpload' name='enableMeetingUpload'>
+                    <label class='custom-control-label' for='enableMeetingUpload'>Enable meeting upload</label>
                 </div>
                 <div class='custom-control custom-switch'>
                     <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >

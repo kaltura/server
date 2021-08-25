@@ -20,12 +20,17 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	const RESOURCE_PARENT_SEARCH_PERFIX = 'r';
 	const RESOURCES_INDEXED_FIELD_PREFIX = 'pid';
 	
+	const CUSTOM_DATA_FIELD_LINKED_TO = 'linkedTo';
+	const CUSTOM_DATA_FIELD_LINKED_BY = 'linkedBy';
+	
+	
+	
 	public function __construct() 
 	{
 		parent::__construct();
 		$this->applyDefaultValues();
 	}
-
+	
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or equivalent initialization method).
@@ -160,6 +165,134 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function getRecurrence()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECURRENCE);
+	}
+	
+	public function getLinkedTo()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_TO);
+	}
+	
+	public function getLinkedBy()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY);
+	}
+	
+	public function setLinkedTo($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_TO, $v);
+	}
+	
+	public function setLinkedByString($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $v);
+	}
+	
+	public function addAnotherLinkedBy($v)
+	{
+		$linkedByArray = explode(',', $this->getLinkedBy());
+		if (!in_array($v, $linkedByArray))
+		{
+			$linkedByArray[] = $v;
+			$linkedByString = implode(',', $linkedByArray);
+			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
+		}
+	}
+	
+	public function removeFromLinkedByArray($v)
+	{
+		$linkedByArray = explode(',', $this->getLinkedBy());
+		$key = array_search($v, $linkedByArray);
+		if ($key !== false)
+		{
+			unset($linkedByArray[$key]);
+			$linkedByString = implode(',', $linkedByArray);
+			$this->putInCustomData(self::CUSTOM_DATA_FIELD_LINKED_BY, $linkedByString);
+		}
+	}
+	
+	public function addLinkedByEventOfNewFollower($linkedToEventId)
+	{
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		if (!$linkedToEvent)
+		{
+			KalturaLog::err("Event $linkedToEventId not found");
+			return;
+		}
+		$linkedToEvent->addAnotherLinkedBy($this->id);
+		$linkedToEvent->save();
+	}
+	
+	public function updateStartEndTimeOfFollowerEvents()
+	{
+		$linkedByEventIds = explode(',', $this->getLinkedBy());
+		foreach ($linkedByEventIds as $linkedByEventId)
+		{
+		//update start & end date for all linked by events
+			if(trim($linkedByEventId) == '')
+			{
+				continue;
+			}
+			$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+			if (!$linkedEvent)
+			{
+				KalturaLog::err("Event $linkedByEventId not found");
+				continue;
+			}
+			$linkedEvent->shiftEvent(strtotime($this->getEndDate()));
+			$linkedEvent->save();
+		}
+	}
+	
+	public function shiftEvent ($parentEndDate)
+	{
+		$newStartDate = $parentEndDate + $this->getLinkedTo()->offset;
+		$this->setStartDate($newStartDate);
+		$this->setEndDate($newStartDate + $this->duration);
+	}
+	
+	public function unlinkFollowerEvents()
+	{
+		$linkedByEventIds = explode(',', $this->getLinkedBy());
+		foreach ($linkedByEventIds as $linkedByEventId)
+		{
+			if(trim($linkedByEventId) == '')
+			{
+				continue;
+			}
+			$linkedEvent = ScheduleEventPeer::retrieveByPK($linkedByEventId);
+			if (!$linkedEvent)
+			{
+				KalturaLog::err("Event $linkedByEventId not found");
+				continue;
+			}
+			$linkedEvent->setLinkedTo(null);
+			$linkedEvent->save();
+		}
+		
+	}
+	
+	public function removeCurrentEventFromPrecedingEvent($linkedToEventId)
+	{
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		if (!$linkedToEvent)
+		{
+			KalturaLog::err("Event $linkedToEventId not found");
+			return;
+		}
+		$linkedToEvent->removeFromLinkedByArray($this->getId());
+		$linkedToEvent->save();
+	}
+	
+	public function getLinkedToEndTime()
+	{
+		$linkedToEventId = $this->getLinkedTo()->getEventId();
+		$linkedToEvent = ScheduleEventPeer::retrieveByPK($linkedToEventId);
+		if (!$linkedToEvent)
+		{
+			KalturaLog::err("Event $linkedToEventId not found");
+			return;
+		}
+		return $linkedToEvent->getEndDate();
 	}
 	
 	/**

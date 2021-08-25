@@ -195,7 +195,8 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		
 		$cache = null;
 		//Block only external queries, batch should always work
-		if(kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
+		$enableSphinxSearchLimitStats = kConf::get('enable_sphinx_search_limit_stats', 'runtime_config', null);
+		if($enableSphinxSearchLimitStats && kCurrentContext::$ks_partner_id != Partner::BATCH_PARTNER_ID)
 		{
 			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		}
@@ -961,7 +962,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
 						if (!in_array($fieldsEscapeType, array(SearchIndexFieldEscapeType::MD5_LOWER_CASE, SearchIndexFieldEscapeType::PREFIXED_MD5_LOWER_CASE)))
 						{
-							$this->addMatch('@' .  $sphinxField . ' "' .$val . '\\\*"');
+							$this->addMatch('@' .  $sphinxField . ' "^' .$val . '\\\*"');
 						}
 						else
 						{
@@ -1282,7 +1283,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			$freeText = "^$freeText$";
 			$condition = "@(" . $matchFields . ") $freeText";
 			if($isLikeExpr)
-				$condition .= " | $freeText\\\*";
+				$condition .= " | ^$freeText\\\*";
 			$additionalConditions[] = $condition;
 		}
 		else
@@ -1312,7 +1313,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				{
 					$condition = "@(" . $matchFields . ") $freeText";
 					if($isLikeExpr)
-						$condition .= " | $freeText\\\*";
+						$condition .= " | ^$freeText\\\*";
 					$additionalConditions[] = $condition;
 				}
 			}
@@ -1322,7 +1323,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 				$freeTextExpr = implode(baseObjectFilter::AND_SEPARATOR, $freeTextsArr);
 				$condition = "@(" . $matchFields . ") $freeTextExpr";
 				if($isLikeExpr)
-					$condition .= " | $freeTextExpr\\\*";
+					$condition .= " | ^$freeTextExpr\\\*";
 				$additionalConditions[] = $condition;
 			}
 		}

@@ -5,7 +5,7 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 	function __construct()
 	{
 		parent::__construct();
-		$this->DEFAULT_RENDERER_CLASS = 'kDashRedirectManifestRenderer';
+		$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 	}
 	
 	public function checkIsLive($url)
@@ -16,17 +16,7 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 			return false;
 		}
 		
-		$mediaUrls = $this->getDashUrls($content);
-		foreach($mediaUrls as $mediaUrl)
-		{
-			$mediaUrl = requestUtils::resolve($mediaUrl, $url);
-			if($this->urlExists($mediaUrl, array('audio/mp4', 'video/mp4'), '0-1') !== false)
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		return $this->doesMinimumUpdatePeriodExist($content);
 	}
 
 	protected function getHttpUrl($entryServerNode)
@@ -37,23 +27,22 @@ class DeliveryProfileLiveDash extends DeliveryProfileLive
 	
 	/**
 	 * @param string $content
-	 * @return array
+	 * @return bool
 	 */
-	protected function getDashUrls($content)
+	protected function doesMinimumUpdatePeriodExist($content)
 	{
-		$xml = new SimpleXMLElement($content);
-		$mediaItems = $xml->xpath('//*[@media]');
-		if(!count($mediaItems))
-			return array();
-		
-		$mediaUrls = array();
-		foreach($mediaItems as $mediaItem)
+		try
 		{
-			/* @var $mediaItem SimpleXMLElement */
-			$mediaUrls[] = strval($mediaItem->attributes()->media);
+			$xml = new SimpleXMLElement($content);
 		}
-		
-		return $mediaUrls;
+		catch (Exception $e)
+		{
+			KalturaLog::debug('Failed to parse MPD content as XML: ' . $e->getMessage());
+			return false;
+		}
+
+		$minimumUpdatePeriod = $xml->attributes()->minimumUpdatePeriod;
+		return $minimumUpdatePeriod ? true : false;
 	}
 }
 

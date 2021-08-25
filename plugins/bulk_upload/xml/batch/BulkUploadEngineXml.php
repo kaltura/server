@@ -608,7 +608,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		
-		$this->handlePluginAddedData($item, $existingEntry);
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
 		
 		switch($contentAssetsAction)
@@ -629,10 +628,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $item->categories, $updatedEntryBulkUploadResult, true);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
-		
+
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$updatedEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
+
+		$this->handlePluginAddedData($item, $existingEntry);
 	}
 	
 	/**

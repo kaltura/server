@@ -110,7 +110,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			else
 			{
-				$this->setEntryCategory($updatedEntry);
+				$this->setEntryCategory($entry, $recording->meetingMetadata->meetingId);
 			}
 		}
 		
@@ -132,9 +132,71 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
 		$assetParamsResourceContainer->resource = $resource;
 		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
-		KBatchBase::$kClient->media->addContent($entry->id, $resource);
+		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+		$this->approveEntryIfNeeded($recording->parentEntryId);
 		KBatchBase::unimpersonate();
 		return $entry;
+	}
+	
+	protected function addEntryToCategory($categoryName, $entryId)
+	{
+		$categoryId = $this->findCategoryIdByName($categoryName);
+		if ($categoryId)
+		{
+			$this->addCategoryEntry($categoryId, $entryId);
+		}
+	}
+	
+	protected function findCategoryIdByName($categoryName)
+	{
+		$isFullPath = self::isFullPath($categoryName);
+		
+		$categoryFilter = new KalturaCategoryFilter();
+		if ($isFullPath)
+		{
+			$categoryFilter->fullNameEqual = $categoryName;
+		}
+		else
+		{
+			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
+		}
+		
+		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+		$categoryId = null;
+		if ($isFullPath)
+		{
+			if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
+			{
+				$categoryId = $categoryResponse->objects[0]->id;
+			}
+		}
+		else
+		{
+			$categoryIds = array();
+			foreach ($categoryResponse->objects as $category)
+			{
+				if ($category->name === $categoryName)
+				{
+					$categoryIds[] = $category->id;
+				}
+			}
+			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
+		}
+		return $categoryId;
+	}
+	
+	protected function isFullPath($categoryName)
+	{
+		$numCategories = count(explode('>', $categoryName));
+		return ($numCategories > 1);
+	}
+	
+	protected function addCategoryEntry($categoryId, $entryId)
+	{
+		$categoryEntry = new KalturaCategoryEntry();
+		$categoryEntry->categoryId = $categoryId;
+		$categoryEntry->entryId = $entryId;
+		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
 	}
 	
 	/**
@@ -204,9 +266,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	/**
 	 * @param KalturaMediaEntry $entry
+	 * @param string $meetingId
 	 * @throws kCoreException
 	 */
-	protected abstract function setEntryCategory($entry);
+	protected abstract function setEntryCategory($entry, $meetingId);
 	
 	/**
 	 * @param kalturaZoomDropFolderFile $recording
@@ -250,7 +313,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$updatedEntry->description = $this->createEntryDescriptionFromRecording($recording);
 		$updatedEntry->name = $recording->meetingMetadata->topic;
 		$updatedEntry->userId = $ownerId;
-		$updatedEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		$updatedEntry->adminTags = self::ADMIN_TAG_ZOOM;
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$kalturaEntry = KBatchBase::$kClient->baseEntry->update($recording->parentEntryId, $updatedEntry);
@@ -282,4 +344,12 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse);
 	
+	protected function approveEntryIfNeeded($parentEntryId)
+	{
+		$parentEntry =  KBatchBase::$kClient->baseEntry->get($parentEntryId);
+		if ($parentEntry && $parentEntry->replacementStatus  == KalturaEntryReplacementStatus::NOT_READY_AND_NOT_APPROVED)
+		{
+			KBatchBase::$kClient->media->approveReplace($parentEntryId);
+		}
+	}
 }

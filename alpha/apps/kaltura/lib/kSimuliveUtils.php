@@ -41,7 +41,7 @@ class kSimuliveUtils
 		// getting the flavors from source entry
 		$flavorAssets = assetPeer::retrieveReadyWebByEntryId($sourceEntry->getId());
 		// getting the entry's caption assets
-		$captionAssets = myPlaylistUtils::getEntryIdsCaptions($sourceEntry->getId());
+		$captionAssets = myPlaylistUtils::getEntryIdsCaptions($sourceEntry->getId(), array(CaptionAsset::ASSET_STATUS_READY));
 		$assets = array_merge($captionAssets, $flavorAssets);
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
 	}

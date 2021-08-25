@@ -1,4 +1,144 @@
+# Quasar-17.9.0 #
+
+## Add partner for CNC server ##
+
+* Issue Type: Task
+* Issue ID: PLAT-23018
+
+### Configuration ###
+First replace all tokens from the ini file below (under cnc section) and remove".template" from the file name : deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
+
+# Quasar-17.8.0 #
+
+## Static Content Conversion Profiles ##
+
+* Issue Type: Task
+* Issue ID: FOUN-174
+
+### Configuration ###  
+* Update confmaps to activate the static conversion profiles
+* Update admin.ini configuration file:
+
+	moduls.enableStaticContentConversion.enabled = true
+	moduls.enableStaticContentConversion.permissionType = 2
+	moduls.enableStaticContentConversion.label = Disable Static Content Conversion
+	moduls.enableStaticContentConversion.permissionName = FEATURE_DISABLE_STATIC_CONTENT_CONVERSION
+	moduls.enableStaticContentConversion.basePermissionType =
+	moduls.enableStaticContentConversion.basePermissionName =
+	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment Scripts ### 
+	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
+	
+	
+# Quasar-17.7.0 #
+
+## Microsoft Teams Drop Folder  ##
+
+* Issue Type: Task
+* Issue ID: PSVAMB-25152
+
+### Configuration ###  
+* Update plugins.ini configuration file
+* Update admin.ini configuration file
+* Generate clients
+
+### Deployment Scripts ### 
+	php deployment/base/scripts/installPlugins.php
+	php deployment/updates/scripts/add_permissions/2021_07_02_add_vendor_service_permissions.php
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2021_06_02_alter_vendor_integration_column_name.sql
+
+# Quasar-17.5.0 #
+
+## Update EmailEventNotificationEntryWasAddedToChannel ##
+* Issue Type: Task
+* Issue ID: SUP-27690
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/2021_06_13_updateEntryWasAddedToChannelEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_06_13_deploy_update_entry_was_added_to_channel_email_notification.php
+
+
+
+# Quasar-17.4.0 #
+## Version Highlight ##
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_06_01_partner_update_partner_permission.php
+
+# Quasar-17.3.0 # 
+## Version Highlight ## 
+### Features ###  
+ - PSVAMB-18194 : add new feature to support Intelligent Tagging, specifically using OpenCalais  
+ - PLAT-22844: Add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP), for more information about the failure.
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_06_reach_permission_update.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_12_20_reach_internal_partner.php
+	php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22844
+- Description: add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+
+	First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_05_13_update_media_xml_bulk_job_failed.template.xml
+
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+        
+# Quasar-17.2.0 #
+## Version Highlight ##
+ - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
+ immediately or fail. Websites can call it before register, to predict success or fail of register.
+ 
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_05_04_Partner_RegistrationValidationPermission.php
+
+## Add missing permission to PLAYBACK_BASE_ROLE ##
+- Issue Type: Task
+- Issue ID: FOUN-132
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "PLAYBACK BASE ROLE" WIDGET_SESSION_PERMISSION realrun
+
+#### Known Issues & Limitations ####
+	None
+
 # Quasar-17.1.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
+    Zoom as polling engine (type of drop folder ) - includes the following:
+        a. Deletion of content from Zoom
+        b. Import of old content - by changing scanning time in the drop folder UI (admin console)
+        c. Authetication from OnPrems - using JWT token supplied by the caller 
+        * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
+        currently, it is enabled on SAAS for internal accounts (testing only).
+
+### Bug fix ###
+
+
 ## Zoom as a polling engine ##
 - Issue Type: Task
 - Issue ID: PLAT-22641
@@ -15,6 +155,9 @@ Add the following to batch.ini:
 	id                              = @ID@
 	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
 	params.tags                     = zoom
+    
+	[KAsyncDropFolderContentProcessor : JobHandlerWorker]
+	params.accuracy                 = 85%
 
 ### Deployment scripts ###
 - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php

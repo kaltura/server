@@ -34,7 +34,8 @@
 				service: 'user',
 				action: 'loginByLoginId',
 				loginId: $email.val(),
-				password: $password.val()
+				password: $password.val(),
+				partnerId: window.atob(window.location.pathname.split('/')[5]),
 			};
 			callApi(data, onLoginApiSuccess, onLoginApiError);
 			return false;

@@ -130,6 +130,12 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 
+		//For static content trimming we need to pass the adminTags to the temp entry in order to convert with the same flow and the original 
+		$adminTags = $dbEntry->getAdminTagsArr();
+		$staticContentAdminTags = kConf::get('staticContentAdminTags','runtime_config',array());
+		$tempAdminTags = array_intersect($adminTags,$staticContentAdminTags);
+		$tempDbEntry->setAdminTags(implode(',',$tempAdminTags));
+
 		$kResource = $resource->toObject();
 		if ($kResource->getType() == 'kOperationResource')
 			$tempDbEntry->setTempTrimEntry(true);
@@ -638,8 +644,13 @@ class KalturaEntryService extends KalturaBaseService
 	  	if(!$dbAsset)
 	  	{
 	  		$isNewAsset = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
-
+			$fileExt = Null;
+			$assetObject = assetPeer::retrieveById($srcSyncKey->getObjectId());
+			if($assetObject)
+			{
+				$fileExt = $assetObject->getFileExt();
+			}
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $fileExt);
 	  	}
 	  	
 		if(!$dbAsset)
@@ -857,17 +868,22 @@ class KalturaEntryService extends KalturaBaseService
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
-			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
-    			{
-    				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-    			}
+    		    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
 
-    			KalturaLog::err("Failed downloading file[$url]");
-    			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
-    			$dbEntry->save();
+                 //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+                if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
+    		    {
+                    if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
+                    {
+                        return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+                    }
 
-    			return null;
+                    KalturaLog::err("Failed downloading file[$url]");
+                    $dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+                    $dbEntry->save();
+
+                    return null;
+                }
     		}
 
     		if($dbAsset && !($dbAsset instanceof flavorAsset))

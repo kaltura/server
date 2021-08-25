@@ -13,16 +13,26 @@ function fileDeletePolicy() {
 	$("select#fileDeletePolicy").each(function(inx, value){
 		var $input = $(value);
 		$input.change(function(){
+			var $fileDeleteRegex = $('#fileDeleteRegex');
+			var $fileDeleteRegexLable = $('#fileDeleteRegex-label');
+
 			var $autoFileDeleteDays = $('#autoFileDeleteDays');
 			var $autoFileDeleteDaysLabel = $('#autoFileDeleteDays-label');
 			
 			if ($input.val() == 1) {
+				$fileDeleteRegex.attr("hidden", true);
+				$fileDeleteRegexLable.attr("hidden", true);
+				$fileDeleteRegex.val('');
+
 				$autoFileDeleteDays.attr("hidden", true);
 				$autoFileDeleteDaysLabel.attr("hidden", true);
 				$autoFileDeleteDays.val('0');
 		    }else{
-		    	$autoFileDeleteDays.attr("hidden", false);
-		    	$autoFileDeleteDaysLabel.attr("hidden", false);
+				$fileDeleteRegex.attr("hidden", false);
+				$fileDeleteRegexLable.attr("hidden", false);
+
+				$autoFileDeleteDays.attr("hidden", false);
+				$autoFileDeleteDaysLabel.attr("hidden", false);
 		    }
 		});
 

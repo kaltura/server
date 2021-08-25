@@ -691,7 +691,7 @@ class kFileBase
 			else
 			{
 				KalturaLog::err("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
-				throw new KalturaException("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
+				throw new Exception("Failed to retrieve asset content from [$externalUrl] to [$tmpFilePath]");
 			}
 		}
 		catch(Exception $e)

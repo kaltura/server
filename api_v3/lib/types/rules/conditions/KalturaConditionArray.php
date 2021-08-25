@@ -66,6 +66,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaBooleanEventNotificationCondition();
 			case ConditionType::HTTP_HEADER:
 				return new KalturaHttpHeaderCondition();
+			case ConditionType::ENTRY_SCHEDULED:
+				return new KalturaEntryScheduledCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}

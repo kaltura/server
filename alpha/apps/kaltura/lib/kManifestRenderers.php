@@ -76,7 +76,8 @@ abstract class kManifestRenderer
 	 * @var string
 	 */
 	protected $internalIP = null;
-
+	
+	protected $restrictAccessControlAllowOriginDomains = false;
 
 	protected function prepareFlavors()
 	{
@@ -93,11 +94,30 @@ abstract class kManifestRenderer
 	/**
 	 * @return string
 	 */
-	protected function getAccessControlAllowOriginDomains()
+	protected function getAccessControlAllowOriginHeaders()
 	{
-		return '*';
-	}
+		$headers = array();
 
+		if( ! $this->restrictAccessControlAllowOriginDomains ||
+			! isset( $_SERVER [ infraRequestUtils::ORIGIN_HEADER ] ) )
+		{
+			$allowOrigin = '*';
+		}
+		else
+		{
+			$allowOrigin = $_SERVER [ infraRequestUtils::ORIGIN_HEADER ];
+			$headers[] = 'Access-Control-Allow-Credentials: true';
+		}
+
+		$headers[] = 'Access-Control-Allow-Origin:' . $allowOrigin;
+		return $headers;
+	}
+	
+	public function setRestrictAccessControlAllowOriginDomains($v)
+	{
+		$this->restrictAccessControlAllowOriginDomains = $v;
+	}
+	
 	/**
 	 * @return string
 	 */
@@ -314,7 +334,7 @@ abstract class kManifestRenderer
 		$this->applyDomainPrefix();
 	
 		$headers = $this->getHeaders();
-		$headers[] = 'Access-Control-Allow-Origin:' . $this->getAccessControlAllowOriginDomains();
+		$headers = array_merge($headers, $this->getAccessControlAllowOriginHeaders());
 		$headers[] = 'Access-Control-Expose-Headers: Server,range,Content-Length,Content-Range';
 		$headers[] = 'Timing-Allow-Origin:*';
 		foreach ($headers as $header)
@@ -928,27 +948,6 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		$this->setClosedCaptions();
-		$this->setAccessControlAllowOriginDomain();
-	}
-
-	protected function setAccessControlAllowOriginDomain()
-	{
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS, $dbEntry->getPartnerId()))
-		{
-			return;
-		}
-
-		$host = infraRequestUtils::getUrlHost();
-		if($host)
-		{
-			$this->accessControlAllowOriginDomains = $host;
-		}
-	}
-
-	protected function getAccessControlAllowOriginDomains()
-	{
-		return $this->accessControlAllowOriginDomains;
 	}
 
 	protected function setClosedCaptions()

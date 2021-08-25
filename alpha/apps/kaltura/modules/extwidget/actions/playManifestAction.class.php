@@ -1313,7 +1313,7 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$renderer = null;
-
+		
 		switch($this->entry->getType())
 		{
 			case entryType::PLAYLIST:
@@ -1365,6 +1365,7 @@ class playManifestAction extends kalturaAction
 		$renderer->partnerId = $this->entry->getPartnerId();
 		$renderer->entryType = $entryType;
 		$renderer->duration = $this->duration;
+		
 		if ($this->deliveryProfile)
 		{
 			$renderer->tokenizer = $this->deliveryProfile->getTokenizer();
@@ -1402,13 +1403,18 @@ class playManifestAction extends kalturaAction
 		if ($this->deliveryProfile && $this->deliveryProfile->getAdStitchingEnabled())
 			$renderer->cachingHeadersAge = 0;
 
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS,
+			$renderer->partnerId))
+		{
+			$renderer->setRestrictAccessControlAllowOriginDomains(true);
+		}
 		
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
 			$cache->storeRendererToCache($renderer);
 		}
-
+		
 		// Output the response
 		KExternalErrors::terminateDispatch();
 

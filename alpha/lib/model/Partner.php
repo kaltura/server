@@ -93,6 +93,12 @@ class Partner extends BasePartner
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
+	
+	const TRIGRAM_PERCENTAGE = 'trigram_percentage';
+	
+	const MAX_WORDS_FOR_NGRAM = 'max_words_for_ngram';
+	
+	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
  
 	private $cdnWhiteListCache = array();
 
@@ -2187,6 +2193,16 @@ class Partner extends BasePartner
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
 	
+	public function getTwoFactorAuthenticationMode()
+	{
+		return $this->getFromCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE);
+	}
+	
+	public function setTwoFactorAuthenticationMode($v)
+	{
+		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
+	}
+	
 	public function getSharedStorageProfileId()
 	{
 		$sharedStorageId = null;
@@ -2216,5 +2232,25 @@ class Partner extends BasePartner
 	public function setSharedStorageProfileId($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID, $v);
+	}
+	
+	public function getTrigramPercentage()
+	{
+		return $this->getFromCustomData(self::TRIGRAM_PERCENTAGE);
+	}
+	
+	public function setTrigramPercentage($v)
+	{
+		return $this->putInCustomData(self::TRIGRAM_PERCENTAGE, $v);
+	}
+	
+	public function getMaxWordForNgram()
+	{
+		return $this->getFromCustomData(self::MAX_WORDS_FOR_NGRAM);
+	}
+	
+	public function setMaxWordForNgram($v)
+	{
+		return $this->putInCustomData(self::MAX_WORDS_FOR_NGRAM, $v);
 	}
 }

@@ -6,6 +6,7 @@
 class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 {
 	const MAX_ZOOM_DROP_FOLDERS = 4; //Temporary
+	const DELETION_POLICY = 'deletionPolicy';
 	/**
 	 * @inheritDoc
 	 */
@@ -15,37 +16,42 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		{
 			return true;
 		}
+		if (self::wasDeletionPolicyChanged($object, $modifiedColumns))
+		{
+			/* @var $object ZoomVendorIntegration */
+			list($partnerZoomDropFolder, $partnerZoomDropFoldersCount) = self::getZoomDropFolderRelatedInfo($object);
+			if ($object->getDeletionPolicy())
+			{
+				$partnerZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
+				$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', 1);
+				$partnerZoomDropFolder->setAutoFileDeleteDays($daysToDelete);
+			}
+			else
+			{
+				$partnerZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
+			}
+			$partnerZoomDropFolder -> save();
+			KalturaLog ::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated deletion policy to ' .
+			                   $partnerZoomDropFolder->getFileDeletePolicy());
+		}
 		if ( self::wasStatusChanged($object, $modifiedColumns))
 		{
-			//Update the status of the Drop Folder
-			$criteria = new Criteria();
-			$criteria->add(DropFolderPeer::PARTNER_ID, $object->getPartnerId());
-			$criteria->add(DropFolderPeer::TYPE, ZoomDropFolderPlugin::getCoreValue('DropFolderType',
-			                                                                        ZoomDropFolderType::ZOOM));
-			$allPartnerZoomDropFolders = DropFolderPeer::doSelect($criteria);
-			$partnerZoomDropFoldersCount = count($allPartnerZoomDropFolders);
-			$currentVendorId = $object->getId();
-			$foundZoomDropFolder = false;
-			foreach ($allPartnerZoomDropFolders as $partnerZoomDropFolder)
+			self::setDefaultValuesIntegration($object);
+			list($partnerZoomDropFolder, $partnerZoomDropFoldersCount) = self::getZoomDropFolderRelatedInfo($object);
+			if ($partnerZoomDropFolder)
 			{
-				/* @var $partnerZoomDropFolder ZoomDropFolder */
-				if ($partnerZoomDropFolder->getFromCustomData(ZoomDropFolder::ZOOM_VENDOR_INTEGRATION_ID) == $currentVendorId)
-				{
-					$foundZoomDropFolder = true;
-					$partnerZoomDropFolder -> setStatus(self::getDropFolderStatus($object -> getStatus()));
-					$partnerZoomDropFolder -> save();
-					KalturaLog ::debug('ZoomDropFolder with vendorId ' . $currentVendorId . ' updated status to ' .
-					                   $partnerZoomDropFolder->getStatus());
-					break;
-				}
+				$partnerZoomDropFolder->setStatus(self::getDropFolderStatus($object->getStatus()));
+				$partnerZoomDropFolder->save();
+				KalturaLog ::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated status to ' .
+				                   $partnerZoomDropFolder->getStatus());
 			}
-			if (!$foundZoomDropFolder && $partnerZoomDropFoldersCount < self::MAX_ZOOM_DROP_FOLDERS)
+			if (!$partnerZoomDropFolder && $partnerZoomDropFoldersCount < self::MAX_ZOOM_DROP_FOLDERS)
 			{
 				self::createNewZoomDropFolder($object);
 			}
 			else
 			{
-				if (!$foundZoomDropFolder)
+				if (!$partnerZoomDropFolder)
 				{
 					throw new KalturaAPIException(KalturaZoomDropFolderErrors::EXCEEDED_MAX_ZOOM_DROP_FOLDERS);
 				}
@@ -54,12 +60,33 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		return true;
 	}
 	
+	public static function getZoomDropFolderRelatedInfo($object)
+	{
+		$criteria = new Criteria();
+		$criteria->add(DropFolderPeer::PARTNER_ID, $object->getPartnerId());
+		$criteria->add(DropFolderPeer::TYPE, ZoomDropFolderPlugin::getCoreValue('DropFolderType',
+		                                                                        ZoomDropFolderType::ZOOM));
+		$allPartnerZoomDropFolders = DropFolderPeer::doSelect($criteria);
+		$partnerZoomDropFoldersCount = count($allPartnerZoomDropFolders);
+		$partnerZoomDropFolderFound = null;
+		foreach ($allPartnerZoomDropFolders as $partnerZoomDropFolder)
+		{
+			/* @var $partnerZoomDropFolder ZoomDropFolder */
+			if ($partnerZoomDropFolder->getZoomVendorIntegrationId() == $object->getId())
+			{
+				$partnerZoomDropFolderFound = $partnerZoomDropFolder;
+				break;
+			}
+		}
+		return array($partnerZoomDropFolderFound, $partnerZoomDropFoldersCount);
+	}
+	
 	/**
 	 * @inheritDoc
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if ( self::wasStatusChanged($object, $modifiedColumns))
+		if ( self::wasStatusChanged($object, $modifiedColumns) || self::wasDeletionPolicyChanged($object, $modifiedColumns))
 		{
 			return true;
 		}
@@ -75,6 +102,20 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		return ($object instanceof ZoomVendorIntegration) && in_array('vendor_integration.STATUS', $modifiedColumns);
 	}
 	
+	public static function wasDeletionPolicyChanged(BaseObject $object, array $modifiedColumns)
+	{
+		if ($object instanceof ZoomVendorIntegration && in_array('vendor_integration.CUSTOM_DATA', $modifiedColumns))
+		{
+			$oldCustomDataValues = $object->getCustomDataOldValues();
+			$oldDeletionPolicy = isset ($oldCustomDataValues[''][self::DELETION_POLICY]) ? $oldCustomDataValues[''][self::DELETION_POLICY] : '';
+			if ($oldDeletionPolicy != $object->getDeletionPolicy())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static function hasRefreshTokenChanged(BaseObject $object, array $modifiedColumns)
 	{
 		return ($object instanceof ZoomVendorIntegration)
@@ -86,15 +127,15 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 	{
 		switch ($v)
 		{
-			case VendorStatus::DISABLED:
+			case VendorIntegrationStatus::DISABLED:
 			{
 				return DropFolderStatus::DISABLED;
 			}
-			case VendorStatus::ACTIVE:
+			case VendorIntegrationStatus::ACTIVE:
 			{
 				return DropFolderStatus::ENABLED;
 			}
-			case VendorStatus::DELETED:
+			case VendorIntegrationStatus::DELETED:
 			{
 				return DropFolderStatus::DELETED;
 			}
@@ -103,6 +144,23 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 				return DropFolderStatus::ERROR;
 			}
 		}
+	}
+	
+	protected static function setDefaultValuesIntegration(ZoomVendorIntegration $zoomVendorIntegrationObject)
+	{
+		if ($zoomVendorIntegrationObject->getEnableMeetingUpload() === null)
+		{
+			$zoomVendorIntegrationObject->setEnableMeetingUpload(true);
+		}
+		if ($zoomVendorIntegrationObject->getDeletionPolicy() === null)
+		{
+			$zoomVendorIntegrationObject->setDeletionPolicy(false);
+		}
+		if ($zoomVendorIntegrationObject->getEnableZoomTranscription() === null)
+		{
+			$zoomVendorIntegrationObject->setEnableZoomTranscription(true);
+		}
+		$zoomVendorIntegrationObject->save();
 	}
 	
 	protected static function createNewZoomDropFolder($zoomVendorIntegrationObject)
@@ -137,7 +195,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($zoomVendorIntegrationObject->getDeletionPolicy())
 		{
 			$newZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-			$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', dateUtils::DAY*3);
+			$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', 1);
 			$newZoomDropFolder->setAutoFileDeleteDays($daysToDelete);
 		}
 		else

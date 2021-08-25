@@ -235,22 +235,33 @@ class ThumbAssetService extends KalturaAssetService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param string $url
+	 * @param kUrlResource $contentResource
 	 */
-	protected function attachUrl(thumbAsset $thumbAsset, $url)
+	protected function attachUrl(thumbAsset $thumbAsset, kUrlResource $contentResource)
 	{
-		$fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
-		if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
-			return $this->attachFile($thumbAsset, $fullPath);
-			
-		if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
-		{
-			$thumbAsset->setDescription("Failed downloading file[$url]");
-			$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_ERROR);
-			$thumbAsset->save();
-		}
-		
-		throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_DOWNLOAD_FAILED, $url);
+        $url = $contentResource->getUrl();
+        $fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
+
+        //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+        if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
+        {
+            if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
+            {
+	            return $this->attachFile($thumbAsset, $fullPath);
+            }
+            
+            if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
+            {
+                $thumbAsset->setDescription("Failed downloading file[$url]");
+                $thumbAsset->setStatus(thumbAsset::ASSET_STATUS_ERROR);
+                $thumbAsset->save();
+            }
+
+            throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_DOWNLOAD_FAILED, $url);
+        }
+
+         kJobsManager::addImportJob(null, $thumbAsset->getEntryId(), $thumbAsset->getPartnerId(), $url, $thumbAsset, null, $contentResource->getImportJobData());
+
     }
     
 	/**
@@ -259,7 +270,7 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	protected function attachUrlResource(thumbAsset $thumbAsset, kUrlResource $contentResource)
 	{
-    	$this->attachUrl($thumbAsset, $contentResource->getUrl());
+    	$this->attachUrl($thumbAsset, $contentResource);
     }
     
 	/**
@@ -289,7 +300,7 @@ class ThumbAssetService extends KalturaAssetService
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 		
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($newSyncKey, false, false);
 		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$thumbAsset->setWidth($width);
