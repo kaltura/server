@@ -61,8 +61,9 @@ class previewAction extends kalturaAction
 
 		$playlist_name = null;
 		$playlist_description = null;
-		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+
+		$embed_host = myPartnerUtils::getApiCdnHostForPartner($this->partner_id, kConf::get('www_host'));
+		$embed_host_https = myPartnerUtils::getApiCdnHostHttpsForPartner($this->partner_id, kConf::get('www_host'));
 
 		// Check if HTTPS enabled and set protocol
 		$https_enabled = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;

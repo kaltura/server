@@ -370,37 +370,131 @@ class myPartnerUtils
 		switch ($hostType)
 		{
 			case 'thumbnail':
-				if ($partner && $partner->getThumbnailHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
-				}
-				if ($partner && $partner->getCdnHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
-				}
-				return requestUtils::getThumbnailCdnHost($protocol);
+				return self::getThumbnailHostForPartner($partner_id, $protocol);
 			case 'api':
-				if ($protocol == 'https')
-				{
-					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
-					return 'https://' . $apiHost;
-				}
-				else
-				{
-					$apiHost = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-					return 'http://' . $apiHost;
-				}
-				break;
+				return self::getApiCdnHost($partner_id, $protocol, kConf::get('www_host'));
 			default:
-				if ($partner && $partner->getCdnHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
-				}
-				return requestUtils::getCdnHost($protocol);
+				return self::getCdnHostForPartner($partner_id, $protocol);
 		}
 	}
-	
-	
+
+	/**
+	 * @param null $partnerId
+	 * @param string $protocol
+	 * @return string|string[]|null
+	 */
+	public static function getCdnHostForPartner($partnerId = null, $protocol = 'http')
+	{
+		if ($partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if($partner && $partner->getCdnHost())
+			{
+				return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
+			}
+		}
+		return requestUtils::getCdnHost($protocol);
+	}
+
+	/**
+	 * @param null $partnerId
+	 * @param null $defaultValue
+	 * @return bool|mixed|string|null
+	 * @throws Exception
+	 */
+	public static function getApiCdnHostHttpsForPartner($partnerId = null, $defaultValue = null)
+	{
+		$host = kConf::hasParam('cdn_api_host_https') ? kConf::get('cdn_api_host_https') : $defaultValue;
+		if ($partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if($partner && $partner->getCdnApiHostHttps())
+			{
+				return $partner->getCdnApiHostHttps();
+			}
+		}
+		return $host;
+	}
+
+	/**
+	 * @param null $partnerId
+	 * @param null $protocol
+	 * @return string|string[]|null
+	 */
+	public static function getThumbnailHostForPartner($partnerId = null, $protocol = null)
+	{
+		if ($partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if ($partner && $partner->getThumbnailHost())
+			{
+				$url =  preg_replace('/^https?/', $protocol, $partner->getThumbnailHost(),-1,$count);
+				if ($count === 0)
+				{
+					$url = "$protocol://" . $url;
+				}
+				return $url;
+
+			}
+			if ($partner && $partner->getCdnHost())
+			{
+				$url = preg_replace('/^https?/', $protocol, $partner->getCdnHost(), -1, $count);
+				if ($count === 0)
+				{
+					$url = "$protocol://" . $url;
+				}
+				return $url;
+			}
+		}
+		return requestUtils::getThumbnailCdnHost($protocol);
+	}
+
+	/**
+	 * @param null $partnerId
+	 * @param null $protocol
+	 * @param null $defaultValue
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function getApiCdnHost($partnerId = null, $protocol = null, $defaultValue = null)
+	{
+		if (!$protocol)
+		{
+			$protocol = infraRequestUtils::getProtocol();
+		}
+
+		if ($protocol == infraRequestUtils::PROTOCOL_HTTPS)
+		{
+			$cdnApiHostHttps = self::getApiCdnHostHttpsForPartner($partnerId, $defaultValue);
+			if ($cdnApiHostHttps)
+			{
+				return "$protocol://" . $cdnApiHostHttps;
+			}
+		}
+
+		return "$protocol://" . self::getApiCdnHostForPartner($partnerId, $defaultValue);
+	}
+
+	/**
+	 * @param null $partnerId
+	 * @param null $defaultValue
+	 * @return bool|mixed|string|null
+	 * @throws Exception
+	 */
+	public static function getApiCdnHostForPartner($partnerId = null, $defaultValue = null)
+	{
+		$host = kConf::hasParam('cdn_api_host') ? kConf::get('cdn_api_host') : $defaultValue;
+		if ($partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if($partner && $partner->getCdnApiHost())
+			{
+				return $partner->getCdnApiHost();
+			}
+		}
+		return $host;
+	}
+
 	public static function getPlayServerHost($partner_id, $protocol = null)
 	{
 		if(is_null($protocol))
@@ -433,8 +527,12 @@ class myPartnerUtils
 			$protocol='http';
 
 		// if a protocol was set manually (or by the temporary http default above) use it instead of the partner setting
-		$thumbHost = preg_replace('/^https?/', $protocol, $thumbHost);
-			
+
+		$thumbHost = preg_replace('/^https?/', $protocol, $thumbHost, -1, $count);
+		if ($count === 0)
+		{
+			$thumbHost = "$protocol://" . $thumbHost;
+		}
 		return $thumbHost;
 	}
 	

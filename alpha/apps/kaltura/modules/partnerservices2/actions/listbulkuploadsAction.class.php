@@ -74,8 +74,8 @@ class listbulkuploadsAction extends defPartnerservices2Action
 				"numOfEntries" => count($bulkResults),
 				"status" => $job->getStatus(),
 				"error" => ($job->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED ? $job->getMessage() : ''),
-				"logFileUrl" => requestUtils::getCdnHost() . "/index.php/extwidget/bulkuploadfile/id/{$job->getId()}/pid/{$job->getPartnerId()}/type/log",
-				"csvFileUrl" => requestUtils::getCdnHost() . "/index.php/extwidget/bulkuploadfile/id/{$job->getId()}/pid/{$job->getPartnerId()}/type/csv"
+				"logFileUrl" => myPartnerUtils::getCdnHostForPartner($job->getPartnerId()) . "/index.php/extwidget/bulkuploadfile/id/{$job->getId()}/pid/{$job->getPartnerId()}/type/log",
+				"csvFileUrl" => myPartnerUtils::getCdnHostForPartner($job->getPartnerId()) . "/index.php/extwidget/bulkuploadfile/id/{$job->getId()}/pid/{$job->getPartnerId()}/type/csv"
 			);
 			
 		}

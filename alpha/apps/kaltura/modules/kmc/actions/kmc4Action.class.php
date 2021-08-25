@@ -90,13 +90,16 @@ class kmc4Action extends kalturaAction
 		$this->service_url = requestUtils::getRequestHost();
 		$this->host = $this->stripProtocol( $this->service_url );
 		$this->embed_host = $this->stripProtocol( myPartnerUtils::getHost($this->partner_id) );
-		if (kConf::hasParam('cdn_api_host') && kConf::hasParam('www_host') && $this->host == kConf::get('cdn_api_host')) {
+
+		$cdnHost = myPartnerUtils::getApiCdnHostForPartner($this->partner_id);
+		if ($cdnHost && kConf::hasParam('www_host') && $this->host == $cdnHost) {
 	        $this->host = kConf::get('www_host');
 		}
-		if($this->embed_host == kConf::get("www_host") && kConf::hasParam('cdn_api_host')) {
-			$this->embed_host = kConf::get('cdn_api_host');
+		if($this->embed_host == kConf::get("www_host") && $cdnHost) {
+			$this->embed_host = $cdnHost;
 		}
-		$this->embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');	
+
+		$this->embed_host_https = myPartnerUtils::getApiCdnHostHttpsForPartner($this->partner_id,  kConf::get('www_host'));
 
 		$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
 		$this->cdn_host = $this->stripProtocol( $this->cdn_url );

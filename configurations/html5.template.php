@@ -23,6 +23,7 @@ $kConf = new kConf();
 $wgKalturaVersion = basename(getcwd()); // Gets the version by the folder name
 
 // The default Kaltura service url:
+//TODO - ask how to retrieve the partner
 $wgKalturaServiceUrl = wgGetUrl('cdn_api_host');
 // Default Kaltura CDN url:
 $wgKalturaCDNUrl = wgGetUrl('cdn_host');

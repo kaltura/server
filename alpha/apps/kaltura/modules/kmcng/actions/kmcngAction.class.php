@@ -90,6 +90,10 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfsPreviewV7 = isset($this->previewUIConfV7) ? array_values($this->previewUIConfV7) : null;
 		$this->contentUiconfPreviewV7 = (is_array($this->contentUiconfsPreviewV7)) ? reset($this->contentUiconfsPreviewV7) : null;
 
+
+		//$cdnHost = requestUtils::getApiCdnHostForPartner($this->partner_id);
+		//$cdnHostHttps = requestUtils::getApiCdnHostHttpsForPartner($this->partner_id);
+		//TODO - ask how to retrieve the partner
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
 		if (!$enforceSecureProtocol && !$requestSecureProtocol)
 			$secureCDNServerUri = "http://" . kConf::get("cdn_api_host");

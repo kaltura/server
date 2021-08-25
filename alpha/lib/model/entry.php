@@ -3867,7 +3867,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$entryId = $this->getId();
 		$protocolStr = infraRequestUtils::getProtocol();
 		
-		$url = requestUtils::getApiCdnHost();
+		$url = myPartnerUtils::getApiCdnHost($this->getPartnerId());
 		$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 		$url .= "/playManifest/entryId/$entryId/format/$format/protocol/$protocolStr";
 		

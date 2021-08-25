@@ -389,8 +389,7 @@ abstract class LiveEntry extends entry
 			
 			return $configurations;
 		}
-
-		$cdnApiHost = kConf::get("cdn_api_host");
+		$cdnApiHost = myPartnerUtils::getApiCdnHostForPartner($this->partner_id);
 		$baseManifestUrl = "$protocol://$cdnApiHost/p/{$this->partner_id}/sp/{$this->partner_id}00/playManifest/entryId/{$this->id}/protocol/$protocol";
 
 		$configuration = new kLiveStreamConfiguration();

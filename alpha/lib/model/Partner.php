@@ -512,6 +512,12 @@ class Partner extends BasePartner
 
 	public function getCdnHost()	{		return $this->getFromCustomData( "cdnHost" , null, false  );	}
 	public function setCdnHost( $v )	{		return $this->putInCustomData( "cdnHost", $v );	}
+
+	public function getCdnApiHost()	{		return $this->getFromCustomData( "cdnApiHost" , null, false  );	}
+	public function setCdnApiHost( $v )	{		return $this->putInCustomData( "cdnApiHost", $v );	}
+
+	public function getCdnApiHostHttps()	{		return $this->getFromCustomData( "cdnApiHostHttps" , null, false  );	}
+	public function setCdnApiHostHttps( $v )	{		return $this->putInCustomData( "cdnApiHostHttps", $v );	}
 		
 	public function getPlayServerHost()	{		return $this->getFromCustomData( "playServerHost");	}
 	public function setPlayServerHost( $v )	{		return $this->putInCustomData( "playServerHost", $v );	}

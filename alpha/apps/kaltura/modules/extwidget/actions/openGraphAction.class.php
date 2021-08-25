@@ -46,15 +46,14 @@ class openGraphAction extends sfAction
 			$flavorId = $flavor_asset->getId();
 		}	
 
-		$embed_host = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-		$embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
-
 		$https_enabled = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? true : false;
 		$protocol = ($https_enabled) ? 'https' : 'http';
 		$port = ($_SERVER["SERVER_PORT"] != "80") ? ":".$_SERVER["SERVER_PORT"] : '';		
 
 		$partnerId = $widget->getPartnerId();
-		
+		$embed_host = myPartnerUtils::getApiCdnHostForPartner($partnerId,  kConf::get('www_host'));
+		$embed_host_https = myPartnerUtils::getApiCdnHostHttpsForPartner($partnerId, kConf::get('www_host'));
+
 		$this->widget = $widget;
 		$this->entry = $entry; 
 		$this->uiConf = $uiConf;
