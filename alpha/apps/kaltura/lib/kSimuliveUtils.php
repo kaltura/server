@@ -38,11 +38,11 @@ class kSimuliveUtils
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
 
-		list($mainFlavorAssets, $mainCaptionAssets) = self::getEntryAssets($sourceEntry);
+		list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = self::getEntryAssets($sourceEntry);
 
 		// getting the preStart assets (only if the preStartEntry exists)
 		$preStartEntry = kSimuliveUtils::getPreStartEntry($currentEvent);
-		list($preStartFlavorAssets, $preStartCaptionAssets) = self::getEntryAssets($preStartEntry);
+		list($preStartFlavorAssets, $preStartCaptionAssets, $preStartAudioAssets) = self::getEntryAssets($preStartEntry);
 		if ($preStartEntry)
 		{
 			array_unshift($durations, $preStartEntry->getLengthInMsecs());
@@ -50,7 +50,7 @@ class kSimuliveUtils
 
 		// getting the postEnd assets (only if the postEndEntry exists)
 		$postEndEntry = kSimuliveUtils::getPostEndEntry($currentEvent);
-		list($postEndFlavorAssets, $postEndCaptionAssets) = self::getEntryAssets($postEndEntry);
+		list($postEndFlavorAssets, $postEndCaptionAssets, $postEndAudioAssets) = self::getEntryAssets($postEndEntry);
 		if ($postEndEntry)
 		{
 			$durations[] = $postEndEntry->getLengthInMsecs();
@@ -63,25 +63,10 @@ class kSimuliveUtils
 		$flavorAssets = self::mergeAssetArrays($flavorAssets, $mainFlavorAssets);
 		$flavorAssets = self::mergeAssetArrays($flavorAssets, $postEndFlavorAssets);
 
-		$captionAssets = array();
-		// we need to handle caption assets only if there is caption asset for at least one of the entries
-		if ($mainCaptionAssets || $preStartCaptionAssets || $postEndCaptionAssets) {
-			$captionsCount = max(max(count($preStartCaptionAssets), count($mainCaptionAssets)), count($postEndCaptionAssets));
-			// fill the empty caption arrays with "nulls"
-			foreach (array(&$preStartCaptionAssets, &$mainCaptionAssets, &$postEndCaptionAssets) as &$captionArr)
-			{
-				if (!count($captionArr))
-				{
-					$captionArr = array_fill(0, $captionsCount, null);
-				}
-			}
+		$captionAssets = self::createPaddedAssetsArray($mainCaptionAssets, $preStartCaptionAssets, $postEndCaptionAssets, count($preStartFlavorAssets) != 0, count($postEndFlavorAssets) != 0);
+		$audioAssets = self::createPaddedAssetsArray($mainAudioAssets, $preStartAudioAssets, $postEndAudioAssets, count($preStartFlavorAssets) != 0, count($postEndFlavorAssets) != 0);
 
-			// creating the captionAssets array (array of arrays s.t each array contain the caption assets of all the entries exist, padded with nulls if needed)
-			$captionAssets = $preStartFlavorAssets ? self::mergeAssetArrays($captionAssets, $preStartCaptionAssets) : $captionAssets;
-			$captionAssets = self::mergeAssetArrays($captionAssets, $mainCaptionAssets);
-			$captionAssets = $postEndFlavorAssets ? self::mergeAssetArrays($captionAssets, $postEndCaptionAssets) : $captionAssets;
-		}
-		$assets = array_merge($flavorAssets, $captionAssets);
+		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
 	}
 
@@ -212,12 +197,40 @@ class kSimuliveUtils
 	{
 		$flavorAssets = array();
 		$captionAssets = array();
+		$audioOnlyAssets = array();
 		if ($entry)
 		{
-			$flavorAssets = assetPeer::retrieveReadyWebByEntryId($entry->getId());
+			list($flavorAssets, $audioOnlyAssets)  = self::getEntryFlavorAssets($entry);
 			$captionAssets = myPlaylistUtils::getEntryIdsCaptionsSortedByLanguage($entry->getId(), array(CaptionAsset::ASSET_STATUS_READY));
 		}
-		return array($flavorAssets, $captionAssets);
+		return array($flavorAssets, $captionAssets, $audioOnlyAssets);
+	}
+
+	/**
+	 * Returning the flavor assets and audio-only flavo assets of the entry
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function getEntryFlavorAssets ($entry)
+	{
+		$flavorAssets = array();
+		$audioOnlyAssets = array();
+		if ($entry)
+		{
+			$allFlavorAssets = assetPeer::retrieveReadyWebByEntryId($entry->getId());
+			// filter the regular flavorAssets (not audio only)
+			$flavorAssets = array_filter($allFlavorAssets, function ($asset)
+			{
+				return !$asset->hasTag(assetParams::TAG_ALT_AUDIO) && !$asset->hasTag(assetParams::TAG_AUDIO_ONLY);
+			});
+			// filter the audio flavor assets
+			$audioOnlyAssets = array_filter($allFlavorAssets, function ($asset)
+			{
+				return $asset->hasTag(assetParams::TAG_ALT_AUDIO) || $asset->hasTag(assetParams::TAG_AUDIO_ONLY);
+			});
+			usort($audioOnlyAssets, array("asset", "cmpAssetsByLanguage"));
+		}
+		return array($flavorAssets, $audioOnlyAssets);
 	}
 
 	/**
@@ -245,5 +258,40 @@ class kSimuliveUtils
 			$a[] = array_shift($arr);
 		}
 		return $arrayOfArrays;
+	}
+
+	/**
+	 * receiving 3 arrays of assets (caption/flavor), if one of the arrays isn't empty - it will fill the empty arrays 
+	 * with nulls (according to the non empty arrays size). The function returns array of arrays s.t each array 
+	 * has the merged assets (caption OR flavor) of pre+main+post entries padded with nulls for missing assets. 
+	 * @param array $mainAssets
+	 * @param array $preStartAssets
+	 * @param array $postEndAssets
+	 * @param boolean $hasPreStart
+	 * @param boolean $hasPostEnd
+	 * @return array
+	 */
+	protected static function createPaddedAssetsArray ($mainAssets, $preStartAssets, $postEndAssets, $hasPreStart, $hasPostEnd)
+	{
+		$assets = array();
+		// we need to handle caption assets only if there is caption asset for at least one of the entries
+		if ($mainAssets || $preStartAssets || $postEndAssets)
+		{
+			$assetsCount = max(max(count($preStartAssets), count($mainAssets)), count($postEndAssets));
+			// fill the empty caption arrays with "nulls"
+			foreach (array(&$preStartAssets, &$mainAssets, &$postEndAssets) as &$assetsArr)
+			{
+				if (!count($assetsArr))
+				{
+					$assetsArr = array_fill(0, $assetsCount, null);
+				}
+			}
+
+			// creating the captionAssets array (array of arrays s.t each array contain the caption assets of all the entries exist, padded with nulls if needed)
+			$assets = $hasPreStart ? self::mergeAssetArrays($assets, $preStartAssets) : $assets;
+			$assets = self::mergeAssetArrays($assets, $mainAssets);
+			$assets = $hasPostEnd ? self::mergeAssetArrays($assets, $postEndAssets) : $assets;
+		}
+		return $assets;
 	}
 }

@@ -870,4 +870,24 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	{
 		return null;
 	}
+
+	/**
+	 * @param $c1 asset
+	 * @param $c2 asset
+	 * @return int
+	 */
+	public static function cmpAssetsByLanguage($c1, $c2)
+	{
+		$aLang = $c1->getLanguage();
+		$bLang = $c2->getLanguage();
+		if (!$aLang)
+		{
+			return -1;
+		}
+		if (!$bLang)
+		{
+			return 1;
+		}
+		return strcmp($aLang, $bLang);
+	}
 }

@@ -946,11 +946,22 @@ class serveFlavorAction extends kalturaAction
 			$sequence = array();
 
 			$sequence['clips'] = array();
+			$isAudioAssets = false;
+			foreach ($assetArray as $asset)
+			{
+				if ($asset && ($asset->hasTag(assetParams::TAG_ALT_AUDIO) || $asset->hasTag(assetParams::TAG_AUDIO_ONLY)))
+				{
+					// if at least one asset is audio only asset - we can assume that all the others is either audio only or null 
+					$isAudioAssets = true;
+					break;
+				}
+			}
+
 			foreach ($assetArray as $asset)
 			{
 				if ($asset == null)
 				{
-					$sequence['clips'][] = array("sourceType" => "file", "type" => "source", "path" => "empty");
+					$sequence['clips'][] = $isAudioAssets ? array("type" => "silence") : array("sourceType" => "file", "type" => "source", "path" => "empty");
 					continue;
 				}
 				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);

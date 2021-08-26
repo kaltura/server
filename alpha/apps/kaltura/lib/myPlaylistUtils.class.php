@@ -1152,28 +1152,8 @@ HTML;
 	public static function getEntryIdsCaptionsSortedByLanguage($entryId, $captionAssetStatuses = array())
 	{
 		$captions = self::getEntryIdsCaptions($entryId, $captionAssetStatuses);
-		usort($captions, array("myPlaylistUtils", "cmpCaptionAssetsByLanguage"));
+		usort($captions, array("asset", "cmpAssetsByLanguage"));
 		return $captions;
-	}
-
-	/**
-	 * @param $c1 CaptionAsset
-	 * @param $c2 CaptionAsset
-	 * @return int
-	 */
-	protected function cmpCaptionAssetsByLanguage($c1, $c2)
-	{
-		$aLang = $c1->getLanguage();
-		$bLang = $c2->getLanguage();
-		if (!$aLang)
-		{
-			return -1;
-		}
-		if (!$bLang)
-		{
-			return 1;
-		}
-		return strcmp($aLang, $bLang);
 	}
 
 	private static function getIds ( $list )
