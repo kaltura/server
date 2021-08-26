@@ -22,7 +22,7 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	protected static $class_types_cache = array(
 		VendorTypeEnum::ZOOM_ACCOUNT => self::ZOOM_VENDOR_INTEGRATION,
 		VendorTypeEnum::CHARGE_BEE_FREE_TRIAL => self::CHARGE_BEE_VENDOR_INTEGRATION,
-		VendorTypeEnum::CHARGE_BEE_FREE_PAYGO => self::CHARGE_BEE_VENDOR_INTEGRATION,
+		VendorTypeEnum::CHARGE_BEE_PAYGO => self::CHARGE_BEE_VENDOR_INTEGRATION,
 	);
 
 	/**
@@ -82,6 +82,20 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	/**
 	 * @param $accountID
 	 * @param $vendorType
+	 * @return array
+	 * @throws PropelException
+	 */
+	public static function retrieveVendorPerAccountAndType($accountID, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		return self::doSelect($c);
+	}
+
+	/**
+	 * @param $accountID
+	 * @param $vendorType
 	 * @return VendorIntegration
 	 * @throws PropelException
 	 */
@@ -108,6 +122,20 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
 		return self::doSelectOne($c);
+	}
+
+	/**
+	 * @param $partnerId
+	 * @param $vendorType
+	 * @return array
+	 * @throws PropelException
+	 */
+	public static function retrieveVendorsByPartnerAndType($partnerId, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		return self::doSelect($c);
 	}
 
 } // VendorIntegrationPeer

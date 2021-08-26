@@ -13,16 +13,6 @@ class KalturaChargeBeeVendorIntegration extends KalturaObject implements IFilter
 	public $id;
 
 	/**
-	 * @var time
-	 */
-	public $lastAccessToChargeBee;
-
-	/**
-	 * @var string
-	 */
-	public $handledEventIds;
-
-	/**
 	 * @var KalturaVendorTypeEnum
 	 * @filter eq,in
 	 */
@@ -35,7 +25,7 @@ class KalturaChargeBeeVendorIntegration extends KalturaObject implements IFilter
 	public $subscriptionId;
 
 	/**
-	 * @var KalturaVendorStatus
+	 * @var KalturaVendorIntegrationStatus
 	 * @filter eq,in
 	 */
 	public $status;
@@ -64,7 +54,17 @@ class KalturaChargeBeeVendorIntegration extends KalturaObject implements IFilter
 	/**
 	 * @var string
 	 */
+	public $invoiceId;
+
+	/**
+	 * @var string
+	 */
 	public $planId;
+
+	/**
+	 * @var bool
+	 */
+	public $isPaymentFailed;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -72,15 +72,15 @@ class KalturaChargeBeeVendorIntegration extends KalturaObject implements IFilter
 	private static $map_between_objects = array
 	(
 		'id',
-		'lastAccessToChargeBee',
-		'handledEventIds',
 		'type' => 'vendorType',
 		'subscriptionId' => 'accountId',
 		'status',
 		'createdAt',
 		'updatedAt',
 		'partnerId',
+		'invoiceId',
 		'planId',
+		'isPaymentFailed',
 	);
 
 	public function getMapBetweenObjects()
