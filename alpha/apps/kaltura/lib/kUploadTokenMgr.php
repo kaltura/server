@@ -331,10 +331,11 @@ class kUploadTokenMgr
 			}
 			else
 			{
-				$currentFileSize = $this->_uploadToken->getUploadedFileSize();
+				$currentFileSize = $this->estimateFileSize();
+				KalturaLog::debug("Yossi: Current Estimated file size is [$currentFileSize]");
 			}
 			
-			KalturaLog::debug("uploadStats {$this->_uploadToken->getId()}: $verifyFinalChunk $resumeAt $chunkSize $currentFileSize");
+			KalturaLog::debug("uploadStats {$this->_uploadToken->getId()}: $resumeAt $chunkSize $currentFileSize $verifyFinalChunk");
 			
 			if($this->_autoFinalize && $this->checkIsFinalChunk($chunkSize))
 			{
@@ -347,7 +348,9 @@ class kUploadTokenMgr
 				if(kFile::isSharedPath($uploadFilePath))
 				{
 					$this->lockMoveChunkToShared($sourceFilePath, $chunkFilePath);
-					return $this->estimateFileSize();
+					$currentFileSize += $chunkSize;
+					KalturaLog::debug("Yossi: Return Current file size is [$currentFileSize]");
+					return $currentFileSize;
 				}
 				
 				$useGlobDuringChunkUploads = kConf::get("use_glob_during_chunk_uploads", "runtime_config", null);
@@ -384,7 +387,8 @@ class kUploadTokenMgr
 			{
 				$sharedUploadPath = $uploadFilePath;
 				$targetFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . basename($uploadFilePath);
-				$targetFileResource = self::openFile($targetFilePath, 'w+b');
+				touch($targetFilePath);
+				$targetFileResource = self::openFile($targetFilePath, 'r+b');
 			}
 			
 			// if finalChunk, try appending chunks till reaching expected file size for up to 30 seconds while sleeping for 1 second each iteration
@@ -397,13 +401,14 @@ class kUploadTokenMgr
 				KalturaLog::log("handleResume iteration: $count chunk: $chunkFilePath size: $chunkSize finalChunk: {$this->_finalChunk} filesize: $currentFileSize expected: $expectedFileSize");
 			} while ($verifyFinalChunk && $currentFileSize != $expectedFileSize && $count < $uploadFinalChunkMaxAppendTime);
 			
-			//Close file handle which was opened at the beggining of the call
+			//Close file handle which was opened at the beginning of the call
 			fclose($targetFileResource);
 			if ($verifyFinalChunk && $currentFileSize != $expectedFileSize)
 				throw new kUploadTokenException("final size $currentFileSize failed to match expected size $expectedFileSize", kUploadTokenException::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 			
 			if($sharedUploadPath)
 			{
+				KalturaLog::debug("Move local file [$targetFilePath] to destination [$sharedUploadPath]");
 				kFile::rename($targetFilePath, $sharedUploadPath);
 			}
 		}
@@ -586,7 +591,7 @@ class kUploadTokenMgr
 		while ( ((microtime(true) - $appendStartTime) < self::MAX_APPEND_TIME) || $verifyFinalChunk )
 		{
 			$globStart = microtime(true);
-			$chunks = self::listPendingChunks($uploadFilePath);
+			$chunks = self::listPendingChunksSorted($uploadFilePath);
 			$globTook = (microtime(true) - $globStart);
 			KalturaLog::debug("glob took - " . $globTook . " seconds count " . count($chunks));
 			
@@ -797,11 +802,12 @@ class kUploadTokenMgr
 		return  kFile::unlink($filePath);
 	}
 	
-	private static function listPendingChunks($uploadFilePath)
+	private static function listPendingChunksSorted($uploadFilePath)
 	{
+		$dirList = array();
+		
 		if(!self::$sharedUploadModeEnabled)
 		{
-			$dirList = array();
 			$dirListObjects = glob("$uploadFilePath.chunk.*", GLOB_NOSORT);
 			foreach ($dirListObjects as $dirListObject)
 			{
@@ -810,12 +816,15 @@ class kUploadTokenMgr
 					"fileSize" => null
 				);
 			}
-			
-			return $dirList;
+		}
+		else
+		{
+			$sharedUploadPath = self::translateLocalSharedPathToRemote($uploadFilePath);
+			$dirList =  kFile::listDir("$sharedUploadPath.chunk.", dirname($sharedUploadPath) . DIRECTORY_SEPARATOR);
 		}
 		
-		$sharedUploadPath = self::translateLocalSharedPathToRemote($uploadFilePath);
-		return kFile::listDir("$sharedUploadPath.chunk.", dirname($sharedUploadPath) . DIRECTORY_SEPARATOR);
+		self::sortChunks($dirList);
+		return $dirList;
 	}
 	
 	private static function openChunkFile($filePath)
@@ -881,7 +890,7 @@ class kUploadTokenMgr
 	protected function estimateFileSize()
 	{
 		$uploadPath = $this->_uploadToken->getUploadTempPath();
-		$chunks = $this->listPendingChunks($uploadPath);
+		$chunks = self::listPendingChunksSorted($uploadPath);
 		
 		$currentFileSize = 0;
 		foreach($chunks as $key => $chunk)
@@ -904,7 +913,26 @@ class kUploadTokenMgr
 			}
 		}
 		
-		KalturaLog::debug("Estimated File size is: [$currentFileSize]");
 		return $currentFileSize;
+	}
+	
+	protected static function sortChunks(&$chunks)
+	{
+		$res = array();
+		foreach($chunks as $key => $chunk)
+		{
+			$path = $chunk['path'];
+			$parts = explode(".", $path);
+			if (!count($parts))
+			{
+				continue;
+			}
+			
+			$chunkOffset = $parts[count($parts) - 1];
+			$res[$chunkOffset] = $chunk;
+		}
+		
+		$chunks = $res;
+		ksort($chunks, SORT_NUMERIC);
 	}
 }
