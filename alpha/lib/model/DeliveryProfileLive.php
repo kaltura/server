@@ -385,7 +385,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return array($matchedPattern, $shouldRedirect);
 	}
 	
-	private function generateLiveSecuredPackagerToken($url)
+	public function generateLiveSecuredPackagerToken($url)
 	{
 		$livePackagerToken = kConf::get("live_packager_secure_token");
 		
