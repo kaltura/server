@@ -63,8 +63,8 @@ class KalturaGroup extends KalturaBaseUser
 	{
 		$dbObject = $this->toObject();
 
-		$dbObject->setScreenName($newGroupName);
-		$dbObject->setPuserId($newGroupId);
+		$dbObject->setScreenName(myXmlUtils::purifyField('kuser', 'screenName' , $newGroupName));
+		$dbObject->setPuserId(myXmlUtils::purifyField('kuser', 'puserId' ,$newGroupId));
 		$dbObject->setTags($dbOriginalGroup->getTags());
 		$dbObject->setPartnerId($dbOriginalGroup->getPartnerId());
 		$dbObject->setPartnerData($dbOriginalGroup->getPartnerData());
