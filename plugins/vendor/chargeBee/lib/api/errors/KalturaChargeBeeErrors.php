@@ -13,4 +13,5 @@ class KalturaChargeBeeErrors extends KalturaErrors
 	const MISSING_SUBSCRIPTION_ID = 'MISSING_SUBSCRIPTION_ID;;Missing subscription id in the request';
 	const FAILED_RETRIEVING_PARTNER = 'FAILED_RETRIEVING_PARTNER;;Failed to retrieve the partner according to subscription';
 	const MISSING_INVOICE_ID = 'MISSING_INVOICE_ID;;Missing invoice id in the request';
+	const FAILED_RETRIEVING_VENDOR_INTEGRATION = 'FAILED_RETRIEVING_VENDOR_INTEGRATION;;Failed to retrieve the vendor integration';
 }

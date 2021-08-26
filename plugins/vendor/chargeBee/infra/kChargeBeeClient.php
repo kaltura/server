@@ -87,14 +87,6 @@ class kChargeBeeClient
 		return $this->callChargeBee($apiPath, $options);
 	}
   
-	public function updateSubscriptionTrialEnd($subscriptionId, $trialEnd)
-	{
-		$apiPath = str_replace('@subscriptionId@', $subscriptionId, self::API_RETRIEVE_SUBSCRIPTION);
-		$apiPath .= '?trial_end=' . $trialEnd;
-		$options = array(CURLOPT_CUSTOMREQUEST => 'POST');
-		return $this->callChargeBee($apiPath, $options);
-	}
-  
 	/**
 	 * @param $response
 	 * @param int $httpCode

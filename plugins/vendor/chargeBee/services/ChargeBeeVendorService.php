@@ -12,6 +12,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 	
 	const REQUEST_USER = 'PHP_AUTH_USER';
 	const REQUEST_PASSWORD = 'PHP_AUTH_PW';
+	const TRIAL_END_NOW = 0;
 	
 	const CONFIGURATION_USER = 'user';
 	const CONFIGURATION_PASSWORD = 'password';
@@ -19,7 +20,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 	const REQUEST_PAYMENT_SOURCE_ADDED = 'payment_source_added';
 	const REQUEST_PAYMENT_FAILED = 'payment_failed';
 	const REQUEST_SUBSCRIPTION_TRIAL_END_REMINDER = 'subscription_trial_end_reminder';
-	const REQUEST_SUBSCRIPTION_CANCELED = 'subscription_canceled';
+	const REQUEST_SUBSCRIPTION_CANCELLED = 'subscription_cancelled';
 	const REQUEST_INVOICE_CREATED = 'pending_invoice_created';
 	
 	/**
@@ -47,7 +48,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$dbChargeBeeVendorIntegration->setAccountId($chargeBeeVendorIntegration->subscriptionId);
 		$dbChargeBeeVendorIntegration->setVendorType($chargeBeeVendorIntegration->type);
 		$dbChargeBeeVendorIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
-		$dbChargeBeeVendorIntegration->setStatus(VendorStatus::ACTIVE);
+		$dbChargeBeeVendorIntegration->setStatus(VendorIntegrationStatus::ACTIVE);
 		$dbChargeBeeVendorIntegration->save();
 
 		$chargeBeeVendorIntegration->fromObject($dbChargeBeeVendorIntegration, $this->getResponseProfile());
@@ -138,7 +139,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
 		}
 		
-		$chargeBeeConfiguration = self::getChargeBeeConfiguration();
+		$chargeBeeConfiguration = kConf::get(kChargeBeeUtils::CONFIGURATION_PARAM_NAME, self::MAP_NAME, array());
 		if (!isset($chargeBeeConfiguration[self::CONFIGURATION_USER]) || !isset($chargeBeeConfiguration[self::CONFIGURATION_PASSWORD]))
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_USER_PASSWORD_CONFIGURATION);
@@ -148,7 +149,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::UNAUTHORIZED_USER_PASSWORD);
 		}
-		
+
 		$this->handlePostData();
 	}
 	
@@ -173,8 +174,8 @@ class ChargeBeeVendorService extends KalturaBaseService
 			case self::REQUEST_SUBSCRIPTION_TRIAL_END_REMINDER:
 				$this->handleSubscriptionTrialEndReminder($data);
 				break;
-			case self::REQUEST_SUBSCRIPTION_CANCELED:
-				$this->handleSubscriptionCanceled($data);
+			case self::REQUEST_SUBSCRIPTION_CANCELLED:
+				$this->handleSubscriptionCancelled($data);
 				break;
 			case self::REQUEST_INVOICE_CREATED:
 				$this->handlePendingInvoiceCreated($data);
@@ -187,58 +188,56 @@ class ChargeBeeVendorService extends KalturaBaseService
 	
 	protected function handlePaymentSourceAdded($data)
 	{
-		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
-		
-		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
-		
+		$partnerId = $data->content->customer->id;
+		$vendorIntegrationsOnPartner = VendorIntegrationPeer::retrieveVendorsByPartnerAndType($partnerId, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if (!$partner)
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_PARTNER);
+		}
 		PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $partnerId);
-		
+		$partner->setPartnerPackage(PartnerPackages::PARTNER_PACKAGE_DEVELOPER_PAYG);
+		$partner->save();
+
 		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
 		foreach ($childPartners as $childPartner)
 		{
 			PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $childPartner->getPartnerId());
+			$childPartner->setPartnerPackage(PartnerPackages::PARTNER_PACKAGE_DEVELOPER_PAYG);
+			$childPartner->save();
 		}
-		
-		$vendorIntegration->setVendorType(KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		list($chargeBeeConfMap, $site, $siteApiKey) = kChargeBeeUtils::getSiteConfig($partner->country);
-		
-		$chargeBeeClient = new kChargeBeeClient($site, $siteApiKey);
-		$chargeBeeClient->updateSubscriptionTrialEnd($data->content->customer->id, 0);
+
+		$chargeBeeClient = kChargeBeeUtils::getChargeBeeClient($partner->country);
+		foreach ($vendorIntegrationsOnPartner as $vendorIntegration)
+		{
+			$vendorIntegration->setIsPaymentFailed(false);
+			$vendorIntegration->setVendorType(KalturaVendorTypeEnum::CHARGE_BEE_PAYGO);
+			$vendorIntegration->save();
+			$chargeBeeClient->updateSubscriptionTrialEnd($vendorIntegration->subscriptionId, self::TRIAL_END_NOW);
+		}
 	}
 	
 	
 	protected function handlePaymentFailed($data)
 	{
-		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		
-		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		
-		PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
-		$partner->setStatus(KalturaPartnerStatus::READ_ONLY);
-		$partner->save();
-		
-		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
-		foreach ($childPartners as $childPartner)
-		{
-			PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $childPartner->getPartnerId());
-			$childPartner->setStatus(KalturaPartnerStatus::READ_ONLY);
-			$childPartner->save();
-		}
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->transaction->subscription_id, KalturaVendorTypeEnum::CHARGE_BEE_PAYGO);
+		$vendorIntegration->setIsPaymentFailed(true);
+		$vendorIntegration->save();
 	}
 	
 	
 	protected function handleSubscriptionTrialEndReminder($data)
 	{
-		$vendorIntegration = $this->retrieveVendorIntegration($data->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->subscription->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
+		$vendorIntegration->setStatus(KalturaVendorIntegrationStatus::DISABLED);
+		$vendorIntegration->save();
+
 		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
-		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		
+		if (!$partner)
+		{
+			throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_PARTNER);
+		}
 		$partner->setStatus(KalturaPartnerStatus::FULL_BLOCK);
 		$partner->save();
 		
@@ -251,32 +250,53 @@ class ChargeBeeVendorService extends KalturaBaseService
 	}
 	
 	
-	protected function handleSubscriptionCanceled($data)
+	protected function handleSubscriptionCancelled($data)
 	{
-		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		
+		$vendorIntegrationPayGo = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->subscription->id, KalturaVendorTypeEnum::CHARGE_BEE_PAYGO);
+		$vendorIntegrationFree = VendorIntegrationPeer::retrieveSingleVendorPerPartner($data->content->subscription->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL);
+		$vendorIntegration = $vendorIntegrationPayGo ? $vendorIntegrationPayGo : $vendorIntegrationFree;
+		$type = $vendorIntegrationPayGo ? KalturaVendorTypeEnum::CHARGE_BEE_PAYGO : KalturaVendorTypeEnum::CHARGE_BEE_FREE_TRIAL;
 		$partnerId = $this->retrievePartnerIdByVendorIntegration($vendorIntegration);
-		
-		PermissionPeer::enableForPartner(FEATURE_LIMIT_ALLOWED_ACTIONS, $partnerId);
-		
-		$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
-		foreach ($childPartners as $childPartner)
+		$vendorIntegrationsOnPartner = VendorIntegrationPeer::retrieveVendorsByPartnerAndType($partnerId, $type);
+		if ($vendorIntegrationFree || count($vendorIntegrationsOnPartner) == 1)
 		{
-			PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $childPartner->getPartnerId());
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if (!$partner)
+			{
+				throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_PARTNER);
+			}
+			PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $partnerId);
+			$partner->setStatus(KalturaPartnerStatus::READ_ONLY);
+			$partner->save();
+
+			$childPartners = PartnerPeer::retrieveChildsOfPartner($partnerId);
+			foreach ($childPartners as $childPartner)
+			{
+				PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $childPartner->getPartnerId());
+				$childPartner->setStatus(KalturaPartnerStatus::READ_ONLY);
+				$childPartner->save();
+			}
+		}
+		else
+		{
+			foreach ($vendorIntegrationsOnPartner as $vendorIntegration)
+			{
+				$vendorIntegration->setStatus(KalturaVendorIntegrationStatus::ERROR);
+				$vendorIntegration->save();
+			}
 		}
 	}
 	
 	
 	protected function handlePendingInvoiceCreated($data)
 	{
-		$vendorIntegration = $this->retrieveVendorIntegration($data->content->customer->id, KalturaVendorTypeEnum::CHARGE_BEE_FREE_PAYGO);
-		
-		if (!$data->content->transaction->linked_invoices[0]->invoice_id)
+		$vendorIntegration = $this->retrieveVendorIntegration($data->content->invoice->subscription_id, KalturaVendorTypeEnum::CHARGE_BEE_PAYGO);
+		if (!$data->content->invoice->id)
 		{
 			throw new KalturaAPIException(KalturaChargeBeeErrors::MISSING_INVOICE_ID);
 		}
-		
-		$vendorIntegration->setInvoiceId($data->content->transaction->linked_invoices[0]->invoice_id);
+		$vendorIntegration->setInvoiceId($data->content->invoice->id);
+		$vendorIntegration->save();
 	}
 	
 	
@@ -290,7 +310,7 @@ class ChargeBeeVendorService extends KalturaBaseService
 		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($id, $vendorType);
 		if (!$vendorIntegration)
 		{
-			throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_PARTNER);
+			throw new KalturaAPIException(KalturaChargeBeeErrors::FAILED_RETRIEVING_VENDOR_INTEGRATION);
 		}
 		
 		return $vendorIntegration;
@@ -307,6 +327,5 @@ class ChargeBeeVendorService extends KalturaBaseService
 		
 		return $partnerId;
 	}
-	
 
 }

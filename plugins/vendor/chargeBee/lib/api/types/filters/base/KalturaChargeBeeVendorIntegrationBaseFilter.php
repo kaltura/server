@@ -66,7 +66,7 @@ abstract class KalturaChargeBeeVendorIntegrationBaseFilter extends KalturaFilter
 	public $subscriptionIdEqual;
 
 	/**
-	 * @var KalturaVendorStatus
+	 * @var KalturaVendorIntegrationStatus
 	 */
 	public $statusEqual;
 
