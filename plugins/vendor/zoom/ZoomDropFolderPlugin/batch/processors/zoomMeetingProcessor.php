@@ -18,8 +18,9 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 	protected function setEntryCategory($entry, $meetingId)
 	{
 		$categoryTrackingField = $this->zoomClient->retrieveTrackingField($meetingId);
+		$zoomMeetingType = $this->zoomClient->retrieveMeetingType($meetingId);
 		KBatchBase::impersonate($this->dropFolder->partnerId);
-		if ($categoryTrackingField)
+		if ($categoryTrackingField && $zoomMeetingType != 4)
 		{
 			$this->addEntryToCategory($categoryTrackingField, $entry->id);
 		}
