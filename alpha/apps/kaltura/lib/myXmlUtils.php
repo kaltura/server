@@ -24,21 +24,4 @@ class myXmlUtils
 
 		return true;
 	}
-
-	public static function purifyField($className, $fieldName, $fieldValue)
-	{
-		if (!isset(kCurrentContext::$HTMLPurifierBehaviour) || kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
-		{
-			return $fieldValue;
-		}
-
-		try
-		{
-			return kHtmlPurifier::purify($className, $fieldName, $fieldValue);
-		}
-		catch (Exception $e)
-		{
-			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $className, $fieldName);
-		}
-	}
 }
