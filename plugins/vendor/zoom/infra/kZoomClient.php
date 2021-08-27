@@ -147,6 +147,18 @@ class kZoomClient
 		return $this->callZoom($apiPath);
 	}
 	
+        public function retrieveMeetingType($meetingId)
+        {
+                $meeting = $this->retrieveMeeting($meetingId);
+                $meetingType == '';
+                if ($meeting && isset($meeting[kZoomRecording::TYPE]))
+                {
+                        $meetingType = $meeting[kZoomRecording::TYPE];
+                }
+                KalturaLog::debug('Meeting Type is: path: ' . $meetingType);
+                return $meetingType;
+        }
+
 	public function retrieveTrackingField($meetingId)
 	{
 		$meeting = $this->retrieveMeeting($meetingId);
