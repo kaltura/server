@@ -155,7 +155,7 @@ class kZoomClient
                 {
                         $meetingType = $meeting[kZoomRecording::TYPE];
                 }
-                KalturaLog::debug('Meeting Type is: path: ' . $meetingType);
+                KalturaLog::debug('Meeting Type is: ' . $meetingType);
                 return $meetingType;
         }
 
