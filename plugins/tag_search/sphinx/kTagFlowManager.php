@@ -210,7 +210,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param array $privacyContexts
      * @return array
      */
-    private static function getFoundTags(array $objectTags, $partnerId, $objectClass,array $privacyContexts)
+    private static function getFoundTags(array $objectTags, $partnerId, $objectClass ,$privacyContexts = array())
     {
         $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
         if (count($privacyContexts))
@@ -229,7 +229,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param array $privacyContexts
      * @return array
      */
-    private static function getTagsToAdd (array $foundTagObjects , array $objectTags, array $privacyContexts)
+    private static function getTagsToAdd (array $foundTagObjects , array $objectTags, $privacyContexts = array())
     {
     	//Any requested tag should be added with all privacy contexts as long as it does not exist (the tag with this privacy context).
 	    $privacyContextByTag = array();
@@ -317,7 +317,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param string $objectClass
      * @param array $privacyContexts
      */
-	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, array $privacyContexts = array(self::NULL_PC))
+	public static function decrementExistingTagsInstanceCount ($tagsToCheck, $partnerId, $objectClass, $privacyContexts = array(self::NULL_PC))
 	{
 		$objectTags = self::trimObjectTags($tagsToCheck);
 		if (!count($objectTags))
