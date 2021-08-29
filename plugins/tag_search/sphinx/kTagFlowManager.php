@@ -210,7 +210,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      * @param array $privacyContexts
      * @return array
      */
-    private static function getFoundTags(array $objectTags, $partnerId, $objectClass ,$privacyContexts = array())
+    private static function getFoundTags(array $objectTags, $partnerId, $objectClass, $privacyContexts = array())
     {
         $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
         if (count($privacyContexts))
