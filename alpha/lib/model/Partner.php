@@ -29,6 +29,7 @@ class Partner extends BasePartner
 	const PARTNER_STATUS_ACTIVE = 1;
 	const PARTNER_STATUS_CONTENT_BLOCK = 2;
 	const PARTNER_STATUS_FULL_BLOCK = 3;
+	const PARTNER_STATUS_READ_ONLY = 4;
 	
 	const CONTENT_BLOCK_SERVICE_CONFIG_ID = 'services_limited_partner.ct';
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
