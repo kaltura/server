@@ -23,8 +23,8 @@ class kFlowHelper
 
 	const DAYS = 'days';
 	const HOURS = 'hours';
-
-
+	
+	
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -36,32 +36,49 @@ class kFlowHelper
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
 			return $flavorAsset;
-
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
 		{
 			KalturaLog::err("Entry [$entryId] not found");
 			return null;
 		}
-
+		
 		// creates the flavor asset
+		return self::createFlavorAsset($partnerId, $entryId, true, array(flavorParams::TAG_SOURCE),flavorParams::SOURCE_FLAVOR_ID, $fileExt);
+	}
+	
+	protected static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
+											$fileExt = null)
+	{
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
-		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
-		$flavorAsset->setIsOriginal(true);
-		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+		$flavorAsset->addTags($tags);
+		$flavorAsset->setIsOriginal($isOriginal);
+		$flavorAsset->setFlavorParamsId($sourceFlavorId);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-
+		
 		if ($fileExt)
 		{
 			$flavorAsset->setFileExt($fileExt);
 		}
-
+		
 		$flavorAsset->save();
-
+		
 		return $flavorAsset;
+	}
+	
+	public static function createAdditionalFlavorAsset($partnerId, $entryId, $fileExt = null, $flavorParamsId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+		{
+			KalturaLog::err("Entry [$entryId] not found");
+			return null;
+		}
+		return self::createFlavorAsset($partnerId, $entryId,false, array(), $flavorParamsId, $fileExt);
 	}
 
 	/**
@@ -238,9 +255,14 @@ class kFlowHelper
 			
 			$flavorAsset->setWidth($width);
 			$flavorAsset->setHeight($height);
-			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
+			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
 		}
 		$flavorAsset->save();
+
+		if($flavorAsset instanceof AttachmentAsset)
+		{
+			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
+		}
 		
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
@@ -2333,6 +2355,8 @@ class kFlowHelper
 
 		if($entry)
 		{
+			self::handleStaticContent($entry);
+
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
 
 			$clonePendingEntriesArray = $entry->getClonePendingEntries();
@@ -3522,5 +3546,44 @@ class kFlowHelper
 			}
 		}
 		return $allFinished;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @throws PropelException
+	 */
+	protected static function handleStaticContent(entry $entry)
+	{
+		$disableStaticContentSourceDeletionPartners = kConf::get('disableStaticContentSourceDeletionPartners', 'runtime_config', array());
+		if (in_array($entry->getPartnerId(), $disableStaticContentSourceDeletionPartners) || in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $disableStaticContentSourceDeletionPartners) || !kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+		{
+			return;
+		}
+
+		$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
+		$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles', 'runtime_config', array());
+		$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$conversionProfileKey], ConversionProfileType::MEDIA, true);
+		if (!$profile)
+		{
+			return;
+		}
+
+		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
+		if (count($nonSourceFlavors) < 2)
+		{
+			return;
+		}
+
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
+		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
+		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
+		{
+			$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
+			$sourceFlavor->save();
+			$highestBitrateFlavor->setIsOriginal(true);
+			$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
+			$highestBitrateFlavor->save();
+		}
 	}
 }

@@ -61,7 +61,7 @@ abstract class kZoomProcessor
 
 				break;
 			case kZoomUsersMatching::CMS_MATCHING:
-				$accessToken = kZoomOauth::getValidAccessToken($this->zoomIntegration);
+				$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
 				$zoomUser = $this->zoomClient->retrieveZoomUser($userName, $accessToken);
 				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
 				{

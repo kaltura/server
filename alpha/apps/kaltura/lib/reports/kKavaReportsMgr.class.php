@@ -25,6 +25,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_SESSION_ID = 'uniqueSessionId';
 	const METRIC_BUFFER_STARTS = 'bufferStarts';
 	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
+	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
+	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -159,6 +161,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_UNIQUE_SESSIONS = 'view_unique_sessions';
 	const METRIC_ERROR_POSITION_COUNT = 'error_position_count';
 	const METRIC_ERROR_UNKNOWN_POSITION_COUNT = 'error_unknown_position_count';
+	const METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT = 'view_segment_download_time_count';
+	const METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT = 'view_manifest_download_time_count';
 
 	//player-events-realtime druid calculated metrics
 	const METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH = 'avg_view_downstream_bandwidth';
@@ -171,6 +175,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_BUFFER_TIME_RATIO = 'view_buffer_time_ratio';
 	const METRIC_AVG_VIEW_SESSION_ERROR_RATE = 'avg_view_session_error_rate';
 	const METRIC_AVG_VIEW_PLAY_TIME_SEC = 'avg_view_play_time_sec';
+	const METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC = 'avg_view_segment_download_time_sec';
+	const METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC = 'avg_view_manifest_download_time_sec';
 
 	const METRIC_DYNAMIC_VIEWERS = 'viewers';
 	const METRIC_DYNAMIC_VIEWERS_BUFFERING = 'viewers_buffering';
@@ -460,6 +466,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
 		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_OWNERS => true,
+		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
+		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -903,6 +911,30 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BANDWIDTH))),
 			self::getDoubleSumAggregator(self::METRIC_DOWNSTREAM_BANDWIDTH_SUM, self::METRIC_DOWNSTREAM_BANDWIDTH_SUM));
 
+		self::$aggregations_def[self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME))),
+			self::getLongSumAggregator(self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME))),
+			self::getLongSumAggregator(self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME))),
+			self::getDoubleSumAggregator(self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM, self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME))),
+			self::getDoubleSumAggregator(self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM, self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM));
+
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
@@ -1182,6 +1214,20 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 				self::METRIC_DOWNSTREAM_BANDWIDTH_SUM,
 				self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT, self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC,
+				self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM,
+				self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT, self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC,
+				self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM,
+				self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT));
 
 		self::$metrics_def[self::METRIC_AVG_VIEW_LATENCY] = array(
 			self::DRUID_AGGR => array(self::METRIC_LATENCY_SUM, self::METRIC_VIEW_LATENCY_COUNT),

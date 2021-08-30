@@ -55,15 +55,29 @@ class conversionProfile2Peer extends BaseconversionProfile2Peer
 		return array(array("conversionProfile2:id=%s", self::ID), array("conversionProfile2:partnerId=%s", self::PARTNER_ID));		
 	}
 	
-	public static function retrieveByPartnerIdAndSystemName ($partnerId, $systemName, $type)
+	public static function retrieveByPartnerIdAndSystemName ($partnerId, $systemName, $type, $includeDefaultPartner = false)
 	{
 		$c = new Criteria();
-		$c->addAnd(conversionProfile2Peer::PARTNER_ID, $partnerId);
+		if ($includeDefaultPartner)
+		{
+			self::setUseCriteriaFilter ( false );
+			$c->addAnd(conversionProfile2Peer::PARTNER_ID, array($partnerId,  PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+			$c->addDescendingOrderByColumn(conversionProfile2Peer::PARTNER_ID);
+		}
+		else
+		{
+			$c->addAnd(conversionProfile2Peer::PARTNER_ID, $partnerId);
+		}
 		$c->addAnd(conversionProfile2Peer::SYSTEM_NAME, $systemName);
 		$c->addAnd(conversionProfile2Peer::STATUS, ConversionProfileStatus::ENABLED);
 		$c->addAnd(conversionProfile2Peer::TYPE, $type);
 		
-		return conversionProfile2Peer::doSelectOne($c);
+		$res =  conversionProfile2Peer::doSelectOne($c);
+		if($includeDefaultPartner)
+		{
+			self::setUseCriteriaFilter ( true );
+		}
+		return $res;
 	}
 
 	public static function retrieveByPKAndPartnerId($id, $partnerId)

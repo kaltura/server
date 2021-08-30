@@ -246,7 +246,7 @@ class ZoomHelper
 			self::exitWithError(kZoomErrorMessages::NO_INTEGRATION_DATA);
 		}
 
-		if($zoomIntegration->getStatus() == VendorStatus::DISABLED)
+		if($zoomIntegration->getStatus() == VendorIntegrationStatus::DISABLED)
 		{
 			self::exitWithError(kZoomErrorMessages::UPLOAD_DISABLED);
 		}
@@ -285,6 +285,10 @@ class ZoomHelper
 		$recordingFilesOrdered = array();
 		foreach($recordingFiles as $recordingFile)
 		{
+			if(!isset($recordingFile[$recordingType]))
+			{
+				continue;
+			}
 			if(!isset($recordingFilesOrdered[$recordingFile[$recordingStart]]))
 			{
 				$recordingFilesOrdered[$recordingFile[$recordingStart]] = array();

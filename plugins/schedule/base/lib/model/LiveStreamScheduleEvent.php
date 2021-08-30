@@ -67,7 +67,15 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	{
 		$this->putInCustomData(self::POST_END_TIME, $v);
 	}
-
+	
+	public function shiftEvent ($parentEndDate)
+	{
+		$newStartDate = $parentEndDate + $this->getLinkedTo()->offset;
+		$this->setStartScreenTime($newStartDate);
+		$this->setEndScreenTime($newStartDate + $this->duration);
+		parent::shiftEvent($parentEndDate);
+	}
+	
 	/**
 	 * @return int
 	 */
@@ -134,8 +142,9 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		switch ($context)
 		{
 			case 'getLiveStatus':
-				if($this->getSourceEntryId())
+				if ($this->getSourceEntryId() && ($this->getCalculatedStartTime() + kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC < time()))
 				{
+					// Simulive flow (and event is playable)
 					$output = EntryServerNodeStatus::PLAYABLE;
 					return true;
 				}
