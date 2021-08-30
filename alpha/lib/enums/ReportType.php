@@ -67,6 +67,7 @@ interface ReportType extends BaseEnum
    const INTERACTIVE_VIDEO_NODE_SWITCH_HOTSPOT_CLICKED_PERCENTILES = 57;
    const TOP_CUSTOM_VAR2 = 58;
    const TOP_CUSTOM_VAR3 = 59;
+   const SELF_SERVED_USAGE = 60;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;
