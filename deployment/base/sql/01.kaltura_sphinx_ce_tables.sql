@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `sphinx_log_server` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `server` varchar(63) DEFAULT NULL,
   `dc` int(11) DEFAULT NULL,
-  `last_log_id` int(11) DEFAULT NULL,
+  `last_log_id` bigint(20) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
