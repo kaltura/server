@@ -1,3 +1,16 @@
+# Quasar-17.9.0 #
+
+## Add partner for CNC server ##
+
+* Issue Type: Task
+* Issue ID: PLAT-23018
+
+### Configuration ###
+First replace all tokens from the ini file below (under cnc section) and remove".template" from the file name : deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
+
 # Quasar-17.8.0 #
 
 ## Static Content Conversion Profiles ##

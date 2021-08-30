@@ -1,3 +1,5 @@
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `kaltura` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `kaltura`;
 SET GLOBAL sql_mode = '';
 DELIMITER $$
 

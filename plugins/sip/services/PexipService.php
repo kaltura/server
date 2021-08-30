@@ -111,8 +111,8 @@ class PexipService extends KalturaBaseService
 		}
 		catch(Exception $e)
 		{
+			KalturaLog::err($e->getMessage());
 			$msg = 'Error validating and retrieving Entry for sip Call';
-			KalturaLog::err($msg);
 			$response->msg = $msg;
 			return $response;
 		}
