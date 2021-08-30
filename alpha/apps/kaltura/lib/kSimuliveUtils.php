@@ -274,11 +274,11 @@ class kSimuliveUtils
 	protected static function createPaddedAssetsArray ($mainAssets, $preStartAssets, $postEndAssets, $hasPreStart, $hasPostEnd)
 	{
 		$assets = array();
-		// we need to handle caption assets only if there is caption asset for at least one of the entries
+		// we need to handle caption / audio assets only if there is caption asset for at least one of the entries
 		if ($mainAssets || $preStartAssets || $postEndAssets)
 		{
 			$assetsCount = max(max(count($preStartAssets), count($mainAssets)), count($postEndAssets));
-			// fill the empty caption arrays with "nulls"
+			// fill the empty caption / audio asset arrays with "nulls"
 			foreach (array(&$preStartAssets, &$mainAssets, &$postEndAssets) as &$assetsArr)
 			{
 				if (!count($assetsArr))
@@ -287,7 +287,7 @@ class kSimuliveUtils
 				}
 			}
 
-			// creating the captionAssets array (array of arrays s.t each array contain the caption assets of all the entries exist, padded with nulls if needed)
+			// creating the assets array (as array of arrays s.t each array contain the caption / audio assets of all the entries exist, padded with nulls if needed)
 			$assets = $hasPreStart ? self::mergeAssetArrays($assets, $preStartAssets) : $assets;
 			$assets = self::mergeAssetArrays($assets, $mainAssets);
 			$assets = $hasPostEnd ? self::mergeAssetArrays($assets, $postEndAssets) : $assets;
