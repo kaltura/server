@@ -880,14 +880,6 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	{
 		$aLang = $c1->getLanguage();
 		$bLang = $c2->getLanguage();
-		if (!$aLang)
-		{
-			return -1;
-		}
-		if (!$bLang)
-		{
-			return 1;
-		}
 		return strcmp($aLang, $bLang);
 	}
 }
