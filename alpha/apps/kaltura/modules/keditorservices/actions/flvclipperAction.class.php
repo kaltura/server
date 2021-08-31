@@ -365,7 +365,7 @@ class flvclipperAction extends kalturaAction
 				
 				if ($cdn_name == "limelight") // limelight request - secure it
 				{
-					$ll_url = requestUtils::getCdnHost()."/s$request".$flv_extension;
+					$ll_url = myPartnerUtils::getCdnHostForPartner($entry->getPartnerId())."/s$request".$flv_extension;
 					$secret = kConf::get("limelight_madiavault_password");
 					
 					$expire = "&e=".(time() + 120);

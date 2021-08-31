@@ -107,17 +107,6 @@ class requestUtils extends infraRequestUtils
 			return "$protocol://".kConf::get("cdn_thumbnail_host_https", 'local', kConf::get("cdn_host_https"));
 		return "$protocol://".kConf::get("cdn_thumbnail_host", 'local', kConf::get("cdn_host"));
 	}
-	
-	public static function getApiCdnHost()
-	{
-		$protocol = self::getProtocol();
-			
-		if ($protocol == "https" && kConf::hasParam('cdn_api_host_https'))
-			return "$protocol://" . kConf::get('cdn_api_host_https');
-			
-		return "$protocol://" . kConf::get('cdn_api_host');
-	}
-	
 	// TODO - see how can rewrite better code for the doc-root of the application !!
 	public static function  getWebRootUrl( $include_host = true )
 	{

@@ -55,8 +55,8 @@ var kmc = {
         </div> <!-- server_wrap -->
 	</div><!-- main -->
 <!--[if lte IE 7]>
-<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/json2.min.js"></script>
-<script type="text/javascript" src="<?php echo requestUtils::getCdnHost( requestUtils::getRequestProtocol() ); ?>/lib/js/localStorage.min.js"></script>
+<script type="text/javascript" src="<?php echo myPartnerUtils::getCdnHostForPartner(null, requestUtils::getRequestProtocol() ); ?>/lib/js/json2.min.js"></script>
+<script type="text/javascript" src="<?php echo myPartnerUtils::getCdnHostForPartner(null, requestUtils::getRequestProtocol() ); ?>/lib/js/localStorage.min.js"></script>
 <![endif]-->
 <?php if( $previewEmbedV2 ) { ?>
 <!-- Preview & Embed Modal -->

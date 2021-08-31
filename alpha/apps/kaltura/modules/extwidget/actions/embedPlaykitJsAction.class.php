@@ -309,9 +309,9 @@ class embedPlaykitJsAction extends sfAction
 		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
-		$serviceUrl = requestUtils::getApiCdnHost().'/api_v3';
+		$serviceUrl = myPartnerUtils::getApiCdnHost(this->partner->getId()).'/api_v3';
 		// Default Kaltura CDN url:
-		$cdnUrl = requestUtils::getCdnHost($protocol);
+		$cdnUrl = myPartnerUtils::getCdnHostForPartner($this->partner->getId(), $protocol);
 		// Default Stats URL
 		$statsServiceUrl = $this->buildUrl($protocol,"stats_host");
 		// Default Live Stats URL

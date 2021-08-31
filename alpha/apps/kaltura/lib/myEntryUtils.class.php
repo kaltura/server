@@ -1949,11 +1949,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		else
 			$protocol = infraRequestUtils::PROTOCOL_HTTP;
 
-		$cdnApiHost = null;
-		if ($protocol == infraRequestUtils::PROTOCOL_HTTPS && kConf::hasParam('cdn_api_host_https'))
-			$cdnApiHost = "$protocol://" . kConf::get('cdn_api_host_https');
-		else
-			$cdnApiHost =  "$protocol://" . kConf::get('cdn_api_host');
+		$cdnApiHost = myPartnerUtils::getApiCdnHost($partnerId , $protocol);
 
 		$flavorIds = array();
 		$fileExtension = null;

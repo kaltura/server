@@ -1069,14 +1069,8 @@ class playManifestAction extends kalturaAction
 	{
 		kApiCache::setConditionalCacheExpiry(600);		// the result contains a KS so we shouldn't cache it for a long time
 
-        	if ($this->deliveryAttributes->getMediaProtocol() == 'https' && kConf::hasParam('cdn_api_host_https'))
-        	{
-            		$mediaUrl = "https://" . kConf::get('cdn_api_host_https');
-        	}
-        	else
-        	{
-            		$mediaUrl = "http://" . kConf::get('cdn_api_host');
-        	}
+			$partnerId = $this->entry->getPartnerId();
+			$mediaUrl = myPartnerUtils::getApiCdnHost($partnerId , $this->deliveryAttributes->getMediaProtocol());
         	$mediaUrl .= str_replace("f4m", "smil", str_replace("hdnetwork", "hdnetworksmil", $_SERVER["REQUEST_URI"]));
 
 		$renderer = new kF4MManifestRenderer(array(), $this->entryId);

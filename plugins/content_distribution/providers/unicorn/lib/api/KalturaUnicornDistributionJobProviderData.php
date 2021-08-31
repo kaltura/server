@@ -43,8 +43,9 @@ class KalturaUnicornDistributionJobProviderData extends KalturaConfigurableDistr
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);
-		
-		$this->notificationBaseUrl = 'http://' . kConf::get('cdn_api_host');
+
+		$partnerId  = isset($distributionJobData->distributionProfile->partnerId) ? $distributionJobData->distributionProfile->partnerId : null;
+		$this->notificationBaseUrl = 'http://' .  myPartnerUtils::getApiCdnHostForPartner($partnerId);
 		
 		if(!$distributionJobData)
 			return;

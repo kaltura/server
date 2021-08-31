@@ -380,14 +380,21 @@ class kwidgetAction extends sfAction
 					urlencode(str_replace("{partnerId}", $partner_id, kConf::get('kdp3_wrapper_stats_url'))) : "";
 
 				$partner_host = str_replace("http://", "", str_replace("https://", "", $partner_host));
+				$cdnHost = myPartnerUtils::getApiCdnHostForPartner($partner_id);
 				// if the host is the default www domain use the cdn api domain
 				if ($partner_host == kConf::get("www_host") && $optimizedHost === null)
-					$partner_host = kConf::get("cdn_api_host");
+				{
+					$partner_host = $cdnHost;
+				}
 				else if ($optimizedHost)
+				{
 					$partner_host = $optimizedHost;
+				}
 
-				if ($protocol == "https" && $partner_host = kConf::get("cdn_api_host"))
-					$partner_host = kConf::get("cdn_api_host_https");
+				if ($protocol == "https" && $partner_host = $cdnHost)
+				{
+					$partner_host = myPartnerUtils::getApiCdnHostHttpsForPartner($partner_id);
+				}
 	
 				$dynamic_date = $widgetIdStr .
 					$track_wrapper.

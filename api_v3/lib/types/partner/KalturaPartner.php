@@ -288,6 +288,18 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $cdnHost;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $cdnApiHost;
+
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $cdnApiHostHttps;
 	
 	/**
 	 * @var bool
@@ -453,7 +465,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
 		'firstName' , 'lastName' , 'country' , 'state' , 'publishersQuota', 'partnerGroupType', 'defaultEntitlementEnforcement', 
 		'defaultDeliveryType', 'defaultEmbedCodeType', 'deliveryTypes', 'embedCodeTypes',  'templatePartnerId', 'ignoreSeoLinks',
-		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
+		'host', 'cdnHost', 'cdnApiHost', 'cdnApiHostHttps', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode'
@@ -486,6 +498,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		}
 		if (!$this->cdnHost){
 			$this->cdnHost = null;
+		}
+		if (!$this->cdnApiHost){
+			$this->cdnApiHost = null;
+		}
+		if (!$this->cdnApiHostHttps){
+			$this->cdnApiHostHttps = null;
 		}
 		if (kCurrentContext::getCurrentPartnerId() > 0)
 		{

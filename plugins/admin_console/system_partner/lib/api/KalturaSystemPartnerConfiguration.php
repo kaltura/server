@@ -44,6 +44,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
+	public $cdnApiHost;
+
+	/**
+	 * @var string
+	 */
+	public $cdnApiHostHttps;
+
+	/**
+	 * @var string
+	 */
 	public $cdnHostWhiteList;
 
 	/**
@@ -486,6 +496,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"adminEmail",
 		"host",
 		"cdnHost",
+		"cdnApiHost",
+		"cdnApiHostHttps",
 		"cdnHostWhiteList",
 	    "thumbnailHost",
 		//"maxBulkSize",
