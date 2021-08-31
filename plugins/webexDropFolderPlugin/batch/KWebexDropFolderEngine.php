@@ -49,16 +49,16 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		
 		if ($this->dropFolder->incremental)
 		{
-			$pastPeriod = $this->getMaximumExecutionTime() ?  $this->getMaximumExecutionTime() : 3600;
 			if ($this->dropFolder->lastFileTimestamp)
 			{
+				$pastPeriod = $this->getMaximumExecutionTime() ? $this->getMaximumExecutionTime() : 3600;
 				$startTime = $this->dropFolder->lastFileTimestamp - $pastPeriod;
 			}
 			else
 			{
-				$startTime = time() - $pastPeriod;
+				$startTime = time() - self::MAX_QUERY_DATE_RANGE_DAYS * Time::DAY;
 			}
-			$endTime = time();
+			$endTime = time() + Time::DAY;
 			
 			for ($i = $startTime; $i < $endTime; $i = $i + Time::WEEK)
 			{
