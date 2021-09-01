@@ -31,10 +31,31 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public $description;
 	
 	/**
-	 * @var KalturaScheduledTaskProfileStatus
+	 * @var KalturaVirtualEventStatus
 	 * @filter eq,in
 	 */
 	public $status;
+	
+	/**
+	 * @var int[]
+	 * @filter eq,in,order
+	 */
+	public $attendeesGroupIds;
+	
+	/**
+	 * @var int
+	 */
+	public $registrationScheduleEventId;
+	
+	/**
+	 * @var int
+	 */
+	public $agendaScheduleEventId;
+	
+	/**
+	 * @var int
+	 */
+	public $eventScheduleEventId;
 	
 	/**
 	 * The type of engine to use to list objects using the given "objectFilter"
@@ -51,13 +72,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public $objectFilter;
 	
 	/**
-	 * A list of tasks to execute on the founded objects
-	 *
-	 * @var KalturaObjectTaskArray
-	 */
-	public $objectTasks;
-	
-	/**
 	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
@@ -71,18 +85,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public $updatedAt;
 	
-	/**
-	 * @var time
-	 * @filter gte,lte,order,lteornull
-	 */
-	public $lastExecutionStartedAt;
-	
-	/**
-	 * The maximum number of result count allowed to be processed by this profile per execution
-	 *
-	 * @var int
-	 */
-	public $maxTotalCountAllowed;
 	
 	/*
 	 */
@@ -90,16 +92,17 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'id',
 		'partnerId',
 		'name',
-		'systemName',
 		'description',
 		'status',
+		'attendeesGroupIds',
+		'registrationScheduleEventId',
+		'agendaScheduleEventId',
+		'eventScheduleEventId',
 		'objectFilterEngineType',
 		'objectFilter',
 		'objectTasks',
 		'createdAt',
 		'updatedAt',
-		'lastExecutionStartedAt',
-		'maxTotalCountAllowed',
 	);
 	
 	/* (non-PHPdoc)
@@ -113,7 +116,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function toInsertableObject($objectToFill = null, $propertiesToSkip = array())
 	{
 		if (is_null($this->status))
-			$this->status = KalturaScheduledTaskProfileStatus::DISABLED;
+			$this->status = KalturaVirtualEventStatus::DELETED;
 		
 		return parent::toInsertableObject($objectToFill, $propertiesToSkip);
 	}
@@ -124,16 +127,8 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyMinLength('name', 3, false);
-		$this->validatePropertyMinLength('systemName', 3, true);
 		$this->validatePropertyNotNull('objectFilterEngineType');
 		$this->validatePropertyNotNull('objectFilter');
-		$this->validatePropertyNotNull('objectTasks');
-		$this->validatePropertyNotNull('maxTotalCountAllowed');
-		foreach($this->objectTasks as $objectTask)
-		{
-			/* @var KalturaObjectTask $objectTask */
-			$objectTask->validateForInsert(array('type'));
-		}
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
@@ -143,7 +138,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validatePropertyMinLength('name', 3, true);
-		$this->validatePropertyMinLength('systemName', 3, true);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -154,7 +148,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function toObject($dbObject = null, $propertiesToSkip = array())
 	{
 		if(is_null($dbObject))
-			$dbObject = new ScheduledTaskProfile();
+			$dbObject = new VirtualEvent();
 		
 		$dbObject = parent::toObject($dbObject, $propertiesToSkip);
 		if (!is_null($this->objectFilter))
@@ -163,12 +157,11 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	}
 	
 	/**
-	 * @param ScheduledTaskProfile $srcObj
+	 * @param VirtualEvent $srcObj
 	 */
 	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($srcObj, $responseProfile);
-		$this->objectTasks = KalturaObjectTaskArray::fromDbArray($srcObj->getObjectTasks());
 		$filterType = $srcObj->getObjectFilterApiType();
 		if (!class_exists($filterType))
 		{
