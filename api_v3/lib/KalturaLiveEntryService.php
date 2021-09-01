@@ -15,12 +15,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 	//amount of time for holding kLock
 	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
 
-	//Default recording limit length for append recording
-	const DAY_IN_SECONDS = 86400;
-
-	//Max time from recording created time before creating new recorded entry
-	const SEVEN_DAYS_IN_SECONDS = 7 * self::DAY_IN_SECONDS;
-
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -592,8 +586,8 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			KalturaLog::debug("recorded entry source type is not KALTURA_RECORDED_LIVE [recordedEntryId = {$dbRecordedEntry->getId()}]");
 		}
-		$maxAppendTimeReached = ($recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS) < time();
-		$recordingMoreThanLimit = $dbRecordedEntry->getDuration() > kConf::get('recording_limit_length', 'local', self::DAY_IN_SECONDS);
+		$maxAppendTimeReached = ($recordedEntryCreationTime + kTimeConversion::WEEK) < time();
+		$recordingMoreThanLimit = $dbRecordedEntry->getDuration() > kConf::get('recording_limit_length', 'local', kTimeConversion::DAY);
 
 		KalturaLog::debug("maxAppendTimeReached [$maxAppendTimeReached] recordedEntryCreationTime [$recordedEntryCreationTime] recordingMoreThenLimit [$recordingMoreThanLimit] isKalturaRecordedLive [$isKalturaRecordedLive]");
 		return $isKalturaRecordedLive && ($maxAppendTimeReached || $recordingMoreThanLimit);
