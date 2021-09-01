@@ -474,9 +474,11 @@ class KalturaLiveEntryService extends KalturaEntryService
 		if (!$flavorParamsId)
 		{
 			// check if the conversion profile is already VOD if not set it to default.
+			KalturaLog::info('In handleRecording with flavor params id null entry ' . $dbLiveEntry->getId());
 			if ($recordedEntry->getconversionProfile2()->getType() == ConversionProfileType::LIVE_STREAM)
 			{
 				$recordedEntry->setConversionProfileId($this->getPartner()->getDefaultConversionProfileId());
+				$recordedEntry->save();
 			}
 			$service = new MediaService();
 			$service->initService('media', 'media', 'updateContent');

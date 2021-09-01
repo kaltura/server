@@ -20,6 +20,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		"entitledUsersPublishMatchOr" => "_matchor_entitled_kusers_publish",
 		"entitledUsersViewMatchAnd" => "_matchand_entitled_kusers_view",
 		"entitledUsersViewMatchOr" => "_matchor_entitled_kusers_view",
+		"conversionProfileIdEqual" => "_eq_conversion_profile_id",
 	);
 	
 	static private $order_by_map = array
@@ -73,6 +74,11 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 	 * @var string
 	 */
 	public $redirectFromEntryId;
+
+	/**
+	 * @var int
+	 */
+	public $conversionProfileIdEqual;
 
 	/* (non-PHPdoc)
 	 * @see KalturaFilter::getCoreFilter()
