@@ -38,11 +38,11 @@ class kSimuliveUtils
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
 
-		list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = self::getEntryAssets($sourceEntry);
+		list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = myEntryUtils::getEntryAssets($sourceEntry);
 
 		// getting the preStart assets (only if the preStartEntry exists)
 		$preStartEntry = kSimuliveUtils::getPreStartEntry($currentEvent);
-		list($preStartFlavorAssets, $preStartCaptionAssets, $preStartAudioAssets) = self::getEntryAssets($preStartEntry);
+		list($preStartFlavorAssets, $preStartCaptionAssets, $preStartAudioAssets) = myEntryUtils::getEntryAssets($preStartEntry);
 		if ($preStartEntry)
 		{
 			array_unshift($durations, $preStartEntry->getLengthInMsecs());
@@ -50,7 +50,7 @@ class kSimuliveUtils
 
 		// getting the postEnd assets (only if the postEndEntry exists)
 		$postEndEntry = kSimuliveUtils::getPostEndEntry($currentEvent);
-		list($postEndFlavorAssets, $postEndCaptionAssets, $postEndAudioAssets) = self::getEntryAssets($postEndEntry);
+		list($postEndFlavorAssets, $postEndCaptionAssets, $postEndAudioAssets) = myEntryUtils::getEntryAssets($postEndEntry);
 		if ($postEndEntry)
 		{
 			$durations[] = $postEndEntry->getLengthInMsecs();
@@ -186,51 +186,6 @@ class kSimuliveUtils
 		}
 		// conditional cache should expire when event start
 		return max($playableStartTime - $nowEpoch, self::SIMULIVE_SCHEDULE_MARGIN);
-	}
-
-	/**
-	 * Returning the flavorAssets and captionAssets of the entry (if the entry is null - will return 2 empty arrays)
-	 * @param entry $entry
-	 * @return array
-	 */
-	public static function getEntryAssets ($entry)
-	{
-		$flavorAssets = array();
-		$captionAssets = array();
-		$audioOnlyAssets = array();
-		if ($entry)
-		{
-			list($flavorAssets, $audioOnlyAssets)  = self::getEntryFlavorAssets($entry);
-			$captionAssets = myPlaylistUtils::getEntryIdsCaptionsSortedByLanguage($entry->getId(), array(CaptionAsset::ASSET_STATUS_READY));
-		}
-		return array($flavorAssets, $captionAssets, $audioOnlyAssets);
-	}
-
-	/**
-	 * Returning the flavor assets and audio-only flavo assets of the entry
-	 * @param entry $entry
-	 * @return array
-	 */
-	public static function getEntryFlavorAssets ($entry)
-	{
-		$flavorAssets = array();
-		$audioOnlyAssets = array();
-		if ($entry)
-		{
-			$allFlavorAssets = assetPeer::retrieveReadyWebByEntryId($entry->getId());
-			// filter the regular flavorAssets (not audio only)
-			$flavorAssets = array_filter($allFlavorAssets, function ($asset)
-			{
-				return !$asset->hasTag(assetParams::TAG_ALT_AUDIO) && !$asset->hasTag(assetParams::TAG_AUDIO_ONLY);
-			});
-			// filter the audio flavor assets
-			$audioOnlyAssets = array_filter($allFlavorAssets, function ($asset)
-			{
-				return $asset->hasTag(assetParams::TAG_ALT_AUDIO) || $asset->hasTag(assetParams::TAG_AUDIO_ONLY);
-			});
-			usort($audioOnlyAssets, array("asset", "cmpAssetsByLanguage"));
-		}
-		return array($flavorAssets, $audioOnlyAssets);
 	}
 
 	/**
