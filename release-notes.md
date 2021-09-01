@@ -15,6 +15,14 @@ Moving functionality to batch, in order to enable a shorter partner registration
 ### Deployment Scripts ### 
     php deployment/updates/scripts/2021_08_17_allow_clone_uiconf_from_batch.php
 
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action add, setContent) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-778
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_caption_liveng_permissions.php
+
 # Quasar-17.9.0 #
 ## Add partner for CNC server ##
 
