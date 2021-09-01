@@ -7,7 +7,7 @@
 /**
  * Contains enumerable time values
  */
-interface Time extends BaseEnum
+interface kTimeConversion extends BaseEnum
 {
     const SECOND  = 1;
     const SECONDS = 1;

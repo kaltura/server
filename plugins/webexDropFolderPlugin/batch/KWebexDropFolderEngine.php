@@ -56,14 +56,14 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			}
 			else
 			{
-				$startTime = time() - self::MAX_QUERY_DATE_RANGE_DAYS * Time::DAY;
+				$startTime = time() - self::MAX_QUERY_DATE_RANGE_DAYS * kTimeConversion::DAY;
 			}
-			$endTime = time() + Time::DAY;
+			$endTime = time() + kTimeConversion::DAY;
 			
-			for ($i = $startTime; $i < $endTime; $i = $i + Time::WEEK)
+			for ($i = $startTime; $i < $endTime; $i = $i + kTimeConversion::WEEK)
 			{
 				$startDate = date('m/j/Y H:i:s', $i);
-				$endDateEpoch = min($i + Time::WEEK, $endTime);
+				$endDateEpoch = min($i + kTimeConversion::WEEK, $endTime);
 				$endDate = date('m/j/Y H:i:s', $endDateEpoch);
 				
 				$this->getFilesFromWebex($startDate, $endDate);
@@ -80,7 +80,7 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		}
 	}
 	
-	private function getFilesFromWebex($startTime, $endTime)
+	protected function getFilesFromWebex($startTime, $endTime)
 	{
 		$result = $this->listAllRecordings($startTime, $endTime);
 		if (!empty($result))
