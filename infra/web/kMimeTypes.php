@@ -1,5 +1,5 @@
 <?php
-class MimeTypes
+class kMimeTypes
 {
 	const TYPE_OCTETSTREAM = 'application/octet-stream';
 	const TYPE_TEXT = 'text/plain';

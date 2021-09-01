@@ -1,10 +1,4 @@
-# Quasar-17.8.0 #
-
-## Static Content Conversion Profiles ##
-
-* Issue Type: Task
-* Issue ID: FOUN-174
-
+# Quasar-17.10.0 #
 ## Add action for serving Playback key ##
 An encrypted key served to make sure videos are not shared outside the customers domain
 * Issue Type: Task
@@ -12,6 +6,14 @@ An encrypted key served to make sure videos are not shared outside the customers
 
 #### Deployment Script #### 
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
+
+
+# Quasar-17.8.0 #
+
+## Static Content Conversion Profiles ##
+
+* Issue Type: Task
+* Issue ID: FOUN-174
 
 ### Configuration ###  
 * Update confmaps to activate the static conversion profiles

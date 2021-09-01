@@ -1066,7 +1066,7 @@ class BaseEntryService extends KalturaEntryService
 		
 		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
 		$key = base64_encode(md5(md5(kConf::get(self::PLAYBACK_SECRET) . $partner->getId()) . $entryId, true));
-		return new kRendererString($key, MimeTypes::TYPE_TEXT);
+		return new kRendererString($key, kMimeTypes::TYPE_TEXT);
 	}
 
 }
