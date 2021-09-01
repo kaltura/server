@@ -398,7 +398,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					$audioLabel = $flavor->getLabel();
 				}
 				
-				if (is_callable(array($flavor, 'getLanguage')))
+				if ($flavor instanceof asset)
 				{
 					$audioLanguageData = $this->getAudioLanguage($flavor);
 				}
