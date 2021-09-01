@@ -8,7 +8,7 @@ class Form_PlayReadyPolicyConfigureExtend_SubForm extends Form_DrmPolicyConfigur
 {
 	public function init()
 	{
-        $this->addElement('text', 'gracePeriod', array(
+		$this->addElement('text', 'gracePeriod', array(
 			'label'			=> 'Grace Period:',
 			'filters'		=> array('StringTrim'),
 		));
