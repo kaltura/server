@@ -119,7 +119,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	
 	public static function getCaptionSearchData(entry $entry)
 	{
-		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		if(!$captionAssets || !count($captionAssets))
 			return null;
 			
@@ -223,7 +223,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 	public static function getCaptionElasticSearchData($entry)
 	{
-		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		if(!$captionAssets || !count($captionAssets))
 			return null;
 

@@ -329,7 +329,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         $omitOutputtingOriginalText = $this->retrieveValueFromXml($data, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME);
         $headers = array (
             "Content-Type: text/xml",
-            "charset:utf8",
+            "charset: utf8",
             "x-ag-access-token: $apiKey",
             "outputFormat: application/json",
             "x-calais-language: English"
@@ -401,7 +401,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         $mediaEntry = $this->getMediaEntry($vendorTask->entryId);
         $text = $this->getEntryTextTranscript($vendorTask);
 
-        return '<Document><Title>' . htmlspecialchars($mediaEntry->name) . '</Title><Description>' . htmlspecialchars($mediaEntry->description) . '</Description><Body>' . htmlspecialchars($text) . '</Body></Document>';
+        return '<Document><Title>' . htmlspecialchars($mediaEntry->name) . '</Title><Body>' . htmlspecialchars($mediaEntry->description) . ' ' . htmlspecialchars($text) . '</Body></Document>';
     }
 
 
@@ -551,7 +551,29 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
                 $metadataProfileIdXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/metadataProfileId";
 
                 $this->targetAllMetadataFields[$fieldName]['metadataProfileId'] = intval($xml->xpath($metadataProfileIdXpath)[0]);
-            }
+
+				$additionalConditionsXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/additionalConditions";
+				$additionalConditions = $xml->xpath($additionalConditionsXpath);
+
+				if (count($additionalConditions))
+				{
+					$this->targetAllMetadataFields[$fieldName]['additionalConditions'] = array();
+					foreach ($additionalConditions as $additionalCondition)
+					{
+						$additionalConditionObject = array();
+						$additionalConditionObject['fieldName'] = strval($additionalCondition->xpath('./fieldName')[0]);
+
+						$validValues = $additionalCondition->xpath('./validValue');
+						foreach ($validValues as $validValue)
+						{
+							$additionalConditionObject['validValues'][] = strval($validValue);
+						}
+
+						$this->targetAllMetadataFields[$fieldName]['additionalConditions'][] = $additionalConditionObject;
+					}
+				}
+
+			}
 
         }
 
@@ -637,9 +659,25 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
                 return false;
             }
 
-            $objects = $this->retrieveDynamicObjectByMetadataProfileAndXpath($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, self::DYNAMIC_OBJECT_ID_XPATH, $objectId);
-            if ($objects->totalCount)
+            $dynamicObjects = $this->retrieveDynamicObjectByMetadataProfileAndXpath($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, self::DYNAMIC_OBJECT_ID_XPATH, $objectId);
+            if ($dynamicObjects->totalCount)
             {
+            	$dynamicObject = new SimpleXMLElement($dynamicObjects->objects[0]->xml);
+            	if ($this->targetAllMetadataFields[$metadataProfileFieldName]['additionalConditions'])
+				{
+					KalturaLog::info("Additional conditions exist for metadata profile $metadataProfileId");
+					foreach ($this->targetAllMetadataFields[$metadataProfileFieldName]['additionalConditions'] as $condition)
+					{
+						KalturaLog::info('Checking field name ' . $condition['fieldName'] . ' against set list ' .  print_r($condition['validValues'], true));
+						$requiredValue = strval($dynamicObject->xpath('./' . $condition['fieldName'])[0]);
+						if (!in_array($requiredValue, $condition['validValues']))
+						{
+							KalturaLog::info('Additional conditions for dynamic object ' . $dynamicObjects->objects[0]->id . ' not met.');
+							return false;
+						}
+					}
+				}
+
                 return true;
             }
 

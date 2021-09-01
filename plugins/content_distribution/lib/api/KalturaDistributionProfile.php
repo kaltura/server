@@ -161,6 +161,11 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 	 */
 	public $distributeTrigger;
 
+	/**
+	 * @readonly
+	 * @var bool
+	 */
+	public $supportImageEntry;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)  
@@ -188,6 +193,7 @@ abstract class KalturaDistributionProfile extends KalturaObject implements IFilt
 		'recommendedDcForDownload',
 		'recommendedDcForExecute',
 		'distributeTrigger',
+		'supportImageEntry',
 	 );
 		 
 	public function getMapBetweenObjects()
