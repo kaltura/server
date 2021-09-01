@@ -8,6 +8,8 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
+	
+	const PLAYBACK_SECRET = 'playback_secret';
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
      */
@@ -1040,6 +1042,31 @@ class BaseEntryService extends KalturaEntryService
 		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
 
 		return $result;
+	}
+	
+	/**
+	 * This action serves HLS encrypted key if access control is validated
+	 * @action servePlaybackKey
+	 * @param string $entryId
+	 * @ksOptional
+	 * @return file
+	 */
+	public function servePlaybackKeyAction($entryId)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$entry || $entry->getStatus() === entryStatus::DELETED)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		
+		$securityEntryHelper = new KSecureEntryHelper($entry, null, kApiCache::getHttpReferrer(), ContextType::PLAY);
+		http_response_code(KCurlHeaderResponse::HTTP_STATUS_FORBIDDEN);
+		$securityEntryHelper->validateForPlay();
+		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
+		
+		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
+		$key = base64_encode(md5(md5(kConf::get(self::PLAYBACK_SECRET) . $partner->getId()) . $entryId, true));
+		return new kRendererString($key, kMimeTypes::TYPE_TEXT);
 	}
 
 }
