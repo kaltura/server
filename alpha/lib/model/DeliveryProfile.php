@@ -376,6 +376,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$ext = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
+		$audioLanguageData = null;
 		$audioLabel = null;
 		$audioCodec = null;
 		$isDefaultAudio = false;
@@ -397,7 +398,10 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 					$audioLabel = $flavor->getLabel();
 				}
 				
-				$audioLanguageData = $flavor->getLanguage() ? $this->getAudioLanguage($flavor) : null;
+				if ($flavor instanceof asset)
+				{
+					$audioLanguageData = $this->getAudioLanguage($flavor);
+				}
 				if (!$audioLanguageData) 
 				{
 					$audioLanguage = 'und';
