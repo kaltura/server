@@ -1,5 +1,21 @@
-# Quasar-17.9.0 #
+# Quasar-17.10.0 #
+## Add action for serving Playback key ##
+An encrypted key served to make sure videos are not shared outside the customers domain
+* Issue Type: Task
+* Issue ID: PLAT-22731
 
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
+
+## Partner registration - Move all time consuming jobs to run in batch ##
+Moving functionality to batch, in order to enable a shorter partner registration action
+* Issue Type: Task
+* Issue ID: PLAT-23082
+
+### Deployment Scripts ### 
+    php deployment/updates/scripts/2021_08_17_allow_clone_uiconf_from_batch.php
+
+# Quasar-17.9.0 #
 ## Add partner for CNC server ##
 
 * Issue Type: Task
@@ -29,6 +45,7 @@ First replace all tokens from the ini file below (under cnc section) and remove"
 	moduls.enableStaticContentConversion.basePermissionType =
 	moduls.enableStaticContentConversion.basePermissionName =
 	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
+  
 
 ### Deployment Scripts ### 
 	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
