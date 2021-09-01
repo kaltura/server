@@ -13,11 +13,11 @@
  * @package plugins.virtualEvent
  * @subpackage model
  */
-class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPeer {
+class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPeer {
 	
 	/*
 	 * (non-PHPdoc)
-	 * @see BaseScheduleEventPeer::setDefaultCriteriaFilter()
+	 * @see BaseVirtualEventPeer::setDefaultCriteriaFilter()
 	 */
 	public static function setDefaultCriteriaFilter()
 	{
@@ -60,7 +60,7 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	}
 	
 	/* (non-PHPdoc)
-	 * @see BaseScheduleEventPeer::doSelect()
+	 * @see BaseVirtualEventPeer::doSelect()
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
 	{
@@ -76,7 +76,7 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	}
 	
 	/**
-	 * Deletes entirely from the DB all occurences of event from now on
+	 * Deletes entirely from the DB all occurrences of event from now on
 	 * @param int $parentId
 	 * @param array $exceptForIds
 	 */
@@ -87,19 +87,19 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 		$criteria->add(VirtualEventPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
 		
 		if($exceptForIds)
-			$criteria->add(ScheduleEventPeer::ID, $exceptForIds, Criteria::NOT_IN);
+			$criteria->add(VirtualEventPeer::ID, $exceptForIds, Criteria::NOT_IN);
 		
 		
-		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
-		ScheduleEventPeer::doDelete($criteria);
+		$virtualEvents = VirtualEventPeer::doSelect($criteria);
+		VirtualEventPeer::doDelete($criteria);
 		
 		$now = time();
-		foreach($scheduleEvents as $scheduleEvent)
+		foreach($virtualEvents as $virtualEvent)
 		{
-			/* @var $scheduleEvent ScheduleEvent */
-			$scheduleEvent->setStatus(ScheduleEventStatus::DELETED);
-			$scheduleEvent->setUpdatedAt($now);
-			$scheduleEvent->indexToSearchIndex();
+			/* @var $virtualEvent VirtualEvent */
+			$virtualEvent->setStatus(VirtualEventStatus::DELETED);
+			$virtualEvent->setUpdatedAt($now);
+			$virtualEvent->indexToSearchIndex();
 		}
 	}
 	
@@ -111,57 +111,55 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	public static function cancelByParentId($parentId, array $exceptForDates = null)
 	{
 		$criteria = new Criteria();
-		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
-		$criteria->add(ScheduleEventPeer::START_DATE, kApiCache::getTime(), Criteria::GREATER_THAN);
+		$criteria->add(VirtualEventPeer::PARENT_ID, $parentId);
+		$criteria->add(VirtualEventPeer::START_DATE, kApiCache::getTime(), Criteria::GREATER_THAN);
 		
 		if($exceptForDates)
 		{
-			$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $exceptForDates, Criteria::NOT_IN);
+			$criteria->add(VirtualEventPeer::ORIGINAL_START_DATE, $exceptForDates, Criteria::NOT_IN);
 		}
 		
 		$now = time();
 		
 		$update = new Criteria();
-		$update->add(ScheduleEventPeer::STATUS, ScheduleEventStatus::CANCELLED);
-		$update->add(ScheduleEventPeer::UPDATED_AT, $now);
+		$update->add(VirtualEventPeer::STATUS, VirtualEventStatus::CANCELLED);
+		$update->add(VirtualEventPeer::UPDATED_AT, $now);
 		
-		$con = Propel::getConnection(ScheduleEventPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+		$con = Propel::getConnection(VirtualEventPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		BasePeer::doUpdate($criteria, $update, $con);
 		
-		$scheduleEvents = ScheduleEventPeer::doSelect($criteria);
-		foreach($scheduleEvents as $scheduleEvent)
+		$virtualEvents = VirtualEventPeer::doSelect($criteria);
+		foreach($virtualEvents as $virtualEvent)
 		{
-			/* @var $scheduleEvent ScheduleEvent */
-			$scheduleEvent->setStatus(ScheduleEventStatus::CANCELLED);
-			$scheduleEvent->setUpdatedAt($now);
-			$scheduleEvent->indexToSearchIndex();
+			/* @var $virtualEvent VirtualEvent */
+			$virtualEvent->setStatus(VirtualEventStatus::CANCELLED);
+			$virtualEvent->setUpdatedAt($now);
+			$virtualEvent->indexToSearchIndex();
 		}
 	}
 	
 	/**
 	 * @param int $pk
-	 * @return ScheduleEvent
+	 * @return VirtualEvent
 	 */
 	public static function retrieveByPKNoFilter($pk)
 	{
 		self::setUseCriteriaFilter(false);
-		$scheduleEvent = self::retrieveByPK($pk);
+		$virtualEvent = self::retrieveByPK($pk);
 		self::setUseCriteriaFilter(true);
 		
-		return $scheduleEvent;
+		return $virtualEvent;
 	}
 	
 	/**
 	 * @param int $parentId
-	 * @return array<ScheduleEvent>
+	 * @return array<VirtualEvent>
 	 */
 	public static function retrieveByParentId($parentId)
 	{
 		$criteria = new Criteria();
-		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
-		return ScheduleEventPeer::doSelect($criteria);
+		$criteria->add(VirtualEventPeer::PARENT_ID, $parentId);
+		return VirtualEventPeer::doSelect($criteria);
 	}
 	
 	
@@ -169,43 +167,41 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	/**
 	 * @param int $parentId
 	 * @param array $dates
-	 * @return array<ScheduleEvent>
+	 * @return array<VirtualEvent>
 	 */
 	public static function retrieveByParentIdAndDates($parentId, array $dates)
 	{
 		$criteria = new Criteria();
-		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
-		$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $dates, Criteria::IN);
+		$criteria->add(VirtualEventPeer::PARENT_ID, $parentId);
+		$criteria->add(VirtualEventPeer::ORIGINAL_START_DATE, $dates, Criteria::IN);
 		
-		return ScheduleEventPeer::doSelect($criteria);
+		return VirtualEventPeer::doSelect($criteria);
 	}
 	
 	/**
 	 * @param int $parentId
 	 * @param array $startDates
 	 * @param array $endDates
-	 * @return array<ScheduleEvent>
+	 * @return array<VirtualEvent>
 	 */
 	public static function retrieveByParentIdAndStartAndEndDates($parentId, $startDates, $endDates)
 	{
 		$criteria = new Criteria();
-		$criteria->add(ScheduleEventPeer::PARENT_ID, $parentId);
-		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
-		$criteria->add(ScheduleEventPeer::START_DATE, $startDates, Criteria::IN);
-		$criteria->add(ScheduleEventPeer::END_DATE, $endDates, Criteria::IN);
+		$criteria->add(VirtualEventPeer::PARENT_ID, $parentId);
+		$criteria->add(VirtualEventPeer::START_DATE, $startDates, Criteria::IN);
+		$criteria->add(VirtualEventPeer::END_DATE, $endDates, Criteria::IN);
 		
-		return ScheduleEventPeer::doSelect($criteria);
+		return VirtualEventPeer::doSelect($criteria);
 	}
 	
 	/**
 	 * @param string $templateEntryId
-	 * @return array<ScheduleEvent>
+	 * @return array<VirtualEvent>
 	 */
 	public static function retrieveByTemplateEntryId($templateEntryId)
 	{
-		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
-		$filter = new ScheduleEventFilter();
+		$c = KalturaCriteria::create(VirtualEventPeer::OM_CLASS);
+		$filter = new VirtualEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
 		
@@ -217,21 +213,21 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	 * @param array $types
 	 * @param int $startTime
 	 * @param int $endTime
-	 * @return array<ScheduleEvent>
+	 * @return array<VirtualEvent>
 	 */
 	public static function retrieveByTemplateEntryIdAndTypes($templateEntryId, $types, $startTime = null, $endTime = null)
 	{
-		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
-		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		$c = KalturaCriteria::create(VirtualEventPeer::OM_CLASS);
+		$c->add(VirtualEventPeer::TYPE, $types, Criteria::IN);
 		if ($startTime) // if giving start time - ignore all the events that already finished
 		{
-			$c->add(ScheduleEventPeer::END_DATE, $startTime - self::TIME_MARGIN, Criteria::GREATER_EQUAL);
+			$c->add(VirtualEventPeer::END_DATE, $startTime - self::TIME_MARGIN, Criteria::GREATER_EQUAL);
 		}
 		if ($endTime) // if giving end time - ignore all future events after 6 hours margin.
 		{
-			$c->add(ScheduleEventPeer::START_DATE, $endTime + self::TIME_MARGIN, Criteria::LESS_EQUAL);
+			$c->add(VirtualEventPeer::START_DATE, $endTime + self::TIME_MARGIN, Criteria::LESS_EQUAL);
 		}
-		$filter = new ScheduleEventFilter();
+		$filter = new VirtualEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
 		return self::doSelect($c);
@@ -240,18 +236,12 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	public static function retrieveByTemplateEntryIdAndTime($templateEntryId,
 	                                                        $time = null)
 	{
-		$types = array	(ScheduleEventType::LIVE_STREAM,
-		                   ScheduleEventType::LIVE_REDIRECT,
-		                   ScheduleEventType::MEETING,
-		                   ScheduleEventType::RECORD);
-		
 		$time = $time ? $time : time();
 		
-		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
-		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
-		$c->add(ScheduleEventPeer::END_DATE, $time, Criteria::GREATER_EQUAL);
-		$c->add(ScheduleEventPeer::START_DATE, $time, Criteria::LESS_EQUAL);
-		$filter = new ScheduleEventFilter();
+		$c = KalturaCriteria::create(VirtualEventPeer::OM_CLASS);
+		$c->add(VirtualEventPeer::END_DATE, $time, Criteria::GREATER_EQUAL);
+		$c->add(VirtualEventPeer::START_DATE, $time, Criteria::LESS_EQUAL);
+		$filter = new VirtualEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
 		return self::doSelect($c);
@@ -262,26 +252,26 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	 * @param int $startTime
 	 * @param int $endTime
 	 * @param array $types
-	 * @return array<ScheduleEvent>
+	 * @return array<VirtualEvent>
 	 */
 	public static function retrieveOtherEvents($templateEntryId, $startDate, $endDate, array $idsToIgnore)
 	{
-		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c = KalturaCriteria::create(VirtualEventPeer::OM_CLASS);
 		
-		$criterion1 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::LESS_THAN);
-		$criterion1->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN));
+		$criterion1 = $c->getNewCriterion(VirtualEventPeer::START_DATE, $startDate, Criteria::LESS_THAN);
+		$criterion1->addAnd($c->getNewCriterion(VirtualEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN));
 		
-		$criterion2 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
-		$criterion2->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::GREATER_THAN));
+		$criterion2 = $c->getNewCriterion(VirtualEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$criterion2->addAnd($c->getNewCriterion(VirtualEventPeer::END_DATE, $endDate, Criteria::GREATER_THAN));
 		
-		$criterion3 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::GREATER_EQUAL);
-		$criterion3->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::LESS_EQUAL));
+		$criterion3 = $c->getNewCriterion(VirtualEventPeer::START_DATE, $startDate, Criteria::GREATER_EQUAL);
+		$criterion3->addAnd($c->getNewCriterion(VirtualEventPeer::END_DATE, $endDate, Criteria::LESS_EQUAL));
 		
 		$c->addOr($criterion1);
 		$c->addOr($criterion2);
 		$c->addOr($criterion3);
 		
-		$filter = new ScheduleEventFilter();
+		$filter = new VirtualEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->setIdsNotIn($idsToIgnore);
 		$filter->attachToCriteria($c);
@@ -294,64 +284,18 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	 * @param date $startDate
 	 * @param date $endDate
 	 * @param string|null $scheduleEventIdToIgnore
-	 * @return array <ScheduleEvent>
+	 * @return array <VirtualEvent>
 	 */
 	public static function retrieveEventsByResourceIdsAndDateWindow($resourceIds, $startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
 		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
-		$filter = new ScheduleEventFilter();
+		$filter = new VirtualEventFilter();
 		$filter->setResourceIdsIn($resourceIds);
 		$filter->attachToCriteria($c);
 		
 		return self::doSelect($c);
 	}
 	
-	/**
-	 * @param date $startDate
-	 * @param date $endDate
-	 * @param string|null $scheduleEventIdToIgnore
-	 * @return array <ScheduleEvent>
-	 */
-	public static function retrieveBlackoutEventsByDateWindow($startDate, $endDate, $scheduleEventIdToIgnore = null)
-	{
-		$cacheResult = self::tryGetBlackoutResultFromSessionCache($startDate, $endDate);
-		if(isset($cacheResult))
-		{
-			return $cacheResult;
-		}
-		
-		$c = self::getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore);
-		$c->addAnd(ScheduleEventPeer::TYPE, ScheduleEventType::BLACKOUT, Criteria::EQUAL);
-		$result = self::doSelect($c);
-		self::addBlackoutResultToCache($startDate, $endDate, $result);
-		return $result;
-	}
-	
-	protected static function tryGetBlackoutResultFromSessionCache($startDate, $endDate)
-	{
-		if(self::$blackoutSessionCache && self::$blackoutSessionCache[self::BLACKOUT_SESSION_CACHE_START_DATE]
-			<= $startDate && self::$blackoutSessionCache[self::BLACKOUT_SESSION_CACHE_END_DATE] >= $endDate)
-		{
-			$result = array();
-			foreach (self::$blackoutSessionCache[self::BLACKOUT_SESSION_CACHE_RESULT] as $event)
-			{
-				if($event->getStartDate('U') <= $endDate && $eventEndDate = $event->getEndDate('U') >= $startDate)
-				{
-					$result[] = $event;
-				}
-			}
-			
-			return $result;
-		}
-		
-		return null;
-	}
-	
-	protected static function addBlackoutResultToCache($startDate, $endDate, $result)
-	{
-		self::$blackoutSessionCache = array(self::BLACKOUT_SESSION_CACHE_START_DATE => $startDate,
-		                                    self::BLACKOUT_SESSION_CACHE_END_DATE => $endDate, self::BLACKOUT_SESSION_CACHE_RESULT => $result);
-	}
 	
 	/**
 	 * @param date $startDate
@@ -361,17 +305,10 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	 */
 	protected static function getRetrieveEventsByDateWindowCriteria($startDate, $endDate, $scheduleEventIdToIgnore = null)
 	{
-		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
-		$c->addAnd(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
-		$c->addAnd(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
-		$c->addAnd(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
-		$c->addAnd(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRING, Criteria::NOT_EQUAL);
-		if($scheduleEventIdToIgnore)
-		{
-			KalturaLog::info("Ignoring  scheduleEventId {$scheduleEventIdToIgnore}");
-			$c->addAnd(ScheduleEventPeer::ID, $scheduleEventIdToIgnore, Criteria::NOT_EQUAL);
-			$c->addAnd(ScheduleEventPeer::PARENT_ID, $scheduleEventIdToIgnore, Criteria::NOT_IN);
-		}
+		$c = KalturaCriteria::create(VirtualEventPeer::OM_CLASS);
+		$c->addAnd(VirtualEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$c->addAnd(VirtualEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN);
+		$c->addAnd(VirtualEventPeer::STATUS, VirtualEventStatus::ACTIVE, Criteria::EQUAL);
 		
 		return $c;
 	}
@@ -382,15 +319,11 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 	public function getRootObjects(IRelatedObject $object)
 	{
 		$roots = array();
-		if($object instanceof EntryScheduleEvent)
+		if($object instanceof EntryVirtualEvent)
 		{
 			$categories =  categoryPeer::retrieveByPKs(explode(',', $object->getCategoryIds()));
 			$entries =  entryPeer::retrieveByPKs(explode(',', $object->getEntryIds()));
-			$recurrenceObjects = array();
-			if($object->getRecurrenceType()==ScheduleEventRecurrenceType::RECURRING) {
-				$recurrenceObjects = self::retrieveByParentId($object->getId(), array());
-			}
-			$roots = array_merge($categories, $entries, $recurrenceObjects);
+			$roots = array_merge($categories, $entries);
 		}
 		
 		return $roots;
@@ -404,9 +337,5 @@ class VirtualEventPeer extends BaseScheduleEventPeer implements IRelatedObjectPe
 		return false;
 	}
 	
-	public static function getCacheInvalidationKeys()
-	{
-		return array(array("scheduleEvent:id%s", self::ID));
-	}
 	
-} // ScheduleEventPeer
+} // VirtualEventPeer
