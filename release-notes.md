@@ -1,5 +1,407 @@
-# Propus 16.15.0  #
+# Quasar-17.10.0 #
+## Add action for serving Playback key ##
+An encrypted key served to make sure videos are not shared outside the customers domain
+* Issue Type: Task
+* Issue ID: PLAT-22731
 
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
+
+## Partner registration - Move all time consuming jobs to run in batch ##
+Moving functionality to batch, in order to enable a shorter partner registration action
+* Issue Type: Task
+* Issue ID: PLAT-23082
+
+### Deployment Scripts ### 
+    php deployment/updates/scripts/2021_08_17_allow_clone_uiconf_from_batch.php
+
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action add, setContent) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-778
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_caption_liveng_permissions.php
+
+# Quasar-17.9.0 #
+## Add partner for CNC server ##
+
+* Issue Type: Task
+* Issue ID: PLAT-23018
+
+### Configuration ###
+First replace all tokens from the ini file below (under cnc section) and remove".template" from the file name : deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
+
+# Quasar-17.8.0 #
+
+## Static Content Conversion Profiles ##
+
+* Issue Type: Task
+* Issue ID: FOUN-174
+
+### Configuration ###  
+* Update confmaps to activate the static conversion profiles
+* Update admin.ini configuration file:
+
+	moduls.enableStaticContentConversion.enabled = true
+	moduls.enableStaticContentConversion.permissionType = 2
+	moduls.enableStaticContentConversion.label = Disable Static Content Conversion
+	moduls.enableStaticContentConversion.permissionName = FEATURE_DISABLE_STATIC_CONTENT_CONVERSION
+	moduls.enableStaticContentConversion.basePermissionType =
+	moduls.enableStaticContentConversion.basePermissionName =
+	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
+  
+
+### Deployment Scripts ### 
+	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
+	
+	
+# Quasar-17.7.0 #
+
+## Microsoft Teams Drop Folder  ##
+
+* Issue Type: Task
+* Issue ID: PSVAMB-25152
+
+### Configuration ###  
+* Update plugins.ini configuration file
+* Update admin.ini configuration file
+* Generate clients
+
+### Deployment Scripts ### 
+	php deployment/base/scripts/installPlugins.php
+	php deployment/updates/scripts/add_permissions/2021_07_02_add_vendor_service_permissions.php
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2021_06_02_alter_vendor_integration_column_name.sql
+
+# Quasar-17.5.0 #
+
+## Update EmailEventNotificationEntryWasAddedToChannel ##
+* Issue Type: Task
+* Issue ID: SUP-27690
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/2021_06_13_updateEntryWasAddedToChannelEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_06_13_deploy_update_entry_was_added_to_channel_email_notification.php
+
+
+
+# Quasar-17.4.0 #
+## Version Highlight ##
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_06_01_partner_update_partner_permission.php
+
+# Quasar-17.3.0 # 
+## Version Highlight ## 
+### Features ###  
+ - PSVAMB-18194 : add new feature to support Intelligent Tagging, specifically using OpenCalais  
+ - PLAT-22844: Add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP), for more information about the failure.
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_06_reach_permission_update.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_12_20_reach_internal_partner.php
+	php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22844
+- Description: add the content parameters err_code & message to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+
+	First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_05_13_update_media_xml_bulk_job_failed.template.xml
+
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
+        
+# Quasar-17.2.0 #
+## Version Highlight ##
+ - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
+ immediately or fail. Websites can call it before register, to predict success or fail of register.
+ 
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_05_04_Partner_RegistrationValidationPermission.php
+
+## Add missing permission to PLAYBACK_BASE_ROLE ##
+- Issue Type: Task
+- Issue ID: FOUN-132
+
+### Configuration ###
+	None
+
+### Deployment scripts ###
+	php alpha/scripts/utils/permissions/addPermissionToRole.php null "PLAYBACK BASE ROLE" WIDGET_SESSION_PERMISSION realrun
+
+#### Known Issues & Limitations ####
+	None
+
+# Quasar-17.1.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
+    Zoom as polling engine (type of drop folder ) - includes the following:
+        a. Deletion of content from Zoom
+        b. Import of old content - by changing scanning time in the drop folder UI (admin console)
+        c. Authetication from OnPrems - using JWT token supplied by the caller 
+        * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
+        currently, it is enabled on SAAS for internal accounts (testing only).
+
+### Bug fix ###
+
+
+## Zoom as a polling engine ##
+- Issue Type: Task
+- Issue ID: PLAT-22641
+- Drop Folder checkbox was removed from partner configuration, drop folder is allowed to all.
+
+#### Configuration ####
+Add ZoomDropFolder to your plugins.ini
+
+Add the following to batch.ini:
+
+	enabledWorkers.KAsyncDropFolderWatcherRemoteZoom = 1
+
+	[KAsyncDropFolderWatcherRemoteZoom : KAsyncDropFolderWatcherRemote]
+	id                              = @ID@
+	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
+	params.tags                     = zoom
+    
+	[KAsyncDropFolderContentProcessor : JobHandlerWorker]
+	params.accuracy                 = 85%
+
+### Deployment scripts ###
+- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_16_Zoom_AddLocalFetchRgistrationPremission.php
+
+# Quasar-17.0.0 #
+## Version Highlight ##
+### Features ###
+    PLAT-22719 - Add 'Restrict Access Control Allow Origin Domains' under partner configuration,
+        to allow only the requested site in the response header 'access-control-allow-origin',
+        for M3U8 PlayManifest request.
+
+### Bug fix ###
+
+## Restrict Access Control Allow Origin Domains ##
+- Issue Type: Task
+- Issue ID: PLAT-22719
+
+#### Configuration ####
+- Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.restrictOriginDomains.enabled = true
+    moduls.restrictOriginDomains.permissionType = 2
+    moduls.restrictOriginDomains.label = Restrict Access Control Allow Origin Domains
+    moduls.restrictOriginDomains.permissionName = FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS
+    moduls.restrictOriginDomains.basePermissionType =
+    moduls.restrictOriginDomains.basePermissionName =
+    moduls.restrictOriginDomains.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Propus-16.20.0  #
+
+## Version Highlight ##
+### Features ###
+    KMCNG-2296 - Add a new API (baseEntry.exportToCsv) that exports entries data according to a supplied filter.
+        The data will be send to the KS admin email in a CSV format.
+    
+    PLAT-22694 - appToken - add the ability to set weaker privileges on the KS,
+        if the privileges are already allowed on the appToken
+    
+    VIRTC-2021 - Admin Console, add ability to set custom password policy per partner.
+      Once policy for partner is set, the system policy is ignored.
+     
+    PLAT-22722 - Add mpeg ts files to the allowed files list
+    
+    PLAT-22714 - Add new type of Live-Schedulued event - KalturaLiveRedirectScheduleEvent, once its time has come it will rediret the live entry to another entry (live or vod)
+    
+    PLAT-22698 - ThumbAsset::add, Abilty to add Thumbnails to image entry.
+    
+### Bug fix ###
+
+    PLAT-22724 - Admin console, storage profile, when flavor param source only was not displayed - fixed. 
+    
+    PLAT-22696 - Trancate utf8 strings in the following entry properties :state,city,zip,screen_name,first_name,last_name,full_name
+
+## Export entries to CSV ##
+- Issue Type: Task
+- Issue ID: KMCNG-2296
+- Description: new API- baseEntry.exportToCsv
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_10_add_entry_export_csv_permissions.php
+
+# Propus-16.19.0  #
+
+## Version Highlight ##
+### Features ###
+    PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
+        This new type will be used by KMS for NewRow scheduled meeting,
+        but customers can use if for anytype.
+
+    PLAT-22622 - Add close caption support to playManifest, the caption language
+        is from the related stream info
+
+### Bug fix ###
+    SUP-25895 - Zoom, Adding file extention to imported source files. 
+    PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
+
+## Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED (EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22606
+- Description: add the content parameter entry_reference_id to HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED
+
+### Deployment scripts ###
+- Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
+
+## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
+- Issue Type: Task
+- Issue ID: PLAT-22679
+- Description: add the content parameter file_name to Media_XML_Bulk_Failure_Notification (HTTP)
+
+### Deployment scripts ###
+- Update Media_XML_Bulk_Failure_Notification:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_04_update_media_xml_bulk_job_failed.template.xml
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
+
+# Propus-16.18.0  #
+## Version Highlight ##
+### Features ###
+    PLAT-9940 - Adminconsole::UiConf, add filter by tags\type\name
+    SUP-24898 - Reach, Allow reach vendors KS overcome access control
+    PLAT-11136 - Allow entry user (Viewer/Publisher/Editor) list all userEntries.
+    This can allow webcast app see all the users that joined the event, when activated 
+    by others than the owner.
+    PLAT-22617 - User::LoginByLoginId, Allow setting priviledge on user object ksPrivileges. 
+    For this user, Any new login will generate a session that will include the specific permsission.
+    The motivation is to create users that can only login and access specific actions (such as loginByLoginId) 
+
+### Bug fix ###
+    SUP-26142 - Zoom, Chat file was not added to the primary entry, fixed.
+    REACH2-1050 - Reach, Block adding new task when entry is not ready.
+
+
+## Add Description to confMaps modifications ##
+- Issue Type: Task
+- Issue ID: FOUN-114
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2021_02_17_alter_config_maps_table.sql
+
+
+# Propus-16.17.0  #
+
+## Version Highlight ##
+
+### New features ###
+Enhance Zoom registration UI, adding:
+    a. Reload existing configuration
+    b. Support CMS_USER_ID matching
+    c. New look + updated logo
+
+# Propus-16.16.0  #
+
+## Version Highlight ##
+
+### New features ###
+
+	- PLAT-22575 : 	Adding support for a new type of Drop Folder: S3
+
+## Send http notification when registering new partner on the partner's template ##
+- Issue Type: Task
+- Issue ID: PLAT-22547
+- Description: You can use this http notification if you need to notify for every new partner created from the templates partners.
+    in this case we used the notification to call 1-kms-int.mediaspace.kaltura.com/latest/public/create_instance.php
+
+### Deployment scripts ###
+-Add kaftestme registration http request on partner creation:
+        
+    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET and PARTNER_ID) from the XML files below and remove ".template" from the file name:
+        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_01_13_partner_Added_Kaftestme_Http_Notification.template
+        
+    Run deployment script:
+        php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
+
+## Ability to cancel tasks ##
+- Issue Type: Task
+- Issue ID: REACH2-989
+
+### Configuration ###
+
+none
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_01_25_add_permissions_entry_vendor_task_object.php
+
+## New drop folder type S3 ##
+- Issue Type: Task
+- Issue ID: PLAT-22575
+
+### Configuration ###
+
+Add S3DropFolder to your plugins.ini
+
+### Deployment scripts ###
+
+php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+# Propus-16.15.0  #
+
+## Version Highlight ##
+
+### New features ###
+	
+	- SUP-24887 : YouTube! Kaltura Distribution app is certified for authetication without warnings 
+	- PLAT-22514 : Zoom enhancement, link between cms_user_id and entry onwer upon new recording
+	- SUP-24551 : Support upload caption files using sshUrlContentResource 
+	- REACH2-990 : Ability to set label for caption by setting new properties on KalturaReachProfile
+		- labelAdditionForMachineServiceType  (to be set on Machine translated caption coming from this profile)
+		- labelAdditionForHumanServiceType    (to be set on Human translated coming from this profile)
+	- SUP-24759 : REACH Captions Dashboard - Filtering/Sorting/Report Indicating Target Language
+	- SUP-25144 : New exception is raised (CRITERIA EXCEEDED MAX MATCHES ALLOWED) when tring to access object index > 10000 in eSearch service
+
+### Bug fix ###
+
+	- PLAT-22564 : attachment_attachmentasset->get must be done with KS
+	- SUP-25087 : Clipping of old content is stuck	
+
+### SAAS related ###
+
+	- PLAT-11239 : Download of files via VOD packager  
+	- PLAT-10788 : Fix link https://kmc.kaltura.com/default
+	
 ## Reach - update reach_vendor response profile ##
 - Issue Type: Task
 - Issue ID: REACH2-998
@@ -17,7 +419,6 @@ First replace all tokens in the XML file below and remove ".template" from the f
 Run deployment script:
 
                 - php /opt/kaltura/app/deployment/updates/scripts/2021_01_03_update_reach_vendor_response_profile.php
-
 
 
 # Propus 16.13.0  #

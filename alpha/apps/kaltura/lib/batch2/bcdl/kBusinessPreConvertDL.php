@@ -14,6 +14,13 @@ class kBusinessPreConvertDL
 			EntrySourceType::LECTURE_CAPTURE => "LECTURE_CAPTURE_PROFILE",
 	);
 
+	const KALTURA_CLASSROOM_CONVERSION_KEY = 'kaltura_classroom';
+	const KALTURA_CAPTURE_CONVERSION_KEY = 'kaltura_capture';
+	const ZOOM_ENTRY_CONVERSION_KEY = 'zoom_entry';
+	const EXPRESS_RECORDER_CONVERSION_KEY = 'express_recorder';
+	const KALTURA_MEETING_CONVERSION_KEY = 'kaltura_meeting';
+	const MS_TEAMS_CONVERSION_KEY = 'ms_teams';
+
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
 	 *
@@ -416,19 +423,22 @@ class kBusinessPreConvertDL
 	 * @return BatchJob
 	 */
 	public static function decideAddEntryFlavor(BatchJob $parentJob = null, $entryId, $flavorParamsId, &$errDescription, $flavorAssetId = null,
-			array $dynamicAttributes = array(), $priority = 0)
+			array $dynamicAttributes = array(), $priority = 0, $currentFlavorAsset = null)
 	{
 		KalturaLog::log("entryId [$entryId], flavorParamsId [$flavorParamsId]");
-
-		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
-		if (is_null($originalFlavorAsset))
+		
+		if (is_null($currentFlavorAsset))
 		{
-			$errDescription = 'Original flavor asset not found';
-			KalturaLog::err($errDescription);
-			return null;
+			$currentFlavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
+			if (is_null($currentFlavorAsset))
+			{
+				$errDescription = 'Original flavor asset not found';
+				KalturaLog::err($errDescription);
+				return null;
+			}
 		}
-
-		if ($originalFlavorAsset->getId() != $flavorAssetId && !$originalFlavorAsset->isLocalReadyStatus())
+		
+		if ($currentFlavorAsset->getId() != $flavorAssetId && !$currentFlavorAsset->isLocalReadyStatus())
 		{
 			$errDescription = 'Original flavor asset not ready';
 			KalturaLog::err($errDescription);
@@ -436,15 +446,15 @@ class kBusinessPreConvertDL
 		}
 
 		$mediaInfoId = null;
-		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($originalFlavorAsset->getId());
+		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($currentFlavorAsset->getId());
 		if($mediaInfo){
 			$mediaInfoId = $mediaInfo->getId();
 			/*
 			 * Auto decrypt
 			 */
-			if($originalFlavorAsset->getEncryptionKey()){
-				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$originalFlavorAsset->getEncryptionKey().")");
-				$mediaInfo->decryptionKey = bin2hex(base64_decode($originalFlavorAsset->getEncryptionKey()));
+			if($currentFlavorAsset->getEncryptionKey()){
+				KalturaLog::log("Encrypted Source, adding decryption (encryptionKey:".$currentFlavorAsset->getEncryptionKey().")");
+				$mediaInfo->decryptionKey = bin2hex(base64_decode($currentFlavorAsset->getEncryptionKey()));
 			}
 		}
 		$flavorParams = assetParamsPeer::retrieveByPK($flavorParamsId);
@@ -488,8 +498,7 @@ class kBusinessPreConvertDL
 		if ($parentJob) // prefer the partner id from the parent job, although it should be the same
 			$partnerId = $parentJob->getPartnerId();
 		else
-			$partnerId = $originalFlavorAsset->getPartnerId();
-
+			$partnerId = $currentFlavorAsset->getPartnerId();
 		if(is_null($flavorAssetId))
 		{
 			$flavorAsset = assetPeer::retrieveByEntryIdAndParams($entryId, $flavorParamsId);
@@ -577,11 +586,11 @@ class kBusinessPreConvertDL
 				KalturaLog::log("Updating Collection flavor [" . $flavor->getId() . "] for asset [" . $tagedFlavorAsset->getId() . "]");
 				$flavors[$flavorAssetId] = $flavor;
 			}
-			return self::decideCollectionConvert($collectionTag, $originalFlavorAsset, $entry, $parentJob, $flavors);
+			return self::decideCollectionConvert($collectionTag, $currentFlavorAsset, $entry, $parentJob, $flavors);
 		}
 		else
 		{
-			return self::decideFlavorConvert($flavorAsset, $flavor, $originalFlavorAsset, $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
+			return self::decideFlavorConvert($flavorAsset, $flavor, $currentFlavorAsset, $conversionProfile->getId(), $mediaInfoId, $parentJob, null, false, $priority);
 		}
 	}
 
@@ -1444,6 +1453,14 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		// create a convert job per each flavor
 		foreach($finalFlavors as $flavor)
 		{
+			$sourceFlavorParamsOutput = assetParamsOutputPeer::retrieveByAssetId($originalFlavorAsset->getId());
+			$staticContentAdminTags = kConf::get('staticContentAdminTags','runtime_config',array());
+			$tempAdminTags = array_intersect( $entry->getAdminTagsArr(), $staticContentAdminTags);
+			if ($sourceFlavorParamsOutput && !empty($tempAdminTags) && $sourceFlavorParamsOutput->getFlavorParamsId() == $flavor->getFlavorParamsId() && $sourceFlavorParamsOutput->getFlavorParamsId() !=0 )
+			{
+				continue;
+			}
+
 			$flavorAsset = kBatchManager::createFlavorAsset($flavor, $entry->getPartnerId(), $entry->getId());
 			if(!$flavorAsset)
 			{
@@ -1505,7 +1522,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		return true;
 	}
 
-	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, flavorAsset $originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
+	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, flavorAsset
+	$originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
 	{
 		if(strlen(trim($flavor->getSourceAssetParamsIds())))
 		{
@@ -2213,16 +2231,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	public static function checkConditionalProfiles($entry, $mediaInfo)
 	{
-		if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
-		{
-			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
-		}
-		else 
-		{
-			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
-		}
-		
-		if(!$profile) 
+		$profile = self::retrieveConversionProfileByType($entry);
+		if(!$profile)
 		{
 			KalturaLog::log("No profile for entry(".($entry->getId())."), cannot check profile conditions ");
 			return;
@@ -2264,5 +2274,80 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		
 		KalturaLog::log("None of the conditions are met.");
 		return;
+	}
+
+	/**
+	 * @param $entry
+	 * @return conversionProfile2|null
+	 * @throws Exception
+	 */
+	public static function retrieveConversionProfileByType($entry)
+	{
+		$profile = null;
+		if(self::shouldCheckStaticContentFlow($entry))
+		{
+			$key = self::getConversionProfileKey($entry);
+			$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
+		}
+		elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
+		{
+			$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), self::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
+		}
+
+		if(!$profile)
+		{
+			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
+		}
+
+		return $profile;
+	}
+	
+	/**
+	 * @param $entry
+	 * @return bool
+	 */
+	public static function shouldCheckStaticContentFlow($entry)
+	{
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_STATIC_CONTENT_CONVERSION, $entry->getPartnerId()))
+			return false;
+			
+		$key = self::getConversionProfileKey($entry);
+		$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles','runtime_config',array());
+		return $key && isset($staticContentConversionProfiles[$key]);
+	}
+
+	/**
+	 * @param Entry $entry
+	 * @return string|null
+	 */
+	public static function getConversionProfileKey(Entry $entry)
+	{
+		$adminTags = $entry->getAdminTagsArr();
+		if ($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
+		{
+			if (in_array('kalturaclassroom', $adminTags))
+			{
+				return self::KALTURA_CLASSROOM_CONVERSION_KEY;
+			}
+			return self::KALTURA_CAPTURE_CONVERSION_KEY;
+		}
+		elseif (in_array('zoomentry', $adminTags))
+		{
+			return self::ZOOM_ENTRY_CONVERSION_KEY;
+		}
+		elseif (in_array('kalturameeting', $adminTags))
+		{
+			return self::KALTURA_MEETING_CONVERSION_KEY;
+		}
+		elseif (in_array('expressrecorder', $adminTags))
+		{
+			return self::EXPRESS_RECORDER_CONVERSION_KEY;
+		}
+		elseif (in_array('msteams', $adminTags))
+		{
+			return self::MS_TEAMS_CONVERSION_KEY;
+		}
+		return null;
 	}
 }

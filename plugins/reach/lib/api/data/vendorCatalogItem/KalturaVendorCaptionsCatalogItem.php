@@ -6,12 +6,6 @@
 class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 {
 	/**
-	 * @var KalturaCatalogItemLanguage
-	 * @filter eq,in
-	 */
-	public $sourceLanguage;
-	
-	/**
 	 * @var KalturaVendorCatalogItemOutputFormat
 	 * @filter eq,in
 	 */
@@ -30,7 +24,6 @@ class KalturaVendorCaptionsCatalogItem extends KalturaVendorCatalogItem
 	
 	private static $map_between_objects = array
 	(
-		'sourceLanguage',
 		'outputFormat',
 		'enableSpeakerId',
 		'fixedPriceAddons'

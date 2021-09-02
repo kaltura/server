@@ -6,7 +6,6 @@
  */
 class KalturaUser extends KalturaBaseUser
 {
-	const MAX_NAME_LEN = 40;
 	private static $names = array('firstName', 'lastName', 'fullName', 'screenName');
 
 	/**
@@ -84,6 +83,27 @@ class KalturaUser extends KalturaBaseUser
 	 */
 	public $attendanceInfo;
 
+	/**
+	 * @var string
+	 */
+	public $title;
+
+	/**
+	 * @var string
+	 */
+	public $company;
+
+	/**
+	 * @var string
+	 */
+	public $ksPrivileges;
+	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $encryptedSeed;
+
 	private static $map_between_objects = array (
 		"type",
 		"dateOfBirth",
@@ -95,7 +115,10 @@ class KalturaUser extends KalturaBaseUser
 		"roleNames" => "userRoleNames",
 		"isAccountOwner",
 		"registrationInfo",
-		"attendanceInfo"
+		"attendanceInfo",
+		"title",
+		"company",
+		"ksPrivileges",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -149,12 +172,8 @@ class KalturaUser extends KalturaBaseUser
 
 	private function verifyMaxLength()
 	{
-		if (strlen($this->firstName) > self::MAX_NAME_LEN)
-			$this->firstName = kString::alignUtf8String($this->firstName, self::MAX_NAME_LEN);
-		if (strlen($this->lastName) > self::MAX_NAME_LEN)
-			$this->lastName = kString::alignUtf8String($this->lastName, self::MAX_NAME_LEN);
-		if (strlen($this->fullName) > self::MAX_NAME_LEN)
-			$this->fullName = kString::alignUtf8String($this->fullName, self::MAX_NAME_LEN);
+		if (strlen($this->fullName) > kuser::MAX_NAME_LEN)
+			$this->fullName = kString::alignUtf8String($this->fullName, kuser::MAX_NAME_LEN);
 	}
 
 	public function validateForInsert($propertiesToSkip = array())

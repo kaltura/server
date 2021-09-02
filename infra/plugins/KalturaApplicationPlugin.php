@@ -103,4 +103,17 @@ abstract class KalturaApplicationPlugin
 
         return $value;
     }
+
+	protected function getFilterFromRequest(Zend_Controller_Request_Abstract $request, $filter)
+	{
+		$filterInput = $request->getParam('filter_input');
+
+		if(strlen($filterInput))
+		{
+			$filterType = $request->getParam('filter_type');
+			$filter->$filterType = $filterInput;
+		}
+
+		return $filter;
+	}
 }

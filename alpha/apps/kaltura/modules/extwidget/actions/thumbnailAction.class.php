@@ -51,7 +51,7 @@ class thumbnailAction extends sfAction
 		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		requestUtils::handleConditionalGet();
-		ignore_user_abort();
+		ignore_user_abort(true);
 		$entry_id = $this->getRequestParameter("entry_id");
 		$widget_id = $this->getRequestParameter("widget_id", 0);
 		$upload_token_id = $this->getRequestParameter("upload_token_id");
@@ -392,6 +392,11 @@ class thumbnailAction extends sfAction
 				$actionList = $secureEntryHelper->getActionList(RuleActionType::LIMIT_THUMBNAIL_CAPTURE);
 				if ($actionList)
 					KExternalErrors::dieError(KExternalErrors::NOT_ALLOWED_PARAMETER);
+			}
+
+			if(!$entry->isScheduledNow())
+			{
+				KalturaLog::info("Capture thumbnail request when entry is not in schedule: entryID [{$entry->getId()}], partnerId [{$entry->getPartnerId()}]");
 			}
 		}
 

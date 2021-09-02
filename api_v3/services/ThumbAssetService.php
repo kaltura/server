@@ -73,7 +73,10 @@ class ThumbAssetService extends KalturaAssetService
     function addAction($entryId, KalturaThumbAsset $thumbAsset)
     {
     	$dbEntry = entryPeer::retrieveByPK($entryId);
-    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || ($dbEntry->getType() == entryType::MEDIA_CLIP && !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO, KalturaMediaType::LIVE_STREAM_FLASH))))
+    	if(!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || ($dbEntry->getType() ==
+			    entryType::MEDIA_CLIP && !in_array($dbEntry->getMediaType(), array
+			    (KalturaMediaType::IMAGE, KalturaMediaType::VIDEO, KalturaMediaType::AUDIO,
+			     KalturaMediaType::LIVE_STREAM_FLASH))))
     		throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
     	if($thumbAsset->thumbParamsId)
@@ -232,22 +235,33 @@ class ThumbAssetService extends KalturaAssetService
     
 	/**
 	 * @param thumbAsset $thumbAsset
-	 * @param string $url
+	 * @param kUrlResource $contentResource
 	 */
-	protected function attachUrl(thumbAsset $thumbAsset, $url)
+	protected function attachUrl(thumbAsset $thumbAsset, kUrlResource $contentResource)
 	{
-		$fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
-		if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
-			return $this->attachFile($thumbAsset, $fullPath);
-			
-		if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
-		{
-			$thumbAsset->setDescription("Failed downloading file[$url]");
-			$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_ERROR);
-			$thumbAsset->save();
-		}
-		
-		throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_DOWNLOAD_FAILED, $url);
+        $url = $contentResource->getUrl();
+        $fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
+
+        //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+        if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
+        {
+            if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
+            {
+	            return $this->attachFile($thumbAsset, $fullPath);
+            }
+            
+            if($thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_QUEUED || $thumbAsset->getStatus() == thumbAsset::ASSET_STATUS_NOT_APPLICABLE)
+            {
+                $thumbAsset->setDescription("Failed downloading file[$url]");
+                $thumbAsset->setStatus(thumbAsset::ASSET_STATUS_ERROR);
+                $thumbAsset->save();
+            }
+
+            throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_DOWNLOAD_FAILED, $url);
+        }
+
+         kJobsManager::addImportJob(null, $thumbAsset->getEntryId(), $thumbAsset->getPartnerId(), $url, $thumbAsset, null, $contentResource->getImportJobData());
+
     }
     
 	/**
@@ -256,7 +270,7 @@ class ThumbAssetService extends KalturaAssetService
 	 */
 	protected function attachUrlResource(thumbAsset $thumbAsset, kUrlResource $contentResource)
 	{
-    	$this->attachUrl($thumbAsset, $contentResource->getUrl());
+    	$this->attachUrl($thumbAsset, $contentResource);
     }
     
 	/**
@@ -286,7 +300,7 @@ class ThumbAssetService extends KalturaAssetService
         $newSyncKey = $thumbAsset->getSyncKey(thumbAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
         kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $srcSyncKey);
 		
-		$fileSync = kFileSyncUtils::getLocalFileSyncForKey($newSyncKey, false);
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($newSyncKey, false, false);
 		list($width, $height, $type, $attr) = kImageUtils::getImageSize($fileSync);
 		
 		$thumbAsset->setWidth($width);
@@ -1029,16 +1043,8 @@ class ThumbAssetService extends KalturaAssetService
 
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaErrors::THUMB_ASSET_IS_NOT_READY);
-
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$c->add(FileSyncPeer::OBJECT_ID, $id);
-		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
-		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$fileSyncs = FileSyncPeer::doSelect($c);
+		
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($id, $assetDb, FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
@@ -1072,7 +1078,7 @@ class ThumbAssetService extends KalturaAssetService
 		{
 			$dbThumbAsset->setStatus(thumbAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$dbThumbAsset->save();
-			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
 	}
 	

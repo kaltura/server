@@ -141,7 +141,7 @@ class KCurlWrapper
 	const LOW_SPEED_BYTE_LIMIT = 1; //1 byte per sec
 	const LOW_SPEED_TIME_LIMIT = 595; //595 sec + 5 sec until it is detected total is 600 sec = 10 min
 
-	const HTTP_USER_AGENT = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
+	const HTTP_USER_AGENT = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6';
 	
 	const ERROR_CODE_FAILED_TO_OPEN_FILE_FOR_WRITING = 37;
 
@@ -767,7 +767,17 @@ class KCurlWrapper
 			$sourceUrl = 'http://' . $sourceUrl;
 		}
 
-		$parts = parse_url($sourceUrl);
+        //Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
+        //https://bugs.php.net/bug.php?id=73754
+        $sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
+
+        // extract information from URL and job data
+        $parts = parse_url($sourceUrl);
+        if($replaceCount)
+        {
+            $parts = preg_replace("/_kHash_/", "#", $parts);
+        }
+
 		if (!isset($parts['scheme']) || !isset($parts['host']))
 		{
 			KalturaLog::log("Failed to parse url [$sourceUrl]");

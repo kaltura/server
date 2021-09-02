@@ -16,51 +16,118 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	protected $styles;
 
 	/**
+	 * @var array
+	 */
+	protected $regions;
+
+	function parseElementsByName(KDOMDocument $xml, $elementName)
+	{
+		$xmlNS = $xml->lookupNamespaceURI('xml');
+		$elements = $xml->getElementsByTagName($elementName);
+		$parsedElements = array();
+		foreach($elements as $element)
+		{
+			if ($element->hasAttribute('id'))
+				$id = $element->getAttribute('id');
+			else if ($element->hasAttributeNS($xmlNS, 'id'))
+				$id = $element->getAttributeNS($xmlNS, 'id');
+			else
+				continue;
+
+			$parsedElements[$id] = $this->parseStyleAttributes($element);
+		}
+		return $parsedElements;
+	}
+	/**
 	 * @param DOMElement $element
 	 * @param array $style
 	 * @return array
 	 */
-	function parseStyles(DOMElement $element, $style = array())
+	function parseStyleAttributes(DOMElement $element, $style = array())
 	{
-		if ($element->hasAttributeNS($this->ttsNS, 'fontWeight') && $element->getAttributeNS($this->ttsNS, 'fontWeight') == 'bold')
+		if ($element->hasAttributeNS($this->ttsNS, 'fontWeight') && $element->getAttributeNS($this->ttsNS, 'fontWeight') === 'bold')
 			$style['bold'] = true;
-		if ($element->hasAttributeNS($this->ttsNS, 'fontStyle') && $element->getAttributeNS($this->ttsNS, 'fontStyle') == 'italic')
+		if ($element->hasAttributeNS($this->ttsNS, 'fontStyle') && $element->getAttributeNS($this->ttsNS, 'fontStyle') === 'italic')
 			$style['italic'] = true;
 		
-		$copiedAtts = array('textAlign', 'displayAlign', 'color', 'backgroundColor', 'fontFamily', 'fontSize');
+		$copiedAtts = array('textAlign', 'displayAlign', 'color', 'backgroundColor', 'fontFamily', 'fontSize', 'origin', 'extent');
 		foreach ($copiedAtts as $copiedAtt)
+		{
 			if ($element->hasAttributeNS($this->ttsNS, $copiedAtt))
-				$style[$copiedAtt] = $element->getAttributeNS($this->ttsNS, $copiedAtt);
+			{
+				$value = $element->getAttributeNS($this->ttsNS, $copiedAtt);
+				if( (($copiedAtt === 'origin') || ($copiedAtt === 'extent')) && (!preg_match("/([0-9]?[0-9]|100)% ([0-9]?[0-9]|100)%/", $value)) )
+				{
+					continue;
+				}
+				$style[$copiedAtt] = $value;
+			}
+		}
 		return $style;
 	}
-	
+
+	function getInnerElement(DOMElement $childNode, $elementName, $elements, $origElement)
+	{
+		$innerElement = $origElement;
+		$innerId = $childNode->getAttribute($elementName);
+		if ($innerId && isset($elements[$innerId]))
+		{
+			$innerElement = $elements[$innerId];
+		}
+
+		return $innerElement;
+	}
+
+	function getAndUpdateStyleAttributes($childNode, $style, $region)
+	{
+		$styleAttributes = $this->parseStyleAttributes($childNode);
+		foreach ($styleAttributes as $key => $value)
+		{
+			if(isset($key, $style))
+			{
+				$style[$key] = $value;
+			}
+
+			if(isset($key, $region))
+			{
+				$region[$key] = $value;
+			}
+		}
+		return array($style, $region);
+	}
 	/**
 	 * @param DOMNode $curNode
 	 * @param array $style
-	 * @return array  
+	 * @param array $region
+	 * @return array
 	 */
-	function getTextContent(DOMNode $curNode, $style)
+	function getTextContent(DOMNode $curNode, $style, $region)
 	{
 		$result = array();
 		for ($i = 0; $i < $curNode->childNodes->length; $i++)
 		{
 			$childNode = $curNode->childNodes->item($i);
+			/* @var $childNode DOMElement */
+
 			switch ($childNode->nodeType)
 			{
 			case XML_TEXT_NODE:
-				$result[] = array('text' => $childNode->textContent, 'style' => $style);
+				$result[] = array('text' => $childNode->textContent, 'style' => array_merge($region, $style));
 				break;
 			
 			case XML_ELEMENT_NODE:
 				switch (strtolower($childNode->nodeName))
 				{
 				case 'span':
-					$innerStyle = $this->parseStyles($childNode, $style);
-					$result = array_merge($result, $this->getTextContent($childNode, $innerStyle));
+					$innerStyle = $this->getInnerElement($childNode, 'style', $this->styles, $style);
+					$innerRegion = $this->getInnerElement($childNode, 'region', $this->regions, $region);
+
+					list($innerStyle, $innerRegion) = $this->getAndUpdateStyleAttributes($childNode, $innerStyle, $innerRegion);
+					$result = array_merge($result, $this->getTextContent($childNode, $innerStyle, $innerRegion));
 					break;
 					
 				case 'br':
-					$result[] = array('text' => "\n", 'style' => $style);
+					$result[] = array('text' => "\n");
 					break;
 				}
 				break;
@@ -72,9 +139,10 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 	/**
 	 * @param DOMNode $curNode
 	 * @param string $styleId
+	 * @param string $regionId
 	 * @return array  
 	 */
-	function parseBody(DOMNode $curNode, $styleId = null)
+	function parseBody(DOMNode $curNode, $styleId = null, $regionId = null)
 	{	
 		$itemsData = array();
 		for ($i = 0; $i < $curNode->childNodes->length; $i++)
@@ -82,12 +150,13 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			$childNode = $curNode->childNodes->item($i);
 			if ($childNode->nodeType != XML_ELEMENT_NODE)
 				continue;
-			
+
 			$curStyleId = $childNode->hasAttribute('style') ? $childNode->getAttribute('style') : $styleId;
-						
+			$regionId = $childNode->hasAttribute('region') ? $childNode->getAttribute('region') : $regionId;
+
 			if (strtolower($childNode->nodeName) != 'p')
 			{
-				$itemsData = array_merge($itemsData, $this->parseBody($childNode, $curStyleId));
+				$itemsData = array_merge($itemsData, $this->parseBody($childNode, $curStyleId, $regionId));
 				continue;
 			}
 			
@@ -106,8 +175,13 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 			$style = array();
 			if (!is_null($curStyleId) && isset($this->styles[$curStyleId]))
 				$style = $this->styles[$curStyleId];
-			
-			$itemsData[] = array('startTime' => $startTime, 'endTime' => $endTime, 'content' => $this->getTextContent($childNode, $style));
+
+			$region = array();
+			if ($regionId && isset($this->regions[$regionId]))
+				$region = $this->regions[$regionId];
+
+			list($style, $region) = $this->getAndUpdateStyleAttributes($childNode, $style, $region);
+			$itemsData[] = array('startTime' => $startTime, 'endTime' => $endTime, 'content' => $this->getTextContent($childNode, $style, $region));
 		}
 		
 		return $itemsData;
@@ -130,25 +204,9 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		}
 
 		// parse styles
-		$xmlNS = $xml->lookupNamespaceURI('xml');
 		$this->ttsNS = $xml->lookupNamespaceURI('tts');
-		
-		$elements = $xml->getElementsByTagName('style');
-		$this->styles = array();
-		foreach($elements as $element)
-		{
-			if ($element->hasAttribute('id'))
-				$id = $element->getAttribute('id');
-			else if ($element->hasAttributeNS($xmlNS, 'id'))
-				$id = $element->getAttributeNS($xmlNS, 'id');
-			else 
-				continue;
-
-			$style = $this->parseStyles($element);
-
-			$this->styles[$id] = $style;
-		}
-
+		$this->styles = $this->parseElementsByName($xml, 'style');
+		$this->regions = $this->parseElementsByName($xml, 'region');
 		
 		// parse content
 		$itemsData = $this->parseBody($xml);

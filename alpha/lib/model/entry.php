@@ -103,7 +103,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const MAX_NORMALIZED_RANK = 5;
 
 	const MAX_CATEGORIES_PER_ENTRY = 32;
-	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 200;
+	const MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE = 1000;
 	
 	const MIX_EDITOR_TYPE_SIMPLE = 1;
 	const MIX_EDITOR_TYPE_ADVANCED = 2;
@@ -1247,11 +1247,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $dynamicAttributes;
 	}
 	
-	public function getMaxCategoriesPerEntry()
+	public function getMaxCategoriesPerEntry($numberOfPrivacyContext = null)
 	{
 		$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY;
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+		if (PermissionPeer ::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT,
+		                                       $this -> getPartnerId()))
+		{
+			if (!is_null($numberOfPrivacyContext) && $numberOfPrivacyContext < 2)
+			{
+				$maxCategoriesPerEntry = entry::MAX_CATEGORIES_PER_ENTRY_DISABLE_LIMIT_FEATURE;
+			}
+		}
 			
 		// When batch move entry between categories it's adding the new category before deleting the old one
 		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kCurrentContext::$ks_object)
@@ -1847,7 +1853,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setSourceVersion( $v ) {	$this->putInCustomData ( "sourceVersion" , $v);	}
 	public function getSourceVersion() 	{	return $this->getFromCustomData( "sourceVersion", null, null);	}
-
+	
+	public function setBlockAutoTranscript($v)  {$this->putInCustomData('blockAutoTranscript', $v);}
+	public function getBlockAutoTranscript()    {return $this->getFromCustomData('blockAutoTranscript', null, false);}
+	
+	
 	public function getParentEntry()
 	{
 		if(!$this->getParentEntryId())
@@ -2840,6 +2850,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				
 				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersPublishArray()))
 					$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
+
+				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersViewArray()))
+					$this->setEntitledPusersView(implode(",", array_merge($this->getEntitledPusersViewArray(), array($parentEntry->getPuserId()))));
 			}
 		}
 		
@@ -2930,7 +2943,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			}
 		}
 
-		if ($this->customDataValueHasChanged('entitledUserPuserEdit') || $this->customDataValueHasChanged('entitledUserPuserPublish') || $this->isColumnModified(entryPeer::PUSER_ID))
+		if ($this->customDataValueHasChanged('entitledUserPuserEdit') || $this->customDataValueHasChanged('entitledUserPuserPublish') || $this->customDataValueHasChanged('entitledUserPuserView') || $this->isColumnModified(entryPeer::PUSER_ID))
 		{
 			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($this->getId(), $this->getPartnerId());
 			foreach ($childEntries as $childEntry)
@@ -2984,6 +2997,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$shouldSave = false;
 		$entitledPusersEditArray = $this->getEntitledUserPuserEditArray();
 		$entitledPusersPublishArray = $this->getEntitledPusersPublishArray();
+		$entitledPusersViewArray = $this->getEntitledPusersViewArray();
 		
 		if(count(array_diff($target->getEntitledUserPuserEditArray(), $entitledPusersEditArray)))
 		{
@@ -2996,11 +3010,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$entitledPusersPublishArray = array_merge($target->getEntitledPusersPublishArray(), $entitledPusersPublishArray);
 			$shouldSave = true;
 		}
-		
+
+                if(count(array_diff($target->getEntitledPusersViewArray(), $entitledPusersViewArray)))
+                {
+                        $entitledPusersViewArray = array_merge($target->getEntitledPusersViewArray(), $entitledPusersViewArray);
+                        $shouldSave = true;
+                }
+
 		if($target->getPuserId() != $this->getPuserId())
 		{
-			$entitledPusersPublishArray = array_merge($entitledPusersEditArray, array($this->getPuserId()));
+			$entitledPusersEditArray = array_merge($entitledPusersEditArray, array($this->getPuserId()));
 			$entitledPusersPublishArray = array_merge($entitledPusersPublishArray, array($this->getPuserId()));
+			$entitledPusersViewArray = array_merge($entitledPusersViewArray, array($this->getPuserId()));
 			$shouldSave = true;
 		}
 		
@@ -3009,6 +3030,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		
 		$target->setEntitledPusersEdit(implode(",", array_unique($entitledPusersEditArray)));
 		$target->setEntitledPusersPublish(implode(",", array_unique($entitledPusersPublishArray)));
+		$target->setEntitledPusersView(implode(",", array_unique($entitledPusersViewArray)));
 		$target->save();
 	}
 	
@@ -3249,6 +3271,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setAccessControlId($template->getAccessControlId());
 		$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
 		$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
+		$this->setEntitledPusersView($template->getEntitledPusersView());
 
 		if ($this instanceof $template)
 		{
@@ -3744,6 +3767,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		{
 			$copyObj->setEntitledPusersEdit($this->getEntitledPusersEdit());
 			$copyObj->setEntitledPusersPublish($this->getEntitledPusersPublish());
+			$copyObj->setEntitledPusersView($this->getEntitledPusersView());
 		}
 		catch(kCoreException $e)
 		{
@@ -4384,6 +4408,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return in_array($adminTag, explode(',', $this->getAdminTags()));
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getAdminTagsArr()
+	{
+		$tags = explode(",", $this->getAdminTags());
+		$tagsToReturn = array();
+		foreach($tags as $tag)
+		{
+			$tag = trim($tag);
+			if($tag)
+			{
+				$tagsToReturn[] = $tag;
+			}
+		}
+		return array_unique($tagsToReturn);
+	}
 
 	/**
 	 * allow edit or change related metadata
@@ -4412,4 +4453,5 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 		return false;
 	}
+
 }

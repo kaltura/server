@@ -5,6 +5,10 @@ class LiveClusterMediaServerNode extends MediaServerNode
 {
     const ENVIRONMENT = 'env';
     const SESSION_TYPE = 'st';
+    const TIMELINE_URL_PARAM = 'tl';
+    const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'tl';
+    const USER_TYPE_ADMIN = 'main';
+    const USER_TYPE_USER = 'viewer';
 
     /**
      * Applies default values to this object.
@@ -45,8 +49,42 @@ class LiveClusterMediaServerNode extends MediaServerNode
         return self::ENVIRONMENT . '/' . $this->getEnvironment();
     }
 
-    public function getSessionType($entryServerNode)
+    public static function getSessionType($entryServerNode)
     {
-        return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() .'/';
+        return self::SESSION_TYPE . '/' . $entryServerNode->getServerType() . '/';
     }
+
+	public function getEntryIdUrl(DeliveryProfileDynamicAttributes $da)
+	{
+		if ($da->getServeVodFromLive())
+		{
+			$recordingEntryId = $da->getServeLiveAsVodEntryId();
+			$entryId =  $da->getEntryId();
+			return '/' . self::ENTRY_ID_URL_PARAM . "/$entryId/" . self::TIMELINE_URL_PARAM . "/$recordingEntryId/";
+//			returns "/e/$entryId/tl/$recordingEntryId/"
+		}
+
+		return parent::getEntryIdUrl($da);
+	}
+
+	protected function getUserType($isAdmin)
+	{
+		return $isAdmin ? self::USER_TYPE_ADMIN : self::USER_TYPE_USER;
+	}
+
+	protected function getUrlType()
+	{
+		return self::EXPLICIT_LIVE_VIEWER_TYPE_URL;
+	}
+
+
+	public function getExplicitLiveUrl($liveUrl, LiveStreamEntry $entry)
+	{
+		$tlUrlParam = '/' . self::TIMELINE_URL_PARAM . '/';
+		if (strpos($liveUrl, $tlUrlParam) !== false)
+		{
+			return '';
+		}
+		return parent::getExplicitLiveUrl($liveUrl, $entry);
+	}
 }

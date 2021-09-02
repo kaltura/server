@@ -7,13 +7,17 @@
  * @package server-infra
  * @subpackage request
  */
+require_once __DIR__ . '/../../../../../infra/general/kString.class.php';
+
 class infraRequestUtils
 {
 	const PROTOCOL_HTTP = 'http';
 	const PROTOCOL_HTTPS = 'https';
+	const PROTOCOL_SFTP = 'sftp';
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	const CLIENT_TAG = 'clientTag';
-
+	const ORIGIN_HEADER = 'HTTP_ORIGIN';
+	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = array();
 	protected static $requestParams = null;
@@ -444,7 +448,24 @@ class infraRequestUtils
 		}
 		return $result;
 	}
-	
+
+	public static function getUrlHost()
+	{
+		$requestParams = self::getRequestParams();
+		if(!array_key_exists('referrer', $requestParams))
+		{
+			return null;
+		}
+
+		$referrer = base64_decode($requestParams['referrer']);
+		if(!is_string($referrer))
+		{
+			return null;
+		}
+
+		return self::parseUrlHost($referrer);
+	}
+
 	public static function buildRequestParams(array $parameters)
 	{
 		$pieces = array();
@@ -487,7 +508,8 @@ class infraRequestUtils
 			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
 			{
 				$requestBody = file_get_contents("php://input");
-				if(preg_match('/^\{.*\}$/', $requestBody))
+				$requestBody = trim($requestBody);
+				if(kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
 				{
 					$post = json_decode($requestBody, true);
 					if($post)

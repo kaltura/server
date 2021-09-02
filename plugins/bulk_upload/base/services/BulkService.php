@@ -28,7 +28,14 @@ class BulkService extends KalturaBaseService
 	{
 		if(get_class($bulkUploadData) == 'KalturaBulkUploadJobData')
 			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, 'KalturaBulkUploadJobData');
-			
+
+		$validContent = myXmlUtils::validateXmlFileContent($fileData['tmp_name']);
+		if(!$validContent)
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+
+
 	    if($bulkUploadEntryData->conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
 			$bulkUploadEntryData->conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
 	    
@@ -359,7 +366,7 @@ class BulkService extends KalturaBaseService
 		if($local)
 		{
 			$filePath = $fileSync->getFullPath();
-			$mimeType = kFile::mimeType($filePath);
+			$mimeType = kFileUtils::getServeMimeType($filePath);
 			return $this->dumpFile($filePath, $mimeType);
 		}
 		else

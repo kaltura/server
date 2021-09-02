@@ -27,23 +27,24 @@ class KFileTransferExportEngine extends KExportEngine
 	function export() 
 	{
 		$srcTempFile = null;
-		
-		$srcFile = kFile::realPath($this->srcFile);
-		$realPathRemote = strpos($srcFile, "http") !== false && kFile::checkFileExists($this->srcFile);
-		if($realPathRemote || !KBatchBase::pollingFileExists($this->srcFile))
+
+		list($isRemote, $remoteUrl, $isDir) = kFile::resolveFilePath($this->srcFile);
+		$realPathRemote = $isRemote && kFile::checkFileExists($this->srcFile);
+		if( $realPathRemote || !KBatchBase::pollingFileExists($this->srcFile))
 		{
-			$externalUrl = $realPathRemote ? $srcFile : $this->data->externalUrl;
+			$externalUrl = $isRemote ? $remoteUrl : $this->data->externalUrl;
 			if($externalUrl == null)
 			{
 				throw new kTemporaryException("Source file {$this->srcFile} does not exist, and no external URL provided");
 			}
-			
-			$srcTempFile = $this->getAssetFile($externalUrl, $this->data->flavorAssetId);
+
+			$srcTempFile = kFile::fetchRemoteToLocal($this->srcFile, $externalUrl, $isDir,
+				sys_get_temp_dir() . "/imports/", $this->data->flavorAssetId . "_" . basename($this->srcFile));
+
 			if(!$srcTempFile)
 			{
 				throw new kTemporaryException("Source file {$this->srcFile} does not exist");
 			}
-
 			$this->srcFile = $srcTempFile;
 		}
 
@@ -93,6 +94,7 @@ class KFileTransferExportEngine extends KExportEngine
 			else if (kFile::isDir($this->srcFile))
 			{
 				$filesPaths = kFile::dirList($this->srcFile);
+
 				$destDir = $this->destFile;
 				foreach ($filesPaths as $filePath)
 				{
@@ -229,56 +231,29 @@ class KFileTransferExportEngine extends KExportEngine
 		return $storageExportData;
 	}
 
-	protected function getAssetFile($externalUrl, $uniqueDownloadId = null)
-	{
-		// Needed arguments
-		if($externalUrl === null)
-		{
-			KalturaLog::info("No external url provided,");
-			return null;
-		}
-
-		// Create the temporary file path
-		$tempDirectoryPath = sys_get_temp_dir();
-		if (!kFile::isDir($tempDirectoryPath))
-		{
-			kFile::fullMkfileDir($tempDirectoryPath, 0700, true);
-		}
-		
-		if(!$uniqueDownloadId)
-		{
-			$uniqueDownloadId = uniqid(rand(),true);
-		}
-		
-		$filePath = $tempDirectoryPath . "/asset_$uniqueDownloadId";
-
-		// Retrieve the file
-		$res = null;
-		try
-		{
-			$stat = KCurlWrapper::getDataFromFile($externalUrl, $filePath, null, true);
-
-			if ($stat)
-			{
-				$res = $filePath;
-				KalturaLog::info("Succeeded to retrieve asset content for assetId: [$assetId]");
-			}
-			else
-			{
-				KalturaLog::info("Failed to retrieve asset content for assetId: [$assetId]");
-			}
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::info("Can't serve asset id [$assetId] from [$externalUrl] " . $e->getMessage());
-		}
-
-		return $res;
-	}
-
 	protected function unlinkFileIfNeeded($tempFile)
 	{
-		if($tempFile)
+		if (!$tempFile)
+		{
+			return;
+		}
+
+		if (kFile::isDir($tempFile))
+		{
+			$dir = dir($tempFile);
+			if (!$dir)
+			{
+				return null;
+			}
+			while ($dirFile = $dir->read())
+			{
+				if ($dirFile != "." && $dirFile != "..")
+				{
+					unlink($tempFile . DIRECTORY_SEPARATOR . $dirFile);
+				}
+			}
+		}
+		else
 		{
 			unlink($tempFile);
 		}

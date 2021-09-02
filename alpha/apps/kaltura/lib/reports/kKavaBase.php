@@ -68,6 +68,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_ROOT_ENTRY_ID = 'rootEntryId';
 	const DIMENSION_NODE_ID = 'nodeId';
 	const DIMENSION_APPLICATION_VER = 'applicationVer';
+	const DIMENSION_PARTNER_CRM_ID = 'partnerCrmId';
+	const DIMENSION_PLAYLIST_ID = 'playlistId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -119,6 +121,8 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_HOTSPOT_CLICKED = 'hotspotClicked';
 	const EVENT_TYPE_NODE_SWITCH = 'nodeSwitch';
 	const EVENT_TYPE_ADD_TO_CALENDAR_CLICKED = 'addToCalendarClicked';
+	const EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED = 'downloadAttachmentClicked';
+	const EVENT_TYPE_REACTION_CLICKED = 'reactionClicked';
 
 	// event types - storage / entry lifecycle
 	const EVENT_TYPE_STATUS = 'status';
@@ -155,6 +159,8 @@ class kKavaBase extends kDruidBase
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
 	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
 	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
+	const PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME = 'hasSegmentDownloadTime';
+	const PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME = 'hasManifestDownloadTime';
 
 	//user engagement values
 	const USER_SOUND_ON_TAB_FOCUSED = 'SoundOnTabFocused';
@@ -209,6 +215,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PARTNER_ID => 1,
 			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_PLAYLIST_ID => 1,
 			self::DIMENSION_ENTRY_ID => 1,
 			self::DIMENSION_CATEGORIES => 1,
 			self::DIMENSION_ENTRY_OWNER_ID => 1,
@@ -242,6 +249,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
+			self::DIMENSION_POSITION => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -304,6 +312,7 @@ class kKavaBase extends kDruidBase
 		),
 		self::DATASOURCE_API_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_CRM_ID => 1,
 			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_APPLICATION => 1,
 			self::DIMENSION_DOMAIN => 1,

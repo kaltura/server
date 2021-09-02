@@ -66,6 +66,17 @@ class UserLoginData extends BaseUserLoginData{
 	
 	
 	/**
+	 * Code to be run after deleting the object in database
+	 * @param PropelPDO $con
+	 */
+	public function postDelete(PropelPDO $con = null)
+	{
+		parent::postDelete($con);
+		kQueryCache::invalidateQueryCache($this);
+		kEventsManager::raiseEvent(new kObjectErasedEvent($this));
+	}
+	
+	/**
 	 * @return int
 	 */
 	public function getLoginAttempts()
@@ -333,6 +344,11 @@ class UserLoginData extends BaseUserLoginData{
 		return $invalidPasswordStructureMessage; 
 	}
 	
+	public function isCommonPassword($password)
+	{
+		$commonPasswordsMap = kConf::getMap(kConfMapNames::COMMON_PASSWORDS);
+		return $commonPasswordsMap and isset($commonPasswordsMap[$password]);
+	}
 		
 	public function getCacheInvalidationKeys()
 	{

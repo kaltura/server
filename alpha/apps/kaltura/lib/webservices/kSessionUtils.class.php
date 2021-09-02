@@ -52,6 +52,7 @@ class kSessionUtils
 		$ks->user = $puser_id;
 		$ks->privileges = $privileges;
 		$ks->additional_data = $additional_data;
+		$ks->setInitialSecret($partner_secret);
 		
 		return $ks;
 	}
@@ -80,7 +81,7 @@ class kSessionUtils
 
 			$ks_type = ks::TYPE_KS;
 			if($admin)
-				$ks_type = $admin ; // if the admin > 1 - use it rather than automatially setting it to be 2
+				$ks_type = $admin ; // if the admin > 1 - use it rather than automatically setting it to be 2
 				
 			$ks = self::createKSession($partner_id, $partner_secret, $puser_id, $desired_expiry_in_seconds, $ks_type, $privileges, $additional_data, $master_partner_id);
 			$ks_str = $ks->toSecureString();
@@ -296,6 +297,10 @@ class ks extends kSessionBase
 		list($ksVersion, $secrets) = $this->getKSVersionAndSecret($this->partner_id);
 		$secretsArray = explode(',', $secrets);
 		$secret = $secretsArray[0]; // first element is always the main Admin Secret
+		if ($this->type == SessionType::ADMIN && $this->initialSecret)
+		{
+			$secret = $this->initialSecret;
+		}
 		return kSessionBase::generateSession(
 			$ksVersion,
 			$secret,
@@ -823,7 +828,6 @@ class ks extends kSessionBase
 
 	public static function retrieveAllowedAppSessionPrivileges($privilegesArray, $appSessionPrivileges)
 	{
-		$allowedAppSessionPrivileges = array();
 		$serverPrivileges = kSessionBase::getServerPrivileges();
 		$privilegesKeys = array_map('trim', array_keys($privilegesArray));
 		$forbidenSessionPrivileges = array_merge_recursive($serverPrivileges , $privilegesKeys);
@@ -831,11 +835,13 @@ class ks extends kSessionBase
 		// allow adding privileges to app token only if they are not in use by the server and were not set on the original app token
 		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
 		{
-			if(!in_array(trim($privilegeName), $forbidenSessionPrivileges))
-				$allowedAppSessionPrivileges[$privilegeName] = $privilegeValue;
+			if( !in_array(trim($privilegeName), $forbidenSessionPrivileges) || (in_array(self::PRIVILEGE_WILDCARD, $privilegesArray[$privilegeName])) )
+			{
+				$privilegesArray[$privilegeName] = $privilegeValue;
+			}
 		}
 
-		return $allowedAppSessionPrivileges;
+		return $privilegesArray;
 	}
 
 }

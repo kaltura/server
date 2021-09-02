@@ -210,6 +210,8 @@ class myUploadUtils
 	{
 		$fileType = kFileUtils::getMimeType($uploadFilePath);
 
+		KalturaLog::debug("File type: $fileType");
+
 		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
 		{
 			if ( strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)) == self::BAT_FILE_EXTENSION)

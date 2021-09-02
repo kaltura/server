@@ -121,7 +121,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
 
-		self::checkPasswordValidation ( $newPassword, $loginData );
+		self::checkPasswordValidation($newPassword, $loginData);
+		
 		self::validate2FA($loginData, $otp);
 		// update password if requested
 		if ($newPassword && $newPassword != $oldPassword) {
@@ -201,13 +202,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	public static function checkPasswordValidation($newPassword, $loginData) {
 		// check that new password structure is valid
-		if ($newPassword && 
-				  !UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
-				  (stripos($newPassword, $loginData->getFirstName()) !== false)   ||
-				  (stripos($newPassword, $loginData->getLastName()) !== false)    ||
-				  (stripos($newPassword, $loginData->getFullName()) !== false)    ||
-				  ($newPassword == $loginData->getLoginEmail())   ){
+		if ($newPassword &&
+			!UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
+			(strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
+			(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
+			(stripos($newPassword, $loginData->getFullName()) !== false) ||
+			($newPassword == $loginData->getLoginEmail()))
+		{
 			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
+		}
+		
+		if ($loginData->isCommonPassword($newPassword))
+		{
+			throw new kUserException('', kUserException::COMMON_PASSWORD_NOT_ALLOWED);
 		}
 		
 		// check that password hasn't been used before by this user
@@ -330,18 +337,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$loginData) {
 			throw new kUserException ('', kUserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
-		// check password structure
-		if (!self::isPasswordStructureValid($newPassword, $loginData->getConfigPartnerId())   ||
-			stripos($newPassword, $loginData->getFirstName()) !== false   ||
-			stripos($newPassword, $loginData->getLastName()) !== false    ||
-			$newPassword == $loginData->getLoginEmail()  ) {
-			throw new kUserException ('', kUserException::PASSWORD_STRUCTURE_INVALID);
-		}
 		
-		// check that password wasn't used before
-		if ($loginData->passwordUsedBefore($newPassword)) {
-			throw new kUserException ('', kUserException::PASSWORD_ALREADY_USED);
-		}
+		self::checkPasswordValidation($newPassword, $loginData);
 		
 		$loginData->resetPassword($newPassword);
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
@@ -468,6 +465,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
 		$requestedPartner = $partnerId;
+		$kuser = null;
 		
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
@@ -520,6 +518,22 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$otpRequired = true;
 		}
 
+		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
+		{
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+			if ($kuser)
+			{
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
+				{
+					$otpRequired = $kuser->getIsAdmin();
+				}
+				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY)
+				{
+					$otpRequired = !$kuser->getIsAdmin();
+				}
+			}
+		}
+		
 		if ($otpRequired)
 		{
 			if(!$otp)
@@ -565,7 +579,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
 		}
 
-		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+		if(is_null($kuser))
+		{
+			$kuser = kuserPeer::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
+		}
 		
 		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
 		{
@@ -713,11 +730,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$existingData = self::getByEmail($loginEmail);
 		if (!$existingData)
 		{
-			if ($checkPasswordStructure && 
-				!UserLoginDataPeer::isPasswordStructureValid($password, $partnerId)) {
-				throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
-			}
-			
 			// create a new login data record
 			$loginData = new UserLoginData();
 			$loginData->setConfigPartnerId($partnerId);
@@ -728,6 +740,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$loginData->setLoginAttempts(0);
 			$loginData->setLoginBlockedUntil(null);
 			$loginData->resetPreviousPasswords();
+			
+			if ($checkPasswordStructure)
+			{
+				self::checkPasswordValidation($password, $loginData);
+			}
+			
 			$loginData->save();
 			// now $loginData has an id and hash key can be generated
 			$hashKey = $loginData->newPassHashKey();
@@ -741,6 +759,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$seed = GoogleAuthenticator::createSecret();
 				$loginData->setSeedFor2FactorAuth($seed);
 			}
+			else
+			{
+				self::add2faSeed($partner,$isAdminUser,$loginData);
+			}
+			
 			
 			$loginData->save();
 			$alreadyExisted = false;
@@ -764,7 +787,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$existingData->save();
 			}
 			
-						
 			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
 			$alreadyExisted = true;
 			
@@ -775,6 +797,39 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			
 			return $existingData;
 		}	
+	}
+	
+	protected static function add2faSeed($partner, $isAdminUser, $userLoginData)
+	{
+		$generateNewSeed = false;
+		if ($partner->getUseTwoFactorAuthentication())
+		{
+			switch($partner->getTwoFactorAuthenticationMode())
+			{
+				case TwoFactorAuthenticationMode::ALL:
+					$generateNewSeed=true;
+					break;
+				
+				case TwoFactorAuthenticationMode::ADMIN_USERS_ONLY:
+					$generateNewSeed = $isAdminUser;
+					break;
+				
+				case TwoFactorAuthenticationMode::NON_ADMIN_USERS_ONLY;
+					$generateNewSeed = !$isAdminUser;
+					break;
+				
+				default:
+					$generateNewSeed=false;
+					break;
+			}
+
+			if($generateNewSeed)
+			{
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
+				$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+			}
+		}
+		return $generateNewSeed;
 	}
 	
 	/**

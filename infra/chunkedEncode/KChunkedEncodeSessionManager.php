@@ -33,6 +33,7 @@
 		public $hostname = 0;
 		
 		public $attempt = 0; //Job execution attempt
+		public $history = null; //job execution history in case of failures
 		
 		/* ---------------------------
 		 *
@@ -172,7 +173,12 @@
 				}
 				$elapsed = time()-$job->startTime;
 				if($elapsed>$maxExecutionTime) {
-					if(!array_key_exists($job->id, $this->failed)){
+					/*
+					 * The bellow cond was DISABLED to prevent endless loop and stuck chk on 2nd and further chk job retries.
+					 * Remarked and left as a reference, since the original need for that cond is unclear
+					 */
+//					if(!array_key_exists($job->id, $this->failed))
+					{
 						$this->retryJob($manager, $job);
 						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
 					}
@@ -315,7 +321,12 @@
 			$videoJobs = $this->getVideoJobs();
 			foreach($videoJobs as $job) {
 				$chunker->updateChunkFileStatData($job->id,$job->stat,isset($job->outFileSizes) ? $job->outFileSizes : array());
-				$logFilename = $chunker->getChunkName($job->id,".log");
+				if(isset($chunker->setup->sharedChunkPath)){
+					$logFilename = $chunker->getChunkName($job->id,"shared_base").".log";
+				}
+				else
+					$logFilename = $chunker->getChunkName($job->id,".log");
+
 				$execData = new KProcessExecutionData($job->process, $logFilename);
 				$execData->startedAt = $job->startTime;
 				$this->chunkExecutionDataArr[$job->id] = $execData;
@@ -360,8 +371,15 @@ $audMaxExecutionTime = 0;
 				if(isset($this->chunker->params->duration) && $this->chunker->params->duration>0)
 					$audMaxExecutionTime=round($this->chunker->params->duration/2);
 				else $audMaxExecutionTime = round($this->maxExecutionTime);
+					// Min execution timeout - at least 30s, to prevent TO's of very short contents
+				$vidMaxExecutionTime = max($vidMaxExecutionTime,30);
+				$audMaxExecutionTime = max($audMaxExecutionTime,30);
 			}
-
+// Workarround for long conversions of large MXF file stored on S3
+if($this->chunker->sourceFileDt->containerFormat=="mxf"){
+	$audMaxExecutionTime*= 2;
+	$vidMaxExecutionTime*= 2;
+}
 			if($this->videoJobs->detectErrors($this->storeManager, $vidMaxExecutionTime, $chunkedEncodeReadIdx)!=true)
 				return false;
 			return $this->audioJobs->detectErrors($this->storeManager, $audMaxExecutionTime, $chunkedEncodeReadIdx);
@@ -602,6 +620,10 @@ $audMaxExecutionTime = 0;
 			$this->storeManager->SaveJob($job);
 	
 			$job->state = $job::STATE_PENDING;
+			
+			//Reset job time stamps to avoid exec timeout when retrying failed job
+			$this->resetJobParams($job);
+			
 			$job->attempt++;
 			if($this->storeManager->AddJob($job)===false) {
 				KalturaLog::log("FAILED to retry job($job->id)");
@@ -609,6 +631,15 @@ $audMaxExecutionTime = 0;
 			}
 			KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
 			return true;
+		}
+		
+		protected function resetJobParams(&$job)
+		{
+			$job->history[] = array('h' => $job->hostname, 'id' => $job->id, 'st' =>$job->startTime);
+			
+			//Reset job timestamps
+			$job->queueTime = 0;
+			$job->startTime = 0;
 		}
 
 		/* ---------------------------

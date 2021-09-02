@@ -134,7 +134,8 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	const CUSTOM_DATA_AUTO_FILE_DELETE_DAYS  = 'auto_file_delete_days';
 	const CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS = 'ignore_file_name_patterns';
 	const CUSTOM_DATA_LAST_ACCESSED_AT = 'last_accessed_at';
-	
+	const CUSTOM_DATA_FILE_DELETE_REGEX = 'file_delete_regex';
+
 	
 	// File size check interval - value in seconds
 	
@@ -150,10 +151,24 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_SIZE_CHECK_INTERVAL, $interval);
 	}
-	
-	
 
-	
+
+
+	// file delete regex
+
+	/**
+	 * @return string
+	 */
+	public function getFileDeleteRegex()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FILE_DELETE_REGEX);
+	}
+
+	public function setFileDeleteRegex($fileDeleteRegex)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_FILE_DELETE_REGEX, $fileDeleteRegex);
+	}
+
 	// Automatic file delete days
 		
 	/**
@@ -327,5 +342,11 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	{
 		$dropFolderFilePath = $this->getPath().'/'.$fileName;
 		return realpath($dropFolderFilePath);
-	}	
+	}
+
+	public function getDropFolderParams()
+	{
+		return array();
+	}
+
 } // DropFolder

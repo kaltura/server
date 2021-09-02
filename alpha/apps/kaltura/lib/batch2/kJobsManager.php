@@ -546,13 +546,7 @@ class kJobsManager
 
 		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
-			$pathMgr = $sharedStorageProfile->getPathManager();
-			
-			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $flavorAsset->getVersion());
-			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
-			
-			$convertData->setDestFileSyncSharedPath($sharedPath);
+			$convertData->setDestFileSyncSharedPath(self::getSharedPath($partner,$parentJob,$flavorAsset));
 		}
 		
 		// creats a child convert job
@@ -623,6 +617,25 @@ class kJobsManager
 		}
 		
 		return $fileSync;		
+	}
+	
+	private static function getSharedPath ($partner,$parentJob,$flavorAsset)
+	{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
+			if($parentJob && $parentJob->getJobType()== BatchJobType::CLIP_CONCAT)
+			{
+				$temp_storage_bucket = kConf::get('temp_storage_bucket', myCloudUtils::CLOUD_STORAGE_MAP, null);
+				if($temp_storage_bucket)
+				{
+					$root = $temp_storage_bucket;
+				}
+			}
+			
+			return kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 	}
 	
 	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData &$convertData)
@@ -852,9 +865,11 @@ class kJobsManager
 	 */
 	public static function addPostConvertJob(BatchJob $parentJob = null, $postConvertAssetType, $fileSyncKey, $flavorAssetId, $flavorParamsOutputId, $createThumb = false, $thumbOffset = 3)
 	{
+		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($fileSyncKey);
+
 		$postConvertData = new kPostConvertJobData();
 		$postConvertData->setPostConvertAssetType($postConvertAssetType);
-		$postConvertData->setSrcFileSyncLocalPath(kFileSyncUtils::getResolveLocalFileSyncForKey($fileSyncKey));
+		$postConvertData->setSrcFileSyncLocalPath($fileSync);
 		$postConvertData->setFlavorParamsOutputId($flavorParamsOutputId);
 		$postConvertData->setFlavorAssetId($flavorAssetId);
 		$postConvertData->setThumbOffset($thumbOffset);
@@ -871,14 +886,16 @@ class kJobsManager
 		}
 		
 		$flavorAsset = assetPeer::retrieveById($flavorAssetId);
-		$flavorParamsOutput = null;
-		if($flavorAsset && $flavorAsset->getEncryptionKey()) {
+		$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
+		$unsupportedEncryptionFormats = kConf::get('unsupported_encryption_formats', 'runtime_config', array(assetParams::CONTAINER_FORMAT_MPEGTS));
+		if($flavorAsset && $flavorAsset->getEncryptionKey() &&
+			(!$flavorParamsOutput || ($flavorParamsOutput && !in_array($flavorParamsOutput->getFormat(), $unsupportedEncryptionFormats))))
+		{
 			$postConvertData->setFlavorAssetEncryptionKey($flavorAsset->getEncryptionKey());
 		}
 		
 		if($createThumb)
 		{
-			$flavorParamsOutput = assetParamsOutputPeer::retrieveByPK($flavorParamsOutputId);
 			if(!$flavorParamsOutput)
 			{
 				if($flavorAsset)
@@ -1005,7 +1022,7 @@ class kJobsManager
  		}
  			
  		$entry = entryPeer::retrieveByPK($entryId);
- 		if($entry)
+		if($entry && !$asset instanceof CaptionAsset)
  		{
  			$higherStatuses = array(
  				entryStatus::PRECONVERT,
@@ -1030,9 +1047,37 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-
-
-
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$importToShared = kConf::get('enable_import_to_shared', 'runtime_config', null);
+		$excludePartnersImportToShared = kConf::get('exclude_partners_import_to_shared', 'runtime_config', array());
+		if($importToShared && $partner->getSharedStorageProfileId() && !in_array($partnerId, $excludePartnersImportToShared))
+		{
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$pathMgr = $sharedStorageProfile->getPathManager();
+			
+			$sharedPath = null;
+			if($asset)
+			{
+				list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
+			}
+			elseif($entry)
+			{
+				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
+				$path = myContentStorage::getPathFromId($entry->getId()) . DIRECTORY_SEPARATOR . $entry->getId() . '_import';
+			}
+			else
+			{
+				//Not able to create any unique dir path based on asset or entry id so we will create random dir location
+				$randomId = kString::generateStringId();
+				$root = $sharedStorageProfile->getStorageBaseDir() . DIRECTORY_SEPARATOR . "entry/flavors/";
+				$path = myContentStorage::getPathFromId($randomId) . DIRECTORY_SEPARATOR . $randomId . '_import';
+			}
+			
+			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
+			$jobData->setDestFileSharedPath($sharedPath);
+		}
+		
 		$batchJob->setObjectId($jobData->getFlavorAssetId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
 		return self::addJob($batchJob, $jobData, BatchJobType::IMPORT, $subType);
@@ -1109,22 +1154,19 @@ class kJobsManager
 			$entry->save();
 		}
  	
-		/*
-		* TODO - AWS - Handle shared concat flow
-		* Add shared file destination when genrating the concat to stoareg output file to shared stoarge defined on the partner
-		*
 		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
 		if($partner->getSharedStorageProfileId())
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
 			$pathMgr = $sharedStorageProfile->getPathManager();
-			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
-			$root = $sharedStorageProfile->getStorageBaseDir();
+			
+			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
+			$nextVersion = kFileSyncUtils::calcObjectNewVersion($asset->getId(), $asset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
 			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 		 
 			$jobData->setDestFilePath($sharedPath);
 		}
-		*/
  	
 		$batchJob = null;
 		if($parentJob)
@@ -1599,7 +1641,14 @@ class kJobsManager
 			$batchJob->setPartnerId($partnerId);
 		}
 		
-		$batchJob->setDc($dc);
+		if(kDataCenterMgr::isDcIdShared($dc))
+		{
+			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
+		}
+		else
+		{
+			$batchJob->setDc($dc);
+		}
 		
 		KalturaLog::log("Creating File Delete job, from data center id: ". $dc ." with source file: " . $deleteFileData->getLocalFileSyncPath());
 		return self::addJob($batchJob, $deleteFileData, BatchJobType::DELETE_FILE );
@@ -1645,7 +1694,12 @@ class kJobsManager
 			{
 				$extractMediaData->setExtractId3Tags(true);
 			}
-			else if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+			elseif(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+			{
+				$profileLC = kBusinessPreConvertDL::retrieveConversionProfileByType($entry);
+				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
+			}
+			elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 			{
 				$profileLC = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
 				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
@@ -1998,15 +2052,16 @@ class kJobsManager
 
 	protected static function shouldUseSharedStorageForEngine($conversionEngine)
 	{
-		$SharedSupportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
-						KalturaConversionEngineType::ON2,
-						KalturaConversionEngineType::FFMPEG,
-						KalturaConversionEngineType::MENCODER,
-						KalturaConversionEngineType::ENCODING_COM,
-						KalturaConversionEngineType::EXPRESSION_ENCODER3,
-						KalturaConversionEngineType::CHUNKED_FFMPEG,
-						KalturaConversionEngineType::FFMPEG_VP8,
-						KalturaConversionEngineType::FFMPEG_AUX);
+		$supportedEngines = array(KalturaConversionEngineType::KALTURA_COM,
+			KalturaConversionEngineType::ON2,
+			KalturaConversionEngineType::FFMPEG,
+			KalturaConversionEngineType::MENCODER,
+			KalturaConversionEngineType::ENCODING_COM,
+			KalturaConversionEngineType::EXPRESSION_ENCODER3,
+			KalturaConversionEngineType::CHUNKED_FFMPEG,
+			KalturaConversionEngineType::FFMPEG_VP8,
+			KalturaConversionEngineType::FFMPEG_AUX);
+		$SharedSupportedEngines = Kconf::get('sharedStorageConversionEngines', 'cloud_storage', $supportedEngines);
 
 		if(in_array($conversionEngine, $SharedSupportedEngines))
 		{

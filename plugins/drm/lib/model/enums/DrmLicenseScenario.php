@@ -5,4 +5,5 @@
  */ 
 interface DrmLicenseScenario extends BaseEnum
 {
+	const NONE = 0;
 }
