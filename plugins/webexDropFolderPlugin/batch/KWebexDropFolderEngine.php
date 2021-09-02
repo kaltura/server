@@ -70,9 +70,9 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 				$endDate = date('m/j/Y H:i:s', $endDateEpoch);
 				
 				$handledFilesCount += $this->getFilesFromWebex($startDate, $endDate);
-				KalturaLog::info('Webex files handled: ' . $handledFilesCount . ' between times ' . $startDate . ' - ' . $endDate);
 				if ($handledFilesCount >= self::MAX_FILES_TO_HANDLE)
 				{
+					KalturaLog::info('Webex files handled: ' . $handledFilesCount . ' between times ' . $startDate . ' - ' . $endDate);
 					break;
 				}
 			}
