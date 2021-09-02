@@ -5,12 +5,6 @@
  */
 class KalturaVendorChapteringCatalogItem extends KalturaVendorCatalogItem
 {
-	/**
-	 * @var KalturaCatalogItemLanguage
-	 * @filter eq,in
-	 */
-	public $sourceLanguage;
-
 	private static $map_between_objects = array
 	(
 		'sourceLanguage',

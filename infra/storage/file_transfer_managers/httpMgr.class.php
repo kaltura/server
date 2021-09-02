@@ -11,8 +11,8 @@ class httpMgr extends kFileTransferMgr
 	/**
 	 * @var string
 	 */
-	protected $userAgent = "\"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.6) Gecko/2009011913 Firefox/3.0.6\"";
-	
+	protected $userAgent = KCurlWrapper::HTTP_USER_AGENT;
+
 	/**
 	 * @var resource
 	 */
@@ -37,15 +37,15 @@ class httpMgr extends kFileTransferMgr
 	protected function __construct(array $options = null)
 	{
 		parent::__construct($options);
-	
+
 		if($options)
 		{
 			if(isset($options['userAgent']))
 				$this->userAgent = $options['userAgent'];
-				
+
 			if(isset($options['fieldName']))
 				$this->fieldName = $options['fieldName'];
-				
+
 			if(isset($options['fileName']))
 				$this->fileName = $options['fileName'];
 		}

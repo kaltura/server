@@ -61,8 +61,15 @@ class kFile extends kFileBase
 	}
 
 	// TODO - implement recursion
-	static public function dirList($directory, $return_directory_as_prefix = true, $should_recurse = false)
+	static public function dirList($directory, $return_directory_as_prefix = true)
 	{
+		if (kFile::isSharedPath($directory))
+		{
+			$sharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($directory);
+			$pathPrefix = $return_directory_as_prefix ? $directory . "/" : '';
+			return $sharedFsMgr->listFiles($directory . "/" , $pathPrefix, false, true);
+		}
+
 		// create an array to hold directory list
 		$results = array();
 		
@@ -74,10 +81,9 @@ class kFile extends kFileBase
 		// keep going until all files in directory have been read
 		while($file = readdir($handler))
 		{
-			
 			// if $file isn't this directory or its parent,
 			// add it to the results array
-			if($file != '.' && $file != '..')
+			if($file != '.' && $file != '..' )
 			{
 				$results[] = ($return_directory_as_prefix ? $directory . "/" : "") . $file;
 			}
@@ -336,7 +342,7 @@ class kFile extends kFileBase
 	
 	public static function moveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		KalturaLog::debug("moveFile from [$from] to [$to] override_if_exists [$override_if_exists] copy [$copy]");
+		kSharedFileSystemMgr::safeLog("moveFile from [$from] to [$to] override_if_exists [$override_if_exists] copy [$copy]");
 		$from = kFile::fixPath($from);
 		$to = kFile::fixPath($to);
 		

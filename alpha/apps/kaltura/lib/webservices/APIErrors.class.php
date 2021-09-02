@@ -378,6 +378,8 @@ class APIErrors
 	
 	const PASSWORD_STRUCTURE_INVALID = "PASSWORD_STRUCTURE_INVALID;RULES;The password you entered has an invalid structure.\nPasswords must obey the following rules :\n@RULES@";
 	
+	const COMMON_PASSWORD_NOT_ALLOWED = "COMMON_PASSWORD;;Chosen password is a common password";
+	
 	const PASSWORD_ALREADY_USED = "PASSWORD_ALREADY_USED;;Chosen password has already been used";
 	
 	const PASSWORD_EXPIRED = "PASSWORD_EXPIRED;;Current password has expired";

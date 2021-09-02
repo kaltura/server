@@ -30,7 +30,7 @@ class ConfMapsTableMap extends TableMap {
 	 */
 	public function initialize()
 	{
-	  // attributes
+		// attributes
 		$this->setName('conf_maps');
 		$this->setPhpName('ConfMaps');
 		$this->setClassname('ConfMaps');
@@ -45,6 +45,7 @@ class ConfMapsTableMap extends TableMap {
 		$this->addColumn('REMARKS', 'Remarks', 'VARCHAR', false, 255, null);
 		$this->addColumn('CONTENT', 'Content', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('VERSION', 'Version', 'INTEGER', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

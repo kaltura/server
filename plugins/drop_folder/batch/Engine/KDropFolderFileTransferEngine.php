@@ -11,13 +11,12 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	 */	
 	protected $fileTransferMgr;
 
-	
 	public function watchFolder (KalturaDropFolder $folder)
 	{
 		$this->dropFolder = $folder;
 		$this->fileTransferMgr =  self::getFileTransferManager($this->dropFolder);
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
-						    										
+
 		$physicalFiles = $this->getDropFolderFilesFromPhysicalFolder();
 		if(count($physicalFiles) > 0)
 			$dropFolderFilesMap = $this->loadDropFolderFiles();
@@ -50,6 +49,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 					unset($dropFolderFilesMap[$physicalFileName]);
 				continue;
 			}
+
+			$this->logPhysicalFile($this->dropFolder->path.'/'.$physicalFile->filename,$physicalFile);
 			
 			if($this->validatePhysicalFile($physicalFileName))
 			{
@@ -91,40 +92,63 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		}
 	}
-	
+
 	protected function fileExists ()
 	{
 		return $this->fileTransferMgr->fileExists($this->dropFolder->path);
 	}
-	
+
+	protected function shouldPurgeFile(KalturaDropFolderFile $dropFolderFile)
+	{
+		if($this->dropFolder->fileDeleteRegex && !preg_match($this->dropFolder->fileDeleteRegex, $dropFolderFile->fileName))
+		{
+			return false;
+		}
+
+		if($dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
+		{
+			return true;
+		}
+
+		$purgeTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays * 86400;
+		if( ($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED)
+			&& ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
+			&& (time() > $purgeTime) )
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
-		try 
+		try
 		{
 			$fullPath = $this->dropFolder->path.'/'.$dropFolderFile->fileName;
-			$lastModificationTime = $this->fileTransferMgr->modificationTime($fullPath);
-			$fileSize = $this->fileTransferMgr->fileSize($fullPath);
+			$lastModificationTime = $this->getLastModificationTime($fullPath);
+			$fileSize = $this->getFileSize($fullPath);
 		}
 		catch (Exception $e)
 		{
 			$closedStatuses = array(
-				KalturaDropFolderFileStatus::HANDLED, 
-				KalturaDropFolderFileStatus::PURGED, 
+				KalturaDropFolderFileStatus::HANDLED,
+				KalturaDropFolderFileStatus::PURGED,
 				KalturaDropFolderFileStatus::DELETED
 			);
-			
-			//In cases drop folder is not configured with auto delete we want to verify that the status file is not in one of the closed statuses so 
+
+			//In cases drop folder is not configured with auto delete we want to verify that the status file is not in one of the closed statuses so
 			//we won't update it to error status
 			if(!in_array($dropFolderFile->status, $closedStatuses))
 			{
 				//Currently "modificationTime" does not throw Exception since from php documentation not all servers support the ftp_mdtm feature
 				KalturaLog::err('Failed to get modification time or file size for file ['.$fullPath.']');
-				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE, 
+				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
 															DropFolderPlugin::ERROR_READING_FILE_MESSAGE. '['.$fullPath.']', $e);
 			}
-			return false;		
-		}				 
-				
+			return false;
+		}
+
 		if($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
 		{
 			$this->handleUploadingDropFolderFile($dropFolderFile, $fileSize, $lastModificationTime);
@@ -135,18 +159,16 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$isLastModificationTimeUpdated = $dropFolderFile->lastModificationTime && $dropFolderFile->lastModificationTime != '' && ($lastModificationTime > $dropFolderFile->lastModificationTime);
 			
 			if($isLastModificationTimeUpdated) //file is replaced, add new entry
-		 	{
-		 		$this->handleFileAdded($dropFolderFile->fileName, $fileSize, $lastModificationTime);
-		 	}
-		 	else
-		 	{
-		 		$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays*86400;
-		 		if(($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE && time() > $deleteTime) ||
-		 			$dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
-		 		{
-		 			$this->purgeFile($dropFolderFile);
-		 		}
-		 	}
+			{
+				$this->handleFileAdded($dropFolderFile->fileName, $fileSize, $lastModificationTime);
+			}
+			else
+			{
+				if($this->shouldPurgeFile($dropFolderFile))
+				{
+					$this->purgeFile($dropFolderFile);
+				}
+			}
 		}
 	}
 	
@@ -181,11 +203,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		try 
 		{
 			$newDropFolderFile = new KalturaDropFolderFile();
-	    	$newDropFolderFile->dropFolderId = $this->dropFolder->id;
-	    	$newDropFolderFile->fileName = $fileName;
-	    	$newDropFolderFile->fileSize = $fileSize;
-	    	$newDropFolderFile->lastModificationTime = $lastModificationTime; 
-	    	$newDropFolderFile->uploadStartDetectedAt = time();
+			$newDropFolderFile->dropFolderId = $this->dropFolder->id;
+			$newDropFolderFile->fileName = $fileName;
+			$newDropFolderFile->fileSize = $fileSize;
+			$newDropFolderFile->lastModificationTime = $lastModificationTime;
+			$newDropFolderFile->uploadStartDetectedAt = time();
 			$dropFolderFile = $this->dropFolderFileService->add($newDropFolderFile);
 			return $dropFolderFile;
 		}
@@ -247,44 +269,54 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 	}
 	
 	/** 
-     * Init a kFileTransferManager acccording to folder type and login to the server
-     * @throws Exception
-     * 
-     * @return kFileTransferMgr
-     */
+	 * Init a kFileTransferManager acccording to folder type and login to the server
+	 * @throws Exception
+	 *
+	 * @return kFileTransferMgr
+	 */
 	public static function getFileTransferManager(KalturaDropFolder $dropFolder)
 	{
 		$engineOptions = isset(KBatchBase::$taskConfig->engineOptions) ? KBatchBase::$taskConfig->engineOptions->toArray() : array();
-	    $fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
-	    
-	    $host =null; $username=null; $password=null; $port=null;
-	    $privateKey = null; $publicKey = null;
-	    
-	    if($dropFolder instanceof KalturaRemoteDropFolder)
-	    {
-	   		$host = $dropFolder->host;
-	    	$port = $dropFolder->port;
-	    	$username = $dropFolder->username;
-	    	$password = $dropFolder->password;
-	    }  
-	    if($dropFolder instanceof KalturaSshDropFolder)
-	    {
-	    	$privateKey = $dropFolder->privateKey;
-	    	$publicKey = $dropFolder->publicKey;
-	    	$passPhrase = $dropFolder->passPhrase;  	    	
-	    }
+		if($dropFolder instanceof KalturaS3DropFolder)
+		{
+			$engineOptions['s3Region'] = $dropFolder->s3Region;
+		}
+		$fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
 
-        // login to server
-        if ($privateKey || $publicKey) 
-        {
-	       	$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
-        	$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey'): null;
-        	$fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);        	
-        }
-        else 
-        {
-        	$fileTransferMgr->login($host, $username, $password, $port);        	
-        }
+		$host =null; $username=null; $password=null; $port=null;
+		$privateKey = null; $publicKey = null;
+
+		if($dropFolder instanceof KalturaRemoteDropFolder)
+		{
+			$host = $dropFolder->host;
+			$port = $dropFolder->port;
+			$username = $dropFolder->username;
+			$password = $dropFolder->password;
+		}
+		if($dropFolder instanceof KalturaSshDropFolder)
+		{
+			$privateKey = $dropFolder->privateKey;
+			$publicKey = $dropFolder->publicKey;
+			$passPhrase = $dropFolder->passPhrase;
+		}
+		if($dropFolder instanceof KalturaS3DropFolder)
+		{
+			$host = $dropFolder->s3Host;
+			$username = $dropFolder->s3UserId;
+			$password = $dropFolder->s3Password;
+		}
+
+		// login to server
+		if ($privateKey || $publicKey)
+		{
+			$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
+			$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey'): null;
+			$fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);
+		}
+		else
+		{
+			$fileTransferMgr->login($host, $username, $password, $port);
+		}
 		
 		return $fileTransferMgr;		
 	}
@@ -305,6 +337,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				return kFileTransferMgrType::SCP;
 			case KalturaDropFolderType::SFTP:
 				return kFileTransferMgrType::SFTP;
+			case KalturaDropFolderType::S3DROPFOLDER:
 			case KalturaDropFolderType::S3:
 				return kFileTransferMgrType::S3;
 			default:
@@ -372,18 +405,18 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		$delResult = null;
 		try 
 		{
-		    $delResult = $this->fileTransferMgr->delFile($fullPath);
+			$delResult = $this->fileTransferMgr->delFile($fullPath);
 		}
 		catch (Exception $e) 
 		{
 			KalturaLog::err("Error when deleting drop folder file - ".$e->getMessage());
-		    $delResult = null;
+			$delResult = null;
 		}
 		if (!$delResult) 
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE, 
 														 DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
 		else
-		 	$this->handleFilePurged($dropFolderFile->id);
+			$this->handleFilePurged($dropFolderFile->id);
 	}
 	
 	protected function getDropFolderFilesFromPhysicalFolder()
@@ -469,22 +502,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)
 	{
-		try 
+		try
 		{
 			$entryFilter = new KalturaBaseEntryFilter();
 			$entryFilter->referenceIdEqual = $data->parsedSlug;
-			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;		
+			$entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP;
+			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;
 			
 			$entryPager = new KalturaFilterPager();
 			$entryPager->pageSize = 1;
 			$entryPager->pageIndex = 1;
 			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
 			
-			if (is_array($entryList->objects) && isset($entryList->objects[0]) ) 
+			if (is_array($entryList->objects) && isset($entryList->objects[0]))
 			{
-				$result = $entryList->objects[0];
-				if ($result->referenceId === $data->parsedSlug) 
-					return $result;
+				return $entryList->objects[0];
 			}
 			
 			return false;			
@@ -536,6 +568,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		{
 			$this->createCategoryAssociations ($dropFolder, $updatedEntry->userId, $updatedEntry->id);
 		}
+	}
+
+	protected function getLastModificationTime($fullPath)
+	{
+		return $this->fileTransferMgr->modificationTime($fullPath);
+	}
+
+	protected function getFileSize($fullPath)
+	{
+		return $this->fileTransferMgr->fileSize($fullPath);
+	}
+
+	protected function logPhysicalFile($fullPath,$physicalFileInfo)
+	{
+		//do nothing.
 	}
 
 }

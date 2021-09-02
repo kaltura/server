@@ -17,7 +17,10 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 	const LIVE_STREAM_OM_CLASS = 'LiveStreamScheduleEvent';
 	const RECORD_OM_CLASS = 'RecordScheduleEvent';
+	const MEETING_OM_CLASS = 'MeetingScheduleEvent';
 	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
+	const LIVE_REDIRECT_OM_CLASS = 'LiveRedirectScheduleEvent';
+	
 	const BLACKOUT_SESSION_CACHE_START_DATE = 'start_date';
 	const BLACKOUT_SESSION_CACHE_END_DATE = 'end_date';
 	const BLACKOUT_SESSION_CACHE_RESULT = 'result';
@@ -30,6 +33,8 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		ScheduleEventType::LIVE_STREAM => self::LIVE_STREAM_OM_CLASS,
 		ScheduleEventType::RECORD => self::RECORD_OM_CLASS,
 		ScheduleEventType::BLACKOUT => self::BLACKOUT_OM_CLASS,
+		ScheduleEventType::MEETING => self::MEETING_OM_CLASS,
+		ScheduleEventType::LIVE_REDIRECT => self::LIVE_REDIRECT_OM_CLASS,
 	);
 	
 	/*
@@ -254,7 +259,59 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$filter->attachToCriteria($c);
 		return self::doSelect($c);
 	}
+	
+	public static function retrieveByTemplateEntryIdAndTime($templateEntryId,
+	                                                      $time = null)
+	{
+		$types = array	(ScheduleEventType::LIVE_STREAM,
+		                   ScheduleEventType::LIVE_REDIRECT,
+		                   ScheduleEventType::MEETING,
+		                   ScheduleEventType::RECORD);
+		
+		$time = $time ? $time : time();
+		
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		$c->add(ScheduleEventPeer::END_DATE, $time, Criteria::GREATER_EQUAL);
+		$c->add(ScheduleEventPeer::START_DATE, $time, Criteria::LESS_EQUAL);
+		$filter = new ScheduleEventFilter();
+		$filter->setTemplateEntryIdEqual($templateEntryId);
+		$filter->attachToCriteria($c);
+		return self::doSelect($c);
+	}
 
+	/**
+	 * @param string $templateEntryId
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @param array $types
+	 * @return array<ScheduleEvent>
+	 */
+	public static function retrieveOtherEvents($templateEntryId, $startDate, $endDate, array $idsToIgnore)
+	{
+		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
+
+		$criterion1 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::LESS_THAN);
+		$criterion1->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $startDate, Criteria::GREATER_THAN));
+
+		$criterion2 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $endDate, Criteria::LESS_THAN);
+		$criterion2->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::GREATER_THAN));
+
+		$criterion3 = $c->getNewCriterion(ScheduleEventPeer::START_DATE, $startDate, Criteria::GREATER_EQUAL);
+		$criterion3->addAnd($c->getNewCriterion(ScheduleEventPeer::END_DATE, $endDate, Criteria::LESS_EQUAL));
+		
+		$c->addOr($criterion1);
+		$c->addOr($criterion2);
+		$c->addOr($criterion3);
+		
+		$filter = new ScheduleEventFilter();
+		$filter->setTemplateEntryIdEqual($templateEntryId);
+		$filter->setIdsNotIn($idsToIgnore);
+		$filter->attachToCriteria($c);
+
+		return self::doSelect($c);
+	}
+	
 	/**
 	 * @param string $resourceIds
 	 * @param date $startDate

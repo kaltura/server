@@ -251,15 +251,17 @@ abstract class kSharedFileSystemMgr
 	 * @return int
 	 */
 	abstract protected function doGetUploadMaxSize();
-	
+
 	/**
 	 * returns list of files under given file path
 	 *
 	 * @param $filePath file path to list dir content for
-	 *
-	 * @return int
+	 * @param string $pathPrefix
+	 * @param bool $recursive
+	 * @param bool $fileNamesOnly
+	 * @return array
 	 */
-	abstract protected function doListFiles($filePath, $pathPrefix = '');
+	abstract protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false);
 	
 	/**
 	 * returns true/false if the givven file path exists and is a regular file
@@ -341,6 +343,11 @@ abstract class kSharedFileSystemMgr
 	 * @return bool
 	 */
 	abstract protected function doCopyDir($src, $dest, $deleteSrc);
+	
+	/**
+	 * @return bool
+	 */
+	abstract protected function doShouldPollFileExists();
 	
 	/**
 	 * @return bool
@@ -512,10 +519,10 @@ abstract class kSharedFileSystemMgr
 		return $this->doRename($from, $to);
 	}
 	
-	public function listFiles($filePath, $pathPrefix = '')
+	public function listFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
 		$filePath = kFileBase::fixPath($filePath);
-		return $this->doListFiles($filePath, $pathPrefix);
+		return $this->doListFiles($filePath, $pathPrefix, $recursive, $fileNamesOnly);
 	}
 	
 	public function isFile($filePath)
@@ -536,6 +543,11 @@ abstract class kSharedFileSystemMgr
 		return $this->doMimeType($filePath);
 	}
 	
+	
+	public function shouldPollFileExists()
+	{
+		return $this->doShouldPollFileExists();
+	}
 	/**
 	 * copies local src to shared destination.
 	 * Doesn't support non-flat directories!

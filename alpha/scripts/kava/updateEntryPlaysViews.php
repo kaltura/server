@@ -33,7 +33,7 @@ while($s = trim(fgets($f)))
 		//in case we have cache don't use propel so we wont get the values from cache
 		$entrySql = 'SELECT e.plays, e.views FROM entry AS e WHERE e.status<>3 and e.id = ?';
 		$stmt = $connection->prepare($entrySql);
-		$stmt->bindValue(1, $entryId);
+		$stmt->bindValue(1, $entryId, PDO::PARAM_STR);
 		$stmt->execute();
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 		if (!$row)

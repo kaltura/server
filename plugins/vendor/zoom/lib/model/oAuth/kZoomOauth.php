@@ -32,6 +32,7 @@ class kZoomOauth
 		$vendorIntegration->saveTokensData($tokensData);
 		return $tokensData;
 	}
+	
 
 	public static function requestAccessToken($authCode)
 	{

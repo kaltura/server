@@ -180,7 +180,6 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	{
 		if(!($dbObject instanceof LiveStreamEntry))
 			return;
-
 		/**
 		 * @var LiveStreamEntry @dbObject
 		 */

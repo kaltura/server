@@ -1,0 +1,1 @@
+ALTER TABLE conf_maps ADD custom_data TEXT AFTER content;

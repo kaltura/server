@@ -51,6 +51,13 @@ $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
+$explicitPartnerIdsString = kConf::get('explicitPartnerIds','elasticDynamicMap',null);
+$explicitPartnerIds = array();
+if ($explicitPartnerIdsString)
+{
+        $explicitPartnerIdsArray = explode(',',$explicitPartnerIdsString);
+        $explicitPartnerIds = array_map('trim',$explicitPartnerIdsArray);
+}
 
 if (!$systemSettings || !$systemSettings['LOG_DIR'])
 {
@@ -131,11 +138,12 @@ while (true)
 	$elasticLogs = $assocElasticLogs;
 
 	$ping = $elasticClient->ping();
-
 	if (!$ping)
 	{
 		KalturaLog::err('cannot connect to elastic cluster with client[' . print_r($elasticClient, true) . ']');
 		sleep(5);
+		kMemoryManager::clearMemory();
+		$elasticClient = new elasticClient($elasticServer, $elasticPort);
 		continue;
 	}
 
@@ -179,12 +187,17 @@ while (true)
 				//we save the elastic command as serialized object in the sql field
 				$command = $elasticLog->getSql();
 				$command = unserialize($command);
-				$index = $command['index'];
 				$action = $command['action'];
+				$index = $command['index'];
+				$partnerId = $elasticLog->getPartnerId();
+				$command['index'] = kBaseESearch::getSplitIndexNamePerPartner($command['index'], $partnerId);
 
-				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!==false && $action == ElasticMethodType::UPDATE)))
+				if ($action && ($processScriptUpdates || !(strpos($index, ElasticIndexMap::ELASTIC_ENTRY_INDEX)!== false && $action == ElasticMethodType::UPDATE)))
 				{
-					$response = $elasticClient->addToBulk($command);
+					if (empty($explicitPartnerIds) || in_array($partnerId, $explicitPartnerIds))
+					{
+						$response = $elasticClient->addToBulk($command);
+					}
 				}
 
 				unset($objectIdElasticLog[$objectId]);

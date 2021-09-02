@@ -307,6 +307,8 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 	 */
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
+		$this->last_hydrate_time = time();
+
 		try {
 
 			$this->kshow_id = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
@@ -1183,6 +1185,13 @@ abstract class BaseKshowKuser extends BaseObject  implements Persistent {
 
 			$this->akshow = null;
 			$this->akuser = null;
+	}
+
+	protected $last_hydrate_time;
+
+	public function getLastHydrateTime()
+	{
+		return $this->last_hydrate_time;
 	}
 
 } // BaseKshowKuser

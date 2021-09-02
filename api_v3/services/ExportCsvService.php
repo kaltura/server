@@ -20,48 +20,86 @@ class ExportCsvService extends KalturaBaseService
 	 * @param KalturaUserFilter $filter A filter used to exclude specific types of users
 	 * @param int $metadataProfileId
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
+	 * @param KalturaKeyValueArray $mappedFields mapping between field
+	 * headline and its mapped value
 	 * @return string
 	 *
 	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_PROFILE
 	 * @throws MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED
 	 */
-	public function userExportToCsvAction (KalturaUserFilter $filter = null, $metadataProfileId = null, $additionalFields = null)
+	public function userExportToCsvAction (KalturaUserFilter $filter = null,
+	                                       $metadataProfileId = null,
+	                                       $additionalFields = null,
+	                                       KalturaKeyValueArray $mappedFields = null)
 	{
+		if(!$filter)
+		{
+			$filter = new KalturaUserFilter();
+		}
+		return $this->exportMappedObjectToCsv(ExportObjectType::USER, new kUsersCsvJobData(),
+			$filter, $metadataProfileId, $additionalFields, $mappedFields);
+	}
+
+	/**
+	 * add batch job that sends an email with a link to download an updated CSV that contains list of entries
+	 * @action entryExportToCsv
+	 * @actionAlias baseEntry.exportToCsv
+	 * @param KalturaBaseEntryFilter $filter A filter used to exclude specific entries
+	 * @param int $metadataProfileId
+	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
+	 * @param KalturaKeyValueArray $mappedFields mapping between field headline and its mapped value
+	 * @return string
+	 */
+	public function entryExportToCsvAction(KalturaBaseEntryFilter $filter = null, $metadataProfileId = null,
+	                                       $additionalFields = null, KalturaKeyValueArray $mappedFields = null)
+	{
+		if (!$filter)
+		{
+			$filter = new KalturaBaseEntryFilter();
+		}
+		return $this->exportMappedObjectToCsv(ExportObjectType::ENTRY, new kEntriesCsvJobData(),
+			$filter, $metadataProfileId, $additionalFields, $mappedFields);
+	}
+
+	protected function exportMappedObjectToCsv($exportObjectType, $jobData, $filter, $metadataProfileId, $additionalFields, $mappedFields)
+	{
+		$kuser = $this->getKuser();
+		if(!$kuser || !$kuser->getEmail())
+		{
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
+		}
+
 		if($metadataProfileId)
 		{
 			$metadataProfile = MetadataProfilePeer::retrieveByPK($metadataProfileId);
-			if (!$metadataProfile || ($metadataProfile->getPartnerId() != $this->getPartnerId()))
+			if ( !$metadataProfile || ($metadataProfile->getPartnerId() != $this->getPartnerId()) )
+			{
 				throw new KalturaAPIException(MetadataErrors::INVALID_METADATA_PROFILE, $metadataProfileId);
+			}
 		}
 		else
 		{
 			if($additionalFields->count)
+			{
 				throw new KalturaAPIException(MetadataErrors::METADATA_PROFILE_NOT_SPECIFIED, $metadataProfileId);
+			}
 		}
-		
-		if (!$filter)
-			$filter = new KalturaUserFilter();
-		$dbFilter = new kuserFilter();
-		$filter->toObject($dbFilter);
-		
-		$kuser = $this->getKuser();
-		if(!$kuser || !$kuser->getEmail())
-			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
-		
-		$jobData = new kUsersCsvJobData();
+
+		$dbFilter = $filter->toObject();
+
 		$jobData->setFilter($dbFilter);
 		$jobData->setMetadataProfileId($metadataProfileId);
 		$jobData->setAdditionalFields($additionalFields);
 		$jobData->setUserMail($kuser->getEmail());
 		$jobData->setUserName($kuser->getPuserId());
-		
-		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), ExportObjectType::USER);
-		
+		$jobData->setMappedFields($mappedFields);
+
+		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), $exportObjectType);
+
 		return $kuser->getEmail();
 	}
-	
-	
+
 	/**
 	 *
 	 * Will serve a requested CSV

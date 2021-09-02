@@ -30,7 +30,10 @@ abstract class LiveEntry extends entry
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
 	protected $decidingLiveProfile = false;
-
+	
+	protected $isPlayable = null;
+	protected $currentEvent = null;
+	
 	public function copyInto($copyObj, $deepcopy = false)
 	{
 		parent::copyInto($copyObj, $deepcopy);
@@ -250,9 +253,13 @@ abstract class LiveEntry extends entry
 		
 		return array(array('bitrate' => 300, 'width' => 320, 'height' => 240));
 	}
-	
+
 	public function getRecordedEntryId()
 	{
+		if($this->pluginableGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
 		return $this->getFromCustomData("recorded_entry_id");
 	}
 	
@@ -501,7 +508,10 @@ abstract class LiveEntry extends entry
 		foreach ($pluginInstances as $instance)
 		{
 			/* @var $instance IKalturaScheduleEventProvider */
-			$pluginEvents = $instance->getScheduleEvents($this->getId(), array(ScheduleEventType::LIVE_STREAM), $startTime, $endTime);
+			$pluginEvents = $instance->getScheduleEvents($this->getId(),
+			                                             array(ScheduleEventType::LIVE_STREAM),
+			                                             $startTime,
+			                                             $endTime);
 			if ($pluginEvents)
 			{
 				KalturaLog::debug('IKalturaScheduleEventProvider pluginEvents = ' . print_r($pluginEvents, true));
@@ -510,14 +520,39 @@ abstract class LiveEntry extends entry
 		}
 		return $events;
 	}
-
+	
+	/**
+	 * @param $context string - used for binding the getter to the final
+	 * decorator
+	 * @param $output any - a new value for the caller
+	 * @return boolean - indicating for the caller to stop the processing and
+	 * use the new output
+	 */
+	protected function pluginableGetter($context, &$output)
+	{
+		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaDynamicGetter');
+		foreach ($pluginInstances as $instance)
+		{
+			if($instance->getter($this, $context, $output))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public function getLiveStatus($checkExplicitLive = false, $protocol = null)
 	{
 		if ($checkExplicitLive && $this->getViewMode() == ViewMode::PREVIEW && !$this->canViewExplicitLive())
 		{
 			return EntryServerNodeStatus::STOPPED;
 		}
-
+		
+		if($this->pluginableGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+		
 		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 		{
 			return $this->getInternalLiveStatus($checkExplicitLive);
@@ -531,15 +566,25 @@ abstract class LiveEntry extends entry
 	}
 
 	/**
-	 * @return boolean
+	 * @param bool $currentDcOnly
+	 * @param string $protocol
+	 * @return bool|null
 	 */
 	public function isCurrentlyLive($currentDcOnly = false, $protocol = null)
 	{
-		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+		try
 		{
-			return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+			if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
+			{
+				return $this->getLiveStatus(true, $protocol) === EntryServerNodeStatus::PLAYABLE;
+			}
+			return $this->isExternalCurrentlyLive($protocol);
 		}
-		return $this->isExternalCurrentlyLive($protocol);
+		catch (Exception $e)
+		{
+			KalturaLog::debug('Got exception during checking if entry currently live: ' . $e->getMessage());
+			return null;
+		}
 	}
 
 	protected function isExternalCurrentlyLive($reqProtocol = null)
@@ -606,15 +651,10 @@ abstract class LiveEntry extends entry
 		}
 		return null;
 	}
-
-
+	
+	
 	protected function getInternalLiveStatus($checkExplicitLive = false)
 	{
-		if (kSimuliveUtils::getPlayableSimuliveEvent($this))
-		{
-			return EntryServerNodeStatus::PLAYABLE;
-		}
-
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
 
@@ -767,6 +807,7 @@ abstract class LiveEntry extends entry
 			$dbLiveEntryServerNode->setPartnerId($this->getPartnerId());
 			$dbLiveEntryServerNode->setStatus($liveEntryStatus);
 			$dbLiveEntryServerNode->setDc($serverNode->getDc());
+			$dbLiveEntryServerNode->setViewMode($this->getViewMode());
 			
 			if($applicationName)
 				$dbLiveEntryServerNode->setApplicationName($applicationName);
@@ -1075,10 +1116,11 @@ abstract class LiveEntry extends entry
 
 	public function getObjectParams($params = null)
 	{
+		$enableIsLive = kConf::get('enableIsLiveOnElasticIndex', 'elastic', true);
 		$body = array(
 			'recorded_entry_id' => $this->getRecordedEntryId(),
 			'push_publish' => $this->getPushPublishEnabled(),
-			'is_live' => $this->isCurrentlyLive(),
+			'is_live' => $enableIsLive ? $this->isCurrentlyLive() : false,
 		);
 		elasticSearchUtils::cleanEmptyValues($body);
 
@@ -1106,6 +1148,13 @@ abstract class LiveEntry extends entry
 	public function setViewMode($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerTypes($this->getId(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP));
+		foreach ($entryServerNodes as $entryServerNode)
+		{
+			/* @var $entryServerNode LiveEntryServerNode */
+			$entryServerNode->setViewMode($v);
+			$entryServerNode->save();
+		}
 	}
 
 	public function getRecordingStatus()
@@ -1128,17 +1177,29 @@ abstract class LiveEntry extends entry
 
 	public function getRedirectEntryId()
 	{
-		if ($this->isPlayable())
+		if($this->pluginableGetter(__FUNCTION__, $output))
+		{
+			return $output;
+		}
+		
+		if($this->isPlayable())
 		{
 			return null;
 		}
-
+		
 		return parent::getRedirectEntryId();
 	}
 
 	public function isPlayable()
 	{
-		return $this->getViewMode() == ViewMode::ALLOW_ALL && in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+		//Calculate isPlayable only once in session
+		if(is_null($this->isPlayable))
+		{
+			$this->isPlayable = $this->getViewMode() == ViewMode::ALLOW_ALL
+				&& in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+		}
+		
+		return $this->isPlayable;
 	}
 
 	public function getRecordedEntryConversionProfile()
@@ -1150,6 +1211,4 @@ abstract class LiveEntry extends entry
         }
 	    return $conversionProfileId;
     }
-
-
 }

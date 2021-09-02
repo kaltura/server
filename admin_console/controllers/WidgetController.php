@@ -44,7 +44,7 @@ class WidgetController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')));
 		$form = new Form_Widget();
-		$form->setObjTypes($this->getSupportedUiConfTypes());
+		$form->setObjTypes(self::getSupportedUiConfTypes());
 		$form->setAction($action);
 		$client = Infra_ClientHelper::getClient();
 		$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
@@ -74,7 +74,7 @@ class WidgetController extends Zend_Controller_Action
 		$id = $request->getParam('id');
 		$action = $this->view->url(array('controller' => $request->getParam('controller'), 'action' => $request->getParam('action')));
 		$form = new Form_Widget();
-		$form->setObjTypes($this->getSupportedUiConfTypes());
+		$form->setObjTypes(self::getSupportedUiConfTypes());
 		$form->setAction($action);
 		
 		$client = Infra_ClientHelper::getClient();
@@ -116,7 +116,7 @@ class WidgetController extends Zend_Controller_Action
 		
 		
 		$form = new Form_Widget();
-		$form->setObjTypes($this->getSupportedUiConfTypes());
+		$form->setObjTypes(self::getSupportedUiConfTypes());
 		$form->setAction($action);
 		
 		$client = Infra_ClientHelper::getClient();
@@ -191,7 +191,7 @@ class WidgetController extends Zend_Controller_Action
 	protected function getUiConfFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
 		$uiConfFilter = new Kaltura_Client_Type_UiConfFilter();
-		$uiConfFilter->objTypeIn = implode(',', array_keys($this->getSupportedUiConfTypes()));
+		$uiConfFilter->objTypeIn = implode(',', array_keys(self::getSupportedUiConfTypes()));
 		$partnerFilter = null;
 		$filterType = $request->getParam('filter_type');
 		$filterInput = $request->getParam('filter_input');
@@ -199,6 +199,15 @@ class WidgetController extends Zend_Controller_Action
 		{
 			case 'by-uiconf-id':
 				$uiConfFilter->idIn = $filterInput;
+				break;
+			case 'by-uiconf-type':
+				$uiConfFilter->objTypeIn = $request->getParam('filter_obj_type_input');
+				break;
+			case 'by-uiconf-name':
+				$uiConfFilter->nameLike = $filterInput;
+				break;
+			case 'by-uiconf-tags':
+				$uiConfFilter->tagsMultiLikeOr = $filterInput;
 				break;
 			case 'byid':
 				$uiConfFilter->partnerIdIn = $filterInput;
@@ -235,7 +244,7 @@ class WidgetController extends Zend_Controller_Action
 		return $uiConfFilter;
 	}
 	
-	protected function getSupportedUiConfTypes()
+	public static function getSupportedUiConfTypes()
 	{
 		$types = array(
 			'Generic'
@@ -244,7 +253,7 @@ class WidgetController extends Zend_Controller_Action
 		if ($typesConfig)
 		{
 			if ($typesConfig === "*")
-				return $this->getAllUiConfTypes();
+				return self::getAllUiConfTypes();
 				
 			foreach($typesConfig as $config)
 			{
@@ -252,7 +261,7 @@ class WidgetController extends Zend_Controller_Action
 				{
 					if ($config === "*")
 					{
-						return $this->getAllUiConfTypes();
+						return self::getAllUiConfTypes();
 					}
 					else
 					{
@@ -264,8 +273,8 @@ class WidgetController extends Zend_Controller_Action
 		}
 		return $types;
 	}
-	
-	protected function getAllUiConfTypes()
+
+	public static function getAllUiConfTypes()
 	{
 		$types = array();
 		$reflectionClass = new ReflectionClass('Kaltura_Client_Enum_UiConfObjType');

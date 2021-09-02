@@ -6,9 +6,7 @@
 
 class KExportMediaEsearchEngine extends KObjectExportEngine
 {
-	
 	const LIMIT = 10000;
-	
 	const PAGE_SIZE = 500;
 	
 	public function fillCsv(&$csvFile, &$data)
@@ -57,7 +55,8 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	/**
 	 * Generate the first csv row containing the fields
 	 */
-	protected function addHeaderRowToCsv($csvFile, $additionalFields)
+	protected function addHeaderRowToCsv($csvFile, $additionalFields,
+	                                     $mappedFileds = null)
 	{
 		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt ';
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));

@@ -11,7 +11,6 @@ class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
-	const ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY = 10;
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -360,7 +359,22 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * @throws KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
+	
+	
 	public function isLiveAction ($id, $protocol = null)
+	{
+		$liveStreamEntry = $this->fetchLiveEntry($id);
+		$liveStreamEntry->setLiveStatusCache();
+		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
+		
+		if ($isLive !== null)
+		{
+			return $this->responseHandlingIsLive($isLive);
+		}
+		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+	}
+	
+	protected function fetchLiveEntry($id)
 	{
 		if (!kCurrentContext::$ks)
 		{
@@ -368,7 +382,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
 			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
 				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
+			
 			// enforce entitlement
 			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
 		}
@@ -379,28 +393,11 @@ class LiveStreamService extends KalturaLiveEntryService
 		
 		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
-		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
-			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
-
-		/* @var $liveStreamEntry LiveStreamEntry */
-	
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
-
-		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
-		if ($isLive !== null)
-		{
-			return $this->responseHandlingIsLive($isLive);
-		}
-		throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_STATUS_CANNOT_BE_DETERMINED, $protocol);
+		
+		return $liveStreamEntry;
 	}
-
-
-
+	
+	
 	private function responseHandlingIsLive($isLive)
 	{
 		if (!$isLive){
@@ -578,57 +575,33 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function getDetailsAction($id)
 	{
-		if (!kCurrentContext::$ks)
-		{
-			kEntitlementUtils::initEntitlementEnforcement(null, false);
-			$liveStreamEntry = kCurrentContext::initPartnerByEntryId($id);
-			if (!$liveStreamEntry || $liveStreamEntry->getStatus() == entryStatus::DELETED)
-				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
-			// enforce entitlement
-			$this->setPartnerFilters(kCurrentContext::getCurrentPartnerId());
-		}
-		else
-		{
-			$liveStreamEntry = entryPeer::retrieveByPK($id);
-		}
-
-		if (!$liveStreamEntry || ($liveStreamEntry->getType() != entryType::LIVE_STREAM))
-			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $id);
-
-		/** @var LiveStreamEntry $liveStreamEntry */
-
-		if (!in_array($liveStreamEntry->getSource(), LiveEntry::$kalturaLiveSourceTypes))
-			KalturaResponseCacher::setConditionalCacheExpiry(self::ISLIVE_ACTION_NON_KALTURA_LIVE_CONDITIONAL_CACHE_EXPIRY);
-
-		$simuliveCondCacheTime = kSimuliveUtils::getIsLiveCacheTime($liveStreamEntry);
-		if ($simuliveCondCacheTime)
-		{
-			KalturaResponseCacher::setConditionalCacheExpiry($simuliveCondCacheTime);
-		}
-
-		$res = new KalturaLiveStreamDetails();
+		$liveStreamEntry = $this->fetchLiveEntry($id);
+		$liveStreamEntry->setLiveStatusCache();
+		$liveStreamDetails = new KalturaLiveStreamDetails();
 		$isLive = $liveStreamEntry->isCurrentlyLive();
-		$res->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
+		$liveStreamDetails->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
 		if (in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
-			$res = $this->getLiveStreamDetails($id, $liveStreamEntry);
+			$this->updateInternalLiveStreamDetails($liveStreamEntry, $liveStreamDetails);
+		}
+
+		if ($isLive && $liveStreamDetails->broadcastStatus == KalturaLiveStreamBroadcastStatus::OFFLINE) //Simulive flow
+		{
+			$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 		}
 
 		$this->responseHandlingIsLive($isLive);
-		return $res;
+		return $liveStreamDetails;
 	}
 
 	/**
-	 * @param $id
 	 * @param $liveStreamEntry
-	 * @return KalturaLiveStreamDetails
+	 * @param KalturaLiveStreamDetails $liveStreamDetails
 	 */
-	protected function getLiveStreamDetails($id, $liveStreamEntry)
+	protected function updateInternalLiveStreamDetails($liveStreamEntry, $liveStreamDetails)
 	{
 		/** @var LiveEntry $liveStreamEntry*/
-		$res = new KalturaLiveStreamDetails();
-		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($id, EntryServerNodePeer::$connectedServerNodeStatuses);
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($liveStreamEntry->getId(), EntryServerNodePeer::$connectedServerNodeStatuses);
 		$primaryIsPlayableUser = false;
 		$secondaryIsPlayableUser = false;
 		foreach ($entryServerNodes as $currESN)
@@ -636,40 +609,35 @@ class LiveStreamService extends KalturaLiveEntryService
 			/** @var LiveEntryServerNode $currESN */
 			if ($currESN->getServerType() == EntryServerNodeType::LIVE_PRIMARY)
 			{
-				$res->primaryStreamStatus = $currESN->getStatus();
+				$liveStreamDetails->primaryStreamStatus = $currESN->getStatus();
 				$primaryIsPlayableUser = $currESN->getIsPlayableUser();
 			} else if ($currESN->getServerType() == EntryServerNodeType::LIVE_BACKUP)
 			{
-				$res->secondaryStreamStatus = $currESN->getStatus();
+				$liveStreamDetails->secondaryStreamStatus = $currESN->getStatus();
 				$secondaryIsPlayableUser = $currESN->getIsPlayableUser();
 			}
 		}
-		$res->viewMode = $liveStreamEntry->getViewMode();
-		$res->wasBroadcast = $liveStreamEntry->getBroadcastTime() ? true : false;
+		$liveStreamDetails->viewMode = $liveStreamEntry->getViewMode();
+		$liveStreamDetails->wasBroadcast = $liveStreamEntry->getBroadcastTime() ? true : false;
 
-		$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::OFFLINE;
-		if ($res->primaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+		$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::OFFLINE;
+		if ($liveStreamDetails->primaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
 		{
-			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
+			$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
 			if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $primaryIsPlayableUser)
 			{
-				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+				$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 			}
 		}
-		if ($res->broadcastStatus != KalturaLiveStreamBroadcastStatus::LIVE && $res->secondaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
+		if ($liveStreamDetails->broadcastStatus != KalturaLiveStreamBroadcastStatus::LIVE && $liveStreamDetails->secondaryStreamStatus == EntryServerNodeStatus::PLAYABLE)
 		{
-			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
+			$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::PREVIEW;
 			if ($liveStreamEntry->getViewMode() == ViewMode::ALLOW_ALL && $secondaryIsPlayableUser)
 			{
-				$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
+				$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 			}
 		}
 
-		if (kSimuliveUtils::getPlayableSimuliveEvent($liveStreamEntry))
-		{
-			$res->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
-		}
-		return $res;
 	}
 
 	/**

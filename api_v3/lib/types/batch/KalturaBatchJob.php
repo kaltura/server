@@ -419,7 +419,11 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kUsersCsvJobData':
 				$this->data = new KalturaUsersCsvJobData();
 				break;
-			
+
+			case 'kEntriesCsvJobData':
+				$this->data = new KalturaEntriesCsvJobData();
+				break;
+
 			case 'kClipConcatJobData':
 				$this->data = new KalturaClipConcatJobData();
 				break;
@@ -710,12 +714,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kCopyCaptionsJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaCopyCaptionsJobData();
-				break;
-
-			case KalturaBatchJobType::USERS_CSV:
-				$dbData = new kUsersCsvJobData();
-				if(is_null($this->data))
-					$this->data = new KalturaUsersCsvJobData();
 				break;
 
 			case KalturaBatchJobType::LIVE_ENTRY_ARCHIVE:

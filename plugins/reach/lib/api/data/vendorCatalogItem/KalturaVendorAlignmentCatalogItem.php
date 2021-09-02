@@ -6,12 +6,6 @@
 class KalturaVendorAlignmentCatalogItem extends KalturaVendorCatalogItem
 {
 	/**
-	 * @var KalturaCatalogItemLanguage
-	 * @filter eq,in
-	 */
-	public $sourceLanguage;
-	
-	/**
 	 * @var KalturaVendorCatalogItemOutputFormat
 	 * @filter eq,in
 	 */
@@ -19,7 +13,6 @@ class KalturaVendorAlignmentCatalogItem extends KalturaVendorCatalogItem
 
 	private static $map_between_objects = array
 	(
-		'sourceLanguage',
 		'outputFormat',
 	);
 	

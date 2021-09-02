@@ -9,17 +9,24 @@ class KAsyncConcat extends KJobHandlerWorker
 {
 	const LiveChunkDuration = 900000;	// msec (15*60*1000);
 	const MaxChunkDelta 	= 150;		// msec
-	
+	const CONCAT_METHOD_FILE 	= "raw";
+	const CONCAT_METHOD_FFMPEG 	= "ffmpeg";
+
 	/**
 	 * @var string
 	 */
 	protected $localTempPath;
-	
+
 	/**
 	 * @var string
 	 */
 	protected $sharedTempPath;
 	
+	/**
+	 * @var string
+	 */
+	protected $concatMethod;
+
 	/**
 	 * (non-PHPdoc)
 	 * @see KBatchBase::getJobType()
@@ -42,6 +49,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
+		$this->concatMethod = isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 	
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -91,8 +99,8 @@ class KAsyncConcat extends KJobHandlerWorker
 		$mediaInfoBin = isset(KBatchBase::$taskConfig->params->mediaInfoCmd)? KBatchBase::$taskConfig->params->mediaInfoCmd: "mediainfo";
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		
+		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath.".mp4" : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
 		{
@@ -100,7 +108,17 @@ class KAsyncConcat extends KJobHandlerWorker
 			$srcFiles[] = $srcFile->value;
 		}
 
-		$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration,$data->shouldSort);
+		$attemptNum = 1;
+		$totalAttempts = isset(KBatchBase::$taskConfig->params->totalAttempts) ? KBatchBase::$taskConfig->params->totalAttempts : 3;
+
+		do
+		{
+			KalturaLog::info('Concat attempt ' . $attemptNum . ' out of: ' . $totalAttempts);
+			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $attemptNum);
+			$attemptNum++;
+		}
+		while (!$result && $attemptNum <= $totalAttempts);
+
 		if(! $result)
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);
 
@@ -139,7 +157,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::RETRY);
 			
 		$data->destFilePath = $sharedTempFilePath;
-		return $this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
+		return $this->closeJob($job, null, null, 'successfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 	}
 
 	/**
@@ -151,13 +169,15 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @param unknown_type $clipStart
 	 * @param unknown_type $clipDuration
 	 * @param bool $shouldSort
+	 * @param integer $attempt
 	 * @return boolean
+	 * @throws kApplicativeException
 	 */
-	protected static function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true)
+	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $attempt = 1)
 	{
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
-		$concateStr = null;
+		$concatStr = null;
 	
 		/*
 		 * Evaluate clipping arguments
@@ -198,20 +218,6 @@ class KAsyncConcat extends KJobHandlerWorker
 				else if(isset($mi->audioBitRate) && $mi->audioBitRate>0)
 					$chunkBr+= $mi->audioBitRate;
 			}
-	
-				/*
-				 * On last chunk file - 
-				 * - no duration delta validity tests
-				 * - pack the final concat string and finish the loop
-				 */
-			$fileName = kFile::realPath($fileName);
-			if($i==$filesArrCnt){
-				$concateStr = "concat:\"$concateStr$fileName\"";
-				break;
-			}
-			else {
-				$concateStr.= "$fileName|";
-			}
 			
 				/* 
 				 * ##############
@@ -249,7 +255,8 @@ class KAsyncConcat extends KJobHandlerWorker
 			}
 				*/
 		}
-	
+		
+		$concatStr = $this->concatFilesArr($filesArr, $outFilename);
 			/*
 			 * For clip flow - set converion to x264,
 			 * otherwise - just copy video
@@ -282,7 +289,8 @@ class KAsyncConcat extends KJobHandlerWorker
 			$audioParamStr.= " -bsf:a aac_adtstoasc";
 			$audioParamStr.= " -map a ";
 		}
-	
+
+		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
 			/*
 			 * ##############
 			 * ############## DISABLE the 'small-distortion-fix' code, see above
@@ -297,12 +305,179 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 		else */
 		{
-			$cmdStr = "$ffmpegBin -protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" -probesize 15M -analyzeduration 25M -i $concateStr $videoParamStr $audioParamStr";
+			$cmdStr = "$ffmpegBin ";
+			if($this->concatMethod == self::CONCAT_METHOD_FFMPEG)
+			{
+				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
+			}
+			
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr -i $concatStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	
 		KalturaLog::debug("Executing [$cmdStr]");
 		$output = system($cmdStr, $rv);
+		
+		if($this->concatMethod == self::CONCAT_METHOD_FILE && kFile::checkFileExists($concatStr))
+		{
+			kFile::unlink($concatStr);
+		}
+		
 		return ($rv == 0) ? true : false;
+	}
+	
+	protected function concatFilesArr($filesArr, $outFileName)
+	{
+		if($this->concatMethod == self::CONCAT_METHOD_FILE)
+		{
+			$mergedOutFileName = $outFileName.".merged";
+			$rv = $this->mergeFiles($filesArr, $mergedOutFileName);
+			return $rv ? $mergedOutFileName : null;
+		}
+		
+		$i = 0;
+		$concatStr = null;
+		$filesArrCnt = count($filesArr);
+		foreach($filesArr as $fileName)
+		{
+			$i++;
+			$fileName = kFile::realPath($fileName);
+			/*
+			 * On last chunk file -
+			 * - no duration delta validity tests
+			 * - pack the final concat string and finish the loop
+			 */
+			if($i==$filesArrCnt)
+			{
+				$concatStr = "concat:\"$concatStr$fileName\"";
+				break;
+			}
+			else {
+				$concatStr.= "$fileName|";
+			}
+		}
+		
+		return $concatStr;
+	}
+	
+	protected function mergeFiles($filesArr, $outFileName)
+	{
+		stream_wrapper_restore('http');
+		stream_wrapper_restore('https');
+		
+		$rv = true;
+		$concatenatedFileSize = 0;
+		$oFh = fopen($outFileName,"wb");
+		if($oFh===false)
+		{
+			return false;
+		}
+		
+		foreach($filesArr as $file) {
+			$retries = 3;
+			$concatFileSuccess = false;
+			$fileSize = kFile::fileSize($file);
+			
+			while($retries > 0)
+			{
+				$bytesWritten = self::appendFile($oFh, $file, 10000000, $fileSize);
+				if($bytesWritten !== false)
+				{
+					$concatenatedFileSize += $bytesWritten;
+					$concatFileSuccess = true;
+					break;
+				}
+				
+				$retries--;
+				fseek($oFh, $concatenatedFileSize, SEEK_SET);
+				KalturaLog::debug("Failed to download [$file], rfs [$remoteFileSize], ofs [$bytesWritten], retries left [$retries]");
+				sleep(rand(1,3));
+			}
+			
+			if(!$concatFileSuccess)
+			{
+				KalturaLog::debug("Failed to build merged file, Convert will fail, bytes fetched [$concatenatedFileSize]");
+				$rv = false;
+				break;
+			}
+		}
+		fclose($oFh);
+		
+		stream_wrapper_unregister('https');
+		stream_wrapper_unregister('http');
+		
+		return $rv;
+	}
+	
+	protected static function appendFile($fhd, $fileName, $rdSz=10000000, $expectedFileSize = null)
+	{
+		$fileName = kFile::realPath($fileName);
+		if(($ifhd = fopen($fileName,"rb"))===false)
+		{
+			return false;
+		}
+		
+		$wrSz=0;
+		while(!feof($ifhd))
+		{
+			$iBuf = fread($ifhd, $rdSz);
+			if($iBuf === false)
+			{
+				return false;
+			}
+			if(($sz = fwrite($fhd, $iBuf, $rdSz))===false)
+			{
+				return false;
+			}
+			
+			$wrSz += $sz;
+		}
+		
+		fclose($ifhd);
+		KalturaLog::log("sz:$wrSz ex: $expectedFileSize ".$fileName);
+		
+		if($expectedFileSize && $expectedFileSize != $wrSz)
+		{
+			return false;
+		}
+		
+		return $wrSz;
+	}
+
+	/**
+	 * @param $attempt
+	 * @return string
+	 */
+	protected static function getProbeSizeAndAnalyzeDuration($attempt)
+	{
+		switch ($attempt)
+		{
+			case 1:
+				$probeSize = 15;
+				$analyzeDuration = 25;
+				break;
+			case 2:
+				$probeSize = 50;
+				$analyzeDuration = 100;
+				break;
+			case 3:
+				$probeSize = 75;
+				$analyzeDuration = 150;
+				break;
+			case 4:
+				$probeSize = 100;
+				$analyzeDuration = 200;
+				break;
+			case 5:
+				$probeSize = 125;
+				$analyzeDuration = 250;
+				break;
+			default:
+				$probeSize = 150;
+				$analyzeDuration = 300;
+		}
+		$probeSizeStr = '-probesize ' . $probeSize . 'M';
+		$analyzeDurationStr = '-analyzeduration ' . $analyzeDuration . 'M';
+		return $probeSizeStr . ' ' . $analyzeDurationStr;
 	}
 }

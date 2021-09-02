@@ -154,7 +154,7 @@ class KAsyncImport extends KJobHandlerWorker
 					if($actualFileSize >= $fileSize)
 					{
 						$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-						return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+						return $this->moveFile($job, $data);
 					}
 					else
 					{
@@ -180,7 +180,6 @@ class KAsyncImport extends KJobHandlerWorker
 				//Not all servers support all the options so we need to remove them from our headers.
 				$curlWrapper->close();
 			}
-
 			if($resumeOffset)
 			{
 				$this->updateJob($job, "Resuming download, from ".$resumeOffset ." size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
@@ -188,7 +187,7 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl);;
+				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
@@ -214,10 +213,11 @@ class KAsyncImport extends KJobHandlerWorker
 					if( $actualFileSize >= $fileSize)
 					{
 						$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-						return $this->moveFile($job, $data->destFileLocalPath, $fileSize);
+						return $this->moveFile($job, $data);
 					}
 					else
 					{
+						list($actualFileSize, $data) = $this->movePartialFileToShared($data, $actualFileSize);
 						$percent = floor($actualFileSize/$fileSize*100);
 						$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
 						$e->setResetJobExecutionAttempts(true);
@@ -261,8 +261,10 @@ class KAsyncImport extends KJobHandlerWorker
 				KalturaLog::debug("shouldCheckFileSize:{$shouldCheckFileSize} actualFileSize:{$actualFileSize} fileSize:{$fileSize}");
 				if($actualFileSize < $fileSize && $shouldCheckFileSize)
 				{
+					//Handle flow where destFileSync local path is a different mount than the shared file system mount
+					list($actualFileSize, $data) = $this->movePartialFileToShared($data, $actualFileSize);
 					$percent = floor($actualFileSize * 100 / $fileSize);
-					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "DDownloaded size: $actualFileSize($percent%) " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY);
+					$this->closeJob($job, KalturaBatchJobErrorTypes::CURL, $errNumber, "Downloaded size: $actualFileSize($percent%) " . $curlWrapper->getError(), KalturaBatchJobStatus::RETRY, $data);
 					return job;
 				}
 				
@@ -276,7 +278,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
-			$job = $this->moveFile($job, $data->destFileLocalPath);
+			$job = $this->moveFile($job, $data);
 		}
 		catch(kTemporaryException $tex)
 		{
@@ -294,7 +296,6 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		return $job;
 	}
-
 
 	/*
 	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
@@ -373,7 +374,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$fileSize = $fileTransferMgr->fileSize($remotePath);
 				
 	            // create a temp file path
-				$destFile = $this->getTempFilePath($remotePath);
+				$destFile = $this->getTempFilePath($remotePath, $fileSize);
 				$data->destFileLocalPath = $destFile;
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				KalturaLog::debug("destFile [$destFile]");
@@ -403,6 +404,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$actualFileSize = kFile::fileSize($data->destFileLocalPath);
 				if($actualFileSize < $fileSize)
 				{
+					list($actualFileSize, $data) = $this->movePartialFileToShared($data, $actualFileSize);
 					$percent = floor($actualFileSize * 100 / $fileSize);
 					$e = new kTemporaryException("Downloaded size: $actualFileSize($percent%)");
 					$e->setResetJobExecutionAttempts(true);
@@ -412,7 +414,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
 
-			$job = $this->moveFile($job, $data->destFileLocalPath);
+			$job = $this->moveFile($job, $data);
 		}
 		catch(Exception $ex)
 		{
@@ -427,47 +429,56 @@ class KAsyncImport extends KJobHandlerWorker
 	 * @param int $fileSize
 	 * @return KalturaBatchJob
 	 */
-	private function moveFile(KalturaBatchJob $job, $destFile)
+	private function moveFile(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
 		try
 		{
-			// creates a shared file path
-			$rootPath = self::$taskConfig->params->sharedTempPath;
-
-			$res = self::createDir( $rootPath );
-			if ( !$res )
+			// creates a shared file path or use the one set on the job data if provided
+			$destFile = $data->destFileLocalPath;
+			$sharedFile = $data->destFileSharedPath;
+			if(!$sharedFile)
 			{
-				KalturaLog::err( "Cannot continue import without shared directory");
-				die();
+				$rootPath = self::$taskConfig->params->sharedTempPath;
+				$res = self::createDir( $rootPath );
+				if ( !$res )
+				{
+					KalturaLog::err("Cannot continue import without shared directory");
+					die();
+				}
+				$sharedFile = $rootPath . DIRECTORY_SEPARATOR . uniqid('import_');
 			}
-			$uniqid = uniqid('import_');
-			$sharedFile = $rootPath . DIRECTORY_SEPARATOR . $uniqid;
 
 			$ext = pathinfo($destFile, PATHINFO_EXTENSION);
 			if(strlen($ext))
+			{
 				$sharedFile .= ".$ext";
-
+				//If we changed the shared file name we need to update it on the jobs data
+				if($data->destFileSharedPath)
+				{
+					$data->destFileSharedPath = $sharedFile;
+				}
+			}
+			
 			KalturaLog::debug("rename('$destFile', '$sharedFile')");
-			rename($destFile, $sharedFile);
-			if(!file_exists($sharedFile))
+			kFile::moveFile($destFile, $sharedFile);
+			if(!kFile::checkFileExists($sharedFile))
 			{
 				KalturaLog::err("Error: renamed file doesn't exist");
 				die();
 			}
 
 			clearstatcache();
-
 			$fileSize = kFile::fileSize($sharedFile);
-
 			$this->setFilePermissions($sharedFile);
 
 			$data = $job->data;
 			$data->destFileLocalPath = $sharedFile;
+			
 			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 
 			if($this->checkFileExists($sharedFile, $fileSize))
 			{
-				$this->closeJob($job, null, null, 'Succesfully moved file', KalturaBatchJobStatus::FINISHED, $data);
+				$this->closeJob($job, null, null, 'Successfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 			}
 			else
 			{
@@ -481,12 +492,16 @@ class KAsyncImport extends KJobHandlerWorker
 		return $job;
 	}
 	
-
-
-	protected function getTempFilePath($remotePath)
+	protected function getTempFilePath($remotePath, $fileSize = null)
 	{
 	    // create a temp file path
 		$rootPath = self::$taskConfig->params->localTempPath;
+		$fileSizeThreshold = isset(self::$taskConfig->params->fileSizeThreshold) ? self::$taskConfig->params->fileSizeThreshold : null;
+		$shardTempPath = isset(self::$taskConfig->params->sharedTempPath) ? self::$taskConfig->params->sharedTempPath : null;
+		if ($fileSize && $fileSizeThreshold && $shardTempPath && $fileSize > $fileSizeThreshold )
+		{
+			$rootPath = $shardTempPath;
+		}
 
 		$res = self::createDir( $rootPath );
 		if ( !$res )
@@ -509,5 +524,38 @@ class KAsyncImport extends KJobHandlerWorker
 			$destFile .= ".$ext";
 
 		return $destFile;
+	}
+	
+	/**
+	 * @param $partialFilePath
+	 */
+	protected function movePartialFileToShared(KalturaImportJobData &$data, $partialFileSize)
+	{
+		$sharedTempPath = self::$taskConfig->params->sharedTempPath;
+		if(!$sharedTempPath)
+		{
+			KalturaLog::err("Cannot continue import without shared directory");
+			throw new Exception("Cannot continue import without shared directory");
+		}
+		
+		
+		$res = self::createDir( $sharedTempPath );
+		if ( !$res )
+		{
+			KalturaLog::err("Failed to create shared dir, cannot continue import without shared directory");
+			throw new Exception("Failed to create shared dir, cannot continue import without shared directory");
+		}
+		
+		$partialFilePath = $data->destFileLocalPath;
+		$sharedTempFilePath = $sharedTempPath . DIRECTORY_SEPARATOR . basename($partialFilePath);
+		if(!kFile::moveFile($partialFilePath, $sharedTempFilePath))
+		{
+			//If we failed to copy local file to shared location reset download operation
+			kFile::unlink($partialFilePath);
+			return array(0, null);
+		}
+		
+		$data->destFileLocalPath = $sharedTempFilePath;
+		return array($partialFileSize, $data);
 	}
 }

@@ -56,6 +56,13 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 	public $inputEntitledUsersPublish;
 
 	/**
+	 * The input entitled users view to set on the entry
+	 *
+	 * @var string
+	 */
+	public $inputEntitledUsersView;
+
+	/**
 	 * Should clear the media repurposing data and therefore reset the process
 	 *
 	 * @var bool
@@ -78,6 +85,7 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$dbObject->setDataValue('inputUserId', $this->inputUserId);
 		$dbObject->setDataValue('inputEntitledUsersEdit', $this->inputEntitledUsersEdit);
 		$dbObject->setDataValue('inputEntitledUsersPublish', $this->inputEntitledUsersPublish);
+		$dbObject->setDataValue('inputEntitledUsersView', $this->inputEntitledUsersView);
 		$dbObject->setDataValue('resetMediaRepurposingProcess', $this->resetMediaRepurposingProcess);
 		return $dbObject;
 	}
@@ -94,6 +102,7 @@ class KalturaModifyEntryObjectTask extends KalturaObjectTask
 		$this->inputUserId = $srcObj->getDataValue('inputUserId');
 		$this->inputEntitledUsersEdit = $srcObj->getDataValue('inputEntitledUsersEdit');
 		$this->inputEntitledUsersPublish = $srcObj->getDataValue('inputEntitledUsersPublish');
+		$this->inputEntitledUsersView = $srcObj->getDataValue('inputEntitledUsersView');
 		$this->resetMediaRepurposingProcess = is_null($srcObj->getDataValue('resetMediaRepurposingProcess')) ? false : $srcObj->getDataValue('resetMediaRepurposingProcess');
 	}
 }

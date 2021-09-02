@@ -306,16 +306,20 @@
 		 */
 		public function parseLogFile($logFileName)
 		{
-			if(!file_exists($logFileName))
+			KalturaLog::log("logFileName:$logFileName");
+			if(!kFile::checkFileExists($logFileName)) {
+				KalturaLog::log("NOT FOUND $logFileName !!!");
 				return;
-			$fp = fopen($logFileName, 'r');
-			if($fp==null)
-				return;
-			$line = fgets($fp);
-			$logLines = null;
-			$logLines = self::readLastLines($fp, 300);							
-			$logLines[] = $line;
-			fclose($fp);
+			}
+
+			$line = kFile::getFileContent($logFileName, 0,80);
+			$flSz = kFile::fileSize($logFileName);
+			$startFrom = $flSz<300? 0: $flSz-300;
+			$logLines = kFile::getFileContent($logFileName, $startFrom, $flSz);
+KalturaLog::log("logLinesBuffer - fileSize($flSz), startFrom($startFrom), loaded(".strlen($logLines)."), text - \n $logLines");
+			$logLines.= (PHP_EOL.$line);
+			$logLines = explode(PHP_EOL, $logLines);
+
 			foreach($logLines as $line){
 				if(strstr($line, "elapsed")!==false) {
 					$tmpArr = explode(" ",$line);

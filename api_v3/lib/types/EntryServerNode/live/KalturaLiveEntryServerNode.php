@@ -25,11 +25,17 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $isPlayableUser;
 
+	/**
+	 * @var KalturaViewMode
+	 */
+	public $viewMode;
+
 	private static $map_between_objects = array
 	(
 		"streams",
 		"recordingInfo",
 		"isPlayableUser",
+		"viewMode",
 	);
 
 	/* (non-PHPdoc)

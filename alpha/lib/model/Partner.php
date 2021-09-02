@@ -91,7 +91,15 @@ class Partner extends BasePartner
 	const LIVE_CONCURRENT_BY_ADMIN_TAG = 'live_concurrent_by_admin_tag';
 
 	const ALL_PARTNERS_WILD_CHAR = "*";
-  
+	
+	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
+	
+	const TRIGRAM_PERCENTAGE = 'trigram_percentage';
+	
+	const MAX_WORDS_FOR_NGRAM = 'max_words_for_ngram';
+	
+	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
+ 
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -1147,7 +1155,9 @@ class Partner extends BasePartner
 	public function setMaxConcurrentLiveByAdminTag($limitsArray)			{
 		$this->putInCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG, $limitsArray);
 	}
-
+	public function setSecondarySecretRoleId($v)        {$this->putInCustomData(self::SECONDARY_SECRET_ROLE, $v);}
+	
+	public function getSecondarySecretRoleId()          {return $this->getFromCustomData(self::SECONDARY_SECRET_ROLE);}
 	public function getMaxConcurrentLiveByAdminTag()			{
 		$defaultValues = kConf::get('ConcurrentLiveLimitByAdminTag_DefaultValues', 'local', array());
 		return array_replace($defaultValues, (array)$this->getFromCustomData(self::LIVE_CONCURRENT_BY_ADMIN_TAG));
@@ -1189,9 +1199,11 @@ class Partner extends BasePartner
 	public function getTemplateCustomMetadataNum()		{return $this->getFromCustomData('template_custom_metadata_num', null, 0);}
 	public function getInitialPasswordSet()				{return $this->getFromCustomData('initial_password_set', null, 0);}
 	public function getMarketoCampaignId()				{return $this->getFromCustomData('marketo_campaign_id', null, 0);}
-
-
-    public function setLiveStreamBroadcastUrlConfigurations($key, $value)
+	
+	
+	
+	
+	public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
     	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
     }
@@ -2181,6 +2193,16 @@ class Partner extends BasePartner
 		$this->putInCustomData('avoidIndexingSearchHistory', $v);
 	}
 	
+	public function getTwoFactorAuthenticationMode()
+	{
+		return $this->getFromCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE);
+	}
+	
+	public function setTwoFactorAuthenticationMode($v)
+	{
+		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
+	}
+	
 	public function getSharedStorageProfileId()
 	{
 		$sharedStorageId = null;
@@ -2210,5 +2232,25 @@ class Partner extends BasePartner
 	public function setSharedStorageProfileId($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATE_SHARED_STORAGE_STORAGE_PROFILE_ID, $v);
+	}
+	
+	public function getTrigramPercentage()
+	{
+		return $this->getFromCustomData(self::TRIGRAM_PERCENTAGE);
+	}
+	
+	public function setTrigramPercentage($v)
+	{
+		return $this->putInCustomData(self::TRIGRAM_PERCENTAGE, $v);
+	}
+	
+	public function getMaxWordForNgram()
+	{
+		return $this->getFromCustomData(self::MAX_WORDS_FOR_NGRAM);
+	}
+	
+	public function setMaxWordForNgram($v)
+	{
+		return $this->putInCustomData(self::MAX_WORDS_FOR_NGRAM, $v);
 	}
 }

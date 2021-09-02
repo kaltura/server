@@ -9,6 +9,8 @@
 class PeerUtils
 {
 
+	const SETTER_GETTER_PREFIX_LEN = 3;
+
 	/**
 	 * Retrieve multiple objects by pkey but will keep the ordered of the requested Ids.
 	 *
@@ -32,5 +34,26 @@ class PeerUtils
 		return function ($a, $b) use ($objectsOrder) {
 			return ($objectsOrder[$a->getId()] > $objectsOrder[$b->getId()]) ? 1 : -1;
 		};
+	}
+
+	static protected function getName($input)
+	{
+		return ltrim(strtolower(preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', substr($input, self::SETTER_GETTER_PREFIX_LEN))), '_') . '_extension';
+	}
+
+	static public function getExtension($obj, $getterFuncStr)
+	{
+		return $obj->getFromCustomData(self::getName($getterFuncStr), null, '');
+	}
+	static public function setExtension($obj, $v, $maxLengthInDb, $setterFuncStr)
+	{
+		
+		$ext = substr($v, $maxLengthInDb);
+		if($ext || $obj->getCustomData())
+		{
+			$alignedUtf8Str = kString::alignUtf8String($v, $maxLengthInDb);
+			$ext = substr($v, strlen($alignedUtf8Str));
+			$obj->putInCustomData(self::getName($setterFuncStr), ($ext === false) ? '' : $ext);
+		}
 	}
 }

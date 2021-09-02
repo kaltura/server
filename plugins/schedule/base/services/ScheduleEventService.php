@@ -189,8 +189,17 @@ class ScheduleEventService extends KalturaBaseService
 		}
 
 		$dbScheduleEvent->setStatus(ScheduleEventStatus::DELETED);
+		if($dbScheduleEvent->getLinkedTo())
+		{
+			$eventToUnlinkId = $dbScheduleEvent->getLinkedTo()->getEventId();
+			if (isset($eventToUnlinkId))
+			{
+				$eventToUnlink = ScheduleEventPeer::retrieveByPK($eventToUnlinkId);
+				$eventToUnlink->removeFromLinkedByArray($dbScheduleEvent->getId());
+			}
+		}
 		$dbScheduleEvent->save();
-
+		
 		if($dbScheduleEvent->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
 		{
 			ScheduleEventPeer::deleteByParentId($scheduleEventId);

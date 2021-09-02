@@ -23,8 +23,8 @@ class kFlowHelper
 
 	const DAYS = 'days';
 	const HOURS = 'hours';
-
-
+	
+	
 	/**
 	 * @param int $partnerId
 	 * @param string $entryId
@@ -36,32 +36,49 @@ class kFlowHelper
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		if ($flavorAsset)
 			return $flavorAsset;
-
+		
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
 		{
 			KalturaLog::err("Entry [$entryId] not found");
 			return null;
 		}
-
+		
 		// creates the flavor asset
+		return self::createFlavorAsset($partnerId, $entryId, true, array(flavorParams::TAG_SOURCE),flavorParams::SOURCE_FLAVOR_ID, $fileExt);
+	}
+	
+	protected static function createFlavorAsset($partnerId, $entryId, $isOriginal, $tags, $sourceFlavorId,
+											$fileExt = null)
+	{
 		$flavorAsset = flavorAsset::getInstance();
 		$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$flavorAsset->incrementVersion();
-		$flavorAsset->addTags(array(flavorParams::TAG_SOURCE));
-		$flavorAsset->setIsOriginal(true);
-		$flavorAsset->setFlavorParamsId(flavorParams::SOURCE_FLAVOR_ID);
+		$flavorAsset->addTags($tags);
+		$flavorAsset->setIsOriginal($isOriginal);
+		$flavorAsset->setFlavorParamsId($sourceFlavorId);
 		$flavorAsset->setPartnerId($partnerId);
 		$flavorAsset->setEntryId($entryId);
-
+		
 		if ($fileExt)
 		{
 			$flavorAsset->setFileExt($fileExt);
 		}
-
+		
 		$flavorAsset->save();
-
+		
 		return $flavorAsset;
+	}
+	
+	public static function createAdditionalFlavorAsset($partnerId, $entryId, $fileExt = null, $flavorParamsId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+		{
+			KalturaLog::err("Entry [$entryId] not found");
+			return null;
+		}
+		return self::createFlavorAsset($partnerId, $entryId,false, array(), $flavorParamsId, $fileExt);
 	}
 
 	/**
@@ -130,7 +147,7 @@ class kFlowHelper
 		if($dbBatchJob->getExecutionStatus() == BatchJobExecutionStatus::ABORTED)
 			return $dbBatchJob;
 
-		if(!file_exists($data->getDestFileLocalPath()))
+		if(!kFile::checkFileExists($data->getDestFileLocalPath()))
 			throw new APIException(APIErrors::INVALID_FILE_NAME, $data->getDestFileLocalPath());
 
 		// get entry
@@ -160,9 +177,22 @@ class kFlowHelper
 				$dbEntry->setData("." . $ext);
 			else				
 				$dbEntry->setData(".jpg");
-			
-			
-			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+
+
+			$flavorAsset = null;
+			if($data->getFlavorAssetId())
+			{
+				$flavorAsset = assetPeer::retrieveById($data->getFlavorAssetId());
+			}
+
+			if($flavorAsset && ($flavorAsset instanceof thumbAsset))
+			{
+				$syncKey = $flavorAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+			}
+			else
+			{
+				$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+			}
 
 			try
 			{
@@ -178,6 +208,13 @@ class kFlowHelper
 			}
 			$dbEntry->setStatus(entryStatus::READY);
 			$dbEntry->save();
+
+			if($flavorAsset)
+			{
+				$flavorAsset->setStatus(asset::ASSET_STATUS_READY);
+				$flavorAsset->save();
+			}
+
 			return $dbBatchJob;
 		}
 
@@ -218,19 +255,43 @@ class kFlowHelper
 			
 			$flavorAsset->setWidth($width);
 			$flavorAsset->setHeight($height);
-			$flavorAsset->setSize(filesize($data->getDestFileLocalPath()));
+			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
 		}
 		$flavorAsset->save();
+
+		if($flavorAsset instanceof AttachmentAsset)
+		{
+			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
+		}
 		
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey, true, false, $data->getCacheOnly());
+		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
+		{
+			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
+			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
+			if(!$storageProfile)
+			{
+				KalturaLog::err("Shared storage [$partnerSharedStorageProfileId] Not found");
+				throw new Exception ( "Shared storage [$partnerSharedStorageProfileId] Not found");
+			}
+			
+			$localFilePath = $data->getDestFileSharedPath();
+			kFileSyncUtils::createReadySyncFileForKey($syncKey, $data->getDestFileSharedPath(), $partnerSharedStorageProfileId);
+		}
+		else
+		{
+			kFileSyncUtils::moveFromFile($data->getDestFileLocalPath(), $syncKey);
+			
+			// set the path in the job data
+			$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			$data->setDestFileLocalPath($localFilePath);
+			$dbBatchJob->setData($data);
+		}
 
-
-		// set the path in the job data
-		$localFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-		$data->setDestFileLocalPath($localFilePath);
+		
 		$data->setFlavorAssetId($flavorAsset->getId());
-		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
 
 		$convertProfileExist = self::activateConvertProfileJob($dbBatchJob->getEntryId(), $localFilePath);
@@ -544,16 +605,9 @@ class kFlowHelper
 
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		
-		kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
-		
-		/*
-		 * TODO - AWS - Handle shared concat flow
-		 * kFileSyncUtils::moveFromFile should be replaced with this code to support saving concat result to shared storage based on partner config
-		 * This could be done only once convert flow code is changed to support remote file input
-		 *
-		$partner = PartnerPeer::retrieveByPK($dbBatchJob->getPartnerId());
+		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
-		if($partnerSharedStorageProfileId)
+		if($partnerSharedStorageProfileId && $data->getDestFilePath() && kFile::isSharedPath($data->getDestFilePath()))
 		{
 			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
 			$storageProfile = StorageProfilePeer::retrieveByPK($partnerSharedStorageProfileId);
@@ -564,7 +618,6 @@ class kFlowHelper
 		{
 			kFileSyncUtils::moveFromFile($data->getDestFilePath(), $syncKey);
 		}
-		*/
 
 		kEventsManager::raiseEvent(new kObjectAddedEvent($flavorAsset, $dbBatchJob));
 
@@ -663,9 +716,11 @@ class kFlowHelper
 			return;
 		}
 		
-		
 		$pendingFileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
 		$pendingFileSync->save();
+		
+		//Once remote file is marked as ready we can delete the local copy and update local copy file sync
+		$flavorAsset->deleteLocalFileCopy();
 	}
 
 	/**
@@ -1304,7 +1359,7 @@ class kFlowHelper
 
 		if(!$dbBatchJob->getEntry())
 		{
-			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is porbably deleted will return job instead of api exception");
+			KalturaLog::debug("Entry [{$dbBatchJob->getEntryId()}] not found, the entry is probably deleted will return job instead of api exception");
 			return $dbBatchJob;
 		}
 
@@ -1313,15 +1368,29 @@ class kFlowHelper
 		if(!$flavorAsset)
 			throw new APIException(APIErrors::INVALID_FLAVOR_ASSET_ID, $data->getFlavorAssetId());
 		
-		if(!is_null($data->getEngineMessage())) {
+		$shouldSave = false;
+		if(!is_null($data->getEngineMessage()))
+		{
 			$flavorAsset->setDescription($flavorAsset->getDescription() . "\n" . $data->getEngineMessage());
+			$shouldSave = true;
+		}
+		
+		$logFileExists = $data->getLogFileSyncLocalPath() && kFile::checkFileExists($data->getLogFileSyncLocalPath());
+		if($logFileExists)
+		{
+			$flavorAsset->incLogFileVersion();
+			$shouldSave = true;
+		}
+		
+		if($shouldSave)
+		{
 			$flavorAsset->save();
 		}
 
 		// Creates the file sync
 		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
 		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
-		if(kFile::checkFileExists($data->getLogFileSyncLocalPath()))
+		if($logFileExists)
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);
 			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
@@ -2286,6 +2355,8 @@ class kFlowHelper
 
 		if($entry)
 		{
+			self::handleStaticContent($entry);
+
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
 
 			$clonePendingEntriesArray = $entry->getClonePendingEntries();
@@ -3475,5 +3546,44 @@ class kFlowHelper
 			}
 		}
 		return $allFinished;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @throws PropelException
+	 */
+	protected static function handleStaticContent(entry $entry)
+	{
+		$disableStaticContentSourceDeletionPartners = kConf::get('disableStaticContentSourceDeletionPartners', 'runtime_config', array());
+		if (in_array($entry->getPartnerId(), $disableStaticContentSourceDeletionPartners) || in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $disableStaticContentSourceDeletionPartners) || !kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+		{
+			return;
+		}
+
+		$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
+		$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles', 'runtime_config', array());
+		$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$conversionProfileKey], ConversionProfileType::MEDIA, true);
+		if (!$profile)
+		{
+			return;
+		}
+
+		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
+		if (count($nonSourceFlavors) < 2)
+		{
+			return;
+		}
+
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
+		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
+		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
+		{
+			$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
+			$sourceFlavor->save();
+			$highestBitrateFlavor->setIsOriginal(true);
+			$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
+			$highestBitrateFlavor->save();
+		}
 	}
 }

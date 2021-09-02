@@ -295,6 +295,11 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
  	 * @var string
  	 */
  	public $aggregationCategories;
+
+	/**
+	 * @var string
+	 */
+	public $adminTags;
 	
 	private static $mapBetweenObjects = array
 	(
@@ -333,6 +338,7 @@ class KalturaCategory extends KalturaObject implements IRelatedFilterable
 		"pendingEntriesCount",
 		"isAggregationCategory",
  		"aggregationCategories",
+		"adminTags"
 	);
 	
 	/* (non-PHPdoc)

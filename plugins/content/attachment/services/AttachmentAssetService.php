@@ -48,13 +48,17 @@ class AttachmentAssetService extends KalturaAssetService
 	protected function kalturaNetworkAllowed($actionName)
 	{
 		if(
-			$actionName == 'get' ||
 			$actionName == 'list' ||
 			$actionName == 'getUrl'
 			)
 		{
 			$this->partnerGroup .= ',0';
 			return true;
+		}
+
+		if($actionName==='get')
+		{
+			$this->partnerGroup .= ',0';
 		}
 			
 		return parent::kalturaNetworkAllowed($actionName);
@@ -218,11 +222,12 @@ class AttachmentAssetService extends KalturaAssetService
 
 	/**
 	 * @param AttachmentAsset $attachmentAsset
-	 * @param string $url
+	 * @param kUrlResource $contentResource
 	 * @throws KalturaAPIException
 	 */
-	protected function attachUrl(AttachmentAsset $attachmentAsset, $url)
+	protected function attachUrl(AttachmentAsset $attachmentAsset, kUrlResource $contentResource)
 	{
+		$url = $contentResource->getUrl();
 		$fileName = basename($url);
 		if(strlen($fileName) > self::MAX_FILE_NAME_LENGTH)
 		{
@@ -230,19 +235,27 @@ class AttachmentAssetService extends KalturaAssetService
 		}
 
 		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $fileName;
-		if (KCurlWrapper::getDataFromFile($url, $fullPath) && !myUploadUtils::isFileTypeRestricted($fullPath))
-		{
-			return $this->attachFile($attachmentAsset, $fullPath);
-		}
-			
-		if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
-		{
-			$attachmentAsset->setDescription("Failed downloading file[$url]");
-			$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_ERROR);
-			$attachmentAsset->save();
-		}
-		
-		throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_DOWNLOAD_FAILED, $url);
+
+        //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+        if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
+        {
+            if (KCurlWrapper::getDataFromFile($url, $fullPath) && !myUploadUtils::isFileTypeRestricted($fullPath))
+            {
+                return $this->attachFile($attachmentAsset, $fullPath);
+            }
+
+            if($attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_QUEUED || $attachmentAsset->getStatus() == AttachmentAsset::ASSET_STATUS_NOT_APPLICABLE)
+            {
+                $attachmentAsset->setDescription("Failed downloading file[$url]");
+                $attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_ERROR);
+                $attachmentAsset->save();
+            }
+
+            throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_DOWNLOAD_FAILED, $url);
+        }
+
+        kJobsManager::addImportJob(null, $attachmentAsset->getEntryId(), $attachmentAsset->getPartnerId(), $url, $attachmentAsset, null, $contentResource->getImportJobData());
+
     }
     
 	/**
@@ -251,7 +264,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	protected function attachUrlResource(AttachmentAsset $attachmentAsset, kUrlResource $contentResource)
 	{
-    	$this->attachUrl($attachmentAsset, $contentResource->getUrl());
+    	$this->attachUrl($attachmentAsset, $contentResource);
     }
     
 	/**
@@ -418,16 +431,8 @@ class AttachmentAssetService extends KalturaAssetService
 		if ($assetDb->getStatus() != asset::ASSET_STATUS_READY)
 			throw new KalturaAPIException(KalturaAttachmentErrors::ATTACHMENT_ASSET_IS_NOT_READY);
 
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ASSET);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$c->add(FileSyncPeer::OBJECT_ID, $id);
-		$c->add(FileSyncPeer::VERSION, $assetDb->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $assetDb->getPartnerId());
-		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$fileSyncs = FileSyncPeer::doSelect($c);
-			
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($id, $assetDb, FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
 		$listResponse->totalCount = count($listResponse->objects);

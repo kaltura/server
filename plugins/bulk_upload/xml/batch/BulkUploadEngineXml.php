@@ -8,7 +8,7 @@
 class BulkUploadEngineXml extends KBulkUploadEngine
 {
 	/**
-	 * The defalut thumbnail tag
+	 * The default thumbnail tag
 	 * @var string
 	 */
 	const DEFAULT_THUMB_TAG = 'default_thumb';
@@ -108,7 +108,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function validate()
 	{
-		if(!file_exists($this->data->filePath))
+		if(!kFile::checkFileExists($this->data->filePath))
 		{
 			throw new KalturaBatchException("File doesn't exist [{$this->data->filePath}]", KalturaBatchJobAppErrors::BULK_FILE_NOT_FOUND);
 		}
@@ -173,7 +173,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	 */
 	protected function xslTransform($filePath)
 	{
-		$xdoc = file_get_contents($filePath);
+		$xdoc = kFile::getFileContent($filePath);
 		if(is_null($xdoc) || is_null($this->conversionProfileXsl))
 			return $xdoc;
 		
@@ -608,7 +608,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		
-		$this->handlePluginAddedData($item, $existingEntry);
 		$pluginReplacementOptions = $this->getPluginReplacementOptions($item);
 		
 		switch($contentAssetsAction)
@@ -629,10 +628,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$updatedEntryBulkUploadResult = $this->createCategoryAssociations($entryId, $item->categories, $updatedEntryBulkUploadResult, true);
 		//Adds the additional data for the flavors and thumbs
 		$this->handleFlavorAndThumbsAdditionalData($entryId, $flavorAssets, $thumbAssets);
-		
+
 		//Updates the bulk upload result for the given entry (with the status and other data)
 		$updatedEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
+
+		$this->handlePluginAddedData($item, $existingEntry);
 	}
 	
 	/**

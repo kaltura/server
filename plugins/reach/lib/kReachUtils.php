@@ -93,6 +93,25 @@ class kReachUtils
 		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
 
+	public static function areFlavorsReady(entry $entry, ReachProfile $reachProfile)
+	{
+		$reachProfileFlavorParamsIds = $reachProfile->getFlavorParamsIds();
+		if( is_null($reachProfileFlavorParamsIds) || ($reachProfileFlavorParamsIds === '') )
+		{
+			return true;
+		}
+
+		$flavorParamsIds = explode(',', $reachProfileFlavorParamsIds);
+		$readyFlavors = assetPeer::retrieveReadyFlavorsIdsByEntryId($entry->getId(), $flavorParamsIds);
+		if( count($flavorParamsIds) == count($readyFlavors) )
+		{
+			KalturaLog::log("All flavors with params IDs [{$reachProfileFlavorParamsIds}] are ready");
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * @param $entry
 	 * @param $catalogItem
@@ -160,39 +179,16 @@ class kReachUtils
 		$remainingCredit = $allowedCredit - ($creditUsed  + $taskPriceDiff);
 		return $remainingCredit >= 0 ? true : false;
 	}
-	
-	public static function isDuplicateTask($entryId, $catalogItemId, $partnerId, $version, $allowResubmission)
-	{
-		$statusArr = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::PENDING_MODERATION);
-		$activeTasks = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version);
-		$activeTasksOnOlderVersion = EntryVendorTaskPeer::retrieveActiveTasks($entryId, $catalogItemId, $partnerId, null, $statusArr);
-		if($activeTasksOnOlderVersion || ($activeTasks && !$allowResubmission))
-		{
-			return true;
-		}
-		foreach ($activeTasks as $activeTask)
-		{
-			if (in_array($activeTask->getStatus(), $statusArr))
-			{
-				return true;
-			}
-		}
 
-		return false;
-	}
-	
-	public static function isEntryTypeSupported($type, $mediaType = null)
+
+	public static function tryToCancelTask($entryVendorTask)
 	{
-		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
-		$supported = in_array($type, $supportedTypes);
-		if($mediaType && $supported)
-		{
-			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
-		}
-		
-		return $supported;
-		
+		$entryVendorTask->setStatus(EntryVendorTaskStatus::ABORTED);
+		$entryVendorTask->setErrDescription('Aborted following cancel request');
+
+		EntryVendorTaskService::tryToSave($entryVendorTask);
 	}
+
 
 	public static function reachStrToTime($offset , $value)
 	{

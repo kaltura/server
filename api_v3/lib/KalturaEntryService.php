@@ -130,6 +130,12 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 
+		//For static content trimming we need to pass the adminTags to the temp entry in order to convert with the same flow and the original 
+		$adminTags = $dbEntry->getAdminTagsArr();
+		$staticContentAdminTags = kConf::get('staticContentAdminTags','runtime_config',array());
+		$tempAdminTags = array_intersect($adminTags,$staticContentAdminTags);
+		$tempDbEntry->setAdminTags(implode(',',$tempAdminTags));
+
 		$kResource = $resource->toObject();
 		if ($kResource->getType() == 'kOperationResource')
 			$tempDbEntry->setTempTrimEntry(true);
@@ -638,8 +644,13 @@ class KalturaEntryService extends KalturaBaseService
 	  	if(!$dbAsset)
 	  	{
 	  		$isNewAsset = true;
-			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId());
-
+			$fileExt = Null;
+			$assetObject = assetPeer::retrieveById($srcSyncKey->getObjectId());
+			if($assetObject)
+			{
+				$fileExt = $assetObject->getFileExt();
+			}
+			$dbAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $dbEntry->getId(), $fileExt);
 	  	}
 	  	
 		if(!$dbAsset)
@@ -857,17 +868,22 @@ class KalturaEntryService extends KalturaBaseService
 			// TODO - move image handling to media service
     		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
     		{
-			    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
-    			if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
-    			{
-    				return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
-    			}
+    		    $entryFullPath = myContentStorage::getFSUploadsPath() . '/' . $dbEntry->getId() . '.' . $ext;
 
-    			KalturaLog::err("Failed downloading file[$url]");
-    			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
-    			$dbEntry->save();
+                 //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+                if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
+    		    {
+                    if (KCurlWrapper::getDataFromFile($url, $entryFullPath) && !myUploadUtils::isFileTypeRestricted($entryFullPath))
+                    {
+                        return $this->attachFile($entryFullPath, $dbEntry, $dbAsset);
+                    }
 
-    			return null;
+                    KalturaLog::err("Failed downloading file[$url]");
+                    $dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
+                    $dbEntry->save();
+
+                    return null;
+                }
     		}
 
     		if($dbAsset && !($dbAsset instanceof flavorAsset))
@@ -1219,16 +1235,8 @@ class KalturaEntryService extends KalturaBaseService
 
 		if ($dbEntry->getStatus() != entryStatus::READY)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $entryId);
-
-		$c = new Criteria();
-		$c->add(FileSyncPeer::OBJECT_TYPE, FileSyncObjectType::ENTRY);
-		$c->add(FileSyncPeer::OBJECT_SUB_TYPE, kEntryFileSyncSubType::DATA);
-		$c->add(FileSyncPeer::OBJECT_ID, $entryId);
-		$c->add(FileSyncPeer::VERSION, $dbEntry->getVersion());
-		$c->add(FileSyncPeer::PARTNER_ID, $dbEntry->getPartnerId());
-		$c->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
-		$c->add(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-		$fileSyncs = FileSyncPeer::doSelect($c);
+		
+		$fileSyncs = kFileSyncUtils::getReadyRemoteFileSyncsForAsset($entryId, $dbEntry, FileSyncObjectType::ENTRY, kEntryFileSyncSubType::DATA);
 
 		$listResponse = new KalturaRemotePathListResponse();
 		$listResponse->objects = KalturaRemotePathArray::fromDbArray($fileSyncs, $this->getResponseProfile());
@@ -1970,7 +1978,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
 			$dbEntry->save();
-			throw new KalturaAPIException(KalturaErrors::IMAGE_CONTENT_NOT_SECURE);
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
 	}
 

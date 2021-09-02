@@ -31,7 +31,12 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
 					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
-				)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			)
 		),
 
@@ -51,9 +56,16 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 
@@ -74,9 +86,16 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VIEW,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
-				self::REPORT_ENRICH_OUTPUT => 'coordinates',
-				self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
 			),
 		),
 
@@ -126,6 +145,9 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_DVR,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC,
+				self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC,
+				self::EVENT_TYPE_ERROR,
 			),
 			self::REPORT_TOTAL_METRICS => array(
 				self::METRIC_VIEW_UNIQUE_AUDIENCE,
@@ -141,6 +163,9 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_ENGAGEMENT,
 				self::METRIC_AVG_VIEW_DVR,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC,
+				self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC,
+				self::EVENT_TYPE_ERROR,
 			)
 		),
 
@@ -151,11 +176,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-					'peer' => 'kuserPeer',
-				)
+				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
 			),
 			self::REPORT_METRICS => array(
 				self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
@@ -197,11 +218,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('PUSER_ID'),
-					'peer' => 'kuserPeer',
-				)
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
 			)
 		),
 
@@ -276,6 +293,9 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_LIVE_LATENCY,
 				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC,
+				self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC,
+				self::EVENT_TYPE_ERROR,
 			),
 			self::REPORT_TOTAL_METRICS => array(
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
@@ -284,6 +304,9 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_AVG_VIEW_LIVE_LATENCY,
 				self::METRIC_AVG_VIEW_DROPPED_FRAMES_RATIO,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
+				self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC,
+				self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC,
+				self::EVENT_TYPE_ERROR,
 			),
 		),
 
@@ -304,11 +327,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-					self::REPORT_ENRICH_CONTEXT => array(
-						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
-						'peer' => 'kuserPeer',
-					)
+					self::REPORT_ENRICH_FUNC => 'self::getUserFullNameWithFallback',
 				),
 			),
 			self::REPORT_EDIT_FILTER_FUNC => 'self::includeOnlyLiveNowEntriesEditFilter',

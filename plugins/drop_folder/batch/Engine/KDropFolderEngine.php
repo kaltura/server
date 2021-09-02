@@ -57,9 +57,10 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
+	 * @param $timeFrame
 	 * @return array
 	 */
-	protected function loadDropFolderFiles()
+	protected function loadDropFolderFiles($timeFrame = null)
 	{
 		$dropFolderFiles =null;
 
@@ -67,6 +68,10 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
+		if ($timeFrame)
+		{
+			$dropFolderFileFilter->createdAtGreaterThanOrEqual = time() - $timeFrame;
+		}
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
@@ -321,6 +326,62 @@ abstract class KDropFolderEngine implements IKalturaLogger
 			}
 		}
 	}
+
+	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
+	{
+		try
+		{
+			$updatedFileSize = $this->getUpdatedFileSize($dropFolderFile);
+		}
+		catch (Exception $e)
+		{
+			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
+				DropFolderPlugin::ERROR_READING_FILE_MESSAGE, $e);
+			return null;
+		}
+
+		if (!$dropFolderFile->fileSize)
+		{
+			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_READING_FILE,
+				DropFolderPlugin::ERROR_READING_FILE_MESSAGE . '[' . $dropFolderFile->contentUrl . ']');
+		}
+		else if ($dropFolderFile->fileSize < $updatedFileSize)
+		{
+			try
+			{
+				$updateDropFolderFile = new KalturaDropFolderFile();
+				$updateDropFolderFile->fileSize = $updatedFileSize;
+
+				return $this->dropFolderFileService->update($dropFolderFile->id, $updateDropFolderFile);
+			}
+			catch (Exception $e)
+			{
+				$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
+					DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
+				return null;
+			}
+		}
+		else // file sizes are equal
+		{
+			$time = time();
+			$fileSizeLastSetAt = $this->dropFolder->fileSizeCheckInterval + $dropFolderFile->fileSizeLastSetAt;
+
+			KalturaLog::info("time [$time] fileSizeLastSetAt [$fileSizeLastSetAt]");
+
+			// check if fileSizeCheckInterval time has passed since the last file size update
+			if ($time > $fileSizeLastSetAt)
+			{
+				try {
+					return $this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::PENDING);
+				} catch (KalturaException $e) {
+					$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_HANDLING, KalturaDropFolderFileErrorCode::ERROR_UPDATE_FILE,
+						DropFolderPlugin::ERROR_UPDATE_FILE_MESSAGE, $e);
+					return null;
+				}
+			}
+		}
+	}
+
 	
 	function log($message)
 	{

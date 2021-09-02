@@ -34,32 +34,55 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		$c->add(EntryVendorTaskPeer::VERSION, $version);
 		return EntryVendorTaskPeer::doSelect($c);
 	}
-	
-	public static function retrieveActiveTasks($entryId, $catalogItemId, $partnerId, $version, $statuses = array())
+
+    public static function retrieveTasksByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
+    {
+        $c = new Criteria();
+        $c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
+        $c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
+        $c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+        $c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
+        if ($version)
+        {
+            $c->add(EntryVendorTaskPeer::VERSION, $version);
+        }
+
+        $c->addDescendingOrderByColumn(EntryVendorTaskPeer::VERSION);
+        $c->addDescendingOrderByColumn(EntryVendorTaskPeer::ID);
+
+        return EntryVendorTaskPeer::doSelect($c);
+    }
+
+	public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
+    {
+        $tasks = self::retrieveTasksByStatus($entryId, $catalogItemId, $partnerId, $version, $statuses);
+
+        return $tasks[0];
+    }
+
+	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version = null)
 	{
-		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
-		$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $catalogItemId);
-		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		if ($version)
-		{
-			$c->add(EntryVendorTaskPeer::VERSION, $version);
-		}
-		if ($statuses)
-		{
-			$c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
-		}
-		else
-		{
-			$c->add(EntryVendorTaskPeer::STATUS,
-				array(EntryVendorTaskStatus::PROCESSING,
-					EntryVendorTaskStatus::READY,
-					EntryVendorTaskStatus::PENDING,
-					EntryVendorTaskStatus::PENDING_MODERATION
-				), Criteria::IN);
-		}
-		return EntryVendorTaskPeer::doSelect($c);
-	}
+	    $statusList = array(EntryVendorTaskStatus::PROCESSING,
+            EntryVendorTaskStatus::READY,
+            EntryVendorTaskStatus::PENDING,
+            EntryVendorTaskStatus::PENDING_MODERATION,
+            EntryVendorTaskStatus::PENDING_MODERATION,
+            EntryVendorTaskStatus::PENDING_ENTRY_READY,
+        );
+
+	    return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
+    }
+	
+
+    public static function retrieveOneActiveTask($entryId, $catalogItemId, $partnerId, $version = null)
+    {
+        $statusList = array(EntryVendorTaskStatus::PROCESSING,
+            EntryVendorTaskStatus::PENDING,
+            EntryVendorTaskStatus::PENDING_MODERATION,
+        );
+
+        return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
+    }
 	
 	public static function retrievePendingByEntryId($entryId, $partnerId = null ,$status = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY))
 	{

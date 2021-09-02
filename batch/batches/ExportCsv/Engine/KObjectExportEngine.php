@@ -16,8 +16,10 @@ abstract class KObjectExportEngine
 		{
 			case KalturaExportObjectType::USER:
 				return new KUserExportEngine();
-			
-			
+
+			case KalturaExportObjectType::ENTRY:
+				return new KEntryExportEngine();
+
 			default:
 				return KalturaPluginManager::loadObject('KObjectExportEngine', $objectType);
 		}
@@ -28,5 +30,7 @@ abstract class KObjectExportEngine
 	/**
 	 * Generate the first csv row containing the fields
 	 */
-	abstract protected function addHeaderRowToCsv($csvFile, $additionalFields);
+	abstract protected function addHeaderRowToCsv($csvFile,
+	                                              $additionalFields,
+	                                              $mappedFields = null);
 }

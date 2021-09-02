@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaUsersCsvJobData extends KalturaExportCsvJobData
+class KalturaUsersCsvJobData extends KalturaMappedObjectsCsvJobData
 {
 	/**
 	 * The filter should return the list of users that need to be specified in the csv.
@@ -11,28 +11,10 @@ class KalturaUsersCsvJobData extends KalturaExportCsvJobData
 	 * @var KalturaUserFilter
 	 */
 	public $filter;
-	
-	/**
-	 * The metadata profile we should look the xpath in
-	 *
-	 * @var int
-	 */
-	public $metadataProfileId;
-	
-	
-	/**
-	 * The xpath to look in the metadataProfileId  and the wanted csv field name
-	 *
-	 * @var KalturaCsvAdditionalFieldInfoArray
-	 */
-	public $additionalFields;
-	
-	
+
 	private static $map_between_objects = array
 	(
 		'filter',
-		'metadataProfileId',
-		'additionalFields',
 	);
 	
 	/* (non-PHPdoc)
@@ -53,5 +35,4 @@ class KalturaUsersCsvJobData extends KalturaExportCsvJobData
 		
 		return parent::toObject($dbData, $props_to_skip);
 	}
-	
 }

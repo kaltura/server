@@ -59,7 +59,7 @@ class KAsyncVirusScan extends KJobHandlerWorker
 			}
 
 			if (!$output) {
-				KalturaLog::notice('Virus scan engine ['.get_class($engine).'] did not return any log for file ['.$data->srcFilePath.']');
+				KalturaLog::notice('Virus scan engine ['.get_class($engine).'] did not return any log for file ['.$data->fileContainer->filePath.']');
 				$output = 'Virus scan engine ['.get_class($engine).'] did not return any log';
 			}
 		

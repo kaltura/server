@@ -8,9 +8,11 @@ class ZoomVendorService extends KalturaBaseService
 {
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-
-	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete');
-
+	const INTEGRATION_CODE = 'integrationCode';
+	const AUTH_CODE = 'code';
+	
+	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'preOauthValidation');
+	
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
 	 * @param string $actionName
@@ -20,7 +22,7 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		return in_array ($actionName, self::$PARTNER_NOT_REQUIRED_ACTIONS);
 	}
-
+	
 	/**
 	 * @return array
 	 * @throws KalturaAPIException
@@ -32,10 +34,21 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NO_VENDOR_CONFIGURATION);
 		}
-
+		
 		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 	}
-
+	
+	/**
+	 * @return bool
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
+	public static function shouldUseOAuth2AuthenticationMethod()
+	{
+		$zoomConfiguration = self::getZoomConfiguration();
+		return isset($zoomConfiguration['clientSecret']);
+	}
+	
 	/**
 	 * @param $serviceId
 	 * @param $serviceName
@@ -46,35 +59,53 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 	}
-
+	
 	/**
-	 *
+	 * load html page the that will ask the user for its KMC URL, derive the region of the user from it,
+	 * and redirect to the registration page in the correct region, while forwarding the necessary code for registration
 	 * @action oauthValidation
-	 * @return string
 	 * @throws Exception
 	 */
 	public function oauthValidationAction()
+	{
+		$authCode = $_GET[self::AUTH_CODE];
+		ZoomHelper::loadRegionalCloudRedirectionPage($authCode);
+	}
+	
+	/**
+	 *
+	 * @action preOauthValidation
+	 * @return string
+	 * @throws Exception
+	 */
+	public function preOauthValidation()
 	{
 		KalturaResponseCacher::disableCache();
 		$zoomConfiguration = self::getZoomConfiguration();
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
-		$isAdmin = false;
-		$tokens = null;
-		if(!array_key_exists('code', $_GET))
+		if(!array_key_exists(self::AUTH_CODE, $_GET) || !$_GET[self::AUTH_CODE])
 		{
 			$url = $zoomBaseURL . '/oauth/authorize?' . 'response_type=code' . '&client_id=' . $clientId .  '&redirect_uri=' . $redirectUrl;
 			ZoomHelper::redirect($url);
 		}
 		else
 		{
-			$authCode = $_GET['code'];
+			try
+			{
+				$ks = isset($_GET[self::INTEGRATION_CODE]) ? ks::fromSecureString ($_GET[self::INTEGRATION_CODE]) : null;
+			}
+			catch (Exception $e)
+			{
+				throw new KalturaAPIException($e->getMessage());
+			}
+			$authCode = $_GET[self::AUTH_CODE];
 			$tokens  = kZoomOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
-			$client = new kZoomClient($zoomBaseURL);
-			$permissions = $client->retrieveTokenZoomUserPermissions($accessToken);
-			$user = $client->retrieveTokenZoomUser($accessToken);
+			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
+			$permissions = $client->retrieveTokenZoomUserPermissions();
+			$user = $client->retrieveTokenZoomUser();
 			$accountId = $user[ZoomHelper::ACCOUNT_ID];
 			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 			if(!$zoomIntegration)
@@ -83,22 +114,34 @@ class ZoomVendorService extends KalturaBaseService
 				$zoomIntegration->setAccountId($accountId);
 				ZoomHelper::setZoomIntegration($zoomIntegration);
 			}
-
-			$zoomIntegration->setStatus(VendorStatus::DISABLED);
+			else if ($zoomIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
+			{
+				throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
+			}
+			
 			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
 			$permissions = $permissions['permissions'];
 			$isAdmin = ZoomHelper::canConfigureEventSubscription($permissions);
-		}
-
-		if($isAdmin)
-		{
-			ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
+			if($isAdmin)
+			{
+				if($ks)
+				{
+					$zoomIntegration->setPartnerId($ks->getPartnerId());
+					$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+					$zoomIntegration->save();
+					ZoomHelper::loadSubmitPage($zoomIntegration,$accountId,$ks);
+				}
+				else
+				{
+					ZoomHelper::loadLoginPage($tokens, $zoomConfiguration);
+				}
+			}
 		}
 
 		throw new KalturaAPIException(KalturaZoomErrors::ZOOM_ADMIN_REQUIRED);
 	}
-
+	
 	/**
 	 * @action deAuthorization
 	 * @return string
@@ -118,13 +161,13 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
-
-		$zoomIntegration->setStatus(VendorStatus::DELETED);
+		
+		$zoomIntegration->setStatus(VendorIntegrationStatus::DELETED);
 		$zoomIntegration->save();
 		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
 		return true;
 	}
-
+	
 	/**
 	 * @action fetchRegistrationPage
 	 * @param string $tokensData
@@ -141,10 +184,9 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomConfiguration = self::getZoomConfiguration();
 		$tokens = $this->handleEncryptTokens($tokensData, $iv, $zoomConfiguration);
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
-		$client = new kZoomClient($zoomBaseURL);
-		$zoomUserData = $client->retrieveTokenZoomUser($tokens[kZoomOauth::ACCESS_TOKEN]);
-		$accountId = $zoomUserData[ZoomHelper::ACCOUNT_ID];
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
+		$client = new kZoomClient($zoomBaseURL,null,$tokens[kZoomTokens::REFRESH_TOKEN],null,null,$tokens[kZoomTokens::ACCESS_TOKEN]);
+		$accountId = $this->getAccountId($client->retrieveTokenZoomUser());
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if($zoomIntegration && intval($partnerId) !==  $zoomIntegration->getPartnerId() && $partnerId !== 0)
 		{
@@ -153,10 +195,50 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->setTokensData($tokens);
 			$zoomIntegration->save();
 		}
-
+		
 		ZoomHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs());
 	}
-
+	
+	/**
+	 * @action localRegistrationPage
+	 * @param string $jwt
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 * @throws Exception
+	 */
+	public function localRegistrationPageAction($jwt)
+	{
+		$isOAuth2Authentication = self::shouldUseOAuth2AuthenticationMethod();
+		
+		if ($isOAuth2Authentication)
+		{
+			throw new KalturaAPIException(KalturaZoomErrors::NOT_ALLOWED_ON_THIS_INSTANCE);
+		}
+		$zoomConfiguration = self::getZoomConfiguration();
+		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
+		$client = new kZoomClient($zoomBaseURL,$jwt,null,null,null,null);
+		$zoomAccountId = $this->getAccountId($client->retrieveTokenZoomUser());
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId);
+		if(!$zoomIntegration)
+		{
+			$zoomIntegration = new ZoomVendorIntegration();
+			$zoomIntegration->setAccountId($zoomAccountId);
+			$zoomIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
+			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+		}
+		$zoomIntegration->setJwtToken($jwt);
+		$zoomIntegration->save();
+		
+		ZoomHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs());
+	}
+	
+	protected function getAccountId($jsonDataAsArray)
+	{
+		$accountId = $jsonDataAsArray[ZoomHelper::ACCOUNT_ID];
+		KalturaLog::debug(print_r($accountId, true));
+		return $accountId;
+	}
+	
 	/**
 	 * @param string $tokensData
 	 * @param string $iv
@@ -177,10 +259,10 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			KExternalErrors::dieGracefully();
 		}
-
+		
 		return $tokens;
 	}
-
+	
 	/**
 	 * @action submitRegistration
 	 * @param string $accountId
@@ -193,21 +275,21 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-
+		
 		/** @var ZoomVendorIntegration $zoomIntegration */
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId);
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
 		}
-
+		
 		kuserPeer::createKuserForPartner($partnerId, $integrationSetting->defaultUserId);
 		$this->configureZoomCategories($integrationSetting, $zoomIntegration);
 		$integrationSetting->toInsertableObject($zoomIntegration);
 		$zoomIntegration->save();
 		return true;
 	}
-
+	
 	/**
 	 * @param KalturaZoomIntegrationSetting $integrationSetting
 	 * @param ZoomVendorIntegration $zoomIntegration
@@ -226,7 +308,7 @@ class ZoomVendorService extends KalturaBaseService
 		{
 			$zoomIntegration->unsetCategory();
 		}
-
+		
 		if($integrationSetting->zoomWebinarCategory)
 		{
 			if(ZoomHelper::createCategoryForZoom($zoomIntegration->getPartnerId(), $integrationSetting->zoomWebinarCategory))
@@ -239,7 +321,7 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->unsetWebinarCategory();
 		}
 	}
-
+	
 	/**
 	 * @action recordingComplete
 	 * @throws Exception
@@ -255,7 +337,7 @@ class ZoomVendorService extends KalturaBaseService
 		$this->setPartnerFilters($zoomIntegration->getPartnerId());
 		$kZoomEventHandler->processEvent($event);
 	}
-
+	
 	/**
 	 * Retrieve zoom integration setting object by partner id
 	 *
@@ -274,7 +356,35 @@ class ZoomVendorService extends KalturaBaseService
 			$integrationSetting->fromObject($zoomIntegration);
 			return $integrationSetting;
 		}
-
+		
 		throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
 	}
+	
+	/**
+	 * List KalturaZoomIntegrationSetting objects
+	 *
+	 * @action list
+	 * @param KalturaFilterPager $pager Pager
+	 * @return KalturaZoomIntegrationSettingResponse
+	 */
+	public function listAction(KalturaFilterPager $pager = null)
+	{
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+		
+		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
+		$c->addAnd(VendorIntegrationPeer::VENDOR_TYPE,VendorTypeEnum::ZOOM_ACCOUNT);
+		$c->addAnd(VendorIntegrationPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
+		$totalCount = VendorIntegrationPeer::doCount($c);
+		$pager->attachToCriteria($c);
+		$list = VendorIntegrationPeer::doSelect($c);
+		$newList = KalturaZoomIntegrationSettingArray::fromDbArray($list);
+		$response = new KalturaZoomIntegrationSettingResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		return $response;
+	}
+	
 }

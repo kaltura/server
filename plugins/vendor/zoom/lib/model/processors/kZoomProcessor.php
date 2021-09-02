@@ -21,10 +21,15 @@ abstract class kZoomProcessor
 	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
+	 * @param string $jwtToken
+	 * @param string $refreshToken
+	 * @param string $clientId
+	 * @param string $clientSecret
+	 * @param string $accessToken
 	 */
-	public function __construct($zoomBaseUrl)
+	public function __construct($zoomBaseUrl,$jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl);
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
 	}
 
 	/**
@@ -56,8 +61,9 @@ abstract class kZoomProcessor
 
 				break;
 			case kZoomUsersMatching::CMS_MATCHING:
-				$zoomUser = $this->zoomClient->retrieveZoomUser($userName);
-				if(isset($zoomUser[self::CMS_USER_FIELD]))
+				$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
+				$zoomUser = $this->zoomClient->retrieveZoomUser($userName, $accessToken);
+				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
 				{
 					$result = $zoomUser[self::CMS_USER_FIELD];
 				}

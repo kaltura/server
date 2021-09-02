@@ -255,6 +255,11 @@ class BulkUploadScheduleEventCsvEngine extends BulkUploadEngineCsv
 				return new KalturaRecordScheduleEvent();
 			case KalturaScheduleEventType::LIVE_STREAM:
 				return new KalturaLiveStreamScheduleEvent();
+			case KalturaScheduleEventType::MEETING:
+				return new KalturaMeetingScheduleEvent();
+			case KalturaScheduleEventType::LIVE_REDIRECT:
+				return new KalturaLiveRedirectScheduleEvent();
+				
 			default:
 				KalturaLog::notice("Invalid scheduled event type: $eventType!");
 				throw new KalturaBatchException("Invalid scheduled event type: $eventType", KalturaBatchJobErrorTypes::APP);

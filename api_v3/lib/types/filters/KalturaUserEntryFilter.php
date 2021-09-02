@@ -58,7 +58,40 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 				$this->getFormattedPropertyNameWithClassName('userIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('userIdIn') . '/' .
 				$this->getFormattedPropertyNameWithClassName('entryIdEqual') . '/' . $this->getFormattedPropertyNameWithClassName('entryIdIn'));
 	}
-	
+
+	protected function getEntriesByEntitledKuser()
+	{
+		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
+
+		$allEntryIds = $this->entryIdEqual ? array($this->entryIdEqual) : explode(',', $this->entryIdIn);
+		$entries = entryPeer::retrieveByPKs($allEntryIds);
+		$entitledEntriesIds = array();
+
+		/* @var $entry entry */
+		foreach ($entries as $entry)
+		{
+			if(	$entry->isEntitledKuserEdit($currentKsKuserId)		||
+				$entry->isEntitledKuserPublish($currentKsKuserId)	||
+				$entry->isEntitledKuserView($currentKsKuserId) )
+			{
+				$entitledEntriesIds[] = $entry->getEntryId();
+			}
+		}
+		return array($entitledEntriesIds, array_diff($allEntryIds, $entitledEntriesIds));
+	}
+
+	protected function buildCriteriaByEntitledEntries(Criteria $c, $entitledEntriesIds, $notEntitledEntriesIds)
+	{
+		$notEntitledEntriesCriterion = $c->getNewCriterion(UserEntryPeer::ENTRY_ID, $notEntitledEntriesIds, Criteria::IN);
+		$notEntitledEntriesCriterion->addAnd($c->getNewCriterion(UserEntryPeer::KUSER_ID, kCurrentContext::getCurrentKsKuserId(), Criteria::EQUAL));
+
+		$criteria = $c->getNewCriterion(UserEntryPeer::ENTRY_ID, $entitledEntriesIds, Criteria::IN);
+		$criteria->addOr($notEntitledEntriesCriterion);
+
+		$c->addAnd($criteria);
+		return $c;
+	}
+
 	/**
 	 * @param KalturaFilterPager $pager
 	 * @param KalturaDetachedResponseProfile $responseProfile
@@ -74,13 +107,28 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		}
 
 		$c = new Criteria();
-		
 		$userEntryFilter = $this->toObject();
-		$userEntryFilter->attachToCriteria($c);
 
+		// For User KS and if no user ID was given in the filter, retrieve all the user entries for which the user is entitled to.
+		$disableDefaultCriteria = false;
+		if (kCurrentContext::$ks && !kCurrentContext::$is_admin_session && !$this->userIdEqual && !$this->userIdIn)
+		{
+			$disableDefaultCriteria = true;
+			list($entitledEntriesIds, $notEntitledEntriesIds) = $this->getEntriesByEntitledKuser();
+
+			$c = $this->buildCriteriaByEntitledEntries($c, $entitledEntriesIds, $notEntitledEntriesIds);
+			$c->addAnd ( UserEntryPeer::STATUS, UserEntryStatus::DELETED, Criteria::NOT_EQUAL);
+
+			UserEntryPeer::setUseCriteriaFilter(false);
+
+			$userEntryFilter->unsetByName('_eq_entry_id');
+			$userEntryFilter->unsetByName('_in_entry_id');
+		}
+
+		$userEntryFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
-		
 		$list = UserEntryPeer::doSelect($c);
+
 		$resultCount = count($list);
 		if ($resultCount && ($resultCount < $pager->pageSize))
 		{
@@ -90,6 +138,11 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 		{
 			KalturaFilterPager::detachFromCriteria($c);
 			$totalCount = UserEntryPeer::doCount($c);
+		}
+
+		if($disableDefaultCriteria)
+		{
+			UserEntryPeer::setUseCriteriaFilter(true);
 		}
 
 		$response->totalCount = $totalCount;

@@ -122,18 +122,21 @@ class serveFlavorAction extends kalturaAction
 										 $firstClipStartTime, $initialClipIndex, $initialSegmentIndex,
 										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null)
 	{
+		$mpegtsWrapValue = 1 << 33;
+		$offset = intval(($mpegtsWrapValue / 2 - ($firstClipStartTime * 90) % $mpegtsWrapValue) / 90);
+
 		$mediaSet['playlistType'] = 'live';
-		$mediaSet['firstClipTime'] = $firstClipStartTime;
+		$mediaSet['firstClipTime'] = $firstClipStartTime + $offset;
 		$mediaSet['discontinuity'] = $discontinuity;
 
 		if (!is_null($endTime))
 		{
-			$mediaSet['presentationEndTime'] = $endTime;
+			$mediaSet['presentationEndTime'] = $endTime + $offset;
 		}
 
 		if($repeat)
 		{
-			$mediaSet['segmentBaseTime'] = (int)$playlistStartTime;
+			$mediaSet['segmentBaseTime'] = (int)$playlistStartTime + $offset;
 		}
 		else
 		{
@@ -147,6 +150,8 @@ class serveFlavorAction extends kalturaAction
 		{
 			$mediaSet['liveWindowDuration'] = $dvrWindow;
 		}
+
+		$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = intval($offset / 1000);
 
 		return $mediaSet;
 	}
@@ -427,7 +432,7 @@ class serveFlavorAction extends kalturaAction
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
 					if ($offset)
 					{
-						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] = $offset;
+						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] += $offset;
 					}
 					$this->sendJson($mediaSet, false, true, $entry);
 				}
@@ -457,6 +462,15 @@ class serveFlavorAction extends kalturaAction
 		$fileName = $this->getRequestParameter( "fileName" );
 		$fileParam = $this->getRequestParameter( "file" );
 		$fileParam = basename($fileParam);
+
+		$dirFileName = $this->getRequestParameter( "dirFileName" );
+		$file_name = $this->getRequestParameter( "file_name" ); // backward compatibility for download action
+		if($file_name)
+		{
+			$dirFileName = $file_name;
+		}
+		$dirFileName =  basename($dirFileName);
+
 		$referrer = base64_decode($this->getRequestParameter("referrer"));
 		if (!is_string($referrer)) // base64_decode can return binary data
 			$referrer = '';
@@ -500,7 +514,7 @@ class serveFlavorAction extends kalturaAction
 
 		if ($this->pathOnly && self::$requestAuthorized)
 		{
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $flavorAsset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId(), true, $dirFileName);
 			if ($file_sync && is_null(self::$preferredStorageId))
 			{
 				if ($fileParam && is_dir($path))
@@ -936,6 +950,7 @@ class serveFlavorAction extends kalturaAction
 				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 			}
 			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
+			$sequence['id'] = $asset->getId();
 			if ($asset->getLanguage())
 			{
 				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
@@ -948,6 +963,12 @@ class serveFlavorAction extends kalturaAction
 					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
 				}
 			}
+
+			if (method_exists($asset, 'getLabel') && $asset->getLabel())
+			{
+				$sequence['label'] = $asset->getLabel();
+			}
+
 			$sequences[] = $sequence;
 		}
 		return $sequences;

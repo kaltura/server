@@ -49,5 +49,20 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 			'onclick' => "exportToCsv($('#filter_type').val(), $('#filter_input').val(), $('#filter_status').val(), $('#from_time').val())",
 			'decorators' => array('ViewHelper'),
 		));
+
+		$this->addElement('hidden', 'crossLine', array(
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'hr', 'class' => 'crossLine')))
+		));
+
+		$this->addElement('text', 'task_ids', array(
+			'label' => 'Insert Pending Task ids (Separated by commas):',
+		));
+
+		$this->addElement('button', 'abort', array(
+			'ignore' => true,
+			'label' => 'ABORT TASKS',
+			'onclick' => "abortTask($('#task_ids').val())",
+			'decorators' => array('ViewHelper'),
+		));
 	}
 }

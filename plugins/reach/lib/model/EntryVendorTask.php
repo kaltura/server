@@ -435,4 +435,23 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->indexToSearchIndex();
 	}
 
+	public function save(PropelPDO $con = null)
+	{
+		if (in_array(EntryVendorTaskPeer::STATUS, $this->modifiedColumns) &&
+			(in_array($this->status, array(EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::ABORTED))))
+		{
+			if (in_array($this->oldColumnsValues[EntryVendorTaskPeer::STATUS],
+				array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY)))
+			{
+				return parent::save($con);
+			}
+			else
+			{
+				throw new kCoreException("Entry vendor task item with id [$this->id] could not be updated to status [$this->status]", kCoreException::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED);
+
+			}
+		}
+		parent::save($con);
+	}
+
 } // EntryVendorTask

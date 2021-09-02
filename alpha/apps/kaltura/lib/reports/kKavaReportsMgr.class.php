@@ -25,6 +25,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_SESSION_ID = 'uniqueSessionId';
 	const METRIC_BUFFER_STARTS = 'bufferStarts';
 	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
+	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
+	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -37,6 +39,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_PERCENTILES_RATIO = 'avg_completion_rate';
 	const METRIC_PLAYTHROUGH_RATIO = 'play_through_ratio';
 	const METRIC_UNIQUE_ENTRIES = 'unique_videos';
+	const METRIC_UNIQUE_PLAYED_ENTRIES = 'unique_played_videos';
 	const METRIC_UNIQUE_USERS = 'unique_known_users';
 	const METRIC_CARDINALITY = 'cardinality';
 	const METRIC_COUNT_UGC = 'count_ugc';
@@ -156,6 +159,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_UNIQUE_SESSIONS = 'view_unique_sessions';
 	const METRIC_ERROR_POSITION_COUNT = 'error_position_count';
 	const METRIC_ERROR_UNKNOWN_POSITION_COUNT = 'error_unknown_position_count';
+	const METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT = 'view_segment_download_time_count';
+	const METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT = 'view_manifest_download_time_count';
 
 	//player-events-realtime druid calculated metrics
 	const METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH = 'avg_view_downstream_bandwidth';
@@ -168,6 +173,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_BUFFER_TIME_RATIO = 'view_buffer_time_ratio';
 	const METRIC_AVG_VIEW_SESSION_ERROR_RATE = 'avg_view_session_error_rate';
 	const METRIC_AVG_VIEW_PLAY_TIME_SEC = 'avg_view_play_time_sec';
+	const METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC = 'avg_view_segment_download_time_sec';
+	const METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC = 'avg_view_manifest_download_time_sec';
 
 	const METRIC_DYNAMIC_VIEWERS = 'viewers';
 	const METRIC_DYNAMIC_VIEWERS_BUFFERING = 'viewers_buffering';
@@ -336,6 +343,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_HOTSPOT_CLICKED,
 		self::EVENT_TYPE_NODE_SWITCH,
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
+		self::EVENT_TYPE_REACTION_CLICKED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -387,11 +396,14 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_HOTSPOT_CLICKED => 'count_hotspot_clicked',
 		self::EVENT_TYPE_NODE_SWITCH => 'count_node_switch',
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
+		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED => 'count_download_attachment_clicked',
+		self::EVENT_TYPE_REACTION_CLICKED => 'count_reaction_clicked',
 	);
 
 	//global transform
 	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_PLAYED_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_CONTRIBUTORS => 'floor',
 		self::METRIC_VIEW_UNIQUE_AUDIENCE => 'floor',
@@ -426,6 +438,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_DROP_OFF => true,
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
+		self::METRIC_UNIQUE_PLAYED_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
 		self::METRIC_BUFFER_TIME_RATIO => true,
 		self::METRIC_AVG_BITRATE => true,
@@ -447,6 +460,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_PERIOD_UNIQUE_SESSIONS => true,
 		self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_OWNERS => true,
+		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
+		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -778,6 +793,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::METRIC_UNIQUE_ENTRIES, 
 			array(self::DIMENSION_ENTRY_ID));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
+
 		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
@@ -878,6 +897,30 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_BANDWIDTH))),
 			self::getDoubleSumAggregator(self::METRIC_DOWNSTREAM_BANDWIDTH_SUM, self::METRIC_DOWNSTREAM_BANDWIDTH_SUM));
+
+		self::$aggregations_def[self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME))),
+			self::getLongSumAggregator(self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME))),
+			self::getLongSumAggregator(self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME))),
+			self::getDoubleSumAggregator(self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM, self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getSelectorFilter(self::DIMENSION_EVENT_PROPERTIES, self::PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME))),
+			self::getDoubleSumAggregator(self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM, self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1156,6 +1199,20 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 				self::METRIC_DOWNSTREAM_BANDWIDTH_SUM,
 				self::METRIC_VIEW_DOWNSTREAM_BANDWIDTH_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT, self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC,
+				self::METRIC_SEGMENT_DOWNLOAD_TIME_SUM,
+				self::METRIC_VIEW_SEGMENT_DOWNLOAD_TIME_COUNT));
+
+		self::$metrics_def[self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT, self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC,
+				self::METRIC_MANIFEST_DOWNLOAD_TIME_SUM,
+				self::METRIC_VIEW_MANIFEST_DOWNLOAD_TIME_COUNT));
 
 		self::$metrics_def[self::METRIC_AVG_VIEW_LATENCY] = array(
 			self::DRUID_AGGR => array(self::METRIC_LATENCY_SUM, self::METRIC_VIEW_LATENCY_COUNT),
@@ -2234,6 +2291,10 @@ class kKavaReportsMgr extends kKavaBase
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
 			'node_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_NODE_ID),
+			'crm_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_CRM_ID),
+			'playlist_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYLIST_ID),
+			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
+			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -3782,6 +3843,36 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getUserIdAndFullNameBase($ids, $partner_id)
+	{
+		$context = array(
+			'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
+		);
+		return self::getUsersInfo($ids, $partner_id, $context);
+	}
+
+	protected static function getUserFullNameWithFallback($ids, $partner_id)
+	{
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		foreach ($result as $id => $row)
+		{
+			$result[$id] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
+	protected static function getUserIdAndFullNameWithFallback($ids, $partner_id)
+	{
+		$result = self::getUserIdAndFullNameBase($ids, $partner_id);
+		foreach ($result as $id => &$row)
+		{
+			$row[1] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
 	protected static function getEntriesSource($ids, $partner_id, $context)
 	{
 		$context['peer'] = 'entryPeer';
@@ -4761,7 +4852,7 @@ class kKavaReportsMgr extends kKavaBase
 			$dimension_ids = array();
 			foreach ($rows as $row)
 			{
-				$dimension_ids[] = $row[$dimension];
+				$dimension_ids[] = !is_null($row[$dimension]) ? $row[$dimension] : '';
 			}
 
 			// issue a second topN query
