@@ -1322,7 +1322,7 @@ class playManifestAction extends kalturaAction
 		}
 
 		$renderer = null;
-
+    
 		switch($this->servedEntryType)
 		{
 			case entryType::PLAYLIST:
