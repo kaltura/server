@@ -1467,7 +1467,8 @@ class myPartnerUtils
 
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
- 		// Launch a batch job that will copy the heavy load as an async operation 
+ 		// Launch a batch job that will copy the heavy load as an async operation
+	    KalturaLog::log("Launching addCopyPartnerJob to copy items from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
   		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
  	}
  	
