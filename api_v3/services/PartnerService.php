@@ -135,17 +135,16 @@ class PartnerService extends KalturaBaseService
 		{
 			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $se->getMessage());
 		}
-		catch (kCoreException $ex)
+		catch (KalturaAPIException $ex)
 		{
 			KalturaLog::CRIT($ex);
-			$exceptionMessage = (str_replace('KalturaPartner::', '', $ex->getMessage()));
-			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $exceptionMessage);
+			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $ex->getMessage());
 		}
 		catch ( Exception $ex )
 		{
 			KalturaLog::CRIT($ex);
 			// this assumes the partner name is unique - TODO - remove key from DB !
-			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, 'Unknown error');
+			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, 'unknown error');
 		}
 		
 		$partner = new KalturaPartner(); // start from blank

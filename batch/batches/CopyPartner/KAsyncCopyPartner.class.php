@@ -153,6 +153,9 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$newCategory->updatedAt = null;
 		$newCategory->userJoinPolicy = null;
 		$newCategory->status = null;
+		$newCategory->privacyContexts = null;
+		$newCategory->inheritedParentId = null;
+		$newCategory->pendingEntriesCount = null;
 		return $newCategory;
 	}
 	

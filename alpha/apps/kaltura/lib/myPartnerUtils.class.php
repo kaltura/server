@@ -1467,8 +1467,9 @@ class myPartnerUtils
 
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
- 		// Launch a batch job that will copy the heavy load as an async operation 
-  		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
+		// Launch a batch job that will copy the heavy load as an async operation
+		KalturaLog::log("Launching addCopyPartnerJob to copy items from partner [" . $fromPartner->getId() . "] to partner [" . $toPartner->getId() . "]");
+		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
  	}
  	
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
