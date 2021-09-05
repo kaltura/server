@@ -1464,7 +1464,12 @@ class myPartnerUtils
  		self::copyAccessControls($fromPartner, $toPartner);
  		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
-
+	  
+		self::copyCategories($fromPartner, $toPartner);
+	 
+		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
+		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
+ 	
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
  		// Launch a batch job that will copy the heavy load as an async operation 
