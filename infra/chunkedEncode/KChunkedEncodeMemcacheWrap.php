@@ -708,7 +708,7 @@ ini_set("memory_limit","512M");
 		 * @param string $tmpPromptFolder
 		 * @return bool
 		 */
-		public static function ExecuteJobCommand($host, $port, $token, $jobIndex, $tmpPromptFolder="/tmp")
+		public static function ExecuteJobCommand($host, $port, $token, $jobIndex, $tmpPromptFolder="/tmp",$ffmpegBin="ffmpeg",$ffprobeBin="ffprobe")
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, jobIndex:$jobIndex");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
@@ -784,7 +784,7 @@ ini_set("memory_limit","512M");
 					// No need to check for empties for 1st chunk and audio chunks
 				if($job->id==0 || strstr($outFilename,'.vid')===false)
 					break;
-				if(KFFMpegMediaParser::detectEmptyFrames("ffmpeg", "ffprobe", $outFilename)===false)
+				if(KFFMpegMediaParser::detectEmptyFrames($ffmpegBin, $ffprobeBin, $outFilename)===false)
 					break;
 			}
 
@@ -794,9 +794,9 @@ ini_set("memory_limit","512M");
 						// VP9 / AV1 requires MP4 file container, they don't comply w/MPEGTS
 						// X264 / X265 comply w/both MP4 & MPEGTS, but meanwhile we'll continue w/MPEGTS
 					if((strstr($cmdLine,"libvpx-vp9")!==false) || (strstr($cmdLine,"libaom-av1")!==false))
-						$rv = $stat->getDataMP4($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
+						$rv = $stat->getDataMP4($outFilename,$ffprobeBin,$ffmpegBin,$tmpPromptFolder);
 					else
-						$rv = $stat->getDataMpegts($outFilename,"ffprobe","ffmpeg",$tmpPromptFolder);
+						$rv = $stat->getDataMpegts($outFilename,$ffprobeBin,$ffmpegBin,$tmpPromptFolder);
 					$job->stat = $stat;
 				}
 
