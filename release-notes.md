@@ -10,13 +10,10 @@ An encrypted key served to make sure videos are not shared outside the customers
 ## Partner registration - Move all time consuming jobs to run in batch ##
 Moving functionality to batch, in order to enable a shorter partner registration action
 * Issue Type: Task
-* Issue ID: PLAT-23082 
-
-The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
-under [batchClient] add to the 'include' part: uiconf.*
+* Issue ID: PLAT-23082
 
 ### Deployment Scripts ### 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_17_allow_clone_uiconf_from_batch.php
+    php deployment/updates/scripts/2021_08_17_allow_clone_uiconf_from_batch.php
 
 ## Add permissions for caption service for liveNG ##
 Add permissions for caption service (action add, setContent) for liveNG (partner -5 )
