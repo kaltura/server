@@ -234,13 +234,9 @@ class kSimuliveUtils
 		{
 			$assetsCount = max(max(count($preStartAssets), count($mainAssets)), count($postEndAssets));
 			// fill the empty caption / audio asset arrays with "nulls"
-			foreach (array(&$preStartAssets, &$mainAssets, &$postEndAssets) as &$assetsArr)
-			{
-				if (!count($assetsArr))
-				{
-					$assetsArr = array_fill(0, $assetsCount, null);
-				}
-			}
+			$preStartAssets = array_pad($preStartAssets, $assetsCount, null);
+			$mainAssets = array_pad($mainAssets, $assetsCount, null);
+			$postEndAssets = array_pad($postEndAssets, $assetsCount, null);
 
 			// creating the assets array (as array of arrays s.t each array contain the caption / audio assets of all the entries exist, padded with nulls if needed)
 			$assets = $hasPreStart ? self::mergeAssetArrays($assets, $preStartAssets) : $assets;
