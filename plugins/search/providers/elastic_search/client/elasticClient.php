@@ -16,6 +16,7 @@ class elasticClient
 	const ELASTIC_RETRY_ON_CONFLICT_KEY = 'retry_on_conflict';
 	const ELASTIC_PREFERENCE_KEY = 'preference';
 	const ELASTIC_STICKY_SESSION_PREFIX = 'ELStickySessionIndex_';
+	const REST_TOTAL_HITS_AS_INT = 'rest_total_hits_as_int';
 
 	const GET = 'GET';
 	const POST = 'POST';
@@ -43,6 +44,7 @@ class elasticClient
 
 	protected $elasticHost;
 	protected $elasticPort;
+	protected $isLegacyVersion;
 	protected $ch;
 	protected $bulkBuffer;
 	protected $bulkBufferSize;
@@ -52,19 +54,32 @@ class elasticClient
 	 * elasticClient constructor.
 	 * @param null $host
 	 * @param null $port
+	 * @param null $isLegacyVersion
 	 * @param null $curlTimeout - timeout in seconds
 	 */
-	public function __construct($host = null, $port = null, $curlTimeout = null)
+	public function __construct($host = null, $port = null, $isLegacyVersion = null, $curlTimeout = null)
 	{
 		if (!$host)
+		{
 			$host = kConf::get('elasticHost', 'elastic', null);
+		}
 		KalturaLog::debug("Setting elastic host $host");
 		$this->elasticHost = $host;
 		
 		if (!$port)
-			$port = kConf::get('elasticPort', 'elastic', null);;
+		{
+			$port = kConf::get('elasticPort', 'elastic', null);
+		}
+		KalturaLog::debug("Setting elastic port $host");
 		$this->elasticPort = $port;
-		
+
+		if (is_null($isLegacyVersion))
+		{
+			$isLegacyVersion = kConf::get('isLegacyVersion', 'elastic', true);
+		}
+		KalturaLog::debug("Setting isLegacyVersion flag to $isLegacyVersion");
+		$this->isLegacyVersion = $isLegacyVersion;
+
 		$this->ch = curl_init();
 		
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
@@ -134,6 +149,12 @@ class elasticClient
 		{
 			$queryParams[self::ELASTIC_PREFERENCE_KEY] = $params[self::ELASTIC_PREFERENCE_KEY];
 			unset($params[self::ELASTIC_PREFERENCE_KEY]);
+		}
+
+		if (isset($params[self::REST_TOTAL_HITS_AS_INT]))
+		{
+			$queryParams[self::REST_TOTAL_HITS_AS_INT] = $params[self::REST_TOTAL_HITS_AS_INT];
+			unset($params[self::REST_TOTAL_HITS_AS_INT]);
 		}
 		
 		if (count($queryParams) > 0) {
@@ -257,6 +278,12 @@ class elasticClient
 			//add preference so that requests from the same session will hit the same shards
 			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
 		}
+
+		if (!$this->isLegacyVersion)
+		{
+			$params[self::REST_TOTAL_HITS_AS_INT] = "true";
+		}
+
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH);
 		
@@ -481,12 +508,21 @@ class elasticClient
 		if (isset($params[self::ELASTIC_INDEX_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
 
-		if (isset($params[self::ELASTIC_TYPE_KEY]))
-			$cmd .= '/' . $params[self::ELASTIC_TYPE_KEY];
+		if ($this->isLegacyVersion)
+		{
+			if (isset($params[self::ELASTIC_TYPE_KEY]))
+			{
+				$cmd .= '/' . $params[self::ELASTIC_TYPE_KEY];
+			}
+		}
+		elseif (!$action)
+		{
+			$cmd .= "/_doc";
+		}
 		
 		if (isset($params[self::ELASTIC_ID_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_ID_KEY];
-		
+
 		if ($action)
 			$cmd .= "/_$action";
 		
@@ -508,10 +544,13 @@ class elasticClient
 
 	protected function getBulkActionAndMetadata(&$params)
 	{
-		$actionArr = array (
-			'_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY],
-			'_'.self::ELASTIC_TYPE_KEY => $params[self::ELASTIC_TYPE_KEY],
-		);
+		$actionArr = array ('_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY]);
+
+		if ($this->isLegacyVersion)
+		{
+			$actionArr['_'.self::ELASTIC_TYPE_KEY] = $params[self::ELASTIC_TYPE_KEY];
+		}
+
 		if (isset($params[self::ELASTIC_ID_KEY]))
 		{
 			$actionArr['_'.self::ELASTIC_ID_KEY] = $params[self::ELASTIC_ID_KEY];
@@ -525,5 +564,6 @@ class elasticClient
 
 		$cmd = array ($params[self::ELASTIC_ACTION_KEY] => $actionArr);
 		return json_encode($cmd);
+
 	}
 }
