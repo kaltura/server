@@ -14,6 +14,7 @@ class Form_EventNotificationTemplatesFilter extends Form_PartnerIdFilter
 			'partnerIdEqual' => 'Publisher ID',
 			'typeEqual' => 'Type',
 			'systemNameEqual' => 'System Name',
+			'idEqual' => 'Template ID',
 			'statusEqual' => 'Status'
 		));
 	}
