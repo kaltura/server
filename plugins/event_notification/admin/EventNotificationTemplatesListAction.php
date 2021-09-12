@@ -30,7 +30,7 @@ class EventNotificationTemplatesListAction extends KalturaApplicationPlugin impl
 	
 	/**
 	 * @param Zend_Controller_Request_Abstract $request
-	 * @return Kaltura_Client_Type_PartnerFilter
+	 * @return Kaltura_Client_EventNotification_Type_EventNotificationTemplateFilter
 	 */
 	protected function getEventNotificationTemplatesFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
@@ -98,8 +98,10 @@ class EventNotificationTemplatesListAction extends KalturaApplicationPlugin impl
 		$paginator->setItemCountPerPage($pageSize);
 		
 		$newForm = new Form_NewEventNotificationTemplate();
-		if ($eventNotificationTemplatesFilter && isset($dropFolderFilter->idIn))
-		    $newForm->getElement('newPartnerId')->setValue($eventNotificationTemplatesFilter->idIn);
+		if ($eventNotificationTemplatesFilter && isset($eventNotificationTemplatesFilter->partnerIdEqual))
+		{
+			$newForm->getElement('newPartnerId')->setValue($eventNotificationTemplatesFilter->partnerIdEqual);
+		}
 		
 		$listTemplatesPager = new Kaltura_Client_Type_FilterPager();
 		$listTemplatesPager->pageSize = 500;
