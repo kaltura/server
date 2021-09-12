@@ -12,9 +12,9 @@ class Form_EventNotificationTemplatesFilter extends Form_PartnerIdFilter
 		$filterType->setMultiOptions(array(
 			'none' => 'None',
 			'partnerIdEqual' => 'Publisher ID',
-			'typeEqual' => 'Type',
-			'systemNameEqual' => 'System Name',
 			'idEqual' => 'Template ID',
+			'systemNameEqual' => 'System Name',
+			'typeEqual' => 'Type',
 			'statusEqual' => 'Status'
 		));
 	}
