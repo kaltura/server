@@ -58,7 +58,7 @@ class ESearchQueryFromFilter
 			}
 
 			list( , $operator, $fieldName) = $fieldParts;
-			if(!($fieldValue === NULL || $fieldValue === ''))
+			if(!(is_null($fieldValue) || $fieldValue === ''))
 			{
 				$emptyFilter = false;
 				if (!in_array($fieldName, static::getSupportedFields()))
