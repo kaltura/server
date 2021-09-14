@@ -73,9 +73,16 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
-		
+
 		/* @var ZoomVendorIntegration $vendorIntegration */
-		$vendorIntegration = VendorIntegrationPeer ::retrieveByPK($this->zoomVendorIntegrationId);
+		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
+
+		$lockKey = 'zoomVendorIntegration_create_' . $vendorIntegration -> getId();
+		kLock::runLocked($lockKey, array($this, 'createZoomVendorIntegrationImpl'), array($vendorIntegration));
+	}
+
+	public function createZoomVendorIntegrationImpl(ZoomVendorIntegration $vendorIntegration)
+	{
 		try
 		{
 			if ($vendorIntegration)
@@ -104,8 +111,8 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 						$vendorIntegration -> saveTokensData($freshTokens);
 					}
 				}
-				
-				
+
+
 				$zoomIntegrationObject = new KalturaZoomIntegrationSetting();
 				$zoomIntegrationObject -> fromObject($vendorIntegration);
 				$this -> zoomVendorIntegration = $zoomIntegrationObject;
