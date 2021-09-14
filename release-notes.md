@@ -1,3 +1,13 @@
+# Quasar-17.11.0 #
+## Add permissions to cnc partner ##
+Add permissions to CNC partner for session service and groupuser service
+
+* Issue Type: Task
+* Issue ID: PLAT-23128
+
+#### Deployment Script ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_add_permissions_groupuser_and_seesion.php
+
 # Quasar-17.10.0 #
 ## Add action for serving Playback key ##
 An encrypted key served to make sure videos are not shared outside the customers domain
