@@ -411,7 +411,7 @@ class myPartnerRegistration
 			$newPartner->setAccountOwnerKuserId($kuserId);
 			$newPartner->save();
 			
-			$this->configurePartnerByPackage($newPartner);
+			//$this->configurePartnerByPackage($newPartner);
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
