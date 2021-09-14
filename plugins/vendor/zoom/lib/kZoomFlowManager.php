@@ -16,11 +16,18 @@ class kZoomFlowManager implements kObjectCreatedEventConsumer
 	public function objectCreated (BaseObject $object)
 	{
 		/* @var $object CaptionAsset */
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, kConfMapNames::MAP_NAME);
-		$object->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
-		$object->save();
-		
-		return true;
+		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR);
+		if ($zoomConfiguration)
+		{
+			$object->setAccuracy($zoomConfiguration['ZoomTranscriptionAccuracy']);
+			$object->save();
+			
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	/**
