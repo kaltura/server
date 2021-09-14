@@ -1,3 +1,13 @@
+# Quasar-17.11.0 #
+## Partner registration - Move all time-consuming jobs to run in batch ##
+Moving functionality to batch, in order to enable a shorter partner registration action
+* Issue Type: Task
+* Issue ID: PLAT-23082
+
+### Deployment Scripts ### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_allow_copy_uiconf_and_categories_from_batch.php
+
+
 # Quasar-17.10.0 #
 ## Add action for serving Playback key ##
 An encrypted key served to make sure videos are not shared outside the customers domain

@@ -1464,11 +1464,6 @@ class myPartnerUtils
  		self::copyAccessControls($fromPartner, $toPartner);
  		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
-	  
-		self::copyCategories($fromPartner, $toPartner);
-	 
-		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
-		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
  	
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
@@ -1546,17 +1541,54 @@ class myPartnerUtils
 			$newCategory->reSetDepth();
 			$newCategory->reSetFullName();
  			categoryPeer::setUseCriteriaFilter(true);
-			
+
 			$newCategory->setEntriesCount(0);
 			$newCategory->setMembersCount(0);
 			$newCategory->setPendingMembersCount(0);
 			$newCategory->setDirectSubCategoriesCount(0);
 			$newCategory->setDirectEntriesCount(0);
 			$newCategory->save();
- 			
+
  			KalturaLog::log("Copied [".$category->getId()."], new id is [".$newCategory->getId()."]");
  		}
  	}
+	
+	public static function copyCategory(int $fromPartnerId, int $toPartnerId, $categoryId, $parentCategoryId = null)
+	{
+		KalturaLog::log("Copying category[$categoryId] from partner  [$fromPartnerId] to partner [$toPartnerId]");
+		
+		categoryPeer::setUseCriteriaFilter(false);
+		$category = categoryPeer::retrieveByPK($categoryId);
+		
+		/* @var $category category */
+		$category->setPuserId(null);
+		$newCategory = $category->copy();
+		$newCategory->setPartnerId($toPartnerId);
+		if($category->getParentId())
+		{
+			$newCategory->setParentId($parentCategoryId);
+		}
+		categoryPeer::setUseCriteriaFilter(true);
+		$newCategory->save();
+		
+		$newCategory->setIsIndex(true);
+		categoryPeer::setUseCriteriaFilter(false);
+		$newCategory->reSetFullIds();
+		$newCategory->reSetInheritedParentId();
+		$newCategory->reSetDepth();
+		$newCategory->reSetFullName();
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		$newCategory->setEntriesCount(0);
+		$newCategory->setMembersCount(0);
+		$newCategory->setPendingMembersCount(0);
+		$newCategory->setDirectSubCategoriesCount(0);
+		$newCategory->setDirectEntriesCount(0);
+		$newCategory->save();
+		
+		KalturaLog::log("Copied [" . $category->getId() . "], new id is [" . $newCategory->getId() . "]");
+		return $newCategory;
+	}
  	
  	public static function copyEntriesByType(Partner $fromPartner, Partner $toPartner, $entryType, $dontCopyUsers = false)
  	{
