@@ -54,7 +54,7 @@ class kBeaconCacheLayerActions
 		}
 		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
-		$key = 'apiRateLimit-'.$partnerId;
+		$key = 'apiRateLimit-beacon-add-'.$partnerId;
 		$cache->add($key, 0, 10);
 		$counter = $cache->increment($key);
 		if ($counter > 50)
