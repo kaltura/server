@@ -38,23 +38,42 @@ class kBeaconCacheLayerActions
 	public static function add($params)
 	{
 		if(is_null($params))
+		{
 			throw new Exception("Params not provided");
+		}
+		
+		$partnerId =  $params[kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID];
+		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
+		{
+			$partnerId = $params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID];
+		}
+		
+		if(!$partnerId)
+		{
+			return false;
+		}
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		$key = 'apiRateLimit-'.$partnerId;
+		$cache->add($key, 0, 10);
+		$counter = $cache->increment($key);
+		if ($counter > 50)
+		{
+			return true;
+		}
 		
 		if(self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID))
+		{
 			return false;
+		}
 		
 		if (self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_EVENT_TYPE) ||
 			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_OBJECT_ID) ||
 			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_RELATED_OBJECT_TYPE)
 		)
+		{
 			return false;
-		
-		$partnerId =  $params[kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID];
-		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
-			$partnerId = $params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID];
-		
-		if(!$partnerId)
-			return false;
+		}
 		
 		$beacon = new kBeacon($partnerId);
 		$beacon->setObjectId($params[kBeaconCacheLayerActions::PARAM_OBJECT_ID]);
