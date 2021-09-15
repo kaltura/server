@@ -59,6 +59,7 @@ class kBeaconCacheLayerActions
 		$counter = $cache->increment($key);
 		if ($counter > 50)
 		{
+			header("X-Kaltura-apiRateLimit: Access to beacon->add was rate limited");
 			return true;
 		}
 		
