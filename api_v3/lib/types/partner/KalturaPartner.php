@@ -440,12 +440,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $numPrevPassToKeep;
 	
 	/**
-	 * @var KalturaTwoFactorAuthenticationMode
-	 * @readonly
-	 */
-	public $twoFactorAuthenticationMode;
-	
-	/**
 	 * @var bool
 	 * @readonly
 	 */
@@ -462,7 +456,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
-		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode',
+		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep',
 		'purifyImageContent'
 	);
 	

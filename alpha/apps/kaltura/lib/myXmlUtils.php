@@ -44,8 +44,6 @@ class myXmlUtils
 			return $fieldValue;
 		}
 		
-		
-		
 		try
 		{
 			return kHtmlPurifier::purify($className, $fieldName, $fieldValue);
