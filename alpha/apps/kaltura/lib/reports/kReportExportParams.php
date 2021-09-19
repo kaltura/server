@@ -16,6 +16,11 @@ class kReportExportParams
 	 * @var string
 	 */
 	protected $reportsItemsGroup;
+	
+	/**
+	 * @var string
+	 */
+	protected $baseUrl;
 
 	/**
 	 * @return string
@@ -64,5 +69,20 @@ class kReportExportParams
 	{
 		$this->reportsItemsGroup = $reportsItemsGroup;
 	}
-
+	
+	/**
+	 * @return string
+	 */
+	public function getBaseUrl()
+	{
+		return $this->baseUrl;
+	}
+	
+	/**
+	 * @param string $baseUrl
+	 */
+	public function setBaseUrl($baseUrl)
+	{
+		$this->baseUrl = $baseUrl;
+	}
 }

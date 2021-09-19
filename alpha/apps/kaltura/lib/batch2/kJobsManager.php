@@ -1951,6 +1951,7 @@ class kJobsManager
 		$jobData->setTimeZoneOffset($offset);
 		$jobData->setTimeReference(time());
 		$jobData->setReportsGroup($coreParams->getReportsItemsGroup());
+		$jobData->setBaseUrl($coreParams->getBaseUrl());
 
 		$job = new BatchJob();
 		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());
