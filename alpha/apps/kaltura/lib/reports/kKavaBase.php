@@ -372,6 +372,14 @@ class kKavaBase extends kDruidBase
 		),
 	);
 
+	protected static $datasources_hash_dimensions = array(
+		self::DATASOURCE_HISTORICAL => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
+		self::DATASOURCE_REALTIME => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
+	);
 	protected static $sourceFromAdminTag = array(
 		'kalturaclassroom' => 'Classroom Capture',
 		'kalturacapture' => 'Kaltura Capture',
