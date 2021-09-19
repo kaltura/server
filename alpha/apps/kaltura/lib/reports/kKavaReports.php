@@ -1671,7 +1671,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
-		ReportType::SELF_SERVED_USAGE => array(
+		ReportType::SELF_SERVE_USAGE => array(
 			self::REPORT_JOIN_REPORTS => array(
 				// reach credit
 				array(

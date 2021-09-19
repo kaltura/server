@@ -41,7 +41,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	 */
 	protected function doCopyPartner(KalturaBatchJob $job, KalturaCopyPartnerJobData $jobData)
 	{
-		$this->log( "doCopyPartner job id [$job->id], From PID: $jobData->fromPartnerId, To PID: $jobData->toPartnerId" );
+		$this->log("doCopyPartner job id [$job->id], From PID: $jobData->fromPartnerId, To PID: $jobData->toPartnerId");
 
 		$this->fromPartnerId = $jobData->fromPartnerId;
 		$this->toPartnerId = $jobData->toPartnerId;
@@ -68,23 +68,24 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		do
 		{
 			// Get the source partner's entries list
-			self::impersonate( $this->fromPartnerId );
-			$entriesList = $this->getClient()->baseEntry->listAction( $entryFilter, $pageFilter );
+			self::impersonate($this->fromPartnerId);
+			$entriesList = $this->getClient()->baseEntry->listAction($entryFilter, $pageFilter);
 
 			$receivedObjectsCount = $entriesList->objects ? count($entriesList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
-			if ( $receivedObjectsCount > 0 )
+			if ($receivedObjectsCount > 0)
 			{
 				// Write the source partner's entries to the destination partner 
-				self::impersonate( $this->toPartnerId );
-				foreach ( $entriesList->objects as $entry )
+				self::impersonate( $this->toPartnerId);
+				foreach ($entriesList->objects as $entry)
 				{
-					$newEntry = $this->getClient()->baseEntry->cloneAction( $entry->id );
+					$newEntry = $this->getClient()->baseEntry->cloneAction($entry->id);
 				}
 			}			
-		} while ( $receivedObjectsCount );
+		} while ($receivedObjectsCount);
 	
 		self::unimpersonate();
-	}	
+	}
+	
 }

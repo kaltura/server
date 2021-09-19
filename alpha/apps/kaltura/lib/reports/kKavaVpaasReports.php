@@ -209,8 +209,8 @@ class kKavaVpaasReports extends kKavaReports
 			),
 		),
 
-		ReportType::SELF_SERVED_USAGE_VPAAS => array(
-			self::REPORT_BASE_DEF => ReportType::SELF_SERVED_USAGE,
+		ReportType::SELF_SERVE_USAGE_VPAAS => array(
+			self::REPORT_BASE_DEF => ReportType::SELF_SERVE_USAGE,
 		)
 	);
 
