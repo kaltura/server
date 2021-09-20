@@ -36,7 +36,7 @@ class kZoomFlowManager implements kObjectCreatedEventConsumer
 	 */
 	public function shouldConsumeCreatedEvent (BaseObject $object)
 	{
-		if($object instanceof CaptionAsset && $object->getSource() === CaptionSource::ZOOM)
+		if($object instanceof CaptionAsset && $object->getSource() == CaptionSource::ZOOM)
 		{
 			return true;
 		}
