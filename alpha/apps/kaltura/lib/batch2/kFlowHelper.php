@@ -20,6 +20,10 @@ class kFlowHelper
 	const REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
+	
+	const ANALYTICS_MAP = 'analytics';
+	
+	const EXPORT_REPORT_CUSTOM_URL = 'export_report_custom_url';
 
 	const DAYS = 'days';
 	const HOURS = 'hours';
@@ -3116,7 +3120,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $privilegeActionsLimit = null)
+	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $baseUrl, $reportName, $privilegeActionsLimit = null)
 	{
 		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
 		if (!preg_match($regex, $file_name, $matches))
@@ -3133,7 +3137,22 @@ class kFlowHelper
 		}
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
+		$customUrlPartners = kConf::get('export_report_custom_url', 'analytics');
+		if ($baseUrl && in_array($partner_id, $customUrlPartners))
+		{
+			$time = time();
+			if (!$reportName)
+			{
+				$reportName = '';
+			}
+			$url = "$file_name|$reportName|$time";
+			$url = $baseUrl . '?id=' . urlencode($url);
+		}
+		else
+		{
+			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
+		}
+		KalturaLog::info('Sending Dror an Email with url - ' . $url);
 
 		if ($partner->getEnforceHttpsApi())
 		{
@@ -3165,6 +3184,7 @@ class kFlowHelper
 		$data->setFiles($finalFiles);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
+		$baseUrl = $data->getBaseUrl();
 
 		$privilegeActionsLimit = null;
 		$expiryByPartner = kConf::get("report_export_expiry_by_partner", 'analytics', array());
@@ -3183,13 +3203,14 @@ class kFlowHelper
 		foreach ($finalFiles as $finalFile)
 		{
 			$fileName = basename($finalFile->getFileId());
-			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $privilegeActionsLimit);
+			$reportName = $finalFile->getFileName();
+			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $baseUrl, $reportName, $privilegeActionsLimit);
 			if (!$url)
 			{
 				KalturaLog::err("Failed to create download URL for file - {$finalFile->getFileId()}");
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
-			$linkName = $finalFile->getFileName() ? $finalFile->getFileName() : $fileName;
+			$linkName = $reportName ? $reportName : $fileName;
 			$links[] = '<a href="' . $url .'" target="_blank" >' . $linkName . '</a>';
 		}
 

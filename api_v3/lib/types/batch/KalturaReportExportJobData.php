@@ -33,6 +33,11 @@ class KalturaReportExportJobData extends KalturaJobData
 	public $timeZoneOffset;
 	
 	public $timeReference;
+	
+	/**
+	 * @var string
+	 */
+	public $baseUrl;
 
 	private static $map_between_objects = array
 	(
@@ -43,6 +48,7 @@ class KalturaReportExportJobData extends KalturaJobData
 		"files",
 		"timeZoneOffset",
 		"timeReference",
+		"baseUrl"
 	);
 
 	public function getMapBetweenObjects()
