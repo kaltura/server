@@ -21,8 +21,6 @@ class kFlowHelper
 
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
 	
-	const ANALYTICS_MAP = 'analytics';
-	
 	const EXPORT_REPORT_CUSTOM_URL = 'export_report_custom_url';
 
 	const DAYS = 'days';
@@ -3137,29 +3135,36 @@ class kFlowHelper
 		}
 
 		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-		$customUrlPartners = kConf::get('export_report_custom_url', 'analytics');
-		if ($baseUrl && in_array($partner_id, $customUrlPartners))
+		$url = kFlowHelper::buildCustomUrl($partner_id, $baseUrl, $file_name, $reportName);
+		if (!$url)
+		{
+			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
+		}
+
+		if ($partner->getEnforceHttpsApi())
+		{
+			$url = str_replace("http:", "https:", $url);
+		}
+		
+		return $url;
+	}
+	
+	protected static function buildCustomUrl($partnerId, $baseUrl, $fileName, $reportName)
+	{
+		$customUrlPartners = kConf::get(self::EXPORT_REPORT_CUSTOM_URL, kConfMapNames::ANALYTICS);
+		if ($baseUrl && in_array($partnerId, $customUrlPartners))
 		{
 			$time = time();
 			if (!$reportName)
 			{
 				$reportName = '';
 			}
-			$url = "$file_name|$reportName|$time";
+			$url = "$fileName|$reportName|$time";
 			$url = $baseUrl . '?id=' . urlencode($url);
+			return $url;
 		}
-		else
-		{
-			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
-		}
-		KalturaLog::info('Sending Dror an Email with url - ' . $url);
-
-		if ($partner->getEnforceHttpsApi())
-		{
-			$url = str_replace("http:", "https:", $url);
-		}
-
-		return $url;
+		
+		return null;
 	}
 
 	public static function handleReportExportFinished(BatchJob $dbBatchJob, kReportExportJobData $data)
