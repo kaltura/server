@@ -353,6 +353,18 @@ class KalturaResponseCacher extends kApiCache
 					if (array_key_exists($actionKey, $confActions))
 					{
 						$startTime = microtime(true);
+
+						require_once(dirname(__FILE__) . "/KalturaDispatcher.php");
+						require_once(dirname(__FILE__) . "/../../alpha/apps/kaltura/lib/kCurrentContext.class.php");
+
+						$dispatcher = KalturaDispatcher::getInstance();
+						if (!$dispatcher->rateLimit($service, $action, $params, false))
+						{
+							$result = "Access to $service->$action was rate limited";
+							$processingTime = microtime(true) - $startTime;
+							self::returnCacheResponseStructure($processingTime, $format, $result);;
+						}
+
 						$filePath = dirname(__FILE__).$confActions[$actionKey];
 						if ($filePath != dirname(__FILE__) &&
 							file_exists($filePath))

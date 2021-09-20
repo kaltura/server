@@ -316,11 +316,11 @@ class KalturaDispatcher
 		
 		return null;
 	}
-	
-	protected function rateLimit($service, $action, $params)
+
+	public function rateLimit($service, $action, $params, $shouldCheckPartner = true)
 	{
 		if (!kConf::hasMap('api_rate_limit') ||
-			kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+			($shouldCheckPartner && kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID))
 		{
 			return true;
 		}
@@ -328,7 +328,7 @@ class KalturaDispatcher
 		$skipEnforceInternalIp = kConf::get('skip_enforce_internal_ip', 'api_rate_limit', null);
 
 		// if 'api_rate_limit' map contains param 'skip_enforce_internal_ip' with value 1, we will ignore the IP check
-		if(!$skipEnforceInternalIp && kIpAddressUtils::isInternalIp())
+		if (!$skipEnforceInternalIp && kIpAddressUtils::isInternalIp())
 		{
 			// if api request is internal IP, the source is a batch machine, and we won't block the action
 			return true;
@@ -338,7 +338,7 @@ class KalturaDispatcher
 		{
 			return true;
 		}
-		
+
 		if (isset($rule['_key']))
 		{
 			$keyOptions = explode(',', $rule['_key']);
@@ -352,7 +352,7 @@ class KalturaDispatcher
 					break;
 				}
 			}
-			
+
 			if (!$key)
 			{
 				return true;
@@ -362,17 +362,17 @@ class KalturaDispatcher
 		{
 			$key = '';
 		}
-		
+
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if (!$cache)
 		{
 			return true;
 		}
-		
+
 		$partnerId = kCurrentContext::$ks_partner_id;
 		$keySeed = "$service-$action-$partnerId-$key";
-		$key = 'apiRateLimit-'.md5($keySeed);
-		
+		$key = 'apiRateLimit-' . md5($keySeed);
+
 		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
 		$cache->add($key, 0, $cacheExpiry);
 		$counter = $cache->increment($key);
@@ -380,14 +380,17 @@ class KalturaDispatcher
 		{
 			return true;
 		}
-		
-		KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
-		
+
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
+		}
+
 		if (isset($rule['_logOnly']) && $rule['_logOnly'])
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 }
