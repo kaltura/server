@@ -3128,16 +3128,16 @@ class kFlowHelper
 		}
 
 		$partner = PartnerPeer::retrieveByPK($partner_id);
-		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
-		if ($privilegeActionsLimit)
-		{
-			$privilege .= "," . $privilegeActionsLimit;
-		}
-
-		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
+		
 		$url = kFlowHelper::buildCustomUrl($partner_id, $baseUrl, $file_name, $reportName);
 		if (!$url)
 		{
+			$privilege = ks::PRIVILEGE_DOWNLOAD . ':' . $file_name;
+			if ($privilegeActionsLimit)
+			{
+				$privilege .= ',' . $privilegeActionsLimit;
+			}
+			$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
 			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 		}
 
@@ -3151,7 +3151,7 @@ class kFlowHelper
 	
 	protected static function buildCustomUrl($partnerId, $baseUrl, $fileName, $reportName)
 	{
-		$customUrlPartners = kConf::get(self::EXPORT_REPORT_CUSTOM_URL, kConfMapNames::ANALYTICS);
+		$customUrlPartners = kConf::get(self::EXPORT_REPORT_CUSTOM_URL, kConfMapNames::ANALYTICS, array());
 		if ($baseUrl && in_array($partnerId, $customUrlPartners))
 		{
 			$time = time();
