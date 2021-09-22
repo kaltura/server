@@ -77,56 +77,48 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
 
-		$lockKey = 'zoomVendorIntegration_create_' . $vendorIntegration -> getId();
-		kLock::runLocked($lockKey, array($this, 'createZoomVendorIntegrationImpl'), array($vendorIntegration));
-	}
+		$retries = 2;
+		while($retries--) {
+			try {
+				if ($vendorIntegration) {
+					$headerData = self::getZoomHeaderData();
+					$this->clientId = $headerData[0];
+					$this->clientSecret = $headerData[1];
+					$this->baseURL = $headerData[2];
+					$this->jwtToken = $vendorIntegration->getJwtToken();
+					$this->refreshToken = $vendorIntegration->getRefreshToken();
+					$this->accessToken = $vendorIntegration->getAccessToken();
+					$this->description = $vendorIntegration->getZoomAccountDescription();
+					$zoomClient = new kZoomClient($this->baseURL, $this->jwtToken, $this->refreshToken, $this->clientId,
+						$this->clientSecret, $this->accessToken);
 
-	public function createZoomVendorIntegrationImpl(ZoomVendorIntegration $vendorIntegration)
-	{
-		try
-		{
-			if ($vendorIntegration)
-			{
-				$headerData = self ::getZoomHeaderData();
-				$this -> clientId = $headerData[0];
-				$this -> clientSecret = $headerData[1];
-				$this -> baseURL = $headerData[2];
-				$this -> jwtToken = $vendorIntegration -> getJwtToken();
-				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
-				$this -> accessToken = $vendorIntegration -> getAccessToken();
-				$this -> description = $vendorIntegration->getZoomAccountDescription();
-				$zoomClient = new kZoomClient($this -> baseURL, $this -> jwtToken, $this -> refreshToken, $this -> clientId,
-				                              $this -> clientSecret, $this -> accessToken);
-				
-				if ($this -> accessToken && $this -> refreshToken && kCurrentContext ::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
-					$vendorIntegration -> getExpiresIn() <= time() +
-					kconf ::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
-				{
-					KalturaLog ::debug('Token expired for account id: ' . $vendorIntegration -> getAccountId() . ' renewing with the new tokens');
-					$freshTokens = $zoomClient -> refreshTokens();
-					if ($freshTokens)
-					{
-						$this -> accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
-						$this -> refreshToken = $freshTokens[kZoomTokens::REFRESH_TOKEN];
-						$vendorIntegration -> saveTokensData($freshTokens);
+					if ($this->accessToken && $this->refreshToken && kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
+						$vendorIntegration->getExpiresIn() <= time() +
+						kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600)) {
+						KalturaLog::debug('Token expired for account id: ' . $vendorIntegration->getAccountId() . ' renewing with the new tokens');
+						$freshTokens = $zoomClient->refreshTokens();
+						if ($freshTokens) {
+							$this->accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
+							$this->refreshToken = $freshTokens[kZoomTokens::REFRESH_TOKEN];
+							$vendorIntegration->saveTokensData($freshTokens);
+						}
 					}
+
+
+					$zoomIntegrationObject = new KalturaZoomIntegrationSetting();
+					$zoomIntegrationObject->fromObject($vendorIntegration);
+					$this->zoomVendorIntegration = $zoomIntegrationObject;
+				} else {
+					throw new KalturaAPIException(KalturaZoomDropFolderErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
 				}
+				break;
 
-
-				$zoomIntegrationObject = new KalturaZoomIntegrationSetting();
-				$zoomIntegrationObject -> fromObject($vendorIntegration);
-				$this -> zoomVendorIntegration = $zoomIntegrationObject;
-			}
-			else
-			{
-				throw new KalturaAPIException(KalturaZoomDropFolderErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
+			} catch (Exception $e) {
+				$this->errorDescription = $e->getMessage();
+				sleep(1);
+				continue;
 			}
 		}
-		catch (Exception $e)
-		{
-			$this->errorDescription = $e->getMessage();
-		}
-		
 	}
 	
 	public function toObject($dbObject = null, $skip = array())
