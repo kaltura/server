@@ -3160,7 +3160,7 @@ class kFlowHelper
 				$reportName = '';
 			}
 			$url = "$fileName|$reportName|$time";
-			$url = $baseUrl . '?id=' . urlencode($url);
+			$url = urldecode($baseUrl) . '?id=' . urlencode($url);
 			return $url;
 		}
 		
