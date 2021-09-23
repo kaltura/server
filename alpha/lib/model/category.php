@@ -2035,5 +2035,69 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	{
 		return null;
 	}
+	
+	public static function copyCategory($fromPartnerId, $toPartnerId, $categoryId, $parentCategoryId = null)
+	{
+		KalturaLog::log("Copying category[$categoryId] from partner  [$fromPartnerId] to partner [$toPartnerId]");
+		
+		categoryPeer::setUseCriteriaFilter(false);
+		$category = categoryPeer::retrieveByPK($categoryId);
+		
+		/* @var $category category */
+		$category->setPuserId(null);
+		$newCategory = $category->copy();
+		$newCategory->setInitialParam($toPartnerId, $parentCategoryId);
+		
+		KalturaLog::log("Copied [" . $category->getId() . "], new id is [" . $newCategory->getId() . "]");
+		return $newCategory;
+	}
+	
+	protected function setInitialParam($toPartnerId, $parentCategoryId)
+	{
+		$this->setPartnerId($toPartnerId);
+		if($parentCategoryId)
+		{
+			$this->setParentId($parentCategoryId);
+		}
+		categoryPeer::setUseCriteriaFilter(true);
+		$this->save();
+		
+		$this->setIsIndex(true);
+		categoryPeer::setUseCriteriaFilter(false);
+		$this->reSetFullIds();
+		$this->reSetInheritedParentId();
+		$this->reSetDepth();
+		$this->reSetFullName();
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		$this->setEntriesCount(0);
+		$this->setMembersCount(0);
+		$this->setPendingMembersCount(0);
+		$this->setDirectSubCategoriesCount(0);
+		$this->setDirectEntriesCount(0);
+		$this->save();
+	}
+	
+	public function copyCategories(Partner $fromPartner, Partner $toPartner)
+	{
+		KalturaLog::log("Copying categories from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
+		
+		categoryPeer::setUseCriteriaFilter(false);
+		$c = new Criteria();
+		$c->addAnd(categoryPeer::PARTNER_ID, $fromPartner->getId());
+		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
+		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
+		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
+		
+		$categories = categoryPeer::doSelect($c);
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		foreach($categories as $category)
+		{
+			self::copyCategory($category,
+								kObjectCopyHandler::getMappedId('category', $category->getParentId()),
+								$toPartner->getId());
+		}
+	}
 
 }

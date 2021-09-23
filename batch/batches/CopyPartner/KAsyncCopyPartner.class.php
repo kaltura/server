@@ -121,8 +121,11 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 					self::impersonate($this->toPartnerId);
 					$parentCatId = ($category->parentId != 0) ? $parentCategoryIdMapping[$category->parentId] : null;
 					$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
-					$parentCategoryIdMapping[$category->id] = $result->id;
-					$this->log('created category [' . $result->id . ']');
+					if($result)
+					{
+						$parentCategoryIdMapping[$category->id] = $result->id;
+						$this->log('created category [' . $result->id . ']');
+					}
 				}
 			}
 		}
@@ -166,7 +169,10 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				foreach ($uiConfList->objects as $uiConf)
 				{
 					$result = $this->getClient()->uiConf->add($this->cloneUiConf($uiConf));
-					$this->log('created uiConf [' . $result->id . ']');
+					if ($result)
+					{
+						$this->log('created uiConf [' . $result->id . ']');
+					}
 				}
 			}
 		}

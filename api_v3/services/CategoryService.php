@@ -80,7 +80,7 @@ class CategoryService extends KalturaBaseService
 	 * @throws KalturaAPIException
 	 * @return KalturaCategory
 	 */
-	function cloneAction(int $categoryId, int $fromPartnerId, int $parentCategoryId = null)
+	function cloneAction($categoryId, $fromPartnerId, $parentCategoryId = null)
 	{
 		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
 		{
@@ -99,7 +99,7 @@ class CategoryService extends KalturaBaseService
 		
 		try
 		{
-			$newCategoryDb = myPartnerUtils::copyCategory($fromPartnerId, $this->getPartnerId(), $categoryId, $parentCategoryId);
+			$newCategoryDb = category::copyCategory($fromPartnerId, $this->getPartnerId(), $categoryId, $parentCategoryId);
 		}
 		catch(Exception $ex)
 		{
