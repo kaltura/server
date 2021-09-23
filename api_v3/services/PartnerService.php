@@ -135,7 +135,7 @@ class PartnerService extends KalturaBaseService
 		{
 			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $se->getMessage());
 		}
-		catch (kCoreException $ex)
+		catch (KalturaAPIException $ex)
 		{
 			KalturaLog::CRIT($ex);
 			$exceptionMessage = (str_replace('KalturaPartner::', '', $ex->getMessage()));
