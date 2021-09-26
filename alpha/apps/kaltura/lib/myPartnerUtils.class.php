@@ -1464,11 +1464,6 @@ class myPartnerUtils
  		self::copyAccessControls($fromPartner, $toPartner);
  		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
-	  
-		self::copyCategories($fromPartner, $toPartner);
-	 
-		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
-		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
  	
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
@@ -1511,50 +1506,6 @@ class myPartnerUtils
  		{
  			$newPermission = $permission->copyToPartner($toPartner->getId());
  			$newPermission->save();
- 		}
- 	}
- 	
- 	public static function copyCategories(Partner $fromPartner, Partner $toPartner)
- 	{
- 		KalturaLog::log("Copying categories from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
- 		
- 		categoryPeer::setUseCriteriaFilter(false);
- 		$c = new Criteria();
- 		$c->addAnd(categoryPeer::PARTNER_ID, $fromPartner->getId());
- 		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
- 		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
- 		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
- 		
- 		$categories = categoryPeer::doSelect($c);
- 		categoryPeer::setUseCriteriaFilter(true);
- 		
- 		foreach($categories as $category)
- 		{
- 			/* @var $category category */
- 			$category->setPuserId(null);
- 			$newCategory= $category->copy();
- 			$newCategory->setPartnerId($toPartner->getId());
- 			if($category->getParentId())
- 				$newCategory->setParentId(kObjectCopyHandler::getMappedId('category', $category->getParentId()));
- 				
- 			$newCategory->save();
- 			
-			$newCategory->setIsIndex(true);
- 			categoryPeer::setUseCriteriaFilter(false);
-			$newCategory->reSetFullIds();
-			$newCategory->reSetInheritedParentId();
-			$newCategory->reSetDepth();
-			$newCategory->reSetFullName();
- 			categoryPeer::setUseCriteriaFilter(true);
-			
-			$newCategory->setEntriesCount(0);
-			$newCategory->setMembersCount(0);
-			$newCategory->setPendingMembersCount(0);
-			$newCategory->setDirectSubCategoriesCount(0);
-			$newCategory->setDirectEntriesCount(0);
-			$newCategory->save();
- 			
- 			KalturaLog::log("Copied [".$category->getId()."], new id is [".$newCategory->getId()."]");
  		}
  	}
  	
