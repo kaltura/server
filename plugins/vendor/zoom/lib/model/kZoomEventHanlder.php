@@ -223,7 +223,7 @@ class kZoomEventHanlder
 		$kMeetingMetaData->setMeetingId($recording->id);
 		$kMeetingMetaData->setUuid($recording->uuid);
 		$kMeetingMetaData->setTopic($recording->topic);
-		$kMeetingMetaData->setMeetingStartTime(strtotime(str_replace(array('T','Z'),array(' ',''), $recording->startTime)));
+		$kMeetingMetaData->setMeetingStartTime(kTimeZoneUtils::timeZoneStrToTime((str_replace(array('T','Z'),array(' ',''), $recording->startTime)), Null, 'Zulu'));
 		$kMeetingMetaData->setAccountId($event->accountId);
 		$kMeetingMetaData->setHostId($recording->hostId);
 		if (isset($recording->recordingType))
