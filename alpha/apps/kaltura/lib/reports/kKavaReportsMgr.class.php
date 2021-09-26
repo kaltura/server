@@ -4379,7 +4379,10 @@ class kKavaReportsMgr extends kKavaBase
 					);
 					if ($enrich_context)
 					{
-						$enrich_context = array_merge($enrich_context, $context);
+						if (is_array($enrich_context))
+						{
+							$enrich_context = array_merge($enrich_context, $context);
+						}
 					}
 					else
 					{
