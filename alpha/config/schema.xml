@@ -2215,4 +2215,27 @@
 			<index-column name="status" />
 		</index>
 	</table>
+	<table skipSql="false" abstract="false" name="virtual_event" reloadOnInsert="true">
+		<column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="100" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="description" type="longvarchar" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="partner_id" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="start_date" type="timestamp" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="end_date" type="timestamp" />
+		<column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="duration" type="integer" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="deletion_date" type="timestamp" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="organizer" type="varchar" size="256" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="location" type="varchar" size="256" />
+		<index name="partner_id_index">
+			<index-column name="partner_id" />
+		</index>
+		<index name="name_index">
+			<index-column name="name" />
+		</index>
+	</table>
 </database>
