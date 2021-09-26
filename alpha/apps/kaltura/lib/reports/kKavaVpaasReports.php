@@ -54,7 +54,6 @@ class kKavaVpaasReports extends kKavaReports
 				self::REPORT_ENRICH_FUNC => 'kKavaVpaasReports::getUsersInfoVpaas',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'PARTNER_ID'),
-					'hash' => false,
 				)
 			),
 		),

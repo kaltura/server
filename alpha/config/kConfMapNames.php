@@ -9,4 +9,5 @@ class kConfMapNames
 	const REQUIRE_CATEGORY_ENTRY_FILTER_PARTNERS = 'partner_ids_require_category_entry_filter';
 	const COMMON_PASSWORDS = 'common_passwords';
 	const VENDOR = 'vendor';
+	const ANALYTICS = 'analytics';
 }

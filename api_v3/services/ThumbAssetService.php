@@ -902,8 +902,6 @@ class ThumbAssetService extends KalturaAssetService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
-		
 		
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
