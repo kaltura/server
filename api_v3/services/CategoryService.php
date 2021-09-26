@@ -99,7 +99,7 @@ class CategoryService extends KalturaBaseService
 		
 		try
 		{
-			$newCategoryDb = category::copyCategory($fromPartnerId, $this->getPartnerId(), $categoryId, $parentCategoryId);
+			$newCategoryDb = category::copyCategory($fromPartnerId, $this->getPartnerId(), $categoryDb, $parentCategoryId);
 		}
 		catch(Exception $ex)
 		{

@@ -2036,14 +2036,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		return null;
 	}
 	
-	public static function copyCategory($fromPartnerId, $toPartnerId, $categoryId, $parentCategoryId = null)
+	public static function copyCategory($fromPartnerId, $toPartnerId, $category, $parentCategoryId = null)
 	{
-		KalturaLog::log("Copying category[$categoryId] from partner  [$fromPartnerId] to partner [$toPartnerId]");
-		
-		categoryPeer::setUseCriteriaFilter(false);
-		$category = categoryPeer::retrieveByPK($categoryId);
-		
 		/* @var $category category */
+		$categoryId = $category->getId();
+		KalturaLog::log("Copying category[$categoryId] from partner  [$fromPartnerId] to partner [$toPartnerId]");
+
 		$category->setPuserId(null);
 		$newCategory = $category->copy();
 		$newCategory->setInitialParam($toPartnerId, $parentCategoryId);
@@ -2076,28 +2074,6 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$this->setDirectSubCategoriesCount(0);
 		$this->setDirectEntriesCount(0);
 		$this->save();
-	}
-	
-	public function copyCategories(Partner $fromPartner, Partner $toPartner)
-	{
-		KalturaLog::log("Copying categories from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
-		
-		categoryPeer::setUseCriteriaFilter(false);
-		$c = new Criteria();
-		$c->addAnd(categoryPeer::PARTNER_ID, $fromPartner->getId());
-		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
-		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
-		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
-		
-		$categories = categoryPeer::doSelect($c);
-		categoryPeer::setUseCriteriaFilter(true);
-		
-		foreach($categories as $category)
-		{
-			self::copyCategory($category,
-								kObjectCopyHandler::getMappedId('category', $category->getParentId()),
-								$toPartner->getId());
-		}
 	}
 
 }
