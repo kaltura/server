@@ -233,9 +233,18 @@ class UserLoginData extends BaseUserLoginData{
 	
 	public function passwordUsedBefore($pass)
 	{
-		$previousPass = $this->getPreviousPasswords();
-		$i = 0;
 		$passToKeep = $this->getNumPrevPassToKeep();
+		$previousPass = $this->getPreviousPasswords();
+		if ($passToKeep > 0 && count($previousPass) == 0)
+		{
+			$encryptedPassword = sha1($this->salt . $pass);
+			if ($encryptedPassword === $this->sha1_password)
+			{
+				return true;
+			}
+		}
+		
+		$i = 0;
 		while ($i < count($previousPass) && $i < $passToKeep) {
 			if ($previousPass[$i]['sha1'] === sha1($previousPass[$i]['salt'] . $pass)) {
 				return true;
