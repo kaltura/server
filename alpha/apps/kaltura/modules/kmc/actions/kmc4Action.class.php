@@ -73,7 +73,7 @@ class kmc4Action extends kalturaAction
 		if (!$partner->validateApiAccessControl())
 			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
 		
-		kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
+		kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, self::CURRENT_KMC_VERSION, null, null, null);
 		$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 		$ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 		$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
@@ -244,7 +244,7 @@ class kmc4Action extends kalturaAction
                 'player_id'				=> isset($this->content_uiconf_livea) ? $this->content_uiconf_livea->getId() : '',
 					
 				'map_zoom_levels' => kConf::hasParam ("map_zoom_levels") ? kConf::get ("map_zoom_levels") : '',
-			    'map_urls' => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : '',
+			    'map_urls' => kConf::hasParam ("cdn_static_hosts") ? array_map(fn($s) => "$s/content/static/maps/v1", kConf::get ("cdn_static_hosts")) : '',
             ),
 			'usagedashboard'			=> array(
 				'version'				=> kConf::get("usagedashboard_version"),
