@@ -500,8 +500,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		}
 		if($partner->getHideSecrets())
 		{
-			$this->adminSecret=null;
-			$this->secret=null;
+			$this->adminSecret = null;
+			$this->secret = null;
 		}
 		
 	}
