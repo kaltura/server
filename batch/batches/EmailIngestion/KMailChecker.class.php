@@ -291,10 +291,13 @@ class KMailChecker {
 			$body = $body_html;
 		}
 		else {
-			// loop through all found ALTERNATIVE parts (mail might contain more than 1) and loop for the body text
-			while (!$body && (list($partNum,$partStruct) = each($more_parts))) {
-				$body = $this->getBody($msgNum, $partStruct, $partNum);
-			}
+            // loop through all found ALTERNATIVE parts (mail might contain more than 1) and loop for the body text
+            foreach ($more_parts as $partNum=>$partStruct) {
+                $body = $this->getBody($msgNum, $partStruct, $partNum);
+                if ($body) {
+                    break;
+                }
+            }
 		}
 
 		return trim($body);
