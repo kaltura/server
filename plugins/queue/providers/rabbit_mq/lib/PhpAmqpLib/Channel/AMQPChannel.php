@@ -197,7 +197,6 @@ class AMQPChannel extends AbstractChannel
 
         $this->send_method_frame(array(20, 41));
         $this->do_close();
-
         throw new AMQPProtocolChannelException($reply_code, $reply_text, array($class_id, $method_id));
     }
 
@@ -1085,8 +1084,7 @@ class AMQPChannel extends AbstractChannel
             $pkt = $this->prepare_method_frame(array($class_id, $method_id), $args);
             $this->publish_cache[$cache_key] = $pkt->getvalue();
             if (count($this->publish_cache) > $this->publish_cache_max_size) {
-                reset($this->publish_cache);
-                $old_key = key($this->publish_cache);
+                $old_key = array_key_first($this->publish_cache);
                 unset($this->publish_cache[$old_key]);
             }
         }
@@ -1337,10 +1335,10 @@ class AMQPChannel extends AbstractChannel
      * Beware that only non-transactional channels may be put into confirm mode and vice versa
      *
      * @param bool $nowait
-     * @throws \PhpAmqpLib\Exception\AMQPTimeoutException if the specified operation timeout was exceeded
      * @return null
+     *@throws \PhpAmqpLib\Exception\AMQPTimeoutException if the specified operation timeout was exceeded
      */
-    public function confirm_select($nowait = false)
+    public function confirm_select(bool $nowait)
     {
         list($class_id, $method_id, $args) = $this->protocolWriter->confirmSelect($nowait);
 
@@ -1353,6 +1351,7 @@ class AMQPChannel extends AbstractChannel
         $this->wait(array($this->waitHelper->get_wait('confirm.select_ok')
         ), false, $this->channel_rpc_timeout);
         $this->next_delivery_tag = 1;
+        return null;
     }
 
     /**
