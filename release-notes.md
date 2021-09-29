@@ -2,7 +2,7 @@
 
 ## Add partner for self serve server ##
 * Issue Type: Task
-* Issue ID: PLAT-
+* Issue ID: PLAT-23201
 
 ### Configuration ###
 First replace all tokens from the ini file below (under self-serve-server section) and remove ".template" from the file name :
