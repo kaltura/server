@@ -16,8 +16,8 @@ class kBeaconSearchQueryManger
 		$beaconElasticConfig = kConf::get('beacon', 'elastic');
 		$host = isset($beaconElasticConfig['elasticHost']) ? $beaconElasticConfig['elasticHost'] : null;
 		$port = isset($beaconElasticConfig['elasticPort']) ? $beaconElasticConfig['elasticPort'] : null;
-		$isLegacyVersion = isset($beaconElasticConfig['isLegacyVersion']) ? $beaconElasticConfig['isLegacyVersion'] : true;
-		self::$elasticClient = new elasticClient($host, $port, $isLegacyVersion);
+		$elasticVersion = isset($beaconElasticConfig['elasticVersion']) ? $beaconElasticConfig['elasticVersion'] : elasticClient::DEFAULT_ELASTIC_MAJOR_VERSION;
+		self::$elasticClient = new elasticClient($host, $port, $elasticVersion);
 	}
 	
 	public function search($searchQuery)

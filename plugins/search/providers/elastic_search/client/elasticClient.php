@@ -41,10 +41,11 @@ class elasticClient
 
 	const ELASTIC_ACTION_BULK = 'bulk';
 	const DEFAULT_BULK_SIZE = 500;
+	const DEFAULT_ELASTIC_MAJOR_VERSION = 5;
 
 	protected $elasticHost;
 	protected $elasticPort;
-	protected $isLegacyVersion;
+	protected $elasticVersion;
 	protected $ch;
 	protected $bulkBuffer;
 	protected $bulkBufferSize;
@@ -54,10 +55,10 @@ class elasticClient
 	 * elasticClient constructor.
 	 * @param null $host
 	 * @param null $port
-	 * @param null $isLegacyVersion
+	 * @param null $elasticVersion
 	 * @param null $curlTimeout - timeout in seconds
 	 */
-	public function __construct($host = null, $port = null, $isLegacyVersion = null, $curlTimeout = null)
+	public function __construct($host = null, $port = null, $elasticVersion = null, $curlTimeout = null)
 	{
 		if (!$host)
 		{
@@ -73,12 +74,12 @@ class elasticClient
 		KalturaLog::debug("Setting elastic port $host");
 		$this->elasticPort = $port;
 
-		if (is_null($isLegacyVersion))
+		if (is_null($elasticVersion))
 		{
-			$isLegacyVersion = kConf::get('isLegacyVersion', 'elastic', true);
+			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::DEFAULT_ELASTIC_MAJOR_VERSION);
 		}
-		KalturaLog::debug("Setting isLegacyVersion flag to $isLegacyVersion");
-		$this->isLegacyVersion = $isLegacyVersion;
+		KalturaLog::debug("Setting elastic version to [$elasticVersion]");
+		$this->elasticVersion = $elasticVersion;
 
 		$this->ch = curl_init();
 		
@@ -279,7 +280,7 @@ class elasticClient
 			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
 		}
 
-		if (!$this->isLegacyVersion)
+		if ($this->elasticVersion > self::DEFAULT_ELASTIC_MAJOR_VERSION)
 		{
 			$params[self::REST_TOTAL_HITS_AS_INT] = "true";
 		}
@@ -508,7 +509,7 @@ class elasticClient
 		if (isset($params[self::ELASTIC_INDEX_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
 
-		if ($this->isLegacyVersion)
+		if ($this->elasticVersion <= self::DEFAULT_ELASTIC_MAJOR_VERSION)
 		{
 			if (isset($params[self::ELASTIC_TYPE_KEY]))
 			{
@@ -546,7 +547,7 @@ class elasticClient
 	{
 		$actionArr = array ('_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY]);
 
-		if ($this->isLegacyVersion)
+		if ($this->elasticVersion <= self::DEFAULT_ELASTIC_MAJOR_VERSION)
 		{
 			$actionArr['_'.self::ELASTIC_TYPE_KEY] = $params[self::ELASTIC_TYPE_KEY];
 		}
