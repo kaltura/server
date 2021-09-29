@@ -43,8 +43,10 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
     public static function getExcludeServerNodesFromAPI($serverTypesNotIn)
     {
         $serverNodeFilter = new KalturaServerNodeFilter();
+		$serverNodePager = new KalturaFilterPager();
+		$serverNodePager->pageSize = 500;
         $serverNodeFilter->typeIn = $serverTypesNotIn;
-        return self::$kClient->serverNode->listAction($serverNodeFilter);
+        return self::$kClient->serverNode->listAction($serverNodeFilter, $serverNodePager);
     }
 
 
@@ -75,7 +77,6 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;
-		$entryServerNodePager->pageIndex = 1;
 		
 		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
 		
