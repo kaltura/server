@@ -102,6 +102,8 @@ class Partner extends BasePartner
 	
 	const PURIFY_IMAGE_CONTENT = 'purify_image_content';
 	
+	const HIDE_SECRETS = 'hideSecrets';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2265,4 +2267,15 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData(self::PURIFY_IMAGE_CONTENT, $v);
 	}
+	
+	public function getHideSecrets()
+	{
+		return $this->getFromCustomData(self::HIDE_SECRETS, null, false);
+	}
+	
+	public function setHideSecrets($v)
+	{
+		return $this->putInCustomData(self::HIDE_SECRETS, $v);
+	}
 }
+
