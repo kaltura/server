@@ -1,3 +1,17 @@
+# Quasar-17.12.0 #
+
+## Add partner for self serve server ##
+* Issue Type: Task
+* Issue ID: PLAT-
+
+### Configuration ###
+First replace all tokens from the ini file below (under self-serve-server section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
+
 # Quasar-17.11.0 #
 
 ## Partner registration - Move all time-consuming jobs to run in batch ##

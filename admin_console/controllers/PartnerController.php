@@ -701,7 +701,7 @@ class PartnerController extends Zend_Controller_Action
 		if ($statusIn != ''){
 			$filter->statusIn = $statusIn;
 		}else{
-			$filter->statusIn = Kaltura_Client_Enum_PartnerStatus::ACTIVE . ',' . Kaltura_Client_Enum_PartnerStatus::BLOCKED;
+			$filter->statusIn = Kaltura_Client_Enum_PartnerStatus::ACTIVE . ',' . Kaltura_Client_Enum_PartnerStatus::BLOCKED . ',' . Kaltura_Client_Enum_PartnerStatus::READ_ONLY;
 		}
 		 
 		$filter->orderBy = Kaltura_Client_Enum_PartnerOrderBy::ID_DESC;
