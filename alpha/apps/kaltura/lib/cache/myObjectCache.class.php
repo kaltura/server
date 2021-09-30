@@ -24,7 +24,7 @@ class myObjectCache
 	// in the case of the array - do 2 things : 
 	// 1. store each object in the cache
 	// 2. store the array of id's in the cache associated    
-	public function putArray ( $parnet , $field_name , $arr )
+	public function putArray ($parent , $field_name , $arr )
 	{
 		if ( $arr == null ) return;
 		
@@ -46,35 +46,29 @@ class myObjectCache
 			$i++;
 		}
 
-		$parnet_clazz = get_class ( $parnet );
+		$parnet_clazz = get_class ( $parent );
 		
-		$id = $parnet->getId();
-//		echo "myObjectCache::put: [" . $obj_clazz . "] [$id]"; 
-				
+		$id = $parent->getId();
+
 
 		$key = $parnet_clazz . "_" . $id . "_arr_$field_name";
 		
-		KalturaLog::info (  __CLASS__ . ":putArray: $key" );
+		KalturaLog::info (  self::class . ":putArray: $key" );
 //		echo "putArray:" . $key . "(" . count ( $arr ) . ")\n" ;
 		
 		self::$s_memory_cache->put ( $key , $id_list , $this->m_expiry_in_seconds );
 		self::$s_cache->put ( $key , $id_list , $this->m_expiry_in_seconds);
 	}
 	
-	public function getArray ( $parnet , $field_name )
+	public function getArray ($parent , $field_name )
 	{
-		$obj_clazz = get_class ( $parnet );
-		
-		$id = $parnet->getId();
-
+		$obj_clazz = get_class ( $parent );
+		$id = $parent->getId();
 		$key = $obj_clazz . "_" . $id . "_arr_$field_name";
-		
-//		echo "getArray:" . $key . "\n" ;
-		
 		$res = @ self::$s_memory_cache->get ( $key );
 		if ( $res == null ) $res = self::$s_cache->get ( $key );
 		
-		if ( $res == null ) return;
+		if ( $res == null ) return null;
 
 		$obj_clazz = null;
 		// now attempt to re-create the array:
@@ -113,7 +107,7 @@ class myObjectCache
 		}
 
 		$key = $obj_clazz . "_" . $id . "_arr_$field_name";
-		KalturaLog::info (  __CLASS__ . ":removeArray: $key" );
+		KalturaLog::info (  self::class . ":removeArray: $key" );
 		
 		 
 		self::$s_memory_cache->remove ( $key );
@@ -137,8 +131,7 @@ class myObjectCache
 			$getter_func_name = "get{$cache_key_field}";
 			$id = "{$cache_key_field}_" . $obj->$getter_func_name();
 		}
-//		echo "\nmyObjectCache::put: [" . $obj_clazz . "] [$id]\n"; 
-				
+
 		$key = $obj_clazz . "_" . $id;
 		
 		// make the memory cache much shorter - for whn using it in batch processes. the memcahce can be cleared easily
@@ -155,7 +148,6 @@ class myObjectCache
 				
 		$key = $obj_clazz . "_" . $id;
 		
-//		echo "\nmyObjectCache::putValue: [$key] , [$obj_clazz] , [$id] , [$cache_key_field] , [$value]\n";		
 		self::$s_memory_cache->put ( $key , $value , $this->m_expiry_in_seconds );
 		self::$s_cache->put ( $key , $value , $this->m_expiry_in_seconds );
 	}
@@ -170,38 +162,31 @@ class myObjectCache
 		{
 			$key = $obj_clazz . "_" . "{$cache_key_field}_" . $id;
 		}
-		
-		
-		$res = null;
+
 		$res = self::$s_memory_cache->get ( $key );
 		if ( $res != null ) 
 		{
-//			echo "\nmyObjectCache::get: [$key] [$obj_clazz] [$id] - found in cache1\n";
 			return $res;
 		}
 		
 		$res = self::$s_cache->get ( $key );
 		if ( $res != null ) 
 		{
-//			echo "\nmyObjectCache::get: [$key] [$obj_clazz] [$id] - found in cache2\n";
 			self::$s_memory_cache->put ( $key , $res , $this->m_expiry_in_seconds );
 			return $res;
 		}
 
-//		echo "\nmyObjectCache::get: [" . $obj_clazz . "] [$id] - NOT found in any cache\n";
 		return null;
 	}
 	
 	public function remove ( $obj_clazz , $id )
 	{
 		$key = $obj_clazz . "_" . $id;
-//		echo "\nmyObjectCache::remove: [" . $obj_clazz . "] [$id]\n";
 		self::$s_memory_cache->remove ( $key );
 		self::$s_cache->remove ( $key );		
 	}
 
 }
-
 
 class memoryCache
 {
@@ -217,7 +202,6 @@ class memoryCache
 		$expiry = $expiry-3;
 		
 		$expired_time = time() + $expiry ;
-//		echo __METHOD__ . " [$name] [$expired_time]\n";		
 		self::$s_map[$name] = array ( $expired_time , $value );
 	}
 	
@@ -231,7 +215,6 @@ class memoryCache
 			$expired_time = $value_arr[0];
 			
 			$now = time();
-//			echo __METHOD__ . " [$name] [$expired_time] [$now]\n";
 			if ( $expired_time >= $now  )
 				return $value_arr[1];
 		}
@@ -244,4 +227,4 @@ class memoryCache
 	}
 }
 
-?>
+
