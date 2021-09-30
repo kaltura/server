@@ -15,7 +15,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 	 */
 	public static function dependsOn()
 	{
-		$class = get_called_class();
+		$class = static::class;
 		$integrationVersion = $class::getRequiredIntegrationPluginVersion();
 		$dependency = new KalturaDependency(IntegrationPlugin::getPluginName(), $integrationVersion);
 		
@@ -27,7 +27,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 	 */
 	public static function getEnums($baseEnumName = null)
 	{
-		$class = get_called_class();
+		$class = static::class;
 		$integrationProviderClassName = $class::getIntegrationProviderClassName();
 		if(is_null($baseEnumName))
 			return array($integrationProviderClassName);
@@ -43,7 +43,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{			
-		$class = get_called_class();
+		$class = static::class;
 		$objectClass = $class::getObjectClass($baseClass, $enumValue);
 		if (is_null($objectClass)) 
 		{
@@ -66,7 +66,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 	 */
 	public static function getIntegrationProviderCoreValue($valueName)
 	{
-		$class = get_called_class();
+		$class = static::class;
 		$value = $class::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
@@ -76,7 +76,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 	 */
 	public static function getApiValue($valueName)
 	{
-		$class = get_called_class();
+		$class = static::class;
 		return $class::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 }
