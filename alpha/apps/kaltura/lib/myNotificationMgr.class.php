@@ -23,9 +23,7 @@ class myNotificationMgr
 		
 		$this->m_not_list[] = $not;
 		$this->m_not_id_list[] = $not_id;
-		if ( $this->m_url != null && $this->m_url != $url ) 
-		{ // ERROR ! 
-		}
+
 		$this->m_url = $url; // assume all URLs are the same
 		array_merge ( $this->m_params , $params ); // accumulate the params
 		$this->m_serialized_params = $serialized_params;
@@ -54,13 +52,11 @@ class myNotificationMgr
 			foreach (  $map as $name => $value )
 			{
 				$match = preg_match ( "/^(not[^_]*)_(.*)$/" , $name , $parts );
-//$debug .= "match: $match " . print_r ( $parts , true ) . "\n";				
 				if ( ! $match ) continue;
 				$not_name_parts = $parts[1];
 				$not_property = @$parts[2];
-				
-				//$not_name_parts = split ( "_" , $name , 2 );
-				//	$not_property = @$not_name_parts[1];
+
+
 $debug .= "name: $name\n";				
 				$prefix = $not_name_parts;
 				$not_prefix = null;
@@ -71,7 +67,6 @@ $debug .= "name: $name\n";
 				else
 				{
 					$not_data = @$res[$prefix];
-//$debug .= "3(" . print_r ( $not_data , true ) . ")";					
 					if ( $not_data == null )
 					{
 						$res[$prefix] = array();
@@ -80,7 +75,6 @@ $debug .= "name: $name\n";
 $debug .= "property: $not_property = [$value]\n";					
 					$not_data[$not_property] = $value;
 				}
-				//$res[$prefix] = $not_data;				
 			}
 			
 			
@@ -126,74 +120,8 @@ $debug .= "property: $not_property = [$value]\n";
 		if ( ! $nofity ) return false;
 		$nofication_config = myNotificationsConfig::getInstance( $nofication_config_str );
 		$nofity_send_type = $nofication_config->shouldNotify ( $notification_type );
-		
-//echo "nofication_config_str: $nofication_config_str<br>notification_type:$notification_type<br>";
-		
+
 		if ( $nofity_send_type == self::NOTIFICATION_MGR_NO_SEND ) return false;
-		
-//echo "nofity_send_type: $nofity_send_type<br>";
-		
-		// now check what type of notification to use - none / synch / a-synch
-
-//		Remarked by Tan-Tan, Nov 5 2009 to support the new batches
-//
-//		$not = new notification();
-//		$not->setType( $notification_type );
-//		if (  $nofity_send_type == self::NOTIFICATION_MGR_SEND_ASYNCH || $nofity_send_type == self::NOTIFICATION_MGR_SEND_BOTH)
-//		{
-// 			
-//			// the notification should be in status pending so it will be sent in the 
-//			$not->setStatus( BatchJob::BATCHJOB_STATUS_PENDING );
-//		}
-//		elseif (  $nofity_send_type == self::NOTIFICATION_MGR_SEND_SYNCH  )
-//		{
-//			$not->setStatus( BatchJob::BATCHJOB_STATUS_FINISHED );
-//		}
-//		
-//		// return the notification to the caller
-//		$retrun_notification = ( $nofity_send_type == self::NOTIFICATION_MGR_SEND_SYNCH || $nofity_send_type == self::NOTIFICATION_MGR_SEND_BOTH );
-//		
-////echo "retrun_notification: $retrun_notification<br>";
-//		
-//		$not->setPartnerId( $partner_id );
-//		$not->setPuserId( $puser_id );
-//		$not->setDc ( kDataCenterMgr::getCurrentDcId() );
-//		if ( $object_data instanceof BaseObject )
-//		{
-//			$not->setObjectId($object_data->getId() );
-//			$not->setData( self::createNotificationData ( $notification_type , $object_data, $extra_notification_data  ) );
-//				
-//			if ( $object_data instanceof entry )
-//			{
-//				if (defined("KALTURA_API_V3"))
-//					$puser_id = $object_data->getKuser()->getPuserId();
-//				else
-//					$puser_id = PuserKuserPeer::getByKuserId( $object_data->getKuserId() , 1 );
-//					
-//				$not->setPuserId( $puser_id );
-//				
-//			}
-//		}
-//		else
-//		{
-//			// in this case all we have is the object data which is the id
-//			// this is probably the case of some delete and we mifght not have the object in hand but only the id
-//			$not->setObjectId( $object_data );
-//		}
-//		$not->save();
-		
-		
-		
-
-//		Added by Tan-Tan, Nov 2009 to support the new batches		
-//		if (  $nofity_send_type == self::NOTIFICATION_MGR_SEND_ASYNCH || $nofity_send_type == self::NOTIFICATION_MGR_SEND_BOTH)
-//		{
-// 			
-//			// the notification should be in status pending so it will be sent in the 
-//			$job->setStatus( BatchJob::BATCHJOB_STATUS_PENDING );
-//		}
-//		else
-
 		$dontSend = false;
 		if (  $nofity_send_type == self::NOTIFICATION_MGR_SEND_SYNCH  )
 		{
@@ -221,7 +149,7 @@ $debug .= "property: $not_property = [$value]\n";
 					else
 					{
 						$puser_id = null;
-						KalturaLog::log ( __CLASS__.'::'.__METHOD__.' [line: '.__LINE__.'] could not find kuser ['.$object_data->getKuserId().'] from object ['.$object_data->getId().']');
+						KalturaLog::log ( self::class.'::'.__METHOD__.' [line: '.__LINE__.'] could not find kuser ['.$object_data->getKuserId().'] from object ['.$object_data->getId().']');
 					}
 				}
 				else
@@ -244,7 +172,7 @@ $debug .= "property: $not_property = [$value]\n";
 					}
 					if(is_null($puser_id))
 					{
-						KalturaLog::log ( __CLASS__.'::'.__METHOD__.' [line: '.__LINE__.'] could not get puser_id out of api_v3 context puserId from entry:['.$object_data->getPuserId().'] kuser ID:['.$object_data->getKuserId().'] entry:['.$object_data->getId().']');
+						KalturaLog::log ( self::class.'::'.__METHOD__.' [line: '.__LINE__.'] could not get puser_id out of api_v3 context puserId from entry:['.$object_data->getPuserId().'] kuser ID:['.$object_data->getKuserId().'] entry:['.$object_data->getId().']');
 					}
 				}
 			}
@@ -297,13 +225,13 @@ $debug .= "property: $not_property = [$value]\n";
 				$param_names = array ( "name" , "tags" , "search_text" , "media_type" , "length_in_msecs" , "permissions", "thumbnail_url" , "kshow_id" , 
 					"group_id" , "partner_data", "status", "width", "height", "data_url", "download_url", "download_size", "media_date" , "moderation_status" );
 				break;
+			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_UPDATE_PERMISSIONS:
 			case kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_PERMISSIONS:
 				$param_names = array ( "permissions" );
 				break;
-			case kNotificationJobData::NOTIFICATION_TYPE_ENTRY_DELETE:
-				$param_names = null;
-				break;
 			case kNotificationJobData::NOTIFICATION_TYPE_ENTRY_BLOCK:
+			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_DELETE:
+			case kNotificationJobData::NOTIFICATION_TYPE_ENTRY_DELETE:
 				$param_names = null;
 				break;
 			case kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL:
@@ -316,18 +244,10 @@ $debug .= "property: $not_property = [$value]\n";
 				$param_names = array ( "moderation_status", "moderation_count" );
 				break;
 			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_ADD:
-				//$param_names = array ( "name" , "description" , "searchText" , "permissions" ,"groupId");
 				$param_names = array ( "name" , "description" , "tags" , "search_text" , "permissions" , "group_id" , "partner_data" , "show_entry_id" );
 				break;
-			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_DELETE:
-				$param_names = null;
-				break;
 			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_UPDATE_INFO:
-				//$param_names = array ( "name" , "description" , "searchText" ,"groupId" );
 				$param_names = array ( "name" , "description" , "tags" , "search_text" , "group_id" , "partner_data"  );
-				break;
-			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_UPDATE_PERMISSIONS:
-				$param_names = array ( "permissions" );
 				break;
 			case kNotificationJobData::NOTIFICATION_TYPE_KSHOW_RANK:
 				$param_names = array ( "rank" , "votes" );
@@ -419,9 +339,7 @@ $debug .= "property: $not_property = [$value]\n";
 		);
 		
 		if ( kNotificationJobData::isEntryNotification($type )) $params["entry_id"] = $job->getData()->getObjectId();
-			//$params["entryId"] = $not->getObjectId();
 		if ( kNotificationJobData::isKshowNotification($type )) $params["kshow_id"] = $job->getData()->getObjectId();
-//			$params["kshowId"] = $not->getObjectId();
 
 		$object_data_params = myNotificationMgr::getDataAsArray( $job->getData()->getData() ) ;
 		
@@ -524,4 +442,4 @@ class myNotificationsConfig
 	}
 }
 
-?>
+
