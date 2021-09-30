@@ -63,6 +63,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
 				if ($entryVendorTask->status != KalturaEntryVendorTaskStatus::PENDING)
 				{
 					KalturaLog::info('Entry vendor task id ' . $entryVendorTask->id . ' is in an invalid status: ' . $entryVendorTask->status . '. Skipping.');
+					$handledTasksCounter++;
 					continue;
 				}
 
