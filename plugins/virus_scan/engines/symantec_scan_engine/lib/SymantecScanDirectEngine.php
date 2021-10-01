@@ -16,8 +16,8 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	 * For example - command line of the relevant binary file.
 	 * @param unknown_type $paramsObject Object containing job parameters
 	 */
-	public function config($paramsObject)
-	{
+	public function config($paramsObject): bool
+    {
 		if (isset($paramsObject->sleepBetweenScanRetries))
 		{
 			$this->sleepBetweenScanRetries = $paramsObject->sleepBetweenScanRetries;
@@ -89,8 +89,8 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	 * @param boolean $cleanIfInfected
 	 * @param string $errorDescription
 	 */
-	public function execute($filePath, $cleanIfInfected, &$output, &$errorDescription)
-	{
+	public function execute($filePath, $cleanIfInfected, &$output, &$errorDescription): int
+    {
 		if (!file_exists($filePath))
 		{
 			$errorDescription = 'Source file does not exists ['.$filePath.']';
@@ -152,9 +152,8 @@ Encapsulated: null-body=0
 				
 			default:	// incl: 500 - internal error
 				KalturaLog::err("Got invalid scan status $statusCode");
-				$scanAttempts++;				
-				continue;
-			}
+				$scanAttempts++;
+            }
 		}
 		
 		return KalturaVirusScanJobResult::SCAN_ERROR;
