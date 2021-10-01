@@ -107,7 +107,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 								break;
 							default:
 								KalturaLog::err("Missing comparison type");
-								continue;
+                                break;
 						}
 											
 						$metadataField = $this->getMetadataSearchField($field, $xPaths);
