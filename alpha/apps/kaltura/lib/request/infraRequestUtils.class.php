@@ -367,7 +367,7 @@ class infraRequestUtils
 
         // if still empty ....
         if (!$remote_addr)
-            $remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
+            $remote_addr = ($_SERVER['REMOTE_ADDR'] ?? null);
 
         return $remote_addr;
     }
@@ -397,7 +397,7 @@ class infraRequestUtils
             $result = rtrim($urlDetails['path'], '/'); // trim trailing slashes. example: www.kaltura.com/test.php
 
             // stop string at first slash. example: httpssss/google.com - malformed url...
-            if (strpos($result, "/") !== false) {
+            if (str_contains($result, "/")) {
                 $result = substr($result, 0, strpos($result, "/"));
             }
         } else // empty path and host, cannot parse the URL
@@ -406,13 +406,13 @@ class infraRequestUtils
         }
 
         // some urls might return host or path which is not yet clean for comparison with user's input
-        if (strpos($result, "?") !== false) {
+        if (str_contains($result, "?")) {
             $result = substr($result, 0, strpos($result, "?"));
         }
-        if (strpos($result, "#") !== false) {
+        if (str_contains($result, "#")) {
             $result = substr($result, 0, strpos($result, "#"));
         }
-        if (strpos($result, "&") !== false) {
+        if (str_contains($result, "&")) {
             $result = substr($result, 0, strpos($result, "&"));
         }
         return $result;
@@ -476,7 +476,7 @@ class infraRequestUtils
                     if ($post)
                         self::$jsonData = $requestBody;
                 }
-            } elseif (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])) {
+            } elseif (str_starts_with(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') && isset($_POST['json'])) {
                 $post = json_decode($_POST['json'], true, 512, JSON_THROW_ON_ERROR);
                 if ($post)
                     self::$jsonData = $_POST['json'];
