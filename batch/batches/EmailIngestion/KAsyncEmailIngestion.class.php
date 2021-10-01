@@ -278,7 +278,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
      * @param mixed $curId
      * @return MailMsg
      */
-    public function handleAttachments(bool|array $email_profiles, MailMsg $curMail, KalturaMediaEntry $mediaEntry, $user, $host, KMailChecker $mailChecker, mixed $curId): MailMsg
+    public function handleAttachments($email_profiles, MailMsg $curMail, KalturaMediaEntry $mediaEntry, $user, $host, KMailChecker $mailChecker, mixed $curId): MailMsg
     {
 // add the mail's attachment for each valid email profile
         $failures = new AddEntriesFailures();

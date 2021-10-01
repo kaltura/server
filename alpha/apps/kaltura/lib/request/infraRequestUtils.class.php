@@ -132,23 +132,55 @@ class infraRequestUtils
         while (FALSE !== ob_get_clean()) ;
 
         if ($mime == null) {
-            $content_type = match ($ext) {
-                "css" => "text/css",
-                "flv" => "video/x-flv",
-                "mp4" => "video/mp4",
-                "mov", "qt" => "video/quicktime",
-                "webm" => "video/webm",
-                "ogg" => "video/ogg",
-                "mp3" => "audio/mpeg",
-                "jpg" => "image/jpeg",
-                "swf" => "application/x-shockwave-flash",
-                "m3u8" => "application/x-mpegURL",
-                "ts" => "video/MP2T",
-                "3gp" => "video/3gpp",
-                "js" => "application/javascript",
-                "htm", "html" => "text/html",
-                default => "image/$ext",
-            };
+            switch ($ext) {
+                case "css":
+                    $content_type = "text/css";
+                    break;
+                case "flv":
+                    $content_type = "video/x-flv";
+                    break;
+                case "mp4":
+                    $content_type = "video/mp4";
+                    break;
+                case "mov":
+                case "qt":
+                    $content_type = "video/quicktime";
+                    break;
+                case "webm":
+                    $content_type = "video/webm";
+                    break;
+                case "ogg":
+                    $content_type = "video/ogg";
+                    break;
+                case "mp3":
+                    $content_type = "audio/mpeg";
+                    break;
+                case "jpg":
+                    $content_type = "image/jpeg";
+                    break;
+                case "swf":
+                    $content_type = "application/x-shockwave-flash";
+                    break;
+                case "m3u8":
+                    $content_type = "application/x-mpegURL";
+                    break;
+                case "ts":
+                    $content_type = "video/MP2T";
+                    break;
+                case "3gp":
+                    $content_type = "video/3gpp";
+                    break;
+                case "js":
+                    $content_type = "application/javascript";
+                    break;
+                case "htm":
+                case "html":
+                    $content_type = "text/html";
+                    break;
+                default:
+                    $content_type = "image/$ext";
+                    break;
+            }
         } else {
             $content_type = $mime;
         }
