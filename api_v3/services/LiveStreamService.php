@@ -165,6 +165,11 @@ class LiveStreamService extends KalturaLiveEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || $dbEntry->getType() != entryType::LIVE_STREAM)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+
+		if (in_array($dbEntry->getPartner()->getStatus(), array(Partner::PARTNER_STATUS_CONTENT_BLOCK, Partner::PARTNER_STATUS_FULL_BLOCK)))
+		{
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
+		}
 		
 		/* @var $dbEntry LiveStreamEntry */
 		if ($dbEntry->getStreamPassword() != $token)
