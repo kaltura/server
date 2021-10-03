@@ -77,6 +77,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		
 		$entryServerNodePager = new KalturaFilterPager();
 		$entryServerNodePager->pageSize = 500;
+		$entryServerNodePager->pageIndex = 1;
 		
 		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
 		
