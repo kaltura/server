@@ -476,6 +476,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $twoFactorAuthenticationMode;
 	
+	/**
+	 * @var bool
+	 */
+	public $purifyImageContent;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -566,7 +571,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'secondarySecretRoleId',
 		'trigramPercentage',
 		'maxWordForNgram',
-		'twoFactorAuthenticationMode'
+		'twoFactorAuthenticationMode',
+		'purifyImageContent'
 	);
 
 	public function getMapBetweenObjects()
@@ -584,6 +590,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		$this->restrictEntryByMetadata = $source_object->getShouldApplyAccessControlOnEntryMetadata();
 		$this->htmlPurifierBaseListUsage = $source_object->getHtmlPurifierBaseListUsage();
+		$this->purifyImageContent = $source_object->getPurifyImageContent();
 		$this->ovpEnvironmentUrl = $source_object->getOvpEnvironmentUrl();
 		$this->ottEnvironmentUrl = $source_object->getOttEnvironmentUrl();
 		

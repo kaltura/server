@@ -99,14 +99,18 @@ class Partner extends BasePartner
 	const MAX_WORDS_FOR_NGRAM = 'max_words_for_ngram';
 	
 	const TWO_FACTOR_AUTHENTICATION_MODE = 'two_factor_authentication_mode';
- 
+	
+	const PURIFY_IMAGE_CONTENT = 'purify_image_content';
+	
+	const HIDE_SECRETS = 'hideSecrets';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
 		
-		return parent::save ( $con ) ;		
+		return parent::save ( $con ) ;
 	}
 	
 	public function validateSecret ( $partner_secret , $partner_key , &$ks_max_expiry_in_seconds , $admin = false )
@@ -2253,4 +2257,25 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData(self::MAX_WORDS_FOR_NGRAM, $v);
 	}
+	
+	public function getPurifyImageContent()
+	{
+		return $this->getFromCustomData(self::PURIFY_IMAGE_CONTENT, null, true);
+	}
+	
+	public function setPurifyImageContent($v)
+	{
+		return $this->putInCustomData(self::PURIFY_IMAGE_CONTENT, $v);
+	}
+	
+	public function getHideSecrets()
+	{
+		return $this->getFromCustomData(self::HIDE_SECRETS, null, false);
+	}
+	
+	public function setHideSecrets($v)
+	{
+		return $this->putInCustomData(self::HIDE_SECRETS, $v);
+	}
 }
+

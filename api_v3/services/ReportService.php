@@ -468,6 +468,12 @@ class ReportService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_REPORT_ITEMS_GROUP);
 		}
 
+		$customUrlPartnerIds = kConf::get(kFlowHelper::EXPORT_REPORT_CUSTOM_URL, kConfMapNames::ANALYTICS, array());
+		if (in_array($this->getPartnerId(), $customUrlPartnerIds) && !$params->baseUrl)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'baseUrl');
+		}
+
 	}
 
 	protected function parseParamsStr($paramsStr)

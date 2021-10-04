@@ -2035,5 +2035,45 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	{
 		return null;
 	}
+	
+	public static function copyCategory($fromPartnerId, $toPartnerId, $category, $parentCategoryId = null)
+	{
+		/* @var $category category */
+		$categoryId = $category->getId();
+		KalturaLog::log("Copying category[$categoryId] from partner  [$fromPartnerId] to partner [$toPartnerId]");
+
+		$category->setPuserId(null);
+		$newCategory = $category->copy();
+		$newCategory->setInitialParam($toPartnerId, $parentCategoryId);
+		
+		KalturaLog::log("Copied [" . $category->getId() . "], new id is [" . $newCategory->getId() . "]");
+		return $newCategory;
+	}
+	
+	protected function setInitialParam($toPartnerId, $parentCategoryId)
+	{
+		$this->setPartnerId($toPartnerId);
+		if($parentCategoryId)
+		{
+			$this->setParentId($parentCategoryId);
+		}
+		categoryPeer::setUseCriteriaFilter(true);
+		$this->save();
+		
+		$this->setIsIndex(true);
+		categoryPeer::setUseCriteriaFilter(false);
+		$this->reSetFullIds();
+		$this->reSetInheritedParentId();
+		$this->reSetDepth();
+		$this->reSetFullName();
+		categoryPeer::setUseCriteriaFilter(true);
+		
+		$this->setEntriesCount(0);
+		$this->setMembersCount(0);
+		$this->setPendingMembersCount(0);
+		$this->setDirectSubCategoriesCount(0);
+		$this->setDirectEntriesCount(0);
+		$this->save();
+	}
 
 }

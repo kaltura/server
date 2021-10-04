@@ -71,6 +71,54 @@ class CategoryService extends KalturaBaseService
 	}
 	
 	/**
+	 * Clone Category
+	 *
+	 * @action clone
+	 * @param int $categoryId
+	 * @param int $fromPartnerId
+	 * @param int $parentCategoryId
+	 * @throws KalturaAPIException
+	 * @return KalturaCategory
+	 */
+	function cloneAction($categoryId, $fromPartnerId, $parentCategoryId = null)
+	{
+		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
+		{
+			categoryPeer::setUseCriteriaFilter(false);
+		}
+		
+		$categoryDb = categoryPeer::retrieveByPK($categoryId);
+		
+		if (!$categoryDb)
+		{
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+		}
+		
+		$newCategory = new KalturaCategory();
+		$newCategoryDb = new category();
+		
+		try
+		{
+			$newCategoryDb = category::copyCategory($fromPartnerId, $this->getPartnerId(), $categoryDb, $parentCategoryId);
+		}
+		catch(Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+			{
+				$this->handleCoreException($ex, $newCategoryDb, $newCategory);
+			}
+			else
+			{
+				throw $ex;
+			}
+		}
+		
+		$newCategory->fromObject($newCategoryDb, $this->getResponseProfile());
+		categoryPeer::setUseCriteriaFilter(true);
+		return $newCategory;
+	}
+	
+	/**
 	 * Get Category by id
 	 * 
 	 * @action get
