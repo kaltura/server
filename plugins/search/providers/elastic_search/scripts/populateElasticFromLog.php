@@ -48,7 +48,7 @@ if (empty($config))
 $elasticCluster = $config['elasticCluster'];
 $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
-$elasticVersion = isset($config['elasticVersion']) ? $config['elasticVersion'] : elasticClient::DEFAULT_ELASTIC_MAJOR_VERSION;
+$elasticVersion = isset($config['elasticVersion']) ? $config['elasticVersion'] : elasticClient::ELASTIC_MAJOR_VERSION_5;
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);

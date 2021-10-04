@@ -142,11 +142,7 @@ class ESearchCategoryUserItem extends ESearchItem
 
         if ($this->getFieldName()  ==  ESearchCategoryUserFieldName::USER_ID)
 		{
-			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
-				array('index' => $indexName,
-					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
-					'id' => $this->getSearchTerm(),
-					'path' => ESearchUserFieldName::GROUP_IDS));
+			$preFixGroups = ESearchGroupUserItem::createGroupIdsTermsQuery($this->getFieldName(),$this->getSearchTerm(), $indexName);
 			$boolQuery = new kESearchBoolQuery();
 			$boolQuery->addToShould($exactQuery);
 			$boolQuery->addToShould($preFixGroups);

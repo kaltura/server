@@ -41,7 +41,8 @@ class elasticClient
 
 	const ELASTIC_ACTION_BULK = 'bulk';
 	const DEFAULT_BULK_SIZE = 500;
-	const DEFAULT_ELASTIC_MAJOR_VERSION = 5;
+	const ELASTIC_MAJOR_VERSION_5 = 5;
+	const ELASTIC_MAJOR_VERSION_7 = 7;
 
 	protected $elasticHost;
 	protected $elasticPort;
@@ -76,7 +77,7 @@ class elasticClient
 
 		if (is_null($elasticVersion))
 		{
-			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::DEFAULT_ELASTIC_MAJOR_VERSION);
+			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::ELASTIC_MAJOR_VERSION_5);
 		}
 		KalturaLog::debug("Setting elastic version to [$elasticVersion]");
 		$this->elasticVersion = $elasticVersion;
@@ -280,7 +281,7 @@ class elasticClient
 			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
 		}
 
-		if ($this->elasticVersion > self::DEFAULT_ELASTIC_MAJOR_VERSION)
+		if ($this->elasticVersion >= self::ELASTIC_MAJOR_VERSION_7)
 		{
 			$params[self::REST_TOTAL_HITS_AS_INT] = "true";
 		}
@@ -509,7 +510,7 @@ class elasticClient
 		if (isset($params[self::ELASTIC_INDEX_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
 
-		if ($this->elasticVersion <= self::DEFAULT_ELASTIC_MAJOR_VERSION)
+		if ($this->elasticVersion < self::ELASTIC_MAJOR_VERSION_7)
 		{
 			if (isset($params[self::ELASTIC_TYPE_KEY]))
 			{
@@ -547,7 +548,7 @@ class elasticClient
 	{
 		$actionArr = array ('_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY]);
 
-		if ($this->elasticVersion <= self::DEFAULT_ELASTIC_MAJOR_VERSION)
+		if ($this->elasticVersion < self::ELASTIC_MAJOR_VERSION_7)
 		{
 			$actionArr['_'.self::ELASTIC_TYPE_KEY] = $params[self::ELASTIC_TYPE_KEY];
 		}

@@ -58,7 +58,7 @@ class ElasticIndexRotationWorker
 	{
 		$elasticServer = $this->configSection['elasticServer'];
 		$elasticPort = isset($this->configSection['elasticPort']) ? $this->configSection['elasticPort'] : 9200;
-		$elasticVersion = isset($this->configSection['elasticVersion']) ? $this->configSection['elasticVersion'] : elasticClient::DEFAULT_ELASTIC_MAJOR_VERSION;
+		$elasticVersion = isset($this->configSection['elasticVersion']) ? $this->configSection['elasticVersion'] : elasticClient::ELASTIC_MAJOR_VERSION_5;
 		$this->client = $client = new elasticClient($elasticServer, $elasticPort, $elasticVersion);
 		$this->indexPattern = $this->configSection['indexPattern'];
 		$this->indexAlias =  $this->configSection['indexAlias'];
