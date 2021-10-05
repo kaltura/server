@@ -15,7 +15,9 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_JSON = 1;
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
-		
+
+	const BATCH_PARTNER_ID = -1;
+
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
 	
 	protected $_defaultExpiry = 0;
@@ -354,11 +356,7 @@ class KalturaResponseCacher extends kApiCache
 					{
 						$startTime = microtime(true);
 
-						require_once(dirname(__FILE__) . "/KalturaDispatcher.php");
-						require_once(dirname(__FILE__) . "/../../alpha/apps/kaltura/lib/kCurrentContext.class.php");
-
-						$dispatcher = KalturaDispatcher::getInstance();
-						if (!$dispatcher->rateLimit($service, $action, $params, false))
+						if (!self::rateLimit($service, $action, $params))
 						{
 							$result = "Access to $service->$action was rate limited";
 							$processingTime = microtime(true) - $startTime;
@@ -566,5 +564,165 @@ class KalturaResponseCacher extends kApiCache
 		}
 		
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
+	}
+
+	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
+	{
+		if (!kConf::hasMap('api_rate_limit') || $ksPartnerId == self::BATCH_PARTNER_ID)
+		{
+			return true;
+		}
+
+		$skipEnforceInternalIp = kConf::get('skip_enforce_internal_ip', 'api_rate_limit', null);
+
+		// if 'api_rate_limit' map contains param 'skip_enforce_internal_ip' with value 1, we will ignore the IP check
+		if (!$skipEnforceInternalIp && kIpAddressUtils::isInternalIp())
+		{
+			// if api request is internal IP, the source is a batch machine, and we won't block the action
+			return true;
+		}
+		$rule = self::getRateLimitRule($params, $partnerId, $ksPartnerId);
+		if (!$rule)
+		{
+			return true;
+		}
+
+		if (isset($rule['_key']))
+		{
+			$keyOptions = explode(',', $rule['_key']);
+			$key = null;
+			foreach ($keyOptions as $keyOption)
+			{
+				$value = self::getApiParamValueWildcard($params, $keyOption);
+				if ($value)
+				{
+					$key = $value;
+					break;
+				}
+			}
+
+			if (!$key)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$key = '';
+		}
+
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+		{
+			return true;
+		}
+
+		$partnerId = $ksPartnerId;
+		$keySeed = "$service-$action-$partnerId-$key";
+		$key = 'apiRateLimit-' . md5($keySeed);
+
+		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
+		$cache->add($key, 0, $cacheExpiry);
+		$counter = $cache->increment($key);
+		if ($counter <= $rule['_limit'])
+		{
+			return true;
+		}
+
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
+		}
+
+		if (isset($rule['_logOnly']) && $rule['_logOnly'])
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function getApiParamValue($params, $key)
+	{
+		if (isset($params[$key]))
+		{
+			return $params[$key];
+		}
+
+		$explodedKey = explode(':', $key);
+		foreach ($explodedKey as $curKey)
+		{
+			if (!is_array($params) || !isset($params[$curKey]))
+			{
+				return null;
+			}
+
+			$params = $params[$curKey];
+		}
+
+		return $params;
+	}
+
+	protected static function getApiParamValueWildcard($params, $key)
+	{
+		$result = '';
+		foreach ($params as $curKey => $value)
+		{
+			if (is_array($value))
+			{
+				// recurse into the nested param
+				$result .= self::getApiParamValueWildcard($value, $key);
+				continue;
+			}
+
+			if ($curKey == $key ||
+				substr($curKey, -strlen($key) - 1) == ':' . $key)
+			{
+				$result .= $value;
+			}
+		}
+		return $result;
+	}
+
+	protected static function getRateLimitRule($params, $partnerId= null, $ksPartnerId = null)
+	{
+		foreach (kConf::getMap('api_rate_limit') as $rateLimitRule)
+		{
+			$matches = true;
+			if(!is_array($rateLimitRule))
+			{
+				continue;
+			}
+			foreach ($rateLimitRule as $key => $value)
+			{
+				if ($key[0] == '_')
+				{
+					if ($key == '_partnerId')
+					{
+						$partnerId = $ksPartnerId ? $ksPartnerId : $partnerId;
+						if (!in_array($partnerId, explode(",", $value)))
+						{
+							$matches = false;
+							break;
+						}
+					}
+
+					continue;
+				}
+
+				if (self::getApiParamValue($params, $key) != $value)
+				{
+					$matches = false;
+					break;
+				}
+			}
+
+			if ($matches)
+			{
+				return $rateLimitRule;
+			}
+		}
+
+		return null;
 	}
 }
