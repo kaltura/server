@@ -208,6 +208,9 @@ class kKavaVpaasReports extends kKavaReports
 			),
 		),
 
+		ReportType::SELF_SERVE_USAGE_VPAAS => array(
+			self::REPORT_BASE_DEF => ReportType::SELF_SERVE_USAGE,
+		)
 	);
 
 	protected static function getValidEnrichedPartners($partner_id, $partner_ids)
@@ -326,6 +329,13 @@ class kKavaVpaasReports extends kKavaReports
 		{
 			foreach ($report_def[self::REPORT_JOIN_REPORTS] as &$cur_report)
 			{
+				if (isset($cur_report[self::REPORT_JOIN_GRAPHS]))
+				{
+					foreach ($cur_report[self::REPORT_JOIN_GRAPHS] as &$cur_graph_report)
+					{
+						$cur_graph_report[self::REPORT_PARENT_PARTNER_FILTER] = true;
+					}
+				}
 				$cur_report[self::REPORT_PARENT_PARTNER_FILTER] = true;
 			}
 		}

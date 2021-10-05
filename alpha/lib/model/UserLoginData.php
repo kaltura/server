@@ -230,7 +230,6 @@ class UserLoginData extends BaseUserLoginData{
 		$this->putInCustomData ('seedFor2FactorAuth', $v);
 	}
 	
-	
 	public function passwordUsedBefore($pass)
 	{
 		$passToKeep = $this->getNumPrevPassToKeep();
@@ -251,7 +250,7 @@ class UserLoginData extends BaseUserLoginData{
 			}
 			$i++;
 		}
-		return false;		
+		return false;
 	}
 	
 	public function getMaxLoginAttempts()
