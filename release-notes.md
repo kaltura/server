@@ -1,3 +1,10 @@
+# Quasar-17.12.0 #
+
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action update, list) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-811
+
 # Quasar-17.11.0 #
 
 ## Partner registration - Move all time-consuming jobs to run in batch ##
