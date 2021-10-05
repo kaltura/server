@@ -189,10 +189,6 @@ class SystemPartnerService extends KalturaBaseService
 		$dbPartner->setStatus($status);
 		$dbPartner->setStatusChangeReason( $reason );
 		$dbPartner->save();
-		if($status == KalturaPartnerStatus::READ_ONLY)
-		{
-			PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $id);
-		}
 		PartnerPeer::removePartnerFromCache($id);
 	}
 	

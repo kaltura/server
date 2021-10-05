@@ -1496,8 +1496,22 @@ class Partner extends BasePartner
 		}
 	
 		$objectDeleted = false;
-		if($this->isColumnModified(PartnerPeer::STATUS) && $this->getStatus() == Partner::PARTNER_STATUS_DELETED)
-			$objectDeleted = true;
+		if($this->isColumnModified(PartnerPeer::STATUS))
+		{
+			if($this->getStatus() == Partner::PARTNER_STATUS_DELETED)
+			{
+				$objectDeleted = true;
+			}
+			else if($this->getStatus() == Partner::PARTNER_STATUS_READ_ONLY)
+			{
+				PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $this->getId());
+			}
+			else if($this->getColumnsOldValue(PartnerPeer::STATUS) == Partner::PARTNER_STATUS_READ_ONLY)
+			{
+				PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $this->getId());
+
+			}
+		}
 		
 		$ret = parent::postUpdate($con);
 	
