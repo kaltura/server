@@ -344,12 +344,16 @@ class KalturaResponseCacher extends kApiCache
 			$service = $params['service'];
 			$action = $params['action'];
 			if ($service === 'session' && $action === 'start')
+			{
 				return self::handleSessionStart($params);
+			}
 			else
 			{
 				$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
 				if (!self::isSupportedFormat($format))
-					return;			// the format is unsupported at this level
+				{
+					return;
+				}			// the format is unsupported at this level
 				$confActions = $path = kConf::get('cache_based_service_actions');;
 				if (is_array($confActions))
 				{
@@ -364,8 +368,15 @@ class KalturaResponseCacher extends kApiCache
 						{
 							require_once($filePath);
 							$className = basename($filePath, ".php");
+							if (!class_exists($className) || !method_exists($className, $action))
+							{
+								$result = "Could not run $className::$action since it does not exist";
+								$processingTime = microtime(true) - $startTime;
+								return self::returnCacheResponseStructure($processingTime, $format, $result);
+							}
+
 							$validateAction = "{$action}_validate";
-							if (class_exists($className) && method_exists($className, $validateAction))
+							if (method_exists($className, $validateAction))
 							{
 								$validateResult = $className::$validateAction($params);
 								if($validateResult === false)
@@ -373,12 +384,11 @@ class KalturaResponseCacher extends kApiCache
 									return;
 								}
 
-								if ( $validateResult !== true)
+								if ($validateResult !== true)
 								{
 									$result = "$service->$action call not validated. " . $validateResult;
 									$processingTime = microtime(true) - $startTime;
-									self::returnCacheResponseStructure($processingTime, $format, $result);
-									return;
+									return self::returnCacheResponseStructure($processingTime, $format, $result);
 								}
 							}
 
@@ -387,20 +397,19 @@ class KalturaResponseCacher extends kApiCache
 							{
 								$result = "Access to $service->$action was rate limited";
 								$processingTime = microtime(true) - $startTime;
-								self::returnCacheResponseStructure($processingTime, $format, $result);
-								return;
+								return self::returnCacheResponseStructure($processingTime, $format, $result);
 							}
-
-							if (class_exists($className) && method_exists($className, $action))
-								$result =  $className::$action($params);
-							else
-								$result = "Could not run $className::$action since it does not exist";
+							$result =  $className::$action($params);
 						}
 						else
-						    $result = "Failed to parse $actionKey as a valid class configuration";
+						{
+							$result = "Failed to parse $actionKey as a valid class configuration";
+						}
 						
 						if($result === false)
+						{
 							return;
+						}
 						
 						$processingTime = microtime(true) - $startTime;
 						self::returnCacheResponseStructure($processingTime, $format, $result);

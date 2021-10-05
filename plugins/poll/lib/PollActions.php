@@ -84,7 +84,7 @@ class PollActions
 		return false;
 	}
 
-	/* Poll vode_validate Actions to be called from cache */
+	/* Poll vote_validate Actions to be called from cache */
 	public static function vote_validate($params)
 	{
 		if ( is_null($params) ||
@@ -159,7 +159,7 @@ class PollActions
 		return $pollType;
 	}
 
-	/* Poll getVode_validate Actions to be called from cache */
+	/* Poll getVote_validate Actions to be called from cache */
 	public static function getVote_validate($params)
 	{
 		if ( is_null($params) ||
