@@ -1,5 +1,17 @@
 # Quasar-17.12.0 #
 
+## Add partner for self serve server ##
+* Issue Type: Task
+* Issue ID: PLAT-23201
+
+### Configuration ###
+First replace all tokens from the ini file below (under self-serve-server section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
+
 ## Add permissions for caption service for liveNG ##
 Add permissions for caption service (action update, list) for liveNG (partner -5 )
 * Issue Type: Task

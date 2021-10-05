@@ -16,7 +16,8 @@ class Partner extends BasePartner
 	const MONITORING_PARTNER_ID = -4;
 	const MEDIA_SERVER_PARTNER_ID = -5;
 	const PLAY_SERVER_PARTNER_ID = -6;
-	
+	const SELF_SERVE_PARTNER_ID = -12;
+
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
 	const VALIDATE_WRONG_LOGIN = -1;
@@ -29,6 +30,7 @@ class Partner extends BasePartner
 	const PARTNER_STATUS_ACTIVE = 1;
 	const PARTNER_STATUS_CONTENT_BLOCK = 2;
 	const PARTNER_STATUS_FULL_BLOCK = 3;
+	const PARTNER_STATUS_READ_ONLY = 4;
 	
 	const CONTENT_BLOCK_SERVICE_CONFIG_ID = 'services_limited_partner.ct';
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
@@ -1496,8 +1498,22 @@ class Partner extends BasePartner
 		}
 	
 		$objectDeleted = false;
-		if($this->isColumnModified(PartnerPeer::STATUS) && $this->getStatus() == Partner::PARTNER_STATUS_DELETED)
-			$objectDeleted = true;
+		if($this->isColumnModified(PartnerPeer::STATUS))
+		{
+			if($this->getStatus() == Partner::PARTNER_STATUS_DELETED)
+			{
+				$objectDeleted = true;
+			}
+			else if($this->getStatus() == Partner::PARTNER_STATUS_READ_ONLY)
+			{
+				PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $this->getId());
+			}
+			else if($this->getColumnsOldValue(PartnerPeer::STATUS) == Partner::PARTNER_STATUS_READ_ONLY)
+			{
+				PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $this->getId());
+
+			}
+		}
 		
 		$ret = parent::postUpdate($con);
 	
