@@ -38,7 +38,7 @@ class KalturaResponseCacher extends kApiCache
 		if (!parent::init())
 			return false;
 
-		self::handleCacheBasedServiceActions($this->_params);
+		$this->handleCacheBasedServiceActions($this->_params);
 		
 		// remove parameters that do not affect the api result
 		foreach(kConf::get('v3cache_ignore_params') as $name)
@@ -335,8 +335,10 @@ class KalturaResponseCacher extends kApiCache
 			$format == self::RESPONSE_TYPE_JSON ;
 	}
 
-	private static function handleCacheBasedServiceActions(&$params)
+	private function handleCacheBasedServiceActions()
 	{
+		$params = $this->_params;
+
 		if (isset($params['service']) && isset($params['action']))
 		{
 			$service = $params['service'];
@@ -356,19 +358,39 @@ class KalturaResponseCacher extends kApiCache
 					{
 						$startTime = microtime(true);
 
-						if (!self::rateLimit($service, $action, $params))
-						{
-							$result = "Access to $service->$action was rate limited";
-							$processingTime = microtime(true) - $startTime;
-							self::returnCacheResponseStructure($processingTime, $format, $result);;
-						}
-
 						$filePath = dirname(__FILE__).$confActions[$actionKey];
 						if ($filePath != dirname(__FILE__) &&
 							file_exists($filePath))
 						{
 							require_once($filePath);
 							$className = basename($filePath, ".php");
+							$validateAction = "{$action}_validate";
+							if (class_exists($className) && method_exists($className, $validateAction))
+							{
+								$validateResult = $className::$validateAction($params);
+								if($validateResult === false)
+								{
+									return;
+								}
+
+								if ( $validateResult !== true)
+								{
+									$result = "$service->$action call not validated. " . $validateResult;
+									$processingTime = microtime(true) - $startTime;
+									self::returnCacheResponseStructure($processingTime, $format, $result);
+									return;
+								}
+							}
+
+							$ksPartnerId = $this->_ksObj ? $this->_ksObj->partner_id : 0;
+							if (!self::rateLimit($service, $action, $params, $this->_partnerId, $ksPartnerId))
+							{
+								$result = "Access to $service->$action was rate limited";
+								$processingTime = microtime(true) - $startTime;
+								self::returnCacheResponseStructure($processingTime, $format, $result);
+								return;
+							}
+
 							if (class_exists($className) && method_exists($className, $action))
 								$result =  $className::$action($params);
 							else
