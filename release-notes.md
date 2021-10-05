@@ -12,6 +12,11 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
 
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action update, list) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-811
+
 # Quasar-17.11.0 #
 
 ## Partner registration - Move all time-consuming jobs to run in batch ##

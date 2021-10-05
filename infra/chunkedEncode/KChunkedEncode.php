@@ -11,6 +11,9 @@
 	 */
 	class KChunkedEncode {
 		const	MaxInaccuracyValue = 0.100;	// 100 msec, ~3 frames
+		const 	CHUNK_ENCODE_POSTFIX = 'chunkenc';
+		const 	SupportedOutputCodecs = array("libx264","libx265","h264","h264b","h264m","h264h",
+					"h265","libvpx-vp9","libaom-av1");
 		
 		public $params = null;			// Additional encoding parameters, evaluated from the cmd-line
 		public $setup = null;
@@ -23,13 +26,20 @@
 		public $maxInaccuracyValue=null;// Max allowed duration inaccuracy 
 
 		public $cmdLine = null;
-		const CHUNK_ENCODE_POSTFIX = 'chunkenc';
 		public $chunkEncodeToken = self::CHUNK_ENCODE_POSTFIX;	// Used to identify the chunked encode jobs
 		public $videoChunkPostfix = 'vid';		// File postfix's
 		public $audioFilePostfix = 'aud';		//
 		
+			// - raw - simple file level concatenation (linux cat, fread/fwrite, ffmpeg 'concat' protocol)
+			// - demuxer - ffmpeg demuxer concat
+		public $concatMethod = "raw";
+		
+			// - mpegts - for H264/H265 codecs
+			// - mp4 - for VP9 / AV1 (they does not mux into mpegts)
 		public $chunkFileFormat = "mpegts";
-	
+		public $concatSettings = null;
+		public $chunkDurThreshInFrames = 10;
+		
 		/********************
 		 * 
 		 */
@@ -37,6 +47,18 @@
 		{
 			$this->setup = $setup;
 			$this->params  = new KChunkedEncodeParams();
+				/* 
+				 * VP9 and AV1 cannot be muxed into MPEGTS,
+				 * Therefore their chunks generated with MP4,
+				 * and require more complicated concat method - demuxer.
+				 * (H264/5 can use demuxer method too)
+				 */
+			if((strstr($setup->cmd,"libvpx-vp9")!==false) 
+			|| (strstr($setup->cmd,"libaom-av1")!==false)) {
+				$this->concatMethod="demuxer";
+				$this->chunkFileFormat = "mp4";
+				$this->concatSettings = "-f concat -safe 0";
+			}
 			kBatchUtils::tryLoadKconfConfig();
 		}
 		
@@ -263,7 +285,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			KalturaLog::log("vcodec($vcodec), acodec($acodec), format($format), fps($fps), gop($gop), duration($duration), height($height)");
 
 
-			if(!in_array($vcodec, array("libx264","libx265","h264","h264b","h264m","h264h","h265"))){
+			if(!in_array($vcodec, KChunkedEncode::SupportedOutputCodecs)){
 				KalturaLog::log($msgStr="UNSUPPORTED: video codec ($vcodec)");
 				return false;
 			}
@@ -398,7 +420,9 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				}
 			}
 			
-			$cmdLineArr[] = "-map 0:v:0 -flags -global_header";
+			$cmdLineArr[] = "-map 0:v:0";
+			if($this->chunkFileFormat=="mpegts")
+				$cmdLineArr[] = "-flags -global_header";
 			if(isset($params->videoFilters->filterStr))
 				$cmdLineArr[] = "-filter_complex ".($params->videoFilters->filterStr);
 			if($params->vcodec=='libx264')
@@ -628,10 +652,11 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 		}
 		
 		/********************
-		 * concatChunk
+		 * fetchChunkFile
 		 */
-		private static function concatChunk($fhd, $fileName, $rdSz=10000000, $expectedFileSize = null)
+		private static function fetchChunkFile($fhd, $fileName, $rdSz=10000000, $expectedFileSize = null)
 		{
+KalturaLog::log("fhd:$fhd, fileName:$fileName, rdSz:$rdSz, expectedFileSize:$expectedFileSize");
 			$fileName = kFile::realPath($fileName);
 			if(($ifhd=fopen($fileName,"rb"))===false){
 				return false;
@@ -656,7 +681,31 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			
 			return $wrSz;
 		}
-		
+
+		/********************
+		 * fetchChunkFileWithRetries
+		 */
+		protected static function fetchChunkFileWithRetries($fhd, $fileName, &$mergedFileSize, $retries=3, $rdSz=10000000, $expectedFileSize = null)
+		{
+KalturaLog::log("fhd:$fhd, fileName:$fileName, mergedFileSize:$mergedFileSize, retries:$retries=3, rdSz:$rdSz, expectedFileSize:$expectedFileSize");
+			$rv = false;
+			while($retries > 0) {
+				$bytesWritten=self::fetchChunkFile($fhd, $fileName, $rdSz, $expectedFileSize);
+				if($bytesWritten !== false) {
+					$mergedFileSize += $bytesWritten;
+					$rv = true;
+					break;
+				}
+				
+				$retries--;
+				fseek($fhd, $mergedFileSize, SEEK_SET);
+				$remoteFileSize = kFile::fileSize($fileName);
+				KalturaLog::debug("Failed to download [$fileName], rfs [$remoteFileSize], ofs [$expectedFileSize], retries left [$retries]");
+				sleep(rand(1,3));
+			}
+			return $rv;
+		}
+
 		/********************
 		 * ConcatChunks
 		 */
@@ -666,12 +715,20 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			Remove return to revert back to using ts concat flow
 			return true;
 			*/
-			
+			if($this->concatMethod=="raw")
+				return $this->concatRawChunkFiles();
+			else
+				return $this->fetchChunkFilesForDemuxerConcat();
+		}
+
+		/********************
+		 * concatRawChunkFiles
+		 *	Concat chunk files by ordinary file copy, one after the other, into a concat'ed file
+		 */
+		private function concatRawChunkFiles()
+		{
+				// To contain concatenated mpegts video file
 			$videoFilename = $this->getSessionName("video");
-			$oFh=fopen($videoFilename,"wb");
-			if($oFh===false){
-				return false;
-			}
 			
 			stream_wrapper_restore('http');
 			stream_wrapper_restore('https');
@@ -680,6 +737,10 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			$mergedFileSize = 0;
 			$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
 			
+			$oFh=fopen($videoFilename,"wb");
+			if($oFh===false){
+				return false;
+			}
 			foreach($this->chunkDataArr as $idx=>$chunkData) {
 				$originalFileSize = null;
 				if(isset($chunkData->toFix)) {
@@ -692,27 +753,11 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 						$originalFileSize = $chunkData->outFileSizes[basename($chunkFileName)];
 					}
 				}
+
+				$rv = self::fetchChunkFileWithRetries($oFh, $chunkFileName, $mergedFileSize, 3, 10000000, $originalFileSize);
 				
-				$retries = 3;
-				$mergeFileSuccess = false;
-				while($retries > 0) {
-					$bytesWritten=self::concatChunk($oFh, $chunkFileName, 10000000, $originalFileSize);
-					if($bytesWritten !== false) {
-						$mergedFileSize += $bytesWritten;
-						$mergeFileSuccess = true;
-						break;
-					}
-					
-					$retries--;
-					fseek($oFh, $mergedFileSize, SEEK_SET);
-					$remoteFileSize = kFile::fileSize($chunkFileName);
-					KalturaLog::debug("Failed to download [$chunkFileName], rfs [$remoteFileSize], ofs [$originalFileSize], retries left [$retries]");
-					sleep(rand(1,3));
-				}
-				
-				if(!$mergeFileSuccess) {
+				if($rv==false) {
 					KalturaLog::debug("Failed to build merged file, Convert will fail, bytes fetched [$mergedFileSize]");
-					$rv = false;
 					break;
 				}
 			}
@@ -723,6 +768,65 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			
 			return $rv;
 		}
+		
+		/********************
+		 * fetchChunkFilesForDemuxerConcat
+		 *	Fetch chunk files the remote storage, into a local folder
+		 *	and generate FFmpeg demuxer concat list file 
+		 */
+		public function fetchChunkFilesForDemuxerConcat()
+		{
+				// To contain ffmpeg's demuxer concat list file
+			$videoFilename = $this->getSessionName("video");
+			
+			stream_wrapper_restore('http');
+			stream_wrapper_restore('https');
+			
+			$rv = true;
+			$mergedFileSize = 0;
+			$mode = isset($this->setup->sharedChunkPath) ? "shared" : null;
+			
+			$concatChunkListStr = null;
+			foreach($this->chunkDataArr as $idx=>$chunkData) {
+				$originalFileSize = null;
+				$chunkDuration = 0;
+				if(isset($chunkData->toFix)) {
+					$chunkFileName = $this->getChunkName($idx,"fix");
+					$originalFileSize = filesize($chunkFileName);
+					$chunkDuration = $chunkData->toFix*$this->params->frameDuration;
+				}
+				else {
+					$chunkFileName = $this->getChunkName($idx, $mode);
+					if( isset($chunkData->outFileSizes) && isset($chunkData->outFileSizes[basename($chunkFileName)]) ) {
+						$originalFileSize = $chunkData->outFileSizes[basename($chunkFileName)];
+					}
+					$chunkDuration = $chunkData->duration;
+				}
+
+				$fetchedChunkName = $videoFilename."_chk$idx";
+				$oFh=fopen($fetchedChunkName,"wb");
+				if($oFh===false){
+					return false;
+				}
+KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedFileSize, originalFileSize:$originalFileSize");
+				$rv = self::fetchChunkFileWithRetries($oFh, $chunkFileName, $mergedFileSize, 3, 10000000, $originalFileSize);
+				fclose($oFh);
+				
+				if($rv==false) {
+					KalturaLog::debug("Failed to build merged file, Convert will fail, bytes fetched [$mergedFileSize]");
+					break;
+				}
+				$concatChunkListStr.= "file $fetchedChunkName\n"."duration $chunkDuration\n";
+			}
+			KalturaLog::log("List file :$videoFilename - \n$concatChunkListStr ");
+			kFile::filePutContents($videoFilename, $concatChunkListStr);
+			
+			stream_wrapper_unregister('https');
+			stream_wrapper_unregister('http');
+			
+			return $rv;
+		}
+		
 		/********************
 		 * BuildMergeCommandLine
 		 */
@@ -733,9 +837,9 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			
 			$mode = null;
 			$setup = $this->setup;
-			$mergeCmd = $setup->ffmpegBin;
+			$mergeCmd = "$setup->ffmpegBin $this->concatSettings";
 			
-			/* Remove comment to re-enable chuk concat via ffmpeg
+			/* Remove comment to re-enable chunk concat via ffmpeg
 			$vidConcatStr = "concat:'";
 			if($this->setup->sharedChunkPath) {
 				$mode = "shared";
@@ -835,7 +939,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			$chunkData = $this->chunkDataArr[$idx];
 			$chunkFixName = $this->getChunkName($idx, "fix");
 
-			$cmdLine = $this->setup->ffmpegBin;
+			$cmdLine = $this->setup->ffmpegBin." $this->concatSettings";
 			if($this->chunkFileFormat=="mpegts")
 				$cmdLine.= " -itsoffset -1.4";
 			if(isset($this->params->fps)) 
@@ -855,8 +959,21 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			$resolvedSecondSegmentName = kFile::realPath($secondSegmentName);
 			KalturaLog::debug("resolvedFirstSegmentName: $resolvedFirstSegmentName, resolvedSecondSegmentName: $resolvedSecondSegmentName");
 			
+			$chunkSegmentsConcatListStr = null;
 			if( (count($chunkOutputFileList) && in_array($secondSegmentName, $chunkOutputFileList)) || kFile::checkFileExists($secondSegmentName)) {
-				$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
+				if($this->concatMethod=="raw")
+						// Use ffmpeg concat protocol method
+					$cmdLine.= " -i concat:'".$resolvedFirstSegmentName."|".$resolvedSecondSegmentName."'";
+				else {
+						// Use ffmpeg concat demuxer method
+					$chunkSegmentsConcatListStr = "file $resolvedFirstSegmentName\n"."duration $chunkData->duration\n";
+					$chunkSegmentsConcatListStr.= "file $resolvedSecondSegmentName\n"."duration ".($this->setup->chunkOverlap)."\n";
+					$chunkSegmentsConcatListName = $chunkFixName."list";
+					if(kFile::filePutContents($chunkSegmentsConcatListName, $chunkSegmentsConcatListStr)==false)
+						KalturaLog::log("FAILED to write $chunkSegmentsConcatListName");
+					$cmdLine.= " -i $chunkSegmentsConcatListName";
+					KalturaLog::log("chk $idx segment concat list -\n".$chunkSegmentsConcatListStr);
+				}
 			}
 			else {
 				kBatchUtils::addReconnectParams("http", $resolvedFirstSegmentName, $cmdLine);
@@ -872,7 +989,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			
 			return $cmdLine;
 		}
-
+		
 		/********************
 		 * rv  - null(no audio)
 		 */
@@ -1341,6 +1458,33 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			KalturaLog::log("$strVer");
 			return $strVer;
 		}
+		
+		/********************
+		 * deleteTmpMergedVideoFile
+		 */
+		public function deleteTmpMergedVideoFile()
+		{
+			$localTmpConcatVideoFilePath = $this->getSessionName("video");
+			
+			if($this->concatMethod=="raw") {
+				$localTmpConcatVideoFilePath = $this->getSessionName("video");
+				foreach($this->chunkDataArr as $idx=>$chunkData) {
+					$localTmpChunkFilePath = $localTmpConcatVideoFilePath."_chk$idx";
+					if(file_exists($localTmpChunkFilePath)) {
+						if(!unlink($localTmpChunkFilePath)) {
+							KalturaLog::warning("Failed to delete local the tmp video concat file from [$localTmpChunkFilePath]");
+						}
+					}
+				}
+			}
+			
+			if(file_exists($localTmpConcatVideoFilePath)) {
+				KalturaLog::debug("Deleting local copy of the tmp video concat file from [$localTmpConcatVideoFilePath]");
+				if(!unlink($localTmpConcatVideoFilePath)) {
+					KalturaLog::warning("Failed to delete local the tmp video concat file from [$localTmpConcatVideoFilePath]");
+				}
+			}
+		}
 	}
 	
 	/********************
@@ -1718,4 +1862,4 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			$obj->filters[] = $entity;
 		return null;
 	}
-		
+
