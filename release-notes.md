@@ -17,6 +17,10 @@ Add permissions for caption service (action update, list) for liveNG (partner -5
 * Issue Type: Task
 * Issue ID: LIV-811
 
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_05_update_list_caption_liveng_permissions.php
+
+
 # Quasar-17.11.0 #
 
 ## Partner registration - Move all time-consuming jobs to run in batch ##
