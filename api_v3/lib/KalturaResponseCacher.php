@@ -673,7 +673,7 @@ class KalturaResponseCacher extends kApiCache
 		return false;
 	}
 
-	protected function getApiParamValue($params, $key)
+	protected static function getApiParamValue($params, $key)
 	{
 		if (isset($params[$key]))
 		{
