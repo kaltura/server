@@ -4,7 +4,7 @@ require_once (dirname(__FILE__) . '/../bootstrap.php');
 
 if ($argc < 2)
 {
-	echo PHP_EOL . ' ---- Update List Of Pending Clipping Entries ---- ' . PHP_EOL;
+	KalturaLog::info(' ---- Update List Of Pending Clipping Entries ---- ');
 	die (' Error execute script, Usage: php updateEntryStatusToError.php < /path/to/entries_id_list || entryId_1,entryId_2,.. || entry_id > < realrun / dryrun >' . PHP_EOL);
 }
 
@@ -27,18 +27,22 @@ foreach ($entriesIds as $entryId)
 	$entryId = trim($entryId);
 	$entry = entryPeer::retrieveByPKNoFilter($entryId);
 	/* @var $entry entry */
-	if (!$entry) {
+	if (!$entry)
+	{
 		$failedEntries[] = $entryId;
 		KalturaLog::debug('ERROR: could not find entry id [' . $entryId . ']');
 		continue;
 	}
 	if ($entry -> getStatus() == entryStatus::PENDING)
 	{
-		try {
+		try
+		{
 			$entry->setStatus(entryStatus::ERROR_CONVERTING);
 			$entry->save();
 			$successEntries[] = $entry->getId();
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			$failedEntries[] = $entry->getId();
 			KalturaLog::warning('Failed to set status for entry Id: ' . $entry->getId());
 		}
@@ -80,21 +84,26 @@ function echoResults($totalEntries, $successEntries, $failedEntries)
 	KalturaLog::info('Done');
 
 	/* Display Entries Result */
-	echo PHP_EOL . ' ---- Entries Count ---- ' . PHP_EOL . $totalEntries . PHP_EOL;
+	KalturaLog::info(' ---- Entries Counts ---- ');
+	KalturaLog::info('Number of total entries ' . $totalEntries);
 
-	if ($successEntries) {
-		echo PHP_EOL . ' ---- Success Entries ---- ' . PHP_EOL. count($successEntries) . PHP_EOL;
-		foreach ($successEntries as $successEntry) {
-			echo $successEntry . PHP_EOL;
+	if ($successEntries)
+	{
+		KalturaLog::info(' ---- Success Entries ---- ');
+		KalturaLog::info('Number of successful entries ' . count($successEntries));
+		foreach ($successEntries as $successEntry)
+		{
+			KalturaLog::info($successEntry);
 		}
-		echo PHP_EOL;
 	}
 
-	if ($failedEntries) {
-		echo PHP_EOL . ' ---- Failed Entries ---- ' . PHP_EOL . count($failedEntries) . PHP_EOL;
-		foreach ($failedEntries as $failedEntry) {
-			echo $failedEntry . PHP_EOL;
+	if ($failedEntries)
+	{
+		KalturaLog::info(' ---- Failed Entries ---- ');
+		KalturaLog::info('Number of failed entries ' . count($failedEntries));
+		foreach ($failedEntries as $failedEntry)
+		{
+			KalturaLog::info($failedEntry);
 		}
-		echo PHP_EOL;
 	}
 }
