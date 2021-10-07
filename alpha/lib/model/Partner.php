@@ -1819,14 +1819,9 @@ class Partner extends BasePartner
 			return false;
 		}
 		
-		$globalAccessControlId = kConf::get(self::GLOBAL_ACCESS_CONTROL, kConfMapNames::ACCESS_CONTROL, null);
-		if ($globalAccessControlId)
+		if (!$this->validateGlobalApiAccessControl())
 		{
-			$anotherAccessControl = accessControlPeer::retrieveByPK(intval($globalAccessControlId['id']));
-			if (!is_null($anotherAccessControl) && !$this->applyAccessControlContext($anotherAccessControl))
-			{
-				return false;
-			}
+			return false;
 		}
 		
 		$accessControl = $this->getApiAccessControl();
@@ -1836,6 +1831,22 @@ class Partner extends BasePartner
 		}
 
 		return $this->applyAccessControlContext($accessControl);
+	}
+	
+	protected function validateGlobalApiAccessControl()
+	{
+		$globalAccessControlConfiguration = kConf::get(self::GLOBAL_ACCESS_CONTROL, kConfMapNames::RUNTIME_CONFIG, null);
+		$globalAccessControlId = $globalAccessControlConfiguration['id'];
+		if ($globalAccessControlId)
+		{
+			$globalAccessControl = accessControlPeer::retrieveByPK($globalAccessControlId);
+			if (!is_null($globalAccessControl) && !$this->applyAccessControlContext($globalAccessControl))
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	protected function applyAccessControlContext($accessControl)
@@ -1868,6 +1879,7 @@ class Partner extends BasePartner
 				}
 			}
 		}
+		
 		return true;
 	}
 	
