@@ -394,7 +394,7 @@ class GroupUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL,
 					$filter->getFormattedPropertyNameWithClassName('userIdEqual') .
-					'/' . $this->getFormattedPropertyNameWithClassName('groupIdEqual'));
+					'/' . $filter->getFormattedPropertyNameWithClassName('groupIdEqual'));
 			}
 			else if($filter->userIdEqual != null)
 			{
