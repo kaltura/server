@@ -47,12 +47,12 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 			list($partnerZoomDropFolder, $partnerZoomDropFoldersCount) = self::getZoomDropFolderRelatedInfo($object);
 			if ($partnerZoomDropFolder)
 			{
-				$partnerZoomDropFolder->setStatus(self::getDropFolderStatus($object->getStatus()));
-				if ($partnerZoomDropFolder->getStatus() == DropFolderStatus::ENABLED)
+				if ($partnerZoomDropFolder->getStatus() != DropFolderStatus::ENABLED && $object->getStatus() == VendorIntegrationStatus::ACTIVE)
 				{
 					self::verifyAndSetDropFolderConfig($partnerZoomDropFolder);
 				}
 
+				$partnerZoomDropFolder->setStatus(self::getDropFolderStatus($object->getStatus()));
 				$partnerZoomDropFolderModified = true;
 				KalturaLog ::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated status to ' .
 				                   $partnerZoomDropFolder->getStatus());
