@@ -34,28 +34,39 @@ class kBeaconCacheLayerActions
 	{
 		return !array_key_exists($paramKey, $params) || $params[$paramKey] == '';
 	}
-	
-	public static function add($params)
+
+	/* Poll add_validate Actions to be called from cache */
+	public static function add_validate($params)
 	{
 		if(is_null($params))
 			throw new Exception("Params not provided");
-		
+
 		if(self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID))
 			return false;
-		
+
 		if (self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_EVENT_TYPE) ||
 			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_OBJECT_ID) ||
 			self::validateInputExists($params, kBeaconCacheLayerActions::PARAM_RELATED_OBJECT_TYPE)
 		)
 			return false;
-		
+
 		$partnerId =  $params[kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID];
 		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
 			$partnerId = $params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID];
-		
+
 		if(!$partnerId)
 			return false;
-		
+
+		return true;
+	}
+
+
+	public static function add($params)
+	{
+		$partnerId =  $params[kBeaconCacheLayerActions::PARAM_KS_PARTNER_ID];
+		if(isset($params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID]))
+			$partnerId = $params[kBeaconCacheLayerActions::PARAM_IMPERSONATED_PARTNER_ID];
+
 		$beacon = new kBeacon($partnerId);
 		$beacon->setObjectId($params[kBeaconCacheLayerActions::PARAM_OBJECT_ID]);
 		$beacon->setEventType($params[kBeaconCacheLayerActions::PARAM_EVENT_TYPE]);

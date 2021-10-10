@@ -140,7 +140,7 @@ class EventNotificationTemplatesListAction extends KalturaApplicationPlugin impl
 	public function getPublisherAdminActionJavascript()
 	{
 		$functionStr = 'function eventNotificationTemplates(partnerId) {
-			var url = pluginControllerUrl + /'.get_class($this).'/ + \'filter_type/byid/filter_input/\' + partnerId;
+			var url = pluginControllerUrl + /'.get_class($this).'/ + \'filter_type/partnerIdEqual/filter_input/\' + partnerId;
 			document.location = url;
 		}';
 		return $functionStr;
