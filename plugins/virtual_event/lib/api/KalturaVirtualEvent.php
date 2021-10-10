@@ -9,38 +9,43 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in,order
 	 */
 	public $id;
 	
 	/**
 	 * @var int
+	 * @filter eq
 	 * @readonly
-	 * @filter eq,in
 	 */
 	public $partnerId;
 	
 	/**
 	 * @var string
+	 * @filter like,mlikeor,mlikeand,eq,order
 	 */
 	public $name;
 	
 	/**
 	 * @var string
+	 * @filter like,mlikeor,mlikeand,eq,order
 	 */
 	public $description;
 	
 	/**
 	 * @var KalturaVirtualEventStatus
-	 * @filter eq,in
+	 * @filter eq
 	 */
 	public $status;
 	
 	/**
-	 * @var int[]
-	 * @filter eq,in,order
+	 * @var int
 	 */
-	public $attendeesGroupIds;
+	public $attendeesGroupId;
+	
+	/**
+	 * @var int
+	 */
+	public $adminsGroupId;
 	
 	/**
 	 * @var int
@@ -58,20 +63,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public $eventScheduleEventId;
 	
 	/**
-	 * The type of engine to use to list objects using the given "objectFilter"
-	 *
-	 * @var KalturaObjectFilterEngineType
-	 */
-	public $objectFilterEngineType;
-	
-	/**
-	 * A filter object (inherits KalturaFilter) that is used to list objects for scheduled tasks
-	 *
-	 * @var KalturaFilter
-	 */
-	public $objectFilter;
-	
-	/**
 	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
@@ -85,6 +76,11 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public $updatedAt;
 	
+	/**
+	 * @var time
+	 * @filter gte,lte,order
+	 */
+	public $deletionDueDate;
 	
 	/*
 	 */
@@ -94,15 +90,14 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'name',
 		'description',
 		'status',
-		'attendeesGroupIds',
+		'attendeesGroupId',
+		'adminsGroupId',
 		'registrationScheduleEventId',
 		'agendaScheduleEventId',
 		'eventScheduleEventId',
-		'objectFilterEngineType',
-		'objectFilter',
-		'objectTasks',
 		'createdAt',
 		'updatedAt',
+		'deletionDueDate',
 	);
 	
 	/* (non-PHPdoc)
@@ -116,8 +111,9 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function toInsertableObject($objectToFill = null, $propertiesToSkip = array())
 	{
 		if (is_null($this->status))
+		{
 			$this->status = KalturaVirtualEventStatus::DELETED;
-		
+		}
 		return parent::toInsertableObject($objectToFill, $propertiesToSkip);
 	}
 	
@@ -127,8 +123,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyMinLength('name', 3, false);
-		$this->validatePropertyNotNull('objectFilterEngineType');
-		$this->validatePropertyNotNull('objectFilter');
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
@@ -156,25 +150,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		return $dbObject;
 	}
 	
-	/**
-	 * @param VirtualEvent $srcObj
-	 */
-	public function doFromObject($srcObj, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		parent::doFromObject($srcObj, $responseProfile);
-		$filterType = $srcObj->getObjectFilterApiType();
-		if (!class_exists($filterType))
-		{
-			KalturaLog::err(sprintf('Class %s not found, cannot initiate object filter instance', $filterType));
-			$this->objectFilter = new KalturaFilter();
-		}
-		else
-		{
-			$this->objectFilter = new $filterType();
-		}
-		
-		$this->objectFilter->fromObject($srcObj->getObjectFilter());
-	}
 	
 	/* (non-PHPdoc)
 	 * @see IFilterable::getExtraFilters()

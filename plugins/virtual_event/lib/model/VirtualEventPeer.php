@@ -21,42 +21,12 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 	 */
 	public static function setDefaultCriteriaFilter()
 	{
-		if(self::$s_criteria_filter == null)
+		if(self::$s_criteria_filter == null )
 			self::$s_criteria_filter = new criteriaFilter();
 		
 		$c = new Criteria();
 		$c->addAnd(VirtualEventPeer::STATUS, VirtualEventStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter($c);
-	}
-	
-	/**
-	 * The returned Class will contain objects of the default type or
-	 * objects that inherit from the default.
-	 *
-	 * @param      array $row PropelPDO result row.
-	 * @param      int $colnum Column to examine for OM class information (first is 0).
-	 * @return 	   bool|mixed|object|string
-	 * @throws     PropelException Any exceptions caught during processing will be rethrown wrapped into a PropelException.
-	 */
-	public static function getOMClass($row, $colnum)
-	{
-		if($row)
-		{
-			$typeField = self::translateFieldName(VirtualEventPeer::TYPE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
-			$assetType = $row[$typeField];
-			if(isset(self::$class_types_cache[$assetType]))
-				return self::$class_types_cache[$assetType];
-			
-			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $assetType);
-			if($extendedCls)
-			{
-				self::$class_types_cache[$assetType] = $extendedCls;
-				return $extendedCls;
-			}
-			self::$class_types_cache[$assetType] = parent::OM_CLASS;
-		}
-		
-		return parent::OM_CLASS;
 	}
 	
 	/* (non-PHPdoc)
@@ -139,5 +109,29 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 		return false;
 	}
 	
+	/**
+	 * Retrieve a single object by pkey.
+	 *
+	 * @param      int $pk the primary key.
+	 * @param      PropelPDO $con the connection to use
+	 * @return     category
+	 */
+	public static function retrieveByPK($pk, PropelPDO $con = null)
+	{
+		if (!strlen(trim($pk))) {
+			return null;
+		}
+		
+		if (null !== ($obj = virtualEventPeer::getInstanceFromPool((string) $pk))) {
+			return $obj;
+		}
+		
+		$criteria = KalturaCriteria::create(virtualEventPeer::OM_CLASS);
+		$criteria->add(virtualEventPeer::ID, $pk);
+		
+		$v = virtualEventPeer::doSelect($criteria, $con);
+		
+		return !empty($v) > 0 ? $v[0] : null;
+	}
 	
 } // VirtualEventPeer

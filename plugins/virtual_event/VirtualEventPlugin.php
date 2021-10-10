@@ -31,9 +31,6 @@ class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices
 	
 	public static function isAllowedPartner($partnerId)
 	{
-		if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId == Partner::BATCH_PARTNER_ID)
-			return true;
-		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner)
 			return $partner->getPluginEnabled(self::PLUGIN_NAME);

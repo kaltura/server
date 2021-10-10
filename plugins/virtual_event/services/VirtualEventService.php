@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @service virtualEvent
  * @package plugins.virtualEvent
@@ -10,12 +9,6 @@ class VirtualEventService extends KalturaBaseService
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
-		
-		$partnerId = $this->getPartnerId();
-		if (!VirtualEventPlugin::isAllowedPartner($partnerId))
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
-		
-		$this->applyPartnerFilterForClass('VirtualEvent');
 	}
 	
 	/**
@@ -26,7 +19,7 @@ class VirtualEventService extends KalturaBaseService
 	 * @return KalturaVirtualEvent
 	 *
 	 */
-	public function addAction(KalturaVirtualEvent $virtualEvent)
+	public function addAction(KalturaVirtualEvent $virtualEvent )
 	{
 		/* @var $dbVirtualEvent VirtualEvent */
 		$dbVirtualEvent = $virtualEvent->toInsertableObject();
@@ -120,26 +113,16 @@ class VirtualEventService extends KalturaBaseService
 	public function listAction(KalturaVirtualEventFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaVirtualEventFilter();
-		
+		}
+
 		if (!$pager)
+		{
 			$pager = new KalturaFilterPager();
+		}
 		
-		$virtualEventFilter = new VirtualEventFilter();
-		$filter->toObject($virtualEventFilter);
-		
-		$c = new Criteria();
-		$virtualEventFilter->attachToCriteria($c);
-		$count = VirtualEventPeer::doCount($c);
-		
-		$pager->attachToCriteria($c);
-		$list = VirtualEventPeer::doSelect($c);
-		
-		$response = new KalturaVirtualEventFilterListResponse();
-		$response->objects = KalturaVirtualEventArray::fromDbArray($list, $this->getResponseProfile());
-		$response->totalCount = $count;
-		
-		return $response;
+		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
 }

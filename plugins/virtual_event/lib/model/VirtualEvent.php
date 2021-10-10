@@ -12,9 +12,14 @@
  * @package plugins.virtual_event
  * @subpackage model
  */
-abstract class VirtualEvent extends BaseVirtualEvent implements IRelatedObject, IIndexable
+ class VirtualEvent extends BaseVirtualEvent implements IRelatedObject
 {
 	const CUSTOM_DATA_FIELD_OWNER_ID   = 'ownerId';
+    const CUSTOM_DATA_FIELD_ADMINS_GROUP_ID = 'adminsGroupId';
+	const CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID = 'attendeesGroupId';
+	const CUSTOM_DATA_FIELD_FULL_SE_ID = 'fullScheduleEventId';
+	const CUSTOM_DATA_FIELD_REGISTRATION_SE_ID = 'registrationScheduleEventId';
+	const CUSTOM_DATA_FIELD_AGENDA_SE_ID = 'agendaScheduleEventId';
 	
 	const RESOURCES_INDEXED_FIELD_PREFIX = 'pid';
 	
@@ -22,7 +27,7 @@ abstract class VirtualEvent extends BaseVirtualEvent implements IRelatedObject, 
 	public function __construct ()
 	{
 		parent::__construct();
-		$this->applyDefaultValues();
+//		$this->applyDefaultValues();
 	}
 	
 	/**
@@ -136,51 +141,6 @@ abstract class VirtualEvent extends BaseVirtualEvent implements IRelatedObject, 
 		return $this->getId();
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 * @see IIndexable::getEntryId()
-	 */
-	public function getEntryId ()
-	{
-		return null;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see IIndexable::getIndexObjectName()
-	 */
-	public function getIndexObjectName ()
-	{
-		return 'ScheduleEventIndex';
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see IIndexable::indexToSearchIndex()
-	 */
-	public function indexToSearchIndex ()
-	{
-		kEventsManager::raiseEventDeferred(new kObjectReadyForIndexEvent($this));
-	}
-	
-	public function getSphinxIndexName ()
-	{
-		return kSphinxSearchManager::getSphinxIndexName(ScheduleEventIndex::getObjectIndexName());
-	}
-	
-	public function getEntryIds ()
-	{
-		return '';
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see IIndexable::getTemplateEntryId()
-	 */
-	public function getTemplateEntryId ()
-	{
-		return null;
-	}
 	
 	public function getSummary ()
 	{
@@ -201,4 +161,62 @@ abstract class VirtualEvent extends BaseVirtualEvent implements IRelatedObject, 
 		
 		return $objectName::getSphinxMatchOptimizations($this);
 	}
-}
+	
+	 public function getAdminsGroupId()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_ID);
+	 }
+	
+	 public function setAdminsGroupId($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_ID, $v);
+	 }
+	
+	 public function getAttendeesGroupId()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID);
+	 }
+	
+	 public function setAttendeesGroupId($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID, $v);
+	 }
+	
+	 public function getEventScheduleEventId()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FULL_SE_ID);
+	 }
+	
+	 public function setEventScheduleEventId($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_FULL_SE_ID, $v);
+	 }
+	
+	 public function getAgendaScheduleEventId()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_AGENDA_SE_ID);
+	 }
+	
+	 public function setAgendaScheduleEventId($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_AGENDA_SE_ID, $v);
+	 }
+	
+	 public function getRegistrationScheduleEventId()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_SE_ID);
+	 }
+	
+	 public function setRegistrationScheduleEventId($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_SE_ID, $v);
+	 }
+	
+	 /**
+	  * @return mixed
+	  */
+	 public function getIndexObjectName ()
+	 {
+		 return "VirtualEventIndex";
+	 }
+ }
