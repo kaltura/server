@@ -1693,9 +1693,9 @@ class myPartnerUtils
 		}
 
 		// take blocked-countries country code from partner custom data
-		$blockContries = $partner->getDelivryBlockCountries();
+		$blockCountries = $partner->getDelivryBlockCountries();
 		// if not set on partner custom data - take from kConf
-		if(empty($blockContries) || is_null($blockContries))
+		if(empty($blockCountries) || is_null($blockCountries))
 		{
 			// don't auto block paying partners
 			if ($partner->getPartnerPackage() > PartnerPackages::PARTNER_PACKAGE_FREE)
@@ -1703,19 +1703,29 @@ class myPartnerUtils
 					return;
 			}
 			
-			$blockContries = kConf::get ("delivery_block_countries" );
+			$blockCountries = kConf::get ("delivery_block_countries" );
 		}
-		if ($blockContries)
+		if ($blockCountries)
 		{
 			// check if request is coming from the blocked country - and block if it is
-			$currentCountry = null;
-			$blockedCountry = requestUtils::matchIpCountry( $blockContries , $currentCountry );
-			if ($blockedCountry)
+			if (!myPartnerUtils::isRequestCountryAllowed($blockCountries, $partnerId))
 			{
-				KalturaLog::log ( "IP_BLOCK partner [$partnerId] from country [$currentCountry]" );
-				KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);			
+				KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);
 			}
 		}
+	}
+	
+	public static function isRequestCountryAllowed($blockedCountriesList, $partnerId)
+	{
+		$currentCountry = null;
+		$blockedCountry = requestUtils::matchIpCountry($blockedCountriesList, $currentCountry);
+		if ($blockedCountry)
+		{
+			KalturaLog::err("IP_BLOCK partner [$partnerId] from country [$currentCountry]");
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

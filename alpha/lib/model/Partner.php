@@ -34,7 +34,7 @@ class Partner extends BasePartner
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
 	
 	const MAX_ACCESS_CONTROLS = 24;
-	const GLOBAL_ACCESS_CONTROL = 'global_access_control';
+	const GLOBAL_ACCESS_LIMITATIONS = 'global_access_limitations';
 	
 	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
 	const MAX_NUMBER_OF_CATEGORIES = 1500;
@@ -1819,7 +1819,7 @@ class Partner extends BasePartner
 			return false;
 		}
 		
-		if (!$this->validateGlobalApiAccessControl())
+		if (!$this->validateGlobalApiAccessLimitations())
 		{
 			return false;
 		}
@@ -1833,22 +1833,15 @@ class Partner extends BasePartner
 		return $this->applyAccessControlContext($accessControl);
 	}
 	
-	protected function validateGlobalApiAccessControl()
+	protected function validateGlobalApiAccessLimitations()
 	{
-		$globalAccessControlConfiguration = kConf::get(self::GLOBAL_ACCESS_CONTROL, kConfMapNames::RUNTIME_CONFIG, null);
-		if ($globalAccessControlConfiguration)
+		$globalAccessLimitationsConfiguration = kConf::get(self::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, null);
+		if ($globalAccessLimitationsConfiguration)
 		{
-			$blockedCountriesList = $globalAccessControlConfiguration['blockedCountries'];
+			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
 			if ($blockedCountriesList)
 			{
-				// check if request is coming from the blocked country - and block if it is
-				$currentCountry = null;
-				$blockedCountry = requestUtils::matchIpCountry( $blockedCountriesList , $currentCountry );
-				if ($blockedCountry)
-				{
-					KalturaLog::err("IP_BLOCK partner [$this->id] from country [$currentCountry]");
-					return false;
-				}
+				return myPartnerUtils::isRequestCountryAllowed($blockedCountriesList, $this->id);
 			}
 		}
 		
