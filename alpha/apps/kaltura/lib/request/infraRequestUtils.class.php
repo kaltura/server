@@ -476,7 +476,7 @@ class infraRequestUtils
                     if ($post)
                         self::$jsonData = $requestBody;
                 }
-            } elseif (str_starts_with(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') && isset($_POST['json'])) {
+            } elseif (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json'])) {
                 $post = json_decode($_POST['json'], true, 512, JSON_THROW_ON_ERROR);
                 if ($post)
                     self::$jsonData = $_POST['json'];
