@@ -1,5 +1,5 @@
 # Quasar-17.12.0 #
-## Add permission for self serve partner ##
+## Add report getTotal permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: PLAT-23215
 
