@@ -1836,13 +1836,19 @@ class Partner extends BasePartner
 	protected function validateGlobalApiAccessControl()
 	{
 		$globalAccessControlConfiguration = kConf::get(self::GLOBAL_ACCESS_CONTROL, kConfMapNames::RUNTIME_CONFIG, null);
-		$globalAccessControlId = $globalAccessControlConfiguration['id'];
-		if ($globalAccessControlId)
+		if ($globalAccessControlConfiguration)
 		{
-			$globalAccessControl = accessControlPeer::retrieveByPK($globalAccessControlId);
-			if (!is_null($globalAccessControl) && !$this->applyAccessControlContext($globalAccessControl))
+			$blockedCountriesList = $globalAccessControlConfiguration['blockedCountries'];
+			if ($blockedCountriesList)
 			{
-				return false;
+				// check if request is coming from the blocked country - and block if it is
+				$currentCountry = null;
+				$blockedCountry = requestUtils::matchIpCountry( $blockedCountriesList , $currentCountry );
+				if ($blockedCountry)
+				{
+					KalturaLog::err("IP_BLOCK partner [$this->id] from country [$currentCountry]");
+					return false;
+				}
 			}
 		}
 		
