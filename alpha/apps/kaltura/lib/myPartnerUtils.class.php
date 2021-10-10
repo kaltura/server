@@ -1708,14 +1708,14 @@ class myPartnerUtils
 		if ($blockCountries)
 		{
 			// check if request is coming from the blocked country - and block if it is
-			if (!myPartnerUtils::isRequestCountryAllowed($blockCountries, $partnerId))
+			if (!myPartnerUtils::isRequestFromAllowedCountry($blockCountries, $partnerId))
 			{
 				KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);
 			}
 		}
 	}
 	
-	public static function isRequestCountryAllowed($blockedCountriesList, $partnerId)
+	public static function isRequestFromAllowedCountry($blockedCountriesList, $partnerId)
 	{
 		$currentCountry = null;
 		$blockedCountry = requestUtils::matchIpCountry($blockedCountriesList, $currentCountry);

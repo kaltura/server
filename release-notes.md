@@ -1,3 +1,16 @@
+# Quasar-17.12.0 #
+
+## Block specific countries from accessing the API ##
+* Issue Type: Task
+* Issue ID: PLAT-22927
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    blockedCountries = US,GB,CN
+(Countries are listed with ISO code)
+
 # Quasar-17.11.0 #
 
 ## Partner registration - Move all time-consuming jobs to run in batch ##
