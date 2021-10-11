@@ -8,8 +8,7 @@
 Add/Update a configuration map called 'runtime_config' with following config:
 
     [global_access_limitations]
-    blockedCountries = US,GB,CN
-(Countries are listed with ISO code)
+    blockedCountries = @COMMA_SEPERATED_COUNTRIES_ISO_CODES@
 
 ## Add partner for self serve server ##
 * Issue Type: Task
