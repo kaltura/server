@@ -1210,7 +1210,7 @@ class Partner extends BasePartner
 	public function getStatus()
 	{
 		$status = $this->status;
-		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null && $this->partner_parent_id != $this->id)
+		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null && $this->partner_parent_id !== $this->id)
 		{
 			$partnerParentId = PartnerPeer::retrieveByPK($this->partner_parent_id);
 			if ($partnerParentId)
