@@ -1207,8 +1207,20 @@ class Partner extends BasePartner
 	public function getMarketoCampaignId()				{return $this->getFromCustomData('marketo_campaign_id', null, 0);}
 	
 	
-	
-	
+	public function getStatus()
+	{
+		$status = $this->status;
+		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null && $this->partner_parent_id != $this->id)
+		{
+			$partnerParentId = PartnerPeer::retrieveByPK($this->partner_parent_id);
+			if ($partnerParentId)
+			{
+				$status = $partnerParentId->getStatus();
+			}
+		}
+		return $status;
+	}
+
 	public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
     	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');

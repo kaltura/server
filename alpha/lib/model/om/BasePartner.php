@@ -680,16 +680,7 @@ abstract class BasePartner extends BaseObject  implements Persistent {
 	 */
 	public function getStatus()
 	{
-		$status = $this->status;
-		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null)
-		{
-			$partnerParentId = PartnerPeer::retrieveByPK($this->partner_parent_id);
-			if ($partnerParentId)
-			{
-				$status = $partnerParentId->getStatus();
-			}
-		}
-		return $status;
+		return $this->status;
 	}
 
 	/**
