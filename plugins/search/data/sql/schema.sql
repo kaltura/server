@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS `sphinx_log`;
 
 CREATE TABLE `sphinx_log`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`executed_server_id` INTEGER,
 	`object_type` VARCHAR(255),
 	`object_id` VARCHAR(20),
@@ -38,17 +38,17 @@ DROP TABLE IF EXISTS `sphinx_log_server`;
 
 CREATE TABLE `sphinx_log_server`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` BIGINT(20) NOT NULL AUTO_INCREMENT,
 	`server` VARCHAR(63),
 	`dc` INTEGER,
-	`last_log_id` INTEGER,
+	`last_log_id` BIGINT(20),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	PRIMARY KEY (`id`),
 	INDEX `sphinx_log_server_FI_1` (`last_log_id`),
 	CONSTRAINT `sphinx_log_server_FK_1`
-		FOREIGN KEY (`last_log_id`)
-		REFERENCES `sphinx_log` (`id`)
+	FOREIGN KEY (`last_log_id`)
+	REFERENCES `sphinx_log` (`id`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
