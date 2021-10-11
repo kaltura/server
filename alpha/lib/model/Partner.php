@@ -1213,7 +1213,7 @@ class Partner extends BasePartner
 		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null && $this->partner_parent_id !== $this->id)
 		{
 			$partnerParentId = PartnerPeer::retrieveByPK($this->partner_parent_id);
-			if ($partnerParentId)
+			if ($partnerParentId && $partnerParentId->getStatus() === Partner::PARTNER_STATUS_READ_ONLY)
 			{
 				$status = $partnerParentId->getStatus();
 			}
