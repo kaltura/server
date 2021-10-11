@@ -13,7 +13,7 @@
 		const	MaxInaccuracyValue = 0.100;	// 100 msec, ~3 frames
 		const 	CHUNK_ENCODE_POSTFIX = 'chunkenc';
 		const 	SupportedOutputCodecs = array("libx264","libx265","h264","h264b","h264m","h264h",
-					"h265","libvpx-vp9","libaom-av1");
+					"h265","libvpx-vp9","vp9","libaom-av1","av1");
 		
 		public $params = null;			// Additional encoding parameters, evaluated from the cmd-line
 		public $setup = null;
