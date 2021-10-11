@@ -26,6 +26,7 @@ class elasticClient
 	const ELASTIC_ACTION_INDEX = 'index';
 	const ELASTIC_ACTION_UPDATE = 'update';
 	const ELASTIC_ACTION_SEARCH = 'search';
+	const ELASTIC_ACTION_SCROLL = 'scroll';
 	const ELASTIC_ACTION_DELETE = 'delete';
 	const ELASTIC_ACTION_PING = 'ping';
 	const ELASTIC_GET_MASTER_INFO = 'get_master_info';
@@ -72,7 +73,7 @@ class elasticClient
 		{
 			$port = kConf::get('elasticPort', 'elastic', null);
 		}
-		KalturaLog::debug("Setting elastic port $host");
+		KalturaLog::debug("Setting elastic port $port");
 		$this->elasticPort = $port;
 
 		if (is_null($elasticVersion))
@@ -158,7 +159,19 @@ class elasticClient
 			$queryParams[self::REST_TOTAL_HITS_AS_INT] = $params[self::REST_TOTAL_HITS_AS_INT];
 			unset($params[self::REST_TOTAL_HITS_AS_INT]);
 		}
-		
+
+		if (isset($params['scroll']))
+		{
+			$queryParams['scroll'] = $params['scroll'];
+			unset($params['scroll']);
+		}
+
+		if (isset($params['scroll_id']))
+		{
+			$queryParams['scroll_id'] = $params['scroll_id'];
+			unset($params['scroll_id']);
+		}
+
 		if (count($queryParams) > 0) {
 			$val .= '?';
 			$val .= http_build_query($queryParams);
@@ -263,7 +276,7 @@ class elasticClient
 	{
 		return curl_errno($this->ch);
 	}
-	
+
 	/**
 	 * search API
 	 * @param array $params
@@ -288,15 +301,50 @@ class elasticClient
 
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH);
-		
+
 		if (isset($params[self::ELASTIC_SIZE_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_SIZE_KEY] = $params[self::ELASTIC_SIZE_KEY];
-		
+
 		if (isset($params[self::ELASTIC_FROM_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_FROM_KEY] = $params[self::ELASTIC_FROM_KEY];
 
 		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
 		$val = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], $logQuery, self::ELASTIC_ACTION_SEARCH, $monitorIndexName);
+		return $val;
+	}
+
+	/**
+	 * scroll API
+	 * @param array $params
+	 * @param $logQuery bool
+	 * @param $shouldAddPreference bool
+	 * @return mixed
+	 */
+	public function scroll(array $params, $logQuery = false, $shouldAddPreference = false)
+	{
+		kApiCache::disableConditionalCache();
+		if ($shouldAddPreference)
+		{
+			//add preference so that requests from the same session will hit the same shards
+			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
+		}
+
+		if ($this->elasticVersion >= self::ELASTIC_MAJOR_VERSION_7)
+		{
+			$params[self::REST_TOTAL_HITS_AS_INT] = "true";
+		}
+
+		$queryParams = $this->getQueryParams($params);
+		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH .'/'. self::ELASTIC_ACTION_SCROLL);
+
+		if (isset($params[self::ELASTIC_SIZE_KEY]))
+			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_SIZE_KEY] = $params[self::ELASTIC_SIZE_KEY];
+
+		if (isset($params[self::ELASTIC_FROM_KEY]))
+			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_FROM_KEY] = $params[self::ELASTIC_FROM_KEY];
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$val = $this->sendRequest($cmd, self::GET, $params[self::ELASTIC_BODY_KEY], $logQuery, self::ELASTIC_ACTION_SEARCH, $monitorIndexName);
 		return $val;
 	}
 	
