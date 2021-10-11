@@ -486,6 +486,24 @@ class kString
 		}
 		return $output;
 	}
-
-
+	
+	public static function compareStringWithRegex($string, $regex)
+	{
+		$regexLength = strlen($regex);
+		if ($regexLength > 0 && $regex[$regexLength - 1] != '/')
+		{
+			$regex = $regex . '/';
+		}
+		if ($regex[0] != '/')
+		{
+			$regex = '/' . $regex;
+		}
+		
+		if (!preg_match($regex, $string))
+		{
+			return false;
+		}
+		
+		return true;
+	}
 }

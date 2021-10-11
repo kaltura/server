@@ -404,7 +404,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $monitorUsage;
 	
 	/**
-	 * @var string
+	 * @var string[]
 	 * @requiresPermission insert,update
 	 */
 	public $passwordStructureValidations;
@@ -456,7 +456,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
-		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode'
+		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -597,7 +597,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$passwordValidation = $partner->getPasswordStructureRegex();
 		if (isset($passwordValidation[0]))
 		{
-			$this->passwordStructureValidations = $passwordValidation[0];
+			$this->passwordStructureValidations = $passwordValidation;
 			$this->passwordStructureValidationsDescription = $partner->getInvalidPasswordStructureMessage();
 		}
 		else
