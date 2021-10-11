@@ -1,5 +1,15 @@
 # Quasar-17.12.0 #
 
+## Block specific countries from accessing the API ##
+* Issue Type: Task
+* Issue ID: PLAT-22927
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    blockedCountries = @COMMA_SEPERATED_COUNTRIES_ISO_CODES@
+
 ## Add partner for self serve server ##
 * Issue Type: Task
 * Issue ID: PLAT-23201
@@ -19,7 +29,6 @@ Add permissions for caption service (action update, list) for liveNG (partner -5
 
 #### Deployment Script #### 
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_05_update_list_caption_liveng_permissions.php
-
 
 # Quasar-17.11.0 #
 

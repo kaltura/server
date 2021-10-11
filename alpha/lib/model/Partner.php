@@ -36,6 +36,7 @@ class Partner extends BasePartner
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
 	
 	const MAX_ACCESS_CONTROLS = 24;
+	const GLOBAL_ACCESS_LIMITATIONS = 'global_access_limitations';
 	
 	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
 	const MAX_NUMBER_OF_CATEGORIES = 1500;
@@ -1833,11 +1834,38 @@ class Partner extends BasePartner
 			KalturaLog::err('Action was accessed over HTTP while the partner is configured for HTTPS access only');
 			return false;
 		}
-
+		
+		if (!$this->validateGlobalApiAccessLimitations())
+		{
+			return false;
+		}
+		
 		$accessControl = $this->getApiAccessControl();
 		if (is_null($accessControl))
+		{
 			return true;
+		}
 
+		return $this->applyAccessControlContext($accessControl);
+	}
+	
+	protected function validateGlobalApiAccessLimitations()
+	{
+		$globalAccessLimitationsConfiguration = kConf::get(self::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, null);
+		if ($globalAccessLimitationsConfiguration)
+		{
+			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
+			if ($blockedCountriesList)
+			{
+				return myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id);
+			}
+		}
+		
+		return true;
+	}
+	
+	protected function applyAccessControlContext($accessControl)
+	{
 		$context = new kEntryContextDataResult();
 		
 		$scope = new accessControlScope();
@@ -1847,12 +1875,12 @@ class Partner extends BasePartner
 		$disableCache = $accessControl->applyContext($context, $scope, false);
 		if ($disableCache)
 			kApiCache::disableCache();
-
+		
 		if(count($context->getMessages()))
 		{
 			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getMessages()));
 		}
-
+		
 		if(count($context->getActions()))
 		{
 			$actions = $context->getActions();
@@ -1866,6 +1894,7 @@ class Partner extends BasePartner
 				}
 			}
 		}
+		
 		return true;
 	}
 	
