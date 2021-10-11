@@ -336,8 +336,9 @@ class ReportService extends KalturaBaseService
 	}
 
 	/**
-	 * @param $id
-	 * @param KalturaKeyValueArray|null $params
+	 * @action getCsv
+	 * @param int $id
+	 * @param KalturaKeyValueArray $params
 	 * @return kRendererString
 	 * @throws KalturaAPIException
 	 */
