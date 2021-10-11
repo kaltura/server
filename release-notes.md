@@ -1,4 +1,11 @@
 # Quasar-17.12.0 #
+## Add report getTotal permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23215
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_10_self_serve_server_add_report_permission.php
+
 
 ## Block specific countries from accessing the API ##
 * Issue Type: Task
