@@ -1208,8 +1208,20 @@ class Partner extends BasePartner
 	public function getMarketoCampaignId()				{return $this->getFromCustomData('marketo_campaign_id', null, 0);}
 	
 	
-	
-	
+	public function getStatus()
+	{
+		$status = $this->status;
+		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null && $this->partner_parent_id !== $this->id)
+		{
+			$partnerParentId = PartnerPeer::retrieveByPK($this->partner_parent_id);
+			if ($partnerParentId && $partnerParentId->getStatus() === Partner::PARTNER_STATUS_READ_ONLY)
+			{
+				$status = $partnerParentId->getStatus();
+			}
+		}
+		return $status;
+	}
+
 	public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
     	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
@@ -1499,21 +1511,9 @@ class Partner extends BasePartner
 		}
 	
 		$objectDeleted = false;
-		if($this->isColumnModified(PartnerPeer::STATUS))
+		if($this->isColumnModified(PartnerPeer::STATUS) && $this->getStatus() == Partner::PARTNER_STATUS_DELETED)
 		{
-			if($this->getStatus() == Partner::PARTNER_STATUS_DELETED)
-			{
-				$objectDeleted = true;
-			}
-			else if($this->getStatus() == Partner::PARTNER_STATUS_READ_ONLY)
-			{
-				PermissionPeer::enableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, PermissionType::SPECIAL_FEATURE, $this->getId());
-			}
-			else if($this->getColumnsOldValue(PartnerPeer::STATUS) == Partner::PARTNER_STATUS_READ_ONLY)
-			{
-				PermissionPeer::disableForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, $this->getId());
-
-			}
+			$objectDeleted = true;
 		}
 		
 		$ret = parent::postUpdate($con);
