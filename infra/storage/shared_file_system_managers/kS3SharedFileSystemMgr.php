@@ -348,7 +348,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		while (!feof($sourceFH))
 		{
 			$srcContent = stream_get_contents($sourceFH, 16 * 1024 * 1024);
-			$result = $this->multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath);
+			$result = $this->multipartUploadPart($uploadId, $partNumber, $srcContent, $destFilePath);
 			if(!$result)
 			{
 				kSharedFileSystemMgr::unRegisterStreamWrappers();
@@ -627,15 +627,15 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 				if ($fileType == 'dir')
 				{
-					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject['Size']);
-					if( $recursive)
+					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject['Size']);
+					if($recursive)
 					{
 						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
 					}
 				}
 				else
 				{
-					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject['Size']);
 				}
 			}
 		}
@@ -788,6 +788,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
+		$startTime = microtime(true);
 		$retries = $this->retriesNum;
 		while ($retries > 0)
 		{
@@ -801,6 +802,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
+		
+		$timeTook = microtime(true) - $startTime;
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess($copy ? 'COPY' : 'RENAME', $timeTook, $success ? null : kFile::RENAME_FAILED_CODE);
+		}
+		
 		if (!$success)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
@@ -868,7 +876,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $result;
 	}
 	
-	public function multipartUploadPartUpload($uploadId, $partNumber, &$srcContent, $destFilePath)
+	public function multipartUploadPart($uploadId, $partNumber, &$srcContent, $destFilePath)
 	{
 		$params = $this->initBasicS3Params($destFilePath);
 		$params['Body'] = $srcContent;

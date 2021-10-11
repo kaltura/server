@@ -785,4 +785,9 @@ class kFileBase
 		
 		return true;
 	}
+	
+	public static function getShardFsInstanceByPath($path)
+	{
+		return kSharedFileSystemMgr::getInstanceFromPath($path);
+	}
 }
