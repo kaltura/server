@@ -334,36 +334,37 @@ class ReportService extends KalturaBaseService
 		
 		return $reportResponse;
 	}
-	
+
 	/**
 	 * @action getCsv
 	 * @param int $id
 	 * @param KalturaKeyValueArray $params
-	 * @return file
+	 * @return kRendererString
+	 * @throws KalturaAPIException
 	 */
 	public function getCsvAction($id, KalturaKeyValueArray $params = null)
 	{
 		$this->addPartnerIdToParams($params);
-		
+
 		ini_set( "memory_limit","1024M" );
 		set_time_limit(600);
-		
+
 		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_DISABLED_PARTNERS))
 		{
 			$customReports = kConf::getMap('custom_reports');
 			if (!isset($customReports[$id]))
 				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-			
+
 			list($columns, $rows) = kKavaReportsMgr::customReport($id, $params->toObjectsArray());
 		}
-		else 
+		else
 		{
 			$dbReport = ReportPeer::retrieveByPK($id);
 			if (is_null($dbReport))
 				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-				
+
 			$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
-			
+
 			$kReportsManager = new kReportManager($dbReport);
 			list($columns, $rows) = $kReportsManager->execute($execParams);
 		}
@@ -383,14 +384,14 @@ class ReportService extends KalturaBaseService
 
 		header('Content-Type: text/csv');
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
-		echo "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
-		echo implode(',', $columns) . "\n";
-		foreach($rows as $row) 
+		$content = "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
+		$content .= implode(',', $columns) . "\n";
+		foreach($rows as $row)
 		{
 			$row = str_replace(',', ' ', $row);
-			echo implode(',', $row) . "\n";
+			$content .= implode(',', $row) . "\n";
 		}
-		die;
+		return new kRendererString($content, 'text/csv');
 	}
 	
 	/**
