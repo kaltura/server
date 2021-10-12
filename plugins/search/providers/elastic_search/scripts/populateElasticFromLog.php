@@ -48,6 +48,7 @@ if (empty($config))
 $elasticCluster = $config['elasticCluster'];
 $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
+$elasticVersion = isset($config['elasticVersion']) ? $config['elasticVersion'] : elasticClient::ELASTIC_MAJOR_VERSION_5;
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
@@ -96,7 +97,7 @@ foreach ($serverLastLogs as $serverLastLog)
 	$handledRecords[$serverLastLog->getDc()] = array();
 }
 
-$elasticClient = new elasticClient($elasticServer, $elasticPort); //take the server and port from config - $elasticServer , $elasticPort
+$elasticClient = new elasticClient($elasticServer, $elasticPort, $elasticVersion); //take the server, port and elasticVersion from config - $elasticServer , $elasticPort
 
 while (true)
 {
@@ -143,7 +144,7 @@ while (true)
 		KalturaLog::err('cannot connect to elastic cluster with client[' . print_r($elasticClient, true) . ']');
 		sleep(5);
 		kMemoryManager::clearMemory();
-		$elasticClient = new elasticClient($elasticServer, $elasticPort);
+		$elasticClient = new elasticClient($elasticServer, $elasticPort, $elasticVersion);
 		continue;
 	}
 
