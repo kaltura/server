@@ -339,7 +339,7 @@ class ReportService extends KalturaBaseService
 	 * @action getCsv
 	 * @param int $id
 	 * @param KalturaKeyValueArray $params
-	 * @return kRendererString
+	 * @return file
 	 * @throws KalturaAPIException
 	 */
 	public function getCsvAction($id, KalturaKeyValueArray $params = null)
