@@ -1,4 +1,13 @@
 # Quasar-17.10.0 #
+## Virtual Event ##
+A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
+### Deployment ###
+* Add VirtualEvent to ../app/configurations/plugins.ini
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_virtual_event.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 ## Add action for serving Playback key ##
 An encrypted key served to make sure videos are not shared outside the customers domain
 * Issue Type: Task

@@ -18,6 +18,10 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 		"descriptionMultiLikeAnd" => "_mlikeand_description",
 		"descriptionEqual" => "_eq_description",
 		"statusEqual" => "_eq_status",
+		"tagsLike" => "_like_tags",
+		"tagsMultiLikeOr" => "_mlikeor_tags",
+		"tagsMultiLikeAnd" => "_mlikeand_tags",
+		"tagsEqual" => "_eq_tags",
 		"createdAtGreaterThanOrEqual" => "_gte_created_at",
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
@@ -32,6 +36,8 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 		"-name" => "-name",
 		"+description" => "+description",
 		"-description" => "-description",
+		"+tags" => "+tags",
+		"-tags" => "-tags",
 		"+createdAt" => "+created_at",
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
@@ -99,6 +105,26 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 	 * @var KalturaVirtualEventStatus
 	 */
 	public $statusEqual;
+
+	/**
+	 * @var string
+	 */
+	public $tagsLike;
+
+	/**
+	 * @var string
+	 */
+	public $tagsMultiLikeOr;
+
+	/**
+	 * @var string
+	 */
+	public $tagsMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $tagsEqual;
 
 	/**
 	 * @var time

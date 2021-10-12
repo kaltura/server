@@ -33,22 +33,4 @@ class KalturaVirtualEventFilter extends KalturaVirtualEventBaseFilter
 		return $response;
 	}
 	
-//	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
-//	{
-//		$virtualEventFilter = $this->toObject();
-//
-//		$c = KalturaCriteria::create(VirtualEventPeer::OM_CLASS);
-//		$virtualEventFilter->attachToCriteria($c);
-//		$pager->attachToCriteria($c);
-//		$dbList = VirtualEventPeer::doSelect($c);
-//		$totalCount = $c->getRecordsCount();
-//
-//		$list = KalturaVirtualEventArray::fromDbArray($dbList, $responseProfile);
-//
-//		$response = new KalturaVirtualEventFilterListResponse();
-//		$response->objects = $list;
-//		$response->totalCount = $totalCount;
-//		return $response;
-//	}
-	
 }

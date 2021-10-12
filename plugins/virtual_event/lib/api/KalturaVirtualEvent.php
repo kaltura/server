@@ -38,12 +38,18 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public $status;
 	
 	/**
-	 * @var int
+	 * @var string
+	 * @filter like,mlikeor,mlikeand,eq,order
+	 */
+	public $tags;
+	
+	/**
+	 * @var string
 	 */
 	public $attendeesGroupId;
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $adminsGroupId;
 	
@@ -90,6 +96,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'name',
 		'description',
 		'status',
+		'tags',
 		'attendeesGroupId',
 		'adminsGroupId',
 		'registrationScheduleEventId',
