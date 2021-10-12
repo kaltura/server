@@ -8,6 +8,9 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 {
 	static private $map_between_objects = array
 	(
+		"idEqual" => "_eq_id",
+		"idIn" => "_in_id",
+		"idNotIn" => "_notin_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"nameLike" => "_like_name",
 		"nameMultiLikeOr" => "_mlikeor_name",
@@ -18,6 +21,7 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 		"descriptionMultiLikeAnd" => "_mlikeand_description",
 		"descriptionEqual" => "_eq_description",
 		"statusEqual" => "_eq_status",
+		"statusIn" => "_in_status",
 		"tagsLike" => "_like_tags",
 		"tagsMultiLikeOr" => "_mlikeor_tags",
 		"tagsMultiLikeAnd" => "_mlikeand_tags",
@@ -55,6 +59,21 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
+
+	/**
+	 * @var int
+	 */
+	public $idEqual;
+
+	/**
+	 * @var string
+	 */
+	public $idIn;
+
+	/**
+	 * @var string
+	 */
+	public $idNotIn;
 
 	/**
 	 * @var int
@@ -105,6 +124,11 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 	 * @var KalturaVirtualEventStatus
 	 */
 	public $statusEqual;
+
+	/**
+	 * @var string
+	 */
+	public $statusIn;
 
 	/**
 	 * @var string

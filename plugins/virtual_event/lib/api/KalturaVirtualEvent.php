@@ -9,6 +9,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
+	 * @filter eq,in,notin
 	 */
 	public $id;
 	
@@ -33,7 +34,8 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var KalturaVirtualEventStatus
-	 * @filter eq
+	 * @readonly
+	 * @filter eq,in
 	 */
 	public $status;
 	
@@ -117,10 +119,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	public function toInsertableObject($objectToFill = null, $propertiesToSkip = array())
 	{
-		if (is_null($this->status))
-		{
-			$this->status = KalturaVirtualEventStatus::DELETED;
-		}
 		return parent::toInsertableObject($objectToFill, $propertiesToSkip);
 	}
 	

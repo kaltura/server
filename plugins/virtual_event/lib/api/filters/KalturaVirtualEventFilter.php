@@ -26,7 +26,7 @@ class KalturaVirtualEventFilter extends KalturaVirtualEventBaseFilter
 		
 		$list = VirtualEventPeer::doSelect($c);
 		
-		$response = new KalturaPermissionListResponse();
+		$response = new KalturaVirtualEventFilterListResponse();
 		$response->objects = KalturaVirtualEventArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $count;
 		

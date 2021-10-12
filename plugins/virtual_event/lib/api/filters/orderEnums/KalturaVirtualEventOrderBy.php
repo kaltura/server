@@ -9,6 +9,8 @@ class KalturaVirtualEventOrderBy extends KalturaStringEnum
 	const NAME_DESC = "-name";
 	const DESCRIPTION_ASC = "+description";
 	const DESCRIPTION_DESC = "-description";
+	const TAGS_ASC = "+tags";
+	const TAGS_DESC = "-tags";
 	const CREATED_AT_ASC = "+createdAt";
 	const CREATED_AT_DESC = "-createdAt";
 	const UPDATED_AT_ASC = "+updatedAt";
