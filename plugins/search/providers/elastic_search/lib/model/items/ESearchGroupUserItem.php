@@ -150,10 +150,9 @@ class ESearchGroupUserItem extends ESearchItem
 	 * @param $fieldName
 	 * @param $kuserId
 	 * @param $indexName
-	 * @return array
 	 * @throws Exception
 	 */
-	public static function createGroupIdsTermsQuery($fieldName, $kuserId, $indexName): array
+	public static function createGroupIdsTermsQuery($fieldName, $kuserId, $indexName)
 	{
 		$elasticVersion = kConf::get('elasticVersion', 'elastic', elasticClient::ELASTIC_MAJOR_VERSION_5);
 		$terms = array('index' => $indexName,
