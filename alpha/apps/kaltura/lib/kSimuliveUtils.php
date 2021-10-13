@@ -13,7 +13,7 @@ class kSimuliveUtils
 	const MINIMUM_TIME_TO_PLAYABLE_SEC = 18; // 3 * default segment duration
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
-	const DURATION_ROUND_THRESHOLD_SEC = 0.1;
+	const DURATION_ROUND_THRESHOLD_MILISECONDS = 100;
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
@@ -257,10 +257,10 @@ class kSimuliveUtils
 	 */
 	protected static function roundDuration ($durationMs)
 	{
-		$durationSec = $durationMs / self::SECOND_IN_MILLISECONDS;
-		if ($durationSec > intval($durationSec) && $durationSec < intval($durationSec) + self::DURATION_ROUND_THRESHOLD_SEC)
+		$durationFrac = $durationMs % self::SECOND_IN_MILLISECONDS;
+		if ($durationFrac < self::DURATION_ROUND_THRESHOLD_MILISECONDS)
 		{
-			return intval($durationSec) * self::SECOND_IN_MILLISECONDS;
+			$durationMs -= $durationFrac;
 		}
 		return $durationMs;
 	}
