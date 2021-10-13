@@ -26,7 +26,7 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 	 * Property to save last entry ID played in a playlist.
 	 * @var string
 	 */
-	public $lastEntryId;
+	public $playlistLastEntryId;
 
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -35,7 +35,7 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 		'playbackContext',
 		'lastTimeReached',
 		'lastUpdateTime',
-		'lastEntryId',
+		'playlistLastEntryId',
 	);
 		 
 	/* (non-PHPdoc)
