@@ -23,6 +23,7 @@ class ViewHistoryUserEntry extends UserEntry
 
 	public function setPlaybackContext ($v)					{return $this->putInCustomData(self::CUSTOM_DATA_PLAYBACK_CONTEXT, $v);}
 	public function setLastTimeReached ($v)					{return $this->putInCustomData(self::CUSTOM_DATA_LAST_TIME_REACHED, $v);}
+	public function setLastUpdateTime ($v)					{return $this->putInCustomData(self::CUSTOM_DATA_LAST_UPDATE_TIME, $v);}
 	public function setPlaylistLastEntryId ($v)				{return $this->putInCustomData(self::CUSTOM_DATA_PLAYTLIST_LAST_ENTRY_ID, $v);}
 	
 }
