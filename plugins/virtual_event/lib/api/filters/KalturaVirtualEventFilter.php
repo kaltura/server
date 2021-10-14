@@ -22,11 +22,11 @@ class KalturaVirtualEventFilter extends KalturaVirtualEventBaseFilter
 		$virtualEventFilter->attachToCriteria($c);
 		$count = VirtualEventPeer::doCount($c);
 		
-		$pager->attachToCriteria ( $c );
+		$pager->attachToCriteria ($c);
 		
 		$list = VirtualEventPeer::doSelect($c);
 		
-		$response = new KalturaVirtualEventFilterListResponse();
+		$response = new KalturaVirtualEventListResponse();
 		$response->objects = KalturaVirtualEventArray::fromDbArray($list, $responseProfile);
 		$response->totalCount = $count;
 		

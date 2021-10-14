@@ -2,7 +2,7 @@
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
 ### Deployment ###
-* Add VirtualEvent to ../app/configurations/plugins.ini
+* Add VirtualEvent to plugins.ini
 ### Scripts ###
     mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_virtual_event.php

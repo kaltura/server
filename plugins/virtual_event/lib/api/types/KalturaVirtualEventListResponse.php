@@ -3,7 +3,7 @@
  * @package plugins.virtualEvent
  * @subpackage api.types
  */
-class KalturaVirtualEventFilterListResponse extends KalturaListResponse
+class KalturaVirtualEventListResponse extends KalturaListResponse
 {
 	/**
 	 * @var KalturaVirtualEventArray

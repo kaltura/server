@@ -23,7 +23,7 @@ class VirtualEventService extends KalturaBaseService
 	{
 		/* @var $dbVirtualEvent VirtualEvent */
 		$dbVirtualEvent = $virtualEvent->toInsertableObject();
-		$dbVirtualEvent->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		$dbVirtualEvent->setPartnerId($this->getPartnerId());
 		$dbVirtualEvent->save();
 		
 		// return the saved object
@@ -46,7 +46,9 @@ class VirtualEventService extends KalturaBaseService
 		// get the object
 		$dbVirtualEvent = VirtualEventPeer::retrieveByPK($id);
 		if (!$dbVirtualEvent)
+		{
 			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_NOT_FOUND, $id);
+		}
 		
 		// return the found object
 		$virtualEvent = new KalturaVirtualEvent();
@@ -69,7 +71,9 @@ class VirtualEventService extends KalturaBaseService
 		// get the object
 		$dbVirtualEvent = VirtualEventPeer::retrieveByPK($id);
 		if (!$dbVirtualEvent)
+		{
 			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_NOT_FOUND, $id);
+		}
 		
 		// save the object
 		/** @var VirtualEvent $dbVirtualEvent */
@@ -95,7 +99,9 @@ class VirtualEventService extends KalturaBaseService
 		// get the object
 		$dbVirtualEvent = VirtualEventPeer::retrieveByPK($id);
 		if (!$dbVirtualEvent)
+		{
 			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_NOT_FOUND, $id);
+		}
 		
 		// set the object status to deleted
 		$dbVirtualEvent->setStatus(KalturaVirtualEventStatus::DELETED);
@@ -108,7 +114,7 @@ class VirtualEventService extends KalturaBaseService
 	 * @action list
 	 * @param KalturaVirtualEventFilter $filter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaVirtualEventFilterListResponse
+	 * @return KalturaVirtualEventListResponse
 	 */
 	public function listAction(KalturaVirtualEventFilter $filter = null, KalturaFilterPager $pager = null)
 	{

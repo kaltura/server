@@ -6,6 +6,8 @@
  */
 class KalturaVirtualEvent extends KalturaObject implements IFilterable
 {
+	const PROPERTY_MIN_LENGTH = 3;
+	
 	/**
 	 * @var int
 	 * @readonly
@@ -15,7 +17,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var int
-	 * @filter eq
+	 * @filter eq,in
 	 * @readonly
 	 */
 	public $partnerId;
@@ -68,7 +70,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 */
-	public $eventScheduleEventId;
+	public $mainEventScheduleEventId;
 	
 	/**
 	 * @var time
@@ -127,7 +129,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength('name', 3, false);
+		$this->validatePropertyMinLength('name', self::PROPERTY_MIN_LENGTH, false);
 		parent::validateForInsert($propertiesToSkip);
 	}
 	
@@ -136,7 +138,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength('name', 3, true);
+		$this->validatePropertyMinLength('name', self::PROPERTY_MIN_LENGTH, true);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

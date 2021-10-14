@@ -15,13 +15,11 @@
  class VirtualEvent extends BaseVirtualEvent implements IRelatedObject
 {
 	const CUSTOM_DATA_FIELD_OWNER_ID   = 'ownerId';
-    const CUSTOM_DATA_FIELD_ADMINS_GROUP_ID = 'adminsGroupId';
+	const CUSTOM_DATA_FIELD_ADMINS_GROUP_ID = 'adminsGroupId';
 	const CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID = 'attendeesGroupId';
-	const CUSTOM_DATA_FIELD_FULL_SE_ID = 'fullScheduleEventId';
+	const CUSTOM_DATA_FIELD_MAIN_SE_ID = 'mainEventScheduleEventId';
 	const CUSTOM_DATA_FIELD_REGISTRATION_SE_ID = 'registrationScheduleEventId';
 	const CUSTOM_DATA_FIELD_AGENDA_SE_ID = 'agendaScheduleEventId';
-	
-	const RESOURCES_INDEXED_FIELD_PREFIX = 'pid';
 	
 	
 	public function __construct ()
@@ -154,13 +152,6 @@
 		return array("virtualEvent:id" . strtolower($this->getId()));
 	}
 	
-	public function getSphinxMatchOptimizations ()
-	{
-		$objectName = $this->getIndexObjectName();
-		
-		return $objectName::getSphinxMatchOptimizations($this);
-	}
-	
 	 public function getAdminsGroupId()
 	 {
 		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_ID);
@@ -181,14 +172,14 @@
 		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID, $v);
 	 }
 	
-	 public function getEventScheduleEventId()
+	 public function getMainEventScheduleEventId()
 	 {
-		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_FULL_SE_ID);
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MAIN_SE_ID);
 	 }
 	
 	 public function setEventScheduleEventId($v)
 	 {
-		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_FULL_SE_ID, $v);
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_MAIN_SE_ID, $v);
 	 }
 	
 	 public function getAgendaScheduleEventId()

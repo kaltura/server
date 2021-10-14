@@ -45,32 +45,6 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 		return parent::doSelect($c, $con);
 	}
 	
-	/**
-	 * Deletes entirely from the DB all occurrences of event from now on
-	 * @param int $parentId
-	 * @param array $exceptForIds
-	 */
-	public static function deleteByParentId($parentId, array $exceptForIds = null)
-	{
-		$criteria = new Criteria();
-		$criteria->add(VirtualEventPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
-		
-		if($exceptForIds)
-			$criteria->add(VirtualEventPeer::ID, $exceptForIds, Criteria::NOT_IN);
-		
-		
-		$virtualEvents = VirtualEventPeer::doSelect($criteria);
-		VirtualEventPeer::doDelete($criteria);
-		
-		$now = time();
-		foreach($virtualEvents as $virtualEvent)
-		{
-			/* @var $virtualEvent VirtualEvent */
-			$virtualEvent->setStatus(VirtualEventStatus::DELETED);
-			$virtualEvent->setUpdatedAt($now);
-			$virtualEvent->indexToSearchIndex();
-		}
-	}
 	
 	/**
 	 * @param int $pk
@@ -83,22 +57,6 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 		self::setUseCriteriaFilter(true);
 		
 		return $virtualEvent;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		$roots = array();
-		if($object instanceof EntryVirtualEvent)
-		{
-			$categories =  categoryPeer::retrieveByPKs(explode(',', $object->getCategoryIds()));
-			$entries =  entryPeer::retrieveByPKs(explode(',', $object->getEntryIds()));
-			$roots = array_merge($categories, $entries);
-		}
-		
-		return $roots;
 	}
 	
 	/* (non-PHPdoc)
