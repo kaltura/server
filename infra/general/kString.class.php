@@ -490,11 +490,11 @@ class kString
 	public static function compareStringWithRegex($string, $regex)
 	{
 		$regexLength = strlen($regex);
-		if ($regexLength > 0 && $regex[$regexLength - 1] != '/')
+		if ($regexLength > 0 && !kString::endsWith($regex, '/'))
 		{
 			$regex = $regex . '/';
 		}
-		if ($regex[0] != '/')
+		if (!kString::beginsWith($regex, '/'))
 		{
 			$regex = '/' . $regex;
 		}

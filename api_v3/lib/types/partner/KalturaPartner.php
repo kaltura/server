@@ -404,7 +404,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $monitorUsage;
 	
 	/**
-	 * @var string[]
+	 * @var array
 	 * @requiresPermission insert,update
 	 */
 	public $passwordStructureValidations;
