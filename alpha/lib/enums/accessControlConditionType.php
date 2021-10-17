@@ -24,4 +24,6 @@ interface ConditionType extends BaseEnum
 	const BOOLEAN = 17;
 	const HTTP_HEADER = 18;
 	const ENTRY_SCHEDULED = 19;
+	const VALIDATE_ACTION_NAME = 20;
+	const VALIDATE_AUTHENTICATION_TYPES = 21;
 }
