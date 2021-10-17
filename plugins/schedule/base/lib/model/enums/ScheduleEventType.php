@@ -10,4 +10,5 @@ interface ScheduleEventType extends BaseEnum
 	const BLACKOUT = 3;
 	const MEETING = 4;
 	const LIVE_REDIRECT = 5;
+	const VIRTUAL = 6;
 }

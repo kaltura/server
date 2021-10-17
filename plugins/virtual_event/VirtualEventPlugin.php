@@ -5,7 +5,7 @@
 class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'virtualEvent';
-	const VIRTUAL_EVENTS_CONSUMER = 'kVirtualEventsConsumer';
+	const VIRTUAL_EVENT_CONSUMER = 'kVirtualEventConsumer';
 	
 	public static function getPluginName()
 	{
@@ -36,7 +36,7 @@ class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKal
 	 */
 	public static function getEventConsumers()
 	{
-		return array(self::VIRTUAL_EVENTS_CONSUMER);
+		return array(self::VIRTUAL_EVENT_CONSUMER);
 	}
 	
 	public static function isAllowedPartner($partnerId)
