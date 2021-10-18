@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaAuthenticationTypesCondition extends KalturaCondition
+class KalturaUrlAuthenticationParamsCondition extends KalturaCondition
 {
 	/**
 	 * Init object type
@@ -19,7 +19,7 @@ class KalturaAuthenticationTypesCondition extends KalturaCondition
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if(!$dbObject)
-			$dbObject = new kAuthenticationTypesCondition();
+			$dbObject = new kUrlAuthenticationParamsCondition();
 			
 		return parent::toObject($dbObject, $skip);
 	}

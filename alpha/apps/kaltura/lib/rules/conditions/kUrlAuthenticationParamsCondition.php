@@ -3,7 +3,7 @@
  * @package Core
  * @subpackage model.data
  */
-class kAuthenticationTypesCondition extends kCondition
+class kUrlAuthenticationParamsCondition extends kCondition
 {
 	/* (non-PHPdoc)
 	 * @see kCondition::__construct()
@@ -20,22 +20,21 @@ class kAuthenticationTypesCondition extends kCondition
 	protected function internalFulfilled(kScope $scope)
 	{
 		$authParamNames = kConf::get('auth_data_param_names', 'local', array());
-		$params = infraRequestUtils::getUrlRequestParams();
-		$requestParams = array_replace_recursive($_POST, $_FILES, $_GET, $params);
+		$requestParams = infraRequestUtils::getUrlRequestParams();
 
 		KalturaLog::debug('Compares fields [ ' . print_r($authParamNames, true) . ' ] to value [' . print_r($requestParams, true) .']');
 
-		$filteredKeys = array();
+		$filtereddKeys = array();
 		foreach($requestParams as $key => $value)
 		{
-			$res = preg_split('/:/', $key);
-			$filteredKeys[] = end($res);
+			$res = explode(':', $key);
+			$filtereddKeys[] = end($res);
 		}
 
-		$result = array_intersect($filteredKeys,$authParamNames );
+		$result = array_intersect($filtereddKeys, $authParamNames );
 		if(!empty($result))
 		{
-			KalturaLog::debug("Request params condition is fullfilled, condition is true");
+			KalturaLog::debug("Request params condition is fullfilled with result " . print_r($result, true) . " - condition is true");
 			return true;
 		}
 

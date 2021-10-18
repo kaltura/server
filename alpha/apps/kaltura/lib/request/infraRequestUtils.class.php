@@ -513,7 +513,7 @@ class infraRequestUtils
 			$post = $_POST;
 		}
 
-		self::$requestParams = array_replace_recursive($post, $_FILES, $_GET, $params);
+		self::$requestParams = array_replace_recursive($post, $_FILES, $params);
 
 		$v3cacheTruncateParams = kConf::get('v3cache_truncate_time_params', 'local', array());
 		$v3cacheTruncateValue = kConf::get('v3cache_truncate_time_value', 'local', 60);
@@ -599,6 +599,6 @@ class infraRequestUtils
 				$params[$key['value']] = $value['value'];
 			}
 		}
-		return $params;
+		return array_replace_recursive($_GET, $params);
 	}
 }
