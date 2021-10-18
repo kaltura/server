@@ -11,7 +11,7 @@ class kActionNameCondition extends kRegexCondition
 	 */
 	public function __construct($not = false)
 	{
-		$this->setType(ConditionType::VALIDATE_ACTION_NAME);
+		$this->setType(ConditionType::ACTION_NAME);
 		parent::__construct($not);
 	}
 
@@ -21,11 +21,6 @@ class kActionNameCondition extends kRegexCondition
 	public function getFieldValue(kScope $scope)
 	{
 		return kCurrentContext::$service . '.' . kCurrentContext::$action;
-	}
-
-	protected function matches($field, $value)
-	{
-		return ($field === $value) || preg_match("/$value/i", $field);
 	}
 
 }

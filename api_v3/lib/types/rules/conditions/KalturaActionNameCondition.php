@@ -10,7 +10,7 @@
 	  */
 	 public function __construct()
 	 {
-		 $this->type = KalturaConditionType::VALIDATE_ACTION_NAME;
+		 $this->type = KalturaConditionType::ACTION_NAME;
 	 }
 
 	 /* (non-PHPdoc)

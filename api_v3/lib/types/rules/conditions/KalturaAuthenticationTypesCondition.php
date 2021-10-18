@@ -10,7 +10,7 @@ class KalturaAuthenticationTypesCondition extends KalturaCondition
 	 */
 	public function __construct() 
 	{
-		$this->type = ConditionType::VALIDATE_AUTHENTICATION_TYPES;
+		$this->type = ConditionType::URL_AUTH_PARAMS;
 	}
 	
 	/* (non-PHPdoc)

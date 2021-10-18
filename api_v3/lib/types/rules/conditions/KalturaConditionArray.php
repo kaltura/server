@@ -68,9 +68,9 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaHttpHeaderCondition();
 			case ConditionType::ENTRY_SCHEDULED:
 				return new KalturaEntryScheduledCondition();
-			case ConditionType::VALIDATE_ACTION_NAME:
+			case ConditionType::ACTION_NAME:
 				return new KalturaActionNameCondition();
-			case ConditionType::VALIDATE_AUTHENTICATION_TYPES:
+			case ConditionType::URL_AUTH_PARAMS:
 				return new KalturaAuthenticationTypesCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());

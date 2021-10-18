@@ -10,7 +10,7 @@ class kAuthenticationTypesCondition extends kCondition
 	 */
 	public function __construct($not = false)
 	{
-		$this->setType(ConditionType::VALIDATE_AUTHENTICATION_TYPES);
+		$this->setType(ConditionType::URL_AUTH_PARAMS);
 		parent::__construct($not);
 	}
 	
@@ -19,19 +19,24 @@ class kAuthenticationTypesCondition extends kCondition
 	 */
 	protected function internalFulfilled(kScope $scope)
 	{
-		$types = kConf::get('authenticationTypes', 'local', array());
-		$requestParams = infraRequestUtils::parseRequestParams(false); // get only requewst params and url params
+		$authParamNames = kConf::get('auth_data_param_names', 'local', array());
+		$params = infraRequestUtils::getUrlRequestParams();
+		$requestParams = array_replace_recursive($_POST, $_FILES, $_GET, $params);
 
-		KalturaLog::debug('Compares fields [ ' . print_r($types, true) . " ] to value [$requestParams]");
+		KalturaLog::debug('Compares fields [ ' . print_r($authParamNames, true) . ' ] to value [' . print_r($requestParams, true) .']');
 
-		foreach ($types as $authenticationType)
+		$filteredKeys = array();
+		foreach($requestParams as $key => $value)
 		{
-			$keys = array_keys($requestParams);
-			if( key_exists($authenticationType, $requestParams) || (int)preg_grep('/\d+:'.$authenticationType.'/',$keys))
-			{
-				KalturaLog::debug("Requset param $authenticationType exists, condition is true");
-				return true;
-			}
+			$res = preg_split('/:/', $key);
+			$filteredKeys[] = end($res);
+		}
+
+		$result = array_intersect($filteredKeys,$authParamNames );
+		if(!empty($result))
+		{
+			KalturaLog::debug("Request params condition is fullfilled, condition is true");
+			return true;
 		}
 
 		KalturaLog::debug("Authentication types doesn't exist on requests params. condition is false");
