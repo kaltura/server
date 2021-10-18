@@ -1,3 +1,12 @@
+# Quasar-17.13.0 #
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action delete) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-811
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_18_update_list_caption_liveng_permissions.php
+
 # Quasar-17.12.0 #
 ## Add report getTotal permission for self serve partner ##
 * Issue Type: Task
