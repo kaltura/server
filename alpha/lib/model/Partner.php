@@ -16,7 +16,8 @@ class Partner extends BasePartner
 	const MONITORING_PARTNER_ID = -4;
 	const MEDIA_SERVER_PARTNER_ID = -5;
 	const PLAY_SERVER_PARTNER_ID = -6;
-	
+	const SELF_SERVE_PARTNER_ID = -12;
+
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
 	const VALIDATE_WRONG_LOGIN = -1;
@@ -29,11 +30,13 @@ class Partner extends BasePartner
 	const PARTNER_STATUS_ACTIVE = 1;
 	const PARTNER_STATUS_CONTENT_BLOCK = 2;
 	const PARTNER_STATUS_FULL_BLOCK = 3;
+	const PARTNER_STATUS_READ_ONLY = 4;
 	
 	const CONTENT_BLOCK_SERVICE_CONFIG_ID = 'services_limited_partner.ct';
 	const FULL_BLOCK_SERVICE_CONFIG_ID = 'services_block.ct';
 	
 	const MAX_ACCESS_CONTROLS = 24;
+	const GLOBAL_ACCESS_LIMITATIONS = 'global_access_limitations';
 	
 	//this is not enforced anymore, but for default pager size when listing ctagoeries (since we didn't have pager before flacon)
 	const MAX_NUMBER_OF_CATEGORIES = 1500;
@@ -1205,8 +1208,20 @@ class Partner extends BasePartner
 	public function getMarketoCampaignId()				{return $this->getFromCustomData('marketo_campaign_id', null, 0);}
 	
 	
-	
-	
+	public function getStatus()
+	{
+		$status = $this->status;
+		if ($this->status === Partner::PARTNER_STATUS_ACTIVE && $this->partner_parent_id !== null && $this->partner_parent_id !== $this->id)
+		{
+			$partnerParentId = PartnerPeer::retrieveByPK($this->partner_parent_id);
+			if ($partnerParentId && $partnerParentId->getStatus() === Partner::PARTNER_STATUS_READ_ONLY)
+			{
+				$status = $partnerParentId->getStatus();
+			}
+		}
+		return $status;
+	}
+
 	public function setLiveStreamBroadcastUrlConfigurations($key, $value)
     {
     	$this->putInCustomData($key, $value, 'live_stream_broadcast_url_configurations');
@@ -1497,7 +1512,9 @@ class Partner extends BasePartner
 	
 		$objectDeleted = false;
 		if($this->isColumnModified(PartnerPeer::STATUS) && $this->getStatus() == Partner::PARTNER_STATUS_DELETED)
+		{
 			$objectDeleted = true;
+		}
 		
 		$ret = parent::postUpdate($con);
 	
@@ -1817,11 +1834,38 @@ class Partner extends BasePartner
 			KalturaLog::err('Action was accessed over HTTP while the partner is configured for HTTPS access only');
 			return false;
 		}
-
+		
+		if (!$this->validateGlobalApiAccessLimitations())
+		{
+			return false;
+		}
+		
 		$accessControl = $this->getApiAccessControl();
 		if (is_null($accessControl))
+		{
 			return true;
+		}
 
+		return $this->applyAccessControlContext($accessControl);
+	}
+	
+	protected function validateGlobalApiAccessLimitations()
+	{
+		$globalAccessLimitationsConfiguration = kConf::get(self::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, null);
+		if ($globalAccessLimitationsConfiguration)
+		{
+			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
+			if ($blockedCountriesList)
+			{
+				return myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id);
+			}
+		}
+		
+		return true;
+	}
+	
+	protected function applyAccessControlContext($accessControl)
+	{
 		$context = new kEntryContextDataResult();
 		
 		$scope = new accessControlScope();
@@ -1831,12 +1875,12 @@ class Partner extends BasePartner
 		$disableCache = $accessControl->applyContext($context, $scope, false);
 		if ($disableCache)
 			kApiCache::disableCache();
-
+		
 		if(count($context->getMessages()))
 		{
 			header("X-Kaltura-API-Access-Control: ".implode(', ', $context->getMessages()));
 		}
-
+		
 		if(count($context->getActions()))
 		{
 			$actions = $context->getActions();
@@ -1850,6 +1894,7 @@ class Partner extends BasePartner
 				}
 			}
 		}
+		
 		return true;
 	}
 	

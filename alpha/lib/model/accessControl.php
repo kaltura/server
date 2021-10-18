@@ -90,9 +90,9 @@ class accessControl extends BaseaccessControl implements IBaseObject
 			$this->setIpTree($this->buildRulesIpTree());
 		}
 
-		// set this profile as partners default
+		// Only in case of 'UPDATE' action check if should set as default
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
-		if ($partner && $this->isDefault === true && $partner->getDefaultAccessControlId() !== $this->getId())
+		if (!$this->isNew() && $this->isDefault === true && $partner && $partner->getDefaultAccessControlId() !== $this->getId())
 		{
 			$partner->setDefaultAccessControlId($this->getId());
 			$partner->save();

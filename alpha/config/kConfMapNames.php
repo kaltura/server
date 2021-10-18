@@ -10,4 +10,5 @@ class kConfMapNames
 	const COMMON_PASSWORDS = 'common_passwords';
 	const VENDOR = 'vendor';
 	const ANALYTICS = 'analytics';
+	const RUNTIME_CONFIG = 'runtime_config';
 }

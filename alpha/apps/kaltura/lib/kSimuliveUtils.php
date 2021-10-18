@@ -13,6 +13,7 @@ class kSimuliveUtils
 	const MINIMUM_TIME_TO_PLAYABLE_SEC = 18; // 3 * default segment duration
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
+	const DURATION_ROUND_THRESHOLD_MILISECONDS = 100;
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
@@ -36,7 +37,7 @@ class kSimuliveUtils
 		}
 		// all times should be in ms
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
-		$durations[] = min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime);
+		$durations[] = self::roundDuration(min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime));
 
 		list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = myEntryUtils::getEntryAssets($sourceEntry);
 
@@ -45,7 +46,8 @@ class kSimuliveUtils
 		list($preStartFlavorAssets, $preStartCaptionAssets, $preStartAudioAssets) = myEntryUtils::getEntryAssets($preStartEntry);
 		if ($preStartEntry)
 		{
-			array_unshift($durations, $preStartEntry->getLengthInMsecs());
+			$preStartRoundedDuration = self::roundDuration($preStartEntry->getLengthInMsecs());
+			array_unshift($durations, $preStartRoundedDuration);
 		}
 
 		// getting the postEnd assets (only if the postEndEntry exists)
@@ -53,7 +55,8 @@ class kSimuliveUtils
 		list($postEndFlavorAssets, $postEndCaptionAssets, $postEndAudioAssets) = myEntryUtils::getEntryAssets($postEndEntry);
 		if ($postEndEntry)
 		{
-			$durations[] = $postEndEntry->getLengthInMsecs();
+			$postEndRoundedDuration = self::roundDuration($postEndEntry->getLengthInMsecs());
+			$durations[] = $postEndRoundedDuration;
 		}
 		$endTime = $startTime + array_sum($durations);
 
@@ -244,5 +247,21 @@ class kSimuliveUtils
 			$assets = $hasPostEnd ? self::mergeAssetArrays($assets, $postEndAssets) : $assets;
 		}
 		return $assets;
+	}
+
+	/**
+	 * receiving duration (in ms) , if the received duration (in sec) is slightly above the intval of the duration - it
+	 * will return the rounded intval. otherwise - the received duration will be returned.
+	 * @param int $durationMs
+	 * @return int
+	 */
+	protected static function roundDuration ($durationMs)
+	{
+		$durationFrac = $durationMs % self::SECOND_IN_MILLISECONDS;
+		if ($durationFrac < self::DURATION_ROUND_THRESHOLD_MILISECONDS)
+		{
+			$durationMs -= $durationFrac;
+		}
+		return $durationMs;
 	}
 }

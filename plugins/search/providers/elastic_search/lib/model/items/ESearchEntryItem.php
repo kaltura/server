@@ -219,11 +219,7 @@ class ESearchEntryItem extends ESearchItem
 		if (in_array($this->getFieldName(), array(ESearchEntryFieldName::ENTITLED_USER_EDIT,ESearchEntryFieldName::ENTITLED_USER_PUBLISH,
 			ESearchEntryFieldName::ENTITLED_USER_VIEW, ESearchEntryFieldName::USER_ID)))
 		{
-			$preFixGroups = new kESearchTermsQuery($this->getFieldName(),
-				array('index' => $indexName,
-					'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
-					'id' => $this->getSearchTerm(),
-					'path' => ESearchUserFieldName::GROUP_IDS));
+			$preFixGroups = ESearchGroupUserItem::createGroupIdsTermsQuery($this->getFieldName(),$this->getSearchTerm(), $indexName);
 			$boolQuery = new kESearchBoolQuery();
 			$boolQuery->addToShould($exactQuery);
 			$boolQuery->addToShould($preFixGroups);

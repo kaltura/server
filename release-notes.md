@@ -1,3 +1,42 @@
+# Quasar-17.12.0 #
+## Add report getTotal permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23215
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_10_self_serve_server_add_report_permission.php
+
+
+## Block specific countries from accessing the API ##
+* Issue Type: Task
+* Issue ID: PLAT-22927
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    blockedCountries = @COMMA_SEPERATED_COUNTRIES_ISO_CODES@
+
+## Add partner for self serve server ##
+* Issue Type: Task
+* Issue ID: PLAT-23201
+
+### Configuration ###
+First replace all tokens from the ini file below (under self-serve-server section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
+
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action update, list) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-811
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_05_update_list_caption_liveng_permissions.php
+
 # Quasar-17.11.0 #
 
 ## Partner registration - Move all time-consuming jobs to run in batch ##

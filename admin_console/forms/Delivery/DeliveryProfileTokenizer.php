@@ -16,7 +16,7 @@ abstract class Form_Delivery_DeliveryProfileTokenizer extends Zend_Form_SubForm
  				'multiOptions'  => array(),
  		));
 		
-		$this->addElement('text', 'key', array(
+		$this->addElement('textarea', 'key', array(
 			'label'			=> 'Key:',
 			'filters'		=> array('StringTrim'),
 		));		
