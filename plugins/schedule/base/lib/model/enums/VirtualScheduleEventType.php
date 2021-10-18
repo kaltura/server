@@ -7,5 +7,5 @@ interface VirtualScheduleEventType extends BaseEnum
 {
 	const AGENDA = 1;
 	const REGISTRATION = 2;
-	const EVENT = 3;
+	const MAIN_EVENT = 3;
 }

@@ -92,4 +92,13 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 		return !empty($v) > 0 ? $v[0] : null;
 	}
 	
+	/* (non-PHPdoc)
+	 * @see IRelatedObjectPeer::getRootObjects()
+	 */
+	public function getRootObjects(IRelatedObject $object)
+	{
+		$roots = array();
+		return $roots;
+	}
+	
 } // VirtualEventPeer

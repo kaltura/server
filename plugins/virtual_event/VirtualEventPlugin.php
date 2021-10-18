@@ -2,10 +2,9 @@
 /**
  * @package plugins.virtualEvent
  */
-class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKalturaEventConsumers
+class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices
 {
 	const PLUGIN_NAME = 'virtualEvent';
-	const VIRTUAL_EVENT_CONSUMER = 'kVirtualEventConsumer';
 	
 	public static function getPluginName()
 	{
@@ -28,15 +27,6 @@ class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKal
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-	}
-	
-	/*
-	 * (non-PHPdoc)
-	 * @see IKalturaEventConsumers::getEventConsumers()
-	 */
-	public static function getEventConsumers()
-	{
-		return array(self::VIRTUAL_EVENT_CONSUMER);
 	}
 	
 	public static function isAllowedPartner($partnerId)
