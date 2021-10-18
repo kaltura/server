@@ -80,8 +80,38 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		}
 		$filter->unsetByName('_eq_is_public');
 
+		if(!is_null($filter->get('_eq_parent_id')))
+		{
+			$this->sphinxSkipped = false;
+			$parentId = $filter->get('_eq_parent_id');
+			$this->addAnd(CuePointPeer::PARENT_ID, CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()).$parentId, Criteria::EQUAL);
+		}
+		$filter->unsetByName('_eq_parent_id');
+
+		if(!is_null($filter->get('_in_parent_id')))
+		{
+			$this->sphinxSkipped = false;
+			$parentIds = explode(',', $filter->get('_in_parent_id'));
+
+			for ($i=0; $i< count($parentIds); $i++ ) {
+				$condition .= "(" . CuePoint::getIndexPrefix(kCurrentContext::getCurrentPartnerId()) . $parentIds[$i] . ")";
+				if ( $i < count($parentIds) - 1 )
+					$condition .= " | ";
+			}
+			$this->addMatch("@parent_id $condition");
+		}
+		$filter->unsetByName('_in_parent_id');
+
 		return parent::applyFilterFields($filter);
 	}
+
+
+	private function buildReferenceIdMatchString( $refId )
+	{
+		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
+		return "\\\" " . mySearchUtils::getMd5EncodedString($refId) . " $notEmpty$\\\"";
+	}
+
 
 	public function translateSphinxCriterion(SphinxCriterion $crit)
 	{
