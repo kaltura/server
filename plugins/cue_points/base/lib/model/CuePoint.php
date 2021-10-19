@@ -242,7 +242,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 		return self::getIndexPrefix($this->getPartnerId()).$val;
 	}
 
-	public function getAttachPidToParentId()
+	public function getParentIdStr()
 	{
 		$val = (string)$this->getParentId();
 		if (empty($val))
