@@ -133,9 +133,7 @@ class embedIframeAction extends sfAction
 		$partner_host = myPartnerUtils::getHost($partner_id);
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
 
-		$embedPlaykitConf = kConf::getMap(kConfMapNames::APP_VERSIONS);
-		$playerApps = isset($embedPlaykitConf['playerApps']) ? $embedPlaykitConf['playerApps'] : null;
-		$html5_version = isset($playerApps['html5_version']) ? $playerApps['html5_version'] : null;
+		$html5_version = kConf::getArrayValue('html5_version','playerApps',kConfMapNames::APP_VERSIONS,null);
 
 		$use_cdn = $uiConf->getUseCdn();
 		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
@@ -156,12 +154,4 @@ class embedIframeAction extends sfAction
 		if ($entry_id)
 			$url .=  "/entry_id/{$entry_id}";
 		$url .=  "/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
-		$url .= '?' . http_build_query($_GET, '', '&'); // forward all GET parameters
-
-		if ($allowCache)
-			$cache->put($requestKey, $url);
-
-		KExternalErrors::terminateDispatch();
-		$this->redirect($url);
-	}
-}
+		$url .= '?' . http_build_query($_GET, '', '&'); //

@@ -110,9 +110,9 @@ class kmcngAction extends kalturaAction
 		$studio = null;
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::APP_VERSIONS);
 		$playerApps = isset($embedPlaykitConf['playerApps']) ? $embedPlaykitConf['playerApps'] : null;
-		$html5_version = isset($playerApps['html5_version']) ? $playerApps['html5_version'] : null;
-		$studio_version = isset($playerApps['studio_version']) ? $playerApps['studio_version'] : null;
-		$studio_v3_version = isset($playerApps['studio_v3_version']) ? $playerApps['studio_v3_version'] : null;
+        $html5_version = kConf::getArrayValue('html5_version','playerApps',kConfMapNames::APP_VERSIONS,null);
+        $studio_version = kConf::getArrayValue('studio_version','playerApps',kConfMapNames::APP_VERSIONS,null);
+        $studio_v3_version = kConf::getArrayValue('studio_v3_version','playerApps',kConfMapNames::APP_VERSIONS,null);
 		if ($studio_version && $html5_version)
 		{
 			$studio = array(
