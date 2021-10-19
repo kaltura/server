@@ -44,7 +44,7 @@ class CuePointIndex extends BaseIndexObject
 		if (!self::$fieldsMap)
 		{
 			self::$fieldsMap = array(
-				'parent_id' => 'parentId',
+				'parent_id' => 'parentIdStr',
 				'entry_id' => 'entryId',
 				'name' => 'name',
 				'system_name' => 'systemName',
