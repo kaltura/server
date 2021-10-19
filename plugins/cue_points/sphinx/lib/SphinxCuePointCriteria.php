@@ -105,14 +105,6 @@ class SphinxCuePointCriteria extends SphinxCriteria
 		return parent::applyFilterFields($filter);
 	}
 
-
-	private function buildReferenceIdMatchString( $refId )
-	{
-		$notEmpty = kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId();
-		return "\\\" " . mySearchUtils::getMd5EncodedString($refId) . " $notEmpty$\\\"";
-	}
-
-
 	public function translateSphinxCriterion(SphinxCriterion $crit)
 	{
 		$field = $crit->getTable() . '.' . $crit->getColumn();
