@@ -154,4 +154,12 @@ class embedIframeAction extends sfAction
 		if ($entry_id)
 			$url .=  "/entry_id/{$entry_id}";
 		$url .=  "/wid/{$widget_id}/uiconf_id/{$uiconf_id}";
-		$url .= '?' . http_build_query($_GET, '', '&'); //
+		$url .= '?' . http_build_query($_GET, '', '&'); // forward all GET parameters
+
+		if ($allowCache)
+			$cache->put($requestKey, $url);
+
+		KExternalErrors::terminateDispatch();
+		$this->redirect($url);
+	}
+}
