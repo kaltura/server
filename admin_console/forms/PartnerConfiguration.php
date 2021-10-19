@@ -525,6 +525,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Use only basic list for purification',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
+		
+		$this->addElement('checkbox', 'purify_image_content', array(
+			'label'	  => 'Purify image content',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
 //-----------------------------------------------------------------------
 		$this->addElement('hidden', 'crossLine', array(
 			'lable'			=> 'line',
@@ -983,7 +988,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addLimitSubForm($liveRtcStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS);
 
 		//Add dynamic limits from admin.ini
-		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
+		$limitLiveByAdminTag = Zend_Registry::get('config')->limitLiveByAdminTag ? Zend_Registry::get('config')->limitLiveByAdminTag : array();
+		foreach($limitLiveByAdminTag as $limit)
 		{
 			$limitType = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag";
 			$limitSubForm = new Form_PartnerConfigurationLimitByAdminTagSubForm($limitType, $limit->label, $limit->adminTag);
@@ -1049,8 +1055,8 @@ class Form_PartnerConfiguration extends Infra_Form
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
-		
-		foreach(Zend_Registry::get('config')->limitLiveByAdminTag as $limit)
+		$limitLiveByAdminTag = Zend_Registry::get('config')->limitLiveByAdminTag ? Zend_Registry::get('config')->limitLiveByAdminTag : array();
+		foreach($limitLiveByAdminTag as $limit)
 		{
 			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag" . '_max';
 		}
@@ -1082,7 +1088,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			array('legend' => 'Live Stream Config')
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
 
 		$this->addDisplayGroup(
 			array_merge(

@@ -70,14 +70,21 @@ class PlayReadyPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKalt
 		if (class_exists('Kaltura_Client_Client'))
 		{
 			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
-    		{
-    			return new Kaltura_Client_PlayReady_Type_PlayReadyProfile();
-    		}
-    		if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
-    		{
-     			return new Form_PlayReadyProfileConfigureExtend_SubForm();
-    		}	   		
-    		
+			{
+				return new Kaltura_Client_PlayReady_Type_PlayReadyProfile();
+			}
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
+			{
+				return new Kaltura_Client_PlayReady_Type_PlayReadyPolicy();
+			}
+			if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
+			{
+				return new Form_PlayReadyProfileConfigureExtend_SubForm();
+			}
+			if ($baseClass == 'Form_DrmPolicyConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
+			{
+				return new Form_PlayReadyPolicyConfigureExtend_SubForm();
+			}
 		}
 		return null;
 	}
@@ -104,14 +111,21 @@ class PlayReadyPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKalt
 		if (class_exists('Kaltura_Client_Client'))
 		{
 			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
-    		{
-    			return 'Kaltura_Client_PlayReady_Type_PlayReadyProfile';
-    		}
-    		if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
-    		{
-     			return 'Form_PlayReadyProfileConfigureExtend_SubForm';
-    		}	   		
-    		
+			{
+				return 'Kaltura_Client_PlayReady_Type_PlayReadyProfile';
+			}
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
+			{
+				return 'Kaltura_Client_PlayReady_Type_PlayReadyPolicy';
+			}
+			if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
+			{
+				return 'Form_PlayReadyProfileConfigureExtend_SubForm';
+			}
+			if ($baseClass == 'Form_DrmPolicyConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY)
+			{
+				return 'Form_PlayReadyPolicyConfigureExtend_SubForm';
+			}
 		}
 			
 		return null;

@@ -20,6 +20,8 @@ class kFlowHelper
 	const REPORT_EXPIRY_TIME = 604800; // 7 * 60 * 60 * 24
 
 	const SERVE_OBJECT_CSV_PARTIAL_URL = "/api_v3/index.php/service/exportCsv/action/serveCsv/ks/";
+	
+	const EXPORT_REPORT_CUSTOM_URL = 'export_report_custom_url';
 
 	const DAYS = 'days';
 	const HOURS = 'hours';
@@ -2355,6 +2357,8 @@ class kFlowHelper
 
 		if($entry)
 		{
+			self::handleStaticContent($entry);
+
 			kBusinessConvertDL::checkForPendingLiveClips($entry);
 
 			$clonePendingEntriesArray = $entry->getClonePendingEntries();
@@ -3114,7 +3118,7 @@ class kFlowHelper
 		return $dbBatchJob;
 	}
 
-	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $privilegeActionsLimit = null)
+	protected static function createReportExportDownloadUrl($partner_id, $file_name, $expiry, $baseUrl, $reportName, $privilegeActionsLimit = null)
 	{
 		$regex = "/^{$partner_id}_Report_export_[a-zA-Z0-9]+$/";
 		if (!preg_match($regex, $file_name, $matches))
@@ -3124,21 +3128,43 @@ class kFlowHelper
 		}
 
 		$partner = PartnerPeer::retrieveByPK($partner_id);
-		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
-		if ($privilegeActionsLimit)
+		
+		$url = kFlowHelper::buildCustomUrl($partner_id, $baseUrl, $file_name, $reportName);
+		if (!$url)
 		{
-			$privilege .= "," . $privilegeActionsLimit;
+			$privilege = ks::PRIVILEGE_DOWNLOAD . ':' . $file_name;
+			if ($privilegeActionsLimit)
+			{
+				$privilege .= ',' . $privilegeActionsLimit;
+			}
+			$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
+			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 		}
-
-		$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 
 		if ($partner->getEnforceHttpsApi())
 		{
 			$url = str_replace("http:", "https:", $url);
 		}
-
+		
 		return $url;
+	}
+	
+	protected static function buildCustomUrl($partnerId, $baseUrl, $fileName, $reportName)
+	{
+		$customUrlPartners = kConf::get(self::EXPORT_REPORT_CUSTOM_URL, kConfMapNames::ANALYTICS, array());
+		if ($baseUrl && in_array($partnerId, $customUrlPartners))
+		{
+			$time = time();
+			if (!$reportName)
+			{
+				$reportName = '';
+			}
+			$url = "$fileName|$reportName|$time";
+			$url = urldecode($baseUrl) . urlencode($url);
+			return $url;
+		}
+		
+		return null;
 	}
 
 	public static function handleReportExportFinished(BatchJob $dbBatchJob, kReportExportJobData $data)
@@ -3163,6 +3189,7 @@ class kFlowHelper
 		$data->setFiles($finalFiles);
 		$dbBatchJob->setData($data);
 		$dbBatchJob->save();
+		$baseUrl = $data->getBaseUrl();
 
 		$privilegeActionsLimit = null;
 		$expiryByPartner = kConf::get("report_export_expiry_by_partner", 'analytics', array());
@@ -3181,13 +3208,14 @@ class kFlowHelper
 		foreach ($finalFiles as $finalFile)
 		{
 			$fileName = basename($finalFile->getFileId());
-			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $privilegeActionsLimit);
+			$reportName = $finalFile->getFileName();
+			$url = self::createReportExportDownloadUrl($dbBatchJob->getPartnerId(), $fileName, $expiry, $baseUrl, $reportName, $privilegeActionsLimit);
 			if (!$url)
 			{
 				KalturaLog::err("Failed to create download URL for file - {$finalFile->getFileId()}");
 				return kFlowHelper::handleReportExportFailed($dbBatchJob, $data);
 			}
-			$linkName = $finalFile->getFileName() ? $finalFile->getFileName() : $fileName;
+			$linkName = $reportName ? $reportName : $fileName;
 			$links[] = '<a href="' . $url .'" target="_blank" >' . $linkName . '</a>';
 		}
 
@@ -3544,5 +3572,44 @@ class kFlowHelper
 			}
 		}
 		return $allFinished;
+	}
+
+	/**
+	 * @param entry $entry
+	 * @throws PropelException
+	 */
+	protected static function handleStaticContent(entry $entry)
+	{
+		$disableStaticContentSourceDeletionPartners = kConf::get('disableStaticContentSourceDeletionPartners', 'runtime_config', array());
+		if (in_array($entry->getPartnerId(), $disableStaticContentSourceDeletionPartners) || in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $disableStaticContentSourceDeletionPartners) || !kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+		{
+			return;
+		}
+
+		$conversionProfileKey = kBusinessPreConvertDL::getConversionProfileKey($entry);
+		$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles', 'runtime_config', array());
+		$profile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), $staticContentConversionProfiles[$conversionProfileKey], ConversionProfileType::MEDIA, true);
+		if (!$profile)
+		{
+			return;
+		}
+
+		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
+		if (count($nonSourceFlavors) < 2)
+		{
+			return;
+		}
+
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
+		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
+		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
+		{
+			$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
+			$sourceFlavor->save();
+			$highestBitrateFlavor->setIsOriginal(true);
+			$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
+			$highestBitrateFlavor->save();
+		}
 	}
 }

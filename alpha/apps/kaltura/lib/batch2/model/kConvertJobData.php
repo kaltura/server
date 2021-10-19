@@ -226,12 +226,14 @@ class kConvertJobData extends kConvartableJobData
 			return BatchJobUrgencyType::DEFAULT_URGENCY;
 		}
 
-		if($batchJob->getObjectId() && $batchJob->getObjectType()) {
-			$batchJobs = BatchJobPeer::retrieveByJobTypeAndObject($batchJob->getObjectId(), $batchJob->getObjectType(), 
+		if($batchJob->getObjectId() && $batchJob->getObjectType())
+		{
+			$oldestBatchJob = BatchJobPeer::retrieveByJobTypeAndObject($batchJob->getObjectId(), $batchJob->getObjectType(),
 				$batchJob->getJobType(), $batchJob->getJobSubType());
 			
-			if(count($batchJobs)) {
-				return $batchJobs[0]->getLockInfo()->getUrgency() + 1;
+			if($oldestBatchJob)
+			{
+				return $oldestBatchJob->getLockInfo()->getUrgency() + 1;
 			}
 		}
 

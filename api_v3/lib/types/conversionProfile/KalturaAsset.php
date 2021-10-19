@@ -120,7 +120,7 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	/**
 	 * The size (in Bytes) of the asset
 	 *
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 */
 	public $sizeInBytes;

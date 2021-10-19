@@ -29,7 +29,7 @@
 				<td><?php echo $this->enumTranslate('Kaltura_Client_Drm_Enum_DrmProfileStatus', $drmProfile->status); ?></td>
 				<td><?php echo $drmProfile->name; ?></td>
 				<td><?php echo $drmProfile->partnerId; ?></td>
-				<td><?php echo $this->enumTranslate('Kaltura_Client_Drm_Enum_DrmProfileProvider', $drmProfile->provider); ?></td>
+				<td><?php echo $this->enumTranslate('Kaltura_Client_Drm_Enum_DrmProviderType', $drmProfile->provider); ?></td>
 				<td><?php echo date($this->translate('time format'), $drmProfile->createdAt); ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $drmProfile->id; ?>)">
@@ -46,9 +46,6 @@
 <?php echo $this->adminApiForm; ?>
 
 <script type="text/javascript">
-$(function(){
-	addSubTitle('Drm Profiles');
-});
 
 jQuery('#filter_type').change(function() {
 	if(this.value == "none") {

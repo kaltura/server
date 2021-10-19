@@ -546,7 +546,7 @@ class kJobsManager
 
 		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
-			$convertData->setDestFileSyncSharedPath(self::getSharedPath($partner,$parentJob,$flavor));
+			$convertData->setDestFileSyncSharedPath(self::getSharedPath($partner,$parentJob,$flavorAsset));
 		}
 		
 		// creats a child convert job
@@ -626,24 +626,16 @@ class kJobsManager
 			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
 			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			list($root, $path) = $pathMgr->generateFilePathArr($flavorAsset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $nextVersion);
-			$sharedPath = kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 			if($parentJob && $parentJob->getJobType()== BatchJobType::CLIP_CONCAT)
 			{
-				try
+				$temp_storage_bucket = kConf::get('temp_storage_bucket', myCloudUtils::CLOUD_STORAGE_MAP, null);
+				if($temp_storage_bucket)
 				{
-					$temp_storage_bucket = kConf::get('temp_storage_bucket', myCloudUtils::CLOUD_STORAGE_MAP, null);
-					if(isset($temp_storage_bucket))
-					{
-						$sharedPath = str_replace($root,$temp_storage_bucket,$sharedPath);
-					}
+					$root = $temp_storage_bucket;
 				}
-				catch (Exception $ex)
-				{
-					KalturaLog::err($ex);
-				}
-				
 			}
-			return $sharedPath;
+			
+			return kFile::fixPath(rtrim($root, "/") . DIRECTORY_SEPARATOR . ltrim($path, "/"));
 	}
 	
 	private static function getNextConversionEngine(flavorParamsOutput $flavor, BatchJob $parentJob = null, $lastEngineType, kConvertJobData &$convertData)
@@ -1702,7 +1694,12 @@ class kJobsManager
 			{
 				$extractMediaData->setExtractId3Tags(true);
 			}
-			else if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+			elseif(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+			{
+				$profileLC = kBusinessPreConvertDL::retrieveConversionProfileByType($entry);
+				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
+			}
+			elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 			{
 				$profileLC = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
 				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
@@ -1954,6 +1951,7 @@ class kJobsManager
 		$jobData->setTimeZoneOffset($offset);
 		$jobData->setTimeReference(time());
 		$jobData->setReportsGroup($coreParams->getReportsItemsGroup());
+		$jobData->setBaseUrl($coreParams->getBaseUrl());
 
 		$job = new BatchJob();
 		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());

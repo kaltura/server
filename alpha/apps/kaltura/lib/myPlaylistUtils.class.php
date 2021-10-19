@@ -1149,6 +1149,13 @@ HTML;
 		return $captionAssets;
 	}
 
+	public static function getEntryIdsCaptionsSortedByLanguage($entryId, $captionAssetStatuses = array())
+	{
+		$captions = self::getEntryIdsCaptions($entryId, $captionAssetStatuses);
+		usort($captions, array("asset", "cmpAssetsByLanguage"));
+		return $captions;
+	}
+
 	private static function getIds ( $list )
 	{
 		$id_list  =array();

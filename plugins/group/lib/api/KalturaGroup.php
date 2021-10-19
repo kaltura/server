@@ -39,12 +39,7 @@ class KalturaGroup extends KalturaBaseUser
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$id = $this->id;
-		if (!$this->id && $propertiesToSkip->getPuserId())
-		{
-			$id = $propertiesToSkip->getPuserId();
-		}
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $id))
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $this->id))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
@@ -61,20 +56,18 @@ class KalturaGroup extends KalturaBaseUser
 
 	public function clonedObject($dbOriginalGroup, $newGroupId, $newGroupName)
 	{
-		$dbObject = $this->toObject();
+		$this->screenName = $newGroupName;
+		$this->id = $newGroupId;
+		$this->tags = $dbOriginalGroup->getTags();
+		$this->partnerData = $dbOriginalGroup->getPartnerData();
+		$this->status = $dbOriginalGroup->getStatus();
+		$this->email = $dbOriginalGroup->getEmail();
+		$this->language = $dbOriginalGroup->getLanguage();
+		$this->thumbnailUrl = $dbOriginalGroup->getPicture();
+		$this->description = $dbOriginalGroup->getAboutMe();
 
-		$dbObject->setScreenName($newGroupName);
-		$dbObject->setPuserId($newGroupId);
-		$dbObject->setTags($dbOriginalGroup->getTags());
+		$dbObject = $this->toInsertableObject();
 		$dbObject->setPartnerId($dbOriginalGroup->getPartnerId());
-		$dbObject->setPartnerData($dbOriginalGroup->getPartnerData());
-		$dbObject->setStatus($dbOriginalGroup->getStatus());
-		$dbObject->setEmail($dbOriginalGroup->getEmail());
-		$dbObject->setLanguage($dbOriginalGroup->getLanguage());
-		$dbObject->setPicture($dbOriginalGroup->getPicture());
-		$dbObject->setAboutMe($dbOriginalGroup->getAboutMe());
-
-
 		return $dbObject;
 	}
 

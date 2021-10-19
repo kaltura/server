@@ -232,8 +232,6 @@ class GroupService extends KalturaBaseUserService
 			$newGroupName = $newGroupId;
 		}
 		$newDbGroup = $group->clonedObject($dbGroup, $newGroupId, $newGroupName);
-		$group->validateForInsert($newDbGroup);
-
 		$newDbGroup->save();
 
 		$groupUsers =  KuserKgroupPeer::retrieveKuserKgroupByKgroupId($dbGroup->getId());

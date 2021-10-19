@@ -88,12 +88,8 @@ abstract class kReachVendorTaskProcessorEngine
 
         $updateTask = new KalturaEntryVendorTask();
         $updateTask->status = $status;
-        try {
-            $this->reachPlugin->entryVendorTask->update($task->id, $updateTask);
-        } catch (Exception $e)
-        {
-            KalturaLog::err("Unable to move task ID {$task->id} to PROCESSING status");
-        }
+
+        $this->reachPlugin->entryVendorTask->update($task->id, $updateTask);
 
         KBatchBase::unimpersonate();
     }

@@ -502,22 +502,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 	private function isEntryMatch(KalturaDropFolderContentProcessorJobData $data)
 	{
-		try 
+		try
 		{
 			$entryFilter = new KalturaBaseEntryFilter();
 			$entryFilter->referenceIdEqual = $data->parsedSlug;
-			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;		
+			$entryFilter->typeIn = KalturaEntryType::MEDIA_CLIP;
+			$entryFilter->statusIn = KalturaEntryStatus::IMPORT.','.KalturaEntryStatus::PRECONVERT.','.KalturaEntryStatus::READY.','.KalturaEntryStatus::PENDING.','.KalturaEntryStatus::NO_CONTENT;
 			
 			$entryPager = new KalturaFilterPager();
 			$entryPager->pageSize = 1;
 			$entryPager->pageIndex = 1;
 			$entryList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $entryPager);
 			
-			if (is_array($entryList->objects) && isset($entryList->objects[0]) ) 
+			if (is_array($entryList->objects) && isset($entryList->objects[0]))
 			{
-				$result = $entryList->objects[0];
-				if ($result->referenceId === $data->parsedSlug) 
-					return $result;
+				return $entryList->objects[0];
 			}
 			
 			return false;			

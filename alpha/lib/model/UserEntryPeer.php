@@ -102,7 +102,7 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		$c->add(UserEntryPeer::ENTRY_ID, $entryId);
 		$c->add(UserEntryPeer::TYPE, $type);
 		$c->add(UserEntryPeer::STATUS, QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
-		$c->addDescendingOrderByColumn(UserEntryPeer::ID);
+		$c->addDescendingOrderByColumn(UserEntryPeer::UPDATED_AT);
 		$userEntryList = UserEntryPeer::doSelect($c);
 		return $userEntryList;
 	}

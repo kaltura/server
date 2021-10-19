@@ -149,6 +149,9 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_LIVE_REAL_MEDIA = 'Live stream real media';
 	const MEDIA_TYPE_LIVE_QUICKTIME = 'Live stream quicktime';
 
+	// source type
+	const SOURCE_INTERACTIVE_VIDEO = 'Interactive Video';
+
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
 
@@ -159,6 +162,8 @@ class kKavaBase extends kDruidBase
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
 	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
 	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
+	const PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME = 'hasSegmentDownloadTime';
+	const PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME = 'hasManifestDownloadTime';
 
 	//user engagement values
 	const USER_SOUND_ON_TAB_FOCUSED = 'SoundOnTabFocused';
@@ -370,6 +375,14 @@ class kKavaBase extends kDruidBase
 		),
 	);
 
+	protected static $datasources_hash_dimensions = array(
+		self::DATASOURCE_HISTORICAL => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
+		self::DATASOURCE_REALTIME => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
+	);
 	protected static $sourceFromAdminTag = array(
 		'kalturaclassroom' => 'Classroom Capture',
 		'kalturacapture' => 'Kaltura Capture',

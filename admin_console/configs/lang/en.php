@@ -142,6 +142,7 @@ return array(
 	'Kaltura_Client_Enum_PartnerStatus::ACTIVE' => 'Active',
 	'Kaltura_Client_Enum_PartnerStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_PartnerStatus::FULL_BLOCK' => 'Removed',
+	'Kaltura_Client_Enum_PartnerStatus::READ_ONLY' => 'Read Only',
 
 	'Kaltura_Client_Enum_UserStatus::BLOCKED' => 'Blocked',
 	'Kaltura_Client_Enum_UserStatus::ACTIVE' => 'Active',
@@ -1320,11 +1321,34 @@ return array(
 	'user role intro text' => '',
 	//DRM
 	'drm profile list intro text' => 'Here you can manage the Drm profiles of your Kaltura video platform deployment',
+	'drm policy list intro text' => 'Here you can manage the Drm policies of your Kaltura video platform deployment',
 	'Kaltura_Client_Drm_Enum_DrmProfileStatus::ACTIVE' => 'Active',
+	'Kaltura_Client_Drm_Enum_DrmPolicyStatus::ACTIVE' => 'Active',
+
 	'Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE' => 'Widevine',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::PLAY_READY' => 'Play Ready',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::CENC' => 'CENC',
 	'Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY' => 'Fairplay',
+
+	'Kaltura_Client_Drm_Enum_DrmLicenseScenario::NONE' => 'None',
+	'Kaltura_Client_Drm_Enum_DrmLicenseScenario::PROTECTION' => 'Protection',
+	'Kaltura_Client_Drm_Enum_DrmLicenseScenario::PURCHASE' => 'Purchase',
+	'Kaltura_Client_Drm_Enum_DrmLicenseScenario::RENTAL' => 'Rental',
+	'Kaltura_Client_Drm_Enum_DrmLicenseScenario::SUBSCRIPTION' => 'Subscription',
+
+	'Kaltura_Client_Drm_Enum_DrmLicenseType::PERSISTENT' => 'Persistent',
+	'Kaltura_Client_Drm_Enum_DrmLicenseType::NON_PERSISTENT' => 'Non Persistent',
+
+	'Kaltura_Client_Drm_Enum_DrmLicenseExpirationPolicy::FIXED_DURATION' => 'Fixed Duration',
+	'Kaltura_Client_Drm_Enum_DrmLicenseExpirationPolicy::ENTRY_SCHEDULING_END' => 'Entry Scheduling End',
+	'Kaltura_Client_Drm_Enum_DrmLicenseExpirationPolicy::UNLIMITED' => 'Unlimited',
+
+	'Kaltura_Client_PlayReady_Enum_PlayReadyLicenseRemovalPolicy::FIXED_FROM_EXPIRATION' => 'Fixed From Expiration',
+	'Kaltura_Client_PlayReady_Enum_PlayReadyLicenseRemovalPolicy::ENTRY_SCHEDULING_END' => 'Entry Scheduling End',
+	'Kaltura_Client_PlayReady_Enum_PlayReadyLicenseRemovalPolicy::NONE' => 'None',
+
+	'Kaltura_Client_PlayReady_Enum_PlayReadyMinimumLicenseSecurityLevel::NON_COMMERCIAL_QUALITY' => 'Non Commercial Quality',
+	'Kaltura_Client_PlayReady_Enum_PlayReadyMinimumLicenseSecurityLevel::COMMERCIAL_QUALITY' => 'Commercial Quality',
 
 	// Delivery profiles
 	'delivery-profiles-configuration intro text' => "Here you can configure your delivery profiles",
