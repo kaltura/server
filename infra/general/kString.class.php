@@ -499,11 +499,6 @@ class kString
 			$regex = '/' . $regex;
 		}
 		
-		if (!preg_match($regex, $string))
-		{
-			return false;
-		}
-		
-		return true;
+		return preg_match($regex, $string);
 	}
 }
