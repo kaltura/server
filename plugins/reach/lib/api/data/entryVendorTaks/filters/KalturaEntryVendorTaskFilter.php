@@ -15,17 +15,6 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		"userIdEqual" => "_eq_kuser_id",
 		"freeText" => "_free_text",
 	);
-
-	static private $order_by_map = array
-	(
-		"+expectedFinishTime" => "+expected_finish_time",
-		"-expectedFinishTime" => "-expected_finish_time",
-	);
-
-	public function getOrderByMap()
-	{
-		return array_merge(parent::getOrderByMap(), self::$order_by_map);
-	}
 	
 	public function getMapBetweenObjects()
 	{
