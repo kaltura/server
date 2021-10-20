@@ -7,7 +7,7 @@
  */
 
 // AWS SDK PHP Client Library
-require_once(dirname(__FILE__) . '/../../../vendor/aws/aws-autoloader.php');
+require_once(dirname(__FILE__) . '/../../../vendor/aws_v3/aws-autoloader.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/../RefreshableRole.class.php');
 
@@ -30,11 +30,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
 	
-	//This works only for SDK V3 for V2 need to use ‌NoSuchKey && getAwsErrorCode
-	//const AWS_404_ERROR = 'NotFound';
-	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getStatusCode";
-	const AWS_404_ERROR = 404;
+	const AWS_404_ERROR = '‌NoSuchKey';
 	
 	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
 	const DEFAULT_S3_APP_NAME = "Kaltura-Server";
@@ -51,6 +48,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $concurrency;
 	protected $userAgentRegex;
 	protected $userAgentPartner;
+	protected $usePathStyleEndPoint;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -86,6 +84,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
 		}
 		
+		$this->usePathStyleEndPoint = isset($options['use_path_style_endpoint']) ?  $options['use_path_style_endpoint'] :  false;
 		$this->userAgentPartner = isset($options['userAgentPartner']) ? $options['userAgentPartner'] : "Kaltura";
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
 		$this->storageClass = isset($options['storageClass']) ? $options['storageClass'] : 'INTELLIGENT_TIERING';
@@ -93,7 +92,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $this->login();
 	}
 	
-	private function setClientUserAgent()
+	/**
+	 * @return string
+	 */
+	private function getClientUserAgent()
 	{
 		$appName = self::DEFAULT_S3_APP_NAME;
 		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
@@ -102,7 +104,18 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$appName = $matches[0];
 		}
 		
-		$this->s3Client->setUserAgent("APN/1.0 $this->userAgentPartner/1.0 $appName/1.0");
+		return "APN/1.0 $this->userAgentPartner/1.0 $appName/1.0";
+	}
+	
+	private function getBaseClientConfig()
+	{
+		return array(
+			'region' => $this->s3Region,
+			'signature' => $this->signatureType ? $this->signatureType : 'v4',
+			'version' => '2006-03-01',
+			'debug' => true,
+			'ua_append' => array($this->getClientUserAgent())
+		);
 	}
 	
 	private function login()
@@ -121,35 +134,37 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				return false;
 			}
 			
-			return $this->generateS3Client();
+			return $this->generateCachedCredentialsS3Client();
 		}
-		
-		$config = array(
-			'credentials' => array(
-				'key'    => $this->accessKeyId,
-				'secret' => $this->accessKeySecret,
-			),
-			'region' => $this->s3Region,
-			'signature' => $this->signatureType ? $this->signatureType : 'v4',
-			'version' => '2006-03-01',
-		);
-		
-		if ($this->endPoint)
-			$config['endpoint'] = $this->endPoint;
-		
-		$this->s3Client = S3Client::factory($config);
-		$this->setClientUserAgent();
 		
 		/**
 		 * There is no way of "checking the credentials" on s3.
 		 * Doing a ListBuckets would only check that the user has the s3:ListAllMyBuckets permission
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
-		 * code elsewhere if the permissions are not sufficient.
+		 * flow elsewhere if the permissions are not sufficient.
 		 **/
+		return $this->generateStaticCredsClient();
+	}
+	
+	private function generateStaticCredsClient()
+	{
+		$config = $this->getBaseClientConfig();
+		$config['credentials'] = array(
+			'key'    => $this->accessKeyId,
+			'secret' => $this->accessKeySecret,
+		);
+		
+		if ($this->endPoint)
+			$config['endpoint'] = $this->endPoint;
+		if($this->usePathStyleEndPoint)
+			$config['use_path_style_endpoint'] = true;
+		
+		$this->s3Client = S3Client::factory($config);
+		
 		return true;
 	}
 	
-	private function generateS3Client()
+	private function generateCachedCredentialsS3Client()
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
 		
@@ -160,14 +175,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
 		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
 		
-		$this->s3Client = S3Client::factory(array(
-			'credentials' => $roleCreds,
-			'region' => $this->s3Region,
-			'signature' => 'v4',
-			'version' => '2006-03-01'
-		));
-		
-		$this->setClientUserAgent();
+		$config = $this->getBaseClientConfig();
+		$config['credentials'] = $roleCreds;
+		$this->s3Client = S3Client::factory($config);
 		
 		return true;
 	}
@@ -348,7 +358,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		while (!feof($sourceFH))
 		{
 			$srcContent = stream_get_contents($sourceFH, 16 * 1024 * 1024);
-			$result = $this->multipartUploadPartUpload($uploadId, $partNumber, $srcContent, $destFilePath);
+			$result = $this->multipartUploadPart($uploadId, $partNumber, $srcContent, $destFilePath);
 			if(!$result)
 			{
 				kSharedFileSystemMgr::unRegisterStreamWrappers();
@@ -627,15 +637,15 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 				if ($fileType == 'dir')
 				{
-					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject['Size']);
-					if( $recursive)
+					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject['Size']);
+					if($recursive)
 					{
 						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
 					}
 				}
 				else
 				{
-					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject['Size']);
 				}
 			}
 		}
@@ -682,9 +692,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$params = $this->initBasicS3Params($filePath);
 		
 		$cmd = $this->s3Client->getCommand('GetObject', $params);
-
-		$expiry = time() + 5 * 86400;
-		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		
+		$request = $this->s3Client->createPresignedRequest($cmd, '+7200 minutes');
+		$preSignedUrl = (string)$request->getUri();
 		return $preSignedUrl;
 	}
 	
@@ -788,6 +798,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
+		$startTime = microtime(true);
 		$retries = $this->retriesNum;
 		while ($retries > 0)
 		{
@@ -801,6 +812,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
+		
+		$timeTook = microtime(true) - $startTime;
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess($copy ? 'COPY' : 'RENAME', $timeTook, $success ? null : kFile::RENAME_FAILED_CODE);
+		}
+		
 		if (!$success)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
@@ -868,7 +886,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		return $result;
 	}
 	
-	public function multipartUploadPartUpload($uploadId, $partNumber, &$srcContent, $destFilePath)
+	public function multipartUploadPart($uploadId, $partNumber, &$srcContent, $destFilePath)
 	{
 		$params = $this->initBasicS3Params($destFilePath);
 		$params['Body'] = $srcContent;
