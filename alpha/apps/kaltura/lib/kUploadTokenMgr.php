@@ -29,8 +29,8 @@ class kUploadTokenMgr
 	private $_autoFinalizeCache;
 	
 	/**
-	 * Shared storage client
-	 * @var kFileTransferMgr
+	 * @var bool
+	 * Is direct upload to shared stoarge enbaled
 	 */
 	private static $sharedUploadModeEnabled;
 	
@@ -65,8 +65,6 @@ class kUploadTokenMgr
 		
 		self::$sharedStorageOptions = array(
 			'sharedStorageBaseDir' => isset($sharedStorageClientConfig['sharedStorageBaseDir']) ? $sharedStorageClientConfig['sharedStorageBaseDir'] : null,
-			'uploadChunkDirectToShared' => isset($chunkUploadDirectToShared['enabled']) ? $chunkUploadDirectToShared['enabled'] : false,
-			'uploadChunkDirectToSharedMaxFileSize' => isset($chunkUploadDirectToShared['maxFileSize']) ? $chunkUploadDirectToShared['maxFileSize'] : null,
 			'uploadTokenId' => $this->_uploadToken->getId()
 		);
 		
@@ -263,12 +261,7 @@ class kUploadTokenMgr
 	{
 		$this->initStorageOptions();
 		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
-		if($this->_uploadToken->getFileSize() && self::$sharedStorageOptions['uploadChunkDirectToShared']
-			&& $this->_uploadToken->getFileSize() < self::$sharedStorageOptions['uploadChunkDirectToSharedMaxFileSize'])
-		{
-			$uploadPath = DIRECTORY_SEPARATOR . self::$sharedStorageOptions['sharedStorageBaseDir'] . "/uploads/upload_token/";
-		}
-		elseif(count($uploadVolumes))
+		if(count($uploadVolumes))
 		{
 			$lastChar = substr($uploadTokenId, -1);
 			$uploadPath = $uploadVolumes[ord($lastChar) % count($uploadVolumes)] . "content/uploads/";
@@ -324,16 +317,8 @@ class kUploadTokenMgr
 			$chunkFilePath = "$uploadFilePath.chunk.$resumeAt";
 			
 			//Open final upload file path and re-use during the session
-			if(!kFile::isSharedPath($uploadFilePath))
-			{
-				$targetFileResource = self::openFile($uploadFilePath, 'r+b');
-				$currentFileSize = ftell($targetFileResource);
-			}
-			else
-			{
-				$currentFileSize = $this->estimateFileSize();
-				KalturaLog::debug("Yossi: Current Estimated file size is [$currentFileSize]");
-			}
+			$targetFileResource = self::openFile($uploadFilePath, 'r+b');
+			$currentFileSize = ftell($targetFileResource);
 			
 			KalturaLog::debug("uploadStats {$this->_uploadToken->getId()}: $resumeAt $chunkSize $currentFileSize $verifyFinalChunk");
 			
