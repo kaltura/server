@@ -109,13 +109,20 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	private function getBaseClientConfig()
 	{
-		return array(
+		$config = array(
 			'region' => $this->s3Region,
 			'signature' => $this->signatureType ? $this->signatureType : 'v4',
 			'version' => '2006-03-01',
-			'debug' => true,
 			'ua_append' => array($this->getClientUserAgent())
 		);
+		
+		if ($this->endPoint)
+			$config['endpoint'] = $this->endPoint;
+		
+		if($this->usePathStyleEndPoint)
+			$config['use_path_style_endpoint'] = true;
+		
+		return $config;
 	}
 	
 	private function login()
@@ -153,11 +160,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			'key'    => $this->accessKeyId,
 			'secret' => $this->accessKeySecret,
 		);
-		
-		if ($this->endPoint)
-			$config['endpoint'] = $this->endPoint;
-		if($this->usePathStyleEndPoint)
-			$config['use_path_style_endpoint'] = true;
 		
 		$this->s3Client = S3Client::factory($config);
 		
