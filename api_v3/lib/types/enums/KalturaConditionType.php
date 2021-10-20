@@ -24,6 +24,8 @@ class KalturaConditionType extends KalturaDynamicEnum implements ConditionType
 			ConditionType::ANONYMOUS_IP => 'Validate that request came from an IP which fits an anonymous profile (e.g. anonymous, proxy).',
 			ConditionType::BOOLEAN => 'validate the boolean event notifications.',
 			ConditionType::HTTP_HEADER => 'Validate that request came with specific header values',
+			ConditionType::ACTION_NAME => 'Validate that request is for a desired service and action',
+			ConditionType::URL_AUTH_PARAMS => 'Validate url authentication params on request',
 			);
 		
 		return self::mergeDescriptions(self::getEnumClass(), $descriptions);
