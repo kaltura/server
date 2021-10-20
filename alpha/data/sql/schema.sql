@@ -1923,8 +1923,9 @@ CREATE TABLE `server_node`
 	`environment` VARCHAR(32),
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
-	KEY `partner_id_status_system_name`(`partner_id`, `status`, `system_name`),
-	KEY `partner_id_status_host_name`(`partner_id`, `status`, `host_name`)
+    KEY `partner_id_status_system_name` (`partner_id`,`status`,`system_name`(255)),
+    KEY `host_name` (`host_name`(255)),
+    KEY `status_heartbeat` (`status`,`heartbeat_time`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
