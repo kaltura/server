@@ -31,7 +31,7 @@ abstract class LiveEntry extends entry
 	
 	protected $decidingLiveProfile = false;
 	
-	protected $isStreaming = null;
+	protected $isPlayable = null;
 	protected $currentEvent = null;
 	
 	public function copyInto($copyObj, $deepcopy = false)
@@ -1182,7 +1182,7 @@ abstract class LiveEntry extends entry
 			return $output;
 		}
 		
-		if($this->isStreaming())
+		if($this->isPlayable())
 		{
 			return null;
 		}
@@ -1190,15 +1190,16 @@ abstract class LiveEntry extends entry
 		return parent::getRedirectEntryId();
 	}
 
-	public function isStreaming()
+	public function isPlayable()
 	{
-		//Calculate isStreaming only once in session
-		if(is_null($this->isStreaming))
+		//Calculate isPlayable only once in session
+		if(is_null($this->isPlayable))
 		{
-			$this->isStreaming = in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+			$this->isPlayable = $this->getViewMode() == ViewMode::ALLOW_ALL
+				&& in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
 		}
 		
-		return $this->isStreaming;
+		return $this->isPlayable;
 	}
 
 	public function getRecordedEntryConversionProfile()
