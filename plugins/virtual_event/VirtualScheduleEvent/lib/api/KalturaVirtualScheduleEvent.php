@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package plugins.virtual_event
+ * @subpackage api.objects
+ * @abstract
+ * @relatedService ScheduleEventService
+ */
 
 class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 {
@@ -46,11 +52,11 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * (non-PHPdoc)
 	 * @see KalturaScheduleEvent::getScheduleEventType()
 	 */
 	public function getScheduleEventType ()
 	{
-		return ScheduleEventType::VIRTUAL;
+		return VirtualScheduleEventType::VIRTUAL;
 	}
 }

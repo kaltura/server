@@ -1,7 +1,9 @@
 <?php
 /**
- * @package 
+ * @package plugins.virtual_event
  * @subpackage api.filters
+ * @abstract
+ * @relatedService ScheduleEventService
  */
 class KalturaVirtualScheduleEventFilter extends KalturaVirtualScheduleEventBaseFilter
 {

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package 
+ * @package plugins.virtual_event
  * @relatedService ScheduleEventService
  * @subpackage api.filters.base
  * @abstract
