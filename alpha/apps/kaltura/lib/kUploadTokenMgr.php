@@ -861,35 +861,6 @@ class kUploadTokenMgr
 		}
 	}
 	
-	protected function estimateFileSize()
-	{
-		$uploadPath = $this->_uploadToken->getUploadTempPath();
-		$chunks = self::listPendingChunksSorted($uploadPath);
-		
-		$currentFileSize = 0;
-		foreach($chunks as $key => $chunk)
-		{
-			$path = $chunk['path'];
-			$parts = explode(".", $path);
-			if (!count($parts))
-			{
-				continue;
-			}
-			
-			$fileSize = $chunk['fileSize'];
-			$chunkOffset = $parts[count($parts) - 1];
-			
-			// dismiss chunks which won't enlarge the file or which are starting after the end of the file
-			// support backwards compatibility of overriding a final chunk at the offset zero
-			if ($chunkOffset == 0 || ($chunkOffset <= $currentFileSize && $chunkOffset + $fileSize > $currentFileSize))
-			{
-				$currentFileSize = $chunkOffset + $fileSize;
-			}
-		}
-		
-		return $currentFileSize;
-	}
-	
 	protected static function sortChunks(&$chunks)
 	{
 		$res = array();
