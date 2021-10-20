@@ -412,7 +412,7 @@ class kUploadTokenMgr
 			return false;
 		}
 		
-		if ($fp && function_exists('stream_set_chunk_size'))
+		if (function_exists('stream_set_chunk_size'))
 		{
 			stream_set_chunk_size($fp, self::CHUNK_SIZE);
 		}
