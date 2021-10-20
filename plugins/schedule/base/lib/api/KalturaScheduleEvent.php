@@ -582,10 +582,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			case ScheduleEventType::LIVE_REDIRECT:
 				$object = new KalturaLiveRedirectScheduleEvent();
 				break;
-			
-			case ScheduleEventType::VIRTUAL:
-				$object = new KalturaVirtualScheduleEvent();
-				break;
 				
 			default:
 				$object = KalturaPluginManager::loadObject('KalturaScheduleEvent', $sourceObject->getType());

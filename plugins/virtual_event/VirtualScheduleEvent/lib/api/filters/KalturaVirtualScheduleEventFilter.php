@@ -6,10 +6,10 @@
 class KalturaVirtualScheduleEventFilter extends KalturaVirtualScheduleEventBaseFilter
 {
 	/* (non-PHPdoc)
-	 * @see KalturaScheduleEventFilter::getListResponseType()
-	 */
+	* @see KalturaScheduleEventFilter::getListResponseType()
+	*/
 	protected function getListResponseType()
 	{
-		return ScheduleEventType::VIRTUAL;
+		return VirtualScheduleEventType::VIRTUAL;
 	}
 }

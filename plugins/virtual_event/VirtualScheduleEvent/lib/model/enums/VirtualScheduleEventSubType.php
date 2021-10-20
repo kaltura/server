@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.schedule
+ * @package plugins.virtual_event
  * @subpackage model.enum
  */
-interface VirtualScheduleEventType extends BaseEnum
+interface VirtualScheduleEventSubType extends BaseEnum
 {
 	const AGENDA = 1;
 	const REGISTRATION = 2;

@@ -11,7 +11,7 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	
 	/**
 	 * The type of the Virtual Schedule Event
-	 * @var KalturaVirtualScheduleEventType
+	 * @var KalturaVirtualScheduleEventSubType
 	 * @insertonly
 	 * @filter eq,in,notin
 	 */

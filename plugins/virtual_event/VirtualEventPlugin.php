@@ -2,7 +2,7 @@
 /**
  * @package plugins.virtualEvent
  */
-class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices
+class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'virtualEvent';
 	
@@ -39,4 +39,33 @@ class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices
 		
 		return false;
 	}
+	
+	/*
+	 * (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if (($baseClass === 'KalturaScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
+		{
+			return new KalturaVirtualScheduleEvent();
+		}
+	}
+	
+	/*
+	 * (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if(($baseClass === 'ScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
+		{
+			return 'VirtualScheduleEvent';
+		}
+	}
+	
+//	public function getScheduleEventType()
+//	{
+//
+//	}
 }

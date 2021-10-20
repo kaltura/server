@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.schedule
+ * @package plugins.virtual_event
  * @subpackage model
  */
 
@@ -47,6 +47,6 @@ class VirtualScheduleEvent extends ScheduleEvent
 	public function applyDefaultValues ()
 	{
 		parent ::applyDefaultValues();
-		$this -> setType(ScheduleEventType::VIRTUAL);
+		$this -> setType(VirtualScheduleEventType::VIRTUAL);
 	}
 }

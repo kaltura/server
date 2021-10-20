@@ -13,7 +13,7 @@
  * @package plugins.virtualEvent
  * @subpackage model
  */
-class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPeer {
+class VirtualEventPeer extends BaseVirtualEventPeer {
 	
 	/*
 	 * (non-PHPdoc)
@@ -59,14 +59,6 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 		return $virtualEvent;
 	}
 	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::isReferenced()
-	 */
-	public function isReferenced(IRelatedObject $object)
-	{
-		return false;
-	}
-	
 	/**
 	 * Retrieve a single object by pkey.
 	 *
@@ -91,14 +83,6 @@ class VirtualEventPeer extends BaseVirtualEventPeer implements IRelatedObjectPee
 		
 		return !empty($v) > 0 ? $v[0] : null;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	public function getRootObjects(IRelatedObject $object)
-	{
-		$roots = array();
-		return $roots;
-	}
+
 	
 } // VirtualEventPeer
