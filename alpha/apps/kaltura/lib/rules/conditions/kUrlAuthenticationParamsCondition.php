@@ -28,7 +28,7 @@ class kUrlAuthenticationParamsCondition extends kCondition
 		foreach($requestParams as $key => $value)
 		{
 			$res = explode(':', $key);
-			$filtereddKeys[] = end($res);
+			$filtereddKeys[] = strtolower(end($res));
 		}
 
 		$result = array_intersect($filtereddKeys, $authParamNames );
