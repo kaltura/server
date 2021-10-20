@@ -1678,17 +1678,24 @@ class kKavaReports extends kKavaReportsMgr
 						self::DRUID_DIMENSION => self::DIMENSION_STATUS,
 						self::DRUID_VALUES => array(self::TASK_READY)
 					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
 				),
 				// unique users
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
 				),
 				// playmanifest and live view time
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+
 				),
 				// total entries and interactive videos
 				array(
@@ -1698,17 +1705,23 @@ class kKavaReports extends kKavaReportsMgr
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::SOURCE_INTERACTIVE_VIDEO),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT_TOTAL, self::SOURCE_INTERACTIVE_VIDEO),
 				),
 				// bandwidth
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 				),
 				// transcoding
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
 				// storage
 				array(
@@ -1720,6 +1733,7 @@ class kKavaReports extends kKavaReportsMgr
 								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 							),
+							self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 						),
 						array(
@@ -1729,6 +1743,7 @@ class kKavaReports extends kKavaReportsMgr
 								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 							),
+							self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
 							self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
 						),

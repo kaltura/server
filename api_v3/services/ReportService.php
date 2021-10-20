@@ -46,7 +46,7 @@ class ReportService extends KalturaBaseService
 	{
 		if(!$objectIds && $reportType != ReportType::VPAAS_USAGE_MULTI)
 		{
-			return $this->getPartnerId();
+			return $reportType == ReportType::SELF_SERVE_USAGE_VPAAS ? null : $this->getPartnerId();
 		}
 			
 		$c = new Criteria();
