@@ -483,37 +483,53 @@ class infraRequestUtils
 	{
 		if (!is_null(self::$requestParams))
 			return self::$requestParams;
-
-		$params = self::getUrlRequestParams();
-
-		$post = null;
-		if (isset($_SERVER['CONTENT_TYPE']))
+		
+		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
+		$pathParts = array();
+		if (isset($_SERVER['PHP_SELF']))
+			$pathParts = explode('/', $_SERVER['PHP_SELF']);
+		$pathParts = array_diff($pathParts, $scriptParts);
+		
+		$params = array();
+		reset($pathParts);
+		while(current($pathParts))
 		{
-			if (strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
+			$key = each($pathParts);
+			$value = each($pathParts);
+			if (is_array($key) && !array_key_exists($key['value'], $params))
+			{
+				$params[$key['value']] = $value['value'];
+			}
+		}
+		
+		$post = null;
+		if(isset($_SERVER['CONTENT_TYPE']))
+		{
+			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
 			{
 				$requestBody = file_get_contents("php://input");
 				$requestBody = trim($requestBody);
-				if (kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
+				if(kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
 				{
 					$post = json_decode($requestBody, true);
-					if ($post)
+					if($post)
 						self::$jsonData = $requestBody;
 				}
 			}
-			elseif (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
+			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
 			{
 				$post = json_decode($_POST['json'], true);
-				if ($post)
+				if($post)
 					self::$jsonData = $_POST['json'];
 			}
 		}
-
-		if (!$post)
+		
+		if(!$post)
 		{
 			$post = $_POST;
 		}
-
-		self::$requestParams = array_replace_recursive($post, $_FILES, $params);
+		
+		self::$requestParams = array_replace_recursive($post, $_FILES, $_GET, $params);
 
 		$v3cacheTruncateParams = kConf::get('v3cache_truncate_time_params', 'local', array());
 		$v3cacheTruncateValue = kConf::get('v3cache_truncate_time_value', 'local', 60);
@@ -528,6 +544,7 @@ class infraRequestUtils
 		}
 
 		require_once(__dir__ . '/requestParamsPreprocessor.php');
+
 		requestParamsPreprocessor::editParams(self::$requestParams);
 
 		return self::$requestParams;
@@ -575,30 +592,5 @@ class infraRequestUtils
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 
 		$result = curl_exec($ch);
-	}
-
-	/**
-	 * @return array
-	 */
-	public static function getUrlRequestParams()
-	{
-		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
-		$pathParts = array();
-		if (isset($_SERVER['PHP_SELF']))
-			$pathParts = explode('/', $_SERVER['PHP_SELF']);
-		$pathParts = array_diff($pathParts, $scriptParts);
-
-		$params = array();
-		reset($pathParts);
-		while (current($pathParts))
-		{
-			$key = each($pathParts);
-			$value = each($pathParts);
-			if (is_array($key) && !array_key_exists($key['value'], $params))
-			{
-				$params[$key['value']] = $value['value'];
-			}
-		}
-		return array_replace_recursive($_GET, $params);
 	}
 }
