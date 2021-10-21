@@ -46,7 +46,7 @@ class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKal
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if (($baseClass === 'KalturaScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
+		if (($baseClass == 'KalturaScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
 		{
 			return new KalturaVirtualScheduleEvent();
 		}
@@ -58,14 +58,11 @@ class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKal
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if(($baseClass === 'ScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
+		if(($baseClass == 'ScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
 		{
 			return 'VirtualScheduleEvent';
 		}
 	}
 	
-//	public function getScheduleEventType()
-//	{
-//
-//	}
+
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.virtual_event
+ * @package plugins.virtualEvent
  * @relatedService ScheduleEventService
  * @subpackage api.filters.base
  * @abstract
@@ -12,9 +12,9 @@ abstract class KalturaVirtualScheduleEventBaseFilter extends KalturaScheduleEven
 		"virtualEventIdEqual" => "_eq_virtual_event_id",
 		"virtualEventIdIn" => "_in_virtual_event_id",
 		"virtualEventIdNotIn" => "_notin_virtual_event_id",
-		"virtualScheduleEventTypeEqual" => "_eq_virtual_schedule_event_type",
-		"virtualScheduleEventTypeIn" => "_in_virtual_schedule_event_type",
-		"virtualScheduleEventTypeNotIn" => "_notin_virtual_schedule_event_type",
+		"virtualScheduleEventSubTypeEqual" => "_eq_virtual_schedule_event_sub_type",
+		"virtualScheduleEventSubTypeIn" => "_in_virtual_schedule_event_sub_type",
+		"virtualScheduleEventSubTypeNotIn" => "_notin_virtual_schedule_event_sub_type",
 	);
 
 	static private $order_by_map = array
@@ -49,15 +49,15 @@ abstract class KalturaVirtualScheduleEventBaseFilter extends KalturaScheduleEven
 	/**
 	 * @var KalturaVirtualScheduleEventSubType
 	 */
-	public $virtualScheduleEventTypeEqual;
+	public $virtualScheduleEventSubTypeEqual;
 
 	/**
 	 * @var string
 	 */
-	public $virtualScheduleEventTypeIn;
+	public $virtualScheduleEventSubTypeIn;
 
 	/**
 	 * @var string
 	 */
-	public $virtualScheduleEventTypeNotIn;
+	public $virtualScheduleEventSubTypeNotIn;
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.virtual_event
+ * @package plugins.virtualEvent
  * @subpackage model.enum
  */
 interface VirtualScheduleEventSubType extends BaseEnum

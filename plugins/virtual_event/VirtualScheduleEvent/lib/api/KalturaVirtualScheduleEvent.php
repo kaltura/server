@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.virtual_event
+ * @package plugins.virtualEvent
  * @subpackage api.objects
  * @abstract
  * @relatedService ScheduleEventService
@@ -21,13 +21,13 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	 * @insertonly
 	 * @filter eq,in,notin
 	 */
-	public $virtualScheduleEventType;
+	public $virtualScheduleEventSubType;
 	
 	
 	private static $map_between_objects = array
 	(
 		'virtualEventId',
-		'virtualScheduleEventType',
+		'virtualScheduleEventSubType',
 	);
 	
 	/* (non-PHPdoc)

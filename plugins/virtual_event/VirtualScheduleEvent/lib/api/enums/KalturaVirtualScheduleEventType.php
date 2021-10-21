@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.virtual_event
+ * @package plugins.virtualEvent
  * @subpackage api.enum
  */
 class KalturaVirtualScheduleEventType extends KalturaEnum implements VirtualScheduleEventType
