@@ -174,4 +174,8 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const MOE = 'moe';
 	const BLA = 'bla';
 	const OKA = 'oka';
+	const CC1 = 'cc1';
+	const CC2 = 'cc2';
+	const CC3 = 'cc3';
+	const CC4 = 'cc4';
 }
