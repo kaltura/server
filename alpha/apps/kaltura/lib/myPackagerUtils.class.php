@@ -12,7 +12,6 @@ class myPackagerUtils
 	const PACKAGER_REMOTE_VOLUME_MAP_URL = 'packager_remote_volume_map_url';
 	const PACKAGER_URL = 'packager_url';
 	const LIVE_PACKAGER_URL = 'live_packager_url';
-	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
 	const MP4_FILENAME_PARAMETER = '/name/a.mp4';
 
@@ -283,10 +282,10 @@ class myPackagerUtils
 				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REMOTE_THUMB:
-				$result = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::LIVE_THUMB:
-				$result = kConf::get(self::LIVE_PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::LIVE_PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_LIVE_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REGULAR_VOLUME_MAP:
 				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
@@ -342,7 +341,11 @@ class myPackagerUtils
 			return false;
 		}
 
-		$currentEntryServerNodes = myEntryUtils::getRelevantEntryServerNodes($entry);
+		$currentEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		if ($entry->getType() == entryType::LIVE_STREAM)
+		{
+			$currentEntryServerNodes = array_merge($currentEntryServerNodes, EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId()), EntryServerNodeType::LIVE_BACKUP);
+		}
 		if (!$currentEntryServerNodes)
 		{
 			return false;
@@ -379,7 +382,6 @@ class myPackagerUtils
 					continue;
 				}
 
-				KalturaLog::info("UNGA curling thumb url: $serverNodeUrl");
 				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$streams[0]->getFlavorId()}");
 				if($result)
 				{
@@ -427,7 +429,7 @@ class myPackagerUtils
 	protected static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '', $offsetPostfix = '')
 	{
 		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix, $postFix, $offsetPostfix);
-		KalturaLog::info("BNGA curling thumb url: $packagerThumbCapture, to path: $tempThumbPath");
+
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
 		if($success)
@@ -626,5 +628,29 @@ class myPackagerUtils
 		}
 
 		return $content;
+	}
+
+	public static function generateLivePackagerToken($url, $signingDomain = '')
+	{
+		$livePackagerToken = kConf::get("live_packager_secure_token");
+
+		if(!empty($signingDomain))
+		{
+			$domain = parse_url($url, PHP_URL_HOST);
+			if($domain && $domain != '')
+			{
+				$url = str_replace($domain, $signingDomain, $url);
+			}
+			else
+			{
+				KalturaLog::debug("Failed to parse domain from original url, signed domain will not be modified");
+			}
+		}
+
+		$strippedUrl = preg_replace('#^https?://#', '', $url);
+
+		$token = md5("$livePackagerToken $strippedUrl", true);
+		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');
+		return $token;
 	}
 }
