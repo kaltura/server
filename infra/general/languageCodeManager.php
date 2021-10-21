@@ -387,10 +387,10 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MO','mo','mol','mol','Moldavian','Moldavian','Moldavian');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'MU','mu','mul','mul','Multilingual','Multilingual','Multilingual');
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'UN', "un", "und", "und", "Undefined", "Undefined","Undefined");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC1', "cc1", "cc1", "cc1", "Closed Caption 1", "Closed Caption 1","Closed Caption 1");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC2', "cc2", "cc2", "cc2", "Closed Caption 2", "Closed Caption 2","Closed Caption 2");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC3', "cc3", "cc3", "cc3", "Closed Caption 3", "Closed Caption 3","Closed Caption 3");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC4', "cc4", "cc4", "cc4", "Closed Caption 4", "Closed Caption 4","Closed Caption 4");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC1', 'cc1', 'cc1', 'cc1', 'Closed Caption 1', 'Closed Caption 1','Closed Caption 1');
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC2', 'cc2', 'cc2', 'cc2', 'Closed Caption 2', 'Closed Caption 2','Closed Caption 2');
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC3', 'cc3', 'cc3', 'cc3', 'Closed Caption 3', 'Closed Caption 3','Closed Caption 3');
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,'CC4', 'cc4', 'cc4', 'cc4', 'Closed Caption 4', 'Closed Caption 4','Closed Caption 4');
 
         /*Extended support in ISO639-2/3/5*/
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"AAL",null,null ,"aal","Afade","Afa\xc3\xab");
