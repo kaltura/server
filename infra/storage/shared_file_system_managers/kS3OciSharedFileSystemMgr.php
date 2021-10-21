@@ -10,7 +10,7 @@
 // AWS SDK PHP Client Library
 require_once(dirname(__FILE__) . '/../../../vendor/aws_v3/aws-autoloader.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
-require_once(dirname(__FILE__) . '/../RefreshableRole.class.php');
+//require_once(dirname(__FILE__) . '/../RefreshableRole.class.php');
 
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
@@ -21,8 +21,12 @@ use Aws\S3\Enum\CannedAcl;
 
 use Aws\Common\Credentials\Credentials;
 use Doctrine\Common\Cache\FilesystemCache;
-use Guzzle\Cache\DoctrineCacheAdapter;
+//use Guzzle\Cache\DoctrineCacheAdapter;
 use Aws\Common\Credentials\CacheableCredentials;
+
+use Aws\Credentials\CredentialProvider; // need
+use Aws\DoctrineCacheAdapter; // need
+use Aws\Credentials\InstanceProfileProvider;
 
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
@@ -178,6 +182,33 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$config = $this->getBaseClassConfig();
 		$config['credentials'] = $roleCreds;
 		$this->s3Client = S3Client::factory($config);
+
+		return true;
+	}
+
+	private function generateCachedCredentialsS3Client_OCI()
+	{
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache_v3';
+		$credentialsCachedFile = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
+
+		$profile = new InstanceProfileProvider(); // import to here?
+		$provider = CredentialProvider::assumeRole(array(
+			'client' => new StsClient(array( // Sts not supported by OCI
+				'region' => 'us-east-1',
+				'version' => '2011-06-15',
+				'credentials' => $profile
+			)),
+			'assume_role_params' => array(
+				'RoleArn' => $this->s3Arn,
+				'RoleSessionName' => 's3-access-example' // need to be made dynamic
+			)
+		));
+
+		$validCredentialsCachedFile = CredentialProvider::cache($provider, $credentialsCachedFile);
+
+		$config = $this->getBaseClassConfig(); // maybe add optional 'credentials' param to function?
+		$config['credentials'] = $validCredentialsCachedFile;
+		$this->s3Client = new S3Client($config);
 
 		return true;
 	}
