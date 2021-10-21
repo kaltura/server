@@ -2204,4 +2204,22 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		return $result;
 	}
+
+	public static function getRelevantEntryServerNodes($entry)
+	{
+		$sourceId = $entry->getRootEntryId();
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerType($sourceId, EntryServerNodeType::LIVE_PRIMARY);
+
+		if ($entry->getType() == entryType::LIVE_STREAM)
+		{
+			$entryServerNodes = array_merge($entryServerNodes, EntryServerNodePeer::retrieveByEntryIdAndServerType($sourceId, EntryServerNodeType::LIVE_BACKUP));
+		}
+
+		if (self::isLiveClippingEntry($entry))
+		{
+			$entryServerNodes = array_merge($entryServerNodes, EntryServerNodePeer::retrieveByEntryIdAndServerType($sourceId, EntryServerNodeType::LIVE_CLIPPING_TASK));
+		}
+
+		return $entryServerNodes;
+	}
 }

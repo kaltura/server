@@ -10,11 +10,11 @@ class myPackagerUtils
 	const PACKAGER_MAPPED_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
 	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_local_volume_map_url';
 	const PACKAGER_REMOTE_VOLUME_MAP_URL = 'packager_remote_volume_map_url';
-	const PACKAGER_URL = "packager_url";
-	const LIVE_PACKAGER_URL = "live_packager_url";
+	const PACKAGER_URL = 'packager_url';
+	const LIVE_PACKAGER_URL = 'live_packager_url';
 	const LOCAL_MAP_NAME = 'local';
 	const RECORDING_LIVE_TYPE = 'recording';
-	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
+	const MP4_FILENAME_PARAMETER = '/name/a.mp4';
 
 	/**
 	 * @param entry $entry
@@ -271,31 +271,31 @@ class myPackagerUtils
 
 		if (!$packagerUrl)
 		{
-			$packagerUrl = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null);
+			$packagerUrl = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null);
 		}
 
 		switch ($packagerUrlType)
 		{
 			case kPackagerUrlType::REGULAR_THUMB:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::MAPPED_THUMB:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REMOTE_THUMB:
-				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::LIVE_THUMB:
-				$result = kConf::get(self::LIVE_PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::LIVE_PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
 				break;
 			case kPackagerUrlType::REGULAR_VOLUME_MAP:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::MAPPED_VOLUME_MAP:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REMOTE_VOLUME_MAP:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_REMOTE_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_REMOTE_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			default:
 		}
@@ -327,7 +327,6 @@ class myPackagerUtils
 
 	/**
 	 * @param entry $entry
-	 * @param $liveType
 	 * @param $destThumbPath
 	 * @param $calc_vid_sec
 	 * @param int|null $width
@@ -337,38 +336,38 @@ class myPackagerUtils
 	 */
 	protected static function captureLiveThumb(entry $entry, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
 	{
-		$result = false;
+		$liveCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::LIVE_THUMB);
+		if (!$liveCaptureUrl)
+		{
+			return false;
+		}
+
+		$currentEntryServerNodes = myEntryUtils::getRelevantEntryServerNodes($entry);
+		if (!$currentEntryServerNodes)
+		{
+			return false;
+		}
+
+		$thumbName = kConf::get(myPackagerUtils::PACKAGER_LIVE_THUMB_NAME, kConfMapNames::LOCAL_SETTINGS, null);
+		if (!$thumbName)
+		{
+			return false;
+		}
+
 		if (!$calc_vid_sec)
 		{
 			$calc_vid_sec = myEntryUtils::DEFAULT_THUMB_SEC_LIVE;
 		}
 
-		$liveCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::LIVE_THUMB);
-		if (!$liveCaptureUrl)
-		{
-			return $result;
-		}
-		$timelineId = $entry->getId();
-		$liveCaptureUrl .= "e/{$entry->getRootEntryId()}/tl/$timelineId/";
-		$thumbName = kConf::get(myPackagerUtils::PACKAGER_LIVE_THUMB_NAME, myPackagerUtils::LOCAL_MAP_NAME, null);
-
-		$currentEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($entry->getRootEntryId());
-		if (!$currentEntryServerNodes)
-		{
-			return $result;
-		}
 		foreach ($currentEntryServerNodes as $entryServerNode)
 		{
 			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $entryServerNode->getServerNodeId());
-			if (!$serverNode) {
+			if (!$serverNode)
+			{
 				continue;
 			}
 
-			$serverNodeUrl = str_replace('{dc}', $serverNode->getEnvDc(), $liveCaptureUrl);
-
-			$tokenGenerator = new DeliveryProfileLivePackagerHls();
-			$secureToken = $tokenGenerator->generateLiveSecuredPackagerToken($serverNodeUrl);
-			$serverNodeUrl .= "t/$secureToken/";
+			$serverNodeUrl = $serverNode->createThumbUrl($liveCaptureUrl, $entry);
 
 			$serverNodeUrl .= $thumbName;
 
@@ -380,15 +379,16 @@ class myPackagerUtils
 					continue;
 				}
 
+				KalturaLog::info("UNGA curling thumb url: $serverNodeUrl");
 				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$streams[0]->getFlavorId()}");
-				if ($result)
+				if($result)
 				{
 					return $result;
 				}
 			}
 		}
 
-		return $result;
+		return false;
 	}
 
 	/**
@@ -427,6 +427,7 @@ class myPackagerUtils
 	protected static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '', $offsetPostfix = '')
 	{
 		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix, $postFix, $offsetPostfix);
+		KalturaLog::info("BNGA curling thumb url: $packagerThumbCapture, to path: $tempThumbPath");
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
 		if($success)
