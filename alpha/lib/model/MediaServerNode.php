@@ -18,7 +18,6 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	abstract public function getWebService($serviceName);
 	abstract public function getLiveWebServiceName();
 	abstract public function getEnvDc();
-	abstract public function createThumbUrl($baseUrl, $entry);
 
 	public function getAppNameAndPrefix()
 	{
@@ -94,6 +93,11 @@ abstract class MediaServerNode extends DeliveryServerNode {
 	public static function getSessionType($entryServerNode)
 	{
 		return '';
+	}
+
+	public function createThumbUrl($baseUrl, $entry)
+	{
+		return 'Not Implemented';
 	}
 
 	public function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
