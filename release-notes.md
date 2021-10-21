@@ -6,6 +6,20 @@ Add the following configurations to local.ini:
     packager_live_thumb_url = /{dc}/capture/
     packager_live_thumb_name = frame-{offset}.jpg
 
+## Synchronize categories of live entries with recorded VOD ##
+* Issue Type: Task
+* Issue ID: KMCNG-2387
+
+### Configuration ###
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamSyncVodCategory.enabled = true
+    moduls.liveStreamSyncVodCategory.permissionType = 2
+    moduls.liveStreamSyncVodCategory.label = Kaltura Live Streams - Sync recorded VOD category
+    moduls.liveStreamSyncVodCategory.permissionName = FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY
+    moduls.liveStreamSyncVodCategory.basePermissionType = 2
+    moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
 
 # Quasar-17.12.0 #
 ## Add report getTotal permission for self serve partner ##
