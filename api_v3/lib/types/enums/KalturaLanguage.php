@@ -575,7 +575,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const BLA = 'Siksika';
 	const OKA = 'Okanagan';
 
-	#Add consts for liveNG in case we can't get it out from the entry.
+	#Add consts for default caption.
 	const CC1 = 'Closed Caption 1';
 	const CC2 = 'Closed Caption 2';
 	const CC3 = 'Closed Caption 3';
