@@ -150,7 +150,7 @@
 		public function EvaluateSampled($sourceFilename, $sourceData, $complexityFilename, $start=null, $duration=null)
 		{
 			KalturaLog::log("sourceFilename($sourceFilename), complexityFilename($complexityFilename), start($start), duration($duration)");
-
+			$sourceFilename = '"'.kFile::realPath($sourceFilename).'"';
 				/*
 				 * Determine the sampling start time and duration
 				 */
