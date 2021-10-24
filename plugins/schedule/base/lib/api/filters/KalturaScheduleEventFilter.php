@@ -112,11 +112,6 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$type = $this->getListResponseType();
-
-		if ($type == VirtualScheduleEventType::VIRTUAL && !VirtualEventPlugin::isAllowedPartner(kCurrentContext::$ks_partner_id))
-		{
-			throw new KalturaAPIException (KalturaVirtualEventErrors::VIRTUAL_EVENT_DISABLED);
-		}
 		if ($this->ownerIdEqual)
 		{
 			$dbKuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::$ks_partner_id, $this->ownerIdEqual);

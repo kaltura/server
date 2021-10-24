@@ -8,7 +8,7 @@ class VirtualScheduleEvent extends ScheduleEvent
 {
 
 	const VIRTUAL_EVENT_ID = 'virtual_event_id';
-	const VIRTUAL_SCHEDULE_EVENT_TYPE = 'virtual_schedule_event_type';
+	const VIRTUAL_SCHEDULE_EVENT_SUB_TYPE = 'virtual_schedule_event_sub_type';
 	/**
 	 * @param string $v
 	 */
@@ -28,17 +28,17 @@ class VirtualScheduleEvent extends ScheduleEvent
 	/**
 	 * @param string $v
 	 */
-	public function setVirtualScheduleEventType($v)
+	public function setVirtualScheduleEventSubType($v)
 	{
-		$this->putInCustomData(self::VIRTUAL_SCHEDULE_EVENT_TYPE, $v);
+		$this->putInCustomData(self::VIRTUAL_SCHEDULE_EVENT_SUB_TYPE, $v);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getVirtualScheduleEventType()
+	public function getVirtualScheduleEventSubType()
 	{
-		return $this->getFromCustomData(self::VIRTUAL_SCHEDULE_EVENT_TYPE);
+		return $this->getFromCustomData(self::VIRTUAL_SCHEDULE_EVENT_SUB_TYPE);
 	}
 	
 	/* (non-PHPdoc)
