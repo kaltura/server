@@ -341,6 +341,7 @@ class myPackagerUtils
 			return false;
 		}
 
+//		Temporary logic because recordings for backup streams are not currently supported
 		$currentEntryServerNodes = array(EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY));
 		if ($entry->getType() == entryType::LIVE_STREAM)
 		{
@@ -429,7 +430,6 @@ class myPackagerUtils
 	protected static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '', $offsetPostfix = '')
 	{
 		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix, $postFix, $offsetPostfix);
-		KalturaLog::debug("MONG final url: $packagerThumbCapture, local path: $tempThumbPath");
 
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
