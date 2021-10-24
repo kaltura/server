@@ -4,6 +4,7 @@
  */
 class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
+    const ZOOM_QUERY_TIME = 259200;
 	const MAX_DATE_RANGE_DAYS = 14;
 	const ONE_DAY = 86400;
 	const HOUR = 3600;
@@ -40,7 +41,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
-		$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
+		$dropFolderFilesMap = $this->loadDropFolderFiles(self::ZOOM_QUERY_TIME);
 		if ($meetingFilesOrdered)
 		{
 			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap);
@@ -88,8 +89,15 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-		$fromInSec = $this->dropFolder->lastHandledMeetingTime ? $this->dropFolder->lastHandledMeetingTime : time() -
-			self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+        $lastHandledMeetingTime = $this->dropFolder->lastHandledMeetingTime;
+        if($lastHandledMeetingTime && $lastHandledMeetingTime > time() - self::ZOOM_QUERY_TIME)
+        {
+            $fromInSec = $lastHandledMeetingTime - self::ONE_DAY;
+        }
+        else
+        {
+            $fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+        }
 		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
 		$from = date('Y-m-d', $fromInSec);
 		$to = date('Y-m-d', $toInSec);
@@ -170,7 +178,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
+					$dropFolderFilesMap = $this->loadDropFolderFiles(self::ZOOM_QUERY_TIME);
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
