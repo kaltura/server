@@ -1,0 +1,35 @@
+== JUnit XML Document Generator Library
+
+https://secure.travis-ci.org/cmuench/junit-xml[image:https://secure.travis-ci.org/cmuench/junit-xml.png[image]]
+
+Install component with composer.
+
+[source,shell]
+----
+composer require --dev n98/junit-xml
+----
+
+=== Example
+
+[source,php]
+----
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$document = new \N98\JUnitXml\Document();
+
+$suite = $this->document->addTestSuite();
+$timeStamp = new \DateTime();
+$suite->setName('My Test Suite');
+$suite->setTimestamp($timeStamp);
+$suite->setTime(0.344244);
+
+$testCase = $suite->addTestCase();
+$testCase->addError('My error 1', 'Exception');
+$testCase->addError('My error 2', 'Exception');
+$testCase->addError('My error 3', 'Exception');
+$testCase->addError('My error 4', 'Exception');
+$testCase->addFailure('My failure 1', 'Exception');
+$testCase->addFailure('My failure 2', 'Exception');
+
+$document->save('results.xml');
+----
