@@ -69,7 +69,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	protected function getLastHandledMeetingTime($meetingFilesOrdered)
 	{
 		$lastMeeting = end($meetingFilesOrdered);
-		$lastHandledMeetingTime = self::convertTimeToUnix($lastMeeting[self::START_TIME]);
+		$lastHandledMeetingTime = kTimeZoneUtils::strToZuluTime($lastMeeting[self::START_TIME]);
 		KalturaLog::info('Last meeting is: '. print_r($lastMeeting, true));
 		KalturaLog::info('Last handled meeting time from DF is: '. $this->dropFolder->lastHandledMeetingTime);
 		KalturaLog::info('Last meeting time'. $lastHandledMeetingTime);
@@ -107,7 +107,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			}
 			foreach ($meetingFiles as $meetingFile)
 			{
-				$meetingsStartTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
+				$meetingsStartTime = kTimeZoneUtils::strToZuluTime($meetingFile[self::START_TIME]);
 				$meetingFilesByStartTime[$meetingsStartTime] = $meetingFile;
 			}
 			
@@ -313,7 +313,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$kMeetingMetaData->meetingId = $meetingFile[self::ID];
 		$kMeetingMetaData->uuid = $meetingFile[self::UUID];
 		$kMeetingMetaData->topic = $meetingFile[self::TOPIC];
-		$kMeetingMetaData->meetingStartTime = self::convertTimeToUnix($meetingFile[self::START_TIME]);
+		$kMeetingMetaData->meetingStartTime = kTimeZoneUtils::strToZuluTime($meetingFile[self::START_TIME]);
 		$kMeetingMetaData->accountId = $meetingFile[self::ACCOUNT_ID];
 		$kMeetingMetaData->hostId = $meetingFile[self::HOST_ID];
 		$kZoomRecording = new kZoomRecording();
@@ -328,7 +328,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$kRecordingFile->id = $recordingFile[self::ID];
 		$kRecordingFile->downloadUrl = $recordingFile[self::DOWNLOAD_URL];
 		$kRecordingFile->fileExtension = $recordingFile[self::FILE_EXTENSION];
-		$kRecordingFile->recordingStart = self::convertTimeToUnix($recordingFile[self::RECORDING_START]);
+		$kRecordingFile->recordingStart = kTimeZoneUtils::strToZuluTime($recordingFile[self::RECORDING_START]);
 		$kZoomRecordingFile = new kZoomRecordingFile();
 		$kZoomRecordingFile->parseFileType($recordingFile[self::RECORDING_FILE_TYPE]);
 		$kRecordingFile->fileType = $kZoomRecordingFile->recordingFileType;
@@ -346,12 +346,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$zoomDropFolderFile->parentEntryId = $parentEntryId;
 		$zoomDropFolderFile->isParentEntry = $isParentEntry;
 		return $zoomDropFolderFile;
-	}
-	
-	public static function convertTimeToUnix($time)
-	{
-		$newTime = str_replace(array('T','Z'),array(' ',''),$time);
-		return strtotime($newTime);
 	}
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)

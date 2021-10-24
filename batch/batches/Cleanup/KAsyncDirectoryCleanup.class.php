@@ -32,10 +32,11 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 		$pattern = $this->getAdditionalParams('pattern');
 		$simulateOnly = $this->getAdditionalParams('simulateOnly');
 		$minutesOld = $this->getAdditionalParams('minutesOld');
+		$maxFilesToDelete = $this->getAdditionalParams('maxFilesToDelete');
 		$searchPath = $path . $pattern;
 		KalturaLog::info('Searching ' . $searchPath);
 		$usePHP = $this->getAdditionalParams('usePHP');
-		$this->deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP);
+		$this->deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP, $maxFilesToDelete );
 	}
 
 	/**
@@ -44,7 +45,7 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 	 * @param $simulateOnly
 	 * @return bool
 	 */
-	protected function deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP)
+	protected function deleteFiles($searchPath, $minutesOld, $simulateOnly, $usePHP, $maxFilesToDelete)
 	{
 		$secondsOld = $minutesOld * 60;
 		$files = kFile::getFilesByPattern($searchPath);
@@ -85,6 +86,11 @@ class KAsyncDirectoryCleanup extends KPeriodicWorker
 				if ($this->deleteFile($file, $usePHP))
 				{
 					$this->deletedFilesCount++;
+					if($maxFilesToDelete && $maxFilesToDelete <= $this->deletedFilesCount )
+					{
+						KalturaLog::log("Exceeded max deleted files {$maxFilesToDelete}, breaking loop");
+						break;
+					}
 				}
 			}
 		}

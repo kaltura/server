@@ -116,6 +116,7 @@ return array (
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FR_CA' => "French (Canada)",
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_TW' => "Taiwanese Mandarin",
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PT_BR' => "Portuguese (Brazil)",
+    'Kaltura_Client_Reach_Enum_CatalogItemLanguage::CA' => "Catalan",
 
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',

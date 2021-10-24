@@ -8,8 +8,8 @@ class DrmProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 	public function __construct()
 	{
 		$this->action = 'DrmProfileListAction';
-		$this->label = null;
-		$this->rootLabel = null;
+		$this->label = 'Drm Profiles';
+		$this->rootLabel = 'DRM';
 	}
 	
 	/**
@@ -86,7 +86,7 @@ class DrmProfileListAction extends KalturaApplicationPlugin implements IKalturaA
 	public function getPublisherAdminActionOptions($partner, $permissions)
 	{
 		$options = array();
-		$options[] = array (0 => 'Drm Profiles', 1 => 'listDrmProfiles');
+		$options[] = array (0 => 'Drm', 1 => 'listDrmProfiles');
 		return $options;
 	}
 	

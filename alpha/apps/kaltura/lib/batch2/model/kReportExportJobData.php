@@ -40,6 +40,11 @@ class kReportExportJobData extends kJobData
 	 * @var string
 	 */
 	protected $reportsGroup;
+	
+	/**
+	 * @var string
+	 */
+	protected $baseUrl;
 
 	/**
 	 * @return string
@@ -152,5 +157,20 @@ class kReportExportJobData extends kJobData
 	{
 		$this->reportsGroup = $reportsGroup;
 	}
-
+	
+	/**
+	 * @return string
+	 */
+	public function getBaseUrl()
+	{
+		return $this->baseUrl;
+	}
+	
+	/**
+	 * @param string $baseUrl
+	 */
+	public function setBaseUrl($baseUrl)
+	{
+		$this->baseUrl = $baseUrl;
+	}
 }

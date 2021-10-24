@@ -202,3 +202,42 @@ $rotation = null;
 	
 }
 
+	/**
+	 * 
+	 * KDLOperatorFfmpeg4_4
+	 *
+	 */
+class KDLOperatorFfmpeg4_4 extends KDLOperatorFfmpeg2_7_2 {
+	/* ---------------------------
+	 * getVideoCodecSpecificParams
+	 */
+	protected function getVideoCodecSpecificParams(KDLFlavor $design, KDLFlavor $target)
+	{
+		switch ($target->_video->_id){
+			case  KDLVideoTarget::AV1:
+				$vidCodecSpecStr = "libaom-av1 -tag:v av01".$this->calcForcedKeyFrames($target->_video, $target);
+				break;
+			default:
+				$vidCodecSpecStr = parent::getVideoCodecSpecificParams($design, $target);
+				break;
+		}
+		
+		return $vidCodecSpecStr;
+	}	
+}
+
+	/**
+	 * 
+	 * KDLOperatorFfmpegMain
+	 *
+	 */
+class KDLOperatorFfmpegMain extends KDLOperatorFfmpeg4_4 {}
+
+	/**
+	 * 
+	 * KDLOperatorFfmpegAux
+	 *
+	 */
+class KDLOperatorFfmpegAux extends KDLOperatorFfmpeg4_4 {}
+
+

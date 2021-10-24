@@ -328,6 +328,12 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		{
 			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LINKED_EVENT_CONFLICT);
 		}
+
+		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
+		{
+			$this->validateRecurringEventForInsert();
+		}
+
 		if (!is_null($this->startDate))
 		{
 			$this->validatePropertyNotNull('endDate');
@@ -337,10 +343,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			// retrieve relevant event's start time and calculate the current event start and end time
 			$this->validatePropertyNotNull('duration');
 			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId(), $this->duration);
-		}
-		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
-		{
-			$this->validateRecurringEventForInsert();
 		}
 		
 		$this->validate($this->startDate, $this->endDate);
@@ -579,6 +581,10 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 
 			case ScheduleEventType::LIVE_REDIRECT:
 				$object = new KalturaLiveRedirectScheduleEvent();
+				break;
+
+			case ScheduleEventType::VOD:
+				$object = new KalturaVodScheduleEvent();
 				break;
 				
 			default:

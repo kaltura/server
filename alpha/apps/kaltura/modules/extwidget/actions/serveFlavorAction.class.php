@@ -941,34 +941,55 @@ class serveFlavorAction extends kalturaAction
 	{
 		$sequences = array();
 
-		foreach ($assets as $asset)
+		foreach ($assets as $assetArray)
 		{
-			$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-			list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $asset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
-			if(!$path)
+			$sequence = array();
+
+			$sequence['clips'] = array();
+			$isAudioAssets = false;
+			foreach ($assetArray as $asset)
 			{
-				KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
-			}
-			$sequence = array('clips' => array(self::getClipData($path, $asset, $sourceType)));
-			$sequence['id'] = $asset->getId();
-			if ($asset->getLanguage())
-			{
-				$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
-				if ($languageCode && $languageCode !== 'und')
+				if ($asset && ($asset->hasTag(assetParams::TAG_ALT_AUDIO) || $asset->hasTag(assetParams::TAG_AUDIO_ONLY)))
 				{
-					$sequence['language'] = $languageCode;
-				}
-				else
-				{
-					KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
+					// if at least one asset is audio only asset - we can assume that all the others is either audio only or null 
+					$isAudioAssets = true;
+					break;
 				}
 			}
 
-			if (method_exists($asset, 'getLabel') && $asset->getLabel())
+			foreach ($assetArray as $asset)
 			{
-				$sequence['label'] = $asset->getLabel();
-			}
+				if ($asset == null)
+				{
+					$sequence['clips'][] = $isAudioAssets ? array("type" => "silence") : array("sourceType" => "file", "type" => "source", "path" => "empty");
+					continue;
+				}
+				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+				list ($file_sync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($syncKey, $asset, self::getPreferredStorageProfileId(), self::getFallbackStorageProfileId());
+				if(!$path)
+				{
+					KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
+				}
+				$sequence['clips'][] = self::getClipData($path, $asset, $sourceType);
 
+				if ($asset->getLanguage())
+				{
+					$languageCode = languageCodeManager::getLanguageCode($asset->getLanguage(), true);
+					if ($languageCode && $languageCode !== 'und')
+					{
+						$sequence['language'] = $languageCode;
+					}
+					else
+					{
+						KalturaLog::debug('language ' . $asset->getLanguage() . ' not supported');
+					}
+				}
+
+				if (method_exists($asset, 'getLabel') && $asset->getLabel())
+				{
+					$sequence['label'] = $asset->getLabel();
+				}
+			}
 			$sequences[] = $sequence;
 		}
 		return $sequences;

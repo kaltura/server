@@ -265,25 +265,35 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 	}
 	
-	public static function isPasswordStructureValid($pass,$partnerId = null)
+	public static function isPasswordStructureValid($pass, $partnerId = null)
 	{
-		if(kCurrentContext::getCurrentPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if (kCurrentContext::getCurrentPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
 			return true;
-			
-		$regexps = kConf::get('user_login_password_structure');
-		if($partnerId){
-			$partner = PartnerPeer::retrieveByPK($partnerId);
-			if($partner && $partner->getPasswordStructureRegex())
-				$regexps = $partner->getPasswordStructureRegex();
 		}
-		if (!is_array($regexps)) {
+		
+		$regexps = kConf::get('user_login_password_structure');
+		if ($partnerId)
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if ($partner && $partner->getPasswordStructureRegex())
+			{
+				$regexps = $partner->getPasswordStructureRegex();
+			}
+		}
+		if (!is_array($regexps))
+		{
 			$regexps = array($regexps);
 		}
-		foreach($regexps as $regex) {
-			if(!preg_match($regex, $pass)) {
+		
+		foreach ($regexps as $regex)
+		{
+			if (!kString::compareStringWithRegex($pass, $regex))
+			{
 				return false;
 			}
-		}	
+		}
+		
 		return true;
 	}
 			
@@ -736,15 +746,16 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$loginData->setLoginEmail($loginEmail);
 			$loginData->setFirstName($firstName);
 			$loginData->setLastName($lastName);
-			$loginData->setPassword($password);
-			$loginData->setLoginAttempts(0);
-			$loginData->setLoginBlockedUntil(null);
-			$loginData->resetPreviousPasswords();
 			
 			if ($checkPasswordStructure)
 			{
 				self::checkPasswordValidation($password, $loginData);
 			}
+			
+			$loginData->setPassword($password);
+			$loginData->setLoginAttempts(0);
+			$loginData->setLoginBlockedUntil(null);
+			$loginData->resetPreviousPasswords();
 			
 			$loginData->save();
 			// now $loginData has an id and hash key can be generated
