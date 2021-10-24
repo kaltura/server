@@ -22,6 +22,7 @@ interface kSharedFileSystemMgrType
 {
 	const NFS = "NFS";
 	const S3 = "S3";
+	const OCI = "OCI";
 }
 
 abstract class kSharedFileSystemMgr
@@ -619,6 +620,10 @@ abstract class kSharedFileSystemMgr
 			
 			case kSharedFileSystemMgrType::S3:
 				self::$kSharedFsMgr[$type] = new kS3SharedFileSystemMgr(self::$storageConfig);
+				break;
+			
+			case kSharedFileSystemMgrType::OCI:
+				self::$kSharedFsMgr[$type] = new kOciSharedFileSystemMgr(self::$storageConfig);
 				break;
 		}
 		
