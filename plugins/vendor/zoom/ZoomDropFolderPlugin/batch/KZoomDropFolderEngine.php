@@ -89,10 +89,13 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-	        $lastHandledMeetingTime = $this->dropFolder->lastHandledMeetingTime;
-              if($lastHandledMeetingTime && $lastHandledMeetingTime > time() - self::ZOOM_QUERY_TIME)
+	       $fromInSec  = $this->dropFolder->lastHandledMeetingTime;
+              if($fromInSec)
               {
-                  $fromInSec = $lastHandledMeetingTime - self::ONE_DAY;
+                  if($fromInSec > time() - self::ZOOM_QUERY_TIME)
+                  {
+                      $fromInSec = $fromInSec - self::ONE_DAY;
+                  }
               }
               else
               {
@@ -223,7 +226,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
-		$entryFilter->updatedAtGreaterThanOrEqual = time() - (self::HOUR * 3);
+		$entryFilter->updatedAtGreaterThanOrEqual = time() - self::ZOOM_QUERY_TIME;
 		$entryFilter->statusNotIn = KalturaEntryStatus::DELETED . ',' . KalturaEntryStatus::ERROR_CONVERTING . ',' .
 			KalturaEntryStatus::ERROR_IMPORTING;
 		
