@@ -89,7 +89,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-	       $fromInSec  = $this->dropFolder->lastHandledMeetingTime;
+	        $fromInSec  = $this->dropFolder->lastHandledMeetingTime;
               if($fromInSec)
               {
                   if($fromInSec > time() - self::ZOOM_QUERY_TIME)
