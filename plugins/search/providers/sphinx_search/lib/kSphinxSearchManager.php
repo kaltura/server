@@ -470,7 +470,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$calcSphinxSplitIndex = kConf::get('dynamic_split_index_calculation', 'runtime_config', null);
 		if($calcSphinxSplitIndex)
 		{
-			KalturaLog::debug("TTT: before splitIndexName $splitIndexName");
 			$tableNames = $this->getSphinxRtTables($sphinxConnection);
 			foreach ($tableNames as $key => &$tableName)
 			{
@@ -483,7 +482,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				$splitIndexName = $indexName . '_' . ($indexSplitFactor[$indexName]-1);
 		}
 		
-		KalturaLog::debug("TTT: after splitIndexName $splitIndexName");
 		if($sphinxConnection->getKalturaOption('sharded') && $splitIndexName)
 		{
 			$sql = str_replace(kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName()), $splitIndexName, $sql);
