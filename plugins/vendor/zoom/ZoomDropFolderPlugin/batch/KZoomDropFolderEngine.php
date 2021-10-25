@@ -4,8 +4,7 @@
  */
 class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
-      // 3 days
-      const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200;
+      const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200; // 3 days
 	const MAX_DATE_RANGE_DAYS = 14;
 	const ONE_DAY = 86400;
 	const HOUR = 3600;
