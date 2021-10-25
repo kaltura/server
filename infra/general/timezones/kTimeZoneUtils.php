@@ -31,4 +31,10 @@ class kTimeZoneUtils
         return $result;
     }
 
+    public static function strToZuluTime($datetime)
+    {
+        $newDatetime = str_replace(array('T','Z'),array(' ',''), $datetime);
+        return self::timeZoneStrToTime($newDatetime, Null, 'Zulu');
+    }
+
 }

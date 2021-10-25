@@ -67,6 +67,28 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		return parent::getEntryIdUrl($da);
 	}
 
+	protected function getThumbTimeline($entry)
+	{
+		if (myEntryUtils::shouldServeVodFromLive($entry))
+		{
+			return $entry->getId();
+		}
+
+		return $this->getUserType(!$entry->getExplicitLive() || $entry->canViewExplicitLive());
+	}
+
+	public function createThumbUrl($baseUrl, $entry)
+	{
+		$serverNodeUrl = str_replace('{dc}', $this->getEnvDc(), $baseUrl);
+		$serverNodeUrl .= self::ENTRY_ID_URL_PARAM . "/{$entry->getRootEntryId()}/";
+		$serverNodeUrl .= self::TIMELINE_URL_PARAM . "/{$this->getThumbTimeline($entry)}/";
+
+		$token = myPackagerUtils::generateLivePackagerToken($serverNodeUrl);
+		$serverNodeUrl .= "t/$token/";
+
+		return $serverNodeUrl;
+	}
+
 	protected function getUserType($isAdmin)
 	{
 		return $isAdmin ? self::USER_TYPE_ADMIN : self::USER_TYPE_USER;
