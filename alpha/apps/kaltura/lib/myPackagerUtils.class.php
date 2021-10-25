@@ -2,17 +2,18 @@
 
 class myPackagerUtils
 {
-	const PACKAGER_LOCAL_LIVE_THUMB_URL = 'packager_local_live_thumb_capture_url';
+	const PACKAGER_LIVE_THUMB_NAME = 'packager_live_thumb_name';
+	const PACKAGER_LIVE_THUMB_URL = 'packager_live_thumb_url';
 	const PACKAGER_MAPPED_THUMB_URL = 'packager_mapped_thumb_capture_url';
 	const PACKAGER_LOCAL_THUMB_URL = 'packager_local_thumb_capture_url';
 	const PACKAGER_REMOTE_THUMB_URL = 'packager_thumb_capture_url';
 	const PACKAGER_MAPPED_VOLUME_MAP_URL = 'packager_mapped_volume_map_url';
 	const PACKAGER_LOCAL_VOLUME_MAP_URL = 'packager_local_volume_map_url';
 	const PACKAGER_REMOTE_VOLUME_MAP_URL = 'packager_remote_volume_map_url';
-	const PACKAGER_URL = "packager_url";
-	const LOCAL_MAP_NAME = 'local';
+	const PACKAGER_URL = 'packager_url';
+	const LIVE_PACKAGER_URL = 'live_packager_url';
 	const RECORDING_LIVE_TYPE = 'recording';
-	const MP4_FILENAME_PARAMETER = "/name/a.mp4";
+	const MP4_FILENAME_PARAMETER = '/name/a.mp4';
 
 	/**
 	 * @param entry $entry
@@ -28,7 +29,7 @@ class myPackagerUtils
 	{
 		if(myEntryUtils::shouldServeVodFromLive($entry))
 		{
-			return self::captureLiveThumb($entry, self::RECORDING_LIVE_TYPE, $capturedThumbPath, $calc_vid_sec, $width, $height);
+			return self::captureLiveThumb($entry, $capturedThumbPath, $calc_vid_sec, $width, $height);
 		}
 		else if ($entry->getType() == entryType::PLAYLIST)
 		{
@@ -269,31 +270,31 @@ class myPackagerUtils
 
 		if (!$packagerUrl)
 		{
-			$packagerUrl = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null);
+			$packagerUrl = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null);
 		}
 
 		switch ($packagerUrlType)
 		{
 			case kPackagerUrlType::REGULAR_THUMB:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::MAPPED_THUMB:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REMOTE_THUMB:
-				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+				$result = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_REMOTE_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
-			case kPackagerUrlType::LOCAL_LIVE_THUMB:
-				$result = kConf::get(self::PACKAGER_URL,self::LOCAL_MAP_NAME, null) . kConf::get(self::PACKAGER_LOCAL_LIVE_THUMB_URL, self::LOCAL_MAP_NAME, null);
+			case kPackagerUrlType::LIVE_THUMB:
+				$result = kConf::get(self::LIVE_PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null) . kConf::get(self::PACKAGER_LIVE_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REGULAR_VOLUME_MAP:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_LOCAL_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::MAPPED_VOLUME_MAP:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_MAPPED_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			case kPackagerUrlType::REMOTE_VOLUME_MAP:
-				$result = $packagerUrl . kConf::get(self::PACKAGER_REMOTE_VOLUME_MAP_URL, self::LOCAL_MAP_NAME, null);
+				$result = $packagerUrl . kConf::get(self::PACKAGER_REMOTE_VOLUME_MAP_URL, kConfMapNames::LOCAL_SETTINGS, null);
 				break;
 			default:
 		}
@@ -325,7 +326,6 @@ class myPackagerUtils
 
 	/**
 	 * @param entry $entry
-	 * @param $liveType
 	 * @param $destThumbPath
 	 * @param $calc_vid_sec
 	 * @param int|null $width
@@ -333,28 +333,65 @@ class myPackagerUtils
 	 * @return bool|mixed
 	 * @throws Exception
 	 */
-	protected static function captureLiveThumb(entry $entry, $liveType, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
+	protected static function captureLiveThumb(entry $entry, $destThumbPath, $calc_vid_sec, $width = null, $height = null)
 	{
-		$packagerCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::LOCAL_LIVE_THUMB);
-		if (!$packagerCaptureUrl)
+		$liveCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::LIVE_THUMB);
+		if (!$liveCaptureUrl)
 		{
 			return false;
 		}
 
-		$dc = myEntryUtils::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
-		if (is_null($dc))
+//		Temporary logic because recordings for backup streams are not currently supported
+		$currentEntryServerNodes = array(EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY));
+		if ($entry->getType() == entryType::LIVE_STREAM)
+		{
+			$currentEntryServerNodes[] = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId(), EntryServerNodeType::LIVE_BACKUP);
+		}
+		if (!$currentEntryServerNodes)
 		{
 			return false;
 		}
 
-		$url = 'p/' . $entry->getPartnerId() . '/e/' . $entry->getId();
-		$packagerCaptureUrl = str_replace(array ( "{dc}", "{liveType}"), array ( $dc, $liveType) , $packagerCaptureUrl );
-		if (!$calc_vid_sec) //Temp until packager support time 0
+		$thumbName = kConf::get(myPackagerUtils::PACKAGER_LIVE_THUMB_NAME, kConfMapNames::LOCAL_SETTINGS, null);
+		if (!$thumbName)
+		{
+			return false;
+		}
+
+		if (!$calc_vid_sec)
 		{
 			$calc_vid_sec = myEntryUtils::DEFAULT_THUMB_SEC_LIVE;
 		}
 
-		return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $destThumbPath, $width, $height, '+');
+		foreach ($currentEntryServerNodes as $entryServerNode)
+		{
+			$serverNode = ServerNodePeer::retrieveActiveMediaServerNode(null, $entryServerNode->getServerNodeId());
+			if (!$serverNode)
+			{
+				continue;
+			}
+
+			$serverNodeUrl = $serverNode->createThumbUrl($liveCaptureUrl, $entry);
+
+			$serverNodeUrl .= $thumbName;
+
+			$streams = $entryServerNode->getStreams();
+			foreach ($streams as $liveParam)
+			{
+				if (is_null($liveParam->getWidth()))
+				{
+					continue;
+				}
+
+				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$streams[0]->getFlavorId()}");
+				if($result)
+				{
+					return $result;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -386,12 +423,14 @@ class myPackagerUtils
 	 * @param int $height
 	 * @param string $offsetPrefix
 	 * @param string $postFix
+	 * @param string $offsetPostfix
 	 * @return bool
 	 * @throws Exception
 	 */
-	protected static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '')
+	protected static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '', $offsetPostfix = '')
 	{
-		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix, $postFix);
+		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix, $postFix, $offsetPostfix);
+
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
 		if($success)
@@ -590,5 +629,29 @@ class myPackagerUtils
 		}
 
 		return $content;
+	}
+
+	public static function generateLivePackagerToken($url, $signingDomain = '')
+	{
+		$livePackagerToken = kConf::get("live_packager_secure_token");
+
+		if(!empty($signingDomain))
+		{
+			$domain = parse_url($url, PHP_URL_HOST);
+			if($domain && $domain != '')
+			{
+				$url = str_replace($domain, $signingDomain, $url);
+			}
+			else
+			{
+				KalturaLog::debug("Failed to parse domain from original url, signed domain will not be modified");
+			}
+		}
+
+		$strippedUrl = preg_replace('#^https?://#', '', $url);
+
+		$token = md5("$livePackagerToken $strippedUrl", true);
+		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');
+		return $token;
 	}
 }

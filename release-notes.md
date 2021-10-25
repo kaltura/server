@@ -1,3 +1,12 @@
+# Quasar-17.13.0 #
+### Configuration ###
+Add the following configurations to local.ini:
+
+    live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
+    packager_live_thumb_url = /{dc}/capture/
+    packager_live_thumb_name = frame-{offset}.jpg
+
+
 # Quasar-17.12.0 #
 ## Add report getTotal permission for self serve partner ##
 * Issue Type: Task

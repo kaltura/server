@@ -4,6 +4,7 @@
  */
 class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
+      const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200; // 3 days
 	const MAX_DATE_RANGE_DAYS = 14;
 	const ONE_DAY = 86400;
 	const HOUR = 3600;
@@ -40,7 +41,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
-		$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
+		$dropFolderFilesMap = $this->loadDropFolderFiles(self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 		if ($meetingFilesOrdered)
 		{
 			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap);
@@ -88,8 +89,18 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-		$fromInSec = $this->dropFolder->lastHandledMeetingTime ? $this->dropFolder->lastHandledMeetingTime : time() -
-			self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+	        $fromInSec  = $this->dropFolder->lastHandledMeetingTime;
+              if($fromInSec)
+              {
+                  if($fromInSec > time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE)
+                  {
+                      $fromInSec = max($fromInSec - self::ONE_DAY, time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
+                  }
+              }
+              else
+              {
+                  $fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+              }
 		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
 		$from = date('Y-m-d', $fromInSec);
 		$to = date('Y-m-d', $toInSec);
@@ -170,7 +181,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->loadDropFolderFiles(self::ONE_DAY * 3);
+					$dropFolderFilesMap = $this->loadDropFolderFiles(self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
@@ -215,7 +226,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
-		$entryFilter->updatedAtGreaterThanOrEqual = time() - (self::HOUR * 3);
+		$entryFilter->updatedAtGreaterThanOrEqual = time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE;
 		$entryFilter->statusNotIn = KalturaEntryStatus::DELETED . ',' . KalturaEntryStatus::ERROR_CONVERTING . ',' .
 			KalturaEntryStatus::ERROR_IMPORTING;
 		

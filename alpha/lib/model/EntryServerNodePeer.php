@@ -108,7 +108,7 @@ class EntryServerNodePeer extends BaseEntryServerNodePeer {
 	 *
 	 * @param      string $entryId.
 	 * @param      PropelPDO $con the connection to use
-	 * @return     array Array of matching EntryServerNodes
+	 * @return     array<EntryServerNode> Array of matching EntryServerNodes
 	 */
 	public static function retrieveByEntryId($entryId, PropelPDO $con = null)
 	{
