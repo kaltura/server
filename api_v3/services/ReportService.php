@@ -13,6 +13,7 @@ class ReportService extends KalturaBaseService
 		ReportType::PARTNER_USAGE,
 		ReportType::VAR_USAGE,
 		ReportType::VPAAS_USAGE_MULTI,
+		ReportType::SELF_SERVE_USAGE_VPAAS,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
