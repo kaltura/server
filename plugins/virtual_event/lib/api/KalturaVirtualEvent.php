@@ -49,11 +49,13 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @filter eq,in
 	 */
 	public $attendeesGroupId;
 	
 	/**
 	 * @var string
+	 * @filter eq,in
 	 */
 	public $adminsGroupId;
 	
@@ -105,7 +107,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'adminsGroupId',
 		'registrationScheduleEventId',
 		'agendaScheduleEventId',
-		'eventScheduleEventId',
+		'mainEventScheduleEventId',
 		'createdAt',
 		'updatedAt',
 		'deletionDueDate',

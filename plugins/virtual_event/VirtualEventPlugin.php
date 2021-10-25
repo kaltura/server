@@ -2,10 +2,9 @@
 /**
  * @package plugins.virtualEvent
  */
-class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKalturaEventConsumers
+class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKalturaObjectLoader
 {
 	const PLUGIN_NAME = 'virtualEvent';
-	const VIRTUAL_EVENTS_CONSUMER = 'kVirtualEventsConsumer';
 	
 	public static function getPluginName()
 	{
@@ -30,15 +29,6 @@ class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKal
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 	}
 	
-	/*
-	 * (non-PHPdoc)
-	 * @see IKalturaEventConsumers::getEventConsumers()
-	 */
-	public static function getEventConsumers()
-	{
-		return array(self::VIRTUAL_EVENTS_CONSUMER);
-	}
-	
 	public static function isAllowedPartner($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
@@ -49,4 +39,30 @@ class VirtualEventPlugin extends KalturaPlugin implements  IKalturaServices,IKal
 		
 		return false;
 	}
+	
+	/*
+	 * (non-PHPdoc)
+	 * @see IKalturaObjectLoader::loadObject()
+	 */
+	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
+	{
+		if (($baseClass == 'KalturaScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
+		{
+			return new KalturaVirtualScheduleEvent();
+		}
+	}
+	
+	/*
+	 * (non-PHPdoc)
+	 * @see IKalturaObjectLoader::getObjectClass()
+	 */
+	public static function getObjectClass($baseClass, $enumValue)
+	{
+		if(($baseClass == 'ScheduleEvent') && ($enumValue == VirtualScheduleEventType::VIRTUAL))
+		{
+			return 'VirtualScheduleEvent';
+		}
+	}
+	
+
 }

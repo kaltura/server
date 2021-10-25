@@ -177,7 +177,7 @@
 		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_MAIN_SE_ID);
 	 }
 	
-	 public function setEventScheduleEventId($v)
+	 public function setMainEventScheduleEventId($v)
 	 {
 		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_MAIN_SE_ID, $v);
 	 }
