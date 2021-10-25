@@ -466,8 +466,28 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			return true;
 					
 		$sphinxConnection = DbManager::getSphinxConnection(false, $splitIndexName);
+		
+		$calcSphinxSplitIndex = kConf::get('dynamic_split_index_calculation', 'runtime_config', null);
+		if($calcSphinxSplitIndex)
+		{
+			KalturaLog::debug("TTT: before splitIndexName $splitIndexName");
+			$tableNames = $this->getSphinxRtTables($sphinxConnection);
+			foreach ($tableNames as $key => &$tableName)
+			{
+				$tableName = preg_replace('/_[0-9]+/', '', $tableName);
+			}
+			
+			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
+			$indexSplitFactor = array_count_values($tableNames);
+			if($indexSplitFactor[$indexName] > 1)
+				$splitIndexName = $indexName . '_' . ($indexSplitFactor[$indexName]-1);
+		}
+		
+		KalturaLog::debug("TTT: after splitIndexName $splitIndexName");
 		if($sphinxConnection->getKalturaOption('sharded') && $splitIndexName)
+		{
 			$sql = str_replace(kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName()), $splitIndexName, $sql);
+		}
 		
 		$ret = $sphinxConnection->exec($sql);
 		if($ret)
@@ -583,7 +603,23 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		}
 			
 		return false;
-        
     }
+	
+	function getSphinxRtTables($sphinxCon)
+	{
+		$sphinxRtTables = array();
+		$query = $sphinxCon->query("SHOW TABLES");
+		$sphinxTablesData = $query->fetchAll();
+		
+		foreach ($sphinxTablesData as $sphinxTableData)
+		{
+			if($sphinxTableData['Type'] == "rt")
+			{
+				$sphinxRtTables[] = $sphinxTableData['Index'];
+			}
+		}
+		
+		return $sphinxRtTables;
+	}
 
 }
