@@ -3,7 +3,7 @@
  * @package api
  * @subpackage services
  */
-class KalturaBaseUserService extends KalturaBaseService 
+class KalturaBaseUserService extends KalturaBaseService
 {
 	
 	protected function partnerRequired($actionName)
@@ -29,11 +29,11 @@ class KalturaBaseUserService extends KalturaBaseService
 	{
 		parent::initService ($serviceId, $serviceName, $actionName);
 		$this->applyPartnerFilterForClass('kuser');
-	}	
+	}
 	
 	/**
 	 * Update admin user password and email
-	 * 
+	 *
 	 * @param string $email
 	 * @param string $password
 	 * @param string $newEmail Optional, provide only when you want to update the email
@@ -81,8 +81,8 @@ class KalturaBaseUserService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::COMMON_PASSWORD_NOT_ALLOWED);
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
-				$c = new Criteria(); 
-				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
+				$c = new Criteria();
+				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email );
 				$loginData = UserLoginDataPeer::doSelectOne($c);
 				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
@@ -112,15 +112,16 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(APIErrors::LOGIN_BLOCKED);
 			}
-			throw $e;			
+			throw $e;
 		}
 	}
 
 	
 	/**
 	 * Reset admin user password and send it to the users email address
-	 * 
+	 *
 	 * @param string $email
+	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @param KalturaResetPassLinkType $linkType kmc or kms
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -128,8 +129,8 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
-	 */	
-	protected function resetPasswordImpl($email, $linkType = KalturaResetPassLinkType::KMC)
+	 */
+	protected function resetPasswordImpl($email, KalturaCustomizedEmailContents $customizedEmailContents = null, $linkType = KalturaResetPassLinkType::KMC)
 	{
 		KalturaResponseCacher::disableCache();
 		
@@ -137,7 +138,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		$this->validateRequestsAmount($email);
 		
 		try {
-			$new_password = UserLoginDataPeer::resetUserPassword($email, $linkType);
+			$new_password = UserLoginDataPeer::resetUserPassword($email, $customizedEmailContents, $linkType);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -156,8 +157,8 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
 				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
 			}
-			throw $e;			
-		}	
+			throw $e;
+		}
 		
 		if (!$new_password)
 			throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND, "user not found" );
@@ -166,7 +167,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	
 	/**
 	 * Get a session using user email and password
-	 * 
+	 *
 	 * @param string $puserId
 	 * @param string $loginEmail
 	 * @param string $password
@@ -174,7 +175,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param int $expiry
 	 * @param string $privileges
 	 * @param string $otp
-	 * 
+	 *
 	 * @return string KS
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
@@ -185,7 +186,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @thrown KalturaErrors::INTERNAL_SERVERL_ERROR
 	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
-	 */		
+	 */
 	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
 		KalturaResponseCacher::disableCache();
@@ -241,17 +242,17 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code === kUserException::DIRECT_LOGIN_BLOCKED) {
 				throw new KalturaAPIException(KalturaErrors::DIRECT_LOGIN_BLOCKED);
 			}
-									
+			
 			throw new $e;
 		}
 		if (!$user) {
 			throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND);
-		}		
+		}
 		
 		if ( ($partnerId && $user->getPartnerId() != $partnerId) ||
 		     ($this->getPartnerId() && !$partnerId && $user->getPartnerId() != $this->getPartnerId()) ) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $partnerId);
-		}			
+		}
 		
 		$partner = PartnerPeer::retrieveByPK($user->getPartnerId());
 		
@@ -271,7 +272,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	
 	/**
 	 * Set initial users password
-	 * 
+	 *
 	 * @param string $hashKey
 	 * @param string $newPassword new password to set
 	 *
@@ -281,7 +282,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::NEW_PASSWORD_HASH_KEY_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
 	 * @throws KalturaErrors::INTERNAL_SERVERL_ERROR
-	 */	
+	 */
 	protected function setInitialPasswordImpl($hashKey, $newPassword)
 	{
 		KalturaResponseCacher::disableCache();
@@ -331,7 +332,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	}
 	
 	protected function validateApiAccessControlByEmail($email)
-	{ 
+	{
 		$loginData = UserLoginDataPeer::getByEmail($email);
 		if ($loginData)
 		{
@@ -406,30 +407,30 @@ class KalturaBaseUserService extends KalturaBaseService
 			!$ksObj->verifyPrivileges(kSessionBase::PRIVILEGE_ENABLE_PARTNER_CHANGE_ACCOUNT, $destPartnerId))
 			throw new KalturaAPIException(APIErrors::PARTNER_CHANGE_ACCOUNT_DISABLED);
 		
-		try 
+		try
 		{
 			$adminKuser = UserLoginDataPeer::userLoginByKs($ks, $destPartnerId, true);
 		}
-		catch (kUserException $e) 
+		catch (kUserException $e)
 		{
 			$code = $e->getCode();
-			if ($code == kUserException::USER_NOT_FOUND) 
+			if ($code == kUserException::USER_NOT_FOUND)
 			{
 				throw new KalturaAPIException(APIErrors::ADMIN_KUSER_NOT_FOUND);
 			}
-			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) 
+			if ($code == kUserException::LOGIN_DATA_NOT_FOUND)
 			{
 				throw new KalturaAPIException(APIErrors::LOGIN_DATA_NOT_FOUND);
 			}
-			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED) 
+			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED)
 			{
 				throw new KalturaAPIException(APIErrors::LOGIN_RETRIES_EXCEEDED);
 			}
-			else if ($code == kUserException::LOGIN_BLOCKED) 
+			else if ($code == kUserException::LOGIN_BLOCKED)
 			{
 				throw new KalturaAPIException(APIErrors::LOGIN_BLOCKED);
 			}
-			else if ($code == kUserException::USER_IS_BLOCKED) 
+			else if ($code == kUserException::USER_IS_BLOCKED)
 			{
 				throw new KalturaAPIException(APIErrors::USER_IS_BLOCKED);
 			}
@@ -444,12 +445,12 @@ class KalturaBaseUserService extends KalturaBaseService
 			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
 		}
 		
-		if (!$adminKuser || !$adminKuser->getIsAdmin()) 
+		if (!$adminKuser || !$adminKuser->getIsAdmin())
 		{
 			throw new KalturaAPIException(APIErrors::ADMIN_KUSER_NOT_FOUND);
 		}
 		
-		if ($destPartnerId != $adminKuser->getPartnerId()) 
+		if ($destPartnerId != $adminKuser->getPartnerId())
 		{
 			throw new KalturaAPIException(APIErrors::UNKNOWN_PARTNER_ID, $destPartnerId);
 		}

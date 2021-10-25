@@ -4,7 +4,7 @@
 /**
  * Skeleton subclass for performing query and update operations on the 'user_login_data' table.
  *
- * 
+ *
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -39,7 +39,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$newPassword = substr($newPassword, 0, $i) . $c . substr($newPassword, $i);
 		}
 
-		return $newPassword;		
+		return $newPassword;
 	}
 	
 	private static function str_makerand ($minlength, $maxlength, $useupper, $usespecial, $usenumbers)
@@ -69,17 +69,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	
 	
-	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink)
+	private static function emailResetPassword($partner_id, $cms_email, $user_name, $customizedEmailContents, $resetPasswordLink)
 	{
 		kJobsManager::addMailJob(
-			null, 
-			0, 
-			$partner_id, 
-			UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET, 
-			kMailJobData::MAIL_PRIORITY_NORMAL, 
-			kConf::get( "partner_change_email_email" ), 
-			kConf::get( "partner_change_email_name" ), 
-			$cms_email, 
+			null,
+			0,
+			$partner_id,
+			UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET,
+			$customizedEmailContents,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			kConf::get( "partner_change_email_email" ),
+			kConf::get( "partner_change_email_name" ),
+			$cms_email,
 			array($user_name, $resetPasswordLink)
 		);
 	}
@@ -91,8 +92,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 
-		$c = new Criteria(); 
-		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $oldLoginEmail ); 
+		$c = new Criteria();
+		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $oldLoginEmail );
 		$loginData = UserLoginDataPeer::doSelectOne($c);
 		
 		// check if login data exists
@@ -151,7 +152,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$kuser->save();
 			}
 		}
-				
+		
 		$loginData->save();
 		
 		return $loginData;
@@ -223,13 +224,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 
-		
+	
 
 	
-	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
+	public static function resetUserPassword($email, KalturaCustomizedEmailContents $customizedEmailContents = null, $linkType = resetPassLinkType::KMC)
 	{
-		$c = new Criteria(); 
-		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
+		$c = new Criteria();
+		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email );
 		$loginData = UserLoginDataPeer::doSelectOne($c);
 		
 		// check if login data exists
@@ -247,8 +248,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
-				
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType));
+		
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), $customizedEmailContents, self::getPassResetLink($loginData->getPasswordHashKey(), $linkType));
 		return true;
 	}
 	
@@ -296,7 +297,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		return true;
 	}
-			
+	
 	public static function decodePassHashKey($hashKey)
 	{
 		$decoded = base64_decode($hashKey);
@@ -466,7 +467,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('Invalid partner id ['.$requestedPartnerId.']', kUserException::INVALID_PARTNER);
 		}
 		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner);
-			
+		
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
 
@@ -479,10 +480,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
-		}		
+		}
 		
 		// check if password is valid
-		if ($validatePassword && !$loginData->isPasswordValid($password)) 
+		if ($validatePassword && !$loginData->isPasswordValid($password))
 		{
 			return self::loginAttemptsLogic($loginData);
 		}
@@ -493,7 +494,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		//Check if the user's ip address is in the right range to ignore the otp
 		$otpRequired = false;
-		if(kConf::hasParam ('otp_required_partners') && 
+		if(kConf::hasParam ('otp_required_partners') &&
 			in_array ($partnerId, kConf::get ('otp_required_partners')) &&
 			kConf::hasParam ('partner_otp_internal_ips'))
 		{
@@ -682,7 +683,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$c->addAscendingOrderByColumn(kuserPeer::PARTNER_ID);
 		
 		$kusers = kuserPeer::doSelect($c);
-						
+		
 		foreach ($kusers as $kuser)
 		{
 			if ($kuser->getStatus() != KuserStatus::ACTIVE)
@@ -721,7 +722,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!kString::isEmailString($loginEmail)) {
 			throw new kUserException('', kUserException::INVALID_EMAIL);
 		}
-			
+		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (!$partner) {
 			throw new kUserException('', kUserException::INVALID_PARTNER);
@@ -778,7 +779,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			
 			$loginData->save();
 			$alreadyExisted = false;
-			return $loginData;			
+			return $loginData;
 		}
 		else
 		{
@@ -798,7 +799,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				$existingData->save();
 			}
 			
-			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');	
+			KalturaLog::info('Existing login data with the same email & password exists - returning id ['.$existingData->getId().']');
 			$alreadyExisted = true;
 			
 			if ($isAdminUser && !$existingData->isLastLoginPartnerIdSet()) {
@@ -807,7 +808,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			}
 			
 			return $existingData;
-		}	
+		}
 	}
 	
 	protected static function add2faSeed($partner, $isAdminUser, $userLoginData)
@@ -844,7 +845,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 	
 	/**
-	 * 
+	 *
 	 * updates first and last name on the login data record, according to the given kuser object
 	 * @param int $loginDataId
 	 * @param kuser $kuser
@@ -859,7 +860,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		$loginData->setFirstName($kuser->getFirstName());
 		$loginData->setLastName($kuser->getLastName());
-		$loginData->save();	
+		$loginData->save();
 	}
 	
 	
@@ -903,7 +904,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));		
+		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));
 	}
 
 	public static function getAuthInfoLink($hashKey)

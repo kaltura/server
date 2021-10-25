@@ -23,39 +23,43 @@ class KalturaMailJobData extends KalturaJobData
 	/**
 	 * @var string
 	 */
-	public $recipientName;  
+	public $recipientName;
 
 	/**
 	 * @var string
-	 */	
+	 */
    	public $recipientEmail;
    	
 	/**
-	 * kuserId  
+	 * kuserId
 	 * @var int
-	 */   	
+	 */
     public $recipientId;
     
 	/**
 	 * @var string
-	 */    
+	 */
     public $fromName;
     
 	/**
 	 * @var string
-	 */    
+	 */
     public $fromEmail;
   
 	/**
 	 * @var string
-	 */    
+	 */
     public $bodyParams;
 
 	/**
 	 * @var string
-	 */    
-    public $subjectParams;  
-
+	 */
+	public $subjectParams;
+	
+	/**
+	 * @var KalturaCustomizedEmailContents
+	 */
+	public $customizedEmailContents;
 	/**
  	* @var string
  	*/
@@ -91,19 +95,20 @@ class KalturaMailJobData extends KalturaJobData
 		"mailType" ,
 	    "mailPriority" ,
 	    "status " ,
-		"recipientName" ,  
+		"recipientName" ,
 	   	"recipientEmail" ,
 	    "recipientId" ,
 	    "fromName" ,
 	    "fromEmail" ,
 	    "bodyParams" ,
-	    "subjectParams" ,  
+	    "subjectParams" ,
 	    "templatePath" ,
 	    "language" ,
 	    "campaignId" ,
 	    "minSendDate" ,
 		"isHtml" ,
 		"separator",
+		"customizedEmailContents",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -112,7 +117,7 @@ class KalturaMailJobData extends KalturaJobData
 	}
 
 	
-	public function toObject($dbData = null, $props_to_skip = array()) 
+	public function toObject($dbData = null, $props_to_skip = array())
 	{
 		if(is_null($dbData))
 			$dbData = new kMailJobData();

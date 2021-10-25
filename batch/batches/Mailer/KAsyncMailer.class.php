@@ -99,7 +99,11 @@ class KAsyncMailer extends KJobHandlerWorker
 		{
 			$this->initConfig($data->language);	
 		}
-		
+		if ($data->customizedEmailContents)
+		{
+			$data->subjectParams .= '|' . $data->customizedEmailContents->emailSubject;
+			$data->bodyParams .= '|' . $data->customizedEmailContents->emailBody;
+		}
 		try
 		{
 			$separator = $data->separator;
@@ -195,7 +199,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	
 	protected function getSubjectByType( $type, $language, $subjectParamsArray  )
 	{
-		if ( $type > 0 )
+		if ( $type > 0 && sizeof($subjectParamsArray) == 0)
 		{
 			$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
 			$defaultLanguageTexts = $this->texts_array[self::DEFAULT_LANGUAGE];
@@ -204,6 +208,10 @@ class KAsyncMailer extends KJobHandlerWorker
 			$subject = vsprintf( $subject, $subjectParamsArray );
 			//$this->mail->setSubject( $subject );
 			return $subject;
+		}
+		elseif(sizeof($subjectParamsArray) > 0)
+		{
+			return end($subjectParamsArray);
 		}
 		else
 		{
@@ -222,6 +230,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		$footer = ( isset($common_text_arr[$type . '_footer']) ) ? $common_text_arr[$type . '_footer'] : ($common_text_arr['footer'] ? $common_text_arr['footer'] : $defaultCommonTexts['footer']);
 		$defaultBody = isset ($defaultLanguageTexts['bodies'][$type]) ? $defaultLanguageTexts['bodies'][$type] : '';
 		$body = isset($languageTexts['bodies'][$type]) ? $languageTexts['bodies'][$type] : $defaultBody;
+		$body = isset($bodyParamsArray[2]) ? $bodyParamsArray[2] : $body;
 		
 		// TODO - move to batch config
 		$forumsLink = $this->getAdditionalParams('forumUrl');

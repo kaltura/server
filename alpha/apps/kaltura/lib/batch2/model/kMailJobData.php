@@ -34,38 +34,38 @@ class kMailJobData extends kJobData
 	/**
 	 * @var string
 	 */
-	private $recipientName;  
+	private $recipientName;
 
 	/**
 	 * @var string
-	 */	
+	 */
    	private $recipientEmail;
    	
 	/**
-	 * kuserId  
+	 * kuserId
 	 * @var int
-	 */   	
+	 */
     private $recipientId;
     
 	/**
 	 * @var string
-	 */    
+	 */
     private $fromName;
     
 	/**
 	 * @var string
-	 */    
+	 */
     private $fromEmail;
   
 	/**
 	 * @var string
-	 */    
+	 */
     private $bodyParams;
 
 	/**
 	 * @var string
-	 */    
-    private $subjectParams;  
+	 */
+    private $subjectParams;
 
 	/**
  	* @var string
@@ -96,7 +96,12 @@ class kMailJobData extends kJobData
 	 * @var string
 	 */
 	private $separator = '|';
-    
+	
+	/**
+	 * @var kCustomizedEmailContents
+	 */
+	private $customizedEmailContents;
+ 
 	/**
 	 * @return the $mailType
 	 */
@@ -295,7 +300,7 @@ class kMailJobData extends kJobData
 		$paramsstring = '';
 		if ( is_array( $paramsArray ) ) foreach( $paramsArray as $param )
 		{
-			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param; 
+			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param;
 		}
 		$this->setBodyParams( $paramsstring );
 	}
@@ -314,7 +319,7 @@ class kMailJobData extends kJobData
 		$paramsstring = '';
 		if ( is_array( $paramsArray ) ) foreach( $paramsArray as $param )
 		{
-			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param; 
+			$paramsstring =  ( $paramsstring ? $paramsstring.$this->getSeparator() : '' ).$param;
 		}
 		$this->setSubjectParams( $paramsstring );
 	}
@@ -373,5 +378,15 @@ class kMailJobData extends kJobData
 	public function setSeparator ($v)
 	{
 		$this->separator = $v;
+	}
+	
+	public function setCustomizedEmailContents($v)
+	{
+		$this->customizedEmailContents = $v;
+	}
+	
+	public function getCustomizedEmailContents()
+	{
+		return $this->customizedEmailContents;
 	}
 }

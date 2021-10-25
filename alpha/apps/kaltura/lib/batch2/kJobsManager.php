@@ -1,9 +1,9 @@
 <?php
 
 /**
- * 
+ *
  * Manages the jobs add, get status and abort
- * 
+ *
  * @package Core
  * @subpackage Batch
  *
@@ -155,7 +155,7 @@ class kJobsManager
 		if($dbBatchJob->getJobType() != $jobType) {
 			throw new APIException(APIErrors::GET_EXCLUSIVE_JOB_WRONG_TYPE, $jobType, $dbBatchJob->getId());
 		}
-			
+		
 		$dbBatchJob->setExecutionStatus(BatchJobExecutionStatus::NORMAL);
 		
 		// if not currently locked
@@ -203,8 +203,9 @@ class kJobsManager
 		}
 	}
 	
-	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null)
+	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $customizedEmailContents, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null)
 	{
+		/* @var $customizedEmailContents KalturaCustomizedEmailContents */
 	  	$jobData = new kMailJobData();
 		$jobData->setMailPriority($mailPriority);
 	 	$jobData->setMailType($mailType);
@@ -222,13 +223,14 @@ class kJobsManager
 		$jobData->setRecipientName($toName);
 		$jobData->setRecipientId($toId);
 		
-		$jobData->setCampaignId($camaignId);		
+		$jobData->setCampaignId($camaignId);
 		$jobData->setCampaignId($camaignId);
 	 	$jobData->setTemplatePath($templatePath);
 	
 	 	$partner = PartnerPeer::retrieveByPK($partnerId);
-		$jobData->setLanguage($partner->getLanguage()); 
-	 	
+		$jobData->setLanguage($partner->getLanguage());
+		$jobData->setCustomizedEmailContents($customizedEmailContents->toObject());
+	 
 		
 		$batchJob = null;
 		if($parentJob)
@@ -288,16 +290,16 @@ class kJobsManager
 			$batchJob->setEntryId($entry->getId());
 			$batchJob->setPartnerId($entry->getPartnerId());
 		}
-				
+		
 		$batchJob->setObjectId($entry->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ENTRY);
 		return self::addJob($batchJob, $jobData, BatchJobType::PROVISION_PROVIDE, $entry->getSource());
 	}
 
 	/**
-	 * addConvertIsmCollectionJob creates a convert collection job 
-	 * 
-	 * @param string $tag 
+	 * addConvertIsmCollectionJob creates a convert collection job
+	 *
+	 * @param string $tag
 	 * @param FileSyncKey $srcSyncKey
 	 * @param entry $entry
 	 * @param BatchJob $parentJob
@@ -305,17 +307,17 @@ class kJobsManager
 	 * @return BatchJob
 	 */
 	public static function addConvertIsmCollectionJob($tag, FileSyncKey $srcSyncKey, entry $entry, BatchJob $parentJob = null, array $flavorParamsOutputs, $sameRoot = null)
-	{		
+	{
 		list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		
 		$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 		if($fileSync)
 		{
-			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)			
+			if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
 				$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 			$srcFileSyncDescriptor->setFileSyncRemoteUrl($fileSync->getExternalUrl($entry->getId()));
-			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());			
-			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());		
+			$srcFileSyncDescriptor->setAssetId($fileSync->getObjectId());
+			$srcFileSyncDescriptor->setFileSyncObjectSubType($srcSyncKey->getObjectSubType());
 		}
 		
 		// increment entry version
@@ -365,7 +367,7 @@ class kJobsManager
 				
 				
 		KalturaLog::log("Calling CDLProceessFlavorsForCollection with [" . count($flavorParamsOutputs) . "] flavor params");
-				
+		
 		$presetXml = KDLWrap::CDLProceessFlavorsForCollection($flavorParamsOutputs);
 		$presetXml = str_replace(KDLCmdlinePlaceholders::OutFileName, $fileName, $presetXml);
 
@@ -414,7 +416,7 @@ class kJobsManager
 		$dbConvertCollectionJob->setObjectType(BatchJobObjectType::ENTRY);
 		$dbConvertCollectionJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
-		$dbConvertCollectionJob = kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData, 
+		$dbConvertCollectionJob = kJobsManager::addJob($dbConvertCollectionJob, $convertCollectionData,
 				BatchJobType::CONVERT_COLLECTION, $currentConversionEngine);
 		
 		
@@ -440,17 +442,17 @@ class kJobsManager
 	
 	
 	/**
-	 * addFlavorConvertJob adds a single flavor conversion 
-	 * 
+	 * addFlavorConvertJob adds a single flavor conversion
+	 *
 	 * @param FileSyncKey $srcSyncKey
 	 * @param flavorParamsOutput $flavor
 	 * @param int $flavorAssetId
 	 * @param int $conversionProfileId
 	 * @param int $mediaInfoId
 	 * @param BatchJob $parentJob
-	 * @param int $lastEngineType  
+	 * @param int $lastEngineType
 	 * @param bool $sameRoot
-	 * @return BatchJob 
+	 * @return BatchJob
 	 */
 	public static function addFlavorConvertJob(array $srcSyncKeys, flavorParamsOutput $flavor, $flavorAssetId, $conversionProfileId = null,
 			$mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
@@ -477,8 +479,8 @@ class kJobsManager
 		if(!$dbCurrentConversionEngine)
 			return null;
 		
-		foreach ($srcSyncKeys as $srcSyncKey) 
-		{		
+		foreach ($srcSyncKeys as $srcSyncKey)
+		{
 			$srcFileSyncDescriptor = new kSourceFileSyncDescriptor();
 			$addImportJob = false;
 			
@@ -507,7 +509,7 @@ class kJobsManager
 			{
 				return null;
 			}
-				
+			
 			$srcFlavorAsset = assetPeer::retrieveById($srcSyncKey->getObjectId());
 			if($addImportJob)
 			{
@@ -517,12 +519,12 @@ class kJobsManager
 				$url = $fileSync->getExternalUrl($flavorAsset->getEntryId(), null, true);
 				return kJobsManager::addImportJob($parentJob, $flavorAsset->getEntryId(), $partner->getId(), $url, $srcFlavorAsset, null, null, true);
 			}
-			else 
+			else
 			{
 				if($flavor->getSourceRemoteStorageProfileId() == StorageProfile::STORAGE_KALTURA_DC)
 				{
 					if($fileSync->getFileType() != FileSync::FILE_SYNC_FILE_TYPE_URL)
-						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);						
+						$srcFileSyncDescriptor->setPathAndKeyByFileSync($fileSync);
 				}
 				else
 				{
@@ -567,7 +569,7 @@ class kJobsManager
 		$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
 		if($mediaInfo === NULL) {
 			// in case we don't know the estimatted info, we will set it to a big number.
-			$estimatedEffort = kJobData::MAX_ESTIMATED_EFFORT; 
+			$estimatedEffort = kJobData::MAX_ESTIMATED_EFFORT;
 		} else {
 			$estimatedEffort = max($mediaInfo->getVideoDuration(),$mediaInfo->getAudioDuration(),$mediaInfo->getContainerDuration());
 		}
@@ -587,7 +589,7 @@ class kJobsManager
 		{
 			list($fileSync, $local) = kFileSyncUtils::getReadyFileSyncForKey($srcSyncKey, true, false);
 		}
-		else 
+		else
 		{
 			$fileSync = kFileSyncUtils::getReadyExternalFileSyncForKey($srcSyncKey, $flavor->getSourceRemoteStorageProfileId());
 		}
@@ -597,26 +599,26 @@ class kJobsManager
 			kBatchManager::updateEntry($flavorAsset->getEntryId(), entryStatus::ERROR_CONVERTING);
 			if($isLocal)
 				$description = "Source file sync not found: $srcSyncKey";
-			else 
+			else
 				$description = "Remote source file sync not found $srcSyncKey, storage profile id [" . $flavor->getSourceRemoteStorageProfileId() . "]";
 			
 			$flavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_ERROR);
 			$flavorAsset->setDescription($description);
 			$flavorAsset->save();
-				
+			
 			KalturaLog::err($description);
 			return null;
 		}
 		
 		if($isLocal && !$local)
-		{		
+		{
 			if(StorageProfile::shouldImportFile($fileSync, $partner))
 				$addImportJob = true;
-			else	
+			else
 				throw new kCoreException("Source file not found for flavor conversion [" . $flavorAsset->getId() . "]", kCoreException::SOURCE_FILE_NOT_FOUND);
 		}
 		
-		return $fileSync;		
+		return $fileSync;
 	}
 	
 	private static function getSharedPath ($partner,$parentJob,$flavorAsset)
@@ -677,7 +679,7 @@ class kJobsManager
 		else
 		{
 			if(
-				$parentJob && 
+				$parentJob &&
 				$flavor->getEngineVersion() &&
 				(
 					$parentJob->getJobType() == BatchJobType::CONVERT
@@ -740,9 +742,9 @@ class kJobsManager
 		return $dbCurrentConversionEngine;
 	}
 	/**
-	 * 
+	 *
 	 * Allow plugin to set additional information on ConvertJobData object
-	 * 
+	 *
 	 * @param string $conversionEngineId
 	 * @param kConvertJobData $convertData
 	 */
@@ -953,7 +955,7 @@ class kJobsManager
 			if($parentJob->getJobType() == BatchJobType::CONVERT_PROFILE)
 				$useSameRoot = false;
 				
-			$batchJob = $parentJob->createChild(BatchJobType::POSTCONVERT, $mediaParserType, $useSameRoot); 
+			$batchJob = $parentJob->createChild(BatchJobType::POSTCONVERT, $mediaParserType, $useSameRoot);
 		}
 		else
 		{
@@ -975,25 +977,25 @@ class kJobsManager
 		$entryUrl = str_replace('//', '/', $entryUrl);
 		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
 		
-		if (is_null($subType)) 
+		if (is_null($subType))
 		{
-    		if (stripos($entryUrl, 'sftp:') === 0) 
+    		if (stripos($entryUrl, 'sftp:') === 0)
     		{
     		    $subType = kFileTransferMgrType::SFTP;
     		}
-    		elseif (stripos($entryUrl, 'scp:') === 0) 
+    		elseif (stripos($entryUrl, 'scp:') === 0)
     		{
     		    $subType = kFileTransferMgrType::SCP;
     		}
-    		elseif (stripos($entryUrl, 'ftp:') === 0) 
+    		elseif (stripos($entryUrl, 'ftp:') === 0)
     		{
     		    $subType = kFileTransferMgrType::FTP;
     		}
-    		elseif (stripos($entryUrl, 'https:') === 0) 
+    		elseif (stripos($entryUrl, 'https:') === 0)
     		{
     		    $subType = kFileTransferMgrType::HTTPS;
     		}
-    		else 
+    		else
     		{
     		    $subType = kFileTransferMgrType::HTTP;
     		}
@@ -1011,7 +1013,7 @@ class kJobsManager
  				if(!$asset->isLocalReadyStatus())
 	 				$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
  			}
- 			else 
+ 			else
  			{
  				$asset->incrementVersion();
 	 			$asset->setStatus(asset::FLAVOR_ASSET_STATUS_IMPORTING);
@@ -1020,7 +1022,7 @@ class kJobsManager
  			
  			$jobData->setFlavorAssetId($asset->getId());
  		}
- 			
+ 		
  		$entry = entryPeer::retrieveByPK($entryId);
 		if($entry && !$asset instanceof CaptionAsset)
  		{
@@ -1111,7 +1113,7 @@ class kJobsManager
 		$jobData->setEndTime($endTime);
 		$jobData->setSrcFilePath($filePath);
 		$jobData->setFileIndex(count($files));
- 			
+ 	
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -1278,7 +1280,7 @@ class kJobsManager
 	public static function addDeleteJob($partnerId, $objectType, baseObjectFilter $filter)
 	{
 	    $jobData = new kDeleteJobData();
- 		$jobData->setFilter($filter);	
+ 		$jobData->setFilter($filter);
  		
 		$batchJob = new BatchJob();
 		$batchJob->setPartnerId($partnerId);
@@ -1300,9 +1302,9 @@ class kJobsManager
 				throw new APIException(APIErrors::INVALID_ENTRY_ID, $entryId);
 		}
 		
-		$chunksOfEntries = array_chunk($entryIds, self::BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT);	
+		$chunksOfEntries = array_chunk($entryIds, self::BULK_DOWLOAD_SINGLE_JOB_ENTRIES_AMOUNT);
 		$jobs = array();
-			
+		
 		foreach($chunksOfEntries as $chunk)
 		{
 			$jobDb = new BatchJob();
@@ -1362,7 +1364,7 @@ class kJobsManager
 			// load the asset params to the instance pool
 			$flavorIds = flavorParamsConversionProfilePeer::getFlavorIdsByProfileId($conversionProfile->getId());
 			assetParamsPeer::retrieveByPKs($flavorIds);
-					
+			
 			$conversionRequired = false;
 			$sourceFileRequiredStorages = array();
 			$sourceIncludedInProfile = false;
@@ -1447,7 +1449,7 @@ class kJobsManager
 						$flavorAsset->setStatus(asset::FLAVOR_ASSET_STATUS_DELETED);
 						$flavorAsset->setDeletedAt(time());
 					}
-						
+					
 					$flavorAsset->save();
 					
 					if($sourceIncludedInProfile)
@@ -1475,7 +1477,7 @@ class kJobsManager
 			$entry->setCreateThumb(false);
 		}
 		$entry->save();
- 		
+ 	
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -1505,14 +1507,14 @@ class kJobsManager
 	 * @param FileSync $fileSync
 	 * @param FileSync $srcFileSync
 	 * @param bool $force
-	 * 
+	 *
 	 * @return BatchJob
 	 */
 	public static function addStorageExportJob(BatchJob $parentJob = null, $entryId, $partnerId, StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false, $dc = null)
 	{
 		$netStorageExportData = kStorageExportJobData::getInstance($externalStorage->getProtocol());
 		$netStorageExportData->setStorageExportJobData($externalStorage, $fileSync, $srcFileSync);
-				
+		
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -1538,7 +1540,7 @@ class kJobsManager
 			$batchJob->setDc($dc);
 		}
 
-		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
+		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath());
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
 	}
 	
@@ -1576,7 +1578,7 @@ class kJobsManager
 	
 	/**
 	 * Update privacy context on category entries
-	 * 
+	 *
 	 * @param BatchJob $parentJob
 	 * @param int $partnerId
 	 * @param int $categoryId
@@ -1620,7 +1622,7 @@ class kJobsManager
 		$batchJob->setObjectId($fileSync->getId());
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($storage->getProtocol());
-		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath()); 
+		KalturaLog::log("Creating Net-Storage Delete job, with source file: " . $netStorageDeleteData->getSrcFileSyncLocalPath());
 		return self::addJob($batchJob, $netStorageDeleteData, BatchJobType::STORAGE_DELETE, $storage->getProtocol());
 	}
 	
@@ -1720,7 +1722,7 @@ class kJobsManager
 		$batchJob = $parentJob->createChild(BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine, false);
 		$batchJob->setObjectId($flavorAssetId);
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
-		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath()); 
+		KalturaLog::log("Creating Extract Media job, with source file: " . $extractMediaData->getSrcFileSyncLocalPath());
 		return self::addJob($batchJob, $extractMediaData, BatchJobType::EXTRACT_MEDIA, $mediaInfoEngine);
 	}
 
@@ -1742,7 +1744,7 @@ class kJobsManager
 		$jobData->setUserId($puserId);
 		$jobData->setObjectId($objectId);
 		$jobData->setData($notificationData);
- 		
+ 	
 		$batchJob = null;
 		if($parentJob)
 		{
@@ -1754,7 +1756,7 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-			
+		
 		if($sendType == kNotificationJobData::NOTIFICATION_MGR_NO_SEND || $sendType == kNotificationJobData::NOTIFICATION_MGR_SEND_SYNCH)
 			$batchJob->setStatus(BatchJob::BATCHJOB_STATUS_DONT_PROCESS);
 		
@@ -1788,9 +1790,9 @@ class kJobsManager
 			{
 				$entry = entryPeer::retrieveByPKNoFilter($batchJob->getEntryId()); // some jobs could be on deleted entry
 				if($entry)
-				{	
+				{
 					$batchJob->setRootJobId($entry->getBulkUploadId());
-					$batchJob->setBulkJobId($entry->getBulkUploadId());		
+					$batchJob->setBulkJobId($entry->getBulkUploadId());
 				}
 			}
 		}
@@ -1807,7 +1809,7 @@ class kJobsManager
 			$batchJob = self::updateBatchJob($batchJob, $batchJob->getStatus());
 		}
 
-		return $batchJob;		
+		return $batchJob;
 	}
 	
 	/**
@@ -1859,7 +1861,7 @@ class kJobsManager
 		{
 		    $jobData->setBulkUploadObjectType(BulkUploadObjectType::ENTRY);
 		}
-			
+		
 		if ($jobData->getBulkUploadObjectType() == BulkUploadObjectType::ENTRY && !$jobData->getObjectData()->getConversionProfileId())
 		{
 			$jobData->setConversionProfileId($partner->getDefaultConversionProfileId());
@@ -1883,7 +1885,7 @@ class kJobsManager
 
 	/**
 	 * Copy aspects of one partner into another
-	 * 
+	 *
 	 * @param int $fromPartnerId
 	 * @param int $toPartnerId
 	 * @return BatchJob
