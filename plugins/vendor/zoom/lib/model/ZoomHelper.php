@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.vendor
  * @subpackage zoom.model
@@ -35,7 +36,7 @@ class ZoomHelper
      * @return null|zoomVendorIntegration
      * @throws PropelException
      */
-	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false)
+	public static function getZoomIntegrationByAccountId($accountId, bool $includeDeleted)
 	{
 		if($includeDeleted)
 		{
@@ -79,15 +80,10 @@ class ZoomHelper
 	 * @param array $zoomUserPermissions
 	 * @return bool
 	 */
-	public static function canConfigureEventSubscription($zoomUserPermissions)
-	{
-		if(in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions))
-		{
-			return true;
-		}
-
-		return false;
-	}
+	public static function canConfigureEventSubscription($zoomUserPermissions): bool
+    {
+        return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
+    }
 
 	/**
 	 * redirects to new URL
@@ -153,7 +149,6 @@ class ZoomHelper
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);
-			/** @noinspection PhpUndefinedMethodInspection */
 			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace( '@partnerId@',$zoomIntegration->getPartnerId(),$page);
@@ -173,8 +168,7 @@ class ZoomHelper
 	public static function extractAccountIdFromDeAuthPayload($data)
 	{
 		$payload = $data[self::PAYLOAD];
-		$accountId = $payload[self::ACCOUNT_ID];
-		return $accountId;
+        return $payload[self::ACCOUNT_ID];
 	}
 
 	/**
@@ -184,8 +178,7 @@ class ZoomHelper
 	public static function getPayloadData()
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
-		$data = json_decode($request_body, true);
-		return $data;
+        return json_decode($request_body, true);
 	}
 
 	/**
@@ -317,9 +310,9 @@ class ZoomHelper
 		return $recordingFilesOrdered;
 	}
 	
-	public static function sortArrayByValuesArray(array $filesOrderByRecordingType, array $orderArray)
-	{
-		$ordered = [];
+	public static function sortArrayByValuesArray(array $filesOrderByRecordingType, array $orderArray): array
+    {
+		$ordered = array();
 		foreach ($orderArray as $item)
 		{
 			$filesByRecordingType = self::getFilesByRecordingType($filesOrderByRecordingType, $item);
