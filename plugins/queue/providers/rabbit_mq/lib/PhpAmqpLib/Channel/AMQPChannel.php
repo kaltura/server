@@ -1084,7 +1084,8 @@ class AMQPChannel extends AbstractChannel
             $pkt = $this->prepare_method_frame(array($class_id, $method_id), $args);
             $this->publish_cache[$cache_key] = $pkt->getvalue();
             if (count($this->publish_cache) > $this->publish_cache_max_size) {
-                $old_key = array_key_first($this->publish_cache);
+                reset($this->publish_cache);
+                $old_key = key($this->publish_cache);
                 unset($this->publish_cache[$old_key]);
             }
         }
