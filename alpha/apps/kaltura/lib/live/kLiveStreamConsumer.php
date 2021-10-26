@@ -11,6 +11,7 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 		if ($object instanceof LiveEntry && $this->isLiveEntryCategoryChanged($object, $modifiedColumns))
 		{
 			$this->handleLiveEntryCategoryChanged($object, $modifiedColumns);
+			return true;
 		}
 		
 		return true;
@@ -19,10 +20,6 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 	protected function handleLiveEntryCategoryChanged(entry $object, array $modifiedColumns)
 	{
 		/* @var $object LiveEntry */
-		if (!$object->getRecordedEntryId())
-		{
-			return false;
-		}
 		$recordedEntry = entryPeer::retrieveByPK($object->getRecordedEntryId());
 		if (!$recordedEntry)
 		{
@@ -33,7 +30,7 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 		$categories = $object->getCategories();
 		if (is_null($categories))
 		{
-			KalturaLog::info("Categories for live entry {$object->getId()} could not be retrieved retrieved.");
+			KalturaLog::info("Categories for live entry {$object->getId()} could not be retrieved.");
 			return false;
 		}
 		
