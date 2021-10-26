@@ -21,6 +21,11 @@ class CuePointIndex extends BaseIndexObject
 	{
 		return 'str_cue_point_id';
 	}
+	
+	public static function getSphinxSplitIndexFieldName()
+	{
+		return 'cue_point.PARTNER_ID';
+	}
 
 	public static function getPropelIdField()
 	{
