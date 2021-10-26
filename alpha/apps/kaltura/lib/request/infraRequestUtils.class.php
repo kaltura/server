@@ -592,8 +592,7 @@ class infraRequestUtils
         $params = array();
         while (current($pathParts)) {
             $key = current($pathParts);
-            next($pathParts);
-            $value = current($pathParts);
+            $value = next($pathParts);
             next($pathParts);
             if (!array_key_exists($key, $params)) {
                 $params[$key] = $value;
