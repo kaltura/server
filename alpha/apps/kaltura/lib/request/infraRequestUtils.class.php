@@ -18,9 +18,9 @@ class infraRequestUtils
 	const CLIENT_TAG = 'clientTag';
 	const ORIGIN_HEADER = 'HTTP_ORIGIN';
 	
-	protected static bool $isInGetRemoteAddress = false;
-	protected static array $remoteAddress = array();
-	protected static ?array $requestParams = null;
+	protected static $isInGetRemoteAddress = false;
+	protected static $remoteAddress = array();
+	protected static $requestParams = null;
 	protected static $hostname = null;
 	public static $jsonData = null;
 
