@@ -406,7 +406,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$dropFolderFileId = $data->dropFolderFileIds;
 		/* @var KalturaZoomDropFolderFile $dropFolderFile*/
 		$dropFolderFile = $this->dropFolderFileService->get($dropFolderFileId);
+
+		/* @var KalturaZoomDropFolder $dropFolder */
 		$dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
+		if(!$dropFolder->zoomVendorIntegration)
+		{
+			throw new kExternalException(KalturaDropFolderErrorCode::MISSING_CONFIG, DropFolderPlugin::MISSING_CONFIG_MESSAGE);
+		}
+
 		$zoomBaseUrl = $dropFolder->baseURL;
 		$entry = KBatchBase::$kClient->baseEntry->get($dropFolderFile->parentEntryId);
 		switch ($data->contentMatchPolicy)
