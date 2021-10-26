@@ -124,7 +124,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
             // -----------------------------------------
             // loop through all mails in current mailbox
             // -----------------------------------------
-            foreach(array_values($newMails) as $curId) {
+            foreach(newMails as $curId) {
 
                 if ($mailsProcessed >= $maxMails) {
                     KalturaLog::info("Reached the max mails per job for current mailbox [$mailboxNumber] - skipping to next mailbox");
