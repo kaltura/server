@@ -14,7 +14,7 @@ class KDLOperatorVlc extends KDLOperatorBase
     /* ---------------------------
      * GenerateCommandLine
      */
-    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra = null): string
+    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra = null)
     {
 
         $cmdStr = "--extraintf logger --log-verbose=10 --verbose-objects=+all --no-sout-transcode-hurry-up -I dummy -vvv";

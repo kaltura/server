@@ -480,7 +480,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
      * @param KMailChecker $mailChecker
      * @param mixed $curId
      */
-    public function reportProblems(AddEntriesFailures $failures, MailMsg $curMail, $user, $host, KMailChecker $mailChecker, mixed $curId): void
+    public function reportProblems(AddEntriesFailures $failures, MailMsg $curMail, $user, $host, KMailChecker $mailChecker, mixed $curId)
     {
         $new_folder = self::UNKNOWN;
         if ($failures->upload_failed || $failures->add_entry_failed || $failures->error_saving_temp_file) {

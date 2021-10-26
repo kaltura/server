@@ -294,7 +294,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $metadataField;
 	}
 	
-	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false , $metadataProfileFieldId = null): string
+	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false , $metadataProfileFieldId = null)
     {
 		
 		 if($isIndex) {
@@ -316,7 +316,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		}
 	}
 	
-	protected function createSphinxSearchPhrase($text, $partnerScope = null, $metadataProfileFieldId = null): string
+	protected function createSphinxSearchPhrase($text, $partnerScope = null, $metadataProfileFieldId = null)
     {
 		
 		$prefix = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ';

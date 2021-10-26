@@ -80,7 +80,7 @@ class ZoomHelper
 	 * @param array $zoomUserPermissions
 	 * @return bool
 	 */
-	public static function canConfigureEventSubscription($zoomUserPermissions): bool
+	public static function canConfigureEventSubscription($zoomUserPermissions)
     {
         return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
     }

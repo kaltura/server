@@ -1339,7 +1339,7 @@ class AMQPChannel extends AbstractChannel
      * @return null
      *@throws \PhpAmqpLib\Exception\AMQPTimeoutException if the specified operation timeout was exceeded
      */
-    public function confirm_select(bool $nowait)
+    public function confirm_select($nowait)
     {
         list($class_id, $method_id, $args) = $this->protocolWriter->confirmSelect($nowait);
 
