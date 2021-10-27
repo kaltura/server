@@ -30,6 +30,8 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getCode";
 	const OS_404_ERROR = 404;
+	const COPY_OBJECT_STATUS_COMPLETED = 'COMPLETED';
+	const COPY_OBJECT_STATUS_FAILED = 'FAILED';
 	
 	/* @var ObjectStorageClient $objectStoargeClient */
 	protected $objectStoargeClient;
@@ -43,6 +45,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $storageClass;
 	protected $userAgentRegex;
 	protected $userAgentPartner;
+	protected $sseType;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kLocalFileSystemManger' class
 	public function __construct(array $options = null)
@@ -59,6 +62,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->namespaceName = isset($options['namespaceName']) ? $options['namespaceName'] : null;
 			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
 			$this->userAgentPartner = isset($options['userAgentPartner']) ? $options['userAgentPartner'] : "Kaltura";
+			$this->sseType = isset($options['sseType']) ? $options['sseType'] : null;
 		}
 		
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
@@ -81,7 +85,13 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doCreateDirForPath($filePath)
 	{
-		// TODO: Implement doCreateDirForPath() method.
+		$dirname = dirname($filePath);
+		if (!$this->doIsDir($dirname))
+		{
+			return $this->doMkdir($dirname);
+		}
+
+		return true;
 	}
 	
 	protected function doCheckFileExists($filePath)
@@ -107,17 +117,62 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doUnlink($filePath)
 	{
-		// TODO: Implement doUnlink() method.
+		$response = $this->osCall('deleteObject', null, $filePath);
+		if($response)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	protected function doPutFileContentAtomic($filePath, $fileContent)
 	{
-		// TODO: Implement doPutFileContentAtomic() method.
+		return $this->doPutFileContent($filePath, (string)$fileContent);
+	}
+
+	private function doPutFileHelper($filePath , $fileContent, $params)
+	{
+		$params = $this->initBasicOciParams($filePath);
+		$params['concurrency'] = $this->concurrency;
+
+		$data = $this->getFileContentHelper($fileContent);
+		$params['putObjectBody'] = $data;
+
+		try
+		{
+			$res = $this->objectStoargeClient->putObject($params);
+
+			KalturaLog::debug("File uploaded to OS, info: " . print_r($res, true));
+			return array(true, $res);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::warning("Failed to uploaded to OS, info with message: " . $e->getMessage());
+			return array(false, $e->getMessage());
+		}
 	}
 	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
-		// TODO: Implement doPutFileContent() method.
+		$params = array();
+		if ($this->sseType === "AES256")
+		{
+			$params['ServerSideEncryption'] = "AES256";
+		}
+
+		$retries = $this->retriesNum;
+		while ($retries > 0)
+		{
+			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
+			if ($success)
+				return $res;
+
+			$retries--;
+		}
+
+		KalturaLog::err("put file content failed with error: {$res->getMessage()}");
+
+		return false;
 	}
 	
 	protected function doRename($filePath, $newFilePath)
@@ -127,7 +182,56 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doCopy($fromFilePath, $toFilePath)
 	{
-		// TODO: Implement doCopy() method.
+		$params = $this->prepCopyParams($fromFilePath, $toFilePath);
+		$response = $this->osCall('copyObject', $params);
+
+		if (!$response)
+		{
+			KalturaLog::debug('Copy Object Failed');
+			return false;
+		}
+
+		// OS copyObject works asynchronously need to check for status
+		$headers = $response->getHeaders();
+		$workRequestId = $headers['opc-work-request-id'][0];
+		$params['workRequestId'] = $workRequestId;
+		$isDone = false;
+
+		KalturaLog::debug('Sending copy request to OS from "' . $fromFilePath . '" to "' . $toFilePath . '", OS Work Request Id = ' . $workRequestId);
+		while (!$isDone)
+		{
+			$response = $this->osCall('getWorkRequest', $params);
+			$status = $response->getJson()->status;
+			$timeFinished = $response->getJson()->timeFinished;
+
+			if ($status == self::COPY_OBJECT_STATUS_COMPLETED)
+			{
+				KalturaLog::debug('Successfully copied from "' . $fromFilePath . '" to "' . $toFilePath . '"');
+				$isDone = true;
+				continue;
+			}
+
+			if (!$timeFinished)
+			{
+				KalturaLog::debug('Current Work Request Status = ' . $status . ' sleeping for 1 sec');
+				sleep(1);
+				continue;
+			}
+
+			if ($status == self::COPY_OBJECT_STATUS_FAILED)
+			{
+				$response = $this->osCall('listWorkRequestErrors', array('workRequestId' => $workRequestId));
+				$reason = $response->getBody();
+				KalturaLog::debug('Failed to copy from "' . $fromFilePath . '" to "' . $toFilePath . '" reason: ' . print_r($reason, true));
+			}
+		}
+
+		if($status != self::COPY_OBJECT_STATUS_COMPLETED)
+		{
+			KalturaLog::debug('Failed to copy, finale status = ' . $status);
+			return false;
+		}
+		return true;
 	}
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
@@ -147,17 +251,52 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
 	{
-		// TODO: Implement doMoveFile() method.
+		$from = kFileBase::fixPath($from);
+		$to = kFileBase::fixPath($to);
+
+		if(!$this->doCheckFileExists($from))
+		{
+			KalturaLog::err("file [$from] does not exist locally or on external storage");
+			return false;
+		}
+		if (strpos($to, '\"') !== false)
+		{
+			KalturaLog::err("Illegal destination file [$to]");
+			return false;
+		}
+		return $this->copyRecursively($from, $to, !$copy);
 	}
-	
+
 	protected function doIsDir($path)
 	{
-		// TODO: Implement doIsDir() method.
+		//Object storage does use directories so to determine if path is dir or not we simply list the path on OS
+		//If it returns more than 1 match than its a directory
+		//When checking if path is Dir in OS add a trailing slash to the path to avoid considering files with the same name but different ext as dir's
+		// Example:
+		//  my_bucket/dir1/dir2/my_file.mp4
+		//  my_bucket/dir1/dir2/my_file.mp4.log
+		$path = $path . '/';
+		$params = $this->initBasicOciParams($path);
+		$params['prefix'] = $params['objectName'];
+
+		try
+		{
+			$dirListObjects = $this->objectStoargeClient->listObjects($params)->getJson();
+			foreach ($dirListObjects->objects as $dirListObject)
+			{
+				return true;
+			}
+		}
+		catch ( Exception $e )
+		{
+			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
+		}
+		return false;
 	}
 	
 	protected function doMkdir($path, $mode, $recursive)
 	{
-		// TODO: Implement doMkdir() method.
+		return true;
 	}
 	
 	protected function doRmdir($path)
@@ -182,8 +321,8 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			return false;
 		}
-		
-		return $result->getHeaderValue('Content-Length');
+		$headers = $result->getHeaders();
+		return $headers['Content-Length'][0];
 	}
 	
 	protected function doDeleteFile($filename)
@@ -252,9 +391,46 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		// TODO: Implement doFilemtime() method.
 	}
 	
-	protected function doMoveLocalToShared($from, $to, $copy = false)
+	protected function doMoveLocalToShared($src, $dest, $copy = false)
 	{
-		// TODO: Implement doMoveLocalToShared() method.
+		$params = array();
+		if ($this->sseType === "AES256")
+		{
+			$params['ServerSideEncryption'] = "AES256";
+		}
+
+		$fp = fopen($src, 'r');
+		if(!$fp)
+		{
+			KalturaLog::err("Failed to open file: [$src]");
+			return false;
+		}
+
+		$retries = $this->retriesNum;
+		while ($retries > 0)
+		{
+			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
+			if ($success)
+				break;
+
+			sleep(rand(1,3));
+			$retries--;
+		}
+
+		//Silence error to avoid warning caused by file handle being changed by the OS client upload action
+		@fclose($fp);
+		if (!$success)
+		{
+			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			return false;
+		}
+		if (!$copy && (!unlink($src)))
+		{
+			KalturaLog::err("Failed to delete source file : [$src]");
+			return false;
+		}
+
+		return $success;
 	}
 	
 	protected function doDir($filePath)
@@ -360,5 +536,57 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		self::safeLog("OS [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
+	}
+
+	private function getFileContentHelper($body)
+	{
+		switch (gettype($body))
+		{
+			case 'string':
+				return self::fromString($body);
+			case 'resource':
+				return $body;
+			case 'object':
+				if (method_exists($body, '__toString'))
+				{
+					return self::fromString((string)$body);
+				}
+				break;
+			case 'array':
+				return self::fromString(http_build_query($body));
+		}
+		throw new InvalidArgumentException('Invalid resource type');
+	}
+	private static function fromString($string)
+	{
+		$stream = fopen('php://temp', 'r+');
+		if ($string !== '')
+		{
+			fwrite($stream, $string);
+			rewind($stream);
+		}
+		return $stream;
+	}
+
+	protected function prepCopyParams($fromFilePath, $toFilePath)
+	{
+		list($fromBucket, $fromFilePath) = $this->getBucketAndFilePath($fromFilePath);
+		list($toBucket, $toFilePath) = $this->getBucketAndFilePath($toFilePath);
+
+		$copyObjectDetails = array(
+			'sourceObjectName' => $fromFilePath,
+			'destinationRegion' => $this->region,
+			'destinationNamespace' => $this->namespaceName,
+			'destinationBucket' => $toBucket,
+			'destinationObjectName' => $toFilePath
+		);
+
+		$params = array(
+			'bucketName' => $fromBucket,
+			'namespaceName' => $this->namespaceName,
+			'copyObjectDetails' => $copyObjectDetails
+		);
+
+		return $params;
 	}
 }

@@ -62,11 +62,6 @@ class OciResponse
     {
         return $this->json;
     }
-	
-	public function getHeaderValue($key)
-	{
-		return trim($this->headers[$key][0]);
-	}
 
     public function echoResponse()
     {
