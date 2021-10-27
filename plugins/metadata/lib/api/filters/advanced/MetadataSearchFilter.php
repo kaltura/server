@@ -263,7 +263,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	 * 
 	 * @param string $field - xPath (metadataProfileField)
 	 */
-	protected function getMetadataSearchField($field = null, $xPaths = array(), &$fieldType = null): ?string
+	protected function getMetadataSearchField($field = null, $xPaths = array(), &$fieldType = null)
     {
 		$fieldType = null;
 		if(!$field)
@@ -334,7 +334,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	}
 	
 	
-	public function getFreeTextConditions($partnerScope, $freeTexts): array
+	public function getFreeTextConditions($partnerScope, $freeTexts)
     {
 		$metadataProfileFieldIds = array();
 		$metadataProfileId = $this->getMetadataProfileId();

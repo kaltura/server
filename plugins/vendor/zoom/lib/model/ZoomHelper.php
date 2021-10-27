@@ -310,7 +310,7 @@ class ZoomHelper
 		return $recordingFilesOrdered;
 	}
 	
-	public static function sortArrayByValuesArray(array $filesOrderByRecordingType, array $orderArray): array
+	public static function sortArrayByValuesArray(array $filesOrderByRecordingType, array $orderArray)
     {
 		$ordered = array();
 		foreach ($orderArray as $item)

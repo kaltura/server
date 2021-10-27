@@ -89,7 +89,7 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	 * @param boolean $cleanIfInfected
 	 * @param string $errorDescription
 	 */
-	public function execute($filePath, $cleanIfInfected, &$output, &$errorDescription): int
+	public function execute($filePath, $cleanIfInfected, &$output, &$errorDescription)
     {
 		if (!file_exists($filePath))
 		{

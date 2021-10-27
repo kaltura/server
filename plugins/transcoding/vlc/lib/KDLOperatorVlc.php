@@ -170,7 +170,7 @@ class KDLOperatorVlc extends KDLOperatorBase
      * CheckConstraints
      */
 
-    private function generateH264params($videoObject): string
+    private function generateH264params($videoObject)
     {
         $params = null;
         $h264 = new KDLCodecH264($videoObject);
