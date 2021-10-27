@@ -28,10 +28,15 @@ use Oracle\Oci\Common\Logging\EchoLogAdapter;
 
 class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 {
+	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
+	const MAX_PARTS_NUMBER = 10000;
+	const MIN_PART_SIZE = 5242880;
+	
+	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getCode";
-	const OS_404_ERROR = 404;
 	const COPY_OBJECT_STATUS_COMPLETED = 'COMPLETED';
 	const COPY_OBJECT_STATUS_FAILED = 'FAILED';
+	const OS_404_ERROR = 404;
 	
 	/* @var ObjectStorageClient $objectStoargeClient */
 	protected $objectStoargeClient;
@@ -85,12 +90,6 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doCreateDirForPath($filePath)
 	{
-		$dirname = dirname($filePath);
-		if (!$this->doIsDir($dirname))
-		{
-			return $this->doMkdir($dirname);
-		}
-
 		return true;
 	}
 	
@@ -142,7 +141,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			$res = $this->objectStoargeClient->putObject($params);
 
-			KalturaLog::debug("File uploaded to OS, info: " . print_r($res, true));
+			self::safeLog("File uploaded to OS, info: " . print_r($res, true));
 			return array(true, $res);
 		}
 		catch (Exception $e)
@@ -182,12 +181,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doCopy($fromFilePath, $toFilePath)
 	{
-		$params = $this->prepCopyParams($fromFilePath, $toFilePath);
+		$params = $this->getCopyParams($fromFilePath, $toFilePath);
 		$response = $this->osCall('copyObject', $params);
 
 		if (!$response)
 		{
-			KalturaLog::debug('Copy Object Failed');
+			self::safeLog('Copy Object Failed');
 			return false;
 		}
 
@@ -197,7 +196,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$params['workRequestId'] = $workRequestId;
 		$isDone = false;
 
-		KalturaLog::debug('Sending copy request to OS from "' . $fromFilePath . '" to "' . $toFilePath . '", OS Work Request Id = ' . $workRequestId);
+		self::safeLog("Sending copy request to OS fro [$fromFilePath] to [$toFilePath] OS Work Request Id [$workRequestId]");
 		while (!$isDone)
 		{
 			$response = $this->osCall('getWorkRequest', $params);
@@ -206,14 +205,14 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 			if ($status == self::COPY_OBJECT_STATUS_COMPLETED)
 			{
-				KalturaLog::debug('Successfully copied from "' . $fromFilePath . '" to "' . $toFilePath . '"');
+				self::safeLog("Successfully copied from [$fromFilePathto] to [$toFilePath]");
 				$isDone = true;
 				continue;
 			}
 
 			if (!$timeFinished)
 			{
-				KalturaLog::debug('Current Work Request Status = ' . $status . ' sleeping for 1 sec');
+				self::safeLog("Current Work Request Status = $status sleeping for 1 sec");
 				sleep(1);
 				continue;
 			}
@@ -222,13 +221,13 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			{
 				$response = $this->osCall('listWorkRequestErrors', array('workRequestId' => $workRequestId));
 				$reason = $response->getBody();
-				KalturaLog::debug('Failed to copy from "' . $fromFilePath . '" to "' . $toFilePath . '" reason: ' . print_r($reason, true));
+				self::safeLog("Failed to copy from [$fromFilePath] to [$toFilePath] reason: " . print_r($reason, true));
 			}
 		}
 
 		if($status != self::COPY_OBJECT_STATUS_COMPLETED)
 		{
-			KalturaLog::debug('Failed to copy, finale status = ' . $status);
+			self::safeLog("Failed to copy, finale status [$status]");
 			return false;
 		}
 		return true;
@@ -241,12 +240,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
 	{
-		// TODO: Implement doFullMkdir() method.
+		return true;
 	}
 	
 	protected function doFullMkfileDir($path, $rights = 0777, $recursive = true)
 	{
-		// TODO: Implement doFullMkfileDir() method.
+		return true;
 	}
 	
 	protected function doMoveFile($from, $to, $override_if_exists = false, $copy = false)
@@ -306,12 +305,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doChown($path, $user, $group)
 	{
-		// TODO: Implement doChown() method.
+		return true;
 	}
 	
 	protected function doChmod($path, $mode)
 	{
-		// TODO: Implement doChmod() method.
+		return true;
 	}
 	
 	protected function doFileSize($filename)
@@ -327,42 +326,173 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doDeleteFile($filename)
 	{
-		// TODO: Implement doDeleteFile() method.
+		return $this->doUnlink($filename);
 	}
 	
 	protected function doCopySingleFile($src, $dest, $deleteSrc)
 	{
-		// TODO: Implement doCopySingleFile() method.
+		if(!kFile::isSharedPath($src))
+		{
+			return $this->copyFileLocalToShared($src, $dest, $deleteSrc);
+		}
+		
+		return $this->copyFileFromShared($src, $dest, $deleteSrc);
+	}
+	
+	protected function copyFileLocalToShared($src, $dest, $deleteSrc)
+	{
+		$result = $this->doGetFileFromResource($src, $dest);
+		if (!$result)
+		{
+			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			return false;
+		}
+		if ($deleteSrc && (!unlink($src)))
+		{
+			KalturaLog::err("Failed to delete source file : [$src]");
+			return false;
+		}
+		return true;
+	}
+	
+	protected function copyFileFromShared($src, $dest, $deleteSrc)
+	{
+		if(kFile::isSharedPath($dest))
+		{
+			$result = $this->doCopy($src, $dest);
+		}
+		else
+		{
+			$result = $this->copySharedToLocal($src, $dest);
+		}
+		
+		if ($result && $deleteSrc)
+		{
+			return $this->doDeleteFile($src);
+		}
+		
+		KalturaLog::debug("Copy file from shared result [$result] ");
+		return $result;
+	}
+	
+	protected function copySharedToLocal($src, $dest)
+	{
+		// TODO: Implement doCopyDir() method.
 	}
 	
 	protected function doGetMaximumPartsNum()
 	{
-		// TODO: Implement doGetMaximumPartsNum() method.
+		return self::MAX_PARTS_NUMBER;
 	}
 	
 	protected function doGetUploadMinimumSize()
 	{
-		// TODO: Implement doGetUploadMinimumSize() method.
+		return self::MIN_PART_SIZE;
 	}
 	
 	protected function doGetUploadMaxSize()
 	{
-		// TODO: Implement doGetUploadMaxSize() method.
+		return self::MULTIPART_UPLOAD_MINIMUM_FILE_SIZE;
 	}
 	
 	protected function doListFiles($filePath, $pathPrefix = '', $recursive = true, $fileNamesOnly = false)
 	{
-		// TODO: Implement doListFiles() method.
+		$dirList = array();
+		try
+		{
+			$params = $this->initBasicOciParams($filePath);
+			$params['prefix'] = $params['objectName'];
+			$params['fields'] = 'size';
+			$bucket = $params['bucketName'];
+			$dirListObjects = $this->objectStoargeClient->listObjects($params)->getJson();
+			
+			$originalFilePath = $bucket . '/' . $filePath . '/';
+			
+			foreach ($dirListObjects->objects as $dirListObject)
+			{
+				$fullPath = '/' . $bucket . '/' . $dirListObject->name;
+				$fileName = $pathPrefix.basename($fullPath);
+				if($originalFilePath == $fullPath)
+					continue;
+				
+				$fileType = "file";
+				if($dirListObject->size == 0 && substr_compare($fullPath, '/', -strlen('/')) === 0)
+				{
+					$fileType = 'dir';
+				}
+				
+				if ($fileType == 'dir')
+				{
+					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject->size);
+					if( $recursive)
+					{
+						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
+					}
+				}
+				else
+				{
+					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject->size);
+				}
+			}
+		}
+		catch ( Exception $e )
+		{
+			self::safeLog("Couldn't list file objects for remote path, [$filePath] from bucket [$bucket]: {$e->getMessage()}");
+		}
+		
+		return $dirList;
 	}
 	
 	protected function doIsFile($filePath)
 	{
-		// TODO: Implement doIsFile() method.
+		$response = $this->getHeadObjectForPath($filePath);
+		if(!$response)
+		{
+			return false;
+		}
+		
+		$resHeaders = $response->getHeaders();
+		$contentLength = $resHeaders['Content-Length'][0];
+		return ($contentLength != 0 && substr($filePath, -1) != "/") ? true : false;
 	}
 	
 	protected function doRealPath($filePath, $getRemote = true)
 	{
-		// TODO: Implement doRealPath() method.
+		if(!$getRemote)
+			return $filePath;
+		
+		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
+		
+		$preAuthenticatedRequestDetails = array(
+			'accessType' => 'ObjectRead',
+			'objectName' => $filePath,
+			'name' => "kaltura-$filePath",
+			'timeExpires' => date('Y-m-d\TH:i:sP', strtotime('+5 days'))
+		);
+		
+		$params = array(
+			'bucketName' => $bucket,
+			'namespaceName' => $this->namespaceName,
+			'createPreauthenticatedRequestDetails' => $preAuthenticatedRequestDetails
+		);
+		
+		try
+		{
+			$preSignedUrl = $this->objectStoargeClient->createPreauthenticatedRequest($params)->getJson();
+		}
+		catch ( Exception $e )
+		{
+			self::safeLog("Couldn't create pre signed url for [$path]: {$e->getMessage()}");
+			return null;
+		}
+		
+		if(!$preSignedUrl)
+		{
+			self::safeLog("No preSignedUrl object returned");
+			return null;
+		}
+		
+		return "https://objectstorage.{$this->region}.oraclecloud.com" . $preSignedUrl->accessUri;
 	}
 	
 	protected function doMimeType($filePath)
@@ -378,17 +508,34 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doDumpFilePart($filePath, $range_from, $range_length)
 	{
-		// TODO: Implement doDumpFilePart() method.
+		$fileUrl = $this->doRealPath($filePath);
+		
+		$ch = curl_init();
+		
+		curl_setopt($ch, CURLOPT_URL, $fileUrl);
+		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+		$range_to = ($range_from + $range_length) - 1;
+		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
+		
+		$result = curl_exec($ch);
 	}
 	
 	protected function doChgrp($filePath, $contentGroup)
 	{
-		// TODO: Implement doChgrp() method.
+		return true;
 	}
 	
 	protected function doFilemtime($filePath)
 	{
-		// TODO: Implement doFilemtime() method.
+		$response = $this->getHeadObjectForPath($filePath);
+		
+		if(!$response)
+		{
+			return false;
+		}
+		$headers = $response->getHeaders();
+		return $headers['last-modified'][0];
 	}
 	
 	protected function doMoveLocalToShared($src, $dest, $copy = false)
@@ -435,7 +582,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doDir($filePath)
 	{
-		// TODO: Implement doDir() method.
+		return null;
 	}
 	
 	protected function doCopyDir($src, $dest, $deleteSrc)
@@ -445,12 +592,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doShouldPollFileExists()
 	{
-		// TODO: Implement doShouldPollFileExists() method.
+		return false;
 	}
 	
 	protected function doCopySharedToSharedAllowed()
 	{
-		// TODO: Implement doCopySharedToSharedAllowed() method.
+		return false;
 	}
 	
 	protected function getHeadObjectForPath($path)
@@ -568,7 +715,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		return $stream;
 	}
 
-	protected function prepCopyParams($fromFilePath, $toFilePath)
+	protected function getCopyParams($fromFilePath, $toFilePath)
 	{
 		list($fromBucket, $fromFilePath) = $this->getBucketAndFilePath($fromFilePath);
 		list($toBucket, $toFilePath) = $this->getBucketAndFilePath($toFilePath);

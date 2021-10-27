@@ -307,9 +307,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRename($filePath, $newFilePath)
 	{
-		if(kFile::isSharedPath($filePath) && !$this->doCopy($filePath, $newFilePath))
+		if(kFile::isSharedPath($filePath) && $this->doCopy($filePath, $newFilePath))
 		{
-			return false;
+			kFile::unlink($filePath);
+			return true;
 		}
 		
 		if(!$this->doMoveLocalToShared($filePath, $newFilePath, true))
@@ -764,7 +765,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			return false;
 		}
-		return $result['Last-Modified'];
+		return $result['LastModified'];
 	}
 	
 	protected function doMoveLocalToShared($src, $dest, $copy = false)
