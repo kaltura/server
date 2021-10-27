@@ -263,7 +263,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	 * 
 	 * @param string $field - xPath (metadataProfileField)
 	 */
-	protected function getMetadataSearchField($field = null, $xPaths = array(), &$fieldType = null): ?string
+	protected function getMetadataSearchField($field = null, $xPaths = array(), &$fieldType = null)
     {
 		$fieldType = null;
 		if(!$field)
@@ -294,7 +294,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		return $metadataField;
 	}
 	
-	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false , $metadataProfileFieldId = null): string
+	public static function createSphinxSearchCondition($partnerId, $text, $isIndex = false , $metadataProfileFieldId = null)
     {
 		
 		 if($isIndex) {
@@ -316,7 +316,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 		}
 	}
 	
-	protected function createSphinxSearchPhrase($text, $partnerScope = null, $metadataProfileFieldId = null): string
+	protected function createSphinxSearchPhrase($text, $partnerScope = null, $metadataProfileFieldId = null)
     {
 		
 		$prefix = '@' . MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA) . ' ';
@@ -334,7 +334,7 @@ class MetadataSearchFilter extends AdvancedSearchFilterOperator
 	}
 	
 	
-	public function getFreeTextConditions($partnerScope, $freeTexts): array
+	public function getFreeTextConditions($partnerScope, $freeTexts)
     {
 		$metadataProfileFieldIds = array();
 		$metadataProfileId = $this->getMetadataProfileId();

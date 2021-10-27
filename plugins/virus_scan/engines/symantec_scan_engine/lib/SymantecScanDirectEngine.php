@@ -16,7 +16,7 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	 * For example - command line of the relevant binary file.
 	 * @param unknown_type $paramsObject Object containing job parameters
 	 */
-	public function config($paramsObject): bool
+	public function config($paramsObject)
     {
 		if (isset($paramsObject->sleepBetweenScanRetries))
 		{
@@ -89,7 +89,7 @@ class SymantecScanDirectEngine extends SymantecScanEngine
 	 * @param boolean $cleanIfInfected
 	 * @param string $errorDescription
 	 */
-	public function execute($filePath, $cleanIfInfected, &$output, &$errorDescription): int
+	public function execute($filePath, $cleanIfInfected, &$output, &$errorDescription)
     {
 		if (!file_exists($filePath))
 		{

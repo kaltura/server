@@ -1084,7 +1084,8 @@ class AMQPChannel extends AbstractChannel
             $pkt = $this->prepare_method_frame(array($class_id, $method_id), $args);
             $this->publish_cache[$cache_key] = $pkt->getvalue();
             if (count($this->publish_cache) > $this->publish_cache_max_size) {
-                $old_key = array_key_first($this->publish_cache);
+                reset($this->publish_cache);
+                $old_key = key($this->publish_cache);
                 unset($this->publish_cache[$old_key]);
             }
         }
@@ -1338,7 +1339,7 @@ class AMQPChannel extends AbstractChannel
      * @return null
      *@throws \PhpAmqpLib\Exception\AMQPTimeoutException if the specified operation timeout was exceeded
      */
-    public function confirm_select(bool $nowait)
+    public function confirm_select($nowait)
     {
         list($class_id, $method_id, $args) = $this->protocolWriter->confirmSelect($nowait);
 
