@@ -176,7 +176,19 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRename($filePath, $newFilePath)
 	{
-		// TODO: Implement doRename() method.
+		if(kFile::isSharedPath($filePath) && $this->doCopy($filePath, $newFilePath))
+		{
+			kFile::unlink($filePath);
+			return true;
+		}
+
+		if(!$this->doMoveLocalToShared($filePath, $newFilePath, true))
+		{
+			return false;
+		}
+
+		kFile::unlink($filePath);
+		return true;
 	}
 	
 	protected function doCopy($fromFilePath, $toFilePath)
@@ -196,7 +208,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$params['workRequestId'] = $workRequestId;
 		$isDone = false;
 
-		self::safeLog("Sending copy request to OS fro [$fromFilePath] to [$toFilePath] OS Work Request Id [$workRequestId]");
+		self::safeLog("Sending copy request to OS from [$fromFilePath] to [$toFilePath] OS Work Request Id [$workRequestId]");
 		while (!$isDone)
 		{
 			$response = $this->osCall('getWorkRequest', $params);
@@ -205,7 +217,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 			if ($status == self::COPY_OBJECT_STATUS_COMPLETED)
 			{
-				self::safeLog("Successfully copied from [$fromFilePathto] to [$toFilePath]");
+				self::safeLog("Successfully copied from [$fromFilePath] to [$toFilePath]");
 				$isDone = true;
 				continue;
 			}
@@ -227,7 +239,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 		if($status != self::COPY_OBJECT_STATUS_COMPLETED)
 		{
-			self::safeLog("Failed to copy, finale status [$status]");
+			self::safeLog("Failed to copy, final status [$status]");
 			return false;
 		}
 		return true;
