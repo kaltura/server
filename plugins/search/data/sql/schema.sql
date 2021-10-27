@@ -28,7 +28,7 @@ CREATE TABLE `sphinx_log` (
     KEY `sphinx_log_FI_1` (`partner_id`),
     KEY `created_at` (`created_at`),
     KEY `dc_id` (`dc`,`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=109382799732 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 #-----------------------------------------------------------------------------
 #-- sphinx_log_server
@@ -46,7 +46,7 @@ CREATE TABLE `sphinx_log_server` (
  `updated_at` datetime DEFAULT NULL,
  PRIMARY KEY (`id`),
  KEY `sphinx_log_server_FI_1` (`last_log_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1961 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;
