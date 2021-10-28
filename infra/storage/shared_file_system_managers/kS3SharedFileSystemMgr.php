@@ -866,7 +866,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			return false;
 		}
-		return $result;
+		return true;
 	}
 	
 	public function multipartUploadPartUpload($uploadId, $partNumber, &$srcContent, $destFilePath)

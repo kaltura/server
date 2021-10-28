@@ -31,6 +31,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
+	const CHUNK_SIZE = 102400;
 
 	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getCode";
@@ -465,7 +466,37 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function copySharedToLocal($src, $dest)
 	{
-		// TODO: Implement doCopyDir() method.
+		$bytesWritten = 0;
+
+		// wrap function
+		kSharedFileSystemMgr::restoreStreamWrappers();
+		$srcRealPath = $this->doRealPath($src);
+
+		$sourceFH = fopen($srcRealPath, 'rb');
+		if (!$sourceFH)
+		{
+			self::safeLog("Could not open source file [$src] for read");
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
+			return false;
+		}
+
+		if (function_exists('stream_set_chunk_size'))
+		{
+			stream_set_chunk_size($sourceFH, self::CHUNK_SIZE);
+		}
+
+		$start = microtime(true);
+		while (!feof($sourceFH))
+		{
+			$data = fread($sourceFH, self::CHUNK_SIZE);
+			$bytesWritten += strlen($data);
+			file_put_contents($dest, $data);
+		}
+		$totalCopyTime = microtime(true) - $start;
+		self::safeLog("Took [$totalCopyTime] seconds, bytes written [$bytesWritten]");
+		fclose($sourceFH);
+
+		return true;
 	}
 	
 	protected function doGetMaximumPartsNum()
