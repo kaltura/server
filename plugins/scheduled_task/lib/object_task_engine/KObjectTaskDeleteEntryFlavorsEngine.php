@@ -111,6 +111,14 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 				$atLeastOneFlavorWillBeLeft = true;
 				break;
 			}
+
+			$flavorAssetTags = explode(',', $flavor->tags);
+			$tagSource = in_array('source', $flavorAssetTags);
+			if ($flavor->isOriginal && $tagSource)
+			{
+				$atLeastOneFlavorWillBeLeft = true;
+				break;
+			}
 		}
 
 		if (!$atLeastOneFlavorWillBeLeft)
@@ -122,7 +130,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		foreach ($flavors as $flavor)
 		{
 			/** @var $flavor KalturaFlavorAsset */
-			if (!in_array($flavor->flavorParamsId, $flavorParamsIds))
+			if (!in_array($flavor->flavorParamsId, $flavorParamsIds) && !$flavor->isOriginal)
 			{
 				$this->deleteFlavor($flavor->id, $flavor->partnerId);
 			}
