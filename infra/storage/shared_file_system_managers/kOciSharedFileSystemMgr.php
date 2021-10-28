@@ -146,7 +146,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::warning("Failed to uploaded to OS, info with message: " . $e->getMessage());
+			self::safeLog("Failed to uploaded to OS, info with message: " . $e->getMessage());
 			return array(false, $e->getMessage());
 		}
 	}
@@ -169,7 +169,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$retries--;
 		}
 
-		KalturaLog::err("put file content failed with error: {$res->getMessage()}");
+		self::safeLog("put file content failed with error: {$res->getMessage()}");
 
 		return false;
 	}
@@ -330,12 +330,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 		if(!$this->doCheckFileExists($from))
 		{
-			KalturaLog::err("file [$from] does not exist locally or on external storage");
+			self::safeLog("file [$from] does not exist locally or on external storage");
 			return false;
 		}
 		if (strpos($to, '\"') !== false)
 		{
-			KalturaLog::err("Illegal destination file [$to]");
+			self::safeLog("Illegal destination file [$to]");
 			return false;
 		}
 		return $this->copyRecursively($from, $to, !$copy);
@@ -375,7 +375,20 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRmdir($path)
 	{
-		// TODO: Implement doRmdir() method.
+		$rmSuccess = true;
+		$successMetric = array(false => 0, true => 0);
+		list($bucket, $filePath) = $this->getBucketAndFilePath($path);
+		
+		$objectsToDelete = $this->doListFiles($path,'', true);
+		foreach($objectsToDelete as $objectToDelete)
+		{
+			$unlinkSuccess = $this->doUnlink($objectToDelete['fullPath']);
+			$successMetric[$unlinkSuccess] = $successMetric[$unlinkSuccess]++;
+			$rmSuccess = $rmSuccess && $unlinkSuccess;
+		}
+		
+		self::safeLog("rmDir result is [$rmSuccess], copied [" . $successMetric[0] . "] failed [" . $successMetric[1] . "]");
+		return $rmSuccess;
 	}
 	
 	protected function doChown($path, $user, $group)
@@ -419,12 +432,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$result = $this->doGetFileFromResource($src, $dest);
 		if (!$result)
 		{
-			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			self::safeLog("Failed to upload file: [$src] to [$dest]");
 			return false;
 		}
 		if ($deleteSrc && (!unlink($src)))
 		{
-			KalturaLog::err("Failed to delete source file : [$src]");
+			self::safeLog("Failed to delete source file : [$src]");
 			return false;
 		}
 		return true;
@@ -446,7 +459,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			return $this->doDeleteFile($src);
 		}
 		
-		KalturaLog::debug("Copy file from shared result [$result] ");
+		self::safeLog("Copy file from shared result [$result] ");
 		return $result;
 	}
 	
@@ -498,7 +511,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				
 				if ($fileType == 'dir')
 				{
-					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject->size);
+					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject->size, 'fullPath' => $fullPath);
 					if( $recursive)
 					{
 						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
@@ -506,7 +519,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				}
 				else
 				{
-					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject->size);
+					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject->size, 'fullPath' => $fullPath);
 				}
 			}
 		}
@@ -624,7 +637,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$fp = fopen($src, 'r');
 		if(!$fp)
 		{
-			KalturaLog::err("Failed to open file: [$src]");
+			self::safeLog("Failed to open file: [$src]");
 			return false;
 		}
 
@@ -643,12 +656,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		@fclose($fp);
 		if (!$success)
 		{
-			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
+			self::safeLog("Failed to upload file: [$src] to [$dest]");
 			return false;
 		}
 		if (!$copy && (!unlink($src)))
 		{
-			KalturaLog::err("Failed to delete source file : [$src]");
+			self::safeLog("Failed to delete source file : [$src]");
 			return false;
 		}
 
@@ -662,7 +675,32 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doCopyDir($src, $dest, $deleteSrc)
 	{
-		// TODO: Implement doCopyDir() method.
+		$copySuccess = true;
+		$dirObjects = $this->getListObjects($src);
+		list($bucket, $filePath) = $this->getBucketAndFilePath($src);
+		
+		foreach ($dirObjects as $object)
+		{
+			if(kFile::isDir($object->name))
+			{
+				self::safeLog("Initiating internal dir copy from [{$object->name}] to [" . $dest . basename($object->name) . "] delSrc [$deleteSrc]");
+				$copySuccess = kFile::copyDir($object->name, $dest . basename($object->name), $deleteSrc);
+				continue;
+			}
+				
+			$fileName = basename($object->name);
+			
+			$from = "/$bucket/{$object->name}";
+			$to = $dest . DIRECTORY_SEPARATOR . $fileName;
+			$res = kFile::copySingleFile($from, $to , $deleteSrc);
+			if (!$res)
+			{
+				self::safeLog("Failed to copy file from [$from] to [$to], continue to other objects");
+				$copySuccess = false;
+			}
+		}
+		
+		return $copySuccess;
 	}
 	
 	protected function doShouldPollFileExists()
@@ -732,8 +770,9 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		return false;
 	}
 	
-	public function initBasicOciParams($filePath)
+	protected function initBasicOciParams($filePath)
 	{
+		KalturaLog::debug("TTT: filePath [$filePath]");
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		
 		$params = array(
@@ -759,6 +798,23 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		self::safeLog("OS [$command] command failed. Retries left: [$retries] Params: " . print_r($params, true)."\n{$e->getMessage()}");
 	}
+	
+	protected function getListObjects($filePath)
+	{
+		$params = $this->initBasicOciParams($filePath);
+		$params['prefix'] = $params['objectName'];
+		
+		try
+		{
+			$dirListObjects = $this->objectStoargeClient->listObjects($params)->getJson();
+		}
+		catch ( Exception $e )
+		{
+			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
+		}
+		
+		return $dirListObjects->objects;
+	}
 
 	private function getFileContentHelper($body)
 	{
@@ -779,6 +835,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		throw new InvalidArgumentException('Invalid resource type');
 	}
+	
 	private static function fromString($string)
 	{
 		$stream = fopen('php://temp', 'r+');
