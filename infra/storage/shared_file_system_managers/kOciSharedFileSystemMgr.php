@@ -467,34 +467,18 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function copySharedToLocal($src, $dest)
 	{
 		$bytesWritten = 0;
-
-		// wrap function
-		kSharedFileSystemMgr::restoreStreamWrappers();
-		$srcRealPath = $this->doRealPath($src);
-
-		$sourceFH = fopen($srcRealPath, 'rb');
-		if (!$sourceFH)
-		{
-			self::safeLog("Could not open source file [$src] for read");
-			kSharedFileSystemMgr::unRegisterStreamWrappers();
-			return false;
-		}
-
-		if (function_exists('stream_set_chunk_size'))
-		{
-			stream_set_chunk_size($sourceFH, self::CHUNK_SIZE);
-		}
+		list($sourceFH, $destFH) = $this->getSourceAndDestinationStreams($src, $dest);
 
 		$start = microtime(true);
 		while (!feof($sourceFH))
 		{
 			$data = fread($sourceFH, self::CHUNK_SIZE);
 			$bytesWritten += strlen($data);
-			file_put_contents($dest, $data);
+			fwrite($destFH, $data);
 		}
 		$totalCopyTime = microtime(true) - $start;
 		self::safeLog("Took [$totalCopyTime] seconds, bytes written [$bytesWritten]");
-		fclose($sourceFH);
+		$this->closeSourceAndDestinationStreams($sourceFH, $destFH);
 
 		return true;
 	}
@@ -916,5 +900,42 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$params = $this->initBasicOciParams($destFilePath);
 		$params['uploadId'] = $uploadId;
 		return $params;
+	}
+
+	protected function getSourceAndDestinationStreams($src, $dest)
+	{
+		kSharedFileSystemMgr::restoreStreamWrappers();
+		$srcRealPath = $this->doRealPath($src);
+
+		$sourceFH = fopen($srcRealPath, 'rb');
+		if (!$sourceFH)
+		{
+			self::safeLog("Could not open source file [$src] for read");
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
+			return false;
+		}
+
+		$destFH = fopen($dest, 'w');
+		if (!$destFH)
+		{
+			self::safeLog("Could not open destination file [$dest] for read");
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
+			return false;
+		}
+
+		if (function_exists('stream_set_chunk_size'))
+		{
+			stream_set_chunk_size($sourceFH, self::CHUNK_SIZE);
+		}
+
+		return array($sourceFH, $destFH);
+	}
+
+	protected function closeSourceAndDestinationStreams($sourceFH, $destFH)
+	{
+		fclose($sourceFH);
+		fclose($destFH);
+		kSharedFileSystemMgr::unRegisterStreamWrappers();
+		return true;
 	}
 }
