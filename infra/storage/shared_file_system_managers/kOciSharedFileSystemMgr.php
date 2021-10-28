@@ -31,7 +31,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
-	
+
 	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getCode";
 	const COPY_OBJECT_STATUS_COMPLETED = 'COMPLETED';
@@ -247,7 +247,70 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doGetFileFromResource($resource, $destFilePath = null, $allowInternalUrl = false)
 	{
-		// TODO: Implement doGetFileFromResource() method.
+		kSharedFileSystemMgr::restoreStreamWrappers();
+
+		$sourceFH = fopen($resource, 'rb');
+		if(!$sourceFH)
+		{
+			self::safeLog("Could not open source file [$resource] for read");
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
+			return false;
+		}
+
+		$multiPartParams = $this->getMultipartUploadParams($destFilePath);
+
+		$responseJsonObject = $this->objectStoargeClient->createMultipartUpload($multiPartParams)->getJson();
+		$uploadId = $responseJsonObject->uploadId;
+		if(!$uploadId)
+		{
+			self::safeLog("Failed to get Multipart Upload ID - aborting");
+			kSharedFileSystemMgr::unRegisterStreamWrappers();
+			return false;
+		}
+
+		self::safeLog("Starting multipart upload for [$resource] to [$destFilePath] with upload id [$uploadId]");
+
+		// Upload the file in parts.
+		$partNumber = 1;
+		$parts = array();
+		$params = $this->getUploadPartParams($destFilePath, $uploadId);
+
+		while (!feof($sourceFH))
+		{
+			$srcContentPart = stream_get_contents($sourceFH, 16 * 1024 * 1024);
+
+			$params['uploadPartNum'] = $partNumber;
+			$params['uploadPartBody'] = $srcContentPart;
+			$result = $this->objectStoargeClient->uploadPart($params);
+
+			if(!$result)
+			{
+				kSharedFileSystemMgr::unRegisterStreamWrappers();
+				$this->objectStoargeClient->abortMultipartUpload($params);
+				return false;
+			}
+
+			$resHeaders = $result->getHeaders();
+
+			$parts['partsToCommit'][] = array(
+				'partNum' => $partNumber,
+				'etag' => $resHeaders['etag'][0]
+			);
+			self::safeLog("Uploading part [$partNumber] dest file path [$destFilePath]");
+			$partNumber++;
+		}
+		fclose($sourceFH);
+
+		// Commit the multipart upload.
+		$params['commitMultipartUploadDetails'] = $parts;
+		$result = $this->objectStoargeClient->commitMultipartUpload($params);
+
+		kSharedFileSystemMgr::unRegisterStreamWrappers();
+		if(!$result)
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	protected function doFullMkdir($path, $rights = 0755, $recursive = true)
@@ -746,6 +809,24 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			'copyObjectDetails' => $copyObjectDetails
 		);
 
+		return $params;
+	}
+
+	protected function getMultipartUploadParams($destFilePath)
+	{
+		list($bucketName, $fileName) = $this->getBucketAndFilePath($destFilePath);
+		$multiPartParams = array(
+			'namespaceName' => $this->namespaceName,
+			'bucketName' => $bucketName,
+			'createMultipartUploadDetails' => array('object' => $fileName)
+		);
+		return $multiPartParams;
+	}
+
+	protected function getUploadPartParams($destFilePath, $uploadId)
+	{
+		$params = $this->initBasicOciParams($destFilePath);
+		$params['uploadId'] = $uploadId;
 		return $params;
 	}
 }
