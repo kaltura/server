@@ -1195,7 +1195,7 @@ abstract class LiveEntry extends entry
 		//Calculate isStreaming only once in session
 		if(is_null($this->isStreaming))
 		{
-			$this->isStreaming = in_array($this->getLiveStatus(), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
+			$this->isStreaming = in_array($this->getLiveStatus(true), array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::AUTHENTICATED));
 		}
 		
 		return $this->isStreaming;
