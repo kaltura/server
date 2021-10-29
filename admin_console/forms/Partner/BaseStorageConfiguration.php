@@ -60,6 +60,12 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'port', array(
+			'label'			=> 'Port:',
+			'required'		=> true,
+			'filters'		=> array('StringTrim'),
+		));
 		
 		$this->addElement('checkbox', 'allowAutoDelete', array(
 			'label'			=> 'Allow auto-deletion of files:',
@@ -99,7 +105,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 		));
 		
 		
-		$this->addDisplayGroup(array('storageUrl', 'allowAutoDelete'), 'storage_info', array(
+		$this->addDisplayGroup(array('storageUrl', 'port', 'allowAutoDelete'), 'storage_info', array(
 			'legend' => 'Export Details',
 
 		));
