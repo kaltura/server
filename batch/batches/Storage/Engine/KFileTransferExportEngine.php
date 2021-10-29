@@ -74,9 +74,9 @@ class KFileTransferExportEngine extends KExportEngine
 			if($keyPairLogin) {
 				$privateKeyFile = $this->data->serverPrivateKey ? kFile::createTempFile($this->data->serverPrivateKey, 'privateKey', 0600) : null;
 				$publicKeyFile = $this->data->serverPublicKey ? kFile::createTempFile($this->data->serverPublicKey, 'publicKey', 0600) : null;
-				$engine->loginPubKey($this->data->serverUrl, $this->data->serverUsername, $publicKeyFile, $privateKeyFile, $this->data->serverPassPhrase);
+				$engine->loginPubKey($this->data->serverUrl, $this->data->serverUsername, $publicKeyFile, $privateKeyFile, $this->data->serverPassPhrase, $this->data->port);
 			} else {	
-				$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
+				$engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword, $this->data->port);
 			}
 		}
 		catch(Exception $e)
