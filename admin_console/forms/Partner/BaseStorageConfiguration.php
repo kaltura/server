@@ -61,12 +61,6 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('text', 'port', array(
-			'label'			=> 'Port:',
-			'required'		=> true,
-			'filters'		=> array('StringTrim'),
-		));
-		
 		$this->addElement('checkbox', 'allowAutoDelete', array(
 			'label'			=> 'Allow auto-deletion of files:',
 			'filters'		=> array('StringTrim'),
