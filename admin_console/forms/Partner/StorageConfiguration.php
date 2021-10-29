@@ -21,7 +21,6 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 
 		$this->addElement('text', 'port', array(
 			'label'			=> 'Port:',
-			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		
