@@ -211,7 +211,13 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 				$object->privateKey = $content;
 			}
 		}
-		
+
+		//If the port is set to an empty value that is not explicitly null - there is no need to include it in the final object.
+		if (!is_null($object->port) && !$object->port)
+		{
+			unset($object->port);
+		}
+
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
 		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
 		$object->shouldExportCaptions = $properties['shouldExportCaptions'];
