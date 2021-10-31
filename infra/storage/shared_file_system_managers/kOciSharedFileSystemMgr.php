@@ -787,7 +787,6 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function initBasicOciParams($filePath)
 	{
-		KalturaLog::debug("TTT: filePath [$filePath]");
 		list($bucket, $filePath) = $this->getBucketAndFilePath($filePath);
 		
 		$params = array(
