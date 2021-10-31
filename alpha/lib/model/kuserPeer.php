@@ -442,6 +442,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 * @param kuser $user
 	 * @param string $password
 	 * @param bool $checkPasswordStructure
+	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @throws kUserException::USER_NOT_FOUND
 	 * @throws kUserException::USER_ALREADY_EXISTS
 	 * @throws kUserException::INVALID_EMAIL
@@ -452,7 +453,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 * @throws kPermissionException::ROLE_ID_MISSING
 	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
 	 */
-	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true, $sendEmail = null)
+	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true, $sendEmail = null, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
 		if (!$user->getPuserId()) {
 			throw new kUserException('', kUserException::USER_ID_MISSING);
@@ -487,7 +488,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$user->enableLogin($user->getEmail(), $password, $checkPasswordStructure, $sendEmail);
+			$user->enableLogin($user->getEmail(), $password, $checkPasswordStructure, $sendEmail, $customizedEmailContents);
 		}	
 		
 		$user->save();
@@ -567,8 +568,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	}
 	
 	
-	public static function sendNewUserMail(kuser $user, $existingUser)
+	public static function sendNewUserMail(kuser $user, $existingUser, $customizedEmailContents = null)
 	{
+		/* @var $customizedEmailContents KalturaCustomizedEmailContents  */
 		// setup parameters
 		$partnerId = $user->getPartnerId();
 		$userName = $user->getFullName();
@@ -587,7 +589,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
 		if (!$existingUser) {
-			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey());
+			$baseLink = (!is_null($customizedEmailContents)) ? $customizedEmailContents->getBaseLink() : null;
+			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), null, $baseLink);
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/').'/kmcng';
 		$adminConsoleLink = trim(kConf::get('admin_console_url'));
@@ -634,12 +637,19 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			null, 
 			0, 
 			$partnerId, 
-			$mailType, 
+			$mailType,
 			kMailJobData::MAIL_PRIORITY_NORMAL, 
 			kConf::get ("partner_registration_confirmation_email" ), 
 			kConf::get ("partner_registration_confirmation_name" ), 
 			$loginEmail, 
-			$bodyParams
+			$bodyParams,
+			array(),
+			null,
+			null,
+			null,
+			null,
+			null,
+			$customizedEmailContents->toObject()
 		);
 	}
 

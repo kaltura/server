@@ -99,24 +99,20 @@ class KAsyncMailer extends KJobHandlerWorker
 		{
 			$this->initConfig($data->language);	
 		}
-		if ($data->customizedEmailContents)
-		{
-			$data->subjectParams .= '|' . $data->customizedEmailContents->emailSubject;
-			$data->bodyParams .= '|' . $data->customizedEmailContents->emailBody;
-		}
 		try
 		{
 			$separator = $data->separator;
  			$result = $this->sendEmail( 
- 				$data->recipientEmail,
- 				$data->recipientName,
- 				$data->mailType,
- 				explode ( $separator , $data->subjectParams ) ,
- 				explode ( $separator , $data->bodyParams ),
- 				$data->fromEmail ,
- 				$data->fromName,
- 				$data->language,
- 				$data->isHtml);
+				$data->recipientEmail,
+				$data->recipientName,
+				$data->mailType,
+				explode ( $separator , $data->subjectParams ) ,
+				explode ( $separator , $data->bodyParams ),
+				$data->fromEmail ,
+				$data->fromName,
+				$data->language,
+				$data->isHtml,
+				$data->customizedEmailContents);
 			
 	 		if ( $result )
 	 		{
@@ -141,7 +137,7 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 
-	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $language = 'en', $isHtml = false  )
+	protected function sendEmail( $recipientemail, $recipientname, $type, $subjectParams, $bodyParams, $fromemail , $fromname, $language = 'en', $isHtml = false, $customizedEmailContents = null)
 	{
 		$this->mail = new PHPMailer();
 		$this->mail->CharSet = 'utf-8';
@@ -164,9 +160,12 @@ class KAsyncMailer extends KJobHandlerWorker
 			$this->mail->From = self::MAILER_DEFAULT_SENDER_EMAIL ;
 			$this->mail->FromName = self::MAILER_DEFAULT_SENDER_NAME ;
 		}
-			
-		$this->mail->Subject = $this->getSubjectByType( $type, $language, $subjectParams  ) ;
-		$this->mail->Body = $this->getBodyByType( $type, $language, $bodyParams, $recipientemail, $isHtml ) ;
+		
+		$customizedSubject = !is_null($customizedEmailContents) ? $customizedEmailContents->emailSubject : null;
+		$customizedBody = !is_null($customizedEmailContents) ? $customizedEmailContents->emailBody : null;
+		
+		$this->mail->Subject = $this->getSubjectByType( $type, $language, $subjectParams, $customizedSubject) ;
+		$this->mail->Body = $this->getBodyByType( $type, $language, $bodyParams, $recipientemail, $isHtml, $customizedBody) ;
 			
 //		$this->mail->setContentType( "text/plain; charset=\"utf-8\"" ) ; //; charset=utf-8" );
 		// definition of the required parameters
@@ -197,9 +196,9 @@ class KAsyncMailer extends KJobHandlerWorker
 	}
 	
 	
-	protected function getSubjectByType( $type, $language, $subjectParamsArray  )
+	protected function getSubjectByType( $type, $language, $subjectParamsArray, $customizedSubject = null)
 	{
-		if ( $type > 0 && sizeof($subjectParamsArray) == 0)
+		if ( $type > 0 && is_null($customizedSubject))
 		{
 			$languageTexts = isset($this->texts_array[$language]) ? $this->texts_array[$language] : reset($this->texts_array);
 			$defaultLanguageTexts = $this->texts_array[self::DEFAULT_LANGUAGE];
@@ -209,9 +208,9 @@ class KAsyncMailer extends KJobHandlerWorker
 			//$this->mail->setSubject( $subject );
 			return $subject;
 		}
-		elseif(sizeof($subjectParamsArray) > 0)
+		elseif($customizedSubject)
 		{
-			return end($subjectParamsArray);
+			return $customizedSubject;
 		}
 		else
 		{
@@ -219,7 +218,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		}
 	}
 
-	protected function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false  )
+	protected function getBodyByType( $type, $language, $bodyParamsArray, $recipientemail, $isHtml = false, $customizedBody = null)
 	{
 		// if this does not need the common_header, under common_text should have $type_header =
 		// same with footer
@@ -230,7 +229,7 @@ class KAsyncMailer extends KJobHandlerWorker
 		$footer = ( isset($common_text_arr[$type . '_footer']) ) ? $common_text_arr[$type . '_footer'] : ($common_text_arr['footer'] ? $common_text_arr['footer'] : $defaultCommonTexts['footer']);
 		$defaultBody = isset ($defaultLanguageTexts['bodies'][$type]) ? $defaultLanguageTexts['bodies'][$type] : '';
 		$body = isset($languageTexts['bodies'][$type]) ? $languageTexts['bodies'][$type] : $defaultBody;
-		$body = isset($bodyParamsArray[2]) ? $bodyParamsArray[2] : $body;
+		$body = isset($customizedBody) ? $customizedBody : $body;
 		
 		// TODO - move to batch config
 		$forumsLink = $this->getAdditionalParams('forumUrl');

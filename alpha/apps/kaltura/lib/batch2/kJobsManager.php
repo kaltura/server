@@ -203,9 +203,10 @@ class kJobsManager
 		}
 	}
 	
-	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $customizedEmailContents, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null)
+	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName,
+									$toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null,
+									$camaignId = null, $templatePath = null, $separator = null, kCustomizedEmailContents $customizedEmailContents = null)
 	{
-		/* @var $customizedEmailContents KalturaCustomizedEmailContents */
 	  	$jobData = new kMailJobData();
 		$jobData->setMailPriority($mailPriority);
 	 	$jobData->setMailType($mailType);
@@ -229,7 +230,7 @@ class kJobsManager
 	
 	 	$partner = PartnerPeer::retrieveByPK($partnerId);
 		$jobData->setLanguage($partner->getLanguage());
-		$jobData->setCustomizedEmailContents($customizedEmailContents->toObject());
+		$jobData->setCustomizedEmailContents($customizedEmailContents);
 	 
 		
 		$batchJob = null;

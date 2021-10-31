@@ -15,6 +15,11 @@ class kCustomizedEmailContents
 	 */
 	public $emailBody;
 	
+	/**
+	 * @var string
+	 */
+	public $baseLink;
+	
 	public function setEmailSubject($emailSubject)
 	{
 		$this->emailSubject = $emailSubject;
@@ -25,6 +30,11 @@ class kCustomizedEmailContents
 		$this->emailBody = $emailBody;
 	}
 	
+	public function setBaseLink($baseLink)
+	{
+		$this->baseLink = $baseLink;
+	}
+	
 	public function getEmailSubject()
 	{
 		return $this->emailSubject;
@@ -33,5 +43,10 @@ class kCustomizedEmailContents
 	public function getEmailBody()
 	{
 		return $this->emailBody;
+	}
+	
+	public function getBaseLink()
+	{
+		return $this->baseLink;
 	}
 }

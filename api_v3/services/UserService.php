@@ -16,6 +16,7 @@ class UserService extends KalturaBaseUserService
 	 *
 	 * @action add
 	 * @param KalturaUser $user The new user
+	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @return KalturaUser The new user
 	 *
 	 * @throws KalturaErrors::DUPLICATE_USER_BY_ID
@@ -27,7 +28,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::DUPLICATE_USER_BY_LOGIN_ID
 	 * @throws KalturaErrors::USER_ROLE_NOT_FOUND
 	 */
-	function addAction(KalturaUser $user)
+	function addAction(KalturaUser $user, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
 		if (!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
 		{
@@ -40,7 +41,7 @@ class UserService extends KalturaBaseUserService
 		}
 
 		$lockKey = "user_add_" . $this->getPartnerId() . $user->id;
-		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user));
+		return kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($user, $customizedEmailContents));
 	}
 
 	/**
@@ -389,8 +390,8 @@ class UserService extends KalturaBaseUserService
 	 * @action resetPassword
 	 *
 	 * @param string $email The user's email address (login email)
-	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @param KalturaResetPassLinkType $linkType kmc or kms
+	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -399,9 +400,9 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	public function resetPasswordAction($email, KalturaCustomizedEmailContents $customizedEmailContents = null, $linkType = KalturaResetPassLinkType::KMC)
+	public function resetPasswordAction($email, $linkType = KalturaResetPassLinkType::KMC, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
-		return parent::resetPasswordImpl($email, $customizedEmailContents, $linkType);
+		return parent::resetPasswordImpl($email, $linkType, $customizedEmailContents);
 	}
 	
 	/**
@@ -482,6 +483,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $userId The user's unique identifier in the partner's system
 	 * @param string $loginId The user's email address that identifies the user for login
 	 * @param string $password The user's password
+	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @return KalturaUser The user object represented by the user and login IDs
 	 *
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
@@ -491,7 +493,7 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 *
 	 */
-	public function enableLoginAction($userId, $loginId, $password = null)
+	public function enableLoginAction($userId, $loginId, $password = null, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
 		try
 		{
@@ -502,13 +504,13 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
 			}
 			
-			if (!$user->getIsAdmin() && !$password) {
+			if (!$user->getIsAdmin() && !$password && is_null($customizedEmailContents)) {
 				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'password');
 			}
 			
 			// Gonen 2011-05-29 : NOTE - 3rd party uses this action and expect that email notification will not be sent by default
 			// if this call ever changes make sure you do not change default so mails are sent.
-			$user->enableLogin($loginId, $password, true);
+			$user->enableLogin($loginId, $password, true, null, $customizedEmailContents);
 			$user->save();
 		}
 		catch (Exception $e)

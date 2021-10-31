@@ -130,7 +130,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	protected function resetPasswordImpl($email, KalturaCustomizedEmailContents $customizedEmailContents = null, $linkType = KalturaResetPassLinkType::KMC)
+	protected function resetPasswordImpl($email, $linkType = KalturaResetPassLinkType::KMC, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
 		KalturaResponseCacher::disableCache();
 		
@@ -138,7 +138,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		$this->validateRequestsAmount($email);
 		
 		try {
-			$new_password = UserLoginDataPeer::resetUserPassword($email, $customizedEmailContents, $linkType);
+			$new_password = UserLoginDataPeer::resetUserPassword($email, $linkType, $customizedEmailContents);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -471,14 +471,14 @@ class KalturaBaseUserService extends KalturaBaseService
 		return $ks;
 	}
 	
-	function addUserImpl(KalturaBaseUser $user)
+	function addUserImpl(KalturaBaseUser $user, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
 		/* @var $dbUser kuser */
 		$dbUser = $user->toInsertableObject();
 		$dbUser->setPartnerId($this->getPartnerId());
 		try {
 			$checkPasswordStructure = isset($user->password) ? true : false;
-			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
+			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure, null, $customizedEmailContents);
 		}
 
 		catch (kUserException $e) {

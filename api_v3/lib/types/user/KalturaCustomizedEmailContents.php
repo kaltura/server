@@ -18,10 +18,16 @@ class KalturaCustomizedEmailContents extends KalturaObject
 	 */
 	public $emailBody;
 	
+	/**
+	 * @var string
+	 */
+	public $baseLink;
+	
 	private static $map_between_objects = array
 	(
 		'emailSubject',
-		'emailBody'
+		'emailBody',
+		'baseLink',
 	);
 	
 	public function getMapBetweenObjects ()
@@ -49,6 +55,11 @@ class KalturaCustomizedEmailContents extends KalturaObject
 		$this->emailBody = $emailBody;
 	}
 	
+	public function setBaseLink($baseLink)
+	{
+		$this->baseLink = $baseLink;
+	}
+	
 	public function getEmailSubject ()
 	{
 		return $this->emailSubject;
@@ -57,6 +68,11 @@ class KalturaCustomizedEmailContents extends KalturaObject
 	public function getEmailBody ()
 	{
 		return $this->emailBody;
+	}
+	
+	public function getBaseLink ()
+	{
+		return $this->baseLink;
 	}
 	
 

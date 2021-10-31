@@ -988,6 +988,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 * @param string $loginId
 	 * @param string $password
 	 * @param bool $checkPasswordStructure
+	 * @param KalturaCustomizedEmailContents $customizedEmailContents
 	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
 	 * @throws kUserException::INVALID_EMAIL
 	 * @throws kUserException::INVALID_PARTNER
@@ -995,7 +996,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 */
-	public function enableLogin($loginId, $password = null, $checkPasswordStructure = true, $sendEmail = null)
+	public function enableLogin($loginId, $password = null, $checkPasswordStructure = true, $sendEmail = null, KalturaCustomizedEmailContents $customizedEmailContents = null)
 	{
 		if (!$password)
 		{
@@ -1028,13 +1029,15 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($sendEmail)
 		{
 			if ($loginDataExisted) {
-				kuserPeer::sendNewUserMail($this, true);
+				kuserPeer::sendNewUserMail($this, true, $customizedEmailContents);
 			}
 			else {
-				kuserPeer::sendNewUserMail($this, false);
+				kuserPeer::sendNewUserMail($this, false,$customizedEmailContents);
 			}
-			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_USER_EMAIL, $this->getPartnerId()))
+			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_USER_EMAIL, $this->getPartnerId()) && $this->getIsAdmin())
+			{
 				kuserPeer::sendNewUserMailToAdmins($this);
+			}
 		}	
 		return $this;
 	}
