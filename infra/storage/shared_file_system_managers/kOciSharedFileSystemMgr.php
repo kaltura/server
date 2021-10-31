@@ -824,7 +824,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
+			self::safeLog("Couldn't determine if path [{$params['prefix']}] is dir: {$e->getMessage()}");
 		}
 		
 		return $dirListObjects->objects;
