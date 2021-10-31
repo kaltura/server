@@ -1,3 +1,12 @@
+# Quasar-17.14.0 #
+## Add systemPartner updateConfiguration permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23192
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
+
+
 # Quasar-17.13.0 #
 ### Configuration ###
 Add the following configurations to local.ini:
