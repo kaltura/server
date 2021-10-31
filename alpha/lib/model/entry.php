@@ -1327,9 +1327,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return parent::getCategories();
 	}
 
-	public function getCategoriesIds()
+	public function getCategoriesIds($checkDisableCategoryLimit = true)
 	{
-		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+		if($checkDisableCategoryLimit && PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
 		return parent::getCategoriesIds();
 	}

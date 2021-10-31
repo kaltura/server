@@ -10,34 +10,84 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 	{
 		if ($object instanceof LiveEntry && $this->isLiveEntryCategoryChanged($object, $modifiedColumns))
 		{
-			$this->handleLiveEntryCategoryChanged($object, $modifiedColumns);
+			$this->handleLiveEntryCategoryChanged($object);
 			return true;
 		}
 		
 		return true;
 	}
 
-	protected function handleLiveEntryCategoryChanged(entry $object, array $modifiedColumns)
+	protected function handleLiveEntryCategoryChanged(LiveEntry $liveEntry)
 	{
-		/* @var $object LiveEntry */
-		$recordedEntry = entryPeer::retrieveByPK($object->getRecordedEntryId());
-		if (!$recordedEntry)
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $liveEntry->getPartnerId()))
 		{
-			KalturaLog::info("Recorded entry {$object->getRecordedEntryId()} could not be retrieved.");
-			return false;
+			$recordedEntry = entryPeer::retrieveByPK($liveEntry->getRecordedEntryId());
+			if (!$recordedEntry)
+			{
+				KalturaLog::info("Recorded entry {$liveEntry->getRecordedEntryId()} could not be retrieved.");
+				return false;
+			}
+			
+			$categories = $liveEntry->getCategories();
+			if (is_null($categories))
+			{
+				KalturaLog::info("Categories for live entry {$liveEntry->getId()} could not be retrieved.");
+				return false;
+			}
+			
+			$recordedEntry->setCategories($categories);
+			$recordedEntry->save();
 		}
-		
-		$categories = $object->getCategories();
-		if (is_null($categories))
+		else
 		{
-			KalturaLog::info("Categories for live entry {$object->getId()} could not be retrieved.");
-			return false;
+			$recordedEntryId = $liveEntry->getRecordedEntryId();
+			$recordedEntry = BaseentryPeer::retrieveByPK($recordedEntryId);
+			if (!$recordedEntry)
+			{
+				KalturaLog::info("Recorded entry {$liveEntry->getRecordedEntryId()} could not be retrieved.");
+				return false;
+			}
+			
+			$liveEntryCategories = retrieveCategoriesArrayFromEntry($liveEntry);
+			$recordedEntryCategories = retrieveCategoriesArrayFromEntry($recordedEntry);
+			
+			$categoriesToAdd = array_diff($liveEntryCategories, $recordedEntryCategories);
+			$categoriesToRemove = array_diff($recordedEntryCategories, $liveEntryCategories);
+				
+			foreach ($categoriesToAdd as $categoryId)
+			{
+				$categoryEntry = new categoryEntry();
+				$categoryEntry->add($recordedEntryId, $categoryId);
+				$categoryEntry->setEntryId($recordedEntryId);
+				$categoryEntry->setCategoryId($categoryId);
+				$categoryEntry ->save();
+			}
+			
+			foreach ($categoriesToRemove as $categoryId)
+			{
+				$categoryToRemove = CategoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $recordedEntryId);
+				$categoryToRemove->setAsDeleted();
+				$categoryToRemove ->save();
+			}
+			
+			if ($categoriesToRemove)
+			{
+				myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $recordedEntry);
+			}
 		}
-		
-		$recordedEntry->setCategories($categories);
-		$recordedEntry->save();
 		
 		return true;
+	}
+	
+	protected function retrieveCategoriesArrayFromEntry($entry)
+	{
+		$categoriesIds = $entry->getCategoriesIds(false);
+		if (is_null($categoriesIds))
+		{
+			KalturaLog::info("Categories for live entry {$entry->getId()} could not be retrieved.");
+			return array();
+		}
+		return explode(entry::ENTRY_CATEGORY_SEPARATOR, $categoriesIds);
 	}
 
 	protected function isLiveEntryCategoryChanged(entry $object, array $modifiedColumns)

@@ -75,61 +75,16 @@ class CategoryEntryService extends KalturaBaseService
 	 */
 	function deleteAction($entryId, $categoryId)
 	{
-		$entry = entryPeer::retrieveByPK($entryId);
-
-		if (!$entry)
-		{
-			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
-				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
-		}
-			
-		$category = categoryPeer::retrieveByPK($categoryId);
-		if (!$category && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
-
-		//validate user is entitled to remove entry from category
-		if(kEntitlementUtils::getEntitlementEnforcement() &&
-			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
-			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
-		{
-			$kuserIsEntitled = false;
-			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
-
-			// First pass: check if kuser is a manager
-			if ( $kuser )
-			{
-				if ( $kuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER )
-				{
-					$kuserIsEntitled = true;
-				}
-			}
-			else
-			{
-				$kuser = kuserPeer::retrieveByPK( kCurrentContext::getCurrentKsKuserId() );
-			}
-
-			// Second pass: check if kuser is a co-publisher
-			if ( ! $kuserIsEntitled
-					&& $kuser
-					&& $entry->isEntitledKuserPublish($kuser->getKuserId()))
-			{
-				$kuserIsEntitled = true;
-			}
-
-			if ( ! $kuserIsEntitled )
-			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
-			}
-		}
-			
 		$dbCategoryEntry = categoryEntryPeer::retrieveByCategoryIdAndEntryId($categoryId, $entryId);
-		if(!$dbCategoryEntry)
+		if (!$dbCategoryEntry)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
+		}
 		
-		$dbCategoryEntry->setStatus(CategoryEntryStatus::DELETED);
+		$dbCategoryEntry->setAsDeleted();
+		
 		$dbCategoryEntry->save();
 		
-		//need to select the entry again - after update
 		$entry = entryPeer::retrieveByPK($entryId);		
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE, $entry);
 	}
