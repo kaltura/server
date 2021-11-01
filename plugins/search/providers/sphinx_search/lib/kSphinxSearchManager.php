@@ -479,7 +479,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 			$indexSplitFactor = array_count_values($tableNames);
 			if($indexSplitFactor[$indexName] > 1)
-				$splitIndexName = $indexName . '_' . ($indexSplitFactor[$indexName]-1);
+				$splitIndexName = $indexName . '_' . ($object->getPartnerId()/10%$indexSplitFactor[$indexName]);
 		}
 		
 		if($sphinxConnection->getKalturaOption('sharded') && $splitIndexName)
