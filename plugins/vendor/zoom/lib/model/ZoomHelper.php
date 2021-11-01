@@ -36,7 +36,7 @@ class ZoomHelper
      * @return null|zoomVendorIntegration
      * @throws PropelException
      */
-	public static function getZoomIntegrationByAccountId($accountId, bool $includeDeleted)
+	public static function getZoomIntegrationByAccountId($accountId, bool $includeDeleted = false)
 	{
 		if($includeDeleted)
 		{
