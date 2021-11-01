@@ -93,7 +93,7 @@ class kBatchUtils
 		
 		$sharedStorageConfig['region'] = isset($storageOptions['region']) ? $storageOptions['region'] : null;
 		$sharedStorageConfig['namespaceName'] = isset($storageOptions['namespaceName']) ? $storageOptions['namespaceName'] : null;
-		
+		$sharedStorageConfig['configFileLocation'] = isset($storageOptions['configFileLocation']) ? $storageOptions['configFileLocation'] : null;
 
 		KalturaLog::debug("Config loaded: " . print_r($sharedStorageConfig, true));
 		kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageConfig));

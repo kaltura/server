@@ -22,8 +22,9 @@ use Oracle\Oci\Common\UserAgent;
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
 use GuzzleHttp\Exception\ClientException;
 use Oracle\Oci\Common\AbstractClient;
-use Oracle\Oci\Common\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Logging\EchoLogAdapter;
+use Oracle\Oci\Common\ConfigFile;
+use Oracle\Oci\Common\Auth\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Auth\InstancePrincipalsAuthProvider;
 
 
@@ -43,16 +44,13 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	/* @var ObjectStorageClient $objectStoargeClient */
 	protected $objectStoargeClient;
 	protected $retriesNum;
+	protected $concurrency;
 	
 	protected $region;
-	protected $endPoint;
-	protected $accessKeySecret;
 	protected $namespaceName;
-	protected $accessKeyId;
-	protected $storageClass;
 	protected $userAgentRegex;
 	protected $userAgentPartner;
-	protected $sseType;
+	protected $configFileLocation;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kLocalFileSystemManger' class
 	public function __construct(array $options = null)
@@ -60,7 +58,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		parent::__construct($options);
 		if(!$options || (is_array($options) && !count($options)))
 		{
-			$options = kConf::get('oci_storage_options', 'cloud_storage', null);
+			$options = kConf::get('storage_options', 'cloud_storage', null);
 		}
 		
 		if($options)
@@ -69,6 +67,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->namespaceName = isset($options['namespaceName']) ? $options['namespaceName'] : null;
 			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
 			$this->userAgentPartner = isset($options['userAgentPartner']) ? $options['userAgentPartner'] : "Kaltura";
+			$this->configFileLocation = isset($options['configFileLocation']) ? $options['configFileLocation'] : null;
 		}
 		
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
@@ -84,7 +83,15 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		$auth_provider = new InstancePrincipalsAuthProvider();
+		if($this->configFileLocation)
+		{
+			$auth_provider = new ConfigFileAuthProvider(ConfigFile::loadFromFile($this->configFileLocation));
+		}
+		else
+		{
+			$auth_provider = new InstancePrincipalsAuthProvider();
+		}
+		
 		$this->objectStoargeClient = new ObjectStorageClient($auth_provider,  $this->region);
 		UserAgent::setAdditionalClientUserAgent($this->getKalturaCustomUserAgent());
 	}
@@ -799,6 +806,11 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 					return false;
 				}
 				$this->handleException($command, $retries, $params, $e);
+			}
+			catch(Exception $e)
+			{
+				$retries--;
+				self::safeLog("Caught generic Exception " . $e->getMessage());
 			}
 		}
 		
