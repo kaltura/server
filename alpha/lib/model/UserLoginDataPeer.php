@@ -256,7 +256,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->save();
 		
 		$baseLink = !is_null($customizedEmailContents) ? $customizedEmailContents->getbaseLink() : null;
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $baseLink), $customizedEmailContents->toObject());
+		$kCustomizedEmailContents = !is_null($customizedEmailContents) ? $customizedEmailContents->toObject() : null;
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $baseLink), $kCustomizedEmailContents);
 		return true;
 	}
 	

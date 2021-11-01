@@ -632,6 +632,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			$mailType = self::getUserMailType($authType, $existingUser);
 			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
 		}
+		$kCustomizedEmailContents = !is_null($customizedEmailContents) ? $customizedEmailContents->toObject() : null;
 		// add mail job
 		kJobsManager::addMailJob(
 			null, 
@@ -649,7 +650,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			null,
 			null,
 			null,
-			$customizedEmailContents->toObject()
+			$kCustomizedEmailContents
 		);
 	}
 
