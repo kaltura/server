@@ -33,7 +33,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
 	const CHUNK_SIZE = 102400;
-
+	const DEFAULT_APP_NAME = "Kaltura-Server";
 	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getCode";
 	const COPY_OBJECT_STATUS_COMPLETED = 'COMPLETED';
@@ -91,7 +91,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function getKalturaCustomUserAgent()
 	{
-		$appName = self::DEFAULT_S3_APP_NAME;
+		$appName = self::DEFAULT_APP_NAME;
 		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
 		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches[0]))
 		{
