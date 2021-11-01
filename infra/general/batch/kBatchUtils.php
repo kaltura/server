@@ -151,6 +151,18 @@ class kBatchUtils
 			kSharedFileSystemMgr::setFileSystemOptions('userAgentPartner', $storageRunParams['userAgentPartner']);
 		}
 		
+		if(isset($storageRunParams['region'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('region', $storageRunParams['region']);
+		}
+		
+		if(isset($storageRunParams['namespaceName'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('namespaceName', $storageRunParams['namespaceName']);
+		}
+		
+		if(isset($storageRunParams['configFileLocation'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('configFileLocation', $storageRunParams['configFileLocation']);
+		}
+		
 		$storageTypeMap = $storageRunParams['storageTypeMap'];
 		foreach ($storageTypeMap as $key => $value) {
 			kFile::setStorageTypeMap($key, $value);
