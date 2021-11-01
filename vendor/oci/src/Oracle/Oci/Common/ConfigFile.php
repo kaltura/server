@@ -6,17 +6,16 @@ use InvalidArgumentException;
 
 class ConfigFile
 {
-    /*final*/ /*string*/ protected static $defaultProfileName = "DEFAULT";
+    const DEFAULT_PROFILE_NAME = "DEFAULT";
     /*string*/ protected $profileName;
     // map from profileName -> propertyName -> property
     protected $allProperties;
 
     private function __construct(
         $allProperties,
-        /*string*/ 
+        /*string*/
         $profileName
-    )
-    {
+    ) {
         $this->allProperties = $allProperties;
         $this->profileName = $profileName;
     }
@@ -39,13 +38,13 @@ class ConfigFile
     public static function loadFromStringArray(/*string*/ $str, /*string*/ $profileName = null) // : ConfigFile
     {
         if ($profileName == null) {
-            $profileName = ConfigFile::$defaultProfileName;
+            $profileName = ConfigFile::DEFAULT_PROFILE_NAME;
         }
 
         $allProperties = [];
         $properties = null;
         $lineNumber = 0;
-        $currentProfile = ConfigFile::$defaultProfileName;
+        $currentProfile = ConfigFile::DEFAULT_PROFILE_NAME;
         foreach ($str as $line) {
             ++$lineNumber;
             $line = trim($line);
@@ -101,8 +100,8 @@ class ConfigFile
         }
 
         // default, or not found in specified profile
-        if (array_key_exists(ConfigFile::$defaultProfileName, $this->allProperties)) {
-            $properties = $this->allProperties[ConfigFile::$defaultProfileName];
+        if (array_key_exists(ConfigFile::DEFAULT_PROFILE_NAME, $this->allProperties)) {
+            $properties = $this->allProperties[ConfigFile::DEFAULT_PROFILE_NAME];
             if (array_key_exists($propertyName, $properties)) {
                 return $properties[$propertyName];
             }
@@ -117,14 +116,14 @@ class ConfigFile
     public function __toString()
     {
         $str = "";
-        if (array_key_exists(ConfigFile::$defaultProfileName, $this->allProperties)) {
-            $str .= "[" . ConfigFile::$defaultProfileName . "]" . PHP_EOL;
-            foreach ($this->allProperties[ConfigFile::$defaultProfileName] as $key => $value) {
+        if (array_key_exists(ConfigFile::DEFAULT_PROFILE_NAME, $this->allProperties)) {
+            $str .= "[" . ConfigFile::DEFAULT_PROFILE_NAME . "]" . PHP_EOL;
+            foreach ($this->allProperties[ConfigFile::DEFAULT_PROFILE_NAME] as $key => $value) {
                 $str .= $key . "=" . $value . PHP_EOL;
             }
         }
         foreach ($this->allProperties as $profileName => $properties) {
-            if ($profileName == ConfigFile::$defaultProfileName) {
+            if ($profileName == ConfigFile::DEFAULT_PROFILE_NAME) {
                 continue;
             }
             $str .= "[" . $profileName . "]" . PHP_EOL;

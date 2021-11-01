@@ -4,21 +4,26 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
+class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
 {
     public static $files = array (
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
-        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
-        '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
+        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '0d59ee240a4cd96ddbb4ff164fccea4d' => __DIR__ . '/..' . '/symfony/polyfill-php73/bootstrap.php',
+        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'a4d81d512b8c1016fe4acf40220f12a5' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
+        'd542d7c666618af7d3415cdbe00a510f' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -32,22 +37,25 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php80\\' => 23,
+            'Symfony\\Polyfill\\Php73\\' => 23,
             'Symfony\\Polyfill\\Php72\\' => 23,
-            'Symfony\\Polyfill\\Php70\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
+            'Symfony\\Polyfill\\Intl\\Grapheme\\' => 31,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Symfony\\Contracts\\Service\\' => 26,
             'Symfony\\Component\\Yaml\\' => 23,
+            'Symfony\\Component\\String\\' => 25,
             'Symfony\\Component\\Process\\' => 26,
             'Symfony\\Component\\Finder\\' => 25,
-            'Symfony\\Component\\Debug\\' => 24,
             'Symfony\\Component\\Console\\' => 26,
         ),
         'P' => 
         array (
-            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Container\\' => 14,
             'Prophecy\\' => 9,
         ),
         'O' => 
@@ -75,20 +83,24 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
         'phpDocumentor\\Reflection\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
-            1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
-            2 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
         ),
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
         ),
+        'Symfony\\Polyfill\\Php80\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
+        ),
+        'Symfony\\Polyfill\\Php73\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php73',
+        ),
         'Symfony\\Polyfill\\Php72\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
-        ),
-        'Symfony\\Polyfill\\Php70\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php70',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -102,13 +114,25 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-idn',
         ),
+        'Symfony\\Polyfill\\Intl\\Grapheme\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme',
+        ),
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Symfony\\Contracts\\Service\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/service-contracts',
+        ),
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'Symfony\\Component\\String\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/string',
         ),
         'Symfony\\Component\\Process\\' => 
         array (
@@ -118,21 +142,17 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
-        'Symfony\\Component\\Debug\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/debug',
-        ),
         'Symfony\\Component\\Console\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
         ),
-        'Psr\\Log\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
-        ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
         ),
         'Prophecy\\' => 
         array (
@@ -169,29 +189,60 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
     );
 
     public static $classMap = array (
-        'ArithmeticError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ArithmeticError.php',
-        'AssertionError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/AssertionError.php',
-        'DivisionByZeroError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/DivisionByZeroError.php',
-        'Error' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/Error.php',
+        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'File_Iterator' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Iterator.php',
         'File_Iterator_Facade' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Facade.php',
         'File_Iterator_Factory' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Factory.php',
+        'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
         'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'Oracle\\Oci\\Common\\AbstractClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AbstractClient.php',
-        'Oracle\\Oci\\Common\\AuthProviderInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\AbstractRequestingAuthenticationDetailsProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\AuthProviderInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\CachingSessionKeySupplier' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\ConfigFileAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\FederationClientInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
+        'Oracle\\Oci\\Common\\Auth\\InstancePrincipalsAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\JWT' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/SecurityTokenAdapter.php',
+        'Oracle\\Oci\\Common\\Auth\\KeyPair' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\RefreshFailedException' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
+        'Oracle\\Oci\\Common\\Auth\\Refreshable' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
+        'Oracle\\Oci\\Common\\Auth\\RefreshableOnNotAuthenticatedInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\RegionProviderInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\SecurityTokenAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/SecurityTokenAdapter.php',
+        'Oracle\\Oci\\Common\\Auth\\SessionKeySupplierImpl' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\SessionKeySupplierInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\UrlBasedX509CertificateSupplier' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
+        'Oracle\\Oci\\Common\\Auth\\UserAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\X509AuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
+        'Oracle\\Oci\\Common\\Auth\\X509CertificateSupplierInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
+        'Oracle\\Oci\\Common\\Auth\\X509FederationClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
         'Oracle\\Oci\\Common\\ConfigFile' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/ConfigFile.php',
-        'Oracle\\Oci\\Common\\ConfigFileAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Constants' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Constants.php',
+        'Oracle\\Oci\\Common\\ExcludeBodySigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\FederationSigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\HeadersToSign' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\HttpUtils' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/HttpUtils.php',
         'Oracle\\Oci\\Common\\Logging\\AbstractLogAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
         'Oracle\\Oci\\Common\\Logging\\EchoLogAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
         'Oracle\\Oci\\Common\\Logging\\LogAdapterInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
+        'Oracle\\Oci\\Common\\Logging\\Logger' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
+        'Oracle\\Oci\\Common\\Logging\\NamedLogAdapterDecorator' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
         'Oracle\\Oci\\Common\\Logging\\NoOpLogAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
+        'Oracle\\Oci\\Common\\Logging\\RedactingLogAdapterDecorator' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
+        'Oracle\\Oci\\Common\\Logging\\StringBufferLogAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
+        'Oracle\\Oci\\Common\\ObjectStorageSigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\OciBadResponseException' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/OciException.php',
+        'Oracle\\Oci\\Common\\OciException' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/OciException.php',
         'Oracle\\Oci\\Common\\OciResponse' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/OciResponse.php',
         'Oracle\\Oci\\Common\\Realm' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Regions.php',
         'Oracle\\Oci\\Common\\Region' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Regions.php',
-        'Oracle\\Oci\\Common\\RegionProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\SigningStrategies' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\SigningStrategyConstants' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\SigningStrategyInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\StandardSigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        'Oracle\\Oci\\Common\\StringUtils' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/StringUtils.php',
         'Oracle\\Oci\\Common\\UserAgent' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/UserAgent.php',
-        'Oracle\\Oci\\Common\\UserAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AuthProviderInterface.php',
+        'Oracle\\Oci\\ObjectStorage\\ObjectStorageAsyncClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/ObjectStorageAsyncClient.php',
         'Oracle\\Oci\\ObjectStorage\\ObjectStorageClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/ObjectStorageClient.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/Assert.php',
         'PHPUnit\\Framework\\BaseTestListener' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/BaseTestListener.php',
@@ -572,7 +623,6 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
         'PHP_Token_XOR_EQUAL' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_YIELD' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_YIELD_FROM' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
-        'ParseError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ParseError.php',
         'SebastianBergmann\\CodeCoverage\\CodeCoverage' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/CodeCoverage.php',
         'SebastianBergmann\\CodeCoverage\\CoveredCodeNotExecutedException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/CoveredCodeNotExecutedException.php',
         'SebastianBergmann\\CodeCoverage\\Driver\\Driver' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Driver/Driver.php',
@@ -652,17 +702,18 @@ class ComposerStaticInitf7c46bb25a45561c130efb48747dc331
         'SebastianBergmann\\RecursionContext\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/recursion-context/src/InvalidArgumentException.php',
         'SebastianBergmann\\ResourceOperations\\ResourceOperations' => __DIR__ . '/..' . '/sebastian/resource-operations/src/ResourceOperations.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
-        'SessionUpdateTimestampHandlerInterface' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/SessionUpdateTimestampHandlerInterface.php',
+        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
-        'TypeError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/TypeError.php',
+        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitf7c46bb25a45561c130efb48747dc331::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitf7c46bb25a45561c130efb48747dc331::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitf7c46bb25a45561c130efb48747dc331::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6::$classMap;
 
         }, null, ClassLoader::class);
     }

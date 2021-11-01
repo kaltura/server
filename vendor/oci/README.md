@@ -43,6 +43,17 @@ Oracle gratefully acknowledges the contributions to oci-php-sdk that have been m
 
 You can find information on any known issues with the SDK [here](https://docs.cloud.oracle.com/iaas/Content/knownissues.htm).
 
+### Thread Safety
+
+The OCI PHP SDK is based on the `GuzzleHttp\Client`; therefore, it has the same threading behavior as `GuzzleHttp\Client`.
+ 
+There does not appear to be good documentation on the thread safety of `GuzzleHttp\Client`, but there are hints that it is _NOT_ thread-safe:
+
+1. "Are you using threads (like with pthreads)? Guzzle is not thread safe and will not work in a multithreaded application" [1](https://github.com/guzzle/guzzle/issues/1504)
+2. "I would guess that the underlying cURL handles, and PHP's integration with cURL, have an issue being shared across multiple threads. You may have to create unique clients for each thread." [2](https://github.com/guzzle/guzzle/issues/1398)
+ 
+These issues are not unique to the OCI PHP SDK, and the solution seems to simply be to create a separate client per thread.
+
 ## License
 
 Copyright (c) 2021, Oracle and/or its affiliates.  All rights reserved.

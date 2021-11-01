@@ -26,6 +26,10 @@
     "autoload": {
         "classmap": [
             "src/"
+        ],
+        "files": [
+            "src/Oracle/Oci/Common/Logging/LogAdapterInterface.php",
+            "src/Oracle/Oci/Common/SigningStrategy.php"
         ]
     }
 }
