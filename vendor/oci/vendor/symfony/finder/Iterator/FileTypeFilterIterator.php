@@ -16,10 +16,10 @@ namespace Symfony\Component\Finder\Iterator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileTypeFilterIterator extends FilterIterator
+class FileTypeFilterIterator extends \FilterIterator
 {
-    const ONLY_FILES = 1;
-    const ONLY_DIRECTORIES = 2;
+    public const ONLY_FILES = 1;
+    public const ONLY_DIRECTORIES = 2;
 
     private $mode;
 
@@ -27,7 +27,7 @@ class FileTypeFilterIterator extends FilterIterator
      * @param \Iterator $iterator The Iterator to filter
      * @param int       $mode     The mode (self::ONLY_FILES or self::ONLY_DIRECTORIES)
      */
-    public function __construct(\Iterator $iterator, $mode)
+    public function __construct(\Iterator $iterator, int $mode)
     {
         $this->mode = $mode;
 
@@ -39,6 +39,7 @@ class FileTypeFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
+    #[\ReturnTypeWillChange]
     public function accept()
     {
         $fileinfo = $this->current();

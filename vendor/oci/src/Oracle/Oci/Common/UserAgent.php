@@ -4,8 +4,8 @@ namespace Oracle\Oci\Common;
 
 class UserAgent
 {
-    protected static $ociPhpSdkVersion = "0.0.1";
-    protected static $userAgentTemplate = "Oracle-PhpSDK/{ociPhpSdkVersion} (PHP/{phpVersion}; {os}){additionalClientUserAgent}{additionalUserAgentFromEnvVar}";
+    const OCI_PHP_SDK_VERSION = "0.0.1";
+    const USER_AGENT_TEMPLATE = "Oracle-PhpSDK/{ociPhpSdkVersion} (PHP/{phpVersion}; {os}){additionalClientUserAgent}{additionalUserAgentFromEnvVar}";
     /*?string*/ protected static $additionalClientUserAgent = null;
     /*string*/ protected static $userAgent;
     /*bool*/ protected static $wasInitialized = false;
@@ -24,7 +24,7 @@ class UserAgent
 
         UserAgent::$wasInitialized = true;
 
-        $str = str_replace("{ociPhpSdkVersion}", UserAgent::$ociPhpSdkVersion, UserAgent::$userAgentTemplate);
+        $str = str_replace("{ociPhpSdkVersion}", UserAgent::OCI_PHP_SDK_VERSION, UserAgent::USER_AGENT_TEMPLATE);
         $str = str_replace("{phpVersion}", phpversion(), $str);
         $str = str_replace("{os}", php_uname("s") . " " . php_uname("r") . " " . php_uname("m"), $str);
         $value = "";
@@ -42,7 +42,7 @@ class UserAgent
         UserAgent::$userAgent = $str;
     }
 
-    public static function setAdditionalClientUserAgent(string $additionalClientUserAgent)
+    public static function setAdditionalClientUserAgent(/*string*/ $additionalClientUserAgent)
     {
         $str = trim($additionalClientUserAgent);
         if ($str == "") {

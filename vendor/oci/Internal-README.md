@@ -34,7 +34,13 @@ mvn clean install --projects codegen/objectstorage
 You can run the unit tests using:
 
 ```
-vendor/bin/phpunit --bootstrap vendor/autoload.php tests
+vendor/bin/phpunit
+```
+
+By default, the tests for Instance Principals are not run. You can run those using:
+
+```
+vendor/bin/phpunit --group InstancePrincipalsRequired
 ```
 
 

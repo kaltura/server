@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Comparator\DateComparator;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class DateRangeFilterIterator extends FilterIterator
+class DateRangeFilterIterator extends \FilterIterator
 {
     private $comparators = [];
 
@@ -38,6 +38,7 @@ class DateRangeFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
+    #[\ReturnTypeWillChange]
     public function accept()
     {
         $fileinfo = $this->current();

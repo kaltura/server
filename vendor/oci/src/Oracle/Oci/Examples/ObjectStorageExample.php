@@ -4,26 +4,24 @@ namespace Oracle\Oci\Examples;
 
 require 'vendor/autoload.php';
 
-require 'src/Oracle/Oci/Common/AuthProviderInterface.php';
-require 'src/Oracle/Oci/Common/OciResponse.php';
-require 'src/Oracle/Oci/Common/Regions.php';
-require 'src/Oracle/Oci/Common/UserAgent.php';
-require 'src/Oracle/Oci/Common/HttpUtils.php';
-require 'src/Oracle/Oci/ObjectStorage/ObjectStorageClient.php';
-
 use DateTime;
 use Oracle\Oci\Common\Region;
 use Oracle\Oci\Common\UserAgent;
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
-use GuzzleHttp\Exception\ClientException;
-use Oracle\Oci\Common\AbstractClient;
-use Oracle\Oci\Common\ConfigFileAuthProvider;
+use Oracle\Oci\Common\Auth\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Logging\EchoLogAdapter;
+use Oracle\Oci\Common\Logging\Logger;
+use Oracle\Oci\Common\OciBadResponseException;
 
-date_default_timezone_set('Europe/Istanbul');
-AbstractClient::setGlobalLogAdapter(new EchoLogAdapter(LOG_INFO, [
-    "Oracle\Oci\ObjectStorage\ObjectStorageClient\middleware\\uri" => LOG_DEBUG,
-    "Oracle\Oci\Common\OciResponse" => LOG_DEBUG
+// TODO: Update these to your own values
+$bucket_name = "mricken-test";
+$file_to_upload = "composer.json";
+// END TODO: Update these to your own values
+
+date_default_timezone_set('Etc/UTC');
+Logger::setGlobalLogAdapter(new EchoLogAdapter(0, [
+    "Oracle\\Oci\\ObjectStorage\\ObjectStorageClient" => LOG_DEBUG,
+    "Oracle\\Oci\\Common\\OciResponse" => LOG_DEBUG
 ]));
 
 echo "UserAgent: " . UserAgent::getUserAgent() . PHP_EOL;
@@ -39,6 +37,7 @@ $region = Region::getRegion("us-phoenix-1");
 echo "Region: $region".PHP_EOL;
 
 $auth_provider = new ConfigFileAuthProvider();
+echo "Region from config file: {$auth_provider->getRegion()}" . PHP_EOL;
 
 // $auth_provider = new UserAuthProvider(
 //     'ocid1.tenancy.oc1..aaaaaaaacqp432hpa5oc2kvxm4kpwbkodfru4okbw2obkcdob5zuegi4rwxq',
@@ -62,7 +61,6 @@ $namespace = $response->getJson();
 
 echo "Namespace = '{$namespace}'".PHP_EOL;
 
-$bucket_name = "mricken-test";
 $object_name = "php-test.txt";
 $body = "This is a test of Object Storage from PHP.";
 
@@ -81,6 +79,9 @@ $response = $c->getObject([
 
 $retrieved_body = $response->getBody();
 
+echo "Sent: $body" . PHP_EOL;
+echo "Recv: $retrieved_body" . PHP_EOL;
+
 if ($body != $retrieved_body) {
     echo "ERROR: Retrieved body does not equal uploaded body!".PHP_EOL;
     die;
@@ -97,7 +98,7 @@ $response = $c->headObject([
 $object_name2 = "php-test2.txt";
 
 echo "----- putObject with file -----".PHP_EOL;
-$file_handle = fopen("composer.json", "rb");
+$file_handle = fopen($file_to_upload, "rb");
 $response = $c->putObject([
     'namespaceName' => $namespace,
     'bucketName' => $bucket_name,
@@ -105,13 +106,13 @@ $response = $c->putObject([
     'putObjectBody' => $file_handle]);
 
 echo "----- headObject of uploaded file -----".PHP_EOL;
-$file_handle = fopen("composer.json", "rb");
+$file_handle = fopen($file_to_upload, "rb");
 $response = $c->headObject([
     'namespaceName' => $namespace,
     'bucketName' => $bucket_name,
     'objectName' => $object_name2]);
 $retrieved_filesize = $response->getHeaders()['Content-Length'][0];
-$size = filesize("composer.json");
+$size = filesize($file_to_upload);
 if ($size != $retrieved_filesize) {
     echo "ERROR: Retrieved file size ($retrieved_filesize) does not equal uploaded file size ($size)!".PHP_EOL;
     die;
@@ -138,8 +139,7 @@ echo "Work request id: $workrequest_id".PHP_EOL;
 
 echo "----- Wait for Work Request to be Done (getWorkRequest) -----".PHP_EOL;
 $isDone = false;
-while(!$isDone)
-{
+while (!$isDone) {
     $response = $c->getWorkRequest([
         'workRequestId' => $workrequest_id
     ]);
@@ -148,7 +148,7 @@ while(!$isDone)
     if ($status == "COMPLETED" || $timeFinished != null) {
         echo "Work request status: $status".PHP_EOL;
         $isDone = true;
-    } else if ($timeFinished != null) {
+    } elseif ($timeFinished != null) {
         echo "Work request status: $status, terminal state reached at $timeFinished".PHP_EOL;
         $isDone = true;
     } else {
@@ -168,13 +168,13 @@ $c->listWorkRequestErrors([
 ]);
 
 echo "----- headObject of copied file -----".PHP_EOL;
-$file_handle = fopen("composer.json", "rb");
+$file_handle = fopen($file_to_upload, "rb");
 $response = $c->headObject([
     'namespaceName' => $namespace,
     'bucketName' => $bucket_name,
     'objectName' => $object_name3]);
 $retrieved_filesize = $response->getHeaders()['Content-Length'][0];
-$size = filesize("composer.json");
+$size = filesize($file_to_upload);
 if ($size != $retrieved_filesize) {
     echo "ERROR: Retrieved file size ($retrieved_filesize) does not equal uploaded file size ($size)!".PHP_EOL;
     die;
@@ -199,11 +199,11 @@ try {
         'namespaceName' => $namespace,
         'bucketName' => $bucket_name,
         'objectName' => "doesNotExist"]);
-    // $response->echoResponse();
     echo "ERROR: Object was supposed to not exist!".PHP_EOL;
     die;
-} catch (ClientException $e) {
-    $statusCode = $e->getResponse()->getStatusCode();
+} catch (OciBadResponseException $e) {
+    echo $e . PHP_EOL;
+    $statusCode = $e->getStatusCode();
     if ($statusCode != 404) {
         echo "ERROR: Returned $statusCode instead of 404!".PHP_EOL;
         die;
@@ -212,7 +212,7 @@ try {
 
 echo "----- putObject with file into subdirectory -----".PHP_EOL;
 $object_name4 = "php-test/php-test4.txt";
-$file_handle = fopen("composer.json", "rb");
+$file_handle = fopen($file_to_upload, "rb");
 $response = $c->putObject([
     'namespaceName' => $namespace,
     'bucketName' => $bucket_name,
@@ -224,13 +224,13 @@ $response = $c->putObject([
     ]]);
 
 echo "----- headObject of uploaded file -----".PHP_EOL;
-$file_handle = fopen("composer.json", "rb");
+$file_handle = fopen($file_to_upload, "rb");
 $response = $c->headObject([
     'namespaceName' => $namespace,
     'bucketName' => $bucket_name,
     'objectName' => $object_name4]);
 $retrieved_filesize = $response->getHeaders()['Content-Length'][0];
-$size = filesize("composer.json");
+$size = filesize($file_to_upload);
 if ($size != $retrieved_filesize) {
     echo "ERROR: Retrieved file size ($retrieved_filesize) does not equal uploaded file size ($size)!".PHP_EOL;
     die;

@@ -90,6 +90,10 @@ class kBatchUtils
 		$sharedStorageConfig['maxConcurrentUploadConnections'] = isset($storageOptions['maxConcurrentUploadConnections']) ? $storageOptions['maxConcurrentUploadConnections'] : null;
 		$sharedStorageConfig['userAgentRegex'] = isset($storageOptions['userAgentRegex']) ? $storageOptions['userAgentRegex'] : null;
 		$sharedStorageConfig['userAgentPartner'] = isset($storageOptions['userAgentPartner']) ? $storageOptions['userAgentPartner'] : null;
+		
+		$sharedStorageConfig['region'] = isset($storageOptions['region']) ? $storageOptions['region'] : null;
+		$sharedStorageConfig['namespaceName'] = isset($storageOptions['namespaceName']) ? $storageOptions['namespaceName'] : null;
+		
 
 		KalturaLog::debug("Config loaded: " . print_r($sharedStorageConfig, true));
 		kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageConfig));

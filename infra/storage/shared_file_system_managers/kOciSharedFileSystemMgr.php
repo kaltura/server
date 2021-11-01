@@ -24,6 +24,7 @@ use GuzzleHttp\Exception\ClientException;
 use Oracle\Oci\Common\AbstractClient;
 use Oracle\Oci\Common\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Logging\EchoLogAdapter;
+use Oracle\Oci\Common\Auth\InstancePrincipalsAuthProvider;
 
 
 class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
@@ -68,11 +69,10 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->namespaceName = isset($options['namespaceName']) ? $options['namespaceName'] : null;
 			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
 			$this->userAgentPartner = isset($options['userAgentPartner']) ? $options['userAgentPartner'] : "Kaltura";
-			$this->sseType = isset($options['sseType']) ? $options['sseType'] : null;
 		}
 		
 		$this->concurrency = isset($options['concurrency']) ? $options['concurrency'] : 1;
-		$this->retriesNum = isset($options['concurrency']) ? $options['concurrency'] : 3;
+		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
 	
@@ -84,10 +84,22 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			return false;
 		}
 		
-		$auth_provider = new ConfigFileAuthProvider();
+		$auth_provider = new InstancePrincipalsAuthProvider();
 		$this->objectStoargeClient = new ObjectStorageClient($auth_provider,  $this->region);
+		UserAgent::setAdditionalClientUserAgent($this->getKalturaCustomUserAgent());
 	}
 	
+	protected function getKalturaCustomUserAgent()
+	{
+		$appName = self::DEFAULT_S3_APP_NAME;
+		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
+		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches[0]))
+		{
+			$appName = $matches[0];
+		}
+		
+		return "APN/1.0 $this->userAgentPartner/1.0 $appName/1.0";
+	}
 	
 	protected function doCreateDirForPath($filePath)
 	{
@@ -364,7 +376,15 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
+			//404 indicates the path does not exist
+			$getExceptionFunctionName = self::GET_EXCEPTION_CODE_FUNCTION_NAME;
+			$returnStatusCode = $e->$getExceptionFunctionName();
+			if($returnStatusCode == self::OS_404_ERROR)
+			{
+				return false;
+			}
+			
+			self::safeLog("Couldn't determine if path [$path] is dir: sc {$returnStatusCode} msg {$e->getMessage()}");
 		}
 		return false;
 	}
@@ -824,7 +844,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			self::safeLog("Couldn't determine if path [{$params['prefix']}] is dir: {$e->getMessage()}");
+			self::safeLog("Could not list objects for path [$filePath] with msg: {$e->getMessage()}");
 		}
 		
 		return $dirListObjects->objects;

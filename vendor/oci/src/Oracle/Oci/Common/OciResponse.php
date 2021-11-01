@@ -2,28 +2,34 @@
 
 namespace Oracle\Oci\Common;
 
+use Oracle\Oci\Common\Logging\Logger;
+
 class OciResponse
 {
+    /*LogAdapterInterface*/ protected static $logger;
+
     /*int*/ protected $statusCode;
     protected $headers;
     protected $body;
     /*mixed*/ protected $json;
 
     public function __construct(
-        /*int*/ 
+        /*int*/
         $statusCode,
         $headers,
         $body = null,
-        /*mixed*/ 
+        /*mixed*/
         $json = null
-    )
-    {
+    ) {
+        if (OciResponse::$logger == null) {
+            OciResponse::$logger = Logger::logger(static::class);
+        }
         $this->statusCode = $statusCode;
         $this->headers = $headers;
         $this->body = $body;
         $this->json = $json;
 
-        if (AbstractClient::getGlobalLogAdapter()->isLogEnabled(LOG_DEBUG, __CLASS__)) {
+        if (OciResponse::$logger->isDebugEnabled()) {
             $str = "OciResponse:" . PHP_EOL;
             $str .= "Status code: " . $this->getStatusCode() . PHP_EOL;
             $str .= "Headers    : " . PHP_EOL;
@@ -39,7 +45,7 @@ class OciResponse
             } else {
                 $str .= "JSON Body  : " . json_encode($this->getJson(), JSON_PRETTY_PRINT) . PHP_EOL;
             }
-            AbstractClient::getGlobalLogAdapter()->log($str, LOG_DEBUG, [], __CLASS__);
+            OciResponse::$logger->debug($str);
         }
     }
 

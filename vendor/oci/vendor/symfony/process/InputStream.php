@@ -66,6 +66,10 @@ class InputStream implements \IteratorAggregate
         return !$this->open;
     }
 
+    /**
+     * @return \Traversable
+     */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         $this->open = true;
@@ -78,9 +82,7 @@ class InputStream implements \IteratorAggregate
             $current = array_shift($this->input);
 
             if ($current instanceof \Iterator) {
-                foreach ($current as $cur) {
-                    yield $cur;
-                }
+                yield from $current;
             } else {
                 yield $current;
             }
