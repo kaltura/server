@@ -789,15 +789,11 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			}
 			catch (ClientException $e)
 			{
-				$getExceptionFunctionName = self::GET_EXCEPTION_CODE_FUNCTION_NAME;
-				$retries--;
-				if (in_array($e->$getExceptionFunctionName(), $finalErrorCodes))
-				{
-					//In case final status is passed dont log the exception to avoid spamming the log file
-					$retries = 0;
-					return false;
-				}
-				$this->handleException($command, $retries, $params, $e);
+				$this->handleException($command, $retries, $params, $e, $finalErrorCodes);
+			}
+			catch (OciBadResponseException $e)
+			{
+				$this->handleException($command, $retries, $params, $e, $finalErrorCodes);
 			}
 			catch(Exception $e)
 			{
@@ -826,8 +822,17 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		return explode("/",ltrim($filePath,"/"),2);
 	}
 	
-	protected function handleException($command, $retries, $params, $e)
+	protected function handleException($command, &$retries, $params, $e, $finalErrorCodes)
 	{
+		$getExceptionFunctionName = self::GET_EXCEPTION_CODE_FUNCTION_NAME;
+		$retries--;
+		if (in_array($e->$getExceptionFunctionName(), $finalErrorCodes))
+		{
+			//In case final status is passed dont log the exception to avoid spamming the log file
+			$retries = 0;
+			return false;
+		}
+		
 		// don't print body to logs
 		if(isset($params['Body']));
 		{
