@@ -19,6 +19,7 @@ require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 use Oracle\Oci\Common\HttpUtils;
 use Oracle\Oci\Common\Region;
 use Oracle\Oci\Common\UserAgent;
+use Oracle\Oci\Common\OciException;
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
 use GuzzleHttp\Exception\ClientException;
 use Oracle\Oci\Common\AbstractClient;
