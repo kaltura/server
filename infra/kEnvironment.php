@@ -30,6 +30,7 @@ class kEnvironment
 			'general_cache_dir' => "$cacheDir/general/",
 			'response_cache_dir' => "$cacheDir/response/",
 			'syndication_core_xsd_path' => "$appDir/alpha/config/syndication.core.xsd",
+			'last_Update_path' =>  "$cacheDir/",
 		);
 	}
 		

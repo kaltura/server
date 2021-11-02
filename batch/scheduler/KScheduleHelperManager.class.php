@@ -6,6 +6,8 @@
  */
 class KScheduleHelperManager
 {
+	protected $lastUpdate = null;
+
 	/**
 	 * @return array
 	 */
@@ -282,6 +284,24 @@ class KScheduleHelperManager
 		return self::getCachePath() . DIRECTORY_SEPARATOR . 'status.log';
 	}
 
+
+	protected static function getLastFileUpdateTimeStampPath()
+	{
+		$lastUpdate = kEnvironment::get("last_Update_path") . DIRECTORY_SEPARATOR . 'update.log';
+		if (!file_exists($lastUpdate))
+		{
+			kFile::fullMkdir($lastUpdate);
+			self::setLastFileUpdateTimeStamp($lastUpdate, new DateTime());
+		}
+
+		return $lastUpdate;
+	}
+
+	protected static function setLastFileUpdateTimeStamp(string $lastUpdate, DateTime $time)
+	{
+		file_put_contents($lastUpdate, $time->format('Y-m-d H:i:s'));
+	}
+
 	/**
 	 * @return string
 	 */
@@ -320,6 +340,21 @@ class KScheduleHelperManager
 	 */
 	public static function loadStatuses()
 	{
+		$map = kConf::getMap('batch/batch');
+		$temp = $map['template'];
+		$minTimeToUpdate = $temp['minutesFromLastUpdate'];
+
+		$lastFileUpdateTimeStampPath = self::getLastFileUpdateTimeStampPath();
+		$lastFileUpdateFileContent = file_get_contents($lastFileUpdateTimeStampPath);
+		$lastFileUpdateTimeStamp = new DateTime($lastFileUpdateFileContent);
+		$currentTimeStamp = new DateTime();
+		$diffTime = $lastFileUpdateTimeStamp->diff($currentTimeStamp);
+		if ($diffTime->i < $minTimeToUpdate && $diffTime->h == 0)
+		{
+			return array();
+		}
+		self::setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath, new DateTime());
+
 		$filePath = self::getStatusFilePath();
 		if(!file_exists($filePath))
 			return array();
