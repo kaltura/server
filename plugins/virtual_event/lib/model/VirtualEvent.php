@@ -14,7 +14,6 @@
  */
  class VirtualEvent extends BaseVirtualEvent implements IRelatedObject
 {
-	const CUSTOM_DATA_FIELD_OWNER_ID   = 'ownerId';
 	const CUSTOM_DATA_FIELD_ADMINS_GROUP_ID = 'adminsGroupId';
 	const CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID = 'attendeesGroupId';
 	const CUSTOM_DATA_FIELD_MAIN_SE_ID = 'mainEventScheduleEventId';
@@ -27,127 +26,13 @@
 		parent::__construct();
 	}
 	
-	/**
-	 * Applies default values to this object.
-	 * This method should be called from the object's constructor (or equivalent initialization method).
-	 * @see __construct()
-	 */
-	public function applyDefaultValues ()
-	{
-		$this->setSequence(1);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see BaseVirtualEvent::preInsert()
-	 */
 	public function preInsert (PropelPDO $con = null)
 	{
 		$this->setStatus(VirtualEventStatus::ACTIVE);
-		$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
-		
-		$this->setCustomDataObj();
-		
 		return parent::preInsert($con);
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 * @see BaseVirtualEvent::postInsert()
-	 */
-	public function postInsert (PropelPDO $con = null)
-	{
-		parent::postInsert($con);
-		
-		if (!$this->alreadyInSave)
-		{
-			kEventsManager::raiseEvent(new kObjectAddedEvent($this));
-		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see BaseVirtualEvent::postUpdate()
-	 */
-	public function postUpdate (PropelPDO $con = null)
-	{
-		if ($this->alreadyInSave)
-		{
-			return parent::postUpdate($con);
-		}
-		
-		$objectUpdated = $this->isModified();
-		$objectDeleted = false;
-		if ($this->isColumnModified(VirtualEventPeer::STATUS) && $this->getStatus() == VirtualEventStatus::DELETED)
-		{
-			$objectDeleted = true;
-		}
-		
-		$ret = parent::postUpdate($con);
-		
-		if ($objectDeleted)
-		{
-			kEventsManager::raiseEvent(new kObjectDeletedEvent($this));
-		}
-		
-		if ($objectUpdated)
-		{
-			kEventsManager::raiseEvent(new kObjectUpdatedEvent($this));
-		}
-		
-		return $ret;
-	}
-	
-	
-	/* (non-PHPdoc)
-	 * @see BaseVirtualEvent::preSave()
-	 */
-	public function preSave (PropelPDO $con = null)
-	{
-		return parent::preSave($con);
-	}
-	
-	public function incrementSequence ()
-	{
-		$this->setSequence(kDataCenterMgr::incrementVersion($this->getSequence()));
-	}
-	
-	/**
-	 * @param string $v
-	 */
-	public function setOwnerId ($puserId)
-	{
-		$kuser = kuserPeer::createKuserForPartner(kCurrentContext::getCurrentPartnerId(), $puserId, kCurrentContext::$is_admin_session);
-		$this->setOwnerKuserId($kuser->getId());
-		$this->putInCustomData(self::CUSTOM_DATA_FIELD_OWNER_ID, $puserId);
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getOwnerId ()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OWNER_ID);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see IIndexable::getIntId()
-	 */
-	public function getIntId ()
-	{
-		return $this->getId();
-	}
-	
-	
-	public function getSummary ()
-	{
-		if (parent::getSummary())
-		{
-			return parent::getSummary();
-		}
-	}
-	
-	public function getCacheInvalidationKeys ()
+	 public function getCacheInvalidationKeys ()
 	{
 		return array("virtualEvent:id" . strtolower($this->getId()));
 	}
@@ -200,13 +85,5 @@
 	 public function setRegistrationScheduleEventId($v)
 	 {
 		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_SE_ID, $v);
-	 }
-	
-	 /**
-	  * @return mixed
-	  */
-	 public function getIndexObjectName ()
-	 {
-		 return "VirtualEventIndex";
 	 }
  }

@@ -9,7 +9,9 @@ class VirtualScheduleEventFilter extends ScheduleEventFilter
 {
 	public function init()
 	{
-		$this->fields = kArray::makeAssociativeDefaultValue(array(
+		parent::init();
+		
+		$extendedFields = kArray::makeAssociativeDefaultValue(array(
 			'_eq_virtual_event_id',
 			'_in_virtual_event_id',
 			'_notin_virtual_event_id',
@@ -18,7 +20,6 @@ class VirtualScheduleEventFilter extends ScheduleEventFilter
 			'_notin_virtual_schedule_event_sub_type',
 		), null);
 		
-		$this->allowed_order_fields = array(
-		);
+		$this->fields = array_merge($this->fields , $extendedFields);
 	}
 }

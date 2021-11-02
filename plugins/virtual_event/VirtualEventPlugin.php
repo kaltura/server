@@ -14,10 +14,7 @@ class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKal
 	
 	public static function getServicesMap()
 	{
-		$map = array(
-			'virtualEvent' => 'VirtualEventService',
-		);
-		return $map;
+		return array(self::PLUGIN_NAME => 'VirtualEventService',);
 	}
 	
 	/**

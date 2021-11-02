@@ -10,11 +10,6 @@ class KalturaVirtualEventArray extends KalturaTypedArray
 		parent::__construct("KalturaVirtualEvent");
 	}
 	
-	public function insert(KalturaVirtualEvent $map)
-	{
-		$this->array[] = $map;
-	}
-	
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaVirtualEventArray();

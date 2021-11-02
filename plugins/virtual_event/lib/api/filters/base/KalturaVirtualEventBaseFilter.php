@@ -12,6 +12,7 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 		"idIn" => "_in_id",
 		"idNotIn" => "_notin_id",
 		"partnerIdEqual" => "_eq_partner_id",
+		"partnerIdIn" => "_in_partner_id",
 		"nameLike" => "_like_name",
 		"nameMultiLikeOr" => "_mlikeor_name",
 		"nameMultiLikeAnd" => "_mlikeand_name",
@@ -79,6 +80,11 @@ abstract class KalturaVirtualEventBaseFilter extends KalturaFilter
 	 * @var int
 	 */
 	public $partnerIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $partnerIdIn;
 
 	/**
 	 * @var string

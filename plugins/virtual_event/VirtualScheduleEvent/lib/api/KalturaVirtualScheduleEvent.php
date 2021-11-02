@@ -23,7 +23,6 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	 */
 	public $virtualScheduleEventSubType;
 	
-	
 	private static $map_between_objects = array
 	(
 		'virtualEventId',

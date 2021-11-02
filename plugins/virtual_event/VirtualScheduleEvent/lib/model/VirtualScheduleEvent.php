@@ -46,7 +46,7 @@ class VirtualScheduleEvent extends ScheduleEvent
 	 */
 	public function applyDefaultValues ()
 	{
-		parent ::applyDefaultValues();
+		parent::applyDefaultValues();
 		$this -> setType(VirtualScheduleEventType::VIRTUAL);
 	}
 }

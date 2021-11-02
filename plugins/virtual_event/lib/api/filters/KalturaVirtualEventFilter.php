@@ -16,19 +16,18 @@ class KalturaVirtualEventFilter extends KalturaVirtualEventBaseFilter
 	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$response = new KalturaVirtualEventListResponse();
 		$virtualEventFilter = $this->toObject();
 		
 		$c = new Criteria();
 		$virtualEventFilter->attachToCriteria($c);
-		$count = VirtualEventPeer::doCount($c);
+		$response->totalCount = VirtualEventPeer::doCount($c);
 		
 		$pager->attachToCriteria ($c);
 		
 		$list = VirtualEventPeer::doSelect($c);
 		
-		$response = new KalturaVirtualEventListResponse();
 		$response->objects = KalturaVirtualEventArray::fromDbArray($list, $responseProfile);
-		$response->totalCount = $count;
 		
 		return $response;
 	}

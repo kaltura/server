@@ -5,5 +5,5 @@
  */
 interface VirtualScheduleEventType extends ScheduleEventType
 {
-	const VIRTUAL = 6;
+	const VIRTUAL = 7;
 }

@@ -58,31 +58,4 @@ class VirtualEventPeer extends BaseVirtualEventPeer {
 		
 		return $virtualEvent;
 	}
-	
-	/**
-	 * Retrieve a single object by pkey.
-	 *
-	 * @param      int $pk the primary key.
-	 * @param      PropelPDO $con the connection to use
-	 * @return     category
-	 */
-	public static function retrieveByPK($pk, PropelPDO $con = null)
-	{
-		if (!strlen(trim($pk))) {
-			return null;
-		}
-		
-		if (null !== ($obj = virtualEventPeer::getInstanceFromPool((string) $pk))) {
-			return $obj;
-		}
-		
-		$criteria = KalturaCriteria::create(virtualEventPeer::OM_CLASS);
-		$criteria->add(virtualEventPeer::ID, $pk);
-		
-		$v = virtualEventPeer::doSelect($criteria, $con);
-		
-		return !empty($v) > 0 ? $v[0] : null;
-	}
-
-	
 } // VirtualEventPeer

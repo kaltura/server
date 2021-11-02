@@ -6,8 +6,6 @@
  */
 class KalturaVirtualEvent extends KalturaObject implements IFilterable
 {
-	const PROPERTY_MIN_LENGTH = 3;
-	
 	/**
 	 * @var int
 	 * @readonly
@@ -24,6 +22,8 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
+	 * @minLength 3
+	 * @maxLength 256
 	 * @filter like,mlikeor,mlikeand,eq,order
 	 */
 	public $name;
@@ -49,13 +49,11 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $attendeesGroupId;
 	
 	/**
 	 * @var string
-	 * @filter eq,in
 	 */
 	public $adminsGroupId;
 	
@@ -127,38 +125,17 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	}
 	
 	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForInsert()
-	 */
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyMinLength('name', self::PROPERTY_MIN_LENGTH, false);
-		parent::validateForInsert($propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
-	 * @see KalturaObject::validateForUpdate()
-	 */
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validatePropertyMinLength('name', self::PROPERTY_MIN_LENGTH, true);
-		
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
-	
-	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
 	public function toObject($dbObject = null, $propertiesToSkip = array())
 	{
 		if(is_null($dbObject))
+		{
 			$dbObject = new VirtualEvent();
+		}
 		
-		$dbObject = parent::toObject($dbObject, $propertiesToSkip);
-		if (!is_null($this->objectFilter))
-			$dbObject->setObjectFilterApiType(get_class($this->objectFilter));
-		return $dbObject;
+		return parent::toObject($dbObject, $propertiesToSkip);
 	}
-	
 	
 	/* (non-PHPdoc)
 	 * @see IFilterable::getExtraFilters()
