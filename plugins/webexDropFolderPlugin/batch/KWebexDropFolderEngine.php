@@ -86,11 +86,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 		if (!empty($result))
 		{
 			$this->HandleNewFiles($result);
+			return count($result);
 		}
 		else
 		{
 			KalturaLog::info('No new files to handle at this time');
 		}
+		return 0;
 	}
 
 	protected function getDropFolderFilesMap()
@@ -125,11 +127,19 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 
 			if(!array_key_exists($physicalFileName, $dropFolderFilesMap))
 			{
-				if($this->handleFileAdded($physicalFile))
+				$dropFolderFile = $this->handleFileAdded($physicalFile);
+				if ($dropFolderFile)
 				{
 					$maxTime = max(strtotime($physicalFile->getCreateTime()), $maxTime);
 					KalturaLog::info("Added new file with name [$physicalFileName]. maxTime updated: $maxTime");
 					$result->addFileName(kWebexHandleFilesResult::FILE_ADDED_TO_DROP_FOLDER, $physicalFileName);
+					if (time() - kTimeConversion::WEEK > strtotime($physicalFile->getCreateTime()))
+					{
+						if ($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING && $this->handleExistingDropFolderFile($dropFolderFile))
+						{
+							$result->addFileName(kWebexHandleFilesResult::FILE_HANDLED, $physicalFileName);
+						}
+					}
 				}
 				else
 					$result->addFileName(kWebexHandleFilesResult::FILE_NOT_ADDED_TO_DROP_FOLDER, $physicalFileName);

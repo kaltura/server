@@ -84,8 +84,8 @@ class PollActions
 		return false;
 	}
 
-	/* Poll Vote Actions to be called from cache */
-	public static function vote($params)
+	/* Poll vote_validate Actions to be called from cache */
+	public static function vote_validate($params)
 	{
 		if ( is_null($params) ||
 			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
@@ -93,7 +93,12 @@ class PollActions
 			!array_key_exists(PollActions::ANSWER_IDS_ARG, $params))
 			return 'Missing parameter for vote action';
 
+		return true;
+	}
 
+	/* Poll Vote Actions to be called from cache */
+	public static function vote($params)
+	{
 		$pollId     = $params[PollActions::POLL_ID_ARG];
 		$ansIds     = $params[PollActions::ANSWER_IDS_ARG];
 		$userId     = $params[PollActions::USER_ID_ARG];
@@ -154,13 +159,19 @@ class PollActions
 		return $pollType;
 	}
 
-	public static function getVote($params)
+	/* Poll getVote_validate Actions to be called from cache */
+	public static function getVote_validate($params)
 	{
 		if ( is_null($params) ||
 			!array_key_exists(PollActions::POLL_ID_ARG, $params) ||
 			!array_key_exists(PollActions::USER_ID_ARG, $params))
 			return 'Missing parameter for get vote action';
 
+		return true;
+	}
+
+	public static function getVote($params)
+	{
 		$pollId     = $params[PollActions::POLL_ID_ARG];
 		$userId     = $params[PollActions::USER_ID_ARG];
 		$ksUserId   = empty($params['___cache___userId']) ?  null : $params['___cache___userId'];

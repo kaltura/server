@@ -43,7 +43,7 @@ class kmc3Action extends kalturaAction
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
-			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, self::CURRENT_KMC_VERSION);
+			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, self::CURRENT_KMC_VERSION, $this->uid, $this->screen_name, $this->email);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 		}
 	/** END - load partner from DB, and set templatePartnerId **/

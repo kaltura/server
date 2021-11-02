@@ -553,7 +553,6 @@ class kKavaReports extends kKavaReportsMgr
 				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'SCREEN_NAME', 'FULL_NAME'),
-					'hash' => false,
 				)),
 			self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_SHOW),
@@ -575,7 +574,6 @@ class kKavaReports extends kKavaReportsMgr
 				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
-					'hash' => false,
 				)
 			),
 			self::REPORT_JOIN_REPORTS => array(
@@ -1671,6 +1669,87 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
 		),
 
+		ReportType::SELF_SERVE_USAGE => array(
+			self::REPORT_JOIN_REPORTS => array(
+				// reach credit
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_STATUS,
+						self::DRUID_VALUES => array(self::TASK_READY)
+					),
+					self::REPORT_METRICS => array(self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
+				),
+				// unique users
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+				),
+				// playmanifest and live view time
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+				),
+				// total entries and interactive videos
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::SOURCE_INTERACTIVE_VIDEO),
+				),
+				// bandwidth
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+				),
+				// transcoding
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+				// storage
+				array(
+					self::REPORT_JOIN_GRAPHS => array(
+						array(
+							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+							self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+							),
+							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+						),
+						array(
+							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+							self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+							),
+							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+							self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+						),
+					),
+					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+					self::REPORT_METRICS => array(self::METRIC_PEAK_STORAGE_MB),
+				),
+			),
+			self::REPORT_COLUMN_MAP => array(
+				'unique_known_users' => self::METRIC_UNIQUE_USERS,
+				'total_entries' => self::METRIC_COUNT_TOTAL,
+				'video_streams' => self::EVENT_TYPE_PLAYMANIFEST,
+				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'total_interactive_video_entries' => self::SOURCE_INTERACTIVE_VIDEO,
+				'live_view_time' => self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
+				'total_credits' => self::METRIC_SUM_PRICE,
+				'total_jobs_completed' => self::METRIC_TOTAL_JOBS,
+			),
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)

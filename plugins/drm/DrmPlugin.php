@@ -36,6 +36,9 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 		$pages[] = new DrmProfileConfigureAction();
 		$pages[] = new DrmProfileDeleteAction();
 		$pages[] = new DrmAdminApiAction();
+		$pages[] = new DrmPolicyListAction();
+		$pages[] = new DrmPolicyConfigureAction();
+		$pages[] = new DrmPolicyDeleteAction();
 
 		return $pages;
 	}
@@ -101,6 +104,8 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
             return new KDLOperatorDrm($enumValue);
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return new Kaltura_Client_Drm_Type_DrmProfile();
+        if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
+            return new Kaltura_Client_Drm_Type_DrmPolicy();
         if($baseClass == 'kRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
             return new kAccessControlDrmPolicyAction();
         if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
@@ -127,6 +132,8 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
             return "DrmProfile";
         if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
             return 'Kaltura_Client_Drm_Type_DrmProfile';
+        if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::CENC)
+            return 'Kaltura_Client_Drm_Type_DrmPolicy';
         if($baseClass == 'kRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)
             return 'kAccessControlDrmPolicyAction';
         if($baseClass == 'KalturaRuleAction' && $enumValue == DrmAccessControlActionType::DRM_POLICY)

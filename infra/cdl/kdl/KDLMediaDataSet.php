@@ -208,7 +208,7 @@ class KDLMediaDataSet  {
 	 * -- audioFormat, audioDuration, audioBitRate, audioChannels, audioSampleRate, audioResolution
 	 * - Allowed codecs/formats - 
 	 * -- mp4, mxf, wmv3, mpegps, mpegts, webm, mp3
-	 * -- h264, h265, vp6, vp8, vp9, wmv3, mpeg2
+	 * -- h264, h265, vp6, vp8, vp9, wmv3, mpeg2, av1
 	 * -- mp3, aac, mpeg2, pcm
 	 * -- Preset conditions
 	 * --- isMbr 
@@ -309,6 +309,9 @@ class KDLMediaDataSet  {
 			else if($obj->IsFormatOf(array("mpegvideo","mpeg video"))){
 				$valsArr["videoFormat"]="mpeg2";
 			}
+			else if($obj->IsFormatOf(array("av1","av01"))){
+				$valsArr["videoFormat"]="av1";
+			}
 			else
 				$valsArr["videoFormat"]="undefined";
 			if(isset($obj->_duration))	$valsArr["videoDuration"]=$obj->_duration;
@@ -390,7 +393,7 @@ class KDLMediaDataSet  {
 			 * Verify that the condition statement contains ONLY allowed strings (see decription in the func header)
 			 */
 		$containerFormats = array("mp4","mxf","wmv3","mpegps","mpegts","webm","mp3");
-		$videoCodecs = array("h264","h265","vp6","vp8","vp9","wmv3","mpeg2");
+		$videoCodecs = array("h264","h265","vp6","vp8","vp9","wmv3","mpeg2","av1");
 		$audioCodecs = array("mp3","aac","mpeg2","pcm","ac3","eac3");
 		$allowedFormats = array_unique(array_merge($containerFormats, $videoCodecs, $audioCodecs));
 		$allowedFormats[] = "undefined";

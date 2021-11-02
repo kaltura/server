@@ -119,9 +119,13 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				foreach ($categoryList->objects as $category)
 				{
 					self::impersonate($this->toPartnerId);
-					$result = $this->getClient()->category->add($this->cloneCategory($category, $parentCategoryIdMapping));
-					$parentCategoryIdMapping[$category->id] = $result->id;
-					$this->log('created category [' . $result->id . ']');
+					$parentCatId = ($category->parentId != 0) ? $parentCategoryIdMapping[$category->parentId] : null;
+					$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
+					if($result)
+					{
+						$parentCategoryIdMapping[$category->id] = $result->id;
+						$this->log('created category [' . $result->id . ']');
+					}
 				}
 			}
 		}
@@ -129,31 +133,6 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		
 		self::unimpersonate();
 		$this->log("Copied categories from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId . "]");
-	}
-	
-	protected function cloneCategory($category, &$parentCategoryIdMapping)
-	{
-		/* @var $category KalturaCategory */
-		$newCategory = clone($category);
-		if ($newCategory->parentId != 0)
-		{
-			$newCategory->parentId = $parentCategoryIdMapping[$category->parentId];
-		}
-		$newCategory->id = null;
-		$newCategory->depth = null;
-		$newCategory->partnerId = null;
-		$newCategory->fullName = null;
-		$newCategory->fullIds = null;
-		$newCategory->entriesCount = null;
-		$newCategory->membersCount = null;
-		$newCategory->pendingMembersCount = null;
-		$newCategory->directSubCategoriesCount = null;
-		$newCategory->directEntriesCount = null;
-		$newCategory->createdAt = null;
-		$newCategory->updatedAt = null;
-		$newCategory->userJoinPolicy = null;
-		$newCategory->status = null;
-		return $newCategory;
 	}
 	
 	protected function copyUiConfs()
@@ -190,7 +169,10 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				foreach ($uiConfList->objects as $uiConf)
 				{
 					$result = $this->getClient()->uiConf->add($this->cloneUiConf($uiConf));
-					$this->log('created uiConf [' . $result->id . ']');
+					if ($result)
+					{
+						$this->log('created uiConf [' . $result->id . ']');
+					}
 				}
 			}
 		}

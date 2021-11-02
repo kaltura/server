@@ -15,9 +15,6 @@ class KalturaLiveEntryService extends KalturaEntryService
 	//amount of time for holding kLock
 	const KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT = 3;
 
-	//Max time from recording created time before creating new recorded entry
-	const SEVEN_DAYS_IN_SECONDS = 604800;
-
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -138,9 +135,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 			}
 		}
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
-		$entry->fromObject($dbEntry, $this->getResponseProfile());
-		return $entry;
+		return $this->convertToApiObject($dbEntry);
 	}
 
 	private function ingestAsset(entry $entry, $dbAsset, $filename, $shouldCopy = true, $flavorParamsId = null)
@@ -218,7 +213,13 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$this->setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName);
 
 		$dbLiveEntry->save();
-		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true, $shouldCreateRecordedEntry);
+
+		if ($shouldCreateRecordedEntry && $this->shouldCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, true))
+		{
+			$this->createRecordedEntryWrapper($dbLiveEntry, $mediaServerIndex);
+		}
+
+		return $this->convertToApiObject($dbLiveEntry);
 	}
 
 	protected function setMediaServerWrapper($dbLiveEntry, $mediaServerIndex, $hostname, $liveEntryStatus, $applicationName)
@@ -249,6 +250,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 */
 	private function createRecordedEntry(LiveEntry $dbEntry, $mediaServerIndex)
 	{
+		KalturaLog::info("Creating a recorded entry for " . $dbEntry->getId());
 		$lock = kLock::create("live_record_" . $dbEntry->getId());
 
 		if ($lock && !$lock->lock(self::KLOCK_CREATE_RECORDED_ENTRY_GRAB_TIMEOUT, self::KLOCK_CREATE_RECORDED_ENTRY_HOLD_TIMEOUT))
@@ -363,9 +365,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		$dbLiveEntryServerNode->deleteOrMarkForDeletion();
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
-		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
-		return $entry;
+		return $this->convertToApiObject($dbLiveEntry);
 	}
 
 	/**
@@ -416,9 +416,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		if ($mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
 		{
-			$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
-			$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
-			return $entry;
+			return $this->convertToApiObject($dbLiveEntry);
 		}
 
 		$recordedEntry = null;
@@ -461,9 +459,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		$this->handleRecording($dbLiveEntry, $recordedEntry, $resource, $flavorParamsId);
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
-		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
-		return $entry;
+		return $this->convertToApiObject($dbLiveEntry);
 	}
 
 	private function handleRecording(LiveEntry $dbLiveEntry, entry $recordedEntry, KalturaDataCenterContentResource $resource, $flavorParamsId = null)
@@ -518,62 +514,129 @@ class KalturaLiveEntryService extends KalturaEntryService
 		$dbLiveEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbLiveEntry || !($dbLiveEntry instanceof LiveEntry))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		return $this->checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, false);
 
-	}
-
-	protected function checkAndCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, $forcePrimaryValidation, $shouldCreateRecordedEntry = true)
-	{
-		if ($shouldCreateRecordedEntry && (!$forcePrimaryValidation || $mediaServerIndex == EntryServerNodeType::LIVE_PRIMARY) &&
-			in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)) &&
-			$dbLiveEntry->getRecordStatus()
-		)
+		if ($this->shouldCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, false))
 		{
-			KalturaLog::info("Checking if recorded entry needs to be created for entry ".$dbLiveEntry->getId());
-			$createRecordedEntry = false;
-			if(!$dbLiveEntry->getRecordedEntryId())
-			{
-				$createRecordedEntry = true;
-				KalturaLog::info("Creating a new recorded entry for ".$dbLiveEntry->getId());
-			}
-			else {
-				$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
-				if (!$dbRecordedEntry) {
-					$createRecordedEntry = true;
-				}
-				else{
-					$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
-
-					$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
-					$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime + kConf::get('live_session_reconnect_timeout', 'local', 180) < $dbLiveEntry->getCurrentBroadcastStartTime();
-					$maxAppendTimeReached = ($recordedEntryCreationTime + self::SEVEN_DAYS_IN_SECONDS) < time();
-
-					KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
-					KalturaLog::debug("recordedEntryCreationTime [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
-					KalturaLog::debug("maxAppendTimeReached [$maxAppendTimeReached] recordedEntryCreationTime [$recordedEntryCreationTime]");
-
-					if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION && $isNewSession && $recordedEntryNotYetCreatedForCurrentSession)
-					{
-						$createRecordedEntry = true;
-					}
-
-					if($dbLiveEntry->getRecordStatus() == RecordStatus::APPENDED && $dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $maxAppendTimeReached)
-					{
-						$createRecordedEntry = true;
-						$dbLiveEntry->setRecordedEntryId(null);
-						$dbLiveEntry->save();
-					}
-				}
-			}
-			if ($createRecordedEntry)
-			{
-				KalturaLog::info("Creating a recorded entry for ".$dbLiveEntry->getId());
-				$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
-			}
+			$this->createRecordedEntryWrapper($dbLiveEntry, $mediaServerIndex);
 		}
 
-		$entry = KalturaEntryFactory::getInstanceByType($dbLiveEntry->getType());
-		$entry->fromObject($dbLiveEntry, $this->getResponseProfile());
+		return $this->convertToApiObject($dbLiveEntry);
+	}
+
+	/**
+	 * Checking whether need to create recorded entry for the live entry
+	 * @param LiveEntry $dbLiveEntry
+	 * @param KalturaEntryServerNodeType $mediaServerIndex
+	 * @param KalturaEntryServerNodeStatus $liveEntryStatus
+	 * @param bool $forcePrimaryValidation
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function shouldCreateRecordedEntry($dbLiveEntry, $mediaServerIndex, $liveEntryStatus, $forcePrimaryValidation)
+	{
+		KalturaLog::info("Checking if recorded entry needs to be created for entry " . $dbLiveEntry->getId());
+		if (!$dbLiveEntry->getRecordStatus() || $dbLiveEntry->getRecordStatus() === RecordStatus::DISABLED)
+		{
+			return false;
+		}
+		if (!in_array($liveEntryStatus, array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)))
+		{
+			return false;
+		}
+		if ($forcePrimaryValidation && $mediaServerIndex !== EntryServerNodeType::LIVE_PRIMARY)
+		{
+			return false;
+		}
+
+		if (!$dbLiveEntry->getRecordedEntryId())
+		{
+			return true;
+		}
+
+		$dbRecordedEntry = entryPeer::retrieveByPK($dbLiveEntry->getRecordedEntryId());
+		if (!$dbRecordedEntry)
+		{
+			return true;
+		}
+
+		if ($dbLiveEntry->getRecordStatus() == RecordStatus::PER_SESSION)
+		{
+			return $this->shouldCreateRecordedEntryForPerSession($dbRecordedEntry, $dbLiveEntry);
+		}
+
+		if ($dbLiveEntry->getRecordStatus() == RecordStatus::APPENDED)
+		{
+			return $this->shouldCreateRecordedEntryForAppend($dbRecordedEntry);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checking whether should create recorded entry for the "append" record status case
+	 * @param entry $dbRecordedEntry
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function shouldCreateRecordedEntryForAppend(entry $dbRecordedEntry)
+	{
+		$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
+		$isKalturaRecordedLive = $dbRecordedEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE; // probably can be removed
+		if (!$isKalturaRecordedLive)
+		{
+			KalturaLog::debug("recorded entry source type is not KALTURA_RECORDED_LIVE [recordedEntryId = {$dbRecordedEntry->getId()}]");
+		}
+		$maxAppendTimeReached = ($recordedEntryCreationTime + kTimeConversion::WEEK) < time();
+		$recordingMoreThanLimit = $dbRecordedEntry->getDuration() > kConf::get('recording_limit_length', 'local', kTimeConversion::DAY);
+
+		KalturaLog::debug("maxAppendTimeReached [$maxAppendTimeReached] recordedEntryCreationTime [$recordedEntryCreationTime] recordingMoreThenLimit [$recordingMoreThanLimit] isKalturaRecordedLive [$isKalturaRecordedLive]");
+		return $isKalturaRecordedLive && ($maxAppendTimeReached || $recordingMoreThanLimit);
+	}
+
+	/**
+	 * Checking whether should create recorded entry for the "per session" record status case
+	 * @param entry $dbRecordedEntry
+	 * @param LiveEntry $dbLiveEntry
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected function shouldCreateRecordedEntryForPerSession(entry $dbRecordedEntry, LiveEntry $dbLiveEntry)
+	{
+		$recordedEntryCreationTime = $dbRecordedEntry->getCreatedAt(null);
+		$liveSessionReconnectTimeout = kConf::get('live_session_reconnect_timeout', 'local', 180);
+		$isNewSession = $dbLiveEntry->getLastBroadcastEndTime() + $liveSessionReconnectTimeout < $dbLiveEntry->getCurrentBroadcastStartTime();
+		$recordedEntryNotYetCreatedForCurrentSession = $recordedEntryCreationTime + $liveSessionReconnectTimeout < $dbLiveEntry->getCurrentBroadcastStartTime();
+		KalturaLog::debug("isNewSession [$isNewSession] getLastBroadcastEndTime [{$dbLiveEntry->getLastBroadcastEndTime()}] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
+		KalturaLog::debug("recordedEntryNotYetCreatedForCurrentSession [$recordedEntryNotYetCreatedForCurrentSession] recordedEntryCreationTime [$recordedEntryCreationTime] getCurrentBroadcastStartTime [{$dbLiveEntry->getCurrentBroadcastStartTime()}]");
+		return $isNewSession && $recordedEntryNotYetCreatedForCurrentSession;
+	}
+
+	/**
+	 * Creating recorded entry. If the record status is "APPENDED" - the recorderEntryId will be set to null.
+	 * @param LiveEntry $dbLiveEntry
+	 * @param KalturaEntryServerNodeType $mediaServerIndex
+	 * @throws Exception
+	 */
+	protected function createRecordedEntryWrapper(LiveEntry $dbLiveEntry, $mediaServerIndex)
+	{
+		if ($dbLiveEntry->getRecordStatus() === RecordStatus::APPENDED)
+		{
+			$dbLiveEntry->setRecordedEntryId(null);
+			$dbLiveEntry->save();
+		}
+		$this->createRecordedEntry($dbLiveEntry, $mediaServerIndex);
+	}
+
+	/**
+	 * Converting from dbEntry to the appropriate api entry
+	 * @param entry $dbEntry
+	 * @return KalturaBaseEntry
+	 * @throws Exception
+	 */
+	protected function convertToApiObject(entry $dbEntry)
+	{
+		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
 	}
 }

@@ -18,6 +18,11 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 				return true;
 		}
 
+		if ($object instanceof accessControl)
+		{
+			return true;
+		}
+
 
 
 		return false;
@@ -36,6 +41,11 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 		if ($object instanceof entry)
 		{
 			return $this->handleEntryCreated($object);
+		}
+
+		if ($object instanceof accessControl)
+		{
+			return $this->handleAccessControlCreated($object);
 		}
 
 		return true;
@@ -126,5 +136,18 @@ class kObjectCreatedHandler implements kObjectCreatedEventConsumer
 			/* @var $thumbAsset thumbAsset */
 			$newThumbAsset = $thumbAsset->copyToEntry($object->getEntryId(), $liveEntry->getPartnerId());
 		}
+	}
+
+	protected function handleAccessControlCreated(accessControl $object)
+	{
+		// if requested set this profile as partners default
+		$partner = PartnerPeer::retrieveByPK($object->getPartnerId());
+		if ($partner && $object->getIsDefault() === true && $partner->getDefaultAccessControlId() !== $object->getId())
+		{
+			$partner->setDefaultAccessControlId($object->getId());
+			$partner->save();
+		}
+
+		return true;
 	}
 }

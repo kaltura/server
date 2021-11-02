@@ -54,6 +54,11 @@ class FairplayPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 			{
 				return new Kaltura_Client_Fairplay_Type_FairplayDrmProfile();
 			}
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY)
+			{
+				return new Kaltura_Client_Drm_Type_DrmPolicy();
+			}
+
 			if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY)
 			{
 				return new Form_FairplayProfileConfigureExtend_SubForm();
@@ -82,6 +87,11 @@ class FairplayPlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 			{
 				return 'Kaltura_Client_Fairplay_Type_FairplayDrmProfile';
 			}
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY)
+			{
+				return 'Kaltura_Client_Drm_Type_DrmProfile';
+			}
+
 			if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::FAIRPLAY)
 			{
 				return 'Form_FairplayProfileConfigureExtend_SubForm';

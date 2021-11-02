@@ -70,14 +70,16 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				<xs:annotation>
 					<xs:documentation>
 						The action to apply:<br/>
-						Update - Update existing subtitle(s). Requires captionAssetId or captionParamsId<br/>
-						Replace - Replace all subtitles. When "lang" is provided, replace only subtitles with the given language. If "tags" are also provided, replace only subtitles with the given language and tags. 
+						Update - Update existing subtitle(s). Requires "captionAssetId", "captionParamsId" or "captionParams"<br/>
+						Replace - If no subTitle is provided, delete all subtitles. When subTitle is provided, requires "lang" ("tags" are optional). Replace only subtitles with the given language. If "tags" are also provided, replace only subtitles with the given language and tags.
+						Delete - If no subTitle is provided, delete all subtitles. When subTitle is provided, requires "captionAssetId" or "lang" ("tags" are optional) . When "captionAssetId" is provided, delete the specific subtitle. When "lang" is provided, delete only subtitles with the given language. If "tags" are also provided, replace only subtitles with the given language and tags.
 					</xs:documentation>
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:enumeration value="update" />
+						<xs:enumeration value="update"/>
 						<xs:enumeration value="replace"/>
+						<xs:enumeration value="delete"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -96,7 +98,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 					<xs:documentation>Specifies specific tags you want to set for the flavor asset</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:choice minOccurs="1" maxOccurs="1">
+			<xs:choice minOccurs="0" maxOccurs="1">
 				<xs:element ref="serverFileContentResource" minOccurs="1" maxOccurs="1">
 					<xs:annotation>
 						<xs:documentation>Specifies that content ingestion location is on a Kaltura hosted server</xs:documentation>
@@ -313,24 +315,32 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 	{
 		if(!$captionAssets)
 		{
-			return $captionAssets;
+			return null;
 		}
 
+		if(!$item->subTitles->subTitle)
+		{
+			return $captionAssets;
+		}
+		
 		$captionsToDelete = array();
 
 		foreach($item->subTitles->subTitle as $xmlCaption)
 		{
-			if(!isset($xmlCaption['lang']))
-			{
-				return $captionAssets;
-			}
-
-
 			$tags = $this->xmlBulkUploadEngine->implodeChildElements($xmlCaption->tags);
 			$xmlCaptionTags = $tags ? explode(',', $tags) : array();
 
 			foreach($captionAssets as $captionAsset)
 			{
+				if(isset($xmlCaption['captionAssetId']))
+				{
+					if($xmlCaption['captionAssetId'] == $captionAsset->id)
+					{
+						$captionsToDelete[] = $captionAsset;
+						return $captionsToDelete;
+					}
+					continue;
+				}
 
 				if($captionAsset->language != $xmlCaption['lang'])
 				{
@@ -338,9 +348,10 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 				}
 
 				$foundAllTags = true;
+				$captionAssetTags = explode(',', $captionAsset->tags);
 				foreach($xmlCaptionTags as $xmlCaptionTag)
 				{
-					if(strpos($captionAsset->tags, $xmlCaptionTag) === false)
+					if(!in_array($xmlCaptionTag, $captionAssetTags, true))
 					{
 						$foundAllTags = false;
 						break;
@@ -365,6 +376,7 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		$captionsList = KBatchBase::$kClient->captionAsset->listAction($filter);
 
 		$captionsToDelete = $this->getCaptionsToDelete($captionsList->objects, $item);
+		
 		if($captionsToDelete)
 		{
 			KBatchBase::$kClient->startMultiRequest();
@@ -401,17 +413,27 @@ class CaptionBulkUploadXmlPlugin extends KalturaPlugin implements IKalturaPendin
 		
 		$action = KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE];
 		if(isset($item->subTitles->action))
-			$action = strtolower($item->subTitles->action);
-			
-		switch ($action)
 		{
-			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]:
-				$this->deleteCurrentCaptions($object->id, $item);
-			case KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]:
-				$this->handleItemAdded($object, $item);
-				break;
-			default:
+			$supportedActions =  array(KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::DELETE],
+				KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE],
+				KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]);
+			$action = strtolower($item->subTitles->action);
+			if(!in_array($action, $supportedActions, true))
+			{
 				throw new KalturaBatchException("subTitles->action: $action is not supported", KalturaBatchJobAppErrors::BULK_ACTION_NOT_SUPPORTED);
+			}
+		}
+		
+		if( ($action === KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::DELETE]) ||
+			($action === KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]) )
+		{
+			$this->deleteCurrentCaptions($object->id, $item);
+		}
+		
+		if( ($action === KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::REPLACE]) ||
+			($action === KBulkUploadEngine::$actionsMap[KalturaBulkUploadAction::UPDATE]) )
+		{
+			$this->handleItemAdded($object, $item);
 		}
 	}
 

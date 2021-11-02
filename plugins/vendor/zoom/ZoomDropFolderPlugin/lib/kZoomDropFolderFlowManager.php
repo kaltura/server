@@ -16,23 +16,30 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		{
 			return true;
 		}
+
+		$partnerZoomDropFolderModified = false;
+
 		if (self::wasDeletionPolicyChanged($object, $modifiedColumns))
 		{
 			/* @var $object ZoomVendorIntegration */
 			list($partnerZoomDropFolder, $partnerZoomDropFoldersCount) = self::getZoomDropFolderRelatedInfo($object);
-			if ($object->getDeletionPolicy())
+			if ($partnerZoomDropFolder)
 			{
-				$partnerZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-				$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', 1);
-				$partnerZoomDropFolder->setAutoFileDeleteDays($daysToDelete);
+				if ($object->getDeletionPolicy())
+				{
+					$partnerZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
+					$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', 1);
+					$partnerZoomDropFolder->setAutoFileDeleteDays($daysToDelete);
+				}
+				else
+				{
+					$partnerZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
+				}
+
+				$partnerZoomDropFolderModified = true;
+				KalturaLog::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated deletion policy to ' .
+					$partnerZoomDropFolder->getFileDeletePolicy());
 			}
-			else
-			{
-				$partnerZoomDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
-			}
-			$partnerZoomDropFolder -> save();
-			KalturaLog ::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated deletion policy to ' .
-			                   $partnerZoomDropFolder->getFileDeletePolicy());
 		}
 		if ( self::wasStatusChanged($object, $modifiedColumns))
 		{
@@ -40,8 +47,13 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 			list($partnerZoomDropFolder, $partnerZoomDropFoldersCount) = self::getZoomDropFolderRelatedInfo($object);
 			if ($partnerZoomDropFolder)
 			{
+				if ($partnerZoomDropFolder->getStatus() != DropFolderStatus::ENABLED && $object->getStatus() == VendorIntegrationStatus::ACTIVE)
+				{
+					self::verifyAndSetDropFolderConfig($partnerZoomDropFolder);
+				}
+
 				$partnerZoomDropFolder->setStatus(self::getDropFolderStatus($object->getStatus()));
-				$partnerZoomDropFolder->save();
+				$partnerZoomDropFolderModified = true;
 				KalturaLog ::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated status to ' .
 				                   $partnerZoomDropFolder->getStatus());
 			}
@@ -57,28 +69,47 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 				}
 			}
 		}
+
+		if ($partnerZoomDropFolderModified)
+		{
+			$partnerZoomDropFolder->save();
+		}
+
 		return true;
 	}
-	
+
 	public static function getZoomDropFolderRelatedInfo($object)
 	{
 		$criteria = new Criteria();
 		$criteria->add(DropFolderPeer::PARTNER_ID, $object->getPartnerId());
-		$criteria->add(DropFolderPeer::TYPE, ZoomDropFolderPlugin::getCoreValue('DropFolderType',
-		                                                                        ZoomDropFolderType::ZOOM));
+		$criteria->add(DropFolderPeer::TYPE, ZoomDropFolderPlugin::getCoreValue('DropFolderType', ZoomDropFolderType::ZOOM));
+		DropFolderPeer::setUseCriteriaFilter(false);
 		$allPartnerZoomDropFolders = DropFolderPeer::doSelect($criteria);
-		$partnerZoomDropFoldersCount = count($allPartnerZoomDropFolders);
-		$partnerZoomDropFolderFound = null;
+		DropFolderPeer::setUseCriteriaFilter(true);
+		$partnerZoomDropFoldersCount = 0;
+		$enabledZoomDropFolder = null;
+		$noneEnabledPartnerZoomDropFolder = null;
 		foreach ($allPartnerZoomDropFolders as $partnerZoomDropFolder)
 		{
-			/* @var $partnerZoomDropFolder ZoomDropFolder */
-			if ($partnerZoomDropFolder->getZoomVendorIntegrationId() == $object->getId())
+			if ($partnerZoomDropFolder->getStatus() != DropFolderStatus::DELETED)
 			{
-				$partnerZoomDropFolderFound = $partnerZoomDropFolder;
-				break;
+				$partnerZoomDropFoldersCount++;
+			}
+			if ($enabledZoomDropFolder || $partnerZoomDropFolder->getZoomVendorIntegrationId() != $object->getId())
+			{
+				continue;
+			}
+			if ($partnerZoomDropFolder->getStatus() == DropFolderStatus::ENABLED)
+			{
+				$enabledZoomDropFolder = $partnerZoomDropFolder;
+				continue;
+			}
+			if (!$noneEnabledPartnerZoomDropFolder || $partnerZoomDropFolder->getUpdatedAt() > $noneEnabledPartnerZoomDropFolder->getUpdatedAt())
+			{
+				$noneEnabledPartnerZoomDropFolder = $partnerZoomDropFolder;
 			}
 		}
-		return array($partnerZoomDropFolderFound, $partnerZoomDropFoldersCount);
+		return array($enabledZoomDropFolder ?  $enabledZoomDropFolder : $noneEnabledPartnerZoomDropFolder, $partnerZoomDropFoldersCount);
 	}
 	
 	/**
@@ -107,8 +138,11 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($object instanceof ZoomVendorIntegration && in_array('vendor_integration.CUSTOM_DATA', $modifiedColumns))
 		{
 			$oldCustomDataValues = $object->getCustomDataOldValues();
-			$oldDeletionPolicy = isset ($oldCustomDataValues[''][self::DELETION_POLICY]) ? $oldCustomDataValues[''][self::DELETION_POLICY] : '';
-			if ($oldDeletionPolicy != $object->getDeletionPolicy())
+			if (!isset($oldCustomDataValues[''][self::DELETION_POLICY]))
+			{
+				return false;
+			}
+			if ($oldCustomDataValues[''][self::DELETION_POLICY] != $object->getDeletionPolicy())
 			{
 				return true;
 			}
@@ -207,6 +241,18 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 		$newZoomDropFolder->setLastHandledMeetingTime(time());
 		$newZoomDropFolder->setFileNamePatterns('*');
 		$newZoomDropFolder->save();
+	}
+
+	protected static function verifyAndSetDropFolderConfig(ZoomDropFolder $zoomDropFolder)
+	{
+		KalturaLog::debug('Verify and set config before reactivating Drop Folder Id: ' . $zoomDropFolder->getId());
+		$zoomDropFolder->setLastHandledMeetingTime(time());
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($zoomDropFolder->getConversionProfileId());
+		if (!$conversionProfile)
+		{
+			$partner = PartnerPeer::retrieveByPK($zoomDropFolder->getPartnerId());
+			$zoomDropFolder->setConversionProfileId($partner->getDefaultConversionProfileId());
+		}
 	}
 	
 }

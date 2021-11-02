@@ -135,7 +135,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		$videoFilePath = $data->providerData->videoAssetFilePath;
 		
 		if (!$videoFilePath)
-			throw new KalturaException('No video asset to distribute, the job will fail');
+			throw new KalturaException('No video asset to distribute, the job will fail',KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
 			
 		if (!kFile::checkFileExists($videoFilePath))
 			throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
@@ -388,7 +388,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 	private function fetchIfRemote($filePath)
 	{
 		list($isRemote, $remoteUrl) = kFile::resolveFilePath($filePath);
-		$filePath = !$isRemote ? $filePath : kFile::getExternalFile($remoteUrl, __CLASS__ . '/' . basename($filePath));
+		$filePath = !$isRemote ? $filePath : kFile::getExternalFile($remoteUrl, self::class . '/' . basename($filePath));
 		return array($isRemote, $filePath);
 	}
 	
@@ -401,7 +401,7 @@ class DailymotionDistributionEngine extends DistributionEngine implements
 		return $remoteMediaFile;
 	}
 	
-	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFile, KalturaDailymotionDistributionCaptionInfo $captionInfo){
+	private function updateRemoteMediaFileVersion(KalturaDistributionRemoteMediaFileArray &$remoteMediaFiles, KalturaDailymotionDistributionCaptionInfo $captionInfo){
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		foreach ($remoteMediaFiles as $remoteMediaFile)
 		{

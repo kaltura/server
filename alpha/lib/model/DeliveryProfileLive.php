@@ -384,32 +384,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		return array($matchedPattern, $shouldRedirect);
 	}
-	
+
 	private function generateLiveSecuredPackagerToken($url)
 	{
-		$livePackagerToken = kConf::get("live_packager_secure_token");
-		
-		$signingDomain = $this->getLivePackagerSigningDomain(); 
-		if($signingDomain && $signingDomain != '')
-		{
-			$domain = parse_url($url, PHP_URL_HOST);
-			if($domain && $domain != '')
-			{
-				$url = str_replace($domain, $signingDomain, $url);
-			}
-			else
-			{ 
-				KalturaLog::debug("Failed to parse domain from original url, signed domain will not be modified");
-			}
-		}
-
-		//Remove schema from the signed token to avoid validation errors in case manifest is in http and urls are rtunined in https
-		$url = preg_replace('#^https?://#', '', $url);
-		
-		$token = md5("$livePackagerToken $url", true);
-		$token = rtrim(strtr(base64_encode($token), '+/', '-_'), '=');
-		
-		return $token;
+		$signingDomain = $this->getLivePackagerSigningDomain();
+		return myPackagerUtils::generateLivePackagerToken($url, $signingDomain);
 	}
 	
 	protected function getRenderer($flavors)

@@ -216,6 +216,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		$c = new Criteria();
 		$eventNotificationTemplateFilter->attachToCriteria($c);
 		$count = EventNotificationTemplatePeer::doCount($c);
+		$c->addDescendingOrderByColumn(EventNotificationTemplatePeer::ID);
 		
 		$pager->attachToCriteria ( $c );
 		$list = EventNotificationTemplatePeer::doSelect($c);

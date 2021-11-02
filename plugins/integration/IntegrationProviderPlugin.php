@@ -5,8 +5,8 @@
 abstract class IntegrationProviderPlugin extends KalturaPlugin implements IIntegrationProviderPlugin, IKalturaEnumerator, IKalturaPending, IKalturaObjectLoader
 {
 	const INTEGRATION_PLUGIN_NAME = 'integration';
-	
-	//exteding classes should implement this function to make sure 
+
+	//exteding classes should implement this function to make sure
 	//there will be an object implementing IIntegrationProvider interface
 	abstract function getProvider();
 
@@ -18,10 +18,10 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 		$class = get_called_class();
 		$integrationVersion = $class::getRequiredIntegrationPluginVersion();
 		$dependency = new KalturaDependency(IntegrationPlugin::getPluginName(), $integrationVersion);
-		
+
 		return array($dependency);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see IKalturaEnumerator::getEnums()
 	 */
@@ -31,10 +31,10 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 		$integrationProviderClassName = $class::getIntegrationProviderClassName();
 		if(is_null($baseEnumName))
 			return array($integrationProviderClassName);
-	
+
 		if($baseEnumName == 'IntegrationProviderType')
 			return array($integrationProviderClassName);
-			
+
 		return array();
 	}
 
@@ -42,14 +42,14 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
-	{			
+	{
 		$class = get_called_class();
 		$objectClass = $class::getObjectClass($baseClass, $enumValue);
-		if (is_null($objectClass)) 
+		if (is_null($objectClass))
 		{
 			return null;
 		}
-		
+
 		if (!is_null($constructorArgs))
 		{
 			$reflect = new ReflectionClass($objectClass);
@@ -70,7 +70,7 @@ abstract class IntegrationProviderPlugin extends KalturaPlugin implements IInteg
 		$value = $class::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('IntegrationProviderType', $value);
 	}
-	
+
 	/**
 	 * @return string external API value of dynamic enum.
 	 */
