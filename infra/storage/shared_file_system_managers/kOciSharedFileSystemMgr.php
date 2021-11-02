@@ -174,10 +174,6 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		$params = array();
-		if ($this->sseType === "AES256")
-		{
-			$params['ServerSideEncryption'] = "AES256";
-		}
 
 		$retries = $this->retriesNum;
 		while ($retries > 0)
@@ -671,10 +667,6 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doMoveLocalToShared($src, $dest, $copy = false)
 	{
 		$params = array();
-		if ($this->sseType === "AES256")
-		{
-			$params['ServerSideEncryption'] = "AES256";
-		}
 
 		$fp = fopen($src, 'r');
 		if(!$fp)
