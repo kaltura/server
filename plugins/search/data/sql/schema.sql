@@ -10,24 +10,25 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `sphinx_log`;
 
 
-CREATE TABLE `sphinx_log`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`executed_server_id` INTEGER,
-	`object_type` VARCHAR(255),
-	`object_id` VARCHAR(20),
-	`entry_id` VARCHAR(20),
-	`partner_id` INTEGER default 0,
-	`dc` INTEGER,
-	`sql` LONGTEXT,
-	`created_at` DATETIME,
-	`type` INTEGER,
-	`index_name` VARCHAR(128),
-	`custom_data` TEXT,
-	PRIMARY KEY (`id`),
-	KEY `entry_id`(`entry_id`),
-	KEY `creatd_at`(`created_at`)
-)Type=InnoDB;
+CREATE TABLE `sphinx_log` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `executed_server_id` int(11) NOT NULL,
+    `object_type` varchar(255) NOT NULL,
+    `object_id` varchar(20) NOT NULL,
+    `entry_id` varchar(20) DEFAULT NULL,
+    `partner_id` int(11) DEFAULT '0',
+    `dc` int(11) DEFAULT NULL,
+    `sql` longtext,
+    `created_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+    `type` int(11) DEFAULT NULL,
+    `index_name` varchar(128) DEFAULT NULL,
+    `custom_data` text,
+    PRIMARY KEY (`id`,`created_at`),
+    KEY `entry_id` (`entry_id`),
+    KEY `sphinx_log_FI_1` (`partner_id`),
+    KEY `created_at` (`created_at`),
+    KEY `dc_id` (`dc`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 #-----------------------------------------------------------------------------
 #-- sphinx_log_server
@@ -36,20 +37,16 @@ CREATE TABLE `sphinx_log`
 DROP TABLE IF EXISTS `sphinx_log_server`;
 
 
-CREATE TABLE `sphinx_log_server`
-(
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`server` VARCHAR(63),
-	`dc` INTEGER,
-	`last_log_id` INTEGER,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	PRIMARY KEY (`id`),
-	INDEX `sphinx_log_server_FI_1` (`last_log_id`),
-	CONSTRAINT `sphinx_log_server_FK_1`
-		FOREIGN KEY (`last_log_id`)
-		REFERENCES `sphinx_log` (`id`)
-)Type=InnoDB;
+CREATE TABLE `sphinx_log_server` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `server` varchar(63) DEFAULT NULL,
+ `dc` int(11) DEFAULT NULL,
+ `last_log_id` bigint(20) DEFAULT NULL,
+ `created_at` datetime DEFAULT NULL,
+ `updated_at` datetime DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `sphinx_log_server_FI_1` (`last_log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

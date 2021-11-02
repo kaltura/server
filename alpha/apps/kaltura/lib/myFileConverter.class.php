@@ -274,20 +274,20 @@ class myFileConverter
 	{
 		if (!kFile::checkFileExists($source_file))
 		{
-			KalturaLog::log ( __CLASS__ . " File not found [$source_file]" );
+			KalturaLog::log ( self::class . " File not found [$source_file]" );
 			return;
 		}
 
 		if (kFile::isDir($source_file))
 		{
-			KalturaLog::log ( __CLASS__ . " Cannot create image from directory [$source_file]" );
+			KalturaLog::log ( self::class . " Cannot create image from directory [$source_file]" );
 			return;
 		}
 
 		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
 		if (!$srcIm || !$sourcewidth || !$sourceheight)
 		{
-			KalturaLog::log ( __CLASS__ . " bad image / dimensions [$source_file]" );
+			KalturaLog::log ( self::class . " bad image / dimensions [$source_file]" );
 			return;
 		}
 

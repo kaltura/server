@@ -9,7 +9,6 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 	const MAX_QUERY_DATE_RANGE_DAYS = 25; //Maximum querying date range is 28 days we define it as less than that
 	const MIN_TIME_BEFORE_HANDLING_UPLOADING = 60; //the time in seconds
 	const ADMIN_TAG_WEBEX = 'webexentry';
-	const MAX_FILES_TO_HANDLE = 100; // Maximum files to handle by the batch each round
 	private static $unsupported_file_formats = array('WARF');
 	private $serviceTypes = null;
 	private $dropFolderFilesMap = null;
@@ -61,20 +60,13 @@ class KWebexDropFolderEngine extends KDropFolderEngine
 			}
 			$endTime = time() + kTimeConversion::DAY;
 			
-			$handledFilesCount = 0;
-			
 			for ($i = $startTime; $i < $endTime; $i = $i + kTimeConversion::WEEK)
 			{
 				$startDate = date('m/j/Y H:i:s', $i);
 				$endDateEpoch = min($i + kTimeConversion::WEEK, $endTime);
 				$endDate = date('m/j/Y H:i:s', $endDateEpoch);
 				
-				$handledFilesCount += $this->getFilesFromWebex($startDate, $endDate);
-				if ($handledFilesCount >= self::MAX_FILES_TO_HANDLE)
-				{
-					KalturaLog::info('Webex files handled: ' . $handledFilesCount);
-					break;
-				}
+				$this->getFilesFromWebex($startDate, $endDate);
 			}
 		}
 		else

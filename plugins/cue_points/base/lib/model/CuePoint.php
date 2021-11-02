@@ -192,7 +192,7 @@ abstract class CuePoint extends BaseCuePoint implements IIndexable, IRelatedObje
 	
 	public function getSphinxIndexName()
 	{
-		return kSphinxSearchManager::getSphinxIndexName(CuePointIndex::getObjectIndexName());
+		return kSphinxSearchManager::getSphinxIndexName(CuePointIndex::getObjectIndexName(), CuePointIndex::getSphinxSplitIndexId($this->getPartnerId(), CuePointIndex::getObjectName()));
 	}
 
 	/**

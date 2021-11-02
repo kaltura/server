@@ -40,7 +40,9 @@ class myYouTubeServices extends myBaseMediaSource implements IMediaSource
 			// this provider does not supply media type $media_type
 			return self::searchVideos ($searchText, $page, $pageSize, $authData ); 
 		}
-	}
+        return array('status' => 404, 'message' => 'media type not found');
+
+    }
 		
 	public  function getAuthData($kuserId, $userName, $password, $token)
 	{
@@ -136,8 +138,8 @@ class myYouTubeServices extends myBaseMediaSource implements IMediaSource
 		
 		return self::sendRequest($url);
 	}
-	
-	private static function getObjectInfo($objectId)
+	// used elsewhere..
+	public static function getObjectInfo($objectId)
 	{
 		$url = "http://www.youtube.com/api2_rest?method=youtube.videos.get_details&dev_id=".self::DEV_ID."&video_id=".urlencode($objectId);
 		$xpath = self::getXPathResponse($url);
