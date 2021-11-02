@@ -2,7 +2,7 @@
 
 class myXmlUtils
 {
-	public static function validateXmlFileContent($filePath, $partnerId)
+	public static function validateXmlFileContent($filePath, $partnerId, $isThumbnail = false)
 	{
 		if (!$filePath || !$partnerId)
 		{
@@ -23,7 +23,7 @@ class myXmlUtils
 				return false;
 			}
 			
-			if ($partner && $partner->getPurifyImageContent())
+			if ($isThumbnail && $partner && $partner->getPurifyImageContent())
 			{
 				$modifiedContent = self::purifyField('thumbasset', 'content' , $xmlContent);
 				

@@ -2156,7 +2156,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($syncKey)
 		{
 			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
-			$validContent = myXmlUtils::validateXmlFileContent($filePath, $syncKey->getPartnerId());
+			$validContent = myXmlUtils::validateXmlFileContent($filePath, $syncKey->getPartnerId(), true);
 			if($isTempFile)
 			{
 				unlink($filePath);
