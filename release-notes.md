@@ -1,4 +1,4 @@
-# Quasar-17.13.0 #
+# Quasar-17.14.0 #
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
 ### Deployment ###
