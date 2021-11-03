@@ -8,6 +8,7 @@
 
 class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 {
+	const MAX_DURATION = 5 * kTimeConversion::YEARS; //5 years
 	/**
 	 * The ID of the virtual event connected to this Schedule Event
 	 * @var int
@@ -57,5 +58,15 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	public function getScheduleEventType ()
 	{
 		return VirtualScheduleEventType::VIRTUAL;
+	}
+	
+	protected function getScheduleEventMaxDuration()
+	{
+		return self::MAX_DURATION;
+	}
+	
+	protected function getSingleScheduleEventMaxDuration()
+	{
+		return $this->getScheduleEventMaxDuration();
 	}
 }
