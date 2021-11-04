@@ -371,6 +371,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveStreamEntry = $this->fetchLiveEntry($id);
 		$liveStreamEntry->setLiveStatusCache();
 		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
+		KalturaLog::info("isLive response of entry [$id] is [$isLive]");
 		
 		if ($isLive !== null)
 		{
