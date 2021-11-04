@@ -2,9 +2,9 @@
 
 class myXmlUtils
 {
-	public static function validateXmlFileContent($filePath, $partnerId, $purifyParams = array())
+	public static function validateXmlFileContent($filePath, $purifyParams = array())
 	{
-		if (!$filePath || !$partnerId)
+		if (!$filePath)
 		{
 			return true;
 		}
@@ -12,7 +12,6 @@ class myXmlUtils
 		$fileType = kFileUtils::getMimeType($filePath);
 		if (strpos($fileType, 'html') !== false || strpos($fileType, 'xml') !== false)
 		{
-			$partner = PartnerPeer::retrieveByPK($partnerId);
 			$xmlContent = kFile::getFileContent($filePath);
 			
 			$dom = new KDOMDocument();
@@ -23,16 +22,16 @@ class myXmlUtils
 				return false;
 			}
 			
-			if ($partner && $partner->getPurifyImageContent() && $purifyParams)
+			if ($purifyParams)
 			{
-				self::purifyImageContent($filePath, $xmlContent);
+				self::purifyXmlContent($filePath, $xmlContent, $purifyParams);
 			}
 		}
 		
 		return true;
 	}
 	
-	protected static function purifyImageContent($filePath, $xmlContent, $purifyParams)
+	public static function purifyXmlContent($filePath, $xmlContent, $purifyParams)
 	{
 		if (!is_null($purifyParams[0]) && !is_null($purifyParams[1]))
 		{
