@@ -277,11 +277,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				$audioRecordingFile = $recordingFilesPerTimeSlot[$audioKey];
 				KalturaLog::debug('Video and Audio files were found. audio file is ' . print_r($audioRecordingFile, true) . ' , unsetting Audio');
 				unset($recordingFilesPerTimeSlot[$audioKey]);
-				if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
-				{
-					KalturaLog::debug('Deleting Audio File From Zoom ');
-					$this->zoomClient->deleteRecordingFile($meetingFileUuid, $audioRecordingFile[self::ID]);
-				}
 			}
 		}
 	}
@@ -385,8 +380,47 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE,
 			                       DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
 		}
-		
 		$this->handleFilePurged($dropFolderFile->id);
+
+		if($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
+		{
+			$this->purgeAudioFiles($dropFolderFile->meetingMetadata->uuid);
+		}
+	}
+
+	protected function purgeAudioFiles($meetingId)
+	{
+		try
+		{
+			$meetingRecordings = $this->zoomClient->getMeetingRecordings($meetingId);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err("Error when listing meeting files for meeting id [$meetingId]: ".$e->getMessage());
+			return;
+		}
+
+		if (!$meetingRecordings || !isset($meetingRecordings[kZoomRecording::RECORDING_FILES]))
+		{
+			return;
+		}
+
+		$recordingFiles = $meetingRecordings[kZoomRecording::RECORDING_FILES];
+		foreach ($recordingFiles as $recordingFile)
+		{
+			if ($recordingFile[self::RECORDING_FILE_TYPE] === self::M4A)
+			{
+				KalturaLog::debug('Deleting Audio File From Zoom, file ID: ' . $recordingFile[self::ID]);
+				try
+				{
+					$this->zoomClient->deleteRecordingFile($meetingId, $recordingFile[self::ID]);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err("Error when deleting audio file ID: " . $recordingFile[self::ID] . "Error: " .$e->getMessage());
+				}
+			}
+		}
 	}
 	
 	public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
