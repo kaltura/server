@@ -2,13 +2,13 @@
 
 class myXmlUtils
 {
-	public static function validateXmlFileContent($filePath, $partnerId, $isThumbnail = false)
+	public static function validateXmlFileContent($filePath, $partnerId, $purifyParams = array())
 	{
 		if (!$filePath || !$partnerId)
 		{
 			return true;
 		}
-
+		
 		$fileType = kFileUtils::getMimeType($filePath);
 		if (strpos($fileType, 'html') !== false || strpos($fileType, 'xml') !== false)
 		{
@@ -18,23 +18,31 @@ class myXmlUtils
 			$dom = new KDOMDocument();
 			$dom->loadXML($xmlContent);
 			$element = $dom->getElementsByTagName('script')->item(0);
-			if($element)
+			if ($element)
 			{
 				return false;
 			}
 			
-			if ($isThumbnail && $partner && $partner->getPurifyImageContent())
+			if ($partner && $partner->getPurifyImageContent() && $purifyParams)
 			{
-				$modifiedContent = self::purifyField('thumbasset', 'content' , $xmlContent);
-				
-				if ($modifiedContent != $xmlContent)
-				{
-					kFile::setFileContent($filePath, $modifiedContent);
-				}
+				self::purifyImageContent($filePath, $xmlContent);
 			}
 		}
-
+		
 		return true;
+	}
+	
+	protected static function purifyImageContent($filePath, $xmlContent, $purifyParams)
+	{
+		if (!is_null($purifyParams[0]) && !is_null($purifyParams[1]))
+		{
+			$modifiedContent = self::purifyField($purifyParams[0], $purifyParams[1] , $xmlContent);
+			
+			if ($modifiedContent != $xmlContent)
+			{
+				kFile::setFileContent($filePath, $modifiedContent);
+			}
+		}
 	}
 	
 	public static function purifyField($className, $fieldName, $fieldValue)
