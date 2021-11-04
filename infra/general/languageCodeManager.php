@@ -792,16 +792,16 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"ZAI",null,null ,"zai","Zapotec	 Isthmus","Diidxaz\xc3\xa1'");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"YUE","yue","yue","yue","Cantonese","Cantonese","Cantonese");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"CRG","crg","crg","crg","Michif","Michif","Michif");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QEN",null,null,"qen","English (Audio Described)","English (Audio Described)","qen");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QFR",null,null,"qfr","French (Audio Described)","French (Audio Described)","qfr");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QES",null,null,"qes","Spanish (Audio Described)","Spanish (Audio Described)","qes");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QDE",null,null,"qde","German (Audio Described)","German (Audio Described)","qde");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QHE",null,null,"qhe","Hebrew (Audio Described)","Hebrew (Audio Described)","qhe");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QAR",null,null,"qar","Arabic (Audio Described)","Arabic (Audio Described)","qar");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QRU",null,null,"qru","Russian (Audio Described)","Russian (Audio Described)","qru");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QHI",null,null,"qhi","Hindi (Audio Described)","Hindi (Audio Described)","qhi");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QPT",null,null,"qpt","Portuguese (Audio Described)","Portuguese (Audio Described)","qpt");
-		self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QIT",null,null,"qit","Italian (Audio Described)","Italian (Audio Described)","qit");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QEN",null,null,"qen","English (Audio Described)","English (Audio Described)","qen");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QFR",null,null,"qfr","French (Audio Described)","French (Audio Described)","qfr");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QES",null,null,"qes","Spanish (Audio Described)","Spanish (Audio Described)","qes");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QDE",null,null,"qde","German (Audio Described)","German (Audio Described)","qde");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QHE",null,null,"qhe","Hebrew (Audio Described)","Hebrew (Audio Described)","qhe");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QAR",null,null,"qar","Arabic (Audio Described)","Arabic (Audio Described)","qar");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QRU",null,null,"qru","Russian (Audio Described)","Russian (Audio Described)","qru");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QHI",null,null,"qhi","Hindi (Audio Described)","Hindi (Audio Described)","qhi");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QPT",null,null,"qpt","Portuguese (Audio Described)","Portuguese (Audio Described)","qpt");
+	self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QIT",null,null,"qit","Italian (Audio Described)","Italian (Audio Described)","qit");
 
         //Adding language that are not part of ISO-639
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"HKK","hkk","hkk","hkk","Hokkien","Hokkien","Hokkien");
