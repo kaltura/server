@@ -22,16 +22,6 @@ class myXmlUtils
 			{
 				return false;
 			}
-			
-			if ($partner && $partner->getPurifyImageContent())
-			{
-				$modifiedContent = self::purifyField('thumbasset', 'content' , $xmlContent);
-				
-				if ($modifiedContent != $xmlContent)
-				{
-					kFile::setFileContent($filePath, $modifiedContent);
-				}
-			}
 		}
 
 		return true;
