@@ -38,6 +38,8 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	const DEFAULT_APP_NAME = "Kaltura-Server";
 	
 	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getCode";
+	const COPY_OBJECT_STATUS_ACCEPTED = 'ACCEPTED';
+	const COPY_OBJECT_STATUS_IN_PROGRESS = 'IN_PROGRESS';
 	const COPY_OBJECT_STATUS_COMPLETED = 'COMPLETED';
 	const COPY_OBJECT_STATUS_FAILED = 'FAILED';
 	const OS_404_ERROR = 404;
@@ -223,42 +225,17 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$headers = $response->getHeaders();
 		$workRequestId = $headers['opc-work-request-id'][0];
 		$params['workRequestId'] = $workRequestId;
-		$isDone = false;
-
-		self::safeLog("Sending copy request to OS from [$fromFilePath] to [$toFilePath] OS Work Request Id [$workRequestId]");
-		while (!$isDone)
+		self::safeLog("Copy request sent to OS from [$fromFilePath] to [$toFilePath] OS Work Request Id [$workRequestId]");
+		
+		list($validWorkRequest, $status) = $this->validateWorkRequestAccepted($params);
+		
+		if(!$validWorkRequest)
 		{
-			$response = $this->osCall('getWorkRequest', $params);
-			$status = $response->getJson()->status;
-			$timeFinished = $response->getJson()->timeFinished;
-
-			if ($status == self::COPY_OBJECT_STATUS_COMPLETED)
-			{
-				self::safeLog("Successfully copied from [$fromFilePath] to [$toFilePath]");
-				$isDone = true;
-				continue;
-			}
-
-			if (!$timeFinished)
-			{
-				self::safeLog("Current Work Request Status = $status sleeping for 1 sec");
-				sleep(1);
-				continue;
-			}
-
-			if ($status == self::COPY_OBJECT_STATUS_FAILED)
-			{
-				$response = $this->osCall('listWorkRequestErrors', array('workRequestId' => $workRequestId));
-				$reason = $response->getBody();
-				self::safeLog("Failed to copy from [$fromFilePath] to [$toFilePath] reason: " . print_r($reason, true));
-			}
-		}
-
-		if($status != self::COPY_OBJECT_STATUS_COMPLETED)
-		{
-			self::safeLog("Failed to copy, final status [$status]");
+			self::safeLog("Failed to copy, status [$status] for OS Work Request Id [$workRequestId]");
 			return false;
 		}
+		
+		self::safeLog("Copy request status = [$status] for OS Work Request Id [$workRequestId]");
 		return true;
 	}
 	
@@ -412,7 +389,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$rmSuccess = $rmSuccess && $unlinkSuccess;
 		}
 		
-		self::safeLog("rmDir result is [$rmSuccess], copied [" . $successMetric[0] . "] failed [" . $successMetric[1] . "]");
+		self::safeLog("rmDir result is [$rmSuccess], success [$successMetric[0]] failed [$successMetric[1]]");
 		return $rmSuccess;
 	}
 	
@@ -966,5 +943,30 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		fclose($destFH);
 		kSharedFileSystemMgr::unRegisterStreamWrappers();
 		return true;
+	}
+	
+	protected function validateWorkRequestAccepted($params)
+	{
+		// OS are making a copy request 'asynchronically'
+		// we need to constantly check 'getWorkRequest' to get the Work request Id status
+		// Because it can take a long time (~10GB avg. is 3 min) we send the request and don't wait.
+		
+		$response = $this->osCall('getWorkRequest', $params);
+		$status = $response->getJson()->status;
+		self::safeLog("OS copy request status = [$status]");
+		
+		switch ($status)
+		{
+			case self::COPY_OBJECT_STATUS_ACCEPTED:
+			case self::COPY_OBJECT_STATUS_IN_PROGRESS:
+			case self::COPY_OBJECT_STATUS_COMPLETED:
+				break;
+			case self::COPY_OBJECT_STATUS_FAILED:
+				return array(false, $status);
+			default:
+				self::safeLog("OS unexpected status = [$status] returned");
+				return array(false, $status);
+		}
+		return array(true, $status);
 	}
 }
