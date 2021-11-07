@@ -61,6 +61,16 @@ You can run the linter using:
 vendor/bin/phplint
 ```
 
+# Static Analysis
+
+You can run PHPstan using:
+
+```
+PHPSTAN_PHP=`which php7.3.11` tools/phpstan
+```
+
+Note: PHPstan needs to be run with PHP 7 or higher. Set the `PHPSTAN_PHP` environment variable to the location of your PHP 7+ executable.
+
 
 # Running Examples
 

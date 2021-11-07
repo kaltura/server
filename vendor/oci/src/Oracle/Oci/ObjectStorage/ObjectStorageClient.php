@@ -4,10 +4,10 @@
 
 namespace Oracle\Oci\ObjectStorage;
 
+use BadMethodCallException;
 use InvalidArgumentException;
 use Oracle\Oci\Common\Auth\AuthProviderInterface;
 use Oracle\Oci\Common\HttpUtils;
-use Oracle\Oci\Common\OciResponse;
 use Oracle\Oci\Common\UserAgent;
 use Oracle\Oci\Common\AbstractClient;
 use Oracle\Oci\Common\Constants;
@@ -33,8 +33,6 @@ class ObjectStorageClient extends AbstractClient
 
 
     // Should have waiters.
-
-    // Should have paginators.
 
     // Operation 'abortMultipartUpload':
     // path /n/{namespaceName}/b/{bucketName}/u/{objectName}
@@ -2456,5 +2454,43 @@ class ObjectStorageClient extends AbstractClient
         $__body = $uploadPartBody;
 
         return $this->callApi("PUT", "{$this->endpoint}{$__path}{$__queryStr}", [ 'headers' => $__headers, 'body' => $__body ]);
+    }
+
+    private $iterators = null;
+
+    public function iterators()
+    {
+        if ($this->iterators == null) {
+            $this->iterators = new ObjectStorageIterators($this);
+        }
+        return $this->iterators;
+    }
+
+    /**
+     * Magic method. Calls to unknown methods end up here, with the name of the called method in $method.
+     *
+     * @param string $method method name
+     * @param array $args arguments
+     * @return mixed result
+     */
+    public function __call($method, $args)
+    {
+        // This checks if the called method is a response iterator method, meaning it ends with "...ResponseIterator",
+        // and either begins with "list" or has a special iterator config set; if so, it returns a response iterator
+        // for the operation (which is the method name without "ResponseIterator" at the end).
+        if (parent::isResponseIteratorMethod($method, $this->iterators())) {
+            $params = isset($args[0]) ? $args[0] : null;
+            return $this->iterators()->responseIterator(substr($method, 0, -strlen(self::RESPONSE_ITERATOR_METHOD_SUFFIX)), $params);
+        }
+
+        // If that's not the case, it does the same thing, but for item iterator methods. It checks if the called method
+        // is an item iterator method, meaning it ends with "...Iterator",
+        // and either begins with "list" or has a special iterator config set; if so, it returns an item iterator
+        // for the operation (which is the method name without "Iterator" at the end).
+        if (parent::isItemIteratorMethod($method, $this->iterators())) {
+            $params = isset($args[0]) ? $args[0] : null;
+            return $this->iterators()->itemIterator(substr($method, 0, -strlen(self::ITEM_ITERATOR_METHOD_SUFFIX)), $params);
+        }
+        throw new BadMethodCallException("Unknown method call to '$method'(" . implode(", ", $args) . ")");
     }
 }

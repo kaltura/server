@@ -224,7 +224,7 @@ class TestX509CertificateSupplier implements X509CertificateSupplierInterface
 {
     public function getKeyPair()
     {
-        return null;
+        return null; // @phpstan-ignore-line
     }
 }
 

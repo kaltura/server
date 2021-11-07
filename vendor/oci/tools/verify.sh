@@ -4,13 +4,16 @@ set -e
 
 scriptDir=`dirname $0`
 
-echo -e "\n\n\n\n##### Unit Testing ####"
+echo -e "\n\n\n\n##### Unit Testing #####"
 $scriptDir/../vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 
-echo -e "\n\n\n\n##### Linting ####"
+echo -e "\n\n\n\n##### Static Analysis #####"
+$scriptDir/phpstan
+
+echo -e "\n\n\n\n##### Linting #####"
 $scriptDir/../vendor/bin/phplint
 
-echo -e "\n\n\n\n##### Checking Formatting ####"
+echo -e "\n\n\n\n##### Checking Formatting #####"
 if $scriptDir/php-cs-fixer fix | grep -E "^ *[1-9][0-9]*) (src|test)"; then
     echo "Formatting changes found, aborting commit..."
     exit 1

@@ -24,8 +24,6 @@ class OciException extends RuntimeException
 
 class OciBadResponseException extends OciException
 {
-    private $response;
-
     protected $statusCode;
     protected $errorCode;
     protected $message;
@@ -42,10 +40,9 @@ class OciBadResponseException extends OciException
 
     public function __construct(ResponseInterface &$response)
     {
-        $this->response = $response;
         $this->statusCode = $response->getStatusCode();
         $bodyContents = $response->getBody()->getContents();
-        if ($bodyContents != null && strlen($bodyContents) > 0) {
+        if ($bodyContents) {
             $json = json_decode($response->getBody());
             $this->errorCode = $json->code;
             $this->message = $json->message;

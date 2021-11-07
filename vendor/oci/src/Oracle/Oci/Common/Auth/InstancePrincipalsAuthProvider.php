@@ -241,7 +241,7 @@ abstract class AbstractRequestingAuthenticationDetailsProvider implements AuthPr
             $this->region = Region::getRegion($regionStr);
             if ($this->region == null) {
                 $this->logger->debug(
-                    "Region not supported by this version of the SDK, registering region '{$this->regionStr}' under " . Realm::getRealmForUnknownRegion() . "."
+                    "Region not supported by this version of the SDK, registering region '{$regionStr}' under " . Realm::getRealmForUnknownRegion() . "."
                 );
                 // Proceed by assuming the region id belongs to the "unknown regions" realm.
                 $this->region = new Region($regionStr, $regionStr, Realm::getRealmForUnknownRegion());
@@ -266,7 +266,7 @@ class InstancePrincipalsAuthProvider extends AbstractRequestingAuthenticationDet
 
         $parentParams = [];
         foreach ($params as $k => $v) {
-            if (array_key_exists($k, InstancePrincipalsAuthProvider::ALLOWED_PARAMS)) {
+            if (array_key_exists($k, InstancePrincipalsAuthProvider::ALLOWED_PARAMS)) { // @phpstan-ignore-line (always false, because ALLOWED_PARAMS is empty)
                 $this->{$k} = StringUtils::checkType($k, $v, InstancePrincipalsAuthProvider::ALLOWED_PARAMS);
             } elseif (array_key_exists($k, AbstractRequestingAuthenticationDetailsProvider::ALLOWED_PARAMS)) {
                 $parentParams[$k] = $v;
@@ -276,6 +276,11 @@ class InstancePrincipalsAuthProvider extends AbstractRequestingAuthenticationDet
         }
 
         parent::__construct($parentParams);
+    }
+
+    public function isRefreshableOnNotAuthenticated()
+    {
+        return true;
     }
 
     public function getRegion() // : ?Region

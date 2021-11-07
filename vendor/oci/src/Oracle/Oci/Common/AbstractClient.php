@@ -6,6 +6,8 @@ use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Client;
+use GuzzleHttp\Handler\CurlMultiHandler;
+use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
@@ -27,6 +29,7 @@ abstract class AbstractClient
 
     /*string*/ protected $endpoint;
     protected $client;
+    /*HandlerStack*/ protected $stack;
 
     const DEFAULT_HEADERS = [];
 
@@ -43,17 +46,56 @@ abstract class AbstractClient
         $this->region = AbstractClient::determineRegion($region, $auth_provider, $this->logger());
         $this->endpoint = AbstractClient::determineEndpoint($endpoint, $this->region, $endpointTemplate, $this->logger());
 
-        $handler = new CurlHandler();
-        $stack = HandlerStack::create($handler);
+        $this->setClientWithDefaultHandler();
+    }
 
-        // place signing middleware after prepare-body so it can access Content-Length header
-        $stack->after('prepare_body', Middleware::mapRequest(function (RequestInterface $request) {
-            return $this->signingMiddleware($request);
-        }));
+    /**
+     * Set the multicurl handler with default middleware for the Guzzle client.
+     * Primary for synchronous client
+     */
+    protected function setClientWithDefaultHandler()
+    {
+        $handler = new CurlHandler();
+        $this->stack = HandlerStack::create($handler);
+
+        $this->setDefaultMiddleware();
 
         $this->client = new Client([
-            'handler' => $stack
+            'handler' => $this->stack
         ]);
+    }
+
+    /**
+     * Set the handler for the Guzzle client. Primarily for mock testing. Use with care.
+     * @param CurlHandler|MockHandler|CurlMultiHandler $handler handler for the Guzzle client, e.g. CurlHandler or MockHandler
+     */
+    public function setHandler($handler)
+    {
+        $this->stack->setHandler($handler);
+    }
+
+    public function getStack()
+    {
+        return $this->stack;
+    }
+
+    /**
+     * Set the multicurl handler for the Guzzle client.
+     * Primary for async client
+     */
+    public function setMultiCurlHandler()
+    {
+        $handler = new CurlMultiHandler();
+
+        $this->setHandler($handler);
+    }
+
+    protected function setDefaultMiddleware()
+    {
+        // place signing middleware after prepare-body so it can access Content-Length header
+        $this->stack->after('prepare_body', Middleware::mapRequest(function (RequestInterface $request) {
+            return $this->signingMiddleware($request);
+        }), 'signingMiddleware');
     }
 
     /**
@@ -61,13 +103,13 @@ abstract class AbstractClient
      *
      * If both a region is specified and the auth provider provides a region, the region specified directly takes precedence.
      *
-     * @param region the Region object; or region id or region code as a string
-     * @param auth_provider the auth provider; if it implements RegionProviderInterface, the auth provider may provide the region
-     * @param logger logger for informational messages
+     * @param Region|string|null $region the Region object; or region id or region code as a string; or null, if no region given (outside of the auth provier)
+     * @param AuthProviderInterface $auth_provider the auth provider; if it implements RegionProviderInterface, the auth provider may provide the region
+     * @param LogAdapterInterface $logger logger for informational messages
      *
-     * @return Region region or null
+     * @return Region|null region or null
      */
-    public static function determineRegion(/*Region|string*/ $region, AuthProviderInterface $auth_provider, LogAdapterInterface $logger) // : Region
+    public static function determineRegion(/*Region|string|null*/ $region, AuthProviderInterface $auth_provider, LogAdapterInterface $logger) // : Region
     {
         $resultRegion = null;
 
@@ -103,10 +145,10 @@ abstract class AbstractClient
     /**
      * Return the endpoint, if specified direction; or construct the endpoint based on the region and the endpoint template.
      *
-     * @param endpoint (may be null) if not null, this will be used as endpoint
-     * @param region (may be null) if not null, will be used to construct the endpoint, unless an endpoint is set directly
-     * @param endpointTemplate endpoint template to construct an endpoint from a region
-     * @param logger logger for debug messages
+     * @param string|null $endpoint (may be null) if not null, this will be used as endpoint
+     * @param Region|null $region (may be null) if not null, will be used to construct the endpoint, unless an endpoint is set directly
+     * @param string $endpointTemplate endpoint template to construct an endpoint from a region
+     * @param LogAdapterInterface $logger logger for debug messages
      *
      * @return string endpoint
      */
@@ -188,12 +230,12 @@ abstract class AbstractClient
                 break;
             case strtolower(Constants::CONTENT_LENGTH_HEADER_NAME):
                 $clHeaders = $request->getHeader(Constants::CONTENT_LENGTH_HEADER_NAME);
-                if ($clHeaders != null && count($clHeaders) > 0) {
+                if ($clHeaders) {
                     $content_length = $clHeaders[0];
                 } else {
                     // if content length is 0 we still need to explicitly send the Content-Length header
                     $content_length = 0;
-                    $request = $request->withHeader(Constants::CONTENT_LENGTH_HEADER_NAME, 0);
+                    $request = $request->withHeader(Constants::CONTENT_LENGTH_HEADER_NAME, "0");
                 }
                 $signingParts[] = "$lch: $content_length";
                 break;
@@ -293,7 +335,7 @@ abstract class AbstractClient
 
     public function setLogAdapter(LogAdapterInterface $logAdapter)
     {
-        $this->globalLogAdapter = $logAdapter;
+        $this->logAdapter = $logAdapter;
     }
 
     public function callApi($httpMethod, $endpoint, $opts)
@@ -304,9 +346,10 @@ abstract class AbstractClient
     public function callApiAsync($httpMethod, $endpoint, $opts)
     {
         $request = $this->initRequest($httpMethod, $endpoint, $opts);
+        $responseBodyType = isset($opts['response_body_type']) ? $opts['response_body_type'] : "";
         $responsePromise = $this->client->sendAsync($request)->then(
-            function ($__response) use ($opts) {
-                if (isset($opts['response_body_type']) && $opts['response_body_type'] == 'binary') {
+            function ($__response) use ($responseBodyType) {
+                if ($responseBodyType == 'binary') {
                     return new OciResponse(
                         $__response->getStatusCode(),
                         $__response->getHeaders(),
@@ -322,16 +365,58 @@ abstract class AbstractClient
                 );
             },
             function ($__e) {
-                return HttpUtils::processBadResponseException($__e, false);
+                throw HttpUtils::processBadResponseException($__e);
             }
         );
         return $responsePromise;
     }
 
-    private function initRequest($method, $endpoint, $opts)
+    private function initRequest($method, $endpoint, &$opts)
     {
         $headers = isset($opts['headers']) ? $opts['headers'] + self::DEFAULT_HEADERS : self::DEFAULT_HEADERS;
         $body = isset($opts['body']) ? $opts['body'] : null;
         return new Request($method, $endpoint, $headers, $body);
+    }
+
+    const RESPONSE_ITERATOR_METHOD_SUFFIX = "ResponseIterator";
+    const ITEM_ITERATOR_METHOD_SUFFIX = "Iterator";
+    const LIST_METHOD_PREFIX = "list";
+
+    protected static function isResponseIteratorMethod($method, Iterators $iterators)
+    {
+        if (!StringUtils::endsWith($method, self::RESPONSE_ITERATOR_METHOD_SUFFIX)) {
+            // does not end in "...ResponseIterator";
+            return false;
+        }
+        // ends in "...ResponseIterator"
+        if (StringUtils::startsWith($method, self::LIST_METHOD_PREFIX)) {
+            // and begins with "list"
+            return true;
+        }
+        // does not begin with "list"
+        if ($iterators->hasIteratorForOperation(substr($method, 0, -strlen(self::RESPONSE_ITERATOR_METHOD_SUFFIX)))) {
+            // but has a special IteratorConfig for the method name, with "ResponseIterator" at the end removed
+            return true;
+        }
+        return false;
+    }
+
+    protected static function isItemIteratorMethod($method, Iterators $iterators)
+    {
+        if (!StringUtils::endsWith($method, self::ITEM_ITERATOR_METHOD_SUFFIX)) {
+            // does not end in "...Iterator";
+            return false;
+        }
+        // ends in "...Iterator"
+        if (StringUtils::startsWith($method, self::LIST_METHOD_PREFIX)) {
+            // and begins with "list"
+            return true;
+        }
+        // does not begin with "list"
+        if ($iterators->hasIteratorForOperation(substr($method, 0, -strlen(self::RESPONSE_ITERATOR_METHOD_SUFFIX)))) {
+            // but has a special IteratorConfig for the method name, with "Iterator" at the end removed
+            return true;
+        }
+        return false;
     }
 }

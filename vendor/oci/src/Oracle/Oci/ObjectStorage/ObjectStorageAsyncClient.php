@@ -7,7 +7,6 @@ namespace Oracle\Oci\ObjectStorage;
 use InvalidArgumentException;
 use Oracle\Oci\Common\Auth\AuthProviderInterface;
 use Oracle\Oci\Common\HttpUtils;
-use Oracle\Oci\Common\OciResponse;
 use Oracle\Oci\Common\UserAgent;
 use Oracle\Oci\Common\AbstractClient;
 use Oracle\Oci\Common\Constants;
@@ -29,12 +28,13 @@ class ObjectStorageAsyncClient extends AbstractClient
             $region,
             $endpoint
         );
+        $this->setMultiCurlHandler();
     }
 
 
     // Should have waiters.
 
-    // Should have paginators.
+    // Should have iterators.
 
     // Operation 'abortMultipartUpload':
     // path /n/{namespaceName}/b/{bucketName}/u/{objectName}

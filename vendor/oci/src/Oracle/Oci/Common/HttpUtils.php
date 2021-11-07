@@ -25,9 +25,10 @@ class HttpUtils
 
     public static function encodeArray(&$queryMap, /*string*/ $paramName, $array, /*string*/ $collectionFormat)
     {
-        if ($array == null || empty($array)) {
+        if ($array == null || count($array) == 0) {
             return;
         }
+        $sep = "";
         switch ($collectionFormat) {
             case "csv":
                 $sep = ',';
@@ -130,14 +131,14 @@ class HttpUtils
         return $str;
     }
 
-    public static function processBadResponseException(&$e)
+    public static function processBadResponseException($e)
     {
         // BadResponseException includes 4xx and 5xx exceptions
         if ($e instanceof BadResponseException) {
             $__response = $e->getResponse();
-            throw new OciBadResponseException($__response);
+            return new OciBadResponseException($__response);
         }
         // We'll directly throw ConnectException, RequestException (excluding BadResponseException)
-        throw $e;
+        return $e;
     }
 }

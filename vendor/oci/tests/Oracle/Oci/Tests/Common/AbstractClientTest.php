@@ -84,7 +84,7 @@ class AbstractClientTest extends TestCase
     {
         $endpoint = "a.b.com";
         $region = null;
-        $endpointTemplate = null;
+        $endpointTemplate = "https://objectstorage.{region}.{secondLevelDomain}";
         $resultEndpoint = AbstractClient::determineEndpoint($endpoint, $region, $endpointTemplate, AbstractClientTest::$logger);
 
         $this->assertEquals($endpoint, $resultEndpoint);
@@ -94,7 +94,7 @@ class AbstractClientTest extends TestCase
     {
         $endpoint = "a.b.com";
         $region = Region::US_PHOENIX_1();
-        $endpointTemplate = null;
+        $endpointTemplate = "https://objectstorage.{region}.{secondLevelDomain}";
         $resultEndpoint = AbstractClient::determineEndpoint($endpoint, $region, $endpointTemplate, AbstractClientTest::$logger);
 
         $this->assertEquals($endpoint, $resultEndpoint);
@@ -116,7 +116,12 @@ class AbstractClientTest extends TestCase
         $region = "us-phoenix-1";
         $endpointTemplate = "https://objectstorage.{region}.{secondLevelDomain}";
         try {
-            AbstractClient::determineEndpoint($endpoint, $region, $endpointTemplate, AbstractClientTest::$logger);
+            AbstractClient::determineEndpoint(
+                $endpoint,
+                $region, // @phpstan-ignore-line (needs to be Region or null; this is exactly what this test checks)
+                $endpointTemplate,
+                AbstractClientTest::$logger
+            );
             $this->fail("Should have thrown an InvalidArgumentException");
         } catch (InvalidArgumentException $iae) {
             // expected
@@ -126,9 +131,9 @@ class AbstractClientTest extends TestCase
 
 class DummyAuthProvider implements AuthProviderInterface
 {
-    public function getPrivateKey() //  : string
+    public function getPrivateKey() //  : string|OpenSSLAsymmetricKey
     {
-        return null;
+        return null; // @phpstan-ignore-line
     }
     public function getKeyPassphrase() // : ?string
     {
@@ -136,7 +141,7 @@ class DummyAuthProvider implements AuthProviderInterface
     }
     public function getKeyId() // : string
     {
-        return null;
+        return null; // @phpstan-ignore-line
     }
 }
 
