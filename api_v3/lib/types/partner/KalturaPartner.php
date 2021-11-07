@@ -447,6 +447,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 	/**
 	 * @var bool
+	 * @requiresPermission insert,update
 	 */
 	public $isSelfServe;
 	

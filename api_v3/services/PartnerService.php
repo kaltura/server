@@ -164,7 +164,7 @@ class PartnerService extends KalturaBaseService
 		if ($this -> getKs() && $this -> getKs() -> isAdmin())
 		{
 			$parentPartnerId = $this -> getKs() -> partner_id;
-			if ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			if (in_array($parentPartnerId ,array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::SELF_SERVE_PARTNER_ID)))
 			{
 				$parentPartnerId = null;
 				$isAdminOrVarConsole = true;
