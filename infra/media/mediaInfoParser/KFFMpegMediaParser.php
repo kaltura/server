@@ -771,7 +771,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
-		$interlaced=0;
+		$interlaced=0;$tffed=0;
 		$samples=0;
 		foreach($outputArr as $line){
 			$stam=$pts=$inter=$tff=0;
@@ -784,6 +784,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			$samples++;
 			KalturaLog::log("$stam,pts:$pts,inter:$inter,tff:$tff");
 			$interlaced+=$inter;
+			$tffed+=(int)$tff;
 		}
 		if($samples==0)
 			$scanType=0;
@@ -791,7 +792,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			if($samples>5)	$thresh = 3;
 			else $thresh = 1;
 			
-			if($interlaced>$thresh) {
+			if($interlaced>$thresh || $tffed>$thresh) {
 				$scanType=1;
 			}
 			else
