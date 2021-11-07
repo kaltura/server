@@ -396,7 +396,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::err("Error when listing meeting files for meeting id [$meetingId]: ".$e->getMessage());
+			KalturaLog::err("Error when listing meeting files for meeting id [$meetingId]: " . $e->getMessage());
 			return;
 		}
 
@@ -417,7 +417,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				}
 				catch (Exception $e)
 				{
-					KalturaLog::err("Error when deleting audio file ID: " . $recordingFile[self::ID] . "Error: " .$e->getMessage());
+					KalturaLog::err("Error when deleting audio file ID: " . $recordingFile[self::ID] . " Error: " . $e->getMessage());
 				}
 			}
 		}
