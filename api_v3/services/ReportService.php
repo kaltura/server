@@ -415,7 +415,7 @@ class ReportService extends KalturaBaseService
 	public function getCsvFromStringParamsAction($id, $params = null, $excludedFields = null)
 	{
 		$paramsArray = $this->parseParamsStr($params);
-		return $this->getCsvAction($id, $paramsArray. $excludedFields);
+		return $this->getCsvAction($id, $paramsArray, $excludedFields);
 	}
 
 	/**
