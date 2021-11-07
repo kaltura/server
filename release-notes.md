@@ -1,4 +1,11 @@
 # Quasar-17.14.0 #
+## Add permission to insert isSelfServe property on partner object for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-PLAT-23233
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
+
 ## Add systemPartner updateConfiguration permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: PLAT-23192
