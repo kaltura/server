@@ -74,12 +74,6 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
-	 * The value for the deletion_due_date field.
-	 * @var        string
-	 */
-	protected $deletion_due_date;
-
-	/**
 	 * Flag to prevent endless save loop, if this object is referenced
 	 * by another object which falls in this transaction.
 	 * @var        boolean
@@ -261,46 +255,6 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 				$dt = new DateTime($this->updated_at);
 			} catch (Exception $x) {
 				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-			}
-		}
-
-		if ($format === null) {
-			// We cast here to maintain BC in API; obviously we will lose data if we're dealing with pre-/post-epoch dates.
-			return (int) $dt->format('U');
-		} elseif (strpos($format, '%') !== false) {
-			return strftime($format, $dt->format('U'));
-		} else {
-			return $dt->format($format);
-		}
-	}
-
-	/**
-	 * Get the [optionally formatted] temporal [deletion_due_date] column value.
-	 * 
-	 * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-	 * option in order to avoid converstions to integers (which are limited in the dates they can express).
-	 *
-	 * @param      string $format The date/time format string (either date()-style or strftime()-style).
-	 *							If format is NULL, then the raw unix timestamp integer will be returned.
-	 * @return     mixed Formatted date/time value as string or (integer) unix timestamp (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-	 * @throws     PropelException - if unable to parse/validate the date/time value.
-	 */
-	public function getDeletionDueDate($format = 'Y-m-d H:i:s')
-	{
-		if ($this->deletion_due_date === null) {
-			return null;
-		}
-
-
-		if ($this->deletion_due_date === '0000-00-00 00:00:00') {
-			// while technically this is not a default value of NULL,
-			// this seems to be closest in meaning.
-			return null;
-		} else {
-			try {
-				$dt = new DateTime($this->deletion_due_date);
-			} catch (Exception $x) {
-				throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->deletion_due_date, true), $x);
 			}
 		}
 
@@ -571,58 +525,6 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
-	 * Sets the value of [deletion_due_date] column to a normalized version of the date/time value specified.
-	 * 
-	 * @param      mixed $v string, integer (timestamp), or DateTime value.  Empty string will
-	 *						be treated as NULL for temporal objects.
-	 * @return     VirtualEvent The current object (for fluent API support)
-	 */
-	public function setDeletionDueDate($v)
-	{
-		if(!isset($this->oldColumnsValues[VirtualEventPeer::DELETION_DUE_DATE]))
-			$this->oldColumnsValues[VirtualEventPeer::DELETION_DUE_DATE] = $this->deletion_due_date;
-
-		// we treat '' as NULL for temporal objects because DateTime('') == DateTime('now')
-		// -- which is unexpected, to say the least.
-		if ($v === null || $v === '') {
-			$dt = null;
-		} elseif ($v instanceof DateTime) {
-			$dt = $v;
-		} else {
-			// some string/numeric value passed; we normalize that so that we can
-			// validate it.
-			try {
-				if (is_numeric($v)) { // if it's a unix timestamp
-					$dt = new DateTime('@'.$v, new DateTimeZone('UTC'));
-					// We have to explicitly specify and then change the time zone because of a
-					// DateTime bug: http://bugs.php.net/bug.php?id=43003
-					$dt->setTimeZone(new DateTimeZone(date_default_timezone_get()));
-				} else {
-					$dt = new DateTime($v);
-				}
-			} catch (Exception $x) {
-				throw new PropelException('Error parsing date/time value: ' . var_export($v, true), $x);
-			}
-		}
-
-		if ( $this->deletion_due_date !== null || $dt !== null ) {
-			// (nested ifs are a little easier to read in this case)
-
-			$currNorm = ($this->deletion_due_date !== null && $tmpDt = new DateTime($this->deletion_due_date)) ? $tmpDt->format('Y-m-d H:i:s') : null;
-			$newNorm = ($dt !== null) ? $dt->format('Y-m-d H:i:s') : null;
-
-			if ( ($currNorm !== $newNorm) // normalized values don't match 
-					)
-			{
-				$this->deletion_due_date = ($dt ? $dt->format('Y-m-d H:i:s') : null);
-				$this->modifiedColumns[] = VirtualEventPeer::DELETION_DUE_DATE;
-			}
-		} // if either are not null
-
-		return $this;
-	} // setDeletionDueDate()
-
-	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -665,10 +567,9 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 			$this->partner_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->status = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
 			$this->tags = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-			$this->custom_data = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-			$this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-			$this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-			$this->deletion_due_date = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+			$this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+			$this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+			$this->custom_data = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1232,16 +1133,13 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 				return $this->getTags();
 				break;
 			case 6:
-				return $this->getCustomData();
-				break;
-			case 7:
 				return $this->getCreatedAt();
 				break;
-			case 8:
+			case 7:
 				return $this->getUpdatedAt();
 				break;
-			case 9:
-				return $this->getDeletionDueDate();
+			case 8:
+				return $this->getCustomData();
 				break;
 			default:
 				return null;
@@ -1270,10 +1168,9 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 			$keys[3] => $this->getPartnerId(),
 			$keys[4] => $this->getStatus(),
 			$keys[5] => $this->getTags(),
-			$keys[6] => $this->getCustomData(),
-			$keys[7] => $this->getCreatedAt(),
-			$keys[8] => $this->getUpdatedAt(),
-			$keys[9] => $this->getDeletionDueDate(),
+			$keys[6] => $this->getCreatedAt(),
+			$keys[7] => $this->getUpdatedAt(),
+			$keys[8] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1324,16 +1221,13 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 				$this->setTags($value);
 				break;
 			case 6:
-				$this->setCustomData($value);
-				break;
-			case 7:
 				$this->setCreatedAt($value);
 				break;
-			case 8:
+			case 7:
 				$this->setUpdatedAt($value);
 				break;
-			case 9:
-				$this->setDeletionDueDate($value);
+			case 8:
+				$this->setCustomData($value);
 				break;
 		} // switch()
 	}
@@ -1365,10 +1259,9 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setPartnerId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setStatus($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setTags($arr[$keys[5]]);
-		if (array_key_exists($keys[6], $arr)) $this->setCustomData($arr[$keys[6]]);
-		if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-		if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
-		if (array_key_exists($keys[9], $arr)) $this->setDeletionDueDate($arr[$keys[9]]);
+		if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+		if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+		if (array_key_exists($keys[8], $arr)) $this->setCustomData($arr[$keys[8]]);
 	}
 
 	/**
@@ -1386,10 +1279,9 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(VirtualEventPeer::PARTNER_ID)) $criteria->add(VirtualEventPeer::PARTNER_ID, $this->partner_id);
 		if ($this->isColumnModified(VirtualEventPeer::STATUS)) $criteria->add(VirtualEventPeer::STATUS, $this->status);
 		if ($this->isColumnModified(VirtualEventPeer::TAGS)) $criteria->add(VirtualEventPeer::TAGS, $this->tags);
-		if ($this->isColumnModified(VirtualEventPeer::CUSTOM_DATA)) $criteria->add(VirtualEventPeer::CUSTOM_DATA, $this->custom_data);
 		if ($this->isColumnModified(VirtualEventPeer::CREATED_AT)) $criteria->add(VirtualEventPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(VirtualEventPeer::UPDATED_AT)) $criteria->add(VirtualEventPeer::UPDATED_AT, $this->updated_at);
-		if ($this->isColumnModified(VirtualEventPeer::DELETION_DUE_DATE)) $criteria->add(VirtualEventPeer::DELETION_DUE_DATE, $this->deletion_due_date);
+		if ($this->isColumnModified(VirtualEventPeer::CUSTOM_DATA)) $criteria->add(VirtualEventPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
 	}
@@ -1486,13 +1378,11 @@ abstract class BaseVirtualEvent extends BaseObject  implements Persistent {
 
 		$copyObj->setTags($this->tags);
 
-		$copyObj->setCustomData($this->custom_data);
-
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
-
-		$copyObj->setDeletionDueDate($this->deletion_due_date);
+		
+		$copyObj->setCustomData($this->custom_data);
 
 
 		$copyObj->setNew(true);

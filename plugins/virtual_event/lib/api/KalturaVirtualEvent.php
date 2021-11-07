@@ -24,13 +24,11 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 * @var string
 	 * @minLength 3
 	 * @maxLength 256
-	 * @filter like,mlikeor,mlikeand,eq,order
 	 */
 	public $name;
 	
 	/**
 	 * @var string
-	 * @filter like,mlikeor,mlikeand,eq,order
 	 */
 	public $description;
 	
@@ -43,7 +41,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var string
-	 * @filter like,mlikeor,mlikeand,eq,order
 	 */
 	public $tags;
 	
@@ -88,7 +85,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	/**
 	 * @var time
-	 * @filter gte,lte,order
 	 */
 	public $deletionDueDate;
 	

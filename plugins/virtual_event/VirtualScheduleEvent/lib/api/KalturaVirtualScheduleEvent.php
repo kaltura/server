@@ -13,7 +13,6 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	/**
 	 * The ID of the virtual event connected to this Schedule Event
 	 * @var int
-	 * @filter eq,in,notin
 	 */
 	public $virtualEventId;
 	
@@ -21,7 +20,6 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	 * The type of the Virtual Schedule Event
 	 * @var KalturaVirtualScheduleEventSubType
 	 * @insertonly
-	 * @filter eq,in,notin
 	 */
 	public $virtualScheduleEventSubType;
 	

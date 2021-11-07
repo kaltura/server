@@ -12,21 +12,18 @@ DROP TABLE IF EXISTS `virtual_event`;
 
 CREATE TABLE `virtual_event`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` bigint(20)  NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(256),
-	`description` TEXT,
-	`partner_id` INTEGER,
-	`status` INTEGER,
+	`description` varchar(1024),
+	`partner_id` bigint(20),
+	`status` tinyint(4),
 	`tags` TEXT,
-	`custom_data` TEXT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-	`deletion_due_date` DATETIME,
+    `custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
-	KEY `name_index`(`name`, `partner_id`),
-	KEY `status_index`(`status`, `partner_id`),
-	KEY `deletion_index`(`deletion_due_date`)
+	KEY `status_index`(`status`, `partner_id`)
 )ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
