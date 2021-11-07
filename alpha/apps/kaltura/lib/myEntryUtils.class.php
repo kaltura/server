@@ -2161,7 +2161,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$partner = PartnerPeer::retrieveByPK($syncKey->getPartnerId());
 			if ($partner && $partner->getPurifyImageContent())
 			{
-				$purifyParams = array('thumbasset', 'content');
+				$purifyParams = array('className' => 'thumbasset', 'fieldName' => 'content');
 			}
 			
 			$validContent = myXmlUtils::validateXmlFileContent($filePath, $purifyParams);

@@ -33,9 +33,9 @@ class myXmlUtils
 	
 	public static function purifyXmlContent($filePath, $xmlContent, $purifyParams)
 	{
-		if (!is_null($purifyParams[0]) && !is_null($purifyParams[1]))
+		if (isset($purifyParams['className']) && isset($purifyParams['fieldName']))
 		{
-			$modifiedContent = self::purifyField($purifyParams[0], $purifyParams[1] , $xmlContent);
+			$modifiedContent = self::purifyField($purifyParams['className'], $purifyParams['fieldName'] , $xmlContent);
 			
 			if ($modifiedContent != $xmlContent)
 			{
