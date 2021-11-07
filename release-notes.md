@@ -17,6 +17,19 @@ A new plugin and service dedicated to managing Virtual Events with new dedicated
     mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+## Add permission to insert isSelfServe property on partner object for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-PLAT-23233
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
+
+## Add systemPartner updateConfiguration permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23192
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
 
 # Quasar-17.13.0 #
 ### Configuration ###
