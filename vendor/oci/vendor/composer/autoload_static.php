@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
+class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -24,6 +24,7 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'a4d81d512b8c1016fe4acf40220f12a5' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
         'd542d7c666618af7d3415cdbe00a510f' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
+        '045fff8973a0377b05e6d7d7399cad92' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Utils.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -189,11 +190,19 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
     );
 
     public static $classMap = array (
+        'AbstractClientTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AbstractClientTest.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'ConfigFileTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/ConfigFileTest.php',
+        'DummyAuthProvider' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AbstractClientTest.php',
+        'DummyRegionAuthProvider' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AbstractClientTest.php',
         'File_Iterator' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Iterator.php',
         'File_Iterator_Facade' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Facade.php',
         'File_Iterator_Factory' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Factory.php',
+        'GuzzleTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/GuzzleTest.php',
+        'HttpUtilsTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/HttpUtilsTest.php',
+        'IteratorTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/IteratorTest.php',
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
+        'LogAdapterTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Logging/LogAdapterTest.php',
         'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'Oracle\\Oci\\Common\\AbstractClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AbstractClient.php',
         'Oracle\\Oci\\Common\\Auth\\AbstractRequestingAuthenticationDetailsProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
@@ -201,7 +210,9 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         'Oracle\\Oci\\Common\\Auth\\CachingSessionKeySupplier' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
         'Oracle\\Oci\\Common\\Auth\\ConfigFileAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
         'Oracle\\Oci\\Common\\Auth\\FederationClientInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
+        'Oracle\\Oci\\Common\\Auth\\FederationClientTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/FederationClientTest.php',
         'Oracle\\Oci\\Common\\Auth\\InstancePrincipalsAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\InstancePrincipalsAuthProviderTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/InstancePrincipalsAuthProviderTest.php',
         'Oracle\\Oci\\Common\\Auth\\JWT' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/SecurityTokenAdapter.php',
         'Oracle\\Oci\\Common\\Auth\\KeyPair' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
         'Oracle\\Oci\\Common\\Auth\\RefreshFailedException' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
@@ -209,19 +220,26 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         'Oracle\\Oci\\Common\\Auth\\RefreshableOnNotAuthenticatedInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
         'Oracle\\Oci\\Common\\Auth\\RegionProviderInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
         'Oracle\\Oci\\Common\\Auth\\SecurityTokenAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/SecurityTokenAdapter.php',
+        'Oracle\\Oci\\Common\\Auth\\SecurityTokenAdapterTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/SecurityTokenAdapterTest.php',
         'Oracle\\Oci\\Common\\Auth\\SessionKeySupplierImpl' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
         'Oracle\\Oci\\Common\\Auth\\SessionKeySupplierInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
+        'Oracle\\Oci\\Common\\Auth\\TestX509CertificateSupplier' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/FederationClientTest.php',
+        'Oracle\\Oci\\Common\\Auth\\TestX509FederationClient' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/FederationClientTest.php',
         'Oracle\\Oci\\Common\\Auth\\UrlBasedX509CertificateSupplier' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
         'Oracle\\Oci\\Common\\Auth\\UserAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
         'Oracle\\Oci\\Common\\Auth\\X509AuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
         'Oracle\\Oci\\Common\\Auth\\X509CertificateSupplierInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/X509CertificateSuppliers.php',
+        'Oracle\\Oci\\Common\\Auth\\X509CertificateSuppliersTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/X509CertificateSuppliersTest.php',
         'Oracle\\Oci\\Common\\Auth\\X509FederationClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
         'Oracle\\Oci\\Common\\ConfigFile' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/ConfigFile.php',
         'Oracle\\Oci\\Common\\Constants' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Constants.php',
+        'Oracle\\Oci\\Common\\Defer' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Utils.php',
         'Oracle\\Oci\\Common\\ExcludeBodySigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\FederationSigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\HeadersToSign' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\HttpUtils' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/HttpUtils.php',
+        'Oracle\\Oci\\Common\\IteratorConfig' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Iterator.php',
+        'Oracle\\Oci\\Common\\Iterators' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Iterator.php',
         'Oracle\\Oci\\Common\\Logging\\AbstractLogAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
         'Oracle\\Oci\\Common\\Logging\\EchoLogAdapter' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
         'Oracle\\Oci\\Common\\Logging\\LogAdapterInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
@@ -233,7 +251,10 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         'Oracle\\Oci\\Common\\ObjectStorageSigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\OciBadResponseException' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/OciException.php',
         'Oracle\\Oci\\Common\\OciException' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/OciException.php',
+        'Oracle\\Oci\\Common\\OciItemIterator' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Iterator.php',
         'Oracle\\Oci\\Common\\OciResponse' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/OciResponse.php',
+        'Oracle\\Oci\\Common\\OciResponseIterator' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Iterator.php',
+        'Oracle\\Oci\\Common\\OtherStringUtilsTestClass' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/StringUtilsTest.php',
         'Oracle\\Oci\\Common\\Realm' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Regions.php',
         'Oracle\\Oci\\Common\\Region' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Regions.php',
         'Oracle\\Oci\\Common\\SigningStrategies' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
@@ -241,9 +262,22 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         'Oracle\\Oci\\Common\\SigningStrategyInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\StandardSigningStrategy' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/SigningStrategy.php',
         'Oracle\\Oci\\Common\\StringUtils' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/StringUtils.php',
+        'Oracle\\Oci\\Common\\StringUtilsTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/StringUtilsTest.php',
+        'Oracle\\Oci\\Common\\StringUtilsTestChildClass' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/StringUtilsTest.php',
+        'Oracle\\Oci\\Common\\StringUtilsTestClass' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/StringUtilsTest.php',
         'Oracle\\Oci\\Common\\UserAgent' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/UserAgent.php',
+        'Oracle\\Oci\\Common\\UserAgentTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/UserAgentTest.php',
         'Oracle\\Oci\\ObjectStorage\\ObjectStorageAsyncClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/ObjectStorageAsyncClient.php',
         'Oracle\\Oci\\ObjectStorage\\ObjectStorageClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/ObjectStorageClient.php',
+        'Oracle\\Oci\\ObjectStorage\\ObjectStorageIterators' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/ObjectStorageIterators.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\AbstractMultipartUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/AbstractMultipartUploader.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\AbstractUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/AbstractUploader.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartFileUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartFileUploader.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartResumeInfo' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartUploadException.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartUploadException' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartUploadException.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\SinglePartUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/SinglePartUploader.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\UploadManager' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/UploadManager.php',
+        'Oracle\\Oci\\Tests\\Common\\RequestStoringMiddleware' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/RequestStoringMiddleware.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/Assert.php',
         'PHPUnit\\Framework\\BaseTestListener' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/BaseTestListener.php',
         'PHPUnit\\Framework\\TestCase' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/TestCase.php',
@@ -623,6 +657,7 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         'PHP_Token_XOR_EQUAL' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_YIELD' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_YIELD_FROM' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
+        'RegionsTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/RegionsTest.php',
         'SebastianBergmann\\CodeCoverage\\CodeCoverage' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/CodeCoverage.php',
         'SebastianBergmann\\CodeCoverage\\CoveredCodeNotExecutedException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/CoveredCodeNotExecutedException.php',
         'SebastianBergmann\\CodeCoverage\\Driver\\Driver' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Driver/Driver.php',
@@ -702,18 +737,20 @@ class ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6
         'SebastianBergmann\\RecursionContext\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/recursion-context/src/InvalidArgumentException.php',
         'SebastianBergmann\\ResourceOperations\\ResourceOperations' => __DIR__ . '/..' . '/sebastian/resource-operations/src/ResourceOperations.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'SigningStrategyTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/SigningStrategyTest.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'UploadManagerConstants' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/UploadManagerConstants.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit6df90a21fb3bcd332f01a2cc790070b6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitfef62d0c64c357a8103934033ebf3e38::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitfef62d0c64c357a8103934033ebf3e38::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitfef62d0c64c357a8103934033ebf3e38::$classMap;
 
         }, null, ClassLoader::class);
     }

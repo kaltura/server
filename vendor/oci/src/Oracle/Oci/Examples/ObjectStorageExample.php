@@ -5,7 +5,6 @@ namespace Oracle\Oci\Examples;
 require 'vendor/autoload.php';
 
 use DateTime;
-use Oracle\Oci\Common\Region;
 use Oracle\Oci\Common\UserAgent;
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
 use Oracle\Oci\Common\Auth\ConfigFileAuthProvider;
@@ -20,40 +19,18 @@ $file_to_upload = "composer.json";
 
 date_default_timezone_set('Etc/UTC');
 Logger::setGlobalLogAdapter(new EchoLogAdapter(0, [
-    "Oracle\\Oci\\ObjectStorage\\ObjectStorageClient" => LOG_DEBUG,
-    "Oracle\\Oci\\Common\\OciResponse" => LOG_DEBUG
+    // "Oracle\\Oci\\ObjectStorage\\ObjectStorageClient\\middleware\\uri" => LOG_DEBUG,
+    // "Oracle\\Oci\\Common\\OciResponse" => LOG_DEBUG
 ]));
 
 echo "UserAgent: " . UserAgent::getUserAgent() . PHP_EOL;
-// UserAgent::setAdditionalClientUserAgent("Oracle-CloudShell");
-// echo "UserAgent: " . UserAgent::getUserAgent() . PHP_EOL;
-// putenv("OCI_SDK_APPEND_USER_AGENT=Oracle-CloudDevelopmentKit");
-// UserAgent::init();
-// echo "UserAgent: " . UserAgent::getUserAgent() . PHP_EOL;
-// UserAgent::setAdditionalClientUserAgent("");
-// echo "UserAgent: " . UserAgent::getUserAgent() . PHP_EOL;
-
-$region = Region::getRegion("us-phoenix-1");
-echo "Region: $region".PHP_EOL;
 
 $auth_provider = new ConfigFileAuthProvider();
 echo "Region from config file: {$auth_provider->getRegion()}" . PHP_EOL;
 
-// $auth_provider = new UserAuthProvider(
-//     'ocid1.tenancy.oc1..aaaaaaaacqp432hpa5oc2kvxm4kpwbkodfru4okbw2obkcdob5zuegi4rwxq',
-//     'ocid1.user.oc1..aaaaaaaabiszhenencetzhewboxb3fimi4izpxzsatigo7cqrmbdlitzngza',
-//     '83:f3:27:6b:bf:0d:50:7b:09:d0:92:49:6f:1f:89:32',
-//     'file:///Users/mricken/.oci/bmcs_api_key.pem'
-// );
+// $auth_provider = new ConfigFileAuthProvider(ConfigFile::loadFromFile(ConfigFile::getUserHome() . "/.oci/config_us-phoenix-1", "OTHER"));
 
-// $auth_provider = new ConfigFileAuthProvider(ConfigFile::loadDefault("OTHER"));
-
-// $auth_provider = new ConfigFileAuthProvider(ConfigFile::loadFromFile(ConfigFile::getUserHome() . "/.oci/config_dex-us-phoenix-1-manual", "OTHER"));
-
-$c = new ObjectStorageClient(
-    $auth_provider,
-    $region
-);
+$c = new ObjectStorageClient($auth_provider);
 
 echo "----- getNamespace -----".PHP_EOL;
 $response = $c->getNamespace();
@@ -125,7 +102,7 @@ echo "----- copyObject -----".PHP_EOL;
 $object_name3 = "php-test3.txt";
 $copy_object_details = [
     'sourceObjectName' => $object_name2,
-    'destinationRegion' => $region->getRegionId(),
+    'destinationRegion' => $auth_provider->getRegion()->getRegionId(),
     'destinationNamespace' => $namespace,
     'destinationBucket' => $bucket_name,
     'destinationObjectName' => $object_name3
@@ -183,16 +160,25 @@ if ($size != $retrieved_filesize) {
 }
 
 echo "----- listObjects -----".PHP_EOL;
-$response = $c->listObjects([
-    'namespaceName' => $namespace,
-    'bucketName' => $bucket_name]);
-
-echo "----- listObjects with prefix -----".PHP_EOL;
-$response = $c->listObjects([
+$it = $c->listObjectsIterator([
     'namespaceName' => $namespace,
     'bucketName' => $bucket_name,
-    'prefix' => "dexreq-"]);
+    'limit' => 2
+]);
+foreach ($it as $k => $v) {
+    echo "Object " . ($k + 1) . ": " . json_encode($v) . PHP_EOL;
+}
 
+echo "----- listObjects with prefix -----".PHP_EOL;
+$it = $c->listObjectsIterator([
+    'namespaceName' => $namespace,
+    'bucketName' => $bucket_name,
+    'prefix' => "php-"
+]);
+foreach ($it as $k => $v) {
+    echo "Object " . ($k + 1) . ": " . json_encode($v) . PHP_EOL;
+}
+    
 echo "----- headObject for missing file -----".PHP_EOL;
 try {
     $response = $c->headObject([
@@ -238,8 +224,24 @@ if ($size != $retrieved_filesize) {
     echo "Retrieved file size ($retrieved_filesize) equals uploaded file size ($size)!".PHP_EOL;
 }
 
-echo "----- listBuckets -----".PHP_EOL;
-$response = $c->listBuckets([
+echo "----- listBuckets itemIterator -----".PHP_EOL;
+$it = $c->listBucketsIterator([
     'namespaceName' => $namespace,
     'compartmentId' => "ocid1.tenancy.oc1..aaaaaaaacqp432hpa5oc2kvxm4kpwbkodfru4okbw2obkcdob5zuegi4rwxq",
-    'fields' => ["tags", "tags"]]);
+    'limit' => 2,
+    'fields' => ["tags", "tags"]
+]);
+foreach ($it as $k => $v) {
+    echo "Bucket " . ($k + 1) . ": " . json_encode($v) . PHP_EOL;
+}
+
+echo "----- listBuckets responseIterator -----".PHP_EOL;
+$it = $c->listBucketsResponseIterator([
+    'namespaceName' => $namespace,
+    'compartmentId' => "ocid1.tenancy.oc1..aaaaaaaacqp432hpa5oc2kvxm4kpwbkodfru4okbw2obkcdob5zuegi4rwxq",
+    'limit' => 2,
+    'fields' => ["tags", "tags"]
+]);
+foreach ($it as $k => $v) {
+    echo "listBucket response " . ($k + 1) . ": " . json_encode($v->getJson()) . PHP_EOL;
+}

@@ -2,11 +2,15 @@
 
 namespace Oracle\Oci\Common\Auth;
 
+use OpenSSLAsymmetricKey;
 use Oracle\Oci\Common\ConfigFile;
 use Oracle\Oci\Common\Logging\Logger;
 use Oracle\Oci\Common\Realm;
 use Oracle\Oci\Common\Region;
 
+/**
+ * Simplest interface required to authenticate to OCI services.
+ */
 interface AuthProviderInterface
 {
     /**
@@ -15,20 +19,55 @@ interface AuthProviderInterface
      * @return OpenSSLAsymmetricKey|string either an already parsed OpenSSLAsymmetricKey, a filename in the format scheme://path/to/file.pem, or a PEM formatted private key as a string.
      */
     public function getPrivateKey(); //  : string;
+
+    /**
+     * Return the key passphrase, or null if none.
+     *
+     * @return string|null key passphrase, or null if none
+     */
     public function getKeyPassphrase(); // : ?string;
+
+    /**
+     * Return the key id.
+     *
+     * @return string key id
+     */
     public function getKeyId(); // : string;
 }
 
+/**
+ * Additional interface for auth providers that can also provide the region to use.
+ */
 interface RegionProviderInterface
 {
-    public function getRegion(); // : Region;
+    /**
+     * Get the region.
+     *
+     * @return Region|null the region to use, or null of none set.
+     */
+    public function getRegion(); // : ?Region;
 }
 
+/**
+ * Additional interface for auth providers that can also refresh their credentials when receiving an authentication error.
+ */
 interface RefreshableOnNotAuthenticatedInterface
 {
+    /**
+     * Return true if this auth provider can refresh its credentials on an authentication error.
+     * @return true if the credentials can be refreshed on an authentication error
+     */
+    public function isRefreshableOnNotAuthenticated(); // : bool
+
+    /**
+     * Refresh the credentials.
+     */
     public function refresh();
 }
 
+/**
+ * User auth provider.
+ */
 class UserAuthProvider implements AuthProviderInterface
 {
     /*string*/ protected $tenancy_id;
@@ -75,7 +114,7 @@ class UserAuthProvider implements AuthProviderInterface
 
     public function getPrivateKey() // : string
     {
-        return $this->key_filename;
+        return $this->private_key;
     }
 
     public function getKeyPassphrase() // : ?string
@@ -168,6 +207,3 @@ class ConfigFileAuthProvider implements AuthProviderInterface, RegionProviderInt
         return $this->region;
     }
 }
-
-?>
-

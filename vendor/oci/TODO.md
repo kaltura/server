@@ -9,8 +9,11 @@
 ### Major Features
 - Upload Manager (uploads automatically broken into smaller parts)
 - Paginator (multi-page lists retrieved transparently to the customer)
-- Instance Principals authentication
 - PHP stream wrapper
+
+### Convenience
+- automatic retry on Instance Principals 401
+	- does that mean we need retries?
 
 ### Test
 - Multipart upload operations
@@ -18,9 +21,6 @@
 - PreAuthenticatedRequest (PAR) operations
 
 ## Later
-
-### Refactoring
-- refactor calling GuzzleClient (introduce `callApi` / `callApiAsync` methods in `AbstractClient`) as [recommended by Ziyao](https://bitbucket.oci.oraclecorp.com/projects/SDK/repos/oci-php-sdk/pull-requests/12/overview)
 
 ### Data Types
 - enums

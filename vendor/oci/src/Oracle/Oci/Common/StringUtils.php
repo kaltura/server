@@ -5,7 +5,7 @@ namespace Oracle\Oci\Common;
 use Exception;
 use InvalidArgumentException;
 
-class StringUtils
+abstract class StringUtils
 {
     public static function get_type_or_class($data)
     {
@@ -101,5 +101,15 @@ class StringUtils
                 throw new InvalidArgumentException("The parameter '$k' is required.");
             }
         }
+    }
+
+    public static function startsWith(/*string*/ $haystack, /*string*/ $needle)
+    {
+        return substr($haystack, 0, strlen($needle)) == $needle;
+    }
+
+    public static function endsWith(/*string*/ $haystack, /*string*/ $needle)
+    {
+        return substr($haystack, -strlen($needle)) == $needle;
     }
 }

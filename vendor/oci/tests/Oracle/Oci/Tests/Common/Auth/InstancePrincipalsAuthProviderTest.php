@@ -13,10 +13,11 @@ class InstancePrincipalsAuthProviderTest extends TestCase
      */
     public static function beforeClass()
     {
-        \Oracle\Oci\Common\Logging\Logger::setGlobalLogAdapter(new \Oracle\Oci\Common\Logging\EchoLogAdapter(LOG_INFO, [
-            "Oracle\Oci\Common\Auth" => LOG_DEBUG,
-            "Oracle\Oci\ObjectStorage" => LOG_DEBUG
-        ]));
+        \Oracle\Oci\Common\Logging\Logger::setGlobalLogAdapter(new \Oracle\Oci\Common\Logging\NoOpLogAdapter());
+        // \Oracle\Oci\Common\Logging\Logger::setGlobalLogAdapter(new \Oracle\Oci\Common\Logging\EchoLogAdapter(LOG_INFO, [
+        //     "Oracle\Oci\Common\Auth" => LOG_DEBUG,
+        //     "Oracle\Oci\ObjectStorage" => LOG_DEBUG
+        // ]));
     }
 
     public function testSessionKeySupplierImpl()

@@ -77,7 +77,6 @@ class X509FederationClient extends AbstractClient implements FederationClientInt
 
         $this->autoDetectUsingMetadataUrl();
 
-        $this->federationHttpClient = new Client();
         $this->securityTokenAdapter = new SecurityTokenAdapter(null, $this->sessionKeySupplier);
 
         parent::__construct(
@@ -336,8 +335,7 @@ class X509FederationClient extends AbstractClient implements FederationClientInt
             $this->leafCertificateSupplier =
                     new UrlBasedX509CertificateSupplier(
                         X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/cert.pem",
-                        X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/key.pem",
-                        null
+                        X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/key.pem"
                     );
             $this->logger->debug("Auto-detected leaf certificate supplier.");
         }
@@ -355,7 +353,6 @@ class X509FederationClient extends AbstractClient implements FederationClientInt
 
             $this->intermediateCertificateSuppliers[] = new UrlBasedX509CertificateSupplier(
                 X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/intermediate.pem",
-                null,
                 null
             );
             $this->logger->debug("Auto-detected intermediate certificate supplier.");

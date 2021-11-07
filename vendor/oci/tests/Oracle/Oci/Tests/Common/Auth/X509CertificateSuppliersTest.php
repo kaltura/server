@@ -13,8 +13,7 @@ class X509CertificateSuppliersTest extends TestCase
     {
         $cs = new UrlBasedX509CertificateSupplier(
             X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/cert.pem",
-            X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/key.pem",
-            null
+            X509FederationClient::METADATA_SERVICE_BASE_URL . "identity/key.pem"
         );
         $kp = $cs->getKeyPair();
 

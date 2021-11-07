@@ -53,7 +53,7 @@ class ConfigFile
             }
             if (substr($line, 0, 1) == "[" && substr($line, -1) == "]") {
                 // profile
-                if ($properties != null && count($properties) > 0) {
+                if ($properties) {
                     $allProperties[$currentProfile] = $properties;
                 }
                 $currentProfile = trim(substr($line, 1, -1));
@@ -79,7 +79,7 @@ class ConfigFile
                 $properties[$key] = $value;
             }
         }
-        if ($properties != null && count($properties) > 0) {
+        if ($properties) {
             $allProperties[$currentProfile] = $properties;
         }
 

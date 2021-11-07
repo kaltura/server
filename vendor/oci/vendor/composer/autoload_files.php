@@ -23,4 +23,5 @@ return array(
     '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
     'a4d81d512b8c1016fe4acf40220f12a5' => $baseDir . '/src/Oracle/Oci/Common/Logging/LogAdapterInterface.php',
     'd542d7c666618af7d3415cdbe00a510f' => $baseDir . '/src/Oracle/Oci/Common/SigningStrategy.php',
+    '045fff8973a0377b05e6d7d7399cad92' => $baseDir . '/src/Oracle/Oci/Common/Utils.php',
 );
