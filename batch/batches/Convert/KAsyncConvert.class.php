@@ -256,7 +256,7 @@ class KAsyncConvert extends KJobHandlerWorker
 		$fetchFirst = null;
 		foreach ($data->srcFileSyncs as $srcFileSyncDescriptor) 
 		{
-			$localFileExists = isset($srcFileSyncDescriptor->actualFileSyncLocalPath) && file_exists($srcFileSyncDescriptor->actualFileSyncLocalPath);
+			$localFileExists = isset($srcFileSyncDescriptor->actualFileSyncLocalPath) && kFile::checkFileExists($srcFileSyncDescriptor->actualFileSyncLocalPath);
 			// if the file was already retrieved then we dont care if the isRemoteInput is on or off.
 			if(!$localFileExists && (self::$taskConfig->params->isRemoteInput || !strlen(trim($srcFileSyncDescriptor->actualFileSyncLocalPath)))) // for distributed conversion
 			{
