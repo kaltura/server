@@ -480,6 +480,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $purifyImageContent;
+
+	/**
+	 * @var bool
+	 */
+	public $isSelfServe;
 	
 	
 	private static $map_between_objects = array
@@ -572,7 +577,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'trigramPercentage',
 		'maxWordForNgram',
 		'twoFactorAuthenticationMode',
-		'purifyImageContent'
+		'purifyImageContent',
+		'isSelfServe',
 	);
 
 	public function getMapBetweenObjects()
