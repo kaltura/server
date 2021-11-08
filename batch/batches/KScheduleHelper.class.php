@@ -66,9 +66,9 @@ class KScheduleHelper extends KPeriodicWorker
 		KalturaLog::info(is_array($filters) ? count($filters) : 0 . " filter records found for the scheduler");
 		
 		// get status from the schduler
-		$statuses = KScheduleHelperManager::loadStatuses();
+		$statuses = KScheduleHelperManager::loadStatuses(KBatchBase::$taskConfig->fileUpdateInterval);
 		KalturaLog::info(is_array($statuses) ? count($statuses) : 0 . " status records sent from the scheduler");
-		
+
 		// send status to the server
 		$statusResponse = self::$kClient->batchcontrol->reportStatus($scheduler, (array)$statuses, (array)$filters);
 		KalturaLog::info(count($statusResponse->queuesStatus) . " queue status records returned from the server");

@@ -339,13 +339,13 @@ class KScheduleHelperManager
 	/**
 	 * @return array<KalturaSchedulerStatus>
 	 */
-	public static function loadStatuses()
+	public static function loadStatuses(int $lastUpdateInterval)
 	{
 		$lastFileUpdateTimeStampPath = self::getLastFileUpdateTimeStampPath();
 		$lastFileUpdateFileContent = file_get_contents($lastFileUpdateTimeStampPath);
 		$currentTimeStamp = time();
 
-		if (($currentTimeStamp - $lastFileUpdateFileContent) < 400 )
+		if (($currentTimeStamp - $lastFileUpdateFileContent) < $lastUpdateInterval)
 		{
 			return array();
 		}
