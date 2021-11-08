@@ -7,9 +7,5 @@
  */
 class VirtualScheduleEventFilter extends ScheduleEventFilter
 {
-	public function init()
-	{
-		parent::init();
-		
-	}
+
 }
