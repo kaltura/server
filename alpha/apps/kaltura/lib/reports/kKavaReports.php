@@ -1671,6 +1671,15 @@ class kKavaReports extends kKavaReportsMgr
 
 		ReportType::SELF_SERVE_USAGE => array(
 			self::REPORT_JOIN_REPORTS => array(
+				// unique users
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_USERS),
+				),
+				array(
+					self::REPORT_JOIN_GRAPHS => array(
 				// reach credit
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
@@ -1678,73 +1687,96 @@ class kKavaReports extends kKavaReportsMgr
 						self::DRUID_DIMENSION => self::DIMENSION_STATUS,
 						self::DRUID_VALUES => array(self::TASK_READY)
 					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
-				),
-				// unique users
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_API_USAGE,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_USERS),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
 				),
 				// playmanifest and live view time
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+
 				),
 				// total entries and interactive videos
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
-					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_FILTER => array(
 						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 					),
-					self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::SOURCE_INTERACTIVE_VIDEO),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, self::METRIC_INTERACTIVE_VIDEOS_ADDED, self::METRIC_INTERACTIVE_VIDEOS_DELETED),
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_INTERACTIVE_VIDEOS_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
 				),
 				// bandwidth
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 				),
 				// transcoding
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
 					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
 				// storage
 				array(
-					self::REPORT_JOIN_GRAPHS => array(
-						array(
-							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
-							self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
-								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
-							),
-							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
-						),
-						array(
-							self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
-							self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
-							self::REPORT_FILTER => array(		// can exclude logical deltas in this report
-								self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
-								self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
-							),
-							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-							self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
-						),
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 					),
-					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
-					self::REPORT_METRICS => array(self::METRIC_PEAK_STORAGE_MB),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
 				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+				),
+			),
+					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
+
+				)
 			),
 			self::REPORT_COLUMN_MAP => array(
 				'unique_known_users' => self::METRIC_UNIQUE_USERS,
-				'total_entries' => self::METRIC_COUNT_TOTAL,
+				'total_entries' => self::METRIC_LATEST_ENTRIES,
 				'video_streams' => self::EVENT_TYPE_PLAYMANIFEST,
 				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
 				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
 				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
-				'total_interactive_video_entries' => self::SOURCE_INTERACTIVE_VIDEO,
+				'total_interactive_video_entries' => self::METRIC_LATEST_INTERACTIVE_VIDEOS,
 				'live_view_time' => self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 				'total_credits' => self::METRIC_SUM_PRICE,
 				'total_jobs_completed' => self::METRIC_TOTAL_JOBS,

@@ -6,6 +6,12 @@
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
 
+## Add permission to insert isSelfServe property on partner object for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23233
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
 
 ## Add systemPartner updateConfiguration permission for self serve partner ##
 * Issue Type: Task
