@@ -389,7 +389,7 @@ class ReportService extends KalturaBaseService
 
 		if($excludedFields)
 		{
-			KalturaReportHelper::removeExcludedFieldsFromCsv($excludedFields, $columns, $rows);
+			KCsvWrapper::hideCsvColumns($excludedFields, $columns, $rows);
 		}
 
 		$content .= implode(',', $columns) . "\n";
