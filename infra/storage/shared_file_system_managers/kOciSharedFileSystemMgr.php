@@ -43,6 +43,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	const COPY_OBJECT_STATUS_COMPLETED = 'COMPLETED';
 	const COPY_OBJECT_STATUS_FAILED = 'FAILED';
 	const OS_404_ERROR = 404;
+	const OS_200_VALID = 200;
 	
 	/* @var ObjectStorageClient $objectStoargeClient */
 	protected $objectStoargeClient;
@@ -195,19 +196,33 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRename($filePath, $newFilePath)
 	{
-		if(kFile::isSharedPath($filePath) && $this->doCopy($filePath, $newFilePath))
+		if (kFile::isSharedPath($filePath))
 		{
-			kFile::unlink($filePath);
+			list($bucket, $fileName) = $this->getBucketAndFilePath($filePath);
+			list($toBucket, $newFileName) = $this->getBucketAndFilePath($newFilePath);
+			
+			$params = array(
+				'namespaceName' => $this->namespaceName,
+				'bucketName' => $bucket,
+				'renameObjectDetails' => array(
+					'sourceName' => $fileName,
+					'newName' => $newFileName
+				)
+			);
+			
+			$response = $this->objectStoargeClient->renameObject($params);
+			$statusCode = $response->getStatusCode();
+			if ($statusCode != self::OS_200_VALID)
+			{
+				$headers = $response->getHeaders();
+				$opcRequestId = $headers['opc-request-id'][0];
+				self::safeLog("Failed to rename [$filePath] to [$newFilePath] OS returned status [$statusCode] OPC Request ID [$opcRequestId] body: " . print_r($response->getBody(), 1));
+				return false;
+			}
 			return true;
 		}
 
-		if(!$this->doMoveLocalToShared($filePath, $newFilePath, true))
-		{
-			return false;
-		}
-
-		kFile::unlink($filePath);
-		return true;
+		return $this->doMoveLocalToShared($filePath, $newFilePath);
 	}
 	
 	protected function doCopy($fromFilePath, $toFilePath)
