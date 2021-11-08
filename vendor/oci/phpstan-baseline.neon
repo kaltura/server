@@ -1,0 +1,15 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Class OpenSSLAsymmetricKey not found\\.$#"
+			path: src/Oracle/*
+
+		-
+			message: "#^Method .* has invalid return type OpenSSLAsymmetricKey\\.$#"
+			paths:
+				- src/Oracle/*
+				- tests/*
+
+		-
+			message: "#^Call to an undefined method Oracle\\\\Oci\\\\.*\\\\.*Client\\:\\:list.*Iterator\\(\\)\\.$#"
+			path: src/Oracle/*
