@@ -2,7 +2,7 @@
 /**
  * @package plugins.virtualEvent
  */
-class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKalturaObjectLoader
+class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKalturaObjectLoader,IKalturaPending
 {
 	const PLUGIN_NAME = 'virtualEvent';
 	
@@ -11,6 +11,11 @@ class VirtualEventPlugin extends KalturaPlugin implements IKalturaServices, IKal
 		return self::PLUGIN_NAME;
 	}
 	
+	public static function dependsOn()
+	{
+		$dependency = new KalturaDependency(SchedulePlugin::getPluginName());
+		return array($dependency);
+	}
 	
 	public static function getServicesMap()
 	{
