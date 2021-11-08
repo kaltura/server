@@ -141,7 +141,7 @@ class KFileTransferExportEngine extends KExportEngine
         $engine = kFileTransferMgr::getInstance($this->protocol, $engineOptions);
         
         try{
-            $engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword);
+            $engine->login($this->data->serverUrl, $this->data->serverUsername, $this->data->serverPassword, $this->data->port);
             $engine->delFile($this->destFile);
         }
         catch(kFileTransferMgrException $ke)
