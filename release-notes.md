@@ -1,4 +1,12 @@
 # Quasar-17.14.0 #
+## Add permission for credit info view ##
+* Issue Type: Task
+* Issue ID: PLAT-23234
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
+
+
 ## Add systemPartner updateConfiguration permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: PLAT-23192
