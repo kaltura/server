@@ -6,8 +6,6 @@
  */
 class KScheduleHelperManager
 {
-	protected $lastUpdate = null;
-
 	/**
 	 * @return array
 	 */

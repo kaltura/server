@@ -34,7 +34,6 @@ class KGenericScheduler
 	private $nextStatusTime = 0;
 	private $nextSchedulerStatusTime = 0;
 	private $logWorkerInterval;
-	//private $fileUpdateInterval = 15;
 
 	/**
 	 * Stores all groups of tasks, the index is the task type
@@ -142,7 +141,6 @@ class KGenericScheduler
 		KDwhClient::setEnabled($this->schedulerConfig->getDwhEnabled());
 		KDwhClient::setFileName($this->schedulerConfig->getDwhPath());
 		$this->logWorkerInterval = $this->schedulerConfig->getLogWorkerInterval();
-		//$this->fileUpdateInterval = $this->schedulerConfig->getFileUpdateInterval();
 
 		$taskConfigsValidations = array();
 		foreach($taskConfigs as $taskConfig)
