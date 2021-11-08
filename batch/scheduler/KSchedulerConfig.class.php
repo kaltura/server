@@ -348,10 +348,14 @@ class KSchedulerConfig extends Zend_Config_Ini
 
 	public function getFileUpdateInterval()
 	{
-		if (!$this->fileUpdateInterval)
-			return 15;
-		else
+		if ($this->fileUpdateInterval)
+		{
 			return $this->fileUpdateInterval;
+		}
+		else
+		{
+			return 15;
+		}
 	}
 
 	public function getLogDir()
