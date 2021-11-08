@@ -1855,13 +1855,13 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getYearIdRange($from_day, $to_day)
 	{
 		$date = self::dateIdToDateTime($from_day);
-		$end_month = substr($to_day, 0, 6);
+		$end_year = substr($to_day, 0, 4);
 
 		$result = array();
 		for (;;)
 		{
 			$cur = $date->format('Y');
-			if (strcmp($cur, $end_month) > 0 || count($result) >= 120)
+			if (strcmp($cur, $end_year) > 0 || count($result) >= 15)
 			{
 				break;
 			}
@@ -3710,7 +3710,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
-	
+
 	protected static function aggregateUsageData($interval, $graphs, &$dates)
 	{
 		switch ($interval)
