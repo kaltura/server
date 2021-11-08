@@ -2249,4 +2249,25 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		return array($flavorAssets, $audioOnlyAssets);
 	}
+	
+	/**
+	 * Returning the categories array of the entry
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function getCategoriesArrayFromEntry(entry $entry)
+	{
+		$categoryEntryItems = CategoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+		
+		$categoryEntryArray = array_map(function (categoryEntry $categoryEntry) {
+			return $categoryEntry->getCategoryId();
+			}, $categoryEntryItems);
+		
+		if (!isset($categoryEntryArray))
+		{
+			KalturaLog::info("Categories for entry {$entry->getId()} could not be retrieved.");
+		}
+		
+		return $categoryEntryArray;
+	}
 }

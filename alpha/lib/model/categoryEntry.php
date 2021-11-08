@@ -233,8 +233,8 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 */
 	public function add($entryId, $categoryId)
 	{
-		$entry = $this->retrieveEntry($entryId);
-		$category = $this->retrieveCategory($categoryId);
+		$entry = $this->retrieveEntry($entryId, false);
+		$category = $this->retrieveCategory($categoryId, false);
 
 		$this->validateMaxCategoriesPerEntry($entry, $category);
 		$currentKsKuserId = kCurrentContext::getCurrentKsKuserId();
@@ -264,52 +264,10 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		$entryId = $this->entry_id;
 		$categoryId = $this->category_id;
 		
-		$entry = entryPeer::retrieveByPK($entryId);
+		$entry = $this->retrieveEntry($entryId, true);
+		$category = $this->retrieveCategory($categoryId, true);
 		
-		if (!$entry)
-		{
-			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
-				throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_ID, $entryId);
-		}
-		
-		$category = categoryPeer::retrieveByPK($categoryId);
-		if (!$category && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
-		
-		//validate user is entitled to remove entry from category
-		if(kEntitlementUtils::getEntitlementEnforcement() &&
-			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
-			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
-		{
-			$kuserIsEntitled = false;
-			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
-			
-			// First pass: check if kuser is a manager
-			if ( $kuser )
-			{
-				if ( $kuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER )
-				{
-					$kuserIsEntitled = true;
-				}
-			}
-			else
-			{
-				$kuser = kuserPeer::retrieveByPK( kCurrentContext::getCurrentKsKuserId() );
-			}
-			
-			// Second pass: check if kuser is a co-publisher
-			if ( ! $kuserIsEntitled
-				&& $kuser
-				&& $entry->isEntitledKuserPublish($kuser->getKuserId()))
-			{
-				$kuserIsEntitled = true;
-			}
-			
-			if ( ! $kuserIsEntitled )
-			{
-				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
-			}
-		}
+		$this->validateKuserEntitledToRemoveEntryToCategory($entry, $categoryId);
 		
 		$this->setStatus(CategoryEntryStatus::DELETED);
 	}
@@ -398,6 +356,46 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 			$this->setStatus(CategoryEntryStatus::PENDING);
 		}
 	}
+	
+	/**
+	 * @param entry $entry
+	 * @param $categoryId
+	 * @throws kCoreException
+	 */
+	protected function validateKuserEntitledToRemoveEntryToCategory(entry $entry, $categoryId)
+	{
+		if (kEntitlementUtils::getEntitlementEnforcement() &&
+			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
+			$entry->getCreatorKuserId() != kCurrentContext::getCurrentKsKuserId())
+		{
+			$kuserIsEntitled = false;
+			$kuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
+			
+			// First pass: check if kuser is a manager
+			if ($kuser)
+			{
+				if ($kuser->getPermissionLevel() == CategoryKuserPermissionLevel::MANAGER)
+				{
+					$kuserIsEntitled = true;
+				}
+			}
+			else
+			{
+				$kuser = kuserPeer::retrieveByPK(kCurrentContext::getCurrentKsKuserId());
+			}
+			
+			// Second pass: check if kuser is a co-publisher
+			if (!$kuserIsEntitled && $kuser && $entry->isEntitledKuserPublish($kuser->getKuserId()))
+			{
+				$kuserIsEntitled = true;
+			}
+			
+			if (!$kuserIsEntitled)
+			{
+				throw new kCoreException("Cannot remove entry from category", kCoreException::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
+			}
+		}
+	}
 
 	protected function assignPartnerId()
 	{
@@ -415,34 +413,46 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 			$this->setCreatorPuserId($kuser->getPuserId());
 		}
 	}
-
+	
 	/**
 	 * @param $entryId
+	 * @param $checkIsBatch
 	 * @return entry
 	 * @throws kCoreException
 	 */
-	protected function retrieveEntry($entryId)
+	protected function retrieveEntry($entryId, $checkIsBatch)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
-		if(!$entry)
+		if (!$entry)
 		{
-			throw new kCoreException("Invalid Entry ID: {$entryId}", kCoreException::INVALID_ENTRY_ID, $entryId);
+			if (!$checkIsBatch ||
+				($checkIsBatch && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID))
+			{
+				throw new kCoreException("Invalid Entry ID: {$entryId}", kCoreException::INVALID_ENTRY_ID, $entryId);
+			}
 		}
+		
 		return $entry;
 	}
-
+	
 	/**
 	 * @param $categoryId
+	 * @param $checkIsBatch
 	 * @return category
 	 * @throws kCoreException
 	 */
-	protected function retrieveCategory($categoryId)
+	protected function retrieveCategory($categoryId, $checkIsBatch)
 	{
 		$category = categoryPeer::retrieveByPK($categoryId);
-		if(!$category)
+		if (!$category)
 		{
-			throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND, $categoryId);
+			if (!$checkIsBatch ||
+				($checkIsBatch && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID))
+			{
+				throw new kCoreException("Category ID: {$categoryId} not found", kCoreException::CATEGORY_NOT_FOUND, $categoryId);
+			}
 		}
+		
 		return $category;
 	}
 } // categoryEntry

@@ -48,7 +48,6 @@ class CategoryEntryService extends KalturaBaseService
 			{
 				throw $ex;
 			}
-
 		}
 
 		//need to select the entry again - after update
@@ -81,7 +80,21 @@ class CategoryEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 		}
 		
-		$dbCategoryEntry->setAsDeleted();
+		try
+		{
+			$dbCategoryEntry->setAsDeleted();
+		}
+		catch (Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+			{
+				$this->handleCoreException($ex);
+			}
+			else
+			{
+				throw $ex;
+			}
+		}
 		
 		$dbCategoryEntry->save();
 		
@@ -341,6 +354,9 @@ class CategoryEntryService extends KalturaBaseService
 
 			case kCoreException::CATEGORY_ENTRY_ALREADY_EXISTS:
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_ENTRY_ALREADY_EXISTS);
+				
+			case kCoreException::CANNOT_REMOVE_ENTRY_FROM_CATEGORY:
+				throw new KalturaAPIException(KalturaErrors::CANNOT_REMOVE_ENTRY_FROM_CATEGORY);
 
 			default:
 				throw $ex;
