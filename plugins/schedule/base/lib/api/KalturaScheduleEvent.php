@@ -264,7 +264,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_END_BEFORE_START, $startDate, $endDate);
 		}
 		
-		$maxDuration = SchedulePlugin::getScheduleEventmaxDuration();
+		$maxDuration = $this->getScheduleEventMaxDuration();
 		if(($endDate - $startDate) > $maxDuration)
 		{
 			throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxDuration);
@@ -374,6 +374,11 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	protected function getSingleScheduleEventMaxDuration()
 	{
 		return SchedulePlugin::getSingleScheduleEventMaxDuration();
+	}
+	
+	protected function getScheduleEventMaxDuration()
+	{
+		return SchedulePlugin::getScheduleEventmaxDuration();
 	}
 
 	private function validateRecurringEventForInsert()

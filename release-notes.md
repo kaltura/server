@@ -1,4 +1,24 @@
 # Quasar-17.14.0 #
+## Virtual Event ##
+A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
+### Deployment ###
+*To completely disable the creation of VirtualScheduleEvent, add to runtime_config map the line: virtual_schedule_event_enabled = 0
+to enable change it to 1
+* Add VirtualEvent to plugins.ini
+* Add the following to admin.ini 
+
+
+    moduls.virtualEvent.enabled = true
+    moduls.virtualEvent.permissionType = 2
+    moduls.virtualEvent.label = "Enable Virtual Events"
+    moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
+    moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 ## Add permission for credit info view ##
 * Issue Type: Task
 * Issue ID: PLAT-23234

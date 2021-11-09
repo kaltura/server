@@ -2215,4 +2215,25 @@
 			<index-column name="status" />
 		</index>
 	</table>
+	<table skipSql="false" abstract="false" name="virtual_event" reloadOnInsert="true">
+		<column primaryKey="true" required="true" autoIncrement="true" lazyLoad="false" name="id" type="bigint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="name" type="varchar" size="256" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="description" type="varchar" size="1024" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_id" type="bigint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="status" type="tinyint" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="tags" type="longvarchar" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<index name="partner_id_index">
+			<index-column name="partner_id" />
+		</index>
+		<index name="status_index">
+			<index-column name="status" />
+			<index-column name="partner_id" />
+		</index>
+		<index name="updated_at_index">
+			<index-column name="updated_at" />
+		</index>
+	</table>
 </database>
