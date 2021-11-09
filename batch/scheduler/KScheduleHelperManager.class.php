@@ -346,7 +346,7 @@ class KScheduleHelperManager
 		{
 			return array();
 		}
-		self::setLastFileUpdateTimeStamp();
+		self::setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath);
 
 		$filePath = self::getStatusFilePath();
 		if(!file_exists($filePath))
