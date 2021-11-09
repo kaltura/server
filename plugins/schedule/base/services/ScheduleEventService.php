@@ -29,6 +29,7 @@ class ScheduleEventService extends KalturaBaseService
 	 */
 	public function addAction(KalturaScheduleEvent $scheduleEvent)
 	{
+		$this->isVirtualScheduleEventAllowed($scheduleEvent);
 		// save in database
 		$dbScheduleEvent = $scheduleEvent->toInsertableObject();
 		/* @var $dbScheduleEvent ScheduleEvent */
@@ -410,5 +411,17 @@ class ScheduleEventService extends KalturaBaseService
 		/* @var kResourceReservation $resourceReservator*/
 		foreach($resourceIds as $resourceId)
 			$resourceReservator->deleteReservation($resourceId);
+	}
+	
+	private function isVirtualScheduleEventAllowed($scheduleEvent)
+	{
+			if ($scheduleEvent instanceof KalturaVirtualScheduleEvent)
+			{
+				$virtualScheduleEventEnabled = filter_var(kConf::get('virtual_schedule_event_enabled', kConfMapNames::RUNTIME_CONFIG, null),FILTER_VALIDATE_BOOLEAN) ;
+				if (!$virtualScheduleEventEnabled || !VirtualEventPlugin::isAllowedPartner($this->getPartnerId()))
+				{
+					throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_PLUGIN_DISABLED);
+				}
+			}
 	}
 }
