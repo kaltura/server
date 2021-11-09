@@ -285,19 +285,18 @@ class KScheduleHelperManager
 
 	protected static function getLastFileUpdateTimeStampPath()
 	{
-		$lastUpdate = kEnvironment::get("cache_root_path") . DIRECTORY_SEPARATOR . 'update.log';
-		if (!file_exists($lastUpdate))
+		$lastFileUpdateTimeStampPath = kEnvironment::get("cache_root_path") . DIRECTORY_SEPARATOR . 'update.log';
+		if (!file_exists($lastFileUpdateTimeStampPath))
 		{
-			kFile::fullMkdir($lastUpdate);
-			self::setLastFileUpdateTimeStamp();
+			kFile::fullMkdir($lastFileUpdateTimeStampPath);
+			self::setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath);
 		}
 
-		return $lastUpdate;
+		return $lastFileUpdateTimeStampPath;
 	}
 
-	protected static function setLastFileUpdateTimeStamp()
+	protected static function setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath)
 	{
-		$lastFileUpdateTimeStampPath = self::getLastFileUpdateTimeStampPath();
 		file_put_contents($lastFileUpdateTimeStampPath, time());
 	}
 
@@ -347,7 +346,7 @@ class KScheduleHelperManager
 		{
 			return array();
 		}
-		self::setLastFileUpdateTimeStamp();
+		self::setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath);
 
 		$filePath = self::getStatusFilePath();
 		if(!file_exists($filePath))
