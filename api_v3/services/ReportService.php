@@ -345,9 +345,10 @@ class ReportService extends KalturaBaseService
 	 * @param int $id
 	 * @param KalturaKeyValueArray $params
 	 * @return file
+	 * @param string $excludedFields
 	 * @throws KalturaAPIException
 	 */
-	public function getCsvAction($id, KalturaKeyValueArray $params = null)
+	public function getCsvAction($id, KalturaKeyValueArray $params = null, $excludedFields = null)
 	{
 		$this->addPartnerIdToParams($params);
 
@@ -390,6 +391,12 @@ class ReportService extends KalturaBaseService
 		header('Content-Type: text/csv');
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
 		$content = "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
+
+		if($excludedFields)
+		{
+			KCsvWrapper::hideCsvColumns($excludedFields, $columns, $rows);
+		}
+
 		$content .= implode(',', $columns) . "\n";
 		foreach($rows as $row)
 		{
@@ -398,19 +405,22 @@ class ReportService extends KalturaBaseService
 		}
 		return new kRendererString($content, 'text/csv');
 	}
-	
+
 	/**
-	 * Returns report CSV file executed by string params with the following convention: param1=value1;param2=value2 
-	 * 
+	 * Returns report CSV file executed by string params with the following convention: param1=value1;param2=value2
+	 * excludedFields can be supplied comma separated
+	 *
 	 * @action getCsvFromStringParams
 	 * @param int $id
 	 * @param string $params
+	 * @param string $excludedFields
 	 * @return file
+	 * @throws KalturaAPIException
 	 */
-	public function getCsvFromStringParamsAction($id, $params = null)
+	public function getCsvFromStringParamsAction($id, $params = null, $excludedFields = null)
 	{
 		$paramsArray = $this->parseParamsStr($params);
-		return $this->getCsvAction($id, $paramsArray);
+		return $this->getCsvAction($id, $paramsArray, $excludedFields);
 	}
 
 	/**
