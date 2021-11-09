@@ -2,6 +2,8 @@
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
 ### Deployment ###
+*To completely disable the creation of VirtualScheduleEvent, add to runtime_config map the line: virtual_schedule_event_enabled = 0
+to enable change it to 1
 * Add VirtualEvent to plugins.ini
 * Add the following to admin.ini 
 
