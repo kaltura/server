@@ -332,7 +332,10 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 180sec");
 				return false;
 			}*/
-			
+			if($duration<1){
+				KalturaLog::log($msgStr="UNSUPPORTED: duration ($duration) too short, must be at least 1 sec");
+				return false;
+			}			
 			return true;
 		}
 	
