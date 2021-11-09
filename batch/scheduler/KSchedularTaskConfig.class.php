@@ -45,6 +45,14 @@ class KSchedularTaskConfig extends Zend_Config_Ini
 	}
 
 	/**
+	 * @param $fileUpdateInterval the $fileUpdateInterval to set
+	 */
+	public function setFileUpdateInterval($fileUpdateInterval)
+	{
+		$this->fileUpdateInterval = $fileUpdateInterval;
+	}
+
+	/**
 	 * @return the $remoteServerUrl
 	 */
 	public function getRemoteServerUrl()

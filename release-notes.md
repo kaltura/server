@@ -19,6 +19,12 @@ to enable change it to 1
     mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+## Add permission for credit info view ##
+* Issue Type: Task
+* Issue ID: PLAT-23234
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
 
 ## Add permission to insert isSelfServe property on partner object for self serve partner ##
 * Issue Type: Task
