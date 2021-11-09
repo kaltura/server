@@ -37,16 +37,15 @@ class VirtualEventTableMap extends TableMap {
 		$this->setPackage('plugins.virtual_event');
 		$this->setUseIdGenerator(true);
 		// columns
-		$this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('ID', 'Id', 'BIGINT', true, null, null);
 		$this->addColumn('NAME', 'Name', 'VARCHAR', false, 256, null);
-		$this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('PARTNER_ID', 'PartnerId', 'INTEGER', false, null, null);
-		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('DESCRIPTION', 'Description', 'VARCHAR', false, 1024, null);
+		$this->addColumn('PARTNER_ID', 'PartnerId', 'BIGINT', false, null, null);
+		$this->addColumn('STATUS', 'Status', 'TINYINT', false, null, null);
 		$this->addColumn('TAGS', 'Tags', 'LONGVARCHAR', false, null, null);
-		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-		$this->addColumn('DELETION_DUE_DATE', 'DeletionDueDate', 'TIMESTAMP', false, null, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 

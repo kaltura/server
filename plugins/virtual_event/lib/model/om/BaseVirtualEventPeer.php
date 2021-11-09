@@ -26,7 +26,7 @@ abstract class BaseVirtualEventPeer {
 	const TM_CLASS = 'VirtualEventTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 10;
+	const NUM_COLUMNS = 9;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -49,17 +49,14 @@ abstract class BaseVirtualEventPeer {
 	/** the column name for the TAGS field */
 	const TAGS = 'virtual_event.TAGS';
 
-	/** the column name for the CUSTOM_DATA field */
-	const CUSTOM_DATA = 'virtual_event.CUSTOM_DATA';
-
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'virtual_event.CREATED_AT';
 
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'virtual_event.UPDATED_AT';
-
-	/** the column name for the DELETION_DUE_DATE field */
-	const DELETION_DUE_DATE = 'virtual_event.DELETION_DUE_DATE';
+	
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'virtual_event.CUSTOM_DATA';
 
 	/**
 	 * An identiy map to hold any loaded instances of VirtualEvent objects.
@@ -77,11 +74,11 @@ abstract class BaseVirtualEventPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Description', 'PartnerId', 'Status', 'Tags', 'CustomData', 'CreatedAt', 'UpdatedAt', 'DeletionDueDate', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'description', 'partnerId', 'status', 'tags', 'customData', 'createdAt', 'updatedAt', 'deletionDueDate', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::DESCRIPTION, self::PARTNER_ID, self::STATUS, self::TAGS, self::CUSTOM_DATA, self::CREATED_AT, self::UPDATED_AT, self::DELETION_DUE_DATE, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'description', 'partner_id', 'status', 'tags', 'custom_data', 'created_at', 'updated_at', 'deletion_due_date', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Description', 'PartnerId', 'Status', 'Tags', 'CreatedAt', 'UpdatedAt', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'description', 'partnerId', 'status', 'tags', 'createdAt', 'updatedAt', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::NAME, self::DESCRIPTION, self::PARTNER_ID, self::STATUS, self::TAGS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'description', 'partner_id', 'status', 'tags', 'created_at', 'updated_at', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -91,11 +88,11 @@ abstract class BaseVirtualEventPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Description' => 2, 'PartnerId' => 3, 'Status' => 4, 'Tags' => 5, 'CustomData' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'DeletionDueDate' => 9, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'partnerId' => 3, 'status' => 4, 'tags' => 5, 'customData' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'deletionDueDate' => 9, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::DESCRIPTION => 2, self::PARTNER_ID => 3, self::STATUS => 4, self::TAGS => 5, self::CUSTOM_DATA => 6, self::CREATED_AT => 7, self::UPDATED_AT => 8, self::DELETION_DUE_DATE => 9, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'partner_id' => 3, 'status' => 4, 'tags' => 5, 'custom_data' => 6, 'created_at' => 7, 'updated_at' => 8, 'deletion_due_date' => 9, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Description' => 2, 'PartnerId' => 3, 'Status' => 4, 'Tags' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, 'CustomData' => 8, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'partnerId' => 3, 'status' => 4, 'tags' => 5, 'createdAt' => 6, 'updatedAt' => 7, 'customData' => 8, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::NAME => 1, self::DESCRIPTION => 2, self::PARTNER_ID => 3, self::STATUS => 4, self::TAGS => 5, self::CREATED_AT => 6, self::UPDATED_AT => 7, self::CUSTOM_DATA => 8,  ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'partner_id' => 3, 'status' => 4, 'tags' => 5, 'created_at' => 6, 'updated_at' => 7, 'custom_data' => 8, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
 	);
 
 	/**
@@ -171,10 +168,9 @@ abstract class BaseVirtualEventPeer {
 		$criteria->addSelectColumn(VirtualEventPeer::PARTNER_ID);
 		$criteria->addSelectColumn(VirtualEventPeer::STATUS);
 		$criteria->addSelectColumn(VirtualEventPeer::TAGS);
-		$criteria->addSelectColumn(VirtualEventPeer::CUSTOM_DATA);
 		$criteria->addSelectColumn(VirtualEventPeer::CREATED_AT);
 		$criteria->addSelectColumn(VirtualEventPeer::UPDATED_AT);
-		$criteria->addSelectColumn(VirtualEventPeer::DELETION_DUE_DATE);
+		$criteria->addSelectColumn(VirtualEventPeer::CUSTOM_DATA);
 	}
 
 	/**
