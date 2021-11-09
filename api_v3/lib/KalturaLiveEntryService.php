@@ -543,7 +543,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 		{
 			return false;
 		}
-		if ($forcePrimaryValidation && $mediaServerIndex !== EntryServerNodeType::LIVE_PRIMARY)
+		if ($forcePrimaryValidation && $mediaServerIndex != EntryServerNodeType::LIVE_PRIMARY)
 		{
 			return false;
 		}
