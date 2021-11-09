@@ -227,7 +227,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
 		$entryFilter->referenceIdEqual = $referenceId;
-		$entryFilter->updatedAtGreaterThanOrEqual = time() - (self::DEFAULT_ZOOM_QUERY_TIMERANGE);
+		$entryFilter->updatedAtGreaterThanOrEqual = time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE;
 		$entryFilter->statusNotIn = KalturaEntryStatus::DELETED . ',' . KalturaEntryStatus::ERROR_CONVERTING . ',' .
 			KalturaEntryStatus::ERROR_IMPORTING;
 		
