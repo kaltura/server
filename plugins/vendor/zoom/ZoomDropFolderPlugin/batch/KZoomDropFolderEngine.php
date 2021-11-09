@@ -96,11 +96,12 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			{
 				$fromInSec = max($fromInSec - self::ONE_DAY, time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 			}
-			else
-			{
-				$fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
-			}
 		}
+		else
+		{
+			$fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+		}
+
 		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
 		$from = date('Y-m-d', $fromInSec);
 		$to = date('Y-m-d', $toInSec);
