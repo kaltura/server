@@ -12,8 +12,7 @@ $sf_symfony_data_dir = KALTURA_ROOT_PATH . '/vendor/symfony-data';
 
 // symfony bootstraping
 require_once("$sf_symfony_lib_dir/util/sfCore.class.php");
-$api_v3_lib_dir = KALTURA_ROOT_PATH . '/api_v3/lib';
-require_once("$api_v3_lib_dir/KalturaResponseCacher.php");
+require_once(KALTURA_ROOT_PATH . "/api_v3/lib/KalturaResponseCacher.php");
 sfCore::bootstrap($sf_symfony_lib_dir, $sf_symfony_data_dir);
 
 // Logger
@@ -30,7 +29,7 @@ DbManager::initialize();
 
 ActKeyUtils::checkCurrent();
 KalturaMonitorClient::monitorPs2Start();
-if(KalturaResponseCacher::checkRateLimit())
+if(KalturaResponseCacher::checkPs2RateLimit())
 {
 	sfContext::getInstance()->getController()->dispatch();
 }

@@ -597,7 +597,7 @@ class KalturaResponseCacher extends kApiCache
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
 	}
 	
-	public static function checkRateLimit()
+	public static function checkPs2RateLimit()
 	{
 		$request = sfContext::getInstance()->getRequest();
 		$params= $request->getParameterHolder()->getAll();
