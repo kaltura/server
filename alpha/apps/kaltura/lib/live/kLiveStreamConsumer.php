@@ -16,9 +16,8 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 		
 		if ($object instanceof categoryEntry)
 		{
-			$entryId = $object->getEntryId();
-			$entry = entryPeer::retrieveByPK($entryId);
-			if ($entry)
+			$entry = entryPeer::retrieveByPK($object->getEntryId());
+			if ($entry && $entry->getType() == entryType::LIVE_STREAM && $entry->getRecordedEntryId())
 			{
 				$this->handleLiveEntryCategoryChanged($entry);
 			}
@@ -51,19 +50,21 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 		}
 		else
 		{
-			$this->compareAndSyncCategories($liveEntry, $recordedEntryId, $recordedEntry);
+			$this->compareAndSyncCategories($liveEntry, $recordedEntry);
 		}
 		
 		return true;
 	}
 	
-	protected function compareAndSyncCategories($liveEntry, $recordedEntryId, $recordedEntry)
+	protected function compareAndSyncCategories($liveEntry, $recordedEntry)
 	{
-		$liveEntryCategories = myEntryUtils::getCategoriesArrayFromEntry($liveEntry);
-		$recordedEntryCategories = myEntryUtils::getCategoriesArrayFromEntry($recordedEntry);
+		$liveEntryCategories = myEntryUtils::getCategoriesIdsArrayFromEntry($liveEntry);
+		$recordedEntryCategories = myEntryUtils::getCategoriesIdsArrayFromEntry($recordedEntry);
 		
 		$categoriesToAdd = array_diff($liveEntryCategories, $recordedEntryCategories);
 		$categoriesToRemove = array_diff($recordedEntryCategories, $liveEntryCategories);
+		
+		$recordedEntryId = $recordedEntry->getId();
 		
 		foreach ($categoriesToAdd as $categoryId)
 		{
@@ -126,15 +127,10 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partnerId) &&
 				PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY, $partnerId))
 			{
-				$entryId = $object->getEntryId();
-				$entry = entryPeer::retrieveByPK($entryId);
-				if ($entry)
+				$entry = entryPeer::retrieveByPK($object->getEntryId());
+				if ($entry && $entry->getType() == entryType::LIVE_STREAM)
 				{
-					$type = $entry->getType();
-					if ($type == entryType::LIVE_STREAM)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
 		}

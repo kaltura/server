@@ -2255,19 +2255,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	 * @param entry $entry
 	 * @return array
 	 */
-	public static function getCategoriesArrayFromEntry(entry $entry)
+	public static function getCategoriesIdsArrayFromEntry(entry $entry)
 	{
 		$categoryEntryItems = CategoryEntryPeer::retrieveActiveByEntryId($entry->getId());
 		
-		$categoryEntryArray = array_map(function (categoryEntry $categoryEntry) {
+		$categoryEntryIdsArray = array_map(function (categoryEntry $categoryEntry) {
 			return $categoryEntry->getCategoryId();
 			}, $categoryEntryItems);
 		
-		if (!isset($categoryEntryArray))
+		if (!isset($categoryEntryIdsArray))
 		{
 			KalturaLog::info("Categories for entry {$entry->getId()} could not be retrieved.");
 		}
 		
-		return $categoryEntryArray;
+		return $categoryEntryIdsArray;
 	}
 }
