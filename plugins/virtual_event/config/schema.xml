@@ -13,7 +13,7 @@
 		<index name="partner_id_index">
 			<index-column name="partner_id" />
 		</index>
-		<index name="status_index">
+		<index name="status_partner_index">
 			<index-column name="status" />
 			<index-column name="partner_id" />
 		</index>
