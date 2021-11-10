@@ -282,6 +282,24 @@ class KScheduleHelperManager
 		return self::getCachePath() . DIRECTORY_SEPARATOR . 'status.log';
 	}
 
+
+	protected static function getLastFileUpdateTimeStampPath()
+	{
+		$lastFileUpdateTimeStampPath = kEnvironment::get("cache_root_path") . DIRECTORY_SEPARATOR . 'update.log';
+		if (!file_exists($lastFileUpdateTimeStampPath))
+		{
+			kFile::fullMkdir($lastFileUpdateTimeStampPath);
+			self::setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath);
+		}
+
+		return $lastFileUpdateTimeStampPath;
+	}
+
+	protected static function setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath)
+	{
+		file_put_contents($lastFileUpdateTimeStampPath, time());
+	}
+
 	/**
 	 * @return string
 	 */
@@ -318,8 +336,18 @@ class KScheduleHelperManager
 	/**
 	 * @return array<KalturaSchedulerStatus>
 	 */
-	public static function loadStatuses()
+	public static function loadStatuses(int $lastUpdateInterval)
 	{
+		$lastFileUpdateTimeStampPath = self::getLastFileUpdateTimeStampPath();
+		$lastFileUpdateFileContent = file_get_contents($lastFileUpdateTimeStampPath);
+		$currentTimeStamp = time();
+
+		if (($currentTimeStamp - $lastFileUpdateFileContent) < $lastUpdateInterval)
+		{
+			return array();
+		}
+		self::setLastFileUpdateTimeStamp($lastFileUpdateTimeStampPath);
+
 		$filePath = self::getStatusFilePath();
 		if(!file_exists($filePath))
 			return array();
