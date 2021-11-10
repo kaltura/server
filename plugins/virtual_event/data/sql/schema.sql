@@ -20,7 +20,7 @@ CREATE TABLE `virtual_event`
 	`tags` TEXT,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-    `custom_data` TEXT,
+	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `status_index`(`status`, `partner_id`),
