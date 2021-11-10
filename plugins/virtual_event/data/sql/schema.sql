@@ -23,7 +23,7 @@ CREATE TABLE `virtual_event`
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
-	KEY `status_partner_index`(`status`, `partner_id`),
+	KEY `status_partner_id_index`(`status`, `partner_id`),
 	KEY `updated_at_index`(`updated_at`)
 )ENGINE=InnoDB;
 
