@@ -325,8 +325,11 @@ class infraRequestUtils
 		self::$isInGetRemoteAddress = false;
 		return self::$remoteAddress["ip"];
 	}
-	
-	protected static function internalGetRemoteAddress()
+
+    /**
+     * @throws Exception
+     */
+    protected static function internalGetRemoteAddress()
 	{
 		if(array_key_exists("ip", self::$remoteAddress)) {
 			return self::$remoteAddress["ip"];
@@ -551,7 +554,6 @@ class infraRequestUtils
 		$fh = fopen($file_name, "rb");
 		if($fh)
 		{
-			$pos = 0;
 			fseek($fh, $range_from);
 			while($range_length > 0)
 			{
@@ -569,12 +571,11 @@ class infraRequestUtils
 
 		curl_setopt($ch, CURLOPT_URL, $file_name);
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
-		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 		$range_to = ($range_from + $range_length) - 1;
 		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 
-		$result = curl_exec($ch);
+        curl_exec($ch);
 	}
 
 	/**
@@ -588,17 +589,15 @@ class infraRequestUtils
 			$pathParts = explode('/', $_SERVER['PHP_SELF']);
 		$pathParts = array_diff($pathParts, $scriptParts);
 
-		$params = array();
-		reset($pathParts);
-		while (current($pathParts))
-		{
-			$key = each($pathParts);
-			$value = each($pathParts);
-			if (is_array($key) && !array_key_exists($key['value'], $params))
-			{
-				$params[$key['value']] = $value['value'];
-			}
-		}
+        $params = array();
+        while (current($pathParts)) {
+            $key = current($pathParts);
+            $value = next($pathParts);
+            next($pathParts);
+            if (!array_key_exists($key, $params)) {
+                $params[$key] = $value;
+            }
+        }
 		return array_replace_recursive($_GET, $params);
 	}
 }

@@ -95,6 +95,11 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return '';
 	}
 
+	public function createThumbUrl($baseUrl, $entry)
+	{
+		return 'Not Implemented';
+	}
+
 	public function getPartnerIdUrl(DeliveryProfileDynamicAttributes $da)
 	{
 		$partnerId = $da->getEntry()->getPartnerId();

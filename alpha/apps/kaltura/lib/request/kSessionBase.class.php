@@ -537,7 +537,7 @@ class kSessionBase
 			$rand .= chr(rand(0, 0xff));
 		$fieldsStr = $rand . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
-		
+
 		// encrypt and encode
 		$encryptedFields = self::aesEncrypt($adminSecret, $fieldsStr);
 		$decodedKs = "v2|{$partnerId}|" . $encryptedFields;
