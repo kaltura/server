@@ -24,6 +24,7 @@ CREATE TABLE `virtual_event`
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
 	KEY `status_index`(`status`, `partner_id`)
+	KEY `updated_at_index`(`updated_at`)
 )ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
