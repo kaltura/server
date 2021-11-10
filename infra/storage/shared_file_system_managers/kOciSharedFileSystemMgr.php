@@ -565,7 +565,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				
 				if ($fileType == 'dir')
 				{
-					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject->size, 'fullPath' => $fullPath);
+					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject->size, $fullPath);
 					if( $recursive)
 					{
 						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
@@ -573,7 +573,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				}
 				else
 				{
-					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject->size, 'fullPath' => $fullPath);
+					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject->size, $fullPath);
 				}
 			}
 		}

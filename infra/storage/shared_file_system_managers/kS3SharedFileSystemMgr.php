@@ -628,7 +628,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 
 				if ($fileType == 'dir')
 				{
-					$dirList[] = $fileNamesOnly ?  $fileName : array("path" => $fileName, "fileType" => 'dir', "fileSize" => $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ?  $fileName : array($fileName, 'dir', $dirListObject['Size']);
 					if( $recursive)
 					{
 						$dirList = array_merge($dirList, self::doListFiles($fullPath, $pathPrefix, $fileNamesOnly));
@@ -636,7 +636,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				}
 				else
 				{
-					$dirList[] = $fileNamesOnly ? $fileName : array("path" => $fileName, "fileType" => 'file', "fileSize" => $dirListObject['Size']);
+					$dirList[] = $fileNamesOnly ? $fileName : array($fileName, 'file', $dirListObject['Size']);
 				}
 			}
 		}

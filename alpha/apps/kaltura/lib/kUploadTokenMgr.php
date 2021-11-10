@@ -790,7 +790,14 @@ class kUploadTokenMgr
 		else
 		{
 			$sharedUploadPath = self::translateLocalSharedPathToRemote($uploadFilePath);
-			$dirList =  kFile::listDir("$sharedUploadPath.chunk.", dirname($sharedUploadPath) . DIRECTORY_SEPARATOR);
+			$dirListObjects =  kFile::listDir("$sharedUploadPath.chunk.", dirname($sharedUploadPath) . DIRECTORY_SEPARATOR);
+			foreach ($dirListObjects as $dirListObject)
+			{
+				$dirList[] = array (
+					"path" =>  $dirListObject[0],
+					"fileSize" => $dirListObject[2]
+				);
+			}
 		}
 		
 		self::sortChunks($dirList);
