@@ -601,14 +601,9 @@ class KalturaResponseCacher extends kApiCache
 	{
 		$request = sfContext::getInstance()->getRequest();
 		$params= $request->getParameterHolder()->getAll();
-		$service = $params["module"];
-		$action = $params["action"];
-		if (!self::rateLimit($service,$action,$params))
+		if (!self::rateLimit($params["module"],$params["action"],$params,$params["partnerId"]))
 		{
-			$result = "Access to $service->$action was rate limited";
-			$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
-			self::returnCacheResponseStructure( microtime(true), $format, $result);
-			return false;
+			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
 		}
 		return true;
 	}
