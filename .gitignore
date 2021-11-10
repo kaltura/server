@@ -51,3 +51,8 @@ alpha/.settings/
 .idea
 .DS_Store
 admin_console/lib/Kaltura/Client/
+/vendor/phpstan/
+/vendor/rector/
+/vendor/bin/
+/rector.php
+/stan.neon

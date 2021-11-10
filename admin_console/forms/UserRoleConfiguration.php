@@ -37,6 +37,7 @@ class Form_UserRoleConfiguration extends Infra_Form
 		$filter = new Kaltura_Client_Type_PermissionFilter();
 		$filter->statusEqual = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
 		$filter->typeEqual = Kaltura_Client_Enum_PermissionType::NORMAL;
+		$filter->partnerIdEqual = -2;
 		$filter->orderBy = Kaltura_Client_Enum_PermissionOrderBy::NAME_ASC;
 		
 		$pager = new Kaltura_Client_Type_FilterPager();

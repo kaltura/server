@@ -1,3 +1,55 @@
+# Quasar-17.14.0 #
+## Virtual Event ##
+A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
+### Deployment ###
+*To completely disable the creation of VirtualScheduleEvent, add to runtime_config map the line: virtual_schedule_event_enabled = 0
+to enable change it to 1
+* Add VirtualEvent to plugins.ini
+* Add the following to admin.ini 
+
+
+    moduls.virtualEvent.enabled = true
+    moduls.virtualEvent.permissionType = 2
+    moduls.virtualEvent.label = "Enable Virtual Events"
+    moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
+    moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+## Add permission for credit info view ##
+* Issue Type: Task
+* Issue ID: PLAT-23234
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
+
+## Add permission to insert isSelfServe property on partner object for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23233
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
+
+## Add systemPartner updateConfiguration permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23192
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
+
+
+# Quasar-17.13.0 #
+### Configuration ###
+Add the following configurations to local.ini:
+
+    live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
+    packager_live_thumb_url = /{dc}/capture/
+    packager_live_thumb_name = frame-{offset}.jpg
+
+
 # Quasar-17.12.0 #
 ## Add report getTotal permission for self serve partner ##
 * Issue Type: Task

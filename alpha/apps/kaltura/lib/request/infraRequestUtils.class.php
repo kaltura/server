@@ -325,8 +325,11 @@ class infraRequestUtils
 		self::$isInGetRemoteAddress = false;
 		return self::$remoteAddress["ip"];
 	}
-	
-	protected static function internalGetRemoteAddress()
+
+    /**
+     * @throws Exception
+     */
+    protected static function internalGetRemoteAddress()
 	{
 		if(array_key_exists("ip", self::$remoteAddress)) {
 			return self::$remoteAddress["ip"];
@@ -483,53 +486,37 @@ class infraRequestUtils
 	{
 		if (!is_null(self::$requestParams))
 			return self::$requestParams;
-		
-		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
-		$pathParts = array();
-		if (isset($_SERVER['PHP_SELF']))
-			$pathParts = explode('/', $_SERVER['PHP_SELF']);
-		$pathParts = array_diff($pathParts, $scriptParts);
-		
-		$params = array();
-		reset($pathParts);
-		while(current($pathParts))
-		{
-			$key = each($pathParts);
-			$value = each($pathParts);
-			if (is_array($key) && !array_key_exists($key['value'], $params))
-			{
-				$params[$key['value']] = $value['value'];
-			}
-		}
-		
+
+		$params = self::getUrlRequestParams();
+
 		$post = null;
-		if(isset($_SERVER['CONTENT_TYPE']))
+		if (isset($_SERVER['CONTENT_TYPE']))
 		{
-			if(strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
+			if (strtolower($_SERVER['CONTENT_TYPE']) == 'application/json')
 			{
 				$requestBody = file_get_contents("php://input");
 				$requestBody = trim($requestBody);
-				if(kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
+				if (kString::beginsWith($requestBody, '{') && kString::endsWith($requestBody, '}'))
 				{
 					$post = json_decode($requestBody, true);
-					if($post)
+					if ($post)
 						self::$jsonData = $requestBody;
 				}
 			}
-			elseif(strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
+			elseif (strpos(strtolower($_SERVER['CONTENT_TYPE']), 'multipart/form-data') === 0 && isset($_POST['json']))
 			{
 				$post = json_decode($_POST['json'], true);
-				if($post)
+				if ($post)
 					self::$jsonData = $_POST['json'];
 			}
 		}
-		
-		if(!$post)
+
+		if (!$post)
 		{
 			$post = $_POST;
 		}
-		
-		self::$requestParams = array_replace_recursive($post, $_FILES, $_GET, $params);
+
+		self::$requestParams = array_replace_recursive($post, $_FILES, $params);
 
 		$v3cacheTruncateParams = kConf::get('v3cache_truncate_time_params', 'local', array());
 		$v3cacheTruncateValue = kConf::get('v3cache_truncate_time_value', 'local', 60);
@@ -544,7 +531,6 @@ class infraRequestUtils
 		}
 
 		require_once(__dir__ . '/requestParamsPreprocessor.php');
-
 		requestParamsPreprocessor::editParams(self::$requestParams);
 
 		return self::$requestParams;
@@ -568,7 +554,6 @@ class infraRequestUtils
 		$fh = fopen($file_name, "rb");
 		if($fh)
 		{
-			$pos = 0;
 			fseek($fh, $range_from);
 			while($range_length > 0)
 			{
@@ -586,11 +571,33 @@ class infraRequestUtils
 
 		curl_setopt($ch, CURLOPT_URL, $file_name);
 		curl_setopt($ch, CURLOPT_USERAGENT, "curl/7.11.1");
-		curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 		$range_to = ($range_from + $range_length) - 1;
 		curl_setopt($ch, CURLOPT_RANGE, "$range_from-$range_to");
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, 'kFileUtils::read_body');
 
-		$result = curl_exec($ch);
+        curl_exec($ch);
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getUrlRequestParams()
+	{
+		$scriptParts = explode('/', $_SERVER['SCRIPT_NAME']);
+		$pathParts = array();
+		if (isset($_SERVER['PHP_SELF']))
+			$pathParts = explode('/', $_SERVER['PHP_SELF']);
+		$pathParts = array_diff($pathParts, $scriptParts);
+
+        $params = array();
+        while (current($pathParts)) {
+            $key = current($pathParts);
+            $value = next($pathParts);
+            next($pathParts);
+            if (!array_key_exists($key, $params)) {
+                $params[$key] = $value;
+            }
+        }
+		return array_replace_recursive($_GET, $params);
 	}
 }

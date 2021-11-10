@@ -14,6 +14,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
 	const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
     const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
     const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
+	const CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME = 'CalaisSelectiveTags';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
     const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
@@ -317,16 +318,17 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
 
         return $response;
     }
-    /**
-     * @param SimpleXMLElement $data
-     * @return string[]
-     * @throws Exception
-     */
+
+	/**
+	 * @param SimpleXMLElement $data
+	 * @return string[]
+	 */
     protected function getHeaders($data)
     {
         $apiKey = $this->retrieveValueFromXml($data, self::OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME);
         $enableTickerExtraction = $this->retrieveValueFromXml($data, self::ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME);
         $omitOutputtingOriginalText = $this->retrieveValueFromXml($data, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME);
+	    $calaisSelectiveTags = $this->retrieveValueFromXml($data, self::CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME);
         $headers = array (
             "Content-Type: text/xml",
             "charset: utf8",
@@ -342,6 +344,10 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         {
             $headers[] = "omitOutputtingOriginalText: ". ($omitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
         }
+	    if($calaisSelectiveTags != '')
+	    {
+		    $headers[] = "x-calais-selectiveTags: $calaisSelectiveTags";
+	    }
         return $headers;
     }
 

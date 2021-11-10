@@ -208,11 +208,6 @@ class kZoomEventHanlder
 				$audioRecordingFile = $recordingFilesPerTimeSlot[$audioKey];
 				KalturaLog::debug('Video and Audio files were found. audio file is ' . print_r($audioRecordingFile, true) . ' ,unsetting Audio');
 				unset($recordingFilesPerTimeSlot[$audioKey]);
-				if ($fileDeletionPolicy != DropFolderFileDeletePolicy::MANUAL_DELETE)
-				{
-					KalturaLog::debug('Deleting Audio File From Zoom ');
-					$zoomClient->deleteRecordingFile($meetingFileUuid, $audioRecordingFile->id);
-				}
 			}
 		}
 	}

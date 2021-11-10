@@ -30,7 +30,7 @@ class kmc1Action extends kalturaAction
 			if ( $widget )
 			{
 				$this->embed_code = $widget->getWidgetHtml( "kaltura_player" );
-				
+
 				$ui_conf = $widget->getuiConf();
 //				$this->ui_conf_width = 0; // $ui_conf->getWidth();
 //				$this->ui_conf_height = 0 ; // $ui_conf->getHeight();
@@ -42,7 +42,7 @@ class kmc1Action extends kalturaAction
 		if ($this->partner_id !== NULL)
 		{
 			$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
-			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, $this->uid, $this->screen_name, $this->email, 1);
+			kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, 1, $this->uid, $this->screen_name, $this->email);
 			$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : 0;
 		}
 
