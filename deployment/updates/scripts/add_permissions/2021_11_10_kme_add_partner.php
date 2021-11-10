@@ -21,3 +21,6 @@ passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.groupuser.ini';
 passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.partner.ini';
+passthru("php $script $config");
