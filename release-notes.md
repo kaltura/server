@@ -1,3 +1,16 @@
+# Quasar-17.15.0 #
+## Add partner for KME ##
+* Issue Type: Task
+* Issue ID: PLAT-23254
+
+### Configuration ###
+First replace all tokens from the ini file below (under kme section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_10_kme_add_partner.php
+
 # Quasar-17.14.0 #
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
