@@ -8,12 +8,13 @@
 
 // AWS SDK PHP Client Library
 require_once(dirname(__FILE__) . '/../../../vendor/oci/vendor/autoload.php');
-require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/Common/AuthProviderInterface.php');
+require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php');
 require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/Common/OciResponse.php');
 require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/Common/Regions.php');
 require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/Common/UserAgent.php');
 require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/Common/HttpUtils.php');
 require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/ObjectStorage/ObjectStorageClient.php');
+require_once(dirname(__FILE__) . '/../../../vendor/oci/src/Oracle/Oci/ObjectStorage/ObjectStorageAsyncClient.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 
 use Oracle\Oci\Common\HttpUtils;
@@ -27,6 +28,9 @@ use Oracle\Oci\Common\Logging\EchoLogAdapter;
 use Oracle\Oci\Common\ConfigFile;
 use Oracle\Oci\Common\Auth\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Auth\InstancePrincipalsAuthProvider;
+use Oracle\Oci\ObjectStorage\ObjectStorageAsyncClient;
+use Oracle\Oci\ObjectStorage\Transfer\UploadManager;
+use Oracle\Oci\ObjectStorage\Transfer\MultipartUploadException;
 
 
 class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
@@ -44,6 +48,9 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	const COPY_OBJECT_STATUS_FAILED = 'FAILED';
 	const OS_404_ERROR = 404;
 	const OS_200_VALID = 200;
+	
+	/* @var ObjectStorageAsyncClient $objectStoarageAsyncClient */
+	protected $objectStorageAsyncClient;
 	
 	/* @var ObjectStorageClient $objectStoargeClient */
 	protected $objectStoargeClient;
@@ -97,6 +104,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		$this->objectStoargeClient = new ObjectStorageClient($auth_provider,  $this->region);
+		$this->objectStorageAsyncClient = new ObjectStorageAsyncClient($auth_provider, $this->region);
 		UserAgent::setAdditionalClientUserAgent($this->getKalturaCustomUserAgent());
 	}
 	
@@ -152,45 +160,60 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		return $this->doPutFileContent($filePath, (string)$fileContent);
 	}
-
+	
 	private function doPutFileHelper($filePath , $fileContent, $params)
 	{
-		$params = $this->initBasicOciParams($filePath);
-		$params['concurrency'] = $this->concurrency;
-
-		$data = $this->getFileContentHelper($fileContent);
-		$params['putObjectBody'] = $data;
-
-		try
+		list($bucketName, $fileName) = $this->getBucketAndFilePath($filePath);
+		list($fileContentPath, $isTmpFile) = $this->getFileContentToPathHelper($fileContent);
+		
+		$uploadManager = new UploadManager($this->objectStorageAsyncClient);
+		$uploadPromise = $uploadManager->uploadFile($this->namespaceName, $bucketName, $fileName, $fileContentPath);
+		$resumeInfo = null;
+		$retries = $this->retriesNum;
+		
+		
+		while ($retries > 0)
 		{
-			$res = $this->objectStoargeClient->putObject($params);
-
-			self::safeLog("File uploaded to OS, info: " . print_r($res, true));
-			return array(true, $res);
+			try
+			{
+				if (!$resumeInfo)
+				{
+					$res = $uploadPromise->wait();
+				}
+				else
+				{
+					$resumePromise = $uploadManager->resumeUploadFileFromResumeInfo($resumeInfo);
+					$res = $resumePromise->wait();
+				}
+				
+				self::safeLog("File uploaded to OS, info: " . print_r($res, true));
+				if ($isTmpFile)
+				{
+					self::safeLog("Temp File Path was [$fileContentPath]");
+					unlink($fileContentPath);
+				}
+				return array(true, $res);
+			}
+			catch (MultipartUploadException $e)
+			{
+				$resumeInfo = $e->getMultipartResumeInfo();
+				$retries--;
+			}
 		}
-		catch (Exception $e)
-		{
-			self::safeLog("Failed to uploaded to OS, info with message: " . $e->getMessage());
-			return array(false, $e->getMessage());
-		}
+		
+		self::safeLog("Failed to upload to OS, info with message: " . $e->getMessage());
+		return array(false, $e);
 	}
 	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		$params = array();
 
-		$retries = $this->retriesNum;
-		while ($retries > 0)
-		{
-			list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
-			if ($success)
-				return $res;
-
-			$retries--;
-		}
-
-		self::safeLog("put file content failed with error: {$res->getMessage()}");
-
+		list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
+		if ($success)
+			return $res;
+		
+		self::safeLog("Put file content failed with error: {$res->getMessage()}");
 		return false;
 	}
 	
@@ -601,7 +624,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		catch ( Exception $e )
 		{
-			self::safeLog("Couldn't create pre signed url for [$path]: {$e->getMessage()}");
+			self::safeLog("Couldn't create pre signed url for [$filePath]: {$e->getMessage()}");
 			return null;
 		}
 		
@@ -660,27 +683,9 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doMoveLocalToShared($src, $dest, $copy = false)
 	{
 		$params = array();
-
-		$fp = fopen($src, 'r');
-		if(!$fp)
-		{
-			self::safeLog("Failed to open file: [$src]");
-			return false;
-		}
-
-		$retries = $this->retriesNum;
-		while ($retries > 0)
-		{
-			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
-			if ($success)
-				break;
-
-			sleep(rand(1,3));
-			$retries--;
-		}
-
-		//Silence error to avoid warning caused by file handle being changed by the OS client upload action
-		@fclose($fp);
+		
+		list($success, $res) = $this->doPutFileHelper($dest, $src, $params);
+		
 		if (!$success)
 		{
 			self::safeLog("Failed to upload file: [$src] to [$dest]");
@@ -851,36 +856,55 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		return $dirListObjects->objects;
 	}
-
-	private function getFileContentHelper($body)
+	
+	private function getFileContentToPathHelper($path)
 	{
-		switch (gettype($body))
+		switch (gettype($path))
 		{
 			case 'string':
-				return self::fromString($body);
+				if (is_file($path))
+					return array($path, false);
+				return self::stringToFile($path);
 			case 'resource':
-				return $body;
+				return self::resourceToFile($path);
 			case 'object':
-				if (method_exists($body, '__toString'))
+				if (method_exists($path, '__toString'))
 				{
-					return self::fromString((string)$body);
+					return self::stringToFile((string)$path);
 				}
 				break;
 			case 'array':
-				return self::fromString(http_build_query($body));
+				return self::stringToFile(http_build_query($path));
 		}
 		throw new InvalidArgumentException('Invalid resource type');
 	}
 	
-	private static function fromString($string)
+	private static function resourceToFile($resource)
 	{
-		$stream = fopen('php://temp', 'r+');
-		if ($string !== '')
+		$metadata = stream_get_meta_data($resource);
+		$filePath = isset($metadata['uri']) ? $metadata['uri'] : false;
+		fclose($resource);
+		if (!$filePath || !is_file($filePath))
 		{
-			fwrite($stream, $string);
-			rewind($stream);
+			self::safeLog('Failed to get path from resource');
 		}
-		return $stream;
+		return array($filePath, false);
+	}
+	
+	private static function stringToFile($string)
+	{
+		$tmpFilePath = tempnam(sys_get_temp_dir(), 'oci_upload_');
+		if (!$tmpFilePath)
+		{
+			self::safeLog('Failed to open temp file');
+			return false;
+		}
+		if (file_put_contents($tmpFilePath, $string) === false)
+		{
+			self::safeLog('Failed to write to temp file');
+			return false;
+		}
+		return array($tmpFilePath, true);
 	}
 
 	protected function getCopyParams($fromFilePath, $toFilePath)
