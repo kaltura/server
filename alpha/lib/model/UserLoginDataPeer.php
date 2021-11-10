@@ -91,6 +91,27 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		);
 	}
 	
+	public static function populateCustomEmailBody($emailBody, $associativeBodyParams)
+	{
+		$parsedEmailBody = str_replace('@authType@', $associativeBodyParams['authType'], $emailBody);
+		$parsedEmailBody = str_replace('@existingUser@', $associativeBodyParams['existingUser'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@userName@', $associativeBodyParams['userName'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@creatorUserName@', $associativeBodyParams['creatorUserName'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@publisherName@', $associativeBodyParams['$publisherName'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@loginEmail@', $associativeBodyParams['loginEmail'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@resetPasswordLink@', $associativeBodyParams['resetPasswordLink'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@partnerId@', $associativeBodyParams['$partnerId'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@puserId@', $associativeBodyParams['puserId'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@kmcLink@', $associativeBodyParams['kmcLink'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@contactLink@', $associativeBodyParams['contactLink'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@beginnersGuideLink@', $associativeBodyParams['beginnersGuideLink'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@quickStartGuideLink@', $associativeBodyParams['quickStartGuideLink'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@roleName@', $associativeBodyParams['roleName'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@adminConsoleLink@', $associativeBodyParams['adminConsoleLink'], $parsedEmailBody);
+		$parsedEmailBody = str_replace('@qrCodeLink@', $associativeBodyParams['qrCodeLink'], $parsedEmailBody);
+		return $parsedEmailBody;
+	}
+	
 	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null)
 	{
 		// if email is null, no need to do any DB queries

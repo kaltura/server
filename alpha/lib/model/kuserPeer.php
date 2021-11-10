@@ -614,11 +614,25 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			{
 				$mailType = self::KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL;
 				$bodyParams = array($userName, $creatorUserName, $loginEmail, $roleName, $qrCodeLink);
+				$associativeBodyParams = array(
+					'userName'=>$userName,
+					'creatorUserName'=>$creatorUserName,
+					'loginEmail'=>$loginEmail,
+					'roleName'=>$roleName,
+					'qrCodeLink'=>$qrCodeLink);
 			}
 			else
 			{
 				$mailType = self::KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL;
 				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink, $qrCodeLink);
+				$associativeBodyParams = array(
+					'userName'=>$userName,
+					'creatorUserName'=>$creatorUserName,
+					'loginEmail'=>$loginEmail,
+					'resetPasswordLink'=>$resetPasswordLink,
+					'roleName'=>$roleName,
+					'adminConsoleLink'=>$adminConsoleLink,
+					'qrCodeLink'=>$qrCodeLink);
 			}
 		}
 		else // Not an admin console partner
@@ -631,6 +645,27 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			}
 			$mailType = self::getUserMailType($authType, $existingUser);
 			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
+			$associativeBodyParams = array(
+				'authType'=>$authType,
+				'existingUser'=>$existingUser,
+				'userName'=>$userName,
+				'creatorUserName'=>$creatorUserName,
+				'publisherName'=>$publisherName,
+				'loginEmail'=>$loginEmail,
+				'resetPasswordLink'=>$resetPasswordLink,
+				'partnerId'=>$partnerId,
+				'roleName'=>$roleName,
+				'puserId'=>$puserId,
+				'kmcLink'=>$kmcLink,
+				'contactLink'=>$contactLink,
+				'beginnersGuideLink'=>$beginnersGuideLink,
+				'quickStartGuideLink'=>$quickStartGuideLink);
+		}
+		
+		if (!is_null($customizedEmailContents))
+		{
+			$customizedEmailContents->setEmailBody(UserLoginDataPeer::populateCustomEmailBody($customizedEmailContents->getEmailBody(), $associativeBodyParams));
+			$bodyParams = array();
 		}
 		$kCustomizedEmailContents = !is_null($customizedEmailContents) ? $customizedEmailContents->toObject() : null;
 		// add mail job
