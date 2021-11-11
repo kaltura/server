@@ -71,6 +71,13 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink, $customizedEmailContents)
 	{
+		$bodyParams = array($user_name, $resetPasswordLink);
+		if (!is_null($customizedEmailContents))
+		{
+			$associativeBodyParams = array('userName'=>$user_name, 'resetPasswordLink'=>$resetPasswordLink);
+			$customizedEmailContents->setEmailBody(UserLoginDataPeer::populateCustomEmailBody($customizedEmailContents->getEmailBody(), $associativeBodyParams));
+			$bodyParams = array();
+		}
 		kJobsManager::addMailJob(
 			null,
 			0,
@@ -80,7 +87,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			kConf::get( "partner_change_email_email" ),
 			kConf::get( "partner_change_email_name" ),
 			$cms_email,
-			array($user_name, $resetPasswordLink),
+			$bodyParams,
 			array(),
 			null,
 			null,
@@ -108,8 +115,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$parsedEmailBody = str_replace('@quickStartGuideLink@', $associativeBodyParams['quickStartGuideLink'], $parsedEmailBody);
 		$parsedEmailBody = str_replace('@roleName@', $associativeBodyParams['roleName'], $parsedEmailBody);
 		$parsedEmailBody = str_replace('@adminConsoleLink@', $associativeBodyParams['adminConsoleLink'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@qrCodeLink@', $associativeBodyParams['qrCodeLink'], $parsedEmailBody);
-		return $parsedEmailBody;
+		return str_replace('@qrCodeLink@', $associativeBodyParams['qrCodeLink'], $parsedEmailBody);
 	}
 	
 	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null)
