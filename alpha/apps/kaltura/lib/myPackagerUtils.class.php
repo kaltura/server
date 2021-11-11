@@ -371,7 +371,7 @@ class myPackagerUtils
 				continue;
 			}
 
-			$serverNodeUrl = $serverNode->createThumbUrl($liveCaptureUrl, $entry);
+			$serverNodeUrl = $serverNode->createThumbUrl($liveCaptureUrl, $entry, $entryServerNode);
 
 			$serverNodeUrl .= $thumbName;
 
