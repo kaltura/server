@@ -1,4 +1,4 @@
-CREATE TABLE  IF NOT EXISTS `virtual_event`
+CREATE TABLE IF NOT EXISTS `virtual_event`
 (
     `id` bigint(20)  NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(256),
