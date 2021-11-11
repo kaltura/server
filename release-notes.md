@@ -5,49 +5,48 @@ A new plugin and service dedicated to managing Virtual Events with new dedicated
 *To completely disable the creation of VirtualScheduleEvent, add to runtime_config map the line: virtual_schedule_event_enabled = 0
 to enable change it to 1
 * Add VirtualEvent to plugins.ini
-* Add the following to admin.ini 
+* Add the following to admin.ini
 
-
-    moduls.virtualEvent.enabled = true
-    moduls.virtualEvent.permissionType = 2
-    moduls.virtualEvent.label = "Enable Virtual Events"
-    moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
-    moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.virtualEvent.enabled = true  
+	moduls.virtualEvent.permissionType = 2   
+	moduls.virtualEvent.label = "Enable Virtual Events"   
+	moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION   
+	moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
 
 
 ### Scripts ###
-    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
-    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2021_11_11_create_virtual_event_table.sql
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 ## Add permission for credit info view ##
 * Issue Type: Task
 * Issue ID: PLAT-23234
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
+	php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
 
 ## Add permission to insert isSelfServe property on partner object for self serve partner ##
 * Issue Type: Task
 * Issue ID: PLAT-23233
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
+	php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
 
 ## Add systemPartner updateConfiguration permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: PLAT-23192
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
+	php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
 
 
 # Quasar-17.13.0 #
 ### Configuration ###
 Add the following configurations to local.ini:
 
-    live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
-    packager_live_thumb_url = /{dc}/capture/
-    packager_live_thumb_name = frame-{offset}.jpg
+	live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
+	packager_live_thumb_url = /{dc}/capture/
+	packager_live_thumb_name = frame-{offset}.jpg
 
 
 # Quasar-17.12.0 #
@@ -56,7 +55,7 @@ Add the following configurations to local.ini:
 * Issue ID: PLAT-23215
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2021_10_10_self_serve_server_add_report_permission.php
+	php deployment/updates/scripts/add_permissions/2021_10_10_self_serve_server_add_report_permission.php
 
 
 ## Block specific countries from accessing the API ##
@@ -66,8 +65,8 @@ Add the following configurations to local.ini:
 ### Configuration ###
 Add/Update a configuration map called 'runtime_config' with following config:
 
-    [global_access_limitations]
-    blockedCountries = @COMMA_SEPERATED_COUNTRIES_ISO_CODES@
+	[global_access_limitations]
+	blockedCountries = @COMMA_SEPERATED_COUNTRIES_ISO_CODES@
 
 ## Add partner for self serve server ##
 * Issue Type: Task
@@ -79,7 +78,7 @@ First replace all tokens from the ini file below (under self-serve-server sectio
 deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
+	php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
 
 ## Add permissions for caption service for liveNG ##
 Add permissions for caption service (action update, list) for liveNG (partner -5 )
@@ -87,7 +86,7 @@ Add permissions for caption service (action update, list) for liveNG (partner -5
 * Issue ID: LIV-811
 
 #### Deployment Script #### 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_05_update_list_caption_liveng_permissions.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_05_update_list_caption_liveng_permissions.php
 
 # Quasar-17.11.0 #
 
@@ -97,7 +96,7 @@ Moving functionality to batch, in order to enable a shorter partner registration
 * Issue ID: PLAT-23082
 
 ### Deployment Scripts ### 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_allow_copy_uiconf_and_categories_from_batch.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_allow_copy_uiconf_and_categories_from_batch.php
 
 
 ## Adding analytics report with custom url to partner ##
@@ -106,10 +105,10 @@ Moving functionality to batch, in order to enable a shorter partner registration
 ### Configuration ###
 Add/Update a configuration map called 'analytics' with following config:
 
-    [export_report_custom_url]
-    0 = partner_id_0
-    1 = partner_id_1
-    ...
+	[export_report_custom_url]
+	0 = partner_id_0
+	1 = partner_id_1
+	...
 (Replace partner_id with the appropriate id)
 
 
@@ -119,10 +118,10 @@ Added a default value for the level of accuracy of the automatic transcription g
 * Issue ID: PLAT-23149
 #### Configuration ####
 Add Zoom to configurations/plugins.ini
-    
+	
 Add to configurations/vendor.ini
 
-    [Zoom]
+	[Zoom]
 	ZoomTranscriptionAccuracy = 85
 
 ### Deployment Scripts ### 
@@ -135,7 +134,7 @@ Add permissions to CNC partner for session service and groupuser service
 * Issue ID: PLAT-23128
 
 #### Deployment Script ####
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_add_permissions_groupuser_and_seesion.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_add_permissions_groupuser_and_seesion.php
 
 # Quasar-17.10.0 #
 ## Add action for serving Playback key ##
@@ -144,7 +143,7 @@ An encrypted key served to make sure videos are not shared outside the customers
 * Issue ID: PLAT-22731
 
 #### Deployment Script #### 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
 
 
 ## Add permissions for caption service for liveNG ##
@@ -153,7 +152,7 @@ Add permissions for caption service (action add, setContent) for liveNG (partner
 * Issue ID: LIV-778
 
 #### Deployment Script #### 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_caption_liveng_permissions.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_caption_liveng_permissions.php
 
 # Quasar-17.9.0 #
 ## Add partner for CNC server ##
@@ -165,7 +164,7 @@ Add permissions for caption service (action add, setContent) for liveNG (partner
 First replace all tokens from the ini file below (under cnc section) and remove".template" from the file name : deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
+	php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
 
 # Quasar-17.8.0 #
 
@@ -260,7 +259,7 @@ Run deployment script:
 
 	Run deployment script:
 		php /opt/kaltura/app/deployment/updates/scripts/2021_05_13_deploy_update_bulk_upload_http_notification.php
-        
+		
 # Quasar-17.2.0 #
 ## Version Highlight ##
  - PLAT-22840 : Add new action partner::registrationValidation , this action has the same signature as partner::register, but it will return 
@@ -285,13 +284,13 @@ Run deployment script:
 # Quasar-17.1.0 #
 ## Version Highlight ##
 ### Features ###
-    PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
-    Zoom as polling engine (type of drop folder ) - includes the following:
-        a. Deletion of content from Zoom
-        b. Import of old content - by changing scanning time in the drop folder UI (admin console)
-        c. Authetication from OnPrems - using JWT token supplied by the caller 
-        * Notice - the full release of these features including documenation is due Quasar-17.2.0, 
-        currently, it is enabled on SAAS for internal accounts (testing only).
+	PLAT-22734 - Support dedicated User role for KS created with Secondary Admin Secret
+	Zoom as polling engine (type of drop folder ) - includes the following:
+		a. Deletion of content from Zoom
+		b. Import of old content - by changing scanning time in the drop folder UI (admin console)
+		c. Authetication from OnPrems - using JWT token supplied by the caller 
+		* Notice - the full release of these features including documenation is due Quasar-17.2.0, 
+		currently, it is enabled on SAAS for internal accounts (testing only).
 
 ### Bug fix ###
 
@@ -312,7 +311,7 @@ Add the following to batch.ini:
 	id                              = @ID@
 	friendlyName                    = Drop Folder Watcher for Zoom Remote Drop folder
 	params.tags                     = zoom
-    
+	
 	[KAsyncDropFolderContentProcessor : JobHandlerWorker]
 	params.accuracy                 = 85%
 
@@ -324,9 +323,9 @@ Add the following to batch.ini:
 # Quasar-17.0.0 #
 ## Version Highlight ##
 ### Features ###
-    PLAT-22719 - Add 'Restrict Access Control Allow Origin Domains' under partner configuration,
-        to allow only the requested site in the response header 'access-control-allow-origin',
-        for M3U8 PlayManifest request.
+	PLAT-22719 - Add 'Restrict Access Control Allow Origin Domains' under partner configuration,
+		to allow only the requested site in the response header 'access-control-allow-origin',
+		for M3U8 PlayManifest request.
 
 ### Bug fix ###
 
@@ -337,38 +336,38 @@ Add the following to batch.ini:
 #### Configuration ####
 - Add the following lines from admin.template.ini to admin.ini:
 
-    moduls.restrictOriginDomains.enabled = true
-    moduls.restrictOriginDomains.permissionType = 2
-    moduls.restrictOriginDomains.label = Restrict Access Control Allow Origin Domains
-    moduls.restrictOriginDomains.permissionName = FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS
-    moduls.restrictOriginDomains.basePermissionType =
-    moduls.restrictOriginDomains.basePermissionName =
-    moduls.restrictOriginDomains.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.restrictOriginDomains.enabled = true
+	moduls.restrictOriginDomains.permissionType = 2
+	moduls.restrictOriginDomains.label = Restrict Access Control Allow Origin Domains
+	moduls.restrictOriginDomains.permissionName = FEATURE_RESTRICT_ACCESS_CONTROL_ALLOW_ORIGIN_DOMAINS
+	moduls.restrictOriginDomains.basePermissionType =
+	moduls.restrictOriginDomains.basePermissionName =
+	moduls.restrictOriginDomains.group = GROUP_ENABLE_DISABLE_FEATURES
 
 # Propus-16.20.0  #
 
 ## Version Highlight ##
 ### Features ###
-    KMCNG-2296 - Add a new API (baseEntry.exportToCsv) that exports entries data according to a supplied filter.
-        The data will be send to the KS admin email in a CSV format.
-    
-    PLAT-22694 - appToken - add the ability to set weaker privileges on the KS,
-        if the privileges are already allowed on the appToken
-    
-    VIRTC-2021 - Admin Console, add ability to set custom password policy per partner.
-      Once policy for partner is set, the system policy is ignored.
-     
-    PLAT-22722 - Add mpeg ts files to the allowed files list
-    
-    PLAT-22714 - Add new type of Live-Schedulued event - KalturaLiveRedirectScheduleEvent, once its time has come it will rediret the live entry to another entry (live or vod)
-    
-    PLAT-22698 - ThumbAsset::add, Abilty to add Thumbnails to image entry.
-    
+	KMCNG-2296 - Add a new API (baseEntry.exportToCsv) that exports entries data according to a supplied filter.
+		The data will be send to the KS admin email in a CSV format.
+	
+	PLAT-22694 - appToken - add the ability to set weaker privileges on the KS,
+		if the privileges are already allowed on the appToken
+	
+	VIRTC-2021 - Admin Console, add ability to set custom password policy per partner.
+	  Once policy for partner is set, the system policy is ignored.
+	 
+	PLAT-22722 - Add mpeg ts files to the allowed files list
+	
+	PLAT-22714 - Add new type of Live-Schedulued event - KalturaLiveRedirectScheduleEvent, once its time has come it will rediret the live entry to another entry (live or vod)
+	
+	PLAT-22698 - ThumbAsset::add, Abilty to add Thumbnails to image entry.
+	
 ### Bug fix ###
 
-    PLAT-22724 - Admin console, storage profile, when flavor param source only was not displayed - fixed. 
-    
-    PLAT-22696 - Trancate utf8 strings in the following entry properties :state,city,zip,screen_name,first_name,last_name,full_name
+	PLAT-22724 - Admin console, storage profile, when flavor param source only was not displayed - fixed. 
+	
+	PLAT-22696 - Trancate utf8 strings in the following entry properties :state,city,zip,screen_name,first_name,last_name,full_name
 
 ## Export entries to CSV ##
 - Issue Type: Task
@@ -383,16 +382,16 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_10_add_e
 
 ## Version Highlight ##
 ### Features ###
-    PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
-        This new type will be used by KMS for NewRow scheduled meeting,
-        but customers can use if for anytype.
+	PLAT-22684 - Add new type of ScheduleEvent, called KalturaMeetingScheduleEvent.
+		This new type will be used by KMS for NewRow scheduled meeting,
+		but customers can use if for anytype.
 
-    PLAT-22622 - Add close caption support to playManifest, the caption language
-        is from the related stream info
+	PLAT-22622 - Add close caption support to playManifest, the caption language
+		is from the related stream info
 
 ### Bug fix ###
-    SUP-25895 - Zoom, Adding file extention to imported source files. 
-    PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
+	SUP-25895 - Zoom, Adding file extention to imported source files. 
+	PLAT-22683 - Handle consercutive calling of User:enableLogin/disableLogin
 
 ## Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED (EventNotificationTemplate) ##
 - Issue Type: Task
@@ -401,12 +400,12 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_10_add_e
 
 ### Deployment scripts ###
 - Update HTTP_ENTRY_DISTRIBUTION_STATUS_CHANGED:
-        
-    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
-        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
-        
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
+		
+	First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_07_update_http_entry_distribution_status_changed.template.xml
+		
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2021_03_07_deploy_update_http_entry_distribution_status_changed.php
 
 ## Update Media_XML_Bulk_Failure_Notification (HTTP EventNotificationTemplate) ##
 - Issue Type: Task
@@ -415,28 +414,28 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_03_10_add_e
 
 ### Deployment scripts ###
 - Update Media_XML_Bulk_Failure_Notification:
-        
-    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
-        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_04_update_media_xml_bulk_job_failed.template.xml
-        
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
+		
+	First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the XML files below and remove ".template" from the file name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_03_04_update_media_xml_bulk_job_failed.template.xml
+		
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2021_03_04_deploy_update_bulk_upload_http_notification.php
 
 # Propus-16.18.0  #
 ## Version Highlight ##
 ### Features ###
-    PLAT-9940 - Adminconsole::UiConf, add filter by tags\type\name
-    SUP-24898 - Reach, Allow reach vendors KS overcome access control
-    PLAT-11136 - Allow entry user (Viewer/Publisher/Editor) list all userEntries.
-    This can allow webcast app see all the users that joined the event, when activated 
-    by others than the owner.
-    PLAT-22617 - User::LoginByLoginId, Allow setting priviledge on user object ksPrivileges. 
-    For this user, Any new login will generate a session that will include the specific permsission.
-    The motivation is to create users that can only login and access specific actions (such as loginByLoginId) 
+	PLAT-9940 - Adminconsole::UiConf, add filter by tags\type\name
+	SUP-24898 - Reach, Allow reach vendors KS overcome access control
+	PLAT-11136 - Allow entry user (Viewer/Publisher/Editor) list all userEntries.
+	This can allow webcast app see all the users that joined the event, when activated 
+	by others than the owner.
+	PLAT-22617 - User::LoginByLoginId, Allow setting priviledge on user object ksPrivileges. 
+	For this user, Any new login will generate a session that will include the specific permsission.
+	The motivation is to create users that can only login and access specific actions (such as loginByLoginId) 
 
 ### Bug fix ###
-    SUP-26142 - Zoom, Chat file was not added to the primary entry, fixed.
-    REACH2-1050 - Reach, Block adding new task when entry is not ready.
+	SUP-26142 - Zoom, Chat file was not added to the primary entry, fixed.
+	REACH2-1050 - Reach, Block adding new task when entry is not ready.
 
 
 ## Add Description to confMaps modifications ##
@@ -458,9 +457,9 @@ mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deploy
 
 ### New features ###
 Enhance Zoom registration UI, adding:
-    a. Reload existing configuration
-    b. Support CMS_USER_ID matching
-    c. New look + updated logo
+	a. Reload existing configuration
+	b. Support CMS_USER_ID matching
+	c. New look + updated logo
 
 # Propus-16.16.0  #
 
@@ -474,16 +473,16 @@ Enhance Zoom registration UI, adding:
 - Issue Type: Task
 - Issue ID: PLAT-22547
 - Description: You can use this http notification if you need to notify for every new partner created from the templates partners.
-    in this case we used the notification to call 1-kms-int.mediaspace.kaltura.com/latest/public/create_instance.php
+	in this case we used the notification to call 1-kms-int.mediaspace.kaltura.com/latest/public/create_instance.php
 
 ### Deployment scripts ###
 -Add kaftestme registration http request on partner creation:
-        
-    First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET and PARTNER_ID) from the XML files below and remove ".template" from the file name:
-        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_01_13_partner_Added_Kaftestme_Http_Notification.template
-        
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
+		
+	First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET and PARTNER_ID) from the XML files below and remove ".template" from the file name:
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2021_01_13_partner_Added_Kaftestme_Http_Notification.template
+		
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2021_01_13_partner_Added_Kaftestme.php
 
 ## Ability to cancel tasks ##
 - Issue Type: Task
@@ -546,11 +545,11 @@ None
 
 First replace all tokens in the XML file below and remove ".template" from the file name:
 
-                - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2021_01_03_update_reach_vendor_response_profiles.template.xml
+				- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2021_01_03_update_reach_vendor_response_profiles.template.xml
 
 Run deployment script:
 
-                - php /opt/kaltura/app/deployment/updates/scripts/2021_01_03_update_reach_vendor_response_profile.php
+				- php /opt/kaltura/app/deployment/updates/scripts/2021_01_03_update_reach_vendor_response_profile.php
 
 
 # Propus 16.13.0  #
@@ -560,26 +559,26 @@ Run deployment script:
 - Issue ID: PSVAMB-16978
 
 ### Configuration ###
-    None
+	None
 
 ### Deployment scripts ###
    
 Run deployment script:
    
-    php /opt/kaltura/app/deployment/updates/scripts/2020_12_06_update_lectureCapture_ConversionProfile2.php
+	php /opt/kaltura/app/deployment/updates/scripts/2020_12_06_update_lectureCapture_ConversionProfile2.php
 
 ## Configurable Transcoding Profile for Zoom Integration ##
 - Issue Type: Task
 - Issue ID: PLAT-22489
 
 ### Configuration ###
-    None
+	None
 
 ### Deployment scripts ###
    
 Run deployment script:
    
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_25_update_zoomVendor_add_get_action.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_25_update_zoomVendor_add_get_action.php
 
 # Propus 16.12.0  #
 
@@ -589,18 +588,18 @@ Run deployment script:
 - Issue ID: PLAT-11221
 
 ### configuration ###
-    Add the following to admin.ini:
+	Add the following to admin.ini:
 
-    moduls.liveStreamDeleteRecordedVod.enabled = true
-    moduls.liveStreamDeleteRecordedVod.permissionType = 2
-    moduls.liveStreamDeleteRecordedVod.label = Kaltura Live Streams - Delete recorded VOD
-    moduls.liveStreamDeleteRecordedVod.permissionName = FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD
-    moduls.liveStreamDeleteRecordedVod.basePermissionType = 2
-    moduls.liveStreamDeleteRecordedVod.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
-    moduls.liveStreamDeleteRecordedVod.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.liveStreamDeleteRecordedVod.enabled = true
+	moduls.liveStreamDeleteRecordedVod.permissionType = 2
+	moduls.liveStreamDeleteRecordedVod.label = Kaltura Live Streams - Delete recorded VOD
+	moduls.liveStreamDeleteRecordedVod.permissionName = FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD
+	moduls.liveStreamDeleteRecordedVod.basePermissionType = 2
+	moduls.liveStreamDeleteRecordedVod.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+	moduls.liveStreamDeleteRecordedVod.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ###
-    None
+	None
 
 ## Bumper Plugin ##
 - Issue Type: Task
@@ -611,8 +610,8 @@ run the following:
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_11_12_add_permissions_bumper_service.php
 
 Add 'Bumper' to:
-    /opt/kaltura/app/configurations/plugins.ini
-    
+	/opt/kaltura/app/configurations/plugins.ini
+	
 # Propus 16.11.0  #
 
 ## Reach - update reach_vendor response profile ##
@@ -678,7 +677,7 @@ add the following to 'local.ini' under 'partner_copy_user_roles_ignore_list':
 
 ### Configuration ###
 edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
-    update ids 136, 137 and 138 as described in emails_en.template.ini
+	update ids 136, 137 and 138 as described in emails_en.template.ini
 
 ## Support using S3 as shared storage instead of NFS##
 Issue Type: Feature
@@ -686,33 +685,33 @@ Issue ID : S3
 
 #### Configuration ####
 * Create a new storage profile with the following configurations by running the following script:
-            
-           php /opt/kaltura/app/deployment/updates/scripts/2020_09_02_create_s3_shared_storage_profile.php
-           
-           Params:
-           @name@ 
-           @description@ 
-           @system_name@ 
-           @storage_url@ 
-           @bucket_name@ 
-           @packager_url@ 
-           @ID (optional to set to id of the profile without lettign mysql set it for you)@  
+			
+		   php /opt/kaltura/app/deployment/updates/scripts/2020_09_02_create_s3_shared_storage_profile.php
+		   
+		   Params:
+		   @name@ 
+		   @description@ 
+		   @system_name@ 
+		   @storage_url@ 
+		   @bucket_name@ 
+		   @packager_url@ 
+		   @ID (optional to set to id of the profile without lettign mysql set it for you)@  
 
 * Add/Update a configuration map called 'cloud_storage' with following config:
-    - sharedStorageProfileIds = @id of the s3 shared storage profile@
-    
-    - Storage options:
-    
-            [storage_options]
-            s3Region = @AWS_REGION@
-            accessKeySecret = @ACCESS_KEY_TOKEN@
-            accessKeyId = @ACCESS_KEY_ID@
-            *** The code also supports definineg arn_role_name and using that for the authentication flow
-            
-    - Storage type mype (Defines the base path of your bucket in aws and the which should also corrolate to the storage profile defined in step 1)
-            
-            [storage_type_map]
-            /@bucket_name@/ = S3 
+	- sharedStorageProfileIds = @id of the s3 shared storage profile@
+	
+	- Storage options:
+	
+			[storage_options]
+			s3Region = @AWS_REGION@
+			accessKeySecret = @ACCESS_KEY_TOKEN@
+			accessKeyId = @ACCESS_KEY_ID@
+			*** The code also supports definineg arn_role_name and using that for the authentication flow
+			
+	- Storage type mype (Defines the base path of your bucket in aws and the which should also corrolate to the storage profile defined in step 1)
+			
+			[storage_type_map]
+			/@bucket_name@/ = S3 
 
 # Propus 16.8.0  #
 
@@ -736,8 +735,8 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_08_09_add_p
 
 ### Configuration ###
 add the following to 'local.ini' under 'password_reset_links':
-    kms = "https://%s.mediaspace.kaltura.com/user/set-initial-password?hashKey="
-    
+	kms = "https://%s.mediaspace.kaltura.com/user/set-initial-password?hashKey="
+	
 
 ## DropFolder Enhancements - allow publisher admin KS to set description and status of drop folders  ##
 Issue Type: Task
@@ -761,11 +760,11 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_07_26_add_p
 - Issue ID: WEBC-1925
 
 ### Configuration ###
-    First replace all tokens from the XML files below and remove ".template" from the file name:
-    /opt/kaltura/app/deployment/updates/scripts/xml/2020_07_16_updateQandAResponseProfile_addMoreUserData.template.xml
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2020_07_16_updateQandAResponseProfile_addMoreUserData.template.xml
 		
 #### Deployment Scripts ####	
-    php /opt/kaltura/app/deployment/updates/scripts/2020_07_16_updateQandAResponseProfile_addMoreUserData.php
+	php /opt/kaltura/app/deployment/updates/scripts/2020_07_16_updateQandAResponseProfile_addMoreUserData.php
 
 ## Adding permission to serve and getServeUrl in entryVendorTask ##
 Issue Type: Task
@@ -853,25 +852,25 @@ Issue ID : PLAT-10894
 ### Configuration ###
 Add the following to batch.ini:
 
-    enabledWorkers.KAsyncStoragePeriodicDeleteLocal     = 1
+	enabledWorkers.KAsyncStoragePeriodicDeleteLocal     = 1
 
-    [KAsyncStoragePeriodicDeleteLocal : PeriodicWorker]
-    id                                                  = @ID@
-    friendlyName                                        = Storage Periodic Delete Local
-    type                                                = KAsyncStoragePeriodicDeleteLocal
-    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteLocalExe.php
-    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
-    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
-    params.sleepInterval                                = @SLEEP_INTERVAL@
-    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
-    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
-    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
-    filter.statusEqual                                  = 2
-    filter.dcEqual                                      = @DC@
-    filter.fileTypeEqual                                = 3
+	[KAsyncStoragePeriodicDeleteLocal : PeriodicWorker]
+	id                                                  = @ID@
+	friendlyName                                        = Storage Periodic Delete Local
+	type                                                = KAsyncStoragePeriodicDeleteLocal
+	scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicDeleteLocalExe.php
+	maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+	params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+	params.sleepInterval                                = @SLEEP_INTERVAL@
+	params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+	params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+	params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+	filter.statusEqual                                  = 2
+	filter.dcEqual                                      = @DC@
+	filter.fileTypeEqual                                = 3
 
 #### Deployment Scripts ####
-    php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
+	php deployment/updates/scripts/add_permissions/2020_05_17_fileSync_deleteLocalFileSyncs.php
 
 ## Add periodic storage purge batch ##
 Issue Type: Task
@@ -880,32 +879,32 @@ Issue ID : PLAT-10769
 ### Configuration ###
 Add the following to batch.ini:
 
-    enabledWorkers.KAsyncStoragePeriodicPurge            = 1
+	enabledWorkers.KAsyncStoragePeriodicPurge            = 1
 
-    [KAsyncStoragePeriodicPurge : PeriodicWorker]
-    id                                                  = @ID@
-    friendlyName                                        = Storage Periodic Purge
-    type                                                = KAsyncStoragePeriodicPurge
-    scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicPurgeExe.php
-    maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
-    params.maxCount                                     = @MAX_COUNT@
-    params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
-    params.sleepInterval                                = @SLEEP_INTERVAL@
-    params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
-    params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
-    params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
-    filter.statusEqual                                  = 3
-    filter.dcIn                                         = @DC@
-    filter.fileTypeIn                                   = 1,3
-    
-    [KAsyncStoragePeriodicExport : PeriodicWorker]
-    ....
-    filter.statusEqual                                  = 1
-    filter.dcIn                                         = @DC@
-    filter.fileTypeEqual                                = 3
-    
+	[KAsyncStoragePeriodicPurge : PeriodicWorker]
+	id                                                  = @ID@
+	friendlyName                                        = Storage Periodic Purge
+	type                                                = KAsyncStoragePeriodicPurge
+	scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicPurgeExe.php
+	maximumExecutionTime                                = @MAXIMUM_EXECUTION_TIME@
+	params.maxCount                                     = @MAX_COUNT@
+	params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+	params.sleepInterval                                = @SLEEP_INTERVAL@
+	params.lockExpiryTimeout                            = @LOCK_EXPIRY_TIMEOUT@
+	params.relativeTimeDeletionLimit                    = @RELATIVE_TIME_DELETION_LIMIT@
+	params.relativeTimeRange                            = @RELATIVE_TIME_RANGE@
+	filter.statusEqual                                  = 3
+	filter.dcIn                                         = @DC@
+	filter.fileTypeIn                                   = 1,3
+	
+	[KAsyncStoragePeriodicExport : PeriodicWorker]
+	....
+	filter.statusEqual                                  = 1
+	filter.dcIn                                         = @DC@
+	filter.fileTypeEqual                                = 3
+	
 #### Deployment Scripts ####
-    php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
+	php deployment/updates/scripts/add_permissions/2020_05_06_fileSync_lockFileSyncs.php
 
 
 # Propus 16.2.0  #
@@ -916,7 +915,7 @@ Issue ID: PLAT-10890
 ### Configuration ###
 Modify cloud_storage.ini:
 add new param lastFileSyncIdCreationTimeThreshold = @TIME_THRESHOLD_IN_MILLISECONDS@
-    
+	
 ## Support export captions to remote storage ##
 - Issue Type: Task
 - Issue ID: PLAT-10846
@@ -968,36 +967,36 @@ Issue Type: Task
 Issue ID : PLAT-10735
 
 ### Configuration ###
-    - Add FEATURE_REMOTE_STORAGE permission to partner -1
-    - Add configuration map with the name 'cloud_storage' with following config:
+	- Add FEATURE_REMOTE_STORAGE permission to partner -1
+	- Add configuration map with the name 'cloud_storage' with following config:
 
-        storage_lock_expiry = @TIME_TO_ACQUIRE_LOCK@
-        last_id_loop_addition = @INT_NUM_ADDED_TO_LAST_ID_LOOP@
-        max_id_delay = @INT_NUM_TO_SUBSTRACT_FROM_MAX_ID@
-        [periodic_storage_ids]
+		storage_lock_expiry = @TIME_TO_ACQUIRE_LOCK@
+		last_id_loop_addition = @INT_NUM_ADDED_TO_LAST_ID_LOOP@
+		max_id_delay = @INT_NUM_TO_SUBSTRACT_FROM_MAX_ID@
+		[periodic_storage_ids]
 	0 = @STORAGE_ID@
 	1 = @STORAGE_ID@
 
-       [export_to_cloud]
-        0 = @PARTNER_ID_0@
-        1 = @PARTNER_ID_1@
+	   [export_to_cloud]
+		0 = @PARTNER_ID_0@
+		1 = @PARTNER_ID_1@
 
-    - Add the following to batch.ini:
+	- Add the following to batch.ini:
 
-        enabledWorkers.KAsyncStoragePeriodicExport            = 1
+		enabledWorkers.KAsyncStoragePeriodicExport            = 1
 
-        [KAsyncStoragePeriodicExport : PeriodicWorker]
-        id                                                  = @ID@
-        friendlyName                                        = Storage Periodic Export
-        type                                                = KAsyncStoragePeriodicExport
-        scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicExportExe.php
-        params.maxCount                                     = @MAX_COUNT@
-        params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
-        params.sleepInterval                                = @SLEEP_INTERVAL@
-      
+		[KAsyncStoragePeriodicExport : PeriodicWorker]
+		id                                                  = @ID@
+		friendlyName                                        = Storage Periodic Export
+		type                                                = KAsyncStoragePeriodicExport
+		scriptPath                                          = batches/Storage/Periodic/KAsyncStoragePeriodicExportExe.php
+		params.maxCount                                     = @MAX_COUNT@
+		params.maxExecutionTime                             = @MAX_EXECUTION_TIME@
+		params.sleepInterval                                = @SLEEP_INTERVAL@
+	  
 #### Deployment Scripts ####
-    php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
-    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+	php deployment/updates/scripts/add_permissions/2020_03_12_add_permission_storage_profile_lock_pending_file_syncs.php
+	php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
 
 # Propus 16.0.1 #
 
@@ -1066,7 +1065,7 @@ Issue ID : PLAT-10625
   None
 
 #### Deployment Scripts ####
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_03_09_monitoring_proxy_list_templates.php 
 
 ## Add Live NG plugin ##
 Issue Type: Task
@@ -1079,7 +1078,7 @@ Issue ID : PLAT-10358
 #### Deployment Scripts ####
   install plugins: 
   
-    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
 
 # Orion 15.18.0 #
 
@@ -1091,10 +1090,10 @@ Issue ID : PLAT-10713
 	* Make sure "sphinx_dynamic_config" exists in your configuration maps 
  
 	* To enable the feature for specific partner ids add the following section to the map:
-    [sphinx_sticky_partners]
-    0 = XXXX
-    1 = YYYY
-    where XXXX and YYYY are the partner ids you want to enable the feature for.
+	[sphinx_sticky_partners]
+	0 = XXXX
+	1 = YYYY
+	where XXXX and YYYY are the partner ids you want to enable the feature for.
 	
 
 #### Deployment Scripts ####
@@ -1193,7 +1192,7 @@ none.
 #### Deployment Scripts ####
 Run:
 
-    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_01_09_update_system_gethealthcheck_action.php'
+	'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2020_01_09_update_system_gethealthcheck_action.php'
 
 
 # Orion 15.14.0 #
@@ -1217,7 +1216,7 @@ none.
 #### Deployment Scripts ####
 Run: 
 
-    'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_19_add_system_gethealthcheck_action.php'
+	'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_19_add_system_gethealthcheck_action.php'
 
 # Orion 15.13.0 #
 
@@ -1226,67 +1225,67 @@ Run:
 - Issue ID : PLAT-10269
 
 ### Configuration ###
-    To support sharding sphinx category table add the follwoing to you db.ini file:
-        [sphinx_split_index]
-        enabled = true
-        category = 10
-        
-        Updaet your sphinx kaltura.conf when it comes to the category table definition:
-        index kaltura_category_base:kaltura_base_gt_in_charset
-        {
-        
-        	rt_mem_limit	 = 10240M
-        	min_prefix_len	 = 1
-        	rt_attr_uint	 = category_id
-        	rt_field         = str_category_id
-        	rt_attr_uint	 = parent_id
-        	rt_field	 = name
-        	rt_attr_string	 = name
-        	rt_attr_bigint	 = partner_id
-        	rt_field	 = full_name
-        	rt_attr_string	 = full_name
-        	rt_field	 = full_ids
-        	rt_field	 = description
-        	rt_field	 = tags
-        	rt_field	 = display_in_search
-        	rt_attr_uint	 = kuser_id
-        	rt_attr_uint	 = category_status
-        	rt_field	 = members
-        	rt_field	 = plugins_data
-        	rt_attr_uint	 = depth
-        	rt_field	 = reference_id
-        	rt_field	 = privacy_context
-        	rt_field	 = privacy_contexts
-        	rt_field	 = privacy
-        	rt_field     = sphinx_match_optimizations
-        	rt_attr_uint	 = members_count
-        	rt_attr_uint	 = pending_members_count
-        	rt_attr_uint	 = entries_count
-        	rt_attr_uint	 = direct_entries_count
-        	rt_attr_uint	 = direct_sub_categories_count
-        	rt_attr_uint	 = inheritance_type
-        	rt_attr_uint	 = user_join_policy
-        	rt_attr_uint	 = default_permission_level
-        	rt_attr_uint	 = contribution_policy
-        	rt_attr_uint	 = inherited_parent_id
-        	rt_attr_timestamp	 = created_at
-        	rt_attr_timestamp	 = updated_at
-        	rt_attr_timestamp	 = deleted_at
-        	rt_attr_bigint	 = partner_sort_value
-        	rt_attr_json = dynamic_attributes
-        	rt_field = aggregation_categories
-        }
-        
-        index kaltura_category_0:kaltura_category_base
-        {
-        	path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
-        }
-        
-        duplicate the above index to kaltura_category_0 .... kaltura_category_9
+	To support sharding sphinx category table add the follwoing to you db.ini file:
+		[sphinx_split_index]
+		enabled = true
+		category = 10
+		
+		Updaet your sphinx kaltura.conf when it comes to the category table definition:
+		index kaltura_category_base:kaltura_base_gt_in_charset
+		{
+		
+			rt_mem_limit	 = 10240M
+			min_prefix_len	 = 1
+			rt_attr_uint	 = category_id
+			rt_field         = str_category_id
+			rt_attr_uint	 = parent_id
+			rt_field	 = name
+			rt_attr_string	 = name
+			rt_attr_bigint	 = partner_id
+			rt_field	 = full_name
+			rt_attr_string	 = full_name
+			rt_field	 = full_ids
+			rt_field	 = description
+			rt_field	 = tags
+			rt_field	 = display_in_search
+			rt_attr_uint	 = kuser_id
+			rt_attr_uint	 = category_status
+			rt_field	 = members
+			rt_field	 = plugins_data
+			rt_attr_uint	 = depth
+			rt_field	 = reference_id
+			rt_field	 = privacy_context
+			rt_field	 = privacy_contexts
+			rt_field	 = privacy
+			rt_field     = sphinx_match_optimizations
+			rt_attr_uint	 = members_count
+			rt_attr_uint	 = pending_members_count
+			rt_attr_uint	 = entries_count
+			rt_attr_uint	 = direct_entries_count
+			rt_attr_uint	 = direct_sub_categories_count
+			rt_attr_uint	 = inheritance_type
+			rt_attr_uint	 = user_join_policy
+			rt_attr_uint	 = default_permission_level
+			rt_attr_uint	 = contribution_policy
+			rt_attr_uint	 = inherited_parent_id
+			rt_attr_timestamp	 = created_at
+			rt_attr_timestamp	 = updated_at
+			rt_attr_timestamp	 = deleted_at
+			rt_attr_bigint	 = partner_sort_value
+			rt_attr_json = dynamic_attributes
+			rt_field = aggregation_categories
+		}
+		
+		index kaltura_category_0:kaltura_category_base
+		{
+			path	 = /opt/kaltura/sphinx/kaltura_category_rt_0
+		}
+		
+		duplicate the above index to kaltura_category_0 .... kaltura_category_9
 
 #### Deployment Scripts ####
-    Reindex category tables to sphinx to support the md5 query time fix:
-        php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
+	Reindex category tables to sphinx to support the md5 query time fix:
+		php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
 
 
 ## Reach boolean event notification for privacy context ##
@@ -1323,8 +1322,8 @@ Run 'php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_12_04_
 
 1) Make sure "elasticDynamicMap" exists in your configuration maps 
 2) Add the following section "filterExecutionTags" with following values:
-    0 = KScheduledTaskDryRunner
-    1 = KScheduledTaskRunner
+	0 = KScheduledTaskDryRunner
+	1 = KScheduledTaskRunner
 
 #### Deployment Scripts ####
 
@@ -1391,7 +1390,7 @@ None.
 
 ### Deployment scripts ###
 Alter batch_job_log table to change abort colmun default value    
-    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_26_add_entry_vendor_task_index.sql
 
 ## Configurations Maps Modifications ##
 - Issue Type: Task
@@ -1414,7 +1413,7 @@ modify /opt/kaltura/app/configurations/batchBase.template.ini to /opt/kaltura/ap
 
 ### Deployment scripts ###
 Alter batch_job_log table to change abort colmun default value    
-    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_21_alter_batch_job_log_abort_default_value.sql
 
 ## Adding new KalturaUserEntryType called registration ##
 - Issue Type: Task
@@ -1440,9 +1439,9 @@ add kava_skip_date_rounding_client_tags section to local.ini with:
 
 ### Deployment scripts ###
 Add new kvote table index    
-    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_11_06_add_kvote_index.sql
 Add new permissions
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_11_06_add_rating_permissions.php
 Run installPlugins script  
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
@@ -1495,10 +1494,10 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 - Issue ID: PLAT-10231
 
 ### configuration ###
-    None
+	None
 
 ### Deployment scripts ###
-    OnPrem - reindex entry index in elastic:
+	OnPrem - reindex entry index in elastic:
 	1) Remove old index - delete kaltura_entry
 	2) Create the index - curl -XPUT '{elasticHost}:{elasticPort}/kaltura_entry' -H 'Content-Type: application/json' --data-binary "@entry_mapping.json"
 	3) Index the entries - php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticEntries.php
@@ -1509,15 +1508,15 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 - Issue ID: REACH2-704
 
 ### configuration ###
-    update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
-    rt_attr_timestamp=expected_finish_time
-    
-    Add the following to admin.ini:
-    settings.refreshInterval30Sec = 30
+	update kaltura.conf file and add to kaltura_entry_vendor_task table the following field
+	rt_attr_timestamp=expected_finish_time
+	
+	Add the following to admin.ini:
+	settings.refreshInterval30Sec = 30
 
 ### Deployment scripts ###
-    - php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php
-    - Re-build & Re-index kaltura_entry_vendor_task table
+	- php deployment/updates/scripts/add_permissions/2019_10_27_update_reach_entry_vendor_task_service.php
+	- Re-build & Re-index kaltura_entry_vendor_task table
 
 # Orion 15.8.0 #
 
@@ -1526,11 +1525,11 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 - Issue ID: WEBC-1554
 
 ### Configuration ###
-    First replace all tokens from the XML files below and remove ".template" from the file name:
-    /opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_09_25_updateQandAResponseProfile_addSystemName.template.xml
 		
 #### Deployment Scripts ####	
-    php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_09_25_updateQandAResponseProfile_addSystemName.php
 
 
 ## Remove str_entry_id field from kaltura_cue_point sphinx table  ##
@@ -1538,11 +1537,11 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 - Issue ID: PLAT-10199
 
 ### Configuration ###
-    update kaltura.conf file and remove from kaltura_cue_point table the following field
+	update kaltura.conf file and remove from kaltura_cue_point table the following field
 	rt_attr_string	 = str_entry_id
 	
 #### Deployment Scripts ####	
-    Re-index kaltura_cue_point table
+	Re-index kaltura_cue_point table
 
 # Orion 15.7.0 #
 
@@ -1551,12 +1550,12 @@ max_words_for_ngram = MAX_WORDS_NGRAM(EXAMPLE_2)
 - Issue ID: WEBC-1429
 
 ### Configuration ###
-    First replace all tokens from the XML files below and remove ".template" from the file name:
-    /opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_06_26_updateQandAResponseProfile_addUserData.template.xml
 		
 #### Deployment Scripts ####	
-    php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_06_26_updateQandAResponseProfile_addUserData.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_09_11_add_webcasting_role_permission_to_user_list.php
 
 
 ## Sso emails ##
@@ -1571,10 +1570,10 @@ To use the sso emails you should set the sso login link in sso.ini
 - Issue ID: LEC-1832
 
 ### configuration ###
-    None
+	None
 
 ### Deployment scripts ###
-    php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
+	php deployment/updates/scripts/add_permissions/2019_09_04_add_flavorparam_capture_permission.php
 
 ## Add SSO ##
 - Issue Type: Task
@@ -1597,7 +1596,7 @@ php deployment/updates/scripts/add_permissions/2019_09_04_sso_service.php
 - Issue ID: PLAT-10084
 
 ### configuration ###
-    None
+	None
 
 ### Deployment scripts ###
 php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permissions.php
@@ -1608,13 +1607,13 @@ php deployment/updates/scripts/add_permissions/2019_08_20_update_esearch_permiss
 - Issue ID: AN-801
 
 ### configuration ###
-    Add the following to admin.ini:
+	Add the following to admin.ini:
 
-    moduls.multiPublishersAnalytics.enabled = true
-    moduls.multiPublishersAnalytics.permissionType = 2
-    moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
-    moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
-    moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.multiPublishersAnalytics.enabled = true
+	moduls.multiPublishersAnalytics.permissionType = 2
+	moduls.multiPublishersAnalytics.label = Multi Account Analytics Filter
+	moduls.multiPublishersAnalytics.permissionName = FEATURE_MULTI_ACCOUNT_ANALYTICS
+	moduls.multiPublishersAnalytics.group = GROUP_ENABLE_DISABLE_FEATURES
 
 # Orion 15.5.0 #
 
@@ -1713,27 +1712,27 @@ params.pythonCmd                                    = @LOCATION_OF_PYTHON3@
 
 
 ### Deployment scripts ###
-    Install Plugins
-    
+	Install Plugins
+	
 ## Add permission in the admin console to include live entries in the mrss feed ##
 
 - Issue Type: Feature
 - Issue ID: PSVAMB-7785
 
 ### configuration ###
-    Add the following to admin.ini:
+	Add the following to admin.ini:
 
-    moduls.feedWithLiveEntries.enabled = true
-    moduls.feedWithLiveEntries.permissionType = 2
-    moduls.feedWithLiveEntries.label = "Include live entries in feed"
-    moduls.feedWithLiveEntries.permissionName = FEATURE_LIVE_ENTRIES_IN_FEED
-    moduls.feedWithLiveEntries.basePermissionType =
-    moduls.feedWithLiveEntries.basePermissionName =
-    moduls.feedWithLiveEntries.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.feedWithLiveEntries.enabled = true
+	moduls.feedWithLiveEntries.permissionType = 2
+	moduls.feedWithLiveEntries.label = "Include live entries in feed"
+	moduls.feedWithLiveEntries.permissionName = FEATURE_LIVE_ENTRIES_IN_FEED
+	moduls.feedWithLiveEntries.basePermissionType =
+	moduls.feedWithLiveEntries.basePermissionName =
+	moduls.feedWithLiveEntries.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ###
-    None
-    
+	None
+	
 # Orion 15.1.0 #
 ## New thumbnail API  ##
 - Issue Type: Epic
@@ -1777,29 +1776,29 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_16_updat
 - Issue ID: SUP-18392
 
 ### configuration ###
-    Add the following to local.ini:
+	Add the following to local.ini:
 	indexing_query_compress_threshold = 819200 ( DESIRED_THRESHOLD in size 819200 is 800KB )
-    
+	
 ### Deployment scripts ###
-    run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log <
-    /opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
-    
+	run mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura_sphinx_log <
+	/opt/kaltura/app/deployment/updates/sql/2019_06_12_alter_sphinx_log_table_add_cutom_data_column.sql
+	
 ## Add permission in Admin Console for new live analytics dashboard ##
 
 - Issue Type: Feature
 - Issue ID: AN-709
 
 ### configuration ###
-    Add the following to admin.ini:
+	Add the following to admin.ini:
 
-    moduls.analyticsLiveDashboard.enabled = true
-    moduls.analyticsLiveDashboard.permissionType = 2
-    moduls.analyticsLiveDashboard.label = Enable Real Time Dashboard
-    moduls.analyticsLiveDashboard.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
-    moduls.analyticsLiveDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.analyticsLiveDashboard.enabled = true
+	moduls.analyticsLiveDashboard.permissionType = 2
+	moduls.analyticsLiveDashboard.label = Enable Real Time Dashboard
+	moduls.analyticsLiveDashboard.permissionName = FEATURE_LIVE_ANALYTICS_DASHBOARD
+	moduls.analyticsLiveDashboard.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ###
-    None
+	None
 
 ## Block users from changing roles  ##
 - Issue Type: Task
@@ -1821,7 +1820,7 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_19_updat
 	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_pending_moderation.template.xml
 		
 #### Deployment Scripts ####	
-    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_entry_vendor_pending_moderation.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_entry_vendor_pending_moderation.php
 
 ## Reach notification templates ##
 - Issue Type: Task
@@ -1830,11 +1829,11 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_19_updat
 ### Configuration ###
 	First replace all tokens from the XML files below and remove ".template" from the file name:
 	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_rejected_moderation.template.xml
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_done.template.xml
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_approved_moderation.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_done.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_06_03_update_entry_vendor_task_approved_moderation.template.xml
 		
 #### Deployment Scripts ####	
-    php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_reach_notifications.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_06_03_deploy_update_reach_notifications.php
 
 
 ## Add addition fields in entry vendor task csv ##
@@ -1877,15 +1876,15 @@ NONE
 ### Configuration ###
 
 
-    Add to local.ini uder password_reset_links url for the KMC qr page in the following way: qr_page = @URL_FOR_QR@
-    
-    Edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
-    add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
+	Add to local.ini uder password_reset_links url for the KMC qr page in the following way: qr_page = @URL_FOR_QR@
+	
+	Edit /opt/kaltura/app/configurations/batch/batches/Mailer/emails_en.ini:
+	add constants, subjects and bodies as described in /opt/kaltura/app/batch/batches/Mailer/emails_en.template.ini for ids: 140, 141 and 142.   
 
 
 ### Deployment scripts ###
 
-       php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
+	   php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_06_02_add_user_generate_qr_image.php
 
 ## Deploy "Entry Vendor Task Finished Processing" HTTP notification (for MediaSpace) ##
  - Issue Type: Feature
@@ -1897,11 +1896,11 @@ None
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name:
 
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_05_26_httpEntryVendorTaskDone.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_05_26_httpEntryVendorTaskDone.template.xml
 
 Run deployment script:
 
-    php /opt/kaltura/app/deployment/updates/scripts/2019_05_26_httpEntryVendorTaskDone.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_05_26_httpEntryVendorTaskDone.php
 
 ## Add new bulk upload mechanism for schedule events ## 
 
@@ -1910,7 +1909,7 @@ Run deployment script:
 
 #### Deployment Scripts ####  
 
-        php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_scheduleevent_bulkupload_required_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/2019_05_22_scheduleevent_bulkupload_required_permissions.php
 
 
 # Orion 15.0.0 #
@@ -1921,16 +1920,16 @@ Run deployment script:
 - Issue ID: AN-696
 
 ### configuration ###
-    Add the following to admin.ini:
+	Add the following to admin.ini:
 
-    moduls.analyticsPersistentSessionId.enabled = true
-    moduls.analyticsPersistentSessionId.permissionType = 2
-    moduls.analyticsPersistentSessionId.label = Analytics Persistent Session Id
-    moduls.analyticsPersistentSessionId.permissionName = FEATURE_ANALYTICS_PERSISTENT_SESSION_ID
-    moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.analyticsPersistentSessionId.enabled = true
+	moduls.analyticsPersistentSessionId.permissionType = 2
+	moduls.analyticsPersistentSessionId.label = Analytics Persistent Session Id
+	moduls.analyticsPersistentSessionId.permissionName = FEATURE_ANALYTICS_PERSISTENT_SESSION_ID
+	moduls.analyticsPersistentSessionId.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ###
-    None
+	None
 
 ## configuraiton change ##
 
@@ -2002,9 +2001,9 @@ None
 		Duplicate Kaltura_entry sphinx definition per your sharding factor and add entry distribution index that points to the all.
 		index kaltura_entry
 		{
-		        type=distributed
-		        local=kaltura_entry_X
-		        local=kaltura_entry_X
+				type=distributed
+				local=kaltura_entry_X
+				local=kaltura_entry_X
 		}
 		
 	3. Reindex your data based on the new setup.
@@ -2045,23 +2044,23 @@ None
 - Issue ID: PLAT-9843
 
 ### configuration ###
-    Create new map in config named 'blocked_actions_per_account" and add to it blocked actions for default or for specific partner in the following way:
+	Create new map in config named 'blocked_actions_per_account" and add to it blocked actions for default or for specific partner in the following way:
 
-    [PARTNER_ID]
-    0 = ".*:add.*"
-    1 = ".*:delete.*"
-    2 = ".*:update.*"
+	[PARTNER_ID]
+	0 = ".*:add.*"
+	1 = ".*:delete.*"
+	2 = ".*:update.*"
 	
-    Also add the following to admin.ini:
-    
-    moduls.limitAllowedActions.enabled = true
-    moduls.limitAllowedActions.permissionType = 2
-    moduls.limitAllowedActions.label = Limit allowed actions
-    moduls.limitAllowedActions.permissionName = FEATURE_LIMIT_ALLOWED_ACTIONS
-    moduls.limitAllowedActions.group = GROUP_ENABLE_DISABLE_FEATURES
-    
+	Also add the following to admin.ini:
+	
+	moduls.limitAllowedActions.enabled = true
+	moduls.limitAllowedActions.permissionType = 2
+	moduls.limitAllowedActions.label = Limit allowed actions
+	moduls.limitAllowedActions.permissionName = FEATURE_LIMIT_ALLOWED_ACTIONS
+	moduls.limitAllowedActions.group = GROUP_ENABLE_DISABLE_FEATURES
+	
 ### Deployment scripts ###
-    None
+	None
 	
 # Naos 14.19.0 #
 
@@ -2106,11 +2105,11 @@ None
 
 First replace all tokens in the XML file below and remove ".template" from the fle name:
 
-    /opt/kaltura/app/deployment/updates/scripts/xml/2019_04_11_updateQNAResponseProfile_addDeleted.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/2019_04_11_updateQNAResponseProfile_addDeleted.template.xml
 
 Run deployment script:
 
-    php /opt/kaltura/app/deployment/updates/scripts/2019_04_11_update_qna_metadata_profile_add_deleted.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_04_11_update_qna_metadata_profile_add_deleted.php
 
 
 # Naos 14.18.0 #
@@ -2135,7 +2134,7 @@ Run deployment script:
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_schedule_event_index.sql
 		
 		mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2019_04_10_alter_server_node_index.sql
-    
+	
 
 ## Allowing capture application use list-feature-status action ##
  - Issue Type: Task
@@ -2173,7 +2172,7 @@ None
 
 Run deployment script:
 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_01_update_annotation_permission.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_04_01_update_annotation_permission.php
 
 ## Update "comment added" KMS notification body - fix the link ##
  - Issue Type: Bugfix
@@ -2186,11 +2185,11 @@ None
 
 First replace all tokens in the XML file below and remove ".template" from the fle name:
 
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_04_01_fix_comment_notification_template.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2019_04_01_fix_comment_notification_template.template.xml
 
 Run deployment script:
 
-    php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
+	php /opt/kaltura/app/deployment/updates/scripts/2019_04_01_fix_comment_notification_template.php
 
 # Naos 14.17.0 #
 
@@ -2214,7 +2213,7 @@ Run deployment script:
 	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ###
-     php deployment/updates/scripts/add_permissions/2019_03_25_report_add_export_to_csv_permission.php
+	 php deployment/updates/scripts/add_permissions/2019_03_25_report_add_export_to_csv_permission.php
 
 ## adding support for copying a group ##
 
@@ -2234,13 +2233,13 @@ php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.p
 - Issue ID: AN-513
 
 ### configuration ###
-    Update the following in admin.ini: (need to rename moduls.newAnalyticsTab.label and moduls.newAnalyticsTab.permissionName)
+	Update the following in admin.ini: (need to rename moduls.newAnalyticsTab.label and moduls.newAnalyticsTab.permissionName)
 
-    moduls.newAnalyticsTab.label = Disable New Analytics 
-    moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB_DISABLE
+	moduls.newAnalyticsTab.label = Disable New Analytics 
+	moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB_DISABLE
 
 ### Deployment scripts ###
-    None
+	None
 
 ## Export CSV Job Infrastructure Change ## 
  - Issue Type: Task
@@ -2268,9 +2267,9 @@ php deployment/updates/scripts/add_permissions/2019_03_10_add_group_permission.p
 	Make sure to modify @TMP_DIR@ && @WEB_DIR@ settings
 
 ### Deployment Scripts ### 
-     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
-     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_17_add_exportcsv_permissions_and_items.php
-     php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php
+	 php /opt/kaltura/app/deployment/base/scripts/installPlugins.php 
+	 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_03_17_add_exportcsv_permissions_and_items.php
+	 php deployment/updates/scripts/add_permissions/2019_03_17_add_esearch_permissions_and_items.php
 
 ## Change wording and support empty instance_id metadata in KMS email notifications ##
  - Issue Type: Task
@@ -2429,10 +2428,10 @@ The ability to assign dates as blackouts and to prevent recordings happening in 
 ScheduleEventResource list will filter by default events the have conflict with blackout events   
 
 ### Configuration ###
-    None
+	None
 
 ### Deployment scripts ###
-    None
+	None
 
 ## Add BulkUpload Status Event Notification to HTTP ##
 
@@ -2440,7 +2439,7 @@ ScheduleEventResource list will filter by default events the have conflict with 
 - Issue ID: PLAT-9546
 
 ### Configuration ###
-    First replcae all tokens from the XML files below and remove ".template" from the file name:
+	First replcae all tokens from the XML files below and remove ".template" from the file name:
 	/opt/kaltura/app/deployment/updates/scripts/xml/2019_01_20_bulkUploadHttpNotification.template.xml
 
 ### Deployment scripts ###
@@ -2451,10 +2450,10 @@ ScheduleEventResource list will filter by default events the have conflict with 
 
 - Issue Type: Feature
 - Issue ID: PSVAMB-5604
-    
+	
 ### Deployment scripts ###
-    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    - php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_01_10_add_media_addbulkupload_to_batch_partner.php
+	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	- php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2019_01_10_add_media_addbulkupload_to_batch_partner.php
 
 ## Add permission in Admin Console for forcing https protocol in http notifications ##
 
@@ -2462,16 +2461,16 @@ ScheduleEventResource list will filter by default events the have conflict with 
 - Issue ID: SUP-16550
 
 ### configuration ###
-    Add the following to admin.ini:
-    
-    moduls.httpNotificationDefaultProtocolHttps.enabled = true
-    moduls.httpNotificationDefaultProtocolHttps.permissionType = 2
-    moduls.httpNotificationDefaultProtocolHttps.label = HTTP Notifications Default Protocol HTTPS
-    moduls.httpNotificationDefaultProtocolHttps.permissionName = FEATURE_HTTP_NOTIFICATIONS_DEFAULT_PROTOCOL_HTTPS
-    moduls.httpNotificationDefaultProtocolHttps.group = GROUP_ENABLE_DISABLE_FEATURES
-    
+	Add the following to admin.ini:
+	
+	moduls.httpNotificationDefaultProtocolHttps.enabled = true
+	moduls.httpNotificationDefaultProtocolHttps.permissionType = 2
+	moduls.httpNotificationDefaultProtocolHttps.label = HTTP Notifications Default Protocol HTTPS
+	moduls.httpNotificationDefaultProtocolHttps.permissionName = FEATURE_HTTP_NOTIFICATIONS_DEFAULT_PROTOCOL_HTTPS
+	moduls.httpNotificationDefaultProtocolHttps.group = GROUP_ENABLE_DISABLE_FEATURES
+	
 ### Deployment scripts ###
-    None
+	None
 
 ## Manage configuration maps from admin console ##
 - Issue ttype: Feature
@@ -2481,12 +2480,12 @@ This feature will allow managing system congfiguration in admin console UI along
 It is based on Plat-8932 that is described in this notes below.
 
 ### configuration ###
-    Add ConfMaps to your plugins.ini
+	Add ConfMaps to your plugins.ini
 
 ### Deployment scripts ###
-    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_19_add_conf_maps_role_and_permissions.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_12_11_confmaps_service.php
 
 # Naos 14.11.0 #
 
@@ -2501,9 +2500,9 @@ The indexes name should be in the following format for the script to work {index
 ### Configuration ###
 	Optional:
 	1) Add the following to your elastic.ini file in beacon section:
-        maxNumberOfIndices = {num of monthly indices you want to keep} by default this will be one
-    2) Add beacon_rotation.ini to you configuration based on beacon_rotation.template.ini
-    
+		maxNumberOfIndices = {num of monthly indices you want to keep} by default this will be one
+	2) Add beacon_rotation.ini to you configuration based on beacon_rotation.template.ini
+	
 # Naos 14.10.0 #
 
 ## Beacon service searchScheduledResource api ##
@@ -2515,26 +2514,26 @@ The indexes name should be in the following format for the script to work {index
 
 #### Deployment Scripts ####
 
-    1. Run deployment scripts:
-        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_22_add_beacon_service_permissions.php
-    
-    2. Stop logstash process to avoid re-creating the old beacon index.
-    
-    3. Create new indexes in elastic by runing:
-    	curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2018_12_10' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
-    
-    4. Delete all old beacon_scheduled_resource elastic aliases.
-    
-    5. Create new alises in elastic:
-        curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
-     	    "actions" : [
-                { "add" : { "index" : "beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index" } },
-                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beaconindex" } },
-                { "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index_search" } }
-            ]
-         }
-    
-    6. start logstash process.
+	1. Run deployment scripts:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_22_add_beacon_service_permissions.php
+	
+	2. Stop logstash process to avoid re-creating the old beacon index.
+	
+	3. Create new indexes in elastic by runing:
+		curl -XPUT 'ELASTIC_HOST:ELASTIC_PORT/beacon_scheduled_resource_index_2018_12_10' --data-binary "@/opt/kaltura/app/plugins/beacon/config/mapping/beacon_scheduled_resource_index.json"
+	
+	4. Delete all old beacon_scheduled_resource elastic aliases.
+	
+	5. Create new alises in elastic:
+		curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
+			"actions" : [
+				{ "add" : { "index" : "beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index" } },
+				{ "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beaconindex" } },
+				{ "add" : { "index" : " beacon_scheduled_resource_index_2018_12_10", "alias" : "beacon_scheduled_resource_index_search" } }
+			]
+		 }
+	
+	6. start logstash process.
 
 # Naos 14.9.0 #
 
@@ -2547,9 +2546,9 @@ The indexes name should be in the following format for the script to work {index
 
 #### Deployment Scripts ####
 
-    Run deployment scripts:
-        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_12_add_bulk_update_category_entries_status_permissions.php
-        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_12_update_category_entry_permissions.php
+	Run deployment scripts:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_12_add_bulk_update_category_entries_status_permissions.php
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_12_update_category_entry_permissions.php
 
 # Naos 14.8.0 #
 
@@ -2558,10 +2557,10 @@ The indexes name should be in the following format for the script to work {index
 - Issue ID: PLAT-9393
 
 ### configuration ###
-    N/A
+	N/A
 
 ### Deployment scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_08_update_media_addfromuploadedfile.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_11_08_update_media_addfromuploadedfile.php
 
 ## Add permission in Admin Console for New Analytics ##
 
@@ -2569,17 +2568,17 @@ The indexes name should be in the following format for the script to work {index
 - Issue ID: PLAT-9334
 
 ### configuration ###
-    Add the following to admin.ini:
-    
-    moduls.newAnalyticsTab.enabled = true
-    moduls.newAnalyticsTab.permissionType = 2
-    moduls.newAnalyticsTab.label = "New Analytics"
-    moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB
-    moduls.newAnalyticsTab.group = GROUP_ENABLE_DISABLE_FEATURES
-    
+	Add the following to admin.ini:
+	
+	moduls.newAnalyticsTab.enabled = true
+	moduls.newAnalyticsTab.permissionType = 2
+	moduls.newAnalyticsTab.label = "New Analytics"
+	moduls.newAnalyticsTab.permissionName = FEATURE_NEW_ANALYTICS_TAB
+	moduls.newAnalyticsTab.group = GROUP_ENABLE_DISABLE_FEATURES
+	
 ### Deployment scripts ###
-    None
-    
+	None
+	
 ## Allow allocating specific conference room from pool ##
 
 - Issue Type: Story
@@ -2602,8 +2601,8 @@ The indexes name should be in the following format for the script to work {index
 
 #### Deployment Scripts ####
 
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_11_update_playlist_service_permissions.php
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_11_update_playlist_service_permissions.php
 
 
 # Naos 14.7.0 #
@@ -2614,32 +2613,32 @@ The indexes name should be in the following format for the script to work {index
 
 ### Configuration ###
 
-    The following is must - 
-    1. Rename 'Memcache' inside cache.ini to 'InfraMemcache'
-    2. Rename 'FileSystem' inside cache.ini to 'InfraFileSystem'
-    
-    The following is optional - 
-    3. Add kLocalMemCacheConf.ini file to your configurations/ directory , the file sould containt 2 values - 
-        a. IP\host of local memcache
-        b. Port number of local memcache
-    4.  Add kRemoteMemCacheConf.ini file to your configuration/ directory , the file sould containt 2 values - 
-        a. IP\host of remote (central) memcache
-        b. Port number of remote memcache
+	The following is must - 
+	1. Rename 'Memcache' inside cache.ini to 'InfraMemcache'
+	2. Rename 'FileSystem' inside cache.ini to 'InfraFileSystem'
+	
+	The following is optional - 
+	3. Add kLocalMemCacheConf.ini file to your configurations/ directory , the file sould containt 2 values - 
+		a. IP\host of local memcache
+		b. Port number of local memcache
+	4.  Add kRemoteMemCacheConf.ini file to your configuration/ directory , the file sould containt 2 values - 
+		a. IP\host of remote (central) memcache
+		b. Port number of remote memcache
 
 ### Deployment scripts ###
-    
-    run mysql script that adds new table     
-    - mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_19_create_config_maps_table.sql 
+	
+	run mysql script that adds new table     
+	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_19_create_config_maps_table.sql 
 
 ### How to add new maps? ###
-    
-    1. Using alpha/scripts/utils/insertConfigMapToDb.php you can add new maps to the DB
-    2. Using alpha/scripts/utils/syncDbConfigMapsToCache.phpthe new maps will be inserted into the central memcach
-    Once this is done , calling kConf::getMap(<mapName>) will retrive the values from the memcache
+	
+	1. Using alpha/scripts/utils/insertConfigMapToDb.php you can add new maps to the DB
+	2. Using alpha/scripts/utils/syncDbConfigMapsToCache.phpthe new maps will be inserted into the central memcach
+	Once this is done , calling kConf::getMap(<mapName>) will retrive the values from the memcache
 
 #### Known Issues & Limitations ####
-    
-    None
+	
+	None
 
 ## Split firbase IOS and Android notifications ##
 - Issue Type: Task
@@ -2652,12 +2651,12 @@ The indexes name should be in the following format for the script to work {index
 ### Deployment scripts ###
 
 	First replace all tokens from the XML files below and remove ".template" from the file name:
-        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_10_22_split_firebase_ios_and_android_notifications.template.xml
-        
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_10_22_split_firebase_ios_and_android_notifications.template.xml
+		
 	*** Please note this file contains the following token {FIRE_BASE_AUTHORIZATION_KEY}, this should be replaced with the authorization token from your firebase account (example key=XXXX).
 
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/2018_10_22_deploy_split_firebase_ios_and_android_notifications.php
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2018_10_22_deploy_split_firebase_ios_and_android_notifications.php
 
 #### Known Issues & Limitations ####
 
@@ -2675,11 +2674,11 @@ The indexes name should be in the following format for the script to work {index
 
 	Create new alises in elastic:
 	curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
-    	"actions" : [
-        	{ "add" : { "index" : "beacon_entry_index_XXX", "alias" : "beacon_entry_index_search" } },
-        	{ "add" : { "index" : "beacon_entry_server_node_index_XXX", "alias" : "beacon_entry_server_node_index_search" } },
-        	{ "add" : { "index" : "beacon_scheduled_resource_index_XXX", "alias" : "beacon_scheduled_resource_index_search" } },
-        	{ "add" : { "index" : "beacon_server_node_index_XXX", "alias" : "beacon_server_node_index_search" } },
+		"actions" : [
+			{ "add" : { "index" : "beacon_entry_index_XXX", "alias" : "beacon_entry_index_search" } },
+			{ "add" : { "index" : "beacon_entry_server_node_index_XXX", "alias" : "beacon_entry_server_node_index_search" } },
+			{ "add" : { "index" : "beacon_scheduled_resource_index_XXX", "alias" : "beacon_scheduled_resource_index_search" } },
+			{ "add" : { "index" : "beacon_server_node_index_XXX", "alias" : "beacon_server_node_index_search" } },
 			]
 		}'
 		
@@ -2719,13 +2718,13 @@ Enable SearchHistory plugin:
 
 	- Add the following to plugins.ini file: "SearchHistory"
 	- Make sure the following plugins are enabled since they are required for searchHistory service to work: ElasticSearch, RabbitMQ, Queue.
-    - Add the following to your elastic.ini file in search_history section:
-          disableHistoryIndexing = false
-          completionListSize = 100
-          emptyTermListSize = 500
-    - Add the following to your elastic.ini file in search_history_collect_objects section:
-          0 = entry
-          1 = category
+	- Add the following to your elastic.ini file in search_history section:
+		  disableHistoryIndexing = false
+		  completionListSize = 100
+		  emptyTermListSize = 500
+	- Add the following to your elastic.ini file in search_history_collect_objects section:
+		  0 = entry
+		  1 = category
 
 Configure logstash:
 
@@ -2737,8 +2736,8 @@ Configure rabbitMq:
 	- Bind queue to exchange.
 
 ### Deployment scripts ###
-    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_19_add_searchhistory_permissions.php
+	1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_19_add_searchhistory_permissions.php
 
 
 ## Support volume map and thumb serving with encrypted at rest ##
@@ -2774,7 +2773,7 @@ Configure rabbitMq:
 #### Deployment Scripts ####
 
 	Run deployment script:
-  	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_03_update_groupuser_sync_action.php
 
 	Run after deployment:
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_10_09_update_bulk_sync_group_users_permissions.php 
@@ -2787,9 +2786,9 @@ Configure rabbitMq:
 
 #### Deployment Scripts ####
 	Run:
-  	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_28_create_vendor_integration_table.sql
+	- mysql –h{HOSTNAME}  –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2018_08_28_create_vendor_integration_table.sql
 	Run deployment script:
-  		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_29_zoom_vendor_Integration_permissions.php   
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_08_29_zoom_vendor_Integration_permissions.php   
 
 ## Add event notification for Reach credit expiry ##
 - Issue Type: Task
@@ -2801,10 +2800,10 @@ Configure rabbitMq:
 #### Deployment Scripts ####
 
 	First replcae all tokens from the XML files below and remove ".template" from the fle name:
-        /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_09_01_reach_credit_expired.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_09_01_reach_credit_expired.template.xml
 
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/2018_09_01_deploy_reach_credit_expired_email_notification.php
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/2018_09_01_deploy_reach_credit_expired_email_notification.php
 
 ## Add ability to get server node path ##
 - Issue Type: Task
@@ -2815,8 +2814,8 @@ Configure rabbitMq:
 
 #### Deployment Scripts ####
 
-    Run deployment script:
-        php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_09_06_server_node_getServerNodePath.php
+	Run deployment script:
+		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_09_06_server_node_getServerNodePath.php
 
 ## limit reset password attempts to avoid flooding ##
 - Issue Type: Bug
@@ -2875,23 +2874,23 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_07_24_add_m
 
 ### Configuration ###
 	- Add the following to local.ini:
-        free_trial_resource_url = @FREE_TRIAL_RESOURCE_URL@
+		free_trial_resource_url = @FREE_TRIAL_RESOURCE_URL@
 
 ## Fix out of sync Entries between DC's##
 Issue Type:  Bug
 Issue ID: PLAT-8908
 
 ## Notes ##
-    Needs to run only on Multi-DC environments.
-    In the deployment commnad you will need to change:
-        @DB_HOST@ - the host
-        @DB_USER@ - mysql user name
-        @DB_PASSWORD@ - mysql password 
-        @DC_ID@ - The ID of the DC (ID can be found in /opt/kaltura/app/configurations/hosts/dc_config/*.ini files)
-    The script needs to be run on all Master DB's.
+	Needs to run only on Multi-DC environments.
+	In the deployment commnad you will need to change:
+		@DB_HOST@ - the host
+		@DB_USER@ - mysql user name
+		@DB_PASSWORD@ - mysql password 
+		@DC_ID@ - The ID of the DC (ID can be found in /opt/kaltura/app/configurations/hosts/dc_config/*.ini files)
+	The script needs to be run on all Master DB's.
 
 ### Deployment command ###
-    Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "set sql_log_bin=0; DROP FUNCTION IF EXISTS getDC; create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
+	Run mysql -h@DB_HOST@ -u@DB_USER@ -p@DB_PASSWORD@ -P3306 kaltura -e "set sql_log_bin=0; DROP FUNCTION IF EXISTS getDC; create function getDC() Returns int DETERMINISTIC Return '@DC_ID@'"
 
 # Naos 14.2.0 #
 
@@ -2914,7 +2913,7 @@ php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_07_02_add_p
 ### Configuration ###
 	Add "{dc url}/index.php/extservices/facebookoauth2?next_action=cHJvY2Vzcy1vYXV0aDItcmVzcG9uc2U%3D"
 	To your facebook Valid OAuth Redirect URIs app setting
-        
+		
 ### Deployment scripts ###
 None.
 
@@ -2957,8 +2956,8 @@ None.
 
 ### Configuration ###
 	- Change the following to local.ini:
-        [password_reset_links]
-        default = @SERVICE_URL@/index.php/kmcng/actions/restore-password/
+		[password_reset_links]
+		default = @SERVICE_URL@/index.php/kmcng/actions/restore-password/
 
 ### Deployment scripts ###
 None.
@@ -2971,11 +2970,11 @@ None.
 
 ### Configuration ###
 	- Add the following to Admin.ini:
-        moduls.SelfServe.enabled = true
-        moduls.SelfServe.permissionType = 2
-        moduls.SelfServe.label = "Kaltura Live - Self Serve enabled"
-        moduls.SelfServe.permissionName = FEATURE_SELF_SERVE
-        moduls.SelfServe.group = GROUP_ENABLE_DISABLE_FEATURES
+		moduls.SelfServe.enabled = true
+		moduls.SelfServe.permissionType = 2
+		moduls.SelfServe.label = "Kaltura Live - Self Serve enabled"
+		moduls.SelfServe.permissionName = FEATURE_SELF_SERVE
+		moduls.SelfServe.group = GROUP_ENABLE_DISABLE_FEATURES
 
 
 ### Deployment scripts ###
@@ -3000,8 +2999,8 @@ php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/stan
 ### Configuration ###
 Add 
 ```
-    rtc_token_secret = <secret_value>
-    rtc_token_expiry  = 120
+	rtc_token_secret = <secret_value>
+	rtc_token_expiry  = 120
 ```
  to local.ini before password_reset_links
 
@@ -3065,8 +3064,8 @@ Add
 	None.
 ### Deployment scripts ###
 	Reindex category and entry tables to sphinx
-    php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
-    php /opt/kaltura/app/deployment/base/scripts/populateSphinxEntries.php
+	php /opt/kaltura/app/deployment/base/scripts/populateSphinxCategories.php
+	php /opt/kaltura/app/deployment/base/scripts/populateSphinxEntries.php
 
 # Reach In-House Support #
 - Issue Type: Feature
@@ -3150,7 +3149,7 @@ Add
 		
 	Run deployment script:
 		- php /opt/kaltura/app/deployment/updates/scripts/2018_01_29_deploy_reach_notifications.php
-			    
+				
 	
 #### Known Issues & Limitations ####
 
@@ -3162,12 +3161,12 @@ Add
 
 ### Configuration ###
 	- Add the following to your elastic.ini file in highlights_priority section:
-        fieldname = 10
-        default = 50
-        raw = 1
-        ngrams = 100
-        synonym = 100
-        thai = 150
+		fieldname = 10
+		default = 50
+		raw = 1
+		ngrams = 100
+		synonym = 100
+		thai = 150
 ### Deployment scripts ###
 	None
 
@@ -3176,13 +3175,13 @@ PLAT-7514
 
 ### Deployment scripts ###
 -Add kms registration http request on partner creation:
-        
-        	First replcae all tokens from the XML files below and remove ".template" from the fle name:
-        		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_29_partner_Added_Media_Space_Http_Notification.template.xml
-        
-        	Run deployment script:
-        		php /opt/kaltura/app/deployment/updates/scripts/2018_05_29_partner_Added_Media_Space.php
-        		
+		
+			First replcae all tokens from the XML files below and remove ".template" from the fle name:
+				/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2018_05_29_partner_Added_Media_Space_Http_Notification.template.xml
+		
+			Run deployment script:
+				php /opt/kaltura/app/deployment/updates/scripts/2018_05_29_partner_Added_Media_Space.php
+				
 ## Allow KMC user change account functionality ##
 Issue Type:  New Feature
 Issue ID: KMCNG-1683
@@ -3308,27 +3307,27 @@ Add permission to new updateStatus action in entryServerNode service and add the
 
 ### Configuration ###
 None.
-    
+	
 ### Deployment scripts ###
 Disable current "EntryCategory added FireBase" event notification template
 
 php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/entryAddedToCategoryFireBaseHttpNotification.xml    
  
-    
+	
 # Mercury 13.18.0 #
 
 ## Webex drop folder site name ##
-    - Issue Type: New Feature
-    - Issue ID: PLAT-8732
-    
+	- Issue Type: New Feature
+	- Issue ID: PLAT-8732
+	
  ### Configuration ###
-    
-    A new property was added to drop folder profile - site name.
-    This property can be used for authentication with remote webex site.
-    New defined webex sites, can only work with this parameter rather than site-id and partner-id.
-    FYI - In most cases it can be extracted from Webex service url.
-    Example - https://SITENAME.webex.com
-    
+	
+	A new property was added to drop folder profile - site name.
+	This property can be used for authentication with remote webex site.
+	New defined webex sites, can only work with this parameter rather than site-id and partner-id.
+	FYI - In most cases it can be extracted from Webex service url.
+	Example - https://SITENAME.webex.com
+	
 ## Add conference plugin abilities ##
 	- Issue Type: New Feature
 	- Issue ID: WEBC-1075
@@ -3363,10 +3362,10 @@ php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/stan
 	- enabledWorkers.KAsyncCopyCuePoints = 1
 
 	- [KAsyncCopyCuePoints : JobHandlerWorker]
-      id                                                  = 700
-      friendlyName                                        = Copy Cue Point
-      type                                                = KAsyncCopyCuePoints
-      scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
+	  id                                                  = 700
+	  friendlyName                                        = Copy Cue Point
+	  type                                                = KAsyncCopyCuePoints
+	  scriptPath                                          = ../plugins/cue_points/base/batch/copyCuePoints/KAsyncCopyCuePointsExe.php
 
 ### Deployment scripts ###
 
@@ -3391,8 +3390,8 @@ php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/stan
 add "Konference" to plugins.ini 
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
+	  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_30_01_add_conference_service.php
 
 # Mercury 13.16.0 #
 
@@ -3462,7 +3461,7 @@ php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/stan
 None.
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_28_update_esearch_permissions.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_28_update_esearch_permissions.php
 
 ## Add new Drop Folder Type ##
 
@@ -3473,7 +3472,7 @@ None.
 None. 
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	  php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 ## Taking a break with explicit-live feature breaks player playback ##
 
@@ -3484,7 +3483,7 @@ None.
 None. 
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_04_add_is_playable_user_configurations_KalturaLiveEntryServerNode.php
+	  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_02_04_add_is_playable_user_configurations_KalturaLiveEntryServerNode.php
 
 # Mercury 13.14.0 #
 ## Add Parameters to Recorded Entry replaced EMAIL template ##
@@ -3497,7 +3496,7 @@ First replace all tokens from the XML files below and remove ".template" from th
 	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
 
 ## fix Add-Media-Entry ready email template ##
 
@@ -3511,7 +3510,7 @@ First replace all tokens from the XML files below and remove ".template" from th
 ### Deployment scripts ###
 
 	  php /opt/kaltura/app/deployment/updates/scripts/2017_06_20_deploy_new_event_notification_template.php
-      	
+		
 # Mercury 13.13.0 #
 ## Update File-Sync version field type ##
 
@@ -3535,11 +3534,11 @@ None.
 - Issue ID: PSVAMB-939  
 
 ### Configuration ###  
-    Update the plugins.ini, admin.ini, batch.ini config files from the SaaS tag.
-    
+	Update the plugins.ini, admin.ini, batch.ini config files from the SaaS tag.
+	
 ### Deployment scripts ###  
-    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_12_allow_batch_partner_to_delete_metadata.php
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2018_01_12_allow_batch_partner_to_delete_metadata.php
 
 ## Base Upload Permission and User-role ##
 
@@ -3584,13 +3583,13 @@ None.
 	- enabledWorkers.KAsyncUsersCsv = 1
 
 	- [KAsyncUsersCsv : JobHandlerWorker]
-          id						= XXXXX
-          friendlyName					= Users Csv
-          type						= KAsyncUsersCsv
-          params.localTempPath				= @TMP_DIR@/userscsv
-          params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
-          scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
-          maximumExecutionTime			= 3600
+		  id						= XXXXX
+		  friendlyName					= Users Csv
+		  type						= KAsyncUsersCsv
+		  params.localTempPath				= @TMP_DIR@/userscsv
+		  params.sharedTempPath				= @WEB_DIR@/tmp/userscsv
+		  scriptPath					= batches/UsersCsv/kAsyncUsersCsvExe.php
+		  maximumExecutionTime			= 3600
 
 ### Deployment scripts ###
 
@@ -3623,15 +3622,15 @@ None.
 	
 	5. Create new alises in elastic:
 		curl -XPOST 'ELASTIC_HOST:ELASTIC_PORT/_aliases?pretty' -H 'Content-Type: application/json' -d'{
-    	"actions" : [
-        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beacon_entry_index" } },
-        	{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beaconindex" } },
-        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beacon_entry_server_node_index" } },
-        	{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beaconindex" } },
-        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beacon_scheduled_resource_index" } },
-        	{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beaconindex" } },
-        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beacon_server_node_index" } },
-        	{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beaconindex" } }
+		"actions" : [
+			{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beacon_entry_index" } },
+			{ "add" : { "index" : "beacon_entry_index_2017_01_21", "alias" : "beaconindex" } },
+			{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beacon_entry_server_node_index" } },
+			{ "add" : { "index" : "beacon_entry_server_node_index_2017_01_21", "alias" : "beaconindex" } },
+			{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beacon_scheduled_resource_index" } },
+			{ "add" : { "index" : "beacon_scheduled_resource_index_2017_01_21", "alias" : "beaconindex" } },
+			{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beacon_server_node_index" } },
+			{ "add" : { "index" : "beacon_server_node_index_2017_01_21", "alias" : "beaconindex" } }
 			]
 		}'
 		
@@ -3648,11 +3647,11 @@ None.
 
 ### Configuration ###
 	-Add new module to the admin-console in admin.ini
-        moduls.VastCuePointNoUrl.enabled = true
-        moduls.VastCuePointNoUrl.permissionType = 2
-        moduls.VastCuePointNoUrl.label = "Allow creating VAST advertising cue points without URL"
-        moduls.VastCuePointNoUrl.permissionName = FEATURE_ALLOW_VAST_CUE_POINT_NO_URL
-        moduls.VastCuePointNoUrl.group = GROUP_ENABLE_DISABLE_FEATURES
+		moduls.VastCuePointNoUrl.enabled = true
+		moduls.VastCuePointNoUrl.permissionType = 2
+		moduls.VastCuePointNoUrl.label = "Allow creating VAST advertising cue points without URL"
+		moduls.VastCuePointNoUrl.permissionName = FEATURE_ALLOW_VAST_CUE_POINT_NO_URL
+		moduls.VastCuePointNoUrl.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ###
 
@@ -3672,7 +3671,7 @@ First replcae all tokens from the XML files below and remove ".template" from th
 	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_notRecordedEntryReplaced_emailNotification.template.xml
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_not_recorded_entry_replaced_email_notification.php 
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_not_recorded_entry_replaced_email_notification.php 
 
 
 ## Add Recorded Entry replaced EMAIL template ##
@@ -3685,7 +3684,7 @@ First replcae all tokens from the XML files below and remove ".template" from th
 	/opt/kaltura/app/deployment/updates/scripts/xml/2018_01_15_RecordedEntryReplaced_emailNotification.template.xml
 
 ### Deployment scripts ###
-      php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
+	  php /opt/kaltura/app/deployment/updates/scripts/2018_01_15_deploy_recorded_entry_replaced_email_notification.php
 ## Add notification for server node going offline ##
 
 - Issue Type: Feature
@@ -3747,7 +3746,7 @@ None.
 	Deploy Explicit Live Push notification:
 	1. Push notitifications:
 	   First replacae all tokens from in the XML file below and remove ".template" from the fle name:
-	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
 	
 	   Run deployment script:
 		1. remove existing notification template, through admin console, with system name EXPLICIT_LIVE_PUSH_NOTIFICATIONS if it exists	   
@@ -3793,7 +3792,7 @@ None.
 
 ### Configuration ###
 	- Add the following to your elastic.ini file in innerHits section:
-    	innerHitsWithObjectId = 100
+		innerHitsWithObjectId = 100
 ### Deployment scripts ###
 	None
 
@@ -3802,8 +3801,8 @@ None.
 - Issue ID: TR-1693
 
 ### Deployment script ### 
-    cd /opt/kaltura/app/tests/standAloneClient
-    php exec.php entryChangesSubscriberNotifications.xml    
+	cd /opt/kaltura/app/tests/standAloneClient
+	php exec.php entryChangesSubscriberNotifications.xml    
 
 ## Add eSearch highlight ##
 - Issue Type: Task
@@ -3887,7 +3886,7 @@ None.
 	-Add to local.ini:
 	encryption_iv = @DEFAULT_IV_16B@
 	Change the placeholder for 16 characters string 
-       
+	   
 ### Deployment scripts ###
 	None.
 
@@ -3903,7 +3902,7 @@ None.
 	Deploy Explicit Live Push notification:
 	1. Push notitifications:
 	   First replacae all tokens from in the XML file below and remove ".template" from the fle name:
-	   	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
+		/opt/kaltura/app/deployment/updates/scripts/xml/notifications/explicit_live_notification.template.xml
 	
 	   Run deployment script:
 		1. php /opt/kaltura/app/deployment/updates/scripts/2017_10_22_deploy_explicit_live_push_notifications.php
@@ -3919,7 +3918,7 @@ None.
 ### Configuration ###
 	-Add the following to Admin.ini:
 	access.search.all = SYSTEM_ADMIN_PUBLISHER_USAGE
-       
+	   
 ### Deployment scripts ###
 		None.
 
@@ -3950,7 +3949,7 @@ None.
 	-Added the following to local.ini in server-saas-config:
 	[preconvert_webcam_flv_allowed_partners]
 	Add specific partner to allow this change to affect him (e.g. 0 = @PARTNER_NUMBER@)
-       
+	   
 ### Deployment scripts ###
 		None.
 
@@ -3964,7 +3963,7 @@ None.
 
 ### Configuration ###
 	-Add new module to the admin-console in admin.ini
-        moduls.V3Studio.enabled = true
+		moduls.V3Studio.enabled = true
 	moduls.V3Studio.permissionType = 2
 	moduls.V3Studio.label = "Enable V3 Studio"
 	moduls.V3Studio.permissionName = FEATURE_V3_STUDIO_PERMISSION
@@ -4004,7 +4003,7 @@ None.
 
 ### Configuration ###
 	- Edit admin.ini
-        'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
+		'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment' change to 'moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy collaboration'
 
 ### Deployment scripts ###
 
@@ -4023,7 +4022,7 @@ None.
 - Issue ID: PLAT-7410
 
 ### Deployment scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_24_eSearch_service.php
 
 
 ## Add getVolumeMap action to flavorAsset service ##
@@ -4036,7 +4035,7 @@ None.
 - You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
 - Add the following to local.ini and replace with the tokens with the correct values:
 
-    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+	packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
 
 
 ### Deployment scripts ###
@@ -4059,7 +4058,7 @@ None.
 - You will need to have the nginx-vod-module correctly installed and configured with all the relevant dependencies to support volume map.
 - Add the following to local.ini and replace with the tokens with the correct values:
 
-    packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
+	packager_local_volume_map_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/localvolume/{url}/volume_map.csv
 
 
 ### Deployment scripts ###
@@ -4090,13 +4089,13 @@ example:
 ### Configuration ####
 
 	- Add new module to the admin-console in admin.ini
-        moduls.liveStreamUnlimitedRecording.enabled = true
-        moduls.liveStreamUnlimitedRecording.permissionType = 2
-        moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
-        moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
-        moduls.liveStreamUnlimitedRecording.basePermissionType = 2
-        moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
-        moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
+		moduls.liveStreamUnlimitedRecording.enabled = true
+		moduls.liveStreamUnlimitedRecording.permissionType = 2
+		moduls.liveStreamUnlimitedRecording.label = Enable Unlimited Recording Duration
+		moduls.liveStreamUnlimitedRecording.permissionName = FEATURE_UNLIMITED_RECORDING_DURATION
+		moduls.liveStreamUnlimitedRecording.basePermissionType = 2
+		moduls.liveStreamUnlimitedRecording.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+		moduls.liveStreamUnlimitedRecording.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ## Add permission to restore-deleted-entry action ##
 
@@ -4197,8 +4196,8 @@ Configure rabbitMq:
 	- Bind queue to exchange.
 
 ### Deployment scripts ###
-    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
-    2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_04_add_beacon_service_permissions.php
+	1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+	2. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_09_04_add_beacon_service_permissions.php
 
 ## Add new ElasticSearch plugin ##
 
@@ -4209,8 +4208,8 @@ Configure rabbitMq:
 Add the following to plugins.ini file: "ElasticSearch"
 
 ### Deployment scripts ###
-    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    2. create configurations/elastic.ini from configurations/elastic.ini.template and update placeholders with the elastic cluster information.
+	1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	2. create configurations/elastic.ini from configurations/elastic.ini.template and update placeholders with the elastic cluster information.
 
 ## Add user permission for kclip attributes ##
 
@@ -4259,7 +4258,7 @@ None
 
  - The generator.ini has been change for the clients-generator, make sure to add the following to your generator.ini:
 
-    under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
+	under [batchClient] add to the include part the action: captionSearch_captionAssetItem.list
 
 ### Deployment scripts ###
 
@@ -4277,8 +4276,8 @@ None
 Add the following to plugins.ini file: "Search"
 
 ### Deployment scripts ###
-    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    2. mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
+	1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	2. mysql -h{HOSTNAME} -u{USER} -p{PASSWORD} kaltura_sphinx_log < /opt/kaltura/app/deployment/updates/sql/2017_05_15_add_type_column_sphinx_log.sql
 
 
 ## Preserve Aspect Ratio accurately  ##
@@ -4311,11 +4310,11 @@ Need to add the following section to apache config files /etc/apache2/sites-enab
 
 	Alias /apps/kea "/opt/kaltura/apps/kea"
 	<Directory "/opt/kaltura/apps/kea">
-	    DirectoryIndex index.php
-	    Options ExecCGI -Indexes FollowSymLinks Includes
-	    Order allow,deny
-	    Allow from all
-	    AllowOverride all
+		DirectoryIndex index.php
+		Options ExecCGI -Indexes FollowSymLinks Includes
+		Order allow,deny
+		Allow from all
+		AllowOverride all
 	</Directory>
 
 ### Deployment scripts ###
@@ -4346,7 +4345,7 @@ None
 
 - Add the following to local.ini and replace with the tokens with the correct values:
 
-    packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
+	packager_mapped_thumb_capture_url = @VOD_PACKAGER_HOST@:@VOD_PACKAGER_PORT@/mappedthumb/{url}/thumb-{offset}.jpg
 
 ### Deployment scripts ###
 None
@@ -4408,7 +4407,7 @@ None.
 
 #### Known Issues & Limitations ####
 
-        None.
+		None.
 
 # Lynx 12.19.0 #
 
@@ -4424,7 +4423,7 @@ None.
 
 #### Known Issues & Limitations ####
 
-        None.
+		None.
 
 
 ## WaterMarking - functionality extension ##
@@ -4495,7 +4494,7 @@ None.
 
 	2. Push notitifications:
 	   First replcae all tokens from the XML files below and remove ".template" from the fle name:
-	   	1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
+		1. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/polls_qna_notification.template.xml
 		2. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/user_qna_notification.template.xml
 		3. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/code_qna_notification.template.xml
 		4. /opt/kaltura/app/deployment/updates/scripts/xml/notifications/public_qna_notification.template.xml
@@ -4538,7 +4537,7 @@ None.
 
 ### Deployment scripts ###
 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
 
 ## missing enum in quiz plugin ##
 
@@ -4622,7 +4621,7 @@ None.
   
 ### Deployment scripts ###
 
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2017_05_15_add_poll_service.php
 
 ## ViewHistory Feature Add missing permission item ##
 
@@ -4667,7 +4666,7 @@ None.
 
 ### Deployment scripts ###
 
-    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+	php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
 
 #### Known Issues & Limitations ####
 
@@ -5054,7 +5053,7 @@ None.
 
 ### Deployment scripts ###
 
-    php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
+	php /opt/kaltura/app/tests/standAloneClient/exec.php /opt/kaltura/app/tests/standAloneClient/contentUpdateNotifications.xml
 
 ## Transcription engines operation changes ##
 
@@ -5133,7 +5132,7 @@ None.
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2016_12_20_update_schedule_event_permissions.php
-	                
+					
 ## Need to verify ability to list occurrences by resource of their parent for Extron ##
 
  - Issue Type: Bug
@@ -5427,7 +5426,7 @@ None.
 ### Configuration ###
 - Mandatory: in admin.ini, set settings.remoteAddrHeaderSalt to the same value as remote_addr_header_salt in local.ini
 - In local.ini add the following parameters:  
-    	partner_otp_internal_ips = @IP_RANGE@  
+		partner_otp_internal_ips = @IP_RANGE@  
 	otp_required_partners[] = -2  
 
 ### Deployment scripts ###
@@ -5924,8 +5923,8 @@ Added schedule plugins to plugins.ini
  
 #### Deployment scripts####
 Install plugins:
-    php deployment/base/scripts/installPlugins.php
-    
+	php deployment/base/scripts/installPlugins.php
+	
 ## Use EntryServerNode Table when validating phantom live entries ##
 
  - Issue Type: BUG
@@ -6696,11 +6695,11 @@ None.
 
 #### Configuration ####
  
- 	None.
+	None.
 
 #### Deployment Scripts ####
 
- 	- php deployment/updates/scripts/add_permissions/2015_08_16_add_attachment_asset_permission.php
+	- php deployment/updates/scripts/add_permissions/2015_08_16_add_attachment_asset_permission.php
 
 #### Known Issues & Limitations ####
 
@@ -6715,11 +6714,11 @@ None.
 
 #### Configuration ####
  
- 	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,BASE_USER_SESSION_PERMISSION` at the end
+	- In the file "deployment/permissions/service.uiconf.ini" in the line "permissionItem7.permissions" add `,BASE_USER_SESSION_PERMISSION` at the end
 
 #### Deployment Scripts ####
 
- 	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_user_session_uiconf_listTemplates.php
+	- php deployment/updates/scripts/add_permissions/2015_07_29_allow_user_session_uiconf_listTemplates.php
 
 #### Known Issues & Limitations ####
 
@@ -6737,7 +6736,7 @@ None.
 #### Deployment Scripts ####
 
 Run:
- 	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+	- php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 #### Known Issues & Limitations ####
 
@@ -6750,11 +6749,11 @@ None.
 
 #### Configuration ####
  
- 	None.
+	None.
 
 #### Deployment Scripts ####
 
- 	- php deployment/updates/scripts/add_permissions/2015_07_29_update_quiz_and_userentry_permissions.php
+	- php deployment/updates/scripts/add_permissions/2015_07_29_update_quiz_and_userentry_permissions.php
 
 #### Known Issues & Limitations ####
 
@@ -6774,7 +6773,7 @@ None.
 
 #### Deployment Scripts ####
 
- 	- (Already executed on production) php /opt/kaltura/app/deployment/updates/scripts/2015_07_20_create_applehttp_to_multicast_delivery_profile.php
+	- (Already executed on production) php /opt/kaltura/app/deployment/updates/scripts/2015_07_20_create_applehttp_to_multicast_delivery_profile.php
 
 #### Known Issues & Limitations ####
 
@@ -6807,7 +6806,7 @@ Download Couchbase server and install according to [official instructions](http:
 #### Server Setup ####
 
  - Install Couchbase PHP extension: `pecl install couchbase-2.0.7`
-     - Required `php-devel` `gcc` `gcc-c++` `libcouchbase-devel` `libcouchbase-bin`
+	 - Required `php-devel` `gcc` `gcc-c++` `libcouchbase-devel` `libcouchbase-bin`
  - Add couchbase extension in your php.ini file.
  - Setup Couchbase server [http://@WWW_HOST@:8091](http://@WWW_HOST@:8091 "").
  - Define username and password to be used later in cache.ini configuration.
@@ -6819,55 +6818,55 @@ Download Couchbase server and install according to [official instructions](http:
  - Create View: `objectSpecific`:
 ```javascript
 	function (doc, meta) {
-    	if (meta.type == "json") {
-    		if(doc.type == "primaryObject"){
-    			emit(doc.objectKey, null);
-    		}
-    	}
+		if (meta.type == "json") {
+			if(doc.type == "primaryObject"){
+				emit(doc.objectKey, null);
+			}
+		}
 }
 ```
 
  - Create View: `relatedObjectSessions`:
 ```javascript
 	function (doc, meta) {
-    	if (meta.type == "json") {
-    		if(doc.type == "relatedObject"){
-    	 			emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
-    		}
-    	}
+		if (meta.type == "json") {
+			if(doc.type == "relatedObject"){
+					emit([doc.triggerKey, doc.objectType, doc.sessionKey], null);
+			}
+		}
 }
 ```
 	
  - Create View: `objectSessions`:
 ```javascript
 	function (doc, meta) {
-	 	if (meta.type == "json") {
-	 		if(doc.type == "primaryObject"){
-	 			emit([doc.objectKey, doc.sessionKey], null);
-	 		}
-	 	}
+		if (meta.type == "json") {
+			if(doc.type == "primaryObject"){
+				emit([doc.objectKey, doc.sessionKey], null);
+			}
+		}
 }
 ```
 
  - Create View: `objectTypeSessions`:
 ```javascript
 	function (doc, meta) {
-	 	if (meta.type == "json") {
-	 		if(doc.type == "primaryObject"){
-	 			emit([doc.objectType, doc.sessionKey], null);
-	 		}
-	 	}
+		if (meta.type == "json") {
+			if(doc.type == "primaryObject"){
+				emit([doc.objectType, doc.sessionKey], null);
+			}
+		}
 }
 ```
 	
  - Create View: `sessionType`:
 ```javascript
 	function (doc, meta) {
-    	if (meta.type == "json") {
-    		if(doc.type == "primaryObject"){
-    			emit([doc.sessionKey, doc.objectKey], null);
-    		}
-    	}
+		if (meta.type == "json") {
+			if(doc.type == "primaryObject"){
+				emit([doc.sessionKey, doc.objectKey], null);
+			}
+		}
 }
 ```
 	
@@ -6876,7 +6875,7 @@ Download Couchbase server and install according to [official instructions](http:
 	function (doc, meta) {
 		if (meta.type == "json") {
 			if(doc.type == "relatedObject"){
-	 			emit([doc.triggerKey, doc.objectType], null);
+				emit([doc.triggerKey, doc.objectType], null);
 			}
 		}
 }
@@ -7070,7 +7069,7 @@ None.
 #### Configuration ####
 
 - Add the following line to the plugins.ini file:  
-        Quiz 
+		Quiz 
 
 - Add the following lines from admin.template.ini to admin.ini:
 
@@ -7085,10 +7084,10 @@ None.
 #### Deployment Scripts ####
 
 - run the Following deployemnt scripts:
-        
+		
 		Create new user_entry table:
-        mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_15_06_create_user_entry_table.sql
-        
+		mysql -h@db_host@ -u@db_user@ -p@db_pass@ -P3306 kaltura < deployment/updates/sql/2015_15_06_create_user_entry_table.sql
+		
 
 		Update new services permissions:
 		php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2015_04_11_update_quiz_permissions.php
@@ -7167,7 +7166,7 @@ None.
 
 #### Deployment Scripts ####
 
-    - Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
+	- Need to re-build so that spaces in tags will be replaced by '=' & re-index the tag sphinx table.
 
 #### Known Issues & Limitations ####
 
@@ -7268,7 +7267,7 @@ None.
 
 		- run php /opt/kaltura/app/deployment/updates/scripts/2015_05_17_update_DRM_access_control.php
 		- run php deployment/updates/scripts/add_permissions/2015_05_17_update_drm_license_access_permissions.php
-        - run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+		- run php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 #### Known Issues & Limitations ####
 
@@ -7307,13 +7306,13 @@ None.
 ### Configuration ###
 - Add the following permission block to @APP_DIR@/configurations/admin.ini:
 		moduls.hideTemplatePartnerUiConfs.enabled = true  
-        moduls.hideTemplatePartnerUiConfs.permissionType = 2  
-        moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
-        moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
-        moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
-        moduls.hideTemplatePartnerUiConfs.basePermissionType =  
-        moduls.hideTemplatePartnerUiConfs.basePermissionName =  
-        moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
+		moduls.hideTemplatePartnerUiConfs.permissionType = 2  
+		moduls.hideTemplatePartnerUiConfs.label = "Hide template partner ui-confs from preview&embed menu"  
+		moduls.hideTemplatePartnerUiConfs.permissionName = FEATURE_HIDE_TEMPLATE_PARTNER_UICONFS  
+		moduls.hideTemplatePartnerUiConfs.basePermissionType = 2  
+		moduls.hideTemplatePartnerUiConfs.basePermissionType =  
+		moduls.hideTemplatePartnerUiConfs.basePermissionName =  
+		moduls.hideTemplatePartnerUiConfs.group = GROUP_ENABLE_DISABLE_FEATURES  
 
 ## Error when manually dispatching notification template ##
 
@@ -7394,11 +7393,11 @@ None.
 ### Configuration ###
 
 Add the following line to the plugins.ini file:  
-        FeedDropFolder 
+		FeedDropFolder 
    
 Add the following parameters to the batch.ini DropFolderWatcher worker configuration:  
-        params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
-        params.mrss.limitProcessEachRun						= 20
+		params.mrss.xmlPath									= @WEB_DIR@/tmp/dropFolderFiles  
+		params.mrss.limitProcessEachRun						= 20
    
   
 ### Deployment ###
@@ -7436,13 +7435,13 @@ None.
 
 Add the following lines from admin.template.ini to admin.ini:
 
-    moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
-    moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
-    moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
-    moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
-    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
-    moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
-    moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
+	moduls.liveStreamRecordShouldCopyEntitelment.enabled = true
+	moduls.liveStreamRecordShouldCopyEntitelment.permissionType = 2
+	moduls.liveStreamRecordShouldCopyEntitelment.label = Kaltura Live Streams - Copy entitelment
+	moduls.liveStreamRecordShouldCopyEntitelment.permissionName = FEATURE_LIVE_STREAM_COPY_ENTITELMENTS
+	moduls.liveStreamRecordShouldCopyEntitelment.basePermissionType = 2
+	moduls.liveStreamRecordShouldCopyEntitelment.basePermissionName = FEATURE_LIVE_STREAM
+	moduls.liveStreamRecordShouldCopyEntitelment.group = GROUP_ENABLE_DISABLE_FEATURES
 
 #### Deployment Scripts ####
 
@@ -8908,14 +8907,14 @@ Update admin.ini:
 
 - Remove the line (will be readded in the next item)
 
-        settings.cookieNameSpace = Zend_Auth_AdminConsole"
+		settings.cookieNameSpace = Zend_Auth_AdminConsole"
 
 - Add the following block right under the "settings.enableKCWVisualEditor" line:
 
-        ; cookie options
-        settings.cookieNameSpace = Zend_Auth_AdminConsole
-        settings.secure_cookie_upon_https = true
-        settings.sessionOptions.cookie_httponly = true
+		; cookie options
+		settings.cookieNameSpace = Zend_Auth_AdminConsole
+		settings.secure_cookie_upon_https = true
+		settings.sessionOptions.cookie_httponly = true
 		
 ## TagIndex job ##
 * Enable TagIndex job
