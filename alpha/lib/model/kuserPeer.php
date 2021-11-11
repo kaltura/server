@@ -21,6 +21,24 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL_TO_ADMINS = 125;
 	const MAX_PUSER_LENGTH = 100;
+	
+	const USER_NAME = 'userName';
+	const CREATOR_USER_NAME = 'creatorUserName';
+	const LOGIN_EMAIL = 'loginEmail';
+	const ROLE_NAME = 'roleName';
+	const QR_CODE_LINK = 'qrCodeLink';
+	const RESET_PASSWORD_LINK = 'resetPasswordLink';
+	const ADMIN_CONSOLE_LINK = 'adminConsoleLink';
+	const AUTH_TYPE = 'authType';
+	const EXISTING_USER = 'existingUser';
+	const PUBLISHER_NAME = 'publisherName';
+	const PARTNERID = 'partnerId';
+	const PUSERID = 'puserId';
+	const KMC_LINK = 'kmcLink';
+	const CONTACT_LINK = 'contactLink';
+	const BEGINNERS_GUID_LINK = 'beginnersGuideLink';
+	const QUICK_START_GUID_LINK = 'quickStartGuideLink';
+
 
 	private static $s_default_count_limit = 301;
 
@@ -614,25 +632,22 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			{
 				$mailType = self::KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL;
 				$bodyParams = array($userName, $creatorUserName, $loginEmail, $roleName, $qrCodeLink);
-				$associativeBodyParams = array(
-					'userName'=>$userName,
-					'creatorUserName'=>$creatorUserName,
-					'loginEmail'=>$loginEmail,
-					'roleName'=>$roleName,
-					'qrCodeLink'=>$qrCodeLink);
 			}
 			else
 			{
 				$mailType = self::KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL;
 				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink, $qrCodeLink);
+			}
+			if (!is_null($customizedEmailContents))
+			{
 				$associativeBodyParams = array(
-					'userName'=>$userName,
-					'creatorUserName'=>$creatorUserName,
-					'loginEmail'=>$loginEmail,
-					'resetPasswordLink'=>$resetPasswordLink,
-					'roleName'=>$roleName,
-					'adminConsoleLink'=>$adminConsoleLink,
-					'qrCodeLink'=>$qrCodeLink);
+					self::USER_NAME=>$userName,
+					self::CREATOR_USER_NAME=>$creatorUserName,
+					self::LOGIN_EMAIL=>$loginEmail,
+					self::RESET_PASSWORD_LINK=>$resetPasswordLink,
+					self::ROLE_NAME=>$roleName,
+					self::ADMIN_CONSOLE_LINK=>$adminConsoleLink,
+					self::QR_CODE_LINK=>$qrCodeLink);
 			}
 		}
 		else // Not an admin console partner
@@ -645,48 +660,55 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			}
 			$mailType = self::getUserMailType($authType, $existingUser);
 			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail, $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink, $quickStartGuideLink);
-			$associativeBodyParams = array(
-				'authType'=>$authType,
-				'existingUser'=>$existingUser,
-				'userName'=>$userName,
-				'creatorUserName'=>$creatorUserName,
-				'publisherName'=>$publisherName,
-				'loginEmail'=>$loginEmail,
-				'resetPasswordLink'=>$resetPasswordLink,
-				'partnerId'=>$partnerId,
-				'roleName'=>$roleName,
-				'puserId'=>$puserId,
-				'kmcLink'=>$kmcLink,
-				'contactLink'=>$contactLink,
-				'beginnersGuideLink'=>$beginnersGuideLink,
-				'quickStartGuideLink'=>$quickStartGuideLink);
+			if (!is_null($customizedEmailContents))
+			{
+				$associativeBodyParams = array(
+					self::AUTH_TYPE             => $authType,
+					self::EXISTING_USER         => $existingUser,
+					self::USER_NAME             => $userName,
+					self::CREATOR_USER_NAME     => $creatorUserName,
+					self::PUBLISHER_NAME        => $publisherName,
+					self::LOGIN_EMAIL           => $loginEmail,
+					self::RESET_PASSWORD_LINK   => $resetPasswordLink,
+					self::PARTNERID             => $partnerId,
+					self::ROLE_NAME             => $roleName,
+					self::PUSERID               => $puserId,
+					self::KMC_LINK              => $kmcLink,
+					self::CONTACT_LINK          => $contactLink,
+					self::BEGINNERS_GUID_LINK   => $beginnersGuideLink,
+					self::QUICK_START_GUID_LINK => $quickStartGuideLink);
+			}
 		}
 		
 		if (!is_null($customizedEmailContents))
 		{
 			$customizedEmailContents->setEmailBody(UserLoginDataPeer::populateCustomEmailBody($customizedEmailContents->getEmailBody(), $associativeBodyParams));
-			$bodyParams = array();
+			$kCustomizedEmailContents = !is_null($customizedEmailContents) ? $customizedEmailContents->toObject() : null;
+			// add mail job with customized body and subject
+			kJobsManager::addCustomizedEmailJob(
+				$partnerId,
+				$mailType,
+				$loginEmail,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				'partner_registration_confirmation_email',
+				'partner_registration_confirmation_name',
+				$kCustomizedEmailContents
+			);
 		}
-		$kCustomizedEmailContents = !is_null($customizedEmailContents) ? $customizedEmailContents->toObject() : null;
-		// add mail job
-		kJobsManager::addMailJob(
-			null, 
-			0, 
-			$partnerId, 
-			$mailType,
-			kMailJobData::MAIL_PRIORITY_NORMAL, 
-			kConf::get ("partner_registration_confirmation_email" ), 
-			kConf::get ("partner_registration_confirmation_name" ), 
-			$loginEmail, 
-			$bodyParams,
-			array(),
-			null,
-			null,
-			null,
-			null,
-			null,
-			$kCustomizedEmailContents
-		);
+		else
+		{// add mail job
+			kJobsManager::addMailJob(
+				null,
+				0,
+				$partnerId,
+				$mailType,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get("partner_registration_confirmation_email"),
+				kConf::get("partner_registration_confirmation_name"),
+				$loginEmail,
+				$bodyParams
+			);
+		}
 	}
 
 	public static function getUserMailType($authType, $existingUser)

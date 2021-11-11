@@ -203,6 +203,28 @@ class kJobsManager
 		}
 	}
 	
+	public static function addCustomizedEmailJob($partnerId, $mailType, $mailPriority, $loginEmail, $fromMail, $fromName, $kCustomizedEmailContents)
+	{
+		self::addMailJob(
+			null,
+			0,
+			$partnerId,
+			$mailType,
+			$mailPriority,
+			kConf::get ($fromMail ),
+			kConf::get ($fromName ),
+			$loginEmail,
+			array(),
+			array(),
+			null,
+			null,
+			null,
+			null,
+			null,
+			$kCustomizedEmailContents
+		);
+	}
+	
 	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName,
 									$toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null,
 									$camaignId = null, $templatePath = null, $separator = null, kCustomizedEmailContents $customizedEmailContents = null)

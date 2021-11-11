@@ -76,26 +76,30 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			$associativeBodyParams = array('userName'=>$user_name, 'resetPasswordLink'=>$resetPasswordLink);
 			$customizedEmailContents->setEmailBody(UserLoginDataPeer::populateCustomEmailBody($customizedEmailContents->getEmailBody(), $associativeBodyParams));
-			$bodyParams = array();
+			kJobsManager::addCustomizedEmailJob(
+				$partner_id,
+				UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				$cms_email,
+				'partner_change_email_email',
+				'partner_change_email_name',
+				$customizedEmailContents,
+			);
 		}
-		kJobsManager::addMailJob(
-			null,
-			0,
-			$partner_id,
-			UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET,
-			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get( "partner_change_email_email" ),
-			kConf::get( "partner_change_email_name" ),
-			$cms_email,
-			$bodyParams,
-			array(),
-			null,
-			null,
-			null,
-			null,
-			null,
-			$customizedEmailContents
-		);
+		else
+		{
+			kJobsManager::addMailJob(
+				null,
+				0,
+				$partner_id,
+				UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get( "partner_change_email_email" ),
+				kConf::get( "partner_change_email_name" ),
+				$cms_email,
+				array($user_name, $resetPasswordLink)
+			);
+		}
 	}
 	
 	public static function populateCustomEmailBody($emailBody, $associativeBodyParams)
