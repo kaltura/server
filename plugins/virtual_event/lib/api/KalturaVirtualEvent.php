@@ -148,4 +148,13 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	{
 		return array();
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert($propertiesToSkip)
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyNotNull('name');
+		parent::validateForInsert($propertiesToSkip);
+	}
 }

@@ -69,7 +69,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
 	protected function getThumbTimeline($entry)
 	{
-		if (myEntryUtils::shouldServeVodFromLive($entry))
+		if ($entry->getType() != entryType::LIVE_STREAM)
 		{
 			return $entry->getId();
 		}
@@ -77,11 +77,12 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		return $this->getUserType(!$entry->getExplicitLive() || $entry->canViewExplicitLive());
 	}
 
-	public function createThumbUrl($baseUrl, $entry)
+	public function createThumbUrl($baseUrl, $entry, $entryServerNode)
 	{
 		$serverNodeUrl = str_replace('{dc}', $this->getEnvDc(), $baseUrl);
 		$serverNodeUrl .= self::ENTRY_ID_URL_PARAM . "/{$entry->getRootEntryId()}/";
 		$serverNodeUrl .= self::TIMELINE_URL_PARAM . "/{$this->getThumbTimeline($entry)}/";
+		$serverNodeUrl .= self::SESSION_TYPE . "/{$entryServerNode->getServerType()}/";
 
 		$token = myPackagerUtils::generateLivePackagerToken($serverNodeUrl);
 		$serverNodeUrl .= "t/$token/";

@@ -60,7 +60,7 @@ class Form_Partner_BaseStorageConfiguration extends Infra_Form
 			'required'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
-		
+
 		$this->addElement('checkbox', 'allowAutoDelete', array(
 			'label'			=> 'Allow auto-deletion of files:',
 			'filters'		=> array('StringTrim'),

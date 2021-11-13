@@ -6,6 +6,8 @@
  */
 class VirtualEventService extends KalturaBaseService
 {
+	const VIRTUAL_EVENT = 'VirtualEvent';
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -15,6 +17,8 @@ class VirtualEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
 		}
+		
+		$this->applyPartnerFilterForClass(self::VIRTUAL_EVENT);
 	}
 	
 	/**
@@ -28,6 +32,8 @@ class VirtualEventService extends KalturaBaseService
 	public function addAction(KalturaVirtualEvent $virtualEvent )
 	{
 		/* @var $dbVirtualEvent VirtualEvent */
+		$this->validateScheduleEvents($virtualEvent);
+		$this->validateGroups($virtualEvent);
 		$dbVirtualEvent = $virtualEvent->toInsertableObject();
 		$dbVirtualEvent->setPartnerId($this->getPartnerId());
 		$dbVirtualEvent->save();
@@ -80,6 +86,8 @@ class VirtualEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_NOT_FOUND, $id);
 		}
+		$this->validateScheduleEvents($virtualEvent);
+		$this->validateGroups($virtualEvent);
 		
 		// save the object
 		/** @var VirtualEvent $dbVirtualEvent */
@@ -137,4 +145,57 @@ class VirtualEventService extends KalturaBaseService
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
+	protected function validateScheduleEvents (KalturaVirtualEvent $virtualEvent)
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if ($virtualEvent->agendaScheduleEventId)
+		{
+			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->agendaScheduleEventId, VirtualScheduleEventSubType::AGENDA);
+		}
+		if ($virtualEvent->registrationScheduleEventId)
+		{
+			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->registrationScheduleEventId, VirtualScheduleEventSubType::REGISTRATION);
+		}
+		if ($virtualEvent->mainEventScheduleEventId)
+		{
+			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->mainEventScheduleEventId, VirtualScheduleEventSubType::MAIN_EVENT);
+		}
+	}
+	
+	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId, $subType)
+	{
+		$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
+		if(!$dbScheduleEvents)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+		}
+		foreach ($dbScheduleEvents as $dbScheduleEvent)
+		{
+			if($dbScheduleEvent->getVirtualScheduleEventSubType() != $subType)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+			}
+		}
+	}
+	
+	protected function validateGroups (KalturaVirtualEvent $virtualEvent)
+	{
+		if (!is_null($virtualEvent->adminsGroupId))
+		{
+			$this->isValidGroup($virtualEvent->adminsGroupId);
+		}
+		if (!is_null($virtualEvent->attendeesGroupId))
+		{
+			$this->isValidGroup($virtualEvent->attendeesGroupId);
+		}
+	}
+	
+	protected function isValidGroup($groupId)
+	{
+		$dbGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $groupId);
+		if(!$dbGroup || $dbGroup->getType() != KuserType::GROUP)
+		{
+			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID, $groupId);
+		}
+	}
 }

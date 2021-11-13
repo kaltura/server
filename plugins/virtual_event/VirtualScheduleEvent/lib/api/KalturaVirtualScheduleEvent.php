@@ -68,4 +68,28 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	{
 		return $this->getScheduleEventMaxDuration();
 	}
+	
+	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
+	{
+		$this->validateEventExists();
+		return parent::toUpdatableObject($object_to_fill, $props_to_skip);
+	}
+
+	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
+	{
+		$this->validateEventExists();
+		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+	}
+
+	protected function validateEventExists()
+	{
+		if ($this->virtualEventId)
+		{
+			$dbVirtualEvent = VirtualEventPeer::retrieveByPK($this->virtualEventId);
+			if (!$dbVirtualEvent)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->virtualEventId);
+			}
+		}
+	}
 }
