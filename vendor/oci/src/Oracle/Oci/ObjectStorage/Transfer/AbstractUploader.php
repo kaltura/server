@@ -10,26 +10,14 @@ abstract class AbstractUploader implements PromisorInterface
 {
     protected $client;
 
-    protected $namespace;
-
-    protected $bucketName;
-
-    protected $objectName;
-
-    protected $source;
+    protected $uploadManagerRequest;
 
     protected $promise;
 
-    protected $extras;
-
-    public function __construct(ObjectStorageAsyncClient $client, $namespace, $bucketName, $objectName, $source, $extras)
+    public function __construct(ObjectStorageAsyncClient $client, UploadManagerRequest &$uploadManagerRequest)
     {
         $this->client = $client;
-        $this->namespace = $namespace;
-        $this->bucketName = $bucketName;
-        $this->objectName = $objectName;
-        $this->source = $source;
-        $this->extras = $extras;
+        $this->uploadManagerRequest = $uploadManagerRequest;
     }
 
     public function promise()
@@ -42,10 +30,10 @@ abstract class AbstractUploader implements PromisorInterface
 
     protected function initUploadRequest()
     {
-        return array_merge($this->extras, [
-            'namespaceName' => $this->namespace,
-            'bucketName' => $this->bucketName,
-            'objectName' => $this->objectName,
+        return array_merge($this->uploadManagerRequest->getExtras(), [
+            'namespaceName' => $this->uploadManagerRequest->getNamespace(),
+            'bucketName' => $this->uploadManagerRequest->getBucketName(),
+            'objectName' => $this->uploadManagerRequest->getObjectName(),
         ]);
     }
 

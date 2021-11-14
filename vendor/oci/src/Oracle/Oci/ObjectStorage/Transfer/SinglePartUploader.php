@@ -6,15 +6,15 @@ use Oracle\Oci\ObjectStorage\ObjectStorageAsyncClient;
 
 class SinglePartUploader extends AbstractUploader
 {
-    public function __construct(ObjectStorageAsyncClient $client, $namespace, $bucketName, $objectName, $source, $extras)
+    public function __construct(ObjectStorageAsyncClient $client, UploadManagerRequest &$uploadManagerRequest)
     {
-        parent::__construct($client, $namespace, $bucketName, $objectName, $source, $extras);
+        parent::__construct($client, $uploadManagerRequest);
     }
 
     protected function prepareUpload()
     {
         return $this->client->putObjectAsync(array_merge([
-            'putObjectBody' => $this->source,
+            'putObjectBody' => $this->uploadManagerRequest->getSource(),
         ], $this->initUploadRequest()));
     }
 }

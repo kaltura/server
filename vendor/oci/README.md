@@ -109,10 +109,10 @@ echo "UserAgent: " . UserAgent::getUserAgent() . PHP_EOL;
 
 ## Examples
 
-Examples can be found [here](/src/Oracle/Oci/Examples/).
+Examples can be found [here](/tests/Oracle/Oci/Examples/).
 
 You may run any example by invoking the `php` command with the example you want to run,
-for example: `php src/Oracle/Oci/Examples/ObjectStorageExample.php`
+for example: `php tests/Oracle/Oci/Examples/ObjectStorageExample.php`
 
 ## Documentation
 
@@ -145,7 +145,7 @@ Install Composer as package manager for PHP:
 
 ### Running the Instance Principals Example
 
-The src/Oracle/Oci/Examples/InstancePrincipalsExample.php must be run on an OCI instance. To set it up, you can follow these steps:
+The [`tests/Oracle/Oci/Examples/InstancePrincipalsExample.php`](/tests/Oracle/Oci/Examples/InstancePrincipalsExample.php) and [`tests/Oracle/Oci/Examples/CachingInstancePrincipalsExample.php`](/tests/Oracle/Oci/Examples/CachingInstancePrincipalsExample.php) examples must be run on an OCI instance. To set it up, you can follow these steps:
 
 1. Create a dynamic group. You can use a matching rule like this to get all instances in a certain compartment:
     ```
@@ -169,7 +169,7 @@ The src/Oracle/Oci/Examples/InstancePrincipalsExample.php must be run on an OCI 
 7. SSH into the OCI instance.
 8. Run the example:
     ```
-    php src/Oracle/Oci/Examples/InstancePrincipalsExample.php
+    php tests/Oracle/Oci/Examples/InstancePrincipalsExample.php
     ```
 9. Run the Instance Principal-specific unit tests:
     ```

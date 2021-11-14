@@ -10,6 +10,3 @@ parameters:
 				- src/Oracle/*
 				- tests/*
 
-		-
-			message: "#^Call to an undefined method Oracle\\\\Oci\\\\.*\\\\.*Client\\:\\:list.*Iterator\\(\\)\\.$#"
-			path: src/Oracle/*

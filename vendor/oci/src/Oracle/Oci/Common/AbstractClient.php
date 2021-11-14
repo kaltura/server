@@ -13,17 +13,19 @@ use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
 use OpenSSLAsymmetricKey;
 use Oracle\Oci\Common\Auth\AuthProviderInterface;
+use Oracle\Oci\Common\Auth\RefreshableOnNotAuthenticatedInterface;
 use Oracle\Oci\Common\Auth\RegionProviderInterface;
 use Oracle\Oci\Common\Logging\LogAdapterInterface;
 use Oracle\Oci\Common\Logging\Logger;
 use Oracle\Oci\Common\Logging\NamedLogAdapterDecorator;
 use Oracle\Oci\Common\Logging\RedactingLogAdapterDecorator;
+use Psr\Http\Message\ResponseInterface;
 
 abstract class AbstractClient
 {
     /*LogAdapterInterface*/ protected $logAdapter;
 
-    /*AuthProviderInterface*/ protected $auth_provider;
+    /*AuthProviderInterface*/ protected $authProvider;
     /*?Region*/ protected $region;
     /*SigningStrategyInterface*/ protected $signingStrategy;
 
@@ -35,15 +37,15 @@ abstract class AbstractClient
 
     public function __construct(
         $endpointTemplate,
-        AuthProviderInterface $auth_provider,
+        AuthProviderInterface $authProvider,
         SigningStrategyInterface $signingStrategy,
         $region=null,
         $endpoint=null
     ) {
-        $this->auth_provider = $auth_provider;
+        $this->authProvider = $authProvider;
         $this->signingStrategy = $signingStrategy;
 
-        $this->region = AbstractClient::determineRegion($region, $auth_provider, $this->logger());
+        $this->region = AbstractClient::determineRegion($region, $authProvider, $this->logger());
         $this->endpoint = AbstractClient::determineEndpoint($endpoint, $this->region, $endpointTemplate, $this->logger());
 
         $this->setClientWithDefaultHandler();
@@ -96,6 +98,25 @@ abstract class AbstractClient
         $this->stack->after('prepare_body', Middleware::mapRequest(function (RequestInterface $request) {
             return $this->signingMiddleware($request);
         }), 'signingMiddleware');
+        
+        $this->stack->push(Middleware::retry($this->refreshableAuthRetryDecider()));
+    }
+    
+    protected function refreshableAuthRetryDecider()
+    {
+        return function ($retries, $request, $response = null, $exception = null) {
+            if ($retries >= 1) {
+                return false;
+            }
+            if ($response
+                && $response->getStatusCode() == 401
+                && $this->authProvider instanceof RefreshableOnNotAuthenticatedInterface
+                && $this->authProvider->isRefreshableOnNotAuthenticated()) { // @phpstan-ignore-line
+                $this->authProvider->refresh();
+                return true;
+            }
+            return false;
+        };
     }
 
     /**
@@ -104,17 +125,17 @@ abstract class AbstractClient
      * If both a region is specified and the auth provider provides a region, the region specified directly takes precedence.
      *
      * @param Region|string|null $region the Region object; or region id or region code as a string; or null, if no region given (outside of the auth provier)
-     * @param AuthProviderInterface $auth_provider the auth provider; if it implements RegionProviderInterface, the auth provider may provide the region
+     * @param AuthProviderInterface $authProvider the auth provider; if it implements RegionProviderInterface, the auth provider may provide the region
      * @param LogAdapterInterface $logger logger for informational messages
      *
      * @return Region|null region or null
      */
-    public static function determineRegion(/*Region|string|null*/ $region, AuthProviderInterface $auth_provider, LogAdapterInterface $logger) // : Region
+    public static function determineRegion(/*Region|string|null*/ $region, AuthProviderInterface $authProvider, LogAdapterInterface $logger) // : Region
     {
         $resultRegion = null;
 
-        if ($auth_provider instanceof RegionProviderInterface) {
-            $resultRegion = $auth_provider->getRegion();
+        if ($authProvider instanceof RegionProviderInterface) {
+            $resultRegion = $authProvider->getRegion();
             if (!$resultRegion instanceof Region) {
                 throw new InvalidArgumentException(
                     "The region returned by RegionProviderInterface must be an Oracle\Oci\Common\Region, " .
@@ -270,12 +291,12 @@ abstract class AbstractClient
         // getting the keyId before signing it, because if the auth provider is an AbstractRequestingAuthenticationDetailsProvider,
         // e.g InstancePrincipalsAuthProvider, then getting the key id might trigger a refresh of the session keys.
         // Let's do that now, rather than after signing, so the key id and the private key used for signing are in sync.
-        $keyId = $this->auth_provider->getKeyId();
+        $keyId = $this->authProvider->getKeyId();
 
         $signature = AbstractClient::sign_string(
             $signing_string,
-            $this->auth_provider->getPrivateKey(),
-            $this->auth_provider->getKeyPassphrase()
+            $this->authProvider->getPrivateKey(),
+            $this->authProvider->getKeyPassphrase()
         );
 
         $authorization_header = "Signature version=\"1\",keyId=\"$keyId\",algorithm=\"rsa-sha256\",headers=\"$headersString\",signature=\"$signature\"";
@@ -347,6 +368,12 @@ abstract class AbstractClient
     {
         $request = $this->initRequest($httpMethod, $endpoint, $opts);
         $responseBodyType = isset($opts['response_body_type']) ? $opts['response_body_type'] : "";
+        
+        return $this->sendRequestAsync($request, $responseBodyType);
+    }
+
+    private function sendRequestAsync(&$request, $responseBodyType)
+    {
         $responsePromise = $this->client->sendAsync($request)->then(
             function ($__response) use ($responseBodyType) {
                 if ($responseBodyType == 'binary') {

@@ -21,16 +21,20 @@ use Oracle\Oci\Common\HttpUtils;
 use Oracle\Oci\Common\Region;
 use Oracle\Oci\Common\UserAgent;
 use Oracle\Oci\Common\OciException;
-use Oracle\Oci\ObjectStorage\ObjectStorageClient;
-use GuzzleHttp\Exception\ClientException;
+use Oracle\Oci\Common\OciBadResponseException;
 use Oracle\Oci\Common\AbstractClient;
-use Oracle\Oci\Common\Logging\EchoLogAdapter;
 use Oracle\Oci\Common\ConfigFile;
+use Oracle\Oci\Common\Logging\EchoLogAdapter;
 use Oracle\Oci\Common\Auth\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Auth\InstancePrincipalsAuthProvider;
+
 use Oracle\Oci\ObjectStorage\ObjectStorageAsyncClient;
 use Oracle\Oci\ObjectStorage\Transfer\UploadManager;
 use Oracle\Oci\ObjectStorage\Transfer\MultipartUploadException;
+use Oracle\Oci\ObjectStorage\ObjectStorageClient;
+use Oracle\Oci\ObjectStorage\Transfer\UploadManagerRequest;
+
+use GuzzleHttp\Exception\ClientException;
 
 
 class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
@@ -166,11 +170,17 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		list($bucketName, $fileName) = $this->getBucketAndFilePath($filePath);
 		list($fileContentPath, $isTmpFile) = $this->getFileContentToPathHelper($fileContent);
 		
+		$uploadManagerRequest = UploadManagerRequest::createUploadManagerRequest(
+			$this->namespaceName,
+			$bucketName,
+			$fileName,
+			$fileContent
+		);
+		
 		$uploadManager = new UploadManager($this->objectStorageAsyncClient);
-		$uploadPromise = $uploadManager->uploadFile($this->namespaceName, $bucketName, $fileName, $fileContentPath);
+		$uploadPromise = $uploadManager->upload($uploadManagerRequest);
 		$resumeInfo = null;
 		$retries = $this->retriesNum;
-		
 		
 		while ($retries > 0)
 		{
