@@ -165,10 +165,9 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		return $this->doPutFileContent($filePath, (string)$fileContent);
 	}
 	
-	private function doPutFileHelper($filePath , $fileContent, $params)
+	private function doPutFileHelper($filePath , $fileContent)
 	{
 		list($bucketName, $fileName) = $this->getBucketAndFilePath($filePath);
-		list($fileContentPath, $isTmpFile) = $this->getFileContentToPathHelper($fileContent);
 		
 		$uploadManagerRequest = UploadManagerRequest::createUploadManagerRequest(
 			$this->namespaceName,
@@ -192,22 +191,19 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				}
 				else
 				{
-					$resumePromise = $uploadManager->resumeUploadFileFromResumeInfo($resumeInfo);
+					$resumePromise = $uploadManager->resumeUploadFromResumeInfo($resumeInfo);
 					$res = $resumePromise->wait();
 				}
 				
 				self::safeLog("File uploaded to OS, info: " . print_r($res, true));
-				if ($isTmpFile)
-				{
-					self::safeLog("Temp File Path was [$fileContentPath]");
-					unlink($fileContentPath);
-				}
 				return array(true, $res);
 			}
 			catch (MultipartUploadException $e)
 			{
 				$resumeInfo = $e->getMultipartResumeInfo();
 				$retries--;
+				self::safeLog("Multipart upload failed ($retries retries attempt left) info: ". $e->getFailureExceptions());
+				KalturaMonitorClient::sleep(rand(1,3));
 			}
 		}
 		
@@ -217,9 +213,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doPutFileContent($filePath, $fileContent, $flags = 0, $context = null)
 	{
-		$params = array();
-
-		list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent, $params));
+		list($success, $res) = @($this->doPutFileHelper($filePath, $fileContent));
 		if ($success)
 			return $res;
 		
@@ -432,7 +426,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		$objectsToDelete = $this->doListFiles($path,'', true);
 		foreach($objectsToDelete as $objectToDelete)
 		{
-			$unlinkSuccess = $this->doUnlink($objectToDelete['fullPath']);
+			$unlinkSuccess = $this->doUnlink($objectToDelete[3]);
 			$successMetric[$unlinkSuccess] = $successMetric[$unlinkSuccess]++;
 			$rmSuccess = $rmSuccess && $unlinkSuccess;
 		}
@@ -694,8 +688,17 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		$params = array();
 		
-		list($success, $res) = $this->doPutFileHelper($dest, $src, $params);
+		$fp = fopen($src, 'r');
+		if(!$fp)
+		{
+			self::safeLog("Failed to open file: [$src]");
+			return false;
+		}
 		
+		list($success, $res) = $this->doPutFileHelper($dest, $fp);
+		
+		//Silence error to avoid warning caused by file handle being changed by the OS client upload action
+		@fclose($fp);
 		if (!$success)
 		{
 			self::safeLog("Failed to upload file: [$src] to [$dest]");
@@ -865,56 +868,6 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		return $dirListObjects->objects;
-	}
-	
-	private function getFileContentToPathHelper($path)
-	{
-		switch (gettype($path))
-		{
-			case 'string':
-				if (is_file($path))
-					return array($path, false);
-				return self::stringToFile($path);
-			case 'resource':
-				return self::resourceToFile($path);
-			case 'object':
-				if (method_exists($path, '__toString'))
-				{
-					return self::stringToFile((string)$path);
-				}
-				break;
-			case 'array':
-				return self::stringToFile(http_build_query($path));
-		}
-		throw new InvalidArgumentException('Invalid resource type');
-	}
-	
-	private static function resourceToFile($resource)
-	{
-		$metadata = stream_get_meta_data($resource);
-		$filePath = isset($metadata['uri']) ? $metadata['uri'] : false;
-		fclose($resource);
-		if (!$filePath || !is_file($filePath))
-		{
-			self::safeLog('Failed to get path from resource');
-		}
-		return array($filePath, false);
-	}
-	
-	private static function stringToFile($string)
-	{
-		$tmpFilePath = tempnam(sys_get_temp_dir(), 'oci_upload_');
-		if (!$tmpFilePath)
-		{
-			self::safeLog('Failed to open temp file');
-			return false;
-		}
-		if (file_put_contents($tmpFilePath, $string) === false)
-		{
-			self::safeLog('Failed to write to temp file');
-			return false;
-		}
-		return array($tmpFilePath, true);
 	}
 
 	protected function getCopyParams($fromFilePath, $toFilePath)
