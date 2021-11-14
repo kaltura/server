@@ -112,7 +112,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$filesystem = new Filesystem($filesystemAdapter);
 			$cache = new FilesystemCachePool($filesystem);
 			$uncachedAuthProvider = new InstancePrincipalsAuthProvider();
-			$authProvider = new CachingRequestingAuthProvider($uncached_auth_provider, $cache);
+			$authProvider = new CachingRequestingAuthProvider($uncachedAuthProvider, $cache);
 		}
 		
 		$this->objectStoargeClient = new ObjectStorageClient($authProvider,  $this->region);
