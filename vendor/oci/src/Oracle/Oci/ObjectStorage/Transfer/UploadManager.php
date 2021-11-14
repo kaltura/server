@@ -2,10 +2,12 @@
 
 namespace Oracle\Oci\ObjectStorage\Transfer;
 
+use Exception;
 use Oracle\Oci\ObjectStorage\ObjectStorageAsyncClient;
 use GuzzleHttp\Exception\ClientException;
 use InvalidArgumentException;
 use Oracle\Oci\Common\OciException;
+use phpDocumentor\Reflection\Types\Resource_;
 use RuntimeException;
 use UploadManagerConstants;
 
@@ -20,28 +22,20 @@ class UploadManager
         $this->config = $config + UploadManagerConstants::DEFAULT_CONFIG;
     }
 
-    // Upload the provided file to object storage
+    // Upload the provided stream to object storage
     // This function will automatically determine the way to upload to object storage based on the upload manager configuration
-    // Default will split the file to 5MB per part and allow concurrency
+    // Default will split the contnet to 5MB per part and allow concurrency
     // Returns a guzzle promise
-    public function uploadFile($namespace, $bucketName, $objectName, $path, $extras = [])
+    public function upload(UploadManagerRequest $uploadManagerRequest)
     {
-        $scheme = SELF::determineScheme($path);
-        if ($scheme !== 'file') {
-            throw new InvalidArgumentException("Not supported scheme for uploadFile: $scheme");
+        $uploadManagerRequest->updateUploadConfig($this->config);
+        $size = $uploadManagerRequest->getSize();
+        if ($uploadManagerRequest->getUploadConfig()[UploadManagerConstants::ALLOW_MULTIPART_UPLOADS]) {
+            if ($size == -1 || $size > $uploadManagerRequest->getUploadConfig()[UploadManagerConstants::PART_SIZE_IN_BYTES]) {
+                return $this->multipartUpload($uploadManagerRequest);
+            }
         }
-        $path = realpath($path);
-        if (!file_exists($path)) {
-            throw new InvalidArgumentException("File does not exist: $path");
-        }
-
-        $fileSize = filesize($path);
-        if ($this->config[UploadManagerConstants::ALLOW_MULTIPART_UPLOADS] && $fileSize > $this->config[UploadManagerConstants::PART_SIZE_IN_BYTES]) {
-            $uploadId = $this->createMultipartUpload($namespace, $bucketName, $objectName, $extras);
-            return $this->multipartUpload($uploadId, $namespace, $bucketName, $objectName, $path, $extras);
-        } else {
-            return $this->fileUpload($namespace, $bucketName, $objectName, $path, $extras);
-        }
+        return $this->singlePartUpload($uploadManagerRequest);
     }
 
     // Resume upload for failed parts to object storage
@@ -50,66 +44,57 @@ class UploadManager
     // partsToRetry: A list of parts to be uploaded, should contains partNum, length and position
     // These data can be retrieved from the MultipartUploadException thrown during multipart upload
     // Returns a guzzle promise
-    public function resumeUploadFile($uploadId, $namespace, $bucketName, $objectName, $path, $partsToCommit, $partsToRetry, $extras = [])
+    public function resumeUpload($uploadId, UploadManagerRequest $uploadManagerRequest, $partsToCommit, $partsToRetry)
     {
-        $extras = array_merge($extras, ['partsToCommit'=>$partsToCommit, 'partsToRetry'=>$partsToRetry]);
-        return $this->multipartUpload($uploadId, $namespace, $bucketName, $objectName, $path, $extras);
+        if (empty($partsToRetry)) {
+            throw new InvalidArgumentException("Resume Upload require partsToRetry");
+        }
+        return $this->multipartResumeUpload($uploadId, $uploadManagerRequest, $partsToCommit, $partsToRetry);
     }
 
     // Resume upload for failed parts to object storage using the info from MultipartResumeInfo
     // MultipartResumeInfo can be retrieved from the MultipartUploadException thrown during mutipart upload
     // Returns a guzzle promise
-    public function resumeUploadFileFromResumeInfo(MultipartResumeInfo $resumeInfo)
+    public function resumeUploadFromResumeInfo(MultipartResumeInfo $resumeInfo)
     {
-        return $this->resumeUploadFile(
-            $resumeInfo->getUploadId(),
-            $resumeInfo->getNamespace(),
-            $resumeInfo->getBucketName(),
-            $resumeInfo->getObjectName(),
-            $resumeInfo->getPath(),
-            $resumeInfo->getPartsToCommit(),
-            $resumeInfo->getPartsToRetry(),
-            $resumeInfo->getExtras()
-        );
-    }
-
-    private static function determineScheme($path)
-    {
-        if (is_string($path)) {
-            return !strpos($path, '://') ? 'file' : explode('://', $path)[0];
+        $rewindResult = rewind($resumeInfo->getUploadManagerRequest()->getSource());
+        if (!$rewindResult) {
+            throw new OciException("Unable to rewind the source, resume from resumeInfo not supported");
         }
-        throw new InvalidArgumentException("Please provide file path to upload the file");
+        return $this->resumeUpload(
+            $resumeInfo->getUploadId(),
+            $resumeInfo->getUploadManagerRequest(),
+            $resumeInfo->getPartsToCommit(),
+            $resumeInfo->getPartsToRetry()
+        );
     }
 
     // Abort upload
     // This function require the uploadId returned from createMultipartUpload request
     // Returns a guzzle promise
-    public function abortUpload($uploadId, $namespace, $bucketName, $objectName, $extras = [])
+    public function abortUpload($uploadId, UploadManagerRequest $uploadManagerRequest)
     {
         $params = array_merge([
-            'namespaceName'=>$namespace,
-            'bucketName'=>$bucketName,
+            'namespaceName'=>$uploadManagerRequest->getNamespace(),
+            'bucketName'=>$uploadManagerRequest->getBucketName(),
             'uploadId'=>$uploadId,
-            'objectName'=>$objectName,
-        ], $extras);
+            'objectName'=>$uploadManagerRequest->getObjectName(),
+        ], $uploadManagerRequest->getExtras());
         return $this->client->abortMultipartUploadAsync($params);
     }
 
-    private function fileUpload($namespace, $bucketName, $objectName, $filePath, $extras)
+    private function singlePartUpload(UploadManagerRequest &$uploadManagerRequest)
     {
-        $fileContent = file_get_contents($filePath);
-        if (!$fileContent) {
-            throw new OciException("Unable to read file content");
-        }
-        $response = new SinglePartUploader($this->client, $namespace, $bucketName, $objectName, $fileContent, $extras);
+        $response = new SinglePartUploader($this->client, $uploadManagerRequest);
         return $response->promise();
     }
 
-    private function multipartUpload($uploadId, $namespace, $bucketName, $objectName, $filePath, $extras)
+    private function multipartUpload(UploadManagerRequest &$uploadManagerRequest)
     {
-        return (new MultipartFileUploader($this->client, $namespace, $bucketName, $objectName, $uploadId, $filePath, $extras, $this->config))->promise()->then(
-            function ($partsToCommit) use ($namespace, $bucketName, $objectName, $uploadId, $extras) {
-                return $this->commitMultipartUpload($namespace, $bucketName, $objectName, $uploadId, $partsToCommit, $extras);
+        $uploadId = $this->createMultipartUpload($uploadManagerRequest);
+        return (new MultipartStreamUploader($this->client, $uploadId, $uploadManagerRequest))->promise()->then(
+            function ($partsToCommit) use ($uploadId, $uploadManagerRequest) {
+                return $this->commitMultipartUpload($uploadId, $uploadManagerRequest, $partsToCommit);
             },
             function ($e) {
                 // we'll not perform retry directly, instead throw the exception and users can decide what to do next
@@ -118,30 +103,43 @@ class UploadManager
         );
     }
 
-    private function createMultipartUpload($namespace, $bucketName, $objectName, $extras)
+    private function multipartResumeUpload($uploadId, UploadManagerRequest &$uploadManagerRequest, $partsToCommit, $partsToRetry)
     {
-        $params = [
-            'namespaceName'=>$namespace,
-            'bucketName'=>$bucketName,
+        return (new MultipartStreamResumeUploader($this->client, $uploadId, $uploadManagerRequest, $partsToCommit, $partsToRetry))->promise()->then(
+            function ($partsToCommit) use ($uploadId, $uploadManagerRequest) {
+                return $this->commitMultipartUpload($uploadId, $uploadManagerRequest, $partsToCommit);
+            },
+            function ($e) {
+                // we'll not perform retry directly, instead throw the exception and users can decide what to do next
+                throw $e;
+            }
+        );
+    }
+
+    private function createMultipartUpload(UploadManagerRequest &$uploadManagerRequest)
+    {
+        $params = array_merge([
+            'namespaceName'=>$uploadManagerRequest->getNamespace(),
+            'bucketName'=>$uploadManagerRequest->getBucketName(),
             'createMultipartUploadDetails'=>[
-                'object'=> $objectName
+                'object'=> $uploadManagerRequest->getObjectName()
             ]
-        ];
-        $response = $this->client->createMultipartUploadAsync(array_merge($params, $extras))->wait();
+        ], $uploadManagerRequest->getExtras());
+        $response = $this->client->createMultipartUploadAsync($params)->wait();
         return $response->getJson()->uploadId;
     }
 
-    private function commitMultipartUpload($namespace, $bucketName, $objectName, $uploadId, $partsToCommit, $extras = [])
+    private function commitMultipartUpload($uploadId, UploadManagerRequest &$uploadManagerRequest, $partsToCommit)
     {
         $params = array_merge([
-            'namespaceName'=>$namespace,
-            'bucketName'=>$bucketName,
+            'namespaceName'=>$uploadManagerRequest->getNamespace(),
+            'bucketName'=>$uploadManagerRequest->getBucketName(),
             'uploadId'=>$uploadId,
-            'objectName'=>$objectName,
+            'objectName'=>$uploadManagerRequest->getObjectName(),
             'commitMultipartUploadDetails'=>[
                 'partsToCommit'=>$partsToCommit
             ],
-        ], $extras);
+        ], $uploadManagerRequest->getExtras());
 
         return $this->client->commitMultipartUploadAsync($params);
     }

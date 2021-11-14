@@ -1,5 +1,206 @@
 [
     {
+        "name": "cache/adapter-common",
+        "version": "1.2.0",
+        "version_normalized": "1.2.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-cache/adapter-common.git",
+            "reference": "6b87c5cbdf03be42437b595dbe5de8e97cd1d497"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-cache/adapter-common/zipball/6b87c5cbdf03be42437b595dbe5de8e97cd1d497",
+            "reference": "6b87c5cbdf03be42437b595dbe5de8e97cd1d497",
+            "shasum": ""
+        },
+        "require": {
+            "cache/tag-interop": "^1.0",
+            "php": "^5.6 || ^7.0 || ^8.0",
+            "psr/cache": "^1.0",
+            "psr/log": "^1.0",
+            "psr/simple-cache": "^1.0"
+        },
+        "require-dev": {
+            "cache/integration-tests": "^0.16",
+            "phpunit/phpunit": "^5.7.21"
+        },
+        "time": "2020-12-14T12:17:39+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Cache\\Adapter\\Common\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Aaron Scherer",
+                "email": "aequasi@gmail.com",
+                "homepage": "https://github.com/aequasi"
+            },
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias.nyholm@gmail.com",
+                "homepage": "https://github.com/nyholm"
+            }
+        ],
+        "description": "Common classes for PSR-6 adapters",
+        "homepage": "http://www.php-cache.com/en/latest/",
+        "keywords": [
+            "cache",
+            "psr-6",
+            "tag"
+        ],
+        "support": {
+            "source": "https://github.com/php-cache/adapter-common/tree/1.2.0"
+        }
+    },
+    {
+        "name": "cache/filesystem-adapter",
+        "version": "1.1.0",
+        "version_normalized": "1.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-cache/filesystem-adapter.git",
+            "reference": "1501ca71502f45114844824209e6a41d87afb221"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-cache/filesystem-adapter/zipball/1501ca71502f45114844824209e6a41d87afb221",
+            "reference": "1501ca71502f45114844824209e6a41d87afb221",
+            "shasum": ""
+        },
+        "require": {
+            "cache/adapter-common": "^1.0",
+            "league/flysystem": "^1.0",
+            "php": "^5.6 || ^7.0 || ^8.0",
+            "psr/cache": "^1.0",
+            "psr/simple-cache": "^1.0"
+        },
+        "provide": {
+            "psr/cache-implementation": "^1.0",
+            "psr/simple-cache-implementation": "^1.0"
+        },
+        "require-dev": {
+            "cache/integration-tests": "^0.16",
+            "phpunit/phpunit": "^5.7.21"
+        },
+        "time": "2020-12-14T12:17:39+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Cache\\Adapter\\Filesystem\\": ""
+            },
+            "exclude-from-classmap": [
+                "/Tests/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Aaron Scherer",
+                "email": "aequasi@gmail.com",
+                "homepage": "https://github.com/aequasi"
+            },
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias.nyholm@gmail.com",
+                "homepage": "https://github.com/nyholm"
+            }
+        ],
+        "description": "A PSR-6 cache implementation using filesystem. This implementation supports tags",
+        "homepage": "http://www.php-cache.com/en/latest/",
+        "keywords": [
+            "cache",
+            "filesystem",
+            "psr-6",
+            "tag"
+        ],
+        "support": {
+            "source": "https://github.com/php-cache/filesystem-adapter/tree/1.1.0"
+        }
+    },
+    {
+        "name": "cache/tag-interop",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-cache/tag-interop.git",
+            "reference": "909a5df87e698f1665724a9e84851c11c45fbfb9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-cache/tag-interop/zipball/909a5df87e698f1665724a9e84851c11c45fbfb9",
+            "reference": "909a5df87e698f1665724a9e84851c11c45fbfb9",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^5.5 || ^7.0 || ^8.0",
+            "psr/cache": "^1.0"
+        },
+        "time": "2020-12-04T14:11:04+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Cache\\TagInterop\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Tobias Nyholm",
+                "email": "tobias.nyholm@gmail.com",
+                "homepage": "https://github.com/nyholm"
+            },
+            {
+                "name": "Nicolas Grekas",
+                "email": "p@tchwork.com",
+                "homepage": "https://github.com/nicolas-grekas"
+            }
+        ],
+        "description": "Framework interoperable interfaces for tags",
+        "homepage": "https://www.php-cache.com/en/latest/",
+        "keywords": [
+            "cache",
+            "psr",
+            "psr6",
+            "tag"
+        ],
+        "support": {
+            "issues": "https://github.com/php-cache/tag-interop/issues",
+            "source": "https://github.com/php-cache/tag-interop/tree/1.0.1"
+        }
+    },
+    {
         "name": "doctrine/instantiator",
         "version": "1.4.0",
         "version_normalized": "1.4.0.0",
@@ -333,6 +534,152 @@
             },
             {
                 "url": "https://tidelift.com/funding/github/packagist/guzzlehttp/psr7",
+                "type": "tidelift"
+            }
+        ]
+    },
+    {
+        "name": "league/flysystem",
+        "version": "1.1.5",
+        "version_normalized": "1.1.5.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/thephpleague/flysystem.git",
+            "reference": "18634df356bfd4119fe3d6156bdb990c414c14ea"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/18634df356bfd4119fe3d6156bdb990c414c14ea",
+            "reference": "18634df356bfd4119fe3d6156bdb990c414c14ea",
+            "shasum": ""
+        },
+        "require": {
+            "ext-fileinfo": "*",
+            "league/mime-type-detection": "^1.3",
+            "php": "^7.2.5 || ^8.0"
+        },
+        "conflict": {
+            "league/flysystem-sftp": "<1.0.6"
+        },
+        "require-dev": {
+            "phpspec/prophecy": "^1.11.1",
+            "phpunit/phpunit": "^8.5.8"
+        },
+        "suggest": {
+            "ext-ftp": "Allows you to use FTP server storage",
+            "ext-openssl": "Allows you to use FTPS server storage",
+            "league/flysystem-aws-s3-v2": "Allows you to use S3 storage with AWS SDK v2",
+            "league/flysystem-aws-s3-v3": "Allows you to use S3 storage with AWS SDK v3",
+            "league/flysystem-azure": "Allows you to use Windows Azure Blob storage",
+            "league/flysystem-cached-adapter": "Flysystem adapter decorator for metadata caching",
+            "league/flysystem-eventable-filesystem": "Allows you to use EventableFilesystem",
+            "league/flysystem-rackspace": "Allows you to use Rackspace Cloud Files",
+            "league/flysystem-sftp": "Allows you to use SFTP server storage via phpseclib",
+            "league/flysystem-webdav": "Allows you to use WebDAV storage",
+            "league/flysystem-ziparchive": "Allows you to use ZipArchive adapter",
+            "spatie/flysystem-dropbox": "Allows you to use Dropbox storage",
+            "srmklive/flysystem-dropbox-v2": "Allows you to use Dropbox storage for PHP 5 applications"
+        },
+        "time": "2021-08-17T13:49:42+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "League\\Flysystem\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Frank de Jonge",
+                "email": "info@frenky.net"
+            }
+        ],
+        "description": "Filesystem abstraction: Many filesystems, one API.",
+        "keywords": [
+            "Cloud Files",
+            "WebDAV",
+            "abstraction",
+            "aws",
+            "cloud",
+            "copy.com",
+            "dropbox",
+            "file systems",
+            "files",
+            "filesystem",
+            "filesystems",
+            "ftp",
+            "rackspace",
+            "remote",
+            "s3",
+            "sftp",
+            "storage"
+        ],
+        "funding": [
+            {
+                "url": "https://offset.earth/frankdejonge",
+                "type": "other"
+            }
+        ]
+    },
+    {
+        "name": "league/mime-type-detection",
+        "version": "1.8.0",
+        "version_normalized": "1.8.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/thephpleague/mime-type-detection.git",
+            "reference": "b38b25d7b372e9fddb00335400467b223349fd7e"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/b38b25d7b372e9fddb00335400467b223349fd7e",
+            "reference": "b38b25d7b372e9fddb00335400467b223349fd7e",
+            "shasum": ""
+        },
+        "require": {
+            "ext-fileinfo": "*",
+            "php": "^7.2 || ^8.0"
+        },
+        "require-dev": {
+            "friendsofphp/php-cs-fixer": "^2.18",
+            "phpstan/phpstan": "^0.12.68",
+            "phpunit/phpunit": "^8.5.8 || ^9.3"
+        },
+        "time": "2021-09-25T08:23:19+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "League\\MimeTypeDetection\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Frank de Jonge",
+                "email": "info@frankdejonge.nl"
+            }
+        ],
+        "description": "Mime-type detection for Flysystem",
+        "funding": [
+            {
+                "url": "https://github.com/frankdejonge",
+                "type": "github"
+            },
+            {
+                "url": "https://tidelift.com/funding/github/packagist/league/flysystem",
                 "type": "tidelift"
             }
         ]
@@ -1164,6 +1511,57 @@
         "abandoned": true
     },
     {
+        "name": "psr/cache",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-fig/cache.git",
+            "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-fig/cache/zipball/d11b50ad223250cf17b86e38383413f5a6764bf8",
+            "reference": "d11b50ad223250cf17b86e38383413f5a6764bf8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2016-08-06T20:24:11+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\Cache\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interface for caching libraries",
+        "keywords": [
+            "cache",
+            "psr",
+            "psr-6"
+        ],
+        "support": {
+            "source": "https://github.com/php-fig/cache/tree/master"
+        }
+    },
+    {
         "name": "psr/container",
         "version": "1.1.2",
         "version_normalized": "1.1.2.0",
@@ -1262,6 +1660,111 @@
         ],
         "support": {
             "source": "https://github.com/php-fig/http-message/tree/master"
+        }
+    },
+    {
+        "name": "psr/log",
+        "version": "1.1.4",
+        "version_normalized": "1.1.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-fig/log.git",
+            "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
+            "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2021-05-03T11:20:27+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.1.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\Log\\": "Psr/Log/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "https://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interface for logging libraries",
+        "homepage": "https://github.com/php-fig/log",
+        "keywords": [
+            "log",
+            "psr",
+            "psr-3"
+        ],
+        "support": {
+            "source": "https://github.com/php-fig/log/tree/1.1.4"
+        }
+    },
+    {
+        "name": "psr/simple-cache",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/php-fig/simple-cache.git",
+            "reference": "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/408d5eafb83c57f6365a3ca330ff23aa4a5fa39b",
+            "reference": "408d5eafb83c57f6365a3ca330ff23aa4a5fa39b",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2017-10-23T01:57:42+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Psr\\SimpleCache\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PHP-FIG",
+                "homepage": "http://www.php-fig.org/"
+            }
+        ],
+        "description": "Common interfaces for simple caching",
+        "keywords": [
+            "cache",
+            "caching",
+            "psr",
+            "psr-16",
+            "simple-cache"
+        ],
+        "support": {
+            "source": "https://github.com/php-fig/simple-cache/tree/master"
         }
     },
     {

@@ -16,23 +16,23 @@ interface AuthProviderInterface
     /**
      * Return the private key.
      *
-     * @return OpenSSLAsymmetricKey|string either an already parsed OpenSSLAsymmetricKey, a filename in the format scheme://path/to/file.pem, or a PEM formatted private key as a string.
+     * @return OpenSSLAsymmetricKey|string|resource either an already parsed OpenSSLAsymmetricKey, a filename in the format scheme://path/to/file.pem, or a PEM formatted private key as a string.
      */
-    public function getPrivateKey(); //  : string;
+    public function getPrivateKey();
 
     /**
      * Return the key passphrase, or null if none.
      *
      * @return string|null key passphrase, or null if none
      */
-    public function getKeyPassphrase(); // : ?string;
+    public function getKeyPassphrase();
 
     /**
      * Return the key id.
      *
      * @return string key id
      */
-    public function getKeyId(); // : string;
+    public function getKeyId();
 }
 
 /**

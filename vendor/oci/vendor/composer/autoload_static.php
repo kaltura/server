@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
+class ComposerStaticInit26b8b4bc6bc76994b41dab5e1e3206a8
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -55,8 +55,11 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         ),
         'P' => 
         array (
+            'Psr\\SimpleCache\\' => 16,
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
+            'Psr\\Cache\\' => 10,
             'Prophecy\\' => 9,
         ),
         'O' => 
@@ -66,6 +69,11 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         'N' => 
         array (
             'N98\\JUnitXml\\' => 13,
+        ),
+        'L' => 
+        array (
+            'League\\MimeTypeDetection\\' => 25,
+            'League\\Flysystem\\' => 17,
         ),
         'G' => 
         array (
@@ -77,6 +85,12 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         array (
             'Doctrine\\Instantiator\\' => 22,
             'DeepCopy\\' => 9,
+        ),
+        'C' => 
+        array (
+            'Cache\\TagInterop\\' => 17,
+            'Cache\\Adapter\\Filesystem\\' => 25,
+            'Cache\\Adapter\\Common\\' => 21,
         ),
     );
 
@@ -147,6 +161,14 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
         ),
+        'Psr\\SimpleCache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
@@ -154,6 +176,10 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'Psr\\Cache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/cache/src',
         ),
         'Prophecy\\' => 
         array (
@@ -166,6 +192,14 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         'N98\\JUnitXml\\' => 
         array (
             0 => __DIR__ . '/..' . '/n98/junit-xml/src/N98/JUnitXml',
+        ),
+        'League\\MimeTypeDetection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/mime-type-detection/src',
+        ),
+        'League\\Flysystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/flysystem/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
@@ -187,13 +221,27 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
+        'Cache\\TagInterop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/tag-interop',
+        ),
+        'Cache\\Adapter\\Filesystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/filesystem-adapter',
+        ),
+        'Cache\\Adapter\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cache/adapter-common',
+        ),
     );
 
     public static $classMap = array (
         'AbstractClientTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AbstractClientTest.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'AuthRefreshTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AuthRefreshTest.php',
         'ConfigFileTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/ConfigFileTest.php',
         'DummyAuthProvider' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AbstractClientTest.php',
+        'DummyRefreshableAuthProvider' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AuthRefreshTest.php',
         'DummyRegionAuthProvider' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/AbstractClientTest.php',
         'File_Iterator' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Iterator.php',
         'File_Iterator_Facade' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Facade.php',
@@ -204,9 +252,11 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
         'LogAdapterTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Logging/LogAdapterTest.php',
         'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
+        'OracleOci\\Auth\\CacheTest' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/Auth/CacheTest.php',
         'Oracle\\Oci\\Common\\AbstractClient' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/AbstractClient.php',
         'Oracle\\Oci\\Common\\Auth\\AbstractRequestingAuthenticationDetailsProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
         'Oracle\\Oci\\Common\\Auth\\AuthProviderInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
+        'Oracle\\Oci\\Common\\Auth\\CachingRequestingAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/CachingRequestingAuthProvider.php',
         'Oracle\\Oci\\Common\\Auth\\CachingSessionKeySupplier' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/InstancePrincipalsAuthProvider.php',
         'Oracle\\Oci\\Common\\Auth\\ConfigFileAuthProvider' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/AuthProviderInterface.php',
         'Oracle\\Oci\\Common\\Auth\\FederationClientInterface' => __DIR__ . '/../..' . '/src/Oracle/Oci/Common/Auth/FederationClient.php',
@@ -272,11 +322,15 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
         'Oracle\\Oci\\ObjectStorage\\ObjectStorageIterators' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/ObjectStorageIterators.php',
         'Oracle\\Oci\\ObjectStorage\\Transfer\\AbstractMultipartUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/AbstractMultipartUploader.php',
         'Oracle\\Oci\\ObjectStorage\\Transfer\\AbstractUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/AbstractUploader.php',
-        'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartFileUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartFileUploader.php',
         'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartResumeInfo' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartUploadException.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartStreamResumeUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartStreamResumeUploader.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartStreamUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartStreamUploader.php',
         'Oracle\\Oci\\ObjectStorage\\Transfer\\MultipartUploadException' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/MultipartUploadException.php',
         'Oracle\\Oci\\ObjectStorage\\Transfer\\SinglePartUploader' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/SinglePartUploader.php',
         'Oracle\\Oci\\ObjectStorage\\Transfer\\UploadManager' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/UploadManager.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\UploadManagerRequest' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/UploadManagerRequest.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\UploadManagerUploadFileRequest' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/UploadManagerRequest.php',
+        'Oracle\\Oci\\ObjectStorage\\Transfer\\UploadManagerUploadStringRequest' => __DIR__ . '/../..' . '/src/Oracle/Oci/ObjectStorage/Transfer/UploadManagerRequest.php',
         'Oracle\\Oci\\Tests\\Common\\RequestStoringMiddleware' => __DIR__ . '/../..' . '/tests/Oracle/Oci/Tests/Common/RequestStoringMiddleware.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/Assert.php',
         'PHPUnit\\Framework\\BaseTestListener' => __DIR__ . '/..' . '/phpunit/phpunit/src/ForwardCompatibility/BaseTestListener.php',
@@ -748,9 +802,9 @@ class ComposerStaticInitfef62d0c64c357a8103934033ebf3e38
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitfef62d0c64c357a8103934033ebf3e38::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitfef62d0c64c357a8103934033ebf3e38::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitfef62d0c64c357a8103934033ebf3e38::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit26b8b4bc6bc76994b41dab5e1e3206a8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit26b8b4bc6bc76994b41dab5e1e3206a8::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit26b8b4bc6bc76994b41dab5e1e3206a8::$classMap;
 
         }, null, ClassLoader::class);
     }

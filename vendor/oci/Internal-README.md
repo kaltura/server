@@ -77,7 +77,7 @@ Note: PHPstan needs to be run with PHP 7 or higher. Set the `PHPSTAN_PHP` enviro
 You can run the examples using:
 
 ```
-php src/Oracle/Oci/Examples/ObjectStorageExample.php
+php tests/Oracle/Oci/Examples/ObjectStorageExample.php
 ```
 
 # Development Requirements

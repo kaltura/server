@@ -5,7 +5,6 @@ namespace Oracle\Oci\Common\Auth;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use OpenSSLAsymmetricKey;
-use Oracle\Oci\Common\Logging\LogAdapterInterface;
 use Oracle\Oci\Common\Logging\Logger;
 use Oracle\Oci\Common\Realm;
 use Oracle\Oci\Common\Region;
@@ -103,6 +102,8 @@ class SessionKeySupplierImpl implements SessionKeySupplierInterface
         $details = openssl_pkey_get_details($res);
         $pubKey = $details["key"];
 
+        Logger::logger(static::class)->debug("Generated key pair");
+
         return new KeyPair($pubKey, $privKey);
     }
 }
@@ -128,8 +129,10 @@ class CachingSessionKeySupplier implements SessionKeySupplierInterface
 
     public function refreshKeys()
     {
+        Logger::logger(static::class)->debug("Refreshing keys...");
         $this->inner->refreshKeys();
         $this->cacheKeyPair();
+        Logger::logger(static::class)->debug("Refreshed keys, private key is now a resource: " . $this->cachedKeyPair->getPrivateKey());
     }
 
     public function getKeyPassphrase()
@@ -139,18 +142,27 @@ class CachingSessionKeySupplier implements SessionKeySupplierInterface
 
     protected function cacheKeyPair()
     {
-        if ($this->inner->getKeyPair()->getPrivateKey() instanceof OpenSSLAsymmetricKey) {
-            $parsedKey = $this->inner->getKeyPair()->getPrivateKey();
-        } else {
-            $parsedKey = openssl_pkey_get_private($this->inner->getKeyPair()->getPrivateKey(), $this->inner->getKeyPassphrase());
+        $keyPair = $this->inner->getKeyPair();
+        if (is_string($keyPair->getPrivateKey())) {
+            $parsedKey = openssl_pkey_get_private($keyPair->getPrivateKey(), $this->inner->getKeyPassphrase());
             if (!$parsedKey) {
                 throw new InvalidArgumentException('Error reading private key');
             }
+            Logger::logger(static::class)->debug("Converted string private key to " . StringUtils::get_type_or_class($parsedKey) . ": $parsedKey");
+        } else {
+            $parsedKey = $keyPair->getPrivateKey();
+            Logger::logger(static::class)->debug("Private key was already a " . StringUtils::get_type_or_class($parsedKey) . ": $parsedKey");
         }
-        $this->cachedKeyPair = new KeyPair($this->inner->getKeyPair()->getPublicKey(), $parsedKey);
+        $this->cachedKeyPair = new KeyPair($keyPair->getPublicKey(), $parsedKey);
     }
 }
 
+/**
+ * Abstract auth provider that requests credentials from the federation service.
+ *
+ * Not thread-safe: This auth provider uses a Guzzle client underneath, and Guzzle clients are not thread-safe.
+ * It is recommended to create a new instance of this auth provider per thread.
+ */
 abstract class AbstractRequestingAuthenticationDetailsProvider implements AuthProviderInterface
 {
     const REGION = "region";
@@ -185,11 +197,12 @@ abstract class AbstractRequestingAuthenticationDetailsProvider implements AuthPr
         if ($this->sessionKeySupplier == null) {
             $this->sessionKeySupplier = new SessionKeySupplierImpl();
         }
+
+        $this->sessionKeySupplier = new CachingSessionKeySupplier($this->sessionKeySupplier);
+
         if ($this->federationClient == null) {
             $this->federationClient = new X509FederationClient($this->sessionKeySupplier);
         }
-
-        $this->sessionKeySupplier = new CachingSessionKeySupplier($this->sessionKeySupplier);
 
         $this->region = $this->autoDetectRegionUsingMetadataUrl();
     }
@@ -252,6 +265,12 @@ abstract class AbstractRequestingAuthenticationDetailsProvider implements AuthPr
     }
 }
 
+/**
+ * Auth provider using this instance's principal.
+ *
+ * Not thread-safe: This auth provider uses a Guzzle client underneath, and Guzzle clients are not thread-safe.
+ * It is recommended to create a new instance of this auth provider per thread.
+ */
 class InstancePrincipalsAuthProvider extends AbstractRequestingAuthenticationDetailsProvider implements AuthProviderInterface, RegionProviderInterface, RefreshableOnNotAuthenticatedInterface
 {
     const ALLOWED_PARAMS = [];

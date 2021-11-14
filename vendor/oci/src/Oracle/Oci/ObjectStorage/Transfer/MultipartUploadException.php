@@ -8,14 +8,14 @@ class MultipartUploadException extends OciException
     protected $multipartResumeInfo;
     protected $failureExceptions = [];
 
-    public function __construct($uploadId, $namespace, $bucketName, $objectName, $path, $partsToCommit, $partsToRetry, $extras)
+    public function __construct($uploadId, UploadManagerRequest &$uploadManagerRequest, $partsToCommit, $partsToRetry)
     {
         foreach ($partsToRetry as $key => $part) {
             array_push($this->failureExceptions, $part['exception']);
             unset($partsToRetry[$key]['exception']);
         }
         
-        $this->multipartResumeInfo = new MultipartResumeInfo($uploadId, $namespace, $bucketName, $objectName, $path, $partsToCommit, $partsToRetry, $extras);
+        $this->multipartResumeInfo = new MultipartResumeInfo($uploadId, $uploadManagerRequest, $partsToCommit, $partsToRetry);
 
         parent::__construct("Multipart upload failed, recorded the exceptions to failureExceptions property");
     }
@@ -39,24 +39,16 @@ class MultipartUploadException extends OciException
 class MultipartResumeInfo
 {
     protected $uploadId;
-    protected $namespace;
-    protected $bucketName;
-    protected $objectName;
-    protected $path;
+    protected $uploadManagerRequest;
     protected $partsToCommit;
     protected $partsToRetry;
-    protected $extras;
 
-    public function __construct($uploadId, $namespace, $bucketName, $objectName, $path, $partsToCommit, $partsToRetry, $extras=[])
+    public function __construct($uploadId, UploadManagerRequest &$uploadManagerRequest, $partsToCommit, $partsToRetry)
     {
         $this->uploadId = $uploadId;
-        $this->namespace = $namespace;
-        $this->bucketName = $bucketName;
-        $this->objectName = $objectName;
-        $this->path = $path;
+        $this->uploadManagerRequest = $uploadManagerRequest;
         $this->partsToCommit = $partsToCommit;
         $this->partsToRetry = $partsToRetry;
-        $this->extras = $extras;
     }
 
     public function getUploadId()
@@ -66,22 +58,22 @@ class MultipartResumeInfo
     
     public function getNamespace()
     {
-        return $this->namespace;
+        return $this->uploadManagerRequest->getNamespace();
     }
 
     public function getBucketName()
     {
-        return $this->bucketName;
+        return $this->uploadManagerRequest->getBucketName();
     }
 
     public function getObjectName()
     {
-        return $this->objectName;
+        return $this->uploadManagerRequest->getObjectName();
     }
 
-    public function getPath()
+    public function getUploadManagerRequest()
     {
-        return $this->path;
+        return $this->uploadManagerRequest;
     }
 
     public function getPartsToCommit()
@@ -96,14 +88,14 @@ class MultipartResumeInfo
 
     public function getExtras()
     {
-        return $this->extras;
+        return $this->uploadManagerRequest->getExtras();
     }
 
     public function __toString()
     {
         return "Multipart Resume Info. "."UploadId: ".$this->uploadId.
-        " Namespace: ".$this->namespace." BucketName: ".$this->bucketName." ObjectName: ".$this->bucketName.
-        " Path: ".$this->path." PartsToCommit: ".json_encode($this->partsToCommit)." PartsToRetry: ".json_encode($this->partsToRetry).
-        " Extras: ".json_encode($this->extras);
+        " Namespace: ".$this->getNamespace()." BucketName: ".$this->getBucketName()." ObjectName: ".$this->getBucketName().
+        " PartsToCommit: ".json_encode($this->partsToCommit)." PartsToRetry: ".json_encode($this->partsToRetry).
+        " Extras: ".json_encode($this->getExtras());
     }
 }

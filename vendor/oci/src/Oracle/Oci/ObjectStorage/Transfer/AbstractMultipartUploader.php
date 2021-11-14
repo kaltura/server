@@ -4,6 +4,7 @@ namespace Oracle\Oci\ObjectStorage\Transfer;
 
 use GuzzleHttp\Promise;
 use Oracle\Oci\ObjectStorage\ObjectStorageAsyncClient;
+use Oracle\Oci\Common\Logging\Logger;
 use UploadManagerConstants;
 
 abstract class AbstractMultipartUploader extends AbstractUploader
@@ -16,10 +17,10 @@ abstract class AbstractMultipartUploader extends AbstractUploader
 
     protected $partsToRetry = [];
 
-    public function __construct(ObjectStorageAsyncClient $client, $namespace, $bucketName, $objectName, $source, $extras, array $config = [])
+    public function __construct(ObjectStorageAsyncClient $client, UploadManagerRequest &$uploadManagerRequest)
     {
-        parent::__construct($client, $namespace, $bucketName, $objectName, $source, $extras);
-        $this->config = $config;
+        parent::__construct($client, $uploadManagerRequest);
+        $this->config = $uploadManagerRequest->getUploadConfig();
     }
 
     public function promise()
@@ -37,17 +38,45 @@ abstract class AbstractMultipartUploader extends AbstractUploader
                 if (count($this->partsToRetry) > 0) {
                     throw new MultipartUploadException(
                         $this->uploadId,
-                        $this->namespace,
-                        $this->bucketName,
-                        $this->objectName,
-                        $this->source,
+                        $this->uploadManagerRequest,
                         $this->partsToCommit,
-                        $this->partsToRetry,
-                        $this->extras
+                        $this->partsToRetry
                     );
                 }
                 return $this->partsToCommit;
             }
         );
     }
+
+    protected function prepareUpload()
+    {
+        foreach ($this->prepareSources() as $source) {
+            $params = array_merge($this->initUploadRequest(), [
+                'uploadPartNum'=>$source['partNum'],
+                'uploadPartBody'=> &$source['content'],
+                'contentLength'=> $source['length'],
+                'uploadId'=> $this->uploadId,
+            ]);
+            Logger::logger(static::class)->debug("Preparing for multipart uploading part: ".$params['uploadPartNum']);
+            yield $this->client->uploadPartAsync(
+                $params
+            )->then(function ($response) use ($source) {
+                Logger::logger(static::class)->debug("multipart uploading part: ".$source['partNum']." success");
+                array_push($this->partsToCommit, [
+                        'partNum' => $source['partNum'],
+                        'etag' => $response->getHeaders()['etag'][0]
+                    ]);
+            }, function ($e) use ($source) {
+                Logger::logger(static::class)->debug("multipart uploading part: ".$source['partNum']." failed, error details: ".$e);
+                array_push($this->partsToRetry, [
+                    'partNum' => $source['partNum'],
+                    'length' => $source['length'],
+                    'position' => $source['position'],
+                    'exception' => $e
+                ]);
+            });
+            unset($source);
+        }
+    }
+    abstract protected function prepareSources();
 }
