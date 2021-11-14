@@ -27,6 +27,7 @@ use Oracle\Oci\Common\ConfigFile;
 use Oracle\Oci\Common\Logging\EchoLogAdapter;
 use Oracle\Oci\Common\Auth\ConfigFileAuthProvider;
 use Oracle\Oci\Common\Auth\InstancePrincipalsAuthProvider;
+use Oracle\Oci\Common\Auth\CachingRequestingAuthProvider;
 
 use Oracle\Oci\ObjectStorage\ObjectStorageAsyncClient;
 use Oracle\Oci\ObjectStorage\Transfer\UploadManager;
@@ -34,7 +35,10 @@ use Oracle\Oci\ObjectStorage\Transfer\MultipartUploadException;
 use Oracle\Oci\ObjectStorage\ObjectStorageClient;
 use Oracle\Oci\ObjectStorage\Transfer\UploadManagerRequest;
 
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 use GuzzleHttp\Exception\ClientException;
+use Cache\Adapter\Filesystem\FilesystemCachePool;
 
 
 class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
@@ -100,15 +104,19 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		if($this->configFileLocation)
 		{
-			$auth_provider = new ConfigFileAuthProvider(ConfigFile::loadFromFile($this->configFileLocation));
+			$authProvider = new ConfigFileAuthProvider(ConfigFile::loadFromFile($this->configFileLocation));
 		}
 		else
 		{
-			$auth_provider = new InstancePrincipalsAuthProvider();
+			$filesystemAdapter = new Local("/tmp/oci_creds_cache");
+			$filesystem = new Filesystem($filesystemAdapter);
+			$cache = new FilesystemCachePool($filesystem);
+			$uncachedAuthProvider = new InstancePrincipalsAuthProvider();
+			$authProvider = new CachingRequestingAuthProvider($uncached_auth_provider, $cache);
 		}
 		
-		$this->objectStoargeClient = new ObjectStorageClient($auth_provider,  $this->region);
-		$this->objectStorageAsyncClient = new ObjectStorageAsyncClient($auth_provider, $this->region);
+		$this->objectStoargeClient = new ObjectStorageClient($authProvider,  $this->region);
+		$this->objectStorageAsyncClient = new ObjectStorageAsyncClient($authProvider, $this->region);
 		UserAgent::setAdditionalClientUserAgent($this->getKalturaCustomUserAgent());
 	}
 	
