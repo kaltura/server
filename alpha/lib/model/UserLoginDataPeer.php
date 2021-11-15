@@ -71,11 +71,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink, $customizedEmailContents)
 	{
-		$bodyParams = array($user_name, $resetPasswordLink);
-		if (!is_null($customizedEmailContents))
+		if ($customizedEmailContents)
 		{
-			$associativeBodyParams = array('userName'=>$user_name, 'resetPasswordLink'=>$resetPasswordLink);
-			$customizedEmailContents->setEmailBody(UserLoginDataPeer::populateCustomEmailBody($customizedEmailContents->getEmailBody(), $associativeBodyParams));
+			$associativeBodyParams = array(kEmails::TAG_USER_NAME=>$user_name, kEmails::TAG_RESET_PASSWORD_LINK=>$resetPasswordLink);
+			$customizedEmailContents->setEmailBody(kEmails::populateCustomEmailBody($customizedEmailContents->getEmailBody(), $associativeBodyParams));
 			kJobsManager::addCustomizedEmailJob(
 				$partner_id,
 				UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET,
@@ -102,25 +101,25 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 	
-	public static function populateCustomEmailBody($emailBody, $associativeBodyParams)
-	{
-		$parsedEmailBody = str_replace('@authType@', $associativeBodyParams['authType'], $emailBody);
-		$parsedEmailBody = str_replace('@existingUser@', $associativeBodyParams['existingUser'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@userName@', $associativeBodyParams['userName'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@creatorUserName@', $associativeBodyParams['creatorUserName'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@publisherName@', $associativeBodyParams['$publisherName'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@loginEmail@', $associativeBodyParams['loginEmail'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@resetPasswordLink@', $associativeBodyParams['resetPasswordLink'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@partnerId@', $associativeBodyParams['$partnerId'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@puserId@', $associativeBodyParams['puserId'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@kmcLink@', $associativeBodyParams['kmcLink'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@contactLink@', $associativeBodyParams['contactLink'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@beginnersGuideLink@', $associativeBodyParams['beginnersGuideLink'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@quickStartGuideLink@', $associativeBodyParams['quickStartGuideLink'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@roleName@', $associativeBodyParams['roleName'], $parsedEmailBody);
-		$parsedEmailBody = str_replace('@adminConsoleLink@', $associativeBodyParams['adminConsoleLink'], $parsedEmailBody);
-		return str_replace('@qrCodeLink@', $associativeBodyParams['qrCodeLink'], $parsedEmailBody);
-	}
+//	public static function populateCustomEmailBody($emailBody, $associativeBodyParams)
+//	{
+//		$parsedEmailBody = str_replace('@authType@', $associativeBodyParams['authType'], $emailBody);
+//		$parsedEmailBody = str_replace('@existingUser@', $associativeBodyParams['existingUser'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@userName@', $associativeBodyParams['userName'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@creatorUserName@', $associativeBodyParams['creatorUserName'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@publisherName@', $associativeBodyParams['$publisherName'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@loginEmail@', $associativeBodyParams['loginEmail'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@resetPasswordLink@', $associativeBodyParams['resetPasswordLink'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@partnerId@', $associativeBodyParams['$partnerId'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@puserId@', $associativeBodyParams['puserId'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@kmcLink@', $associativeBodyParams['kmcLink'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@contactLink@', $associativeBodyParams['contactLink'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@beginnersGuideLink@', $associativeBodyParams['beginnersGuideLink'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@quickStartGuideLink@', $associativeBodyParams['quickStartGuideLink'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@roleName@', $associativeBodyParams['roleName'], $parsedEmailBody);
+//		$parsedEmailBody = str_replace('@adminConsoleLink@', $associativeBodyParams['adminConsoleLink'], $parsedEmailBody);
+//		return str_replace('@qrCodeLink@', $associativeBodyParams['qrCodeLink'], $parsedEmailBody);
+//	}
 	
 	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null)
 	{
@@ -286,8 +285,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 		
-		$baseLink = !is_null($customizedEmailContents) ? $customizedEmailContents->getbaseLink() : null;
-		$kCustomizedEmailContents = !is_null($customizedEmailContents) ? $customizedEmailContents->toObject() : null;
+		$baseLink = null;
+		$kCustomizedEmailContents = null;
+		if (!is_null($customizedEmailContents))
+		{
+			$baseLink = getbaseLink();
+			$kCustomizedEmailContents = $customizedEmailContents->toObject();
+		}
+		
 		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $baseLink), $kCustomizedEmailContents);
 		return true;
 	}
@@ -423,20 +428,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$partnerId = $loginData->getConfigPartnerId();
 
 		$resetLinksArray = kConf::get('password_reset_links');
-		if($baseLink)
-		{
-			$resetLinkPrefix = $baseLink;
-		}
-		elseif($linkType == resetPassLinkType::KMS)
-		{
-			$resetLinkPrefix = $resetLinksArray['kms'];
-			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
-		}
-		else
-		{
-			$resetLinkPrefix = $resetLinksArray['default'];
-		}
-
+		$resetLinkPrefix = self::getResetLinkPrefix($partnerId, $resetLinksArray, $linkType, $baseLink);
+		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner) {
 			// partner may define a custom reset password url (admin console for example)
@@ -452,6 +445,24 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$resetLinkPrefix = str_replace(infraRequestUtils::PROTOCOL_HTTP , infraRequestUtils::PROTOCOL_HTTPS , $resetLinkPrefix);
 
 		return $resetLinkPrefix.$hashKey;
+	}
+	
+	protected static function getResetLinkPrefix($partnerId, $resetLinksArray, $linkType, $baseLink = null)
+	{
+		if($baseLink)
+		{
+			$resetLinkPrefix = $baseLink;
+		}
+		elseif($linkType == resetPassLinkType::KMS)
+		{
+			$resetLinkPrefix = $resetLinksArray['kms'];
+			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
+		}
+		else
+		{
+			$resetLinkPrefix = $resetLinksArray['default'];
+		}
+		return $resetLinkPrefix;
 	}
 	
 	// user login by user_login_data record id

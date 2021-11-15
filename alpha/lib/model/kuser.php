@@ -1028,16 +1028,18 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		
 		if ($sendEmail)
 		{
-			if ($loginDataExisted) {
+			if ($loginDataExisted)
+			{
 				kuserPeer::sendNewUserMail($this, true, $customizedEmailContents);
 			}
-			else {
+			else
+			{
 				kuserPeer::sendNewUserMail($this, false,$customizedEmailContents);
 			}
-			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_USER_EMAIL, $this->getPartnerId()) && $this->getIsAdmin())
-			{
-				kuserPeer::sendNewUserMailToAdmins($this);
-			}
+//			if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_USER_EMAIL, $this->getPartnerId()))
+//			{
+//				kuserPeer::sendNewUserMailToAdmins($this);
+//			}
 		}	
 		return $this;
 	}

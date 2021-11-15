@@ -21,23 +21,6 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL = 124;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL_TO_ADMINS = 125;
 	const MAX_PUSER_LENGTH = 100;
-	
-	const USER_NAME = 'userName';
-	const CREATOR_USER_NAME = 'creatorUserName';
-	const LOGIN_EMAIL = 'loginEmail';
-	const ROLE_NAME = 'roleName';
-	const QR_CODE_LINK = 'qrCodeLink';
-	const RESET_PASSWORD_LINK = 'resetPasswordLink';
-	const ADMIN_CONSOLE_LINK = 'adminConsoleLink';
-	const AUTH_TYPE = 'authType';
-	const EXISTING_USER = 'existingUser';
-	const PUBLISHER_NAME = 'publisherName';
-	const PARTNERID = 'partnerId';
-	const PUSERID = 'puserId';
-	const KMC_LINK = 'kmcLink';
-	const CONTACT_LINK = 'contactLink';
-	const BEGINNERS_GUID_LINK = 'beginnersGuideLink';
-	const QUICK_START_GUID_LINK = 'quickStartGuideLink';
 
 
 	private static $s_default_count_limit = 301;
@@ -641,13 +624,13 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			if (!is_null($customizedEmailContents))
 			{
 				$associativeBodyParams = array(
-					self::USER_NAME=>$userName,
-					self::CREATOR_USER_NAME=>$creatorUserName,
-					self::LOGIN_EMAIL=>$loginEmail,
-					self::RESET_PASSWORD_LINK=>$resetPasswordLink,
-					self::ROLE_NAME=>$roleName,
-					self::ADMIN_CONSOLE_LINK=>$adminConsoleLink,
-					self::QR_CODE_LINK=>$qrCodeLink);
+					kEmails::TAG_USER_NAME           => $userName,
+					kEmails::TAG_CREATOR_USER_NAME   => $creatorUserName,
+					kEmails::TAG_LOGIN_EMAIL         => $loginEmail,
+					kEmails::TAG_RESET_PASSWORD_LINK => $resetPasswordLink,
+					kEmails::TAG_ROLE_NAME           => $roleName,
+					kEmails::TAG_ADMIN_CONSOLE_LINK  => $adminConsoleLink,
+					kEmails::TAG_QR_CODE_LINK        => $qrCodeLink);
 			}
 		}
 		else // Not an admin console partner
@@ -663,20 +646,20 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			if (!is_null($customizedEmailContents))
 			{
 				$associativeBodyParams = array(
-					self::AUTH_TYPE             => $authType,
-					self::EXISTING_USER         => $existingUser,
-					self::USER_NAME             => $userName,
-					self::CREATOR_USER_NAME     => $creatorUserName,
-					self::PUBLISHER_NAME        => $publisherName,
-					self::LOGIN_EMAIL           => $loginEmail,
-					self::RESET_PASSWORD_LINK   => $resetPasswordLink,
-					self::PARTNERID             => $partnerId,
-					self::ROLE_NAME             => $roleName,
-					self::PUSERID               => $puserId,
-					self::KMC_LINK              => $kmcLink,
-					self::CONTACT_LINK          => $contactLink,
-					self::BEGINNERS_GUID_LINK   => $beginnersGuideLink,
-					self::QUICK_START_GUID_LINK => $quickStartGuideLink);
+					kEmails::TAG_AUTH_TYPE             => $authType,
+					kEmails::TAG_EXISTING_USER         => $existingUser,
+					kEmails::TAG_USER_NAME             => $userName,
+					kEmails::TAG_CREATOR_USER_NAME     => $creatorUserName,
+					kEmails::TAG_PUBLISHER_NAME        => $publisherName,
+					kEmails::TAG_LOGIN_EMAIL           => $loginEmail,
+					kEmails::TAG_RESET_PASSWORD_LINK   => $resetPasswordLink,
+					kEmails::TAG_PARTNER_ID            => $partnerId,
+					kEmails::TAG_ROLE_NAME             => $roleName,
+					kEmails::TAG_PUSER_ID              => $puserId,
+					kEmails::TAG_KMC_LINK              => $kmcLink,
+					kEmails::TAG_CONTACT_LINK          => $contactLink,
+					kEmails::TAG_BEGINNERS_GUID_LINK   => $beginnersGuideLink,
+					kEmails::TAG_QUICK_START_GUID_LINK => $quickStartGuideLink);
 			}
 		}
 		
