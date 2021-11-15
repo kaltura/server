@@ -630,14 +630,20 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			'createPreauthenticatedRequestDetails' => $preAuthenticatedRequestDetails
 		);
 		
-		try
+		$preSignedUrl = null;
+		$retries = $this->retriesNum;
+		while ($retries > 0)
 		{
-			$preSignedUrl = $this->objectStoargeClient->createPreauthenticatedRequest($params)->getJson();
-		}
-		catch ( Exception $e )
-		{
-			self::safeLog("Couldn't create pre signed url for [$filePath]: {$e->getMessage()}");
-			return null;
+			try
+			{
+				$preSignedUrl = $this->objectStoargeClient->createPreauthenticatedRequest($params)->getJson();
+			}
+			catch (Exception $e)
+			{
+				self::safeLog("Couldn't create pre signed url for [$filePath]: {$e->getMessage()}");
+				KalturaMonitorClient::sleep(rand(1,3));
+				$retries--;
+			}
 		}
 		
 		if(!$preSignedUrl)
