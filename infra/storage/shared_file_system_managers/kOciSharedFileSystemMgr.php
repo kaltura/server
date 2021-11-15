@@ -637,6 +637,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			try
 			{
 				$preSignedUrl = $this->objectStoargeClient->createPreauthenticatedRequest($params)->getJson();
+				break;
 			}
 			catch (Exception $e)
 			{
