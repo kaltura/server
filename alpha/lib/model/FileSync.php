@@ -322,6 +322,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function getExternalUrl($entryId, $format = PlaybackProtocol::HTTP, $internalUsage = false)
 	{
+		if (kDataCenterMgr::isDcDecommissioned($this->getDc()))
+		{
+			return null;
+		}
+		
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC ||
 			(myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) && in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds())) )

@@ -394,4 +394,20 @@ class kDataCenterMgr
 	{
 		return (ceil(intval($version) / 10) * 10) + 2 - self::getCurrentDcId();		
 	}
+	
+	public static function getDecommissionedDcIDs()
+	{
+		$decommissionedDcIds = kConf::get('decommissioned_dc_ids', 'runtime_config', array());
+		
+		if (is_array($decommissionedDcIds))
+			return $decommissionedDcIds;
+		
+		return explode(',', $decommissionedDcIds);
+	}
+	
+	public static function isDcDecommissioned($dcId)
+	{
+		$decommissionedDcIds = self::getDecommissionedDcIds();
+		return in_array($dcId, $decommissionedDcIds);
+	}
 }
