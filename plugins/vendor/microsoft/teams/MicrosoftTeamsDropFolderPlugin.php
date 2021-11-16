@@ -3,7 +3,7 @@
 /**
  * @package plugins.MicrosoftTeamsDropFolder
  */
-class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
+class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'MicrosoftTeamsDropFolder';
 	const EVENT_TEAMS_DROP_FOLDER_FLOW_MANAGER = 'kMicrosoftTeamsDropFolderFlowManager';
