@@ -1,4 +1,12 @@
 # Quasar-17.15.0 #
+## Add permissions for quiz and fileasset to Batch partner for CrossKalturaDistributionEngine ##
+* Issue Type: Client-Bug
+* Issue ID: PSVAMB-26104
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_15_update_file_asset_permission.php
+    php deployment/updates/scripts/add_permissions/2021_11_15_update_quiz_permissions.php
+
 ## Synchronize categories of live entries with recorded VOD ##
 * Issue Type: Task
 * Issue ID: KMCNG-2387
@@ -13,6 +21,7 @@ Add the following lines from admin.template.ini to admin.ini:
     moduls.liveStreamSyncVodCategory.basePermissionType = 2
     moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
     moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
+
 
 # Quasar-17.14.0 #
 ## Virtual Event ##
