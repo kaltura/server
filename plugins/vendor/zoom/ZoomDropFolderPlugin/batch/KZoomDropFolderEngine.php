@@ -4,7 +4,7 @@
  */
 class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
-      const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200; // 3 days
+	const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200; // 3 days
 	const MAX_DATE_RANGE_DAYS = 14;
 	const ONE_DAY = 86400;
 	const HOUR = 3600;
@@ -89,18 +89,19 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsInStartTimeOrder()
 	{
-	        $fromInSec  = $this->dropFolder->lastHandledMeetingTime;
-              if($fromInSec)
-              {
-                  if($fromInSec > time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE)
-                  {
-                      $fromInSec = max($fromInSec - self::ONE_DAY, time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
-                  }
-              }
-              else
-              {
-                  $fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
-              }
+		$fromInSec  = $this->dropFolder->lastHandledMeetingTime;
+		if($fromInSec)
+		{
+			if($fromInSec > time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE)
+			{
+				$fromInSec = max($fromInSec - self::ONE_DAY, time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
+			}
+		}
+		else
+		{
+			$fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
+		}
+
 		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
 		$from = date('Y-m-d', $fromInSec);
 		$to = date('Y-m-d', $toInSec);
@@ -288,11 +289,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				$audioRecordingFile = $recordingFilesPerTimeSlot[$audioKey];
 				KalturaLog::debug('Video and Audio files were found. audio file is ' . print_r($audioRecordingFile, true) . ' , unsetting Audio');
 				unset($recordingFilesPerTimeSlot[$audioKey]);
-				if ($this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE)
-				{
-					KalturaLog::debug('Deleting Audio File From Zoom ');
-					$this->zoomClient->deleteRecordingFile($meetingFileUuid, $audioRecordingFile[self::ID]);
-				}
 			}
 		}
 	}
@@ -396,8 +392,47 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE,
 			                       DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
 		}
-		
 		$this->handleFilePurged($dropFolderFile->id);
+
+		if($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::VIDEO)
+		{
+			$this->purgeAudioFiles($dropFolderFile->meetingMetadata->uuid);
+		}
+	}
+
+	protected function purgeAudioFiles($meetingId)
+	{
+		try
+		{
+			$meetingRecordings = $this->zoomClient->getMeetingRecordings($meetingId);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err("Error when listing meeting files for meeting id [$meetingId]: " . $e->getMessage());
+			return;
+		}
+
+		if (!$meetingRecordings || !isset($meetingRecordings[kZoomRecording::RECORDING_FILES]))
+		{
+			return;
+		}
+
+		$recordingFiles = $meetingRecordings[kZoomRecording::RECORDING_FILES];
+		foreach ($recordingFiles as $recordingFile)
+		{
+			if ($recordingFile[self::RECORDING_FILE_TYPE] === self::M4A)
+			{
+				KalturaLog::debug('Deleting Audio File From Zoom, file ID: ' . $recordingFile[self::ID]);
+				try
+				{
+					$this->zoomClient->deleteRecordingFile($meetingId, $recordingFile[self::ID]);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err("Error when deleting audio file ID: " . $recordingFile[self::ID] . " Error: " . $e->getMessage());
+				}
+			}
+		}
 	}
 	
 	public function processFolder (KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
@@ -406,7 +441,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$dropFolderFileId = $data->dropFolderFileIds;
 		/* @var KalturaZoomDropFolderFile $dropFolderFile*/
 		$dropFolderFile = $this->dropFolderFileService->get($dropFolderFileId);
+
+		/* @var KalturaZoomDropFolder $dropFolder */
 		$dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
+		if(!$dropFolder->zoomVendorIntegration)
+		{
+			throw new kExternalException(KalturaDropFolderErrorCode::MISSING_CONFIG, DropFolderPlugin::MISSING_CONFIG_MESSAGE);
+		}
+
 		$zoomBaseUrl = $dropFolder->baseURL;
 		$entry = KBatchBase::$kClient->baseEntry->get($dropFolderFile->parentEntryId);
 		switch ($data->contentMatchPolicy)

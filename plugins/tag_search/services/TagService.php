@@ -93,7 +93,7 @@ class TagService extends KalturaBaseService
      * @param Tag $tag
      * @return int
      */
-    private function resolveEntryTag(Tag $tag): int
+    private function resolveEntryTag(Tag $tag)
     {
         $c = KalturaCriteria::create(entryPeer::OM_CLASS);
         $c->add(entryPeer::PARTNER_ID, $tag->getPartnerId());

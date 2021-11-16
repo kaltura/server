@@ -106,6 +106,8 @@ class Partner extends BasePartner
 	const PURIFY_IMAGE_CONTENT = 'purify_image_content';
 	
 	const HIDE_SECRETS = 'hideSecrets';
+
+	const IS_SELF_SERVE = 'isSelfServe';
 	
 	private $cdnWhiteListCache = array();
 
@@ -2322,5 +2324,8 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData(self::HIDE_SECRETS, $v);
 	}
+
+	public function getIsSelfServe() { return $this->getFromCustomData(self::IS_SELF_SERVE, null, false); }
+	public function setIsSelfServe( $v ) { $this->putInCustomData(self::IS_SELF_SERVE, $v); }
 }
 

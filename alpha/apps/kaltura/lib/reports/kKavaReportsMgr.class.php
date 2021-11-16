@@ -55,6 +55,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_ENTRIES_ADDED = 'added_entries';
 	const METRIC_ENTRIES_DELETED = 'deleted_entries';
 	const METRIC_ENTRIES_TOTAL = 'total_entries';
+	const METRIC_INTERACTIVE_VIDEOS_ADDED = 'added_interactive_videos';
+	const METRIC_INTERACTIVE_VIDEOS_DELETED = 'deleted_interactive_videos';
+	const METRIC_INTERACTIVE_VIDEOS_TOTAL = 'total_interactive_videos';
 	const METRIC_USERS_ADDED = 'added_users';
 	const METRIC_USERS_DELETED = 'deleted_users';
 	const METRIC_USERS_TOTAL = 'total_users';
@@ -130,6 +133,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_PEAK_ENTRIES = 'peak_entries';
 	const METRIC_AVERAGE_ENTRIES = 'average_entries';
 	const METRIC_LATEST_ENTRIES = 'latest_entries';
+	const METRIC_LATEST_INTERACTIVE_VIDEOS = 'latest_interactive_videos';
 	const METRIC_PEAK_USERS = 'peak_users';
 	const METRIC_AVERAGE_USERS = 'average_users';
 	const METRIC_LATEST_USERS = 'latest_users';
@@ -266,6 +270,7 @@ class kKavaReportsMgr extends kKavaBase
 	const GRANULARITY_HOUR = 'hour';
 	const GRANULARITY_DAY = 'day';
 	const GRANULARITY_MONTH = 'month';
+	const GRANULARITY_YEAR = 'year';
 	const GRANULARITY_TEN_SECOND = 'ten_second';
 	const GRANULARITY_TEN_MINUTE = 'ten_minute';
 	const GRANULARITY_DYNAMIC = 'granularity_dynamic';
@@ -278,6 +283,7 @@ class kKavaReportsMgr extends kKavaBase
 	// aggregation intervals
 	const INTERVAL_DAYS = 'days';
 	const INTERVAL_MONTHS = 'months';
+	const INTERVAL_YEARS = 'years';
 	const INTERVAL_HOURS = 'hours';
 	const INTERVAL_MINUTES = 'minutes';
 	const INTERVAL_TEN_SECONDS = 'ten_seconds';
@@ -430,6 +436,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static $granularity_mapping = array(
 		self::GRANULARITY_DAY => 'P1D',
 		self::GRANULARITY_MONTH => 'P1M',
+		self::GRANULARITY_YEAR => 'P1Y',
 		self::GRANULARITY_HOUR => 'PT1H',
 		self::GRANULARITY_THIRTY_MINUTE => 'PT30M',
 		self::GRANULARITY_TEN_MINUTE => 'PT10M',
@@ -714,44 +721,57 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_USER_TYPE, $value),
 				self::getLongSumAggregator($metric, self::METRIC_DELTA));
 		}
-		
+
 		// delta aggregations
 		$delta_metrics = array(
-			array(self::METRIC_SIZE_BYTES, 	self::METRIC_STORAGE_SIZE_BYTES, 	self::METRIC_SIZE_ADDED_BYTES, 		self::METRIC_SIZE_DELETED_BYTES		),
-			array(self::METRIC_DURATION_SEC,self::METRIC_DURATION_SEC, 			self::METRIC_DURATION_ADDED_SEC, 	self::METRIC_DURATION_DELETED_SEC	),
-			array(self::METRIC_COUNT, 		self::METRIC_ENTRIES_TOTAL, 		self::METRIC_ENTRIES_ADDED, 		self::METRIC_ENTRIES_DELETED		),
-			array(self::METRIC_COUNT, 		self::METRIC_USERS_TOTAL, 			self::METRIC_USERS_ADDED, 			self::METRIC_USERS_DELETED			),
+			array(self::METRIC_SIZE_BYTES, self::METRIC_STORAGE_SIZE_BYTES, self::METRIC_SIZE_ADDED_BYTES, self::METRIC_SIZE_DELETED_BYTES, null),
+			array(self::METRIC_DURATION_SEC,self::METRIC_DURATION_SEC, self::METRIC_DURATION_ADDED_SEC, self::METRIC_DURATION_DELETED_SEC, null),
+			array(self::METRIC_COUNT, self::METRIC_ENTRIES_TOTAL, self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, null),
+			array(self::METRIC_COUNT, self::METRIC_INTERACTIVE_VIDEOS_TOTAL, self::METRIC_INTERACTIVE_VIDEOS_ADDED, self::METRIC_INTERACTIVE_VIDEOS_DELETED,
+				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_INTERACTIVE_VIDEO)),
+			array(self::METRIC_COUNT, self::METRIC_USERS_TOTAL, self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED, null),
 		);
 
 		foreach ($delta_metrics as $metrics)
 		{
-			list($base_metric, $total_metric, $added_metric, $deleted_metric) = $metrics;
+			list($base_metric, $total_metric, $added_metric, $deleted_metric, $metric_filter) = $metrics;
+			$total_filter = self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_STATUS,
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_DELETE
+			));
+			$added_filter = self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_STATUS,
+				self::EVENT_TYPE_PHYSICAL_ADD,
+				self::EVENT_TYPE_LOGICAL_ADD
+			));
+
+			$deleted_filter = self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
+				self::EVENT_TYPE_PHYSICAL_DELETE,
+				self::EVENT_TYPE_LOGICAL_DELETE
+			));
+
+			if ($metric_filter)
+			{
+				$total_filter = self::getAndFilter(array($total_filter, $metric_filter));
+				$added_filter = self::getAndFilter(array($added_filter, $metric_filter));
+				$deleted_filter = self::getAndFilter(array($deleted_filter, $metric_filter));
+			}
 
 			self::$aggregations_def[$total_metric] = self::getFilteredAggregator(
-				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-					self::EVENT_TYPE_STATUS, 
-					self::EVENT_TYPE_PHYSICAL_ADD,
-					self::EVENT_TYPE_PHYSICAL_DELETE,
-					self::EVENT_TYPE_LOGICAL_ADD,
-					self::EVENT_TYPE_LOGICAL_DELETE,
-				)),
+				$total_filter,
 				self::getLongSumAggregator(
 					$total_metric, 
 					$base_metric == self::METRIC_COUNT ? self::METRIC_DELTA : $base_metric));
 
 			self::$aggregations_def[$added_metric] = self::getFilteredAggregator(
-				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-					self::EVENT_TYPE_STATUS, 
-					self::EVENT_TYPE_PHYSICAL_ADD,
-					self::EVENT_TYPE_LOGICAL_ADD
-				)),
+				$added_filter,
 				self::getLongSumAggregator($added_metric, $base_metric));
 
 			self::$aggregations_def[$deleted_metric] = self::getFilteredAggregator(
-				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
-					self::EVENT_TYPE_PHYSICAL_DELETE,
-					self::EVENT_TYPE_LOGICAL_DELETE
-				)),
+				$deleted_filter,
 				self::getLongSumAggregator($deleted_metric, $base_metric));
 		}
 
@@ -1481,6 +1501,8 @@ class kKavaReportsMgr extends kKavaBase
 			self::GRANULARITY_HOUR => array('kKavaReportsMgr', 'timestampToHourId'),
 			self::GRANULARITY_DAY => array('kKavaReportsMgr', 'timestampToDateId'),
 			self::GRANULARITY_MONTH => array('kKavaReportsMgr', 'timestampToMonthId'),
+			self::GRANULARITY_YEAR => array('kKavaReportsMgr', 'timestampToYearId'),
+
 		);
 	}
 
@@ -1780,6 +1802,14 @@ class kKavaReportsMgr extends kKavaBase
 		return $date->format($format);
 	}
 
+	protected static function timestampToYearId($timestamp, $tz, $format = 'Y')
+	{
+		$date = new DateTime($timestamp);
+		$date->modify('12 hour');			// adding 12H in order to round to the nearest day
+		$date->setTimezone($tz);
+		return $date->format($format);
+	}
+
 	protected static function getDateIdRange($from_day, $to_day)
 	{
 		$date = self::dateIdToDateTime($from_day);
@@ -1817,6 +1847,27 @@ class kKavaReportsMgr extends kKavaBase
 
 			$result[] = $cur;
 			$date->modify('first day of next month');
+		}
+
+		return $result;
+	}
+
+	protected static function getYearIdRange($from_day, $to_day)
+	{
+		$date = self::dateIdToDateTime($from_day);
+		$end_year = substr($to_day, 0, 4);
+
+		$result = array();
+		for (;;)
+		{
+			$cur = $date->format('Y');
+			if (strcmp($cur, $end_year) > 0 || count($result) >= 15)
+			{
+				break;
+			}
+
+			$result[] = $cur;
+			$date->modify('first day of next year');
 		}
 
 		return $result;
@@ -3146,14 +3197,21 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				continue;
 			}
-			
-			$cur_result = self::getSimpleGraphImpl(
-				$partner_id,
-				$cur_report_def,
-				$input_filter,
-				$object_ids,
-				$response_options);
-			KalturaLog::debug('Graph - ' . print_r($cur_result, true));
+
+			if (isset($cur_report_def[self::REPORT_JOIN_GRAPHS]))
+			{
+				$cur_result = self::getJoinGraphImpl($partner_id, $cur_report_def, $input_filter, $object_ids, $response_options);
+			}
+			else
+			{
+				$cur_result = self::getSimpleGraphImpl(
+					$partner_id,
+					$cur_report_def,
+					$input_filter,
+					$object_ids,
+					$response_options);
+				KalturaLog::debug('Graph - ' . print_r($cur_result, true));
+			}
 			$result = array_merge($result, $cur_result);
 			if (isset($cur_report_def[self::REPORT_GRANULARITY]))
 			{
@@ -3168,13 +3226,16 @@ class kKavaReportsMgr extends kKavaBase
 
 		// zero fill
 		list($from_day, $to_day) = self::getFromToDay($input_filter);
-		if ($granularity == self::GRANULARITY_MONTH)
+		switch ($granularity)
 		{
-			$dates = self::getMonthIdRange($from_day, $to_day);
-		}
-		else
-		{
-			$dates = self::getDateIdRange($from_day, $to_day);
+			case self::GRANULARITY_YEAR:
+				$dates = self::getYearIdRange($from_day, $to_day);
+				break;
+			case self::GRANULARITY_MONTH:
+				$dates = self::getMonthIdRange($from_day, $to_day);
+				break;
+			default:
+				$dates = self::getDateIdRange($from_day, $to_day);
 		}
 		self::zeroFill($result, $dates);
 		
@@ -3480,7 +3541,18 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_value -= $graphs[self::METRIC_ENTRIES_DELETED][$date];
 			}
 		}
-		
+
+		if (isset($graphs[self::METRIC_INTERACTIVE_VIDEOS_ADDED][$firstDate]))
+		{
+			$cur_value = isset($base_values[self::METRIC_INTERACTIVE_VIDEOS_TOTAL]) ? $base_values[self::METRIC_INTERACTIVE_VIDEOS_TOTAL] : 0;
+			foreach ($dates as $date)
+			{
+				$cur_value += $graphs[self::METRIC_INTERACTIVE_VIDEOS_ADDED][$date];
+				$graphs[self::METRIC_LATEST_INTERACTIVE_VIDEOS][$date] = $cur_value;
+				$cur_value -= $graphs[self::METRIC_INTERACTIVE_VIDEOS_DELETED][$date];
+			}
+		}
+
 		if (isset($graphs[self::METRIC_DURATION_ADDED_MSEC][$firstDate]))
 		{
 			$cur_value = isset($base_values[self::METRIC_DURATION_TOTAL_MSEC]) ? $base_values[self::METRIC_DURATION_TOTAL_MSEC] : 0;
@@ -3582,6 +3654,34 @@ class kKavaReportsMgr extends kKavaBase
 		
 		return $result;
 	}
+
+	protected static function aggregateUsageDataByTimeUnit($graphs, &$dates, $unit)
+	{
+		// group by months
+		$grouped = array();
+		foreach ($dates as $date)
+		{
+			$period = substr($date, 0, $unit);
+			foreach ($graphs as $name => $values)
+			{
+				$grouped[$period][$name][$date] = $values[$date];
+			}
+		}
+
+		// aggregate the months
+		$result = array();
+		foreach ($grouped as $period => $graphs)
+		{
+			foreach (self::aggregateUsageDataAll($graphs) as $header => $value)
+			{
+				$result[$header][$period] = $value;
+			}
+		}
+
+		$dates = array_keys($grouped);
+
+		return $result;
+	}
 	
 	protected static function aggregateUsageDataByMonth($graphs, &$dates)
 	{
@@ -3616,8 +3716,9 @@ class kKavaReportsMgr extends kKavaBase
 		switch ($interval)
 		{
 			case self::INTERVAL_MONTHS:
-				return self::aggregateUsageDataByMonth($graphs, $dates);
-					
+				return self::aggregateUsageDataByTimeUnit($graphs, $dates, 6);
+			case self::INTERVAL_YEARS:
+				return self::aggregateUsageDataByTimeUnit($graphs, $dates, 4);
 			case self::INTERVAL_ALL:
 				$dates = null;
 				$result = self::aggregateUsageDataAll($graphs);
@@ -4281,6 +4382,10 @@ class kKavaReportsMgr extends kKavaBase
 			$granularity = self::GRANULARITY_MONTH;
 			$format = 'Y-m';
 		}
+		if ($context['interval']['value'] === self::INTERVAL_YEARS) {
+			$granularity = self::GRANULARITY_YEAR;
+			$format = 'Y';
+		}
 
 		$transform = self::getTransformTimeDimensions($granularity);
 		$tz_offset = isset($context['timezone_offset']) ? $context['timezone_offset']['value'] : 0;
@@ -4485,6 +4590,9 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		switch ($interval)
 		{
+			case self::INTERVAL_YEARS:
+				return 'year_id';
+
 			case self::INTERVAL_MONTHS:
 				return 'month_id';
 
@@ -4640,6 +4748,8 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		switch ($interval)
 		{
+			case self::INTERVAL_YEARS:
+				return self::GRANULARITY_YEAR;
 			case self::INTERVAL_MONTHS:
 				return self::GRANULARITY_MONTH;
 			case self::INTERVAL_ALL:
@@ -6316,6 +6426,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::GRANULARITY_HOUR => 'hour_id',
 					self::GRANULARITY_DAY => 'date_id',
 					self::GRANULARITY_MONTH => 'month_id',
+					self::GRANULARITY_YEAR => 'year_id',
 				);
 				if (isset($date_name_map[$date_column_name]))
 				{

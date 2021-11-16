@@ -349,7 +349,7 @@ class KGenericScheduler
 		
 		if(count($statuses))
 			KScheduleHelperManager::saveStatuses($statuses);
-		
+
 		return $indexedTaskConfigs;
 	}
 	

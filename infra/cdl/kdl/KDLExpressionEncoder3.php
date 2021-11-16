@@ -593,7 +593,7 @@ class KDLExpressionEncoder3 extends KDLOperatorBase
      * lookForClosest
      */
 
-    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra = null): string
+    public function GenerateCommandLine(KDLFlavor $design, KDLFlavor $target, $extra = null)
     {
         return KDLCmdlinePlaceholders::InFileName . ' ' . KDLCmdlinePlaceholders::ConfigFileName;
     }

@@ -587,7 +587,14 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('select', 'two_factor_authentication_mode', array(
 			'filters' => array('StringTrim')));
 		$this->getElement('two_factor_authentication_mode')->setMultiOptions($twoFactorAuthenticationMode);
-		
+
+//--------------------------- Self Serve Settings ---------------------------
+
+		$this->addElement('checkbox', 'is_self_serve', array(
+			'label'	  => 'is Self Serve',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
@@ -1030,13 +1037,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'two_factor_authentication_mode') ,
 		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
-
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
 		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason'), 'accountOptionsMonitorUsage');
 		$this->addDisplayGroup(array('is_first_login','crossLine'), 'accountOptions');
-				
+		$this->addDisplayGroup(array_merge(array('is_self_serve'), array('crossLine')), 'selfServeSettings', array('legend' => 'Self Serve Settings'));
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',

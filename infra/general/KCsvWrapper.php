@@ -61,5 +61,36 @@ class KCsvWrapper
 		}
 		return false;
 	}
+	
+	public static function hideCsvColumns($excludedFields, &$columns, &$rows)
+	{
+		$excludeIndexes = array();
+		$excludedFieldsArr = explode(',', $excludedFields);
+		foreach ($excludedFieldsArr as $excludedField)
+		{
+			foreach($columns as $key => $columnName)
+			{
+				if($columnName === $excludedField)
+				{
+					$excludeIndexes[] = $key;
+					unset($columns[$key]);
+					break;
+				}
+			}
+		}
+
+		if(sizeof($excludeIndexes) == 0)
+		{
+			return;
+		}
+
+		foreach($rows as &$row)
+		{
+			foreach($excludeIndexes as $index)
+			{
+				unset($row[$index]);
+			}
+		}
+	}
 
 }

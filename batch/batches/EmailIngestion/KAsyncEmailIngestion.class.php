@@ -124,7 +124,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
             // -----------------------------------------
             // loop through all mails in current mailbox
             // -----------------------------------------
-            foreach(array_values($newMails) as $curId) {
+            foreach($newMails as $curId) {
 
                 if ($mailsProcessed >= $maxMails) {
                     KalturaLog::info("Reached the max mails per job for current mailbox [$mailboxNumber] - skipping to next mailbox");
@@ -278,7 +278,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
      * @param mixed $curId
      * @return MailMsg
      */
-    public function handleAttachments($email_profiles, MailMsg $curMail, KalturaMediaEntry $mediaEntry, $user, $host, KMailChecker $mailChecker, mixed $curId): MailMsg
+    public function handleAttachments($email_profiles, MailMsg $curMail, KalturaMediaEntry $mediaEntry, $user, $host, KMailChecker $mailChecker, mixed $curId)
     {
 // add the mail's attachment for each valid email profile
         $failures = new AddEntriesFailures();
@@ -480,7 +480,7 @@ class KAsyncEmailIngestion extends KPeriodicWorker
      * @param KMailChecker $mailChecker
      * @param mixed $curId
      */
-    public function reportProblems(AddEntriesFailures $failures, MailMsg $curMail, $user, $host, KMailChecker $mailChecker, mixed $curId): void
+    public function reportProblems(AddEntriesFailures $failures, MailMsg $curMail, $user, $host, KMailChecker $mailChecker, mixed $curId)
     {
         $new_folder = self::UNKNOWN;
         if ($failures->upload_failed || $failures->add_entry_failed || $failures->error_saving_temp_file) {

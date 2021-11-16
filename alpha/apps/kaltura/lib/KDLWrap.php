@@ -156,7 +156,7 @@ class KDLWrap
 			 */
 			if ($trg->_cdlObject->getChunkedEncodeMode() == 1) {
 				$tmpTrans = clone $trg->_transcoders[0];
-				if($tmpTrans->_id==KDLTranscoders::FFMPEG) {
+				if($tmpTrans->_id==KDLTranscoders::FFMPEG || $tmpTrans->_id==KDLTranscoders::FFMPEG_VP8) {
 					/*
 					 * Check compliance to Chunked Encoding requirements
 					 */

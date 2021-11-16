@@ -595,6 +595,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			$liveStreamDetails->broadcastStatus = KalturaLiveStreamBroadcastStatus::LIVE;
 		}
 
+		KalturaLog::info("broadcastStatus of entry [$id] is [$liveStreamDetails->broadcastStatus] and isLive is [$isLive]");
 		$this->responseHandlingIsLive($isLive);
 		return $liveStreamDetails;
 	}
