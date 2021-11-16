@@ -2,9 +2,13 @@
 ## Add permissions for quiz and fileasset to Batch partner for CrossKalturaDistributionEngine ##
 * Issue Type: Client-Bug
 * Issue ID: PSVAMB-26104
+
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2021_11_15_update_file_asset_permission.php
     php deployment/updates/scripts/add_permissions/2021_11_15_update_quiz_permissions.php
+
+
+
 # Quasar-17.14.0 #
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
