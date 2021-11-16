@@ -264,9 +264,17 @@ class kBatchManager
 			if(isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages)>0){
 				$lang = $multiStreamObj->audio->languages[0];
 			}
-			else if(KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "lang")){
-				$lang = $multiStreamObj->audio->streams[0]->lang;
-			}
+                        else {
+                                if(KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "lang")){
+                                        $audStream = $multiStreamObj->audio->streams[0];
+                                        if(isset($audStream->aliasTo))
+                                                $lang = $audStream->aliasTo;
+                                        else
+                                                $lang = $audStream->lang;
+                                        if(isset($audStream->isDefault))
+                                                $flavorAsset->setDefault($audStream->isDefault);
+                                }
+                        }			
 			if(isset($lang)){
 				KalturaLog::log("Flavor asset(".$flavorAsset->getId().") language overloaded with flavor Params(".$flavorParams->getId().") language($lang)");
 				$flavorAsset->setLanguage($lang);

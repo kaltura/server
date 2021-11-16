@@ -5,6 +5,7 @@
  */ 
 interface reportInterval extends BaseEnum
 {
+	const YEARS = 'years';
 	const MONTHS = 'months';
 	const DAYS = 'days';
 	const HOURS = 'hours';

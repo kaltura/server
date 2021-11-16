@@ -2156,7 +2156,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($syncKey)
 		{
 			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
-			$validContent = myXmlUtils::validateXmlFileContent($filePath, $syncKey->getPartnerId());
+			
+			$purifyParams = array();
+			$partner = PartnerPeer::retrieveByPK($syncKey->getPartnerId());
+			if ($partner && $partner->getPurifyImageContent())
+			{
+				$purifyParams = array('className' => 'thumbasset', 'fieldName' => 'content');
+			}
+			
+			$validContent = myXmlUtils::validateXmlFileContent($filePath, $purifyParams);
+			
 			if($isTempFile)
 			{
 				unlink($filePath);
