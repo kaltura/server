@@ -205,6 +205,19 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		
 		return ScheduleEventPeer::doSelect($criteria);
 	}
+	
+	public static function retrieveByPartnerIdAndId($parentId, $eventId, $subType)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventPeer::PARTNER_ID, $parentId);
+		$criteria->add(ScheduleEventPeer::ID, $eventId);
+		$dbScheduleEvent = ScheduleEventPeer::doSelect($criteria);
+		if(!$dbScheduleEvent || $dbScheduleEvent[0]->getVirtualScheduleEventSubType() != $subType)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $eventId);
+		}
+		return $dbScheduleEvent;
+	}
 
 	/**
 	 * @param int $parentId

@@ -20,7 +20,7 @@ class KalturaVirtualEventFilter extends KalturaVirtualEventBaseFilter
 		$virtualEventFilter = $this->toObject();
 		
 		$c = new Criteria();
-		$c->add(VirtualEventPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
+//		$c->add(VirtualEventPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
 		$virtualEventFilter->attachToCriteria($c);
 		$response->totalCount = VirtualEventPeer::doCount($c);
 		

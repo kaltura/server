@@ -1012,7 +1012,6 @@ abstract class BaseVirtualEventPeer {
 
 		$criteria = new Criteria(VirtualEventPeer::DATABASE_NAME);
 		$criteria->add(VirtualEventPeer::ID, $pk);
-		$criteria->add(VirtualEventPeer::PARTNER_ID, kCurrentContext::$ks_partner_id);
 
 		$v = VirtualEventPeer::doSelect($criteria, $con);
 

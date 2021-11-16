@@ -6,6 +6,8 @@
  */
 class VirtualEventService extends KalturaBaseService
 {
+	const VIRTUAL_EVENT = 'VirtualEvent';
+	
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -15,6 +17,8 @@ class VirtualEventService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
 		}
+		
+		$this->applyPartnerFilterForClass(self::VIRTUAL_EVENT);
 	}
 	
 	/**
@@ -143,17 +147,18 @@ class VirtualEventService extends KalturaBaseService
 	
 	protected function validateScheduleEvents (KalturaVirtualEvent $virtualEvent)
 	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if (!is_null($virtualEvent->agendaScheduleEventId))
 		{
-			$this->getScheduleEvent($virtualEvent->agendaScheduleEventId, VirtualScheduleEventSubType::AGENDA);
+			ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $virtualEvent->agendaScheduleEventId, VirtualScheduleEventSubType::AGENDA);
 		}
 		if (!is_null($virtualEvent->registrationScheduleEventId))
 		{
-			$this->getScheduleEvent($virtualEvent->registrationScheduleEventId, VirtualScheduleEventSubType::REGISTRATION);
+			ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $virtualEvent->registrationScheduleEventId, VirtualScheduleEventSubType::REGISTRATION);
 		}
 		if (!is_null($virtualEvent->mainEventScheduleEventId))
 		{
-			$this->getScheduleEvent($virtualEvent->mainEventScheduleEventId, VirtualScheduleEventSubType::MAIN_EVENT);
+			ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $virtualEvent->mainEventScheduleEventId, VirtualScheduleEventSubType::MAIN_EVENT);
 		}
 	}
 	
@@ -161,15 +166,15 @@ class VirtualEventService extends KalturaBaseService
 	{
 		if (!is_null($virtualEvent->adminsGroupId))
 		{
-			$this->getGroup($virtualEvent->adminsGroupId);
+			$this->isPartnerGroup($virtualEvent->adminsGroupId);
 		}
 		if (!is_null($virtualEvent->attendeesGroupId))
 		{
-			$this->getGroup($virtualEvent->attendeesGroupId);
+			$this->isPartnerGroup($virtualEvent->attendeesGroupId);
 		}
 	}
 	
-	protected function getGroup($groupId)
+	protected function isPartnerGroup($groupId)
 	{
 		$dbGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $groupId);
 		if(!$dbGroup || $dbGroup->getType() != KuserType::GROUP)
@@ -178,16 +183,23 @@ class VirtualEventService extends KalturaBaseService
 		}
 	}
 	
-	protected function getScheduleEvent($eventId, $subType)
+	/**
+	 * Can be used from derived classes to set additional filter that don't automatically happen in applyPartnerFilters
+	 *
+	 * @param string $peer
+	 */
+	protected function applyPartnerFilterForClass($peer)
 	{
-		$criteria = new Criteria();
-		$criteria->add(ScheduleEventPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
-		$criteria->add(ScheduleEventPeer::ID, $eventId);
-		$dbScheduleEvent = ScheduleEventPeer::doSelect($criteria);
-		if(!$dbScheduleEvent || $dbScheduleEvent[0]->getVirtualScheduleEventSubType() != $subType)
+		if ($this->getPartner())
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $eventId);
+			$partner_id = $this->getPartner()->getId();
 		}
+		else
+		{
+			$partner_id = Partner::PARTNER_THAT_DOWS_NOT_EXIST;
+		}
+		
+		myPartnerUtils::addPartnerToCriteria($peer, $partner_id, $this->private_partner_data, $this->partnerGroup($peer), $this->kalturaNetworkAllowed($this->actionName));
 	}
 	
 }
