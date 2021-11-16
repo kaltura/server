@@ -8,6 +8,7 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 	const CLIENT_SECRET = 'client_secret';
 	const CLIENT_ID = 'client_id';
 	const SECRET_EXPIRATION_DATE = 'secret_expiration_date';
+	const CONVERSION_PROFILE_ID = 'conversionProfileId';
 
 	/**
 	 * @return string
@@ -56,5 +57,14 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 	{
 		$this->putInCustomData(self::CLIENT_ID, $clientId);
 	}
-
+	
+	public function setConversionProfileId($v)
+	{
+		$this->putInCustomData ( self::CONVERSION_PROFILE_ID, $v);
+	}
+	
+	public function getConversionProfileId()
+	{
+		return $this->getFromCustomData ( self::CONVERSION_PROFILE_ID,null, null);
+	}
 }
