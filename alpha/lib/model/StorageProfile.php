@@ -42,6 +42,8 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_EXCLUDED_ENTRY_TYPE = 'excluded_entry_types';
 	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 	const CUSTOM_DATA_PATH_PREFIX = 'path_prefix';
+	const CUSTOM_DATA_PORT = 'port';
+
 	/**
 	 * @var kStorageProfileScope
 	 */
@@ -541,4 +543,13 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 		$this->putInCustomData(self::CUSTOM_DATA_PATH_PREFIX, $v);
 	}
 
+	public function getPort()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PORT,null, null);
+	}
+
+	public function setPort($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PORT	, $v);
+	}
 }
