@@ -1,3 +1,19 @@
+# Quasar-17.15.0 #
+## Synchronize categories of live entries with recorded VOD ##
+* Issue Type: Task
+* Issue ID: KMCNG-2387
+
+### Configuration ###
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamSyncVodCategory.enabled = true
+    moduls.liveStreamSyncVodCategory.permissionType = 2
+    moduls.liveStreamSyncVodCategory.label = Kaltura Live Streams - Sync recorded VOD category
+    moduls.liveStreamSyncVodCategory.permissionName = FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY
+    moduls.liveStreamSyncVodCategory.basePermissionType = 2
+    moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Quasar-17.14.0 #
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
@@ -50,21 +66,6 @@ Add the following configurations to local.ini:
     live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
     packager_live_thumb_url = /{dc}/capture/
     packager_live_thumb_name = frame-{offset}.jpg
-
-## Synchronize categories of live entries with recorded VOD ##
-* Issue Type: Task
-* Issue ID: KMCNG-2387
-
-### Configuration ###
-Add the following lines from admin.template.ini to admin.ini:
-
-    moduls.liveStreamSyncVodCategory.enabled = true
-    moduls.liveStreamSyncVodCategory.permissionType = 2
-    moduls.liveStreamSyncVodCategory.label = Kaltura Live Streams - Sync recorded VOD category
-    moduls.liveStreamSyncVodCategory.permissionName = FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY
-    moduls.liveStreamSyncVodCategory.basePermissionType = 2
-    moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
-    moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
 
 # Quasar-17.12.0 #
 ## Add report getTotal permission for self serve partner ##
