@@ -114,8 +114,7 @@ class kMicrosoftTeamsDropFolderFlowManager implements kObjectChangedEventConsume
 		$newTeamsDropFolder->setIntegrationId($teamsVendorIntegrationObject->getId());
 		$newTeamsDropFolder->setPartnerId($teamsVendorIntegrationObject->getPartnerId());
 		$newTeamsDropFolder->setStatus(self::getDropFolderStatus($teamsVendorIntegrationObject -> getStatus()));
-		$newTeamsDropFolder->setType(ZoomDropFolderPlugin::getCoreValue('DropFolderType',
-		                                                               MicrosoftTeamsDropFolderType::MS_TEAMS));
+		$newTeamsDropFolder->setType(MicrosoftTeamsDropFolderPlugin::getDropFolderTypeCoreValue(MicrosoftTeamsDropFolderType::MS_TEAMS));
 		$newTeamsDropFolder->setName('teams_' . $teamsVendorIntegrationObject->getPartnerId() . '_' . $teamsVendorIntegrationObject->getAccountId());
 		$newTeamsDropFolder->setTags('teams');
 		$conversionProfileId = $teamsVendorIntegrationObject->getConversionProfileId();
@@ -134,19 +133,8 @@ class kMicrosoftTeamsDropFolderFlowManager implements kObjectChangedEventConsume
 		$newTeamsDropFolder->setDc(kDataCenterMgr::getCurrentDcId());
 		$newTeamsDropFolder->setPath(0);
 		$newTeamsDropFolder->setFileSizeCheckInterval(0);
-//		if ($teamsVendorIntegrationObject->getDeletionPolicy())
-//		{
-//			$newTeamsDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-//			$daysToDelete = kConf::getArrayValue('dayToDelete', 'ZoomAccount', 'vendor', 1);
-//			$newTeamsDropFolder->setAutoFileDeleteDays($daysToDelete);
-//		}
-//		else
-//		{
-//			$newTeamsDropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
-//		}
 		$newTeamsDropFolder->setLastFileTimestamp(0);
 		$newTeamsDropFolder->setMetadataProfileId(0);
-//		$newTeamsDropFolder->setLastHandledMeetingTime(time());
 		$newTeamsDropFolder->setFileNamePatterns('*');
 		$newTeamsDropFolder->save();
 	}

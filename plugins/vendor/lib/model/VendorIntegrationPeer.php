@@ -92,6 +92,22 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		self::setUseCriteriaFilter(true);
 		return $result;
 	}
+	
+	/**
+	 * @param $accountID
+	 * @param $vendorType
+	 * @return VendorIntegration
+	 * @throws PropelException
+	 */
+	public static function retrieveByPKNoFilter($pk)
+	{
+		$criteria = new Criteria(VendorIntegrationPeer::DATABASE_NAME);
+		$criteria->add(VendorIntegrationPeer::ID, $pk);
+		self::setUseCriteriaFilter(false);
+		$result = self::doSelectOne($criteria);
+		self::setUseCriteriaFilter(true);
+		return $result;
+	}
 
 	/**
 	 * @param $partnerId
