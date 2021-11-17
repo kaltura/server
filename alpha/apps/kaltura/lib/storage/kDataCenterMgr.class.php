@@ -106,7 +106,9 @@ class kDataCenterMgr
 	public static function getDcById($dc_id, $partnerId = null)
 	{
 		if (self::isDcIdShared($dc_id))
+		{
 			$dc_id = kDataCenterMgr::getCurrentDcId();
+		}
 		
 		$dc_config = kConf::getMap("dc_config");
 		
@@ -134,7 +136,7 @@ class kDataCenterMgr
 
 			if (!isset($dc["url"]))
 			{
-				throw new Exception ( "Cannot find DC with id [$dc_id]" );
+				throw new Exception ("Cannot find DC with id [$dc_id]");
 			}
 		}
 		elseif (isset($decommissioned_list[$dc_id]))
@@ -143,12 +145,11 @@ class kDataCenterMgr
 		}
 		else
 		{
-			throw new Exception ( "Cannot find DC with id [$dc_id]" );
+			throw new Exception ("Cannot find DC with id [$dc_id]");
 		}
 		
 		$dc["id"]=$dc_id;
 		return $dc;
-//		return array ( $dc_id , $dc );
 	}
 
 	public static function getDcIds($includeShared = true)
