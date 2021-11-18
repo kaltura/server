@@ -1,6 +1,6 @@
 ;This table is used to load the version of specific app
 
 [playerApps]
-html5_version = v2.90
-studio_version = v2.2.3
-studio_v3_version = v3.12.2
+html5_version = @HtmlVersion@
+studio_version = @StudioVersion@
+studio_v3_version = @StudioV3Version@
