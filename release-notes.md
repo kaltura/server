@@ -4,9 +4,12 @@
 * Issue ID: FEC-11387
 
 ### Configuration ###
-Remove `html5_version`, `studio_version` and `studio_v3_version` from base.ini.  
 Create a new configuration map named _appVersions_.  
-Copy from appVersions.template.ini to the new map, and fill the values according the base.ini values.  
+Copy from appVersions.template.ini to the new map, and fill the following values:   
+
+    html5_version = v2.90
+    studio_version = v2.2.3
+    studio_v3_version = v3.12.2
 
 ## Add permissions for quiz and fileasset to Batch partner for CrossKalturaDistributionEngine ##
 * Issue Type: Client-Bug
