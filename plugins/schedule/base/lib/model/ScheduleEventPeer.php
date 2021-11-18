@@ -205,6 +205,14 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		
 		return ScheduleEventPeer::doSelect($criteria);
 	}
+	
+	public static function retrieveByPartnerIdAndId($partnerId, $id)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventPeer::PARTNER_ID, $partnerId);
+		$criteria->add(ScheduleEventPeer::ID, $id);
+		return ScheduleEventPeer::doSelect($criteria);
+	}
 
 	/**
 	 * @param int $parentId

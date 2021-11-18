@@ -188,6 +188,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	public $passPhrase;
 
 	/**
+	 * @var int
+	 */
+	public $port;
+
+	/**
 	 * @var bool
 	 */
 	public $shouldExportThumbs;
@@ -252,6 +257,7 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'privateKey',
 		'publicKey',
 		'passPhrase',
+		'port',
 		'shouldExportThumbs',
 		'packagerUrl',
 		'exportPeriodically',
