@@ -383,6 +383,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$partnerId = $loginData->getConfigPartnerId();
 
 		$resetLinksArray = kConf::get('password_reset_links');
+		//TODO get link from dynamic map
 		if($linkType == resetPassLinkType::KMS)
 		{
 			$resetLinkPrefix = $resetLinksArray['kms'];
