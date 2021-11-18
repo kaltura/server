@@ -77,7 +77,7 @@ class embedIframeJsAction extends sfAction
 		{
 			if (!$iframeEmbed)
 				$host = "$protocol://". kConf::get('html5lib_host') ."/";
-    		$html5_version = kConf::getArrayValue('html5_version','playerApps',kConfMapNames::APP_VERSIONS,null);
+			$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 			if ($ui_conf_html5_url)
 			{
 				$url =  $host . $ui_conf_html5_url;

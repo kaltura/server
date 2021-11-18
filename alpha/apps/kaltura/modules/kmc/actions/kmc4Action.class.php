@@ -159,17 +159,19 @@ class kmc4Action extends kalturaAction
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
 
-        $html5_version = kConf::getArrayValue('html5_version','playerApps',kConfMapNames::APP_VERSIONS,null);
-        $studio_version = kConf::getArrayValue('studio_version','playerApps',kConfMapNames::APP_VERSIONS,null);
-        $studio_v3_version = kConf::getArrayValue('studio_v3_version','playerApps',kConfMapNames::APP_VERSIONS,null);
+		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_version = kConf::getArrayValue('studio_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_v3_version = kConf::getArrayValue('studio_v3_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 
-		if (!is_null($studio_version)) {
+		if (!is_null($studio_version))
+		{
 			$this->studioUiConf = uiConfPeer::getUiconfByTagAndVersion(self::HTML5_STUDIO_TAG, $studio_version);
 			$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
 			$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 		}
 
-		if (!is_null($studio_v3_version)) {
+		if (!is_null($studio_v3_version))
+		{
 			$this->studioV3UiConf = uiConfPeer::getUiconfByTagAndVersion(self::STUDIO_V3_TAG, $studio_v3_version);
 			$this->content_uiconfs_studio_v3 = isset($this->studioV3UiConf) ? array_values($this->studioV3UiConf) : null;
 			$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;

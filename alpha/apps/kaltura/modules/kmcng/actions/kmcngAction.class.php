@@ -108,9 +108,9 @@ class kmcngAction extends kalturaAction
 
 
 		$studio = null;
-        $html5_version = kConf::getArrayValue('html5_version','playerApps',kConfMapNames::APP_VERSIONS,null);
-        $studio_version = kConf::getArrayValue('studio_version','playerApps',kConfMapNames::APP_VERSIONS,null);
-        $studio_v3_version = kConf::getArrayValue('studio_v3_version','playerApps',kConfMapNames::APP_VERSIONS,null);
+		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_version = kConf::getArrayValue('studio_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_v3_version = kConf::getArrayValue('studio_v3_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 		if ($studio_version && $html5_version)
 		{
 			$studio = array(
