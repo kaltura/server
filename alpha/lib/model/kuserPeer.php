@@ -593,7 +593,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$puserId = $user->getPuserId();
 		if (!$existingUser)
 		{
-			$baseLink = ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID)?self::getPlatformBaseLink():null;
+			$baseLink = ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID) ? self::getPlatformBaseLink() : null; //TODO get link from dynamic map
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), $baseLink);
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/') . '/kmcng';
@@ -672,20 +672,35 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		
 		if ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID)
 		{
-			$emailBody =
+			$templateEmailBody = ''; //TODO retrieve from dynamic map
+			$emailBody = kEmails::populateCustomEmailBody($templateEmailBody, $associativeBodyParams);
+			$dynamicEmailContents = new kDynamicEmailContents();
+			$dynamicEmailContents->setEmailSubject(''); //TODO retrieve subject from dynamic map
+			$dynamicEmailContents->setEmailBody($emailBody);
+			kJobsManager::addCustomizedEmailJob(
+				$partnerId,
+				$mailType,
+				$loginEmail,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				'partner_registration_confirmation_email',
+				'partner_registration_confirmation_name',
+				$dynamicEmailContents
+			);
 		}
-		// add mail job
-		kJobsManager::addMailJob(
-			null, 
-			0, 
-			$partnerId, 
-			$mailType, 
-			kMailJobData::MAIL_PRIORITY_NORMAL, 
-			kConf::get ("partner_registration_confirmation_email" ), 
-			kConf::get ("partner_registration_confirmation_name" ), 
-			$loginEmail, 
-			$bodyParams
-		);
+		else
+		{// add mail job
+			kJobsManager::addMailJob(
+				null,
+				0,
+				$partnerId,
+				$mailType,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				kConf::get("partner_registration_confirmation_email"),
+				kConf::get("partner_registration_confirmation_name"),
+				$loginEmail,
+				$bodyParams
+			);
+		}
 	}
 
 	public static function getUserMailType($authType, $existingUser)

@@ -104,7 +104,12 @@ class kMailJobData extends kJobData
 	{
 		return $this->mailType;
 	}
-
+	
+	/**
+	 * @var kDynamicEmailContents
+	 */
+	private $dynamicEmailContents;
+	
 	/**
 	 * @return the $mailPriority
 	 */
@@ -373,5 +378,15 @@ class kMailJobData extends kJobData
 	public function setSeparator ($v)
 	{
 		$this->separator = $v;
+	}
+	
+	public function setDynamicEmailContents($v)
+	{
+		$this->dynamicEmailContents = $v;
+	}
+	
+	public function getDynamicEmailContents()
+	{
+		return $this->dynamicEmailContents;
 	}
 }
