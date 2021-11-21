@@ -3,6 +3,8 @@
 * Issue Type: Task
 * Issue ID: FEC-11387
 
+:warning: **Breaking Change*: The player and studio version are no longer exist in base.ini
+
 ### Configuration ###
 Create a new configuration map named _appVersions_.  
 Copy from appVersions.template.ini to the new map, and fill the following values:   
