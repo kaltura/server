@@ -13,13 +13,7 @@ $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/
 $config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-13.ini';
 passthru("php $script $config");
 
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.appToken.ini';
-passthru("php $script $config");
-
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.session.ini';
-passthru("php $script $config");
-
-$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.groupuser.ini';
 passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.partner.ini';
