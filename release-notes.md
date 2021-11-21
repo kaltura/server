@@ -1,4 +1,16 @@
 # Quasar-17.15.0 #
+## Add partner for KME ##
+* Issue Type: Task
+* Issue ID: PLAT-23254
+
+### Configuration ###
+First replace all tokens from the ini file below (under kme section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_10_kme_add_partner.php
+
 ## Add permissions for quiz and fileasset to Batch partner for CrossKalturaDistributionEngine ##
 * Issue Type: Client-Bug
 * Issue ID: PSVAMB-26104
@@ -21,7 +33,6 @@ Add the following lines from admin.template.ini to admin.ini:
     moduls.liveStreamSyncVodCategory.basePermissionType = 2
     moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
     moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
-
 
 # Quasar-17.14.0 #
 ## Virtual Event ##
