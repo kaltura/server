@@ -83,10 +83,13 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 
 	protected function validateEventExists()
 	{
-		$dbVirtualEvent = VirtualEventPeer::retrieveByPK($this->virtualEventId);
-		if(!$dbVirtualEvent)
+		if ($this->virtualEventId)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->virtualEventId);
+			$dbVirtualEvent = VirtualEventPeer::retrieveByPK($this->virtualEventId);
+			if (!$dbVirtualEvent)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->virtualEventId);
+			}
 		}
 	}
 }
