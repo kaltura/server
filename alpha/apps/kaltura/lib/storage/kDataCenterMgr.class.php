@@ -103,39 +103,53 @@ class kDataCenterMgr
 	}
 
 	// returns a tupple with the id and the DC's properties
-	public static function getDcById ( $dc_id , $partnerId = null)
+	public static function getDcById($dc_id, $partnerId = null)
 	{
-		if(self::isDcIdShared($dc_id))
+		if (self::isDcIdShared($dc_id))
+		{
 			$dc_id = kDataCenterMgr::getCurrentDcId();
+		}
 		
 		$dc_config = kConf::getMap("dc_config");
+		
 		// find the dc with the desired id
 		$dc_list = isset($dc_config["local_list"]) ? $dc_config["local_list"] : $dc_config["list"];
-		if ( isset( $dc_list[$dc_id] ) )		
+		
+		// find decommissioned dc list
+		$decommissioned_list = isset($dc_config['decommissioned_list']) ? $dc_config['decommissioned_list'] : array();
+		
+		if (isset($dc_list[$dc_id]))
+		{
 			$dc = $dc_list[$dc_id];
-		else if ($partnerId)
+		}
+		elseif ($partnerId)
 		{
 			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIds();
-			if(in_array($dc_id, $cloudStorageProfileIds))
+			if (in_array($dc_id, $cloudStorageProfileIds))
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);
-				if($storageProfile->getPackagerUrl())
+				if ($storageProfile->getPackagerUrl())
 				{
 					$dc["url"] = $storageProfile->getPackagerUrl();
 				}
 			}
 
-			if(!isset($dc["url"]))
+			if (!isset($dc["url"]))
 			{
-				throw new Exception ( "Cannot find DC with id [$dc_id]" );
+				throw new Exception ("Cannot find DC with id [$dc_id]");
 			}
 		}
+		elseif (isset($decommissioned_list[$dc_id]))
+		{
+			$dc = $decommissioned_list[$dc_id];
+		}
 		else
-			throw new Exception ( "Cannot find DC with id [$dc_id]" );
+		{
+			throw new Exception ("Cannot find DC with id [$dc_id]");
+		}
 		
 		$dc["id"]=$dc_id;
 		return $dc;
-//		return array ( $dc_id , $dc );
 	}
 
 	public static function getDcIds($includeShared = true)

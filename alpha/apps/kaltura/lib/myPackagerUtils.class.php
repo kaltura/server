@@ -371,7 +371,7 @@ class myPackagerUtils
 				continue;
 			}
 
-			$serverNodeUrl = $serverNode->createThumbUrl($liveCaptureUrl, $entry);
+			$serverNodeUrl = $serverNode->createThumbUrl($liveCaptureUrl, $entry, $entryServerNode);
 
 			$serverNodeUrl .= $thumbName;
 
@@ -383,7 +383,7 @@ class myPackagerUtils
 					continue;
 				}
 
-				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$streams[0]->getFlavorId()}");
+				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$liveParam->getFlavorId()}");
 				if($result)
 				{
 					return $result;

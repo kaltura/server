@@ -336,7 +336,7 @@ class KScheduleHelperManager
 	/**
 	 * @return array<KalturaSchedulerStatus>
 	 */
-	public static function loadStatuses(int $lastUpdateInterval)
+	public static function loadStatuses($lastUpdateInterval)
 	{
 		$lastFileUpdateTimeStampPath = self::getLastFileUpdateTimeStampPath();
 		$lastFileUpdateFileContent = file_get_contents($lastFileUpdateTimeStampPath);

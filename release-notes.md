@@ -11,27 +11,49 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2021_11_10_kme_add_partner.php
 
+## Add permissions for quiz and fileasset to Batch partner for CrossKalturaDistributionEngine ##
+* Issue Type: Client-Bug
+* Issue ID: PSVAMB-26104
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_15_update_file_asset_permission.php
+    php deployment/updates/scripts/add_permissions/2021_11_15_update_quiz_permissions.php
+
+## Synchronize categories of live entries with recorded VOD ##
+* Issue Type: Task
+* Issue ID: KMCNG-2387
+
+### Configuration ###
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamSyncVodCategory.enabled = true
+    moduls.liveStreamSyncVodCategory.permissionType = 2
+    moduls.liveStreamSyncVodCategory.label = Kaltura Live Streams - Sync recorded VOD category
+    moduls.liveStreamSyncVodCategory.permissionName = FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY
+    moduls.liveStreamSyncVodCategory.basePermissionType = 2
+    moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
+
 # Quasar-17.14.0 #
 ## Virtual Event ##
 A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
+
 ### Deployment ###
-*To completely disable the creation of VirtualScheduleEvent, add to runtime_config map the line: virtual_schedule_event_enabled = 0
-to enable change it to 1
-* Add VirtualEvent to plugins.ini
-* Add the following to admin.ini 
+	* Add VirtualEvent to plugins.ini
 
-
-    moduls.virtualEvent.enabled = true
-    moduls.virtualEvent.permissionType = 2
-    moduls.virtualEvent.label = "Enable Virtual Events"
-    moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
-    moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+	* Add the following to admin.ini 
+	    moduls.virtualEvent.enabled = true
+	    moduls.virtualEvent.permissionType = 2
+	    moduls.virtualEvent.label = "Enable Virtual Events"
+	    moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
+	    moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
 
 
 ### Scripts ###
-    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/plugins/virtual_event/data/sql/schema.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2021_11_11_create_virtual_event_table.sql
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 ## Add permission for credit info view ##
 * Issue Type: Task
 * Issue ID: PLAT-23234
@@ -61,7 +83,6 @@ Add the following configurations to local.ini:
     live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
     packager_live_thumb_url = /{dc}/capture/
     packager_live_thumb_name = frame-{offset}.jpg
-
 
 # Quasar-17.12.0 #
 ## Add report getTotal permission for self serve partner ##

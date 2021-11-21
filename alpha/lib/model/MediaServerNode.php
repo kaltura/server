@@ -95,7 +95,7 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return '';
 	}
 
-	public function createThumbUrl($baseUrl, $entry)
+	public function createThumbUrl($baseUrl, $entry, $entryServerNode)
 	{
 		return 'Not Implemented';
 	}
