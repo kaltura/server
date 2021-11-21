@@ -46,14 +46,6 @@ class VirtualEventPeer extends BaseVirtualEventPeer {
 		return parent::doSelect($c, $con);
 	}
 	
-	public static function retrieveByPartnerIdAndId($partnerId, $id)
-	{
-		$criteria = new Criteria();
-		$criteria->add(VirtualEventPeer::PARTNER_ID, $partnerId);
-		$criteria->add(VirtualEventPeer::ID, $id);
-		return VirtualEventPeer::doSelect($criteria);
-	}
-	
 	/**
 	 * @param int $pk
 	 * @return VirtualEvent

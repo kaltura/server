@@ -71,17 +71,17 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 	
 	public function toUpdatableObject ( $object_to_fill , $props_to_skip = array() )
 	{
-		$this->validateForInsertAndInsert();
+		$this->validateEventExists();
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip);
 	}
 
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
-		$this->validateForInsertAndInsert();
+		$this->validateEventExists();
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 
-	protected function validateForInsertAndInsert()
+	protected function validateEventExists()
 	{
 		$dbVirtualEvent = VirtualEventPeer::retrieveByPK($this->virtualEventId);
 		if(!$dbVirtualEvent)
