@@ -25,6 +25,7 @@ class VirtualEventPeer extends BaseVirtualEventPeer {
 			self::$s_criteria_filter = new criteriaFilter();
 		
 		$c = new Criteria();
+		$c->addAnd(VirtualEventPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId(), Criteria::EQUAL);
 		$c->addAnd(VirtualEventPeer::STATUS, VirtualEventStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter($c);
 	}

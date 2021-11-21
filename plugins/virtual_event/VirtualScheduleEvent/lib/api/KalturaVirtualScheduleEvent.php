@@ -74,17 +74,16 @@ class KalturaVirtualScheduleEvent extends KalturaScheduleEvent
 		$this->validateForInsertAndInsert();
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip);
 	}
-	
+
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$this->validateForInsertAndInsert();
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
-	
+
 	protected function validateForInsertAndInsert()
 	{
-		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$dbVirtualEvent = VirtualEventPeer::retrieveByPartnerIdAndId($partnerId, $this->virtualEventId);
+		$dbVirtualEvent = VirtualEventPeer::retrieveByPK($this->virtualEventId);
 		if(!$dbVirtualEvent)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $this->virtualEventId);
