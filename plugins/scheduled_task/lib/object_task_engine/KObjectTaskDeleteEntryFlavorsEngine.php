@@ -112,13 +112,17 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 				break;
 			}
 
-			$flavorAssetTags = explode(',', $flavor->tags);
-			$tagSource = in_array('source', $flavorAssetTags);
-			if ($flavor->isOriginal && $tagSource)
+			if(in_array("0", $flavorParamsIds))
 			{
-				$atLeastOneFlavorWillBeLeft = true;
-				break;
+				$flavorAssetTags = explode(',', $flavor->tags);
+				$tagSource = in_array('source', $flavorAssetTags);
+				if ($flavor->isOriginal && $tagSource)
+				{
+					$atLeastOneFlavorWillBeLeft = true;
+					break;
+				}
 			}
+
 		}
 
 		if (!$atLeastOneFlavorWillBeLeft)
@@ -127,12 +131,26 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			return;
 		}
 
-		foreach ($flavors as $flavor)
+		if(in_array("0", $flavorParamsIds))
 		{
-			/** @var $flavor KalturaFlavorAsset */
-			if (!in_array($flavor->flavorParamsId, $flavorParamsIds) && !$flavor->isOriginal)
+			foreach ($flavors as $flavor)
 			{
-				$this->deleteFlavor($flavor->id, $flavor->partnerId);
+				/** @var $flavor KalturaFlavorAsset */
+				if (!in_array($flavor->flavorParamsId, $flavorParamsIds) && !$flavor->isOriginal)
+				{
+					$this->deleteFlavor($flavor->id, $flavor->partnerId);
+				}
+			}
+		}
+		else
+		{
+			foreach ($flavors as $flavor)
+			{
+				/** @var $flavor KalturaFlavorAsset */
+				if (!in_array($flavor->flavorParamsId, $flavorParamsIds))
+				{
+					$this->deleteFlavor($flavor->id, $flavor->partnerId);
+				}
 			}
 		}
 	}
