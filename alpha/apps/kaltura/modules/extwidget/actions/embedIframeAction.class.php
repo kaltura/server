@@ -134,6 +134,8 @@ class embedIframeAction extends sfAction
 		$partner_cdnHost = myPartnerUtils::getCdnHost($partner_id);
 
 		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		if(!$html5_version)
+		    KExternalErrors::dieError(KExternalErrors::VERSION_NOT_FOUND, 'html player');
 
 		$use_cdn = $uiConf->getUseCdn();
 		$host = $use_cdn ?  $partner_cdnHost : $partner_host;
