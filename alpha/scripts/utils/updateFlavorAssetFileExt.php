@@ -1,6 +1,9 @@
 <?php
 require_once (dirname(__FILE__) . '/../bootstrap.php');
 
+define('MAX_FLAVORS_IN_INTERVAL', 1000);
+define('SLEEP_INTERVAL_IN_SEC', 15);
+
 if ($argc < 2)
 {
 	KalturaLog::info(' ---- Update Flavor Asset File Ext ---- ');
@@ -25,8 +28,6 @@ $failedFlavors = array();
 $skippedFlavors = array();
 $notFoundFlavors = array();
 $counter = 0;
-$MAX_FLAVORS_IN_INTERVAL = 1000;
-$SLEEP_INTERVAL_IN_SEC = 15;
 
 foreach ($flavorAssetIdsArr as $flavorAssetId)
 {
@@ -68,11 +69,11 @@ foreach ($flavorAssetIdsArr as $flavorAssetId)
 
 	$counter++;
 
-	if ($counter % $MAX_FLAVORS_IN_INTERVAL === 0)
+	if ($counter % MAX_FLAVORS_IN_INTERVAL === 0)
 	{
 		kMemoryManager::clearMemory();
 		KalturaLog::debug(' Sleeping for 15 sec [' . $counter . ' / ' . $totalFlavors . ']');
-		sleep($SLEEP_INTERVAL_IN_SEC);
+		sleep(SLEEP_INTERVAL_IN_SEC);
 	}
 }
 
