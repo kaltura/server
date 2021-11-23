@@ -252,7 +252,7 @@ class kUploadTokenMgr
 		if (!$extension)
 			$extension = self::NO_EXTENSION_IDENTIFIER;
 		
-		$uploadPath = $this->getUploadRootPath() .
+		$uploadPath = $this->getUploadRootPath($uploadTokenId) .
 			substr($uploadTokenId, -2).'/'.
 			substr($uploadTokenId, -4, 2).'/' .
 			$uploadTokenId.'.'.$extension;
@@ -260,7 +260,7 @@ class kUploadTokenMgr
 		return str_replace('//', '/', $uploadPath);
 	}
 	
-	protected function getUploadRootPath()
+	protected function getUploadRootPath($uploadTokenId)
 	{
 		$uploadVolumes = kConf::get('upload_volumes', 'runtime_config', array());
 		if(count($uploadVolumes))
