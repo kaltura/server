@@ -112,10 +112,10 @@ class kmcngAction extends kalturaAction
 		$studio_version = kConf::getArrayValue('studio_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 		$studio_v3_version = kConf::getArrayValue('studio_v3_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 
-        if(!$html5_version)
-            KalturaLog::warning("The html player version was not found");
-        if(!$studio_version && !$studio_v3_version)
-            KalturaLog::warning("The studio version was not found");
+		if(!$html5_version)
+			KalturaLog::warning("The html player version was not found");
+		if(!$studio_version && !$studio_v3_version)
+			KalturaLog::warning("The studio version was not found");
 
 		if ($studio_version && $html5_version)
 		{
