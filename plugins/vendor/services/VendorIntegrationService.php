@@ -114,7 +114,7 @@ class VendorIntegrationService extends KalturaBaseService
 	 *
 	 * @action updateStatus
 	 * @param int $id
-	 * @param KalturaIntegrationSetting $status
+	 * @param KalturaVendorIntegrationStatus $status
 	 * @return KalturaIntegrationSetting
 	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
