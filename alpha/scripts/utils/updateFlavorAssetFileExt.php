@@ -24,15 +24,12 @@ $successFlavors = array();
 $failedFlavors = array();
 $skippedFlavors = array();
 $notFoundFlavors = array();
-$counter = 1;
+$counter = 0;
+$MAX_FLAVORS_IN_INTERVAL = 1000;
+$SLEEP_INTERVAL_IN_SEC = 15;
 
 foreach ($flavorAssetIdsArr as $flavorAssetId)
 {
-	if (empty($flavorAssetId)) //if needed new function
-	{
-		continue;
-	}
-
 	$flavorAssetId = trim($flavorAssetId);
 	$flavorAsset = assetPeer::retrieveById($flavorAssetId);
 
@@ -69,14 +66,14 @@ foreach ($flavorAssetIdsArr as $flavorAssetId)
 		$notFoundFlavors[] = $flavorAssetId;
 	}
 
-	if ($counter % 1000 === 0)
+	$counter++;
+
+	if ($counter % $MAX_FLAVORS_IN_INTERVAL === 0)
 	{
 		kMemoryManager::clearMemory();
 		KalturaLog::debug(' Sleeping for 15 sec [' . $counter . ' / ' . $totalFlavors . ']');
-		sleep(15);
+		sleep($SLEEP_INTERVAL_IN_SEC);
 	}
-
-	$counter++;
 }
 
 echoResults($totalFlavors, $successFlavors, $failedFlavors, $skippedFlavors, $notFoundFlavors);

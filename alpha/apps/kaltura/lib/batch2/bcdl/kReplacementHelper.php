@@ -318,6 +318,7 @@ class kReplacementHelper
 	{
 		/* @var $newAsset asset */
 		KalturaLog::info("Create link from new asset [" . $newAsset->getId() . "] to old asset [" . $oldAsset->getId() . "] for flavor [" . $oldAsset->getFlavorParamsId() . "]");
+		KalturaLog::info("gettingclose");
 
 		$oldAsset->linkFromAsset($newAsset);
 		$oldAsset->save();
@@ -375,6 +376,7 @@ class kReplacementHelper
 		$oldAsset->setVideoCodecId($newAsset->getVideoCodecId());
 		$oldAsset->setContainerFormat($newAsset->getContainerFormat());
 		$oldAsset->setFileExt($newAsset->getFileExt());
+		$oldAsset->setIsOriginal($newAsset->getIsOriginal());
 		$oldAsset->setFrameRate($newAsset->getFrameRate());
 		$oldAsset->setStatus($newAsset->getStatus());
 		$oldAsset->save();
