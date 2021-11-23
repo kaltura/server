@@ -164,10 +164,17 @@ class VirtualEventService extends KalturaBaseService
 	
 	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId, $subType)
 	{
-		$dbScheduleEvent = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
-		if(!$dbScheduleEvent || $dbScheduleEvent[0]->getVirtualScheduleEventSubType() != $subType)
+		$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
+		if(!$dbScheduleEvents)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+		}
+		foreach ($dbScheduleEvents as $dbScheduleEvent)
+		{
+			if($dbScheduleEvent->getVirtualScheduleEventSubType() != $subType)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+			}
 		}
 	}
 	

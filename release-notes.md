@@ -1,9 +1,9 @@
 # Quasar-17.15.0 #
-## Move V2 player version and studio versions from base.ini to dynamic map ##
+## Move V2 player version and studio versions from base.ini to dedicated map ##
 * Issue Type: Task
 * Issue ID: FEC-11387
 
-:warning: **Breaking Change**: The player and studio version are no longer exist in base.ini
+:warning: **Breaking Change**: The player and studio versions are no longer exist in base.ini.
 
 ### Configuration ###
 Create a new configuration map named _appVersions_.  
