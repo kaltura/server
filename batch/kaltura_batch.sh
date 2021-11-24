@@ -119,8 +119,9 @@ stop() {
     echo "Stopping Batch Manager.... "
     get_pids
     SIGNAL=$1
+    KEEP_ALIVE=$2
     if [ -n "$KP" ]; then
-        if [ -r $BASE_DIR/keepAlive ]; then
+        if [[ $KEEP_ALIVE || -r $BASE_DIR/keepAlive ]]; then
             echo "Server is on Keep Alive mode - workers won't be killed!"
             echo_status "Killing Batch Manager with PID $KP_PARENT" 0
             kill -s $SIGNAL $KP_PARENT > /dev/null
@@ -153,7 +154,7 @@ case "$1" in
         show_status
         ;;
     restart)
-        stop 15
+        stop 15 1
         start
         ;;
     *)
