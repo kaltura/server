@@ -597,21 +597,6 @@ class KalturaResponseCacher extends kApiCache
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
 	}
 	
-	public static function checkPs2RateLimit()
-	{
-		$request = sfContext::getInstance()->getRequest();
-		$params= $request->getParameterHolder()->getAll();
-		if(!$params || !is_array($params) || !isset($params["module"]) || !isset($params["action"]))
-		{
-			return true;
-		}
-		if (!self::rateLimit($params["module"],$params["action"],$params,$params["partnerId"]))
-		{
-			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
-		}
-		return true;
-	}
-	
 	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
 	{
 		if (!kConf::hasMap('api_rate_limit') || $ksPartnerId == self::BATCH_PARTNER_ID)

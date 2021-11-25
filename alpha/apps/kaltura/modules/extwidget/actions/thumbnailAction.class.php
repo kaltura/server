@@ -347,6 +347,16 @@ class thumbnailAction extends sfAction
 		}
 
 		$partner = $entry->getPartner();
+		$partnerId=$entry->getPartnerId();
+		$params = infraRequestUtils::getRequestParams();
+		if(isset($partnerId))
+		{
+			if (!KalturaResponseCacher::rateLimit("extwidget","thumbnail",$params,$partnerId))
+			{
+				KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
+			}
+		}
+
 		
 		//checks whether the thumbnail display should be restricted by KS
 		$base64Referrer = $this->getRequestParameter("referrer");

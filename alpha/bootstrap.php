@@ -29,6 +29,5 @@ DbManager::initialize();
 
 ActKeyUtils::checkCurrent();
 KalturaMonitorClient::monitorPs2Start();
-KalturaResponseCacher::checkPs2RateLimit();
 sfContext::getInstance()->getController()->dispatch();
 
