@@ -5,31 +5,50 @@
 
 class kEmails
 {
-	const TAG_AUTH_TYPE = '@authType@';
-	const TAG_EXISTING_USER = '@existingUser@';
-	const TAG_USER_NAME = '@userName@';
-	const TAG_CREATOR_USER_NAME = '@creatorUserName@';
-	const TAG_PUBLISHER_NAME = '@publisherName@';
-	const TAG_LOGIN_EMAIL = '@loginEmail@';
-	const TAG_RESET_PASSWORD_LINK = '@resetPasswordLink@';
-	const TAG_PARTNER_ID = '@$partnerId@';
-	const TAG_PUSER_ID = '@puserId@';
-	const TAG_KMC_LINK = '@kmcLink@';
-	const TAG_CONTACT_LINK = '@contactLink@';
-	const TAG_BEGINNERS_GUID_LINK = '@beginnersGuideLink@';
+	const TAG_AUTH_TYPE             = '@authType@';
+	const TAG_EXISTING_USER         = '@existingUser@';
+	const TAG_USER_NAME             = '@userName@';
+	const TAG_CREATOR_USER_NAME     = '@creatorUserName@';
+	const TAG_PUBLISHER_NAME        = '@publisherName@';
+	const TAG_LOGIN_EMAIL           = '@loginEmail@';
+	const TAG_RESET_PASSWORD_LINK   = '@resetPasswordLink@';
+	const TAG_PARTNER_ID            = '@partnerId@';
+	const TAG_PUSER_ID              = '@puserId@';
+	const TAG_KMC_LINK              = '@kmcLink@';
+	const TAG_CONTACT_LINK          = '@contactLink@';
+	const TAG_BEGINNERS_GUID_LINK   = '@beginnersGuideLink@';
 	const TAG_QUICK_START_GUID_LINK = '@quickStartGuideLink@';
-	const TAG_ROLE_NAME = '@roleName@';
-	const TAG_ADMIN_CONSOLE_LINK = '@adminConsoleLink@';
-	const TAG_QR_CODE_LINK = '@qrCodeLink@';
+	const TAG_ROLE_NAME             = '@roleName@';
+	const TAG_ADMIN_CONSOLE_LINK    = '@adminConsoleLink@';
+	const TAG_QR_CODE_LINK          = '@qrCodeLink@';
+	const TAG_LOGIN_LINK            = '@loginLink@';
+	const DYNAMIC_EMAIL_BASE_LINK   = 'dynamic_email_base_link';
+	const DYNAMIC_EMAIL_SUBJECTS    = 'subjects';
+	const DYNAMIC_EMAIL_BODIES      = 'bodies';
 	
 	public static function populateCustomEmailBody($emailBody, $associativeBodyParams)
 	{
 		$parsedEmailBody = $emailBody;
 		foreach ($associativeBodyParams as $fieldTag => $fieldValue)
 		{
-			$parsedEmailBody = str_replace($fieldTag, $associativeBodyParams[$fieldValue], $parsedEmailBody);
+			$parsedEmailBody = str_replace($fieldTag, $fieldValue, $parsedEmailBody);
 		}
 		return $parsedEmailBody;
+	}
+	
+	public static function getDynamicEmailData($mailType)
+	{
+		$dynamicBodies = kConf::get(self::DYNAMIC_EMAIL_BODIES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		$dynamicSubjects = kConf::get(self::DYNAMIC_EMAIL_SUBJECTS, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		$dynamicEmailContents = new kDynamicEmailContents();
+		$dynamicEmailContents->setEmailBody($dynamicBodies[$mailType]);
+		$dynamicEmailContents->setEmailSubject($dynamicSubjects[$mailType]);
+		return $dynamicEmailContents;
+	}
+	
+	public static function getPlatformBaseLink()
+	{
+		return kConf::get(kEmails::DYNAMIC_EMAIL_BASE_LINK, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
 	}
     /***
      * This function splits a string of emails separated by ; or , into an array of emails

@@ -97,6 +97,8 @@ class Partner extends BasePartner
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
 	
+	const LIMITED_ADMIN_ROLE_NAME = 'limited_admin_role_name';
+	
 	const TRIGRAM_PERCENTAGE = 'trigram_percentage';
 	
 	const MAX_WORDS_FOR_NGRAM = 'max_words_for_ngram';
@@ -1127,8 +1129,10 @@ class Partner extends BasePartner
 	public function setTemplateCustomMetadataNum($v)	{$this->putInCustomData('template_custom_metadata_num', $v);}
 	public function setInitialPasswordSet($v)			{$this->putInCustomData('initial_password_set', $v);}
 	public function setMarketoCampaignId($v)			{$this->putInCustomData('marketo_campaign_id', $v);}
+	public function setLimitedAdminRoleName($v)			{$this->putInCustomData(self::LIMITED_ADMIN_ROLE_NAME, $v);}
 
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
+	public function getLimitedAdminRoleName()				{return $this->getFromCustomData(self::LIMITED_ADMIN_ROLE_NAME, null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
 	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota', null, 0);}
 	public function getBandwidthQuota()					{return $this->getFromCustomData('bandwidth_quota', null, 0);}

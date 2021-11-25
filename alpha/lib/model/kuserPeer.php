@@ -21,7 +21,6 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	const KALTURA_NEW_EXISTING_USER_ADMIN_CONSOLE_EMAIL  = 124;
 	const KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL_TO_ADMINS = 125;
 	const MAX_PUSER_LENGTH                               = 100;
-	const PLACEHOLDER_ROLE_ID                            = 'x';
 	
 	private static $s_default_count_limit = 301;
 
@@ -572,6 +571,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	{
 		// setup parameters
 		$partnerId = $user->getPartnerId();
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$platformUserRole = $partner->getLimitedAdminRoleName();
 		$userName = $user->getFullName();
 		if (!$userName)
 		{
@@ -586,15 +587,15 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$creatorUserName = $creatorUser->getFullName();
 			}
 		}
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		
 		$publisherName = $partner->getName();
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
 		if (!$existingUser)
 		{
-			$baseLink = ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID) ? self::getPlatformBaseLink() : null; //TODO get link from dynamic map
-			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), $baseLink);
+			$baseLink = (strpos($roleName, $platformUserRole) !== false) ? kEmails::getPlatformBaseLink() : null;
+			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), null, $baseLink);
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/') . '/kmcng';
 		$adminConsoleLink = trim(kConf::get('admin_console_url'));
@@ -626,7 +627,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$mailType = self::KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL;
 				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink, $qrCodeLink);
 			}
-			if ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID)
+			if (strpos($user->getUserRoleNames(), $platformUserRole) !== false)
 			{
 				$associativeBodyParams = array(
 					kEmails::TAG_USER_NAME           => $userName,
@@ -650,7 +651,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail,
 			                                      $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink,
 			                                      $quickStartGuideLink);
-			if ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID)
+			if (strpos($user->getUserRoleNames(), $platformUserRole) !== false)
 			{
 				$associativeBodyParams = array(
 					kEmails::TAG_AUTH_TYPE             => $authType,
@@ -667,21 +668,22 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 					kEmails::TAG_CONTACT_LINK          => $contactLink,
 					kEmails::TAG_BEGINNERS_GUID_LINK   => $beginnersGuideLink,
 					kEmails::TAG_QUICK_START_GUID_LINK => $quickStartGuideLink);
+				if ($authType == PartnerAuthenticationType::SSO)
+				{
+					$associativeBodyParams += [kEmails::TAG_LOGIN_LINK => $bodyParams[3]];
+				}
 			}
 		}
 		
-		if ($user->getRoleIds() == self::PLACEHOLDER_ROLE_ID)
+		if (strpos($user->getUserRoleNames(), $platformUserRole) !== false)
 		{
-			$templateEmailBody = ''; //TODO retrieve from dynamic map
-			$emailBody = kEmails::populateCustomEmailBody($templateEmailBody, $associativeBodyParams);
-			$dynamicEmailContents = new kDynamicEmailContents();
-			$dynamicEmailContents->setEmailSubject(''); //TODO retrieve subject from dynamic map
-			$dynamicEmailContents->setEmailBody($emailBody);
-			kJobsManager::addCustomizedEmailJob(
+			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType);
+			$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
+			kJobsManager::addDynamicEmailJob(
 				$partnerId,
 				$mailType,
-				$loginEmail,
 				kMailJobData::MAIL_PRIORITY_NORMAL,
+				$loginEmail,
 				'partner_registration_confirmation_email',
 				'partner_registration_confirmation_name',
 				$dynamicEmailContents
@@ -759,13 +761,6 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$ret = self::retrieveByPK($pk, $con);
 		self::setUseCriteriaFilter(true);
 		return $ret;
-	}
-	
-	/* (non-PHPdoc)
-	 * @see IRelatedObjectPeer::getRootObjects()
-	 */
-	protected static function getPlatformBaseLink ()
-	{
 	}
 	
 	public function getRootObjects(IRelatedObject $object)

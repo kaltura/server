@@ -338,6 +338,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Secondary Secret Role Id:',
 			'filters'		=> array('StringTrim'),
 		));
+//--------------------------- Limited Admin Role Name --------------------------------
+		$this->addElement('text', 'limited_admin_role_name', array(
+			'label'			=> 'Limited Admin Role:',
+			'filters'		=> array('StringTrim'),
+		));
+
 //--------------------------- Password Security ---------------------------
 		
 		$this->addElement('text', 'login_block_period', array(
@@ -1034,6 +1040,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
 		                                   array('crossLine')), 'security', array('legend' => 'Security'));
+		$this->addDisplayGroup(array_merge(array('limited_admin_role_name',),
+		                                   array('crossLine')), 'limitedAdminRoleName', array('legend' => 'Limited Admin Role Name'));
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'two_factor_authentication_mode') ,
 		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));

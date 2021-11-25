@@ -462,6 +462,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $secondarySecretRoleId;
 	
 	/**
+	 * @var string
+	 */
+	public $limitedAdminRoleName;
+	
+	/**
 	 * @var int
 	 */
 	public $trigramPercentage;
@@ -574,6 +579,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
+		'limitedAdminRoleName',
 		'trigramPercentage',
 		'maxWordForNgram',
 		'twoFactorAuthenticationMode',
@@ -816,6 +822,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setSecondarySecretRoleId(null);
+		}
+		
+		if(!is_null($this->limitedAdminRoleName))
+		{
+			$object_to_fill->setLimitedAdminRoleName($this->limitedAdminRoleName);
+		}
+		else
+		{
+			$object_to_fill->setLimitedAdminRoleName(null);
 		}
 		
 		return $object_to_fill;
