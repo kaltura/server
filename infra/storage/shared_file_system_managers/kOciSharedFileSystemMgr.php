@@ -185,9 +185,8 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		);
 		
 		$uploadManager = new UploadManager($this->objectStorageAsyncClient);
-		$uploadPromise = $uploadManager->upload($uploadManagerRequest);
-		$resumeInfo = null;
 		$retries = $this->retriesNum;
+		$resumeInfo = null;
 		
 		while ($retries > 0)
 		{
@@ -195,6 +194,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			{
 				if (!$resumeInfo)
 				{
+					$uploadPromise = $uploadManager->upload($uploadManagerRequest);
 					$res = $uploadPromise->wait();
 				}
 				else
