@@ -54,18 +54,20 @@ class kUploadTokenMgr
 		$uploadTempPath = $this->_uploadToken->getUploadTempPath();
 		if($uploadTempPath && strpos($uploadTempPath, $remoteChunkUploadDir))
 		{
-			self::initStorageOptions();
+			self::initStorageOptions($this->_uploadToken->getId());
 		}
 	}
 	
-	private static function initStorageOptions()
+	private static function initStorageOptions($uploadTokenId)
 	{
 		self::$sharedStorageOptions = kConf::get("shared_storage_client_config", "runtime_config", array());
+		self::$sharedStorageOptions['uploadTokenId'] = $uploadTokenId;
 		
 		//If we received empty array or sharedStorageBaseDir is not defined us legacy nfs upload
 		if(!count(self::$sharedStorageOptions) || !isset(self::$sharedStorageOptions['sharedStorageBaseDir']))
 		{
 			KalturaLog::debug("Failed to load shared storage client config, will revert to using NFS for shared storage");
+			self::$sharedUploadModeEnabled = false;
 			return;
 		}
 		
