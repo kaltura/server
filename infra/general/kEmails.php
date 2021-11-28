@@ -23,6 +23,7 @@ class kEmails
 	const TAG_QR_CODE_LINK          = '@qrCodeLink@';
 	const TAG_LOGIN_LINK            = '@loginLink@';
 	const DYNAMIC_EMAIL_BASE_LINK   = 'dynamic_email_base_link';
+	const DYNAMIC_EMAIL_ROLE_NAMES   = 'dynamic_email_role_names';
 	const DYNAMIC_EMAIL_SUBJECTS    = 'subjects';
 	const DYNAMIC_EMAIL_BODIES      = 'bodies';
 	
@@ -36,14 +37,24 @@ class kEmails
 		return $parsedEmailBody;
 	}
 	
-	public static function getDynamicEmailData($mailType)
+	public static function getDynamicEmailData($mailType, $roleName)
 	{
-		$dynamicBodies = kConf::get(self::DYNAMIC_EMAIL_BODIES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
-		$dynamicSubjects = kConf::get(self::DYNAMIC_EMAIL_SUBJECTS, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		$dynamicBodies = kConf::get(self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BODIES, $roleName), kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		$dynamicSubjects = kConf::get(self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_SUBJECTS, $roleName), kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
 		$dynamicEmailContents = new kDynamicEmailContents();
 		$dynamicEmailContents->setEmailBody($dynamicBodies[$mailType]);
 		$dynamicEmailContents->setEmailSubject($dynamicSubjects[$mailType]);
 		return $dynamicEmailContents;
+	}
+	
+	public static function getIsDynamicEmailRole($userRoleName =  null)
+	{
+		return strpos(kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null), $userRoleName) !== false;
+	}
+	
+	protected static function getFormattedEmailComponentName($blockType, $roleName)
+	{
+		return $blockType . '_' . $roleName;
 	}
 	
 	public static function getPlatformBaseLink()

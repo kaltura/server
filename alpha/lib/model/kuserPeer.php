@@ -592,9 +592,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
+		$isDynamicEmailRole = kEmails::getIsDynamicEmailRole($roleName);
 		if (!$existingUser)
 		{
-			$baseLink = (strpos($roleName, $platformUserRole) !== false) ? kEmails::getPlatformBaseLink() : null;
+			$baseLink = ($isDynamicEmailRole) ? kEmails::getPlatformBaseLink() : null;
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), null, $baseLink);
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/') . '/kmcng';
@@ -627,7 +628,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$mailType = self::KALTURA_NEW_USER_ADMIN_CONSOLE_EMAIL;
 				$bodyParams = array($userName, $creatorUserName, $loginEmail, $resetPasswordLink, $roleName, $adminConsoleLink, $qrCodeLink);
 			}
-			if (strpos($user->getUserRoleNames(), $platformUserRole) !== false)
+			if ($isDynamicEmailRole)
 			{
 				$associativeBodyParams = array(
 					kEmails::TAG_USER_NAME           => $userName,
@@ -651,7 +652,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			$bodyParams = self::getUserBodyParams($authType, $existingUser, $userName, $creatorUserName, $publisherName, $loginEmail,
 			                                      $resetPasswordLink, $partnerId, $roleName, $puserId, $kmcLink, $contactLink, $beginnersGuideLink,
 			                                      $quickStartGuideLink);
-			if (strpos($user->getUserRoleNames(), $platformUserRole) !== false)
+			if ($isDynamicEmailRole)
 			{
 				$associativeBodyParams = array(
 					kEmails::TAG_AUTH_TYPE             => $authType,
@@ -675,9 +676,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			}
 		}
 		
-		if (strpos($user->getUserRoleNames(), $platformUserRole) !== false)
+		if ($isDynamicEmailRole)
 		{
-			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType);
+			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $roleName);
 			$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
 			kJobsManager::addDynamicEmailJob(
 				$partnerId,
