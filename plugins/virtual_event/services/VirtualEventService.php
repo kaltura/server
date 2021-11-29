@@ -182,11 +182,19 @@ class VirtualEventService extends KalturaBaseService
 	{
 		if (!is_null($virtualEvent->adminsGroupId))
 		{
-			$this->isValidGroup($virtualEvent->adminsGroupId);
+			$groups = explode(',', $virtualEvent->adminsGroupId);
+			foreach ($groups as $group)
+			{
+				$this->isValidGroup($group);
+			}
 		}
 		if (!is_null($virtualEvent->attendeesGroupId))
 		{
-			$this->isValidGroup($virtualEvent->attendeesGroupId);
+			$groups = explode(',', $virtualEvent->attendeesGroupId);
+			foreach ($groups as $group)
+			{
+				$this->isValidGroup($group);
+			}
 		}
 	}
 	
