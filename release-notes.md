@@ -9,7 +9,7 @@
 Create a new configuration map named _appVersions_.  
 Copy from appVersions.template.ini to the new map, and fill the following values:   
 
-    html5_version = v2.90
+    html5_version = v2.91
     studio_version = v2.2.3
     studio_v3_version = v3.12.2
 
