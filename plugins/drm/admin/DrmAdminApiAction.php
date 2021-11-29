@@ -106,7 +106,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		curl_close($ch);
 		KalturaLog::debug("Got response from UDRM server as [$result]");
 
-		if($httpCode === 404)
+		if($httpCode === KCurlHeaderResponse::HTTP_STATUS_NOT_FOUND)
 		{
 			if ($originalAction === AdminApiActionType::ADD)
 			{
@@ -116,7 +116,7 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 			throw new Exception("The record [{$drmType}_$partnerId] does not exist");
 		}
 		
-		if($httpCode !== 200)
+		if($httpCode !== KCurlHeaderResponse::HTTP_STATUS_OK)
 		{
 			throw new Exception("Got bad HTTP response with code ($httpCode)");
 		}
