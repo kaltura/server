@@ -140,6 +140,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'interactivity_version';
 	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'volatile_interactivity_version';
 
+	const MAX_NAME_LEN = 256;
+
 	private $appears_in = null;
 
 	private $m_added_moderation = false;
@@ -332,6 +334,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function incViews ( $should_save = true )
 	{
 		myStatisticsMgr::incEntryViews( $this );
+	}
+
+	public function setName($v)
+	{
+		PeerUtils::setExtension($this, $v, self::MAX_NAME_LEN, __FUNCTION__);
+		return parent::setName(kString::alignUtf8String($v, self::MAX_NAME_LEN));
+	}
+
+	public function getName()
+	{
+		return parent::getName() . PeerUtils::getExtension($this, __FUNCTION__);
 	}
 
 	/**
@@ -1327,9 +1340,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return parent::getCategories();
 	}
 
-	public function getCategoriesIds($checkDisableCategoryLimit = true)
+	public function getCategoriesIds()
 	{
-		if($checkDisableCategoryLimit && PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
 		return parent::getCategoriesIds();
 	}

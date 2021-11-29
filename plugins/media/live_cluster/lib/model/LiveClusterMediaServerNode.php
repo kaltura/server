@@ -69,7 +69,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
 	protected function getThumbTimeline($entry)
 	{
-		if (myEntryUtils::shouldServeVodFromLive($entry))
+		if ($entry->getType() != entryType::LIVE_STREAM)
 		{
 			return $entry->getId();
 		}
