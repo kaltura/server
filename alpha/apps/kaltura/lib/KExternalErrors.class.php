@@ -129,7 +129,7 @@ class KExternalErrors
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
 		self::DATABASE_ERROR => 'Database error',
 		self::INVALID_AUTH_HEADER => 'Invalid auth header',
-		self::VERSION_NOT_FOUNDVERSION_NOT_FOUND => "The [%s] version was not found"
+		self::VERSION_NOT_FOUND => "The [%s] version was not found"
 	);
 
 	public static function dieError($errorCode, $message = null)
