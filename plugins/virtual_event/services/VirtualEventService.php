@@ -150,31 +150,24 @@ class VirtualEventService extends KalturaBaseService
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if ($virtualEvent->agendaScheduleEventId)
 		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->agendaScheduleEventId, VirtualScheduleEventSubType::AGENDA);
+			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->agendaScheduleEventId);
 		}
 		if ($virtualEvent->registrationScheduleEventId)
 		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->registrationScheduleEventId, VirtualScheduleEventSubType::REGISTRATION);
+			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->registrationScheduleEventId);
 		}
 		if ($virtualEvent->mainEventScheduleEventId)
 		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->mainEventScheduleEventId, VirtualScheduleEventSubType::MAIN_EVENT);
+			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->mainEventScheduleEventId);
 		}
 	}
 	
-	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId, $subType)
+	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId)
 	{
 		$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
 		if(!$dbScheduleEvents)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
-		}
-		foreach ($dbScheduleEvents as $dbScheduleEvent)
-		{
-			if($dbScheduleEvent->getVirtualScheduleEventSubType() != $subType)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
-			}
 		}
 	}
 	
