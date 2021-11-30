@@ -180,21 +180,14 @@ class VirtualEventService extends KalturaBaseService
 	
 	protected function validateGroups (KalturaVirtualEvent $virtualEvent)
 	{
-		if (!is_null($virtualEvent->adminsGroupId))
+		$adminGroups = $virtualEvent->adminsGroupIds ? explode(',', $virtualEvent->adminsGroupIds) : array();
+		$AttendeesGroups = $virtualEvent->attendeesGroupIds ? explode(',', $virtualEvent->attendeesGroupIds): array();
+		$groups = array_merge($adminGroups, $AttendeesGroups);
+		
+		foreach ($groups as $group)
 		{
-			$groups = explode(',', $virtualEvent->adminsGroupId);
-			foreach ($groups as $group)
-			{
-				$this->isValidGroup($group);
-			}
-		}
-		if (!is_null($virtualEvent->attendeesGroupId))
-		{
-			$groups = explode(',', $virtualEvent->attendeesGroupId);
-			foreach ($groups as $group)
-			{
-				$this->isValidGroup($group);
-			}
+			$trimmedGroup = trim($group);
+			$this->isValidGroup($trimmedGroup);
 		}
 	}
 	
