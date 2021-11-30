@@ -376,7 +376,7 @@ class flavorAsset extends exportableAsset
 				if (!$entry)
 					throw new kCoreException("Invalid entry id [" . $this->getEntryId() . "]", APIErrors::INVALID_ENTRY_ID);
 				$conversionProfile = $entry->getconversionProfile2();
-				if ($conversionProfile->getDefaultAudioLang() == $flavorLang)
+				if ($conversionProfile && $conversionProfile->getDefaultAudioLang() == $flavorLang)
 				{
 					$this->setDefault(true);
 				}

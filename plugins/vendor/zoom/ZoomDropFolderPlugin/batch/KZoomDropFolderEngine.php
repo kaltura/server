@@ -102,7 +102,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$fromInSec = time() - self::MAX_DATE_RANGE_DAYS * self::ONE_DAY;
 		}
 
-		$toInSec = min(time(), $fromInSec + self::ONE_DAY * 30);
+		$toInSec = min(time(), $fromInSec + self::ONE_DAY);
 		$from = date('Y-m-d', $fromInSec);
 		$to = date('Y-m-d', $toInSec);
 		$nextPageToken = '';
