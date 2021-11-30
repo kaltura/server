@@ -23,44 +23,66 @@ class kEmails
 	const TAG_QR_CODE_LINK          = '@qrCodeLink@';
 	const TAG_LOGIN_LINK            = '@loginLink@';
 	const DYNAMIC_EMAIL_BASE_LINK   = 'dynamic_email_base_link';
-	const DYNAMIC_EMAIL_ROLE_NAMES   = 'dynamic_email_role_names';
+	const DYNAMIC_EMAIL_ROLE_NAMES  = 'dynamic_email_role_names';
 	const DYNAMIC_EMAIL_SUBJECTS    = 'subjects';
 	const DYNAMIC_EMAIL_BODIES      = 'bodies';
 	
 	public static function populateCustomEmailBody($emailBody, $associativeBodyParams)
 	{
-		$parsedEmailBody = $emailBody;
 		foreach ($associativeBodyParams as $fieldTag => $fieldValue)
 		{
-			$parsedEmailBody = str_replace($fieldTag, $fieldValue, $parsedEmailBody);
+			$emailBody = str_replace($fieldTag, $fieldValue, $emailBody);
 		}
-		return $parsedEmailBody;
+		return $emailBody;
 	}
 	
 	public static function getDynamicEmailData($mailType, $roleName)
 	{
+		$dynamicEmailContents = new kDynamicEmailContents();
 		$dynamicBodies = kConf::get(self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BODIES, $roleName), kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
 		$dynamicSubjects = kConf::get(self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_SUBJECTS, $roleName), kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
-		$dynamicEmailContents = new kDynamicEmailContents();
-		$dynamicEmailContents->setEmailBody($dynamicBodies[$mailType]);
-		$dynamicEmailContents->setEmailSubject($dynamicSubjects[$mailType]);
-		return $dynamicEmailContents;
+		
+		if ($dynamicBodies && $dynamicSubjects)
+		{
+			$dynamicEmailContents->setEmailBody($dynamicBodies[$mailType]);
+			$dynamicEmailContents->setEmailSubject($dynamicSubjects[$mailType]);
+			return $dynamicEmailContents;
+		}
+		else
+		{
+			throw new KalturaAPIException(KalturaEmailNotificationErrors::DYNAMIC_EMAIL_CONTENT_TEMPLATE_FAULT);
+		}
 	}
 	
-	public static function getIsDynamicEmailRole($userRoleName =  null)
+	public static function getUseDynamicEmailTemplate($userRoleNames =  null)
 	{
-		return strpos(kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null), $userRoleName) !== false;
+		$rolesArrayFromDynamicMap = explode(',', kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null));
+		$rolesArrayFromUser = explode(',', $userRoleNames);
+		$intersectingRoles = array_intersect($rolesArrayFromDynamicMap, $rolesArrayFromUser);
+		if($intersectingRoles)
+		{
+			return $intersectingRoles[0];
+		}
+		return null;
 	}
 	
 	protected static function getFormattedEmailComponentName($blockType, $roleName)
 	{
-		return $blockType . '_' . $roleName;
+		return $blockType . '-' . $roleName;
 	}
 	
-	public static function getPlatformBaseLink()
+	public static function getCustomBaseLink()
 	{
-		return kConf::get(kEmails::DYNAMIC_EMAIL_BASE_LINK, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		if(kConf::get(kEmails::DYNAMIC_EMAIL_BASE_LINK, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null))
+		{
+			return kConf::get(kEmails::DYNAMIC_EMAIL_BASE_LINK, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		}
+		else
+		{
+			throw new KalturaAPIException(KalturaEmailNotificationErrors::DYNAMIC_EMAIL_CONTENT_TEMPLATE_FAULT);
+		}
 	}
+	
     /***
      * This function splits a string of emails separated by ; or , into an array of emails
      * @param $recipientsString

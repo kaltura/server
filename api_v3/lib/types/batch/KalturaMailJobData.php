@@ -53,8 +53,8 @@ class KalturaMailJobData extends KalturaJobData
 
 	/**
 	 * @var string
-	 */    
-    public $subjectParams;
+	 */
+	public $subjectParams;
 	
 	/**
 	 * @var KalturaDynamicEmailContents
@@ -94,19 +94,19 @@ class KalturaMailJobData extends KalturaJobData
 	private static $map_between_objects = array
 	(
 		"mailType" ,
-	    "mailPriority" ,
-	    "status " ,
+		"mailPriority" ,
+		"status " ,
 		"recipientName" ,  
-	   	"recipientEmail" ,
-	    "recipientId" ,
-	    "fromName" ,
-	    "fromEmail" ,
-	    "bodyParams" ,
-	    "subjectParams" ,  
-	    "templatePath" ,
-	    "language" ,
-	    "campaignId" ,
-	    "minSendDate" ,
+		"recipientEmail" ,
+		"recipientId" ,
+		"fromName" ,
+		"fromEmail" ,
+		"bodyParams" ,
+		"subjectParams" ,
+		"templatePath" ,
+		"language" ,
+		"campaignId" ,
+		"minSendDate" ,
 		"isHtml" ,
 		"separator",
 		"dynamicEmailContents",

@@ -69,11 +69,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	
 	
-	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink, $isPlatformUser, $roleNames)
+	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink, $userRoleName)
 	{
-		if ($isPlatformUser)
+		if ($userRoleName)
 		{
-			$dynamicEmailContents = kEmails::getDynamicEmailData(UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET, $roleNames);
+			$dynamicEmailContents = kEmails::getDynamicEmailData(UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET, $userRoleName);
 			$associativeBodyParams = array(kEmails::TAG_USER_NAME => $user_name, kEmails::TAG_RESET_PASSWORD_LINK => $resetPasswordLink);
 			$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
 			kJobsManager::addDynamicEmailJob(
@@ -258,7 +258,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$roleNames = $user->getUserRoleNames();
 		$partnerId = $loginData->getConfigPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$isPlatformUser = kEmails::getIsDynamicEmailRole($roleNames);
+		$userRoleName = kEmails::getUseDynamicEmailTemplate($roleNames);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
 			KalturaLog::log("Skipping reset-password email sending according to partner configuration.");
@@ -268,8 +268,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 		
-		$baseLink = $isPlatformUser ? kEmails::getPlatformBaseLink() : null;
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $baseLink), $isPlatformUser, $roleNames);
+		$dynamicLink = $userRoleName ? kEmails::getCustomBaseLink() : null;
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $userRoleName);
 		return true;
 	}
 	
@@ -424,19 +424,20 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	protected static function getResetLinkPrefix($partnerId, $linkType, $dynamicLink = null)
 	{
-		$resetLinksArray = kConf::get('password_reset_links');
 		if ($dynamicLink)
 		{
 			return $dynamicLink;
 		}
 		if($linkType == resetPassLinkType::KMS)
 		{
+			$resetLinksArray = kConf::get('password_reset_links');
 			$resetLinkPrefix = $resetLinksArray['kms'];
 			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
 			return $resetLinkPrefix;
 		}
 		else
 		{
+			$resetLinksArray = kConf::get('password_reset_links');
 			return $resetLinksArray['default'];
 		}
 	}
@@ -747,7 +748,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
 	 */
-	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $isAdminUser, $checkPasswordStructure = true, &$alreadyExisted = null, $userRoleNames)
+	public static function addLoginData($loginEmail, $password, $partnerId, $firstName, $lastName, $isAdminUser, $checkPasswordStructure = true, &$alreadyExisted = null, $userRoleNames = null)
 	{
 		if (!kString::isEmailString($loginEmail)) {
 			throw new kUserException('', kUserException::INVALID_EMAIL);
@@ -758,7 +759,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		
-		if ($isAdminUser && strpos($userRoleNames, $partner->getLimitedAdminRoleName()) === false)
+		if($isAdminUser && !in_array($partner->getLimitedAdminRoleName(), explode(',', $userRoleNames)))
 		{
 			$userQuota = $partner->getAdminLoginUsersQuota();
 			$adminLoginUsersNum = $partner->getAdminLoginUsersNumber();
