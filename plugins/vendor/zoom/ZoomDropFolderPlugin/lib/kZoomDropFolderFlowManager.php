@@ -5,7 +5,7 @@
  */
 class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 {
-	const MAX_ZOOM_DROP_FOLDERS = 4; //Temporary
+	const MAX_ZOOM_DROP_FOLDERS = 6; //Temporary
 	const DELETION_POLICY = 'deletionPolicy';
 	/**
 	 * @inheritDoc
