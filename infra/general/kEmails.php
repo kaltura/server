@@ -71,11 +71,12 @@ class kEmails
 		return $blockType . '-' . $roleName;
 	}
 	
-	public static function getCustomBaseLink()
+	public static function getCustomBaseLink($roleName)
 	{
-		if(kConf::get(kEmails::DYNAMIC_EMAIL_BASE_LINK, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null))
+		$dynamicBaseLink = self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BASE_LINK, $roleName);
+		if(kConf::get($dynamicBaseLink, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null))
 		{
-			return kConf::get(kEmails::DYNAMIC_EMAIL_BASE_LINK, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+			return kConf::get($dynamicBaseLink, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
 		}
 		else
 		{

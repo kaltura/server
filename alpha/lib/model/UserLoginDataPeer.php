@@ -268,7 +268,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 		
-		$dynamicLink = $userRoleName ? kEmails::getCustomBaseLink() : null;
+		$dynamicLink = $userRoleName ? kEmails::getCustomBaseLink($userRoleName) : null;
 		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $userRoleName);
 		return true;
 	}
@@ -733,6 +733,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return null;
 	}
 	
+	protected static function isLimitedAdminRole($partner, $userRoleNames)
+	{
+		return in_array($partner->getExcludedAdminRoleName(), explode(',', $userRoleNames));
+	}
+	
 	/**
 	 * Adds a new user login data record
 	 * @param unknown_type $loginEmail
@@ -759,7 +764,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		
-		if($isAdminUser && !in_array($partner->getLimitedAdminRoleName(), explode(',', $userRoleNames)))
+		if($isAdminUser && !self::isLimitedAdminRole($partner, $userRoleNames))
 		{
 			$userQuota = $partner->getAdminLoginUsersQuota();
 			$adminLoginUsersNum = $partner->getAdminLoginUsersNumber();

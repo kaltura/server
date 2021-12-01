@@ -464,7 +464,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $limitedAdminRoleName;
+	public $excludedAdminRoleName;
 	
 	/**
 	 * @var int
@@ -579,7 +579,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
-		'limitedAdminRoleName',
+		'excludedAdminRoleName',
 		'trigramPercentage',
 		'maxWordForNgram',
 		'twoFactorAuthenticationMode',
@@ -824,13 +824,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$object_to_fill->setSecondarySecretRoleId(null);
 		}
 		
-		if(!is_null($this->limitedAdminRoleName))
+		if(!is_null($this->excludedAdminRoleName))
 		{
-			$object_to_fill->setLimitedAdminRoleName($this->limitedAdminRoleName);
+			$object_to_fill->setExcludedAdminRoleName($this->excludedAdminRoleName);
 		}
 		else
 		{
-			$object_to_fill->setLimitedAdminRoleName(null);
+			$object_to_fill->setExcludedAdminRoleName(null);
 		}
 		
 		return $object_to_fill;

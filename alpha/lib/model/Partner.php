@@ -1129,10 +1129,10 @@ class Partner extends BasePartner
 	public function setTemplateCustomMetadataNum($v)	{$this->putInCustomData('template_custom_metadata_num', $v);}
 	public function setInitialPasswordSet($v)			{$this->putInCustomData('initial_password_set', $v);}
 	public function setMarketoCampaignId($v)			{$this->putInCustomData('marketo_campaign_id', $v);}
-	public function setLimitedAdminRoleName($v)			{$this->putInCustomData(self::EXCLUDED_ADMIN_ROLE_NAME, $v);}
+	public function setExcludedAdminRoleName($v)			{$this->putInCustomData(self::EXCLUDED_ADMIN_ROLE_NAME, $v);}
 
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
-	public function getLimitedAdminRoleName()				{return $this->getFromCustomData(self::EXCLUDED_ADMIN_ROLE_NAME, null, 0);}
+	public function getExcludedAdminRoleName()			{return $this->getFromCustomData(self::EXCLUDED_ADMIN_ROLE_NAME, null, 0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
 	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota', null, 0);}
 	public function getBandwidthQuota()					{return $this->getFromCustomData('bandwidth_quota', null, 0);}

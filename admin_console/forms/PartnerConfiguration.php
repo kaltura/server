@@ -1048,8 +1048,6 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason'), 'accountOptionsMonitorUsage');
 		$this->addDisplayGroup(array('is_first_login','crossLine'), 'accountOptions');
 		$this->addDisplayGroup(array_merge(array('is_self_serve'), array('crossLine')), 'selfServeSettings', array('legend' => 'Self Serve Settings'));
-		$this->addDisplayGroup(array_merge(array('excluded_admin_role_name',),
-		                                   array('crossLine')), 'excludedAdminRoleName', array('legend' => 'Excluded administrative (KMC) User Role name'));
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',
@@ -1059,12 +1057,13 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overageUnit',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit',
-									 'excluded_admin_role_name'),'includedUsage', array('legend' => 'Included Usage'));
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit'
+									),'includedUsage', array('legend' => 'Included Usage'));
 		$this->addDisplayGroup(array(
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit'
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
+									'excluded_admin_role_name'
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
