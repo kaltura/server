@@ -148,26 +148,22 @@ class VirtualEventService extends KalturaBaseService
 	protected function validateScheduleEvents (KalturaVirtualEvent $virtualEvent)
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		if ($virtualEvent->agendaScheduleEventId)
+		$scheduleEventIdsArray = array($virtualEvent->agendaScheduleEventId, $virtualEvent->registrationScheduleEventId, $virtualEvent->mainEventScheduleEventId);
+		foreach ($scheduleEventIdsArray as $scheduleEventId)
 		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->agendaScheduleEventId);
-		}
-		if ($virtualEvent->registrationScheduleEventId)
-		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->registrationScheduleEventId);
-		}
-		if ($virtualEvent->mainEventScheduleEventId)
-		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->mainEventScheduleEventId);
+			$this->validateSpecificScheduleEvent($partnerId, $scheduleEventId);
 		}
 	}
 	
 	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId)
 	{
-		$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
-		if(!$dbScheduleEvents)
+		if($scheduleEventId)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+			$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
+			if (!$dbScheduleEvents)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
+			}
 		}
 	}
 	
