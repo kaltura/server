@@ -5,7 +5,6 @@
  */
 class DrmAdminApiAction extends KalturaApplicationPlugin
 {
-
 	/**
 	 * @return string - absolute file path of the phtml template
 	 */
@@ -16,7 +15,6 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 	
 	public function doAction(Zend_Controller_Action $action)
 	{
-
 		$action->getHelper('layout')->setLayout('layout_empty');
 		$request = $action->getRequest();
 
@@ -24,61 +22,51 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		$drmType = $this->_getParam('drmType');
 		$actionApi = $this->_getParam('adminApiAction');
 
-		if (!DrmPlugin::isAllowAdminApi($actionApi)) {
+		if (!DrmPlugin::isAllowAdminApi($actionApi))
+		{
 			$action->view->errMessage = 'You do not have permission for this action';
 			return;
 		}
 		
 		$adminApiForm = new Form_AdminApiConfigure($partnerId, $drmType, $actionApi);
 		KalturaLog::info("Got params for the ADMIN-API action as: partnerId: [$partnerId], drmType: [$drmType] ,actionApi: [$actionApi] ");
-
+		
 		try
 		{
 			if ($request->isPost())
 			{
-
-				if ($actionApi == AdminApiActionType::REMOVE)
-					$this->sendData($drmType, $partnerId, $actionApi);
-
-				if ($actionApi == AdminApiActionType::ADD)
-					$this->sendData($drmType, $partnerId, $actionApi, $this->getParams($request));
-
+				if ($actionApi !== AdminApiActionType::GET)
+				{
+					$this->sendData($drmType, $partnerId, $actionApi, $actionApi, $this->getParams($request));
+				}
 				$action->view->formValid = true;
 			}
 			else
 			{
-				$res = $this->sendData($drmType, $partnerId, AdminApiActionType::GET);
+				$res = $this->sendData($drmType, $partnerId, AdminApiActionType::GET, $actionApi);
 				$adminApiForm->populateJson($res);
 			}
+			
+			$action->view->form = $adminApiForm;
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err($e->getMessage() . PHP_EOL . $e->getTraceAsString());
 			$action->view->errMessage = $e->getMessage();
-		}	
-		$action->view->form = $adminApiForm;
+		}
 	}
-
-
-	private function translateName($name)
-	{
-		$nameArray = array('provider_sign_key' => 'providerSignKey', 'key_pem' => 'keyPem');
-		if (isset($nameArray[$name]))
-			return $nameArray[$name];
-		return $name;
-	}
-
+	
 	private function getParams($request)
 	{
 		$params = $request->getPost();
 		$newParams = array();
-		foreach($params as $key =>$val) {
+		foreach($params as $key =>$val)
+		{
 			if ($val)
-				$newParams[$this->translateName($key)] = $val;
+			{
+				$newParams[$key] = $val;
+			}
 		}
 		return $newParams;
-
-
 	}
 
 	private function getBody($drmType, $partnerId, $params)
@@ -99,12 +87,12 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		return array($host, $secret);
 	}
 
-	private function sendData($drmType, $partnerId, $action, $params = array())
+	private function sendData($drmType, $partnerId, $actionToPerform, $originalAction, $params = array())
 	{
 		list($host, $secret) = $this->getConfigParams();
 		$body = $this->getBody($drmType, $partnerId, $params);
 		$signature = DrmLicenseUtils::signDataWithKey($body,$secret);
-		$url = $host . '/admin/' . $action . 'Partner' . '?signature=' . $signature;
+		$url = $host . '/admin/' . $actionToPerform . 'Partner' . '?signature=' . $signature;
 
 		KalturaLog::debug("Send to UDRM server [$url] and body: [$body]");
 		$ch = curl_init();
@@ -114,12 +102,31 @@ class DrmAdminApiAction extends KalturaApplicationPlugin
 		curl_setopt($ch, CURLOPT_TIMEOUT,        10 );
 		curl_setopt($ch, CURLOPT_POSTFIELDS,     $body);
 		$result=curl_exec ($ch);
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
 		KalturaLog::debug("Got response from UDRM server as [$result]");
 
+		if($httpCode === KCurlHeaderResponse::HTTP_STATUS_NOT_FOUND)
+		{
+			if ($originalAction === AdminApiActionType::ADD)
+			{
+				return '{}';
+			}
+
+			throw new Exception("The record [{$drmType}_$partnerId] does not exist");
+		}
+		
+		if($httpCode !== KCurlHeaderResponse::HTTP_STATUS_OK)
+		{
+			throw new Exception("Got bad HTTP response with code ($httpCode)");
+		}
+		
+		if(!$result)
+		{
+			throw new Exception("Got empty response");
+		}
+		
 		return $result;
 
 	}
-
 }
-
