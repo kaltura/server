@@ -105,6 +105,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LIVE_ENGAGED_USERS_COUNT = 'live_engaged_users_count';
 	const METRIC_LIVE_ENGAGED_USERS_RATIO = 'live_engaged_users_ratio';
 	const METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'live_engaged_users_play_time_ratio';
+	const METRIC_COUNT_ALL_EVENTS = 'count_all';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -690,7 +691,10 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, $event_type),
 				self::getLongSumAggregator($event_type, self::METRIC_COUNT)); 
 		}
-		
+
+		self::$aggregations_def[self::METRIC_COUNT_ALL_EVENTS] =
+			self::getLongSumAggregator(self::METRIC_COUNT_ALL_EVENTS, self::METRIC_COUNT);
+
 		// delta aggregators
 		self::$aggregations_def[self::METRIC_COUNT_TOTAL] = 
 			self::getLongSumAggregator(self::METRIC_COUNT_TOTAL, self::METRIC_DELTA);
