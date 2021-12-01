@@ -186,8 +186,8 @@ class VirtualEventService extends KalturaBaseService
 		
 		foreach ($groupIds as $groupId)
 		{
-			$trimmedGroupId = trim($groupId);
-			$this->isValidGroup($trimmedGroupId);
+			$groupId = trim($groupId);
+			$this->isValidGroup($groupId);
 		}
 	}
 	
