@@ -54,7 +54,7 @@ class kEmails
 		}
 	}
 	
-	public static function getUseDynamicEmailTemplate($userRoleNames =  null)
+	public static function getDynamicEmailUserRoleName($userRoleNames = null)
 	{
 		$rolesArrayFromDynamicMap = explode(',', kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null));
 		$rolesArrayFromUser = explode(',', $userRoleNames);

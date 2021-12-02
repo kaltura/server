@@ -69,11 +69,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	
 	
-	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink, $userRoleName)
+	private static function emailResetPassword($partner_id, $cms_email, $user_name, $resetPasswordLink, $dynamicTemplateUserRoleName)
 	{
-		if ($userRoleName)
+		if ($dynamicTemplateUserRoleName)
 		{
-			$dynamicEmailContents = kEmails::getDynamicEmailData(UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET, $userRoleName);
+			$dynamicEmailContents = kEmails::getDynamicEmailData(UserLoginDataPeer::KALTURAS_CMS_PASSWORD_RESET, $dynamicTemplateUserRoleName);
 			$associativeBodyParams = array(kEmails::TAG_USER_NAME => $user_name, kEmails::TAG_RESET_PASSWORD_LINK => $resetPasswordLink);
 			$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
 			kJobsManager::addDynamicEmailJob(
@@ -258,7 +258,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$roleNames = $user->getUserRoleNames();
 		$partnerId = $loginData->getConfigPartnerId();
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$userRoleName = kEmails::getUseDynamicEmailTemplate($roleNames);
+		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
 			KalturaLog::log("Skipping reset-password email sending according to partner configuration.");
@@ -268,8 +268,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 		
-		$dynamicLink = $userRoleName ? kEmails::getCustomBaseLink($userRoleName) : null;
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $userRoleName);
+		$dynamicLink = $dynamicTemplateUserRoleName ? kEmails::getCustomBaseLink($dynamicTemplateUserRoleName) : null;
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $dynamicTemplateUserRoleName);
 		return true;
 	}
 	
@@ -424,20 +424,19 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	protected static function getResetLinkPrefix($partnerId, $linkType, $dynamicLink = null)
 	{
+		$resetLinksArray = kConf::get('password_reset_links');
 		if ($dynamicLink)
 		{
 			return $dynamicLink;
 		}
 		if($linkType == resetPassLinkType::KMS)
 		{
-			$resetLinksArray = kConf::get('password_reset_links');
 			$resetLinkPrefix = $resetLinksArray['kms'];
-			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId) );
+			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId));
 			return $resetLinkPrefix;
 		}
 		else
 		{
-			$resetLinksArray = kConf::get('password_reset_links');
 			return $resetLinksArray['default'];
 		}
 	}
@@ -733,7 +732,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return null;
 	}
 	
-	protected static function isLimitedAdminRole($partner, $userRoleNames)
+	protected static function isExcludedAdminRole($partner, $userRoleNames)
 	{
 		return in_array($partner->getExcludedAdminRoleName(), explode(',', $userRoleNames));
 	}
@@ -764,7 +763,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		
-		if($isAdminUser && !self::isLimitedAdminRole($partner, $userRoleNames))
+		if($isAdminUser && !self::isExcludedAdminRole($partner, $userRoleNames))
 		{
 			$userQuota = $partner->getAdminLoginUsersQuota();
 			$adminLoginUsersNum = $partner->getAdminLoginUsersNumber();
