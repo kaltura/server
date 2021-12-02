@@ -42,7 +42,7 @@ class kEmails
 		$dynamicBodies = kConf::get(self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BODIES, $roleName), kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
 		$dynamicSubjects = kConf::get(self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_SUBJECTS, $roleName), kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
 		
-		if ($dynamicBodies && $dynamicSubjects)
+		if ($dynamicBodies[$mailType] && $dynamicSubjects[$mailType])
 		{
 			$dynamicEmailContents->setEmailBody($dynamicBodies[$mailType]);
 			$dynamicEmailContents->setEmailSubject($dynamicSubjects[$mailType]);

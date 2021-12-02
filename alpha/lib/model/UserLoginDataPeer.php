@@ -424,11 +424,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	protected static function getResetLinkPrefix($partnerId, $linkType, $dynamicLink = null)
 	{
-		$resetLinksArray = kConf::get('password_reset_links');
 		if ($dynamicLink)
 		{
 			return $dynamicLink;
 		}
+		$resetLinksArray = kConf::get('password_reset_links');
 		if($linkType == resetPassLinkType::KMS)
 		{
 			$resetLinkPrefix = $resetLinksArray['kms'];
@@ -734,7 +734,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	
 	protected static function isExcludedAdminRole($partner, $userRoleNames)
 	{
-		return in_array($partner->getExcludedAdminRoleName(), explode(',', $userRoleNames));
+		return in_array($partner->getExcludedAdminRoleName(), explode(',', $userRoleNames), true);
 	}
 	
 	/**
