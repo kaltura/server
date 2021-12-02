@@ -6,6 +6,7 @@
 :warning: **Breaking Change**: The player and studio versions are no longer exist in base.ini.
 
 ### Configuration ###
+Remove `html5_version`, `studio_version` and `studio_v3_version` from _local.ini_ (if exists).  
 Create a new configuration map named _appVersions_.  
 Copy from appVersions.template.ini to the new map, and fill the following values:
 
