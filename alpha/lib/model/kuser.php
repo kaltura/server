@@ -26,6 +26,11 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const TITLE = 'title';
 	const COMPANY = 'company';
 
+	const USER_ID = 'user_id';
+	const TEAMS_ID = 'teams_id';
+	const RECORDINGS_FOLDER_ID = 'recordings_folder_id';
+	const DELTA_TOKEN = 'delta_token';
+
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
@@ -1500,6 +1505,71 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function getLastName()
 	{
 		return parent::getLastName() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
+
+
+	/**
+	 * @param string $v
+	 */
+	public function setUserId($v)
+	{
+		$this->putInCustomData(self::USER_ID, $v);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUserId()
+	{
+		return $this->getFromCustomData(self::USER_ID);
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setTeamsId($v)
+	{
+		$this->putInCustomData(self::TEAMS_ID, $v);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTeamsId()
+	{
+		return $this->getFromCustomData(self::TEAMS_ID);
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setRecordingsFolderId($v)
+	{
+		$this->putInCustomData(self::RECORDINGS_FOLDER_ID, $v);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRecordingsFolderId()
+	{
+		return $this->getFromCustomData(self::RECORDINGS_FOLDER_ID);
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setDeltaToken($v)
+	{
+		$this->putInCustomData(self::DELTA_TOKEN, $v);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDeltaToken()
+	{
+		return $this->getFromCustomData(self::DELTA_TOKEN);
 	}
 	
 }
