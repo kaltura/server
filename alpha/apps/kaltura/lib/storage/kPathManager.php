@@ -25,16 +25,6 @@ class kPathManager
 	 */
 	public function generateFilePathArr(ISyncableFile $object, $subType, $version = null, $storageProfileId = null)
 	{
-//		$traces = debug_backtrace(false);
-//		foreach($traces as $i => $trace)
-//		{
-//			$file = $trace['file'];
-//			$line = $trace['line'];
-//			$class = $trace['class'];
-//			$function = $trace['function'];
-//			KalturaLog::debug("#$i Called from function [$class::$function] file[$file] line[$line]");
-//		}
-			
 		list($root, $path) = $object->generateFilePathArr($subType, $version);
 		$root = str_replace('//', '/', $root);
 		$path = str_replace('//', '/', $path);
