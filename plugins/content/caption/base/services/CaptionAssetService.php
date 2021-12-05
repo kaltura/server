@@ -158,7 +158,7 @@ class CaptionAssetService extends KalturaAssetService
 		if ($dbCaptionAsset->getContainerFormat() == CaptionType::SCC)
 		{
 			//start convert caption batch Job for upload file.
-			if (!$contentResource->url)
+			if(!isset($contentResource->url))
 			{
 				kCaptionsContentManager::addConvertCaptionAssetJob($dbCaptionAsset, CaptionType::SCC, CaptionType::SRT);
 			}
