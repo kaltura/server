@@ -1,3 +1,34 @@
+# Quasar-17.16.0
+## Allow setting a user role that is not counted in kmc users quota
+* Issue Type: Task
+* Issue ID: PLAT-23297
+
+### Configuration
+To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
+
+## Enable using dynamic email templates for user flows based on their user role
+* Issue Type: Task
+* Issue ID: PLAT-23219, PLAT-23220
+
+
+### Configuration
+* Create a map with the name `dynamic_email_contents` and that is in the following structure: (replace USER_ROLE_NAME with the name of the wanted role)
+
+```
+dynamic_email_role_names = "USER_ROLE_NAME"
+
+dynamic_email_base_link-USER_ROLE = "http://base_url_for_the_template/"
+
+[subjects-USER_ROLE_NAME]
+120 = "Mail Subject 1"
+121 = "Mail Subject 2"
+
+[bodies-USER_ROLE_NAME]
+120 = "Mail Body 1"
+121 = "Mail Body 1"
+```
+(The above texts are examples)
+
 # Quasar-17.15.0 #
 ## Add partner for KME ##
 * Issue Type: Task

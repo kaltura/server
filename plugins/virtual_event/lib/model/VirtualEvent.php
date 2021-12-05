@@ -14,8 +14,8 @@
  */
  class VirtualEvent extends BaseVirtualEvent implements IRelatedObject
 {
-	const CUSTOM_DATA_FIELD_ADMINS_GROUP_ID = 'adminsGroupId';
-	const CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID = 'attendeesGroupId';
+	const CUSTOM_DATA_FIELD_ADMINS_GROUP_IDS = 'adminsGroupIds';
+	const CUSTOM_DATA_FIELD_ATTENDEES_GROUP_IDS = 'attendeesGroupIds';
 	const CUSTOM_DATA_FIELD_MAIN_SE_ID = 'mainEventScheduleEventId';
 	const CUSTOM_DATA_FIELD_REGISTRATION_SE_ID = 'registrationScheduleEventId';
 	const CUSTOM_DATA_FIELD_AGENDA_SE_ID = 'agendaScheduleEventId';
@@ -38,24 +38,24 @@
 		return array("virtualEvent:id" . strtolower($this->getId()));
 	}
 	
-	 public function getAdminsGroupId()
+	 public function getAdminsGroupIds()
 	 {
-		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_ID);
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_IDS);
 	 }
 	
-	 public function setAdminsGroupId($v)
+	 public function setAdminsGroupIds($v)
 	 {
-		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_ID, $v);
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ADMINS_GROUP_IDS, $v);
 	 }
 	
-	 public function getAttendeesGroupId()
+	 public function getAttendeesGroupIds()
 	 {
-		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID);
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_IDS);
 	 }
 	
-	 public function setAttendeesGroupId($v)
+	 public function setAttendeesGroupIds($v)
 	 {
-		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_ID, $v);
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_ATTENDEES_GROUP_IDS, $v);
 	 }
 	
 	 public function getMainEventScheduleEventId()
