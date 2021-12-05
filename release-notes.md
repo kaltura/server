@@ -6,6 +6,23 @@
 ### Configuration
 To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
 
+## Update update EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_11_18_EntryStatusEqualEmailNotification.template.xml.php
+
+
 ## Enable using dynamic email templates for user flows based on their user role
 * Issue Type: Task
 * Issue ID: PLAT-23219, PLAT-23220
@@ -359,6 +376,22 @@ Run deployment script:
         currently, it is enabled on SAAS for internal accounts (testing only).
 
 ### Bug fix ###
+
+## Update add EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_04_27_EmailEventNotificationEntryStatusEqual.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_04_27_deploy_email_event_notification_entry_status_equal.php
 
 
 ## Zoom as a polling engine ##
