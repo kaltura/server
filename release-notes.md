@@ -107,6 +107,23 @@ A new plugin and service dedicated to managing Virtual Events with new dedicated
     php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
 
 
+## Update update EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_11_18_EntryStatusEqualEmailNotification.template.xml.php
+
+
 # Quasar-17.13.0 #
 ### Configuration ###
 Add the following configurations to local.ini:
@@ -359,6 +376,22 @@ Run deployment script:
         currently, it is enabled on SAAS for internal accounts (testing only).
 
 ### Bug fix ###
+
+## Update add EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_04_27_EmailEventNotificationEntryStatusEqual.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_04_27_deploy_email_event_notification_entry_status_equal.php
 
 
 ## Zoom as a polling engine ##
