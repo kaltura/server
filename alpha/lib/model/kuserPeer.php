@@ -511,7 +511,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
-		
+
 		$bodyParams = null;
 
 
@@ -540,7 +540,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				if (!$adminName) { $adminName = $admin->getPuserId(); }
 				$unsubscribeLink .= $admin->getEmail();
 				$bodyParams = null;
-				
+
+				list($adminName, $creatorUserName, $publisherName) = myKuserUtils::sanitizeFields(array($adminName, $creatorUserName, $publisherName));
+
 				if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // Mail for admin console user
 				{
 					$bodyParams = array($adminName, $creatorUserName, $loginEmail, $roleName);
@@ -586,11 +588,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$creatorUserName = $creatorUser->getFullName();
 			}
 		}
-		
-		$publisherName = $partner->getName();
+
 		$loginEmail = $user->getEmail();
 		$roleNames = $user->getUserRoleNames();
-		$puserId = $user->getPuserId();
+
+		list($userName, $creatorUserName, $publisherName, $puserId) = myKuserUtils::sanitizeFields(array($userName, $creatorUserName, $partner->getName(), $user->getPuserId()));
+
 		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
 		if (!$existingUser)
 		{
@@ -674,7 +677,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				}
 			}
 		}
-		
+
 		if ($roleNameToUseDynamicEmailTemplate)
 		{
 			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $roleNameToUseDynamicEmailTemplate);
