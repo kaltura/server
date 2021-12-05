@@ -1,4 +1,11 @@
 # Quasar-17.16.0
+## Add permission for self serve partner to get partner object ##
+* Issue Type: Task
+* Issue ID: PLAT-23311
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_12_05_add_permissions_partner_get.php
+
 ## Allow setting a user role that is not counted in kmc users quota
 * Issue Type: Task
 * Issue ID: PLAT-23297
