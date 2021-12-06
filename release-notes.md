@@ -6,7 +6,7 @@
 ### Configuration
 To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
 
-## Update update EmailEventNotificationEntryStatusEqual template ##
+## Update EmailEventNotificationEntryStatusEqual template ##
 * Issue Type: Task
 * Issue ID: SUP-24181
 
@@ -292,26 +292,6 @@ First replace all tokens from the ini file below (under cnc section) and remove"
 	php deployment/base/scripts/installPlugins.php
 	php deployment/updates/scripts/add_permissions/2021_07_02_add_vendor_service_permissions.php
 	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2021_06_02_alter_vendor_integration_column_name.sql
-
-# Quasar-17.5.0 #
-
-## Update EmailEventNotificationEntryWasAddedToChannel ##
-* Issue Type: Task
-* Issue ID: SUP-27690
-
-#### Configuration ####
-None.
-
-### Deployment scripts ###
-First replace all tokens in the XML file below and remove ".template" from the file name:
-
-	- deployment/updates/scripts/xml/2021_06_13_updateEntryWasAddedToChannelEmailNotification.template.xml
-
-Run deployment script:
-
-	- deployment/updates/scripts/2021_06_13_deploy_update_entry_was_added_to_channel_email_notification.php
-
-
 
 # Quasar-17.4.0 #
 ## Version Highlight ##
