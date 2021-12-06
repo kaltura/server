@@ -460,6 +460,7 @@
 	class KDLOptimizationPolicy {
 		const BitrateFlagBit = 1;
 		const FrameSizeFlagBit = 2;
+                const BitrateMatchResolFlagBit = 4;
 	}
 	
 	class KDLErrors {
