@@ -717,7 +717,7 @@ class KalturaFrontController
 		if ($defaultNull)
 		{
 			KalturaLog::debug('Replacing error code "' . $apiException->getCode() . '" with null result');
-			return null;
+			return $apiException;
 		}
 		else
 		{
