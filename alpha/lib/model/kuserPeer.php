@@ -670,7 +670,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 					kEmails::TAG_QUICK_START_GUID_LINK => $quickStartGuideLink);
 				if ($authType == PartnerAuthenticationType::SSO)
 				{
-					$associativeBodyParams += [kEmails::TAG_LOGIN_LINK => $bodyParams[3]];
+					$associativeBodyParams[kEmails::TAG_LOGIN_LINK] = $bodyParams[3];
 				}
 			}
 		}
