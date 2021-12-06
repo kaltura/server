@@ -5,6 +5,7 @@ class myKuserUtils
 	const NON_EXISTING_USER_ID = -1;
 	const USERS_DELIMITER = ',';
 	const DOT_CHAR = '.';
+	const SPACE_CHAR = ' ';
 
 	public static function preparePusersToKusersFilter( $puserIdsCsv )
 	{
@@ -30,29 +31,9 @@ class myKuserUtils
 		$sanitizedValues = array();
 		foreach ($values as $val)
 		{
-			$sanitizedVal = self::sanitizeField($val);
-			if(!$sanitizedVal)
-			{
-				$sanitizedVal = 'Unknown';
-			}
+			$sanitizedVal = str_replace(self::DOT_CHAR, self::SPACE_CHAR, $val);
 			$sanitizedValues[] = $sanitizedVal;
 		}
 		return $sanitizedValues;
-	}
-
-	public static function sanitizeField($val)
-	{
-		$sanitizedStr = '';
-		$strParts = explode(' ', $val);
-		foreach ($strParts as $strPart)
-		{
-			// remove all parts that contain . char
-			if(strpos($strPart, self::DOT_CHAR) === false)
-			{
-				$sanitizedStr .= $strPart . ' ';
-			}
-		}
-
-		return trim($sanitizedStr);
 	}
 }
