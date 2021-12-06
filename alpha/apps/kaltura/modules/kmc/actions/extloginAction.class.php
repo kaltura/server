@@ -56,10 +56,10 @@ class extloginAction extends kalturaAction
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::USER_NOT_FOUND) {
-				$this->dieOnError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				$this->dieOnError  ( APIErrors::USER_DATA_ERROR );
 			}
 			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
-				$this->dieOnError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				$this->dieOnError  ( APIErrors::USER_DATA_ERROR );
 			}
 			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED) {
 				$this->dieOnError  ( APIErrors::LOGIN_RETRIES_EXCEEDED );
@@ -71,7 +71,7 @@ class extloginAction extends kalturaAction
 				$this->dieOnError  ( APIErrors::PASSWORD_EXPIRED );
 			}
 			else if ($code == kUserException::WRONG_PASSWORD) {
-				$this->dieOnError  (APIErrors::ADMIN_KUSER_NOT_FOUND);
+				$this->dieOnError  (APIErrors::USER_DATA_ERROR);
 			}
 			else if ($code == kUserException::USER_IS_BLOCKED) {
 				$this->dieOnError  (APIErrors::USER_IS_BLOCKED);
@@ -83,7 +83,7 @@ class extloginAction extends kalturaAction
 			$this->dieOnError  ( APIErrors::INTERNAL_SERVERL_ERROR );
 		}
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
-			$this->dieOnError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+			$this->dieOnError  ( APIErrors::USER_DATA_ERROR );
 		}
 		
 		

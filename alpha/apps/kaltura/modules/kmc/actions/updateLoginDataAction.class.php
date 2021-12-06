@@ -232,7 +232,7 @@ class updateLoginDataAction extends kalturaAction
 				throw new KalturaLoginDataException(APIErrors::INVALID_FIELD_VALUE, 'email');
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new KalturaLoginDataException(APIErrors::LOGIN_ID_ALREADY_USED);
+				throw new KalturaLoginDataException(APIErrors::USER_DATA_ERROR);
 			}
 			throw $e;			
 		}		
