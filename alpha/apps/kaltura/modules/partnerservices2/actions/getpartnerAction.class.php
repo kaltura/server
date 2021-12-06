@@ -27,7 +27,7 @@ class getpartnerAction extends defPartnerservices2Action
 					"html_message" => array ("type" => "string", "desc" => ""),
 					),
 				"errors" => array (
-				 	APIErrors::ADMIN_KUSER_NOT_FOUND,
+				 	APIErrors::USER_DATA_ERROR,
 				 	
 				)
 			);
@@ -59,12 +59,12 @@ class getpartnerAction extends defPartnerservices2Action
 		
 		$login_data = UserLoginDataPeer::getByEmail($partner_adminEmail);
 		if (!$login_data) {
-			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
+			$this->addError ( APIErrors::USER_DATA_ERROR );
 			return;
 		}
 		if ( !$login_data->isPasswordValid ( $cms_password ))
 		{
-			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
+			$this->addError ( APIErrors::USER_DATA_ERROR );
 			return;			
 		}
 		
@@ -80,7 +80,7 @@ class getpartnerAction extends defPartnerservices2Action
 		// so no hint about existing admin will leak 
 		if ( count ( $admin ) < 1 )
 		{
-			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
+			$this->addError ( APIErrors::USER_DATA_ERROR );
 			return;
 		}
 		

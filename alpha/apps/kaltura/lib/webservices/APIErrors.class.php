@@ -408,6 +408,8 @@ class APIErrors
 
 	const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED;;Same login id is already in use";
 	
+	const USER_DATA_ERROR = "USER_DATA_ERROR;;User data is not valid.";
+	
 	const CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER = "CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER;;Root admin user cannot be deleted";
 	
 	const ROLE_ID_MISSING = "ROLE_ID_MISSING;;User must have an associated role";
