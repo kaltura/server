@@ -13,6 +13,23 @@
 ### Configuration
 To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
 
+## Update EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_11_18_EntryStatusEqualEmailNotification.template.xml.php
+
+
 ## Enable using dynamic email templates for user flows based on their user role
 * Issue Type: Task
 * Issue ID: PLAT-23219, PLAT-23220
