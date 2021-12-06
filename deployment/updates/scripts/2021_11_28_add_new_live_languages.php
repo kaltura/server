@@ -2,7 +2,7 @@
 /**
  * @package deployment
  *
- * Deploy Lecture Capture Flavors + conversion Profile
+ * Deploy new language flavors for live
  *
  * No need to re-run after server code deploy
  */
