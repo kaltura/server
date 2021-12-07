@@ -473,5 +473,6 @@ class APIErrors
 	const DRUID_QUERY_TIMED_OUT = "DRUID_QUERY_TIMED_OUT;;Query timed out";
 
 	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED;;Switching to requested partner requires re-login';
-
+	
+	const INVALID_OBJECT_ID = 'INVALID_OBJECT_ID;OBJECT_ID;Object with id [@OBJECT_ID@] is invalid';
 }

@@ -62,6 +62,24 @@ class KMicrosoftGraphClient
 		$service = $this->apiUrl . "/v1.0/users/$userId";
 		return $this->sendGraphRequest($service);
 	}
+	
+	public function getUserByMail($email)
+	{
+		$service = $this->apiUrl . "/v1.0/users?\$filter=startsWith(mail,'$email')";
+		return $this->sendGraphRequest($service);
+	}
+	
+	public function getDriveDeltaPage($userTeamsId)
+	{
+		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/root/delta";
+		return $this->sendGraphRequest($service);
+	}
+	
+	public function getRecordingFolderDeltaPage($userTeamsId, $recordingsFolderId)
+	{
+		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/items/$recordingsFolderId/delta";
+		return $this->sendGraphRequest($service);
+	}
 
 	public function getDriveItem($driveId, $driveItemId)
 	{
