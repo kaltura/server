@@ -676,21 +676,11 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		{
 			$cloned->setName( $new_name );
 		}
-		KalturaLog::log( "carmel1_aaaa" );
 		foreach (self::$validSubTypes as $subType)
 		{
-			$path = $cloned->getConfFilePath()[0];
-			KalturaLog::log( "carmel2_aaaa ${$path}");
 			$suffix = $this->getSuffixBySubType($subType);
 			$content = $this->getConfFileBySuffix($suffix);
 			$cloned->setConfFileBySuffix($suffix, $content);
-			$path = $cloned->getConfFilePath()[0];
-			KalturaLog::log( "carmel3_aaaa ${$path}");
-//			$cloned->setConfFilePath($cloned->generateFilePathArr($subType));
-			$path = $cloned->getConfFilePath()[0];
-			KalturaLog::log( "carmel4_aaaa ${$path}");
-			
-			
 		}
 		
 		$cloned->save(null);
