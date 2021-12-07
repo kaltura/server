@@ -506,13 +506,13 @@ class kFileBase
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
 			return $kSharedFsMgr->rename($from, $to);
 		}
-		
+
 		return rename($from, $to);
 	}
 	
 	public static function copy($from, $to)
 	{
-		if(kFile::isSharedPath($to) || kFile::isSharedPath($to))
+		if(kFile::isSharedPath($from) || kFile::isSharedPath($to))
 		{
 			$kSharedFsMgr = kSharedFileSystemMgr::getInstanceFromPath($to);
 			return $kSharedFsMgr->copy($from, $to);

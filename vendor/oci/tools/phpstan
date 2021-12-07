@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -z ${PHPSTAN_PHP+x} ]; then
+    echo "Set the PHPSTAN_PHP variable to point at a PHP 7+ executable."
+    echo "Not running PHPSTAN."
+    exit 0
+fi
+
+dir=`dirname $0`
+
+$PHPSTAN_PHP $dir/phpstan.phar --memory-limit=512M --no-progress "$@" analyze

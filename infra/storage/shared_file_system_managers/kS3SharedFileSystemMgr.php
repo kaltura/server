@@ -307,9 +307,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doRename($filePath, $newFilePath)
 	{
-		if(kFile::isSharedPath($filePath) && !$this->doCopy($filePath, $newFilePath))
+		if(kFile::isSharedPath($filePath) && $this->doCopy($filePath, $newFilePath))
 		{
-			return false;
+			kFile::unlink($filePath);
+			return true;
 		}
 		
 		if(!$this->doMoveLocalToShared($filePath, $newFilePath, true))
@@ -764,7 +765,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			return false;
 		}
-		return $result['Last-Modified'];
+		return $result['LastModified'];
 	}
 	
 	protected function doMoveLocalToShared($src, $dest, $copy = false)
@@ -789,6 +790,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		$retries = $this->retriesNum;
+		$startTime = microtime(true);
+		
 		while ($retries > 0)
 		{
 			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
@@ -801,6 +804,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
 		@fclose($fp);
+		
+		$timeTook = microtime(true) - $startTime;
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess($copy ? 'COPY' : 'RENAME', $timeTook, $success ? null : kFile::RENAME_FAILED_CODE);
+		}
+		
 		if (!$success)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");
@@ -865,7 +875,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			return false;
 		}
-		return $result;
+		return true;
 	}
 	
 	public function multipartUploadPartUpload($uploadId, $partNumber, &$srcContent, $destFilePath)

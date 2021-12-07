@@ -113,8 +113,13 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			if(isset($setup->createFolder) && $setup->createFolder==1) {
 				$setup->output.= "_".$this->chunkEncodeToken."/";
 				if(!kFile::checkFileExists($setup->output)) {
-					KalturaLog::log("Create tmp folder:".$setup->output);
-					kFile::mkdir($setup->output);
+					KalturaLog::log("Create output tmp folder:".$setup->output);
+					if(!kFile::mkdir($setup->output)) {
+						$error = error_get_last();
+						KalturaLog::debug("Failed to create working dir with error: " . $error['message']);
+					}
+					
+					
 				}
 				$setup->output.= $pInfo['filename'];
 				
@@ -122,7 +127,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				{
 					$setup->sharedChunkPath .= "_".$this->chunkEncodeToken."/";
 					if(!kFile::checkFileExists($setup->sharedChunkPath)) {
-						KalturaLog::log("Create tmp folder:".$setup->sharedChunkPath);
+						KalturaLog::log("Create shared tmp folder:".$setup->sharedChunkPath);
 						kFile::fullMkdir($setup->sharedChunkPath);
 					}
 					$setup->sharedChunkPath.= $pInfo['filename'];

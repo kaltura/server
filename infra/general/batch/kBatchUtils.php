@@ -90,6 +90,10 @@ class kBatchUtils
 		$sharedStorageConfig['maxConcurrentUploadConnections'] = isset($storageOptions['maxConcurrentUploadConnections']) ? $storageOptions['maxConcurrentUploadConnections'] : null;
 		$sharedStorageConfig['userAgentRegex'] = isset($storageOptions['userAgentRegex']) ? $storageOptions['userAgentRegex'] : null;
 		$sharedStorageConfig['userAgentPartner'] = isset($storageOptions['userAgentPartner']) ? $storageOptions['userAgentPartner'] : null;
+		
+		$sharedStorageConfig['region'] = isset($storageOptions['region']) ? $storageOptions['region'] : null;
+		$sharedStorageConfig['namespaceName'] = isset($storageOptions['namespaceName']) ? $storageOptions['namespaceName'] : null;
+		$sharedStorageConfig['configFileLocation'] = isset($storageOptions['configFileLocation']) ? $storageOptions['configFileLocation'] : null;
 
 		KalturaLog::debug("Config loaded: " . print_r($sharedStorageConfig, true));
 		kFile::safeFilePutContents($configCacheFileName, serialize($sharedStorageConfig));
@@ -145,6 +149,18 @@ class kBatchUtils
 		
 		if(isset($storageRunParams['userAgentPartner'])) {
 			kSharedFileSystemMgr::setFileSystemOptions('userAgentPartner', $storageRunParams['userAgentPartner']);
+		}
+		
+		if(isset($storageRunParams['region'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('region', $storageRunParams['region']);
+		}
+		
+		if(isset($storageRunParams['namespaceName'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('namespaceName', $storageRunParams['namespaceName']);
+		}
+		
+		if(isset($storageRunParams['configFileLocation'])) {
+			kSharedFileSystemMgr::setFileSystemOptions('configFileLocation', $storageRunParams['configFileLocation']);
 		}
 		
 		$storageTypeMap = $storageRunParams['storageTypeMap'];

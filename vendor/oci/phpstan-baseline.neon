@@ -1,0 +1,12 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Class OpenSSLAsymmetricKey not found\\.$#"
+			path: src/Oracle/*
+
+		-
+			message: "#^Method .* has invalid return type OpenSSLAsymmetricKey\\.$#"
+			paths:
+				- src/Oracle/*
+				- tests/*
+
