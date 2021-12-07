@@ -322,7 +322,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	private static function validateFileSyncSubType ( $sub_type )
 	{
 		if ( !in_array($sub_type, self::$validSubTypes))
-			throw new FileSyncException ( FileSyncObjectType::UICONF ,$sub_type , $validSubTypes );
+			throw new FileSyncException ( FileSyncObjectType::UICONF ,$sub_type , self::$validSubTypes );
 	}
 
 	private function saveConfFileToDisk($v , $file_suffix = null , $isClone = false)
@@ -628,7 +628,24 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		$content_path = myContentStorage::getFSContentRootPath();
 		return 	$content_path . "content/";
 	}
-
+	
+	public static function getStorageProfileIdForObject($objcetClass, $objectType, $storageProfileId = null )
+	{
+		$objectKeys = array(
+			$objcetClass . ':' . $objectType . ':' . '*',
+			'*' // WildCard
+		);
+		
+		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
+		if (array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()))
+		{
+			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$storageProfileId = reset($storageProfileIds);
+		}
+		
+		return $storageProfileId;
+	}
+	
 	/*
 	 * will create a new uiConf object in the DB from this object while using fields from
 	 */
