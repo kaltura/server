@@ -1,4 +1,16 @@
 # Quasar-17.16.0
+## Disable sending Email notification to admin on new admin registration
+* Issue Type: Task
+* Issue ID: PLAT-23316
+### Deployment
+Add the following to admin.ini
+```
+moduls.adminEmailNotifications.enabled = true
+moduls.adminEmailNotifications.permissionType = 2
+moduls.adminEmailNotifications.label = "Disable email notifications to admins on new admin registration"
+moduls.adminEmailNotifications.permissionName = FEATURE_DISABLE_NEW_USER_EMAIL
+moduls.adminEmailNotifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## Add permission for self serve partner to get partner object ##
 * Issue Type: Task
 * Issue ID: PLAT-23311
