@@ -65,6 +65,14 @@ dynamic_email_base_link-USER_ROLE = "http://base_url_for_the_template/"
 ```
 (The above texts are examples)
 
+## Add new live language flavors to existing systems ##
+* Issue Type: Task
+* Issue ID: SUP-29836
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2021_11_28_add_new_live_languages.php
+
+
 # Quasar-17.15.0 #
 ## Add partner for KME ##
 * Issue Type: Task
