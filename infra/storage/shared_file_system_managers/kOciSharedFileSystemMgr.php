@@ -210,9 +210,20 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			{
 				$resumeInfo = $e->getMultipartResumeInfo();
 				$retries--;
-				self::safeLog("Multipart upload failed ($retries retries attempt left) info: ". $e->getFailureExceptions());
+				self::safeLog("Caught MultipartUploadException, retries left [$retries] info: ". $e->getFailureExceptions());
 				KalturaMonitorClient::sleep(rand(1,3));
 			}
+			catch (OciBadResponseException $e)
+			{
+				$retries--;
+				self::safeLog("Caught OciBadResponseException, retries left [$retries] info: ". $e->getMessage());
+			}
+			catch (Exception $e)
+			{
+				$retries--;
+				self::safeLog("Caught generic exception, retries left [$retries] info: ". $e->getMessage());
+			}
+			
 		}
 		
 		self::safeLog("Failed to upload to OS, info with message: " . $e->getMessage());
