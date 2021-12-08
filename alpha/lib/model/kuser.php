@@ -26,10 +26,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const TITLE = 'title';
 	const COMPANY = 'company';
 	
-	const USER_ID = 'user_id';
-	const TEAMS_ID = 'teams_id';
+	const TEAMS_USER_ID = 'teams_user_id';
 	const RECORDINGS_FOLDER_ID = 'recordings_folder_id';
-	const DELTA_TOKEN = 'delta_token';
+	const DELTA_LINK = 'delta_link';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	
@@ -1512,33 +1511,17 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	/**
 	 * @param string $v
 	 */
-	public function setUserId($v)
+	public function setTeamsUserId($v)
 	{
-		$this->putInCustomData(self::USER_ID, $v);
+		$this->putInCustomData(self::TEAMS_USER_ID, $v);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getUserId()
+	public function getTeamsUserId()
 	{
-		return $this->getFromCustomData(self::USER_ID);
-	}
-	
-	/**
-	 * @param string $v
-	 */
-	public function setTeamsId($v)
-	{
-		$this->putInCustomData(self::TEAMS_ID, $v);
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getTeamsId()
-	{
-		return $this->getFromCustomData(self::TEAMS_ID);
+		return $this->getFromCustomData(self::TEAMS_USER_ID);
 	}
 	
 	/**
@@ -1560,16 +1543,16 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	/**
 	 * @param string $v
 	 */
-	public function setDeltaToken($v)
+	public function setDeltaLink($v)
 	{
-		$this->putInCustomData(self::DELTA_TOKEN, $v);
+		$this->putInCustomData(self::DELTA_LINK, $v);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getDeltaToken()
+	public function getDeltaLink()
 	{
-		return $this->getFromCustomData(self::DELTA_TOKEN);
+		return $this->getFromCustomData(self::DELTA_LINK);
 	}
 }

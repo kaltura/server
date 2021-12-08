@@ -30,17 +30,6 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 	 * @readonly
 	 */
 	public $clientId;
-	
-	/**
-	 * @var bool
-	 * @readonly
-	 */
-	public $isInitialized;
-	
-	/**
-	 * @var string
-	 */
-	public $userFilterTag;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -51,8 +40,6 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 		'tenantId',
 		'clientSecret',
 		'clientId',
-		'isInitialized',
-		'userFilterTag'
 	);
 
 	public function getMapBetweenObjects()

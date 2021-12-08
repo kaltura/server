@@ -3,15 +3,11 @@
 
 class KalturaTeamsVendorIntegrationUser extends KalturaVendorIntegrationUser
 {
-	/**
-	 * @var string
-	 */
-	public $userId;
 	
 	/**
 	 * @var string
 	 */
-	public $teamsId;
+	public $teamsUserId;
 	
 	/**
 	 * @var string
@@ -21,10 +17,10 @@ class KalturaTeamsVendorIntegrationUser extends KalturaVendorIntegrationUser
 	/**
 	 * @var string
 	 */
-	public $deltaToken;
+	public $deltaLink;
 	
 	
-	private static $map_between_objects = array('userId', 'teamsId', 'recordingsFolderId', 'deltaToken');
+	private static $map_between_objects = array('teamsUserId', 'recordingsFolderId', 'deltaLink');
 	
 	public function getMapBetweenObjects ( )
 	{

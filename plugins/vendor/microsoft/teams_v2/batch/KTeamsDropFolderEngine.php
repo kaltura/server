@@ -39,9 +39,7 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 	{
 		$this->initializeEngine($dropFolder);
 		
-		//$teamsUsers = $this->retrieveTeamsUsers($dropFolder->partnerId, $dropFolder->userFilterTag);
-		
-		$filter = new KalturaUserFilter();
+		$filter = new KalturaTeamsVendorIntegrationUserFilter();
 		$filter->partnerIdEqual = $dropFolder->partnerId;
 		$filter->statusEqual = KalturaUserStatus::ACTIVE;
 		if ($dropFolder->userFilterTag)
@@ -51,18 +49,24 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 5;
-		$pager->pageIndex = 1;
-		
 		do
 		{
-			$usersList = KBatchBase::$kClient->vendorIntegrationUser->listAction($filter, $pager);
+			$usersList = $this->vendorPlugin->vendorIntegrationUser->listAction($filter, $pager);
 			
 			foreach ($usersList->objects as $kalturaTeamsVendorIntegrationUser)
 			{
-				$this->watchTeamsUserFiles($kalturaTeamsVendorIntegrationUser);
+				try
+				{
+					$this->watchTeamsUserFiles($kalturaTeamsVendorIntegrationUser);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::info("Error running Teams drop folder for user {$kalturaTeamsVendorIntegrationUser->id}: {$e->getMessage()};");
+				}
 			}
 			
 			$returnedSize = $usersList->objects ? count($usersList->objects) : 0;
+			$pager->pageIndex++;
 		}
 		while ($pager->pageSize == $returnedSize);
 	}
@@ -77,50 +81,54 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 		$this->vendorIntegrationSetting = $this->vendorPlugin->vendorIntegration->get($dropFolder->integrationId);
 	}
 	
-	protected function watchTeamsUserFiles($kalturaUser)
+	protected function watchTeamsUserFiles($user)
 	{
-		if ($kalturaUser->email)
+		/* @var $user KalturaTeamsVendorIntegrationUser */
+		$updateUser = new KalturaTeamsVendorIntegrationUser();
+		
+		if ($user->email)
 		{
 			$updateCurrentUser = false;
 			
-			$teamsUserObject = new KalturaTeamsVendorIntegrationUser();
-			$teamsUserObject->id = $kalturaUser->id;
-			$teamsUserObject->userId = $kalturaUser->email;
-			
-			// ADD - if has no teams user
-			$teamsUserObject->teamsId = $this->retrieveTeamsUser($kalturaUser);
-			if ($teamsUserObject->teamsId)
+			if (!$user->teamsUserId)
 			{
-				$updateCurrentUser = true;
-			}
-			
-			// ADD - if has no recordings folder
-			$teamsUserObject->recordingsFolderId = $this->getRecordingsFolderId($teamsUserObject->teamsId);
-			if ($teamsUserObject->recordingsFolderId)
-			{
-				$updateCurrentUser = true;
-			}
-			
-			if ($teamsUserObject->teamsId && $teamsUserObject->recordingsFolderId)
-			{
-				$newDeltaLink = $this->downloadUserFilesFromDrive($teamsUserObject);
-				if ($newDeltaLink)
+				$updateUser->teamsUserId = $this->retrieveTeamsUserByMail($user->email);
+				if (!$updateUser->teamsUserId)
 				{
-					$teamsUserObject->deltaToken = $newDeltaLink;
-					$updateCurrentUser = true;
+					return;
 				}
+				
+				$updateCurrentUser = true;
+			}
+			
+			if (!$user->recordingsFolderId)
+			{
+				$updateUser->recordingsFolderId = $this->getRecordingsFolderId($updateUser->teamsUserId);
+				if (!$updateUser->recordingsFolderId)
+				{
+					return;
+				}
+				
+				$updateCurrentUser = true;
+			}
+			
+			$updateUser->deltaLink = $user->deltaLink;
+			$updateUser->deltaLink = $this->downloadUserFilesFromDrive($updateUser);
+			if ($updateUser->deltaLink)
+			{
+				$updateCurrentUser = true;
 			}
 			
 			if ($updateCurrentUser)
 			{
-				$this->vendorPlugin->vendorIntegrationUser->update($teamsUserObject->id, $teamsUserObject);
+				$this->vendorPlugin->vendorIntegrationUser->update($user->id, $updateUser);
 			}
 		}
 	}
 	
-	protected function retrieveTeamsUser($kalturaUser)
+	protected function retrieveTeamsUserByMail($userEmail)
 	{
-		$teamsUsers = $this->graphClient->getUserByMail($kalturaUser->email);
+		$teamsUsers = $this->graphClient->getUserByMail($userEmail);
 		if (isset($teamsUsers[MicrosoftGraphFieldNames::VALUE]))
 		{
 			foreach ($teamsUsers[MicrosoftGraphFieldNames::VALUE] as $teamsUser)
@@ -135,40 +143,39 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 		return null;
 	}
 	
-	protected function getRecordingsFolderId($teamsId)
+	protected function getRecordingsFolderId($teamsUserId)
 	{
-		$result = $this->graphClient->getDriveDeltaPage($teamsId);
-		foreach ($result[MicrosoftGraphFieldNames::VALUE] as $item)
+		$filesList = $this->graphClient->getDriveDeltaPage($teamsUserId);
+		if (isset($filesList[MicrosoftGraphFieldNames::VALUE]))
 		{
-			if (isset($item['specialFolder']['name']) && $item['specialFolder']['name'] == 'recordings')
+			foreach ($filesList[MicrosoftGraphFieldNames::VALUE] as $item)
 			{
-				return $item['id'];
+				if (isset($item['specialFolder']['name']) && $item['specialFolder']['name'] == 'recordings')
+				{
+					return $item['id'];
+				}
 			}
 		}
 		
 		return null;
 	}
 	
-	protected function downloadUserFilesFromDrive($teamsUserObject)
+	protected function downloadUserFilesFromDrive($user)
 	{
-		$teamsId = $teamsUserObject->teamsId;
-		$recordingsFolderId = $teamsUserObject->recordingsFolderId;
-		
-		if ($teamsUserObject->deltaToken)
+		if ($user->deltaLink)
 		{
-			$filesFromDrive = $this->graphClient->sendGraphRequest($teamsUserObject->deltaToken);
+			$filesFromDrive = $this->graphClient->sendGraphRequest($user->deltaLink);
 		}
 		else
 		{
-			$filesFromDrive = $this->graphClient->getRecordingFolderDeltaPage($teamsId, $recordingsFolderId);
+			$filesFromDrive = $this->graphClient->getRecordingFolderDeltaPage($user->teamsUserId, $user->recordingsFolderId);
 		}
 		
 		if (isset($filesFromDrive[MicrosoftGraphFieldNames::VALUE]))
 		{
 			foreach ($filesFromDrive[MicrosoftGraphFieldNames::VALUE] as $fileInRecordings)
 			{
-				if (isset($fileInRecordings['name']) && $fileInRecordings['name'] != 'Recordings'
-					&& !isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]) && !isset($item[MicrosoftGraphFieldNames::DELETED_FACET]))
+				if (!isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]) && !isset($item[MicrosoftGraphFieldNames::DELETED_FACET]))
 				{
 					$this->getDriveItem($fileInRecordings);
 				}

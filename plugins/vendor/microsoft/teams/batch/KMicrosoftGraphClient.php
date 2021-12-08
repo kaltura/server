@@ -109,7 +109,7 @@ class KMicrosoftGraphClient
 		{
 			$this->authenticate();
 		}
-
+		KalturaLog::info("Sending graph request - $url");
 		$serviceUrl = $url;
 		$ch = curl_init($serviceUrl);
 
@@ -128,7 +128,7 @@ class KMicrosoftGraphClient
 		}
 		else
 		{
-			KalturaLog::info("Error occurred executing Graph API call: $result");
+			KalturaLog::info("Error occurred executing Graph API call (Code $responseCode): $result");
 			return null;
 		}
 
