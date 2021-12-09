@@ -30,7 +30,7 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 	protected $existingDropFolderFiles;
 	
 	/**
-	 * @var KalturaIntegrationSetting
+	 * @var KalturaTeamsVendorIntegrationUser
 	 */
 	protected $vendorIntegrationSetting;
 	
@@ -42,9 +42,9 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 		$filter = new KalturaTeamsVendorIntegrationUserFilter();
 		$filter->partnerIdEqual = $dropFolder->partnerId;
 		$filter->statusEqual = KalturaUserStatus::ACTIVE;
-		if ($dropFolder->userFilterTag)
+		if ($this->vendorIntegrationSetting->userFilterTag)
 		{
-			$filter->tagsMultiLikeOr = $dropFolder->userFilterTag;
+			$filter->tagsMultiLikeOr = $this->vendorIntegrationSetting->userFilterTag;
 		}
 		
 		$pager = new KalturaFilterPager();
@@ -98,25 +98,27 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 					return;
 				}
 				
+				$user->teamsUserId = $updateUser->teamsUserId;
 				$updateCurrentUser = true;
 			}
 			
 			if (!$user->recordingsFolderId)
 			{
-				$updateUser->recordingsFolderId = $this->getRecordingsFolderId($updateUser->teamsUserId);
-				if (!$updateUser->recordingsFolderId)
+				$updateUser->recordingsFolderId = $this->getRecordingsFolderId($user->teamsUserId);
+				if ($updateUser->recordingsFolderId)
 				{
-					return;
+					$user->recordingsFolderId = $updateUser->recordingsFolderId;
+					$updateCurrentUser = true;
 				}
-				
-				$updateCurrentUser = true;
 			}
 			
-			$updateUser->deltaLink = $user->deltaLink;
-			$updateUser->deltaLink = $this->downloadUserFilesFromDrive($updateUser);
-			if ($updateUser->deltaLink)
+			if ($user->recordingsFolderId)
 			{
-				$updateCurrentUser = true;
+				$updateUser->deltaLink = $this->downloadUserFilesFromDrive($user);
+				if ($updateUser->deltaLink)
+				{
+					$updateCurrentUser = true;
+				}
 			}
 			
 			if ($updateCurrentUser)
@@ -316,10 +318,10 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
-		KBatchBase::impersonate ($job->partnerId);
+		KBatchBase::impersonate($job->partnerId);
 
 		/* @var $data KalturaDropFolderContentProcessorJobData */
-		$dropFolder = $this->dropFolderPlugin->dropFolder->get ($data->dropFolderId);
+		$dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
 		//In the case of the microsoft teams drop folder engine, the only possible contentMatch policy is ADD_AS_NEW.
 		//Any other policy should cause an error.
 		switch ($data->contentMatchPolicy)
@@ -335,7 +337,7 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 		KBatchBase::unimpersonate();
 	}
 
-	protected function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data, KalturaMicrosoftTeamsDropFolder $folder)
+	protected function addAsNewContent(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data, $dropFolder)
 	{
 		/* @var $data KalturaDropFolderContentProcessorJobData */
 		$resource = $this->getIngestionResource($job, $data);
@@ -358,7 +360,7 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 		if ($result [1] && $result[1] instanceof KalturaBaseEntry)
 		{
 			$entry = $result [1];
-			$this->createCategoryAssociations ($folder, $entry->userId, $entry->id);
+			$this->createCategoryAssociations ($dropFolder, $entry->userId, $entry->id);
 		}
 	}
 }

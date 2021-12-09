@@ -71,7 +71,7 @@ class KMicrosoftGraphClient
 	
 	public function getDriveDeltaPage($userTeamsId)
 	{
-		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/root/delta";
+		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/root/children?select=id,name,specialFolder";
 		return $this->sendGraphRequest($service);
 	}
 	
