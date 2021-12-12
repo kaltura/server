@@ -1,12 +1,12 @@
 <?php
 /**
- * @package plugins.KTeams
+ * @package plugins.OneDrive
  * @subpackage lib
  */
 
-class TeamsVendorType implements IKalturaPluginEnum, VendorTypeEnum
+class OneDriveVendorType implements IKalturaPluginEnum, VendorTypeEnum
 {
-	const K_TEAMS = 'K_TEAMS';
+	const ONE_DRIVE = 'ONE_DRIVE';
 
 	/**
 	 * @inheritDoc
@@ -14,7 +14,7 @@ class TeamsVendorType implements IKalturaPluginEnum, VendorTypeEnum
 	public static function getAdditionalValues()
 	{
 		return array(
-			'K_TEAMS' => self::K_TEAMS,
+			'ONE_DRIVE' => self::ONE_DRIVE,
 		);
 	}
 
@@ -24,7 +24,7 @@ class TeamsVendorType implements IKalturaPluginEnum, VendorTypeEnum
 	public static function getAdditionalDescriptions()
 	{
 		return array(
-			KTeamsPlugin::getApiValue(self::K_TEAMS) => 'K Teams Vendor Type',
+			OneDrivePlugin::getApiValue(self::ONE_DRIVE) => 'OneDrive Vendor Type',
 		);
 	}
 }

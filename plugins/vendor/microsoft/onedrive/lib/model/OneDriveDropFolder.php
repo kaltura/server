@@ -1,10 +1,10 @@
 <?php
 
 /*
-* @package plugins.KTeams
+* @package plugins.OneDrive
 * @subpackage model
 */
-class TeamsDropFolder extends VendorIntegrationDropFolder
+class OneDriveDropFolder extends VendorIntegrationDropFolder
 {
 	const MS_TEAMS_GRAPH_API_URL = 'https://graph.microsoft.com/v1.0';
 	

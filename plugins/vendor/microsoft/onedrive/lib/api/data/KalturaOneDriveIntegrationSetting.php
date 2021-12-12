@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package plugins.KTeams
+ * @package plugins.OneDrive
  * @subpackage api.objects
  */
-class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
+class KalturaOneDriveIntegrationSetting extends KalturaIntegrationSetting
 {
 	/**
 	 * @var string
@@ -25,6 +25,11 @@ class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
 	 * @var string
 	 */
 	public $userFilterTag;
+	
+	/**
+	 * @var bool
+	 */
+	public $isInitialized;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -35,6 +40,7 @@ class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
 		'clientId',
 		'secretExpirationDate',
 		'userFilterTag',
+		'isInitialized',
 	);
 
 	public function getMapBetweenObjects()
@@ -45,7 +51,7 @@ class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject)) {
-			$dbObject = new TeamsIntegration();
+			$dbObject = new OneDriveIntegration();
 		}
 
 		return parent::toObject($dbObject, $skip);
@@ -54,16 +60,16 @@ class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
 	public function toInsertableObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject)) {
-			$dbObject = new TeamsIntegration();
+			$dbObject = new OneDriveIntegration();
 		}
-		$dbObject->setVendorType(KTeamsPlugin::getVendorTypeCoreValue(TeamsVendorType::K_TEAMS));
+		$dbObject->setVendorType(OneDrivePlugin::getVendorTypeCoreValue(OneDriveVendorType::ONE_DRIVE));
 
 		return parent::toInsertableObject($dbObject, $skip);
 	}
 
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
-		if (!KTeamsPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()))
+		if (!OneDrivePlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
@@ -76,7 +82,7 @@ class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (!KTeamsPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !KTeamsPlugin::isAllowedPartner($sourceObject->getPartnerId()))
+		if (!OneDrivePlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !OneDrivePlugin::isAllowedPartner($sourceObject->getPartnerId()))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
@@ -86,7 +92,7 @@ class KalturaTeamsIntegrationSetting extends KalturaIntegrationSetting
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if (!KTeamsPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId())) {
+		if (!OneDrivePlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId())) {
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
 

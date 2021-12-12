@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package plugins.KTeams
+ * @package plugins.OneDrive
  * @subpackage api.objects
  */
-class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
+class KalturaOneDriveDropFolder extends KalturaRemoteDropFolder
 {
 	/**
 	 * ID of the integration being fulfilled by the drop folder
@@ -49,7 +49,7 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		/* @var $source_object TeamsDropFolder */
+		/* @var $source_object OneDriveDropFolder */
 		if ($source_object->getIntegrationId())
 		{
 			$dbVendorIntegrationItem = VendorIntegrationPeer::retrieveByPK($source_object->getIntegrationId());
@@ -70,7 +70,7 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 	{
 		if (is_null($dbObject))
 		{
-			$dbObject = new TeamsDropFolder();
+			$dbObject = new OneDriveDropFolder();
 		}
 
 		if ($this->integrationId)
@@ -81,7 +81,7 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 				throw new KalturaAPIException(APIErrors::INVALID_OBJECT_ID, $this->integrationId);
 			}
 
-			if ($dbVendorIntegrationItem->getVendorType() != KTeamsPlugin::getVendorTypeCoreValue(TeamsVendorType::K_TEAMS))
+			if ($dbVendorIntegrationItem->getVendorType() != OneDrivePlugin::getVendorTypeCoreValue(OneDriveVendorType::ONE_DRIVE))
 			{
 				throw new KalturaAPIException(APIErrors::INVALID_OBJECT_ID, $this->integrationId);
 			}
@@ -89,7 +89,7 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 
 		if (!$dbObject->getType())
 		{
-			$dbObject->setType(KTeamsPlugin::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS));
+			$dbObject->setType(OneDrivePlugin::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE));
 		}
 
 		return parent::toObject($dbObject, $skip);
@@ -97,7 +97,7 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (!KTeamsPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !KTeamsPlugin::isAllowedPartner($sourceObject->getPartnerId()))
+		if (!OneDrivePlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !OneDrivePlugin::isAllowedPartner($sourceObject->getPartnerId()))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
@@ -107,7 +107,7 @@ class KalturaTeamsDropFolder extends KalturaRemoteDropFolder
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if (!KTeamsPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !KTeamsPlugin::isAllowedPartner($this->partnerId))
+		if (!OneDrivePlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()) || !OneDrivePlugin::isAllowedPartner($this->partnerId))
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}

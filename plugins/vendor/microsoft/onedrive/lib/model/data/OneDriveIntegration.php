@@ -1,14 +1,15 @@
 <?php
 /*
-* @package plugins.KTeams
+* @package plugins.OneDrive
 * @subpackage model
 */
-class TeamsIntegration extends VendorIntegration
+class OneDriveIntegration extends VendorIntegration
 {
 	const CLIENT_SECRET = 'client_secret';
 	const CLIENT_ID = 'client_id';
 	const SECRET_EXPIRATION_DATE = 'secret_expiration_date';
 	const USER_FILTER_TAG = 'user_filter_tag';
+	const IS_INITIALIZED = 'is_initialized';
 
 	/**
 	 * @return string
@@ -58,6 +59,9 @@ class TeamsIntegration extends VendorIntegration
 		$this->putInCustomData(self::CLIENT_ID, $clientId);
 	}
 	
+	/**
+	 * @return string
+	 */
 	public function getUserFilterTag()
 	{
 		return $this->getFromCustomData(self::USER_FILTER_TAG);
@@ -69,5 +73,21 @@ class TeamsIntegration extends VendorIntegration
 	public function setUserFilterTag($userFilterTag)
 	{
 		$this->putInCustomData(self::USER_FILTER_TAG, $userFilterTag);
+	}
+	
+	/**
+	 * @return bool
+	 */
+	public function getIsInitialized()
+	{
+		return $this->getFromCustomData(self::IS_INITIALIZED);
+	}
+	
+	/**
+	 * @param string $isInitialized
+	 */
+	public function setIsInitialized($isInitialized)
+	{
+		$this->putInCustomData(self::IS_INITIALIZED, $isInitialized);
 	}
 }

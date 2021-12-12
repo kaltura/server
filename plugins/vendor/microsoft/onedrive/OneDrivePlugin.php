@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package plugins.KTeams
+ * @package plugins.OneDrive
  */
-class KTeamsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
+class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
 {
-	const PLUGIN_NAME = 'KTeams';
+	const PLUGIN_NAME = 'OneDrive';
 
 	
 	/**
@@ -15,16 +15,16 @@ class KTeamsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnu
 	{
 		if (!$baseEnumName)
 		{
-			return array('TeamsDropFolderType', 'TeamsVendorType');
+			return array('OneDriveDropFolderType', 'OneDriveVendorType');
 		}
 
 		switch ($baseEnumName)
 		{
 			case 'DropFolderType':
-				return array('TeamsDropFolderType');
+				return array('OneDriveDropFolderType');
 				break;
 			case 'VendorTypeEnum':
-				return array('TeamsVendorType');
+				return array('OneDriveVendorType');
 				break;
 		}
 
@@ -38,48 +38,48 @@ class KTeamsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnu
 	{
 		switch ($baseClass) {
 			case 'KDropFolderEngine':
-				if ($enumValue == KalturaDropFolderType::K_TEAMS) {
-					return new KTeamsDropFolderEngine();
+				if ($enumValue == KalturaDropFolderType::ONE_DRIVE) {
+					return new OneDriveDropFolderEngine();
 				}
 				break;
 			case ('KalturaDropFolder'):
-				if ($enumValue == self::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS)) {
-					return new KalturaTeamsDropFolder();
+				if ($enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE)) {
+					return new KalturaOneDriveDropFolder();
 				}
 				break;
 			case ('KalturaDropFolderFile'):
-				if ($enumValue == self::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS)) {
+				if ($enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE)) {
 					return new KalturaMicrosoftTeamsDropFolderFile();
 				}
 				break;
 			case 'kDropFolderContentProcessorJobData':
-				if ($enumValue == self::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS)) {
+				if ($enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE)) {
 					return new kDropFolderContentProcessorJobData();
 				}
 				break;
 			case 'KalturaJobData':
 				$jobSubType = $constructorArgs["coreJobSubType"];
 				if ($enumValue == DropFolderPlugin::getApiValue(DropFolderBatchType::DROP_FOLDER_CONTENT_PROCESSOR) &&
-					$jobSubType == self::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS)) {
+					$jobSubType == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE)) {
 					return new KalturaDropFolderContentProcessorJobData();
 				}
 				break;
 			case 'KalturaIntegrationSetting':
-				if ($enumValue == self::getVendorTypeCoreValue(TeamsVendorType::K_TEAMS)) {
-					return new KalturaTeamsIntegrationSetting();
+				if ($enumValue == self::getVendorTypeCoreValue(OneDriveVendorType::ONE_DRIVE)) {
+					return new KalturaOneDriveIntegrationSetting();
 				}
 				break;
 
 			case 'Form_DropFolderConfigureExtend_SubForm':
-				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::K_TEAMS)
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::ONE_DRIVE)
 				{
 					return new Form_MicrosoftTeamsDropFolderConfigureExtend_SubForm();
 				}
 				break;
 			case 'Kaltura_Client_DropFolder_Type_DropFolder':
-				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::K_TEAMS)
+				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::ONE_DRIVE)
 				{
-					return new Kaltura_Client_KTeams_Type_TeamsDropFolder();
+					return new Kaltura_Client_OneDrive_Type_OneDriveDropFolder();
 				}
 				break;
 		}
@@ -91,19 +91,19 @@ class KTeamsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnu
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		if ($baseClass == 'VendorIntegration' &&
-			$enumValue == self::getVendorTypeCoreValue(TeamsVendorType::K_TEAMS))
+			$enumValue == self::getVendorTypeCoreValue(OneDriveVendorType::ONE_DRIVE))
 		{
-			return 'TeamsIntegration';
+			return 'OneDriveIntegration';
 		}
 
 		if($baseClass == 'DropFolder' &&
-			$enumValue == self::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS))
+			$enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE))
 		{
-			return 'TeamsDropFolder';
+			return 'OneDriveDropFolder';
 		}
 
 		if($baseClass == 'DropFolderFile' &&
-			$enumValue == self::getDropFolderTypeCoreValue(TeamsDropFolderType::K_TEAMS))
+			$enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE))
 		{
 			return 'MicrosoftTeamsDropFolderFile';
 		}
@@ -157,7 +157,6 @@ class KTeamsPlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnu
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
-		KalturaLog::info("Test print - $partnerId");
 		if (in_array($partnerId, array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::BATCH_PARTNER_ID)))
 			return true;
 

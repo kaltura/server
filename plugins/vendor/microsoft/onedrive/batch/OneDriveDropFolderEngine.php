@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package plugins.KTeams
+ * @package plugins.OneDrive
  * @subpackage batch
  */
-class KTeamsDropFolderEngine extends KDropFolderEngine
+class OneDriveDropFolderEngine extends KDropFolderEngine
 {
 	const ADMIN_TAG_TEAMS = 'msTeams';
 
@@ -69,6 +69,13 @@ class KTeamsDropFolderEngine extends KDropFolderEngine
 			$pager->pageIndex++;
 		}
 		while ($pager->pageSize == $returnedSize);
+		
+		if (!$this->vendorIntegrationSetting->isInitialized)
+		{
+//			$updatedVendorIntegrationSetting = new KalturaTeamsVendorIntegrationUser();
+//			$updatedVendorIntegrationSetting->isInitalized = true;
+//			$this->vendorPlugin->vendorIntegration->update($this->vendorIntegrationSetting->id, $updatedVendorIntegrationSetting);
+		}
 	}
 	
 	protected function initializeEngine($dropFolder)
