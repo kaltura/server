@@ -102,6 +102,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function initLiveStreamConfig()
 	{
+		if($this->params->getResponseFormat() == 'redirect')
+		{
+			$this->shouldRedirect = true;
+		}
+
 		if(!$this->liveStreamConfig)
 			$this->liveStreamConfig = new kLiveStreamConfiguration();
 		
