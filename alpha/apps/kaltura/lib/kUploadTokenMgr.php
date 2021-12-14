@@ -61,16 +61,16 @@ class kUploadTokenMgr
 	private static function initStorageOptions($uploadTokenId)
 	{
 		self::$sharedStorageOptions = kConf::get("shared_storage_client_config", "runtime_config", array());
-		self::$sharedStorageOptions['uploadTokenId'] = $uploadTokenId;
 		
 		//If we received empty array or sharedStorageBaseDir is not defined us legacy nfs upload
-		if(!count(self::$sharedStorageOptions) || !isset(self::$sharedStorageOptions['sharedStorageBaseDir']))
+		if(!count(self::$sharedStorageOptions) || !isset(self::$sharedStorageOptions['s3Region']) || !isset(self::$sharedStorageOptions['sharedStorageBaseDir']))
 		{
 			KalturaLog::debug("Failed to load shared storage client config, will revert to using NFS for shared storage");
 			self::$sharedUploadModeEnabled = false;
 			return;
 		}
 		
+		self::$sharedStorageOptions['uploadTokenId'] = $uploadTokenId;
 		self::$sharedUploadModeEnabled = true;
 	}
 	
@@ -355,7 +355,7 @@ class kUploadTokenMgr
 				}
 				else
 				{
-					$this->lockMoveChunkToShared($sourceFilePath, $chunkFilePath);
+					$this->lockMoveChunkToShared($sourceFilePath, $chunkFilePath, $chunkSize);
 				}
 				
 				//Close file handle which was opened at the beginning of the call
@@ -363,7 +363,7 @@ class kUploadTokenMgr
 				return $currentFileSize;
 			}
 			
-			self::moveChunkToShared($sourceFilePath, $chunkFilePath);
+			self::moveChunkToShared($sourceFilePath, $chunkFilePath, $chunkSize);
 			
 			$uploadFinalChunkMaxAppendTime = kConf::get('upload_final_chunk_max_append_time', 'local', 45);
 			
@@ -395,16 +395,16 @@ class kUploadTokenMgr
 		return $currentFileSize;
 	}
 	
-	protected function lockMoveChunkToShared($sourceFilePath, $chunkFilePath)
+	protected function lockMoveChunkToShared($sourceFilePath, $chunkFilePath, $chunkSize)
 	{
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_UPLOAD_TOKEN);
 		if(!$cache)
 		{
-			self::moveChunkToShared($sourceFilePath, $chunkFilePath);
+			self::moveChunkToShared($sourceFilePath, $chunkFilePath, $chunkSize);
 		}
 		elseif($cache->add($chunkFilePath, true, 3600))
 		{
-			self::moveChunkToShared($sourceFilePath, $chunkFilePath);
+			self::moveChunkToShared($sourceFilePath, $chunkFilePath, $chunkSize);
 			$cache->delete($chunkFilePath);
 		}
 	}
@@ -776,10 +776,27 @@ class kUploadTokenMgr
 		return false;
 	}
 	
-	private static function moveChunkToShared($sourceFilePath, $chunkFilePath)
+	private static function moveChunkToShared($sourceFilePath, $chunkFilePath, $chunkSize)
 	{
 		$chunkFilePath = self::translateLocalSharedPathToRemote($chunkFilePath);
-		return kFile::moveFile($sourceFilePath, $chunkFilePath);
+		
+		$startTime = microtime(true);
+		$moveSucceeded = kFile::moveFile($sourceFilePath, $chunkFilePath);
+		$timeTook = microtime(true) - $startTime;
+		
+		if(class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorFileSystemAccess('RENAME', $timeTook, $moveSucceeded ? null : kFile::RENAME_FAILED_CODE);
+		}
+		
+		if($moveSucceeded)
+		{
+			KalturaLog::log("rename took : $timeTook [$sourceFilePath] to [$chunkFilePath] size: [$chunkSize]");
+			return true;
+		}
+		
+		KalturaLog::err("Failed to rename file : [$sourceFilePath] to [$chunkFilePath]");
+		return false;
 	}
 	
 	private static function checkChunkExists($chunkPath)
