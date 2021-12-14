@@ -1011,7 +1011,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		}
 		
 		$loginDataExisted = null;
-		$loginData = UserLoginDataPeer::addLoginData($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure, $loginDataExisted);	
+		$loginData = UserLoginDataPeer::addLoginData($loginId, $password, $this->getPartnerId(), $this->getFirstName(), $this->getLastName(), $this->getIsAdmin(), $checkPasswordStructure, $loginDataExisted, $this->getUserRoleNames());
 		if (!$loginData)
 		{
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);

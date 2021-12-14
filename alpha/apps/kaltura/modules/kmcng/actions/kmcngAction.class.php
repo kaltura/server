@@ -195,6 +195,7 @@ class kmcngAction extends kalturaAction
 				'serverUri' => "http://" . kConf::get("cdn_api_host"),
 				'securedServerUri' => $secureCDNServerUri
 			),
+			'kpfServer' => array('kpfPackageManagerBaseUrl' => kconf::get('kpf_package_manager_base_url','local',null), 'kpfPurchaseManagerBaseUrl' => kconf::get('kpf_purchase_manager_base_url', 'local', null)) ,
 			"externalApps" => array(
 				"studioV2" => $studio,
 				"studioV3" => $studioV3,

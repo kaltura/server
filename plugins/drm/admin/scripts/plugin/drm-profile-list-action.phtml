@@ -195,6 +195,7 @@ function loadDrmProfileSuccess(html) {
 function adminApi(partnerId, drmType, adminApiAction) {
 	let paramStr = '/pId/' + partnerId + '/drmType/' + drmType + '/adminApiAction/' + adminApiAction;
 	var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'DrmAdminApiAction')); ?>' + paramStr;
+	closeAdminApiWindow();
 	dialogDiv = jQuery('<div id="drm-admin-api-dialog"><iframe id="adminApiIFrame" width="100%" height="100%" src="' + url + '"></iframe></div>').appendTo('body');
 	dialogDiv.dialog({bgiframe: true, modal: true, resizable: true, width: 580, height: 700,
 		title: '<?php echo $this->translate('DRM admin-api'); ?>',
@@ -212,8 +213,8 @@ function adminApi(partnerId, drmType, adminApiAction) {
 
 function removeUnneededField(iframedoc)
 {
-	iframedoc.getElementById('pIdFrm').remove();
-	iframedoc.getElementById('drmTypeFrm').remove();
+	iframedoc.getElementById('DrmPartnerId').remove();
+	iframedoc.getElementById('DrmType').remove();
 
 	if (iframedoc.getElementById('serverResults'))
 		iframedoc.getElementById('serverResults').remove();

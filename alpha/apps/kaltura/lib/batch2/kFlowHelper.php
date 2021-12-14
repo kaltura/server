@@ -292,7 +292,15 @@ class kFlowHelper
 			$dbBatchJob->setData($data);
 		}
 
-		
+		if($flavorAsset instanceof captionAsset)
+		{
+			//start convert caption batch Job for import file.
+			if ($flavorAsset->getContainerFormat() == CaptionType::SCC)
+			{
+				kCaptionsContentManager::addConvertCaptionAssetJob($flavorAsset, CaptionType::SCC, CaptionType::SRT);
+			}
+		}
+
 		$data->setFlavorAssetId($flavorAsset->getId());
 		$dbBatchJob->save();
 
