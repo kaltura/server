@@ -275,7 +275,7 @@ abstract class KBatchBase implements IKalturaLogger
 		//$ks = self::$kClient->session->start($secret, "user-2", KalturaSessionType::ADMIN);
 		$ks = $this->createKS();
 		self::$kClient->setKs($ks);
-		kBatchUtils::tryLoadKconfConfig(true);
+		kBatchUtils::tryLoadSharedStorageKconfConfig(true);
 		KDwhClient::setEnabled(self::$taskConfig->getDwhEnabled());
 		KDwhClient::setFileName(self::$taskConfig->getDwhPath());
 		$this->onBatchUp();

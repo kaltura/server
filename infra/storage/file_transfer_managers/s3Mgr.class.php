@@ -83,15 +83,8 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$this->storageClass = $options['storageClass'];
 		}
-
-		if (class_exists('KBatchBase'))
-		{
-			$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
-		}
-		else
-		{
-			$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
-		}
+		
+		$this->s3Arn = kBatchUtils::getKconfParam('s3Arn', 'cloud_storage', null);
 
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
@@ -280,14 +273,7 @@ class s3Mgr extends kFileTransferMgr
 	 */
 	private function getConcurrency()
 	{
-		if (class_exists('KBatchBase'))
-		{
-			return kBatchUtils::getKconfParam('maxConcurrentUploadConnections', true);
-		}
-		else
-		{
-			return kConf::get('maxConcurrentUploadConnections', 'cloud_storage', null);
-		}
+		return kBatchUtils::getKconfParam('maxConcurrentUploadConnections', 'cloud_storage', null);
 	}
 
 	// download a file from the server (ftp_mode is irrelevant)
