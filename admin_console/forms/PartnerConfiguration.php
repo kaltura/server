@@ -338,6 +338,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Secondary Secret Role Id:',
 			'filters'		=> array('StringTrim'),
 		));
+
 //--------------------------- Password Security ---------------------------
 		
 		$this->addElement('text', 'login_block_period', array(
@@ -475,7 +476,11 @@ class Form_PartnerConfiguration extends Infra_Form
 					        
 			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'mothly_bandwidth_combined')))
 		));
- 	
+		
+		$this->addElement('text', 'excluded_admin_role_name', array(
+			'label'			=> 'Excluded administrative (KMC) User Role name:',
+			'filters'		=> array('StringTrim'),
+		));
 		
 	//--------------- Live Stream Params ----------------------------
 		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live');
@@ -1052,12 +1057,13 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overageUnit',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit'
 									),'includedUsage', array('legend' => 'Included Usage'));
 		$this->addDisplayGroup(array(
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit'
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
+									'excluded_admin_role_name'
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();

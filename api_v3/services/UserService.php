@@ -376,7 +376,7 @@ class UserService extends KalturaBaseUserService
 				$error == KalturaErrors::INVALID_OTP ||
 				$error == KalturaErrors::MISSING_OTP)
 			{
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			throw $e;
 		}
@@ -529,7 +529,7 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);

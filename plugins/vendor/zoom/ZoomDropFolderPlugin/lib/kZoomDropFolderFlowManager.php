@@ -5,7 +5,7 @@
  */
 class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 {
-	const MAX_ZOOM_DROP_FOLDERS = 4; //Temporary
+	const MAX_ZOOM_DROP_FOLDERS = 6; //Temporary
 	const DELETION_POLICY = 'deletionPolicy';
 	/**
 	 * @inheritDoc
@@ -57,7 +57,7 @@ class kZoomDropFolderFlowManager implements kObjectChangedEventConsumer
 				KalturaLog ::debug('ZoomDropFolder with vendorId ' . $object->getId() . ' updated status to ' .
 				                   $partnerZoomDropFolder->getStatus());
 			}
-			if (!$partnerZoomDropFolder && $partnerZoomDropFoldersCount < self::MAX_ZOOM_DROP_FOLDERS)
+			if (!$partnerZoomDropFolder && $partnerZoomDropFoldersCount <= self::MAX_ZOOM_DROP_FOLDERS)
 			{
 				self::createNewZoomDropFolder($object);
 			}

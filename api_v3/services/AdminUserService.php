@@ -37,16 +37,16 @@ class AdminUserService extends KalturaBaseUserService
 	{
 		$code = $e->getCode();
 		if ($code == KalturaErrors::USER_NOT_FOUND) {
-			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+			throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 		}
 		else if ($code == KalturaErrors::WRONG_OLD_PASSWORD) {
 			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_WRONG_OLD_PASSWORD, "wrong password" );
 		}
 		else if ($code == KalturaErrors::USER_WRONG_PASSWORD) {
-			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+			throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 		}
 		else if ($code == KalturaErrors::LOGIN_DATA_NOT_FOUND) {
-			throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+			throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 		}
 		throw $e;
 	}
@@ -146,7 +146,7 @@ class AdminUserService extends KalturaBaseUserService
 			$ks = parent::loginImpl(null, $email, $password, $partnerId);
 			$tempKs = kSessionUtils::crackKs($ks);
 			if (!$tempKs->isAdmin()) {
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND); 
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			return $ks;
 		}

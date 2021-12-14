@@ -12,4 +12,5 @@ class kConfMapNames
 	const VENDOR = 'vendor';
 	const ANALYTICS = 'analytics';
 	const RUNTIME_CONFIG = 'runtime_config';
+	const DYNAMIC_EMAIL_CONTENTS = 'dynamic_email_contents';
 }

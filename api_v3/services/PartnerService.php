@@ -300,11 +300,11 @@ class PartnerService extends KalturaBaseService
 			$adminKuser = UserLoginDataPeer::userLoginByEmail($adminEmail, $cmsPassword, $partnerId, $otp);
 		}
 		catch (kUserException $e) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+			throw new KalturaAPIException ( APIErrors::USER_DATA_ERROR, "The data you entered is invalid" );
 		}
 		
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+			throw new KalturaAPIException ( APIErrors::USER_DATA_ERROR, "The data you entered is invalid" );
 		}
 		
 		KalturaLog::log( "Admin Kuser found, going to validate password", KalturaLog::INFO );
