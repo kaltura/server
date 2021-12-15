@@ -59,7 +59,7 @@ class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaE
 				break;
 			case ('KalturaDropFolderFile'):
 				if ($enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE)) {
-					return new KalturaMicrosoftTeamsDropFolderFile();
+					return new KalturaOneDriveDropFolderFile();
 				}
 				break;
 			case 'kDropFolderContentProcessorJobData':
@@ -92,6 +92,12 @@ class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaE
 					return new Kaltura_Client_OneDrive_Type_OneDriveDropFolder();
 				}
 				break;
+			case 'KalturaImportJobData':
+				if ($enumValue == 'kOneDriveImportJobData')
+				{
+					return new KalturaOneDriveImportJobData();
+				}
+				break;
 		}
 	}
 
@@ -115,7 +121,15 @@ class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaE
 		if($baseClass == 'DropFolderFile' &&
 			$enumValue == self::getDropFolderTypeCoreValue(OneDriveDropFolderType::ONE_DRIVE))
 		{
-			return 'MicrosoftTeamsDropFolderFile';
+			return 'OneDriveDropFolderFile';
+		}
+		
+		if ($baseClass == 'KalturaImportJobData')
+		{
+			if ($enumValue == 'kOneDriveImportJobData')
+			{
+				return 'KalturaOneDriveImportJobData';
+			}
 		}
 
 		return null;

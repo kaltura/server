@@ -62,24 +62,6 @@ class KMicrosoftGraphClient
 		$service = $this->apiUrl . "/v1.0/users/$userId";
 		return $this->sendGraphRequest($service);
 	}
-	
-	public function getUserByMail($email)
-	{
-		$service = $this->apiUrl . "/v1.0/users?\$filter=startsWith(mail,'$email')";
-		return $this->sendGraphRequest($service);
-	}
-	
-	public function getDriveDeltaPage($microsoftUserId)
-	{
-		$service = $this->apiUrl . "/v1.0/users/$microsoftUserId/drive/root/children?select=id,name,specialFolder";
-		return $this->sendGraphRequest($service);
-	}
-	
-	public function getRecordingFolderDeltaPage($microsoftUserId, $recordingsFolderId)
-	{
-		$service = $this->apiUrl . "/v1.0/users/$microsoftUserId/drive/items/$recordingsFolderId/delta";
-		return $this->sendGraphRequest($service);
-	}
 
 	public function getDriveItem($driveId, $driveItemId)
 	{
@@ -109,7 +91,7 @@ class KMicrosoftGraphClient
 		{
 			$this->authenticate();
 		}
-		KalturaLog::info("Sending graph request - $url");
+
 		$serviceUrl = $url;
 		$ch = curl_init($serviceUrl);
 
@@ -128,7 +110,7 @@ class KMicrosoftGraphClient
 		}
 		else
 		{
-			KalturaLog::info("Error occurred executing Graph API call (Code $responseCode): $result");
+			KalturaLog::info("Error occurred executing Graph API call: $result");
 			return null;
 		}
 

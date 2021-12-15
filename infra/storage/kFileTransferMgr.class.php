@@ -13,6 +13,7 @@ interface kFileTransferMgrType extends StorageProfileProtocol
 	const HTTP = 4;
 	const HTTPS = 5;
 	const ASPERA = 10;
+	const ONE_DRIVE = 11;
 }
 // path where the classes extending kFileTransferMgr are stored relative to this file
 define ("PATH_TO_MANAGERS", "file_transfer_managers");
@@ -259,6 +260,9 @@ abstract class kFileTransferMgr
 			    
 			case kFileTransferMgrType::ASPERA:
 				return new asperaMgr($options);
+			
+			case kFileTransferMgrType::ONE_DRIVE:
+				return new onedriveMgr($options);
 		}
 
 		return null;
@@ -809,6 +813,11 @@ abstract class kFileTransferMgr
 	public function getRemoteUrl($remote_file)
 	{
 		return $remote_file;
+	}
+	
+	public function refreshUrl($url, KalturaImportJobData $jobData)
+	{
+		return $url;
 	}
 	
 
