@@ -651,12 +651,12 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		{
 			$cloned->setName( $new_name );
 		}
+		
 		foreach (self::$validSubTypes as $subType)
 		{
-
-				$suffix = $this->getSuffixBySubType($subType);
-				$content = $this->getConfFileBySuffix($suffix);
-				$cloned->setConfFileBySuffix($suffix, $content);
+			$suffix = $this->getSuffixBySubType($subType);
+			$content = $this->getConfFileBySuffix($suffix);
+			$cloned->setConfFileBySuffix($suffix, $content);
 		}
 		
 		$cloned->save(null);
