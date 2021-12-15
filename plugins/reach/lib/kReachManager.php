@@ -390,6 +390,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				$this->handleEntryDurationChanged($object);
 			}
+			// Checking if entry duration was modified to handle YouTube entries duration set
 			if (in_array(entryPeer::STATUS, $modifiedColumns)
 				|| (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
 					&& $object->getColumnsOldValue(entryPeer::LENGTH_IN_MSECS) === 0))
