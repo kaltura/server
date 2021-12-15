@@ -60,8 +60,8 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 	/* @var ObjectStorageAsyncClient $objectStoarageAsyncClient */
 	protected $objectStorageAsyncClient;
 	
-	/* @var ObjectStorageClient $objectStoargeClient */
-	protected $objectStoargeClient;
+	/* @var ObjectStorageClient $objectStorageClient */
+	protected $objectStorageClient;
 	protected $retriesNum;
 	protected $concurrency;
 	
@@ -115,7 +115,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$authProvider = new CachingRequestingAuthProvider($uncachedAuthProvider, $cache);
 		}
 		
-		$this->objectStoargeClient = new ObjectStorageClient($authProvider,  $this->region);
+		$this->objectStorageClient = new ObjectStorageClient($authProvider,  $this->region);
 		$this->objectStorageAsyncClient = new ObjectStorageAsyncClient($authProvider, $this->region);
 		UserAgent::setAdditionalClientUserAgent($this->getKalturaCustomUserAgent());
 	}
@@ -256,7 +256,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				)
 			);
 			
-			$response = $this->objectStoargeClient->renameObject($params);
+			$response = $this->objectStorageClient->renameObject($params);
 			$statusCode = $response->getStatusCode();
 			if ($statusCode != self::OS_200_VALID)
 			{
@@ -314,7 +314,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 		$multiPartParams = $this->getMultipartUploadParams($destFilePath);
 
-		$responseJsonObject = $this->objectStoargeClient->createMultipartUpload($multiPartParams)->getJson();
+		$responseJsonObject = $this->objectStorageClient->createMultipartUpload($multiPartParams)->getJson();
 		$uploadId = $responseJsonObject->uploadId;
 		if(!$uploadId)
 		{
@@ -336,12 +336,12 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 			$params['uploadPartNum'] = $partNumber;
 			$params['uploadPartBody'] = $srcContentPart;
-			$result = $this->objectStoargeClient->uploadPart($params);
+			$result = $this->objectStorageClient->uploadPart($params);
 
 			if(!$result)
 			{
 				kSharedFileSystemMgr::unRegisterStreamWrappers();
-				$this->objectStoargeClient->abortMultipartUpload($params);
+				$this->objectStorageClient->abortMultipartUpload($params);
 				return false;
 			}
 
@@ -358,7 +358,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 		// Commit the multipart upload.
 		$params['commitMultipartUploadDetails'] = $parts;
-		$result = $this->objectStoargeClient->commitMultipartUpload($params);
+		$result = $this->objectStorageClient->commitMultipartUpload($params);
 
 		kSharedFileSystemMgr::unRegisterStreamWrappers();
 		if(!$result)
@@ -410,7 +410,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 
 		try
 		{
-			$dirListObjects = $this->objectStoargeClient->listObjects($params)->getJson();
+			$dirListObjects = $this->objectStorageClient->listObjects($params)->getJson();
 			foreach ($dirListObjects->objects as $dirListObject)
 			{
 				return true;
@@ -569,7 +569,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 			$params['prefix'] = $params['objectName'];
 			$params['fields'] = 'size';
 			$bucket = $params['bucketName'];
-			$dirListObjects = $this->objectStoargeClient->listObjects($params)->getJson();
+			$dirListObjects = $this->objectStorageClient->listObjects($params)->getJson();
 			
 			$originalFilePath = $bucket . '/' . $filePath . '/';
 			
@@ -647,7 +647,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			try
 			{
-				$preSignedUrl = $this->objectStoargeClient->createPreauthenticatedRequest($params)->getJson();
+				$preSignedUrl = $this->objectStorageClient->createPreauthenticatedRequest($params)->getJson();
 				break;
 			}
 			catch (Exception $e)
@@ -821,7 +821,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			try
 			{
-				$result = $this->objectStoargeClient->{$command}($params);
+				$result = $this->objectStorageClient->{$command}($params);
 				return $result;
 			}
 			catch (ClientException $e)
@@ -886,7 +886,7 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		try
 		{
-			$dirListObjects = $this->objectStoargeClient->listObjects($params)->getJson();
+			$dirListObjects = $this->objectStorageClient->listObjects($params)->getJson();
 		}
 		catch ( Exception $e )
 		{
@@ -996,5 +996,20 @@ class kOciSharedFileSystemMgr extends kSharedFileSystemMgr
 				return array(false, $status);
 		}
 		return array(true, $status);
+	}
+	
+	public function getOsClient()
+	{
+		return $this->objectStorageClient;
+	}
+	
+	public function getNamespace()
+	{
+		return $this->namespaceName;
+	}
+	
+	public function getRegion()
+	{
+		return $this->region;
 	}
 }
