@@ -291,17 +291,29 @@ class KalturaMonitorClient
 	{
 		$context = sfContext::getInstance();
 		$request = $context->getRequest();
-		$action = $request->getParameter('module') . '.' . $request->getParameter('action');
-		if (strtolower($action) == 'extwidget.playmanifest')
+
+		$module = $request->getParameter('module');
+		$action = $module . '.' . $request->getParameter('action');
+		switch (strtolower($action))
 		{
+		case 'extwidget.playmanifest':
 			return;		// handled by kApiCache
+
+		case 'partnerservices2.defpartnerservices2base':
+			$realAction = $request->getParameter('myaction');
+			if ($realAction)
+			{
+				$action = $module . '.' . $realAction;
+			}
+			break;
 		}
 
 		$params = infraRequestUtils::getRequestParams();
 		$sessionType = isset($params['ks']) ? kSessionBase::SESSION_TYPE_USER : kSessionBase::SESSION_TYPE_NONE;	// assume user ks
 		$clientTag = isset($params['clientTag']) ? $params['clientTag'] : null;
+		$partnerId = isset($params['partner_id']) ? $params['partner_id'] : null;
 
-		self::monitorApiStart(false, $action, null, $sessionType, $clientTag);
+		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
 	}
 
 	public static function monitorApiEnd($errorCode)
