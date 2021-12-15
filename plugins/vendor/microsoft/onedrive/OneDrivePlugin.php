@@ -3,10 +3,20 @@
 /**
  * @package plugins.OneDrive
  */
-class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations
+class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaEnumerator, IKalturaObjectLoader, IKalturaPermissions, IKalturaApplicationTranslations, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'OneDrive';
-
+	const ONE_DRIVE_EVENTS_CONSUMER = 'kOneDriveEventsConsumer';
+	
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::ONE_DRIVE_EVENTS_CONSUMER,
+		);
+	}
 	
 	/**
 	 * @inheritDoc
@@ -73,7 +83,7 @@ class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaE
 			case 'Form_DropFolderConfigureExtend_SubForm':
 				if ($enumValue == Kaltura_Client_DropFolder_Enum_DropFolderType::ONE_DRIVE)
 				{
-					return new Form_MicrosoftTeamsDropFolderConfigureExtend_SubForm();
+					return new Form_OneDriveDropFolderConfigureExtend_SubForm();
 				}
 				break;
 			case 'Kaltura_Client_DropFolder_Type_DropFolder':
@@ -118,9 +128,9 @@ class OneDrivePlugin extends KalturaPlugin implements IKalturaPending, IKalturaE
 	{
 		$dropFolderDependency = new KalturaDependency(DropFolderPlugin::PLUGIN_NAME);
 		$vendorDependency = new KalturaDependency(VendorPlugin::PLUGIN_NAME);
-		$microsoftTeamsDropFolderDependency = new KalturaDependency(MicrosoftTeamsDropFolderPlugin::getPluginName());
+		$microsoftDependency = new KalturaDependency(MicrosoftPlugin::PLUGIN_NAME);
 
-		return array($dropFolderDependency, $vendorDependency, $microsoftTeamsDropFolderDependency);
+		return array($dropFolderDependency, $vendorDependency, $microsoftDependency);
 	}
 
 	/**

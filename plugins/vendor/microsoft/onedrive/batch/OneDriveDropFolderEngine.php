@@ -15,7 +15,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	protected $vendorPlugin;
 
 	/**
-	 * @var KMicrosoftGraphClient
+	 * @var KMicrosoftGraphApiClient
 	 */
 	protected $graphClient;
 
@@ -30,7 +30,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	protected $existingDropFolderFiles;
 	
 	/**
-	 * @var KalturaTeamsVendorIntegrationUser
+	 * @var KalturaOneDriveIntegrationSetting
 	 */
 	protected $vendorIntegrationSetting;
 	
@@ -78,14 +78,14 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		}
 	}
 	
-	protected function initializeEngine($dropFolder)
+	protected function initializeEngine(KalturaOneDriveDropFolder $dropFolder)
 	{
-		/* @var $dropFolder KalturaMicrosoftTeamsDropFolder */
 		$this->dropFolder = $dropFolder;
 		$this->vendorPlugin = KalturaVendorClientPlugin::get(KBatchBase::$kClient);
-		$this->graphClient = new KMicrosoftGraphClient($dropFolder->tenantId, $dropFolder->path, $dropFolder->clientId, $dropFolder->clientSecret);
-		$this->existingDropFolderFiles = $this->loadDropFolderFiles();
 		$this->vendorIntegrationSetting = $this->vendorPlugin->vendorIntegration->get($dropFolder->integrationId);
+		
+		$this->graphClient = new KMicrosoftGraphApiClient($this->vendorIntegrationSetting->accountId, $dropFolder->path, $this->vendorIntegrationSetting->clientId, $this->vendorIntegrationSetting->clientSecret);
+		$this->existingDropFolderFiles = $this->loadDropFolderFiles();
 	}
 	
 	protected function watchTeamsUserFiles($user)
