@@ -8,3 +8,5 @@ $addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . 
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.vendor.vendorIntegrationUser.ini' ;
 passthru("php $addPermissionsAndItemsScript $config");
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.vendor.vendorIntegration.ini' ;
+passthru("php $addPermissionsAndItemsScript $config");

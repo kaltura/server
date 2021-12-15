@@ -30,7 +30,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	protected $existingDropFolderFiles;
 	
 	/**
-	 * @var KalturaTeamsVendorIntegrationUser
+	 * @var KalturaOneDriveIntegrationSetting
 	 */
 	protected $vendorIntegrationSetting;
 	
@@ -48,7 +48,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		}
 		
 		$pager = new KalturaFilterPager();
-		$pager->pageSize = 5;
+		$pager->pageSize = 500;
 		do
 		{
 			$usersList = $this->vendorPlugin->vendorIntegrationUser->listAction($filter, $pager);
@@ -57,11 +57,11 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 			{
 				try
 				{
-					$this->watchTeamsUserFiles($kalturaTeamsVendorIntegrationUser);
+					$this->watchMicrosoftUserFiles($kalturaTeamsVendorIntegrationUser);
 				}
 				catch (Exception $e)
 				{
-					KalturaLog::info("Error running Teams drop folder for user {$kalturaTeamsVendorIntegrationUser->id}: {$e->getMessage()};");
+					KalturaLog::info("Error running OneDrive drop folder for user {$kalturaTeamsVendorIntegrationUser->id}: {$e->getMessage()};");
 				}
 			}
 			
@@ -72,9 +72,11 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		
 		if (!$this->vendorIntegrationSetting->isInitialized)
 		{
-//			$updatedVendorIntegrationSetting = new KalturaTeamsVendorIntegrationUser();
-//			$updatedVendorIntegrationSetting->isInitalized = true;
-//			$this->vendorPlugin->vendorIntegration->update($this->vendorIntegrationSetting->id, $updatedVendorIntegrationSetting);
+			$updatedVendorIntegrationSetting = new KalturaOneDriveIntegrationSetting();
+			$updatedVendorIntegrationSetting->clientSecret = $this->vendorIntegrationSetting->clientSecret;
+			$updatedVendorIntegrationSetting->clientId = $this->vendorIntegrationSetting->clientId;
+			$updatedVendorIntegrationSetting->isInitialized = true;
+			$this->vendorPlugin->vendorIntegration->update($this->vendorIntegrationSetting->id, $updatedVendorIntegrationSetting);
 		}
 	}
 	
@@ -88,63 +90,96 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		$this->vendorIntegrationSetting = $this->vendorPlugin->vendorIntegration->get($dropFolder->integrationId);
 	}
 	
-	protected function watchTeamsUserFiles($user)
+	protected function watchMicrosoftUserFiles($user)
 	{
 		/* @var $user KalturaTeamsVendorIntegrationUser */
-		$updateUser = new KalturaTeamsVendorIntegrationUser();
-		
-		if ($user->email)
+		if (!$user->email)
 		{
-			$updateCurrentUser = false;
-			
-			if (!$user->teamsUserId)
+			return;
+		}
+		
+		$updateUser = new KalturaTeamsVendorIntegrationUser();
+		$updateCurrentUser = false;
+		
+		if (!$user->microsoftUserId)
+		{
+			$updateUser->microsoftUserId = $this->retrieveMicrosoftUserByMail($user->email);
+			if (!$updateUser->microsoftUserId)
 			{
-				$updateUser->teamsUserId = $this->retrieveTeamsUserByMail($user->email);
-				if (!$updateUser->teamsUserId)
+				return;
+			}
+			
+			$user->microsoftUserId = $updateUser->microsoftUserId;
+			$updateCurrentUser = true;
+		}
+		
+		if ($user->recordingsFolderDeltaLink)
+		{
+			if ($this->vendorIntegrationSetting->isInitialized)
+			{
+				$filesFromDrive = $this->graphClient->sendGraphRequest($user->recordingsFolderDeltaLink);
+				if ($filesFromDrive)
 				{
-					return;
+					$updateUser->recordingsFolderDeltaLink = $this->downloadFilesFromDrive($filesFromDrive);
+					if ($updateUser->recordingsFolderDeltaLink)
+					{
+						$updateCurrentUser = true;
+					}
 				}
-				
-				$user->teamsUserId = $updateUser->teamsUserId;
-				$updateCurrentUser = true;
 			}
-			
-			if (!$user->recordingsFolderId)
+		}
+		else
+		{
+			$recordingsFolderId = $this->getRecordingsFolderId($user->microsoftUserId);
+			if ($recordingsFolderId)
 			{
-				$updateUser->recordingsFolderId = $this->getRecordingsFolderId($user->teamsUserId);
-				if ($updateUser->recordingsFolderId)
+				$filesFromDrive = $this->graphClient->getRecordingFolderDeltaPage($user->microsoftUserId, $recordingsFolderId);
+				if ($filesFromDrive)
 				{
-					$user->recordingsFolderId = $updateUser->recordingsFolderId;
-					$updateCurrentUser = true;
+					if ($this->vendorIntegrationSetting->isInitialized)
+					{
+						$updateUser->recordingsFolderDeltaLink = $this->downloadFilesFromDrive($filesFromDrive);
+						if ($updateUser->recordingsFolderDeltaLink)
+						{
+							$updateCurrentUser = true;
+						}
+					}
+					else
+					{
+						do
+						{
+							if (isset($filesFromDrive['@odata.nextLink']))
+							{
+								$filesFromDrive = $this->graphClient->sendGraphRequest($filesFromDrive['@odata.nextLink']);
+							}
+							elseif (isset($filesFromDrive['@odata.deltaLink']))
+							{
+								$updateUser->recordingsFolderDeltaLink = $filesFromDrive['@odata.deltaLink'];
+								$updateCurrentUser = true;
+							}
+						}
+						while (!$updateUser->recordingsFolderDeltaLink);
+					}
 				}
 			}
-			
-			if ($user->recordingsFolderId)
-			{
-				$updateUser->deltaLink = $this->downloadUserFilesFromDrive($user);
-				if ($updateUser->deltaLink)
-				{
-					$updateCurrentUser = true;
-				}
-			}
-			
-			if ($updateCurrentUser)
-			{
-				$this->vendorPlugin->vendorIntegrationUser->update($user->id, $updateUser);
-			}
+		}
+		
+		if ($updateCurrentUser)
+		{
+			$this->vendorPlugin->vendorIntegrationUser->update($user->id, $updateUser);
 		}
 	}
 	
-	protected function retrieveTeamsUserByMail($userEmail)
+	protected function retrieveMicrosoftUserByMail($userEmail)
 	{
-		$teamsUsers = $this->graphClient->getUserByMail($userEmail);
-		if (isset($teamsUsers[MicrosoftGraphFieldNames::VALUE]))
+		$microsoftUsers = $this->graphClient->getUserByMail($userEmail);
+		if (isset($microsoftUsers[MicrosoftGraphFieldNames::VALUE]))
 		{
-			foreach ($teamsUsers[MicrosoftGraphFieldNames::VALUE] as $teamsUser)
+			foreach ($microsoftUsers[MicrosoftGraphFieldNames::VALUE] as $microsoftUser)
 			{
-				if ($teamsUser['id'])
+				if ($microsoftUser['id'])
 				{
-					return $teamsUser['id'];
+					return $microsoftUser['id'];
 				}
 			}
 		}
@@ -152,9 +187,9 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		return null;
 	}
 	
-	protected function getRecordingsFolderId($teamsUserId)
+	protected function getRecordingsFolderId($microsoftUserId)
 	{
-		$filesList = $this->graphClient->getDriveDeltaPage($teamsUserId);
+		$filesList = $this->graphClient->getDriveDeltaPage($microsoftUserId);
 		if (isset($filesList[MicrosoftGraphFieldNames::VALUE]))
 		{
 			foreach ($filesList[MicrosoftGraphFieldNames::VALUE] as $item)
@@ -169,17 +204,8 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		return null;
 	}
 	
-	protected function downloadUserFilesFromDrive($user)
+	protected function downloadFilesFromDrive($filesFromDrive)
 	{
-		if ($user->deltaLink)
-		{
-			$filesFromDrive = $this->graphClient->sendGraphRequest($user->deltaLink);
-		}
-		else
-		{
-			$filesFromDrive = $this->graphClient->getRecordingFolderDeltaPage($user->teamsUserId, $user->recordingsFolderId);
-		}
-		
 		if (isset($filesFromDrive[MicrosoftGraphFieldNames::VALUE]))
 		{
 			foreach ($filesFromDrive[MicrosoftGraphFieldNames::VALUE] as $fileInRecordings)
@@ -191,16 +217,13 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 			}
 		}
 		
-		if ($filesFromDrive)
+		if (isset($filesFromDrive['@odata.nextLink']))
 		{
-		 	if (isset($filesFromDrive['@odata.nextLink']))
-			{
-				return $filesFromDrive['@odata.nextLink'];
-			}
-		 	elseif (isset($filesFromDrive['@odata.deltaLink'])) 
-			{
-				return $filesFromDrive['@odata.deltaLink'];
-			}
+			return $filesFromDrive['@odata.nextLink'];
+		}
+		elseif (isset($filesFromDrive['@odata.deltaLink']))
+		{
+			return $filesFromDrive['@odata.deltaLink'];
 		}
 		
 		return null;

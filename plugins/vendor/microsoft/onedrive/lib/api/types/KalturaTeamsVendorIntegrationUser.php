@@ -7,20 +7,15 @@ class KalturaTeamsVendorIntegrationUser extends KalturaVendorIntegrationUser
 	/**
 	 * @var string
 	 */
-	public $teamsUserId;
+	public $microsoftUserId;
 	
 	/**
 	 * @var string
 	 */
-	public $recordingsFolderId;
-	
-	/**
-	 * @var string
-	 */
-	public $deltaLink;
+	public $recordingsFolderDeltaLink;
 	
 	
-	private static $map_between_objects = array('teamsUserId', 'recordingsFolderId', 'deltaLink');
+	private static $map_between_objects = array('microsoftUserId', 'recordingsFolderDeltaLink');
 	
 	public function getMapBetweenObjects ( )
 	{

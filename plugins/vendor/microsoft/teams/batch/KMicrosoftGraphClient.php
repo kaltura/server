@@ -69,15 +69,15 @@ class KMicrosoftGraphClient
 		return $this->sendGraphRequest($service);
 	}
 	
-	public function getDriveDeltaPage($userTeamsId)
+	public function getDriveDeltaPage($microsoftUserId)
 	{
-		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/root/children?select=id,name,specialFolder";
+		$service = $this->apiUrl . "/v1.0/users/$microsoftUserId/drive/root/children?select=id,name,specialFolder";
 		return $this->sendGraphRequest($service);
 	}
 	
-	public function getRecordingFolderDeltaPage($userTeamsId, $recordingsFolderId)
+	public function getRecordingFolderDeltaPage($microsoftUserId, $recordingsFolderId)
 	{
-		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/items/$recordingsFolderId/delta";
+		$service = $this->apiUrl . "/v1.0/users/$microsoftUserId/drive/items/$recordingsFolderId/delta";
 		return $this->sendGraphRequest($service);
 	}
 

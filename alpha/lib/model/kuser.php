@@ -26,9 +26,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const TITLE = 'title';
 	const COMPANY = 'company';
 	
-	const TEAMS_USER_ID = 'teams_user_id';
-	const RECORDINGS_FOLDER_ID = 'recordings_folder_id';
-	const DELTA_LINK = 'delta_link';
+	const MICROSOFT_USER_ID = 'microsoft_user_id';
+	const RECORDINGS_FOLDER_DELTA_LINK = 'recordings_folder_delta_link';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	
@@ -1511,48 +1510,32 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	/**
 	 * @param string $v
 	 */
-	public function setTeamsUserId($v)
+	public function setMicrosoftUserId($v)
 	{
-		$this->putInCustomData(self::TEAMS_USER_ID, $v);
+		$this->putInCustomData(self::MICROSOFT_USER_ID, $v);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getTeamsUserId()
+	public function getMicrosoftUserId()
 	{
-		return $this->getFromCustomData(self::TEAMS_USER_ID);
+		return $this->getFromCustomData(self::MICROSOFT_USER_ID);
 	}
 	
 	/**
 	 * @param string $v
 	 */
-	public function setRecordingsFolderId($v)
+	public function setRecordingsFolderDeltaLink($v)
 	{
-		$this->putInCustomData(self::RECORDINGS_FOLDER_ID, $v);
+		$this->putInCustomData(self::RECORDINGS_FOLDER_DELTA_LINK, $v);
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getRecordingsFolderId()
+	public function getRecordingsFolderDeltaLink()
 	{
-		return $this->getFromCustomData(self::RECORDINGS_FOLDER_ID);
-	}
-	
-	/**
-	 * @param string $v
-	 */
-	public function setDeltaLink($v)
-	{
-		$this->putInCustomData(self::DELTA_LINK, $v);
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getDeltaLink()
-	{
-		return $this->getFromCustomData(self::DELTA_LINK);
+		return $this->getFromCustomData(self::RECORDINGS_FOLDER_DELTA_LINK);
 	}
 }
