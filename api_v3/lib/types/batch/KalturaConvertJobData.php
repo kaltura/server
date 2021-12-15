@@ -61,6 +61,11 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	 * @var int
 	 */
 	public $userCpu;
+
+	/**
+	 * @var int
+	 */
+	public $estimatedEffort;
     
 	private static $map_between_objects = array
 	(
@@ -74,7 +79,8 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 		"extraDestFileSyncs",
 		"engineMessage",
 		"destFileSyncSharedPath",
-		"userCpu"
+		"userCpu",
+		"estimatedEffort"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -87,7 +93,7 @@ class KalturaConvertJobData extends KalturaConvartableJobData
 	{
 		if(is_null($dbData))
 			$dbData = new kConvertJobData();
-			
+
 		return parent::toObject($dbData, $props_to_skip);
 	}
 	
