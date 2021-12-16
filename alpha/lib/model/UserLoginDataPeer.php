@@ -255,6 +255,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		$partnerId = $loginData->getConfigPartnerId();
+		if ($partnerId <> 0)
+		{
+			myPartnerUtils::resetPartnerFilter('kuser');
+		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$user = kuserPeer::getKuserByEmail($email, $partnerId);
 		$roleNames = null;
