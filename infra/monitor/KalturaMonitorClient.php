@@ -311,7 +311,7 @@ class KalturaMonitorClient
 		$params = infraRequestUtils::getRequestParams();
 		$sessionType = isset($params['ks']) ? kSessionBase::SESSION_TYPE_USER : kSessionBase::SESSION_TYPE_NONE;	// assume user ks
 		$clientTag = isset($params['clientTag']) ? $params['clientTag'] : null;
-		$partnerId = isset($params['partner_id']) ? $params['partner_id'] : null;
+		$partnerId = isset($params['partner_id']) && ctype_digit($params['partner_id']) ? $params['partner_id'] : null;
 
 		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
 	}
