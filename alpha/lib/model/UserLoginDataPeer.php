@@ -406,8 +406,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		$partnerId = $loginData->getConfigPartnerId();
-		
-		$resetLinkPrefix = self::getResetLinkPrefix($partnerId, $linkType, $dynamicLink);
+		$resetLinksArray = kConf::get('password_reset_links');
+		$resetLinkPrefix = self::getResetLinkPrefix($partnerId, $linkType, $resetLinksArray, $dynamicLink);
 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner) {
@@ -426,13 +426,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return $resetLinkPrefix.$hashKey;
 	}
 	
-	protected static function getResetLinkPrefix($partnerId, $linkType, $dynamicLink = null)
+	protected static function getResetLinkPrefix($partnerId, $linkType, $resetLinksArray, $dynamicLink = null)
 	{
 		if ($dynamicLink)
 		{
 			return $dynamicLink;
 		}
-		$resetLinksArray = kConf::get('password_reset_links');
 		if($linkType == resetPassLinkType::KMS)
 		{
 			$resetLinkPrefix = $resetLinksArray['kms'];
