@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>http://orel-ubuntu/</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>fb0c487edea053270da2de559feab08e</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>CoEditors_Changed_Email_New_CoEditors</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Co-editors changed on the entry</description>
+                        <modifiedColumns>entitledUserPuserEdit</modifiedColumns>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Check co-editor added</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; !is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit')) ? [count(array_diff(explode(' ,', $scope->getObject()->getEntitledPusersEdit()), unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit')))) > 0 || count(array_diff(unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit'))),explode(' ,', $scope->getObject()->getEntitledPusersEdit())) > 0 ]: count(explode(' ,', $scope->getObject()->getEntitledPusersEdit())) > 0</code>
+                        </field>
+                    </item>
+                </eventConditions>
+            </template>
+        </request>
+    </multirequest>
+</xml>
