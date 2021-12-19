@@ -7,6 +7,7 @@
 class OneDriveDropFolderEngine extends KDropFolderEngine
 {
 	const ADMIN_TAG_TEAMS = 'msTeams';
+	const BLOCK_BEFORE_EXPIRY_PERIOD = 3600; //In seconds
 
 
 	/**
@@ -34,6 +35,13 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	 */
 	protected $vendorIntegrationSetting;
 	
+	protected function setVendorIntegrationUserListResponseProfile()
+	{
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->type = KalturaResponseProfileType::INCLUDE_FIELDS;
+		$responseProfile->fields = 'id,email,microsoftUserId,recordingsFolderDeltaLink';
+		KBatchBase::$kClient->setResponseProfile($responseProfile);
+	}
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
@@ -49,29 +57,43 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
+		$pager->pageIndex = 0;
+		
 		do
 		{
+			$pager->pageIndex++;
+			$this->setVendorIntegrationUserListResponseProfile();
 			$usersList = $this->vendorPlugin->vendorIntegrationUser->listAction($filter, $pager);
+			if(!$usersList->objects)
+			{
+				break;
+			}
 			
 			foreach ($usersList->objects as $kalturaTeamsVendorIntegrationUser)
 			{
 				try
 				{
+					if (!$kalturaTeamsVendorIntegrationUser->email)
+					{
+						continue;
+					}
+					
+					$start = microtime(true);
 					$this->watchMicrosoftUserFiles($kalturaTeamsVendorIntegrationUser);
+					$elapsed = microtime(true) - $start;
+					KalturaLog::info("Elapsed time for user: ({$elapsed})");
 				}
 				catch (Exception $e)
 				{
 					KalturaLog::info("Error running OneDrive drop folder for user {$kalturaTeamsVendorIntegrationUser->id}: {$e->getMessage()};");
 				}
 			}
-			
-			$returnedSize = $usersList->objects ? count($usersList->objects) : 0;
-			$pager->pageIndex++;
 		}
-		while ($pager->pageSize == $returnedSize);
+		while ($pager->pageSize == count($usersList->objects));
 		
 		if (!$this->vendorIntegrationSetting->isInitialized)
 		{
+			KalturaLog::info('Going to Initialize VendorIntegrationSetting');
 			$updatedVendorIntegrationSetting = new KalturaOneDriveIntegrationSetting();
 			$updatedVendorIntegrationSetting->clientSecret = $this->vendorIntegrationSetting->clientSecret;
 			$updatedVendorIntegrationSetting->clientId = $this->vendorIntegrationSetting->clientId;
@@ -86,6 +108,12 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		$this->vendorPlugin = KalturaVendorClientPlugin::get(KBatchBase::$kClient);
 		$this->vendorIntegrationSetting = $this->vendorPlugin->vendorIntegration->get($dropFolder->integrationId);
 		
+		if($this->vendorIntegrationSetting->secretExpirationDate
+			&& ($this->vendorIntegrationSetting->secretExpirationDate < time() + self::BLOCK_BEFORE_EXPIRY_PERIOD) )
+		{
+			throw new kFileTransferMgrException('Credentials expired', kFileTransferMgrException::cantAuthenticate);
+		}
+		
 		$this->graphClient = new KMicrosoftGraphApiClient($this->vendorIntegrationSetting->accountId, $dropFolder->path, $this->vendorIntegrationSetting->clientId, $this->vendorIntegrationSetting->clientSecret);
 		$this->existingDropFolderFiles = $this->loadDropFolderFiles();
 	}
@@ -93,80 +121,68 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	protected function watchMicrosoftUserFiles($user)
 	{
 		/* @var $user KalturaTeamsVendorIntegrationUser */
-		if (!$user->email)
-		{
-			return;
-		}
 		
-		$updateUser = new KalturaTeamsVendorIntegrationUser();
 		$updateCurrentUser = false;
 		
 		if (!$user->microsoftUserId)
 		{
-			$updateUser->microsoftUserId = $this->retrieveMicrosoftUserByMail($user->email);
-			if (!$updateUser->microsoftUserId)
+			KalturaLog::info("Going to retrieve Microsoft user ID for Kaltura user: [{$user->email}]");
+			$user->microsoftUserId = $this->retrieveMicrosoftUserByMail($user->email);
+			if (!$user->microsoftUserId)
 			{
 				return;
 			}
-			
-			$user->microsoftUserId = $updateUser->microsoftUserId;
 			$updateCurrentUser = true;
 		}
 		
-		if ($user->recordingsFolderDeltaLink)
+		$files = null;
+		if (!$user->recordingsFolderDeltaLink)
 		{
-			if ($this->vendorIntegrationSetting->isInitialized)
-			{
-				$filesFromDrive = $this->graphClient->sendGraphRequest($user->recordingsFolderDeltaLink);
-				if ($filesFromDrive)
-				{
-					$updateUser->recordingsFolderDeltaLink = $this->downloadFilesFromDrive($filesFromDrive);
-					if ($updateUser->recordingsFolderDeltaLink)
-					{
-						$updateCurrentUser = true;
-					}
-				}
-			}
-		}
-		else
-		{
+			KalturaLog::info("Going to retrieve Recording ID for Kaltura user: [{$user->email}]");
 			$recordingsFolderId = $this->getRecordingsFolderId($user->microsoftUserId);
 			if ($recordingsFolderId)
 			{
-				$filesFromDrive = $this->graphClient->getRecordingFolderDeltaPage($user->microsoftUserId, $recordingsFolderId);
-				if ($filesFromDrive)
+				KalturaLog::info("Going to retrieve Recording first page for Kaltura user: [{$user->email}]");
+				$files = $this->graphClient->getRecordingFolderDeltaPage($user->microsoftUserId, $recordingsFolderId);
+			}
+		}
+		
+		if ($this->vendorIntegrationSetting->isInitialized)
+		{
+			if ($user->recordingsFolderDeltaLink)
+			{
+				KalturaLog::info("Going to request new files for Kaltura user: [{$user->email}]");
+				$files = $this->graphClient->sendGraphRequest($user->recordingsFolderDeltaLink);
+			}
+			
+			if ($files)
+			{
+				$user->recordingsFolderDeltaLink = $this->downloadFilesFromDrive($files);
+				if ($user->recordingsFolderDeltaLink)
 				{
-					if ($this->vendorIntegrationSetting->isInitialized)
-					{
-						$updateUser->recordingsFolderDeltaLink = $this->downloadFilesFromDrive($filesFromDrive);
-						if ($updateUser->recordingsFolderDeltaLink)
-						{
-							$updateCurrentUser = true;
-						}
-					}
-					else
-					{
-						do
-						{
-							if (isset($filesFromDrive['@odata.nextLink']))
-							{
-								$filesFromDrive = $this->graphClient->sendGraphRequest($filesFromDrive['@odata.nextLink']);
-							}
-							elseif (isset($filesFromDrive['@odata.deltaLink']))
-							{
-								$updateUser->recordingsFolderDeltaLink = $filesFromDrive['@odata.deltaLink'];
-								$updateCurrentUser = true;
-							}
-						}
-						while (!$updateUser->recordingsFolderDeltaLink);
-					}
+					$updateCurrentUser = true;
 				}
+			}
+		}
+		else if($files)
+		{
+			KalturaLog::info("Going to retrieve the last page for Kaltura user: [{$user->email}]");
+			while(isset($files['@odata.nextLink']))
+			{
+				$files = $this->graphClient->sendGraphRequest($files['@odata.nextLink']);
+			}
+			
+			if (isset($files['@odata.deltaLink']))
+			{
+				$user->recordingsFolderDeltaLink = $files['@odata.deltaLink'];
+				$updateCurrentUser = true;
 			}
 		}
 		
 		if ($updateCurrentUser)
 		{
-			$this->vendorPlugin->vendorIntegrationUser->update($user->id, $updateUser);
+			KalturaLog::info("Going to update Kaltura user: [{$user->email}]");
+			$this->vendorPlugin->vendorIntegrationUser->update($user->id, $user);
 		}
 	}
 	
@@ -212,6 +228,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 			{
 				if (!isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]) && !isset($item[MicrosoftGraphFieldNames::DELETED_FACET]))
 				{
+					KalturaLog::info('Going to get drive item');
 					$this->getDriveItem($fileInRecordings);
 				}
 			}
