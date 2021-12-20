@@ -131,7 +131,7 @@ class KalturaDispatcher
 		}
 		catch (KalturaAPIException $e)
 		{
-			kalturaResponseCacher::incrementPostCallRateLimit($service, $action, $params, kCurrentContext::$ks_partner_id);
+			kalturaResponseCacher::incrementPostCallRateLimit($params, kCurrentContext::$partner_id, kCurrentContext::$ks_partner_id);
 			if ($actionInfo->returnType != 'file')
 			{
 				 throw ($e);

@@ -19,13 +19,8 @@ class KalturaResponseCacher extends kApiCache
 	const BATCH_PARTNER_ID = -1;
 	
 	const POST_INCREMENT = '_postIncrement';
-	const SERVICE ='service';
-	const ACTION = 'action';
-	const PASSWORD = 'password';
-	const RATE_LIMIT_MAP = 'api_rate_limit';
-	const LOGIN_BY_LOGIN_ID = 'loginByLoginId';
-	const EXPIRY = '_expiry';
-	const API_RATE_LIMIT = 'apiRateLimit-';
+	
+	static protected $generatedKey;
 
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
 	
@@ -659,17 +654,17 @@ class KalturaResponseCacher extends kApiCache
 
 		$partnerId = $ksPartnerId;
 		$keySeed = "$service-$action-$partnerId-$key";
-		$key = 'apiRateLimit-' . md5($keySeed);
+		self::$generatedKey = 'apiRateLimit-' . md5($keySeed);
 
 		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
+		$cache->add(self::$generatedKey, 0, $cacheExpiry);
 		if(isset($rule[self::POST_INCREMENT]))
 		{
-			$counter = $cache->get($key);
+			$counter = $cache->get(self::$generatedKey);
 		}
 		else
 		{
-			$cache->add($key, 0, $cacheExpiry);
-			$counter = $cache->increment($key);
+			$counter = $cache->increment(self::$generatedKey);
 		}
 		if ($counter <= $rule['_limit'])
 		{
@@ -678,7 +673,7 @@ class KalturaResponseCacher extends kApiCache
 
 		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
 		{
-			KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
+			KalturaLog::log("Rate limit exceeded - key= " . self::$generatedKey . " keySeed=$keySeed counter=$counter");
 		}
 
 		if (isset($rule['_logOnly']) && $rule['_logOnly'])
@@ -689,43 +684,20 @@ class KalturaResponseCacher extends kApiCache
 		return false;
 	}
 	
-	protected static function getPostCallIncrementRule()
+	public static function incrementPostCallRateLimit($params, $partnerId = null, $ksPartnerId = null)
 	{
-		foreach (kConf::getMap('api_rate_limit') as $rateLimitRule)
+		$rule = self::getRateLimitRule($params, $partnerId, $ksPartnerId);
+		if (!$rule)
 		{
-			if (!is_array($rateLimitRule))
-			{
-				continue;
-			}
-			if (isset($rateLimitRule[self::POST_INCREMENT]))
-			{
-				return $rateLimitRule;
-			}
-		}
-		return null;
-	}
-	
-	public static function incrementPostCallRateLimit($service, $action, $params, $ksPartnerId = null)
-	{
-		$postCallRule = self::getPostCallIncrementRule();
-		if (is_null($postCallRule))
-		{
-			return;
+			return true;
 		}
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if (!$cache)
 		{
 			return;
 		}
-		$key = $params[self::PASSWORD];
-		$partnerId = $ksPartnerId;
-		$keySeed = "$service-$action-$partnerId-$key";
-		$key = self::API_RATE_LIMIT . md5($keySeed);
 		
-		$cacheExpiry = isset($rule[self::EXPIRY]) ? $rule[self::EXPIRY] : 10;
-		$cache->add($key, 0, $cacheExpiry);
-		
-		$cache->increment($key);
+		$cache->increment(self::$generatedKey);
 	}
 
 	protected static function getApiParamValue($params, $key)
