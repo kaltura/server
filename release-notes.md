@@ -35,11 +35,11 @@ None.
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name:
 
-	- deployment/updates/scripts/xml/notifications/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+    - deployment/updates/scripts/xml/2021_11_18_EntryStatusEqualEmailNotification.template.xml
 
 Run deployment script:
 
-	- deployment/updates/scripts/2021_11_18_EntryStatusEqualEmailNotification.template.xml.php
+	- deployment/updates/scripts/2021_11_18_deploy_entry_status_equal_email_notification.php
 
 
 ## Enable using dynamic email templates for user flows based on their user role
