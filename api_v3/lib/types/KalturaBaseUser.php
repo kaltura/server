@@ -215,17 +215,39 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	}
 
 	/**
-	 * @param $object The object to validate
+	 * @param $coreObject The object to validate
 	 * @param $names array of names
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 */
-	protected function validateNames($object , array $names)
+	protected function validateNames($coreObject, array $names)
 	{
-		foreach ($names as $name)
+		foreach ($names as $kalturaProperty => $dbGetFunction)
 		{
-			if (!is_null($object->$name) && strpos($object->$name, kuser::URL_PATTERN) !== false)
+			if(is_null($this->$kalturaProperty))
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $name);
+				continue;
+			}
+			
+			if(strpos($this->$kalturaProperty, kuser::URL_PATTERN) !== false)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
+			}
+			
+			$shouldValidateSpecialChars = true;
+			
+			//If the core object already contains a "bad" value- don't apply the new restriction
+			if($coreObject)
+			{
+				$dbVal = $coreObject->$dbGetFunction();
+				if( strcmp($dbVal, KCsvWrapper::handleInvalidChars($dbVal)) )
+				{
+					$shouldValidateSpecialChars = false;
+				}
+			}
+			
+			if($shouldValidateSpecialChars && strcmp($this->$kalturaProperty, KCsvWrapper::handleInvalidChars($this->$kalturaProperty)))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
 			}
 		}
 	}
