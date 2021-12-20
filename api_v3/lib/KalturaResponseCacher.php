@@ -17,6 +17,15 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_PHP = 3;
 
 	const BATCH_PARTNER_ID = -1;
+	
+	const POST_INCREMENT = '_postIncrement';
+	const SERVICE ='service';
+	const ACTION = 'action';
+	const PASSWORD = 'password';
+	const RATE_LIMIT_MAP = 'api_rate_limit';
+	const LOGIN_BY_LOGIN_ID = 'loginByLoginId';
+	const EXPIRY = '_expiry';
+	const API_RATE_LIMIT = 'apiRateLimit-';
 
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
 	
@@ -653,8 +662,15 @@ class KalturaResponseCacher extends kApiCache
 		$key = 'apiRateLimit-' . md5($keySeed);
 
 		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
-		$cache->add($key, 0, $cacheExpiry);
-		$counter = $cache->increment($key);
+		if(isset($rule[self::POST_INCREMENT]))
+		{
+			$counter = $cache->get($key);
+		}
+		else
+		{
+			$cache->add($key, 0, $cacheExpiry);
+			$counter = $cache->increment($key);
+		}
 		if ($counter <= $rule['_limit'])
 		{
 			return true;
@@ -671,6 +687,45 @@ class KalturaResponseCacher extends kApiCache
 		}
 
 		return false;
+	}
+	
+	protected static function getPostCallIncrementRule()
+	{
+		foreach (kConf::getMap('api_rate_limit') as $rateLimitRule)
+		{
+			if (!is_array($rateLimitRule))
+			{
+				continue;
+			}
+			if (isset($rateLimitRule[self::POST_INCREMENT]))
+			{
+				return $rateLimitRule;
+			}
+		}
+		return null;
+	}
+	
+	public static function incrementPostCallRateLimit($service, $action, $params, $ksPartnerId = null)
+	{
+		$postCallRule = self::getPostCallIncrementRule();
+		if (is_null($postCallRule))
+		{
+			return;
+		}
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+		{
+			return;
+		}
+		$key = $params[self::PASSWORD];
+		$partnerId = $ksPartnerId;
+		$keySeed = "$service-$action-$partnerId-$key";
+		$key = self::API_RATE_LIMIT . md5($keySeed);
+		
+		$cacheExpiry = isset($rule[self::EXPIRY]) ? $rule[self::EXPIRY] : 10;
+		$cache->add($key, 0, $cacheExpiry);
+		
+		$cache->increment($key);
 	}
 
 	protected static function getApiParamValue($params, $key)

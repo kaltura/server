@@ -131,20 +131,21 @@ class KalturaDispatcher
 		}
 		catch (KalturaAPIException $e)
 		{
+			kalturaResponseCacher::incrementPostCallRateLimit($service, $action, $params, kCurrentContext::$ks_partner_id);
 			if ($actionInfo->returnType != 'file')
 			{
 				 throw ($e);
 			}
-					
+			
 			KalturaResponseCacher::adjustApiCacheForException($e);
 			$res = new kRendererDieError ($e->getCode(), $e->getMessage());
 		 }
-		
+		 
 		kEventsManager::flushEvents();
 		
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Dispatch took - " . (microtime(true) - $start) . " seconds, memory: ".memory_get_peak_usage(true));		
-				
+		
 		
 		return $res;
 	}
