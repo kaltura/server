@@ -89,33 +89,7 @@ class UploadTokenService extends KalturaBaseService
 	{
 		$this->restrictPeerToCurrentUser();
 		$uploadTokenDb = UploadTokenPeer::retrieveByPK($uploadTokenId);
-		if (is_null($uploadTokenDb))
-			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
-		
-		$uploadTokenStatus = $uploadTokenDb->getStatus();
-		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_ERROR)
-		{
-			throw new KalturaAPIException(KalturaErrors::MAX_ALLOWED_CHUNK_COUNT_EXCEEDED);
-		}
-		
-		//If upload token is older than max resume time allowed block it
-		$maxUploadTokenResumeTime = kConf::get('upload_token_max_resume_time', 'runtime_config', self::DEFAULT_UPLOAD_TOKEN_MAX_RESUME_TIME);
-		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD && $uploadTokenDb->getUpdatedAt(null) < (time() - $maxUploadTokenResumeTime))
-		{
-			throw new KalturaAPIException(KalturaErrors::UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED, $maxUploadTokenResumeTime);
-		}
-
-		// dont dump an upload to the other DC if it's the first uploaded chunk
-		// optimizes cases where an upload token is created in one DC and the uploads go to the other
-		if ($uploadTokenStatus != UploadToken::UPLOAD_TOKEN_PENDING)
-		{
-			// if the token was already used for upload on another datacenter, proxy the upload action there
-			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
-			if($remoteDCHost)
-			{
-				kFileUtils::dumpApiRequest($remoteDCHost);
-			}
-		}
+		$this->validateForUpload($uploadTokenDb);
 
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb, $finalChunk);
 		try
@@ -238,6 +212,50 @@ class UploadTokenService extends KalturaBaseService
 		if (!$this->getKs() || !$this->getKs()->isAdmin())
 		{
 			UploadTokenPeer::getCriteriaFilter()->getFilter()->addAnd(UploadTokenPeer::KUSER_ID, $this->getKuser()->getId());
+		}
+	}
+	
+	/**
+	 * @param UploadToken|null $uploadTokenDb
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	protected function validateForUpload(UploadToken $uploadTokenDb = null)
+	{
+		if (is_null($uploadTokenDb))
+		{
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_NOT_FOUND);
+		}
+		
+		$uploadTokenStatus = $uploadTokenDb->getStatus();
+		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_ERROR)
+		{
+			throw new KalturaAPIException(KalturaErrors::MAX_ALLOWED_CHUNK_COUNT_EXCEEDED);
+		}
+		
+		//If upload token is older than max resume time allowed block it
+		$maxUploadTokenResumeTime = kConf::get('upload_token_max_resume_time', 'runtime_config', self::DEFAULT_UPLOAD_TOKEN_MAX_RESUME_TIME);
+		if($uploadTokenStatus == UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD && $uploadTokenDb->getUpdatedAt(null) < (time() - $maxUploadTokenResumeTime))
+		{
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_PASSED_MAX_RESUME_TIME_ALLOWED, $maxUploadTokenResumeTime);
+		}
+		
+		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
+		if (!in_array($uploadTokenDb->getStatus(), $allowedStatuses, true))
+		{
+			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD);
+		}
+		
+		// dont dump an upload to the other DC if it's the first uploaded chunk
+		// optimizes cases where an upload token is created in one DC and the uploads go to the other
+		if ($uploadTokenStatus != UploadToken::UPLOAD_TOKEN_PENDING)
+		{
+			// if the token was already used for upload on another datacenter, proxy the upload action there
+			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenDb->getId(), kDataCenterMgr::getCurrentDcId());
+			if($remoteDCHost)
+			{
+				kFileUtils::dumpApiRequest($remoteDCHost);
+			}
 		}
 	}
 }

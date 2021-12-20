@@ -19,7 +19,6 @@ abstract class KJobConversionEngine extends KConversionEngine
 	{
 		$tempPath = dirname($data->destFileSyncLocalPath);
 		$this->logFilePath = $data->logFileSyncLocalPath;
-		
 		// assume there always will be this index
 		$conv_params = $data->flavorParamsOutput;
  
@@ -63,7 +62,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				}
 				else
 				{
-					$exec_cmd = $this->getCmdLine ( $cmd , true );
+					$exec_cmd = $this->getCmdLine ( $cmd , true, $data->estimatedEffort );
 				}
 				$conversion_engine_result = new KConversioEngineResult( $exec_cmd , $cmd );
 				$conversion_engine_result_list[] = $conversion_engine_result;

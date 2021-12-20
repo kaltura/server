@@ -596,7 +596,7 @@ class KalturaResponseCacher extends kApiCache
 		
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
 	}
-
+	
 	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
 	{
 		if (!kConf::hasMap('api_rate_limit') || $ksPartnerId == self::BATCH_PARTNER_ID)

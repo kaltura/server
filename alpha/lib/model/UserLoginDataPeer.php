@@ -254,9 +254,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
-		$user = kuserPeer::getKuserByEmail($email);
-		$roleNames = $user->getUserRoleNames();
 		$partnerId = $loginData->getConfigPartnerId();
+		$roleNames = null;
+		if ($partnerId)
+		{
+			kuserPeer::setUseCriteriaFilter(false);
+			$user = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+			kuserPeer::setUseCriteriaFilter(true);
+			$roleNames = ($user) ? $user->getUserRoleNames() : null;
+		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames);
 		// If on the partner it's set not to reset the password - skip the email sending

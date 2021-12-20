@@ -29,6 +29,7 @@ class elasticClient
 	const ELASTIC_ACTION_SCROLL = 'scroll';
 	const ELASTIC_ACTION_DELETE = 'delete';
 	const ELASTIC_ACTION_PING = 'ping';
+	const ELASTIC_ACTION_HEALTH = 'health';
 	const ELASTIC_GET_MASTER_INFO = 'get_master_info';
 	const ELASTIC_GET_ALIAS_INFO = 'get_alias_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
@@ -437,6 +438,17 @@ class elasticClient
 	{
 		$cmd = $this->elasticHost;
 		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_PING, self::MONITOR_NO_INDEX);
+		return $response;
+	}
+
+	/**
+	 * check health of elastic cluster
+	 * @return mixed
+	 */
+	public function checkHealth()
+	{
+		$cmd = $this->elasticHost . '/_cluster/health';
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_HEALTH, self::MONITOR_NO_INDEX);
 		return $response;
 	}
 	

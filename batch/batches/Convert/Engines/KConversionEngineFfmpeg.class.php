@@ -584,13 +584,23 @@ $stub=null;
 	 *
 	 * @param string $cmd_line
 	 * @param boolean $add_log
+	 * @param integer $estimatedEffort
 	 * @return string
 	 */
-	protected function getCmdLine ($cmd_line , $add_log )
+	protected function getCmdLine ($cmd_line , $add_log, $estimatedEffort = null )
 	{
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
 		$binName = $this->getCmd();
-		$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
+		if(isset(KBatchBase::$taskConfig->estimatedEffortThreshold) && $estimatedEffort && $estimatedEffort < KBatchBase::$taskConfig->estimatedEffortThreshold)
+		{
+			KalturaLog::debug("Setting pre-signed url for convert.");
+			$inputFilePath = kFile::realPath($this->inFilePath);
+		}
+		else
+		{
+			$inputFilePath = kFile::buildDirectUrl($this->inFilePath);
+		}
+
 		kBatchUtils::addReconnectParams("http", $inputFilePath,$binName);
 		
 		$exec_cmd = "$binName " .
