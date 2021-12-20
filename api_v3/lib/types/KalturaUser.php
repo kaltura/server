@@ -6,7 +6,7 @@
  */
 class KalturaUser extends KalturaBaseUser
 {
-	private static $names = array('firstName', 'lastName', 'fullName', 'screenName');
+	private static $names = array('firstName' => 'getFirstName', 'lastName' => 'getLastName', 'fullName' => 'getFullName', 'screenName' => 'getScreenName');
 
 	/**
 	 * @var KalturaUserType
@@ -178,13 +178,13 @@ class KalturaUser extends KalturaBaseUser
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validateNames($this,self::$names);
+		$this->validateNames(null, self::$names);
 		parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateNames($sourceObject ,self::$names);
+		$this->validateNames($sourceObject, self::$names);
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }

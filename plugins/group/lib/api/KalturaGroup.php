@@ -17,7 +17,7 @@ class KalturaGroup extends KalturaBaseUser
 	 */
 	public $processStatus;
 
-	private static $names = array('fullName','screenName');
+	private static $names = array('fullName' => 'getFullName', 'screenName' => 'getScreenName');
 
 	private static $map_between_objects = array('membersCount', 'processStatus');
 
@@ -44,13 +44,13 @@ class KalturaGroup extends KalturaBaseUser
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
 
-		$this->validateNames($this,self::$names);
+		$this->validateNames(null, self::$names);
 		parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateNames($sourceObject ,self::$names);
+		$this->validateNames($sourceObject, self::$names);
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
