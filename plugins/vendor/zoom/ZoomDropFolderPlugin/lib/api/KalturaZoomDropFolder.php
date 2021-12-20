@@ -19,8 +19,13 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	 * @readonly
 	 */
 	public $accessToken;
-	
-	/**
+
+    /**
+     * @readonly
+     */
+    public $expiresIn;
+
+    /**
 	 * @readonly
 	 */
 	public $clientId;
@@ -87,9 +92,10 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 				$this -> jwtToken = $vendorIntegration -> getJwtToken();
 				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
 				$this -> accessToken = $vendorIntegration -> getAccessToken();
+				$this -> expiresIn = $vendorIntegration -> getExpiresIn();
 				$this -> description = $vendorIntegration->getZoomAccountDescription();
 				$zoomClient = new kZoomClient($this -> baseURL, $this -> jwtToken, $this -> refreshToken, $this -> clientId,
-				                              $this -> clientSecret, $this -> accessToken);
+				                              $this -> clientSecret, $this -> accessToken, $this -> expiresIn);
 				
 				if ($this -> accessToken && $this -> refreshToken && kCurrentContext ::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
 					$vendorIntegration -> getExpiresIn() <= time() +
