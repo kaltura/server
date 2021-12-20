@@ -443,7 +443,7 @@ $plannedDur = 0;
 	}
 
 	/* ---------------------------
-	 * generateTarget
+	 * generateTargetFlavor
 	 */
 	private function generateTargetFlavor(KDLMediaDataSet $source) {
 		$target = clone $this;
@@ -564,62 +564,15 @@ $plannedDur = 0;
 				$target->_video = $this->evaluateTargetVideo($source->_video);
 				
 					/*
-					 * Apply optimization-policy to evaluate 'compliancy' state - 
+					 * Apply optimization-policy to evaluate 'compliance' state - 
 					 * if not set - use original BitRate oriented optimization
 					 */
 				if(isset($this->_optimizationPolicy))
 					$optimizationPolicy = $this->_optimizationPolicy;
 				else
 					$optimizationPolicy = KDLOptimizationPolicy::BitrateFlagBit;
-				KalturaLog::log('OptimizationPolicy('.$target->_optimizationPolicy.')');
-				
-					/*
-					 * Bitrate oriented optimization -
-					 * NonCompliant if the source bitrate significantly lower than the flavor bitrate
-					 */
-				if($optimizationPolicy & KDLOptimizationPolicy::BitrateFlagBit) {
-					if($target->_video->_bitRate<$this->_video->_bitRate*KDLConstants::FlavorBitrateComplianceFactor) {
-						$target->_flags = $this->_flags | self::BitrateNonComplyFlagBit;
-						$target->_warnings[KDLConstants::VideoIndex][] = 
-							KDLWarnings::ToString(KDLWarnings::TargetBitrateNotComply, $target->_video->_bitRate, $this->_video->_bitRate);
-					}
-				}
-					/*
-					 * Frame size oriented optimization -
-					 * NonCompliant if the source frame size significantly smaller than the flavor frame size
-					 */
-				if($optimizationPolicy & KDLOptimizationPolicy::FrameSizeFlagBit){
-					$srcVid = $source->_video;
-					$trgVid = $target->_video;
-					$flvrVid= $this->_video;
-					$param1=null;
-					$param2=null;
-					/*
-					 * The BitrateCompliance condition prevented some of flavors to be signed as  'Framesize-non-comply'.
-					 * Therefore it was removed.
-					 */
-		//			if(isset($flvrVid->_bitRate) && $flvrVid->_bitRate>0 && isset($srcVid->_bitRate) && $srcVid->_bitRate>0
-		//			&& $flvrVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$srcVid->_bitRate) 
-					{
-						if(isset($flvrVid->_width) && $flvrVid->_width>0 && isset($trgVid->_width) && $trgVid->_width 
-						&& $flvrVid->_width>$trgVid->_width/KDLConstants::FlavorFrameSizeComplianceFactor) {
-							$target->_flags = $this->_flags | self::FrameSizeNonComplyFlagBit;
-							$param1 = "w:$flvrVid->_width";
-							$param2 = "w:$trgVid->_width";
-						}
-						if(isset($flvrVid->_height) && $flvrVid->_height>0 && isset($trgVid->_height) && $trgVid->_height 
-						&& $flvrVid->_height>$trgVid->_height/KDLConstants::FlavorFrameSizeComplianceFactor) {
-							if(isset($param1)) { $param1.=","; $param2.=","; }
-							$param1.= "h:$flvrVid->_height";
-							$param2.= "h:$trgVid->_height";
-						}
-					}
-					if(isset($param1)){
-						$target->_flags = $this->_flags | self::FrameSizeNonComplyFlagBit;
-						$target->_warnings[KDLConstants::VideoIndex][] = 
-							KDLWarnings::ToString(KDLWarnings::TargetFrameSizeNotComply, $param1, $param2);
-					}
-				}
+				KalturaLog::log('OptimizationPolicy('.$target->_optimizationPolicy.')');			
+				$this->applyOptimizationPolicy($source, $target, $optimizationPolicy);
 			}
 			else if($target->_container && $target->_container->_id==KDLContainerTarget::ISMV) {
 					/*
@@ -676,6 +629,93 @@ $plannedDur = 0;
 		return $target;
 	}
 
+	/* ---------------------------
+	 * applyOptimizationPolicy
+	 */
+	private function applyOptimizationPolicy(KDLMediaDataSet $source, KDLMediaDataSet $target, $optimizationPolicy) {
+		$sourceVid = $source->_video;
+		$targetVid = $target->_video;
+		$flavorVid= $this->_video;
+			/*
+			 * Bitrate oriented optimization -
+			 * NonCompliant if the source bitrate significantly lower than the flavor bitrate
+			 */
+		if($optimizationPolicy & KDLOptimizationPolicy::BitrateFlagBit) {
+			if($targetVid->_bitRate<$flavorVid->_bitRate*KDLConstants::FlavorBitrateComplianceFactor) {
+				$target->_flags = $this->_flags | self::BitrateNonComplyFlagBit;
+				$target->_warnings[KDLConstants::VideoIndex][] = 
+					KDLWarnings::ToString(KDLWarnings::TargetBitrateNotComply, $targetVid->_bitRate, $flavorVid->_bitRate);
+			}
+		}
+			/*
+			 * Frame size oriented optimization -
+			 * NonCompliant if the source frame size significantly smaller than the flavor frame size
+			 */
+		if($optimizationPolicy & KDLOptimizationPolicy::FrameSizeFlagBit){
+			$param1=null;
+			$param2=null;
+			/*
+			 * The BitrateCompliance condition prevented some of flavors to be signed as  'Framesize-non-comply'.
+			 * Therefore it was removed.
+			 */
+//			if(isset($flavorVid->_bitRate) && $flavorVid->_bitRate>0 && isset($sourceVid->_bitRate) && $sourceVid->_bitRate>0
+//			&& $flavorVid->_bitRate/KDLConstants::FlavorBitrateComplianceFactor<$sourceVid->_bitRate) 
+			{
+				if(isset($flavorVid->_width) && $flavorVid->_width>0 && isset($targetVid->_width) && $targetVid->_width 
+				&& $flavorVid->_width>$targetVid->_width/KDLConstants::FlavorFrameSizeComplianceFactor) {
+					$target->_flags = $this->_flags | self::FrameSizeNonComplyFlagBit;
+					$param1 = "w:$flavorVid->_width";
+					$param2 = "w:$targetVid->_width";
+				}
+				if(isset($flavorVid->_height) && $flavorVid->_height>0 && isset($targetVid->_height) && $targetVid->_height 
+				&& $flavorVid->_height>$targetVid->_height/KDLConstants::FlavorFrameSizeComplianceFactor) {
+					if(isset($param1)) { $param1.=","; $param2.=","; }
+					$param1.= "h:$flavorVid->_height";
+					$param2.= "h:$targetVid->_height";
+				}
+			}
+			if(isset($param1)){
+				$target->_flags = $this->_flags | self::FrameSizeNonComplyFlagBit;
+				$target->_warnings[KDLConstants::VideoIndex][] = 
+					KDLWarnings::ToString(KDLWarnings::TargetFrameSizeNotComply, $param1, $param2);
+			}
+		}
+			/*
+			 * Resolution Matched Bitrate oriented optimization -
+			 * NonCompliant if the source matched bitrate significantly lower than the flavor bitrate.
+			 * 'Matched' - adjust the source bitrate/complexity to flavor resolution
+			 * The outcome should be reduction the number of generated redundant assets, 
+			 * of a kind when all the bitrates are 400-600, including the HD's.
+			 * In that scenario only the highest resolution asset and the lowest bitrate 
+			 * asset should be generated
+			 */
+		if($optimizationPolicy & KDLOptimizationPolicy::BitrateMatchResolFlagBit){
+			$sourceNormalizedBitrate = KDLVideoBitrateNormalize::NormalizeSourceToTarget($sourceVid->_id, $sourceVid->_bitRate, $targetVid->_id);
+			if(isset($sourceVid->_complexityValue) && $sourceVid->_complexityValue>500){
+				$complexityNormalizedBitrate = KDLVideoBitrateNormalize::NormalizeSourceToTarget(KDLVideoTarget::H264, $sourceVid->_complexityValue, $targetVid->_id,1);
+				if($sourceNormalizedBitrate>$complexityNormalizedBitrate)
+					$sourceNormalizedBitrate = $complexityNormalizedBitrate;
+			}
+				// Calc resolution matching factor - target-frame-pixels/source-framee-pixels.
+				// The factor limited by 1, to avoid increasing of the cappingBitarate
+			$resolutionMatchFactor = min($targetVid->_height*$targetVid->_width/($sourceVid->_height*$sourceVid->_width),1);
+				// Calc compensation factor, to avoid filtering out of smaller resol'ed flavors
+				// The 'compensationFactor' is higher for flavors w/lower bitrate.
+				// The factor should be >1, to avoid further reduction.
+			$compensationFactor = max($sourceNormalizedBitrate/$flavorVid->_bitRate,1);
+			
+			$cappingBitrate = min(round($sourceNormalizedBitrate*$resolutionMatchFactor*$compensationFactor),$targetVid->_bitRate);
+			if($cappingBitrate<$flavorVid->_bitRate*KDLConstants::FlavorBitrateComplianceFactor) {
+				$target->_flags = $this->_flags | self::BitrateNonComplyFlagBit;
+				$target->_warnings[KDLConstants::VideoIndex][] = 
+					KDLWarnings::ToString(KDLWarnings::TargetBitrateNotComply, $cappingBitrate, $flavorVid->_bitRate);
+			}
+$cmpnFact=round($compensationFactor,3);		$cmpnFact=($cmpnFact==1?"1   ":$cmpnFact);
+$resolFact=round($resolutionMatchFactor,3);	$resolFact=($resolFact==1?"1   ":$resolFact);
+KalturaLog::log("h:$targetVid->_height, srcNormedBr:$sourceNormalizedBitrate,resolFact:$resolFact,cmpnFact:$cmpnFact, \tcap:$cappingBitrate");
+		}
+	}
+	
 	/* ---------------------------
 	 * EvaluateCopyContainer
 	 */

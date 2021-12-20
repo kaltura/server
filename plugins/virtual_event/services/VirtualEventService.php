@@ -148,30 +148,19 @@ class VirtualEventService extends KalturaBaseService
 	protected function validateScheduleEvents (KalturaVirtualEvent $virtualEvent)
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		if ($virtualEvent->agendaScheduleEventId)
+		$scheduleEventIdsArray = array($virtualEvent->agendaScheduleEventId, $virtualEvent->registrationScheduleEventId, $virtualEvent->mainEventScheduleEventId);
+		foreach ($scheduleEventIdsArray as $scheduleEventId)
 		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->agendaScheduleEventId, VirtualScheduleEventSubType::AGENDA);
-		}
-		if ($virtualEvent->registrationScheduleEventId)
-		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->registrationScheduleEventId, VirtualScheduleEventSubType::REGISTRATION);
-		}
-		if ($virtualEvent->mainEventScheduleEventId)
-		{
-			$this->validateSpecificScheduleEvent($partnerId, $virtualEvent->mainEventScheduleEventId, VirtualScheduleEventSubType::MAIN_EVENT);
+			$this->validateSpecificScheduleEvent($partnerId, $scheduleEventId);
 		}
 	}
 	
-	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId, $subType)
+	protected function validateSpecificScheduleEvent ($partnerId, $scheduleEventId)
 	{
-		$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
-		if(!$dbScheduleEvents)
+		if($scheduleEventId)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
-		}
-		foreach ($dbScheduleEvents as $dbScheduleEvent)
-		{
-			if($dbScheduleEvent->getVirtualScheduleEventSubType() != $subType)
+			$dbScheduleEvents = ScheduleEventPeer::retrieveByPartnerIdAndId($partnerId, $scheduleEventId);
+			if (!$dbScheduleEvents)
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduleEventId);
 			}
@@ -180,13 +169,14 @@ class VirtualEventService extends KalturaBaseService
 	
 	protected function validateGroups (KalturaVirtualEvent $virtualEvent)
 	{
-		if (!is_null($virtualEvent->adminsGroupId))
+		$adminGroupIdsArray = $virtualEvent->adminsGroupIds ? explode(',', $virtualEvent->adminsGroupIds) : array();
+		$AttendeesGroupIdsArray = $virtualEvent->attendeesGroupIds ? explode(',', $virtualEvent->attendeesGroupIds): array();
+		$groupIds = array_merge($adminGroupIdsArray, $AttendeesGroupIdsArray);
+		
+		foreach ($groupIds as $groupId)
 		{
-			$this->isValidGroup($virtualEvent->adminsGroupId);
-		}
-		if (!is_null($virtualEvent->attendeesGroupId))
-		{
-			$this->isValidGroup($virtualEvent->attendeesGroupId);
+			$groupId = trim($groupId);
+			$this->isValidGroup($groupId);
 		}
 	}
 	

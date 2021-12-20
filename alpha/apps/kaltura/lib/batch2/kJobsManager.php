@@ -203,7 +203,31 @@ class kJobsManager
 		}
 	}
 	
-	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null)
+	public static function addDynamicEmailJob($partnerId, $mailType, $mailPriority, $loginEmail, $fromMail, $fromName, $dynamicEmailContents)
+	{
+		self::addMailJob(
+			null,
+			0,
+			$partnerId,
+			$mailType,
+			$mailPriority,
+			kConf::get ($fromMail ),
+			kConf::get ($fromName ),
+			$loginEmail,
+			array(),
+			array(),
+			null,
+			null,
+			null,
+			null,
+			null,
+			$dynamicEmailContents
+		);
+	}
+	
+	public static function addMailJob(
+		BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(),
+		array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null, $dynamicEmailContents = null)
 	{
 	  	$jobData = new kMailJobData();
 		$jobData->setMailPriority($mailPriority);
@@ -227,7 +251,8 @@ class kJobsManager
 	 	$jobData->setTemplatePath($templatePath);
 	
 	 	$partner = PartnerPeer::retrieveByPK($partnerId);
-		$jobData->setLanguage($partner->getLanguage()); 
+		$jobData->setLanguage($partner->getLanguage());
+		$jobData->setDynamicEmailContents($dynamicEmailContents);
 	 	
 		
 		$batchJob = null;
@@ -574,7 +599,7 @@ class kJobsManager
 		
 		$dbConvertFlavorJob->setObjectId($flavorAssetId);
 		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
-		
+		$convertData->setEstimatedEffort($convertData->calculateEstimatedEffort($dbConvertFlavorJob));
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
 	

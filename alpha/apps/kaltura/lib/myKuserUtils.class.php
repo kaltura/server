@@ -5,6 +5,8 @@ class myKuserUtils
 	const SPECIAL_CHARS = array('+', '=', '-', '@', ',');
 	const NON_EXISTING_USER_ID = -1;
 	const USERS_DELIMITER = ',';
+	const DOT_CHAR = '.';
+	const SPACE_CHAR = ' ';
 
 	public static function preparePusersToKusersFilter( $puserIdsCsv )
 	{
@@ -24,9 +26,20 @@ class myKuserUtils
 
 		return self::NON_EXISTING_USER_ID; // no result will be returned if no puser exists
 	}
-	
-	public static function startsWithSpecialChar($str)
+
+  public static function startsWithSpecialChar($str)
 	{
 		return $str && in_array($str[0], self::SPECIAL_CHARS);
+  }
+
+	public static function sanitizeFields(array $values)
+	{
+		$sanitizedValues = array();
+		foreach ($values as $val)
+		{
+			$sanitizedVal = str_replace(self::DOT_CHAR, self::SPACE_CHAR, $val);
+			$sanitizedValues[] = $sanitizedVal;
+		}
+		return $sanitizedValues;
 	}
 }

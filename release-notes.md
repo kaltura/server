@@ -1,3 +1,94 @@
+# Quasar-17.17.0
+## Move V2 player version and studio versions from base.ini to dedicated map ##
+* Issue Type: Task
+* Issue ID: FEC-11387
+
+:warning: **Breaking Change**: The player and studio versions are no longer exist in base.ini.
+
+### Configuration ###
+Remove `html5_version`, `studio_version` and `studio_v3_version` from _local.ini_ (if exists).  
+Create a new configuration map named _appVersions_.  
+Copy from appVersions.template.ini to the new map, and fill the following values:
+
+    html5_version = v2.91
+    studio_version = v2.2.3
+    studio_v3_version = v3.12.2
+
+# Quasar-17.16.0
+## Disable sending Email notification to admin on new admin registration
+* Issue Type: Task
+* Issue ID: PLAT-23316
+### Deployment
+Add the following to admin.ini
+```
+moduls.adminEmailNotifications.enabled = true
+moduls.adminEmailNotifications.permissionType = 2
+moduls.adminEmailNotifications.label = "Disable email notifications to admins on new admin registration"
+moduls.adminEmailNotifications.permissionName = FEATURE_DISABLE_NEW_USER_EMAIL
+moduls.adminEmailNotifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add permission for self serve partner to get partner object ##
+* Issue Type: Task
+* Issue ID: PLAT-23311
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_12_05_add_permissions_partner_get.php
+
+## Allow setting a user role that is not counted in kmc users quota
+* Issue Type: Task
+* Issue ID: PLAT-23297
+
+### Configuration
+To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
+
+## Update EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+	- deployment/updates/scripts/xml/notifications/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_11_18_EntryStatusEqualEmailNotification.template.xml.php
+
+
+## Enable using dynamic email templates for user flows based on their user role
+* Issue Type: Task
+* Issue ID: PLAT-23219, PLAT-23220
+
+
+### Configuration
+* Create a map with the name `dynamic_email_contents` and that is in the following structure: (replace USER_ROLE_NAME with the name of the wanted role)
+
+```
+dynamic_email_role_names = "USER_ROLE_NAME"
+
+dynamic_email_base_link-USER_ROLE = "http://base_url_for_the_template/"
+
+[subjects-USER_ROLE_NAME]
+120 = "Mail Subject 1"
+121 = "Mail Subject 2"
+
+[bodies-USER_ROLE_NAME]
+120 = "Mail Body 1"
+121 = "Mail Body 1"
+```
+(The above texts are examples)
+
+## Add new live language flavors to existing systems ##
+* Issue Type: Task
+* Issue ID: SUP-29836
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2021_11_28_add_new_live_languages.php
+
+
 # Quasar-17.15.0 #
 ## Add partner for KME ##
 * Issue Type: Task
