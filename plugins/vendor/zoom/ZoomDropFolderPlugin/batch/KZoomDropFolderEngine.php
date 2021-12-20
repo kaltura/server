@@ -83,8 +83,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$refreshToken = isset($dropFolder->refreshToken) ? $dropFolder->refreshToken : null;
 		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
 		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
-        $accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
-        $expiresIn = isset($dropFolder->expiresIn) ? $dropFolder->expiresIn : null;
+		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
+		$expiresIn = isset($dropFolder->expiresIn) ? $dropFolder->expiresIn : null;
 		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $expiresIn);
 	}
 	

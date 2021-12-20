@@ -20,10 +20,10 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	 */
 	public $accessToken;
 
-    /**
+	/**
      * @readonly
      */
-    public $expiresIn;
+	public $expiresIn;
 
     /**
 	 * @readonly
