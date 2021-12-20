@@ -1,5 +1,5 @@
 # Quasar-17.17.0
-## Add EmailEventNotificationCoEditorsChangedEmailNewCoEditors template ##
+## Changes EmailEventNotification co-editors or co-publishers changed templates ##
 * Issue Type: Task
 * Issue ID: SUP-28334
 
@@ -7,66 +7,46 @@
 None.
 
 ### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+
+Add scripts:
 First replace all tokens in the XML file below and remove ".template" from the file name:
+Co editor -
 
     - deployment/updates/scripts/xml/2021_12_16_addCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
 
-Run deployment script:
-
-    - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Editor_Changed.php
-
-
-## Add EmailEventNotificationCoPublisherChangedEmailNewCoPublisher template ##
-* Issue Type: Task
-* Issue ID: SUP-28334
-
-#### Configuration ####
-None.
-
-### Deployment scripts ###
-First replace all tokens in the XML file below and remove ".template" from the file name:
+Co publisher -
 
     - deployment/updates/scripts/xml/2021_12_16_addCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
 
-
 Run deployment script:
+Co editor -
+
+    - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Editor_Changed.php
+
+Co publisher -
 
     - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Publisher_Changed.php
 
 
-## Update EmailEventNotificationCoEditorsChangedEmailNewCoEditors template ##
-* Issue Type: Task
-* Issue ID: SUP-28334
-
-#### Configuration ####
-None.
-
-### Deployment scripts ###
+Update scripts:
 First replace all tokens in the XML file below and remove ".template" from the file name:
+Co editor -
 
     - deployment/updates/scripts/xml/2021_12_16_updateCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
 
+Co publisher -
+
+    - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+
 Run deployment script:
+Co editor -
 
     - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Editor_Changed.php
 
+Co publisher -
 
-## Update EmailEventNotificationCoPublisherChangedEmailNewCoPublisher template ##
-* Issue Type: Task
-* Issue ID: SUP-28334
-
-#### Configuration ####
-None.
-
-### Deployment scripts ###
-First replace all tokens in the XML file below and remove ".template" from the file name:
-
-    - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml 
-
-
-Run deployment script:
-
-    - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+    - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Publisher_Changed.php
 
 
 # Quasar-17.16.0
