@@ -1,3 +1,74 @@
+# Quasar-17.17.0
+## Add EmailEventNotificationCoEditorsChangedEmailNewCoEditors template ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    - deployment/updates/scripts/xml/2021_12_16_addCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+
+Run deployment script:
+
+    - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Editor_Changed.php
+
+
+## Add EmailEventNotificationCoPublisherChangedEmailNewCoPublisher template ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    - deployment/updates/scripts/xml/2021_12_16_addCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+
+
+Run deployment script:
+
+    - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Publisher_Changed.php
+
+
+## Update EmailEventNotificationCoEditorsChangedEmailNewCoEditors template ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    - deployment/updates/scripts/xml/2021_12_16_updateCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+
+Run deployment script:
+
+    - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Editor_Changed.php
+
+
+## Update EmailEventNotificationCoPublisherChangedEmailNewCoPublisher template ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml 
+
+
+Run deployment script:
+
+    - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+
+
 # Quasar-17.16.0
 ## Disable sending Email notification to admin on new admin registration
 * Issue Type: Task
