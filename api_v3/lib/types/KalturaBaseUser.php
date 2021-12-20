@@ -233,19 +233,17 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
 			}
 			
-			$shouldValidateSpecialChars = true;
-			
 			//If the core object already contains a "bad" value- don't apply the new restriction
 			if($coreObject)
 			{
 				$dbVal = $coreObject->$dbGetFunction();
-				if( strcmp($dbVal, KCsvWrapper::handleInvalidChars($dbVal)) )
+				if( !is_null($dbVal) && myKuserUtils::startsWithSpecialChar($dbVal) )
 				{
-					$shouldValidateSpecialChars = false;
+					continue;
 				}
 			}
 			
-			if($shouldValidateSpecialChars && strcmp($this->$kalturaProperty, KCsvWrapper::handleInvalidChars($this->$kalturaProperty)))
+			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
 			}
