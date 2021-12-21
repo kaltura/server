@@ -97,12 +97,12 @@ class kZoomEventHanlder
 		$jwtToken = $zoomVendorIntegration->getJwtToken();
 		$refreshToken = $zoomVendorIntegration->getRefreshToken();
 		$accessToken = $zoomVendorIntegration->getAccessToken();
-		$expiresIn = $zoomVendorIntegration->getExpiresIn();
+		$accessExpiresIn = $zoomVendorIntegration->getExpiresIn();
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$clientSecret = $zoomConfiguration['clientSecret'];
-		return new kZoomClient($zoomBaseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $expiresIn);
+		return new kZoomClient($zoomBaseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 	
 	

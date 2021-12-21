@@ -26,11 +26,11 @@ abstract class kZoomProcessor
 	 * @param string $clientId
 	 * @param string $clientSecret
      * @param string $accessToken
-     * @param string $expiresIn
+     * @param string $accessExpiresIn
 	 */
-	public function __construct($zoomBaseUrl,$jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $expiresIn)
+	public function __construct($zoomBaseUrl,$jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $expiresIn);
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 
 	/**

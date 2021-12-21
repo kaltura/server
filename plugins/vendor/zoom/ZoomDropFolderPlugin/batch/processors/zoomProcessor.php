@@ -33,8 +33,8 @@ abstract class zoomProcessor
 		$clientId = isset($folder->clientId) ? $folder->clientId : null;
 		$clientSecret = isset($folder->clientSecret) ? $folder->clientSecret : null;
 		$accessToken = isset($folder->accessToken) ? $folder->accessToken : null;
-		$expiresIn = isset($folder->expiresIn) ? $folder->expiresIn : null;
-		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $expiresIn);
+		$accessExpiresIn = isset($folder->accessExpiresIn) ? $folder->accessExpiresIn : null;
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 		$this->dropFolder = $folder;
 	}
 	

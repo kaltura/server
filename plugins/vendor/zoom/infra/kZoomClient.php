@@ -23,7 +23,7 @@ class kZoomClient
 	protected $zoomBaseURL;
 	protected $refreshToken;
 	protected $accessToken;
-	protected $expiresIn;
+	protected $accessExpiresIn;
 	protected $jwtToken;
 	protected $clientId;
 	protected $clientSecret;
@@ -37,11 +37,11 @@ class kZoomClient
 	 * @param null $clientId
 	 * @param null $clientSecret
      * @param null $accessToken
-     * @param null $expiresIn
+     * @param null $accessExpiresIn
 	 * @throws KalturaAPIException
 	 */
 	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
-	                            $clientSecret= null, $accessToken = null, $expiresIn = null)
+	                            $clientSecret= null, $accessToken = null, $accessExpiresIn = null)
 	{
 		$this -> zoomBaseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
@@ -54,7 +54,7 @@ class kZoomClient
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
 		$this->accessToken = $accessToken;
-		$this->expiresIn = $expiresIn;
+		$this->accessExpiresIn = $accessExpiresIn;
 		$this->zoomTokensHelper = new kZoomTokens($zoomBaseURL, $clientId, $clientSecret);
 	}
 	
@@ -261,7 +261,7 @@ class kZoomClient
 		$url = $this -> zoomBaseURL . $apiPath . '?';
 		if ($this->refreshToken)
 		{
-			if (!$this->accessToken || ($this->expiresIn && $this->expiresIn <= time()))
+			if (!$this->accessToken || ($this->accessExpiresIn && $this->accessExpiresIn <= time()))
 			{
 				$this->refreshTokens();
 			}
@@ -277,6 +277,7 @@ class kZoomClient
 			$tokens = $this -> zoomTokensHelper -> refreshTokens($this -> refreshToken);
 			$this -> accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];
 			$this -> refreshToken = $tokens[kZoomTokens::REFRESH_TOKEN];
+			$this -> accessExpiresIn = $tokens[kZoomTokens::EXPIRES_IN];
 		}
 		return $tokens;
 		
