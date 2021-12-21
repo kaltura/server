@@ -85,7 +85,7 @@ class kZoomEventHanlder
 					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL],
 					                                                    $zoomVendorIntegration->getJwtToken(),
 					                                                    $zoomVendorIntegration->getRefreshToken(),
-					                                                    null, null, $zoomVendorIntegration->getAccessToken(),$zoomVendorIntegration->getExpiresIn());
+					                                                    null, null, $zoomVendorIntegration->getAccessToken(), $zoomVendorIntegration->getExpiresIn());
 					$transcriptProcessor->handleRecordingTranscriptComplete($event);
 				}
 				break;

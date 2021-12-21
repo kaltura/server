@@ -185,7 +185,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomConfiguration = self::getZoomConfiguration();
 		$tokens = $this->handleEncryptTokens($tokensData, $iv, $zoomConfiguration);
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
-		$client = new kZoomClient($zoomBaseURL,null,$tokens[kZoomTokens::REFRESH_TOKEN],null,null,$tokens[kZoomTokens::ACCESS_TOKEN], $tokens[kZoomTokens::EXPIRES_IN]);
+		$client = new kZoomClient($zoomBaseURL, null, $tokens[kZoomTokens::REFRESH_TOKEN], null, null, $tokens[kZoomTokens::ACCESS_TOKEN], $tokens[kZoomTokens::EXPIRES_IN]);
 		$accountId = $this->getAccountId($client->retrieveTokenZoomUser());
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
