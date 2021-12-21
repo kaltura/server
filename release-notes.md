@@ -12,26 +12,22 @@ First replace all tokens in the XML file below and remove ".template" from the f
 
 Add scripts:
 
-Co editor
-
+    Co editor:
     - deployment/updates/scripts/xml/2021_12_16_addCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
     - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Editor_Changed.php
 
-Co publisher
-
+    Co publisher:
     - deployment/updates/scripts/xml/2021_12_16_addCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
     - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Publisher_Changed.php
 
 
 Update scripts:
 
-Co editor
-
+    Co editor:
     - deployment/updates/scripts/xml/2021_12_16_updateCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
     - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Editor_Changed.php
 
-Co publisher
-
+    Co publisher:
     - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
     - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Publisher_Changed.php
 
