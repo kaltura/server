@@ -289,7 +289,6 @@ class KAsyncConvert extends KJobHandlerWorker
 			$data->logFileSyncLocalPath
 		);
 		$this->startMonitor($monitorFiles);
-		$resourceUsageStart = getrusage();
 		
 		if(isset($job->urgency)){	
 			$data->urgency = $job->urgency;
@@ -308,14 +307,6 @@ class KAsyncConvert extends KJobHandlerWorker
 
 			$data = $this->operationEngine->getData(); //get the data from operation engine for the cases it was changed
 			
-			if ($data instanceof KalturaConvertJobData)
-			{
-				// counting userCpu used(not counting system cpu to match chunk convert)
-				// will return how much CPU the process used in ms
-				$resourceUsageEnd = getrusage();
-				$data->userCpu = ($resourceUsageEnd['ru_utime.tv_sec'] * 1000 + intval($resourceUsageEnd['ru_utime.tv_usec'] / 1000))
-					- ($resourceUsageStart['ru_utime.tv_sec'] * 1000 + intval($resourceUsageStart['ru_utime.tv_usec']) / 1000);
-			}
 			$this->stopMonitor();
 				
 			$jobMessage = "engine [" . get_class($this->operationEngine) . "] converted successfully. ";

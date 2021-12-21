@@ -118,6 +118,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 		$this->logMediaInfo ( $log_file , $actualFileSyncLocalPath );
 		
 		$duration = 0;
+		$resourceUsageStart = getrusage();
+		
 		foreach ( $conversion_engine_result_list as $conversion_engine_result )
 		{
 			$execution_command_str = $conversion_engine_result->exec_cmd;
@@ -162,7 +164,16 @@ abstract class KJobConversionEngine extends KConversionEngine
 		// Export job CPU metrics 
 		$obj=KChunkedEncodeSessionManager::GetSessionStatsJSON($log_file);
 		if(isset($obj->userCpu))
+		{
 			$data->userCpu = round($obj->userCpu);
+		}
+		else
+		{
+			$resourceUsageEnd = getrusage(1);
+			$userCpuUsedInSec = ($resourceUsageEnd['ru_utime.tv_sec'] + intval($resourceUsageEnd['ru_utime.tv_usec'] / 1000000))
+				- ($resourceUsageStart['ru_utime.tv_sec'] + intval($resourceUsageStart['ru_utime.tv_usec'] / 1000000));
+			$data->userCpu = $userCpuUsedInSec;
+		}
 		
 		return array ( true , $error_message );// indicate all was converted properly
 	}
