@@ -2,7 +2,6 @@
 
 class myKuserUtils
 {
-	const SPECIAL_CHARS = array('+', '=', '-', '@', ',');
 	const NON_EXISTING_USER_ID = -1;
 	const USERS_DELIMITER = ',';
 	const DOT_CHAR = '.';
@@ -29,7 +28,7 @@ class myKuserUtils
 
 	public static function startsWithSpecialChar($str)
 	{
-		return $str && in_array($str[0], self::SPECIAL_CHARS);
+		return $str && in_array($str[0], array('+', '=', '-', '@', ','));
 	}
 
 	public static function sanitizeFields(array $values)
