@@ -131,7 +131,7 @@ class KalturaDispatcher
 		}
 		catch (KalturaAPIException $e)
 		{
-			kalturaResponseCacher::rateLimitPostProcessing();
+			kalturaResponseCacher::onErrorRateLimitProcessing();
 			if ($actionInfo->returnType != 'file')
 			{
 				 throw ($e);
