@@ -1,4 +1,35 @@
 # Quasar-17.17.0
+## Changes to co-editors or co-publishers changed email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts". 
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+
+Add scripts:
+
+    Co editor:
+    - deployment/updates/scripts/xml/2021_12_16_addCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+    - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Editor_Changed.php
+
+    Co publisher:
+    - deployment/updates/scripts/xml/2021_12_16_addCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+    - deployment/updates/scripts/2021_12_16_deploy_add_email_event_notification_Co_Publisher_Changed.php
+
+Update scripts:
+
+    Co editor:
+    - deployment/updates/scripts/xml/2021_12_16_updateCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+    - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Editor_Changed.php
+
+    Co publisher:
+    - deployment/updates/scripts/xml/2021_12_16_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+    - deployment/updates/scripts/2021_12_16_deploy_update_email_event_notification_Co_Publisher_Changed.php
+
 ## Move V2 player version and studio versions from base.ini to dedicated map ##
 * Issue Type: Task
 * Issue ID: FEC-11387
@@ -13,6 +44,7 @@ Copy from appVersions.template.ini to the new map, and fill the following values
     html5_version = v2.91
     studio_version = v2.2.3
     studio_v3_version = v3.12.2
+
 
 # Quasar-17.16.0
 ## Disable sending Email notification to admin on new admin registration
