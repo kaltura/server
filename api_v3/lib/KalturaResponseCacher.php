@@ -20,7 +20,7 @@ class KalturaResponseCacher extends kApiCache
 	
 	const POST_INCREMENT = '_postIncrement';
 	
-	static protected $generatedKey;
+	static protected $rateLimitKey;
 
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
 	
@@ -654,17 +654,18 @@ class KalturaResponseCacher extends kApiCache
 
 		$partnerId = $ksPartnerId;
 		$keySeed = "$service-$action-$partnerId-$key";
-		self::$generatedKey = 'apiRateLimit-' . md5($keySeed);
+		$key = 'apiRateLimit-' . md5($keySeed);
 
 		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
-		$cache->add(self::$generatedKey, 0, $cacheExpiry);
+		$cache->add(self::$rateLimitKey, 0, $cacheExpiry);
 		if(isset($rule[self::POST_INCREMENT]))
 		{
-			$counter = $cache->get(self::$generatedKey);
+			$counter = $cache->get($key);
+			self::$rateLimitKey = $key;
 		}
 		else
 		{
-			$counter = $cache->increment(self::$generatedKey);
+			$counter = $cache->increment($key);
 		}
 		if ($counter <= $rule['_limit'])
 		{
@@ -673,7 +674,7 @@ class KalturaResponseCacher extends kApiCache
 
 		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
 		{
-			KalturaLog::log("Rate limit exceeded - key= " . self::$generatedKey . " keySeed=$keySeed counter=$counter");
+			KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
 		}
 
 		if (isset($rule['_logOnly']) && $rule['_logOnly'])
@@ -684,20 +685,19 @@ class KalturaResponseCacher extends kApiCache
 		return false;
 	}
 	
-	public static function incrementPostCallRateLimit($params, $partnerId = null, $ksPartnerId = null)
+	public static function rateLimitPostProcessing()
 	{
-		$rule = self::getRateLimitRule($params, $partnerId, $ksPartnerId);
-		if (!$rule)
+		if (isset(self::$rateLimitKey))
 		{
-			return true;
+			$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+			if (!$cache)
+			{
+				return;
+			}
+			$cache->increment(self::$rateLimitKey);
 		}
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
-		if (!$cache)
-		{
-			return;
-		}
+		return;
 		
-		$cache->increment(self::$generatedKey);
 	}
 
 	protected static function getApiParamValue($params, $key)
