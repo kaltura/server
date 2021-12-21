@@ -70,6 +70,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_APPLICATION_VER = 'applicationVer';
 	const DIMENSION_PARTNER_CRM_ID = 'partnerCrmId';
 	const DIMENSION_PLAYLIST_ID = 'playlistId';
+	const DIMENSION_VIRTUAL_EVENT_ID = 'virtualEventId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -253,6 +254,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_POSITION => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -372,6 +374,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 		),
 	);
 

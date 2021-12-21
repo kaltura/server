@@ -1558,6 +1558,7 @@ class reportsInputFilter
 	public $playlist_ids;
 	public $domains;
 	public $canonical_urls;
+	public $virtual_event_ids;
 
 
 	public function getFilterBy() {
