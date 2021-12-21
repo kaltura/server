@@ -658,7 +658,7 @@ class KalturaResponseCacher extends kApiCache
 
 		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
 		$cache->add(self::$rateLimitKey, 0, $cacheExpiry);
-		if(isset($rule[self::POST_INCREMENT]))
+		if(isset($rule[self::POST_INCREMENT]) && $rule[self::POST_INCREMENT])
 		{
 			$counter = $cache->get($key);
 			self::$rateLimitKey = $key;
