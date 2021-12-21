@@ -215,17 +215,36 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	}
 
 	/**
-	 * @param $object The object to validate
+	 * @param $coreObject The object to validate
 	 * @param $names array of names
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 */
-	protected function validateNames($object , array $names)
+	protected function validateNames($coreObject, array $names)
 	{
-		foreach ($names as $name)
+		foreach ($names as $kalturaProperty => $dbGetFunction)
 		{
-			if (!is_null($object->$name) && strpos($object->$name, kuser::URL_PATTERN) !== false)
+			if(is_null($this->$kalturaProperty))
 			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $name);
+				continue;
+			}
+			
+			if(strpos($this->$kalturaProperty, kuser::URL_PATTERN) !== false)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
+			}
+			
+			if($coreObject)
+			{
+				$dbVal = $coreObject->$dbGetFunction();
+				if( !is_null($dbVal) && ($dbVal === $this->$kalturaProperty) )
+				{
+					continue;
+				}
+			}
+			
+			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
 			}
 		}
 	}
