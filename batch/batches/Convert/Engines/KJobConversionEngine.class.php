@@ -118,7 +118,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 		$this->logMediaInfo ( $log_file , $actualFileSyncLocalPath );
 		
 		$duration = 0;
-		$resourceUsageStart = getrusage();
+		$rUsedStart = getrusage(1);
 		
 		foreach ( $conversion_engine_result_list as $conversion_engine_result )
 		{
@@ -169,10 +169,13 @@ abstract class KJobConversionEngine extends KConversionEngine
 		}
 		else
 		{
-			$resourceUsageEnd = getrusage(1);
-			$userCpuUsedInSec = ($resourceUsageEnd['ru_utime.tv_sec'] + intval($resourceUsageEnd['ru_utime.tv_usec'] / 1000000))
-				- ($resourceUsageStart['ru_utime.tv_sec'] + intval($resourceUsageStart['ru_utime.tv_usec'] / 1000000));
-			$data->userCpu = $userCpuUsedInSec;
+			$rUsedEnd = getrusage(1);
+			$userCpuSec = round(($rUsedEnd['ru_utime.tv_sec'] + floatval($rUsedEnd['ru_utime.tv_usec'] / 1000000))
+				- ($rUsedStart['ru_utime.tv_sec'] + floatval($rUsedStart['ru_utime.tv_usec'] / 1000000)));
+			if ($userCpuSec)
+			{
+				$data->userCpu = $userCpuSec;
+			}
 		}
 		
 		return array ( true , $error_message );// indicate all was converted properly
