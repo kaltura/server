@@ -36,8 +36,8 @@ class kZoomClient
 	 * @param null $refreshToken
 	 * @param null $clientId
 	 * @param null $clientSecret
-     * @param null $accessToken
-     * @param null $accessExpiresIn
+        * @param null $accessToken
+        * @param null $accessExpiresIn
 	 * @throws KalturaAPIException
 	 */
 	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
