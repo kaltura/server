@@ -117,15 +117,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
-		if ($skipOldPasswordValidation)
+		if ($skipOldPasswordValidation && self::isLoginDataAdmin($loginData->getId()))
 		{
-			self::validateAdminUserResetPasswordRequest($loginData->getId());
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		
 		// if this is an update request (and not just password reset), check that old password is valid
 		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) &&
 			(!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) &&
-			(is_null($skipOldPasswordValidation)))
+			(!$skipOldPasswordValidation))
 		{
 			return self::loginAttemptsLogic($loginData);
 		}
@@ -181,16 +181,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return $loginData;
 	}
 
-	protected static function validateAdminUserResetPasswordRequest($loginDataId)
+	protected static function isLoginDataAdmin($loginDataId)
 	{
 		$c = new Criteria();
 		$c->add(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$c->add(kuserPeer::IS_ADMIN, 0);
 		$user = kuserPeer::doSelectOne($c);
 		
-		if ($user && $user->getIsAdmin())
+		if (!$user)
 		{
-			throw new kUserException('User is an admin', kUserException::CANNOT_UPDATE_LOGIN_DATA);
+			return true;
 		}
+		return false;
 	}
 	
 	protected static function validate2FA($loginData, $otp)
