@@ -185,10 +185,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		$c = new Criteria();
 		$c->add(kuserPeer::LOGIN_DATA_ID, $loginDataId);
-		$c->add(kuserPeer::IS_ADMIN, 0);
+		$c->add(kuserPeer::IS_ADMIN, 1);
 		$user = kuserPeer::doSelectOne($c);
 		
-		if (!$user)
+		if ($user)
 		{
 			return true;
 		}
