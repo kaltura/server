@@ -102,7 +102,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 	
-	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null)
+	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = null)
 	{
 		// if email is null, no need to do any DB queries
 		if (!$oldLoginEmail) {
@@ -117,9 +117,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
+		if ($skipOldPasswordValidation)
+		{
+			self::validateAdminUserResetPasswordRequest($loginData->getId());
+		}
 		
 		// if this is an update request (and not just password reset), check that old password is valid
-		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) && (!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) )
+		if ( ($newPassword || $newLoginEmail || $newFirstName || $newLastName) &&
+			(!$oldPassword || !$loginData->isPasswordValid ( $oldPassword )) &&
+			(is_null($skipOldPasswordValidation)))
 		{
 			return self::loginAttemptsLogic($loginData);
 		}
@@ -175,6 +181,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return $loginData;
 	}
 
+	protected static function validateAdminUserResetPasswordRequest($loginDataId)
+	{
+		$c = new Criteria();
+		$c->add(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$user = kuserPeer::doSelectOne($c);
+		
+		if ($user && $user->getIsAdmin())
+		{
+			throw new kUserException('User is an admin', kUserException::CANNOT_UPDATE_LOGIN_DATA);
+		}
+	}
+	
 	protected static function validate2FA($loginData, $otp)
 	{
 

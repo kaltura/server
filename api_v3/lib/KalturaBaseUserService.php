@@ -51,7 +51,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_OTP
 	 * @throws KalturaErrors::MISSING_OTP
 	 */
-	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
+	protected function updateLoginDataImpl( $email , $password = "" , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = null)
 	{
 		KalturaResponseCacher::disableCache();
 
@@ -64,7 +64,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 
 		try {
-			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName, $otp);
+			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName, $otp, $skipOldPasswordValidation);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -111,6 +111,10 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::LOGIN_BLOCKED)
 			{
 				throw new KalturaAPIException(APIErrors::LOGIN_BLOCKED);
+			}
+			else if ($code == kUserException::CANNOT_UPDATE_LOGIN_DATA)
+			{
+				throw new KalturaAPIException(APIErrors::CANNOT_UPDATE_LOGIN_DATA);
 			}
 			throw $e;			
 		}
