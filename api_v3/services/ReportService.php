@@ -45,7 +45,7 @@ class ReportService extends KalturaBaseService
 	 */
 	protected function validateObjectsAreAllowedPartners($reportType, $objectIds, $delimiter)
 	{
-		if(!$objectIds && $reportType == ReportType::SELF_SERVE_USAGE)
+		if(!$objectIds && $reportType == ReportType::SELF_SERVE_USAGE_VPAAS)
 		{
 			return null;
 		}
