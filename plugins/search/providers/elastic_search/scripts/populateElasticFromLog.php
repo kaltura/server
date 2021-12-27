@@ -138,8 +138,8 @@ while (true)
 	}
 	$elasticLogs = $assocElasticLogs;
 
-	$ping = $elasticClient->ping();
-	if (!$ping)
+	$healthPing = $elasticClient->checkHealth();
+	if (!$healthPing)
 	{
 		KalturaLog::err('cannot connect to elastic cluster with client[' . print_r($elasticClient, true) . ']');
 		sleep(5);

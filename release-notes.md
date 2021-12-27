@@ -1,3 +1,19 @@
+# Quasar-17.17.0
+## Move V2 player version and studio versions from base.ini to dedicated map ##
+* Issue Type: Task
+* Issue ID: FEC-11387
+
+:warning: **Breaking Change**: The player and studio versions are no longer exist in base.ini.
+
+### Configuration ###
+Remove `html5_version`, `studio_version` and `studio_v3_version` from _local.ini_ (if exists).  
+Create a new configuration map named _appVersions_.  
+Copy from appVersions.template.ini to the new map, and fill the following values:
+
+    html5_version = v2.91
+    studio_version = v2.2.3
+    studio_v3_version = v3.12.2
+
 # Quasar-17.16.0
 ## Disable sending Email notification to admin on new admin registration
 * Issue Type: Task
@@ -35,11 +51,11 @@ None.
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name:
 
-	- deployment/updates/scripts/xml/notifications/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+    - deployment/updates/scripts/xml/2021_11_18_EntryStatusEqualEmailNotification.template.xml
 
 Run deployment script:
 
-	- deployment/updates/scripts/2021_11_18_EntryStatusEqualEmailNotification.template.xml.php
+	- deployment/updates/scripts/2021_11_18_deploy_entry_status_equal_email_notification.php
 
 
 ## Enable using dynamic email templates for user flows based on their user role

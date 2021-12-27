@@ -24,6 +24,10 @@ class KalturaBeaconFilter extends KalturaBeaconBaseFilter
 		$relatedObjectType = $this->relatedObjectTypeEqual;
 		if(!$relatedObjectType)
 		{
+			if(!trim($this->relatedObjectTypeIn))
+			{
+				throw new KalturaAPIException(KalturaESearchBeaconErrors::MISSING_MANDATORY_PARAMETER_RELATED_OBJECT_TYPE);
+			}
 			$relatedObjectTypes = explode(",", $this->relatedObjectTypeIn);
 			$relatedObjectType = $relatedObjectTypes[0];
 		}

@@ -2370,6 +2370,7 @@ class kKavaReportsMgr extends kKavaBase
 			'playlist_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYLIST_ID),
 			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
+			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

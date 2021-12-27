@@ -131,20 +131,21 @@ class KalturaDispatcher
 		}
 		catch (KalturaAPIException $e)
 		{
+			kalturaResponseCacher::onErrorRateLimitProcessing();
 			if ($actionInfo->returnType != 'file')
 			{
 				 throw ($e);
 			}
-					
+			
 			KalturaResponseCacher::adjustApiCacheForException($e);
 			$res = new kRendererDieError ($e->getCode(), $e->getMessage());
 		 }
-		
+		 
 		kEventsManager::flushEvents();
 		
 		KalturaLog::debug("Invoke took - " . (microtime(true) - $invokeStart) . " seconds");
 		KalturaLog::debug("Dispatch took - " . (microtime(true) - $start) . " seconds, memory: ".memory_get_peak_usage(true));		
-				
+		
 		
 		return $res;
 	}

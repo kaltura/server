@@ -599,7 +599,7 @@ class kJobsManager
 		
 		$dbConvertFlavorJob->setObjectId($flavorAssetId);
 		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
-		
+		$convertData->setEstimatedEffort($convertData->calculateEstimatedEffort($dbConvertFlavorJob));
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
 	

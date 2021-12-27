@@ -15,7 +15,7 @@ class embedIframeJsAction extends sfAction
 
 		$partner_id = $this->getRequestParameter('partner_id');
 		$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-		
+
 		$optimizedPlayback = kConf::getMap("optimized_playback");
 		if ($partner_id && array_key_exists($partner_id, $optimizedPlayback))
 		{
@@ -28,26 +28,26 @@ class embedIframeJsAction extends sfAction
 				KExternalErrors::dieGracefully();
 			}
 		}
-		
+
 		$uiconf_id = $this->getRequestParameter('uiconf_id');
 		if(!$uiconf_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'uiconf_id');
-			
+
 		$uiConf = uiConfPeer::retrieveByPK($uiconf_id);
 		if(!$uiConf)
 			KExternalErrors::dieError(KExternalErrors::UI_CONF_NOT_FOUND);
-			
+
 		$partner_id = $this->getRequestParameter('partner_id', $uiConf->getPartnerId());
 		if(!$partner_id)
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, 'partner_id');
 
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
-		
+
 		$host = myPartnerUtils::getCdnHost($partner_id, $protocol, 'api');
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
-		
+
 		if (array_key_exists($partner_id, $optimizedPlayback))
 		{
 			// force a specific kdp for the partner
@@ -77,7 +77,10 @@ class embedIframeJsAction extends sfAction
 		{
 			if (!$iframeEmbed)
 				$host = "$protocol://". kConf::get('html5lib_host') ."/";
-			$html5_version = kConf::get('html5_version');
+			$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+			if(!$html5_version)
+			    KExternalErrors::dieError('The html player version was not found');
+
 			if ($ui_conf_html5_url)
 			{
 				$url =  $host . $ui_conf_html5_url;
@@ -101,7 +104,7 @@ class embedIframeJsAction extends sfAction
 					$url .= "/entry_id/$entry_id";
 			}
 		}
-		
+
 		header("pragma:");
 		if($iframeEmbed) {
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . 'wid=' . $widget_id . '&' . $_SERVER["QUERY_STRING"];
@@ -109,7 +112,7 @@ class embedIframeJsAction extends sfAction
 		else
 		{
 			$params = "protocol=$protocol&".$_SERVER["QUERY_STRING"];
-			
+
 			$url .= ((strpos($url, "?") === false) ? "?" : "&") . $params;
 
 			if ($relativeUrl)
@@ -118,7 +121,7 @@ class embedIframeJsAction extends sfAction
 				$headers = array("X-Forwarded-For" =>  requestUtils::getRemoteAddress());
 				if(isset($_SERVER["HTTP_REFERER"]))
 					$headers["referer"] = $_SERVER["HTTP_REFERER"];
-					
+
 				$partner = PartnerPeer::retrieveByPK( $partner_id );
 				if ( $partner )
 				{
@@ -133,7 +136,7 @@ class embedIframeJsAction extends sfAction
 		}
 
 		requestUtils::sendCachingHeaders(60, true, time());
-		
+
 		kFile::cacheRedirect($url);
 		header("Location:$url");
 		KExternalErrors::dieGracefully();

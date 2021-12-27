@@ -27,10 +27,10 @@ class KalturaBeaconEnhanceFilter extends KalturaFilter
 		$queryJsonObject = json_decode($utf8Query, true);
 		
 		if(!$queryJsonObject)
-			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
+			throw new KalturaAPIException(KalturaESearchBeaconErrors::INVALID_PARAMETER_EXTERNAL_QUERY_OBJECT);
 		
 		if(!isset($queryJsonObject['query']))
-			throw new KalturaAPIException(APIErrors::INTERNAL_SERVERL_ERROR);
+			throw new KalturaAPIException(KalturaESearchBeaconErrors::INVALID_QUERY_FIELD_WITHIN_JSON);
 		
 		$searchQuery = array();
 		$searchQuery['body']['query']['bool']['must'] = $queryJsonObject['query'];

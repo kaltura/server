@@ -255,13 +255,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		$partnerId = $loginData->getConfigPartnerId();
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$user = kuserPeer::getKuserByEmail($email, $partnerId);
 		$roleNames = null;
-		if ($user)
+		if ($partnerId)
 		{
-			$roleNames = $user->getUserRoleNames();
+			kuserPeer::setUseCriteriaFilter(false);
+			$user = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
+			kuserPeer::setUseCriteriaFilter(true);
+			$roleNames = ($user) ? $user->getUserRoleNames() : null;
 		}
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
@@ -271,9 +273,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
-		
+
+		$userName = str_replace('.', ' ', $loginData->getFullName());
 		$dynamicLink = $dynamicTemplateUserRoleName ? kEmails::getDynamicTemplateBaseLink($dynamicTemplateUserRoleName) : null;
-		self::emailResetPassword(0, $loginData->getLoginEmail(), $loginData->getFullName(), self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $dynamicTemplateUserRoleName);
+		self::emailResetPassword(0, $loginData->getLoginEmail(), $userName, self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $dynamicTemplateUserRoleName);
 		return true;
 	}
 	
@@ -406,8 +409,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		$partnerId = $loginData->getConfigPartnerId();
-		
-		$resetLinkPrefix = self::getResetLinkPrefix($partnerId, $linkType, $dynamicLink);
+		$resetLinksArray = kConf::get('password_reset_links');
+		$resetLinkPrefix = self::getResetLinkPrefix($partnerId, $linkType, $resetLinksArray, $dynamicLink);
 
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner) {
@@ -426,13 +429,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return $resetLinkPrefix.$hashKey;
 	}
 	
-	protected static function getResetLinkPrefix($partnerId, $linkType, $dynamicLink = null)
+	protected static function getResetLinkPrefix($partnerId, $linkType, $resetLinksArray, $dynamicLink = null)
 	{
 		if ($dynamicLink)
 		{
 			return $dynamicLink;
 		}
-		$resetLinksArray = kConf::get('password_reset_links');
 		if($linkType == resetPassLinkType::KMS)
 		{
 			$resetLinkPrefix = $resetLinksArray['kms'];
