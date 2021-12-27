@@ -16,6 +16,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	const STAT_OP = 'op';
 	const STAT_COUNT = 'count';
 	const STAT_TIME = 'time';
+	const STAT_SEPARATOR = '|';
 
 	protected $hostName;
 	protected $port;
@@ -107,7 +108,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		$connTook = microtime(true) - $connStart;
 		self::safeLog("connect took - {$connTook} seconds to {$this->hostName}:{$this->port} attempts {$this->connectAttempts}");
 
-		$this->updateStats(self::STAT_CONN, array(
+		$this->updateStats(self::STAT_CONN, !$connectResult, array(
 			self::STAT_COUNT => 1,
 			self::STAT_TIME => $connTook));
 
@@ -150,7 +151,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$end = microtime(true);
 			restore_error_handler();
 
-			$this->updateStats(self::STAT_OP, array(
+			$this->updateStats(self::STAT_OP, $this->gotError, array(
 				self::STAT_COUNT => 1,
 				self::STAT_TIME => $end - $start));
 			
@@ -222,13 +223,16 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		return $this->callAndDetectErrors('decrement', array($key, $delta));
 	}
 
-	protected function updateStats($type, $stats)
+	protected function updateStats($type, $error, $stats)
 	{
-		if (!isset(self::$_stats[$this->statsKey]))
+		$error = $error ? 'ERROR' : '';
+		$statsKey = $this->statsKey . self::STAT_SEPARATOR . $error;
+
+		if (!isset(self::$_stats[$statsKey]))
 		{
-			self::$_stats[$this->statsKey] = array();
+			self::$_stats[$statsKey] = array();
 		}
-		$typeStats = &self::$_stats[$this->statsKey];
+		$typeStats = &self::$_stats[$statsKey];
 
 		if (!isset($typeStats[$type]))
 		{
@@ -252,7 +256,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	{
 		foreach (self::$_stats as $statsKey => $typeStats)
 		{
-			$cur = 'instance:' . $statsKey;
+			$cur = 'key:' . rtrim($statsKey, self::STAT_SEPARATOR);
 			foreach ($typeStats as $type => $stats)
 			{
 				foreach ($stats as $key => $value)
@@ -269,16 +273,17 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	{
 		foreach (self::$_stats as $statsKey => $typeStats)
 		{
+			list($server, $error) = explode(self::STAT_SEPARATOR, $statsKey);
 			foreach ($typeStats as $type => $stats)
 			{
 				switch ($type)
 				{
 				case self::STAT_CONN:
-					KalturaMonitorClient::monitorConnTook($statsKey, $stats[self::STAT_TIME], $stats[self::STAT_COUNT]);
+					KalturaMonitorClient::monitorConnTook($server, $stats[self::STAT_TIME], $stats[self::STAT_COUNT], $error);
 					break;
 
 				case self::STAT_OP:
-					KalturaMonitorClient::monitorMemcacheAccess($statsKey, $stats[self::STAT_TIME], $stats[self::STAT_COUNT]);
+					KalturaMonitorClient::monitorMemcacheAccess($server, $stats[self::STAT_TIME], $stats[self::STAT_COUNT], $error);
 					break;
 				}
 			}
