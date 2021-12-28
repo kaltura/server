@@ -212,26 +212,31 @@ class elasticClient
 		$requestTook = microtime(true) - $requestStart;
 		KalturaLog::debug("Elastic took - " . $requestTook . " seconds");
 
-		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost);
-
 		if (!$response)
 		{
 			$code = $this->getErrorNumber();
 			$message = $this->getError();
 			KalturaLog::err("Elastic client curl error code[" . $code . "] message[" . $message . "]");
+
+			$code = 'ERROR_' . $code;
 		}
 		else
 		{
 			KalturaLog::debug("Elastic client response " .$response);
 			//return the response as associative array
 			$response = json_decode($response, true);
-			if (isset($response['error']))
-			{
-				$data = array();
-				$data['errorMsg'] = $response['error'];
-				$data['status'] = $response['status'];
-				throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
-			}
+
+			$code = isset($response['status']) ? 'CODE_' . $response['status'] : '';
+		}
+
+		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost, $code);
+
+		if ($response && isset($response['error']))
+		{
+			$data = array();
+			$data['errorMsg'] = $response['error'];
+			$data['status'] = $response['status'];
+			throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
 		}
 		
 		return $response;

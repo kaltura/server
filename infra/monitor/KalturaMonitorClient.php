@@ -456,7 +456,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName = null)
+	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName, $errorCode)
 	{
 		if (!self::$stream)
 			return;
@@ -468,6 +468,7 @@ class KalturaMonitorClient
 			self::FIELD_QUERY_TYPE		=> $actionName,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_LENGTH			=> strlen($body),
+			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
 
 		self::writeDeferredEvent($data);
