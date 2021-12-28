@@ -665,7 +665,7 @@ class KalturaMonitorClient
 		self::$sleepCount++;
 	}
 
-	public static function monitorExec($command, $startTime)
+	public static function monitorExec($command, $startTime, $errorCode='')
 	{
 		if (!self::$stream)
 			return;
@@ -683,6 +683,7 @@ class KalturaMonitorClient
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_EXEC,
 			self::FIELD_COMMAND			=> $command,
 			self::FIELD_EXECUTION_TIME	=> microtime(true) - $startTime,
+			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
 
 		self::writeDeferredEvent($data);
