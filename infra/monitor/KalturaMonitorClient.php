@@ -508,7 +508,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorConnTook($dsn, $connTook, $count=1)
+	public static function monitorConnTook($dsn, $connTook, $count=1, $errorCode='')
 	{
 		if (!self::$stream)
 			return;
@@ -518,12 +518,13 @@ class KalturaMonitorClient
 				self::FIELD_DATABASE		=> self::getDsnHost($dsn),
 				self::FIELD_EXECUTION_TIME	=> $connTook,
 				self::FIELD_COUNT			=> $count,
+				self::FIELD_ERROR_CODE		=> $errorCode,
 		));
 		
 		self::writeDeferredEvent($data);		
 	}
 
-	public static function monitorMemcacheAccess($hostName, $timeTook, $count)
+	public static function monitorMemcacheAccess($hostName, $timeTook, $count, $errorCode)
 	{
 		if (!self::$stream)
 			return;
@@ -533,6 +534,7 @@ class KalturaMonitorClient
 				self::FIELD_DATABASE		=> $hostName,
 				self::FIELD_EXECUTION_TIME	=> $timeTook,
 				self::FIELD_COUNT			=> $count,
+				self::FIELD_ERROR_CODE		=> $errorCode,
 		));
 
 		self::writeDeferredEvent($data);
