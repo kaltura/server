@@ -218,7 +218,7 @@ class elasticClient
 			$message = $this->getError();
 			KalturaLog::err("Elastic client curl error code[" . $code . "] message[" . $message . "]");
 
-			$code = 'ERROR_' . $code;
+			$code = 'CURL_' . $code;
 		}
 		else
 		{
@@ -226,7 +226,7 @@ class elasticClient
 			//return the response as associative array
 			$response = json_decode($response, true);
 
-			$code = isset($response['status']) ? 'CODE_' . $response['status'] : '';
+			$code = isset($response['status']) ? 'HTTP_' . $response['status'] : '';
 		}
 
 		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost, $code);
