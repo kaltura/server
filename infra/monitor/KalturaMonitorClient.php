@@ -540,7 +540,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorCurl($hostName, $timeTook)
+	public static function monitorCurl($hostName, $timeTook, $curlHandle=null)
 	{
 		if (!self::$stream)
 			return;
@@ -550,6 +550,21 @@ class KalturaMonitorClient
 				self::FIELD_HOST			=> $hostName,
 				self::FIELD_EXECUTION_TIME	=> $timeTook,
 		));
+
+		if ($curlHandle)
+		{
+			$errno = curl_errno($curlHandle);
+			if ($errno)
+			{
+				$errorCode = 'ERROR_' . $errno;
+			}
+			else
+			{
+				$errorCode = 'CODE_' . curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
+			}
+
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 
 		self::writeDeferredEvent($data);
 	}

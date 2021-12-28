@@ -50,7 +50,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		$start = microtime(true);
 		$data = curl_exec($ch);
-		KalturaMonitorClient::monitorCurl(parse_url($url, PHP_URL_HOST), microtime(true) - $start);
+		KalturaMonitorClient::monitorCurl(parse_url($url, PHP_URL_HOST), microtime(true) - $start, $ch);
 
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
