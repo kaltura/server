@@ -554,16 +554,15 @@ class KalturaMonitorClient
 		if ($curlHandle)
 		{
 			$errno = curl_errno($curlHandle);
+			$httpCode = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
 			if ($errno)
 			{
-				$errorCode = 'ERROR_' . $errno;
+				$data[self::FIELD_ERROR_CODE] = 'CURL_' . $errno;
 			}
-			else
+			else if ($httpCode < 200 || $httpCode >= 300)
 			{
-				$errorCode = 'CODE_' . curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
+				$data[self::FIELD_ERROR_CODE] = 'HTTP_' . $httpCode;
 			}
-
-			$data[self::FIELD_ERROR_CODE] = $errorCode;
 		}
 
 		self::writeDeferredEvent($data);
