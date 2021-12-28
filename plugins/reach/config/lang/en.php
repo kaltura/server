@@ -6,6 +6,7 @@ return array (
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING' => 'CHAPTERING',
+    'Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING' => 'DUBBING',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING' => 'INTELLIGENT_TAGGING',
 
     'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',

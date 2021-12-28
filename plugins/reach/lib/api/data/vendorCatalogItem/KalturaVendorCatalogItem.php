@@ -226,6 +226,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::CHAPTERING:
 				$object = new KalturaVendorChapteringCatalogItem();
 				break;
+			
+			case VendorServiceFeature::DUBBING:
+				$object = new KalturaVendorDubbingCatalogItem();
+				break;
 
 			case VendorServiceFeature::INTELLIGENT_TAGGING:
 				$object = new KalturaVendorIntelligentTaggingCatalogItem();

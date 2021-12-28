@@ -285,6 +285,10 @@
         if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING; ?>) {
             jQuery('#filterSourceLanguage').removeAttr('hidden');
         }
+
+        if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING; ?>) {
+            jQuery('#filterSourceLanguage').removeAttr('hidden');
+        }
 		
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
