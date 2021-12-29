@@ -645,6 +645,9 @@ class Propel
 				{
 					KalturaLog::Log("failed to connect [$i] [$timeTook] $dsn");
 				}
+
+				KalturaMonitorClient::monitorConnTook($dsn, $timeTook, 'PDO_' . $e->getCode());
+
 				if ($i == $count || $timeTook < 1)
 					throw new PropelException("Unable to open PDO connection dsn[$dsn] user[$user] password[$password]", $e);
 			}
