@@ -12,7 +12,7 @@ class KMicrosoftGraphApiClient
 
 	const MEETING_SOURCE_VALUE = 'Meeting';
 
-	public $apiUrl;
+	const API_URL = 'https://graph.microsoft.com';
 
 	public $tenantId;
 
@@ -22,68 +22,87 @@ class KMicrosoftGraphApiClient
 
 	public $bearerToken;
 
-	public $bearerTokenExpiry;
+	protected $bearerTokenExpiry;
 
-	function __construct($tenantId, $apiUrl, $clientId, $clientSecret)
+	function __construct($tenantId, $clientId, $clientSecret)
 	{
-		$this->apiUrl = $apiUrl;
 		$this->tenantId = $tenantId;
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
 	}
 
-	public function authenticate ()
+	public function authenticate()
 	{
 		$url = str_replace('{tenantId}', $this->tenantId, self::AUTH_URL);
 
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 
-		$fields = array('grant_type' => 'client_credentials', 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'resource' => $this->apiUrl);
+		$fields = array('grant_type' => 'client_credentials', 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'resource' => self::API_URL);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 		$response = json_decode(curl_exec($ch), true);
 		curl_close($ch);
 
-		KalturaLog::info('Auth token generated: [' . $response[MicrosoftGraphFieldNames::ACCESS_TOKEN] . '], expiry: ' . date('c', $response[MicrosoftGraphFieldNames::EXPIRES_ON]));
-		$this->bearerToken = $response[MicrosoftGraphFieldNames::ACCESS_TOKEN];
-		$this->bearerTokenExpiry = $response[MicrosoftGraphFieldNames::EXPIRES_ON];
+		if (isset($response[MicrosoftGraphFieldNames::ACCESS_TOKEN]))
+		{
+			KalturaLog::info('Auth token generated: [' . $response[MicrosoftGraphFieldNames::ACCESS_TOKEN] . '], expiry: ' . date('c', $response[MicrosoftGraphFieldNames::EXPIRES_ON]));
+			$this->bearerToken = $response[MicrosoftGraphFieldNames::ACCESS_TOKEN];
+			$this->bearerTokenExpiry = $response[MicrosoftGraphFieldNames::EXPIRES_ON];
+		}
+		else
+		{
+			$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			if ($responseCode)
+			{
+				KalturaLog::info("Error occurred while generating Graph API authentication token (Code $responseCode): $response");
+			}
+			else
+			{
+				KalturaLog::info("Error occurred while generating Graph API authentication token: no response");
+			}
+		}
+	}
+	
+	public function getTokenExpiry()
+	{
+		return $this->bearerTokenExpiry;
 	}
 
 	public function getCallRecord($callRecordId)
 	{
-		$service = $this->apiUrl . "/v1.0/communications/callRecords/$callRecordId";
+		$service = self::API_URL . "/v1.0/communications/callRecords/$callRecordId";
 		return $this->sendGraphRequest($service);
 	}
 
 	public function getUser($userId)
 	{
-		$service = $this->apiUrl . "/v1.0/users/$userId";
+		$service = self::API_URL . "/v1.0/users/$userId";
 		return $this->sendGraphRequest($service);
 	}
 	
 	public function getUserByMail($email)
 	{
-		$service = $this->apiUrl . "/v1.0/users?\$filter=startsWith(mail,'$email')";
+		$service = self::API_URL . "/v1.0/users?\$filter=startsWith(mail,'$email')";
 		return $this->sendGraphRequest($service);
 	}
 	
 	public function getDriveDeltaPage($userTeamsId)
 	{
-		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/root/children?select=id,name,specialFolder";
+		$service = self::API_URL . "/v1.0/users/$userTeamsId/drive/root/children?select=id,name,specialFolder";
 		return $this->sendGraphRequest($service);
 	}
 	
 	public function getRecordingFolderDeltaPage($userTeamsId, $recordingsFolderId)
 	{
-		$service = $this->apiUrl . "/v1.0/users/$userTeamsId/drive/items/$recordingsFolderId/delta";
+		$service = self::API_URL . "/v1.0/users/$userTeamsId/drive/items/$recordingsFolderId/delta";
 		return $this->sendGraphRequest($service);
 	}
 
 	public function getDriveItem($driveId, $driveItemId)
 	{
-		$service = $this->apiUrl .  "/v1.0/drives/$driveId/items/$driveItemId";
+		$service = self::API_URL . "/v1.0/drives/$driveId/items/$driveItemId";
 		$response = $this->sendGraphRequest($service);
 
 		if ($response)

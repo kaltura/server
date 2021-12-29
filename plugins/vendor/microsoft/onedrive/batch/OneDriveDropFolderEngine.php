@@ -114,7 +114,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 			throw new kFileTransferMgrException('Credentials expired', kFileTransferMgrException::cantAuthenticate);
 		}
 		
-		$this->graphClient = new KMicrosoftGraphApiClient($this->vendorIntegrationSetting->accountId, $dropFolder->path, $this->vendorIntegrationSetting->clientId, $this->vendorIntegrationSetting->clientSecret);
+		$this->graphClient = new KMicrosoftGraphApiClient($this->vendorIntegrationSetting->accountId, $this->vendorIntegrationSetting->clientId, $this->vendorIntegrationSetting->clientSecret);
 		$this->existingDropFolderFiles = $this->loadDropFolderFiles();
 	}
 	
@@ -278,7 +278,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	{
 		KalturaLog::info("Updating drop folder file $currentDropFolderFile->id");
 
-		$updateDropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
+		$updateDropFolderFile = new KalturaOneDriveDropFolderFile();
 		$updateDropFolderFile->name = $driveItem[MicrosoftGraphFieldNames::NAME];
 		$updateDropFolderFile->description = $driveItem[MicrosoftGraphFieldNames::DESCRIPTION];
 		$updateDropFolderFile->fileSize = $driveItem[MicrosoftGraphFieldNames::SIZE];
@@ -299,7 +299,7 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 	protected function handleFileAdded($extendedItem, $dropFolderId, KalturaIntegrationSetting $integrationData)
 	{
 		KalturaLog::info('Handling drive item with ID ' . $extendedItem[MicrosoftGraphFieldNames::ID_FIELD]);
-		$dropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
+		$dropFolderFile = new KalturaOneDriveDropFolderFile();
 		$dropFolderFile->dropFolderId = $dropFolderId;
 		$dropFolderFile->fileSize = $extendedItem[MicrosoftGraphFieldNames::SIZE];
 		$dropFolderFile->fileName = $extendedItem[MicrosoftGraphFieldNames::ID_FIELD];
@@ -310,7 +310,9 @@ class OneDriveDropFolderEngine extends KDropFolderEngine
 		{
 			$dropFolderFile->description = $extendedItem[MicrosoftGraphFieldNames::DESCRIPTION];
 		}
-
+		
+		$dropFolderFile->tokenExpiry = $this->graphClient->getTokenExpiry();
+		$dropFolderFile->driveId = $extendedItem[MicrosoftGraphFieldNames::PARENT_REFERENCE][MicrosoftGraphFieldNames::DRIVE_ID];
 		$dropFolderFile->ownerId = $this->retrieveUserId($extendedItem[MicrosoftGraphFieldNames::CREATED_BY]);
 		$dropFolderFile->additionalUserIds = $this->retrieveParticipants($extendedItem);
 

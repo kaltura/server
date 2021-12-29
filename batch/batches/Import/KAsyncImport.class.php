@@ -109,7 +109,13 @@ class KAsyncImport extends KJobHandlerWorker
 		try
 		{
 			$sourceUrl = $data->srcFileUrl;
-
+			
+			$fileTransferMgr = kFileTransferMgr::getInstance($jobSubType);
+			if ($fileTransferMgr)
+			{
+				$sourceUrl = $fileTransferMgr->refreshUrl($sourceUrl, $data);
+			}
+			
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
 			$resumeOffset = 0;

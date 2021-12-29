@@ -10,13 +10,19 @@ class OneDriveDropFolder extends VendorIntegrationDropFolder
 	
 	const DEFAULT_CATEGORY_IDS = 'default_category_ids';
 	
-	public function getDefaultCategoryIds ()	{	return $this->getFromCustomData(self::DEFAULT_CATEGORY_IDS);	}
+	public function getDefaultCategoryIds()
+	{
+		return $this->getFromCustomData(self::DEFAULT_CATEGORY_IDS);
+	}
 	
-	public function setDefaultCategoryIds ($defaultCategoryIds)	{	$this->putInCustomData(self::DEFAULT_CATEGORY_IDS, $defaultCategoryIds);	}
+	public function setDefaultCategoryIds($defaultCategoryIds)
+	{
+		$this->putInCustomData(self::DEFAULT_CATEGORY_IDS, $defaultCategoryIds);
+	}
 
 	protected function getRemoteFileTransferMgrType()
 	{
-		return kFileTransferMgrType::HTTP;
+		return kFileTransferMgrType::ONE_DRIVE;
 	}
 
 	/**
@@ -24,7 +30,9 @@ class OneDriveDropFolder extends VendorIntegrationDropFolder
 	 */
 	public function getImportJobData()
 	{
-		return new kDropFolderImportJobData();
+		$jobData = new kOneDriveImportJobData();
+		$jobData->setVendorIntegrationId($this->getIntegrationId());
+		return $jobData;
 	}
 
 	/**
