@@ -1,9 +1,8 @@
 # Quasar-17.17.0
-## New Action Added To The User Service
+## New Login Data Update Action Added To The User Service
 * Issue Type: Task
 * Issue ID: PLAT-23303
-### Deployment
-Run
+### Deployment Scripts
 ```
 php deployment/updates/scripts/add_permissions/2021_12_23_login_data_password_update.php
 ```
