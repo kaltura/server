@@ -1,4 +1,11 @@
 # Quasar-17.17.0
+## New Login Data Update Action Added To The User Service
+* Issue Type: Task
+* Issue ID: PLAT-23303
+### Deployment Scripts
+```
+php deployment/updates/scripts/add_permissions/2021_12_23_login_data_password_update.php
+```
 ## Move V2 player version and studio versions from base.ini to dedicated map ##
 * Issue Type: Task
 * Issue ID: FEC-11387
