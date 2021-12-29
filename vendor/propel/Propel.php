@@ -653,13 +653,14 @@ class Propel
 			}
 		}
 		
-		$totalConnTook = microtime(true) - $connStartTime;
+		$connEndTime = microtime(true);
+		$totalConnTook = $connEndTime - $connStartTime;
 
 		if (class_exists("KalturaLog"))
 			KalturaLog::Log("total conn took $totalConnTook $dsn");
 
 		if (class_exists("KalturaMonitorClient"))
-			KalturaMonitorClient::monitorConnTook($dsn, $totalConnTook);
+			KalturaMonitorClient::monitorConnTook($dsn, $connEndTime - $startTime);
 		
 		// load any connection options from the config file
 		// connection attributes are those PDO flags that have to be set on the initialized connection
