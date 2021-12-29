@@ -398,7 +398,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function getRenderer($flavors)
 	{
-		if($this->shouldRedirect) 
+		if($this->getShouldRedirect())
 		{
 			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 		}
@@ -462,5 +462,18 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		return $this->getFromCustomData("livePackagerSigningDomain");
 	}
+
+	public function setShouldRedirect($v)
+	{
+		$this->shouldRedirect = $v;
+		$this->putInCustomData("shouldRedirect", $v);
+	}
+
+	public function getShouldRedirect()
+	{
+		// if the shouldRedirect changed to true dynamically during the request - it takes priority
+		return $this->shouldRedirect || $this->getFromCustomData("shouldRedirect", null, false);
+	}
+
 }
 
