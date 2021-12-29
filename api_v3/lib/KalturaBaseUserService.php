@@ -51,7 +51,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_OTP
 	 * @throws KalturaErrors::MISSING_OTP
 	 */
-	protected function updateLoginDataImpl( $email , $password = "" , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = null)
+	protected function updateLoginDataImpl( $email , $password = "" , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = false)
 	{
 		KalturaResponseCacher::disableCache();
 

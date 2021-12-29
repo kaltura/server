@@ -384,13 +384,10 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
-	 * Updates a user's login data: email, password, name.
-	 *
+	 * Resets user login password
 	 * @action loginDataResetPassword
-	 *
 	 * @param string $loginDataId The user's current email address that identified the user for login
 	 * @param string $newPassword The user's new password
-	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED

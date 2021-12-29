@@ -102,7 +102,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 	
-	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = null)
+	public static function updateLoginData($oldLoginEmail, $oldPassword, $newLoginEmail = null, $newPassword = null, $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = false)
 	{
 		// if email is null, no need to do any DB queries
 		if (!$oldLoginEmail) {
