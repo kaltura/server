@@ -2,6 +2,7 @@
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	const DEFAULT_MAINTENANCE_DC = -1;
+	const SHOULD_REDIRECT = "should_redirect";
 
 	/**
 	 * @var kLiveStreamConfiguration
@@ -465,14 +466,14 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 	public function setShouldRedirect($v)
 	{
-		$this->shouldRedirect = $v;
-		$this->putInCustomData("shouldRedirect", $v);
+		// sets only the default value in custom data (won't affect "$this->shouldRedirect" which should be changed dynamically)
+		$this->putInCustomData(self::SHOULD_REDIRECT, $v);
 	}
 
 	public function getShouldRedirect()
 	{
 		// if the shouldRedirect changed to true dynamically during the request - it takes priority
-		return $this->shouldRedirect || $this->getFromCustomData("shouldRedirect", null, false);
+		return $this->shouldRedirect || $this->getFromCustomData(self::SHOULD_REDIRECT, null, false);
 	}
 
 }
