@@ -119,7 +119,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		if ($skipOldPasswordValidation && self::isLoginDataAdmin($loginData->getId()))
 		{
-			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+			throw new kUserException('', kUserException::CANNOT_UPDATE_PASSWORD);
 		}
 		
 		// if this is an update request (and not just password reset), check that old password is valid
