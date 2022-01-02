@@ -36,21 +36,21 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 	}
 	
 	/* (non-PHPdoc)
- * @see KalturaObject::toInsertableObject()
- */
+	* @see KalturaObject::toInsertableObject()
+	 * */
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if (is_null($object_to_fill))
+		{
 			$object_to_fill = new VendorDubbingCatalogItem();
+		}
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("sourceLanguage"));
-		$this->validatePropertyNotNull(array("flavorParamsId"));
-		$this->validatePropertyNotNull(array("clearAudioFlavorParamsId"));
+		$this->validatePropertyNotNull(array("sourceLanguage", "flavorParamsId", "clearAudioFlavorParamsId"));
 		
 		$this->validateServiceType();
 		$this->validateFlavorParamsId($this->flavorParamsId);
@@ -72,7 +72,7 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 			$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		}
 		
-		if(isset($this->serviceType) && $this->serviceType!= $sourceObject->getServiceType())
+		if(isset($this->serviceType) && $this->serviceType != $sourceObject->getServiceType())
 		{
 			$this->validateServiceType();
 		}
@@ -84,13 +84,17 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 	{
 		$flavorParams = assetParamsPeer::retrieveByPK($id);
 		if (!$flavorParams)
+		{
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
+		}
 	}
 	
 	protected function validateServiceType()
 	{
 		if($this->serviceType != KalturaVendorServiceType::HUMAN)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_ONLY_HUMAN_ALLOWED);
+		}
 	}
 	
 	/* (non-PHPdoc)

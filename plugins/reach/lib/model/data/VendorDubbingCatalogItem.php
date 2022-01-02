@@ -11,33 +11,10 @@
  * @package plugins.reach
  * @subpackage model
  */
-class VendorDubbingCatalogItem extends VendorCatalogItem
+class VendorDubbingCatalogItem extends VendorAudioCatalogItem
 {
-	const CUSTOM_DATA_FLAVOR_PARAMS_ID = "flavor_params_id";
-	const CUSTOM_DATA_CLEAR_AUDIO_FLAVOR_PARAMS_ID = "clear_audio_flavor_params_id";
-	
 	public function applyDefaultValues()
 	{
 		$this->setServiceFeature(VendorServiceFeature::DUBBING);
-	}
-	
-	public function setFlavorParamsId($flavorParamsId)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_FLAVOR_PARAMS_ID, $flavorParamsId);
-	}
-	
-	public function setClearAudioFlavorParamsId($clearAudioFlavorParamsId)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_CLEAR_AUDIO_FLAVOR_PARAMS_ID, $clearAudioFlavorParamsId);
-	}
-	
-	public function getFlavorParamsId()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FLAVOR_PARAMS_ID);
-	}
-	
-	public function getClearAudioFlavorParamsId()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_CLEAR_AUDIO_FLAVOR_PARAMS_ID);
 	}
 }
