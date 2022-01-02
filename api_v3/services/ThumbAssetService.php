@@ -903,6 +903,12 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
+		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
+		if(myUploadUtils::isFileTypeRestricted($fileData["tmp_name"]) && $fileSize)
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+		
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
 		$dbThumbAsset = new thumbAsset();
@@ -917,7 +923,7 @@ class ThumbAssetService extends KalturaAssetService
 
 		//extract the data before moving the file in case of encryption
 		list($width, $height, $type, $attr) = getimagesize($fileData["tmp_name"]);
-		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
+		
 
 		kFileSyncUtils::moveFromFile($fileData["tmp_name"], $syncKey);
 
