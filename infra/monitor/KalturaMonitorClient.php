@@ -356,7 +356,7 @@ class KalturaMonitorClient
 
 			if ($curFile['error'])
 			{
-				$errorCode = strval($curFile['error']);
+				$errorCode = 'UPLOAD_' . $curFile['error'];
 			}
 		}
 
@@ -676,7 +676,7 @@ class KalturaMonitorClient
 
 		if ($errorCode)
 		{
-			$data[self::FIELD_ERROR_CODE] = $errorCode;
+			$data[self::FIELD_ERROR_CODE] = 'AMQP_' . $errorCode;
 		}
 
 		self::writeDeferredEvent($data);
