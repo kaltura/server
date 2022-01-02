@@ -143,7 +143,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			));
 		}
 		
-		if ($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
+		if (($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION) && ($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING))
 		{
 			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
 			$outputFormat->setLabel('Output Format:');
