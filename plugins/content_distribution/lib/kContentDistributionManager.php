@@ -77,15 +77,13 @@ class kContentDistributionManager
 
 		if($distributionProfile->shouldExcludeAudioFlavors())
 		{
-			$audios = assetPeer::retrieveAudioFlavorsByEntryID($entryDistribution->getEntryId());
-			$audioIds = array();
-			foreach($audios as $audio)
+			$audioFlavorAssets = assetPeer::retrieveAudioFlavorsByEntryID($entryDistribution->getEntryId());
+			$audioAssetIds = array();
+			foreach($audioFlavorAssets as $audioFlavorAsset)
 			{
-				$id = $audio->getId();
-				if (in_array($id, $assetIds))
-					$audioIds[] = $id;
+				$audioAssetIds[] = $audioFlavorAsset->getId();
 			}
-			$assetIds = array_diff($assetIds, $audioIds);
+			$assetIds = array_diff($assetIds, $audioAssetIds);
 		}
 		
 		$assets = assetPeer::retrieveByIds($assetIds);
