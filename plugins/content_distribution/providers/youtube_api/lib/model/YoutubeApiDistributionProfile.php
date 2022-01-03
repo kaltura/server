@@ -346,4 +346,9 @@ class YoutubeApiDistributionProfile extends ConfigurableDistributionProfile
 		$this->setOptionalAssetDistributionRules($ret);
 		$this->save();
 	}
+
+	public function shouldExcludeAudioFlavors()
+	{
+		return true;
+	}
 }

@@ -74,6 +74,19 @@ class kContentDistributionManager
 			$entryDistribution->getThumbAssetIds(),
 			$entryDistribution->getFlavorAssetIds()
 		)));
+
+		if($distributionProfile->shouldExcludeAudioFlavors())
+		{
+			$audios = assetPeer::retrieveAudioFlavorsByEntryID($entryDistribution->getEntryId());
+			$audioIds = array();
+			foreach($audios as $audio)
+			{
+				$id = $audio->getId();
+				if (in_array($id, $assetIds))
+					$audioIds[] = $id;
+			}
+			$assetIds = array_diff($assetIds, $audioIds);
+		}
 		
 		$assets = assetPeer::retrieveByIds($assetIds);
 		$assetObjects = array();
