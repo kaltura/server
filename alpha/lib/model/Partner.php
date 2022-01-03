@@ -635,6 +635,9 @@ class Partner extends BasePartner
 	public function getSupportAnimatedThumbnails()	{		return $this->getFromCustomData( "supportAnimatedThumbnails" , null, false  );	}
 	public function setSupportAnimatedThumbnails( $v )	{		return $this->putInCustomData( "supportAnimatedThumbnails", $v );	}
 	
+	public function getLoadThumbnailsWithKs()	{		return $this->getFromCustomData( 'loadThumbnailsWithKs' , null, false  );	}
+	public function setLoadThumbnailsWithKs( $v )	{		return $this->putInCustomData( 'loadThumbnailsWithKs', $v );	}
+	
 	public function getLandingPage()	{		return $this->getFromCustomData( "landingPage" , null, null  );	}
 	public function setLandingPage( $v )	{		return $this->putInCustomData( "landingPage", $v );	}	
 
