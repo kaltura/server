@@ -6,6 +6,7 @@
 
 ### Deployment
 Add the following to admin.ini:
+```
 moduls.loadThumbnailWithKs.enabled = true
 moduls.loadThumbnailWithKs.permissionType = 2
 moduls.loadThumbnailWithKs.label = Load thumbnail with KS
@@ -13,6 +14,7 @@ moduls.loadThumbnailWithKs.permissionName = FEATURE_LOAD_THUMBNAIL_WITH_KS
 moduls.loadThumbnailWithKs.basePermissionType =
 moduls.loadThumbnailWithKs.basePermissionName =
 moduls.loadThumbnailWithKs.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
 # Quasar-17.17.0
 ## Move V2 player version and studio versions from base.ini to dedicated map ##
