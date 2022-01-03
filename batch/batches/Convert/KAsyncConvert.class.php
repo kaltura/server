@@ -329,6 +329,15 @@ class KAsyncConvert extends KJobHandlerWorker
 				}
 			}
 		}
+		catch (kTemporaryException $e)
+		{
+			if ($e->getCode() === SIGTERM)
+			{
+				$msg = $e->getMessage() . ' ,setting job for RETRY';
+				KalturaLog::debug($msg);
+				$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $e->getCode(), $msg, KalturaBatchJobStatus::RETRY);
+			}
+		}
 		catch (Exception $e)
 		{
 			$data = $this->operationEngine->getData();

@@ -152,8 +152,15 @@ abstract class KJobConversionEngine extends KConversionEngine
 			
 			$this->addToLogFile ( $log_file , $output ) ;
 			
-			if ( $return_value != 0 ) 
+			if ( $return_value != 0 )
+			{
+				if ($return_value === SIGTERM)
+				{
+					throw new kTemporaryException('Got SIGTERM during conversion', 15, 15);
+				}
+				
 				return array ( false , "return value: [$return_value]"  );
+			}
 		}
 		// add media info of target
 		$this->logMediaInfo ( $log_file , $data->destFileSyncLocalPath );

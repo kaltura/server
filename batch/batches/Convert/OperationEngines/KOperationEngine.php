@@ -119,16 +119,25 @@ abstract class KOperationEngine
 	 		 * If operator is defined as 'optional', upon execution failure the operator 
 			 * will copy the source to the output, rather than fail and halt the flavor execution 
 			 */	
-		if($return_value != 0) {
-			if(isset($this->operator) && isset($this->operator->isOptional) && $this->operator->isOptional>0){
+		if($return_value != 0)
+		{
+			if(isset($this->operator) && isset($this->operator->isOptional) && $this->operator->isOptional>0)
+			{
 				$msg = "Operator failed with return value: [$return_value]";
 				if(isset($this->message)) $msg.= ", message :[".$this->message."]"; 
 				$msg.= ".Operator is defined as optional, therefore switching to passthrough mode - copy the source to output.";
 				$this->message = $msg;
 				copy($this->inFilePath, $this->outFilePath);
 			}
-			else 
+			else
+			{
+				if ($return_value === SIGTERM)
+				{
+					throw new kTemporaryException('Got SIGTERM during conversion', 15, 15);
+				}
+				
 				throw new KOperationEngineException("return value: [$return_value]");
+			}
 		}
 		$this->logMediaInfo($this->outFilesPath);
 	}
