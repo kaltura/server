@@ -170,12 +170,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 		else
 		{
 			$rUsedEnd = getrusage(1);
-			$userCpuSec = round(($rUsedEnd['ru_utime.tv_sec'] + floatval($rUsedEnd['ru_utime.tv_usec'] / 1000000))
+			$data->userCpu = round(($rUsedEnd['ru_utime.tv_sec'] + floatval($rUsedEnd['ru_utime.tv_usec'] / 1000000))
 				- ($rUsedStart['ru_utime.tv_sec'] + floatval($rUsedStart['ru_utime.tv_usec'] / 1000000)));
-			if ($userCpuSec)
-			{
-				$data->userCpu = $userCpuSec;
-			}
 		}
 		
 		return array ( true , $error_message );// indicate all was converted properly
