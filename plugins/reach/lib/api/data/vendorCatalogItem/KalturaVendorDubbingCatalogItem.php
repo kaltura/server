@@ -52,7 +52,7 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 	{
 		$this->validatePropertyNotNull(array("sourceLanguage", "flavorParamsId", "clearAudioFlavorParamsId"));
 		
-		$this->validateServiceType();
+//		$this->validateServiceType();
 		$this->validateFlavorParamsId($this->flavorParamsId);
 		$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		
@@ -89,13 +89,13 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 		}
 	}
 	
-	protected function validateServiceType()
-	{
-		if($this->serviceType != KalturaVendorServiceType::HUMAN)
-		{
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_ONLY_HUMAN_ALLOWED);
-		}
-	}
+//	protected function validateServiceType()
+//	{
+//		if($this->serviceType != KalturaVendorServiceType::HUMAN)
+//		{
+//			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_ONLY_HUMAN_ALLOWED);
+//		}
+//	}
 	
 	/* (non-PHPdoc)
  	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
