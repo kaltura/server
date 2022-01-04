@@ -90,10 +90,14 @@ class kHtmlPurifier
 		{
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
-			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, self::DEFAULT_ALLOWED_TAGS);
+			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, array());
 			if ($htmlPurifierConf && isset($htmlPurifierConf[self::ALLOWED_TAGS]))
 			{
 				$config->set('HTML.Allowed', $htmlPurifierConf[self::ALLOWED_TAGS]);
+			}
+			else
+			{
+				$config->set('HTML.Allowed', self::DEFAULT_ALLOWED_TAGS);
 			}
 			self::$purifier = new HTMLPurifier($config);
 			if ( $cacheKey )

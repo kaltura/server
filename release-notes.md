@@ -1,4 +1,14 @@
 # Quasar-17.17.0
+## Html Purifier tags configuration ##
+* Issue Type: Task
+* Issue ID: PLAT-23300
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    allowedTags=img[title|src|alt], ul, li, ol, br
+
+# Quasar-17.17.0
 ## Move V2 player version and studio versions from base.ini to dedicated map ##
 * Issue Type: Task
 * Issue ID: FEC-11387
