@@ -161,11 +161,11 @@ class kOldContentCleaner
 			$criteria->add(FileSyncPeer::UPDATED_AT, 0, Criteria::GREATER_THAN);
 			$criteria->add(FileSyncPeer::DC, kDataCenterMgr::getCurrentDcId());
 			$criteria->add(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_DELETED);
-			$criteria->addSelectColumn('UNIX_TIMESTAMP(MIN(' . FileSyncPeer::UPDATED_AT . '))');
+			$criteria->addSelectColumn('MIN(' . FileSyncPeer::UPDATED_AT . ')');
 			$stmt = FileSyncPeer::doSelectStmt($criteria);
 			$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 			if(count($mins))
-				self::$purgeStartUpdatedAt = reset($mins);
+				self::$purgeStartUpdatedAt = strtotime(reset($mins));
 		}
 		if(is_null(self::$purgeStartUpdatedAt))
 			self::$purgeStartUpdatedAt = 0;
@@ -452,12 +452,12 @@ class kOldContentCleaner
 		else
 		{
 			$nextCriteria->add(FileSyncPeer::UPDATED_AT, self::$purgeStartUpdatedAt, Criteria::GREATER_THAN);
-			$nextCriteria->addSelectColumn('UNIX_TIMESTAMP(MIN(' . FileSyncPeer::UPDATED_AT . '))');
+			$nextCriteria->addSelectColumn('MIN(' . FileSyncPeer::UPDATED_AT . ')');
 			$stmt = FileSyncPeer::doSelectStmt($nextCriteria);
 			$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 			if(count($mins))
 			{
-				$purgeNextStartUpdatedAt = reset($mins);
+				$purgeNextStartUpdatedAt = strtotime(reset($mins));
 				if(!is_null($purgeNextStartUpdatedAt))
 					self::$purgeNextStartUpdatedAt = $purgeNextStartUpdatedAt;
 			}
@@ -502,13 +502,13 @@ class kOldContentCleaner
 		$criteria = new Criteria();
 		$criteria->add(entryPeer::STATUS, array(entryStatus::READY, entryStatus::DELETED), Criteria::NOT_IN);
 		$criteria->add(entryPeer::UPDATED_AT, self::$errObjectsUpdatedAt, Criteria::LESS_THAN);
-		$criteria->addSelectColumn('UNIX_TIMESTAMP(MIN(' . entryPeer::UPDATED_AT . '))');
+		$criteria->addSelectColumn('MIN(' . entryPeer::UPDATED_AT . ')');
 		$stmt = entryPeer::doSelectStmt($criteria);
 		$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		if(!count($mins))
 			return;
 			
-		$errObjectsUpdatedAtStart = reset($mins);
+		$errObjectsUpdatedAtStart = strtotime(reset($mins));
 		if(is_null($errObjectsUpdatedAtStart))
 			return;
 			
@@ -545,13 +545,13 @@ class kOldContentCleaner
 		$criteria = new Criteria();
 		$criteria->add(assetPeer::STATUS, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_DELETED), Criteria::NOT_IN);
 		$criteria->add(assetPeer::UPDATED_AT, self::$errObjectsUpdatedAt, Criteria::LESS_THAN);
-		$criteria->addSelectColumn('UNIX_TIMESTAMP(MIN(' . assetPeer::UPDATED_AT . '))');
+		$criteria->addSelectColumn('MIN(' . assetPeer::UPDATED_AT . ')');
 		$stmt = assetPeer::doSelectStmt($criteria);
 		$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 		if(!count($mins))
 			return;
 			
-		$errObjectsUpdatedAtStart = reset($mins);
+		$errObjectsUpdatedAtStart = strtotime(reset($mins));
 		if(is_null($errObjectsUpdatedAtStart))
 			return;
 			
@@ -721,12 +721,12 @@ class kOldContentCleaner
 			self::$oldVersionsNextStartUpdatedAt[$objectType] = self::$oldVersionsStartUpdatedAt[$objectType];
 			
 			$nextCriteria->add(FileSyncPeer::UPDATED_AT, self::$oldVersionsStartUpdatedAt[$objectType], Criteria::GREATER_THAN);
-			$nextCriteria->addSelectColumn('UNIX_TIMESTAMP(MIN(' . FileSyncPeer::UPDATED_AT . '))');
+			$nextCriteria->addSelectColumn('MIN(' . FileSyncPeer::UPDATED_AT . ')');
 			$stmt = FileSyncPeer::doSelectStmt($nextCriteria);
 			$mins = $stmt->fetchAll(PDO::FETCH_COLUMN);
 			if(count($mins))
 			{
-				$oldVersionsNextStartUpdatedAt = reset($mins);
+				$oldVersionsNextStartUpdatedAt = strtotime(reset($mins));
 				if(!is_null($oldVersionsNextStartUpdatedAt))
 					self::$oldVersionsNextStartUpdatedAt[$objectType] = $oldVersionsNextStartUpdatedAt;
 			}
