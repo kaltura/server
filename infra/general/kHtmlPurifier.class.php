@@ -10,6 +10,7 @@ class kHtmlPurifier
 {
 	const HTML_PURIFIER = 'html_purifier';
 	const ALLOWED_TAGS = 'allowedTags';
+	const DEFAULT_ALLOWED_TAGS = 'img[title|src|alt], ul, li, ol, br';
 	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
@@ -32,8 +33,8 @@ class kHtmlPurifier
 		if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
 			return $modifiedValue;
 		
-		$valueTrimmedSpace = preg_replace('/[ \t]+/', '', $value);
-		$modifiedValueTrimmedSpace = preg_replace('/[ \t]+/', '', $modifiedValue);
+		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
+		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
 		
 		if ($modifiedValueTrimmedSpace != $valueTrimmedSpace)
 		{
@@ -89,8 +90,8 @@ class kHtmlPurifier
 		{
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
-			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG);
-			if (isset($htmlPurifierConf[self::ALLOWED_TAGS]))
+			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, self::DEFAULT_ALLOWED_TAGS);
+			if ($htmlPurifierConf && isset($htmlPurifierConf[self::ALLOWED_TAGS]))
 			{
 				$config->set('HTML.Allowed', $htmlPurifierConf[self::ALLOWED_TAGS]);
 			}
