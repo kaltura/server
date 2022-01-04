@@ -837,4 +837,17 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		
 		return assetPeer::doSelect($c);
 	}
+
+	public static function retrieveNonVideoFlavorsByEntryID($entryId, array $flavorStatuses = array())
+	{
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId);
+		if(count($flavorStatuses))
+		{
+			$c->add(assetPeer::STATUS, $flavorStatuses, Criteria::IN);
+		}
+		$c->add(assetPeer::HEIGHT, 0);
+		$c->add(assetPeer::WIDTH, 0);
+		return assetPeer::doSelect($c);
+	}
 }
