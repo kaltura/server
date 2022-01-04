@@ -325,7 +325,7 @@ class kOldContentCleaner
 		
 		self::finit();
 		
-		KalturaLog::debug('Done, execution time ' . date('H:i:s', time() - $time) . '.');
+		KalturaLog::debug('Done, execution time ' . gmdate('H:i:s', time() - $time) . '.');
 	}
 	
 	/**
