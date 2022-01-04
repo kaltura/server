@@ -40,6 +40,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->zoomClient = $this->initZoomClient($dropFolder);
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
+		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->dropFolder->zoomVendorIntegration->id);
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
 		$dropFolderFilesMap = $this->loadDropFolderFiles(self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 		if ($meetingFilesOrdered)
@@ -63,6 +64,15 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
 		{
+			if($vendorIntegration && $vendorIntegration->getExpiresIn() && $vendorIntegration->getExpiresIn() <= time() -
+				kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
+			{
+				$freshTokens = $this->zoomClient->refreshTokens();
+				if($freshTokens)
+				{
+					$vendorIntegration->saveTokensData($freshTokens);
+				}
+			}
 			$this->handleExistingDropFolderFile($dropFolderFile);
 		}
 	}
