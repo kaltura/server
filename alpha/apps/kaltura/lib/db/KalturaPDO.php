@@ -54,7 +54,16 @@ class KalturaPDO extends PropelPDO
 					
 		$connStart = microtime(true);
 
-		parent::__construct($dsn, $username, $password, $driver_options);
+		try
+		{
+			parent::__construct($dsn, $username, $password, $driver_options);
+		}
+		catch (PDOException $e)
+		{
+			$connTook = microtime(true) - $connStart;
+			KalturaMonitorClient::monitorConnTook($dsn, $connTook, 'PDO_' . $e->getCode());
+			throw $e;
+		}
 
 		$connTook = microtime(true) - $connStart;
 		

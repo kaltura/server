@@ -384,6 +384,43 @@ class UserService extends KalturaBaseUserService
 	}
 	
 	/**
+	 * Resets user login password
+	 * @action loginDataResetPassword
+	 * @param string $loginDataId The user's current email address that identified the user for login
+	 * @param string $newPassword The user's new password
+	 * @throws KalturaErrors::INVALID_FIELD_VALUE
+	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
+	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
+	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws APIErrors::LOGIN_RETRIES_EXCEEDED
+	 * @throws APIErrors::LOGIN_BLOCKED
+	 */
+	public function loginDataResetPasswordAction($loginDataId, $newPassword)
+	{
+		self::validateLoginDataParams(array('id' => $loginDataId));
+		
+		try
+		{
+			$updateLoginData = parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
+		}
+		catch(KalturaAPIException $e)
+		{
+			$error = $e->getCode().';;'.$e->getMessage();
+			if ($error == KalturaErrors::LOGIN_DATA_NOT_FOUND ||
+				$error == KalturaErrors::USER_WRONG_PASSWORD ||
+				$error == KalturaErrors::WRONG_OLD_PASSWORD ||
+				$error == KalturaErrors::INVALID_OTP ||
+				$error == KalturaErrors::MISSING_OTP)
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
+			}
+			throw $e;
+		}
+		return $updateLoginData;
+	}
+	
+	/**
 	 * Reset user's password and send the user an email to generate a new one.
 	 * 
 	 * @action resetPassword

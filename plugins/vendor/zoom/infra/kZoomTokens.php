@@ -19,17 +19,7 @@ class kZoomTokens
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
 	}
-	
-	public function generateAccessToken($refreshToken)
-	{
-		KalturaLog::debug('Refreshing access token from token ' . $refreshToken);
-		$postFields = "grant_type=refresh_token&refresh_token=$refreshToken";
-		$response = $this->curlRetrieveTokensData($postFields);
-		$tokensData = $this->parseTokensResponse($response);
-		KalturaLog::debug('New tokens response' . print_r($tokensData, true));
-		return $tokensData[self::ACCESS_TOKEN];
-	}
-	
+
 	public function refreshTokens($oldRefreshToken)
 	{
 		KalturaLog::info('Refreshing Zoom Tokens');
