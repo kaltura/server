@@ -380,10 +380,9 @@ class myPackagerUtils
 					continue;
 				}
 
-				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$liveParam->getFlavorId()}");
-				if($result)
+				if (self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$liveParam->getFlavorId()}"))
 				{
-					return $result;
+					return true;
 				}
 			}
 		}
