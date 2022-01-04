@@ -1,4 +1,4 @@
-# Quasar-17.17.0
+# Quasar-17.18.0
 ## Html Purifier tags configuration ##
 * Issue Type: Task
 * Issue ID: PLAT-23300
@@ -6,6 +6,7 @@
 ### Configuration ###
 Add/Update a configuration map called 'runtime_config' with following config:
 
+    [html_purifier]
     allowedTags=img[title|src|alt], ul, li, ol, br
 
 # Quasar-17.17.0

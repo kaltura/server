@@ -10,7 +10,6 @@ class kHtmlPurifier
 {
 	const HTML_PURIFIER = 'html_purifier';
 	const ALLOWED_TAGS = 'allowedTags';
-	const DEFAULT_ALLOWED_TAGS = 'img[title|src|alt], ul, li, ol, br';
 	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
@@ -94,10 +93,6 @@ class kHtmlPurifier
 			if ($htmlPurifierConf && isset($htmlPurifierConf[self::ALLOWED_TAGS]))
 			{
 				$config->set('HTML.Allowed', $htmlPurifierConf[self::ALLOWED_TAGS]);
-			}
-			else
-			{
-				$config->set('HTML.Allowed', self::DEFAULT_ALLOWED_TAGS);
 			}
 			self::$purifier = new HTMLPurifier($config);
 			if ( $cacheKey )
