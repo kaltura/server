@@ -838,7 +838,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		return assetPeer::doSelect($c);
 	}
 
-	public static function retrieveNonVideoFlavorsByEntryID($entryId, array $flavorStatuses = array())
+	public static function retrieveAudioFlavorsByEntryIdAndDimensions($entryId, array $flavorStatuses = array())
 	{
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId);
