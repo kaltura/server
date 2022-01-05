@@ -77,9 +77,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 
 	protected function refreshZoomClientTokens()
 	{
+		KalturaLog::debug("Going to refresh Zoom tokens");
 		try
 		{
-			$this->dropFolder = $this->dropFolderService->getAction($this->dropFolder->id);
+			$this->dropFolder = $this->dropFolderService->get($this->dropFolder->id);
 		}
 		catch (Exception $e)
 		{
