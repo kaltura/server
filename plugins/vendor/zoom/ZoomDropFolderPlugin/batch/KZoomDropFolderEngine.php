@@ -8,6 +8,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const MAX_DATE_RANGE_DAYS = 14;
 	const ONE_DAY = 86400;
 	const HOUR = 3600;
+	const ONE_MINUTE = 600;
 	const MAX_PAGE_SIZE = 300;
 	const MEETINGS = 'meetings';
 	const RECORDING_FILES = 'recording_files';
@@ -63,8 +64,30 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
 		{
+			if($this->zoomClient->getAccessExpiresIn() && $this->zoomClient->getAccessExpiresIn() <= time() + self::ONE_MINUTE)
+			{
+				if(!$this->refreshZoomClientTokens())
+				{
+					return;
+				}
+			}
 			$this->handleExistingDropFolderFile($dropFolderFile);
 		}
+	}
+
+	protected function refreshZoomClientTokens()
+	{
+		try
+		{
+			$this->dropFolder = $this->dropFolderService->getAction($this->dropFolder->id);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err("Error handling drop folder Id [" . $this->dropFolder->id . "] - could not refresh access token " . $e->getMessage());
+			return false;
+		}
+		$this->zoomClient = $this->initZoomClient($this->dropFolder);
+		return true;
 	}
 
 	protected function getLastHandledMeetingTime($meetingFilesOrdered)
@@ -84,7 +107,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
 		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
 		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
-		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
+		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
+		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 	
 	protected function getMeetingsInStartTimeOrder()
