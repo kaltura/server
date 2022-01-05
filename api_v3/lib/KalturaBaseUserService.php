@@ -116,6 +116,10 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(APIErrors::CANNOT_UPDATE_LOGIN_DATA);
 			}
+			else if ($code == kUserException::CANNOT_UPDATE_PASSWORD)
+			{
+				throw new KalturaAPIException(APIErrors::CANNOT_UPDATE_ADMIN_LOGIN_DATA);
+			}
 			throw $e;			
 		}
 	}
