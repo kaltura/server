@@ -74,6 +74,8 @@ class kCoreException extends Exception
 	
 	const INVALID_USER_ID = "INVALID_USER_ID";
 	
+	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE";
+	
 	const INVALID_ENTRY_ID = "INVALID_ENTRY_ID";
 	
 	const SEARCH_TOO_GENERAL = "SEARCH_TOO_GENERAL";

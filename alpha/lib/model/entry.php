@@ -1846,7 +1846,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setRootEntryId($v)	{	$this->putInCustomData("rootEntryId", $v); }
 	
-	public function setParentEntryId($v)	{ $this->putInCustomData("parentEntryId", $v); }
+	public function setParentEntryId($v)
+	{
+		$parentEntry = entryPeer::retrieveByPK($v);
+		if (!$this->hasCycle($parentEntry))
+		{
+			$this->putInCustomData("parentEntryId", $v);
+		}
+		else
+		{
+			throw new kCoreException('Parentage has cycle', kCoreException::CYCLE_IN_PARENTAGE);
+		}
+	}
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
 
 	public function setSourceEntryId($v)	{ $this->putInCustomData("sourceEntryId", $v); }
@@ -1882,6 +1893,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$parentEntry = entryPeer::retrieveByPK($this->getParentEntryId());
 		
 		return $parentEntry;
+	}
+	
+	protected function hasCycle(entry $entry, $ancestry = array())
+	{
+		$parentEntryId = $entry->getParentEntryId();
+		if (!$parentEntryId)
+		{
+			return false;
+		}
+		if (in_array($parentEntryId, $ancestry))
+		{
+			return true;
+		}
+		array_push($ancestry, $entry->getId());
+		return $this->hasCycle($entry->getParentEntry(), $ancestry);
 	}
 	
 	public function getSecurityParentId()

@@ -550,6 +550,10 @@ class KalturaFrontController
 				case kCoreException::DRUID_QUERY_TIMED_OUT:
 					$object = new KalturaAPIException(KalturaErrors::DRUID_QUERY_TIMED_OUT);
 					break;
+				
+				case kCoreException::CYCLE_IN_PARENTAGE:
+					$object = new KalturaAPIException(KalturaErrors::CYCLE_IN_PARENTAGE);
+					break;
 			}
 		}
 		else if ($ex instanceof PropelException)
