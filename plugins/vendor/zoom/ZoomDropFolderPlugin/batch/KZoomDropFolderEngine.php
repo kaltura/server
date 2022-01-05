@@ -84,8 +84,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
 		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
 		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
-		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
-		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
+		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
 	}
 	
 	protected function getMeetingsInStartTimeOrder()
