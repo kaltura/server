@@ -33,7 +33,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$this->zoomBaseUrl = $zoomBaseUrl;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
 		parent::__construct($zoomBaseUrl, $this->zoomIntegration->getJwtToken(), $this->zoomIntegration->getRefreshToken(), null, null,
-		                    $this->zoomIntegration->getAccessToken(), $this->zoomIntegration->getExpiresIn());
+		                    $this->zoomIntegration->getAccessToken());
 	}
 
 	/**
@@ -88,8 +88,8 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 			if (isset($recordingFilesPerTimeSlot[kRecordingFileType::CHAT]))
 			{
-				$chatFilesProcessor = new kZoomChatFilesProcessor($this->zoomBaseUrl, $this->zoomIntegration->getJwtToken(), $this->zoomIntegration->getRefreshToken(),
-                                                            null, null, $this->zoomIntegration->getAccessToken(), $this->zoomIntegration->getExpiresIn());
+				$chatFilesProcessor = new kZoomChatFilesProcessor($this->zoomBaseUrl, $this->zoomIntegration->getJwtToken(),
+				                                                  $this->zoomIntegration->getRefreshToken(), null, null, $this->zoomIntegration->getAccessToken());
 
 				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
 				{

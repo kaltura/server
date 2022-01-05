@@ -85,7 +85,7 @@ class kZoomEventHanlder
 					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL],
 					                                                    $zoomVendorIntegration->getJwtToken(),
 					                                                    $zoomVendorIntegration->getRefreshToken(),
-					                                                    null, null, $zoomVendorIntegration->getAccessToken(), $zoomVendorIntegration->getExpiresIn());
+					                                                    null, null, $zoomVendorIntegration->getAccessToken());
 					$transcriptProcessor->handleRecordingTranscriptComplete($event);
 				}
 				break;
@@ -97,12 +97,11 @@ class kZoomEventHanlder
 		$jwtToken = $zoomVendorIntegration->getJwtToken();
 		$refreshToken = $zoomVendorIntegration->getRefreshToken();
 		$accessToken = $zoomVendorIntegration->getAccessToken();
-		$accessExpiresIn = $zoomVendorIntegration->getExpiresIn();
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$clientSecret = $zoomConfiguration['clientSecret'];
-		return new kZoomClient($zoomBaseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
+		return new kZoomClient($zoomBaseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
 	}
 	
 	
