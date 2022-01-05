@@ -638,8 +638,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$requestedPartner = PartnerPeer::retrieveActiveByPK(self::$requestedPartnerId);
 			if (!$requestedPartner)
 			{
-				KalturaLog::crit('Unknown partner id ['.self::$requestedPartnerId.']');
-				throw new kCoreException("Unknown partner Id [" . self::$requestedPartnerId ."]", kCoreException::PARTNER_BLOCKED);
+                $requestedPartner = PartnerPeer::retrieveReadOnlyByPK(self::$requestedPartnerId);
+                if (!$requestedPartner)
+                {
+                    KalturaLog::crit('Unknown partner id [' . self::$requestedPartnerId . ']');
+                    throw new kCoreException("Unknown partner Id [" . self::$requestedPartnerId . "]", kCoreException::PARTNER_BLOCKED);
+                }
 			}
 		}
 		
