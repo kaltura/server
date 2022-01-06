@@ -59,6 +59,12 @@ class kmcngAction extends kalturaAction
 			KalturaLog::warning("Couldn't locate kmcng path: $path");
 			return sfView::ERROR;
 		}
+		
+		if (isset($kmcngParams['kmcng_content_security_policy']))
+		{
+			KalturaLog::info("Added kmcng_content_security_policy header - Content-Security-Policy: " . $kmcngParams['kmcng_content_security_policy']);
+			header("Content-Security-Policy: " . $kmcngParams['kmcng_content_security_policy']);
+		}
 
 		$config = $this->initConfig($deployUrl, $kmcngParams, $enforceSecureProtocol, $requestSecureProtocol);
 		$config = json_encode($config);
