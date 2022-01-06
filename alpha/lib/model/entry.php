@@ -1880,8 +1880,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		
 		$parentEntry = entryPeer::retrieveByPK($this->getParentEntryId());
-		
 		return $parentEntry;
+	}
+	
+	public function getSourceEntry()
+	{
+		if (!$this->getSourceEntryId())
+		{
+			KalturaLog::info("Attempting to get source entry of entry " . $this->getId() . " but source does not exist, returning original entry");
+			return $this;
+		}
+		
+		$sourceEntry = entryPeer::retrieveByPK($this->getSourceEntryId());
+		return $sourceEntry;
 	}
 	
 	public function getSecurityParentId()
