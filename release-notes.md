@@ -1,3 +1,38 @@
+# Quasar-17.18.0
+## Html Purifier tags configuration ##
+* Issue Type: Task
+* Issue ID: PLAT-23300
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [html_purifier]
+    allowedTags=img[title|src|alt], ul, li, ol, br
+
+## New Login Data Update Action Added To The User Service
+* Issue Type: Task
+* Issue ID: PLAT-23303
+### Deployment Scripts
+```
+php deployment/updates/scripts/add_permissions/2021_12_23_login_data_password_update.php
+```
+
+## Add the feature "Load thumbnail with KS"
+* Issue Type: Task
+* Issue ID: SUP-30407
+
+### Deployment
+Add the following to admin.ini:
+```
+moduls.loadThumbnailWithKs.enabled = true
+moduls.loadThumbnailWithKs.permissionType = 2
+moduls.loadThumbnailWithKs.label = Load thumbnail with KS
+moduls.loadThumbnailWithKs.permissionName = FEATURE_LOAD_THUMBNAIL_WITH_KS
+moduls.loadThumbnailWithKs.basePermissionType =
+moduls.loadThumbnailWithKs.basePermissionName =
+moduls.loadThumbnailWithKs.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Quasar-17.17.0
 ## Move V2 player version and studio versions from base.ini to dedicated map ##
 * Issue Type: Task

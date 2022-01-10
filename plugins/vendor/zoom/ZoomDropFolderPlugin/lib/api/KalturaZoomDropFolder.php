@@ -19,7 +19,12 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	 * @readonly
 	 */
 	public $accessToken;
-	
+
+	/**
+	 * @readonly
+	 */
+	public $accessExpiresIn;
+
 	/**
 	 * @readonly
 	 */
@@ -88,6 +93,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
 				$this -> accessToken = $vendorIntegration -> getAccessToken();
 				$this -> description = $vendorIntegration->getZoomAccountDescription();
+				$this -> accessExpiresIn = $vendorIntegration->getExpiresIn();
 				$zoomClient = new kZoomClient($this -> baseURL, $this -> jwtToken, $this -> refreshToken, $this -> clientId,
 				                              $this -> clientSecret, $this -> accessToken);
 				
@@ -101,6 +107,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 					{
 						$this -> accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
 						$this -> refreshToken = $freshTokens[kZoomTokens::REFRESH_TOKEN];
+						$this -> accessExpiresIn = $freshTokens[kZoomTokens::EXPIRES_IN];
 						$vendorIntegration -> saveTokensData($freshTokens);
 					}
 				}

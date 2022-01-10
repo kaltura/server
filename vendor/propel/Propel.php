@@ -645,18 +645,22 @@ class Propel
 				{
 					KalturaLog::Log("failed to connect [$i] [$timeTook] $dsn");
 				}
+
+				KalturaMonitorClient::monitorConnTook($dsn, $timeTook, 'PDO_' . $e->getCode());
+
 				if ($i == $count || $timeTook < 1)
 					throw new PropelException("Unable to open PDO connection dsn[$dsn] user[$user] password[$password]", $e);
 			}
 		}
 		
-		$totalConnTook = microtime(true) - $connStartTime;
+		$connEndTime = microtime(true);
+		$totalConnTook = $connEndTime - $connStartTime;
 
 		if (class_exists("KalturaLog"))
 			KalturaLog::Log("total conn took $totalConnTook $dsn");
 
 		if (class_exists("KalturaMonitorClient"))
-			KalturaMonitorClient::monitorConnTook($dsn, $totalConnTook);
+			KalturaMonitorClient::monitorConnTook($dsn, $connEndTime - $startTime);
 		
 		// load any connection options from the config file
 		// connection attributes are those PDO flags that have to be set on the initialized connection

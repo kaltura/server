@@ -10,12 +10,15 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	
 	protected $dropFolderFileService;
 
+	protected $dropFolderService;
+
 	private $maximumExecutionTime = null;
 	
 	public function __construct ()
 	{
 		$this->dropFolderPlugin = KalturaDropFolderClientPlugin::get(KBatchBase::$kClient);
 		$this->dropFolderFileService = $this->dropFolderPlugin->dropFolderFile;
+		$this->dropFolderService = $this->dropFolderPlugin->dropFolder;
 	}
 	
 	public static function getInstance ($dropFolderType)

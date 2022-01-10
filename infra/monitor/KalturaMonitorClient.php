@@ -326,8 +326,12 @@ class KalturaMonitorClient
 		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_API_END,
 			self::FIELD_EXECUTION_TIME	=> self::getApiExecTime(),
-			self::FIELD_ERROR_CODE		=> strval($errorCode),
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = strval($errorCode);
+		}
 
 		self::writeEvent($data);
 	}
@@ -352,7 +356,7 @@ class KalturaMonitorClient
 
 			if ($curFile['error'])
 			{
-				$errorCode = strval($curFile['error']);
+				$errorCode = 'UPLOAD_' . $curFile['error'];
 			}
 		}
 
@@ -362,8 +366,12 @@ class KalturaMonitorClient
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_UPLOAD,
 			self::FIELD_FILE_SIZE		=> $size,
 			self::FIELD_EXECUTION_TIME	=> self::$lastTime - $requestTime,
-			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 
 		self::writeDeferredEvent($data);
 	}
@@ -456,7 +464,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName = null)
+	public static function monitorElasticAccess($actionName, $indexName, $body, $queryTook, $hostName, $errorCode)
 	{
 		if (!self::$stream)
 			return;
@@ -469,6 +477,11 @@ class KalturaMonitorClient
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_LENGTH			=> strlen($body),
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 
 		self::writeDeferredEvent($data);
 	}
@@ -485,8 +498,12 @@ class KalturaMonitorClient
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_LENGTH			=> $querySize,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
-			self::FIELD_ERROR_CODE		=> $errorCode,
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 
 		self::writeDeferredEvent($data);
 	}
@@ -508,7 +525,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorConnTook($dsn, $connTook, $count=1)
+	public static function monitorConnTook($dsn, $connTook, $count=1, $errorCode='')
 	{
 		if (!self::$stream)
 			return;
@@ -519,11 +536,16 @@ class KalturaMonitorClient
 				self::FIELD_EXECUTION_TIME	=> $connTook,
 				self::FIELD_COUNT			=> $count,
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 		
 		self::writeDeferredEvent($data);		
 	}
 
-	public static function monitorMemcacheAccess($hostName, $timeTook, $count)
+	public static function monitorMemcacheAccess($hostName, $timeTook, $count, $errorCode)
 	{
 		if (!self::$stream)
 			return;
@@ -535,10 +557,15 @@ class KalturaMonitorClient
 				self::FIELD_COUNT			=> $count,
 		));
 
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
+
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorCurl($hostName, $timeTook)
+	public static function monitorCurl($hostName, $timeTook, $curlHandle=null)
 	{
 		if (!self::$stream)
 			return;
@@ -549,10 +576,24 @@ class KalturaMonitorClient
 				self::FIELD_EXECUTION_TIME	=> $timeTook,
 		));
 
+		if ($curlHandle)
+		{
+			$errno = curl_errno($curlHandle);
+			$httpCode = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
+			if ($errno)
+			{
+				$data[self::FIELD_ERROR_CODE] = 'CURL_' . $errno;
+			}
+			else if ($httpCode < 200 || $httpCode >= 300)
+			{
+				$data[self::FIELD_ERROR_CODE] = 'HTTP_' . $httpCode;
+			}
+		}
+
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorFileSystemAccess($operation, $timeTook, $execStatus)
+	public static function monitorFileSystemAccess($operation, $timeTook, $errorCode)
 	{
 		if (!self::$stream)
 			return;
@@ -561,9 +602,13 @@ class KalturaMonitorClient
 			self::FIELD_EVENT_TYPE 		=> self::EVENT_FILE_SYSTEM,
 			self::FIELD_EXECUTION_TIME	=> $timeTook,
 			self::FIELD_QUERY_TYPE		=> $operation,
-			self::FIELD_ERROR_CODE 		=> $execStatus,
 		));
-		
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
+
 		self::writeDeferredEvent($data);
 	}
 	
@@ -615,7 +660,7 @@ class KalturaMonitorClient
 		self::writeEvent($data);
 	}
 
-	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorType = '')
+	public static function monitorRabbitAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorCode = '')
 	{
 		if (!self::$stream)
 			return;
@@ -627,8 +672,12 @@ class KalturaMonitorClient
 			self::FIELD_QUERY_TYPE		=> $queryType,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
 			self::FIELD_LENGTH			=> $querySize ? $querySize : 0,
-			self::FIELD_ERROR_CODE		=> $errorType,
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = 'AMQP_' . $errorCode;
+		}
 
 		self::writeDeferredEvent($data);
 	}
@@ -649,7 +698,7 @@ class KalturaMonitorClient
 		self::$sleepCount++;
 	}
 
-	public static function monitorExec($command, $startTime)
+	public static function monitorExec($command, $startTime, $errorCode='')
 	{
 		if (!self::$stream)
 			return;
@@ -668,6 +717,11 @@ class KalturaMonitorClient
 			self::FIELD_COMMAND			=> $command,
 			self::FIELD_EXECUTION_TIME	=> microtime(true) - $startTime,
 		));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 
 		self::writeDeferredEvent($data);
 	}

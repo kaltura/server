@@ -10,10 +10,16 @@ class KalturaDeliveryProfileLivePackager extends KalturaDeliveryProfile {
 	 * @var string
 	 */
 	public $livePackagerSigningDomain;
+
+	/**
+	 * @var bool
+	 */
+	public $shouldRedirect;
 	
 	private static $map_between_objects = array
 	(
 		"livePackagerSigningDomain",
+		"shouldRedirect"
 	);
 	
 	public function getMapBetweenObjects ( )

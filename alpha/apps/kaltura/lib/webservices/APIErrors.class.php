@@ -405,6 +405,8 @@ class APIErrors
 	const USER_ALREADY_EXISTS = "USER_ALREADY_EXISTS;;User already exists";
 	
 	const CANNOT_UPDATE_LOGIN_DATA = "CANNOT_UPDATE_LOGIN_DATA;;Login data cannot be updated by this action";
+	
+	const CANNOT_UPDATE_ADMIN_LOGIN_DATA = "CANNOT_UPDATE_ADMIN_LOGIN_DATA;;Login data cannot be updated by this action";
 
 	const LOGIN_ID_ALREADY_USED = "LOGIN_ID_ALREADY_USED;;Same login id is already in use";
 	
