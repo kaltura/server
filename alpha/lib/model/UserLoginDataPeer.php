@@ -527,7 +527,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
 
-
 	// user login by user_login_data object
 	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
@@ -642,7 +641,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setLoginAttempts(0);
 		$loginData->save();
 		$passUpdatedAt = $loginData->getPasswordUpdatedAt(null);
-		if ($passUpdatedAt && (time() > $passUpdatedAt + $loginData->getPassReplaceFreq())) {
+		if ($passUpdatedAt && (time() > $passUpdatedAt + $loginData->getPassReplaceFreq()))
+		{
 			throw new kUserException('', kUserException::PASSWORD_EXPIRED);
 		}
 
@@ -651,11 +651,11 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$kuser = kuserPeer::getByLoginDataAndPartner($loginData -> getId(), $partnerId);
 		}
 		
-		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+		if (!$kuser || $kuser->getStatus() != KuserStatus::ACTIVE || !$partner || !$partner->isAllowedLogin())
 		{
 			// if a specific partner was requested - throw error
 			if ($requestedPartner) {
-				if ($partner && $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE) {
+				if ($partner && !$partner->isAllowedLogin()) {
 					throw new kUserException('Partner is blocked', kUserException::USER_IS_BLOCKED);
 				}
 				else if ($kuser && $kuser->getStatus() == KuserStatus::BLOCKED) {
@@ -665,7 +665,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 					throw new kUserException('', kUserException::USER_NOT_FOUND);
 				}
 			}
-			
+
 			// if kuser was found, keep status for following exception message
 			$kuserStatus = $kuser ? $kuser->getStatus() : null;
 			
@@ -739,7 +739,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$c->addAscendingOrderByColumn(kuserPeer::PARTNER_ID);
 		
 		$kusers = kuserPeer::doSelect($c);
-						
+
 		foreach ($kusers as $kuser)
 		{
 			if ($kuser->getStatus() != KuserStatus::ACTIVE)
@@ -747,7 +747,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 				continue;
 			}
 			$partner = PartnerPeer::retrieveByPK($kuser->getPartnerId());
-			if (!$partner || $partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+			if (!$partner || !$partner->isAllowedLogin())
 			{
 				continue;
 			}
