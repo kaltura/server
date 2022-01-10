@@ -53,6 +53,7 @@ class kmcngAction extends kalturaAction
 		$deployUrl = "/apps/kmcng/$kmcngVersion/";
 
 		$path = $basePath . "index.html";
+	
 		$content = file_get_contents($path);
 		if ($content === false)
 		{
@@ -62,7 +63,6 @@ class kmcngAction extends kalturaAction
 		
 		if (isset($kmcngParams['kmcng_content_security_policy']))
 		{
-			KalturaLog::info("Added kmcng_content_security_policy header - Content-Security-Policy: " . $kmcngParams['kmcng_content_security_policy']);
 			header("Content-Security-Policy: " . $kmcngParams['kmcng_content_security_policy']);
 		}
 
