@@ -195,6 +195,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_VPAAS_REPORTS_CLASS = 'kKavaVpaasReports';
 	const KAVA_QOE_REPORTS_CLASS = 'kKavaQoeReports';
 	const KAVA_WEBCAST_REPORTS_CLASS = 'kKavaWebcastReports';
+	const KAVA_VE_REGISTRATION_CLASS = 'kKavaVeRegistrationReports';
 
 	/// report settings
 	// report settings - common
@@ -354,6 +355,12 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
 		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
 		self::EVENT_TYPE_REACTION_CLICKED,
+		self::EVENT_TYPE_VE_REGISTERED,
+		self::EVENT_TYPE_VE_CONFIRMED,
+		self::EVENT_TYPE_VE_ATTENDED,
+		self::EVENT_TYPE_VE_PARTICIPATED,
+		self::EVENT_TYPE_VE_BLOCKED,
+		self::EVENT_TYPE_VE_UNREGISTERED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -598,6 +605,7 @@ class kKavaReportsMgr extends kKavaBase
 		2 => self::KAVA_VPAAS_REPORTS_CLASS,
 		3 => self::KAVA_QOE_REPORTS_CLASS,
 		4 => self::KAVA_WEBCAST_REPORTS_CLASS,
+		5 => self::KAVA_VE_REGISTRATION_CLASS,
 	);
 	
 	protected static $aggregations_def = array();

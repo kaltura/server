@@ -16,6 +16,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
 	const DATASOURCE_REACH_USAGE = 'reach-usage';
 	const DATASOURCE_API_USAGE = 'api-usage';
+	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -71,6 +72,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_PARTNER_CRM_ID = 'partnerCrmId';
 	const DIMENSION_PLAYLIST_ID = 'playlistId';
 	const DIMENSION_VIRTUAL_EVENT_ID = 'virtualEventId';
+	const DIMENSION_INDUSTRY = 'industry';
+	const DIMENSION_ROLE = 'role';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -131,6 +134,14 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_PHYSICAL_DELETE = 'physicalDelete';
 	const EVENT_TYPE_LOGICAL_ADD = 'logicalAdd'; 
 	const EVENT_TYPE_LOGICAL_DELETE = 'logicalDelete';
+
+	// event types - virtual event registration
+	const EVENT_TYPE_VE_REGISTERED = 'Registered';
+	const EVENT_TYPE_VE_CONFIRMED = 'Confirmed';
+	const EVENT_TYPE_VE_ATTENDED = 'Attended';
+	const EVENT_TYPE_VE_PARTICIPATED = 'Participated';
+	const EVENT_TYPE_VE_BLOCKED = 'Blocked';
+	const EVENT_TYPE_VE_UNREGISTERED = 'Unregistered';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -375,6 +386,19 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+		),
+		self::DATASOURCE_VE_REGISTRATION => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
 		),
 	);
 
