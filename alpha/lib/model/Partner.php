@@ -2334,7 +2334,7 @@ class Partner extends BasePartner
 
 	public function isAllowedLogin()
 	{
-		return in_array($this->status,array(Partner::PARTNER_STATUS_ACTIVE,Partner::PARTNER_STATUS_READ_ONLY));
+		return in_array($this->status, array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
 	}
 }
 
