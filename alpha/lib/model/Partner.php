@@ -2331,5 +2331,10 @@ class Partner extends BasePartner
 
 	public function getIsSelfServe() { return $this->getFromCustomData(self::IS_SELF_SERVE, null, false); }
 	public function setIsSelfServe( $v ) { $this->putInCustomData(self::IS_SELF_SERVE, $v); }
+
+	public function isAllowedLogin()
+	{
+		return in_array($this->status, array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
+	}
 }
 
