@@ -1854,8 +1854,15 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
         	if (self::isSourceLive($originSourceType))
 	            return $partner->getDefaultConversionProfileId();
-
-        	return $sourceEntry->getConversionProfileId();
+		
+			$conversionProfileId = $sourceEntry->getConversionProfileId();
+			$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionProfileId);
+			if (!$conversionProfile)
+			{
+				KalturaLog::log("Cannot find conversion profile ID: [$conversionProfileId] - deleted? will return partner default");
+				$conversionProfileId = $partner->getDefaultConversionProfileId();
+			}
+			return $conversionProfileId;
 	}
 
  	/*
