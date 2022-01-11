@@ -136,12 +136,12 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_LOGICAL_DELETE = 'logicalDelete';
 
 	// event types - virtual event registration
-	const EVENT_TYPE_VE_REGISTERED = 'Registered';
-	const EVENT_TYPE_VE_CONFIRMED = 'Confirmed';
-	const EVENT_TYPE_VE_ATTENDED = 'Attended';
-	const EVENT_TYPE_VE_PARTICIPATED = 'Participated';
-	const EVENT_TYPE_VE_BLOCKED = 'Blocked';
-	const EVENT_TYPE_VE_UNREGISTERED = 'Unregistered';
+	const EVENT_TYPE_VE_REGISTERED = 'registered';
+	const EVENT_TYPE_VE_CONFIRMED = 'confirmed';
+	const EVENT_TYPE_VE_ATTENDED = 'attended';
+	const EVENT_TYPE_VE_PARTICIPATED = 'participated';
+	const EVENT_TYPE_VE_BLOCKED = 'blocked';
+	const EVENT_TYPE_VE_UNREGISTERED = 'unregistered';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
