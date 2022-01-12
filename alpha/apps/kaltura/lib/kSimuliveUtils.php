@@ -60,6 +60,15 @@ class kSimuliveUtils
 		}
 		$endTime = $startTime + array_sum($durations);
 
+		if (self::shouldLiveInterrupt($entry, $currentEvent))
+		{
+			// we need to add margin to broadcastStartTime as it's in the past and the player may already requested segments after this time
+			$broadcastStartTimeMs = $entry->getCurrentBroadcastStartTime() * self::SECOND_IN_MILLISECONDS + self::MINIMUM_TIME_TO_PLAYABLE_SEC * self::SECOND_IN_MILLISECONDS;
+			$durations = self::recalculateDurations($durations, $startTime, $broadcastStartTimeMs);
+			// endTime null will cause staled manifest and trigger "playManifest" by the player
+			$endTime = null;
+		}
+
 		// creating the flavorAssets array (array of arrays s.t each array contain the flavor assets of all the entries exist)
 		$flavorAssets = array();
 		$flavorAssets = self::mergeAssetArrays($flavorAssets, $preStartFlavorAssets);
@@ -263,5 +272,50 @@ class kSimuliveUtils
 			$durationMs -= $durationFrac;
 		}
 		return $durationMs;
+	}
+
+	/**
+	 * checking whether we currently inside "interruptible" window of the event and if a "real" live stream is streaming to the entry right now.
+	 * if so - the event should be interrupted by the "real" live 
+	 * @param LiveEntry $entry
+	 * @param ILiveStreamScheduleEvent $event
+	 * @return bool
+	 */
+	public static function shouldLiveInterrupt (LiveEntry $entry, ILiveStreamScheduleEvent $event)
+	{
+		if ($event->isInterruptibleNow())
+		{
+			return $entry->getInternalLiveStatus() === EntryServerNodeStatus::PLAYABLE;
+		}
+		return false;
+	}
+
+	/**
+	 * getting the durations array, event start time and the "real" live start time (epoch sec).
+	 * creating and returning new durations array s.t the duration element that overlaps with "startLive" time will be shorten
+	 * to duration that ending at "startLive", and all the other durations after will get duration of "1" (as 0 isn't valid value for packager)
+	 *
+	 * @param array $durations
+	 * @param int $startDate
+	 * @param int $startLive
+	 * @return array
+	 */
+	public static function recalculateDurations($durations, $startDate, $startLive)
+	{
+		$newDurations = [];
+		$accumulated = 0;
+		for ($i = 0; $i < count($durations); $i++)
+		{
+			$accumulated += $durations[$i];
+			if ($startDate + $accumulated >= $startLive)
+			{
+				$newDurations[] = max($durations[$i] - ($startDate + $accumulated - $startLive), 1); // 1 as 0 is not valid for the packager
+			}
+			else
+			{
+				$newDurations[] = $durations[$i];
+			}
+		}
+		return $newDurations;
 	}
 }

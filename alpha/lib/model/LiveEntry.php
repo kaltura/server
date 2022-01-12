@@ -653,7 +653,7 @@ abstract class LiveEntry extends entry
 	}
 	
 	
-	protected function getInternalLiveStatus($checkExplicitLive = false)
+	public function getInternalLiveStatus($checkExplicitLive = false)
 	{
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
