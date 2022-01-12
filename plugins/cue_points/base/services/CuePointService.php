@@ -120,6 +120,7 @@ class CuePointService extends KalturaBaseService
 	{
 		try
 		{
+			myUploadUtils::handleRestrictedFiles($fileData);
 			$list = kCuePointManager::addFromXml($fileData['tmp_name'], $this->getPartnerId());
 		}
 		catch (kCoreException $e)

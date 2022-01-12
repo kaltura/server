@@ -852,6 +852,7 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
+		myUploadUtils::isUrlFileTypeRestricted($url);
 		$res = KCurlWrapper::getContent($url);
 		if (!$res)
 		{
@@ -903,11 +904,7 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
-		if(myUploadUtils::isFileTypeRestricted($fileData["tmp_name"]) && $fileSize)
-		{
-			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
-		}
+		myUploadUtils::handleRestrictedFiles($fileData);
 		
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		

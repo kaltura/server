@@ -44,6 +44,8 @@ class BulkUploadService extends KalturaBaseService
 		if(!$fileName)
 			$fileName = $csvFileData["name"];
 		
+		myUploadUtils::handleRestrictedFiles($csvFileData);
+		
 		$data = $this->constructJobData($csvFileData["tmp_name"], $fileName, $this->getPartner(), $this->getKuser()->getPuserId(), $uploadedBy, $conversionProfileId, $coreBulkUploadType);
 		
 		$dbJob = kJobsManager::addBulkUploadJob($this->getPartner(), $data, $coreBulkUploadType);

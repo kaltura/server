@@ -417,6 +417,8 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachLocalFileResource(kLocalFileResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
+		myUploadUtils::handleRestrictedFilesByPath($resource->getLocalFilePath());
+		
 		$dbEntry->setSource($resource->getSourceType());
 		$dbEntry->save();
 
@@ -784,6 +786,12 @@ class KalturaEntryService extends KalturaBaseService
 	protected function attachRemoteStorageResource(IRemoteStorageResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
 		$resources = $resource->getResources();
+		
+		foreach($resources as $currentResource)
+		{
+			myUploadUtils::isUrlFileTypeRestricted($currentResource->getUrl());
+		}
+		
 		$fileExt = $resource->getFileExt();
 		$dbEntry->setSource(KalturaSourceType::URL);
 	
@@ -857,10 +865,11 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
+		$url = $resource->getUrl();
+		myUploadUtils::isUrlFileTypeRestricted($url);
+		
 		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_URL);
 		$dbEntry->save();
-
-		$url = $resource->getUrl();
 
 		if (!$resource->getForceAsyncDownload())
 		{
@@ -1625,6 +1634,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 		}*/
 
+		myUploadUtils::isUrlFileTypeRestricted($url);
 		$content = KCurlWrapper::getContent($url);
 		if (!$content)
 		{
@@ -1644,7 +1654,8 @@ class KalturaEntryService extends KalturaBaseService
 
 		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
+		
+		myUploadUtils::handleRestrictedFiles($fileData);
 		// if session is not admin, we should check that the user that is updating the thumbnail is the one created the entry
 		// FIXME: Temporary disabled because update thumbnail feature (in app studio) is working with anonymous ks
 		/*if (!$this->getKs()->isAdmin())

@@ -233,6 +233,7 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(CaptionAsset $captionAsset, $fullPath, $copyOnly = false)
 	{
+		myUploadUtils::handleRestrictedFilesByPath($fullPath);
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		list($width, $height, $type, $attr) = getimagesize($fullPath);
 
@@ -290,6 +291,7 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	protected function attachUrlResource(CaptionAsset $captionAsset, kUrlResource $contentResource)
 	{
+		myUploadUtils::isUrlFileTypeRestricted($contentResource->getUrl());
 		kJobsManager::addImportJob(null, $captionAsset->getEntryId(), $this->getPartnerId(),
 			$contentResource->getUrl(), $captionAsset, null, $contentResource->getImportJobData());
 	}
@@ -352,7 +354,12 @@ class CaptionAssetService extends KalturaAssetService
 	protected function attachRemoteStorageResource(CaptionAsset $captionAsset, IRemoteStorageResource $contentResource)
 	{
 		$resources = $contentResource->getResources();
-
+		
+		foreach($resources as $currentResource)
+		{
+			myUploadUtils::isUrlFileTypeRestricted($currentResource->getUrl());
+		}
+		
 		$captionAsset->setFileExt($contentResource->getFileExt());
 		$captionAsset->incrementVersion();
 		$captionAsset->setStatus(CaptionAsset::ASSET_STATUS_READY);

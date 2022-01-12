@@ -182,6 +182,7 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(AttachmentAsset $attachmentAsset, $fullPath, $copyOnly = false)
 	{
+		myUploadUtils::handleRestrictedFilesByPath($fullPath);
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		
 		$attachmentAsset->incrementVersion();
@@ -326,6 +327,11 @@ class AttachmentAssetService extends KalturaAssetService
 	{
 		$resources = $contentResource->getResources();
 		
+		foreach($resources as $currentResource)
+		{
+			myUploadUtils::isUrlFileTypeRestricted($currentResource->getUrl());
+		}
+		
 		$attachmentAsset->setFileExt($contentResource->getFileExt());
         $attachmentAsset->incrementVersion();
 		$attachmentAsset->setStatus(AttachmentAsset::ASSET_STATUS_READY);
@@ -338,8 +344,7 @@ class AttachmentAssetService extends KalturaAssetService
 			$fileSync = kFileSyncUtils::createReadyExternalSyncFileForKey($syncKey, $currentResource->getUrl(), $storageProfile);
 		}
     }
-    
-    
+	
 	/**
 	 * @param AttachmentAsset $attachmentAsset
 	 * @param kContentResource $contentResource

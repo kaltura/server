@@ -7,6 +7,7 @@ class myUploadUtils
 	const EICAR_MAX_FILE_SIZE = 128;
 	const BAT_FILE_EXTENSION = 'bat';
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
+	const MAX_FILE_NAME_LENGTH = 255;
 
 	public static function uploadFile ( $file_data , $id , $filename , $hash , $extra_id = null )
 	{
@@ -250,5 +251,30 @@ class myUploadUtils
 		return false;
 	}
 	
+	public static function handleRestrictedFilesByPath($fullPath)
+	{
+		if(myUploadUtils::isFileTypeRestricted($fullPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+	}
+	
+	public static function handleRestrictedFiles($fileData)
+	{
+		$fileSize = kFileBase::fileSize($fileData["tmp_name"]);
+		if(myUploadUtils::isFileTypeRestricted($fileData["tmp_name"]) && $fileSize)
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+	}
+	
+	public static function isUrlFileTypeRestricted($url)
+	{
+		$fullPath = kFileBase::getExternalFile($url);
+		if(myUploadUtils::isFileTypeRestricted($fullPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+	}
 }
 ?>

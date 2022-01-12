@@ -230,6 +230,7 @@ class DataService extends KalturaEntryService
 		if(($resource->getType() == 'kLocalFileResource') && (!isset($resource->getSourceType) ||  $resource->getSourceType != KalturaSourceType::WEBCAM))
 		{
 			$file_path = $resource->getLocalFilePath();
+			myUploadUtils::handleRestrictedFilesByPath($file_path);
 			$fileType = kFile::mimeType($file_path);
 			if((substr($fileType, 0, 5) == 'text/') || ($fileType == 'application/xml')) {
 				$dbEntry->setDataContent(kFile::getFileContent($file_path));
