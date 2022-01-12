@@ -555,7 +555,7 @@ abstract class LiveEntry extends entry
 		
 		if (in_array($this->getSource(), LiveEntry::$kalturaLiveSourceTypes))
 		{
-			return $this->getInternalLiveStatus($checkExplicitLive);
+			return $this->getEntryServerNodeStatusForPlayback($checkExplicitLive);
 		}
 		else
 		{
@@ -653,7 +653,7 @@ abstract class LiveEntry extends entry
 	}
 	
 	
-	public function getInternalLiveStatus($checkExplicitLive = false)
+	public function getEntryServerNodeStatusForPlayback($checkExplicitLive = false)
 	{
 		$statusOrder = array(EntryServerNodeStatus::STOPPED, EntryServerNodeStatus::AUTHENTICATED, EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE);
 		$status = EntryServerNodeStatus::STOPPED;
