@@ -866,7 +866,6 @@ class KalturaEntryService extends KalturaBaseService
 	protected function attachUrlResource(kUrlResource $resource, entry $dbEntry, asset $dbAsset = null)
 	{
 		$url = $resource->getUrl();
-		myUploadUtils::isUrlFileTypeRestricted($url);
 		
 		$dbEntry->setSource(entry::ENTRY_MEDIA_SOURCE_URL);
 		$dbEntry->save();
@@ -1655,7 +1654,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData['tmp_name']);
 		// if session is not admin, we should check that the user that is updating the thumbnail is the one created the entry
 		// FIXME: Temporary disabled because update thumbnail feature (in app studio) is working with anonymous ks
 		/*if (!$this->getKs()->isAdmin())

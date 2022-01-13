@@ -191,7 +191,7 @@ class MetadataService extends KalturaBaseService
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
 		
-		myUploadUtils::handleRestrictedFiles($xmlFile);
+		myUploadUtils::handleRestrictedFilesByPath($filePath);
 		$xmlData = file_get_contents($filePath);
 		@unlink($filePath);
 		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
@@ -232,7 +232,6 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromBulkAction($metadataProfileId, $objectType, $objectId, $url)
 	{
-		myUploadUtils::isUrlFileTypeRestricted($url);
 		$this->addFromUrlAction($metadataProfileId, $objectType, $objectId, $url);
 	}
 
@@ -356,7 +355,7 @@ class MetadataService extends KalturaBaseService
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
 		
-		myUploadUtils::handleRestrictedFiles($xmlFile);
+		myUploadUtils::handleRestrictedFilesByPath($filePath);
 		$xmlData = file_get_contents($filePath);
 		@unlink($filePath);
 		return $this->updateAction($id, $xmlData);
@@ -577,7 +576,7 @@ class MetadataService extends KalturaBaseService
 		if(!file_exists($xslFilePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
 		
-		myUploadUtils::handleRestrictedFiles($xslFile);
+		myUploadUtils::handleRestrictedFilesByPath($xslFilePath);
 		$xslData = file_get_contents($xslFilePath);
 		@unlink($xslFilePath);
 

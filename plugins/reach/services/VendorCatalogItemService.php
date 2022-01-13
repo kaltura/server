@@ -246,7 +246,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		if(!$bulkUploadData->fileName)
 			$bulkUploadData->fileName = $fileData['name'];
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData['tmp_name']);
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore('BulkUploadType', $bulkUploadData->type);

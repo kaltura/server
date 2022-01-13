@@ -29,7 +29,7 @@ class BulkService extends KalturaBaseService
 		if(get_class($bulkUploadData) == 'KalturaBulkUploadJobData')
 			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, 'KalturaBulkUploadJobData');
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData['tmp_name']);
 		$validContent = myXmlUtils::validateXmlFileContent($fileData['tmp_name']);
 		if(!$validContent)
 		{
@@ -97,7 +97,7 @@ class BulkService extends KalturaBaseService
 		if(!$bulkUploadData->fileName)
 			$bulkUploadData->fileName = $fileData["name"];
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData["tmp_name"]);
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -143,7 +143,7 @@ class BulkService extends KalturaBaseService
 		if(!$bulkUploadData->fileName)
 			$bulkUploadData->fileName = $fileData["name"];
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData['tmp_name']);
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -188,7 +188,7 @@ class BulkService extends KalturaBaseService
 		if(!$bulkUploadData->fileName)
 			$bulkUploadData->fileName = $fileData["name"];
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData["tmp_name"]);
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);
@@ -470,7 +470,7 @@ class BulkService extends KalturaBaseService
 			$bulkUploadData->fileName = $fileData["name"];
 		}
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
+		myUploadUtils::handleRestrictedFilesByPath($fileData["tmp_name"]);
 		
 		$dbBulkUploadJobData = $bulkUploadData->toInsertableObject();
 		$bulkUploadCoreType = kPluginableEnumsManager::apiToCore("BulkUploadType", $bulkUploadData->type);

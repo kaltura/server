@@ -107,10 +107,10 @@ class BaseEntryService extends KalturaEntryService
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
 		
-		if($resource->localFilePath && myUploadUtils::handleRestrictedFilesByPath($resource->localFilePath))
-		{
-			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
-		}
+//		if($resource->localFilePath)
+//		{
+//			myUploadUtils::handleRestrictedFilesByPath($resource->localFilePath);
+//		}
 		
 		$kResource = $resource->toObject();
     	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
@@ -401,10 +401,10 @@ class BaseEntryService extends KalturaEntryService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		if($resource->localFilePath && myUploadUtils::handleRestrictedFilesByPath($resource->localFilePath))
-		{
-			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
-		}
+//		if($resource->localFilePath)
+//		{
+//			myUploadUtils::handleRestrictedFilesByPath($resource->localFilePath);
+//		}
 		
 		if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
         {

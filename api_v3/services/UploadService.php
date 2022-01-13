@@ -24,8 +24,6 @@ class UploadService extends KalturaEntryService
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		$token = $ksUnique."_".$uniqueId.".".$ext;
 		
-		myUploadUtils::handleRestrictedFiles($fileData);
-		
 		$res = myUploadUtils::uploadFileByToken($fileData, $token, "", null, true);
 	
 		return $res["token"];

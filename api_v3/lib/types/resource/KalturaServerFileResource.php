@@ -38,6 +38,7 @@ class KalturaServerFileResource extends KalturaGenericDataCenterContentResource
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 		
 		$this->validatePropertyNotNull('localFilePath');
+		myUploadUtils::handleRestrictedFilesByPath($this->localFilePath);
 	}
 	
 	/* (non-PHPdoc)
