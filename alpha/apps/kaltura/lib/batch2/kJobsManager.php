@@ -1866,6 +1866,10 @@ class kJobsManager
 		if(!is_null($jobData->getFilePath()))
 		{
 			$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+			if (myUploadUtils::isFileTypeRestricted($jobData->getFilePath()))
+			{
+				throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+			}
 	//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 			try{
 				kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
