@@ -903,6 +903,11 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
+		if(myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
 		$dbThumbAsset = new thumbAsset();
