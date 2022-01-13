@@ -1908,6 +1908,12 @@ WM HGT related
 		* 		- {"audio":{"streams":["all"],"olayout":5.1},"detect":"auto"}
 		* 		- {"audio":{"olayout":5.1},"detect":"auto"}
 		* 		-- If 'olayout' is set and 'streams' ommitted - assume 'streams:all'
+		*
+		*		- "onSingleStream" - activate the multi-stream logic, even for source with single aud stream. default:0 (activate multi only with >=2 aud streams
+		*		-- {"audio":{"languages":["fra","fre"],"onSingleStream":"1"}}
+		*		-- {"audio":{"streams":[{"lang":"eng","onSingleStream":"1"}]}}
+		*		- "aliasTo" - change the asset language, was meant to be used for "description" flows
+		*		-- {"audio":{"streams":[{"lang":"qen","aliasTo":"eng"}]}}
 		*/
 		
 		if (!isset($source->_contentStreams->audio))
@@ -1930,14 +1936,20 @@ WM HGT related
 			 * - otherwise remove the 'multiStream' object'
 			 */
 		$multiStreamHelper = new KDLAudioMultiStreamingHelper($setupMultiStream);
-		$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams);
+		if((isset($setupMultiStream->streams[0]) && isset($setupMultiStream->streams[0]->onSingleStream) 
+			&& $setupMultiStream->streams[0]->onSingleStream==1)
+		|| (isset($setupMultiStream->onSingleStream) && $setupMultiStream->onSingleStream==1))
+			$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams,1);
+		else
+			$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams,2);
 		if(isset($audioStreams)){
 			$targetMultiStream = new stdClass();
 			$targetMultiStream->audio = $audioStreams;
 			return $targetMultiStream;
 		}
-		else 
+		else {
 			return null;
+		}
 	}
 
 	/* ---------------------------
