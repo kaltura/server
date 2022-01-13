@@ -1852,10 +1852,18 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function getCloneConversionProfile($originSourceType,$partner,$sourceEntry)
 	{
-        	if (self::isSourceLive($originSourceType))
-	            return $partner->getDefaultConversionProfileId();
-
-        	return $sourceEntry->getConversionProfileId();
+		if (self::isSourceLive($originSourceType) || self::isAncestorsLive($sourceEntry))
+		{
+			if (kBusinessPreConvertDL::shouldCheckStaticContentFlow($sourceEntry))
+			{
+				$key = kBusinessPreConvertDL::getConversionProfileKey($sourceEntry);
+				$staticContentConversionProfiles = kConf::get('staticContentConversionProfiles', 'runtime_config', array());
+				$conversionProfile = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($sourceEntry->getPartnerId(), $staticContentConversionProfiles[$key], ConversionProfileType::MEDIA, true);
+			}
+			return $conversionProfile ? $conversionProfile->getId() : $partner->getDefaultConversionProfileId();
+		}
+		
+		return $sourceEntry->getConversionProfileId();
 	}
 
  	/*
@@ -2278,5 +2286,37 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		
 		return $categoryEntryIdsArray;
+	}
+	
+	/**
+	 * Check if $entry has an ancestor that is of live type (or specific sourceType, if $liveSourceType passed)
+	 * @param $entry
+	 * @param null $liveSourceType
+	 * @return bool
+	 */
+	public static function isAncestorsLive($entry, $liveSourceType = null)
+	{
+		if ($entry->getIsTemporary() && $entry->getReplacedEntryId())
+		{
+			$entry = entryPeer::retrieveByPK($entry->getReplacedEntryId());
+			if (!$entry)
+			{
+				return false;
+			}
+		}
+		
+		$rootEntryId = $entry->getRootEntryId(true);
+		if ($entry->getId() == $rootEntryId)
+		{
+			return false;
+		}
+		
+		$rootEntry = entryPeer::retrieveByPKNoFilter($rootEntryId);
+		if (!$rootEntry)
+		{
+			return false;
+		}
+		
+		return $liveSourceType ? $rootEntry->getSourceType() == $liveSourceType : self::isSourceLive($rootEntry->getSourceType());
 	}
 }
