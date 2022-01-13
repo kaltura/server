@@ -1868,7 +1868,7 @@ class kJobsManager
 			$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
 			if (myUploadUtils::isFileTypeRestricted($jobData->getFilePath()))
 			{
-				throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+				throw new APIException(APIErrors::INVALID_FILE_TYPE, $jobData->getFileName());
 			}
 	//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 			try{
