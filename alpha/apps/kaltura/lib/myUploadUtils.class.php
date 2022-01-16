@@ -235,7 +235,7 @@ class myUploadUtils
 		return in_array($fileType, $fileTypes['allowed']);
 	}
 
-	public static function isFileTypeRestricted($fullPath, $partnerId = null)
+	public static function isFileTypeRestricted($fullPath, $partnerId = null, $fileExtensionType = null)
 	{
 		if(!$partnerId)
 		{
@@ -243,11 +243,22 @@ class myUploadUtils
 		}
 
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
+				&& ($fileExtensionType && !myUploadUtils::validFileType($fullPath, $fileExtensionType))
 			&& !myUploadUtils::checkIfFileIsAllowed($fullPath))
 		{
 			return true;
 		}
 		return false;
+	}
+	
+	public static function validFileType($fullPath, $fileExtensionType)
+	{
+		$fileExtension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+		if (!in_array($fileExtension, kConf::get($fileExtensionType)))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 }

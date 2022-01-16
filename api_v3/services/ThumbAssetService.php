@@ -9,6 +9,9 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
+	
+	const IMAGE_FILE_EXT = 'image_file_ext';
+	
 	protected function getEnabledMediaTypes()
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
@@ -903,7 +906,7 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		if(myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
+		if (myUploadUtils::isFileTypeRestricted($fileData['tmp_name'], null, self::IMAGE_FILE_EXT))
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
