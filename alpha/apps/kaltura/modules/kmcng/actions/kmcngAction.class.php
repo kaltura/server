@@ -60,15 +60,19 @@ class kmcngAction extends kalturaAction
 			KalturaLog::warning("Couldn't locate kmcng path: $path");
 			return sfView::ERROR;
 		}
-		
-		if (isset($kmcngParams['kmcng_content_security_policy']))
-		{
-			header("Content-Security-Policy: " . $kmcngParams['kmcng_content_security_policy']);
-		}
 
 		$config = $this->initConfig($deployUrl, $kmcngParams, $enforceSecureProtocol, $requestSecureProtocol);
 		$config = json_encode($config);
 		$config = str_replace("\\/", '/', $config);
+		
+		$randNum = strval(rand(11111111, 99999999));
+		$config = str_replace("@NONCE_TOKEN@", $randNum, $config);
+		
+		if (isset($kmcngParams['kmcng_content_security_policy']))
+		{
+			$kmcngContentSecurityPolicy = str_replace("@NONCE_TOKEN@", $randNum, $kmcngParams['kmcng_content_security_policy']);
+			header("Content-Security-Policy: " . $kmcngContentSecurityPolicy);
+		}
 
 		$content = str_replace("<base href=\"/\">", "<base href=\"/index.php/kmcng/\">", $content);
 		$content = preg_replace("/src=\"(?!(http:)|(https:)|\/)/i", "src=\"{$deployUrl}", $content);
