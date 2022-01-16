@@ -11,6 +11,7 @@ class ThumbAssetService extends KalturaAssetService
 {
 	
 	const IMAGE_FILE_EXT = 'image_file_ext';
+	protected $restrictedThumbnailFileTypes = array('xls', 'xlsx', 'csv');
 	
 	protected function getEnabledMediaTypes()
 	{
@@ -906,7 +907,7 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		if (!myUploadUtils::isValidFileType($fileData['name'], self::IMAGE_FILE_EXT)
+		if (!$this->isValidFileType($fileData['name'])
 			|| myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
@@ -951,6 +952,21 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAssets = new KalturaThumbAsset();
 		$thumbAssets->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAssets;
+	}
+	
+	protected function isValidFileType($fileName, $partnerId = null)
+	{
+		if(!$partnerId)
+		{
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+		}
+		$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
+			&& in_array($fileExtension, $this->restrictedThumbnailFileTypes))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	/**
