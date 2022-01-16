@@ -2324,7 +2324,8 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	public static function getConversionProfileKey(Entry $entry)
 	{
 		$adminTags = $entry->getAdminTagsArr();
-		if ($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
+		if ($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE
+			|| myEntryUtils::isAncestorSourceType($entry, array(EntrySourceType::LECTURE_CAPTURE)))
 		{
 			if (in_array('kalturaclassroom', $adminTags))
 			{
