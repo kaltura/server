@@ -9,8 +9,6 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
-	
-	const IMAGE_FILE_EXT = 'image_file_ext';
 	protected $restrictedThumbnailFileTypes = array('xls', 'xlsx', 'csv');
 	
 	protected function getEnabledMediaTypes()
