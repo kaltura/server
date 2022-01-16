@@ -250,10 +250,15 @@ class myUploadUtils
 		return false;
 	}
 	
-	public static function isValidFileType($fileName, $fileExtensionType)
+	public static function isValidFileType($fileName, $fileExtensionType, $partnerId = null)
 	{
+		if(!$partnerId)
+		{
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+		}
 		$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-		if (!in_array($fileExtension, kConf::get($fileExtensionType)))
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
+			&& !in_array($fileExtension, kConf::get($fileExtensionType)))
 		{
 			return false;
 		}
