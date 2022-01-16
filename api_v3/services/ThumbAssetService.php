@@ -9,8 +9,6 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
-	protected $restrictedThumbnailFileTypes = array('xls', 'xlsx', 'csv');
-	
 	protected function getEnabledMediaTypes()
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
@@ -905,7 +903,7 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
-		if (!$this->isValidFileType($fileData['name'])
+		if (!$this->isThumbValidFileType($fileData['name'])
 			|| myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
@@ -952,15 +950,16 @@ class ThumbAssetService extends KalturaAssetService
 		return $thumbAssets;
 	}
 	
-	protected function isValidFileType($fileName, $partnerId = null)
+	protected function isThumbValidFileType($fileName, $partnerId = null)
 	{
+		$restrictedThumbnailFileTypes = array('xls', 'xlsx', 'csv');
 		if(!$partnerId)
 		{
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 		}
 		$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
-			&& in_array($fileExtension, $this->restrictedThumbnailFileTypes))
+			&& in_array($fileExtension, $restrictedThumbnailFileTypes))
 		{
 			return false;
 		}
