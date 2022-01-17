@@ -339,4 +339,18 @@ class ZoomHelper
 		}
 		return $filesByRecordingType;
 	}
+
+	public static function getRedirectUrl($url)
+	{
+		$redirectUrl = $url;
+		$curl = curl_init($url);
+		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
+		$result = curl_exec($curl);
+		if ($result !== false)
+		{
+			$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+		}
+		return $redirectUrl;
+	}
 }
