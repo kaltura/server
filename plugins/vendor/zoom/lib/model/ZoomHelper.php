@@ -26,7 +26,10 @@ class ZoomHelper
 		'chat_file',
 		'poll'
 	);
-
+	
+	const RECORDING_FILE_STATUS = 'status';
+	const RECORDING_FILE_STATUS_PROCESSING = 'processing';
+	
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
@@ -273,11 +276,16 @@ class ZoomHelper
 		}
 	}
 	
-	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType)
+	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType, &$fileInStatusProcessingExists)
 	{
 		$recordingFilesOrdered = array();
 		foreach($recordingFiles as $recordingFile)
 		{
+			if( isset($recordingFile[self::RECORDING_FILE_STATUS]) && ($recordingFile[self::RECORDING_FILE_STATUS] === self::RECORDING_FILE_STATUS_PROCESSING) )
+			{
+				$fileInStatusProcessingExists = true;
+			}
+			
 			if(!isset($recordingFile[$recordingType]))
 			{
 				continue;

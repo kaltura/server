@@ -60,20 +60,18 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
-	 * @param $timeFrame
+	 * @param $fromCreatedAt
 	 * @return array
 	 */
-	protected function loadDropFolderFiles($timeFrame = null)
+	protected function loadDropFolderFiles($fromCreatedAt = null)
 	{
-		$dropFolderFiles =null;
-
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
-		if ($timeFrame)
+		if ($fromCreatedAt)
 		{
-			$dropFolderFileFilter->createdAtGreaterThanOrEqual = time() - $timeFrame;
+			$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
 		}
 
 		$pager = new KalturaFilterPager();
@@ -139,7 +137,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		{
 			KalturaLog::warning("Map is missing files - Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list BUT has [$mapCount] files in map");
 		}
-
+		
 		return $dropFolderFilesMap;
 	}
 
