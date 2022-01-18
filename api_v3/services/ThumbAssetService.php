@@ -9,6 +9,9 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
+	
+	const IMAGE_FILE_EXT = 'image_file_ext';
+	
 	protected function getEnabledMediaTypes()
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
@@ -952,14 +955,14 @@ class ThumbAssetService extends KalturaAssetService
 	
 	protected function isThumbValidFileType($fileName, $partnerId = null)
 	{
-		$restrictedThumbnailFileTypes = array('xls', 'xlsx', 'csv');
+		$allowedThumbnailFileTypes = kConf::get(self::IMAGE_FILE_EXT);
 		if(!$partnerId)
 		{
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 		}
 		$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
-			&& in_array($fileExtension, $restrictedThumbnailFileTypes))
+			&& !in_array($fileExtension, $allowedThumbnailFileTypes))
 		{
 			return false;
 		}
