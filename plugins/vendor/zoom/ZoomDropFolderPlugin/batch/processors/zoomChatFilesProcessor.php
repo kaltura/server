@@ -40,7 +40,7 @@ class zoomChatFilesProcessor extends zoomProcessor
 		KBatchBase::impersonate($entry->partnerId);
 		$attachmentAsset = $this->createAttachmentAssetForChatFile($recording->meetingMetadata->meetingId, $entry, $attachmentPlugin);
 		$attachmentAssetResource = new KalturaUrlResource();
-		$attachmentAssetResource->url = $this->getRedirectUrl($recording);
+		$attachmentAssetResource->url = $this->getZoomRedirectUrlFromFile($recording);
 		$attachmentPlugin->attachmentAsset->setContent($attachmentAsset->id, $attachmentAssetResource);
 		KBatchBase::unimpersonate();
 	}

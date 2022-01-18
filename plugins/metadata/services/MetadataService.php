@@ -190,6 +190,10 @@ class MetadataService extends KalturaBaseService
 		$filePath = $xmlFile['tmp_name'];
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
+		if (myUploadUtils::isFileTypeRestricted($filePath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		
 		$xmlData = file_get_contents($filePath);
 		@unlink($filePath);
@@ -352,6 +356,10 @@ class MetadataService extends KalturaBaseService
 		if(!file_exists($filePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
 		
+		if (myUploadUtils::isFileTypeRestricted($filePath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		$xmlData = file_get_contents($filePath);
 		@unlink($filePath);
 		return $this->updateAction($id, $xmlData);
@@ -571,7 +579,11 @@ class MetadataService extends KalturaBaseService
 		$xslFilePath = $xslFile['tmp_name'];
 		if(!file_exists($xslFilePath))
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
-
+		
+		if (myUploadUtils::isFileTypeRestricted($xslFilePath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		$xslData = file_get_contents($xslFilePath);
 		@unlink($xslFilePath);
 

@@ -246,7 +246,7 @@ class kFile extends kFileBase
 			{
 				if (! kFile::isDir($dest))
 				{
-					KalturaLog::err("Can't override a file with a directory [$dest]");
+					kSharedFileSystemMgr::safeLog("Can't override a file with a directory [$dest]", 'err');
 					return false;
 				}
 			}
@@ -254,7 +254,7 @@ class kFile extends kFileBase
 			{
 				if (! kFile::mkdir($dest))
 				{
-					KalturaLog::err("Failed to create directory [$dest]");
+					kSharedFileSystemMgr::safeLog("Failed to create directory [$dest]", 'err');
 					return false;
 				}
 			}
@@ -269,7 +269,7 @@ class kFile extends kFileBase
 			// Delete source
 			if ($deleteSrc && (! kFile::rmdir($src)))
 			{
-				KalturaLog::err("Failed to delete source directory : [$src]");
+				kSharedFileSystemMgr::safeLog("Failed to delete source directory : [$src]", 'err');
 				return false;
 			}
 		}
@@ -310,11 +310,11 @@ class kFile extends kFileBase
 			
 			if($renameSucceeded)
 			{
-				KalturaLog::log("rename took : $timeTook [$src] to [$dest] size: ".filesize($dest));
+				kSharedFileSystemMgr::safeLog("rename took : $timeTook [$src] to [$dest] size: ".filesize($dest));
 				return true;
 			}
 			
-			KalturaLog::err("Failed to rename file : [$src] to [$dest]");
+			kSharedFileSystemMgr::safeLog("Failed to rename file : [$src] to [$dest]", 'err');
 		}
 		
 		$startTime = microtime(true);
@@ -327,13 +327,13 @@ class kFile extends kFileBase
 		
 		if (!$copySucceeded)
 		{
-			KalturaLog::err("Failed to copy file : [$src] to [$dest]");
+			kSharedFileSystemMgr::safeLog("Failed to copy file : [$src] to [$dest]", 'err');
 			return false;
 		}
 		
 		if ($deleteSrc && (!unlink($src)))
 		{
-			KalturaLog::err("Failed to delete source file : [$src]");
+			kSharedFileSystemMgr::safeLog("Failed to delete source file : [$src]", 'err');
 			return false;
 		}
 		
@@ -349,13 +349,13 @@ class kFile extends kFileBase
 		// Validation
 		if(!kFile::checkFileExists($from))
 		{
-			KalturaLog::err("Source doesn't exist [$from]");
+			kSharedFileSystemMgr::safeLog("Source doesn't exist [$from]", 'err');
 			return false;
 		}
 		
 		if(strpos($to,'\"') !== false)
 		{
-			KalturaLog::err("Illegal destination file [$to]");
+			kSharedFileSystemMgr::safeLog("Illegal destination file [$to]", 'err');
 			return false;
 		}
 		

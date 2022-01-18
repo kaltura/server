@@ -241,7 +241,7 @@ class myUploadUtils
 		{
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 		}
-
+		
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
 			&& !myUploadUtils::checkIfFileIsAllowed($fullPath))
 		{
