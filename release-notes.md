@@ -8,8 +8,8 @@ Add/Update a configuration map called 'runtime_config' with following config:
 
     [html_purifier]
     allowedTags="img[title|src|alt], ul, li, ol, br, a"
-    allowedFrameTargets = "_blank"
-    allowedRel = "nofollow, noopener, noreferrer"
+    allowedFrameTargets="_blank"
+    allowedRel="nofollow, noopener, noreferrer"
 
 # Quasar-17.18.0
 ## Html Purifier tags configuration ##
