@@ -62,7 +62,7 @@ class kSimuliveUtils
 
 		if (self::shouldLiveInterrupt($entry, $currentEvent))
 		{
-			// endTime null will cause the vod packager to return 404 (expired) and trigger "playManifest" by the player
+			// endTime null will cause "expirationTime" to be added to the json
 			$endTime = null;
 		}
 
