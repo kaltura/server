@@ -62,8 +62,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$diff = $today->diff( $lastDayScanned );
 		$diffDays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
 		
-		KalturaLog::info("Avichai: Today: {$today->format('Y-m-d')}, LastDayScanned {$lastDayScanned->format('Y-m-d')}, Diff ($diffDays)");
-		
 		return ($diffDays < 0);
 	}
 	
@@ -106,7 +104,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			
 			KalturaLog::info("Return true for DropFolderId {$this->dropFolder->id}");
 			$ret = true;
-		}while(1);
+		}while(0);
 		
 		return $ret;
 	}
@@ -281,7 +279,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->updateWithLatestDropFolderFiles();
+					$dropFolderFilesMap = $this->updateWithLatestDropFolderFiles($dropFolderFilesMap);
 					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
