@@ -133,6 +133,10 @@ class serveFlavorAction extends kalturaAction
 		{
 			$mediaSet['presentationEndTime'] = $endTime + $offset;
 		}
+		else if (!is_null($dvrWindow)) // the case of simulive flow that should be expired now (switch to "real" live)
+		{
+			$mediaSet['expirationTime'] = time() * self::SECOND_IN_MILLISECONDS - self::TIME_MARGIN;
+		}
 
 		if($repeat)
 		{
