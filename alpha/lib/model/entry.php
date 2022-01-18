@@ -1848,15 +1848,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setParentEntryId($v)
 	{
-		$parentEntry = entryPeer::retrieveByPK($v);
-		if (!$this->hasCycle($this))
-		{
-			$this->putInCustomData("parentEntryId", $v);
-		}
-		else
-		{
-			throw new kCoreException('Parentage has cycle', kCoreException::CYCLE_IN_PARENTAGE);
-		}
+		$this->putInCustomData("parentEntryId", $v);
 	}
 	public function getParentEntryId() 		{ return $this->getFromCustomData( "parentEntryId", null, null ); }
 
@@ -1893,31 +1885,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$parentEntry = entryPeer::retrieveByPK($this->getParentEntryId());
 		
 		return $parentEntry;
-	}
-	
-	protected function hasCycle(entry $entry)
-	{
-		if (!$entry)
-		{
-			return false;
-		}
-		$slowParentEntryPointer = $entry;
-		$fastParentEntryPointer = entryPeer::retrieveByPK($entry->getParentEntryId());
-		
-		while ($slowParentEntryPointer != $fastParentEntryPointer)
-		{
-			if ($fastParentEntryPointer == null || !entryPeer::retrieveByPK($fastParentEntryPointer->getParentEntryId())->getParentEntryId())
-			{
-				if ($slowParentEntryPointer->getParentEntryId() == $entry->getId())
-				{
-					return true;
-				}
-				return false;
-			}
-			$slowParentEntryPointer = entryPeer::retrieveByPK($slowParentEntryPointer->getParentEntryId());
-			$fastParentEntryPointer = entryPeer::retrieveByPK(entryPeer::retrieveByPK($fastParentEntryPointer->getId())->getId());
-		}
-		return true;
 	}
 	
 	public function getSecurityParentId()

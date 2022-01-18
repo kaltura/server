@@ -174,6 +174,8 @@ class KalturaErrors extends APIErrors
 	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
 
 	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
+	
+	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Parentage has cycle";
 
 
 	/**

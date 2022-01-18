@@ -475,8 +475,6 @@ class APIErrors
 	const FILE_CREATION_FAILED = "FILE_CREATION_FAILED;MESSAGE;Failed to create file on specified location with message: \"@MESSAGE@\"";
 
 	const DRUID_QUERY_TIMED_OUT = "DRUID_QUERY_TIMED_OUT;;Query timed out";
-	
-	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Parentage has cycle";
 
 	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED;;Switching to requested partner requires re-login';
 

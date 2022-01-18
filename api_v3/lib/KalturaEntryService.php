@@ -1551,6 +1551,28 @@ class KalturaEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_SCHEDULE_DATES);
 		}
 	}
+	protected function validateNoParentageCycle(KalturaBaseEntry $entry, entry $dbEntry = null)
+	{
+		if (is_null($dbEntry) || is_null($entry->parentEntryId))
+		{
+			return;
+		}
+		$slowParentEntryPointer = $dbEntry;
+		$slowParentEntryPointer->setParentEntryId($entry->parentEntryId);
+		$fastParentEntryPointer = entryPeer::retrieveByPK($slowParentEntryPointer->getParentEntryId());
+		
+		while ($slowParentEntryPointer !== $fastParentEntryPointer)
+		{
+			if ($fastParentEntryPointer == null || !$fastParentEntryPointer->getParentEntryId())
+			{
+				return;
+			}
+			
+			$slowParentEntryPointer = entryPeer::retrieveByPK($slowParentEntryPointer->getParentEntryId());
+			$fastParentEntryPointer = entryPeer::retrieveByPK(entryPeer::retrieveByPK($fastParentEntryPointer->getId())->getId());
+		}
+		throw new KalturaAPIException(KalturaErrors::CYCLE_IN_PARENTAGE);
+	}
 	
 	protected function updateEntry($entryId, KalturaBaseEntry $entry, $entryType = null)
 	{
@@ -1566,7 +1588,8 @@ class KalturaEntryService extends KalturaBaseService
 		$this->checkAdminOnlyUpdateProperties($entry);
 		$this->validateEntitledUsersUpdate($entry, $dbEntry);
 		$this->validateAccessControlId($entry);
-		$this->validateEntryScheduleDates($entry, $dbEntry); 
+		$this->validateEntryScheduleDates($entry, $dbEntry);
+		$this->validateNoParentageCycle($entry, $dbEntry);
 		
 		$dbEntry = $entry->toUpdatableObject($dbEntry);
 		/* @var $dbEntry entry */
