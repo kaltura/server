@@ -54,9 +54,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return $dateTime;
 	}
 	
-	protected function isDayInThePast($timestamp)
+	protected function isDayInThePast($startRunTime, $timestamp)
 	{
-		$today = $this->createZuluDateTime(time());
+		$today = $this->createZuluDateTime($startRunTime);
 		$lastDayScanned = $this->createZuluDateTime($timestamp);
 		
 		$diff = $today->diff( $lastDayScanned );
@@ -65,7 +65,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return ($diffDays < 0);
 	}
 	
-	protected function shouldAdvanceByDay($fileInStatusProcessingExists)
+	protected function shouldAdvanceByDay($startRunTime, $fileInStatusProcessingExists)
 	{
 		/*
 		- "lastHandledMeetingTime" should be interpreted as "dayToScan".
@@ -74,12 +74,12 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			- Or if we're done waiting to some files to be completed.
 		 */
 		
-		if( !$this->isDayInThePast($this->dropFolder->lastHandledMeetingTime) )
+		if( !$this->isDayInThePast($startRunTime, $this->dropFolder->lastHandledMeetingTime) )
 		{
 			return false;
 		}
 		
-		$secondsFromMidnight = time() % self::ONE_DAY;
+		$secondsFromMidnight = $startRunTime % self::ONE_DAY;
 		$meetingGracePeriod = $this->getZoomParam('meetingGracePeriod');
 		
 		if($secondsFromMidnight <= $meetingGracePeriod)
@@ -108,6 +108,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->zoomClient = $this->initZoomClient($dropFolder);
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
+		$startRunTime = time();
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
 		$dropFolderFilesMap = $this->loadDropFolderFiles(time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 		$fileInStatusProcessingExists = false;
@@ -120,7 +121,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			KalturaLog::info('No files to handle at this time');
 		}
 		
-		if($this->shouldAdvanceByDay($fileInStatusProcessingExists))
+		if($this->shouldAdvanceByDay($startRunTime, $fileInStatusProcessingExists))
 		{
 			KalturaLog::info("Advancing DropFolderId {$this->dropFolder->id} in a day");
 			$this->updateDropFolderLastMeetingHandled($this->dropFolder->lastHandledMeetingTime + self::ONE_DAY);
