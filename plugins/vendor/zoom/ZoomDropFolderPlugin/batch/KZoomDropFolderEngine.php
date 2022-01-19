@@ -50,11 +50,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$dateTime = new DateTime();
 		$dateTime->setTimezone(new DateTimeZone("Zulu"));
 		$dateTime->setTimestamp($timestamp);
-		$dateTime->setTime( 0, 0); // set time part to midnight
+		$dateTime->setTime(0, 0); // set time part to midnight
 		return $dateTime;
 	}
 	
-	protected function didScanDayInPast($timestamp)
+	protected function isDayInThePast($timestamp)
 	{
 		$today = $this->createZuluDateTime(time());
 		$lastDayScanned = $this->createZuluDateTime($timestamp);
@@ -74,39 +74,33 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			- Or if we're done waiting to some files to be completed.
 		 */
 		
-		$ret = false;
-		do
+		if( !$this->isDayInThePast($this->dropFolder->lastHandledMeetingTime) )
 		{
-			if( !$this->didScanDayInPast($this->dropFolder->lastHandledMeetingTime) )
-			{
-				break;
-			}
-			
-			$currentTime = time();
-			$meetingGracePeriod = $this->getZoomParam('meetingGracePeriod');
-			
-			if(($currentTime % self::ONE_DAY) <= $meetingGracePeriod)
-			{
-				KalturaLog::info('A new day is here, but still waiting for new meetings to arrive');
-				break;
-			}
-			
-			if($fileInStatusProcessingExists)
-			{
-				$fileProcessingGracePeriod = $this->getZoomParam('fileProcessingGracePeriod');
-				if(($currentTime % self::ONE_DAY) <= $fileProcessingGracePeriod)
-				{
-					KalturaLog::info('A new day is here, but found files in status Processing. Waiting for status completed');
-					break;
-				}
-				KalturaLog::info("DropFolderId {$this->dropFolder->id} ignoring files with status Processing");
-			}
-			
-			KalturaLog::info("Return true for DropFolderId {$this->dropFolder->id}");
-			$ret = true;
-		}while(0);
+			return false;
+		}
 		
-		return $ret;
+		$secondsFromMidnight = time() % self::ONE_DAY;
+		$meetingGracePeriod = $this->getZoomParam('meetingGracePeriod');
+		
+		if($secondsFromMidnight <= $meetingGracePeriod)
+		{
+			KalturaLog::info("DropFolderId {$this->dropFolder->id}: A new day is here, but still waiting for new meetings to arrive");
+			return false;
+		}
+		
+		if($fileInStatusProcessingExists)
+		{
+			$fileProcessingGracePeriod = $this->getZoomParam('fileProcessingGracePeriod');
+			if($secondsFromMidnight <= $fileProcessingGracePeriod)
+			{
+				KalturaLog::info("DropFolderId {$this->dropFolder->id}: A new day is here, but found files in status Processing. Waiting for status completed");
+				return false;
+			}
+			KalturaLog::info("DropFolderId {$this->dropFolder->id}: ignoring files with status Processing");
+		}
+		
+		KalturaLog::info("DropFolderId {$this->dropFolder->id}: Returning true");
+		return true;
 	}
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
