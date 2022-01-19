@@ -194,7 +194,7 @@ abstract class zoomProcessor
 		$redirectUrl = null;
 		if (isset($recording->recordingFile->downloadToken))
 		{
-			$redirectUrl = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
+			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
 		}
 		else if (isset($this->dropFolder->accessToken))
 		{
