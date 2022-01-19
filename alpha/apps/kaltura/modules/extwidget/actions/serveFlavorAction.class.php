@@ -136,7 +136,7 @@ class serveFlavorAction extends kalturaAction
 		else if (!is_null($dvrWindow)) // the case of simulive flow that should be expired now
 		{
 			// expirationTime will cause the hls playlist to be expired from now (as we need to switch from simulive to live)
-			$mediaSet['expirationTime'] = time() * self::SECOND_IN_MILLISECONDS - self::TIME_MARGIN;
+			$mediaSet['expirationTime'] = time() * self::SECOND_IN_MILLISECONDS + $offset - self::TIME_MARGIN;
 		}
 
 		if($repeat)
