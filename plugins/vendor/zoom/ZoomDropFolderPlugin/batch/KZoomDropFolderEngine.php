@@ -64,13 +64,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
 		{
-			if($this->zoomClient->getAccessExpiresIn() && $this->zoomClient->getAccessExpiresIn() <= time() + self::ONE_MINUTE)
-			{
-				if(!$this->refreshZoomClientTokens())
-				{
-					return;
-				}
-			}
 			$this->handleExistingDropFolderFile($dropFolderFile);
 		}
 	}
@@ -382,6 +375,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
+		if($this->zoomClient->getAccessExpiresIn() && $this->zoomClient->getAccessExpiresIn() <= time() + self::ONE_MINUTE)
+		{
+			if(!$this->refreshZoomClientTokens())
+			{
+				return;
+			}
+		}
+		
 		$fileSize = $this->zoomClient->getFileSize($dropFolderFile->meetingMetadata->uuid, $dropFolderFile->recordingFile->id);
 		if (!$fileSize)
 		{
