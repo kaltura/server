@@ -19,6 +19,7 @@
 					}
 				}
 			},
+			"mapping" : {"nested_objects": {"limit" : 100000}},
 			"indexing" : {
 				"slowlog" : {
 					"threshold" : {
@@ -31,7 +32,6 @@
 					}
 				}
 			},
-			"mapping" : {"nested_objects": {"limit" : 100000}}
 		},
 		"number_of_shards" : 12,
 		"number_of_replicas" : 0,
