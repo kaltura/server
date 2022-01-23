@@ -74,6 +74,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_VIRTUAL_EVENT_ID = 'virtualEventId';
 	const DIMENSION_INDUSTRY = 'industry';
 	const DIMENSION_ROLE = 'role';
+	const DIMENSION_ORIGIN = 'origin';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -142,6 +143,8 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VE_PARTICIPATED = 'participated';
 	const EVENT_TYPE_VE_BLOCKED = 'blocked';
 	const EVENT_TYPE_VE_UNREGISTERED = 'unregistered';
+	const EVENT_TYPE_VE_INVITED = 'invited';
+	const EVENT_TYPE_VE_CREATED = 'created';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -399,6 +402,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS_FAMILY => 1,
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_ORIGIN => 1,
 		),
 	);
 
