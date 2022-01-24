@@ -120,7 +120,7 @@ class CuePointService extends KalturaBaseService
 	{
 		try
 		{
-			if (myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
+			if (myUploadUtils::isFileTypeRestricted($fileData['tmp_name'], $fileData['name']))
 			{
 				throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 			}

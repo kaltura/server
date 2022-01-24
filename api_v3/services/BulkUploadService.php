@@ -44,7 +44,7 @@ class BulkUploadService extends KalturaBaseService
 		if(!$fileName)
 			$fileName = $csvFileData["name"];
 		
-		if (myUploadUtils::isFileTypeRestricted($csvFileData["tmp_name"]))
+		if (myUploadUtils::isFileTypeRestricted($csvFileData["tmp_name"], $fileName))
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}

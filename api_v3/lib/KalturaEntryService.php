@@ -1658,7 +1658,7 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY);
 			}
 		}*/
-		if (myUploadUtils::isFileTypeRestricted($fileData["tmp_name"]))
+		if (myUploadUtils::isFileTypeRestricted($fileData["tmp_name"], $fileData['name']))
 		{
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
