@@ -17,7 +17,7 @@
 							"info": "5s"
 						}
 					}
-				},
+				}
 			},
 			"mapping" : {"nested_objects": {"limit" : 100000}},
 			"indexing" : {
