@@ -361,6 +361,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_VE_PARTICIPATED,
 		self::EVENT_TYPE_VE_BLOCKED,
 		self::EVENT_TYPE_VE_UNREGISTERED,
+		self::EVENT_TYPE_VE_INVITED,
+		self::EVENT_TYPE_VE_CREATED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -2379,6 +2381,7 @@ class kKavaReportsMgr extends kKavaBase
 			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
+			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

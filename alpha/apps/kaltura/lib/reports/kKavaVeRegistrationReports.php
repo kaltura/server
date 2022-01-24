@@ -12,6 +12,8 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VE_PARTICIPATED,
 				self::EVENT_TYPE_VE_BLOCKED,
 				self::EVENT_TYPE_VE_UNREGISTERED,
+				self::EVENT_TYPE_VE_INVITED,
+				self::EVENT_TYPE_VE_CREATED,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
@@ -20,6 +22,8 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VE_PARTICIPATED,
 				self::EVENT_TYPE_VE_BLOCKED,
 				self::EVENT_TYPE_VE_UNREGISTERED,
+				self::EVENT_TYPE_VE_INVITED,
+				self::EVENT_TYPE_VE_CREATED,
 			)
 		),
 
@@ -93,5 +97,4 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 
 		return $report_def;
 	}
-
 }
