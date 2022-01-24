@@ -187,7 +187,7 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromFileAction($metadataProfileId, $objectType, $objectId, $xmlFile)
 	{
-		$xmlData = $this->validateFile($xmlFile);
+		$xmlData = $this->validateMetadataFile($xmlFile);
 		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
 	}
 	
@@ -343,7 +343,7 @@ class MetadataService extends KalturaBaseService
 	 */	
 	function updateFromFileAction($id, $xmlFile = null)
 	{
-		$xmlData = $this->validateFile($xmlFile);
+		$xmlData = $this->validateMetadataFile($xmlFile);
 		return $this->updateAction($id, $xmlData);
 	}		
 	
@@ -558,12 +558,12 @@ class MetadataService extends KalturaBaseService
 	 */
 	public function updateFromXSLAction ($id, $xslFile)
 	{
-		$xslData = $this->validateFile($xslFile);
+		$xslData = $this->validateMetadataFile($xslFile);
 
 		return kLock::runLocked("metadata_update_xsl_{$id}", array($this, 'updateFromXSLImpl'), array($id, $xslData));
 	}
 	
-	protected function validateFile($fileData)
+	protected function validateMetadataFile($fileData)
 	{
 		$filePath = $fileData['tmp_name'];
 		$fileName = $fileData['name'];

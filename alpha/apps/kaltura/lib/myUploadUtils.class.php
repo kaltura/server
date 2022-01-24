@@ -243,16 +243,15 @@ class myUploadUtils
 		{
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 		}
-		$allowedThumbnailFileTypes = kConf::get(self::FILE_EXT_WHITELIST, self::SECURITY_MAP, null);
-		if ($allowedThumbnailFileTypes )
+		$allowedFileTypes = kConf::get(self::FILE_EXT_WHITELIST, self::SECURITY_MAP, null);
+		if ($allowedFileTypes)
 		{
 			$fileExtension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
 			if ($fileExtension == '' && $fileName)
 			{
 				$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 			}
-			$allowedThumbnailFileTypes = explode(',', $allowedThumbnailFileTypes);
-			if ($fileExtension !== '' && !in_array($fileExtension, $allowedThumbnailFileTypes))
+			if ($fileExtension !== '' && !in_array($fileExtension, $allowedFileTypes))
 			{
 				return true;
 			}

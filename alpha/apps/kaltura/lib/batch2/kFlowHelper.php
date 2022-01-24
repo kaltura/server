@@ -156,7 +156,7 @@ class kFlowHelper
 		$entryId = $dbBatchJob->getEntryId();
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 
-		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(),null, $dbBatchJob->getPartnerId()))
+		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(),$data->getSrcFileUrl(), $dbBatchJob->getPartnerId()))
 		{
 			if($dbEntry)
 			{
