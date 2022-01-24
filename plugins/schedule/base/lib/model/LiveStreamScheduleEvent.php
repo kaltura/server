@@ -3,7 +3,7 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
+class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILiveStreamScheduleEvent
 {
 	const PROJECTED_AUDIENCE = 'projected_audience';
 	const PRE_START_TIME = 'pre_start_time';
@@ -13,6 +13,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 	const SOURCE_ENTRY_ID = 'source_entry_id';
 	const PRE_START_ENTRY_ID = 'pre_start_entry_id';
 	const POST_END_ENTRY_ID = 'post_end_entry_id';
+	const IS_CONTENT_INTERRUPTIBLE = 'is_content_interruptible';
 	
 	/**
 	 * @param string $v
@@ -223,4 +224,29 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent
 		$this->setCustomDataObj();
 		return true;
 	}
+
+	/**
+	 * @param bool $v
+	 */
+	public function setIsContentInterruptible($v)
+	{
+		$this->putInCustomData(self::IS_CONTENT_INTERRUPTIBLE, $v);
+	}
+
+	public function getIsContentInterruptible()
+	{
+		return $this->getFromCustomData(self::IS_CONTENT_INTERRUPTIBLE);
+	}
+
+	protected function isInsideContent()
+	{
+		$now = time();
+		return $now > $this->getStartScreenTime() && $now < $this->getEndScreenTime();
+	}
+
+	public function isInterruptibleNow()
+	{
+		return $this->getIsContentInterruptible() || !$this->isInsideContent();
+	}
+
 }

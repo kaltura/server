@@ -60,6 +60,12 @@ class kSimuliveUtils
 		}
 		$endTime = $startTime + array_sum($durations);
 
+		if (self::shouldLiveInterrupt($entry, $currentEvent))
+		{
+			// endTime null will cause "expirationTime" to be added to the json
+			$endTime = null;
+		}
+
 		// creating the flavorAssets array (array of arrays s.t each array contain the flavor assets of all the entries exist)
 		$flavorAssets = array();
 		$flavorAssets = self::mergeAssetArrays($flavorAssets, $preStartFlavorAssets);
@@ -264,4 +270,17 @@ class kSimuliveUtils
 		}
 		return $durationMs;
 	}
+
+	/**
+	 * checking whether we currently inside "interruptible" window of the event and if a "real" live stream is streaming to the entry right now.
+	 * if so - the event should be interrupted by the "real" live 
+	 * @param LiveEntry $entry
+	 * @param ILiveStreamScheduleEvent $event
+	 * @return bool
+	 */
+	public static function shouldLiveInterrupt (LiveEntry $entry, ILiveStreamScheduleEvent $event)
+	{
+		return $event->isInterruptibleNow() && $entry->getEntryServerNodeStatusForPlayback() === EntryServerNodeStatus::PLAYABLE;
+	}
+
 }
