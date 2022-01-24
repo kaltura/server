@@ -27,7 +27,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	protected static $_stats = array();
 
 	protected $memcache = null;
-	protected $gotError = false;
+	protected $lastError = '';
 	protected $connectAttempts = 0;
 	
 	/* (non-PHPdoc)
@@ -108,7 +108,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		$connTook = microtime(true) - $connStart;
 		self::safeLog("connect took - {$connTook} seconds to {$this->hostName}:{$this->port} attempts {$this->connectAttempts}");
 
-		$this->updateStats(self::STAT_CONN, !$connectResult, array(
+		$this->updateStats(self::STAT_CONN, !$connectResult ? 'ERROR' : '', array(
 			self::STAT_COUNT => 1,
 			self::STAT_TIME => $connTook));
 
@@ -130,7 +130,8 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	public function errorHandler($errno, $errstr)
 	{
 		self::safeLog("got error from memcache [$errno] [$errstr]");
-		$this->gotError = true;
+		$splitError = explode('failed with: ', $errstr);
+		$this->lastError = count($splitError) > 1 ? 'MEMC_' . $splitError[1] : 'MEMC_ERROR';
 		return false;
 	}
 	
@@ -143,7 +144,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	{
 		while ($this->memcache)
 		{
-			$this->gotError = false;
+			$this->lastError = '';
 			
 			set_error_handler(array($this, 'errorHandler'));
 			$start = microtime(true);
@@ -151,11 +152,11 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$end = microtime(true);
 			restore_error_handler();
 
-			$this->updateStats(self::STAT_OP, $this->gotError, array(
+			$this->updateStats(self::STAT_OP, $this->lastError, array(
 				self::STAT_COUNT => 1,
 				self::STAT_TIME => $end - $start));
 			
-			if (!$this->gotError)
+			if (!$this->lastError)
 			{
 				return $result;
 			}
@@ -225,7 +226,6 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 
 	protected function updateStats($type, $error, $stats)
 	{
-		$error = $error ? 'ERROR' : '';
 		$statsKey = $this->statsKey . self::STAT_SEPARATOR . $error;
 
 		if (!isset(self::$_stats[$statsKey]))

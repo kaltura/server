@@ -233,6 +233,10 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(CaptionAsset $captionAsset, $fullPath, $copyOnly = false)
 	{
+		if (myUploadUtils::isFileTypeRestricted($fullPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		list($width, $height, $type, $attr) = getimagesize($fullPath);
 

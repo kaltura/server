@@ -53,6 +53,7 @@ class kmcngAction extends kalturaAction
 		$deployUrl = "/apps/kmcng/$kmcngVersion/";
 
 		$path = $basePath . "index.html";
+	
 		$content = file_get_contents($path);
 		if ($content === false)
 		{
@@ -63,7 +64,16 @@ class kmcngAction extends kalturaAction
 		$config = $this->initConfig($deployUrl, $kmcngParams, $enforceSecureProtocol, $requestSecureProtocol);
 		$config = json_encode($config);
 		$config = str_replace("\\/", '/', $config);
-
+		
+		$randNum = strval(rand(11111111, 99999999));
+		
+		if (isset($kmcngParams['kmcng_content_security_policy']))
+		{
+			$kmcngContentSecurityPolicy = str_replace("%NONCE_TOKEN%", $randNum, $kmcngParams['kmcng_content_security_policy']);
+			header("Content-Security-Policy: " . $kmcngContentSecurityPolicy);
+		}
+		
+		$content = str_replace("%NONCE_TOKEN%", $randNum, $content);
 		$content = str_replace("<base href=\"/\">", "<base href=\"/index.php/kmcng/\">", $content);
 		$content = preg_replace("/src=\"(?!(http:)|(https:)|\/)/i", "src=\"{$deployUrl}", $content);
 		$content = preg_replace("/href=\"(?!(http:)|(https:)|\/)/i", "href=\"{$deployUrl}", $content);

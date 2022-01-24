@@ -182,6 +182,10 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(AttachmentAsset $attachmentAsset, $fullPath, $copyOnly = false)
 	{
+		if (myUploadUtils::isFileTypeRestricted($fullPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		
 		$attachmentAsset->incrementVersion();

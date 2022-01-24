@@ -738,9 +738,12 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	/**
 	 *
 	 * @param unknown_type $sourceStreams
+	 * @param unknown_type $overrideStreams
+	 * @param integer $minAudioStreams - min number of the source audio streams 
+	 *   that makes it considered as 'multi stream/audio'. Default:2
 	 * @return Ambigous <-, NULL, KDLAudioMultiStreaming>|Ambigous <NULL, KDLAudioMultiStreaming>|NULL|KDLAudioMultiStreamingHelper
 	 */
-	public function GetSettings($sourceStreams, $overrideStreams=null)
+	public function GetSettings($sourceStreams, $overrideStreams=null, $minAudioStreams=2)
 	{
 		$sourceAudioStreams = isset($sourceStreams->audio)? $sourceStreams->audio: null;
 		$overrideStreams = isset($overrideStreams->audio)? $overrideStreams->audio: null;
@@ -749,7 +752,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		if(isset($overrideAudio)){
 			self::applyOverrideToSource($overrideAudio->perTrack, $sourceAudioStreams);
 		}
-		$sourceAnalize = self::analizeSourceContentStreams($sourceStreams);
+		$sourceAnalize = self::analizeSourceContentStreams($sourceStreams,$minAudioStreams);
 		$sourceAnalize->override = $overrideAudio;
 		
 		/*
@@ -846,7 +849,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	 *
 	 * @param unknown_type $contentStreams
 	 */
-	private static function analizeSourceContentStreams($contentStreams)
+	private static function analizeSourceContentStreams($contentStreams, $minAudioStreams)
 	{
 		/*
 		 * Evaluate stream duration differences
@@ -902,7 +905,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 		 * If the streams duration is too diverse (>2) - skip (probably should be concated)
 		 * 'streamAsChannel' considered to be if there are more than 1 mono streams.
 		 */
-		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>1
+		if(array_key_exists('audio', $identicalDur) && count($identicalDur['audio'])>=$minAudioStreams
 		&& (count($contentStreams->audio)-count($identicalDur['audio']))<=2){
 			// Get all streams that have 'surround' like audio layout - FR, FL, ...
 			$channelStreams = KDLAudioLayouts::matchLayouts($identicalDur['audio']);
@@ -955,7 +958,7 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 			$rvAnalize->streamsAsChannels = $channelStreams;
 		}
 			// Set 'languages' only if there are more than 1 language in the file
-		if(isset($langStreams) && count($langStreams)>1){
+		if(isset($langStreams) && count($langStreams)>=$minAudioStreams){
 			$rvAnalize->languages = $langStreams;
 		}
 		if(count($identicalDur)>0) $rvAnalize->identicalDur = $identicalDur;

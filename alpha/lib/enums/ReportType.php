@@ -192,4 +192,11 @@ interface ReportType extends BaseEnum
    const ENGAGEMENT_TOOLS_WEBCAST = 40012;
    const REACTIONS_BREAKDOWN_WEBCAST = 40013;
 
+   // virtual event registration
+   const VE_HIGHLIGHTS = 50000;
+   const VE_REGISTERED_PLATFORMS = 50001;
+   const VE_REGISTERED_INDUSTRY = 50002;
+   const VE_REGISTERED_ROLES = 50003;
+   const VE_REGISTERED_COUNTRIES = 50004;
+
 }
