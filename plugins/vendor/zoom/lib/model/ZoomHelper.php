@@ -354,6 +354,8 @@ class ZoomHelper
 		$curl = curl_init($url);
 		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt ($curl, CURLOPT_HEADER, true);
+		curl_setopt ($curl, CURLOPT_NOBODY, true);
 		$result = curl_exec($curl);
 		if ($result !== false)
 		{
