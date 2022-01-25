@@ -1563,13 +1563,15 @@ class KalturaEntryService extends KalturaBaseService
 		
 		while ($slowParentEntryPointer !== $fastParentEntryPointer)
 		{
-			if ($fastParentEntryPointer == null || !$fastParentEntryPointer->getParentEntryId())
+			if ($fastParentEntryPointer == null
+				|| !$fastParentEntryPointer->getParentEntryId()
+				|| !entryPeer::retrieveByPK($fastParentEntryPointer->getParentEntryId()))
 			{
 				return;
 			}
 			
 			$slowParentEntryPointer = entryPeer::retrieveByPK($slowParentEntryPointer->getParentEntryId());
-			$fastParentEntryPointer = entryPeer::retrieveByPK(entryPeer::retrieveByPK($fastParentEntryPointer->getId())->getId());
+			$fastParentEntryPointer = entryPeer::retrieveByPK(entryPeer::retrieveByPK($fastParentEntryPointer->getParentEntryId())->getParentEntryId());
 		}
 		throw new KalturaAPIException(KalturaErrors::CYCLE_IN_PARENTAGE);
 	}
