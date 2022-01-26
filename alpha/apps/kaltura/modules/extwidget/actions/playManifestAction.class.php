@@ -1415,11 +1415,12 @@ class playManifestAction extends kalturaAction
 			$renderer->setRestrictAccessControlAllowOriginDomains(true);
 		}
 		
-		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
+		if (!$this->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
 			$cache->storeRendererToCache($renderer);
 		}
+
 		
 		// Output the response
 		KExternalErrors::terminateDispatch();
@@ -1559,5 +1560,18 @@ class playManifestAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		$this->servedEntryType = $sourceEntry->getType();
+	}
+
+	protected function shouldDisableCache()
+	{
+		if ($this->secureEntryHelper && $this->secureEntryHelper->shouldDisableCache())
+		{
+			return true;
+		}
+		if ($this->isSimuliveFlow() && (!kCurrentContext::$ks_object || kCurrentContext::$ks_object->isAnonymousSession()))
+		{
+			return true;
+		}
+		return false;
 	}
 }
