@@ -245,26 +245,29 @@ class myUploadUtils
 		}
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId))
 		{
-			$allowedFileTypes = kConf::get(self::FILE_EXT_WHITELIST, self::SECURITY_MAP, null);
-			if ($allowedFileTypes)
+			if (!myUploadUtils::checkIfFileIsAllowed($fullPath) || !myUploadUtils::checkIfExtensionIsAllowed($fullPath, $fileName))
 			{
-				$fileExtension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
-				if ($fileExtension == '' && $fileName)
-				{
-					$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-				}
-				if (($fileExtension !== '' && !in_array($fileExtension, $allowedFileTypes)) || !myUploadUtils::checkIfFileIsAllowed($fullPath))
-				{
-					return true;
-				}
+				return true;
 			}
 		}
-		
-//		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
-//			&& !myUploadUtils::checkIfFileIsAllowed($fullPath))
-//		{
-//			return true;
-//		}
+		return false;
+	}
+	
+	protected static function checkIfExtensionIsAllowed($fullPath, $fileName = null)
+	{
+		$allowedFileTypes = kConf::get(self::FILE_EXT_WHITELIST, self::SECURITY_MAP, null);
+		if ($allowedFileTypes)
+		{
+			$fileExtension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+			if ($fileExtension == '' && $fileName)
+			{
+				$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+			}
+			if ($fileExtension === '' || in_array($fileExtension, $allowedFileTypes))
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	
