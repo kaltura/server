@@ -1420,7 +1420,6 @@ class playManifestAction extends kalturaAction
 			$cache = kPlayManifestCacher::getInstance();
 			$cache->storeRendererToCache($renderer);
 		}
-
 		
 		// Output the response
 		KExternalErrors::terminateDispatch();
