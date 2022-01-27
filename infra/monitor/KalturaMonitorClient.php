@@ -570,21 +570,21 @@ class KalturaMonitorClient
 
 		self::writeDeferredEvent($data);
 	}
-
-  public static function monitorRedisAccess($hostName, $timeTook, $count)
-  {
-    if (!self::$stream)
-      return;
-
+	
+	public static function monitorRedisAccess($hostName, $timeTook, $count)
+	{
+		if (!self::$stream)
+			return;
+		
 		$data = array_merge(self::$basicEventInfo, array(
-      self::FIELD_EVENT_TYPE 		=> self::EVENT_REDIS,
-      self::FIELD_DATABASE		=> $hostName,
-      self::FIELD_EXECUTION_TIME	=> $timeTook,
-      self::FIELD_COUNT			=> $count,
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_REDIS,
+			self::FIELD_DATABASE		=> $hostName,
+			self::FIELD_EXECUTION_TIME	=> $timeTook,
+			self::FIELD_COUNT			=> $count,
 		));
-
-    self::writeDeferredEvent($data);
-  }
+		
+		self::writeDeferredEvent($data)
+	}
 
 	public static function monitorCurl($hostName, $timeTook, $curlHandle=null)
 	{
