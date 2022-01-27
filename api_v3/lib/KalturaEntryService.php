@@ -130,6 +130,12 @@ class KalturaEntryService extends KalturaBaseService
 		$tempDbEntry->setDisplayInSearch(mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$tempDbEntry->setReplacedEntryId($dbEntry->getId());
 
+		//For static content trimming we need to pass the adminTags to the temp entry in order to convert with the same flow and the original 
+		$adminTags = $dbEntry->getAdminTagsArr();
+		$staticContentAdminTags = kConf::get('staticContentAdminTags','runtime_config',array());
+		$tempAdminTags = array_intersect($adminTags,$staticContentAdminTags);
+		$tempDbEntry->setAdminTags(implode(',',$tempAdminTags));
+
 		$kResource = $resource->toObject();
 		if ($kResource->getType() == 'kOperationResource')
 			$tempDbEntry->setTempTrimEntry(true);
@@ -489,6 +495,10 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function attachFile($entryFullPath, entry $dbEntry, asset $dbAsset = null, $copyOnly = false)
 	{
+		if (myUploadUtils::isFileTypeRestricted($entryFullPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -1648,6 +1658,10 @@ class KalturaEntryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::PERMISSION_DENIED_TO_UPDATE_ENTRY);
 			}
 		}*/
+		if (myUploadUtils::isFileTypeRestricted($fileData["tmp_name"], $fileData['name']))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		myEntryUtils::updateThumbnailFromContent($dbEntry, file_get_contents($fileData["tmp_name"]), $fileSyncType);
 		
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());

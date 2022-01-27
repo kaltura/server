@@ -26,7 +26,7 @@ class updateadminpasswordAction extends defPartnerservices2Action
 					),
 				"errors" => array (
 					APIErrors::INVALID_FIELD_VALUE,
-					APIErrors::ADMIN_KUSER_NOT_FOUND,
+					APIErrors::USER_DATA_ERROR,
 					)
 			);
 	}
@@ -75,7 +75,7 @@ class updateadminpasswordAction extends defPartnerservices2Action
 				return null;
 			}
 			if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				$this->addException( APIErrors::LOGIN_ID_ALREADY_USED);
+				$this->addException( APIErrors::USER_DATA_ERROR);
 				return null;
 			}
 			throw $e;

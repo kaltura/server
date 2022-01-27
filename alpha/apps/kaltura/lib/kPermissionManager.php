@@ -638,8 +638,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$requestedPartner = PartnerPeer::retrieveActiveByPK(self::$requestedPartnerId);
 			if (!$requestedPartner)
 			{
-				KalturaLog::crit('Unknown partner id ['.self::$requestedPartnerId.']');
-				throw new kCoreException("Unknown partner Id [" . self::$requestedPartnerId ."]", kCoreException::PARTNER_BLOCKED);
+				$requestedPartner = PartnerPeer::retrieveReadOnlyByPK(self::$requestedPartnerId);
+				if (!$requestedPartner)
+				{
+					KalturaLog::crit('Unknown partner id [' . self::$requestedPartnerId . ']');
+					throw new kCoreException("Unknown partner Id [" . self::$requestedPartnerId . "]", kCoreException::PARTNER_BLOCKED);
+				}
 			}
 		}
 		
@@ -779,7 +783,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 		    throw new kCoreException("Partner blocked", kCoreException::PARTNER_BLOCKED);
 		}
-		if($partnerStatus != Partner::PARTNER_STATUS_ACTIVE)
+		if(!in_array($partnerStatus,array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY)))
 		{
 		    throw new kCoreException("Partner fully blocked", kCoreException::PARTNER_BLOCKED);
 		}
@@ -805,7 +809,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return false;
 		}
 
-		if(self::$operatingPartner && PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, self::$operatingPartner->getId()))
+		if(self::$operatingPartner &&
+			(PermissionPeer::isValidForPartner(PermissionName::FEATURE_LIMIT_ALLOWED_ACTIONS, self::$operatingPartner->getId()) || self::$operatingPartner->getStatus() === partner::PARTNER_STATUS_READ_ONLY))
 		{
 			$actionBlocked = self::isActionBlockedForPartner($service, $action);
 			if($actionBlocked)

@@ -27,6 +27,7 @@ class kZoomClient
 	protected $clientId;
 	protected $clientSecret;
 	protected $zoomTokensHelper;
+	protected $accessExpiresIn;
 	
 	/**
 	 * kZoomClient constructor.
@@ -36,10 +37,11 @@ class kZoomClient
 	 * @param null $clientId
 	 * @param null $clientSecret
 	 * @param null $accessToken
+	 * @param null $accessExpiresIn
 	 * @throws KalturaAPIException
 	 */
 	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
-	                            $clientSecret= null, $accessToken = null)
+	                            $clientSecret= null, $accessToken = null, $accessExpiresIn = null)
 	{
 		$this -> zoomBaseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
@@ -52,6 +54,7 @@ class kZoomClient
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
 		$this->accessToken = $accessToken;
+		$this->accessExpiresIn = $accessExpiresIn;
 		$this->zoomTokensHelper = new kZoomTokens($zoomBaseURL, $clientId, $clientSecret);
 	}
 	
@@ -109,10 +112,10 @@ class kZoomClient
 		return $this->callZoom($apiPath, $options);
 	}
 	
-	public function listRecordings($accountId, $from, $to, $nextPageToken, $pageSize)
+	public function listRecordings($accountId, $dayToScan, $nextPageToken, $pageSize)
 	{
 		$apiPath = str_replace('@accountId@', $accountId, self::API_LIST_RECORDING);
-		$apiPath .= '?from=' . $from . '&to=' . $to . '&next_page_token=' . $nextPageToken . '&pageSize=' . $pageSize;
+		$apiPath .= '?page_size=' . $pageSize . '&next_page_token=' . $nextPageToken . '&from=' . $dayToScan . '&to=' . $dayToScan;
 		return $this->callZoom($apiPath);
 	}
 	
@@ -274,6 +277,7 @@ class kZoomClient
 			$tokens = $this -> zoomTokensHelper -> refreshTokens($this -> refreshToken);
 			$this -> accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];
 			$this -> refreshToken = $tokens[kZoomTokens::REFRESH_TOKEN];
+			$this -> accessExpiresIn = $tokens[kZoomTokens::EXPIRES_IN];
 		}
 		return $tokens;
 		
@@ -287,5 +291,10 @@ class kZoomClient
 	public function getAccessToken()
 	{
 		return $this->accessToken;
+	}
+
+	public function getAccessExpiresIn()
+	{
+		return $this->accessExpiresIn;
 	}
 }

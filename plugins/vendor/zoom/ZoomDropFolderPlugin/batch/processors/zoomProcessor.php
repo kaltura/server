@@ -158,7 +158,7 @@ abstract class zoomProcessor
 			$filterUser->partnerIdEqual = $partnerId;
 			$filterUser->emailStartsWith = $email;
 			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
-			if (!$kalturaUser->objects || $kalturaUser->objects[0]->email != $email)
+			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
 			{
 				return null;
 			}
@@ -188,13 +188,13 @@ abstract class zoomProcessor
 		return $kalturaUser;
 	}
 	
-	protected function getRedirectUrl($recording)
+	protected function getZoomRedirectUrlFromFile($recording)
 	{
 		$url = null;
 		$redirectUrl = null;
 		if (isset($recording->recordingFile->downloadToken))
 		{
-			$redirectUrl = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
+			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
 		}
 		else if (isset($this->dropFolder->accessToken))
 		{
@@ -207,15 +207,7 @@ abstract class zoomProcessor
 		
 		if ($url)
 		{
-			$redirectUrl = $url;
-			$curl = curl_init($url);
-			curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
-			$result = curl_exec($curl);
-			if ($result !== false)
-			{
-				$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-			}
+			$redirectUrl = ZoomHelper::getRedirectUrl($url);
 		}
 		return $redirectUrl;
 	}

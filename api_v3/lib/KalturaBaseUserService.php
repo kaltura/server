@@ -51,7 +51,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::INVALID_OTP
 	 * @throws KalturaErrors::MISSING_OTP
 	 */
-	protected function updateLoginDataImpl( $email , $password , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null)
+	protected function updateLoginDataImpl( $email , $password = "" , $newEmail = "" , $newPassword = "", $newFirstName = null, $newLastName = null, $otp = null, $skipOldPasswordValidation = false)
 	{
 		KalturaResponseCacher::disableCache();
 
@@ -64,7 +64,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		}
 
 		try {
-			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName, $otp);
+			UserLoginDataPeer::updateLoginData ( $email , $password, $newEmail, $newPassword, $newFirstName, $newLastName, $otp, $skipOldPasswordValidation);
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
@@ -94,7 +94,7 @@ class KalturaBaseUserService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			else if ($code === kUserException::INVALID_OTP)
 			{
@@ -111,6 +111,14 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::LOGIN_BLOCKED)
 			{
 				throw new KalturaAPIException(APIErrors::LOGIN_BLOCKED);
+			}
+			else if ($code == kUserException::CANNOT_UPDATE_LOGIN_DATA)
+			{
+				throw new KalturaAPIException(APIErrors::CANNOT_UPDATE_LOGIN_DATA);
+			}
+			else if ($code == kUserException::CANNOT_UPDATE_PASSWORD)
+			{
+				throw new KalturaAPIException(APIErrors::CANNOT_UPDATE_ADMIN_LOGIN_DATA);
 			}
 			throw $e;			
 		}
@@ -154,7 +162,7 @@ class KalturaBaseUserService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			throw $e;			
 		}	
@@ -415,7 +423,7 @@ class KalturaBaseUserService extends KalturaBaseService
 			$code = $e->getCode();
 			if ($code == kUserException::USER_NOT_FOUND) 
 			{
-				throw new KalturaAPIException(APIErrors::ADMIN_KUSER_NOT_FOUND);
+				throw new KalturaAPIException(APIErrors::USER_DATA_ERROR);
 			}
 			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) 
 			{
@@ -446,7 +454,7 @@ class KalturaBaseUserService extends KalturaBaseService
 		
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) 
 		{
-			throw new KalturaAPIException(APIErrors::ADMIN_KUSER_NOT_FOUND);
+			throw new KalturaAPIException(APIErrors::USER_DATA_ERROR);
 		}
 		
 		if ($destPartnerId != $adminKuser->getPartnerId()) 

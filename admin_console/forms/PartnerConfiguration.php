@@ -338,6 +338,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Secondary Secret Role Id:',
 			'filters'		=> array('StringTrim'),
 		));
+
 //--------------------------- Password Security ---------------------------
 		
 		$this->addElement('text', 'login_block_period', array(
@@ -475,7 +476,11 @@ class Form_PartnerConfiguration extends Infra_Form
 					        
 			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'mothly_bandwidth_combined')))
 		));
- 	
+		
+		$this->addElement('text', 'excluded_admin_role_name', array(
+			'label'			=> 'Excluded administrative (KMC) User Role name:',
+			'filters'		=> array('StringTrim'),
+		));
 		
 	//--------------- Live Stream Params ----------------------------
 		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live');
@@ -523,6 +528,11 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addElement('checkbox', 'html_purifier_base_list_usage', array(
 			'label'	  => 'Use only basic list for purification',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
+		
+		$this->addElement('checkbox', 'purify_image_content', array(
+			'label'	  => 'Purify image content',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 //-----------------------------------------------------------------------
@@ -582,7 +592,14 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('select', 'two_factor_authentication_mode', array(
 			'filters' => array('StringTrim')));
 		$this->getElement('two_factor_authentication_mode')->setMultiOptions($twoFactorAuthenticationMode);
-		
+
+//--------------------------- Self Serve Settings ---------------------------
+
+		$this->addElement('checkbox', 'is_self_serve', array(
+			'label'	  => 'is Self Serve',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+		));
+
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
@@ -1025,13 +1042,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'two_factor_authentication_mode') ,
 		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
-
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
 		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason'), 'accountOptionsMonitorUsage');
 		$this->addDisplayGroup(array('is_first_login','crossLine'), 'accountOptions');
-				
+		$this->addDisplayGroup(array_merge(array('is_self_serve'), array('crossLine')), 'selfServeSettings', array('legend' => 'Self Serve Settings'));
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',
@@ -1041,12 +1057,13 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overageUnit',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit'
 									),'includedUsage', array('legend' => 'Included Usage'));
 		$this->addDisplayGroup(array(
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit'
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
+									'excluded_admin_role_name'
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
@@ -1083,7 +1100,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			array('legend' => 'Live Stream Config')
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
 
 		$this->addDisplayGroup(
 			array_merge(

@@ -112,13 +112,7 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 
         $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
 
-
-        $userGroupsQuery = new kESearchTermsQuery(ESearchCategoryFieldName::KUSER_IDS,array(
-			'index' => $indexName,
-			'type' => ElasticIndexMap::ELASTIC_KUSER_TYPE,
-			'id' => $kuserId,
-			'path' => 'group_ids'
-		));
+		$userGroupsQuery = ESearchGroupUserItem::createGroupIdsTermsQuery(ESearchCategoryFieldName::KUSER_IDS,$kuserId, $indexName);
 		$conditionsBoolQuery->addToShould($userGroupsQuery);
 		$userQuery = new kESearchTermQuery(ESearchCategoryFieldName::KUSER_IDS, $kuserId);
 		$conditionsBoolQuery->addToShould($userQuery);

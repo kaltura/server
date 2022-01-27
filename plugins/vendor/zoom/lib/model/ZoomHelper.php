@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.vendor
  * @subpackage zoom.model
@@ -25,7 +26,10 @@ class ZoomHelper
 		'chat_file',
 		'poll'
 	);
-
+	
+	const RECORDING_FILE_STATUS = 'status';
+	const RECORDING_FILE_STATUS_PROCESSING = 'processing';
+	
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
@@ -80,14 +84,9 @@ class ZoomHelper
 	 * @return bool
 	 */
 	public static function canConfigureEventSubscription($zoomUserPermissions)
-	{
-		if(in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions))
-		{
-			return true;
-		}
-
-		return false;
-	}
+    {
+        return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
+    }
 
 	/**
 	 * redirects to new URL
@@ -153,7 +152,6 @@ class ZoomHelper
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);
-			/** @noinspection PhpUndefinedMethodInspection */
 			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace( '@partnerId@',$zoomIntegration->getPartnerId(),$page);
@@ -173,8 +171,7 @@ class ZoomHelper
 	public static function extractAccountIdFromDeAuthPayload($data)
 	{
 		$payload = $data[self::PAYLOAD];
-		$accountId = $payload[self::ACCOUNT_ID];
-		return $accountId;
+        return $payload[self::ACCOUNT_ID];
 	}
 
 	/**
@@ -184,8 +181,7 @@ class ZoomHelper
 	public static function getPayloadData()
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
-		$data = json_decode($request_body, true);
-		return $data;
+        return json_decode($request_body, true);
 	}
 
 	/**
@@ -246,7 +242,7 @@ class ZoomHelper
 			self::exitWithError(kZoomErrorMessages::NO_INTEGRATION_DATA);
 		}
 
-		if($zoomIntegration->getStatus() == VendorStatus::DISABLED)
+		if($zoomIntegration->getStatus() == VendorIntegrationStatus::DISABLED)
 		{
 			self::exitWithError(kZoomErrorMessages::UPLOAD_DISABLED);
 		}
@@ -280,11 +276,16 @@ class ZoomHelper
 		}
 	}
 	
-	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType)
+	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType, &$fileInStatusProcessingExists)
 	{
 		$recordingFilesOrdered = array();
 		foreach($recordingFiles as $recordingFile)
 		{
+			if( isset($recordingFile[self::RECORDING_FILE_STATUS]) && ($recordingFile[self::RECORDING_FILE_STATUS] === self::RECORDING_FILE_STATUS_PROCESSING) )
+			{
+				$fileInStatusProcessingExists = true;
+			}
+			
 			if(!isset($recordingFile[$recordingType]))
 			{
 				continue;
@@ -318,8 +319,8 @@ class ZoomHelper
 	}
 	
 	public static function sortArrayByValuesArray(array $filesOrderByRecordingType, array $orderArray)
-	{
-		$ordered = [];
+    {
+		$ordered = array();
 		foreach ($orderArray as $item)
 		{
 			$filesByRecordingType = self::getFilesByRecordingType($filesOrderByRecordingType, $item);
@@ -345,5 +346,21 @@ class ZoomHelper
 			}
 		}
 		return $filesByRecordingType;
+	}
+
+	public static function getRedirectUrl($url)
+	{
+		$redirectUrl = $url;
+		$curl = curl_init($url);
+		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt ($curl, CURLOPT_HEADER, true);
+		curl_setopt ($curl, CURLOPT_NOBODY, true);
+		$result = curl_exec($curl);
+		if ($result !== false)
+		{
+			$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+		}
+		return $redirectUrl;
 	}
 }

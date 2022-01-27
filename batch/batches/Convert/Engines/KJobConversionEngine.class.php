@@ -19,7 +19,6 @@ abstract class KJobConversionEngine extends KConversionEngine
 	{
 		$tempPath = dirname($data->destFileSyncLocalPath);
 		$this->logFilePath = $data->logFileSyncLocalPath;
-		
 		// assume there always will be this index
 		$conv_params = $data->flavorParamsOutput;
  
@@ -63,7 +62,7 @@ abstract class KJobConversionEngine extends KConversionEngine
 				}
 				else
 				{
-					$exec_cmd = $this->getCmdLine ( $cmd , true );
+					$exec_cmd = $this->getCmdLine ( $cmd , true, $data->estimatedEffort );
 				}
 				$conversion_engine_result = new KConversioEngineResult( $exec_cmd , $cmd );
 				$conversion_engine_result_list[] = $conversion_engine_result;
@@ -118,6 +117,8 @@ abstract class KJobConversionEngine extends KConversionEngine
 		$this->logMediaInfo ( $log_file , $actualFileSyncLocalPath );
 		
 		$duration = 0;
+		$rUsedStart = getrusage(1);
+		
 		foreach ( $conversion_engine_result_list as $conversion_engine_result )
 		{
 			$execution_command_str = $conversion_engine_result->exec_cmd;
@@ -162,7 +163,15 @@ abstract class KJobConversionEngine extends KConversionEngine
 		// Export job CPU metrics 
 		$obj=KChunkedEncodeSessionManager::GetSessionStatsJSON($log_file);
 		if(isset($obj->userCpu))
+		{
 			$data->userCpu = round($obj->userCpu);
+		}
+		else
+		{
+			$rUsedEnd = getrusage(1);
+			$data->userCpu = round(($rUsedEnd['ru_utime.tv_sec'] + floatval($rUsedEnd['ru_utime.tv_usec'] / 1000000))
+				- ($rUsedStart['ru_utime.tv_sec'] + floatval($rUsedStart['ru_utime.tv_usec'] / 1000000)));
+		}
 		
 		return array ( true , $error_message );// indicate all was converted properly
 	}

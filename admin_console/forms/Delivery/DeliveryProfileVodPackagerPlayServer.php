@@ -3,7 +3,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_DeliveryProfileConfiguration
+class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_DeliveryProfileVod
 {
 
 	public function getAdvancedSettings()
@@ -12,7 +12,7 @@ class Form_Delivery_DeliveryProfileVodPackagerPlayServer extends Form_Delivery_D
 			'label'			=> 'Enable ad stitching:',
 		));
 
-		return array('adStitchingEnabled');
+		return array_merge(parent::getAdvancedSettings(), array('adStitchingEnabled'));
 	}
 
 }

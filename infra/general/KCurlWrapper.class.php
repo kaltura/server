@@ -681,7 +681,7 @@ class KCurlWrapper
 
 		if (class_exists('KalturaMonitorClient'))
 		{
-			KalturaMonitorClient::monitorCurl($this->host, $end - $start);
+			KalturaMonitorClient::monitorCurl($this->host, $end - $start, $this->ch);
 		}
 
 		$this->httpCode = $this->getInfo(CURLINFO_HTTP_CODE);
@@ -893,7 +893,7 @@ class KCurlWrapper
 
 		if (class_exists('KalturaMonitorClient'))
 		{
-			KalturaMonitorClient::monitorCurl($host, $end - $start);
+			KalturaMonitorClient::monitorCurl($host, $end - $start, $ch);
 		}
 
 		curl_close($ch);

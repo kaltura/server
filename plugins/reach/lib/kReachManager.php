@@ -20,6 +20,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	protected function getObjectType($eventObjectClassName)
 	{
 		$mapObjectType = array("entry" => objectType::ENTRY,
+			"LiveStreamEntry" => objectType::ENTRY,
 			"category" => objectType::CATEGORY,
 			"asset" => objectType::ASSET,
 			"flavorAsset" => objectType::FLAVORASSET,
@@ -222,7 +223,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 
-		if($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		if($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
 		{
 			$event = new kObjectCreatedEvent($object);
 
@@ -337,7 +338,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->updateReachProfileCreditUsage($object);
 		}
 
-		if ($object instanceof entry && $object->getType() == entryType::MEDIA_CLIP)
+		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))
@@ -389,7 +390,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				$this->handleEntryDurationChanged($object);
 			}
-			if (in_array(entryPeer::STATUS, $modifiedColumns))
+			// Checking if entry duration was modified to handle YouTube entries duration set
+			if (in_array(entryPeer::STATUS, $modifiedColumns)
+				|| (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns)
+					&& $object->getColumnsOldValue(entryPeer::LENGTH_IN_MSECS) === 0))
 			{
 				if ($object->getStatus() == entryStatus::READY && !$object->getBlockAutoTranscript())
 				{

@@ -43,7 +43,7 @@ function fixPath($path)
 function askToDelete($path, $interactive)
 {	
 	$baseKalturaPath = realpath(dirname(__FILE__).DIRECTORY_SEPARATOR.'../..');
-	if (strpos($path, $baseKalturaPath) === 0)
+	if (strpos($path, (string) $baseKalturaPath) === 0)
 	{
 		if ($interactive)
 		{

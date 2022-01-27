@@ -70,7 +70,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 			$c->add ( self::JOB_SUB_TYPE , $jobSubType );
 		
 		$c->addAscendingOrderByColumn(self::CREATED_AT);
-		return self::doSelect( $c );
+		return self::doSelectOne($c);
 	}
 	
 	public static function retrieveByEntryId($obj_id)

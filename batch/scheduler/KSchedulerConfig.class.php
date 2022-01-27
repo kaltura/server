@@ -125,7 +125,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 		}
 		catch (Zend_Config_Exception $e)
 		{
-			$hostNamePrefix = preg_replace('/\d+$/', self::HOSTNAME_WILDCARD , $hostname);
+			$hostNamePrefix = preg_replace('/[a-zA-Z\d]+$/', self::HOSTNAME_WILDCARD , $hostname);
 			parent::__construct($configFileName, $hostNamePrefix, true);
 		}
 
@@ -181,6 +181,7 @@ class KSchedulerConfig extends Zend_Config_Ini
 			$task->setInitOnly(false);
 			$task->setRemoteServerUrl($this->getRemoteServerUrl());
 			$task->setMaxIdleTime($this->getMaxIdleTime());
+			$task->setFileUpdateInterval($this->getFileUpdateInterval());
 
 			$this->taskConfigList[$workerName] = $task;
 		}
@@ -343,6 +344,18 @@ class KSchedulerConfig extends Zend_Config_Ini
 	public function getMaxIdleTime()
 	{
 		return $this->maxIdleTime;
+	}
+
+	public function getFileUpdateInterval()
+	{
+		if ($this->fileUpdateInterval)
+		{
+			return $this->fileUpdateInterval;
+		}
+		else
+		{
+			return 15;
+		}
 	}
 
 	public function getLogDir()

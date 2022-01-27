@@ -16,6 +16,7 @@ class elasticClient
 	const ELASTIC_RETRY_ON_CONFLICT_KEY = 'retry_on_conflict';
 	const ELASTIC_PREFERENCE_KEY = 'preference';
 	const ELASTIC_STICKY_SESSION_PREFIX = 'ELStickySessionIndex_';
+	const REST_TOTAL_HITS_AS_INT = 'rest_total_hits_as_int';
 
 	const GET = 'GET';
 	const POST = 'POST';
@@ -25,8 +26,10 @@ class elasticClient
 	const ELASTIC_ACTION_INDEX = 'index';
 	const ELASTIC_ACTION_UPDATE = 'update';
 	const ELASTIC_ACTION_SEARCH = 'search';
+	const ELASTIC_ACTION_SCROLL = 'scroll';
 	const ELASTIC_ACTION_DELETE = 'delete';
 	const ELASTIC_ACTION_PING = 'ping';
+	const ELASTIC_ACTION_HEALTH = 'health';
 	const ELASTIC_GET_MASTER_INFO = 'get_master_info';
 	const ELASTIC_GET_ALIAS_INFO = 'get_alias_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
@@ -40,9 +43,12 @@ class elasticClient
 
 	const ELASTIC_ACTION_BULK = 'bulk';
 	const DEFAULT_BULK_SIZE = 500;
+	const ELASTIC_MAJOR_VERSION_5 = 5;
+	const ELASTIC_MAJOR_VERSION_7 = 7;
 
 	protected $elasticHost;
 	protected $elasticPort;
+	protected $elasticVersion;
 	protected $ch;
 	protected $bulkBuffer;
 	protected $bulkBufferSize;
@@ -52,19 +58,32 @@ class elasticClient
 	 * elasticClient constructor.
 	 * @param null $host
 	 * @param null $port
+	 * @param null $elasticVersion
 	 * @param null $curlTimeout - timeout in seconds
 	 */
-	public function __construct($host = null, $port = null, $curlTimeout = null)
+	public function __construct($host = null, $port = null, $elasticVersion = null, $curlTimeout = null)
 	{
 		if (!$host)
+		{
 			$host = kConf::get('elasticHost', 'elastic', null);
+		}
 		KalturaLog::debug("Setting elastic host $host");
 		$this->elasticHost = $host;
 		
 		if (!$port)
-			$port = kConf::get('elasticPort', 'elastic', null);;
+		{
+			$port = kConf::get('elasticPort', 'elastic', null);
+		}
+		KalturaLog::debug("Setting elastic port $port");
 		$this->elasticPort = $port;
-		
+
+		if (is_null($elasticVersion))
+		{
+			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::ELASTIC_MAJOR_VERSION_5);
+		}
+		KalturaLog::debug("Setting elastic version to [$elasticVersion]");
+		$this->elasticVersion = $elasticVersion;
+
 		$this->ch = curl_init();
 		
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
@@ -135,7 +154,25 @@ class elasticClient
 			$queryParams[self::ELASTIC_PREFERENCE_KEY] = $params[self::ELASTIC_PREFERENCE_KEY];
 			unset($params[self::ELASTIC_PREFERENCE_KEY]);
 		}
-		
+
+		if (isset($params[self::REST_TOTAL_HITS_AS_INT]))
+		{
+			$queryParams[self::REST_TOTAL_HITS_AS_INT] = $params[self::REST_TOTAL_HITS_AS_INT];
+			unset($params[self::REST_TOTAL_HITS_AS_INT]);
+		}
+
+		if (isset($params['scroll']))
+		{
+			$queryParams['scroll'] = $params['scroll'];
+			unset($params['scroll']);
+		}
+
+		if (isset($params['scroll_id']))
+		{
+			$queryParams['scroll_id'] = $params['scroll_id'];
+			unset($params['scroll_id']);
+		}
+
 		if (count($queryParams) > 0) {
 			$val .= '?';
 			$val .= http_build_query($queryParams);
@@ -175,26 +212,31 @@ class elasticClient
 		$requestTook = microtime(true) - $requestStart;
 		KalturaLog::debug("Elastic took - " . $requestTook . " seconds");
 
-		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost);
-
 		if (!$response)
 		{
 			$code = $this->getErrorNumber();
 			$message = $this->getError();
 			KalturaLog::err("Elastic client curl error code[" . $code . "] message[" . $message . "]");
+
+			$code = 'CURL_' . $code;
 		}
 		else
 		{
 			KalturaLog::debug("Elastic client response " .$response);
 			//return the response as associative array
 			$response = json_decode($response, true);
-			if (isset($response['error']))
-			{
-				$data = array();
-				$data['errorMsg'] = $response['error'];
-				$data['status'] = $response['status'];
-				throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
-			}
+
+			$code = isset($response['status']) ? 'HTTP_' . $response['status'] : '';
+		}
+
+		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost, $code);
+
+		if ($response && isset($response['error']))
+		{
+			$data = array();
+			$data['errorMsg'] = $response['error'];
+			$data['status'] = $response['status'];
+			throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
 		}
 		
 		return $response;
@@ -240,7 +282,7 @@ class elasticClient
 	{
 		return curl_errno($this->ch);
 	}
-	
+
 	/**
 	 * search API
 	 * @param array $params
@@ -257,17 +299,58 @@ class elasticClient
 			//add preference so that requests from the same session will hit the same shards
 			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
 		}
+
+		if ($this->elasticVersion >= self::ELASTIC_MAJOR_VERSION_7)
+		{
+			$params[self::REST_TOTAL_HITS_AS_INT] = "true";
+		}
+
 		$queryParams = $this->getQueryParams($params);
 		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH);
-		
+
 		if (isset($params[self::ELASTIC_SIZE_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_SIZE_KEY] = $params[self::ELASTIC_SIZE_KEY];
-		
+
 		if (isset($params[self::ELASTIC_FROM_KEY]))
 			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_FROM_KEY] = $params[self::ELASTIC_FROM_KEY];
 
 		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
 		$val = $this->sendRequest($cmd, self::POST, $params[self::ELASTIC_BODY_KEY], $logQuery, self::ELASTIC_ACTION_SEARCH, $monitorIndexName);
+		return $val;
+	}
+
+	/**
+	 * scroll API
+	 * @param array $params
+	 * @param $logQuery bool
+	 * @param $shouldAddPreference bool
+	 * @return mixed
+	 */
+	public function scroll(array $params, $logQuery = false, $shouldAddPreference = false)
+	{
+		kApiCache::disableConditionalCache();
+		if ($shouldAddPreference)
+		{
+			//add preference so that requests from the same session will hit the same shards
+			$params[self::ELASTIC_PREFERENCE_KEY] = $this->getPreferenceStickySessionKey();
+		}
+
+		if ($this->elasticVersion >= self::ELASTIC_MAJOR_VERSION_7)
+		{
+			$params[self::REST_TOTAL_HITS_AS_INT] = "true";
+		}
+
+		$queryParams = $this->getQueryParams($params);
+		$cmd = $this->buildElasticCommandUrl($params, $queryParams, self::ELASTIC_ACTION_SEARCH .'/'. self::ELASTIC_ACTION_SCROLL);
+
+		if (isset($params[self::ELASTIC_SIZE_KEY]))
+			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_SIZE_KEY] = $params[self::ELASTIC_SIZE_KEY];
+
+		if (isset($params[self::ELASTIC_FROM_KEY]))
+			$params[self::ELASTIC_BODY_KEY][self::ELASTIC_FROM_KEY] = $params[self::ELASTIC_FROM_KEY];
+
+		$monitorIndexName = isset($params[self::ELASTIC_INDEX_KEY]) ? $params[self::ELASTIC_INDEX_KEY] : self::MONITOR_NO_INDEX;
+		$val = $this->sendRequest($cmd, self::GET, $params[self::ELASTIC_BODY_KEY], $logQuery, self::ELASTIC_ACTION_SEARCH, $monitorIndexName);
 		return $val;
 	}
 	
@@ -360,6 +443,17 @@ class elasticClient
 	{
 		$cmd = $this->elasticHost;
 		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_PING, self::MONITOR_NO_INDEX);
+		return $response;
+	}
+
+	/**
+	 * check health of elastic cluster
+	 * @return mixed
+	 */
+	public function checkHealth()
+	{
+		$cmd = $this->elasticHost . '/_cluster/health';
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_HEALTH, self::MONITOR_NO_INDEX);
 		return $response;
 	}
 	
@@ -481,12 +575,21 @@ class elasticClient
 		if (isset($params[self::ELASTIC_INDEX_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_INDEX_KEY];
 
-		if (isset($params[self::ELASTIC_TYPE_KEY]))
-			$cmd .= '/' . $params[self::ELASTIC_TYPE_KEY];
+		if ($this->elasticVersion < self::ELASTIC_MAJOR_VERSION_7)
+		{
+			if (isset($params[self::ELASTIC_TYPE_KEY]))
+			{
+				$cmd .= '/' . $params[self::ELASTIC_TYPE_KEY];
+			}
+		}
+		elseif (!$action)
+		{
+			$cmd .= "/_doc";
+		}
 		
 		if (isset($params[self::ELASTIC_ID_KEY]))
 			$cmd .= '/' . $params[self::ELASTIC_ID_KEY];
-		
+
 		if ($action)
 			$cmd .= "/_$action";
 		
@@ -508,10 +611,13 @@ class elasticClient
 
 	protected function getBulkActionAndMetadata(&$params)
 	{
-		$actionArr = array (
-			'_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY],
-			'_'.self::ELASTIC_TYPE_KEY => $params[self::ELASTIC_TYPE_KEY],
-		);
+		$actionArr = array ('_'.self::ELASTIC_INDEX_KEY => $params[self::ELASTIC_INDEX_KEY]);
+
+		if ($this->elasticVersion < self::ELASTIC_MAJOR_VERSION_7)
+		{
+			$actionArr['_'.self::ELASTIC_TYPE_KEY] = $params[self::ELASTIC_TYPE_KEY];
+		}
+
 		if (isset($params[self::ELASTIC_ID_KEY]))
 		{
 			$actionArr['_'.self::ELASTIC_ID_KEY] = $params[self::ELASTIC_ID_KEY];
@@ -519,11 +625,13 @@ class elasticClient
 
 		if (isset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]))
 		{
-			$actionArr['_'.self::ELASTIC_RETRY_ON_CONFLICT_KEY] = $params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY];
+			$key = $this->elasticVersion < self::ELASTIC_MAJOR_VERSION_7 ? '_' : null;
+			$actionArr[$key . self::ELASTIC_RETRY_ON_CONFLICT_KEY] = $params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY];
 			unset($params[self::ELASTIC_BODY_KEY][self::ELASTIC_RETRY_ON_CONFLICT_KEY]);
 		}
 
 		$cmd = array ($params[self::ELASTIC_ACTION_KEY] => $actionArr);
 		return json_encode($cmd);
+
 	}
 }

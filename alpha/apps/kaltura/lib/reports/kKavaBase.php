@@ -16,6 +16,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_TRANSCODING_USAGE = 'transcoding-usage';
 	const DATASOURCE_REACH_USAGE = 'reach-usage';
 	const DATASOURCE_API_USAGE = 'api-usage';
+	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -70,6 +71,10 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_APPLICATION_VER = 'applicationVer';
 	const DIMENSION_PARTNER_CRM_ID = 'partnerCrmId';
 	const DIMENSION_PLAYLIST_ID = 'playlistId';
+	const DIMENSION_VIRTUAL_EVENT_ID = 'virtualEventId';
+	const DIMENSION_INDUSTRY = 'industry';
+	const DIMENSION_ROLE = 'role';
+	const DIMENSION_ORIGIN = 'origin';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -131,6 +136,16 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_LOGICAL_ADD = 'logicalAdd'; 
 	const EVENT_TYPE_LOGICAL_DELETE = 'logicalDelete';
 
+	// event types - virtual event registration
+	const EVENT_TYPE_VE_REGISTERED = 'registered';
+	const EVENT_TYPE_VE_CONFIRMED = 'confirmed';
+	const EVENT_TYPE_VE_ATTENDED = 'attended';
+	const EVENT_TYPE_VE_PARTICIPATED = 'participated';
+	const EVENT_TYPE_VE_BLOCKED = 'blocked';
+	const EVENT_TYPE_VE_UNREGISTERED = 'unregistered';
+	const EVENT_TYPE_VE_INVITED = 'invited';
+	const EVENT_TYPE_VE_CREATED = 'created';
+
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
 	const VIEW_EVENT_PERIOD = 'PT10S';	
@@ -149,6 +164,9 @@ class kKavaBase extends kDruidBase
 	const MEDIA_TYPE_LIVE_REAL_MEDIA = 'Live stream real media';
 	const MEDIA_TYPE_LIVE_QUICKTIME = 'Live stream quicktime';
 
+	// source type
+	const SOURCE_INTERACTIVE_VIDEO = 'Interactive Video';
+
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
 
@@ -159,6 +177,8 @@ class kKavaBase extends kDruidBase
 	const PROPERTY_HAS_LATENCY = 'hasLatency';
 	const PROPERTY_HAS_DROPPED_FRAMES_RATIO = 'hasDroppedFramesRatio';
 	const PROPERTY_HAS_JOIN_TIME = 'hasJoinTime';
+	const PROPERTY_HAS_SEGMENT_DOWNLOAD_TIME = 'hasSegmentDownloadTime';
+	const PROPERTY_HAS_MANIFEST_DOWNLOAD_TIME = 'hasManifestDownloadTime';
 
 	//user engagement values
 	const USER_SOUND_ON_TAB_FOCUSED = 'SoundOnTabFocused';
@@ -248,6 +268,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_POSITION => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -367,9 +388,32 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+		),
+		self::DATASOURCE_VE_REGISTRATION => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_ORIGIN => 1,
 		),
 	);
 
+	protected static $datasources_hash_dimensions = array(
+		self::DATASOURCE_HISTORICAL => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
+		self::DATASOURCE_REALTIME => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
+	);
 	protected static $sourceFromAdminTag = array(
 		'kalturaclassroom' => 'Classroom Capture',
 		'kalturacapture' => 'Kaltura Capture',

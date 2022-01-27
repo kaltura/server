@@ -31,6 +31,11 @@ class KalturaUploadedFileResource extends KalturaGenericDataCenterContentResourc
 		if(!$object_to_fill)
 			$object_to_fill = new kLocalFileResource();
 		
+		if (myUploadUtils::isFileTypeRestricted($this->fileData['tmp_name'], $this->fileData['name']))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+		
 		$ext = pathinfo($this->fileData['name'], PATHINFO_EXTENSION);
 		
 		$uploadPath = $this->fileData['tmp_name'];

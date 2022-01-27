@@ -9,6 +9,9 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
+	
+	const IMAGE_FILE_EXT = 'image_file_ext';
+	
 	protected function getEnabledMediaTypes()
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
@@ -902,9 +905,13 @@ class ThumbAssetService extends KalturaAssetService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
 		
-		
+		if (!$this->isThumbValidFileType($fileData['name'])
+			|| myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
 		$dbThumbAsset = new thumbAsset();
@@ -944,6 +951,22 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAssets = new KalturaThumbAsset();
 		$thumbAssets->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAssets;
+	}
+	
+	protected function isThumbValidFileType($fileName, $partnerId = null)
+	{
+		$allowedThumbnailFileTypes = kConf::get(self::IMAGE_FILE_EXT);
+		if(!$partnerId)
+		{
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+		}
+		$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
+			&& !in_array($fileExtension, $allowedThumbnailFileTypes))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	/**

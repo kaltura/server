@@ -20,6 +20,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	const MEETING_OM_CLASS = 'MeetingScheduleEvent';
 	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
 	const LIVE_REDIRECT_OM_CLASS = 'LiveRedirectScheduleEvent';
+	const VOD_OM_CLASS = 'VodScheduleEvent';
 	
 	const BLACKOUT_SESSION_CACHE_START_DATE = 'start_date';
 	const BLACKOUT_SESSION_CACHE_END_DATE = 'end_date';
@@ -35,6 +36,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		ScheduleEventType::BLACKOUT => self::BLACKOUT_OM_CLASS,
 		ScheduleEventType::MEETING => self::MEETING_OM_CLASS,
 		ScheduleEventType::LIVE_REDIRECT => self::LIVE_REDIRECT_OM_CLASS,
+		ScheduleEventType::VOD => self::VOD_OM_CLASS,
 	);
 	
 	/*
@@ -201,6 +203,14 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$criteria->add(ScheduleEventPeer::RECURRENCE_TYPE, ScheduleEventRecurrenceType::RECURRENCE);
 		$criteria->add(ScheduleEventPeer::ORIGINAL_START_DATE, $dates, Criteria::IN);
 		
+		return ScheduleEventPeer::doSelect($criteria);
+	}
+	
+	public static function retrieveByPartnerIdAndId($partnerId, $id)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventPeer::PARTNER_ID, $partnerId);
+		$criteria->add(ScheduleEventPeer::ID, $id);
 		return ScheduleEventPeer::doSelect($criteria);
 	}
 

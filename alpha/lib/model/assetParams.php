@@ -11,6 +11,7 @@
 class assetParams extends BaseassetParams implements IBaseObject
 {
 	const CONTAINER_FORMAT_FLV = "flv";
+	const CONTAINER_FORMAT_FLASH_VIDEO = "flash video";
 	const CONTAINER_FORMAT_MP4 = "mp4";
 	const CONTAINER_FORMAT_AVI = "avi";
 	const CONTAINER_FORMAT_MOV = "mov";
@@ -20,12 +21,17 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_OGV = "ogv";
 	const CONTAINER_FORMAT_WMV = "wmv";
 	const CONTAINER_FORMAT_WMA = "wma";
+	const CONTAINER_FORMAT_WINDOWS_MEDIA = "windows media";
 	const CONTAINER_FORMAT_ISMV = "ismv";
 	const CONTAINER_FORMAT_ISMA = "isma";
 	const CONTAINER_FORMAT_MKV = "mkv";
 	const CONTAINER_FORMAT_WEBM = "webm";
 	const CONTAINER_FORMAT_MPEG = "mpeg";
+	const CONTAINER_FORMAT_MPEG_AUDIO = "mpeg audio";
+	const CONTAINER_FORMAT_MPEG_TS = "mpeg-ts";
 	const CONTAINER_FORMAT_MPEGTS = "mpegts";
+	const CONTAINER_FORMAT_MPEG_PS = "mpeg-ps";
+	const CONTAINER_FORMAT_MPEG_4 = "mpeg-4";
 	const CONTAINER_FORMAT_M2TS = "m2ts";
 	const CONTAINER_FORMAT_APPLEHTTP = "applehttp";
 	const CONTAINER_FORMAT_WAV = "wav";
@@ -38,7 +44,8 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_ISOM = "isom";
 	const CONTAINER_FORMAT_F4V = "f4v";
 	const CONTAINER_FORMAT_QT = "qt";
-	
+	const CONTAINER_FORMAT_QUICKTIME = "quicktime";
+
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
 	

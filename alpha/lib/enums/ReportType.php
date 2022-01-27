@@ -67,6 +67,7 @@ interface ReportType extends BaseEnum
    const INTERACTIVE_VIDEO_NODE_SWITCH_HOTSPOT_CLICKED_PERCENTILES = 57;
    const TOP_CUSTOM_VAR2 = 58;
    const TOP_CUSTOM_VAR3 = 59;
+   const SELF_SERVE_USAGE = 60;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;
@@ -108,6 +109,7 @@ interface ReportType extends BaseEnum
    const PLAYBACK_RATE_VPAAS = 20020;
    const PARTNER_USAGE_VPAAS = 20021;
    const TOP_PLAYBACK_CONTEXT_VPAAS = 20022;
+   const SELF_SERVE_USAGE_VPAAS = 20023;
 
    //qoe reports
    const QOE_OVERVIEW = 30001;
@@ -189,5 +191,12 @@ interface ReportType extends BaseEnum
    const ENGAGMENT_TIMELINE_WEBCAST = 40011;
    const ENGAGEMENT_TOOLS_WEBCAST = 40012;
    const REACTIONS_BREAKDOWN_WEBCAST = 40013;
+
+   // virtual event registration
+   const VE_HIGHLIGHTS = 50000;
+   const VE_REGISTERED_PLATFORMS = 50001;
+   const VE_REGISTERED_INDUSTRY = 50002;
+   const VE_REGISTERED_ROLES = 50003;
+   const VE_REGISTERED_COUNTRIES = 50004;
 
 }

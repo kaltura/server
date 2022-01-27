@@ -404,7 +404,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $monitorUsage;
 	
 	/**
-	 * @var string
+	 * @var KalturaRegexArray
 	 * @requiresPermission insert,update
 	 */
 	public $passwordStructureValidations;
@@ -439,6 +439,18 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $numPrevPassToKeep;
 	
+	/**
+	 * @var KalturaTwoFactorAuthenticationMode
+	 * @readonly
+	 */
+	public $twoFactorAuthenticationMode;
+
+	/**
+	 * @var bool
+	 * @requiresPermission insert,update
+	 */
+	public $isSelfServe;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
@@ -450,7 +462,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
-		'passwordStructureValidations', 'passwordStructureValidationsDescription', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep'
+		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -491,7 +503,13 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			$this->usageLimitWarning = null;
 			$this->lastFreeTrialNotificationDay = null;
 			$this->monitorUsage = null;
+			if($partner->getHideSecrets() && kCurrentContext::$ks_partner_id > 0)
+			{
+				$this->adminSecret = null;
+				$this->secret = null;
+			}
 		}
+		
 	}
 
 	/**
@@ -582,16 +600,13 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	protected function updatePasswordStructureFromPartner(Partner $partner)
 	{
-		$passwordValidation = $partner->getPasswordStructureRegex();
-		if (isset($passwordValidation[0]))
+		$regexArr = $partner->getPasswordStructureRegex();
+		if (!$regexArr)
 		{
-			$this->passwordStructureValidations = $passwordValidation[0];
-			$this->passwordStructureValidationsDescription = $partner->getInvalidPasswordStructureMessage();
+			$regexArr = kConf::get('user_login_password_structure');
 		}
-		else
-		{
-			$this->passwordStructureValidations = kConf::get('user_login_password_structure');
-			$this->passwordStructureValidationsDescription = kConf::get('invalid_password_structure_message');
-		}
+		$this->passwordStructureValidations = KalturaRegexArray::fromDbArray($regexArr);
+		
+		$this->passwordStructureValidationsDescription = $partner->getInvalidPasswordStructureMessage();
 	}
 }

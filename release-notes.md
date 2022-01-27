@@ -1,3 +1,389 @@
+# Quasar-17.19.0
+## Html Purifier configuration for additional attributes ##
+* Issue Type: Task
+* Issue ID: PLAT-23541
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [html_purifier]
+    allowedTags="img[title|src|alt], ul, li, ol, br, a"
+    allowedFrameTargets="_blank"
+    allowedRel="nofollow, noopener, noreferrer"
+
+# Quasar-17.18.0
+## Html Purifier tags configuration ##
+* Issue Type: Task
+* Issue ID: PLAT-23300
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [html_purifier]
+    allowedTags="img[title|src|alt], ul, li, ol, br"
+
+## New Login Data Update Action Added To The User Service
+* Issue Type: Task
+* Issue ID: PLAT-23303
+### Deployment Scripts
+```
+php deployment/updates/scripts/add_permissions/2021_12_23_login_data_password_update.php
+```
+
+## Add the feature "Load thumbnail with KS"
+* Issue Type: Task
+* Issue ID: SUP-30407
+
+### Deployment
+Add the following to admin.ini:
+```
+moduls.loadThumbnailWithKs.enabled = true
+moduls.loadThumbnailWithKs.permissionType = 2
+moduls.loadThumbnailWithKs.label = Load thumbnail with KS
+moduls.loadThumbnailWithKs.permissionName = FEATURE_LOAD_THUMBNAIL_WITH_KS
+moduls.loadThumbnailWithKs.basePermissionType =
+moduls.loadThumbnailWithKs.basePermissionName =
+moduls.loadThumbnailWithKs.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Quasar-17.17.0
+## Move V2 player version and studio versions from base.ini to dedicated map ##
+* Issue Type: Task
+* Issue ID: FEC-11387
+
+:warning: **Breaking Change**: The player and studio versions are no longer exist in base.ini.
+
+### Configuration ###
+Remove `html5_version`, `studio_version` and `studio_v3_version` from _local.ini_ (if exists).  
+Create a new configuration map named _appVersions_.  
+Copy from appVersions.template.ini to the new map, and fill the following values:
+
+    html5_version = v2.91
+    studio_version = v2.2.3
+    studio_v3_version = v3.12.2
+
+# Quasar-17.16.0
+## Disable sending Email notification to admin on new admin registration
+* Issue Type: Task
+* Issue ID: PLAT-23316
+### Deployment
+Add the following to admin.ini
+```
+moduls.adminEmailNotifications.enabled = true
+moduls.adminEmailNotifications.permissionType = 2
+moduls.adminEmailNotifications.label = "Disable email notifications to admins on new admin registration"
+moduls.adminEmailNotifications.permissionName = FEATURE_DISABLE_NEW_USER_EMAIL
+moduls.adminEmailNotifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add permission for self serve partner to get partner object ##
+* Issue Type: Task
+* Issue ID: PLAT-23311
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_12_05_add_permissions_partner_get.php
+
+## Allow setting a user role that is not counted in kmc users quota
+* Issue Type: Task
+* Issue ID: PLAT-23297
+
+### Configuration
+To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
+
+## Update EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    - deployment/updates/scripts/xml/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_11_18_deploy_entry_status_equal_email_notification.php
+
+
+## Enable using dynamic email templates for user flows based on their user role
+* Issue Type: Task
+* Issue ID: PLAT-23219, PLAT-23220
+
+
+### Configuration
+* Create a map with the name `dynamic_email_contents` and that is in the following structure: (replace USER_ROLE_NAME with the name of the wanted role)
+
+```
+dynamic_email_role_names = "USER_ROLE_NAME"
+
+dynamic_email_base_link-USER_ROLE = "http://base_url_for_the_template/"
+
+[subjects-USER_ROLE_NAME]
+120 = "Mail Subject 1"
+121 = "Mail Subject 2"
+
+[bodies-USER_ROLE_NAME]
+120 = "Mail Body 1"
+121 = "Mail Body 1"
+```
+(The above texts are examples)
+
+## Add new live language flavors to existing systems ##
+* Issue Type: Task
+* Issue ID: SUP-29836
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2021_11_28_add_new_live_languages.php
+
+
+# Quasar-17.15.0 #
+## Add partner for KME ##
+* Issue Type: Task
+* Issue ID: PLAT-23254
+
+### Configuration ###
+First replace all tokens from the ini file below (under kme section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_10_kme_add_partner.php
+
+## Add permissions for quiz and fileasset to Batch partner for CrossKalturaDistributionEngine ##
+* Issue Type: Client-Bug
+* Issue ID: PSVAMB-26104
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_15_update_file_asset_permission.php
+    php deployment/updates/scripts/add_permissions/2021_11_15_update_quiz_permissions.php
+
+## Synchronize categories of live entries with recorded VOD ##
+* Issue Type: Task
+* Issue ID: KMCNG-2387
+
+### Configuration ###
+Add the following lines from admin.template.ini to admin.ini:
+
+    moduls.liveStreamSyncVodCategory.enabled = true
+    moduls.liveStreamSyncVodCategory.permissionType = 2
+    moduls.liveStreamSyncVodCategory.label = Kaltura Live Streams - Sync recorded VOD category
+    moduls.liveStreamSyncVodCategory.permissionName = FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY
+    moduls.liveStreamSyncVodCategory.basePermissionType = 2
+    moduls.liveStreamSyncVodCategory.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+    moduls.liveStreamSyncVodCategory.group = GROUP_ENABLE_DISABLE_FEATURES
+
+# Quasar-17.14.0 #
+## Virtual Event ##
+A new plugin and service dedicated to managing Virtual Events with new dedicated table in the DB
+
+### Deployment ###
+	* Add VirtualEvent to plugins.ini
+
+	* Add the following to admin.ini 
+	    moduls.virtualEvent.enabled = true
+	    moduls.virtualEvent.permissionType = 2
+	    moduls.virtualEvent.label = "Enable Virtual Events"
+	    moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
+	    moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2021_11_11_create_virtual_event_table.sql
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_service_virtual_event.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Add permission for credit info view ##
+* Issue Type: Task
+* Issue ID: PLAT-23234
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_08_add_permission_credit_info_view.php
+
+## Add permission to insert isSelfServe property on partner object for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23233
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_11_07_add_permission_is_self_serve_partner_object.php
+
+## Add systemPartner updateConfiguration permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23192
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_28_self_serve_server_add_permission_partner_update.php
+
+
+# Quasar-17.13.0 #
+### Configuration ###
+Add the following configurations to local.ini:
+
+    live_packager_url = @LIVE_PACKAGER_HOST@ - replace @LIVE_PACKAGER_HOST@ with the appropriate liveCDN
+    packager_live_thumb_url = /{dc}/capture/
+    packager_live_thumb_name = frame-{offset}.jpg
+
+# Quasar-17.12.0 #
+## Add report getTotal permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23215
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_10_10_self_serve_server_add_report_permission.php
+
+
+## Block specific countries from accessing the API ##
+* Issue Type: Task
+* Issue ID: PLAT-22927
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    blockedCountries = @COMMA_SEPERATED_COUNTRIES_ISO_CODES@
+
+## Add partner for self serve server ##
+* Issue Type: Task
+* Issue ID: PLAT-23201
+
+### Configuration ###
+First replace all tokens from the ini file below (under self-serve-server section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_09_29_self_serve_server_add_partner.php
+
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action update, list) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-811
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_10_05_update_list_caption_liveng_permissions.php
+
+# Quasar-17.11.0 #
+
+## Partner registration - Move all time-consuming jobs to run in batch ##
+Moving functionality to batch, in order to enable a shorter partner registration action
+* Issue Type: Task
+* Issue ID: PLAT-23082
+
+### Deployment Scripts ### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_allow_copy_uiconf_and_categories_from_batch.php
+
+
+## Adding analytics report with custom url to partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23128
+### Configuration ###
+Add/Update a configuration map called 'analytics' with following config:
+
+    [export_report_custom_url]
+    0 = partner_id_0
+    1 = partner_id_1
+    ...
+(Replace partner_id with the appropriate id)
+
+
+## Adding Zoom Transcript accuracy default value ##
+Added a default value for the level of accuracy of the automatic transcription generated by Zoom
+* Issue Type: Task
+* Issue ID: PLAT-23149
+#### Configuration ####
+Add Zoom to configurations/plugins.ini
+    
+Add to configurations/vendor.ini
+
+    [Zoom]
+	ZoomTranscriptionAccuracy = 85
+
+### Deployment Scripts ### 
+	php deployment/base/scripts/installPlugins.php
+
+## Add permissions to cnc partner ##
+Add permissions to CNC partner for session service and groupuser service
+
+* Issue Type: Task
+* Issue ID: PLAT-23128
+
+#### Deployment Script ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_09_12_add_permissions_groupuser_and_seesion.php
+
+# Quasar-17.10.0 #
+## Add action for serving Playback key ##
+An encrypted key served to make sure videos are not shared outside the customers domain
+* Issue Type: Task
+* Issue ID: PLAT-22731
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_10_baseentry_add_permission.php
+
+
+## Add permissions for caption service for liveNG ##
+Add permissions for caption service (action add, setContent) for liveNG (partner -5 )
+* Issue Type: Task
+* Issue ID: LIV-778
+
+#### Deployment Script #### 
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2021_08_31_add_caption_liveng_permissions.php
+
+# Quasar-17.9.0 #
+## Add partner for CNC server ##
+
+* Issue Type: Task
+* Issue ID: PLAT-23018
+
+### Configuration ###
+First replace all tokens from the ini file below (under cnc section) and remove".template" from the file name : deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_08_22_cnc_server_add_partner.php
+
+# Quasar-17.8.0 #
+
+## Static Content Conversion Profiles ##
+
+* Issue Type: Task
+* Issue ID: FOUN-174
+
+### Configuration ###  
+* Update confmaps to activate the static conversion profiles
+* Update admin.ini configuration file:
+
+	moduls.enableStaticContentConversion.enabled = true
+	moduls.enableStaticContentConversion.permissionType = 2
+	moduls.enableStaticContentConversion.label = Disable Static Content Conversion
+	moduls.enableStaticContentConversion.permissionName = FEATURE_DISABLE_STATIC_CONTENT_CONVERSION
+	moduls.enableStaticContentConversion.basePermissionType =
+	moduls.enableStaticContentConversion.basePermissionName =
+	moduls.enableStaticContentConversion.group = GROUP_ENABLE_DISABLE_FEATURES
+  
+
+### Deployment Scripts ### 
+	php deployment/updates/scripts/2021_07_26_deploy_capture_tools_content_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_kaltura_meeting_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_msft_teams_recordings_conversion_data.php
+	php deployment/updates/scripts/2021_07_26_deploy_zoom_recordings_conversion_data.php
+	
+	
+# Quasar-17.7.0 #
+
+## Microsoft Teams Drop Folder  ##
+
+* Issue Type: Task
+* Issue ID: PSVAMB-25152
+
+### Configuration ###  
+* Update plugins.ini configuration file
+* Update admin.ini configuration file
+* Generate clients
+
+### Deployment Scripts ### 
+	php deployment/base/scripts/installPlugins.php
+	php deployment/updates/scripts/add_permissions/2021_07_02_add_vendor_service_permissions.php
+	mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2021_06_02_alter_vendor_integration_column_name.sql
+
 # Quasar-17.5.0 #
 
 ## Update EmailEventNotificationEntryWasAddedToChannel ##

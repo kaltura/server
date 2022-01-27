@@ -18,9 +18,15 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 			'label'			=> 'path prefix for serve flavor:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'port', array(
+			'label'			=> 'Port:',
+			'filters'		=> array('StringTrim'),
+		));
 		
 		$this->addElementToDisplayGroup('storage_info', 'storageBaseDir');
 		$this->addElementToDisplayGroup('storage_info', 'pathPrefix');
+		$this->addElementToDisplayGroup('storage_info', 'port');
 		
 		$this->addElement('select', 'pathManagerClass', array(
 			'label'			=> 'Path Manager:',
@@ -205,7 +211,13 @@ class Form_Partner_StorageConfiguration extends Form_Partner_BaseStorageConfigur
 				$object->privateKey = $content;
 			}
 		}
-		
+
+		//If the port is set to an empty value that is not explicitly null - there is no need to include it in the final object.
+		if (!is_null($object->port) && !$object->port)
+		{
+			unset($object->port);
+		}
+
 		$object->pathManagerParams = json_decode($properties['pathManagerParams'], true);
 		$object->shouldExportThumbs = $properties['shouldExportThumbnails'];
 		$object->shouldExportCaptions = $properties['shouldExportCaptions'];

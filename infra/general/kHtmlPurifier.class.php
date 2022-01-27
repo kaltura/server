@@ -8,6 +8,11 @@ require_once KALTURA_ROOT_PATH . '/vendor/htmlpurifier/library/HTMLPurifier.auto
  */
 class kHtmlPurifier
 {
+	const HTML_PURIFIER = 'html_purifier';
+	const ALLOWED_TAGS = 'allowedTags';
+	const ALLOWED_FRAME_TARGETS = 'allowedFrameTargets';
+	const ALLOWED_REL = 'allowedRel';
+	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
 	private static $allowedTokenPatterns;
@@ -28,14 +33,16 @@ class kHtmlPurifier
 
 		if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
 			return $modifiedValue;
-
-		if ( $modifiedValue != $value )
+		
+		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
+		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
+		
+		if ($modifiedValueTrimmedSpace != $valueTrimmedSpace)
 		{
 			$msg = "Potential Unsafe HTML tags found in $className::$propertyName"
 					. "\nORIGINAL VALUE: [" . $value . "]"
 					. "\nMODIFIED VALUE: [" . $modifiedValue . "]"
 				;
-
 			KalturaLog::err( $msg );
 
 			if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
@@ -84,7 +91,25 @@ class kHtmlPurifier
 		{
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
+			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, array());
+			if ($htmlPurifierConf)
+			{
+				if (isset($htmlPurifierConf[self::ALLOWED_TAGS]))
+				{
+					$config->set('HTML.Allowed', $htmlPurifierConf[self::ALLOWED_TAGS]);
+				}
+				if (isset($htmlPurifierConf[self::ALLOWED_FRAME_TARGETS]))
+				{
+					$config->set('Attr.AllowedFrameTargets', $htmlPurifierConf[self::ALLOWED_FRAME_TARGETS]);
+				}
+				if (isset($htmlPurifierConf[self::ALLOWED_REL]))
+				{
+					$config->set('Attr.AllowedRel', $htmlPurifierConf[self::ALLOWED_REL]);
+				}
+			}
+			
 			self::$purifier = new HTMLPurifier($config);
+			
 			if ( $cacheKey )
 			{
 				apc_store( $cacheKey, self::$purifier );

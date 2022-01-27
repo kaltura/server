@@ -284,17 +284,30 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 		$mediaInfo->videoBitRateMode; // FIXME
 		$mediaInfo->videoWidth = isset($stream->width)? trim($stream->width): null;
 		$mediaInfo->videoHeight = isset($stream->height)? trim($stream->height): null;
-		$mediaInfo->videoFrameRate = null;
-		if(isset($stream->r_frame_rate)){
-			$r_frame_rate = trim($stream->r_frame_rate);
-			if(is_numeric($r_frame_rate))
-				$mediaInfo->videoFrameRate = $r_frame_rate;
-			else {
-				$value=eval("return ($r_frame_rate);");
-				if($value!=false) $mediaInfo->videoFrameRate = round($value,3);
+			/*
+			 * Extract 'videoFrameRate' from the ffprobe::r_frame_rate.
+			 * If the 'r_frame_rate' is missing or abnormally high (>120), 
+			 * use 'avg_frame_rate'
+			 */
+		{
+			$mediaInfo->videoFrameRate = null;
+			if(isset($stream->r_frame_rate)){
+				$r_frame_rate = trim($stream->r_frame_rate);
+				if(is_numeric($r_frame_rate))
+					$value = $r_frame_rate;
+				else {
+					$value=eval("return ($r_frame_rate);");
+				}
 			}
-		}
-			
+			if(isset($value) && $value!=false && $value<120) 
+				$mediaInfo->videoFrameRate = round($value,3);
+			else if(isset($stream->avg_frame_rate)) {
+				$avg_frame_rate = $stream->avg_frame_rate;
+				$value=eval("return ($avg_frame_rate);");
+				if(isset($value) && $value!=false && $value<120) 
+					$mediaInfo->videoFrameRate = round($value,3);
+			}
+		}			
 		$mediaInfo->videoDar = null;
 		if(isset($stream->display_aspect_ratio)){
 			$display_aspect_ratio = trim($stream->display_aspect_ratio);
@@ -758,7 +771,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			KalturaLog::err("ScanType detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
 			return 0;
 		}
-		$interlaced=0;
+		$interlaced=0;$tffed=0;
 		$samples=0;
 		foreach($outputArr as $line){
 			$stam=$pts=$inter=$tff=0;
@@ -771,6 +784,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			$samples++;
 			KalturaLog::log("$stam,pts:$pts,inter:$inter,tff:$tff");
 			$interlaced+=$inter;
+			$tffed+=(int)$tff;
 		}
 		if($samples==0)
 			$scanType=0;
@@ -778,7 +792,7 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			if($samples>5)	$thresh = 3;
 			else $thresh = 1;
 			
-			if($interlaced>$thresh) {
+			if($interlaced>$thresh || $tffed>$thresh) {
 				$scanType=1;
 			}
 			else

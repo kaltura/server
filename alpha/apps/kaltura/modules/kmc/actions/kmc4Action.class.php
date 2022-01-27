@@ -11,14 +11,14 @@ class kmc4Action extends kalturaAction
     const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
 	const LIVE_DASHBOARD_UICONF_TAG = 'lived_player';
-	
+
 	private $confs = array();
-	
+
 	const SYSTEM_DEFAULT_PARTNER = 0;
-	
-	public function execute ( ) 
+
+	public function execute ( )
 	{
-		
+
 		sfView::SUCCESS;
 
 		/** check parameters and verify user is logged-in **/
@@ -28,7 +28,7 @@ class kmc4Action extends kalturaAction
 			// if kmcks from cookie doesn't exist, try ks from REQUEST
 			$this->ks = $this->getP('ks');
 		}
-		
+
 		/** if no KS found, redirect to login page **/
 		if (!$this->ks)
 		{
@@ -51,7 +51,7 @@ class kmc4Action extends kalturaAction
 			die();
 		}
 		/** END - check parameters and verify user is logged-in **/
-		
+
 		/** Get array of allowed partners for the current user **/
 		$allowedPartners = array();
 		$this->full_name = "";
@@ -60,7 +60,7 @@ class kmc4Action extends kalturaAction
 			$partners = myPartnerUtils::getPartnersArray($currentUser->getAllowedPartnerIds());
 			foreach ($partners as $partner)
 				$allowedPartners[] = array('id' => $partner->getId(), 'name' => $partner->getName());
-				
+
 			$this->full_name = $currentUser->getFullName();
 		}
 		$this->showChangeAccount = (count($allowedPartners) > 1 ) ? true : false;
@@ -69,11 +69,11 @@ class kmc4Action extends kalturaAction
 		$this->partner = $partner = PartnerPeer::retrieveByPK($this->partner_id);
 		if (!$partner)
 			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
-		
+
 		if (!$partner->validateApiAccessControl())
 			KExternalErrors::dieError(KExternalErrors::SERVICE_ACCESS_CONTROL_RESTRICTED);
-		
-		kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, null, null, null, self::CURRENT_KMC_VERSION);
+
+		kmcUtils::redirectPartnerToCorrectKmc($partner, $this->ks, self::CURRENT_KMC_VERSION, null, null, null);
 		$this->templatePartnerId = $this->partner ? $this->partner->getTemplatePartnerId() : self::SYSTEM_DEFAULT_PARTNER;
 		$ignoreEntrySeoLinks = PermissionPeer::isValidForPartner(PermissionName::FEATURE_IGNORE_ENTRY_SEO_LINKS, $this->partner_id);
 		$useEmbedCodeProtocolHttps = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EMBED_CODE_DEFAULT_PROTOCOL_HTTPS, $this->partner_id);
@@ -85,7 +85,7 @@ class kmc4Action extends kalturaAction
 		$defaultDeliveryType = ($partner->getDefaultDeliveryType()) ? $partner->getDefaultDeliveryType() : 'http';
 		$defaultEmbedCodeType = ($partner->getDefaultEmbedCodeType()) ? $partner->getDefaultEmbedCodeType() : 'auto';
 		$this->previewEmbedV2 = PermissionPeer::isValidForPartner(PermissionName::FEATURE_PREVIEW_AND_EMBED_V2, $this->partner_id);
-		
+
 		/** set values for template **/
 		$this->service_url = requestUtils::getRequestHost();
 		$this->host = $this->stripProtocol( $this->service_url );
@@ -96,7 +96,7 @@ class kmc4Action extends kalturaAction
 		if($this->embed_host == kConf::get("www_host") && kConf::hasParam('cdn_api_host')) {
 			$this->embed_host = kConf::get('cdn_api_host');
 		}
-		$this->embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');	
+		$this->embed_host_https = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
 
 		$this->cdn_url = myPartnerUtils::getCdnHost($this->partner_id);
 		$this->cdn_host = $this->stripProtocol( $this->cdn_url );
@@ -124,25 +124,25 @@ class kmc4Action extends kalturaAction
 			$partner->setIsFirstLogin(false);
 			$partner->save();
 		}
-		
+
 		/** get logout url **/
-		$logoutUrl = null; 
+		$logoutUrl = null;
 		if ($partner->getLogoutUrl())
 			$logoutUrl = $partner->getLogoutUrl();
-		
+
 		$this->kmc_swf_version = kConf::get('kmc_version');
 
 		$akamaiEdgeServerIpURL = null;
 		if( kConf::hasParam('akamai_edge_server_ip_url') ) {
 			$akamaiEdgeServerIpURL = kConf::get('akamai_edge_server_ip_url');
 		}
-		
+
 	/** uiconf listing work **/
 		/** fill $confs with all uiconf objects for all modules **/
 		$kmcGeneralUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, self::SYSTEM_DEFAULT_PARTNER);
 		$kmcGeneralTemplateUiConf = kmcUtils::getAllKMCUiconfs('kmc',   $this->kmc_swf_version, $this->templatePartnerId);
 
-		
+
 		/** for each module, create separated lists of its uiconf, for each need **/
 		/** kmc general uiconfs **/
 		$this->kmc_general = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kmcgeneral", false, $kmcGeneralUiConf);
@@ -158,14 +158,24 @@ class kmc4Action extends kalturaAction
 
 		$this->content_uiconds_clipapp_kdp = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kdpClipApp", false, $kmcGeneralUiConf);
 		$this->content_uiconds_clipapp_kclip = kmcUtils::find_confs_by_usage_tag($kmcGeneralTemplateUiConf, "kmc_kClipClipApp", false, $kmcGeneralUiConf);
-		
-		$this->studioUiConf = uiConfPeer::getUiconfByTagAndVersion(self::HTML5_STUDIO_TAG, kConf::get("studio_version"));
-		$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
-		$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
 
-		$this->studioV3UiConf = uiConfPeer::getUiconfByTagAndVersion(self::STUDIO_V3_TAG, kConf::get("studio_v3_version"));
-		$this->content_uiconfs_studio_v3 = isset($this->studioV3UiConf) ? array_values($this->studioV3UiConf) : null;
-		$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
+		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_version = kConf::getArrayValue('studio_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_v3_version = kConf::getArrayValue('studio_v3_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+
+		if (!is_null($studio_version))
+		{
+			$this->studioUiConf = uiConfPeer::getUiconfByTagAndVersion(self::HTML5_STUDIO_TAG, $studio_version);
+			$this->content_uiconfs_studio_v2 = isset($this->studioUiConf) ? array_values($this->studioUiConf) : null;
+			$this->content_uiconf_studio_v2 = (is_array($this->content_uiconfs_studio_v2) && reset($this->content_uiconfs_studio_v2)) ? reset($this->content_uiconfs_studio_v2) : null;
+		}
+
+		if (!is_null($studio_v3_version))
+		{
+			$this->studioV3UiConf = uiConfPeer::getUiconfByTagAndVersion(self::STUDIO_V3_TAG, $studio_v3_version);
+			$this->content_uiconfs_studio_v3 = isset($this->studioV3UiConf) ? array_values($this->studioV3UiConf) : null;
+			$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
+		}
 
 		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
 		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
@@ -174,7 +184,7 @@ class kmc4Action extends kalturaAction
 		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->content_uiconf_livea = (is_array($this->content_uiconfs_livea) && reset($this->content_uiconfs_livea)) ? reset($this->content_uiconfs_livea) : null;
-		
+
 		$this->liveDUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_DASHBOARD_UICONF_TAG, kConf::get("live_dashboard_version"));
 		$this->content_uiconfs_lived = isset($this->liveDUiConf) ? array_values($this->liveDUiConf) : null;
 		$this->content_uiconf_lived = (is_array($this->content_uiconfs_lived) && reset($this->content_uiconfs_lived)) ? reset($this->content_uiconfs_lived) : null;
@@ -220,31 +230,31 @@ class kmc4Action extends kalturaAction
 				'kclip'					=> $this->content_uiconds_clipapp_kclip->getId(),
 			),
 			'studio'					=> array(
-                'version'				=> kConf::get("studio_version"),
+                'version'				=> $studio_version,
                 'uiConfID'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getId() : '',
                 'config'				=> isset($this->content_uiconf_studio_v2) ? $this->content_uiconf_studio_v2->getConfig() : '',
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,
-                'html5_version'		    => kConf::get("html5_version")
+                'html5_version'		    => $html5_version
             ),
             'studioV3'					=> array(
-                'version'				=> kConf::get("studio_v3_version"),
+                'version'				=> $studio_v3_version,
                 'uiConfID'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getId() : '',
                 'config'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getConfig() : '',
                 'playerVersionsMap'		=> isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,
-                'html5_version'		    => kConf::get("html5_version"),
+                'html5_version'		    => $html5_version,
                 'publisherEnvType'		=> isset($this->partner) ? $this->partner->getPublisherEnvironmentType() : ''
             ),
 			'liveanalytics'					=> array(
                 'version'				=> kConf::get("liveanalytics_version"),
                 'player_id'				=> isset($this->content_uiconf_livea) ? $this->content_uiconf_livea->getId() : '',
-					
+
 				'map_zoom_levels' => kConf::hasParam ("map_zoom_levels") ? kConf::get ("map_zoom_levels") : '',
-			    'map_urls' => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : '',
+                'map_urls' => kConf::hasParam ("cdn_static_hosts") ? array_map(function($s) {return "$s/content/static/maps/v1";}, kConf::get ("cdn_static_hosts")) : '',
             ),
 			'usagedashboard'			=> array(
 				'version'				=> kConf::get("usagedashboard_version"),
@@ -262,7 +272,7 @@ class kmc4Action extends kalturaAction
 			'logoUrl' 					=> kmcUtils::getWhitelabelData( $partner, 'logo_url'),
 			'supportUrl' 				=> kmcUtils::getWhitelabelData( $partner, 'support_url'),
 		);
-		
+
 		$this->kmcVars = $kmcVars;
 	}
 
@@ -276,5 +286,5 @@ class kmc4Action extends kalturaAction
 			return $url;
 		}
 	}
-    
+
 }

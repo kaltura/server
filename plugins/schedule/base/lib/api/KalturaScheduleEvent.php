@@ -264,7 +264,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_END_BEFORE_START, $startDate, $endDate);
 		}
 		
-		$maxDuration = SchedulePlugin::getScheduleEventmaxDuration();
+		$maxDuration = $this->getScheduleEventMaxDuration();
 		if(($endDate - $startDate) > $maxDuration)
 		{
 			throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxDuration);
@@ -278,26 +278,35 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	 */
 	public function validateScheduleEventType($targetRecurrenceType, $sourceRecurrenceType)
 	{
-		 if (!is_null($targetRecurrenceType))
-                {
-                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRENCE)
-                                throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
-
-                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
-                                throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
-
-                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
-                                throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
-
-                        if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::NONE && !is_null($this->recurrence))
-				throw new KalturaAPIException("Can't update single schedule event with recurring data when recurrenceType is not \"RECURRING\".");
-                }
-                else
+		if (!is_null($targetRecurrenceType))
 		{
-	                if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && !is_null($this->recurrence))
-        	                throw new KalturaAPIException("Can't update single schedule event with recurring data when recurrenceType is not \"RECURRING\".");
-                }
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE && $targetRecurrenceType != ScheduleEventRecurrenceType::RECURRENCE)
+			{
+				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+			}
 
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::RECURRING && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
+			{
+				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+			}
+
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::RECURRENCE)
+			{
+				throw new KalturaAPIException(KalturaScheduleErrors::INVALID_SCHEDULE_EVENT_TYPE_TO_UPDATE, $sourceRecurrenceType, $targetRecurrenceType);
+			}
+
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && $targetRecurrenceType === ScheduleEventRecurrenceType::NONE && !is_null($this->recurrence))
+			{
+				throw new KalturaAPIException("Can't update single schedule event with recurring data when recurrenceType is not \"RECURRING\".");
+			}
+		}
+		else
+		{
+			if ($sourceRecurrenceType === ScheduleEventRecurrenceType::NONE && !is_null($this->recurrence))
+			{
+				throw new KalturaAPIException("Can't update single schedule event with recurring data when recurrenceType is not \"RECURRING\".");
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -319,6 +328,12 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		{
 			throw new KalturaAPIException(KalturaScheduleErrors::RECURRENCE_LINKED_EVENT_CONFLICT);
 		}
+
+		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
+		{
+			$this->validateRecurringEventForInsert();
+		}
+
 		if (!is_null($this->startDate))
 		{
 			$this->validatePropertyNotNull('endDate');
@@ -328,10 +343,6 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			// retrieve relevant event's start time and calculate the current event start and end time
 			$this->validatePropertyNotNull('duration');
 			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId(), $this->duration);
-		}
-		if($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
-		{
-			$this->validateRecurringEventForInsert();
 		}
 		
 		$this->validate($this->startDate, $this->endDate);
@@ -363,6 +374,11 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 	protected function getSingleScheduleEventMaxDuration()
 	{
 		return SchedulePlugin::getSingleScheduleEventMaxDuration();
+	}
+	
+	protected function getScheduleEventMaxDuration()
+	{
+		return SchedulePlugin::getScheduleEventmaxDuration();
 	}
 
 	private function validateRecurringEventForInsert()
@@ -412,7 +428,8 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		}
 		elseif ($this->linkedTo)
 		{
-			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId(), $sourceObject->getDuration());
+			$duration = is_null($this->duration) ? $sourceObject->getDuration() : $this->duration;
+			$this->setTimingFromLinkedToEvent($this->linkedTo->getEventId(), $duration);
 			if ($this->startDate && $this->endDate)
 			{
 				$startDate = $this->startDate;
@@ -441,13 +458,19 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		{
 			if (!$this->isNull('endDate'))
 			{
-				if (($startDate + $this->duration) != $this->endDate)
-					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_MUST_MATCH_END_TIME);
+				if (is_null($this->linkedTo))
+				{
+					if (($startDate + $this->duration) != $this->endDate)
+					{
+						throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_MUST_MATCH_END_TIME);
+					}
+				}
 			}
 
 			if (!is_null($this->recurrenceType) && $this->recurrenceType != ScheduleEventRecurrenceType::RECURRING)
 			{
 				$this->endDate = $startDate + $this->duration;
+				$this->startDate = $startDate;
 				$this->duration = null;
 			}
 
@@ -457,23 +480,34 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			if ($this->recurrenceType == KalturaScheduleEventRecurrenceType::RECURRING)
 			{
 				if ($this->duration > $maxSingleEventDuration)
+				{
 					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
-			} elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
+				}
+			}
+			elseif ($this->recurrenceType == KalturaScheduleEventRecurrenceType::NONE)
 			{
 				if (($this->endDate - $this->startDate) > $maxSingleEventDuration)
+				{
 					throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+				}
 			}
 		}
 
 		// we can't update a recurrence object and set both until and count so if one of them is going to be updated we set remove the other one.
 		if(!is_null($this->recurrence->until) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getCount()))
+		{
 			$this->recurrence->count = null;
+		}
 		if(!is_null($this->recurrence->count) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getUntil()))
+		{
 			$this->recurrence->until = null;
+		}
 
 		//if we are updating an event from recurring to single event we need to remove the duration on the object since we calculate it from scratch according to start and end date
 		if (!is_null($this->recurrenceType) && $this->recurrenceType == ScheduleEventRecurrenceType::NONE && $sourceObject->getRecurrenceType() == ScheduleEventRecurrenceType::RECURRING)
+		{
 			$this->duration = null;
+		}
 
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
@@ -552,6 +586,10 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 
 			case ScheduleEventType::LIVE_REDIRECT:
 				$object = new KalturaLiveRedirectScheduleEvent();
+				break;
+
+			case ScheduleEventType::VOD:
+				$object = new KalturaVodScheduleEvent();
 				break;
 				
 			default:

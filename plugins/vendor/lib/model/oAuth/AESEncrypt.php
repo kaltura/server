@@ -45,11 +45,14 @@ class AESEncrypt
 		do
 		{
 			$efforts += 1;
-			$iv = openssl_random_pseudo_bytes(16, $wasItSecure);
-			if ($efforts > $maxEfforts)
-			{
-				throw new KalturaAPIException('Unable to generate secure iv for tokens.');
-			}
+            try {
+                $iv = openssl_random_pseudo_bytes(16, $wasItSecure);
+                if ($efforts > $maxEfforts) {
+                    throw new KalturaAPIException('Unable to generate secure iv for tokens.');
+                }
+            } catch(Exception $e) { //ready for php7.4 where the behavior changes
+                throw new KalturaAPIException('Unable to generate secure iv for tokens.');
+            }
 		} while (!$wasItSecure);
 		return $iv;
 	}

@@ -114,14 +114,17 @@ class WidevinePlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
 		if (class_exists('Kaltura_Client_Client'))
 		{
 			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmProfile' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
-    		{
-    			return new Kaltura_Client_Widevine_Type_WidevineProfile();
-    		}
-    		if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
-    		{
-     			return new Form_WidevineProfileConfigureExtend_SubForm();
-    		}	   		
-
+			{
+				return new Kaltura_Client_Widevine_Type_WidevineProfile();
+			}
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+			{
+				return new Kaltura_Client_Drm_Type_DrmPolicy();
+			}
+			if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+			{
+				return new Form_WidevineProfileConfigureExtend_SubForm();
+			}
 		}
 
 		return null;
@@ -184,7 +187,12 @@ class WidevinePlugin extends BaseDrmPlugin implements IKalturaEnumerator, IKaltu
     			return 'Kaltura_Client_Widevine_Type_WidevineProfile';
     		}
 
-    		if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+			if ($baseClass == 'Kaltura_Client_Drm_Type_DrmPolicy' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
+			{
+				return 'Kaltura_Client_Drm_Type_DrmPolicy';
+			}
+
+			if ($baseClass == 'Form_DrmProfileConfigureExtend_SubForm' && $enumValue == Kaltura_Client_Drm_Enum_DrmProviderType::WIDEVINE)
     		{
      			return 'Form_WidevineProfileConfigureExtend_SubForm';
     		}	   		

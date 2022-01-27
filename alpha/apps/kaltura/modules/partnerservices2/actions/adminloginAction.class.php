@@ -26,7 +26,7 @@ class adminloginAction extends defPartnerservices2Action
 					"ks" => array ( "type" => "string" , "desc" => "" ),
 					),
 				"errors" => array (
-					APIErrors::ADMIN_KUSER_NOT_FOUND,
+					APIErrors::USER_DATA_ERROR,
 					APIErrors::LOGIN_RETRIES_EXCEEDED,
 					APIErrors::LOGIN_BLOCKED,
 					APIErrors::USER_WRONG_PASSWORD,
@@ -53,7 +53,7 @@ class adminloginAction extends defPartnerservices2Action
 		// so no hint about existing admin will leak 
 		if ( !$loginData )
 		{
-			$this->addError ( APIErrors::ADMIN_KUSER_NOT_FOUND );	
+			$this->addError ( APIErrors::USER_DATA_ERROR );
 			return;
 		}
 
@@ -63,11 +63,11 @@ class adminloginAction extends defPartnerservices2Action
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::USER_NOT_FOUND) {
-				$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				$this->addError  ( APIErrors::USER_DATA_ERROR );
 				return null;
 			}
 			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
-				$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				$this->addError  ( APIErrors::USER_DATA_ERROR );
 				return null;
 			}
 			else if ($code == kUserException::LOGIN_RETRIES_EXCEEDED) {
@@ -96,7 +96,7 @@ class adminloginAction extends defPartnerservices2Action
 			}
 		}
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
-			$this->addError  ( APIErrors::ADMIN_KUSER_NOT_FOUND );
+			$this->addError  ( APIErrors::USER_DATA_ERROR );
 			return null;
 		}
 		

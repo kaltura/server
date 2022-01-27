@@ -21,7 +21,7 @@ class myMailAttachmentImporter
 	 * output: array with message data, and set of files saved in provided dir path
 	 * 
 	 */
-	
+
 	function getdata($host,$login,$password,$savedirpath)
 	{
 
@@ -39,14 +39,14 @@ class myMailAttachmentImporter
 		if ( $this->mbox == FALSE) return null;
 
 		$status = imap_status($this->mbox, $mailbox, SA_ALL);
-		
+
 			echo "Messages: ", $status->messages, "<BR>\n";
 			echo "Recent: ", $status->recent, "<BR>\n";
 			echo "Unseen: ", $status->unseen, "<BR>\n";
 			echo "UIDnext: ", $status->uidnext, "<BR>\n";
 			echo "UIDvalidity: ", $status->uidvalidity, "<BR>\n";
 			echo "Flags: ", $status->flags, "<BR>\n";
-		
+
 		// now itterate through messages
 		for ($mid = imap_num_msg($this->mbox); $mid >= 1; $mid--)
 		{
@@ -64,13 +64,13 @@ class myMailAttachmentImporter
 			imap_delete($this->mbox,$mid); //imap_delete tags a message for deletion
 
 		} // for multiple messages
-			
+
 		imap_expunge($this->mbox); // imap_expunge deletes all tagged messages
 		imap_close($this->mbox);
 
 		// now send the data to the server
 		$this->exportEntries();
-		
+
 		return $this->importedMessageDataArray;
 	}// function getdata
 
@@ -88,39 +88,39 @@ class myMailAttachmentImporter
 					else if ( $insertype = "image" )
 					{ $mediatypecode = 2; }
 					else $mediatypecode = 0; // unknown type
-				
+
 				$fileforupload = $importedMessageData["attachment"]["filename"];
 				$filethumbnail = $importedMessageData["attachment"]["thumbnail"];
-				
+
 				//$pieces = explode( '@', $importedMessageData["fromaddress"] );
 				//$kusermobileid = $pieces[0];
-				
+
 				$mobileid = $importedMessageData["fromaddress"];
-				
+
 				// create a new curl resource
 				$ch = curl_init();
-				
+
 				// set URL and other appropriate options
 				if ( SF_ENVIRONMENT == 'prod' )
 				{
 					$prefix = 'index.php';
 				}
 				else $prefix = 'kaltura_dev.php';
-				
+
 				$serveraddr = $_SERVER && $_SERVER["SERVER_ADDR"] ? $_SERVER["SERVER_ADDR"] : "localhost";
 
 				$urlstring = $serveraddr.'/'.$prefix.'/contribute/insertMobileEntry?kshow_id='.$kshowinsertid.'&entry_name=MobileEntry&entry_description=Entry_from_mobile_phone&entry_media_type='.$mediatypecode.'&entry_thumbnail='.$filethumbnail.'&entry_data='.$fileforupload.'&mobile_id='.$mobileid;
-				
+
 				//echo $urlstring;
-				
+
 				curl_setopt($ch, CURLOPT_URL, $urlstring);
 				curl_setopt($ch, CURLOPT_HEADER, 0);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER , TRUE);
 				curl_setopt($ch, CURLOPT_POST , TRUE); // make sure we're doing this using post
-				
+
 				// grab URL and pass it to the browser
 				$response = curl_exec($ch);
-				
+
 				if (curl_errno($ch)) 
 				{
 					echo "Error while trying to connect to:". $urlstring."error=".curl_error($ch)."\n"; 
@@ -133,8 +133,8 @@ class myMailAttachmentImporter
 			} else echo 'Error - no attachment\n';
 		}
 	}//function exportEntries
-	
-	
+
+
 	function saveAttachments( $mid )
 	{
 		$attachments = $this->locateAttachments();
@@ -209,8 +209,7 @@ class myMailAttachmentImporter
 
 		if ( is_array($array ) )
 		{
-			while(list($key,$value) = each($array))
-			{
+			foreach ($array as $key => $value) {
 				if(is_array($value))
 				{
 			  echo $key."(array):<blockquote>";
@@ -300,7 +299,7 @@ class myMailAttachmentImporter
 		if ( !$partsArray ) return null;
 		$found = array();
 		$i = 1;
-		
+
 		foreach ($partsArray as $key => $part) {
 			if ($this->checkParam($part, $param1Type, $param1Value)) { //1 == true, go true
 				if (isset($param2Type)) {
@@ -341,7 +340,7 @@ class myMailAttachmentImporter
 			return null;
 		}
 	}
-	
+
 	function getdecodevalue($message,$coding)
 	{
 		if ($coding == 0)
@@ -370,7 +369,7 @@ class myMailAttachmentImporter
 		}
 		return $message;
 	}
-	
+
 }// class
 
 

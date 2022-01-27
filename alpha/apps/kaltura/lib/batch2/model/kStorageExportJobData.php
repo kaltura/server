@@ -25,6 +25,11 @@ class kStorageExportJobData extends kStorageJobData
 	 */
 	private $externalUrl;
 
+	/**
+	 * @var int
+	 */
+	private $port;
+
 	public static function getInstance($protocol)
 	{
 		$data = null;
@@ -58,6 +63,11 @@ class kStorageExportJobData extends kStorageJobData
 		$this->setForce($force);
 		$this->setDestFileSyncStoredPath($externalStorage->getStorageBaseDir() . '/' . $fileSync->getFilePath());
 		$this->setCreateLink($externalStorage->getCreateFileLink());
+
+		if ($externalStorage->getPort())
+		{
+			$this->setPort($externalStorage->getPort());
+		}
 
 		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds())))
 		{
@@ -145,4 +155,19 @@ class kStorageExportJobData extends kStorageJobData
 		$this->externalUrl = $externalUrl;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getPort()
+	{
+		return $this->port;
+	}
+
+	/**
+	 * @param int $port
+	 */
+	public function setPort($port)
+	{
+		$this->port = $port;
+	}
 }

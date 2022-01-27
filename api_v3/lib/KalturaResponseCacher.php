@@ -15,7 +15,13 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_JSON = 1;
 	const RESPONSE_TYPE_XML = 2;
 	const RESPONSE_TYPE_PHP = 3;
-		
+
+	const BATCH_PARTNER_ID = -1;
+	
+	const ON_ERROR = '_onError';
+	
+	static protected $rateLimitKey;
+
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
 	
 	protected $_defaultExpiry = 0;
@@ -36,7 +42,7 @@ class KalturaResponseCacher extends kApiCache
 		if (!parent::init())
 			return false;
 
-		self::handleCacheBasedServiceActions($this->_params);
+		$this->handleCacheBasedServiceActions($this->_params);
 		
 		// remove parameters that do not affect the api result
 		foreach(kConf::get('v3cache_ignore_params') as $name)
@@ -333,19 +339,25 @@ class KalturaResponseCacher extends kApiCache
 			$format == self::RESPONSE_TYPE_JSON ;
 	}
 
-	private static function handleCacheBasedServiceActions(&$params)
+	private function handleCacheBasedServiceActions()
 	{
+		$params = $this->_params;
+
 		if (isset($params['service']) && isset($params['action']))
 		{
 			$service = $params['service'];
 			$action = $params['action'];
 			if ($service === 'session' && $action === 'start')
+			{
 				return self::handleSessionStart($params);
+			}
 			else
 			{
 				$format = isset($params['format']) ? $params['format'] : self::RESPONSE_TYPE_XML;
 				if (!self::isSupportedFormat($format))
-					return;			// the format is unsupported at this level
+				{
+					return;
+				}			// the format is unsupported at this level
 				$confActions = $path = kConf::get('cache_based_service_actions');;
 				if (is_array($confActions))
 				{
@@ -353,22 +365,55 @@ class KalturaResponseCacher extends kApiCache
 					if (array_key_exists($actionKey, $confActions))
 					{
 						$startTime = microtime(true);
+
 						$filePath = dirname(__FILE__).$confActions[$actionKey];
 						if ($filePath != dirname(__FILE__) &&
 							file_exists($filePath))
 						{
 							require_once($filePath);
 							$className = basename($filePath, ".php");
-							if (class_exists($className) && method_exists($className, $action))
-								$result =  $className::$action($params);
-							else
+							if (!class_exists($className) || !method_exists($className, $action))
+							{
 								$result = "Could not run $className::$action since it does not exist";
+								$processingTime = microtime(true) - $startTime;
+								return self::returnCacheResponseStructure($processingTime, $format, $result);
+							}
+
+							$validateAction = "{$action}_validate";
+							if (method_exists($className, $validateAction))
+							{
+								$validateResult = $className::$validateAction($params);
+								if($validateResult === false)
+								{
+									return;
+								}
+
+								if ($validateResult !== true)
+								{
+									$result = "$service->$action call not validated. " . $validateResult;
+									$processingTime = microtime(true) - $startTime;
+									return self::returnCacheResponseStructure($processingTime, $format, $result);
+								}
+							}
+
+							$ksPartnerId = $this->_ksObj ? $this->_ksObj->partner_id : 0;
+							if (!self::rateLimit($service, $action, $params, $this->_partnerId, $ksPartnerId))
+							{
+								$result = "Access to $service->$action was rate limited";
+								$processingTime = microtime(true) - $startTime;
+								return self::returnCacheResponseStructure($processingTime, $format, $result);
+							}
+							$result =  $className::$action($params);
 						}
 						else
-						    $result = "Failed to parse $actionKey as a valid class configuration";
+						{
+							$result = "Failed to parse $actionKey as a valid class configuration";
+						}
 						
 						if($result === false)
+						{
 							return;
+						}
 						
 						$processingTime = microtime(true) - $startTime;
 						self::returnCacheResponseStructure($processingTime, $format, $result);
@@ -554,5 +599,190 @@ class KalturaResponseCacher extends kApiCache
 		}
 		
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
+	}
+	
+	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
+	{
+		if (!kConf::hasMap('api_rate_limit') || $ksPartnerId == self::BATCH_PARTNER_ID)
+		{
+			return true;
+		}
+		
+		self::$rateLimitKey = null;
+		$skipEnforceInternalIp = kConf::get('skip_enforce_internal_ip', 'api_rate_limit', null);
+
+		// if 'api_rate_limit' map contains param 'skip_enforce_internal_ip' with value 1, we will ignore the IP check
+		if (!$skipEnforceInternalIp && kIpAddressUtils::isInternalIp())
+		{
+			// if api request is internal IP, the source is a batch machine, and we won't block the action
+			return true;
+		}
+		$rule = self::getRateLimitRule($params, $partnerId, $ksPartnerId);
+		if (!$rule)
+		{
+			return true;
+		}
+
+		if (isset($rule['_key']))
+		{
+			$keyOptions = explode(',', $rule['_key']);
+			$key = null;
+			foreach ($keyOptions as $keyOption)
+			{
+				$value = self::getApiParamValueWildcard($params, $keyOption);
+				if ($value)
+				{
+					$key = $value;
+					break;
+				}
+			}
+
+			if (!$key)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$key = '';
+		}
+
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+		{
+			return true;
+		}
+
+		$partnerId = $ksPartnerId;
+		$keySeed = "$service-$action-$partnerId-$key";
+		$key = 'apiRateLimit-' . md5($keySeed);
+
+		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
+		$cache->add($key, 0, $cacheExpiry);
+		if(isset($rule[self::ON_ERROR]) && $rule[self::ON_ERROR])
+		{
+			$counter = $cache->get($key);
+			self::$rateLimitKey = $key;
+		}
+		else
+		{
+			$counter = $cache->increment($key);
+		}
+		if ($counter <= $rule['_limit'])
+		{
+			return true;
+		}
+
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::log("Rate limit exceeded - key=$key keySeed=$keySeed counter=$counter");
+		}
+
+		if (isset($rule['_logOnly']) && $rule['_logOnly'])
+		{
+			return true;
+		}
+
+		return false;
+	}
+	
+	public static function onErrorRateLimitProcessing()
+	{
+		if (!isset(self::$rateLimitKey))
+		{
+			return;
+		}
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+		{
+			return;
+		}
+		
+		$cache->increment(self::$rateLimitKey);
+	}
+
+	protected static function getApiParamValue($params, $key)
+	{
+		if (isset($params[$key]))
+		{
+			return $params[$key];
+		}
+
+		$explodedKey = explode(':', $key);
+		foreach ($explodedKey as $curKey)
+		{
+			if (!is_array($params) || !isset($params[$curKey]))
+			{
+				return null;
+			}
+
+			$params = $params[$curKey];
+		}
+
+		return $params;
+	}
+
+	protected static function getApiParamValueWildcard($params, $key)
+	{
+		$result = '';
+		foreach ($params as $curKey => $value)
+		{
+			if (is_array($value))
+			{
+				// recurse into the nested param
+				$result .= self::getApiParamValueWildcard($value, $key);
+				continue;
+			}
+
+			if ($curKey == $key ||
+				substr($curKey, -strlen($key) - 1) == ':' . $key)
+			{
+				$result .= $value;
+			}
+		}
+		return $result;
+	}
+
+	protected static function getRateLimitRule($params, $partnerId= null, $ksPartnerId = null)
+	{
+		foreach (kConf::getMap('api_rate_limit') as $rateLimitRule)
+		{
+			$matches = true;
+			if(!is_array($rateLimitRule))
+			{
+				continue;
+			}
+			foreach ($rateLimitRule as $key => $value)
+			{
+				if ($key[0] == '_')
+				{
+					if ($key == '_partnerId')
+					{
+						$partnerId = $ksPartnerId ? $ksPartnerId : $partnerId;
+						if (!in_array($partnerId, explode(",", $value)))
+						{
+							$matches = false;
+							break;
+						}
+					}
+
+					continue;
+				}
+
+				if (self::getApiParamValue($params, $key) != $value)
+				{
+					$matches = false;
+					break;
+				}
+			}
+
+			if ($matches)
+			{
+				return $rateLimitRule;
+			}
+		}
+
+		return null;
 	}
 }

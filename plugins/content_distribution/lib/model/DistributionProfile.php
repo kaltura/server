@@ -490,6 +490,11 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 		return $result;
 	}
 
+	public function shouldExcludeAudioFlavors()
+	{
+		return false;
+	}
+
 	public function getSunriseDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNRISE_DEFAULT_OFFSET);}	
 	public function getSunsetDefaultOffset()					{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_SUNSET_DEFAULT_OFFSET);}	
 	public function getRecommendedStorageProfileForDownload()	{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_STORAGE_PROFILE_DOWNLOAD);}	
@@ -497,6 +502,7 @@ abstract class DistributionProfile extends BaseDistributionProfile implements IS
 	public function getRecommendedDcForExecute()				{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_RECOMMENDED_DC_EXECUTE);}
 	public function getRequiredAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_REQUIRED_ASSET_DISTRIBUTION_RULES, null, array());}
 	public function getOptionalAssetDistributionRules()			{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_OPTIONAL_ASSET_DISTRIBUTION_RULES, null, array());}
+	public function getSupportImageEntry()					{return false;}
 	public function getDistributeTrigger()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DISTRIBUTE_TRIGGER, null, kDistributeTrigger::ENTRY_READY);

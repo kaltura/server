@@ -16,7 +16,8 @@ class kScheduledResourceSearch extends kBaseSearch
 
 		$host = isset($beaconElasticConfig['elasticHost']) ? $beaconElasticConfig['elasticHost'] : null;
 		$port = isset($beaconElasticConfig['elasticPort']) ? $beaconElasticConfig['elasticPort'] : null;
-		$this->elasticClient = new elasticClient($host, $port);
+		$elasticVersion = isset($beaconElasticConfig['elasticVersion']) ? $beaconElasticConfig['elasticVersion'] : elasticClient::ELASTIC_MAJOR_VERSION_5;
+		$this->elasticClient = new elasticClient($host, $port, $elasticVersion);
 	}
 
 	public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null,

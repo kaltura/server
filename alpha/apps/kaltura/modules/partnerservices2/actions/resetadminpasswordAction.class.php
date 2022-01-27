@@ -38,7 +38,7 @@ class resetadminpasswordAction extends defPartnerservices2Action
 		catch (kUserException $e) {
 			$code = $e->getCode();
 			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
-				$this->addException( APIErrors::ADMIN_KUSER_NOT_FOUND );
+				$this->addException( APIErrors::USER_DATA_ERROR );
 				return null;
 			}
 			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
@@ -54,7 +54,7 @@ class resetadminpasswordAction extends defPartnerservices2Action
 				return null;
 			}
 			if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				$this->addException( APIErrors::LOGIN_ID_ALREADY_USED);
+				$this->addException( APIErrors::USER_DATA_ERROR);
 				return null;
 			}			
 			throw $e;
@@ -62,7 +62,7 @@ class resetadminpasswordAction extends defPartnerservices2Action
 		
 		if ( ! $new_password )
 		{
-			$this->addException( APIErrors::ADMIN_KUSER_NOT_FOUND );
+			$this->addException( APIErrors::USER_DATA_ERROR );
 		}
 		$this->addMsg ( "msg" , "email sent") ;
 	}

@@ -726,11 +726,11 @@ abstract class kSharedFileSystemMgr
 	 *
 	 * @param string $msg
 	 */
-	public static function safeLog($msg)
+	public static function safeLog($msg, $logType = "log")
 	{
 		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
 		{
-			KalturaLog::log($msg);
+			KalturaLog::$logType($msg);
 		}
 	}
 }

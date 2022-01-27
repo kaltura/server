@@ -376,7 +376,44 @@ class UserService extends KalturaBaseUserService
 				$error == KalturaErrors::INVALID_OTP ||
 				$error == KalturaErrors::MISSING_OTP)
 			{
-				throw new KalturaAPIException(KalturaErrors::ADMIN_KUSER_NOT_FOUND);
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
+			}
+			throw $e;
+		}
+		return $updateLoginData;
+	}
+	
+	/**
+	 * Resets user login password
+	 * @action loginDataResetPassword
+	 * @param string $loginDataId The user's current email address that identified the user for login
+	 * @param string $newPassword The user's new password
+	 * @throws KalturaErrors::INVALID_FIELD_VALUE
+	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
+	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
+	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * @throws KalturaErrors::ADMIN_KUSER_NOT_FOUND
+	 * @throws APIErrors::LOGIN_RETRIES_EXCEEDED
+	 * @throws APIErrors::LOGIN_BLOCKED
+	 */
+	public function loginDataResetPasswordAction($loginDataId, $newPassword)
+	{
+		self::validateLoginDataParams(array('id' => $loginDataId));
+		
+		try
+		{
+			$updateLoginData = parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
+		}
+		catch(KalturaAPIException $e)
+		{
+			$error = $e->getCode().';;'.$e->getMessage();
+			if ($error == KalturaErrors::LOGIN_DATA_NOT_FOUND ||
+				$error == KalturaErrors::USER_WRONG_PASSWORD ||
+				$error == KalturaErrors::WRONG_OLD_PASSWORD ||
+				$error == KalturaErrors::INVALID_OTP ||
+				$error == KalturaErrors::MISSING_OTP)
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			throw $e;
 		}
@@ -529,7 +566,7 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
 			}
 			else if ($code == kUserException::LOGIN_ID_ALREADY_USED) {
-				throw new KalturaAPIException(KalturaErrors::LOGIN_ID_ALREADY_USED);
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
 			}
 			else if ($code == kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED) {
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);

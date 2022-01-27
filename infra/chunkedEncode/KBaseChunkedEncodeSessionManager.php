@@ -188,17 +188,23 @@ $retries=3;
 					continue;
 				/*
 				 * Check for too short generated chunks. If found - leave with error,
-				 * 10 frame threshold allowed.
+				 * 10 frame threshold allowed (chunker::chunkDurThreshInFrames).
 				 */
-				if($idx<$maxChunks-1
-				&& $chunkData->stat->start+$chunkData->gap > $chunkData->stat->finish+10*$chunker->params->frameDuration){
-					$msgStr="Chunk id ($chunkData->index): chunk duration too short - ".($chunkData->stat->finish-$chunkData->stat->start.", should be $chunkData->gap");
-					KalturaLog::log($msgStr);
-					$this->returnMessages[] = $msgStr;
-					$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
-					return false;
+				if($idx<$maxChunks-1) {
+					$chunkDurThreshInSec=$chunker->chunkDurThreshInFrames*$chunker->params->frameDuration;
+					$generatedChunkDur = $chunkData->stat->finish-$chunkData->stat->start;
+					if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+						$msgStr="Chunk id ($chunkData->index): too short chunk dur - $generatedChunkDur, should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4).", delta:".round($chunkData->gap-$generatedChunkDur,4);
+						KalturaLog::log($msgStr);
+						$this->returnMessages[] = $msgStr;
+						$this->returnStatus = KChunkedEncodeReturnStatus::AnalyzeError;
+						return false;
+					}
+					else
+						KalturaLog::log("Chunk id ($chunkData->index): correct chunk dur - $generatedChunkDur, should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4).", delta:".round($chunkData->gap-$generatedChunkDur,4));
+						
 				}
-			
+				
 				$toFixChunkIdx = $chunkData->index;
 				
 				$chunkFixName = $chunker->getChunkName($toFixChunkIdx, "fix");
@@ -246,7 +252,7 @@ $retries=3;
 				$this->returnStatus = KChunkedEncodeReturnStatus::MergeError;
 				
 				// remove if you are not working with the fopen flow
-				$this->deleteTmpMergedVideoFile();
+				$this->chunker->deleteTmpMergedVideoFile();
 				
 				return false;
 			}
@@ -258,7 +264,7 @@ $retries=3;
 			for($attempt=0; $attempt<$maxAttempts; $attempt++) {
 
 				$process = $this->executeCmdline($mergeCmd, $concatFilenameLog);
-				if($process==false) {
+				if($process===false) {
 					KalturaLog::log("FAILED to merge (attempt:$attempt)!");
 					$logTail = self::GetLogTail($concatFilenameLog);
 					if(isset($logTail))
@@ -290,7 +296,7 @@ $retries=3;
 			}
 			
 			// remove if you are not working with the fopen flow
-			$this->deleteTmpMergedVideoFile();
+			$this->chunker->deleteTmpMergedVideoFile();
 			
 			if($attempt==$maxAttempts){
 				KalturaLog::log($msgStr="FAILED to merge, leaving!");
@@ -300,17 +306,6 @@ $retries=3;
 			}
 
 			return true;
-		}
-		
-		private function deleteTmpMergedVideoFile()
-		{
-			$localTmpConcatVideoFilePath = $this->chunker->getSessionName("video");
-			if(file_exists($localTmpConcatVideoFilePath)) {
-				KalturaLog::debug("Deleting local copy of the tmp video concat file from [$localTmpConcatVideoFilePath]");
-				if(!unlink($localTmpConcatVideoFilePath)) {
-					KalturaLog::warning("Failed to delete local the tmp video concat file from [$localTmpConcatVideoFilePath]");
-				}
-			}
 		}
 		
 		/********************

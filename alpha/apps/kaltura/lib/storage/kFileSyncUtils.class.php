@@ -1015,11 +1015,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
 		$sharedFileSyncs = array();
-		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
 
 		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
-		$fileSyncAllowFilePattern = kConf::get("file_sync_allow_file_pattern", "runtime_config", array());
-		
+				
 		foreach ($file_sync_list as $file_sync)
 		{
 			// make sure not link and work on original
@@ -1034,24 +1033,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				continue;
 			}
 
-			$fileSyncTypeSubTypeKey = $tmp_file_sync->getObjectType() . ":" . $tmp_file_sync->getObjectSubType();
-			if($isCloudDc && $tmp_file_sync->getDc() == $dc_id &&
-				array_key_exists($fileSyncTypeSubTypeKey, $fileSyncAllowFilePattern) &&
-				!preg_match($fileSyncAllowFilePattern[$fileSyncTypeSubTypeKey], $tmp_file_sync->getFullPath()))
-			{
-				continue;
-			}
-			
 			// always prefer files from current dc
-			if($tmp_file_sync->getDc() == $dc_id)
-			{
-				return array($tmp_file_sync);
-			}
-
-			// If file sync type is in skipFileSyncTypeMap we can also return teh cloud storage file sync
-			if($isCloudDc &&
-				array_key_exists($fileSyncTypeSubTypeKey, $fileSyncAllowFilePattern) &&
-				in_array($tmp_file_sync->getDc(), $sharedStorageProfileId))
+			if(!$isCloudDc && $tmp_file_sync->getDc() == $dc_id)
 			{
 				return array($tmp_file_sync);
 			}
@@ -1060,7 +1043,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			{
 				$dcFileSyncs[] = $tmp_file_sync;
 			}
-			else if(in_array($tmp_file_sync->getDc(), $sharedStorageProfileId))
+			elseif(in_array($tmp_file_sync->getDc(), $sharedStorageProfileIds))
 			{
 				$sharedFileSyncs[] = $tmp_file_sync;
 			}
@@ -1070,8 +1053,18 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			}
 		}
 
+		$localFileSyncs = array_merge($dcFileSyncs, $sharedFileSyncs);
+		//Sort order - first sharedStorages, then current dc , then remote dc
+		usort($localFileSyncs, function($a, $b) use ($sharedStorageProfileIds) {
+			/* @var $a FileSync */
+			/* @var $b FileSync */
+			$aValue = in_array($a->getDc(), $sharedStorageProfileIds) ? 0 : ( $a->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
+			$bValue = in_array($b->getDc(), $sharedStorageProfileIds) ? 0 : ( $b->getDc() == kDataCenterMgr::getCurrentDcId() ? 1 : 2);
+			return $aValue - $bValue;
+		});
+		
 		// always prefer local file syncs, then periodic and lastly remote
-		return array_merge($dcFileSyncs, $sharedFileSyncs, $remoteFileSyncs);
+		return array_merge($localFileSyncs, $remoteFileSyncs);
 	}
 
 	/**
@@ -2236,14 +2229,14 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getReadyInternalFileSyncsForKey(FileSyncKey $syncKey)
 	{
-		$periodicStorageFileSyncs = self::getFileSyncsFromPeriodicStorage($syncKey->getPartnerId(), $syncKey);
+		$c = FileSyncPeer::getCriteriaForFileSyncKey($syncKey);
+		$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 
-		$c = FileSyncPeer::getCriteriaForFileSyncKey( $syncKey );
-		$c->addAnd ( FileSyncPeer::FILE_TYPE , FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-		$c->addAnd ( FileSyncPeer::STATUS , FileSync::FILE_SYNC_STATUS_READY );
-		$localfileSyncs = FileSyncPeer::doSelect( $c );
+		$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
+		$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, kDataCenterMgr::getSharedStorageProfileIds(), Criteria::IN));
+		$c->addAnd($c1);
 
-		return array_merge($periodicStorageFileSyncs, $localfileSyncs);
+		return FileSyncPeer::doSelect($c);
 	}
 	
 	public static function getReadyRemoteFileSyncsForAsset($id, $object, $objectType, $objectSubType)

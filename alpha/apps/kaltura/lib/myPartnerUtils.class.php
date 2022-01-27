@@ -1464,12 +1464,7 @@ class myPartnerUtils
  		self::copyAccessControls($fromPartner, $toPartner);
  		self::copyFlavorParams($fromPartner, $toPartner);
  		self::copyConversionProfiles($fromPartner, $toPartner);
-		
- 		self::copyCategories($fromPartner, $toPartner);
- 		
- 		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_WIDGET);
- 		self::copyUiConfsByType($fromPartner, $toPartner, uiConf::UI_CONF_TYPE_KDP3);
-
+ 	
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
 
  		// Launch a batch job that will copy the heavy load as an async operation 
@@ -1511,50 +1506,6 @@ class myPartnerUtils
  		{
  			$newPermission = $permission->copyToPartner($toPartner->getId());
  			$newPermission->save();
- 		}
- 	}
- 	
- 	public static function copyCategories(Partner $fromPartner, Partner $toPartner)
- 	{
- 		KalturaLog::log("Copying categories from partner [".$fromPartner->getId()."] to partner [".$toPartner->getId()."]");
- 		
- 		categoryPeer::setUseCriteriaFilter(false);
- 		$c = new Criteria();
- 		$c->addAnd(categoryPeer::PARTNER_ID, $fromPartner->getId());
- 		$c->addAnd(categoryPeer::STATUS, CategoryStatus::ACTIVE);
- 		$c->addAscendingOrderByColumn(categoryPeer::DEPTH);
- 		$c->addAscendingOrderByColumn(categoryPeer::CREATED_AT);
- 		
- 		$categories = categoryPeer::doSelect($c);
- 		categoryPeer::setUseCriteriaFilter(true);
- 		
- 		foreach($categories as $category)
- 		{
- 			/* @var $category category */
- 			$category->setPuserId(null);
- 			$newCategory= $category->copy();
- 			$newCategory->setPartnerId($toPartner->getId());
- 			if($category->getParentId())
- 				$newCategory->setParentId(kObjectCopyHandler::getMappedId('category', $category->getParentId()));
- 				
- 			$newCategory->save();
- 			
-			$newCategory->setIsIndex(true);
- 			categoryPeer::setUseCriteriaFilter(false);
-			$newCategory->reSetFullIds();
-			$newCategory->reSetInheritedParentId();
-			$newCategory->reSetDepth();
-			$newCategory->reSetFullName();
- 			categoryPeer::setUseCriteriaFilter(true);
-			
-			$newCategory->setEntriesCount(0);
-			$newCategory->setMembersCount(0);
-			$newCategory->setPendingMembersCount(0);
-			$newCategory->setDirectSubCategoriesCount(0);
-			$newCategory->setDirectEntriesCount(0);
-			$newCategory->save();
- 			
- 			KalturaLog::log("Copied [".$category->getId()."], new id is [".$newCategory->getId()."]");
  		}
  	}
  	
@@ -1742,9 +1693,9 @@ class myPartnerUtils
 		}
 
 		// take blocked-countries country code from partner custom data
-		$blockContries = $partner->getDelivryBlockCountries();
+		$blockCountries = $partner->getDelivryBlockCountries();
 		// if not set on partner custom data - take from kConf
-		if(empty($blockContries) || is_null($blockContries))
+		if(empty($blockCountries) || is_null($blockCountries))
 		{
 			// don't auto block paying partners
 			if ($partner->getPartnerPackage() > PartnerPackages::PARTNER_PACKAGE_FREE)
@@ -1752,19 +1703,29 @@ class myPartnerUtils
 					return;
 			}
 			
-			$blockContries = kConf::get ("delivery_block_countries" );
+			$blockCountries = kConf::get ("delivery_block_countries" );
 		}
-		if ($blockContries)
+		if ($blockCountries)
 		{
 			// check if request is coming from the blocked country - and block if it is
-			$currentCountry = null;
-			$blockedCountry = requestUtils::matchIpCountry( $blockContries , $currentCountry );
-			if ($blockedCountry)
+			if (!myPartnerUtils::isRequestFromAllowedCountry($blockCountries, $partnerId))
 			{
-				KalturaLog::log ( "IP_BLOCK partner [$partnerId] from country [$currentCountry]" );
-				KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);			
+				KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);
 			}
 		}
+	}
+	
+	public static function isRequestFromAllowedCountry($blockedCountriesList, $partnerId)
+	{
+		$currentCountry = null;
+		$blockedCountry = requestUtils::matchIpCountry($blockedCountriesList, $currentCountry);
+		if ($blockedCountry)
+		{
+			KalturaLog::err("IP_BLOCK partner [$partnerId] from country [$currentCountry]");
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

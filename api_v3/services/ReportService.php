@@ -13,6 +13,7 @@ class ReportService extends KalturaBaseService
 		ReportType::PARTNER_USAGE,
 		ReportType::VAR_USAGE,
 		ReportType::VPAAS_USAGE_MULTI,
+		ReportType::SELF_SERVE_USAGE_VPAAS,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -44,6 +45,10 @@ class ReportService extends KalturaBaseService
 	 */
 	protected function validateObjectsAreAllowedPartners($reportType, $objectIds, $delimiter)
 	{
+		if(!$objectIds && $reportType == ReportType::SELF_SERVE_USAGE_VPAAS)
+		{
+			return null;
+		}
 		if(!$objectIds && $reportType != ReportType::VPAAS_USAGE_MULTI)
 		{
 			return $this->getPartnerId();
@@ -334,36 +339,38 @@ class ReportService extends KalturaBaseService
 		
 		return $reportResponse;
 	}
-	
+
 	/**
 	 * @action getCsv
 	 * @param int $id
 	 * @param KalturaKeyValueArray $params
 	 * @return file
+	 * @param string $excludedFields
+	 * @throws KalturaAPIException
 	 */
-	public function getCsvAction($id, KalturaKeyValueArray $params = null)
+	public function getCsvAction($id, KalturaKeyValueArray $params = null, $excludedFields = null)
 	{
 		$this->addPartnerIdToParams($params);
-		
+
 		ini_set( "memory_limit","1024M" );
 		set_time_limit(600);
-		
+
 		if (kKavaBase::isPartnerAllowed($this->getPartnerId(), kKavaBase::VOD_DISABLED_PARTNERS))
 		{
 			$customReports = kConf::getMap('custom_reports');
 			if (!isset($customReports[$id]))
 				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-			
+
 			list($columns, $rows) = kKavaReportsMgr::customReport($id, $params->toObjectsArray());
 		}
-		else 
+		else
 		{
 			$dbReport = ReportPeer::retrieveByPK($id);
 			if (is_null($dbReport))
 				throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
-				
+
 			$execParams = KalturaReportHelper::getValidateExecutionParameters($dbReport, $params);
-			
+
 			$kReportsManager = new kReportManager($dbReport);
 			list($columns, $rows) = $kReportsManager->execute($execParams);
 		}
@@ -383,28 +390,37 @@ class ReportService extends KalturaBaseService
 
 		header('Content-Type: text/csv');
 		header("Content-Disposition: attachment; filename=\"$fileName\"");
-		echo "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
-		echo implode(',', $columns) . "\n";
-		foreach($rows as $row) 
+		$content = "\xEF\xBB\xBF"; // a fix for excel, copied from myReportsMgr
+
+		if($excludedFields)
+		{
+			KCsvWrapper::hideCsvColumns($excludedFields, $columns, $rows);
+		}
+
+		$content .= implode(',', $columns) . "\n";
+		foreach($rows as $row)
 		{
 			$row = str_replace(',', ' ', $row);
-			echo implode(',', $row) . "\n";
+			$content .= implode(',', $row) . "\n";
 		}
-		die;
+		return new kRendererString($content, 'text/csv');
 	}
-	
+
 	/**
-	 * Returns report CSV file executed by string params with the following convention: param1=value1;param2=value2 
-	 * 
+	 * Returns report CSV file executed by string params with the following convention: param1=value1;param2=value2
+	 * excludedFields can be supplied comma separated
+	 *
 	 * @action getCsvFromStringParams
 	 * @param int $id
 	 * @param string $params
+	 * @param string $excludedFields
 	 * @return file
+	 * @throws KalturaAPIException
 	 */
-	public function getCsvFromStringParamsAction($id, $params = null)
+	public function getCsvFromStringParamsAction($id, $params = null, $excludedFields = null)
 	{
 		$paramsArray = $this->parseParamsStr($params);
-		return $this->getCsvAction($id, $paramsArray);
+		return $this->getCsvAction($id, $paramsArray, $excludedFields);
 	}
 
 	/**
@@ -466,6 +482,12 @@ class ReportService extends KalturaBaseService
 		if ($params->reportsItemsGroup && !preg_match('/^\w[\w\s]*$/', $params->reportsItemsGroup))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_REPORT_ITEMS_GROUP);
+		}
+
+		$customUrlPartnerIds = kConf::get(kFlowHelper::EXPORT_REPORT_CUSTOM_URL, kConfMapNames::ANALYTICS, array());
+		if (in_array($this->getPartnerId(), $customUrlPartnerIds) && !$params->baseUrl)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'baseUrl');
 		}
 
 	}

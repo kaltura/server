@@ -462,6 +462,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $secondarySecretRoleId;
 	
 	/**
+	 * @var string
+	 */
+	public $excludedAdminRoleName;
+	
+	/**
 	 * @var int
 	 */
 	public $trigramPercentage;
@@ -475,6 +480,16 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var KalturaTwoFactorAuthenticationMode
 	 */
 	public $twoFactorAuthenticationMode;
+	
+	/**
+	 * @var bool
+	 */
+	public $purifyImageContent;
+
+	/**
+	 * @var bool
+	 */
+	public $isSelfServe;
 	
 	
 	private static $map_between_objects = array
@@ -564,9 +579,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"extendedFreeTrailEndsWarning",
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
+		'excludedAdminRoleName',
 		'trigramPercentage',
 		'maxWordForNgram',
-		'twoFactorAuthenticationMode'
+		'twoFactorAuthenticationMode',
+		'purifyImageContent',
+		'isSelfServe',
 	);
 
 	public function getMapBetweenObjects()
@@ -584,6 +602,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		
 		$this->restrictEntryByMetadata = $source_object->getShouldApplyAccessControlOnEntryMetadata();
 		$this->htmlPurifierBaseListUsage = $source_object->getHtmlPurifierBaseListUsage();
+		$this->purifyImageContent = $source_object->getPurifyImageContent();
 		$this->ovpEnvironmentUrl = $source_object->getOvpEnvironmentUrl();
 		$this->ottEnvironmentUrl = $source_object->getOttEnvironmentUrl();
 		
@@ -803,6 +822,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setSecondarySecretRoleId(null);
+		}
+		
+		if(!is_null($this->excludedAdminRoleName))
+		{
+			$object_to_fill->setExcludedAdminRoleName($this->excludedAdminRoleName);
+		}
+		else
+		{
+			$object_to_fill->setExcludedAdminRoleName(null);
 		}
 		
 		return $object_to_fill;

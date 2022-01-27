@@ -203,7 +203,31 @@ class kJobsManager
 		}
 	}
 	
-	public static function addMailJob(BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(), array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null)
+	public static function addDynamicEmailJob($partnerId, $mailType, $mailPriority, $loginEmail, $fromMail, $fromName, $dynamicEmailContents)
+	{
+		self::addMailJob(
+			null,
+			0,
+			$partnerId,
+			$mailType,
+			$mailPriority,
+			kConf::get ($fromMail ),
+			kConf::get ($fromName ),
+			$loginEmail,
+			array(),
+			array(),
+			null,
+			null,
+			null,
+			null,
+			null,
+			$dynamicEmailContents
+		);
+	}
+	
+	public static function addMailJob(
+		BatchJob $parentJob = null, $entryId, $partnerId, $mailType, $mailPriority, $fromEmail, $fromName, $toEmail, array $bodyParams = array(),
+		array $subjectParams = array(), $toName = null, $toId = null, $camaignId = null, $templatePath = null, $separator = null, $dynamicEmailContents = null)
 	{
 	  	$jobData = new kMailJobData();
 		$jobData->setMailPriority($mailPriority);
@@ -227,7 +251,8 @@ class kJobsManager
 	 	$jobData->setTemplatePath($templatePath);
 	
 	 	$partner = PartnerPeer::retrieveByPK($partnerId);
-		$jobData->setLanguage($partner->getLanguage()); 
+		$jobData->setLanguage($partner->getLanguage());
+		$jobData->setDynamicEmailContents($dynamicEmailContents);
 	 	
 		
 		$batchJob = null;
@@ -574,7 +599,7 @@ class kJobsManager
 		
 		$dbConvertFlavorJob->setObjectId($flavorAssetId);
 		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
-		
+		$convertData->setEstimatedEffort($convertData->calculateEstimatedEffort($dbConvertFlavorJob));
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
 	
@@ -1694,7 +1719,12 @@ class kJobsManager
 			{
 				$extractMediaData->setExtractId3Tags(true);
 			}
-			else if($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE) 
+			elseif(kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
+			{
+				$profileLC = kBusinessPreConvertDL::retrieveConversionProfileByType($entry);
+				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
+			}
+			elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 			{
 				$profileLC = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
 				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
@@ -1836,6 +1866,10 @@ class kJobsManager
 		if(!is_null($jobData->getFilePath()))
 		{
 			$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+			if (myUploadUtils::isFileTypeRestricted($jobData->getFilePath(), $jobData->getFileName()))
+			{
+				throw new APIException(APIErrors::INVALID_FILE_TYPE, $jobData->getFileName());
+			}
 	//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 			try{
 				kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);
@@ -1946,6 +1980,7 @@ class kJobsManager
 		$jobData->setTimeZoneOffset($offset);
 		$jobData->setTimeReference(time());
 		$jobData->setReportsGroup($coreParams->getReportsItemsGroup());
+		$jobData->setBaseUrl($coreParams->getBaseUrl());
 
 		$job = new BatchJob();
 		$job->setPartnerId(kCurrentContext::getCurrentPartnerId());

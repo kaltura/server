@@ -251,6 +251,7 @@ class kAssetUtils
 		{
 			case assetParams::CONTAINER_FORMAT_MP42:
 			case assetParams::CONTAINER_FORMAT_ISOM:
+			case assetParams::CONTAINER_FORMAT_MPEG_4:
 			case assetParams::CONTAINER_FORMAT_MP42_ISOM:
 				$result = assetParams::CONTAINER_FORMAT_MP4;
 				break;
@@ -258,6 +259,7 @@ class kAssetUtils
 				$result = assetParams::CONTAINER_FORMAT_MKV;
 				break;
 			case assetParams::CONTAINER_FORMAT_MPEGTS:
+			case assetParams::CONTAINER_FORMAT_MPEG_TS:
 			case assetParams::CONTAINER_FORMAT_M2TS:
 				$result = assetParams::TS_FILE_EXTENSION;
 				break;
@@ -266,10 +268,21 @@ class kAssetUtils
 				$result = assetParams::M3U8_FILE_EXTENSION;
 				break;
 			case assetParams::CONTAINER_FORMAT_MPEG:
+			case assetParams::CONTAINER_FORMAT_MPEG_PS:
 				$result = assetParams::MPG_FILE_EXTENSION;
 				break;
+			case assetParams::CONTAINER_FORMAT_MPEG_AUDIO:
+				$result = assetParams::CONTAINER_FORMAT_MP3;
+				break;
+			case assetParams::CONTAINER_FORMAT_QUICKTIME:
 			case assetParams::CONTAINER_FORMAT_QT:
 				$result = assetParams::CONTAINER_FORMAT_MOV;
+				break;
+			case assetParams::CONTAINER_FORMAT_WINDOWS_MEDIA:
+				$result = assetParams::CONTAINER_FORMAT_WMV;
+				break;
+			case assetParams::CONTAINER_FORMAT_FLASH_VIDEO:
+				$result = assetParams::CONTAINER_FORMAT_FLV;
 				break;
 			case assetParams::CONTAINER_FORMAT_FLV:
 			case assetParams::CONTAINER_FORMAT_MP4:

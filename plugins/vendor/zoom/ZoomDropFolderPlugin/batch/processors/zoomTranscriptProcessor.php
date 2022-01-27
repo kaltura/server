@@ -31,7 +31,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 				KBatchBase::impersonate($entry->partnerId);
 				$captionAsset = $this->createAssetForTranscription($entry, $captionPlugin);
 				$captionAssetResource = new KalturaUrlResource();
-				$redirectUrl = $this->getRedirectUrl($recording);
+				$redirectUrl = $this->getZoomRedirectUrlFromFile($recording);
 				$captionAssetResource->url = $redirectUrl;
 				$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
 				KBatchBase::unimpersonate();
@@ -58,8 +58,6 @@ class zoomTranscriptProcessor extends zoomProcessor
 		$newCaptionAsset->format = KalturaCaptionType::WEBVTT;
 		$newCaptionAsset->fileExt = self::ZOOM_TRANSCRIPT_FILE_EXT;
 		$newCaptionAsset->source = KalturaCaptionSource::ZOOM;
-		$newCaptionAsset->accuracy = KBatchBase::$taskConfig->params->accuracy;
-		
 		$caption = $captionPlugin->captionAsset->add($entry->id, $newCaptionAsset);
 		return $caption;
 	}

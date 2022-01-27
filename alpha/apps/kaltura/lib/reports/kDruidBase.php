@@ -389,27 +389,29 @@ class kDruidBase
 
 			KalturaLog::debug('Druid query took - ' . $druidTook. ' seconds');
 
-			if (curl_errno($ch))
-			{
-				throw new Exception('Error while trying to connect to:'. $url .' error=' . curl_error($ch));
-			}
-
+			$curlError = curl_errno($ch);
 			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-			if ($httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
+			if ($curlError)
 			{
-				if (strpos($response, 'Query timeout') !== false)
-				{
-					KalturaLog::err('Druid Query timed out.');
-					throw new kCoreException("Druid Query timed out", kCoreException::DRUID_QUERY_TIMED_OUT);
-				}
+				$errorCode = 'CURL_' . $curlError;
+				$errorMsg = 'Error while trying to connect to:' . $url . ' error=' . curl_error($ch);
+			}
+			else if ($httpCode != KCurlHeaderResponse::HTTP_STATUS_OK)
+			{
+				$errorCode = 'HTTP_' . $httpCode;
+				$errorMsg = 'Got invalid status code from druid: ' . $httpCode;
+			}
+			else
+			{
+				$result = json_decode($response, true);
 
-				throw new Exception('Got invalid status code from druid: ' . $httpCode);
+				$errorCode = isset($result[self::DRUID_ERROR]) ?
+					$result[self::DRUID_ERROR_CLASS] . ',' . $result[self::DRUID_ERROR] : '';
+				$errorMsg = '';
 			}
 
 			// Note: not closing the curl handle so that the connection can be reused
-
-			$result = json_decode($response, true);
 
 			KalturaMonitorClient::monitorDruidQuery(
 				parse_url($url, PHP_URL_HOST),
@@ -417,8 +419,18 @@ class kDruidBase
 				$content[self::DRUID_QUERY_TYPE],
 				strlen($post),
 				$druidTook,
-				isset($result[self::DRUID_ERROR]) ? 
-					$result[self::DRUID_ERROR_CLASS] . ',' . $result[self::DRUID_ERROR] : '');
+				$errorCode);
+
+			if ($errorMsg)
+			{
+				if (strpos($response, 'Query timeout') !== false)
+				{
+					KalturaLog::err('Druid Query timed out.');
+					throw new kCoreException('Druid Query timed out', kCoreException::DRUID_QUERY_TIMED_OUT);
+				}
+
+				throw new Exception($errorMsg);
+			}
 
 			if (isset($result[self::DRUID_ERROR]) &&
 				strpos($result[self::DRUID_ERROR_MSG], 'Channel disconnected') !== false)

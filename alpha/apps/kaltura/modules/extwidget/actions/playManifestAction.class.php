@@ -130,6 +130,11 @@ class playManifestAction extends kalturaAction
 	 * @var array
 	 */
 	private $requestedDeliveryProfileIds = null;
+
+	/**
+	 * @var entryType
+	 */
+	private $servedEntryType = null;
 	
 	///////////////////////////////////////////////////////////////////////////////////
 	//	URL tokenization functions
@@ -630,6 +635,17 @@ class playManifestAction extends kalturaAction
 	
 	protected function initFlavorAssetArray($oneOnly = false)
 	{
+		if ($this->isSimuliveFlow())
+		{
+			$liveFlavorAssets = $this->retrieveAssets();
+			if (!$liveFlavorAssets)
+			{
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			}
+			// take the first flavor assets (as it will be ignored anyway)
+			$this->deliveryAttributes->setFlavorAssets(array(array_shift($liveFlavorAssets)));
+			return;
+		}
 		if(!$this->shouldInitFlavorAssetsArray())
 			return;
 		
@@ -864,8 +880,9 @@ class playManifestAction extends kalturaAction
 			$cdnHost = $this->cdnHost;
 			$cdnHostOnly = trim(preg_replace('#https?://#', '', $cdnHost), '/');
 			
+			$isLive = $this->isSimuliveFlow() ? false : null;
 			return DeliveryProfilePeer::getLocalDeliveryByPartner($this->entryId, $this->deliveryAttributes->getFormat(), 
-					$this->deliveryAttributes, $cdnHostOnly);
+					$this->deliveryAttributes, $cdnHostOnly, true, $isLive);
 		}
 	}
 
@@ -894,7 +911,7 @@ class playManifestAction extends kalturaAction
 		if($this->entry->getPartner()->getForceCdnHost())
 			$this->cdnHost = myPartnerUtils::getCdnHost($this->entry->getPartnerId(), $this->protocol);
 		
-		switch($this->entry->getType())
+		switch($this->servedEntryType)
 		{
 			case entryType::PLAYLIST:
 				$this->initPlaylistFlavorAssetArray();
@@ -924,21 +941,6 @@ class playManifestAction extends kalturaAction
 				}
 				break;
 
-			case entryType::LIVE_STREAM:
-				$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $this->getScheduleTime());
-				if ($event)
-				{
-					$this->entryId = $event->getSourceEntryId();
-					$sourceEntry = kSimuliveUtils::getSourceEntry($event);
-					$this->entry = $sourceEntry ? $sourceEntry : $this->entry;
-					$offset = $this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, "0"); // offset in sec
-					if ($offset)
-					{
-						$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
-					}
-					$this->initFlavorAssetArray(true);
-				}
-				break;
 		}
 		
 		if ($this->duration && $this->duration < 10 && $this->deliveryAttributes->getFormat() == PlaybackProtocol::AKAMAI_HDS)
@@ -1312,9 +1314,25 @@ class playManifestAction extends kalturaAction
 
 		$this->enforceEncryption();
 		
+		$this->servedEntryType = $this->entry->getType();
+		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		$liveInterruptedSimulive = false;
+		if ($event)
+		{
+			// serve as simulive only if shouldn't be interrupted by "real" live
+			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
+			{
+				$this->initEventData($event);
+			}
+			else
+			{
+				$liveInterruptedSimulive = true;
+			}
+		}
+
 		$renderer = null;
-		
-		switch($this->entry->getType())
+    
+		switch($this->servedEntryType)
 		{
 			case entryType::PLAYLIST:
 			case entryType::MEDIA_CLIP:
@@ -1325,16 +1343,9 @@ class playManifestAction extends kalturaAction
 				break;
 				
 			case entryType::LIVE_STREAM:
-				if (kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime()))
-				{
-					$renderer = $this->serveVodEntry();
-					$entryType = self::ENTRY_TYPE_VOD;
-				} else
-				{
-					// Live stream
-					$renderer = $this->serveLiveEntry();
-					$entryType = self::ENTRY_TYPE_LIVE;
-				}
+				// Live stream
+				$renderer = $this->serveLiveEntry();
+				$entryType = self::ENTRY_TYPE_LIVE;
 				break;
 			
 			default:
@@ -1408,7 +1419,13 @@ class playManifestAction extends kalturaAction
 		{
 			$renderer->setRestrictAccessControlAllowOriginDomains(true);
 		}
-		
+
+		// if "real" live interrupted simulive - we need to cancel anonymous cache also for interrupted "real" live
+		if ($this->isSimuliveFlow() || $liveInterruptedSimulive)
+		{
+			kApiCache::disableAnonymousCache();
+		}
+
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
@@ -1534,4 +1551,24 @@ class playManifestAction extends kalturaAction
 		$time += intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
 		return $time;
     }
+
+    protected function isSimuliveFlow()
+	{
+		return $this->entry->getType() === entryType::LIVE_STREAM && $this->servedEntryType !== entryType::LIVE_STREAM;
+	}
+
+	protected function initEventData($event)
+	{
+		$offset = $this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, "0"); // offset in sec
+		if ($offset)
+		{
+			$this->deliveryAttributes->setUrlParams('/' . kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM . '/' . $offset);
+		}
+		$sourceEntry = kSimuliveUtils::getSourceEntry($event);
+		if (!$sourceEntry)
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
+		}
+		$this->servedEntryType = $sourceEntry->getType();
+	}
 }

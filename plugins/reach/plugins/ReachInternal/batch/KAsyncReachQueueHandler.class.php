@@ -60,6 +60,13 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
             foreach ($response->objects as $entryVendorTask) {
                 /* @var $entryVendorTask KalturaEntryVendorTask */
 
+				if ($entryVendorTask->status != KalturaEntryVendorTaskStatus::PENDING)
+				{
+					KalturaLog::info('Entry vendor task id ' . $entryVendorTask->id . ' is in an invalid status: ' . $entryVendorTask->status . '. Skipping.');
+					$handledTasksCounter++;
+					continue;
+				}
+
                 //retrieve associated catalog item and retrieve appropriate engine based on the engineType property
                 $catalogItem = $entryVendorTask->relatedObjects[0]->objects[0];
                 /* @var $catalogItem KalturaVendorCatalogItem */

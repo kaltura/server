@@ -158,8 +158,11 @@ class CaptionAssetService extends KalturaAssetService
 
 		if ($dbCaptionAsset->getContainerFormat() == CaptionType::SCC)
 		{
-			//start convert caption batch Job.
-			kCaptionsContentManager::addConvertCaptionAssetJob($dbCaptionAsset, CaptionType::SCC, CaptionType::SRT);
+			//start convert caption batch Job for upload file.
+			if(!isset($contentResource->url))
+			{
+				kCaptionsContentManager::addConvertCaptionAssetJob($dbCaptionAsset, CaptionType::SCC, CaptionType::SRT);
+			}
 
 			$captionAsset = new KalturaCaptionAsset();
 			$captionAsset->fromObject($dbCaptionAsset, $this->getResponseProfile());
@@ -230,6 +233,10 @@ class CaptionAssetService extends KalturaAssetService
 	 */
 	protected function attachFile(CaptionAsset $captionAsset, $fullPath, $copyOnly = false)
 	{
+		if (myUploadUtils::isFileTypeRestricted($fullPath))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
 		$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
 		list($width, $height, $type, $attr) = getimagesize($fullPath);
 

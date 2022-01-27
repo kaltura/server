@@ -161,7 +161,7 @@ class kFileUtils extends kFile
 		// grab URL and pass it to the browser
 		$start = microtime(true);
 		$content = curl_exec($ch);
-		KalturaMonitorClient::monitorCurl($host, microtime(true) - $start);
+		KalturaMonitorClient::monitorCurl($host, microtime(true) - $start, $ch);
 
 		// close curl resource, and free up system resources
 		curl_close($ch);
@@ -265,7 +265,7 @@ class kFileUtils extends kFile
 		// grab URL and pass it to the browser
 		$start = microtime(true);
 		$content = curl_exec($ch);
-		KalturaMonitorClient::monitorCurl($urlHost, microtime(true) - $start);
+		KalturaMonitorClient::monitorCurl($urlHost, microtime(true) - $start, $ch);
 		KalturaLog::debug("CURL executed [$content]");
 		
 		// close curl resource, and free up system resources

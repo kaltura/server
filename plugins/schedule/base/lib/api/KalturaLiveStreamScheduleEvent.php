@@ -29,6 +29,24 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 * @var int
 	 */
 	public $postEndTime;
+
+	/**
+	 * The entry id of the pre start entry
+	 * @var string
+	 */
+	public $preStartEntryId;
+
+	/**
+	 * The entry id of the post end entry
+	 * @var string
+	 */
+	public $postEndEntryId;
+
+	/**
+	 * Detect whether "real" live can interrupt to the "main" content
+	 * @var bool
+	 */
+	public $isContentInterruptible;
 	
 	
 	/* (non-PHPdoc)
@@ -55,6 +73,9 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		'postEndTime',
 		'startDate' => 'startScreenTime',
 		'endDate' => 'endScreenTime',
+		'preStartEntryId',
+		'postEndEntryId',
+		'isContentInterruptible',
 	);
 
 	/* (non-PHPdoc)
@@ -109,6 +130,14 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
 		}
+		if (isset($this->preStartEntryId) && !entryPeer::retrieveByPK($this->preStartEntryId))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->preStartEntryId);
+		}
+		if (isset($this->postEndEntryId) && !entryPeer::retrieveByPK($this->postEndEntryId))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->postEndEntryId);
+		}
 	}
 	
 	/**
@@ -124,7 +153,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		$object_to_fill = parent ::toInsertableObject($object_to_fill, $props_to_skip);
 		
 		/* @var $object_to_fill LiveStreamScheduleEvent */
-		
+		$this->updatePrePostTimes($object_to_fill);
 		$object_to_fill->setStartDate($this->startDate - $this->preStartTime);
 		$object_to_fill->setEndDate($this->endDate + $this->postEndTime);
 		
@@ -150,6 +179,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		//For old records update, we only update startDate if it was changed
 		// for new record we update the start date as relative to the screenTime
 
+		$this->updatePrePostTimes($object_to_fill);
 		//Adjust start time
 		if (isset($this -> startDate) || isset($this -> preStartTime) && $object_to_fill->getFromCustomData(LiveStreamScheduleEvent::SCREENING_START_TIME))
 		{
@@ -166,5 +196,29 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		}
 		
 		return $object_to_fill;
+	}
+
+	/**
+	 * @param LiveStreamScheduleEvent $object_to_fill
+	 *
+	 * If preStart / postEnd entryIds exists, the preStart / postEnd times will be updated in accordance
+	 */
+	protected function updatePrePostTimes($object_to_fill)
+	{
+		if ($this->preStartEntryId)
+		{
+			// the entry exists for sure (as validateForInsert passed)
+			$preStartEntry = entryPeer::retrieveByPK($this->preStartEntryId);
+			$this->preStartTime = round($preStartEntry->getDuration());
+			$object_to_fill->setPreStartTime($this->preStartTime);
+		}
+
+		if ($this->postEndEntryId)
+		{
+			// the entry exists for sure (as validateForInsert passed)
+			$postEndEntry = entryPeer::retrieveByPK($this->postEndEntryId);
+			$this->postEndTime = round($postEndEntry->getDuration());
+			$object_to_fill->setPostEndTime($this->postEndTime);
+		}
 	}
 }

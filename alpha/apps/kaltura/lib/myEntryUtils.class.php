@@ -2156,7 +2156,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($syncKey)
 		{
 			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
-			$validContent = myXmlUtils::validateXmlFileContent($filePath);
+			
+			$purifyParams = array();
+			$partner = PartnerPeer::retrieveByPK($syncKey->getPartnerId());
+			if ($partner && $partner->getPurifyImageContent())
+			{
+				$purifyParams = array('className' => 'thumbasset', 'fieldName' => 'content');
+			}
+			
+			$validContent = myXmlUtils::validateXmlFileContent($filePath, $purifyParams);
+			
 			if($isTempFile)
 			{
 				unlink($filePath);
@@ -2203,5 +2212,71 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Returning the flavorAssets, captionAssets and audio-only assets of the entry (if the entry is null - will return 3 empty arrays)
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function getEntryAssets ($entry)
+	{
+		$flavorAssets = array();
+		$captionAssets = array();
+		$audioOnlyAssets = array();
+		if ($entry)
+		{
+			list($flavorAssets, $audioOnlyAssets)  = self::getEntryFlavorAssets($entry);
+			$captionAssets = myPlaylistUtils::getEntryIdsCaptionsSortedByLanguage($entry->getId(), array(CaptionAsset::ASSET_STATUS_READY));
+		}
+		return array($flavorAssets, $captionAssets, $audioOnlyAssets);
+	}
+
+	/**
+	 * Returning the flavor assets and audio-only flavor assets of the entry (if the entry is null - will return 2 empty arrays)
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function getEntryFlavorAssets ($entry)
+	{
+		$flavorAssets = array();
+		$audioOnlyAssets = array();
+		if ($entry)
+		{
+			$allFlavorAssets = assetPeer::retrieveReadyWebByEntryId($entry->getId());
+			// filter the regular flavorAssets (not audio only)
+			$flavorAssets = array_filter($allFlavorAssets, function ($asset)
+			{
+				return !$asset->hasTag(assetParams::TAG_ALT_AUDIO) && !$asset->hasTag(assetParams::TAG_AUDIO_ONLY);
+			});
+			// filter the audio flavor assets
+			$audioOnlyAssets = array_filter($allFlavorAssets, function ($asset)
+			{
+				return $asset->hasTag(assetParams::TAG_ALT_AUDIO) || $asset->hasTag(assetParams::TAG_AUDIO_ONLY);
+			});
+			usort($audioOnlyAssets, array("asset", "cmpAssetsByLanguage"));
+		}
+		return array($flavorAssets, $audioOnlyAssets);
+	}
+	
+	/**
+	 * Returning the categories array of the entry
+	 * @param entry $entry
+	 * @return array
+	 */
+	public static function getCategoriesIdsArrayFromEntry(entry $entry)
+	{
+		$categoryEntryItems = CategoryEntryPeer::retrieveActiveByEntryId($entry->getId());
+		
+		$categoryEntryIdsArray = array_map(function (categoryEntry $categoryEntry) {
+			return $categoryEntry->getCategoryId();
+			}, $categoryEntryItems);
+		
+		if (!isset($categoryEntryIdsArray))
+		{
+			KalturaLog::info("Categories for entry {$entry->getId()} could not be retrieved.");
+		}
+		
+		return $categoryEntryIdsArray;
 	}
 }

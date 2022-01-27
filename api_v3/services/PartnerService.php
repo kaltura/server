@@ -135,6 +135,12 @@ class PartnerService extends KalturaBaseService
 		{
 			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $se->getMessage());
 		}
+		catch (KalturaAPIException $ex)
+		{
+			KalturaLog::CRIT($ex);
+			$exceptionMessage = (str_replace('KalturaPartner::', '', $ex->getMessage()));
+			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, $exceptionMessage);
+		}
 		catch ( Exception $ex )
 		{
 			KalturaLog::CRIT($ex);
@@ -158,7 +164,7 @@ class PartnerService extends KalturaBaseService
 		if ($this -> getKs() && $this -> getKs() -> isAdmin())
 		{
 			$parentPartnerId = $this -> getKs() -> partner_id;
-			if ($parentPartnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
+			if (in_array($parentPartnerId ,array(Partner::ADMIN_CONSOLE_PARTNER_ID, Partner::SELF_SERVE_PARTNER_ID)))
 			{
 				$parentPartnerId = null;
 				$isAdminOrVarConsole = true;
@@ -294,11 +300,11 @@ class PartnerService extends KalturaBaseService
 			$adminKuser = UserLoginDataPeer::userLoginByEmail($adminEmail, $cmsPassword, $partnerId, $otp);
 		}
 		catch (kUserException $e) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+			throw new KalturaAPIException ( APIErrors::USER_DATA_ERROR, "The data you entered is invalid" );
 		}
 		
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+			throw new KalturaAPIException ( APIErrors::USER_DATA_ERROR, "The data you entered is invalid" );
 		}
 		
 		KalturaLog::log( "Admin Kuser found, going to validate password", KalturaLog::INFO );
