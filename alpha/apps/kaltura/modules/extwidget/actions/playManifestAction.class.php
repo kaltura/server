@@ -1316,12 +1316,17 @@ class playManifestAction extends kalturaAction
 		
 		$this->servedEntryType = $this->entry->getType();
 		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		$liveInterruptedSimulive = false;
 		if ($event)
 		{
 			// serve as simulive only if shouldn't be interrupted by "real" live
 			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
 			{
 				$this->initEventData($event);
+			}
+			else
+			{
+				$liveInterruptedSimulive = true;
 			}
 		}
 
@@ -1414,7 +1419,13 @@ class playManifestAction extends kalturaAction
 		{
 			$renderer->setRestrictAccessControlAllowOriginDomains(true);
 		}
-		
+
+		// if "real" live interrupted simulive - we need to cancel anonymous cache also for interrupted "real" live
+		if ($this->isSimuliveFlow() || $liveInterruptedSimulive)
+		{
+			kApiCache::disableAnonymousCache();
+		}
+
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
