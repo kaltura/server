@@ -291,7 +291,6 @@ class kSimuliveUtils
 	public static function getClosestPlaybackTransitionTime($event, $time)
 	{
 		$eventTransitionTimes = $event->getEventTransitionTimes();
-		KalturaLog::info(print_r($eventTransitionTimes, true));
 		// find the first closest future transition time
 		foreach ($eventTransitionTimes as $transitionTime)
 		{
