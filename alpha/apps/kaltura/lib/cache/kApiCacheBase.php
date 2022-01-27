@@ -137,7 +137,12 @@ class kApiCacheBase
 			$curInstance->disableConditionalCacheInternal();
 		}
 	}
-	
+
+	public static function disableAnonymousCache()
+	{
+		self::setExpiry(-1);
+	}
+
 	protected function disableConditionalCacheInternal()
 	{
 		if (self::$_debugMode && $this->_cacheStatus != self::CACHE_STATUS_ANONYMOUS_ONLY)
