@@ -1315,18 +1315,13 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$this->servedEntryType = $this->entry->getType();
-		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
-		$liveInterruptedSimulive = false;
-		if ($event)
+		$playableEvent = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		if ($playableEvent)
 		{
 			// serve as simulive only if shouldn't be interrupted by "real" live
-			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
+			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $playableEvent))
 			{
-				$this->initEventData($event);
-			}
-			else
-			{
-				$liveInterruptedSimulive = true;
+				$this->initEventData($playableEvent);
 			}
 		}
 
@@ -1420,10 +1415,14 @@ class playManifestAction extends kalturaAction
 			$renderer->setRestrictAccessControlAllowOriginDomains(true);
 		}
 
-		// if "real" live interrupted simulive - we need to cancel anonymous cache also for interrupted "real" live
-		if ($this->isSimuliveFlow() || $liveInterruptedSimulive)
+		// for simulive flow - we need to disable anonymous cache to avoid playback faults, and tune cond cache expiry to the closest transition time
+		if (!is_null($playableEvent))
 		{
 			kApiCache::disableAnonymousCache();
+			$now = time();
+			$cacheExpiry = min(max(kSimuliveUtils::getClosestPlaybackTransitionTime($playableEvent, $now) - $now, 0), 600);
+			KalturaLog::info("setting simulive's playManifest conditional cache expiry of $cacheExpiry");
+			kApiCache::setConditionalCacheExpiry($cacheExpiry);
 		}
 
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
