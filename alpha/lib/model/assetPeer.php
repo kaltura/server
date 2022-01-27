@@ -848,6 +848,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		}
 		$c->add(assetPeer::HEIGHT, 0);
 		$c->add(assetPeer::WIDTH, 0);
+		$c->add(assetPeer::TYPE, assetType::FLAVOR);
 		return assetPeer::doSelect($c);
 	}
 }
