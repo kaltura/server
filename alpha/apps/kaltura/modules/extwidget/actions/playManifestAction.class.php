@@ -1571,5 +1571,4 @@ class playManifestAction extends kalturaAction
 		}
 		$this->servedEntryType = $sourceEntry->getType();
 	}
-
 }
