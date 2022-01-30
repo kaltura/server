@@ -286,7 +286,7 @@ class kSimuliveUtils
 	/**
 	 * @param ILiveStreamScheduleEvent $event
 	 * @param int $time
-	 * @return int - the time of the future closest transition timestamp that comes after $time, if there isn't such transition time - return 0
+	 * @return int|null - the time of the future closest transition timestamp that comes after $time, if there isn't such transition time - return null
 	 */
 	public static function getClosestPlaybackTransitionTime($event, $time)
 	{
@@ -300,6 +300,6 @@ class kSimuliveUtils
 			}
 		}
 		// we shouldn't arrive this if $time is inside event
-		return 0;
+		return null;
 	}
 }

@@ -1326,9 +1326,13 @@ class playManifestAction extends kalturaAction
 			// for simulive flow - we need to disable anonymous cache to avoid playback faults, and tune cond cache expiry to the closest transition time
 			kApiCache::disableAnonymousCache();
 			$now = time();
-			$timeToNextTransition = max(kSimuliveUtils::getClosestPlaybackTransitionTime($event, $now) - $now, -1);
-			KalturaLog::info('time to next transition for event ID [' . $event->getId() . "] : $timeToNextTransition");
-			kApiCache::setConditionalCacheExpiry(min($timeToNextTransition, kApiCache::CONDITIONAL_CACHE_EXPIRY));
+			$closestTransitionTime = kSimuliveUtils::getClosestPlaybackTransitionTime($event, $now);
+			if (!is_null($closestTransitionTime))
+			{
+				$timeToNextTransition = $closestTransitionTime - $now;
+				KalturaLog::info('time to next transition for event ID [' . $event->getId() . "] : $timeToNextTransition");
+				kApiCache::setConditionalCacheExpiry(min($timeToNextTransition, kApiCache::CONDITIONAL_CACHE_EXPIRY));
+			}
 		}
 
 		$renderer = null;
