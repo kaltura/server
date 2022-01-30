@@ -587,18 +587,49 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * Validate that no forbiden attributes are added to an entry that has a parent entry assigned to it.
 	 */
 	
-	public function validateParentEntryId() 
+	public function validateParentEntryId($dbEntry = null)
 	{
 		//An entry with a parent entry id cannot be assigned to categories nor have access control/scheduling
 		if ($this->parentEntryId && ($this->categories || $this->categoriesIds || $this->accessControlId || $this->startDate || $this->endDate))
+		{
 			throw new KalturaAPIException(KalturaErrors::ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN, $this->parentEntryId);
+		}
 			
 		//Parent entry id must exists before assigning it to a child entry
 		if ($this->parentEntryId)
 		{
 			$entry = entryPeer::retrieveByPK($this->parentEntryId);
 			if(!$entry)
+			{
 				throw new KalturaAPIException(KalturaErrors::PARENT_ENTRY_ID_NOT_FOUND, $this->parentEntryId);
+			}
+			$this->validateNoParentageCycle($dbEntry);
+		}
+	}
+	
+	/**
+	 * Validate that no cycles in are created when updating the parent id of the entry
+	 */
+	protected function validateNoParentageCycle(entry $dbEntry)
+	{
+		$id = $this->parentEntryId;
+		if (is_null($id))
+		{
+			return;
+		}
+		
+		while ($id)
+		{
+			$cur = entryPeer::retrieveByPK($id);
+			if (!$cur)
+			{
+				throw new KalturaAPIException(KalturaErrors::PARENT_ENTRY_ID_NOT_FOUND, $id);
+			}
+			if ($cur->getId() == $dbEntry->getId())
+			{
+				throw new KalturaAPIException(KalturaErrors::CYCLE_IN_PARENTAGE);
+			}
+			$id = $cur->getParentEntryId();
 		}
 	}
 		
@@ -719,7 +750,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		/* @var $sourceObject entry */
 		$this->validateUsers();
 		$this->validateCategories();
-		$this->validateParentEntryId();
+		$this->validateParentEntryId($sourceObject);
 		$this->validatePropertyMinLength('referenceId', 2, true);
 		
 //		if($this->referenceId)
