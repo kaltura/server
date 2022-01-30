@@ -252,15 +252,16 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	public function getEventTransitionTimes()
 	{
 		$transitionTimes = array();
+		$startScreenTime = $this->getStartScreenTime();
 		if ($this->getPreStartTime())
 		{
-			$transitionTimes[] = $this->getStartScreenTime() - $this->getPreStartTime(); // start of preStart
+			$transitionTimes[] = $startScreenTime - $this->getPreStartTime(); // start of preStart
 		}
-		$transitionTimes[] = $this->getStartScreenTime(); // start of main content / end of preStart
-		$transitionTimes[] = $this->getStartScreenTime() + $this->getDuration(); // end of main content / start of postEnd
+		$transitionTimes[] = $startScreenTime; // start of main content / end of preStart
+		$transitionTimes[] = $startScreenTime + $this->getDuration(); // end of main content / start of postEnd
 		if ($this->getPostEndTime())
 		{
-			$transitionTimes[] = $this->getStartScreenTime() + $this->getDuration() + $this->getPostEndTime(); // end of postEnd
+			$transitionTimes[] = $startScreenTime + $this->getDuration() + $this->getPostEndTime(); // end of postEnd
 		}
 		return $transitionTimes;
 	}

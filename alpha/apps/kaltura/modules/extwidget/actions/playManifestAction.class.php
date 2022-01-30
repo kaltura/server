@@ -1315,14 +1315,20 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$this->servedEntryType = $this->entry->getType();
-		$playableSimuliveEvent = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
-		if ($playableSimuliveEvent)
+		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		if ($event)
 		{
 			// serve as simulive only if shouldn't be interrupted by "real" live
-			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $playableSimuliveEvent))
+			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
 			{
-				$this->initEventData($playableSimuliveEvent);
+				$this->initEventData($event);
 			}
+			// for simulive flow - we need to disable anonymous cache to avoid playback faults, and tune cond cache expiry to the closest transition time
+			kApiCache::disableAnonymousCache();
+			$now = time();
+			$timeToNextTransition = max(kSimuliveUtils::getClosestPlaybackTransitionTime($event, $now) - $now, -1);
+			KalturaLog::info('time to next transition for event ID [' . $event->getId() . "] : $timeToNextTransition");
+			kApiCache::setConditionalCacheExpiry(min($timeToNextTransition, kApiCache::CONDITIONAL_CACHE_EXPIRY));
 		}
 
 		$renderer = null;
@@ -1413,16 +1419,6 @@ class playManifestAction extends kalturaAction
 			$renderer->partnerId))
 		{
 			$renderer->setRestrictAccessControlAllowOriginDomains(true);
-		}
-
-		// for simulive flow - we need to disable anonymous cache to avoid playback faults, and tune cond cache expiry to the closest transition time
-		if (!is_null($playableSimuliveEvent))
-		{
-			kApiCache::disableAnonymousCache();
-			$now = time();
-			$timeToNextTransition = max(kSimuliveUtils::getClosestPlaybackTransitionTime($playableSimuliveEvent, $now) - $now, 0);
-			KalturaLog::info('time to next transition for event ID [' . $playableSimuliveEvent->getId() . "] : $timeToNextTransition");
-			kApiCache::setConditionalCacheExpiry(min($timeToNextTransition, 600));
 		}
 
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
