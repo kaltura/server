@@ -65,7 +65,7 @@ class BaseEntryService extends KalturaEntryService
     {
     	if($type && $type != KalturaEntryType::AUTOMATIC)
     		$entry->type = $type;
-		
+
 		myEntryUtils::verifyEntryType($entry);
 
     	$dbEntry = parent::add($entry, $entry->conversionProfileId);

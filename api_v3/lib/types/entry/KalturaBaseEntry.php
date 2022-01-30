@@ -598,11 +598,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		//Parent entry id must exists before assigning it to a child entry
 		if ($this->parentEntryId)
 		{
-			$entry = entryPeer::retrieveByPK($this->parentEntryId);
-			if(!$entry)
-			{
-				throw new KalturaAPIException(KalturaErrors::PARENT_ENTRY_ID_NOT_FOUND, $this->parentEntryId);
-			}
 			$this->validateNoParentageCycle($dbEntry);
 		}
 	}
@@ -610,14 +605,14 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Validate that no cycles in are created when updating the parent id of the entry
 	 */
-	protected function validateNoParentageCycle(entry $dbEntry)
+	protected function validateNoParentageCycle(entry $dbEntry = null)
 	{
-		$id = $this->parentEntryId;
-		if (is_null($id))
+		if (is_null($dbEntry))
 		{
 			return;
 		}
 		
+		$id = $this->parentEntryId;
 		while ($id)
 		{
 			$cur = entryPeer::retrieveByPK($id);
