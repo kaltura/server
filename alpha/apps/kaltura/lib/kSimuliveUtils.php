@@ -283,4 +283,23 @@ class kSimuliveUtils
 		return $event->isInterruptibleNow() && $entry->getEntryServerNodeStatusForPlayback() === EntryServerNodeStatus::PLAYABLE;
 	}
 
+	/**
+	 * @param ILiveStreamScheduleEvent $event
+	 * @param int $time
+	 * @return int - the time of the future closest transition timestamp that comes after $time, if there isn't such transition time - return 0
+	 */
+	public static function getClosestPlaybackTransitionTime($event, $time)
+	{
+		$eventTransitionTimes = $event->getEventTransitionTimes();
+		// find the first closest future transition time
+		foreach ($eventTransitionTimes as $transitionTime)
+		{
+			if ($time < $transitionTime)
+			{
+				return $transitionTime;
+			}
+		}
+		// we shouldn't arrive this if $time is inside event
+		return 0;
+	}
 }
