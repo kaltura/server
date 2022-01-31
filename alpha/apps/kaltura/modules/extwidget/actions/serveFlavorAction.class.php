@@ -509,7 +509,10 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
+		if (!($this->shouldSkipEnforceDelivery() && $this->pathOnly && self::$requestAuthorized))
+		{
+			myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
+		}
 		
 		$version = $this->getRequestParameter( "v" );
 		if (!$version)
@@ -1071,5 +1074,15 @@ class serveFlavorAction extends kalturaAction
 			'path' => $path,
 			'sourceType' => $sourceType,
 		);
+	}
+	
+	private function shouldSkipEnforceDelivery()
+	{
+		$packagerCaptureUrl = kConf::get(myPackagerUtils::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
+		if (!$packagerCaptureUrl)
+			return true;
+		
+		$packagerCaptureUrlPrefix = explode("/", $packagerCaptureUrl)[1];
+		return preg_match('/'. $packagerCaptureUrlPrefix .'/', $_SERVER['REQUEST_URI'], $matches);
 	}
 }
