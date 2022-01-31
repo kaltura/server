@@ -729,20 +729,22 @@ class myEntryUtils
 		}
 		 
 		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+
+		$thumbNameAttributes = "";
 		if ($servingVODfromLive && $vid_slices > 0)
-			$thumbName .= "_duration_" . $entryLengthInMsec;
+			$thumbNameAttributes .= "_duration_" . $entryLengthInMsec;
 
 		if ($orig_image_path)
-			$thumbName.= '_oip_'.basename($orig_image_path);
+			$thumbNameAttributes.= '_oip_'.basename($orig_image_path);
 		if ($density)
-			$thumbName.= "_dns_{$density}";
+			$thumbNameAttributes.= "_dns_{$density}";
 		if($stripProfiles)
-			$thumbName .= "_stp_{$stripProfiles}";
+			$thumbNameAttributes .= "_stp_{$stripProfiles}";
 
 		if($start_sec != -1)
-			$thumbName .= "_ssec_{$start_sec}";
+			$thumbNameAttributes .= "_ssec_{$start_sec}";
 		if($end_sec != -1)
-			$thumbName .= "_esec_{$end_sec}";
+			$thumbNameAttributes .= "_esec_{$end_sec}";
 				
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
@@ -753,11 +755,11 @@ class myEntryUtils
 				$entryThumbFilename = "0.jpg";
 		}
 		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
-			$thumbName .= "_NOCACHE_";
+			$thumbNameAttributes .= "_NOCACHE_";
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
-
+		$thumbName .= $thumbNameAttributes;
 		
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 		
@@ -808,6 +810,67 @@ class myEntryUtils
 				header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
 				return $currPath;
 			}
+		}
+
+
+		if($vid_sec > 0 or $vid_slices > 0)
+		{
+			KalturaLog::debug("Path not found [$finalThumbPath], creating path for capture thumbnail");
+			$originalFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+
+			$thumbName = $originalFlavor->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+			$thumbName .= $thumbNameAttributes;
+			$flavorThumbFilename = $originalFlavor->getVersion().".jpg";
+
+			//create final path for thumbnail created
+			$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $originalFlavor, $thumbName, $flavorThumbFilename, $originalFlavor->getVersion());
+
+			//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
+			$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
+
+			//create path for processing thumbnail request
+			$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $originalFlavor->getIntId(), $uniqueThumbName, $flavorThumbFilename , $originalFlavor->getVersion());
+
+			if(!is_null($format))
+			{
+				$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
+				$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
+			}
+
+			KalturaLog::debug("Path for saving capture thumbnail is [$finalThumbPath]");
+			if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
+			{
+				header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+				return $finalThumbPath;
+			}
+
+			foreach ($thumbDirs as $thumbDir)
+			{
+				$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $originalFlavor->getIntId(), $thumbName, $flavorThumbFilename , $originalFlavor->getVersion());
+				KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
+				if (file_exists($currPath) && @filesize($currPath))
+				{
+					if(myCloudUtils::shouldExportThumbToCloud())
+					{
+						KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath], original file mtime: "
+							. date("Y-m-d H:i:s", filemtime($currPath)) );
+						$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+						if($moveFileSuccess)
+						{
+							header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+							return $finalThumbPath;
+						}
+						else
+						{
+							KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+						}
+					}
+
+					header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
+					return $currPath;
+				}
+			}
+
 		}
 
 		kFile::fullMkdir($processingThumbPath);
