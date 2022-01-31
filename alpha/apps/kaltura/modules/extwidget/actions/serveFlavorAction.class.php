@@ -1078,11 +1078,11 @@ class serveFlavorAction extends kalturaAction
 	
 	private function shouldSkipEnforceDelivery()
 	{
-		$packagerCaptureUrl = kConf::get(myPackagerUtils::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
+		$packagerMappedThumbUrl = kConf::get(myPackagerUtils::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
 		if (!$packagerCaptureUrl)
 			return true;
 		
-		$packagerCaptureUrlPrefix = explode("/", $packagerCaptureUrl)[1];
-		return preg_match('/'. $packagerCaptureUrlPrefix .'/', $_SERVER['REQUEST_URI'], $matches);
+		$packagerMappedThumbUrlPrefix = explode("/", $packagerMappedThumbUrl)[1];
+		return preg_match('/'. $packagerMappedThumbUrlPrefix .'/', $_SERVER['REQUEST_URI'], $matches);
 	}
 }
