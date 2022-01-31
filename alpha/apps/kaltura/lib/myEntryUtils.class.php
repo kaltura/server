@@ -813,7 +813,7 @@ class myEntryUtils
 		}
 
 
-		if($vid_sec > 0 or $vid_slices > 0)
+		if (($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
 		{
 			KalturaLog::debug("Path not found [$finalThumbPath], creating path for capture thumbnail");
 			$originalFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
@@ -842,33 +842,6 @@ class myEntryUtils
 			{
 				header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
 				return $finalThumbPath;
-			}
-
-			foreach ($thumbDirs as $thumbDir)
-			{
-				$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $originalFlavor->getIntId(), $thumbName, $flavorThumbFilename , $originalFlavor->getVersion());
-				KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
-				if (file_exists($currPath) && @filesize($currPath))
-				{
-					if(myCloudUtils::shouldExportThumbToCloud())
-					{
-						KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath], original file mtime: "
-							. date("Y-m-d H:i:s", filemtime($currPath)) );
-						$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
-						if($moveFileSuccess)
-						{
-							header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
-							return $finalThumbPath;
-						}
-						else
-						{
-							KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
-						}
-					}
-
-					header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
-					return $currPath;
-				}
 			}
 
 		}
