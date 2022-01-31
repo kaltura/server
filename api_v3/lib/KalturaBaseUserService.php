@@ -148,12 +148,13 @@ class KalturaBaseUserService extends KalturaBaseService
 			$new_password = UserLoginDataPeer::resetUserPassword($email, $linkType);
 			if (!$new_password)
 			{
-				throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_FOUND, "user not found");
+				KalturaLog::err(KalturaErrors::LOGIN_DATA_NOT_FOUND . ': ' . $email);
 			}
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
-			if ($code == kUserException::LOGIN_DATA_NOT_FOUND) {
+			if ($code == kUserException::LOGIN_DATA_NOT_FOUND)
+			{
 				KalturaLog::err(KalturaErrors::LOGIN_DATA_NOT_FOUND . ': ' . $e->getMessage());
 			}
 			else if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
@@ -172,7 +173,6 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw $e;
 			}
-			
 		}
 	}
 
