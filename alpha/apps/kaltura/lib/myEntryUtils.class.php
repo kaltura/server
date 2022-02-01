@@ -688,8 +688,35 @@ class myEntryUtils
 		}
 		return true;
 	}
-	
-	
+
+
+	public static function createThumbPaths($entity, $thumbName, $thumbFilename , $format , $version, $thumbDirs)
+	{
+		//create final path for thumbnail created
+		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity, $thumbName, $thumbFilename, $version);
+
+		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
+		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
+
+		//create path for processing thumbnail request
+		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity->getIntId(), $uniqueThumbName, $thumbFilename , $version);
+
+		if(!is_null($format))
+		{
+			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
+			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
+		}
+
+		KalturaLog::debug("Path for saving capture thumbnail is [$finalThumbPath]");
+		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
+		{
+			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+			return array($finalThumbPath, $processingThumbPath, TRUE);
+		}
+		return array($finalThumbPath, $processingThumbPath, FALSE);
+	}
+
+
 	public static function resizeEntryImage( entry $entry, $version, $width, $height, $type, $bgcolor = "ffffff", $crop_provider = null, $quality = 0,
 		$src_x = 0, $src_y = 0, $src_w = 0, $src_h = 0, $vid_sec = -1, $vid_slice = 0, $vid_slices = -1, $orig_image_path = null, $density = 0, $stripProfiles = false, $thumbParams = null, $format = null, $fileSync = null,
 		$start_sec = -1, $end_sec = -1)
@@ -762,28 +789,10 @@ class myEntryUtils
 		$thumbName .= $thumbNameAttributes;
 		
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
-		
-		//create final path for thumbnail created
-		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry, $thumbName, $entryThumbFilename, $version);
 
-		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
-		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
-		
-		//create path for processing thumbnail request
-		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $uniqueThumbName, $entryThumbFilename , $version );
-
-		if(!is_null($format))
-		{
-			$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
-			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
-		}
-
-		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
-		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
-		{
-			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+		list ($finalThumbPath, $processingThumbPath, $existsInCache) = self::createThumbPaths($entry, $thumbName, $entryThumbFilename , $format , $version, $thumbDirs);
+		if ($existsInCache)
 			return $finalThumbPath;
-		}
 
 		foreach ($thumbDirs as $thumbDir)
 		{
@@ -813,38 +822,21 @@ class myEntryUtils
 		}
 
 
-		if (($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
+		if (($vid_sec != -1) || ($vid_slices != -1))
 		{
-			KalturaLog::debug("Path not found [$finalThumbPath], creating path for capture thumbnail");
-			$originalFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
 
-			$thumbName = $originalFlavor->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
+			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entry);
+			$thumbName = $captureFlavorAsset->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 			$thumbName .= $thumbNameAttributes;
-			$flavorThumbFilename = $originalFlavor->getVersion().".jpg";
+			$flavorThumbFilename = $captureFlavorAsset->getVersion().".jpg";
 
-			//create final path for thumbnail created
-			$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $originalFlavor, $thumbName, $flavorThumbFilename, $originalFlavor->getVersion());
-
-			//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
-			$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
-
-			//create path for processing thumbnail request
-			$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $originalFlavor->getIntId(), $uniqueThumbName, $flavorThumbFilename , $originalFlavor->getVersion());
-
-			if(!is_null($format))
-			{
-				$finalThumbPath = kFile::replaceExt($finalThumbPath, $format);
-				$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
-			}
-
-			KalturaLog::debug("Path for saving capture thumbnail is [$finalThumbPath]");
-			if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
-			{
-				header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
-				return $finalThumbPath;
-			}
+			list ($finalThumbPath, $processingThumbPath, $existsInCache) = self::createThumbPaths($captureFlavorAsset, $thumbName, $flavorThumbFilename , $format , $captureFlavorAsset->getVersion(), $thumbDirs);
+			if ($existsInCache)
+				return $existsInCache;
 
 		}
+
 
 		kFile::fullMkdir($processingThumbPath);
 		/* @var  $fileSync FileSync*/

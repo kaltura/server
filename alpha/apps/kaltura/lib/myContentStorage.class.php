@@ -85,7 +85,7 @@ class myContentStorage
 		return self::getFSContentRootPath() . self::getGeneralEntityPath($entityName, $entity->getIntId(), $thumbName, $fileName, $version);
 	}
 
-	protected static function getThumbEntitySharedPath($int_id, $thumbName, $fileName , $version = null)
+	protected static function getThumbEntitySharedPath($entityId, $thumbName, $fileName , $version = null)
 	{
 		if( $version != null )
 		{
@@ -93,7 +93,7 @@ class myContentStorage
 			$fileName = $version . '.' . $ext;
 		}
 
-		$dir = self::getPathFromId($int_id);
+		$dir = self::getPathFromId($entityId);
 		$res = '/tempthumb/' . $dir . '/' .  $thumbName . '_' . $fileName;
 		return $res;
 	}
