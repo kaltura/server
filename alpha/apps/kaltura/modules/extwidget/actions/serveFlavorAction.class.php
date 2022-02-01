@@ -509,7 +509,7 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		if (!($this->shouldSkipEnforceDelivery() && $this->pathOnly && self::$requestAuthorized))
+		if ($this->shouldEnforceDelivery())
 		{
 			myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
 		}
@@ -1076,13 +1076,20 @@ class serveFlavorAction extends kalturaAction
 		);
 	}
 	
-	private function shouldSkipEnforceDelivery()
+	private function shouldEnforceDelivery()
 	{
-		$packagerMappedThumbUrl = kConf::get(myPackagerUtils::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
-		if (!$packagerCaptureUrl)
+		if (!($this->pathOnly && self::$requestAuthorized))
+		{
 			return true;
+		}
 		
-		$packagerMappedThumbUrlPrefix = explode("/", $packagerMappedThumbUrl)[1];
-		return preg_match('/'. $packagerMappedThumbUrlPrefix .'/', $_SERVER['REQUEST_URI'], $matches);
+		$packagerMappedThumbUrl = kConf::get(myPackagerUtils::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
+		if (!$packagerMappedThumbUrl)
+		{
+			return true;
+		}
+		
+		$splitThumbUrl = explode("/", $packagerMappedThumbUrl);
+		return !kString::beginsWith($_SERVER['REQUEST_URI'], '/' . $splitThumbUrl[1] . '/');
 	}
 }
