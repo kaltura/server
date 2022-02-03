@@ -14,7 +14,7 @@ class kResizeLiveEntryAdapter extends kBaseResizeAdapter
 	{
 		$entry = $this->parameters->get(kThumbFactoryFieldName::ENTRY);
 		$dc = myEntryUtils::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
-		if($dc == null)
+		if($dc === null)
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE);
 		}
