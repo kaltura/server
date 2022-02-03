@@ -362,7 +362,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 * @param $categoryId
 	 * @throws kCoreException
 	 */
-	protected function validateKuserEntitledToRemoveEntryToCategory(entry $entry, $categoryId)
+	protected function validateKuserEntitledToRemoveEntryToCategory($entry, $categoryId)
 	{
 		if (kEntitlementUtils::getEntitlementEnforcement() &&
 			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&
