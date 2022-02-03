@@ -269,6 +269,7 @@ class myUploadUtils
 		{
 			return true;
 		}
+		KalturaLog::err("File ext: [$fileExtension] is not allowed");
 		return false;
 	}
 	
