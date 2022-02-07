@@ -201,6 +201,10 @@ class kmcngAction extends kalturaAction
 			);
 		}
 
+		$playerWrapper = array(
+            "uri" => '/apps/kmcng/' . $kmcngVersion . "/public/playerWrapper.html"
+        );
+
 		$config = array(
 			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getRequest()->getParameter('ks') : null,
 			'kalturaServer' => array(
@@ -223,6 +227,7 @@ class kmcngAction extends kalturaAction
 				"usageDashboard" => $usageDashboard,
 				"editor" => $editor,
 				"reach" => $reach,
+				"playerWrapper" => $playerWrapper,
 				"kmcAnalytics" => $kmcAnalytics
 			),
 			"externalLinks" => array(
