@@ -202,7 +202,7 @@ class kmcngAction extends kalturaAction
 		}
 
 		$playerWrapper = array(
-                    "uri" => '/apps/kmcng/' . $kmcngVersion . "/public/playerWrapper.html"
+                    "uri" => '/apps/kmcng/' . $kmcngParams["kmcng_version"] . "/public/playerWrapper.html"
                 );
 
 		$config = array(
