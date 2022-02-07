@@ -2,7 +2,7 @@
 /**
  * Skeleton subclass for representing a row from the 'vendor_catalog_item' table.
  *
- * 
+ *
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -11,10 +11,10 @@
  * @package plugins.reach
  * @subpackage model
  */
-class VendorAudioDescriptionCatalogItem extends VendorAudioCatalogItem
+class VendorDubbingCatalogItem extends VendorAudioCatalogItem
 {
 	public function applyDefaultValues()
 	{
-		$this->setServiceFeature(VendorServiceFeature::AUDIO_DESCRIPTION);
+		$this->setServiceFeature(VendorServiceFeature::DUBBING);
 	}
-} // VendorAudioDescriptionCatalogItem
+}
