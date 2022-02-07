@@ -41,6 +41,12 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 * @var string
 	 */
 	public $postEndEntryId;
+
+	/**
+	 * Detect whether "real" live can interrupt to the "main" content
+	 * @var bool
+	 */
+	public $isContentInterruptible;
 	
 	
 	/* (non-PHPdoc)
@@ -69,6 +75,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		'endDate' => 'endScreenTime',
 		'preStartEntryId',
 		'postEndEntryId',
+		'isContentInterruptible',
 	);
 
 	/* (non-PHPdoc)
