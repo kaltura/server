@@ -25,17 +25,6 @@ class kQuizManager implements kObjectChangedEventConsumer
 	const HEADER_AGENT = 'User-Agent';
 	const HEADER_AGENT_TYPE = 'HTTP_USER_AGENT';
 	
-	
-	/*TODO:
-	what should be the returned value?
-	how to handle failure?
-	what is the url?
-	how to get the needed data for the headers?
-	Do we need authentication?
-	*/
-	
-	
-	
 	/**
 	 * @param BaseObject $object
 	 * @param array $modifiedColumns
@@ -55,7 +44,8 @@ class kQuizManager implements kObjectChangedEventConsumer
 	
 	protected static function sendBeacon (string $uri)
 	{
-		$statsHost = explode(':', kConf::get(self::MAP_NAME));
+//		$statsHost = explode(':', kConf::get(self::MAP_NAME));
+		$statsHost = array('localhost', 91);
 		$host = $statsHost[0];
 		$port = $statsHost[1];
 		$headers = array(
@@ -113,17 +103,21 @@ class kQuizManager implements kObjectChangedEventConsumer
 	protected static function generateQuizEventContent($quizUserEntry)
 	{
 		/* @var $quizUserEntry QuizUserEntry */
+		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
+		$c->add(CuePointPeer::ENTRY_ID, $quizUserEntry->getEntryId(), Criteria::EQUAL);
+		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
+		$questions = CuePointPeer::doSelect($c);
 		$quizEventContent = array(
 			self::EVENT_TYPE => $quizUserEntry->getType(),
-			self::KUSER_ID => $quizUserEntry->getkuser()->getId(),
+			self::KUSER_ID => $quizUserEntry->getkuser()->getEmail(),
 			self::PARTNER_ID => $quizUserEntry->getPartnerId(),
 			self::ENTRY_ID => $quizUserEntry->getEntryId(),
 			self::EVENT_TIME => date('Y-m-d H:i:s'),//"2022-01-19T13:32:10Z" current time of this event being issued
 			self::VIRTUAL_EVENT_ID => "Unknown",
 			self::VERSION => $quizUserEntry->getVersion(),
 			self::ANSWER_IDS => $quizUserEntry->getAnswerIds(),
-			self::SCORE => $quizUserEntry->getScore(),
-			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),
+			self::SCORE => $quizUserEntry->getScore(),//check
+			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),//check
 			self::NUM_OF_QUESTIONS => $quizUserEntry->getNumOfQuestions(),
 			self::NUM_OF_RELEVANT_QUESTIONS => $quizUserEntry->getNumOfRelevnatQuestions(),
 			self::CALCULATED_SCORE => $quizUserEntry->getCalculatedScore()
