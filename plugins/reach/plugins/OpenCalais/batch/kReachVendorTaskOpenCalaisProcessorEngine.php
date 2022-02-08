@@ -151,6 +151,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
             $cuePointObj->text = $cuePoint['title'];
             $cuePointObj->startTime = $cuePoint['startTime'];
             $cuePointObj->entryId = $entryId;
+	        $cuePointObj->partnerData = $cuePoint['partnerData'];
 
             $this->addCuePoint($cuePointObj);
         }

@@ -118,6 +118,7 @@ class RuleEngine extends OpenCalaisConstants
             return array();
         }
         $name = $apiItemdetails[self::OPCAL_ENTT_NAME];
+	    $permid = $apiItemdetails[self::OPCAL_PERM_ID];
         $nameArray = explode(' ', $name);
         $textTimes = $this->textTimes;
         $n = 0;
@@ -126,18 +127,20 @@ class RuleEngine extends OpenCalaisConstants
         {
             if($textWordTime['w'] == $nameArray[0])
             {
-                $this->handleCuePoints($cuePoints, $n, $nameArray);
+                $this->handleCuePoints($cuePoints, $n, $nameArray, $permid);
             }
             $n++;
         }
         return $cuePoints;
     }
-    /**
-     * @param array $cuePoints
-     * @param int $key
-     * @param array $nameArray
-     */
-    protected function handleCuePoints(array &$cuePoints, $key, array $nameArray)
+
+	/**
+	 * @param array $cuePoints
+	 * @param int   $key
+	 * @param array $nameArray
+	 * @param string $permid
+	 */
+    protected function handleCuePoints(array &$cuePoints, $key, array $nameArray, $permid)
     {
         $textTimes = $this->textTimes;
         $fullName = '';
@@ -155,7 +158,7 @@ class RuleEngine extends OpenCalaisConstants
             }
         }
         $fullName = trim($fullName);
-        $cuePoints[] = array('title' => $fullName, 'startTime' => $startFrom, 'endTime' => $endTo);
+        $cuePoints[] = array('title' => $fullName, 'startTime' => $startFrom, 'endTime' => $endTo, 'partnerData' => $permid);
     }
     /**
      * @param array $apiItemDetails
