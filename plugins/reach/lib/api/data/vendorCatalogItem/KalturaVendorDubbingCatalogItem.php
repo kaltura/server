@@ -16,10 +16,17 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 	 */
 	public $clearAudioFlavorParamsId;
 	
+	/**
+	 * @var KalturaCatalogItemLanguage
+	 * @filter eq,in
+	 */
+	public $targetLanguage;
+	
 	private static $map_between_objects = array
 	(
 		'flavorParamsId',
 		'clearAudioFlavorParamsId',
+		'targetLanguage',
 	);
 	
 	protected function getServiceFeature()
@@ -50,7 +57,7 @@ class KalturaVendorDubbingCatalogItem extends KalturaVendorCatalogItem
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull(array("sourceLanguage", "flavorParamsId", "clearAudioFlavorParamsId"));
+		$this->validatePropertyNotNull(array("sourceLanguage", "targetLanguage", "flavorParamsId", "clearAudioFlavorParamsId"));
 		$this->validateFlavorParamsId($this->flavorParamsId);
 		$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		

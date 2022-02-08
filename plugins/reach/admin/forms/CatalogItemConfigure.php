@@ -100,7 +100,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$sourceLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 		$this->addElement($sourceLanguage);
 
-		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION
+			|| $this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
 		{
 			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
 			$targetLanguage->setLabel('Target Language:');

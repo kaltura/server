@@ -49,7 +49,7 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
 				elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorChapteringCatalogItem', $formData, false, true);
-				elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorDubbingCatalogItem', $formData, false, true);
 			}
 		}

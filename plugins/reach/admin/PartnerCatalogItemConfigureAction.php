@@ -73,8 +73,11 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
 			$catalogItemProfileFilter->statusEqual =  Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE;
 
-			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION ||
+			$serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
+			{
 				$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
+			}
 
 			$client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
@@ -177,8 +180,11 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		if ($partnerCatalogItemsNoIn)
 			$catalogItemProfileFilter->idNotIn = implode(',', $partnerCatalogItemsNoIn);
 
-		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION ||
+			$serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
+		{
 			$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
+		}
 
 		$this->client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);

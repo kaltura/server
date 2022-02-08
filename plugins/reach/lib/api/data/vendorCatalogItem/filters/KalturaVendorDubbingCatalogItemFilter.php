@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.filters
  */
-class KalturaVendorDubbingCatalogItemFilter extends KalturaVendorCatalogItemFilter
+class KalturaVendorDubbingCatalogItemFilter extends KalturaVendorTranslationCatalogItemBaseFilter
 {
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
