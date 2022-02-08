@@ -228,6 +228,13 @@ class kBatchManager
 //KalturaLog::log("Flavor asset tags [".print_r($flavorAsset->setTags(),1)."]");
 				$flavorAsset->addTags($finalTagsArray);
 			}
+
+			$ext = kAssetUtils::getFileExtension($mediaInfoDb->getContainerFormat());
+			if($ext)
+			{
+				$flavorAsset->setFileExt($ext);
+			}
+
 		}
 		else 
 		{
