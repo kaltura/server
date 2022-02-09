@@ -45,9 +45,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
 			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
-
-			if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION ||
-				$serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
+			
+			if(in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
 			{
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;
 			}
