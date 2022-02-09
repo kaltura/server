@@ -44,8 +44,7 @@ class kQuizManager implements kObjectChangedEventConsumer
 	
 	protected static function sendBeacon (string $uri)
 	{
-//		$statsHost = explode(':', kConf::get(self::MAP_NAME));
-		$statsHost = array('localhost', 91);
+		$statsHost = explode(':', kConf::get(self::MAP_NAME));
 		$host = $statsHost[0];
 		$port = $statsHost[1];
 		$headers = array(
@@ -103,11 +102,7 @@ class kQuizManager implements kObjectChangedEventConsumer
 	protected static function generateQuizEventContent($quizUserEntry)
 	{
 		/* @var $quizUserEntry QuizUserEntry */
-		$c = KalturaCriteria::create(CuePointPeer::OM_CLASS);
-		$c->add(CuePointPeer::ENTRY_ID, $quizUserEntry->getEntryId(), Criteria::EQUAL);
-		$c->add(CuePointPeer::TYPE, QuizPlugin::getCoreValue('CuePointType', QuizCuePointType::QUIZ_QUESTION));
-		$questions = CuePointPeer::doSelect($c);
-		$quizEventContent = array(
+		return array(
 			self::EVENT_TYPE => $quizUserEntry->getType(),
 			self::KUSER_ID => $quizUserEntry->getkuser()->getEmail(),
 			self::PARTNER_ID => $quizUserEntry->getPartnerId(),
@@ -117,12 +112,11 @@ class kQuizManager implements kObjectChangedEventConsumer
 			self::VERSION => $quizUserEntry->getVersion(),
 			self::ANSWER_IDS => $quizUserEntry->getAnswerIds(),
 			self::SCORE => $quizUserEntry->getScore(),//check
-			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),//check
+			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),
 			self::NUM_OF_QUESTIONS => $quizUserEntry->getNumOfQuestions(),
 			self::NUM_OF_RELEVANT_QUESTIONS => $quizUserEntry->getNumOfRelevnatQuestions(),
 			self::CALCULATED_SCORE => $quizUserEntry->getCalculatedScore()
 		);
-		return $quizEventContent;
 	}
 	
 }
