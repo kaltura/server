@@ -118,7 +118,7 @@ class RuleEngine extends OpenCalaisConstants
             return array();
         }
         $name = $apiItemdetails[self::OPCAL_ENTT_NAME];
-	    $permid = $apiItemdetails[self::OPCAL_PERM_ID];
+		$permid = $apiItemdetails[self::OPCAL_PERM_ID];
         $nameArray = explode(' ', $name);
         $textTimes = $this->textTimes;
         $n = 0;
@@ -145,12 +145,10 @@ class RuleEngine extends OpenCalaisConstants
         $textTimes = $this->textTimes;
         $fullName = '';
         $startFrom = $textTimes[$key]['s'];
-        $endTo = $textTimes[$key]['e'];
         for($i = 0; $i < count($nameArray); $i++)
         {
             if($textTimes[$key]['w'] == $nameArray[$i])
             {
-                $endTo = $textTimes[$key]['e'];
                 $fullName .= $textTimes[$key++]['w'].' ';
             }
             else{
@@ -158,7 +156,7 @@ class RuleEngine extends OpenCalaisConstants
             }
         }
         $fullName = trim($fullName);
-        $cuePoints[] = array('title' => $fullName, 'startTime' => $startFrom, 'endTime' => $endTo, 'partnerData' => $permid);
+        $cuePoints[] = array('title' => $fullName, 'startTime' => $startFrom, 'partnerData' => $permid);
     }
     /**
      * @param array $apiItemDetails
