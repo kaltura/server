@@ -156,7 +156,7 @@ class RuleEngine extends OpenCalaisConstants
             }
         }
         $fullName = trim($fullName);
-        $cuePoints[] = array('title' => $fullName, 'startTime' => $startFrom, 'partnerData' => $permid);
+        $cuePoints[] = array('text' => $fullName, 'startTime' => $startFrom, 'partnerData' => $permid);
     }
     /**
      * @param array $apiItemDetails
