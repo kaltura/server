@@ -118,7 +118,7 @@ class RuleEngine extends OpenCalaisConstants
             return array();
         }
         $name = $apiItemdetails[self::OPCAL_ENTT_NAME];
-		$permid = $apiItemdetails[self::OPCAL_PERM_ID];
+        $permid = $apiItemdetails[self::OPCAL_PERM_ID];
         $nameArray = explode(' ', $name);
         $textTimes = $this->textTimes;
         $n = 0;
