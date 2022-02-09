@@ -3,9 +3,9 @@ require_once (dirname(__FILE__) . '/../bootstrap.php');
 
 if ($argc < 4)
 {
-	KalturaLog::info(' ---- Copy New Transcoding Profile From Partner 0 ---- ');
+	KalturaLog::info(' ---- Copy New Transcoding Profile From Partner Id 0 ---- ');
 	die (' Error execute script, Usage: php copyNewTranscodingProfile.php
-	 < transcodingId > 
+	 < transcodingProfileId > 
 	 < partnerId > 
 	 < realrun / dryrun >' . PHP_EOL);
 }
@@ -26,7 +26,7 @@ KalturaLog::info($dryRun ? 'DRY RUN' : 'REAL RUN');
 
 if ($transcodingProfiel && $transcodingProfiel->getStatus() == ConversionProfileStatus::ENABLED)
 {
-	KalturaLog::debug("Conversion profile id {$transcodingProfileId} found on partner 0");
+	KalturaLog::debug("Conversion profile id {$transcodingProfileId} found on partner id 0");
 
 	try
 	{
@@ -42,12 +42,12 @@ if ($transcodingProfiel && $transcodingProfiel->getStatus() == ConversionProfile
 	}
 	catch (Exception $e)
 	{
-		KalturaLog::debug("Could not creat the transcoding profile for Pid {$partnerId}");
+		KalturaLog::debug("Could not creat the transcoding profile for partner id {$partnerId}");
 		KalturaLog::debug($e->getMessage());
 	}
 }
 else
 {
-	KalturaLog::debug("Conversion profile id {$transcodingProfileId} could not be found or is not enable on partner 0");
+	KalturaLog::debug("Conversion profile id {$transcodingProfileId} could not be found or is not enable on partner id 0");
 }
 KalturaLog::info("Script Done!");
