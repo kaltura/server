@@ -10,7 +10,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 
 	/**
 	 * unique auto-generated identifier
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 * @filter eq,in,notin
 	 */
