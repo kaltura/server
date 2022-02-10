@@ -1,3 +1,13 @@
+# Rigel-18.0.0
+## Add permissions to KME partner ##
+Add permissions to KME partner for baseentry service
+
+* Issue Type: Task
+* Issue ID: PLAT-23565
+
+#### Deployment Script ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_02_07_add_permissions_baseentry_list.php
+
 # Quasar-17.19.0
 ## Html Purifier configuration for additional attributes ##
 * Issue Type: Task
