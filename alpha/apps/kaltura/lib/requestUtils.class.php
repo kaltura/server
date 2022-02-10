@@ -9,6 +9,10 @@ require_once(dirname(__FILE__) . '/request/infraRequestUtils.class.php');
 class requestUtils extends infraRequestUtils
 {
 	const SECURE_COOKIE_PREFIX = "___";
+	const HEADER_HOST = 'Host';
+	const HEADER_X_FORWARDED_FOR = 'X-Forwarded-For';
+	const HEADER_USER_AGENT = 'User-Agent';
+	const HEADER_USER_AGENT_TYPE = 'HTTP_USER_AGENT';
 	
 	private static $s_cookies_to_be_set = array();
 	
@@ -328,5 +332,37 @@ class requestUtils extends infraRequestUtils
 		$ip_country_list = explode ( "," , $ip_country_list_str );
 		$current_country = self::getIpCountry() ;
 		return ( in_array ( $current_country , $ip_country_list ) );
+	}
+	
+	public static function buildKavaRequest($quizEventContent, $host)
+	{
+		$uri = '/api_v3/index.php?' . http_build_query($quizEventContent, '', '&');
+		$headers = array(
+			self::HEADER_HOST => $host,
+			self::HEADER_X_FORWARDED_FOR => infraRequestUtils::getRemoteAddress(),);
+		if (isset($_SERVER[self::HEADER_USER_AGENT_TYPE]))
+		{
+			$headers[self::HEADER_USER_AGENT] = $_SERVER[self::HEADER_USER_AGENT_TYPE];
+		}
+		$out = "GET {$uri} HTTP/1.1\r\n";
+		foreach($headers as $header => $value)
+		{
+			$out .= "$header: $value\r\n";
+		}
+		$out .= "\r\n";
+		
+		return $out;
+	}
+	
+	public static function sendKavaRequest($host, $port, $out)
+	{
+		$fp = fsockopen($host, $port, $errorNumber, $errorMessage, 0.1);
+		if ($fp === false)
+		{
+			KalturaLog::ERR("ERROR: Could not open socket connection [$host:$port] due to: [$errorNumber] $errorMessage");
+		}
+		
+		fwrite($fp, $out);
+		fclose($fp);
 	}
 }

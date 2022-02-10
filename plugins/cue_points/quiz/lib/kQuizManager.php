@@ -6,11 +6,10 @@
 class kQuizManager implements kObjectChangedEventConsumer
 {
 	const EVENT_TYPE = 'eventType';
+	const QUIZ_EVENT_TYPE = '@event_type_id@';
 	const KUSER_ID = 'kuserId';
 	const ENTRY_ID = 'entryId';
 	const PARTNER_ID = 'partnerId';
-	const EVENT_TIME = 'eventTime';
-	const VIRTUAL_EVENT_ID = 'virtualEventId';
 	const VERSION = 'version';
 	const ANSWER_IDS = 'answerIds';
 	const SCORE = 'score';
@@ -18,12 +17,7 @@ class kQuizManager implements kObjectChangedEventConsumer
 	const NUM_OF_QUESTIONS = 'numOfQuestions';
 	const NUM_OF_RELEVANT_QUESTIONS = 'numOfRelevnatQuestions';
 	const CALCULATED_SCORE = 'calculatedScore';
-	
-	const MAP_NAME = 'internal_analytics_host';
-	const HEADER_HOST = 'Host';
-	const HEADER_IDENTIFIER = 'X-Forwarded-For';
-	const HEADER_AGENT = 'User-Agent';
-	const HEADER_AGENT_TYPE = 'HTTP_USER_AGENT';
+	const INTERNAL_ANALYTICS_HOST = 'internal_analytics_host';
 	
 	/**
 	 * @param BaseObject $object
@@ -32,51 +26,28 @@ class kQuizManager implements kObjectChangedEventConsumer
 	 */
 	public function objectChanged (BaseObject $object, array $modifiedColumns)
 	{
-		$quizEventContent = array();
-		if (self::wasStatusChanged($object, $modifiedColumns))
+		if (!self::wasStatusChanged($object, $modifiedColumns))
 		{
-			$quizEventContent = self::generateQuizEventContent($object);
+			return false;
 		}
-		$uri = '/api_v3/index.php?' . http_build_query($quizEventContent, '', '&');
-		
-		self::sendBeacon($uri);
+		$quizEventContent = self::getQuizEventContent($object);
+		if (kConf::hasParam(self::INTERNAL_ANALYTICS_HOST))
+		{
+			$statsHost = explode(':', kConf::get(self::INTERNAL_ANALYTICS_HOST));
+			self::sendBeacon(
+				$quizEventContent,
+				$statsHost[0],
+				isset($statsHost[1]) ? $statsHost[1] : 80);
+		}
+		return true;
 	}
 	
-	protected static function sendBeacon (string $uri)
+	public static function sendBeacon ($quizEventContent, $host, $port)
 	{
-		$statsHost = explode(':', kConf::get(self::MAP_NAME));
-		$host = $statsHost[0];
-		$port = $statsHost[1];
-		$headers = array(
-			self::HEADER_HOST => $host,
-			self::HEADER_IDENTIFIER => infraRequestUtils::getRemoteAddress(),);
-		if (isset($_SERVER[self::HEADER_AGENT_TYPE]))
-		{
-			$headers[self::HEADER_AGENT] = $_SERVER[self::HEADER_AGENT_TYPE];
-		}
-		$out = "GET {$uri} HTTP/1.1\r\n";
-		foreach($headers as $header => $value)
-		{
-			$out .= "$header: $value\r\n";
-		}
-		$out .= "\r\n";
-		
-		self::sendRequest($uri, $host, $port, $out);
-		
+		requestUtils::sendKavaRequest($host, $port, requestUtils::buildKavaRequest($quizEventContent, $host));
 	}
 	
-	protected static function sendRequest($uri, $host, $port, $out)
-	{
-		KalturaLog::info("Sending beacon to $uri");
-		$fp = fsockopen($host, $port, $errorNumber, $errorMessage, 0.1);
-		if ($fp === false)
-		{
-			KalturaLog::ERR("ERROR: Could not open socket connection [$host:$port] due to: [$errorNumber] $errorMessage");
-		}
-		
-		fwrite($fp, $out);
-		fclose($fp);
-	}
+	
 	
 	/**
 	 * @param BaseObject $object
@@ -95,23 +66,21 @@ class kQuizManager implements kObjectChangedEventConsumer
 	protected static function wasStatusChanged(BaseObject $object, array $modifiedColumns)
 	{
 		return ($object instanceof QuizUserEntry)
-			&& in_array('user_entry.STATUS', $modifiedColumns)
-			&& $object->getStatus() == 10060;
+			&& in_array(UserEntryPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED);
 	}
 	
-	protected static function generateQuizEventContent($quizUserEntry)
+	protected static function getQuizEventContent($quizUserEntry)
 	{
 		/* @var $quizUserEntry QuizUserEntry */
 		return array(
-			self::EVENT_TYPE => $quizUserEntry->getType(),
-			self::KUSER_ID => $quizUserEntry->getkuser()->getEmail(),
+			self::EVENT_TYPE => self::QUIZ_EVENT_TYPE,
+			self::KUSER_ID => $quizUserEntry->getkuser()->getId(),
 			self::PARTNER_ID => $quizUserEntry->getPartnerId(),
 			self::ENTRY_ID => $quizUserEntry->getEntryId(),
-			self::EVENT_TIME => date('Y-m-d H:i:s'),//"2022-01-19T13:32:10Z" current time of this event being issued
-			self::VIRTUAL_EVENT_ID => "Unknown",
 			self::VERSION => $quizUserEntry->getVersion(),
 			self::ANSWER_IDS => $quizUserEntry->getAnswerIds(),
-			self::SCORE => $quizUserEntry->getScore(),//check
+			self::SCORE => $quizUserEntry->getScore(),
 			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),
 			self::NUM_OF_QUESTIONS => $quizUserEntry->getNumOfQuestions(),
 			self::NUM_OF_RELEVANT_QUESTIONS => $quizUserEntry->getNumOfRelevnatQuestions(),
