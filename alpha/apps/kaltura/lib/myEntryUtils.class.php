@@ -690,7 +690,7 @@ class myEntryUtils
 	}
 
 
-	public static function createThumbPaths($entity, $thumbName, $thumbFilename , $format , $version, $thumbDirs)
+	public static function createThumbPaths($entity, $thumbName, $thumbFilename, $format, $version, $thumbDirs)
 	{
 		//create final path for thumbnail created
 		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity, $thumbName, $thumbFilename, $version);
@@ -699,7 +699,7 @@ class myEntryUtils
 		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
 
 		//create path for processing thumbnail request
-		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity->getIntId(), $uniqueThumbName, $thumbFilename , $version);
+		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity->getIntId(), $uniqueThumbName, $thumbFilename, $version);
 
 		if(!is_null($format))
 		{
@@ -711,9 +711,9 @@ class myEntryUtils
 		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
 			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
-			return array($finalThumbPath, $processingThumbPath, TRUE);
+			return array($finalThumbPath, null);
 		}
-		return array($finalThumbPath, $processingThumbPath, FALSE);
+		return array($finalThumbPath, $processingThumbPath);
 	}
 
 
@@ -754,10 +754,8 @@ class myEntryUtils
 		{
 			$entryLengthInMsec = $servingVODfromLive ? $entry->getRecordedLengthInMsecs() : $entry->getLengthInMsecs();
 		}
-		 
-		$thumbName = $entry->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 
-		$thumbNameAttributes = "";
+		$thumbNameAttributes = "_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
 		if ($servingVODfromLive && $vid_slices > 0)
 			$thumbNameAttributes .= "_duration_" . $entryLengthInMsec;
 
@@ -786,17 +784,17 @@ class myEntryUtils
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
-		$thumbName .= $thumbNameAttributes;
+		$thumbName = $entry->getId() . $thumbNameAttributes;
 		
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 
-		list ($finalThumbPath, $processingThumbPath, $existsInCache) = self::createThumbPaths($entry, $thumbName, $entryThumbFilename , $format , $version, $thumbDirs);
-		if ($existsInCache)
+		list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($entry, $thumbName, $entryThumbFilename, $format, $version, $thumbDirs);
+		if (is_null($processingThumbPath))
 			return $finalThumbPath;
 
 		foreach ($thumbDirs as $thumbDir)
 		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename , $version);
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename, $version);
 			KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
 			if (file_exists($currPath) && @filesize($currPath))
 			{
@@ -821,22 +819,19 @@ class myEntryUtils
 			}
 		}
 
-
 		if (($vid_sec != -1) || ($vid_slices != -1))
 		{
 			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
 
 			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entry);
-			$thumbName = $captureFlavorAsset->getId()."_{$width}_{$height}_{$type}_{$crop_provider}_{$bgcolor}_{$quality}_{$src_x}_{$src_y}_{$src_w}_{$src_h}_{$vid_sec}_{$vid_slice}_{$vid_slices}_{$entry_status}";
-			$thumbName .= $thumbNameAttributes;
-			$flavorThumbFilename = $captureFlavorAsset->getVersion().".jpg";
+			$thumbName = $captureFlavorAsset->getId() . $thumbNameAttributes;
+			$flavorThumbFilename = $captureFlavorAsset->getVersion() . ".jpg";
 
-			list ($finalThumbPath, $processingThumbPath, $existsInCache) = self::createThumbPaths($captureFlavorAsset, $thumbName, $flavorThumbFilename , $format , $captureFlavorAsset->getVersion(), $thumbDirs);
-			if ($existsInCache)
-				return $existsInCache;
+			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbName, $flavorThumbFilename, $format, $captureFlavorAsset->getVersion(), $thumbDirs);
+			if (is_null($processingThumbPath))
+				return $finalThumbPath;
 
 		}
-
 
 		kFile::fullMkdir($processingThumbPath);
 		/* @var  $fileSync FileSync*/
