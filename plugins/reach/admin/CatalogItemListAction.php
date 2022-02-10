@@ -46,8 +46,10 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
 		$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
 
-		if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		if(in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
+		{
 			$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
+		}
 
 		$client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);

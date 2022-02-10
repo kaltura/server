@@ -13,6 +13,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 	{
 		return realpath(dirname(__FILE__));
 	}
+	
+	protected static $targetLanguageTypeArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING);
 
 	public function doAction(Zend_Controller_Action $action)
 	{
@@ -73,8 +75,10 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
 			$catalogItemProfileFilter->statusEqual =  Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE;
 
-			if($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			if(in_array($serviceFeature, self::$targetLanguageTypeArray))
+			{
 				$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
+			}
 
 			$client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
@@ -176,9 +180,11 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 
 		if ($partnerCatalogItemsNoIn)
 			$catalogItemProfileFilter->idNotIn = implode(',', $partnerCatalogItemsNoIn);
-
-		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		
+		if(in_array($serviceFeature, self::$targetLanguageTypeArray))
+		{
 			$catalogItemProfileFilter->targetLanguageEqual = $targetLanguage;
+		}
 
 		$this->client = Infra_ClientHelper::getClient();
 		$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
