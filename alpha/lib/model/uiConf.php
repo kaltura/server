@@ -284,12 +284,27 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		$suffix = $this->getSuffixBySubType($sub_type);
 		$incVersion = false;
 		if($sub_type == self::FILE_SYNC_UICONF_SUB_TYPE_DATA)
+		{
 			$incVersion = true;
-			
-		$res = $this->getConfFilePathImpl( $suffix , $incVersion , $version);
+		}
 		
-		$file_root = myContentStorage::getFSContentRootPath( );
-		$file_path = str_replace ( myContentStorage::getFSContentRootPath( ) , "" , $res );
+		if ($externalPath)
+		{
+			$file_root = myCloudUtils::getPartnerSharedStoargeBaseDir($this->getPartnerId());
+			$dir = myContentStorage::getScatteredPathFromIntId($this->getId() * 10);
+			$file_path = "/generatedUiConf/$dir/ui_conf_{$this->getId()}_$version.xml";
+			if ($suffix)
+			{
+				$file_path = str_replace("xml", "$suffix.xml", $file_path);
+			}
+		}
+		else
+		{
+			$res = $this->getConfFilePathImpl($suffix, $incVersion, $version);
+			$file_root = myContentStorage::getFSContentRootPath();
+			$file_path = str_replace(myContentStorage::getFSContentRootPath(), "", $res);
+		}
+		
 		return array ( $file_root , $file_path )	;
 	}
 
