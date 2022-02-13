@@ -28,9 +28,13 @@ class thumbnailAction extends sfAction
 		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
 	}
 
-	public function getIntRequestParameter($name, $default, $min, $max)
+	public function getIntRequestParameter($name, $default, $min, $max = null)
 	{
-		return min($max, max($min, intval($this->getRequestParameter($name, $default))));
+		$val = max($min, intval($this->getRequestParameter($name, $default)));
+		if(is_null($max))
+			return $val;
+
+		return min($max, $val);
 	}
 
 	public function getFloatRequestParameter($name, $default, $min, $max = null)
@@ -76,8 +80,8 @@ class thumbnailAction extends sfAction
 		$src_w = $this->getFloatRequestParameter("src_w", 0, 0, 10000);
 		$src_h = $this->getFloatRequestParameter("src_h", 0, 0, 10000);
 		$vid_sec = $this->getFloatRequestParameter("vid_sec", -1, -1);
-		$vid_slice = $this->getRequestParameter("vid_slice", -1);
-		$vid_slices = $this->getRequestParameter("vid_slices", -1);
+		$vid_slice = $this->getIntRequestParameter("vid_slice", -1, -1);
+		$vid_slices = $this->getIntRequestParameter("vid_slices", -1, -1);
 		$density = $this->getFloatRequestParameter("density", 0, 0);
 		$stripProfiles = $this->getRequestParameter("strip", null);
 		$flavor_id = $this->getRequestParameter("flavor_id", null);
@@ -181,6 +185,11 @@ class thumbnailAction extends sfAction
 		if(($vid_slices != -1 && $vid_slices <= 0) || !is_numeric($vid_slices))
 		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
+		}
+		if($vid_slice != -1)
+		{
+			$vid_slice = (($vid_slices != -1) ? $vid_slice : -1);
+			$vid_slice = (($vid_slice > $vid_slices) ? $vid_slices : $vid_slice);
 		}
 
 		if($vid_slices > 0 && ($vid_slices * $width) >= 65500)

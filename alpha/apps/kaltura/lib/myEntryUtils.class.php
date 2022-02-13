@@ -819,7 +819,7 @@ class myEntryUtils
 			}
 		}
 
-		if (($vid_sec != -1) || ($vid_slices != -1))
+		if (($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
 		{
 			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
 
