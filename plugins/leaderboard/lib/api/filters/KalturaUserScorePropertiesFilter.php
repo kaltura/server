@@ -151,9 +151,30 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			$results = $this->addRanksToRange($tempResults, 0);
 		}
 		
+		ksort($results);
+		
+		$pager->pageIndex = $pager->calcPageIndex();
+		$pager->pageSize = $pager->calcPageSize();
+		$start = ($pager->pageIndex - 1) * $pager->pageSize;
+		$finish = $start + $pager->pageSize;
+		
+		if ($start < count($results))
+		{
+			$i = 0;
+			$paginatedResults = array();
+			foreach ($results as $key => $value)
+			{
+				if ($i >= $start && $i < $finish)
+				{
+					$paginatedResults[$key] = $value;
+				}
+				$i++;
+			}
+			$results = $paginatedResults;
+		}
+		
 		$response = new KalturaUserScorePropertiesResponse();
 		$response->totalCount = count($results);
-		ksort($results);
 		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($results, $responseProfile);
 		
 		return $response;
