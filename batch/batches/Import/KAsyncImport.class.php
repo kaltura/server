@@ -187,7 +187,18 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl, $fileSize);
+				$curlWrapperForRedirect = new KCurlWrapper(self::$taskConfig->params);
+				$curlWrapperForRedirect->setTimeout(self::HEADERS_TIMEOUT);
+				$curlWrapperForRedirect->exec($sourceUrl);
+				$redirectUrl = $curlWrapperForRedirect->getInfo(CURLINFO_EFFECTIVE_URL);
+				$curlWrapperForRedirect->close();
+
+				if(is_null($redirectUrl))
+				{
+					$redirectUrl = $sourceUrl;
+				}
+
+				$data->destFileLocalPath = $this->getTempFilePath($redirectUrl, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
