@@ -103,6 +103,28 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return true;
 	}
 	
+	protected function handleExistingDropFolderFiles()
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 500;
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
+		{
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		}
+		
+		do
+		{
+			$pager->pageIndex++;
+			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager);
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				$this->handleExistingDropFolderFile($dropFolderFile);
+			}
+			
+		} while (count($dropFolderFiles) >= $pager->pageSize);
+	}
+	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->zoomClient = $this->initZoomClient($dropFolder);
@@ -110,11 +132,21 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$startRunTime = time();
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
-		$dropFolderFilesMap = $this->loadDropFolderFiles(time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 		$fileInStatusProcessingExists = false;
+		
 		if ($meetingFilesOrdered)
 		{
-			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap, $fileInStatusProcessingExists);
+			$zoomMeetingsNames = $this->handleMeetingFiles($meetingFilesOrdered, array(), $fileInStatusProcessingExists, true);
+			
+			$dropFolderFilesMap = $this->loadDropFolderFiles(implode ( "," , $zoomMeetingsNames ));
+			$recordingFileNames = array();
+			foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
+			{
+				$recordingFileNames[] = $recordingFileName;
+			}
+			unset($dropFolderFilesMap);
+			
+			$this->handleMeetingFiles($meetingFilesOrdered, $recordingFileNames, $fileInStatusProcessingExists, false);
 		}
 		else
 		{
@@ -127,10 +159,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$this->updateDropFolderLastMeetingHandled($this->dropFolder->lastHandledMeetingTime + self::ONE_DAY);
 		}
 		
-		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
-		{
-			$this->handleExistingDropFolderFile($dropFolderFile);
-		}
+		$this->handleExistingDropFolderFiles();
 	}
 
 	protected function refreshZoomClientTokens()
@@ -226,19 +255,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return $meetings;
 	}
 	
-	protected function updateWithLatestDropFolderFiles($dropFolderFilesMap)
+	protected function handleMeetingFiles($meetingFiles, $dropFolderFilesNames, &$fileInStatusProcessingExists, $retrieveNamesOnly)
 	{
-		$lastKeyValuePair = array_slice($dropFolderFilesMap, -1, 1, true);
-		$lastVal = reset($lastKeyValuePair);
-		KalturaLog::debug("Last DropFolder File ID is ({$lastVal->id}) createdAt ({$lastVal->createdAt})");
-		
-		$newDropFolderFilesMap = $this->loadDropFolderFiles($lastVal->createdAt + 1);
-		KalturaLog::debug('Adding ' . count($newDropFolderFilesMap) . ' drop folder files to ' . count($dropFolderFilesMap) . ' existing files');
-		return array_merge($dropFolderFilesMap, $newDropFolderFilesMap);
-	}
-	
-	protected function handleMeetingFiles($meetingFiles, &$dropFolderFilesMap, &$fileInStatusProcessingExists)
-	{
+		$zoomMeetingsNames = array();
 		foreach ($meetingFiles as $meetingFile)
 		{
 			if($this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]))
@@ -267,8 +286,12 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->updateWithLatestDropFolderFiles($dropFolderFilesMap);
-					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
+					if($retrieveNamesOnly)
+					{
+						$zoomMeetingsNames[] = $recordingFileName;
+						continue;
+					}
+					if (!in_array($recordingFileName, $dropFolderFilesNames))
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
 							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
@@ -297,15 +320,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 							}
 						}
 					}
-					else
-					{
-						$dropFolderFile = $dropFolderFilesMap[$recordingFileName];
-						unset($dropFolderFilesMap[$recordingFileName]);
-						$this->handleExistingDropFolderFile($dropFolderFile);
-					}
 				}
 			}
 		}
+		return $zoomMeetingsNames;
 	}
 	
 	protected function getEntryByReferenceId($referenceId)
