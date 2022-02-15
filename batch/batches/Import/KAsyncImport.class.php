@@ -572,6 +572,14 @@ class KAsyncImport extends KJobHandlerWorker
 		{
 			$redirectUrl = $sourceUrl;
 		}
+		else
+		{
+			$ext = pathinfo($redirectUrl, PATHINFO_EXTENSION);
+			if(is_null($ext))
+			{
+				$redirectUrl = $sourceUrl;
+			}
+		}
 
 		return $redirectUrl;
 	}
