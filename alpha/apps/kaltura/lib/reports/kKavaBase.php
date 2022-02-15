@@ -26,6 +26,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_LOCATION_REGION = 'location.region';
 	const DIMENSION_LOCATION_CITY = 'location.city';
 	const DIMENSION_LOCATION_ISP = 'location.isp';
+	const DIMENSION_LOCATION_WORLD_REGION = 'worldRegion';
 	const DIMENSION_DOMAIN = 'urlParts.domain';
 	const DIMENSION_URL = 'urlParts.canonicalUrl';
 	const DIMENSION_KUSER_ID = 'kuserId';
