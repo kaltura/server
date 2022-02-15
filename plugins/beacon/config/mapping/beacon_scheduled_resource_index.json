@@ -264,82 +264,82 @@
 								}
 							}
 						},
-						"RecordingData": {
+				"RecordingData": {
+					"properties": {
+						"recordingPhase": {
+							"type": "keyword",
+							"normalizer": "kaltura_keyword_normalizer"
+						},
+						"recordingTime": {
+							"type": "keyword",
+							"normalizer": "kaltura_keyword_normalizer"
+						}
+					}
+				},
+				"ResourceDetails": {
+					"properties": {
+						"activeSessions": {
 							"properties": {
-								"recordingPhase": {
-									"type": "keyword",
-									"normalizer": "kaltura_keyword_normalizer"
+								"primary": {
+									"type": "boolean"
 								},
-								"recordingTime": {
+								"secondary": {
+									"type": "boolean"
+								}
+							}
+						},
+						"appVersion": {
+							"type": "keyword",
+							"normalizer": "kaltura_keyword_normalizer"
+						},
+						"resourceId": {
+							"type": "float"
+						},
+						"resourceName": {
+							"type": "text",
+							"analyzer": "kaltura_text",
+							"fields": {
+								"ngrams": {
+									"type": "text",
+									"analyzer": "kaltura_ngrams"
+								},
+								"raw": {
 									"type": "keyword",
 									"normalizer": "kaltura_keyword_normalizer"
 								}
 							}
-						},
-						"ResourceDetails": {
+						}
+					}
+				},
+				"Scheduling": {
+					"properties": {
+						"NextScheduledEvent": {
 							"properties": {
-								"activeSessions": {
-									"properties": {
-										"primary": {
-											"type": "boolean"
-										},
-										"secondary": {
-											"type": "boolean"
-										}
-									}
-								},
-								"appVersion": {
+								"description": {
 									"type": "keyword",
 									"normalizer": "kaltura_keyword_normalizer"
 								},
-								"resourceId": {
+								"endDate": {
 									"type": "float"
 								},
-								"resourceName": {
-									"type": "text",
-									"analyzer": "kaltura_text",
-									"fields": {
-										"ngrams": {
-											"type": "text",
-											"analyzer": "kaltura_ngrams"
-										},
-										"raw": {
-											"type": "keyword",
-											"normalizer": "kaltura_keyword_normalizer"
-										}
-									}
+								"id": {
+									"type": "float"
+								},
+								"organizer": {
+									"type": "keyword",
+									"normalizer": "kaltura_keyword_normalizer"
+								},
+								"startDate": {
+									"type": "float"
+								},
+								"summary": {
+									"type": "keyword",
+									"normalizer": "kaltura_keyword_normalizer"
 								}
 							}
-						},
-						"Scheduling": {
-							"properties": {
-								"NextScheduledEvent": {
-									"properties": {
-										"description": {
-											"type": "keyword",
-											"normalizer": "kaltura_keyword_normalizer"
-										},
-										"endDate": {
-											"type": "float"
-										},
-										"id": {
-											"type": "float"
-										},
-										"organizer": {
-											"type": "keyword",
-											"normalizer": "kaltura_keyword_normalizer"
-										},
-										"startDate": {
-											"type": "float"
-										},
-										"summary": {
-											"type": "keyword",
-											"normalizer": "kaltura_keyword_normalizer"
-										}
-									}
-								}
-							}
-						},
+						}
+					}
+				},
 						"appVersion": {
 							"type": "keyword",
 							"normalizer": "kaltura_keyword_normalizer"
