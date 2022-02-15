@@ -103,6 +103,29 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return true;
 	}
 	
+	protected function handleExistingDropFolderFiles()
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 500;
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
+		{
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		}
+		
+		$fromCreatedAt = time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE;
+		do
+		{
+			$pager->pageIndex++;
+			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager, $fromCreatedAt);
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				$this->handleExistingDropFolderFile($dropFolderFile);
+			}
+			
+		} while (count($dropFolderFiles) >= $pager->pageSize);
+	}
+	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->zoomClient = $this->initZoomClient($dropFolder);
@@ -110,11 +133,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$startRunTime = time();
 		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
-		$dropFolderFilesMap = $this->loadDropFolderFiles(time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 		$fileInStatusProcessingExists = false;
+		
 		if ($meetingFilesOrdered)
 		{
-			$this->handleMeetingFiles($meetingFilesOrdered, $dropFolderFilesMap, $fileInStatusProcessingExists);
+			$this->handleMeetingFiles($meetingFilesOrdered, $fileInStatusProcessingExists);
 		}
 		else
 		{
@@ -127,10 +150,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$this->updateDropFolderLastMeetingHandled($this->dropFolder->lastHandledMeetingTime + self::ONE_DAY);
 		}
 		
-		foreach ($dropFolderFilesMap as $recordingFileName => $dropFolderFile)
-		{
-			$this->handleExistingDropFolderFile($dropFolderFile);
-		}
+		$this->handleExistingDropFolderFiles();
 	}
 
 	protected function refreshZoomClientTokens()
@@ -226,18 +246,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return $meetings;
 	}
 	
-	protected function updateWithLatestDropFolderFiles($dropFolderFilesMap)
-	{
-		$lastKeyValuePair = array_slice($dropFolderFilesMap, -1, 1, true);
-		$lastVal = reset($lastKeyValuePair);
-		KalturaLog::debug("Last DropFolder File ID is ({$lastVal->id}) createdAt ({$lastVal->createdAt})");
-		
-		$newDropFolderFilesMap = $this->loadDropFolderFiles($lastVal->createdAt + 1);
-		KalturaLog::debug('Adding ' . count($newDropFolderFilesMap) . ' drop folder files to ' . count($dropFolderFilesMap) . ' existing files');
-		return array_merge($dropFolderFilesMap, $newDropFolderFilesMap);
-	}
-	
-	protected function handleMeetingFiles($meetingFiles, &$dropFolderFilesMap, &$fileInStatusProcessingExists)
+	protected function handleMeetingFiles($meetingFiles, &$fileInStatusProcessingExists)
 	{
 		foreach ($meetingFiles as $meetingFile)
 		{
@@ -267,8 +276,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
-					$dropFolderFilesMap = $this->updateWithLatestDropFolderFiles($dropFolderFilesMap);
-					if (!array_key_exists($recordingFileName, $dropFolderFilesMap))
+					$dropFolderFilesMap = $this->loadDropFolderFiles($recordingFileName);
+
+					if (count($dropFolderFilesMap) === 0)
 					{
 						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
 							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
@@ -296,12 +306,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 							}
 						}
-					}
-					else
-					{
-						$dropFolderFile = $dropFolderFilesMap[$recordingFileName];
-						unset($dropFolderFilesMap[$recordingFileName]);
-						$this->handleExistingDropFolderFile($dropFolderFile);
 					}
 				}
 			}

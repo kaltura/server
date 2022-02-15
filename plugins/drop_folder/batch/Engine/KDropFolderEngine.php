@@ -43,35 +43,39 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
 	 * @param KalturaFilterPager $pager
+	 * @param $fromCreatedAt
 	 * @return array
 	 */
-	protected function loadDropFolderFilesByPage($pager)
+	protected function loadDropFolderFilesByPage($pager, $fromCreatedAt = null)
 	{
-		$dropFolderFiles =null;
-
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
-
+		
+		if ($fromCreatedAt)
+		{
+			$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
+		}
+		
 		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
 		return $dropFolderFiles->objects;
 	}
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
-	 * @param $fromCreatedAt
+	 * @param $fileName
 	 * @return array
 	 */
-	protected function loadDropFolderFiles($fromCreatedAt = null)
+	protected function loadDropFolderFiles($fileName = null)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
-		if ($fromCreatedAt)
+		if ($fileName)
 		{
-			$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
+			$dropFolderFileFilter->fileNameEqual = $fileName;
 		}
 
 		$pager = new KalturaFilterPager();
