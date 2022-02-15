@@ -187,17 +187,8 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-				$curlWrapperForRedirect = new KCurlWrapper(self::$taskConfig->params);
-				$curlWrapperForRedirect->setTimeout(self::HEADERS_TIMEOUT);
-				$curlWrapperForRedirect->exec($sourceUrl);
-				$redirectUrl = $curlWrapperForRedirect->getInfo(CURLINFO_EFFECTIVE_URL);
-				$curlWrapperForRedirect->close();
 
-				if(is_null($redirectUrl))
-				{
-					$redirectUrl = $sourceUrl;
-				}
-
+				$redirectUrl = $this->getRedirectUrl($sourceUrl);
 				$data->destFileLocalPath = $this->getTempFilePath($redirectUrl, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
@@ -568,5 +559,21 @@ class KAsyncImport extends KJobHandlerWorker
 		
 		$data->destFileLocalPath = $sharedTempFilePath;
 		return array($partialFileSize, $data);
+	}
+
+	private function getRedirectUrl($sourceUrl)
+	{
+		$curlWrapperForRedirect = new KCurlWrapper(self::$taskConfig->params);
+		$curlWrapperForRedirect->setTimeout(self::HEADERS_TIMEOUT);
+		$curlWrapperForRedirect->getHeader($sourceUrl);
+		$redirectUrl = $curlWrapperForRedirect->getInfo(CURLINFO_EFFECTIVE_URL);
+		$curlWrapperForRedirect->close();
+
+		if(is_null($redirectUrl))
+		{
+			$redirectUrl = $sourceUrl;
+		}
+
+		return $redirectUrl;
 	}
 }
