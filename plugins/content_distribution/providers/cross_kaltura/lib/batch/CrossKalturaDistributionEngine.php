@@ -515,6 +515,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 		$targetEntry->parentEntryId = null;
 
+		// transform capabilities
+		$targetEntry->capabilities = $sourceEntry->capabilities;
+
 		// return transformed entry object
 		return $targetEntry;
 	}
