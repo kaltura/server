@@ -187,7 +187,6 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-
 				$redirectUrl = $this->getRedirectUrl($sourceUrl);
 				$data->destFileLocalPath = $this->getTempFilePath($redirectUrl, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
