@@ -19,12 +19,12 @@ class KalturaLocationScheduleResource extends KalturaScheduleResource
 	 */
 	public function toObject($sourceObject = null, $propertiesToSkip = array())
 	{
-        if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_MEETING_ROOMS, kCurrentContext::getCurrentPartnerId()))
-        {
-            throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_KALTURA_MEETING_ROOMS);
-        }
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_MEETING_ROOMS, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, PermissionName::FEATURE_KALTURA_MEETING_ROOMS);
+		}
 
-        if(is_null($sourceObject))
+		if(is_null($sourceObject))
 		{
 			$sourceObject = new LocationScheduleResource();
 		}
