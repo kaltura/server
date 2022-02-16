@@ -103,6 +103,11 @@ class KalturaUser extends KalturaBaseUser
 	 * @readonly
 	 */
 	public $encryptedSeed;
+	
+	/**
+	 * @var bool
+	 */
+	public $isSsoExcluded;
 
 	private static $map_between_objects = array (
 		"type",
@@ -119,6 +124,7 @@ class KalturaUser extends KalturaBaseUser
 		"title",
 		"company",
 		"ksPrivileges",
+		"isSsoExcluded",
 	);
 
 	public function getMapBetweenObjects ( )
@@ -179,6 +185,7 @@ class KalturaUser extends KalturaBaseUser
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validateNames(null, self::$names);
+		$this->validateSsoExclusion();
 		parent::validateForInsert($propertiesToSkip);
 	}
 
@@ -186,5 +193,13 @@ class KalturaUser extends KalturaBaseUser
 	{
 		$this->validateNames($sourceObject, self::$names);
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	protected function validateSsoExclusion()
+	{
+		if(is_null($this->isSsoExcluded))
+		{
+			$this->isSsoExcluded = false;
+		}
 	}
 }

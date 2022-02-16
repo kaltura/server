@@ -574,10 +574,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 
 		if($partner && $partner->getBlockDirectLogin())
 		{
-			throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
+			if(!$kuser || ($kuser && !$kuser->getIsSsoExcluded()))
+			{
+				throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
+			}
 		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
@@ -586,7 +590,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
 		{
-			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 			if ($kuser)
 			{
 				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)

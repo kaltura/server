@@ -676,6 +676,22 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	}
 	
 	/**
+	 * @return is_sso_excluded parameter from custom_data
+	 */
+	public function getIsSsoExcluded()
+	{
+		return $this->getFromCustomData('is_sso_excluded') == true;
+	}
+	
+	/**
+	 * @param bool $isSsoExcluded
+	 */
+	public function setIsSsoExcluded(bool $isSsoExcluded)
+	{
+		$this->putInCustomData('is_sso_excluded', $isSsoExcluded);
+	}
+	
+	/**
 	 * Set language parameter to $language (in custom_data)
 	 * @param string $language
 	 */
