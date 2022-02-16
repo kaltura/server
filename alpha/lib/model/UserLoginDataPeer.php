@@ -582,6 +582,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			{
 				throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
 			}
+			$validateOtp = false;
 		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
