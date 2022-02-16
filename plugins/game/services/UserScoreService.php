@@ -2,7 +2,7 @@
 
 /**
  * @service userScore
- * @package plugins.leaderboard
+ * @package plugins.game
  * @subpackage api.services
  */
 class UserScoreService extends KalturaBaseService
@@ -13,11 +13,11 @@ class UserScoreService extends KalturaBaseService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaUserScorePropertiesResponse
 	 */
-	public function listAction(KalturaUserScorePropertiesFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaUserScorePropertiesFilter $filter, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
 		{
-			$filter = new KalturaUserScorePropertiesFilter();
+			throw new KalturaAPIException(KalturaErrors::USER_SCORE_PROPERTIES_FILTER_REQUIRED);
 		}
 		if (!$pager)
 		{

@@ -757,6 +757,8 @@ class KalturaErrors extends APIErrors
 	 */
 	const USER_SCORE_PROPERTIES_FILTER_REQUIRED = "USER_SCORE_PROPERTIES_FILTER_REQUIRED;;UserScorePropertiesFilter is required";
 	const USER_ID_EQUAL_REQUIRED = "USER_ID_EQUAL_REQUIRED;;userIdEqual is required";
+	const GAME_OBJECT_ID_REQUIRED = "GAME_OBJECT_ID_REQUIRED;;gameObjectId is required";
+	const GAME_OBJECT_TYPE_REQUIRED = "GAME_OBJECT_TYPE_REQUIRED;;gameObjectType is required";
 	
 	/*
 	 * OTP error

@@ -1,7 +1,7 @@
 <?php
 /**
- * @package plugins.leaderboard
- * @relatedService LeaderboardService
+ * @package plugins.game
+ * @relatedService UserScoreService
  * @subpackage api.filters.base
  * @abstract
  */

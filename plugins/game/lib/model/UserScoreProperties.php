@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.leaderboard
+ * @package plugins.game
  * @subpackage model
  */
 class UserScoreProperties
@@ -20,16 +20,6 @@ class UserScoreProperties
 	 * @var int
 	 */
 	protected $score;
-	
-	/**
-	 * @var string
-	 */
-	protected $scoreTags;
-	
-	/**
-	 * @var int
-	 */
-	protected $oldRank;
 	
 	
 	/**
@@ -78,37 +68,5 @@ class UserScoreProperties
 	public function setScore($score)
 	{
 		$this->score = $score;
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getScoreTags()
-	{
-		return $this->scoreTags;
-	}
-	
-	/**
-	 * @param string $scoreTags
-	 */
-	public function setScoreTags($scoreTags)
-	{
-		$this->scoreTags = $scoreTags;
-	}
-	
-	/**
-	 * @return int
-	 */
-	public function getOldRank()
-	{
-		return $this->oldRank;
-	}
-	
-	/**
-	 * @param int $oldRank
-	 */
-	public function setOldRank($oldRank)
-	{
-		$this->oldRank = $oldRank;
 	}
 }

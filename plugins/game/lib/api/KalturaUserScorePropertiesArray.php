@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.leaderboard
+ * @package plugins.game
  * @subpackage api.objects
  */
 class KalturaUserScorePropertiesArray extends KalturaTypedArray

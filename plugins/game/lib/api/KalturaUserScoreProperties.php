@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package plugins.leaderboard
+ * @package plugins.game
  * @subpackage api.objects
  */
 class KalturaUserScoreProperties extends KalturaObject
@@ -20,24 +20,13 @@ class KalturaUserScoreProperties extends KalturaObject
 	 * @var int
 	 */
 	public $score;
-	
-	/**
-	 * @var string
-	 */
-	public $scoreTags;
-	
-	/**
-	 * @var int
-	 */
-	public $oldRank;
+
 	
 	private static $map_between_objects = array
 	(
 		'rank',
 		'userId',
 		'score',
-		'scoreTags',
-		'oldRank',
 	);
 	
 	public function getMapBetweenObjects ( )

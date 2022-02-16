@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package plugins.leaderboard
+ * @package plugins.game
  */
-class LeaderboardPlugin extends KalturaPlugin implements IKalturaServices
+class GamePlugin extends KalturaPlugin implements IKalturaServices
 {
-	const PLUGIN_NAME = 'leaderboard';
+	const PLUGIN_NAME = 'game';
 	
 	/* (non-PHPdoc)
 	* @see IKalturaServices::getServicesMap()

@@ -136,9 +136,9 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		return $this->callAndDetectErrors('mget', array($keys));
 	}
 	
-	public function doZadd($key, $value, $member)
+	public function doZincrby($key, $value, $member)
 	{
-		return $this->callAndDetectErrors('zadd', array($key, $value, $member));
+		return $this->callAndDetectErrors('zincrby', array($key, $value, $member));
 	}
 	
 	public function doZrevrange($key, $low, $high)
@@ -294,13 +294,14 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 				}
 				else
 				{
-					$redis = new RedisCluster(null, array("$this->hostName" . ":" . "$this->port"), $this->timeout, $this->timeout, $this->persistent);
+					$redis = new RedisCluster(null, array("$this->hostName" . ":7001", "$this->hostName" . ":7002"
+					, "$this->hostName" . ":7003", "$this->hostName" . ":7004", "$this->hostName" . ":7005", "$this->hostName" . ":7006", "$this->hostName" . ":7007"), $this->timeout, $this->timeout, $this->persistent);
 				}
 
 			}
 			catch (Exception $e)
 			{
-				self::safeLog("failed to connect to redis");
+				self::safeLog("failed to connect to redis: $e");
 			}
 
 			if ($connectResult || microtime(true) - $curConnStart < .5)        // retry only if there's an error and it's a timeout error
