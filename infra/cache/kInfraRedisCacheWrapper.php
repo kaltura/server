@@ -294,8 +294,12 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 				}
 				else
 				{
-					$redis = new RedisCluster(null, array("$this->hostName" . ":7001", "$this->hostName" . ":7002"
-					, "$this->hostName" . ":7003", "$this->hostName" . ":7004", "$this->hostName" . ":7005", "$this->hostName" . ":7006", "$this->hostName" . ":7007"), $this->timeout, $this->timeout, $this->persistent);
+					$redis = new RedisCluster(null, array($this->hostName . ":" . $this->port), $this->timeout, $this->timeout, $this->persistent);
+					
+					if ($redis)
+					{
+						$connectResult = true;
+					}
 				}
 
 			}
