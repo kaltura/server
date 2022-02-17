@@ -288,6 +288,8 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 			$incVersion = true;
 		}
 		
+		$res = $this->getConfFilePathImpl($suffix, $incVersion, $version);
+		
 		if ($externalPath)
 		{
 			$file_root = myCloudUtils::getPartnerSharedStoargeBaseDir($this->getPartnerId());
@@ -300,7 +302,6 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		}
 		else
 		{
-			$res = $this->getConfFilePathImpl($suffix, $incVersion, $version);
 			$file_root = myContentStorage::getFSContentRootPath();
 			$file_path = str_replace(myContentStorage::getFSContentRootPath(), "", $res);
 		}
