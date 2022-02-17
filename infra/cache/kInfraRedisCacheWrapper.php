@@ -274,7 +274,10 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 				}
 				else
 				{
-					$redis = new RedisCluster(null, array("$this->hostName" . ":" . "$this->port"), $this->timeout, $this->timeout, $this->persistent);
+					$redis = new RedisCluster(null, array($this->hostName.":".$this->port), $this->timeout, $this->timeout, $this->persistent);
+					
+					//There is no isConnected in cluster mode so we need to verify the object is not null to make sure the connection was successful.
+					$connectResult = $redis ? true : false;
 				}
 
 			}
