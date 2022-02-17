@@ -158,6 +158,11 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == KuserStatus::DELETED) {
 			$objectDeleted = true;
 		}
+		
+		if ($this->isCustomDataModified(null, 'is_sso_excluded'))
+		{
+			kuserPeer::sendNewUserMail($this, true);
+		}
 			
 		$oldLoginDataId = null;
 		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
@@ -1055,6 +1060,20 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this;
 	}
 	
+	/**
+	 * @param      string $name
+	 * @param      string $namespace
+	 * @return     boolean True if $name has been modified.
+	 */
+	public function isCustomDataModified($name = null, $namespace = '')
+	{
+		if(isset($this->oldCustomDataValues[$name][$namespace])
+			&& (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$name][$namespace])))
+		{
+			return true;
+		}
+		return false;
+	}
 	
 	public function getIsAccountOwner()
 	{

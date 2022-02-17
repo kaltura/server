@@ -644,7 +644,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 		else // Not an admin console partner
 		{
-			$authType = $partner->getAuthenticationType();
+			$authType = self::getAuthenticationType($user, $partner);
 			$userLoginData = $user->getLoginData();
 			if ($partner->getUseTwoFactorAuthentication() && !$userLoginData->getSeedFor2FactorAuth())
 			{
@@ -706,6 +706,24 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$bodyParams
 			);
 		}
+	}
+	
+	protected static function getAuthenticationType($user, $partner)
+	{
+		/* @var $user kuser*/
+		$authType = $partner->getAuthenticationType();
+		if ($authType == PartnerAuthenticationType::SSO)
+		{
+			if ($user->getIsSsoExcluded())
+			{
+				if ($partner->getUseTwoFactorAuthentication())
+				{
+					return PartnerAuthenticationType::TWO_FACTOR_AUTH;
+				}
+				return PartnerAuthenticationType::PASSWORD_ONLY;
+			}
+		}
+		return $authType;
 	}
 
 	public static function getUserMailType($authType, $existingUser)
