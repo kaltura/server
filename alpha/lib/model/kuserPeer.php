@@ -708,20 +708,17 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 	}
 	
-	protected static function getAuthenticationType($user, $partner)
+	public static function getAuthenticationType($user, $partner)
 	{
 		/* @var $user kuser*/
 		$authType = $partner->getAuthenticationType();
-		if ($authType == PartnerAuthenticationType::SSO)
+		if ($authType != PartnerAuthenticationType::SSO)
 		{
-			if ($user->getIsSsoExcluded())
-			{
-				if ($partner->getUseTwoFactorAuthentication())
-				{
-					return PartnerAuthenticationType::TWO_FACTOR_AUTH;
-				}
-				return PartnerAuthenticationType::PASSWORD_ONLY;
-			}
+			return $authType;
+		}
+		if ($user->getIsSsoExcluded())
+		{
+			return ($partner->getUseTwoFactorAuthentication()) ? PartnerAuthenticationType::TWO_FACTOR_AUTH : PartnerAuthenticationType::PASSWORD_ONLY;
 		}
 		return $authType;
 	}

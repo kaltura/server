@@ -160,7 +160,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			$objectDeleted = true;
 		}
 		
-		if ($this->isCustomDataModified(null, 'is_sso_excluded'))
+		if ($this->isCustomDataModified(self::CUSTOM_DATA_IS_SSO_EXCLUDED))
 		{
 			kuserPeer::sendNewUserMail($this, true);
 		}
@@ -1058,15 +1058,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this;
 	}
 	
-	/**
-	 * @param      string $name
-	 * @param      string $namespace
-	 * @return     boolean True if $name has been modified.
-	 */
-	public function isCustomDataModified($name = null, $namespace = '')
+	public function isCustomDataModified($name = null)
 	{
-		if(isset($this->oldCustomDataValues[$name][$namespace])
-			&& (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[$name][$namespace])))
+		if(isset($this->oldCustomDataValues[null][$name])
+			&& (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[null])))
 		{
 			return true;
 		}
