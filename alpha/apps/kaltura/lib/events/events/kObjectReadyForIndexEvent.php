@@ -25,7 +25,10 @@ class kObjectReadyForIndexEvent extends kApplicativeEvent
 			$additionalLog .= 'id [' . $this->object->getId() . ']';
 			
 		KalturaLog::debug('consumer [' . get_class($consumer) . '] started handling [' . get_class($this) . '] object type [' . get_class($this->object) . '] ' . $additionalLog);
+		$origExecutionScope = kCurrentContext::$executionScope;
+		kCurrentContext::$executionScope = executionScope::INDEXING;
 		$result = $consumer->objectReadyForIndex($this->object, $this->raisedJob);
+		kCurrentContext::$executionScope = $origExecutionScope;
 		KalturaLog::debug('consumer [' . get_class($consumer) . '] finished handling [' . get_class($this) . '] object type [' . get_class($this->object) . '] ' . $additionalLog);
 		return $result;
 	}
