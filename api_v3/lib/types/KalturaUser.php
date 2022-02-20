@@ -185,7 +185,6 @@ class KalturaUser extends KalturaBaseUser
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validateNames(null, self::$names);
-		$this->validateSsoExclusion();
 		parent::validateForInsert($propertiesToSkip);
 	}
 
@@ -193,13 +192,5 @@ class KalturaUser extends KalturaBaseUser
 	{
 		$this->validateNames($sourceObject, self::$names);
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
-	
-	protected function validateSsoExclusion()
-	{
-		if(is_null($this->isSsoExcluded))
-		{
-			$this->isSsoExcluded = false;
-		}
 	}
 }
