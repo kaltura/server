@@ -30,24 +30,17 @@ class kQuizManager implements kObjectChangedEventConsumer
 		{
 			return false;
 		}
-		$quizEventContent = self::getQuizEventContent($object);
 		if (kConf::hasParam(self::INTERNAL_ANALYTICS_HOST))
 		{
+			$quizEventContent = self::getQuizEventContent($object);
 			$statsHost = explode(':', kConf::get(self::INTERNAL_ANALYTICS_HOST));
-			self::sendBeacon(
+			requestUtils::sendAnalyticsBeacon(
 				$quizEventContent,
 				$statsHost[0],
 				isset($statsHost[1]) ? $statsHost[1] : 80);
 		}
 		return true;
 	}
-	
-	public static function sendBeacon ($quizEventContent, $host, $port)
-	{
-		requestUtils::sendKavaRequest($host, $port, requestUtils::buildKavaRequest($quizEventContent, $host));
-	}
-	
-	
 	
 	/**
 	 * @param BaseObject $object
@@ -73,9 +66,8 @@ class kQuizManager implements kObjectChangedEventConsumer
 	protected static function getQuizEventContent($quizUserEntry)
 	{
 		/* @var $quizUserEntry QuizUserEntry */
-		return array(
+		$contents = array(
 			self::EVENT_TYPE => self::QUIZ_EVENT_TYPE,
-			self::KUSER_ID => $quizUserEntry->getkuser()->getId(),
 			self::PARTNER_ID => $quizUserEntry->getPartnerId(),
 			self::ENTRY_ID => $quizUserEntry->getEntryId(),
 			self::VERSION => $quizUserEntry->getVersion(),
@@ -86,6 +78,11 @@ class kQuizManager implements kObjectChangedEventConsumer
 			self::NUM_OF_RELEVANT_QUESTIONS => $quizUserEntry->getNumOfRelevnatQuestions(),
 			self::CALCULATED_SCORE => $quizUserEntry->getCalculatedScore()
 		);
+		if ($quizUserEntry->getkuser())
+		{
+			$contents[self::KUSER_ID] = $quizUserEntry->getkuser()->getId();
+		}
+		return $contents;
 	}
 	
 }

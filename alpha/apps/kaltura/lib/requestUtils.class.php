@@ -334,9 +334,9 @@ class requestUtils extends infraRequestUtils
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
 	
-	public static function buildKavaRequest($quizEventContent, $host)
+	public static function sendAnalyticsBeacon($ventContent, $host, $port)
 	{
-		$uri = '/api_v3/index.php?' . http_build_query($quizEventContent, '', '&');
+		$uri = '/api_v3/index.php?' . http_build_query($ventContent, '', '&');
 		$headers = array(
 			self::HEADER_HOST => $host,
 			self::HEADER_X_FORWARDED_FOR => infraRequestUtils::getRemoteAddress(),);
@@ -351,11 +351,6 @@ class requestUtils extends infraRequestUtils
 		}
 		$out .= "\r\n";
 		
-		return $out;
-	}
-	
-	public static function sendKavaRequest($host, $port, $out)
-	{
 		$fp = fsockopen($host, $port, $errorNumber, $errorMessage, 0.1);
 		if ($fp === false)
 		{
