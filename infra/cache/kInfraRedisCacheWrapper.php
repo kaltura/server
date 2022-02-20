@@ -136,9 +136,9 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		return $this->callAndDetectErrors('mget', array($keys));
 	}
 	
-	public function doZincrby($key, $value, $member)
+	public function doZadd($key, $value, $member)
 	{
-		return $this->callAndDetectErrors('zincrby', array($key, $value, $member));
+		return $this->callAndDetectErrors('zadd', array($key, $value, $member));
 	}
 	
 	public function doZrevrange($key, $low, $high)

@@ -42,13 +42,4 @@ class UserScoreService extends KalturaBaseService
 		
 		return $filter->updateUserScore($score, $filter);
 	}
-	
-	/**
-	 * @action importFromCsv
-	 * @param file $fileData
-	 */
-	public function importFromCsvAction($fileData)
-	{
-	
-	}
 }

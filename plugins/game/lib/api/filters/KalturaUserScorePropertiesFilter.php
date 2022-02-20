@@ -47,10 +47,10 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		return null;
 	}
 	
-	protected function initUserScoresRedis()
+	protected function initGameServicesRedisInstance()
 	{
 		$redisWrapper = new kInfraRedisCacheWrapper();
-		$redisConfig = kConf::get('redis', kConfMapNames::RUNTIME_CONFIG);
+		$redisConfig = kConf::get('game', kConfMapNames::REDIS);
 		$config = array('host' => $redisConfig['host'], 'port' => $redisConfig['port'], 'timeout' => floatval($redisConfig['timeout']),
 			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent']);
 		$redisWrapper->init($config);
@@ -74,12 +74,12 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		return $redisKey;
 	}
 	
-	protected function reorderResultsFromStartingRank($results, $startingRank)
+	protected function updateRanksFromStartingRank($results, $startingRank)
 	{
 		$reorderedResults = array();
 		foreach ($results as $userId => $score)
 		{
-			$reorderedResults[$startingRank] = array('userId' => $userId, 'score' => $score);
+			$reorderedResults[] = array('rank' => $startingRank, 'userId' => $userId, 'score' => $score);
 			$startingRank++;
 		}
 		
@@ -89,19 +89,19 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	protected function getListByUserIdSubstring($redisWrapper, $redisKey)
 	{
 		$rangeResults = $redisWrapper->doZrevrange($redisKey, 0, -1);
-		
 		if (!$rangeResults)
 		{
 			return array();
 		}
-		$rangeResults = $this->reorderResultsFromStartingRank($rangeResults, 0);
+		
+		$rangeResults = $this->updateRanksFromStartingRank($rangeResults, 0);
 		
 		$results = array();
-		foreach ($rangeResults as $rank => $details)
+		foreach ($rangeResults as $details)
 		{
 			if (strpos($details['userId'], $this->userIdIn) !== false)
 			{
-				$results[$rank] = $details;
+				$results[] = $details;
 			}
 		}
 		
@@ -112,43 +112,49 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	{
 		$userRank = $redisWrapper->doZrevrank($redisKey, $this->userIdEqual);
 		$userScore = $redisWrapper->doZscore($redisKey, $this->userIdEqual);
-		if (is_null($userRank) || is_null($userScore))
+		if ($userScore === false || $userRank === false)
 		{
 			return array();
 		}
 		
-		$results[$userRank] = array('userId' => $this->userIdEqual, 'score' => $userScore);
-		
-		if ($this->placesAboveUser)
+		$rankAbove = $userRank - $this->placesAboveUser;
+		if ($rankAbove < 0)
 		{
-			$rankAbove = $userRank - $this->placesAboveUser;
-			if ($rankAbove < 0)
-			{
-				$rankAbove = 0;
-			}
-			$resultsAbove = $redisWrapper->doZrevrange($redisKey, $rankAbove, $userRank - 1);
-			if ($resultsAbove)
-			{
-				$resultsAbove = $this->reorderResultsFromStartingRank($resultsAbove, $rankAbove);
-				foreach ($resultsAbove as $rank => $details)
-				{
-					$results[$rank] = $details;
-				}
-			}
+			$rankAbove = 0;
+		}
+		$rankBelow = $userRank + $this->placesBelowUser;
+		
+		$results = $redisWrapper->doZrevrange($redisKey, $rankAbove, $rankBelow);
+		if (!$results)
+		{
+			$results = array();
 		}
 		
-		if ($this->placesBelowUser)
+		$results = $this->updateRanksFromStartingRank($results, $rankAbove);
+		
+		return $results;
+	}
+	
+	protected function paginateResults($pager, $results)
+	{
+		$pager->pageIndex = $pager->calcPageIndex();
+		$pager->pageSize = $pager->calcPageSize();
+		$start = ($pager->pageIndex - 1) * $pager->pageSize;
+		$finish = $start + $pager->pageSize;
+		
+		if ($start < count($results))
 		{
-			$rankBelow = $userRank + $this->placesBelowUser;
-			$resultsBelow = $redisWrapper->doZrevrange($redisKey, $userRank + 1, $rankBelow);
-			if ($resultsBelow)
+			$i = 0;
+			$paginatedResults = array();
+			foreach ($results as $result)
 			{
-				$resultsBelow = $this->reorderResultsFromStartingRank($resultsBelow, $userRank + 1);
-				foreach ($resultsBelow as $rank => $details)
+				if ($i >= $start && $i < $finish)
 				{
-					$results[$rank] = $details;
+					$paginatedResults[] = $result;
 				}
+				$i++;
 			}
+			$results = $paginatedResults;
 		}
 		
 		return $results;
@@ -156,7 +162,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$redisWrapper = $this->initUserScoresRedis();
+		$redisWrapper = $this->initGameServicesRedisInstance();
 		
 		$redisKey = $this->prepareGameObjectKey();
 		
@@ -173,33 +179,13 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			$results = $redisWrapper->doZrevrange($redisKey, 0, -1);
 			if ($results)
 			{
-				$results = $this->reorderResultsFromStartingRank($results, 0);
+				$results = $this->updateRanksFromStartingRank($results, 0);
 			}
 		}
 		
 		if ($results)
 		{
-			ksort($results);
-			
-			$pager->pageIndex = $pager->calcPageIndex();
-			$pager->pageSize = $pager->calcPageSize();
-			$start = ($pager->pageIndex - 1) * $pager->pageSize;
-			$finish = $start + $pager->pageSize;
-			
-			if ($start < count($results))
-			{
-				$i = 0;
-				$paginatedResults = array();
-				foreach ($results as $key => $value)
-				{
-					if ($i >= $start && $i < $finish)
-					{
-						$paginatedResults[$key] = $value;
-					}
-					$i++;
-				}
-				$results = $paginatedResults;
-			}
+			$results = $this->paginateResults($pager, $results);
 		}
 		
 		$response = new KalturaUserScorePropertiesResponse();
@@ -211,7 +197,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	
 	public function updateUserScore($score)
 	{
-		$redisWrapper = $this->initUserScoresRedis();
+		$redisWrapper = $this->initGameServicesRedisInstance();
 		
 		$redisKey = $this->prepareGameObjectKey();
 		
@@ -220,9 +206,9 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
 		}
 		
-		$newScore = $redisWrapper->doZincrby($redisKey, $score, $this->userIdEqual);
+		$redisWrapper->doZadd($redisKey, $score, $this->userIdEqual);
 		$rank = $redisWrapper->doZrevrank($redisKey, $this->userIdEqual);
-		$result = array($rank => array('userId' => $this->userIdEqual, 'score' => $newScore));
+		$result = array(array('rank' => $rank, 'userId' => $this->userIdEqual, 'score' => $score));
 		
 		$response = new KalturaUserScorePropertiesResponse();
 		$response->totalCount = count($result);
