@@ -27,6 +27,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const COMPANY = 'company';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
+	const CUSTOM_DATA_IS_SSO_EXCLUDED = 'is_sso_excluded';
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
@@ -680,20 +681,17 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return parent::getisAdmin() == true;
 	}
 	
-	/**
-	 * @return is_sso_excluded parameter from custom_data
-	 */
 	public function getIsSsoExcluded()
 	{
-		return $this->getFromCustomData('is_sso_excluded') == true;
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_SSO_EXCLUDED, null, false);
 	}
 	
 	/**
 	 * @param bool $isSsoExcluded
 	 */
-	public function setIsSsoExcluded(bool $isSsoExcluded)
+	public function setIsSsoExcluded($isSsoExcluded)
 	{
-		$this->putInCustomData('is_sso_excluded', $isSsoExcluded);
+		$this->putInCustomData(self::CUSTOM_DATA_IS_SSO_EXCLUDED, $isSsoExcluded);
 	}
 	
 	/**
