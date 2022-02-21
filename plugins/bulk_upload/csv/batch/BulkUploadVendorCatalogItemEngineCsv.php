@@ -207,6 +207,12 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 					$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::MANDATORY_COLUMN_MISSING .' : sourceLanguage');
 				}
 				break;
+			case VendorServiceFeature::DUBBING:
+				if (!$bulkUploadResult->sourceLanguage || !$bulkUploadResult->flavorParamsId || !$bulkUploadResult->clearAudioFlavorParamsId || !$bulkUploadResult->targetLanguage)
+				{
+					$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::MANDATORY_COLUMN_MISSING.': sourceLanguage, targetLanguage, flavorParamsId, clearAudioFlavorParamsId');
+				}
+				break;
 			case VendorServiceFeature::TRANSLATION:
 				if (!$bulkUploadResult->targetLanguage)
 				{
@@ -378,6 +384,10 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 			case VendorServiceFeature::CHAPTERING:
 				$object = new KalturaVendorChapteringCatalogItem();
+				break;
+			
+			case VendorServiceFeature::DUBBING:
+				$object = new KalturaVendorDubbingCatalogItem();
 				break;
 
 			default:

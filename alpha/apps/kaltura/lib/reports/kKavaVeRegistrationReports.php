@@ -81,6 +81,15 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				),
 			)
 		),
+
+		ReportType::VE_REGISTERED_WORLD_REGIONS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'world_region' => self::DIMENSION_LOCATION_WORLD_REGION,
+			),
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_VE_REGISTERED,
+			),
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)

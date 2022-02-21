@@ -20,6 +20,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const ALIGNMENT_OM_CLASS = 'VendorAlignmentCatalogItem';
 	const AUDIO_DESCRIPTION_OM_CLASS = 'VendorAudioDescriptionCatalogItem';
 	const CHAPTERING_OM_CLASS = 'VendorChapteringCatalogItem';
+	const DUBBING_OM_CLASS = 'VendorDubbingCatalogItem';
 	const INTELLIGENT_TAGGING_OM_CLASS = 'VendorIntelligentTaggingCatalogItem';
 	
 	// cache classes by their type
@@ -29,6 +30,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::ALIGNMENT => self::ALIGNMENT_OM_CLASS,
 		VendorServiceFeature::AUDIO_DESCRIPTION => self::AUDIO_DESCRIPTION_OM_CLASS,
 		VendorServiceFeature::CHAPTERING => self::CHAPTERING_OM_CLASS,
+		VendorServiceFeature::DUBBING => self::DUBBING_OM_CLASS,
 		VendorServiceFeature::INTELLIGENT_TAGGING => self::INTELLIGENT_TAGGING_OM_CLASS,
 	);
 	

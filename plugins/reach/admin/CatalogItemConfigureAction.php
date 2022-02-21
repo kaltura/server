@@ -49,6 +49,8 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
 				elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorChapteringCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorDubbingCatalogItem', $formData, false, true);
 			}
 		}
 		$action->view->form = $form;
@@ -162,6 +164,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					break;
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorIntelligentTaggingCatalogItem', $formData, false, true);
+					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorDubbingCatalogItem', $formData, false, true);
 					break;
 			}
 

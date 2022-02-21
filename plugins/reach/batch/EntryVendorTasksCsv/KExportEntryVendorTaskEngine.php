@@ -25,6 +25,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		3 => "ALIGNMENT",
 		4 => "AUDIO_DESCRIPTION",
 		5 => "CHAPTERING",
+		7 => "DUBBING",
 		"N/A" => "N/A",
 	);
 	

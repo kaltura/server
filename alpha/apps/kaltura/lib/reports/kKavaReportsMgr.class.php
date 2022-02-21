@@ -4390,6 +4390,43 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getUsersInfoFromCustomDataFields($ids, $partner_id, $context)
+	{
+		$enrichedInfoFields = $context['info_fields'];
+		$customDataFields = $context['columns'];
+		array_unshift($context['columns'], 'PUSER_ID');
+		$context['peer'] = 'kuserPeer';
+
+		$result = array();
+		$rows = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($rows as $id => $columns)
+		{
+			if (!is_array($columns))
+			{
+				$result[$id] = $id;
+				continue;
+			}
+			$output = array();
+			$puser = array_shift($columns);
+			$output[] = $puser;
+			$parsedFields = array();
+			foreach ($customDataFields as $field)
+			{
+				$parsedField = json_decode(array_shift($columns), true);
+				$parsedFields[$field] = $parsedField;
+			}
+
+			foreach ($enrichedInfoFields as $enrichedInfoField)
+			{
+				list($customDataField, $infoField) = explode(".", $enrichedInfoField);
+				$customDataField = "CUSTOM_DATA.$customDataField";
+				$output[] = isset($parsedFields[$customDataField][$infoField]) ? $parsedFields[$customDataField][$infoField] : '';
+			}
+			$result[$id] = $output;
+		}
+		return $result;
+	}
+
 	protected static function convertTime($dates, $partner_id, $context)
 	{
 		$granularity = self::GRANULARITY_DAY;
