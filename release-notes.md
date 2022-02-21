@@ -1,3 +1,52 @@
+# Rigel-18.01.0
+## Changes to entry ready, entry status equal, media entry ready and unique KMS entry ready email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-30691
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add scripts:
+
+    Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_entry_ready.php
+
+    Entry status equal:
+    - deployment/updates/scripts/xml/2022_02_16_addEntryStatusEqualEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addMediaEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addUniqueKmsEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_uniqu_kms_entry_ready.php
+
+Update scripts:
+
+	Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_ready.php
+
+    Entry status equal:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryStatusEqualEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateMediaEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateUniqueKmsEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_uniqu_kms_entry_ready.php
+
+
 # Quasar-17.19.0
 ## Html Purifier configuration for additional attributes ##
 * Issue Type: Task

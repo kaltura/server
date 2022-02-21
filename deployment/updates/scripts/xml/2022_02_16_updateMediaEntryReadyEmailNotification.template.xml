@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <!-- Media Entry Ready -->
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Media_Entry_Ready</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; !(in_array($scope->getObject()->getType(), array(entryType::DATA, entryType::DOCUMENT))) &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == entryStatus::READY </code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Not temporary</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>!$scope->getObject()->getIsTemporary()</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaOrCondition">
+                        <conditions objectType="array">
+                            <item objectType="KalturaEventFieldCondition">
+                                <field objectType="KalturaEvalBooleanField">
+                                    <code>!$scope->getObject()->getReplacedEntryId()</code>
+                                </field>
+                            </item>
+                            <item objectType="KalturaEventFieldCondition">
+                                <field objectType="KalturaEvalBooleanField">
+                                    <code> $scope->getObject()->getReplacedEntryId() &amp;&amp; !in_array( entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getSourceType() , array(EntrySourceType::RECORDED_LIVE, EntrySourceType::KALTURA_RECORDED_LIVE , EntrySourceType::LECTURE_CAPTURE)) </code>
+                                </field>
+                            </item>
+                        </conditions>
+                    </item>
+                </eventConditions>
+            </template>
+        </request>
+    </multirequest>
+</xml>
