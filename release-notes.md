@@ -34,7 +34,7 @@ Update scripts:
     - deployment/updates/scripts/xml/2022_02_16_updateEntryReadyEmailNotification.template.xml
     - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_ready.php
 
-    Entry status equal:
+    Entry status equals:
     - deployment/updates/scripts/xml/2022_02_16_updateEntryStatusEqualEmailNotification.template.xml
     - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_status_equal.php
 
