@@ -13,6 +13,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const CACHE_PREFIX_STICKY_SESSIONS = 'elastic_large_sql_lock_';
     const REPETITIVE_UPDATES_CONFIG_KEY = 'skip_elastic_repetitive_updates';
     const METADATA_MAX_LENGTH = 256;
+	const SQL_MAX_ALLOWED_PACKET = 1048576; // 1MB (1048576 / 1024 / 1024)
 
     /**
      * @param BaseObject $object
@@ -233,8 +234,16 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
     private function shouldSkipSaveToSphinxLog($object, &$command)
     {
-        // limit the number of large SQLs to 1/min per object, since they load the sphinx log database and elastic servers
-	$commandSize = strlen($command);
+		$commandSize = strlen($command);
+		
+		// limit object index size up to 1MB due to mysql current 'max_allowed_packet' config which is 1MB
+		if ($commandSize > self::SQL_MAX_ALLOWED_PACKET)
+		{
+			KalturaLog::log('skipping saving elastic sphinxLog sql for [' . $object->getId() . '] - command size [' . $commandSize .'] larger than 1MB');
+			return true;
+		}
+	
+		// limit the number of large SQLs to 1/min per object, since they load the sphinx log database and elastic servers
         if ($commandSize > self::MAX_SQL_LENGTH)
         {
             $lockKey = self::CACHE_PREFIX_STICKY_SESSIONS . $object->getElasticObjectName() . '_' . $object->getId();
