@@ -2279,4 +2279,36 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return $categoryEntryIdsArray;
 	}
+	
+	/**
+	 * Check if $entry has an ancestor that is of $sourceType (EntrySourceType)
+	 * @param $entry
+	 * @param array $sourceType
+	 * @return bool
+	 */
+	public static function isAncestorSourceType($entry, $sourceType = array())
+	{
+		if ($entry->getFlowType() == EntryFlowType::TRIM_CONCAT)
+		{
+			$entry = entryPeer::retrieveByPK($entry->getReplacedEntryId());
+			if (!$entry)
+			{
+				return false;
+			}
+		}
+		
+		$rootEntryId = $entry->getRootEntryId(true);
+		if ($entry->getId() == $rootEntryId)
+		{
+			return false;
+		}
+		
+		$rootEntry = entryPeer::retrieveByPKNoFilter($rootEntryId);
+		if (!$rootEntry)
+		{
+			return false;
+		}
+		
+		return in_array($rootEntry->getSourceType(), $sourceType);
+	}
 }
