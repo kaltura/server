@@ -187,7 +187,8 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-				$data->destFileLocalPath = $this->getTempFilePath($sourceUrl, $fileSize);
+				$url = $this->getUrlForExtension($job, $data);
+				$data->destFileLocalPath = $this->getTempFilePath($url, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
@@ -557,5 +558,32 @@ class KAsyncImport extends KJobHandlerWorker
 		
 		$data->destFileLocalPath = $sharedTempFilePath;
 		return array($partialFileSize, $data);
+	}
+
+	protected function getUrlForExtension(KalturaBatchJob $job, KalturaImportJobData $data)
+	{
+		$sourceUrl = $data->srcFileUrl;
+
+		$useRedirectPartners = explode(',', self::$taskConfig->params->redirectedUrlPartners);
+		if(is_null($useRedirectPartners) || !in_array($job->partnerId, $useRedirectPartners))
+		{
+			return $sourceUrl;
+		}
+
+		$curlWrapperForRedirect = new KCurlWrapper(self::$taskConfig->params);
+		$curlWrapperForRedirect->setTimeout(self::HEADERS_TIMEOUT);
+		$curlWrapperForRedirect->getHeader($sourceUrl);
+		$redirectUrl = $curlWrapperForRedirect->getInfo(CURLINFO_EFFECTIVE_URL);
+		$curlWrapperForRedirect->close();
+
+		if(!is_null($redirectUrl))
+		{
+			$ext = pathinfo($redirectUrl, PATHINFO_EXTENSION);
+			if(!is_null($ext))
+			{
+				return $redirectUrl;
+			}
+		}
+		return $sourceUrl;
 	}
 }
