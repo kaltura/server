@@ -1852,17 +1852,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function getCloneConversionProfile($originSourceType,$partner,$sourceEntry)
 	{
-        	if (self::isSourceLive($originSourceType))
-	            return $partner->getDefaultConversionProfileId();
+		if (self::isSourceLive($originSourceType))
+			return $partner->getDefaultConversionProfileId();
 		
-			$conversionProfileId = $sourceEntry->getConversionProfileId();
-			$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionProfileId);
-			if (!$conversionProfile)
-			{
-				KalturaLog::log("Cannot find conversion profile ID: [$conversionProfileId] - deleted? will return partner default");
-				$conversionProfileId = $partner->getDefaultConversionProfileId();
-			}
-			return $conversionProfileId;
+		$conversionProfileId = $sourceEntry->getConversionProfileId();
+		$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionProfileId);
+		if (!$conversionProfile)
+		{
+			KalturaLog::log("Cannot find conversion profile ID: [$conversionProfileId] - deleted? will return partner default");
+			$conversionProfileId = $partner->getDefaultConversionProfileId();
+		}
+		return $conversionProfileId;
 	}
 
  	/*
