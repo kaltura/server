@@ -56,7 +56,7 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 	public static function initGameServicesRedisInstance()
 	{
 		$redisWrapper = new kInfraRedisCacheWrapper();
-		$redisConfig = kConf::get('game', kConfMapNames::REDIS);
+		$redisConfig = kConf::get(self::PLUGIN_NAME, kConfMapNames::REDIS, null);
 		if (!$redisConfig || !isset($redisConfig['host']) || !isset($redisConfig['port']) || !isset($redisConfig['timeout']) ||
 			!isset($redisConfig['cluster'])  || !isset($redisConfig['persistent']))
 		{
