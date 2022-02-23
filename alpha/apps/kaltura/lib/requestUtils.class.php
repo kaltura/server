@@ -334,9 +334,9 @@ class requestUtils extends infraRequestUtils
 		return ( in_array ( $current_country , $ip_country_list ) );
 	}
 	
-	public static function sendAnalyticsBeacon($ventContent, $host, $port)
+	public static function sendAnalyticsBeacon($eventContent, $host, $port)
 	{
-		$uri = '/api_v3/index.php?' . http_build_query($ventContent, '', '&');
+		$uri = '/api_v3/index.php?' . http_build_query($eventContent, '', '&');
 		$headers = array(
 			self::HEADER_HOST => $host,
 			self::HEADER_X_FORWARDED_FOR => infraRequestUtils::getRemoteAddress(),);
@@ -355,6 +355,7 @@ class requestUtils extends infraRequestUtils
 		if ($fp === false)
 		{
 			KalturaLog::ERR("ERROR: Could not open socket connection [$host:$port] due to: [$errorNumber] $errorMessage");
+			return;
 		}
 		
 		fwrite($fp, $out);
