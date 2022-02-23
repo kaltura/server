@@ -23,11 +23,6 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	public $userIdEqual;
 	
 	/**
-	 * @var string
-	 */
-	public $userIdIn;
-	
-	/**
 	 * @var int
 	 */
 	public $placesAboveUser;
@@ -155,38 +150,6 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 * @param $redisWrapper
 	 * @param $pager
 	 * @param $redisKey
-	 * @return array|mixed
-	 */
-	protected function getListByUserIdSubstring($redisWrapper, $pager, $redisKey)
-	{
-		$rangeResults = $redisWrapper->doZrevrange($redisKey, 0, -1);
-		if (!$rangeResults)
-		{
-			KalturaLog::info("No results found for key $redisKey with range 0, -1");
-			return array();
-		}
-		
-		$rangeResults = $this->adjustRanksBasedOnStartingRank($rangeResults, 0);
-		
-		$results = array();
-		foreach ($rangeResults as $details)
-		{
-			// Check for puser  ?? //
-			if (strpos($details['userId'], $this->userIdIn) !== false)
-			{
-				$results[] = $details;
-			}
-		}
-		
-		$results = $this->paginateResults($pager, $results);
-		
-		return $results;
-	}
-	
-	/**
-	 * @param $redisWrapper
-	 * @param $pager
-	 * @param $redisKey
 	 * @return array
 	 */
 	protected function getListBySpecificUserId($redisWrapper, $pager, $redisKey)
@@ -305,11 +268,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		
 		$redisKey = $this->prepareGameObjectKey();
 		
-		if ($this->userIdIn)
-		{
-			$results = $this->getListByUserIdSubstring($redisWrapper, $pager, $redisKey);
-		}
-		elseif ($this->userIdEqual)
+		if ($this->userIdEqual)
 		{
 			$results = $this->getListBySpecificUserId($redisWrapper, $pager, $redisKey);
 		}
