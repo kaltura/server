@@ -65,7 +65,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		return $redisKey;
 	}
 	
-	protected function getKuser($redisWrapper, $puser)
+	protected function getKuserIdFromPuserId($puser)
 	{
 		$partner = kCurrentContext::getCurrentPartnerId();
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partner, $puser);
@@ -104,7 +104,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	}
 	
 	/**
-	 * Formats the results to a map with the expected properties,
+	 * Formats the results to a map with the expected properties, replacing kuser with puser in the results from 'mapKuserPuser',
 	 * And adjusts the results ranks to be their real rank, instead of default Redis results starting from 0
 	 * The results are returned as an array of maps
 	 * @param $results
@@ -155,11 +155,11 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 */
 	protected function getListBySpecificUserId($redisWrapper, $pager, $redisKey)
 	{
-		$kuser = $this->getKuser($redisWrapper, $this->userIdEqual);
+		$kuserId = $this->getKuserIdFromPuserId($this->userIdEqual);
 		
 		// Redis returns 'false' if the provided userId does not exist
-		$userRank = $redisWrapper->doZrevrank($redisKey, $kuser);
-		$userScore = $redisWrapper->doZscore($redisKey, $kuser);
+		$userRank = $redisWrapper->doZrevrank($redisKey, $kuserId);
+		$userScore = $redisWrapper->doZscore($redisKey, $kuserId);
 		if ($userScore === false || $userRank === false)
 		{
 			KalturaLog::info("No result found for userId {$this->userIdEqual} with key $redisKey");
@@ -305,10 +305,10 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
 		}
 		
-		$kuser = $this->getKuser($redisWrapper, $this->userIdEqual);
+		$kuserId = $this->getKuserIdFromPuserId($this->userIdEqual);
 		
-		$addResult = $redisWrapper->doZadd($redisKey, $score, $kuser);
-		$rank = $redisWrapper->doZrevrank($redisKey, $kuser);
+		$addResult = $redisWrapper->doZadd($redisKey, $score, $kuserId);
+		$rank = $redisWrapper->doZrevrank($redisKey, $kuserId);
 		if ($addResult === false || $rank === false)
 		{
 			KalturaLog::info("Failed to add {$this->userIdEqual} to key $redisKey");

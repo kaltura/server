@@ -17,7 +17,7 @@ Add plugin for game services with new API userScore service connected to Redis
     moduls.game.permissionName = GAME_PLUGIN_PERMISSION
     moduls.game.group = GROUP_ENABLE_DISABLE_FEATURES
 
-* Enable checkbox in Partner configuration: 'Enable Games Services'
+* Enable checkbox in Partner configuration: 'Enable Game Services'
 
 ### Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_01_17_service_userscore.php.php
