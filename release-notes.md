@@ -1,3 +1,35 @@
+# Rigel-18.1.0
+## New Game plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-23508
+
+A new plugin to managing Game services with a Redis DB and a new service 'userScore'
+
+### Deployment ###
+	* Add Game to plugins.ini
+
+	* Add the following to admin.ini 
+    moduls.game.enabled = true
+    moduls.game.permissionType = 2
+    moduls.game.label = "Enable Game Services"
+    moduls.game.permissionName = GAME_PLUGIN_PERMISSION
+    moduls.game.group = GROUP_ENABLE_DISABLE_FEATURES
+
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_01_17_service_userscore.php.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+### Configuration ###
+Add/Update a configuration map called 'redis' with following config:
+
+    [game]
+    host=127.0.0.1
+    port=6379
+    timeout=1.5
+    cluster=1
+    persistent=0
+
 # Quasar-17.19.0
 ## Html Purifier configuration for additional attributes ##
 * Issue Type: Task

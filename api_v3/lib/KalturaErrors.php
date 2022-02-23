@@ -759,6 +759,12 @@ class KalturaErrors extends APIErrors
 	const USER_ID_EQUAL_REQUIRED = "USER_ID_EQUAL_REQUIRED;;userIdEqual is required";
 	const GAME_OBJECT_ID_REQUIRED = "GAME_OBJECT_ID_REQUIRED;;gameObjectId is required";
 	const GAME_OBJECT_TYPE_REQUIRED = "GAME_OBJECT_TYPE_REQUIRED;;gameObjectType is required";
+	const USER_ID_NOT_FOUND = "USER_ID_NOT_FOUND;USER_ID;userId [@USER_ID@] not found";
+	
+	/*
+	 * Redis
+	 */
+	const FAILED_INIT_REDIS_INSTANCE = "FAILED_INIT_REDIS_INSTANCE;;Failed to initialize Redis instance";
 	
 	/*
 	 * OTP error

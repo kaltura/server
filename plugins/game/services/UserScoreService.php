@@ -23,6 +23,8 @@ class UserScoreService extends KalturaBaseService
 		{
 			$pager = new KalturaFilterPager();
 		}
+		$pager->pageIndex = $pager->calcPageIndex();
+		$pager->pageSize = $pager->calcPageSize();
 		
 		return $filter->getListResponse($pager);
 	}
