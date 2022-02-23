@@ -1,3 +1,38 @@
+# Rigel-18.1.0
+## New Game plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-23508
+
+Add plugin for game services with new API userScore service connected to Redis
+
+### Deployment ###
+* Add Game to plugins.ini
+
+* Add the following to admin.ini
+
+
+    moduls.game.enabled = true
+    moduls.game.permissionType = 2
+    moduls.game.label = "Enable Game Services"
+    moduls.game.permissionName = GAME_PLUGIN_PERMISSION
+    moduls.game.group = GROUP_ENABLE_DISABLE_FEATURES
+
+* Enable checkbox in Partner configuration: 'Enable Game Services'
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_01_17_service_userscore.php.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+### Configuration ###
+Add/Update a configuration map called 'redis' with following config:
+
+    [game]
+    host=@GAME_REDIS_HOST@
+    port=@GAME_REDIS_PORT@
+    timeout=1.5
+    cluster=1
+    persistent=0
+
 # Rigel-18.0.0
 ## Add permissions to KME partner ##
 Add permissions to KME partner for baseentry service
