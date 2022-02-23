@@ -998,7 +998,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner, $kuser)
 	{
 		$originPartnerAuthType = kuserPeer::getAuthenticationType($kuser,$originPartner);
-		$requestedPartnerAuthType = kuserPeer::getAuthenticationType($kuser, $requestedPartner);
+		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
 		if ($requestedPartnerAuthType === PartnerAuthenticationType::SSO)
 		{
 			throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
