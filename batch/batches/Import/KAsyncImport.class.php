@@ -187,7 +187,7 @@ class KAsyncImport extends KJobHandlerWorker
 			else
 			{
 				// creates a temp file path
-				$url = $this->getUrlForExtension($job, $data);
+				$url = $this->getUrlForExtension($sourceUrl, $job->partnerId);
 				$data->destFileLocalPath = $this->getTempFilePath($url, $fileSize);
 				KalturaLog::debug("destFile [$data->destFileLocalPath]");
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
@@ -560,12 +560,10 @@ class KAsyncImport extends KJobHandlerWorker
 		return array($partialFileSize, $data);
 	}
 
-	protected function getUrlForExtension(KalturaBatchJob $job, KalturaImportJobData $data)
+	protected function getUrlForExtension($sourceUrl, $partnerId)
 	{
-		$sourceUrl = $data->srcFileUrl;
-
 		$useRedirectPartners = explode(',', self::$taskConfig->params->redirectedUrlPartners);
-		if(is_null($useRedirectPartners) || !in_array($job->partnerId, $useRedirectPartners))
+		if(is_null($useRedirectPartners) || !in_array($partnerId, $useRedirectPartners))
 		{
 			return $sourceUrl;
 		}
