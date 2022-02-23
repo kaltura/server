@@ -1866,7 +1866,7 @@ class kJobsManager
 		if(!is_null($jobData->getFilePath()))
 		{
 			$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
-			if (myUploadUtils::isFileTypeRestricted($jobData->getFilePath()))
+			if (myUploadUtils::isFileTypeRestricted($jobData->getFilePath(), $jobData->getFileName()))
 			{
 				throw new APIException(APIErrors::INVALID_FILE_TYPE, $jobData->getFileName());
 			}

@@ -45,9 +45,11 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
 			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
-
-			if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+			
+			if(in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
+			{
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;
+			}
 
 			$client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($client);
@@ -97,6 +99,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING)
 			return new Kaltura_Client_Reach_Type_VendorChapteringCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
+			return new Kaltura_Client_Reach_Type_VendorDubbingCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

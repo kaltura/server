@@ -361,6 +361,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_VE_PARTICIPATED,
 		self::EVENT_TYPE_VE_BLOCKED,
 		self::EVENT_TYPE_VE_UNREGISTERED,
+		self::EVENT_TYPE_VE_INVITED,
+		self::EVENT_TYPE_VE_CREATED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -2379,6 +2381,7 @@ class kKavaReportsMgr extends kKavaBase
 			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
+			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -4382,6 +4385,43 @@ class kKavaReportsMgr extends kKavaBase
 				}
 			}
 
+			$result[$id] = $output;
+		}
+		return $result;
+	}
+
+	protected static function getUsersInfoFromCustomDataFields($ids, $partner_id, $context)
+	{
+		$enrichedInfoFields = $context['info_fields'];
+		$customDataFields = $context['columns'];
+		array_unshift($context['columns'], 'PUSER_ID');
+		$context['peer'] = 'kuserPeer';
+
+		$result = array();
+		$rows = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($rows as $id => $columns)
+		{
+			if (!is_array($columns))
+			{
+				$result[$id] = $id;
+				continue;
+			}
+			$output = array();
+			$puser = array_shift($columns);
+			$output[] = $puser;
+			$parsedFields = array();
+			foreach ($customDataFields as $field)
+			{
+				$parsedField = json_decode(array_shift($columns), true);
+				$parsedFields[$field] = $parsedField;
+			}
+
+			foreach ($enrichedInfoFields as $enrichedInfoField)
+			{
+				list($customDataField, $infoField) = explode(".", $enrichedInfoField);
+				$customDataField = "CUSTOM_DATA.$customDataField";
+				$output[] = isset($parsedFields[$customDataField][$infoField]) ? $parsedFields[$customDataField][$infoField] : '';
+			}
 			$result[$id] = $output;
 		}
 		return $result;

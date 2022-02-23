@@ -60,6 +60,12 @@ class kSimuliveUtils
 		}
 		$endTime = $startTime + array_sum($durations);
 
+		if (self::shouldLiveInterrupt($entry, $currentEvent))
+		{
+			// endTime null will cause "expirationTime" to be added to the json
+			$endTime = null;
+		}
+
 		// creating the flavorAssets array (array of arrays s.t each array contain the flavor assets of all the entries exist)
 		$flavorAssets = array();
 		$flavorAssets = self::mergeAssetArrays($flavorAssets, $preStartFlavorAssets);
@@ -263,5 +269,37 @@ class kSimuliveUtils
 			$durationMs -= $durationFrac;
 		}
 		return $durationMs;
+	}
+
+	/**
+	 * checking whether we currently inside "interruptible" window of the event and if a "real" live stream is streaming to the entry right now.
+	 * if so - the event should be interrupted by the "real" live 
+	 * @param LiveEntry $entry
+	 * @param ILiveStreamScheduleEvent $event
+	 * @return bool
+	 */
+	public static function shouldLiveInterrupt (LiveEntry $entry, ILiveStreamScheduleEvent $event)
+	{
+		return $event->isInterruptibleNow() && $entry->getEntryServerNodeStatusForPlayback() === EntryServerNodeStatus::PLAYABLE;
+	}
+
+	/**
+	 * @param ILiveStreamScheduleEvent $event
+	 * @param int $time
+	 * @return int|null - the time of the future closest transition timestamp that comes after $time, if there isn't such transition time - return null
+	 */
+	public static function getClosestPlaybackTransitionTime($event, $time)
+	{
+		$eventTransitionTimes = $event->getEventTransitionTimes();
+		// find the first closest future transition time
+		foreach ($eventTransitionTimes as $transitionTime)
+		{
+			if ($time < $transitionTime)
+			{
+				return $transitionTime;
+			}
+		}
+		// we shouldn't arrive this if $time is inside event
+		return null;
 	}
 }

@@ -112,10 +112,10 @@ class kZoomClient
 		return $this->callZoom($apiPath, $options);
 	}
 	
-	public function listRecordings($accountId, $from, $to, $nextPageToken, $pageSize)
+	public function listRecordings($accountId, $dayToScan, $nextPageToken, $pageSize)
 	{
 		$apiPath = str_replace('@accountId@', $accountId, self::API_LIST_RECORDING);
-		$apiPath .= '?page_size=' . $pageSize . '&next_page_token=' . $nextPageToken . '&from=' . $from . '&to=' . $to;
+		$apiPath .= '?page_size=' . $pageSize . '&next_page_token=' . $nextPageToken . '&from=' . $dayToScan . '&to=' . $dayToScan;
 		return $this->callZoom($apiPath);
 	}
 	

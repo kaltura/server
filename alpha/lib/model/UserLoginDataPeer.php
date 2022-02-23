@@ -272,7 +272,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		
 		// check if login data exists
 		if (!$loginData) {
-			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
+			throw new kUserException($email, kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		$partnerId = $loginData->getConfigPartnerId();
 		$roleNames = null;

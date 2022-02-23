@@ -86,7 +86,10 @@ class kPlayManifestCacher extends kApiCache
 		$requiredFiles = explode(',', $this->_responseMetadata);
 		foreach ($requiredFiles as $requiredFile)
 		{
-			require_once($requiredFile);
+			if (!include_once($requiredFile))
+			{
+				return;
+			}
 		}
 		$renderer = unserialize($serializedRenderer);
 		

@@ -43,37 +43,39 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
 	 * @param KalturaFilterPager $pager
+	 * @param $fromCreatedAt
 	 * @return array
 	 */
-	protected function loadDropFolderFilesByPage($pager)
+	protected function loadDropFolderFilesByPage($pager, $fromCreatedAt = null)
 	{
-		$dropFolderFiles =null;
-
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
-
+		
+		if ($fromCreatedAt)
+		{
+			$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
+		}
+		
 		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
 		return $dropFolderFiles->objects;
 	}
 
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
-	 * @param $timeFrame
+	 * @param $fileName
 	 * @return array
 	 */
-	protected function loadDropFolderFiles($timeFrame = null)
+	protected function loadDropFolderFiles($fileName = null)
 	{
-		$dropFolderFiles =null;
-
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
-		if ($timeFrame)
+		if ($fileName)
 		{
-			$dropFolderFileFilter->createdAtGreaterThanOrEqual = time() - $timeFrame;
+			$dropFolderFileFilter->fileNameEqual = $fileName;
 		}
 
 		$pager = new KalturaFilterPager();
@@ -139,7 +141,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 		{
 			KalturaLog::warning("Map is missing files - Drop folder [" . $this->dropFolder->id . "] has [$totalCount] file from list BUT has [$mapCount] files in map");
 		}
-
+		
 		return $dropFolderFilesMap;
 	}
 

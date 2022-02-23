@@ -12,6 +12,8 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VE_PARTICIPATED,
 				self::EVENT_TYPE_VE_BLOCKED,
 				self::EVENT_TYPE_VE_UNREGISTERED,
+				self::EVENT_TYPE_VE_INVITED,
+				self::EVENT_TYPE_VE_CREATED,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
@@ -20,6 +22,8 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				self::EVENT_TYPE_VE_PARTICIPATED,
 				self::EVENT_TYPE_VE_BLOCKED,
 				self::EVENT_TYPE_VE_UNREGISTERED,
+				self::EVENT_TYPE_VE_INVITED,
+				self::EVENT_TYPE_VE_CREATED,
 			)
 		),
 
@@ -77,6 +81,15 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				),
 			)
 		),
+
+		ReportType::VE_REGISTERED_WORLD_REGIONS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'world_region' => self::DIMENSION_LOCATION_WORLD_REGION,
+			),
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_VE_REGISTERED,
+			),
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)
@@ -93,5 +106,4 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 
 		return $report_def;
 	}
-
 }

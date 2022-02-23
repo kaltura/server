@@ -577,7 +577,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	{
 		/* @var $entry Baseentry */
 		$entry = $deliveryAttributes->getEntry();
-		if ($entry->getType() === entryType::LIVE_STREAM && !$this->getSimuliveSupport())
+		if ($entry && $entry->getType() === entryType::LIVE_STREAM && !$this->getSimuliveSupport())
 		{
 			return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 		}
