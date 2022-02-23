@@ -294,18 +294,16 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 				}
 				else
 				{
-					$redis = new RedisCluster(null, array($this->hostName . ":" . $this->port), $this->timeout, $this->timeout, $this->persistent);
+					$redis = new RedisCluster(null, array($this->hostName.":".$this->port), $this->timeout, $this->timeout, $this->persistent);
 					
-					if ($redis)
-					{
-						$connectResult = true;
-					}
+					//There is no isConnected in cluster mode so we need to verify the object is not null to make sure the connection was successful.
+					$connectResult = $redis ? true : false;
 				}
 
 			}
 			catch (Exception $e)
 			{
-				self::safeLog("failed to connect to redis: $e");
+				self::safeLog("failed to connect to redis");
 			}
 
 			if ($connectResult || microtime(true) - $curConnStart < .5)        // retry only if there's an error and it's a timeout error

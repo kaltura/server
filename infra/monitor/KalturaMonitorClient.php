@@ -19,6 +19,7 @@ class KalturaMonitorClient
 	const EVENT_COUCHBASE      = 'couchbase';
 	const EVENT_FILE_SYSTEM    = 'filesystem';
 	const EVENT_MEMCACHE       = 'memcache';
+	const EVENT_REDIS          = 'redis';
 	const EVENT_CURL           = 'curl';
 	const EVENT_RABBIT         = 'rabbit';
 	const EVENT_SLEEP          = 'sleep';
@@ -194,6 +195,11 @@ class KalturaMonitorClient
 		if (class_exists('kInfraMemcacheCacheWrapper'))
 		{
 			kInfraMemcacheCacheWrapper::sendMonitorEvents();
+		}
+
+		if (class_exists('kInfraRedisCacheWrapper'))
+		{
+			kInfraRedisCacheWrapper::sendMonitorEvents();
 		}
 
 		if (self::$sleepCount > 0)
@@ -579,7 +585,7 @@ class KalturaMonitorClient
 		
 		self::writeDeferredEvent($data);
 	}
-	
+
 	public static function monitorCurl($hostName, $timeTook, $curlHandle=null)
 	{
 		if (!self::$stream)
