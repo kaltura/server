@@ -522,7 +522,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('Invalid partner id ['.$requestedPartnerId.']', kUserException::INVALID_PARTNER);
 		}
-		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner);
+		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner, $kuser);
 			
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
@@ -995,10 +995,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 
 
-	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner)
+	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner, $kuser)
 	{
-		$originPartnerAuthType = $originPartner->getAuthenticationType();
-		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
+		$originPartnerAuthType = kuserPeer::getAuthenticationType($kuser,$originPartner);
+		$requestedPartnerAuthType = kuserPeer::getAuthenticationType($kuser, $requestedPartner);
 		if ($requestedPartnerAuthType === PartnerAuthenticationType::SSO)
 		{
 			throw new kUserException ('Switching to requested partner requires re-login', kUserException::NEW_LOGIN_REQUIRED);
