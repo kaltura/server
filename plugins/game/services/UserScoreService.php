@@ -46,7 +46,7 @@ class UserScoreService extends KalturaBaseService
 	 * @param KalturaUserScorePropertiesFilter|null $filter
 	 * @return KalturaUserScorePropertiesResponse
 	 */
-	public function updateAction(int $score, KalturaUserScorePropertiesFilter $filter)
+	public function updateAction($score, KalturaUserScorePropertiesFilter $filter)
 	{
 		if (!$filter)
 		{
