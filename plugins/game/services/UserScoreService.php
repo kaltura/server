@@ -7,6 +7,17 @@
  */
 class UserScoreService extends KalturaBaseService
 {
+	public function initService($serviceId, $serviceName, $actionName)
+	{
+		parent::initService($serviceId, $serviceName, $actionName);
+		
+		$partnerId = $this->getPartnerId();
+		if (!GamePlugin::isAllowedPartner($partnerId))
+		{
+			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
+		}
+	}
+	
 	/**
 	 * @action list
 	 * @param KalturaUserScorePropertiesFilter $filter

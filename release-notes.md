@@ -3,18 +3,21 @@
 * Issue Type: Task
 * Issue ID: PLAT-23508
 
-A new plugin to managing Game services with a Redis DB and a new service 'userScore'
+Add plugin for game services with new API userScore service connected to Redis
 
 ### Deployment ###
-	* Add Game to plugins.ini
+* Add Game to plugins.ini
 
-	* Add the following to admin.ini 
+* Add the following to admin.ini
+
+
     moduls.game.enabled = true
     moduls.game.permissionType = 2
     moduls.game.label = "Enable Game Services"
     moduls.game.permissionName = GAME_PLUGIN_PERMISSION
     moduls.game.group = GROUP_ENABLE_DISABLE_FEATURES
 
+* Enable checkbox in Partner configuration: 'Enable Games Services'
 
 ### Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_01_17_service_userscore.php.php
@@ -24,8 +27,8 @@ A new plugin to managing Game services with a Redis DB and a new service 'userSc
 Add/Update a configuration map called 'redis' with following config:
 
     [game]
-    host=127.0.0.1
-    port=6379
+    host=@GAME_REDIS_HOST@
+    port=@GAME_REDIS_PORT@
     timeout=1.5
     cluster=1
     persistent=0

@@ -7,21 +7,11 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 {
 	const PLUGIN_NAME = 'game';
 	
-	public function initService($serviceId, $serviceName, $actionName)
-	{
-		parent::initService($serviceId, $serviceName, $actionName);
-		
-		$partnerId = $this->getPartnerId();
-		if (!GamePlugin::isAllowedPartner($partnerId))
-		{
-			throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "{$this->serviceName}->{$this->actionName}");
-		}
-		
-		$this->applyPartnerFilterForClass(self::PLUGIN_NAME);
-	}
-	
 	public static function isAllowedPartner($partnerId)
 	{
+		if (PermissionPeer::isValidForPartner(PermissionName::GAME_PLUGIN_PERMISSION, $partnerId))
+			return true;
+		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if ($partner)
 		{

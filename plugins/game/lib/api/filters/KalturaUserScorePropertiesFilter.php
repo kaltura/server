@@ -65,58 +65,59 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		return $redisKey;
 	}
 	
-	protected function getKUser($redisWrapper, $pUser)
+	protected function getKuser($redisWrapper, $puser)
 	{
 		$partner = kCurrentContext::getCurrentPartnerId();
-		$kUser = kuserPeer::getKuserByPartnerAndUid($partner, $pUser);
-		if (!$kUser)
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partner, $puser);
+		if (!$kuser)
 		{
-			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $pUser);
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puser);
 		}
 		
-		return $kUser->getId();
+		return $kuser->getId();
 	}
 	
 	/**
-	 * Retrieves pUsers for all kUsers in the results array, and returns a map for these pUsers
+	 * Retrieves pusers for all kusers in the results array, and returns a map for these pusers
 	 * @param $results
 	 * @return array
 	 * @throws PropelException
 	 */
-	protected function createMapKUserToPUser($results)
+	protected function createMapKuserToPuser($results)
 	{
-		$kUsers = array_keys($results);
+		$kusers = array_keys($results);
 		
-		$pUsers = kuserPeer::retrieveByPKs($kUsers);
-		if (!$pUsers)
+		$pusers = kuserPeer::retrieveByPKs($kusers);
+		if (!$pusers)
 		{
-			KalturaLog::info('Failed to retrieve pUsers from DB');
+			KalturaLog::info('Failed to retrieve pusers from DB');
 			return array();
 		}
 		
-		$mapKUserPUser = array();
-		foreach ($pUsers as $pUser)
+		$mapKuserPuser = array();
+		foreach ($pusers as $puser)
 		{
-			$mapKUserPUser[$pUser->getId()] = $pUser->getPuserId();
+			$mapKuserPuser[$puser->getId()] = $puser->getPuserId();
 		}
 		
-		return $mapKUserPUser;
+		return $mapKuserPuser;
 	}
 	
 	/**
-	 * Adjust the results' ranks to be their real rank, instead of default Redis results starting from 0
-	 * The adjusted results are returned as an array of maps
+	 * Formats the results to a map with the expected properties,
+	 * And adjusts the results ranks to be their real rank, instead of default Redis results starting from 0
+	 * The results are returned as an array of maps
 	 * @param $results
 	 * @param $startingRank
-	 * @param $mapKUserPUser
+	 * @param $mapKuserPuser
 	 * @return array
 	 */
-	protected function adjustRanksBasedOnStartingRank($results, $startingRank, $mapKUserPUser)
+	protected function formatUserScoreResults($results, $startingRank, $mapKuserPuser)
 	{
 		$adjustedResults = array();
 		foreach ($results as $userId => $score)
 		{
-			$adjustedResults[] = array('rank' => $startingRank, 'userId' => $mapKUserPUser[$userId], 'score' => $score);
+			$adjustedResults[] = array('rank' => $startingRank, 'userId' => $mapKuserPuser[$userId], 'score' => $score);
 			$startingRank++;
 		}
 		
@@ -154,11 +155,11 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 */
 	protected function getListBySpecificUserId($redisWrapper, $pager, $redisKey)
 	{
-		$kUser = $this->getKUser($redisWrapper, $this->userIdEqual);
+		$kuser = $this->getKuser($redisWrapper, $this->userIdEqual);
 		
 		// Redis returns 'false' if the provided userId does not exist
-		$userRank = $redisWrapper->doZrevrank($redisKey, $kUser);
-		$userScore = $redisWrapper->doZscore($redisKey, $kUser);
+		$userRank = $redisWrapper->doZrevrank($redisKey, $kuser);
+		$userScore = $redisWrapper->doZscore($redisKey, $kuser);
 		if ($userScore === false || $userRank === false)
 		{
 			KalturaLog::info("No result found for userId {$this->userIdEqual} with key $redisKey");
@@ -192,9 +193,9 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			$results = array();
 		}
 		
-		$mapKUserPUser = $this->createMapKUserToPUser($results);
+		$mapKuserPuser = $this->createMapKuserToPuser($results);
 		
-		$results = $this->adjustRanksBasedOnStartingRank($results, $startRank, $mapKUserPUser);
+		$results = $this->formatUserScoreResults($results, $startRank, $mapKuserPuser);
 		
 		return $results;
 	}
@@ -217,9 +218,9 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			return array();
 		}
 		
-		$mapKUserPUser = $this->createMapKUserToPUser($results);
+		$mapKuserPuser = $this->createMapKuserToPuser($results);
 		
-		$results = $this->adjustRanksBasedOnStartingRank($results, $startRank, $mapKUserPUser);
+		$results = $this->formatUserScoreResults($results, $startRank, $mapKuserPuser);
 		
 		return $results;
 	}
@@ -304,10 +305,10 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
 		}
 		
-		$kUser = $this->getKUser($redisWrapper, $this->userIdEqual);
+		$kuser = $this->getKuser($redisWrapper, $this->userIdEqual);
 		
-		$addResult = $redisWrapper->doZadd($redisKey, $score, $kUser);
-		$rank = $redisWrapper->doZrevrank($redisKey, $kUser);
+		$addResult = $redisWrapper->doZadd($redisKey, $score, $kuser);
+		$rank = $redisWrapper->doZrevrank($redisKey, $kuser);
 		if ($addResult === false || $rank === false)
 		{
 			KalturaLog::info("Failed to add {$this->userIdEqual} to key $redisKey");
