@@ -562,7 +562,7 @@ class KAsyncImport extends KJobHandlerWorker
 
 	protected function getUrlForExtension($sourceUrl, $partnerId)
 	{
-		$useRedirectPartners = explode(',', self::$taskConfig->params->redirectedUrlPartners);
+		$useRedirectPartners = explode(',', self::$taskConfig->params->redirectedUrlPartnerIds);
 		if(is_null($useRedirectPartners) || !in_array($partnerId, $useRedirectPartners))
 		{
 			return $sourceUrl;
