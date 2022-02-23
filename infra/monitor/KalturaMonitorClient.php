@@ -583,7 +583,7 @@ class KalturaMonitorClient
 			self::FIELD_COUNT			=> $count,
 		));
 		
-		self::writeDeferredEvent($data)
+		self::writeDeferredEvent($data);
 	}
 
 	public static function monitorCurl($hostName, $timeTook, $curlHandle=null)
