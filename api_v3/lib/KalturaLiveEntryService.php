@@ -402,6 +402,9 @@ class KalturaLiveEntryService extends KalturaEntryService
 	 *
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::RECORDED_ENTRY_LIVE_MISMATCH
+	 * @throws KalturaErrors::KALTURA_RECORDING_DISABLED
+	 * @throws KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND
+
 	 */
 	function setRecordedContentAction($entryId, $mediaServerIndex, KalturaDataCenterContentResource $resource, $duration, $recordedEntryId = null, $flavorParamsId = null)
 	{
