@@ -12,9 +12,9 @@ class KalturaUserScorePropertiesArray extends KalturaTypedArray
 		foreach ($arr as $userScoreProperties)
 		{
 			$nObj = new KalturaUserScoreProperties();
-			$nObj->rank = $userScoreProperties['rank'];
+			$nObj->rank = $userScoreProperties['rank'] + 1;
 			$nObj->userId = $userScoreProperties['userId'];
-			$nObj->score = $userScoreProperties['score'];
+			$nObj->score = floor($userScoreProperties['score']);
 			$newArr[] = $nObj;
 		}
 		
