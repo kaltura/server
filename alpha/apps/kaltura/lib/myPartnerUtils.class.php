@@ -1474,6 +1474,7 @@ class myPartnerUtils
 	public static function copyUserRoles(Partner $fromPartner, Partner $toPartner)
  	{
  		KalturaLog::log('Copying user roles from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
+		self::copyAdminExcludedUserRole($fromPartner, $toPartner);
  		UserRolePeer::setUseCriteriaFilter ( false );
  		$c = new Criteria();
  		$c->addAnd(UserRolePeer::PARTNER_ID, $fromPartner->getId(), Criteria::EQUAL);
@@ -1493,6 +1494,11 @@ class myPartnerUtils
  		}
  	}
  	
+	protected static function copyAdminExcludedUserRole(Partner $fromPartner, Partner $toPartner)
+	{
+		$toPartner->setExcludedAdminRoleName($fromPartner->getExcludedAdminRoleName());
+	}
+	
 	public static function copyPermissions(Partner $fromPartner, Partner $toPartner)
  	{
  		KalturaLog::log('Copying permissions from partner ['.$fromPartner->getId().'] to partner ['.$toPartner->getId().']');
