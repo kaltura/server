@@ -60,7 +60,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		}
 		
 		$redisKey = kCurrentContext::getCurrentPartnerId();
-		$redisKey.= '_' . $this->gameObjectId;
+		$redisKey.= '_' . $this->gameObjectType . '_' . $this->gameObjectId;
 		KalturaLog::info("Accessing Redis game object: $redisKey");
 		return $redisKey;
 	}
