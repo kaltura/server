@@ -166,6 +166,7 @@ class flavorAsset extends exportableAsset
 		$this->setVideoCodecId($fromAsset->getVideoCodecId());
 		$this->setLabel($fromAsset->getLabel());
 		$this->setLanguage($fromAsset->getLanguage());
+		$this->setIsOriginal($fromAsset->getIsOriginal());
 	}
 	
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
