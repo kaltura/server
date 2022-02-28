@@ -97,7 +97,16 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		$mapKuserPuser = array();
 		foreach ($pusers as $puser)
 		{
-			$mapKuserPuser[$puser->getId()] = $puser->getPuserId();
+			if ($puser->getPuserId())
+			{
+				$mapKuserPuser[$puser->getId()] = $puser->getPuserId();
+			}
+			else
+			{
+				$kuser = $puser->getId();
+				$mapKuserPuser[$kuser] = 'Unknown';
+				KalturaLog::info("No puser found for kuser $kuser");
+			}
 		}
 		
 		return $mapKuserPuser;
@@ -153,7 +162,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 * @param $redisKey
 	 * @return array
 	 */
-	protected function getListBySpecificUserId($redisWrapper, $pager, $redisKey)
+	protected function getListBySpecificUserId($redisWrapper, $redisKey)
 	{
 		$kuserId = $this->getKuserIdFromPuserId($this->userIdEqual);
 		
@@ -169,22 +178,6 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		// Depending on the filter attributes, the query range around the user needs to be extended
 		$startRank = $this->calculateStartRank($userRank);
 		$endRank = $this->calculateEndRank($userRank);
-		
-		// Adjust the query range according to the pager
-		$startRankPager = ($pager->pageIndex - 1) * $pager->pageSize;
-		$endRankPager = $startRank + $pager->pageSize - 1;
-		if ($endRank - $startRank >= $startRankPager && $pager->pageSize != 0)
-		{
-			$startRank += $startRankPager;
-			if ($endRank > $startRank + $endRankPager)
-			{
-				$endRank = $startRank + $endRankPager;
-			}
-		}
-		else
-		{
-			return array();
-		}
 		
 		$results = $redisWrapper->doZrevrange($redisKey, $startRank, $endRank);
 		if (!$results)
@@ -206,21 +199,18 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 * @param $redisKey
 	 * @return array
 	 */
-	protected function getListAllUsers($redisWrapper, $pager, $redisKey)
+	protected function getListAllUsers($redisWrapper, $redisKey)
 	{
-		$startRank = ($pager->pageIndex - 1) * $pager->pageSize;
-		$endRank = $startRank + $pager->pageSize - 1;
-		
-		$results = $redisWrapper->doZrevrange($redisKey, $startRank, $endRank);
+		$results = $redisWrapper->doZrevrange($redisKey, 0, -1);
 		if (!$results)
 		{
-			KalturaLog::info("No results found for key $redisKey with range $startRank, $endRank");
+			KalturaLog::info("No results found for key $redisKey");
 			return array();
 		}
 		
 		$mapKuserPuser = $this->createMapKuserToPuser($results);
 		
-		$results = $this->formatUserScoreResults($results, $startRank, $mapKuserPuser);
+		$results = $this->formatUserScoreResults($results, 0, $mapKuserPuser);
 		
 		return $results;
 	}
@@ -233,7 +223,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	protected function paginateResults($pager, $results)
 	{
 		$startRank = ($pager->pageIndex - 1) * $pager->pageSize;
-		$endRank = $startRank + $pager->pageSize - 1;
+		$endRank = $startRank + $pager->pageSize;
 		
 		if ($startRank < count($results))
 		{
@@ -269,19 +259,19 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		
 		$redisKey = $this->prepareGameObjectKey();
 		
-		$response = new KalturaUserScorePropertiesResponse();
 		
 		if ($this->userIdEqual)
 		{
-			$results = $this->getListBySpecificUserId($redisWrapper, $pager, $redisKey);
+			$results = $this->getListBySpecificUserId($redisWrapper, $redisKey);
 		}
 		else
 		{
-			$totalResults = $redisWrapper->doZrevrange($redisKey, 0, -1);
-			$response->totalCount = count($totalResults);
-			$results = $this->getListAllUsers($redisWrapper, $pager, $redisKey);
+			$results = $this->getListAllUsers($redisWrapper, $redisKey);
 		}
 		
+		$response = new KalturaUserScorePropertiesResponse();
+		$response->totalCount = count($results);
+		$results = $this->paginateResults($pager, $results);
 		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($results, $responseProfile);
 		
 		return $response;
