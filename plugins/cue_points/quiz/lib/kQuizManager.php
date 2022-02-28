@@ -7,7 +7,7 @@ class kQuizManager implements kObjectChangedEventConsumer
 {
 	const EVENT_TYPE = 'eventType';
 	const QUIZ_EVENT_TYPE = '@event_type_id@';
-	const KUSER_ID = 'kuserId';
+	const PUSER_ID = 'puserId';
 	const ENTRY_ID = 'entryId';
 	const PARTNER_ID = 'partnerId';
 	const VERSION = 'version';
@@ -80,7 +80,11 @@ class kQuizManager implements kObjectChangedEventConsumer
 		);
 		if ($quizUserEntry->getkuser())
 		{
-			$contents[self::KUSER_ID] = $quizUserEntry->getkuser()->getId();
+			$kuser = kuserPeer::retrieveByPKNoFilter($quizUserEntry->getkuser()->getId());
+			if ($kuser)
+			{
+				$contents[self::PUSER_ID] = $kuser->getPuserId();
+			}
 		}
 		return $contents;
 	}
