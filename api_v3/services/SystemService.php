@@ -25,7 +25,9 @@ class SystemService extends KalturaBaseService
 	 */
 	function pingAction()
 	{
+		KalturaLog::debug("Fetching ping_cache_expiry_time from kConf");
 		$expiry = kConf::get('ping_cache_expiry_time', 'runtime_config', 5);
+		KalturaLog::debug("ping_cache_expiry_time fetched from kConf");
 		kApiCache::setConditionalCacheExpiry($expiry);
 		kApiCache::setExpiry($expiry);
 		return mySystemUtils::ping();
