@@ -141,6 +141,11 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		return $this->callAndDetectErrors('zadd', array($key, $value, $member));
 	}
 	
+	public function doZrem($key, $member)
+	{
+		return $this->callAndDetectErrors('zrem', array($key, $member));
+	}
+	
 	public function doZrevrange($key, $low, $high)
 	{
 		return $this->callAndDetectErrors('zrevrange', array($key, $low, $high, true));
@@ -235,6 +240,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 
 	protected function callAndDetectErrors($methodName, $params)
 	{
+		kApiCache::disableConditionalCache();
 		while ($this->redis)
 		{
 			$this->gotError = false;

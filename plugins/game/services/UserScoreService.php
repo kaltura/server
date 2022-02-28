@@ -43,7 +43,7 @@ class UserScoreService extends KalturaBaseService
 	/**
 	 * @action update
 	 * @param int $score
-	 * @param KalturaUserScorePropertiesFilter|null $filter
+	 * @param KalturaUserScorePropertiesFilter $filter
 	 * @return KalturaUserScorePropertiesResponse
 	 */
 	public function updateAction($score, KalturaUserScorePropertiesFilter $filter)
@@ -54,5 +54,20 @@ class UserScoreService extends KalturaBaseService
 		}
 		
 		return $filter->updateUserScore($score, $filter);
+	}
+	
+	/**
+	 * @action delete
+	 * @param KalturaUserScorePropertiesFilter $filter
+	 * @return KalturaUserScorePropertiesResponse
+	 */
+	public function deleteAction($filter)
+	{
+		if (!$filter)
+		{
+			throw new KalturaAPIException(KalturaErrors::GAME_OBJECT_ID_REQUIRED);
+		}
+		
+		return $filter->deleteUserScore($filter);
 	}
 }

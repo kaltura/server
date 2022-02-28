@@ -269,17 +269,19 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		
 		$redisKey = $this->prepareGameObjectKey();
 		
+		$response = new KalturaUserScorePropertiesResponse();
+		
 		if ($this->userIdEqual)
 		{
 			$results = $this->getListBySpecificUserId($redisWrapper, $pager, $redisKey);
 		}
 		else
 		{
+			$totalResults = $redisWrapper->doZrevrange($redisKey, 0, -1);
+			$response->totalCount = count($totalResults);
 			$results = $this->getListAllUsers($redisWrapper, $pager, $redisKey);
 		}
 		
-		$response = new KalturaUserScorePropertiesResponse();
-		$response->totalCount = count($results);
 		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($results, $responseProfile);
 		
 		return $response;
@@ -318,6 +320,44 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		{
 			$result = array(array('rank' => $rank, 'userId' => $this->userIdEqual, 'score' => $score));
 		}
+		
+		$response = new KalturaUserScorePropertiesResponse();
+		$response->totalCount = count($result);
+		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($result, null);
+		
+		return $response;
+	}
+	
+	/**
+	 * @param $filter
+	 * @return KalturaUserScorePropertiesResponse
+	 * @throws KalturaAPIException
+	 */
+	public function deleteUserScore($filter)
+	{
+		$redisWrapper = GamePlugin::initGameServicesRedisInstance();
+		if (!$redisWrapper)
+		{
+			throw new KalturaAPIException(KalturaErrors::FAILED_INIT_REDIS_INSTANCE);
+		}
+		
+		$redisKey = $this->prepareGameObjectKey();
+		
+		if (!$this->userIdEqual)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
+		}
+		
+		
+		$this->placesAboveUser = 0;
+		$this->placesBelowUser = 0;
+		
+		$pager = new KalturaFilterPager();
+		$result = $this->getListBySpecificUserId($redisWrapper, $pager, $redisKey);
+		
+		$kuserId = $this->getKuserIdFromPuserId($this->userIdEqual);
+		
+		$redisWrapper->doZrem($redisKey, $kuserId);
 		
 		$response = new KalturaUserScorePropertiesResponse();
 		$response->totalCount = count($result);
