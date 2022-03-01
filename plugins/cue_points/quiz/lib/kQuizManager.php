@@ -6,7 +6,7 @@
 class kQuizManager implements kObjectChangedEventConsumer
 {
 	const EVENT_TYPE = 'eventType';
-	const QUIZ_EVENT_TYPE = '@event_type_id@';
+	const QUIZ_EVENT_TYPE = 30001;
 	const USER_ID = 'userId';
 	const ENTRY_ID = 'entryId';
 	const PARTNER_ID = 'partnerId';
