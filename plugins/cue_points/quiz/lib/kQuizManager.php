@@ -5,6 +5,10 @@
  */
 class kQuizManager implements kObjectChangedEventConsumer
 {
+	const SERVICE = 'service';
+	const ACTION = 'action';
+	const SERVICE_ANALYTICS = 'analytics';
+	const ACTION_TRACKEVENT = 'trackEvent';
 	const EVENT_TYPE = 'eventType';
 	const QUIZ_EVENT_TYPE = 30001;
 	const USER_ID = 'userId';
@@ -67,6 +71,8 @@ class kQuizManager implements kObjectChangedEventConsumer
 	{
 		/* @var $quizUserEntry QuizUserEntry */
 		$contents = array(
+			self::SERVICE => self::SERVICE_ANALYTICS,
+			self::ACTION => self::ACTION_TRACKEVENT,
 			self::EVENT_TYPE => self::QUIZ_EVENT_TYPE,
 			self::PARTNER_ID => $quizUserEntry->getPartnerId(),
 			self::ENTRY_ID => $quizUserEntry->getEntryId(),
