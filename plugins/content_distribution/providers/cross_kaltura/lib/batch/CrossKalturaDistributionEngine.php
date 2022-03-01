@@ -367,20 +367,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		$quiz = null;
 		if ($this->distributeQuiz == true)
 		{
-			try {
+			try
+			{
 				$quizClient = KalturaQuizClientPlugin::get($client);
-				$quizFilter = new KalturaQuizFilter();
-				$quizPager = new KalturaFilterPager();
-				$quizFilter->entryIdEqual = $entryId;
-				$quizList = $quizClient->quiz->listAction($quizFilter, $quizPager);
-				$quizObjects = $quizList->objects;
-
-				if(is_array($quizObjects) && count($quizObjects)>0)
-				{
-					$quiz = $quizObjects[0];
-				}
+				$quiz = $this->getQuizByEntryId($quizClient->quiz, $entryId);
 			}
-			catch (Exception $e) {
+			catch (Exception $e)
+			{
 				KalturaLog::err('Cannot get quiz - '.$e->getMessage());
 				throw $e;
 			}
@@ -971,19 +964,9 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 	protected function syncTargetQuiz(KalturaServiceBase $targetClientService, $quizObject, $targetEntryId)
 	{
-		$quiz = null;
-		$quizFilter = new KalturaQuizFilter();
-		$quizPager = new KalturaFilterPager();
-		$quizFilter->entryIdEqual = $targetEntryId;
-		$quizList = $targetClientService->listAction($quizFilter, $quizPager);
-		$quizObjects = $quizList->objects;
-
-		if(is_array($quizObjects) && count($quizObjects)>0) // change count to totalCount
-		{
-			$quiz = $quizObjects[0];
-		}
-
+		$quiz = $this->getQuizByEntryId($targetClientService, $targetEntryId);
 		$args = array($targetEntryId, $quizObject);
+
 		if (is_null($quiz))
 		{
 			// add quiz
@@ -1400,6 +1383,22 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	function log($message)
 	{
 		KalturaLog::log($message);
+	}
+
+	protected function getQuizByEntryId(KalturaServiceBase $targetClientService, $entryId)
+	{
+		$quizFilter = new KalturaQuizFilter();
+		$quizPager = new KalturaFilterPager();
+		$quizFilter->entryIdEqual = $entryId;
+		$quizList = $targetClientService->listAction($quizFilter, $quizPager);
+		$quizObjects = $quizList->objects;
+
+		if(is_array($quizObjects) && count($quizObjects) > 0)
+		{
+			return $quizObjects[0];
+		}
+
+		return null;
 	}
 
 }
