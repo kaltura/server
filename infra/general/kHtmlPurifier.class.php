@@ -12,7 +12,7 @@ class kHtmlPurifier
 	const ALLOWED_TAGS = 'allowedTags';
 	const ALLOWED_FRAME_TARGETS = 'allowedFrameTargets';
 	const ALLOWED_REL = 'allowedRel';
-	const HTML_DOCTYPE = "HTML 4.01 Transitional";
+	const HTML_DOCTYPE = "HTMLDoctype";
 	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
@@ -92,10 +92,13 @@ class kHtmlPurifier
 		{
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
-			$config->set('HTML.Doctype', self::HTML_DOCTYPE);
 			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, array());
 			if ($htmlPurifierConf)
 			{
+				if (isset($htmlPurifierConf[self::HTML_DOCTYPE]))
+				{
+					$config->set('HTML.Doctype', $htmlPurifierConf[self::HTML_DOCTYPE]);
+				}
 				if (isset($htmlPurifierConf[self::ALLOWED_TAGS]))
 				{
 					$config->set('HTML.Allowed', $htmlPurifierConf[self::ALLOWED_TAGS]);
