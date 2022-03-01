@@ -65,7 +65,7 @@ Add scripts:
 
 Update scripts:
 
-	Entry ready:
+    Entry ready:
     - deployment/updates/scripts/xml/2022_02_16_updateEntryReadyEmailNotification.template.xml
     - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_ready.php
 
