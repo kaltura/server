@@ -40,24 +40,11 @@
                             <code>!$scope->getObject()->getIsTemporary()</code>
                         </field>
                     </item>
-                    <item objectType="KalturaOrCondition">
-                        <conditions objectType="array">
-                            <item objectType="KalturaEventFieldCondition">
-                                <field objectType="KalturaEvalBooleanField">
-                                    <code>$scope->getObject()->getType() != entryType::DOCUMENT</code>
-                                </field>
-                            </item>
-                            <item objectType="KalturaEventFieldCondition">
-                                <field objectType="KalturaEvalBooleanField">
-                                    <code>$scope->getObject()->getMediaType() != entry::ENTRY_MEDIA_TYPE_PDF</code>
-                                </field>
-                            </item>
-                            <item objectType="KalturaEventFieldCondition">
-                                <field objectType="KalturaEvalBooleanField">
-                                    <code>!is_null($scope->getObject()->getParentEntryId() ? $scope->getObject()->getParentEntryId() == $scope->getObject()->getId() : true</code>
-                                </field>
-                            </item>
-                        </conditions>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Not slide entry</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getType() != entryType::DOCUMENT || $scope->getObject()->getMediaType() != entry::ENTRY_MEDIA_TYPE_PDF || (!is_null($scope->getObject()->getParentEntryId()) ? $scope->getObject()->getParentEntryId() == $scope->getObject()->getId() : true)</code>
+                        </field>
                     </item>
                     <item objectType="KalturaOrCondition">
                         <conditions objectType="array">
