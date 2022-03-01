@@ -65,21 +65,21 @@ class UserScoreService extends KalturaBaseService
 		
 		$kuserId = GamePlugin::getKuserIdFromPuserId($userId);
 		
-		$addResult = $redisWrapper->doZadd($redisKey, $score, $kuserId);
-		$rank = $redisWrapper->doZrevrank($redisKey, $kuserId);
-		if ($addResult === false || $rank === false)
+		$response = new KalturaUserScorePropertiesResponse();
+		
+		$resultAdd = $redisWrapper->doZadd($redisKey, $score, $kuserId);
+		$userRank = $redisWrapper->doZrevrank($redisKey, $kuserId);
+		if ($resultAdd === false || $userRank === false)
 		{
 			KalturaLog::info("Failed to add $userId to key $redisKey");
-			$result = array();
+			$response->objects = array();
 		}
 		else
 		{
-			$result = array(array('rank' => $rank, 'userId' => $userId, 'score' => $score));
+			$response->objects = KalturaUserScorePropertiesArray::fromDbSingleValue($userRank, $userId, $score);
 		}
 		
-		$response = new KalturaUserScorePropertiesResponse();
-		$response->totalCount = count($result);
-		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($result, null);
+		$response->totalCount = count($response->objects);
 		
 		return $response;
 	}
@@ -108,22 +108,29 @@ class UserScoreService extends KalturaBaseService
 		
 		$kuserId = GamePlugin::getKuserIdFromPuserId($userId);
 		
+		$response = new KalturaUserScorePropertiesResponse();
+		
 		// Redis returns 'false' if the provided userId does not exist
 		$userRank = $redisWrapper->doZrevrank($redisKey, $kuserId);
 		$userScore = $redisWrapper->doZscore($redisKey, $kuserId);
 		if ($userScore === false || $userRank === false)
 		{
 			KalturaLog::info("No result found for userId {$this->userIdEqual} with key $redisKey");
-			return array();
+			$response->objects = array();
+		}
+		else
+		{
+			$response->objects = KalturaUserScorePropertiesArray::fromDbSingleValue($userRank, $userId, $userScore);
 		}
 		
-		$result = array(array('rank' => $userRank, 'userId' => $userId, 'score' => $userScore));
+		$resultRemove = $redisWrapper->doZrem($redisKey, $kuserId);
+		if ($resultRemove === false)
+		{
+			KalturaLog::info("Failed to delete result for userId {$this->userIdEqual} with key $redisKey");
+			$response->objects = array();
+		}
 		
-		$redisWrapper->doZrem($redisKey, $kuserId);
-		
-		$response = new KalturaUserScorePropertiesResponse();
-		$response->totalCount = count($result);
-		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($result, null);
+		$response->totalCount = count($response->objects);
 		
 		return $response;
 	}
