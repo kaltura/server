@@ -60,6 +60,11 @@ class CrossKalturaEntryObjectsContainer
      */
     public $thumbCuePoints;
 
+	/**
+	 * @var KalturaQuiz
+	 */
+	public $quiz;
+
     /**
      * Initialize all member variables
      */
@@ -76,5 +81,6 @@ class CrossKalturaEntryObjectsContainer
         $this->captionAssetsContent = array();
         $this->cuePoints = array();
         $this->thumbCuePoints = array();
+        $this->quiz = null;
     }
 }
