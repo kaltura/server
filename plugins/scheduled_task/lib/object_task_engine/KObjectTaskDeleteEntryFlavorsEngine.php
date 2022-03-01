@@ -14,6 +14,13 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		/** @var KalturaDeleteEntryFlavorsObjectTask $objectTask */
 		$objectTask = $this->getObjectTask();
 		$deleteType = $objectTask->deleteType;
+		
+		if ($this->shouldSkipStaticContent($deleteType, $object))
+		{
+			KalturaLog::notice("Entry ID: [$object->id] content is 'static' - skipping MR actions");
+			return;
+		}
+		
 		$flavorParamsIds = explode(',', $objectTask->flavorParamsIds);
 		$client = $this->getClient();
 
@@ -154,5 +161,58 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			return;
 		}
 		$this->deleteFlavorsKeepingConfiguredList($flavors, array($smallestFlavor->flavorParamsId));
+	}
+	
+	/**
+	 * @param KalturaMediaEntry $object
+	 */
+	protected function shouldSkipStaticContent($deleteType, $object)
+	{
+		// if should 'keep_smallest' asset, no need to check 'static' content
+		if ($deleteType == KalturaDeleteFlavorsLogicType::DELETE_KEEP_SMALLEST)
+		{
+			KalturaLog::notice("Entry ID: [$object->id] delete Type is: [$deleteType] - proceeding with MR actions");
+			return false;
+		}
+		
+		return $this->isStaticContent($object);
+	}
+	
+	/**
+	 * @param KalturaMediaEntry $object
+	 */
+	protected function isStaticContent($object)
+	{
+		if (!$object instanceof KalturaMediaEntry)
+		{
+			KalturaLog::notice("Entry object ID: [$object->id] is not of type 'KalturaMediaEntry' - cannot check if content is 'static'");
+			return false;
+		}
+		
+		// 'kaltura_capture' does not have admin tags and is only identified by sourceType
+		if ($object->sourceType == KalturaSourceType::LECTURE_CAPTURE)
+		{
+			return true;
+		}
+		
+		$staticContentAdminTags = $this->getStaticContentAdminTagsArr($object->partnerId);
+		$adminTags = explode(',', $object->adminTags);
+		
+		return count(array_intersect($staticContentAdminTags, $adminTags));
+	}
+	
+	protected function getStaticContentAdminTagsArr($partnerId)
+	{
+		$this->unimpersonate();
+		$runtimeConfMap = kBatchUtils::getConfigMap('runtime_config');
+		$this->impersonate($partnerId);
+		
+		return isset($runtimeConfMap['staticContentAdminTags']) ? $runtimeConfMap['staticContentAdminTags'] : array(
+			'kalturaclassroom',
+			'zoomentry',
+			'kalturameeting',
+			'expressrecorder',
+			'msteams'
+		);
 	}
 }
