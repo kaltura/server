@@ -42,32 +42,89 @@ class UserScoreService extends KalturaBaseService
 	
 	/**
 	 * @action update
+	 * @param int $gameObjectId
+	 * @param KalturaGameObjectType $gameObjectType
+	 * @param string $userId
 	 * @param int $score
-	 * @param KalturaUserScorePropertiesFilter $filter
 	 * @return KalturaUserScorePropertiesResponse
 	 */
-	public function updateAction($score, KalturaUserScorePropertiesFilter $filter)
+	public function updateAction($gameObjectId, $gameObjectType, $userId, $score)
 	{
-		if (!$filter)
+		$redisWrapper = GamePlugin::initGameServicesRedisInstance();
+		if (!$redisWrapper)
 		{
-			throw new KalturaAPIException(KalturaErrors::USER_SCORE_PROPERTIES_FILTER_REQUIRED);
+			throw new KalturaAPIException(KalturaErrors::FAILED_INIT_REDIS_INSTANCE);
 		}
 		
-		return $filter->updateUserScore($score, $filter);
+		$redisKey = GamePlugin::prepareGameObjectKey($gameObjectId, $gameObjectType);
+		
+		if (!$userId)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
+		}
+		
+		$kuserId = GamePlugin::getKuserIdFromPuserId($userId);
+		
+		$addResult = $redisWrapper->doZadd($redisKey, $score, $kuserId);
+		$rank = $redisWrapper->doZrevrank($redisKey, $kuserId);
+		if ($addResult === false || $rank === false)
+		{
+			KalturaLog::info("Failed to add $userId to key $redisKey");
+			$result = array();
+		}
+		else
+		{
+			$result = array(array('rank' => $rank, 'userId' => $userId, 'score' => $score));
+		}
+		
+		$response = new KalturaUserScorePropertiesResponse();
+		$response->totalCount = count($result);
+		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($result, null);
+		
+		return $response;
 	}
 	
 	/**
 	 * @action delete
-	 * @param KalturaUserScorePropertiesFilter $filter
+	 * @param int $gameObjectId
+	 * @param KalturaGameObjectType $gameObjectType
+	 * @param string $userId
 	 * @return KalturaUserScorePropertiesResponse
 	 */
-	public function deleteAction($filter)
+	public function deleteAction($gameObjectId, $gameObjectType, $userId)
 	{
-		if (!$filter)
+		$redisWrapper = GamePlugin::initGameServicesRedisInstance();
+		if (!$redisWrapper)
 		{
-			throw new KalturaAPIException(KalturaErrors::GAME_OBJECT_ID_REQUIRED);
+			throw new KalturaAPIException(KalturaErrors::FAILED_INIT_REDIS_INSTANCE);
 		}
 		
-		return $filter->deleteUserScore($filter);
+		$redisKey = GamePlugin::prepareGameObjectKey($gameObjectId, $gameObjectType);
+		
+		if (!$userId)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
+		}
+		
+		$kuserId = GamePlugin::getKuserIdFromPuserId($userId);
+		
+		// Redis returns 'false' if the provided userId does not exist
+		$userRank = $redisWrapper->doZrevrank($redisKey, $kuserId);
+		$userScore = $redisWrapper->doZscore($redisKey, $kuserId);
+		if ($userScore === false || $userRank === false)
+		{
+			KalturaLog::info("No result found for userId {$this->userIdEqual} with key $redisKey");
+			return array();
+		}
+		
+		$result = array(array('rank' => $userRank, 'userId' => $userId, 'score' => $userScore));
+		
+		$redisWrapper->doZrem($redisKey, $kuserId);
+		
+		$response = new KalturaUserScorePropertiesResponse();
+		$response->totalCount = count($result);
+		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($result, null);
+		
+		return $response;
 	}
 }
