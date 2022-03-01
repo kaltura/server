@@ -33,6 +33,35 @@ Add/Update a configuration map called 'redis' with following config:
     cluster=1
     persistent=0
 
+## Update entry ready, entry status equal, media entry ready and unique KMS entry ready email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-30691
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+### Scripts ###
+
+	Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_ready.php
+
+    Entry status equals:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryStatusEqualEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateMediaEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateUniqueKmsEntryReadyEmailNotification.template.xml
+    - deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_uniqu_kms_entry_ready.php
+
+
 # Rigel-18.0.0
 ## Add permissions to KME partner ##
 Add permissions to KME partner for baseentry service
