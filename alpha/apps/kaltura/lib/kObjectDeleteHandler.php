@@ -36,6 +36,9 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 
 		if($object instanceof FileSync)
 			return true;
+
+        if($object instanceof Partner)
+            return true;
 			
 		return false;
 	}
@@ -74,8 +77,11 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 
 		if($object instanceof FileSync)
 			$this->fileSyncDelete($object, $raisedJob);
-			
-		return true;
+
+        if($object instanceof Partner)
+            $this->partnerDeleted($object);
+
+        return true;
 	}
 
 	/**
@@ -299,4 +305,15 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 		}
 	}
 
+    protected function partnerDeleted(Partner $partner)
+    {
+        //find all admin users of this partner
+        $adminUsers = Partner::getAdminLoginUsersList($partner->getPartnerId());
+
+        //delete all admin users of the account
+        foreach($adminUsers as $adminUser)
+        {
+            $adminUser->delete();
+        }
+    }
 }
