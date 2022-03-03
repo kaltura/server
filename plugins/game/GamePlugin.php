@@ -64,7 +64,8 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 		}
 		
 		$config = array('host' => $redisConfig['host'], 'port' => $redisConfig['port'], 'timeout' => floatval($redisConfig['timeout']),
-			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent']);
+			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent'], 'password' => $redisConfig['password']);
+		
 		$redisWrapper->init($config);
 		return $redisWrapper;
 	}
@@ -74,7 +75,7 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 	 * @return string
 	 * @throws KalturaAPIException
 	 */
-	public function prepareGameObjectKey($gameObjectId, $gameObjectType)
+	public static function prepareGameObjectKey($gameObjectId, $gameObjectType)
 	{
 		if (is_null($gameObjectId))
 		{
@@ -91,7 +92,7 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 		return $redisKey;
 	}
 	
-	public function getKuserIdFromPuserId($puser)
+	public static function getKuserIdFromPuserId($puser)
 	{
 		$partner = kCurrentContext::getCurrentPartnerId();
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partner, $puser);
@@ -109,7 +110,7 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 	 * @return array
 	 * @throws PropelException
 	 */
-	public function createMapKuserToPuser($results)
+	public static function createMapKuserToPuser($results)
 	{
 		$kusers = array_keys($results);
 		
