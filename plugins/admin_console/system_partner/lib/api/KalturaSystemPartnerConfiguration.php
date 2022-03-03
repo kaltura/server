@@ -722,7 +722,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
+		KalturaLog::err('danielBarak - new partner excluded admin role name: ' . $object_to_fill->getExcludedAdminRoleName());
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
+		KalturaLog::log('danielBarak1 - new partner excluded admin role name: ' . $object_to_fill->getExcludedAdminRoleName());
 		if (!$object_to_fill) {
 			KalturaLog::err('Cannot find object to fill');
 			return null;
@@ -832,6 +834,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			$object_to_fill->setExcludedAdminRoleName(null);
 		}
+		KalturaLog::log('danielBarak - new partner excluded admin role name: ' . $object_to_fill->getExcludedAdminRoleName());
 		
 		return $object_to_fill;
 	}
