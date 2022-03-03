@@ -78,11 +78,11 @@ class kQuizManager implements kObjectChangedEventConsumer
 			self::ENTRY_ID => $quizUserEntry->getEntryId(),
 			self::VERSION => $quizUserEntry->getVersion(),
 			self::ANSWER_IDS => $quizUserEntry->getAnswerIds(),
-			self::SCORE => $quizUserEntry->getScore(),
+			self::SCORE => self::normalizeScore($quizUserEntry->getScore()),
 			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),
 			self::NUM_OF_QUESTIONS => $quizUserEntry->getNumOfQuestions(),
 			self::NUM_OF_RELEVANT_QUESTIONS => $quizUserEntry->getNumOfRelevnatQuestions(),
-			self::CALCULATED_SCORE => $quizUserEntry->getCalculatedScore()
+			self::CALCULATED_SCORE => self::normalizeScore($quizUserEntry->getCalculatedScore())
 		);
 		if ($quizUserEntry->getkuser())
 		{
@@ -93,6 +93,11 @@ class kQuizManager implements kObjectChangedEventConsumer
 			}
 		}
 		return $contents;
+	}
+	
+	protected static function normalizeScore($score)
+	{
+		return (round($score, 0 , PHP_ROUND_HALF_UP) * 100);
 	}
 	
 }
