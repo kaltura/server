@@ -6,7 +6,7 @@
 Add EP User Analytics role on partner 0
 
 ### Scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_03_03_create_ep_user_analytics_role_on_partner_0.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_3_3_create_ep_user_analytics_role_on_partner_0.php
 
 ## New Game plugin ##
 * Issue Type: Task
