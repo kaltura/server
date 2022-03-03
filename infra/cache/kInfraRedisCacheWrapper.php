@@ -325,7 +325,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		}
 
 		$connTook = microtime(true) - $connStart;
-		self::safeLog("Connection took {$connTook} seconds to {$this->hostName}:{$this->port} - Number of attempts: {$this->connectAttempts}");
+		self::safeLog("connect took {$connTook} seconds to {$this->hostName}:{$this->port} - number of attempts: {$this->connectAttempts}");
 
 		$this->updateStats(self::STAT_CONN, array(
 			self::STAT_COUNT => 1,
