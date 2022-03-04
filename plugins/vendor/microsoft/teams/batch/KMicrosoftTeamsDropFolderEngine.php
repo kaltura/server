@@ -82,6 +82,15 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			list ($userId, $driveLastPageUrl) = $line;
 			KalturaLog::info("Handling drive for user ID: $userId, drive URL: $driveLastPageUrl");
 			$items = $this->graphClient->sendGraphRequest($driveLastPageUrl);
+			if (!$items)
+			{
+				KalturaLog::info('Graph request could not be completed. This drive URL will be retried on the next iteration of this file.');
+				$newDriveUrlAssoc[] = array($userId, $driveLastPageUrl);
+				$line = fgetcsv($drivesFileHandle);
+
+				continue;
+			}
+
 			foreach ($items[MicrosoftGraphFieldNames::VALUE] as $item)
 			{
 				if (isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]))
@@ -135,6 +144,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			{
 				$nextLink = $items['@odata.deltaLink'];
 			}
+
 			KalturaLog::info("Next page for user $userId: $nextLink");
 			$newDriveUrlAssoc[] = array($userId, $nextLink);
 			$line = fgetcsv($drivesFileHandle);
