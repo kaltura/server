@@ -167,7 +167,7 @@ function getUserUpdates($updatedAt)
 	foreach ($rows as $row)
 	{
 		$status = $row['STATUS'];
-		if ($status != KuserStatus::ACTIVE)
+		if (!in_array($status , array(KuserStatus::ACTIVE, KuserStatus::BLOCKED)))
 		{
 			continue;
 		}
