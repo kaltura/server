@@ -106,8 +106,8 @@ class PartnerService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 
-		$blockedCountriesList = kConf::getArrayValue("blockedRegistration",partner::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, "");
-		if(!myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, null) && $partner->isSelfServe)
+		$blockedCountriesList = kConf::getArrayValue( "blockedRegistration", partner::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, "");
+		if($partner->isSelfServe && !myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, null) )
 		{
 			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, "Action is temporary blocked from this country");
 		}
