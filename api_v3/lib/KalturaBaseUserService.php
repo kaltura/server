@@ -182,7 +182,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * 
 	 * @param string $puserId
 	 * @param string $loginEmail
-	 * @param string $password
+	 * @param array $password
 	 * @param int $partnerId
 	 * @param int $expiry
 	 * @param string $privileges
@@ -199,7 +199,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @throws KalturaErrors::USER_IS_BLOCKED
 	 * @throws KalturaErrors::DIRECT_LOGIN_BLOCKED
 	 */		
-	protected function loginImpl($puserId, $loginEmail, $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
+	protected function loginImpl($puserId, $loginEmail, array $password, $partnerId = null, $expiry = 86400, $privileges = '*', $otp = null)
 	{
 		KalturaResponseCacher::disableCache();
 		myPartnerUtils::resetPartnerFilter('kuser');

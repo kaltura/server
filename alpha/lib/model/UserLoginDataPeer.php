@@ -468,7 +468,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 	
 	// user login by user_login_data record id
-	public static function userLoginByDataId($loginDataId, $password, $partnerId = null)
+	public static function userLoginByDataId($loginDataId, array $password, $partnerId = null)
 	{
 		$loginData = self::retrieveByPK($loginDataId);
 		if (!$loginData) {
@@ -479,7 +479,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 	
 	// user login by login_email
-	public static function userLoginByEmail($email, $password, $partnerId = null, $otp = null)
+	public static function userLoginByEmail($email, array $password, $partnerId = null, $otp = null)
 	{
 		$loginData = self::getByEmail($email);
 		if (!$loginData) {
@@ -528,7 +528,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 
 	// user login by user_login_data object
-	private static function userLogin(UserLoginData $loginData = null, $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
+	private static function userLogin(UserLoginData $loginData = null, array $password, $partnerId = null, $validatePassword = true, $otp = null, $validateOtp = true)
 	{
 		$requestedPartner = $partnerId;
 		$kuser = null;

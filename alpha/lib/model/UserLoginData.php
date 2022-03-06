@@ -48,9 +48,9 @@ class UserLoginData extends BaseUserLoginData{
 	} 
 	
 	
-	public function isPasswordValid($password_to_match)
+	public function isPasswordValid(array $password_to_match)
 	{
-		return sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password() ;
+		return sha1( $this->getSalt().$password_to_match[0] ) === $this->getSha1Password() ;
 	}
 	
 	

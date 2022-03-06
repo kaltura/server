@@ -402,11 +402,11 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 
 	/**
 	 * @param string $email
-	 * @param string $password
+	 * @param array $password
 	 * @param int $partnerId
 	 * @return kuser
 	 */
-	public static function userLogin($puserId, $password, $partnerId)
+	public static function userLogin($puserId, array $password, $partnerId)
 	{
 		$kuser = self::getKuserByPartnerAndUid($partnerId , $puserId);
 		if (!$kuser) {
