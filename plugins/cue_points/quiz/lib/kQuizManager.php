@@ -97,7 +97,7 @@ class kQuizManager implements kObjectChangedEventConsumer
 	
 	protected static function normalizeScore($score)
 	{
-		return (round($score, 0 , PHP_ROUND_HALF_UP) * 100);
+		return round($score * 100, 0 , PHP_ROUND_HALF_UP);
 	}
 	
 }
