@@ -477,6 +477,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'mothly_bandwidth_combined')))
 		));
 		
+		$this->addElement('text', 'partner_level_allowed_domains', array(
+			'label'			=> 'Partner level allowed domains:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'excluded_admin_role_name', array(
 			'label'			=> 'Excluded administrative (KMC) User Role name:',
 			'filters'		=> array('StringTrim'),
@@ -1063,7 +1068,9 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
-									'excluded_admin_role_name'
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
@@ -1089,7 +1096,10 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max')
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
+									'partner_level_allowed_domains',
+									'excluded_admin_role_name',
+									)
 									, $dynamicLimitTypes, array('crossLine')), 'includedUsageSecondPart');
 
 		$this->addDisplayGroup(
