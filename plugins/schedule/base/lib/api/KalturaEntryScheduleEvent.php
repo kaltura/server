@@ -59,8 +59,8 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 
 		if ($this->templateEntryId && $this->recurrenceType === KalturaScheduleEventRecurrenceType::NONE)
 		{
-			$events = ScheduleEventPeer::retrieveOtherEvents($this->templateEntryId, $startDate, $endDate, array($this->id));
-
+			$eventIdsToIgnore = array_merge(array($this->id) , array_filter(explode(',', $this->linkedBy)));
+			$events = ScheduleEventPeer::retrieveOtherEvents($this->templateEntryId, $startDate, $endDate, $eventIdsToIgnore);
 			if ($events)
 			{
 				throw new KalturaAPIException(KalturaScheduleErrors::SCHEDULE_TIME_IN_USE);
