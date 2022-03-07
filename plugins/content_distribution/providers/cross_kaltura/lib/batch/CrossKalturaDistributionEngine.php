@@ -43,6 +43,12 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 */
 	protected $distributeCuePoints = false;
 
+	/**
+	 * Should distribute quiz ?
+	 * @var bool
+	 */
+	protected $distributeQuiz = false;
+
 
 	/**
 	 * Will hold the target entry ID once created
@@ -76,6 +82,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		$this->targetClient = null;
 		$this->distributeCaptions = false;
 		$this->distributeCuePoints = false;
+		$this->distributeQuiz = false;
 		$this->mapAccessControlIds = array();
 		$this->mapConversionProfileIds = array();
 		$this->mapMetadataProfileIds = array();
@@ -163,13 +170,18 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			}
 		}
 
-		// check if should distribute cue points
+		// check if should distribute cue points and quiz
 		$this->distributeCuePoints = false;
+		$this->distributeQuiz = false;
 		if ($distributionProfile->distributeCuePoints == true)
 		{
 			if (class_exists('CuePointPlugin') && class_exists('KalturaCuePointClientPlugin') && KalturaPluginManager::getPluginInstance(CuePointPlugin::getPluginName()))
 			{
 				$this->distributeCuePoints = true;
+				if (class_exists('QuizPlugin') && class_exists('KalturaQuizClientPlugin') && KalturaPluginManager::getPluginInstance(QuizPlugin::getPluginName()))
+				{
+					$this->distributeQuiz = true;
+				}
 			}
 			else
 			{
@@ -351,6 +363,21 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			$captionAssetsContent[$captionAsset->id] = $this->getAssetContentResource($captionAsset->id, $captionAssetClient->captionAsset, $remoteCaptionAssetContent);
 		}
 
+		// get quiz
+		$quiz = null;
+		if ($this->distributeQuiz == true)
+		{
+			try
+			{
+				$quizClient = KalturaQuizClientPlugin::get($client);
+				$quiz = $this->getQuizByEntryId($quizClient->quiz, $entryId);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err('Cannot get quiz - '.$e->getMessage());
+				throw $e;
+			}
+		}
 
 		// get entry's cue points
 		$cuePoints = array();
@@ -391,6 +418,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		$entryObjects->captionAssetsContent = $captionAssetsContent;
 		$entryObjects->cuePoints = $cuePoints;
 		$entryObjects->thumbCuePoints = $thumbCuePoints;
+		$entryObjects->quiz = $quiz;
 
 		return $entryObjects;
 	}
@@ -934,6 +962,25 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		}
 	}
 
+	protected function syncTargetQuiz(KalturaServiceBase $targetClientService, $quizObject, $targetEntryId)
+	{
+		$quiz = $this->getQuizByEntryId($targetClientService, $targetEntryId);
+		$args = array($targetEntryId, $quizObject);
+
+		if (is_null($quiz))
+		{
+			// add quiz
+			KalturaLog::info('Adding target quiz for entry id ['.$targetEntryId.']');
+			return call_user_func_array(array($targetClientService, 'add'), $args);
+		}
+		else
+		{
+			// update quiz
+			KalturaLog::info('Updating target quiz for entry id ['.$targetEntryId.']');
+			return call_user_func_array(array($targetClientService, 'update'), $args);
+		}
+	}
+
 	/**
 	 * Sync target objects
 	 * @param KalturaDistributionJobData $jobData
@@ -1034,6 +1081,17 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		// sync cue points
 		if ($this->distributeCuePoints)
 		{
+			// sync quiz
+			if ($this->distributeQuiz && !is_null($this->sourceObjects->quiz))
+			{
+				$targetQuizClient = KalturaQuizClientPlugin::get($this->targetClient);
+				$syncedObjects->quiz = $this->syncTargetQuiz(
+					$targetQuizClient->quiz,
+					$this->sourceObjects->quiz,
+					$targetEntryId
+				);
+			}
+
 			foreach ($targetObjects->cuePoints as $cuePoint)
 			{
 				/* @var $cuePoint KalturaCuePoint */
@@ -1325,6 +1383,22 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	function log($message)
 	{
 		KalturaLog::log($message);
+	}
+
+	protected function getQuizByEntryId(KalturaServiceBase $targetClientService, $entryId)
+	{
+		$quizFilter = new KalturaQuizFilter();
+		$quizPager = new KalturaFilterPager();
+		$quizFilter->entryIdEqual = $entryId;
+		$quizList = $targetClientService->listAction($quizFilter, $quizPager);
+		$quizObjects = $quizList->objects;
+
+		if(is_array($quizObjects) && count($quizObjects) > 0)
+		{
+			return $quizObjects[0];
+		}
+
+		return null;
 	}
 
 }

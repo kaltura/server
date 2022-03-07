@@ -6,16 +6,25 @@
 
 class kResizeLiveEntryAdapter extends kBaseResizeAdapter
 {
-	public function resizeEntryImage($params)
+	/**
+	 * @return string
+	 * @throws kThumbnailException
+	 */
+	public function resize()
 	{
 		$entry = $this->parameters->get(kThumbFactoryFieldName::ENTRY);
 		$dc = myEntryUtils::getLiveEntryDcId($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY);
+		if($dc === null)
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE);
+		}
+		
 		if ($dc != kDataCenterMgr::getCurrentDcId ())
 		{
 			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($dc));
 		}
 
-		return parent::resizeEntryImage($params);
+		return parent::resize();
 	}
 
 	protected function getEntryLengthInMS()

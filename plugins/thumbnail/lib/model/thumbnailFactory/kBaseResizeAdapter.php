@@ -160,7 +160,7 @@ class kBaseResizeAdapter
 	{
 		return $this->parameters->get(kThumbFactoryFieldName::ENTRY);
 	}
-
+	
 	/**
 	 * @param $params kThumbAdapterParameters
 	 * @return string
@@ -169,6 +169,15 @@ class kBaseResizeAdapter
 	public function resizeEntryImage($params)
 	{
 		$this->parameters = $params;
+		return $this->resize();
+	}
+	
+	/**
+	 * @return string
+	 * @throws kThumbnailException
+	 */
+	public function resize()
+	{
 		$contentPath = myContentStorage::getFSContentRootPath();
 		$this->calculateThumbName();
 		$this->calculateThumbFileName();

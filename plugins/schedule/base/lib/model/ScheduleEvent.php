@@ -385,7 +385,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 
 	public function getResourceSystemNamesForIndex()
 	{
-		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($this->getId());
+		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($this->getId(), $this->getPartnerId());
 
 		$resourceIds = array();
 		$system_names = array();
