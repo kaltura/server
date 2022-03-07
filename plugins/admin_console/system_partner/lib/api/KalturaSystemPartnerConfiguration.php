@@ -814,7 +814,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		else
 		{
-			$object_to_fill->setPasswordStructureValidations(null);
+			KalturaLog::log('danielBarak - ' . $object_to_fill->getPasswordStructureValidations());
+//			$object_to_fill->setPasswordStructureValidations(null);
 		}
 		
 		if(!is_null($this->secondarySecretRoleId))
@@ -832,7 +833,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		else
 		{
-			$object_to_fill->setExcludedAdminRoleName(null);
+			KalturaLog::log('danielBarak - ' . $object_to_fill->getExcludedAdminRoleName());
+//			$object_to_fill->setExcludedAdminRoleName(null);
 		}
 		KalturaLog::log('danielBarak - new partner excluded admin role name: ' . $object_to_fill->getExcludedAdminRoleName());
 		
