@@ -469,7 +469,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $partnerLevelAllowedDomains;
+	public $allowedDomains;
 	
 	/**
 	 * @var int
@@ -585,7 +585,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
 		'excludedAdminRoleName',
-		'partnerLevelAllowedDomains',
+		'allowedDomains',
 		'trigramPercentage',
 		'maxWordForNgram',
 		'twoFactorAuthenticationMode',
@@ -838,13 +838,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			$object_to_fill->setExcludedAdminRoleName(null);
 		}
-		if(!is_null($this->partnerLevelAllowedDomains))
+		if(!is_null($this->allowedDomains))
 		{
-			$object_to_fill->setPartnerLevelAllowedDomains($this->partnerLevelAllowedDomains);
+			$object_to_fill->setAllowedDomains($this->allowedDomains);
 		}
 		else
 		{
-			$object_to_fill->setPartnerLevelAllowedDomains(null);//should be handled like fix in PLAT-23622
+			$object_to_fill->setAllowedDomains(null);
 		}
 		
 		return $object_to_fill;

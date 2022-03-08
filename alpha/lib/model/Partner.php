@@ -99,7 +99,7 @@ class Partner extends BasePartner
 	
 	const EXCLUDED_ADMIN_ROLE_NAME = 'excluded_admin_role_name';
 	
-	const PARTNER_LEVEL_ALLOWED_DOMAINS = 'partner_level_allowed_domains';
+	const ALLOWED_DOMAINS = 'allowed_domains';
 	
 	const TRIGRAM_PERCENTAGE = 'trigram_percentage';
 	
@@ -1132,11 +1132,11 @@ class Partner extends BasePartner
 	public function setInitialPasswordSet($v)			{$this->putInCustomData('initial_password_set', $v);}
 	public function setMarketoCampaignId($v)			{$this->putInCustomData('marketo_campaign_id', $v);}
 	public function setExcludedAdminRoleName($v)			{$this->putInCustomData(self::EXCLUDED_ADMIN_ROLE_NAME, $v);}
-	public function setPartnerLevelAllowedDomains($v)		{$this->putInCustomData(self::PARTNER_LEVEL_ALLOWED_DOMAINS,$v);}
+	public function setAllowedDomains($v)		{$this->putInCustomData(self::ALLOWED_DOMAINS,$v);}
 
 	public function getLoginUsersQuota()				{return $this->getFromCustomData('login_users_quota', null, 0);}
 	public function getExcludedAdminRoleName()			{return $this->getFromCustomData(self::EXCLUDED_ADMIN_ROLE_NAME, null, 0);}
-	public function getPartnerLevelAllowedDomains()		{return $this->getFromCustomData(self::PARTNER_LEVEL_ALLOWED_DOMAINS,null,0);}
+	public function getAllowedDomains()  				{return $this->getFromCustomData(self::ALLOWED_DOMAINS,null,0);}
 	public function getAdminLoginUsersQuota()			{return $this->getFromCustomData('admin_login_users_quota', null, 3);}
 	public function getPublishersQuota()				{return $this->getFromCustomData('publishers_quota', null, 0);}
 	public function getBandwidthQuota()					{return $this->getFromCustomData('bandwidth_quota', null, 0);}

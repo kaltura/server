@@ -477,11 +477,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'mothly_bandwidth_combined')))
 		));
 		
-		$this->addElement('text', 'partner_level_allowed_domains', array(
-			'label'			=> 'Partner level allowed domains:',
-			'filters'		=> array('StringTrim'),
-		));
-		
 		$this->addElement('text', 'excluded_admin_role_name', array(
 			'label'			=> 'Excluded administrative (KMC) User Role name:',
 			'filters'		=> array('StringTrim'),
@@ -515,6 +510,11 @@ class Form_PartnerConfiguration extends Infra_Form
 
 		$this->addElement('text', 'cdn_host_white_list', array(
 			'label'			=> 'CDN Host white list regex (comma seperated)',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'allowed_domains', array(
+			'label'			=> 'Allowed domains:',
 			'filters'		=> array('StringTrim'),
 		));
 
@@ -1097,7 +1097,6 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
-									'partner_level_allowed_domains',
 									'excluded_admin_role_name',
 									)
 									, $dynamicLimitTypes, array('crossLine')), 'includedUsageSecondPart');
@@ -1110,7 +1109,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			array('legend' => 'Live Stream Config')
 		);
 		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour','allowed_domains'), array('crossLine')), 'htmlPurifierBehaviour');
 
 		$this->addDisplayGroup(
 			array_merge(
