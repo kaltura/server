@@ -1108,8 +1108,8 @@ class Form_PartnerConfiguration extends Infra_Form
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
 		);
-		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour','allowed_domains'), array('crossLine')), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array('allowed_domains','cdn_host_white_list'), 'cdnHostWhiteList');
+		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
 
 		$this->addDisplayGroup(
 			array_merge(
