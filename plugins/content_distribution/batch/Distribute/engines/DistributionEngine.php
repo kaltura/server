@@ -84,7 +84,7 @@ abstract class DistributionEngine implements IDistributionEngine
 		
 		try
 		{
-			KBatchBase::impersonate($entryDistribution->partnerId);
+			KBatchBase::impersonate($partnerId);
 			$flavorAssetsList = KBatchBase::$kClient->flavorAsset->listAction($filter);
 			KBatchBase::unimpersonate();
 		}
