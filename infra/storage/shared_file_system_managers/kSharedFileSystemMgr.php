@@ -516,6 +516,11 @@ abstract class kSharedFileSystemMgr
 			return $this->doMoveLocalToShared($from, $to, !$deleteSrc);
 		}
 		
+		if (!$deleteSrc)
+		{
+			return $this->doCopySingleFile($from, $to, $deleteSrc);
+		}
+		
 		return $this->doRename($from, $to);
 	}
 	
