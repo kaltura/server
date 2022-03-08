@@ -580,7 +580,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 
 		$this->addElement('checkbox', 'block_direct_login', array(
-			'label'	  => 'Block direct login',
+			'label'	  => 'Block direct login for SSO users',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
 		

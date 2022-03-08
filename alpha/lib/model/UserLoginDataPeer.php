@@ -522,7 +522,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('Invalid partner id ['.$requestedPartnerId.']', kUserException::INVALID_PARTNER);
 		}
-		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner);
+		self::verifyAuthenticatedPartnerSwitch($partner, $requestedPartner, $kuser);
 			
 		return self::userLogin($kuser->getLoginData(), null, $requestedPartnerId, false, null, false);  // don't validate password
 	}
@@ -574,10 +574,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			throw new kUserException('', kUserException::INVALID_PARTNER);
 		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 
 		if($partner && $partner->getBlockDirectLogin())
 		{
-			throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
+			if(!$kuser || ($kuser && !$kuser->getIsSsoExcluded()))
+			{
+				throw new kUserException('Direct login is blocked', kUserException::DIRECT_LOGIN_BLOCKED);
+			}
 		}
 		if($validateOtp && $partner && $partner->getUseTwoFactorAuthentication())
 		{
@@ -586,7 +590,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		if($otpRequired && $partner->getTwoFactorAuthenticationMode() != TwoFactorAuthenticationMode::ALL)
 		{
-			$kuser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $partnerId);
 			if ($kuser)
 			{
 				if($partner->getTwoFactorAuthenticationMode()==TwoFactorAuthenticationMode::ADMIN_USERS_ONLY)
@@ -992,9 +995,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	}
 
 
-	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner)
+	protected static function verifyAuthenticatedPartnerSwitch($originPartner, $requestedPartner, $kuser)
 	{
-		$originPartnerAuthType = $originPartner->getAuthenticationType();
+		$originPartnerAuthType = kuserPeer::getAuthenticationType($kuser,$originPartner);
 		$requestedPartnerAuthType = $requestedPartner->getAuthenticationType();
 		if ($requestedPartnerAuthType === PartnerAuthenticationType::SSO)
 		{
