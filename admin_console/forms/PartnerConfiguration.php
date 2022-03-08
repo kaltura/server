@@ -512,6 +512,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'CDN Host white list regex (comma seperated)',
 			'filters'		=> array('StringTrim'),
 		));
+		
+		$this->addElement('text', 'allowed_domains', array(
+			'label'			=> 'Allowed domains:',
+			'filters'		=> array('StringTrim'),
+		));
 
 
 		//--------------- HTML purifier behaviour ----------------------------
@@ -1063,7 +1068,9 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
-									'excluded_admin_role_name'
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
 									), 'configureKmcUsers');
 
 		$dynamicLimitTypes = array();
@@ -1089,7 +1096,9 @@ class Form_PartnerConfiguration extends Infra_Form
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max')
+									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
+									'excluded_admin_role_name',
+									)
 									, $dynamicLimitTypes, array('crossLine')), 'includedUsageSecondPart');
 
 		$this->addDisplayGroup(
@@ -1099,7 +1108,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
 		);
-		$this->addDisplayGroup(array('cdn_host_white_list'), 'cdnHostWhiteList');
+		$this->addDisplayGroup(array('allowed_domains','cdn_host_white_list'), 'cdnHostWhiteList');
 		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
 
 		$this->addDisplayGroup(
