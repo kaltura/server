@@ -63,17 +63,8 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 			return null;
 		}
 		
-		if (isset($redisConfig['scheme']) && $redisConfig['scheme'])
-		{
-			$scheme = array('verify_peer' => true);
-		}
-		else
-		{
-			$scheme = array('verify_peer' => false);
-		}
-		
 		$config = array('host' => $redisConfig['host'], 'port' => $redisConfig['port'], 'timeout' => floatval($redisConfig['timeout']),
-			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent'], 'password' => $redisConfig['password'], 'scheme' => $scheme);
+			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent'], 'password' => $redisConfig['password'], 'scheme' => $redisConfig['scheme']);
 		
 		$redisWrapper->init($config);
 		return $redisWrapper;
