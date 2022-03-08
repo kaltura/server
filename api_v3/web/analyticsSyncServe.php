@@ -343,7 +343,7 @@ function getUserGroupsUpdates($updatedAt)
 	$stmt = KuserKgroupPeer::doSelectStmt($c);
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	// update the categories (a user that wasn't fetched in the second query will remain empty)
+	// update user's groups (a user that wasn't fetched in the second query will remain empty)
 	foreach ($rows as $row)
 	{
 		$puserId = $row['PUSER_ID'];
