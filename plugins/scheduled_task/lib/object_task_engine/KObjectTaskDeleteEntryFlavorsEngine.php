@@ -195,19 +195,16 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			return true;
 		}
 		
-		$staticContentAdminTags = $this->getStaticContentAdminTagsArr($object->partnerId);
+		$staticContentAdminTags = $this->getStaticContentAdminTagsArr();
 		$adminTags = explode(',', $object->adminTags);
 		
 		return count(array_intersect($staticContentAdminTags, $adminTags));
 	}
 	
-	protected function getStaticContentAdminTagsArr($partnerId)
+	protected function getStaticContentAdminTagsArr()
 	{
-		$this->unimpersonate();
-		$runtimeConfMap = kBatchUtils::getConfigMap('runtime_config');
-		$this->impersonate($partnerId);
-		
-		return isset($runtimeConfMap['staticContentAdminTags']) ? $runtimeConfMap['staticContentAdminTags'] : array(
+		// Until kBatchUtils::tryLoadKconfConfig is enhanced to support caching all params - we return a static list
+		return array(
 			'kalturaclassroom',
 			'zoomentry',
 			'kalturameeting',
