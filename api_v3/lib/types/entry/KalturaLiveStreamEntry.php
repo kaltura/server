@@ -249,6 +249,11 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		{
 			$this->streamPassword = LiveStreamEntry::generateStreamPassword();
 		}
+
+		if ($this->srtPass && strlen(trim($this->srtPass)) < kConf::get('srt_pass_min_length', kConfMapNames::LIVE_SETTINGS, 3))
+		{
+			throw new KalturaAPIException(KalturaErrors::SRT_PASS_TOO_SHORT);
+		}
 	
 		return parent::toInsertableObject($dbObject, $props_to_skip);
 	}

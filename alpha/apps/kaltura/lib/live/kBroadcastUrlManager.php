@@ -252,7 +252,7 @@ class kBroadcastUrlManager
 	{
 		$key = KConf::get('live_security_key', kConfMapNames::LIVE_SETTINGS, 'klive');
 		$iv = KConf::get('stream_id_security_key', kConfMapNames::LIVE_SETTINGS, '');
-		$data = $entry->getStreamPassword() . '|' . $entry->getSrtPass();
+		$data = $entry->getSrtPass();
 
 		$encryptedToken = OpenSSLWrapper::encrypt_aes($data, $key, $iv);
 		return base64_encode($encryptedToken);

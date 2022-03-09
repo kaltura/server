@@ -172,7 +172,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		
 		/* @var $dbEntry LiveStreamEntry */
-		if ($dbEntry->getStreamPassword() != $token)
+		if ($dbEntry->getStreamPassword() != $token && (empty($dbEntry->getSrtPass()) || $dbEntry->getSrtPass() != $token))
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
 		/*
