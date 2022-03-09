@@ -13,6 +13,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	protected $timeout;
 	protected $statsKey;
 	protected $password;
+	protected $scheme;
 
 	protected $redis = null;
 	protected $gotError = false;
@@ -37,21 +38,33 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 			self::safeLog('Redis class doesnt exists, cant connect without it');
 			return false;
 		}
-
-		if (!isset($config['host']) || !isset($config['port']))
+		
+		if (isset($config['cluster']) && $config['cluster'])
+		{
+			$this->cluster = true;
+		}
+		
+		if (!isset($config['host']) || (!$this->cluster && !isset($config['port'])))
 		{
 			self::safeLog('Missing host or port in config, cant connect without it');
 			return false;
 		}
-
+		
 		$this->hostName = $config['host'];
 		$this->port = $config['port'];
 		$this->timeout = $config['timeout'];
-		if (isset($config['persistent']) && $config['persistent'])
-			$this->persistent = true;
-		if (isset($config['cluster']) && $config['cluster'])
-			$this->cluster = true;
 		$this->password = $config['password'];
+		
+		$this->scheme = null;
+		if (isset($redisConfig['scheme']) && $redisConfig['scheme'])
+		{
+			$this->scheme = array('verify_peer' => true);
+		}
+		
+		if (isset($config['persistent']) && $config['persistent'])
+		{
+			$this->persistent = true;
+		}
 		
 		return $this->reconnect();
 	}
@@ -239,6 +252,18 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		$this->gotError = true;
 		return false;
 	}
+	
+	protected function getFormattedHost()
+	{
+		if ($this->cluster)
+		{
+			return $this->hostName;
+		}
+		else
+		{
+			return $this->hostName. ':' . $this->port;
+		}
+	}
 
 	protected function callAndDetectErrors($methodName, $params)
 	{
@@ -307,7 +332,17 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 				}
 				else
 				{
-					$redis = new RedisCluster(null, array($this->hostName.':'.$this->port), $this->timeout, $this->timeout, $this->persistent, $this->password);
+					// In Cluster mode we can have multiple hosts: 127.0.0.1:7000,201.100.0.3000:8000, ...
+					$hosts = explode(',', $this->hostName);
+					
+					if ($this->scheme)
+					{
+						$redis = new RedisCluster(null, $hosts, $this->timeout, $this->timeout, $this->persistent, $this->password, $this->scheme);
+					}
+					else
+					{
+						$redis = new RedisCluster(null, $hosts, $this->timeout, $this->timeout, $this->persistent, $this->password);
+					}
 					
 					//There is no isConnected in cluster mode so we need to verify the object is not null to make sure the connection was successful.
 					$connectResult = $redis ? true : false;
@@ -325,7 +360,9 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		}
 
 		$connTook = microtime(true) - $connStart;
-		self::safeLog("connect took {$connTook} seconds to {$this->hostName}:{$this->port} - number of attempts: {$this->connectAttempts}");
+		
+		$formattedHost = $this->getFormattedHost();
+		self::safeLog("connect took {$connTook} seconds to $formattedHost - number of attempts: {$this->connectAttempts}");
 
 		$this->updateStats(self::STAT_CONN, array(
 			self::STAT_COUNT => 1,
