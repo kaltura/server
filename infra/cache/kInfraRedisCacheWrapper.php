@@ -55,13 +55,10 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		$this->timeout = $config['timeout'];
 		$this->password = $config['password'];
 		
+		$this->scheme = null;
 		if (isset($redisConfig['scheme']) && $redisConfig['scheme'])
 		{
 			$this->scheme = array('verify_peer' => true);
-		}
-		else
-		{
-			$this->scheme = null;
 		}
 		
 		if (isset($config['persistent']) && $config['persistent'])
@@ -335,8 +332,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 				}
 				else
 				{
-					// In Cluster mode we can have multiple hosts
-					// 127.0.0.1:7000,201.100.0.3000:8000, ...
+					// In Cluster mode we can have multiple hosts: 127.0.0.1:7000,201.100.0.3000:8000, ...
 					$hosts = explode(',', $this->hostName);
 					
 					if ($this->scheme)
