@@ -50,11 +50,13 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $primaryRtspBroadcastingUrl;
 	
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $secondaryRtspBroadcastingUrl;
 
