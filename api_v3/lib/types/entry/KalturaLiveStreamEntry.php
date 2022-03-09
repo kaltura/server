@@ -57,6 +57,26 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 * @var string
 	 */
 	public $secondaryRtspBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $primarySrtBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $primarySrtStreamId;
+
+	/**
+	 * @var string
+	 */
+	public $secondarySrtBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $secondarySrtStreamId;
 	
 	/**
 	 * @var string
@@ -114,6 +134,11 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 * @readonly
 	 */
 	public $streamUsername;
+
+	/**
+	 * @var string
+	 */
+	public $srtPass;
 	
 	/**
 	 * The Streams primary server node id 
@@ -145,6 +170,10 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"secondarySecuredBroadcastingUrl",
 		"primaryRtspBroadcastingUrl",
 		"secondaryRtspBroadcastingUrl",
+		"primarySrtBroadcastingUrl",
+		"secondarySrtBroadcastingUrl",
+		"primarySrtStreamId",
+		"secondarySrtStreamId",
 		"streamName",
 		"streamUrl",
 	    "hlsStreamUrl",
@@ -152,6 +181,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"encodingIP2",
 		"streamPassword",
 		"streamUsername",
+		"srtPass",
 		"bitrates" => "streamBitrates",
 		"primaryServerNodeId",
 		"sipToken",
@@ -193,6 +223,11 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->secondarySecuredBroadcastingUrl = null;
 			$this->primaryRtspBroadcastingUrl = null;
 			$this->secondaryRtspBroadcastingUrl = null;
+			$this->primarySrtBroadcastingUrl = null;
+			$this->primarySrtStreamId = null;
+			$this->secondarySrtBroadcastingUrl = null;
+			$this->secondarySrtStreamId = null;
+			$this->srtPass = null;
 		}
 		parent::doFromObject($dbObject, $responseProfile);
 	}

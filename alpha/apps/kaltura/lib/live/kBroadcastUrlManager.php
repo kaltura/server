@@ -8,10 +8,12 @@ class kBroadcastUrlManager
 	const DEFAULT_PORT_RTMP = 1935;
 	const DEFAULT_PORT_RTSP = 554;
 	const DEFAULT_PORT_RTMPS = 443;
+	const DEFAULT_PORT_SRT = 7045;
 	
 	const PROTOCOL_RTMP = 'rtmp';
 	const PROTOCOL_RTSP = 'rtsp';
 	const PROTOCOL_RTMPS = 'rtmps';
+	const PROTOCOL_SRT = 'srt';
 
 	const RTMP_DOMAIN = 'domain';
 	const RTMP_PORT = 'port';
@@ -20,6 +22,9 @@ class kBroadcastUrlManager
 	const RTSP_PORT = 'rtsp_port';
 
 	const RTMPS_PORT = 'rtmps_port';
+
+	const SRT_DOMAIN = 'srt_domain';
+	const SRT_PORT = 'srt_port';
 
 	
 	protected $partnerId;
@@ -109,11 +114,20 @@ class kBroadcastUrlManager
 	
 	protected function getPort($dc, $portParam, $protocol)
 	{
-		$port = kBroadcastUrlManager::DEFAULT_PORT_RTMP;
-		if($protocol == kBroadcastUrlManager::PROTOCOL_RTSP)
-			$port = kBroadcastUrlManager::DEFAULT_PORT_RTSP;
-		if($protocol == kBroadcastUrlManager::PROTOCOL_RTMPS)
-			$port = kBroadcastUrlManager::DEFAULT_PORT_RTMPS;
+		switch ($protocol)
+		{
+			case kBroadcastUrlManager::PROTOCOL_RTSP:
+				$port = kBroadcastUrlManager::DEFAULT_PORT_RTSP;
+				break;
+			case kBroadcastUrlManager::PROTOCOL_RTMPS:
+				$port = kBroadcastUrlManager::DEFAULT_PORT_RTMPS;
+				break;
+			case kBroadcastUrlManager::PROTOCOL_SRT:
+				$port = kBroadcastUrlManager::DEFAULT_PORT_SRT;
+				break;
+			default:
+				$port = kBroadcastUrlManager::DEFAULT_PORT_RTMP;
+		}
 	
 		$broadcastConfig = $this->getConfiguration();	
 		if(isset($broadcastConfig[$portParam]))
@@ -174,7 +188,7 @@ class kBroadcastUrlManager
 		return http_build_query($queryParams);
 	}
 	
-	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex, $concatStreamName = false)
+	protected function getBroadcastUrl(LiveStreamEntry $entry, $protocol, $hostname, $mediaServerIndex)
 	{
 		if (!$hostname)
 		{
@@ -185,42 +199,80 @@ class kBroadcastUrlManager
 			$this->useOldUrlPattern = true;
 		
 		$url = "$protocol://$hostname";
-		$url .= $concatStreamName ? "/" . $entry->getId() . '_%i' : '';
-		$paramsStr = $this->getQueryParams($entry, $mediaServerIndex);
+		if ($protocol == kBroadcastUrlManager::PROTOCOL_RTSP)
+		{
+			$url .= "/" . $entry->getId() . '_%i';
+		}
+		if ($protocol != kBroadcastUrlManager::PROTOCOL_SRT)
+		{
+			$paramsStr = $this->getQueryParams($entry, $mediaServerIndex);
+			$url .= ($this->useOldUrlPattern ? "/" : "") . "?$paramsStr";
+		}
 		
-		return "$url" . ($this->useOldUrlPattern ? "/" : "") . "?$paramsStr";
+		return $url;
 	}
 
 	public static function getUrlParamsByProtocol($protocol)
 	{
-		if($protocol == kBroadcastUrlManager::PROTOCOL_RTMP)
-			return array(kBroadcastUrlManager::RTMP_DOMAIN, kBroadcastUrlManager::RTMP_PORT);
-		if($protocol == kBroadcastUrlManager::PROTOCOL_RTMPS)
-			return array(kBroadcastUrlManager::RTMP_DOMAIN, kBroadcastUrlManager::RTMPS_PORT);
-		if($protocol == kBroadcastUrlManager::PROTOCOL_RTSP)
-			return array(kBroadcastUrlManager::RTSP_DOMAIN, kBroadcastUrlManager::RTSP_PORT);
+		switch ($protocol)
+		{
+			case kBroadcastUrlManager::PROTOCOL_RTMPS:
+				return array(kBroadcastUrlManager::RTMP_DOMAIN, kBroadcastUrlManager::RTMPS_PORT);
+			case kBroadcastUrlManager::PROTOCOL_RTSP:
+				return array(kBroadcastUrlManager::RTSP_DOMAIN, kBroadcastUrlManager::RTSP_PORT);
+			case kBroadcastUrlManager::PROTOCOL_SRT:
+				return array(kBroadcastUrlManager::SRT_DOMAIN, kBroadcastUrlManager::SRT_PORT);
+			default:
+				return array(kBroadcastUrlManager::RTMP_DOMAIN, kBroadcastUrlManager::RTMP_PORT);
+		}
 	}
 
 	public function getPrimaryBroadcastUrl(LiveStreamEntry $entry, $protocol)
 	{
 		$currentDc = kDataCenterMgr::getCurrentDcId();
-		$concatStreamName = ($protocol == kBroadcastUrlManager::PROTOCOL_RTSP);
 		$hostname = $this->getHostName($currentDc, true, $entry, $protocol);
-		return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX, $concatStreamName);
+		return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX);
 	}
 
 	public function getSecondaryBroadcastUrl(LiveStreamEntry $entry, $protocol)
 	{
 		$currentDc = kDataCenterMgr::getCurrentDcId();
 		$configuration = $this->getConfiguration();
-		$concatStreamName = ($protocol == kBroadcastUrlManager::PROTOCOL_RTSP);
 		foreach($configuration as $dc => $config)
 		{
 			if(!is_numeric($dc) || $dc == $currentDc)
 				continue;
 
 			$hostname = $this->getHostName($dc, false, $entry, $protocol);
-			return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX, $concatStreamName);
+			return $this->getBroadcastUrl($entry, $protocol, $hostname, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX);
 		}
+	}
+
+	public function getEncryptedToken(LiveStreamEntry $entry)
+	{
+		$key = KConf::get('live_security_key', kConfMapNames::LIVE_SETTINGS, 'klive');
+		$iv = KConf::get('stream_id_security_key', kConfMapNames::LIVE_SETTINGS, '');
+		$data = $entry->getStreamPassword() . '|' . $entry->getSrtPass();
+
+		$encryptedToken = OpenSSLWrapper::encrypt_aes($data, $key, $iv);
+		return base64_encode($encryptedToken);
+	}
+
+	public function createSrtStreamId(LiveStreamEntry $entry, $sessionIndex)
+	{
+		$streamId = '#:::';
+		$streamId .= 'e=' . $entry->getId() . ',i=' . $sessionIndex . ',in=%i';
+
+		$pass = $entry->getSrtPass();
+		if ($pass)
+		{
+			$streamId .= ',et=' . $this->getEncryptedToken($entry);
+		}
+		else
+		{
+			$streamId .= ',t=' . $entry->getStreamPassword();
+		}
+
+		return $streamId;
 	}
 }
