@@ -270,7 +270,7 @@ class kBroadcastUrlManager
 		}
 		else
 		{
-			$streamId .= ',t=' . $entry->getStreamPassword();
+			$streamId .= ',token=' . $entry->getStreamPassword();
 		}
 
 		return $streamId;
