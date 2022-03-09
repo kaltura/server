@@ -660,8 +660,6 @@ class KalturaErrors extends APIErrors
 
 	const LIVE_CLIPPING_UNSUPPORTED_OPERATION = "LIVE_CLIPPING_UNSUPPORTED_OPERATION;OPERATION; Unsupported operation for live clipping: @OPERATION@";
 
-	const SRT_PASS_TOO_SHORT = "SRT_PASS_TOO_SHORT;FIELD;The SRT passphrase is too short";
-
 	/*
 	 * BaseEntry Service
 	 */
