@@ -248,7 +248,7 @@ class kBroadcastUrlManager
 		}
 	}
 
-	public function getEncryptedToken(LiveStreamEntry $entry)
+	public function getEncryptedSrtPass(LiveStreamEntry $entry)
 	{
 		$key = KConf::get('live_security_key', kConfMapNames::LIVE_SETTINGS, 'klive');
 		$iv = KConf::get('stream_id_security_key', kConfMapNames::LIVE_SETTINGS, '');
@@ -266,7 +266,7 @@ class kBroadcastUrlManager
 		$pass = $entry->getSrtPass();
 		if ($pass)
 		{
-			$streamId .= ',et=' . $this->getEncryptedToken($entry);
+			$streamId .= ',ep=' . $this->getEncryptedSrtPass($entry);
 		}
 		else
 		{
