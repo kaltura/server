@@ -154,12 +154,17 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	protected function paginateResults($pager, $results)
 	{
 		$startRank = ($pager->pageIndex - 1) * $pager->pageSize;
+		if ($startRank < 0)
+		{
+			$startRank = 0;
+		}
+		
 		$endRank = $startRank + $pager->pageSize;
 		
+		$i = 0;
+		$paginatedResults = array();
 		if ($startRank < count($results))
 		{
-			$i = 0;
-			$paginatedResults = array();
 			foreach ($results as $result)
 			{
 				if ($i >= $startRank && $i < $endRank)
@@ -168,10 +173,9 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 				}
 				$i++;
 			}
-			$results = $paginatedResults;
 		}
 		
-		return $results;
+		return $paginatedResults;
 	}
 	
 	/**
