@@ -102,14 +102,15 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 		KalturaLog::debug("Got the following Data from the Configure Form:");
 		KalturaLog::debug(print_r($formData, true));
 
-		if ($form->isValid($formData))
+		$partnerId = $formData['partnerId'];
+
+		if ($mediaRepurposingId && $form->isValid($formData))
 		{
-			$partnerId = $formData['partnerId'];
-			if (!$mediaRepurposingId)
-				MediaRepurposingUtils::createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed);
-			else
-				MediaRepurposingUtils::UpdateMr($mediaRepurposingId, $name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed);
-			return true;
+			MediaRepurposingUtils::UpdateMr($mediaRepurposingId, $name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed);
+		}
+		elseif (!$mediaRepurposingId && $form->isValidForCreate($formData))
+		{
+			MediaRepurposingUtils::createNewMr($name, $filterTypeEngine, $filter, $taskArray, $partnerId, $maxEntriesAllowed);
 		}
 		else
 		{
@@ -118,6 +119,8 @@ class MediaRepurposingConfigureAction extends KalturaApplicationPlugin
 			$form->populate($formData);
 			return false;
 		}
+
+		return true;
 	}
 
 }
