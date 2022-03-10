@@ -142,14 +142,14 @@ class LiveStreamEntry extends LiveEntry
 		return $url;
 	}
 
-	private function getSrtStreamId($customDataParam, $sessionIndex)
+	private function getSrtStreamId($customDataParam, $sessionType)
 	{
 		$streamId = $this->getFromCustomData($customDataParam);
 		if($streamId)
 			return $streamId;
 
 		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
-		$streamId = $manager->createSrtStreamId($this, $sessionIndex);
+		$streamId = $manager->createSrtStreamId($this, $sessionType);
 		return $streamId;
 	}
 

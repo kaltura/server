@@ -258,10 +258,10 @@ class kBroadcastUrlManager
 		return base64_encode($encryptedToken);
 	}
 
-	public function createSrtStreamId(LiveStreamEntry $entry, $sessionIndex)
+	public function createSrtStreamId(LiveStreamEntry $entry, $sessionType)
 	{
 		$streamId = '#:::';
-		$streamId .= 'e=' . $entry->getId() . ',i=' . $sessionIndex . ',in=%i';
+		$streamId .= 'e=' . $entry->getId() . ',st=' . $sessionType;
 
 		$pass = $entry->getSrtPass();
 		if ($pass)
@@ -270,7 +270,7 @@ class kBroadcastUrlManager
 		}
 		else
 		{
-			$streamId .= ',token=' . $entry->getStreamPassword();
+			$streamId .= ',p=' . $entry->getStreamPassword();
 		}
 
 		return $streamId;
