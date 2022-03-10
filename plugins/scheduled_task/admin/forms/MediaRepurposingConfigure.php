@@ -332,7 +332,9 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	{
 		$partnerId = $data['partnerId'];
 		if (count(MediaRepurposingUtils::getMrs($partnerId)) > self::MAX_MR_ON_PARTNER)
+		{
 			return false;
+		}
 
 		return $this->isValid($data);
 	}
