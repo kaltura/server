@@ -857,9 +857,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$params = $this->initBasicS3Params($src);
 		$params['SaveAs'] = $dest;
 		
-		kSharedFileSystemMgr::restoreStreamWrappers();
 		$result = $this->s3Call('getObject', $params);
-		kSharedFileSystemMgr::unRegisterStreamWrappers();
 		
 		if(!$result)
 		{
@@ -903,7 +901,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			}
 			catch (S3Exception $e)
 			{
-				kSharedFileSystemMgr::unRegisterStreamWrappers();
 				$getExceptionFunctionName = self::GET_EXCEPTION_CODE_FUNCTION_NAME;
 				$retries--;
 				if(in_array($e->$getExceptionFunctionName(), $finalErrorCodes))
