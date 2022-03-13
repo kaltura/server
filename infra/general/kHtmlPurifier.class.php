@@ -37,12 +37,14 @@ class kHtmlPurifier
 		
 		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
 		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
+		$decodedModifiedValue = htmlspecialchars_decode($modifiedValueTrimmedSpace);
 		
-		if ($modifiedValueTrimmedSpace != $valueTrimmedSpace)
+		if ($modifiedValueTrimmedSpace != $valueTrimmedSpace && $decodedModifiedValue != $valueTrimmedSpace)
 		{
 			$msg = "Potential Unsafe HTML tags found in $className::$propertyName"
 					. "\nORIGINAL VALUE: [" . $value . "]"
 					. "\nMODIFIED VALUE: [" . $modifiedValue . "]"
+					. "\nDECODED ORIGINAL VALUE: [" . $decodedModifiedValue . "] "
 				;
 			KalturaLog::err( $msg );
 
