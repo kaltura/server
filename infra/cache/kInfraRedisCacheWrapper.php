@@ -12,6 +12,8 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	protected $port;
 	protected $timeout;
 	protected $statsKey;
+	protected $password;
+	protected $scheme;
 
 	protected $redis = null;
 	protected $gotError = false;
@@ -33,24 +35,37 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	{
 		if (!class_exists('Redis'))
 		{
-			self::safeLog("Redis class doesn't exists, can't connect without it");
+			self::safeLog('Redis class doesnt exists, cant connect without it');
 			return false;
 		}
-
-		if (!isset($config['host']) || !isset($config['port']))
+		
+		if (isset($config['cluster']) && $config['cluster'])
 		{
-			self::safeLog("Missing host or port in config, can't connect without it");
+			$this->cluster = true;
+		}
+		
+		if (!isset($config['host']) || (!$this->cluster && !isset($config['port'])))
+		{
+			self::safeLog('Missing host or port in config, cant connect without it');
 			return false;
 		}
-
+		
 		$this->hostName = $config['host'];
 		$this->port = $config['port'];
 		$this->timeout = $config['timeout'];
+		$this->password = $config['password'];
+		
+		$this->scheme = null;
+		if (isset($config['scheme']) && $config['scheme'])
+		{
+			$this->scheme = array('verify_peer' => true);
+		}
+		
 		if (isset($config['persistent']) && $config['persistent'])
+		{
 			$this->persistent = true;
-		if (isset($config['cluster']) && $config['cluster'])
-			$this->cluster = true;
-
+		}
+		
 		return $this->reconnect();
 	}
 
@@ -79,7 +94,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::set()
      */
-	protected function doSet($key, $var, $expiry = 0)
+	public function doSet($key, $var, $expiry = 0)
 	{
 		if($expiry>0)
 		{
@@ -139,6 +154,11 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	public function doZadd($key, $value, $member)
 	{
 		return $this->callAndDetectErrors('zadd', array($key, $value, $member));
+	}
+	
+	public function doZrem($key, $member)
+	{
+		return $this->callAndDetectErrors('zrem', array($key, $member));
 	}
 	
 	public function doZrevrange($key, $low, $high)
@@ -228,13 +248,26 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function errorHandler($errno, $errstr)
 	{
-		self::safeLog("got error from redis [$errno] [$errstr]");
+		self::safeLog("Error from Redis: [$errno] [$errstr]");
 		$this->gotError = true;
 		return false;
+	}
+	
+	protected function getFormattedHost()
+	{
+		if ($this->cluster)
+		{
+			return $this->hostName;
+		}
+		else
+		{
+			return $this->hostName. ':' . $this->port;
+		}
 	}
 
 	protected function callAndDetectErrors($methodName, $params)
 	{
+		kApiCache::disableConditionalCache();
 		while ($this->redis)
 		{
 			$this->gotError = false;
@@ -256,7 +289,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 			$this->reconnect();
 		}
 
-		self::safeLog("There is no active redis connection");
+		self::safeLog('There is no active Redis connection');
 		return false;
 	}
 
@@ -290,11 +323,26 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 					else
 						$redis->connect($this->hostName, $this->port, $this->timeout);
 
+					if ($this->password)
+					{
+						$redis->auth($this->password);
+					}
+					
 					$connectResult = $redis->isConnected();
 				}
 				else
 				{
-					$redis = new RedisCluster(null, array($this->hostName.":".$this->port), $this->timeout, $this->timeout, $this->persistent);
+					// In Cluster mode we can have multiple hosts: 127.0.0.1:7000,201.100.0.3000:8000, ...
+					$hosts = explode(',', $this->hostName);
+					
+					if ($this->scheme)
+					{
+						$redis = new RedisCluster(null, $hosts, $this->timeout, $this->timeout, $this->persistent, $this->password, $this->scheme);
+					}
+					else
+					{
+						$redis = new RedisCluster(null, $hosts, $this->timeout, $this->timeout, $this->persistent, $this->password);
+					}
 					
 					//There is no isConnected in cluster mode so we need to verify the object is not null to make sure the connection was successful.
 					$connectResult = $redis ? true : false;
@@ -303,16 +351,18 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 			}
 			catch (Exception $e)
 			{
-				self::safeLog("failed to connect to redis");
+				self::safeLog("Error while connecting to Redis: $e");
 			}
 
 			if ($connectResult || microtime(true) - $curConnStart < .5)        // retry only if there's an error and it's a timeout error
 				break;
-			self::safeLog("got timeout error while connecting to redis...");
+			self::safeLog('Timeout error while connecting to Redis');
 		}
 
 		$connTook = microtime(true) - $connStart;
-		self::safeLog("connect took - {$connTook} seconds to {$this->hostName}:{$this->port} attempts {$this->connectAttempts}");
+		
+		$formattedHost = $this->getFormattedHost();
+		self::safeLog("connect took {$connTook} seconds to $formattedHost - number of attempts: {$this->connectAttempts}");
 
 		$this->updateStats(self::STAT_CONN, array(
 			self::STAT_COUNT => 1,
@@ -320,7 +370,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 
 		if (!$connectResult)
 		{
-			self::safeLog("failed to connect to redis");
+			self::safeLog('Failed connecting to Redis');
 			return false;
 		}
 

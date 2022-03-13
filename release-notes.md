@@ -1,4 +1,13 @@
 # Rigel-18.1.0
+## EP User Analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-23627
+
+Add EP User Analytics role on partner 0
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_3_3_create_ep_user_analytics_role_on_partner_0.php
+
 ## New Game plugin ##
 * Issue Type: Task
 * Issue ID: PLAT-23508
@@ -32,6 +41,55 @@ Add/Update a configuration map called 'redis' with following config:
     timeout=1.5
     cluster=1
     persistent=0
+
+## Update entry ready, entry status equal, media entry ready and unique KMS entry ready email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-30691
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+
+Add scripts:
+
+    Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_entry_ready.php
+
+    Entry status equals:
+    - deployment/updates/scripts/xml/2022_02_16_addEntryStatusEqualEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addMediaEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addUniqueKmsEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_unique_kms_entry_ready.php
+
+Update scripts:
+
+    Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_ready.php
+
+    Entry status equals:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryStatusEqualEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateMediaEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateUniqueKmsEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_unique_kms_entry_ready.php
+
 
 # Rigel-18.0.0
 ## Add permissions to KME partner ##

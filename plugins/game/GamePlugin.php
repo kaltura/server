@@ -64,8 +64,78 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 		}
 		
 		$config = array('host' => $redisConfig['host'], 'port' => $redisConfig['port'], 'timeout' => floatval($redisConfig['timeout']),
-			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent']);
+			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent'], 'password' => $redisConfig['password'], 'scheme' => $redisConfig['scheme']);
+		
 		$redisWrapper->init($config);
 		return $redisWrapper;
+	}
+	
+	/**
+	 * Prepare the redis key to be called with
+	 * @return string
+	 * @throws KalturaAPIException
+	 */
+	public static function prepareGameObjectKey($gameObjectId, $gameObjectType)
+	{
+		if (is_null($gameObjectId))
+		{
+			throw new KalturaAPIException(KalturaErrors::GAME_OBJECT_ID_REQUIRED);
+		}
+		if (!$gameObjectType)
+		{
+			throw new KalturaAPIException(KalturaErrors::GAME_OBJECT_TYPE_REQUIRED);
+		}
+		
+		$redisKey = kCurrentContext::getCurrentPartnerId();
+		$redisKey.= '_' . $gameObjectType . '_' . $gameObjectId;
+		KalturaLog::info("Accessing Redis game object: $redisKey");
+		return $redisKey;
+	}
+	
+	public static function getKuserIdFromPuserId($puser)
+	{
+		$partner = kCurrentContext::getCurrentPartnerId();
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partner, $puser);
+		if (!$kuser)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puser);
+		}
+		
+		return $kuser->getId();
+	}
+	
+	/**
+	 * Retrieves pusers for all kusers in the results array, and returns a map for these pusers
+	 * @param $results
+	 * @return array
+	 * @throws PropelException
+	 */
+	public static function createMapKuserToPuser($results)
+	{
+		$kusers = array_keys($results);
+		
+		$users = kuserPeer::retrieveByPKs($kusers);
+		if (!$users)
+		{
+			KalturaLog::info('Failed to retrieve users from DB');
+			return array();
+		}
+		
+		$mapKuserPuser = array();
+		foreach ($users as $user)
+		{
+			if ($user->getPuserId())
+			{
+				$mapKuserPuser[$user->getId()] = $user->getPuserId();
+			}
+			else
+			{
+				$kuserId = $user->getId();
+				$mapKuserPuser[$kuserId] = 'Unknown';
+				KalturaLog::info("No user found for kuser $kuserId");
+			}
+		}
+		
+		return $mapKuserPuser;
 	}
 }

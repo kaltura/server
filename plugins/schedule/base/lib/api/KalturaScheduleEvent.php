@@ -446,6 +446,11 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		{
 			$this->recurrenceType = $sourceObject->getRecurrenceType();
 		}
+
+		if (is_null($this->linkedBy) && !is_null($sourceObject->getLinkedBy()))
+		{
+			$this->linkedBy = $sourceObject->getLinkedBy();
+		}
 		
 		$this->validate($startDate, $endDate);
 

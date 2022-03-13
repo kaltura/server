@@ -44,66 +44,6 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	}
 	
 	/**
-	 * Prepare the redis key to be called with
-	 * @return string
-	 * @throws KalturaAPIException
-	 */
-	protected function prepareGameObjectKey()
-	{
-		if (is_null($this->gameObjectId))
-		{
-			throw new KalturaAPIException(KalturaErrors::GAME_OBJECT_ID_REQUIRED);
-		}
-		if (!$this->gameObjectType)
-		{
-			throw new KalturaAPIException(KalturaErrors::GAME_OBJECT_TYPE_REQUIRED);
-		}
-		
-		$redisKey = kCurrentContext::getCurrentPartnerId();
-		$redisKey.= '_' . $this->gameObjectId;
-		KalturaLog::info("Accessing Redis game object: $redisKey");
-		return $redisKey;
-	}
-	
-	protected function getKuserIdFromPuserId($puser)
-	{
-		$partner = kCurrentContext::getCurrentPartnerId();
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partner, $puser);
-		if (!$kuser)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puser);
-		}
-		
-		return $kuser->getId();
-	}
-	
-	/**
-	 * Retrieves pusers for all kusers in the results array, and returns a map for these pusers
-	 * @param $results
-	 * @return array
-	 * @throws PropelException
-	 */
-	protected function createMapKuserToPuser($results)
-	{
-		$kusers = array_keys($results);
-		
-		$pusers = kuserPeer::retrieveByPKs($kusers);
-		if (!$pusers)
-		{
-			KalturaLog::info('Failed to retrieve pusers from DB');
-			return array();
-		}
-		
-		$mapKuserPuser = array();
-		foreach ($pusers as $puser)
-		{
-			$mapKuserPuser[$puser->getId()] = $puser->getPuserId();
-		}
-		
-		return $mapKuserPuser;
-	}
-	
-	/**
 	 * Formats the results to a map with the expected properties, replacing kuser with puser in the results from 'mapKuserPuser',
 	 * And adjusts the results ranks to be their real rank, instead of default Redis results starting from 0
 	 * The results are returned as an array of maps
@@ -153,9 +93,9 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 * @param $redisKey
 	 * @return array
 	 */
-	protected function getListBySpecificUserId($redisWrapper, $pager, $redisKey)
+	protected function getListBySpecificUserId($redisWrapper, $redisKey)
 	{
-		$kuserId = $this->getKuserIdFromPuserId($this->userIdEqual);
+		$kuserId = GamePlugin::getKuserIdFromPuserId($this->userIdEqual);
 		
 		// Redis returns 'false' if the provided userId does not exist
 		$userRank = $redisWrapper->doZrevrank($redisKey, $kuserId);
@@ -170,22 +110,6 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 		$startRank = $this->calculateStartRank($userRank);
 		$endRank = $this->calculateEndRank($userRank);
 		
-		// Adjust the query range according to the pager
-		$startRankPager = ($pager->pageIndex - 1) * $pager->pageSize;
-		$endRankPager = $startRank + $pager->pageSize - 1;
-		if ($endRank - $startRank >= $startRankPager && $pager->pageSize != 0)
-		{
-			$startRank += $startRankPager;
-			if ($endRank > $startRank + $endRankPager)
-			{
-				$endRank = $startRank + $endRankPager;
-			}
-		}
-		else
-		{
-			return array();
-		}
-		
 		$results = $redisWrapper->doZrevrange($redisKey, $startRank, $endRank);
 		if (!$results)
 		{
@@ -193,7 +117,7 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			$results = array();
 		}
 		
-		$mapKuserPuser = $this->createMapKuserToPuser($results);
+		$mapKuserPuser = GamePlugin::createMapKuserToPuser($results);
 		
 		$results = $this->formatUserScoreResults($results, $startRank, $mapKuserPuser);
 		
@@ -206,21 +130,18 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	 * @param $redisKey
 	 * @return array
 	 */
-	protected function getListAllUsers($redisWrapper, $pager, $redisKey)
+	protected function getListAllUsers($redisWrapper, $redisKey)
 	{
-		$startRank = ($pager->pageIndex - 1) * $pager->pageSize;
-		$endRank = $startRank + $pager->pageSize - 1;
-		
-		$results = $redisWrapper->doZrevrange($redisKey, $startRank, $endRank);
+		$results = $redisWrapper->doZrevrange($redisKey, 0, -1);
 		if (!$results)
 		{
-			KalturaLog::info("No results found for key $redisKey with range $startRank, $endRank");
+			KalturaLog::info("No results found for key $redisKey");
 			return array();
 		}
 		
-		$mapKuserPuser = $this->createMapKuserToPuser($results);
+		$mapKuserPuser = GamePlugin::createMapKuserToPuser($results);
 		
-		$results = $this->formatUserScoreResults($results, $startRank, $mapKuserPuser);
+		$results = $this->formatUserScoreResults($results, 0, $mapKuserPuser);
 		
 		return $results;
 	}
@@ -233,12 +154,17 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 	protected function paginateResults($pager, $results)
 	{
 		$startRank = ($pager->pageIndex - 1) * $pager->pageSize;
-		$endRank = $startRank + $pager->pageSize - 1;
+		if ($startRank < 0)
+		{
+			$startRank = 0;
+		}
 		
+		$endRank = $startRank + $pager->pageSize;
+		
+		$i = 0;
+		$paginatedResults = array();
 		if ($startRank < count($results))
 		{
-			$i = 0;
-			$paginatedResults = array();
 			foreach ($results as $result)
 			{
 				if ($i >= $startRank && $i < $endRank)
@@ -247,10 +173,9 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 				}
 				$i++;
 			}
-			$results = $paginatedResults;
 		}
 		
-		return $results;
+		return $paginatedResults;
 	}
 	
 	/**
@@ -267,61 +192,22 @@ class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFil
 			throw new KalturaAPIException(KalturaErrors::FAILED_INIT_REDIS_INSTANCE);
 		}
 		
-		$redisKey = $this->prepareGameObjectKey();
+		$redisKey = GamePlugin::prepareGameObjectKey($this->gameObjectId, $this->gameObjectType);
+		
 		
 		if ($this->userIdEqual)
 		{
-			$results = $this->getListBySpecificUserId($redisWrapper, $pager, $redisKey);
+			$results = $this->getListBySpecificUserId($redisWrapper, $redisKey);
 		}
 		else
 		{
-			$results = $this->getListAllUsers($redisWrapper, $pager, $redisKey);
+			$results = $this->getListAllUsers($redisWrapper, $redisKey);
 		}
 		
 		$response = new KalturaUserScorePropertiesResponse();
 		$response->totalCount = count($results);
+		$results = $this->paginateResults($pager, $results);
 		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($results, $responseProfile);
-		
-		return $response;
-	}
-	
-	/**
-	 * @param $score
-	 * @return KalturaUserScorePropertiesResponse
-	 * @throws KalturaAPIException
-	 */
-	public function updateUserScore($score)
-	{
-		$redisWrapper = GamePlugin::initGameServicesRedisInstance();
-		if (!$redisWrapper)
-		{
-			throw new KalturaAPIException(KalturaErrors::FAILED_INIT_REDIS_INSTANCE);
-		}
-		
-		$redisKey = $this->prepareGameObjectKey();
-		
-		if (!$this->userIdEqual)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_ID_EQUAL_REQUIRED);
-		}
-		
-		$kuserId = $this->getKuserIdFromPuserId($this->userIdEqual);
-		
-		$addResult = $redisWrapper->doZadd($redisKey, $score, $kuserId);
-		$rank = $redisWrapper->doZrevrank($redisKey, $kuserId);
-		if ($addResult === false || $rank === false)
-		{
-			KalturaLog::info("Failed to add {$this->userIdEqual} to key $redisKey");
-			$result = array();
-		}
-		else
-		{
-			$result = array(array('rank' => $rank, 'userId' => $this->userIdEqual, 'score' => $score));
-		}
-		
-		$response = new KalturaUserScorePropertiesResponse();
-		$response->totalCount = count($result);
-		$response->objects = KalturaUserScorePropertiesArray::fromDbArray($result, null);
 		
 		return $response;
 	}

@@ -377,6 +377,7 @@ class kReplacementHelper
 		$oldAsset->setFileExt($newAsset->getFileExt());
 		$oldAsset->setFrameRate($newAsset->getFrameRate());
 		$oldAsset->setStatus($newAsset->getStatus());
+		$oldAsset->setIsOriginal($newAsset->getIsOriginal());
 		$oldAsset->save();
 		kEventsManager::enableEvents(true);
 	}

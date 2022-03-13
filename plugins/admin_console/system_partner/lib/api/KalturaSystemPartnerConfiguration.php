@@ -467,6 +467,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $excludedAdminRoleName;
 	
 	/**
+	 * @var string
+	 */
+	public $allowedDomains;
+	
+	/**
 	 * @var int
 	 */
 	public $trigramPercentage;
@@ -580,6 +585,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'enforceHttpsApi',
 		'secondarySecretRoleId',
 		'excludedAdminRoleName',
+		'allowedDomains',
 		'trigramPercentage',
 		'maxWordForNgram',
 		'twoFactorAuthenticationMode',
@@ -818,6 +824,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setSecondarySecretRoleId(null);
+		}
+		
+		if(!is_null($this->allowedDomains))
+		{
+			$object_to_fill->setAllowedDomains($this->allowedDomains);
+		}
+		else
+		{
+			$object_to_fill->setAllowedDomains(null);
 		}
 		
 		return $object_to_fill;
