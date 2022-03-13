@@ -816,10 +816,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 				array(array($this->passwordStructureValidations,
 				            $this->passwordStructureValidationsDescription)));
 		}
-		else
-		{
-			$object_to_fill->setPasswordStructureValidations(null);
-		}
 		
 		if(!is_null($this->secondarySecretRoleId))
 		{
@@ -830,14 +826,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$object_to_fill->setSecondarySecretRoleId(null);
 		}
 		
-		if(!is_null($this->excludedAdminRoleName))
-		{
-			$object_to_fill->setExcludedAdminRoleName($this->excludedAdminRoleName);
-		}
-		else
-		{
-			$object_to_fill->setExcludedAdminRoleName(null);
-		}
 		if(!is_null($this->allowedDomains))
 		{
 			$object_to_fill->setAllowedDomains($this->allowedDomains);
