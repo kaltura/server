@@ -928,7 +928,15 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 			if(($key=array_search("-tag:v", $params->cmdLineArr))!==false) {
 				$mergeCmd.= " -tag:v ".$params->cmdLineArr[$key+1];
 			}
-
+			
+			if(isset($params->metadata)) {
+				$metadataStr = null;
+				foreach($params->metadata as $metadata){
+					$metadataStr.=" ".implode(" ", $metadata);
+				}
+				$mergeCmd.= $metadataStr;
+			}
+			
 			$mergeCmd.= " -y $mergedFilename";
 			KalturaLog::log("mergeCmd:\n$mergeCmd ".date("Y-m-d H:i:s"));
 			return $mergeCmd;
@@ -1054,7 +1062,16 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
 				$cmdLine.= " $filterStr";
-			$cmdLine.= " -map 0:a:0 -metadata:s:a:0 language=";
+			
+			if(isset($params->mappings)) {
+				$mappings = implode(" -map ",$params->mappings);
+				$cmdLine.= " -map ".implode(" -map ",$params->mappings);
+			}
+			else
+				$cmdLine.= " -map 0:a:0";
+			
+			$cmdLine.= " -metadata:s:a:0 language=";
+
 			if(isset($params->abitrate)) $cmdLine.= " -b:a ".$params->abitrate."k";
 			if(isset($params->ar)) $cmdLine.= " -ar ".$params->ar;
 			if(isset($params->ac)) $cmdLine.= " -ac ".$params->ac;
@@ -1701,6 +1718,18 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 					break;
 				case "-bsf:v":
 					$this->bsf = $cmdLineArr[$idx+1];
+					break;
+				case "-map":
+					if(!isset($this->mappings))
+						$this->mappings = array();
+					$this->mappings[] = $cmdLineArr[$idx+1];
+					break;
+				default:
+					if(strpos($val,"-metadata")!==false){
+						if(!isset($this->metadata))
+							$this->metadata = array();
+						$this->metadata[] = array($cmdLineArr[$idx],$cmdLineArr[$idx+1]);
+					}
 					break;
 				}
 			}
