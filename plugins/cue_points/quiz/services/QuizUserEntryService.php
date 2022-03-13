@@ -67,7 +67,6 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry->setNumOfRelevnatQuestions($relevantQuestionCount);
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		self::calculateScoreByScoreType($kQuiz,$userEntry, $dbUserEntry, $score);
-		$dbUserEntry->save();
 		
 		return $userEntry;
 	}
