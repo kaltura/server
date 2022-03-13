@@ -233,9 +233,7 @@ class SystemPartnerService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::UNKNOWN_PARTNER_ID, $pId);
 		try
 		{
-			KalturaLog::log('danielBarak - new partner excluded admin role name: ' . $dbPartner->getExcludedAdminRoleName());
 			$configuration->toUpdatableObject($dbPartner);
-			KalturaLog::log('danielBarak - new partner excluded admin role name: ' . $dbPartner->getExcludedAdminRoleName());
 		}
 		catch(KalturaAPIException $e)
 		{
