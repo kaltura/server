@@ -56,7 +56,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 		$this->password = $config['password'];
 		
 		$this->scheme = null;
-		if (isset($redisConfig['scheme']) && $redisConfig['scheme'])
+		if (isset($config['scheme']) && $config['scheme'])
 		{
 			$this->scheme = array('verify_peer' => true);
 		}
