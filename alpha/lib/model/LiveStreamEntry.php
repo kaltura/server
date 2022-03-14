@@ -84,25 +84,37 @@ class LiveStreamEntry extends LiveEntry
 		return $this->getDynamicBroadcastUrl(self::SECONDARY_RTSP_BROADCASTING_URL, 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
 	}
 
-	public function setPrimarySrtBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::PRIMARY_SRT_BROADCASTING_URL , $v );	}
+	public function setPrimarySrtBroadcastingUrl ( $v )
+	{
+		$this->putInCustomData ( self::PRIMARY_SRT_BROADCASTING_URL , $v );
+	}
 	public function getPrimarySrtBroadcastingUrl (  )
 	{
 		return $this->getDynamicBroadcastUrl(self::PRIMARY_SRT_BROADCASTING_URL, 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_SRT);
 	}
 
-	public function setSecondarySrtBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::SECONDARY_SRT_BROADCASTING_URL , $v );	}
+	public function setSecondarySrtBroadcastingUrl ( $v )
+	{
+		$this->putInCustomData ( self::SECONDARY_SRT_BROADCASTING_URL , $v );
+	}
 	public function getSecondarySrtBroadcastingUrl (  )
 	{
 		return $this->getDynamicBroadcastUrl(self::SECONDARY_SRT_BROADCASTING_URL, 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_SRT);
 	}
 
-	public function setPrimarySrtStreamId ( $v )	{	$this->putInCustomData ( self::PRIMARY_SRT_STREAM_ID , $v );	}
+	public function setPrimarySrtStreamId ( $v )
+	{
+		$this->putInCustomData ( self::PRIMARY_SRT_STREAM_ID , $v );
+	}
 	public function getPrimarySrtStreamId (  )
 	{
 		return $this->getSrtStreamId(self::PRIMARY_SRT_STREAM_ID, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX);
 	}
 
-	public function setSecondarySrtStreamId ( $v )	{	$this->putInCustomData ( self::SECONDARY_SRT_STREAM_ID , $v );	}
+	public function setSecondarySrtStreamId ( $v )
+	{
+		$this->putInCustomData ( self::SECONDARY_SRT_STREAM_ID , $v );
+	}
 	public function getSecondarySrtStreamId (  )
 	{
 		return $this->getSrtStreamId(self::SECONDARY_SRT_STREAM_ID, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX);
@@ -142,11 +154,13 @@ class LiveStreamEntry extends LiveEntry
 		return $url;
 	}
 
-	private function getSrtStreamId($customDataParam, $sessionType)
+	protected function getSrtStreamId($customDataParam, $sessionType)
 	{
 		$streamId = $this->getFromCustomData($customDataParam);
 		if($streamId)
+		{
 			return $streamId;
+		}
 
 		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
 		$streamId = $manager->createSrtStreamId($this, $sessionType);

@@ -26,6 +26,9 @@ class kBroadcastUrlManager
 	const SRT_DOMAIN = 'srt_domain';
 	const SRT_PORT = 'srt_port';
 
+	const LIVE_ENCRYPTION_KEY_PARAM = 'live_security_key';
+	const LIVE_SRT_IV_PARAM = 'stream_id_security_key';
+
 	
 	protected $partnerId;
 	protected $useOldUrlPattern;
@@ -250,8 +253,8 @@ class kBroadcastUrlManager
 
 	public function getEncryptedSrtPass(LiveStreamEntry $entry)
 	{
-		$key = KConf::get('live_security_key', kConfMapNames::LIVE_SETTINGS, 'klive');
-		$iv = KConf::get('stream_id_security_key', kConfMapNames::LIVE_SETTINGS, '');
+		$key = KConf::get(self::LIVE_ENCRYPTION_KEY_PARAM, kConfMapNames::LIVE_SETTINGS, 'klive');
+		$iv = KConf::get(self::LIVE_SRT_IV_PARAM, kConfMapNames::LIVE_SETTINGS, '');
 		$data = $entry->getSrtPass();
 
 		$encryptedToken = OpenSSLWrapper::encrypt_aes($data, $key, $iv);
