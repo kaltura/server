@@ -57,14 +57,39 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 	{
 		$redisWrapper = new kInfraRedisCacheWrapper();
 		$redisConfig = kConf::get(self::PLUGIN_NAME, kConfMapNames::REDIS, null);
-		if (!$redisConfig || !isset($redisConfig['host']) || !isset($redisConfig['port']) || !isset($redisConfig['timeout']) ||
-			!isset($redisConfig['cluster'])  || !isset($redisConfig['persistent']))
+		if (!$redisConfig)
 		{
 			return null;
 		}
 		
-		$config = array('host' => $redisConfig['host'], 'port' => $redisConfig['port'], 'timeout' => floatval($redisConfig['timeout']),
-			'cluster' => $redisConfig['cluster'], 'persistent' => $redisConfig['persistent'], 'password' => $redisConfig['password'], 'scheme' => $redisConfig['scheme']);
+		$configOptions = array(
+			'host' => true,
+			'port' => false,
+			'timeout' => true,
+			'cluster' => true,
+			'persistent' => true,
+			'password' => false,
+			'scheme' => false
+		);
+		
+		$config = array();
+		foreach ($configOptions as $option => $isRequired)
+		{
+			if ($isRequired && !isset($redisConfig[$option]))
+			{
+				KalturaLog::info("Missing in redis configuration: $option");
+				return null;
+			}
+			
+			if (isset($redisConfig[$option]))
+			{
+				$config[$option] = $redisConfig[$option];
+			}
+			else
+			{
+				$config[$option] = null;
+			}
+		}
 		
 		$redisWrapper->init($config);
 		return $redisWrapper;
