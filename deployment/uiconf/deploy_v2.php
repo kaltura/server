@@ -310,8 +310,8 @@ class uiConfDeployment
 	{
 		global $arguments;
 		
-		if(!file_exists($file_path)) {
-			if(!file_exists(dirname($arguments['ini'])))
+		if(!kFile::checkFileExists($file_path)) {
+			if(!kFile::checkFileExists(dirname($arguments['ini'])))
 			{
 				return FALSE;
 			}
@@ -334,15 +334,16 @@ class uiConfDeployment
 		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
 
 		$ret = null;
-		chmod($localPath, 0640);
+		kFile::chmod($localPath, 0640);
 
 		if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
 		{
-			$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
-			passthru("chown $user_group $localPath", $ret);
-			if ($ret !== 0 && $ret !== 127)
+			$user = uiConfDeployment::$arguments['user'];
+			$group = uiConfDeployment::$arguments['group'];
+			$ret = kFile::chown($localPath, $user, $group);
+			if ($ret !== true && $ret !== 0 && $ret !== 127)
 			{
-				KalturaLog::debug("chown [$user_group] failed on path [$localPath] returned value [$ret]");
+				KalturaLog::debug("chown [$user:$group] failed on path [$localPath] returned value [$ret]");
 				exit(1);
 			}
 		}
@@ -495,16 +496,17 @@ class uiConfDeployment
 		$localPath = kFileSyncUtils::getLocalFilePathForKey($sync_key);
 		$localPath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $localPath);
 	
-		chmod($localPath, 0640);
+		kFile::chmod($localPath, 0640);
 	
 		if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')
 			return;
-	
-		$user_group = uiConfDeployment::$arguments['user'] . ':' . uiConfDeployment::$arguments['group'];
-		passthru("chown $user_group $localPath", $ret);
-		if($ret !== 0)
+		
+		$user = uiConfDeployment::$arguments['user'];
+		$group = uiConfDeployment::$arguments['group'];
+		$ret = kFile::chown($localPath, $user, $group);
+		if($ret !== true && $ret !== 0)
 		{
-			KalturaLog::debug("chown [$user_group] failed on path [$localPath]");
+			KalturaLog::debug("chown [$user:$group] failed on path [$localPath]");
 			exit(1);
 		}
 	}
@@ -616,7 +618,7 @@ class uiConfDeployment
 		}
 		
 		//Check if ini file exists
-		if(!file_exists($arguments['ini']))
+		if(!kFile::checkFileExists($arguments['ini']))
 		{
 			uiConfDeployment::printUsage('config file not found '.$arguments['ini']);
 		}
