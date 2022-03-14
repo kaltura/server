@@ -67,7 +67,6 @@ class QuizUserEntryService extends KalturaBaseService{
 		$dbUserEntry->setNumOfRelevnatQuestions($relevantQuestionCount);
 		$dbUserEntry->setStatus(QuizPlugin::getCoreValue('UserEntryStatus', QuizUserEntryStatus::QUIZ_SUBMITTED));
 		self::calculateScoreByScoreType($kQuiz,$userEntry, $dbUserEntry, $score);
-		$dbUserEntry->save();
 		
 		return $userEntry;
 	}
@@ -83,6 +82,7 @@ class QuizUserEntryService extends KalturaBaseService{
 			$scoreType = $kQuiz->getScoreType();
 			//retrieve user entry list order by version desc
 			$userEntryVersions = UserEntryPeer::retriveUserEntriesSubmitted($dbUserEntry->getKuserId(), $dbUserEntry->getEntryId(), QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+			array_push($userEntryVersions, $dbUserEntry);
 			switch ($scoreType)
 			{
 				case KalturaScoreType::HIGHEST:
