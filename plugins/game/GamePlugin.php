@@ -77,6 +77,7 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 		{
 			if ($isRequired && !isset($redisConfig[$option]))
 			{
+				KalturaLog::info("Missing in redis configuration: $option");
 				return null;
 			}
 			
