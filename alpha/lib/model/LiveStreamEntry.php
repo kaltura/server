@@ -5,6 +5,16 @@
  */
 class LiveStreamEntry extends LiveEntry
 {
+	const PRIMARY_BROADCASTING_URL = 'primaryBroadcastingUrl';
+	const SECONDARY_BROADCASTING_URL = 'secondaryBroadcastingUrl';
+	const PRIMARY_RTMPS_BROADCASTING_URL = 'primaryRtmpsBroadcastingUrl';
+	const SECONDARY_RTMPS_BROADCASTING_URL = 'secondaryRtmpsBroadcastingUrl';
+	const PRIMARY_RTSP_BROADCASTING_URL = 'primaryRtspBroadcastingUrl';
+	const SECONDARY_RTSP_BROADCASTING_URL = 'secondaryRtspBroadcastingUrl';
+	const PRIMARY_SRT_BROADCASTING_URL = 'primarySrtBroadcastingUrl';
+	const SECONDARY_SRT_BROADCASTING_URL = 'secondarySrtBroadcastingUrl';
+	const PRIMARY_SRT_STREAM_ID = 'primarySrtStreamId';
+	const SECONDARY_SRT_STREAM_ID = 'secondarySrtStreamId';
 	const LIVE_STATUS_CONDITIONAL_CACHE_EXPIRY = 10;
 	
 	public function applyDefaultValues()
@@ -26,6 +36,9 @@ class LiveStreamEntry extends LiveEntry
 	public function setStreamPassword ( $v )	{	$this->putInCustomData ( "streamPassword" , $v );	}
 	public function getStreamPassword (  )		{	return $this->getFromCustomData( "streamPassword" );	}
 
+	public function setSrtPass ( $v )	{	$this->putInCustomData ( "srtPass" , $v );	}
+	public function getSrtPass (  )		{	return $this->getFromCustomData( "srtPass" );	}
+
 	public function setStreamRemoteId ( $v )	{	$this->putInCustomData ( "streamRemoteId" , $v );	}
 	public function getStreamRemoteId (  )		{	return $this->getFromCustomData( "streamRemoteId" );	}
 
@@ -35,42 +48,78 @@ class LiveStreamEntry extends LiveEntry
 	public function setStreamUrl ( $v )	{	$this->putInCustomData ( "streamUrl" , $v );	}
 	public function getStreamUrl (  )		{	return $this->getFromCustomData( "streamUrl" );	}
 	
-	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryBroadcastingUrl" , $v );	}
+	public function setPrimaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::PRIMARY_BROADCASTING_URL , $v );	}
 	public function getPrimaryBroadcastingUrl (  )
 	{
-		return $this->getDynamicBroadcastUrl('primaryBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+		return $this->getDynamicBroadcastUrl(self::PRIMARY_BROADCASTING_URL, 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
 	}
 
-	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryBroadcastingUrl" , $v );	}
+	public function setSecondaryBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::SECONDARY_BROADCASTING_URL , $v );	}
 	public function getSecondaryBroadcastingUrl (  )
 	{
-		return $this->getDynamicBroadcastUrl('secondaryBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
+		return $this->getDynamicBroadcastUrl(self::SECONDARY_BROADCASTING_URL, 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMP);
 	}
 
-	public function setPrimarySecuredBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtmpsBroadcastingUrl" , $v );	}
+	public function setPrimarySecuredBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::PRIMARY_RTMPS_BROADCASTING_URL , $v );	}
 	public function getPrimarySecuredBroadcastingUrl (  )
 	{
-		return $this->getDynamicBroadcastUrl('primaryRtmpsBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMPS);
+		return $this->getDynamicBroadcastUrl(self::PRIMARY_RTMPS_BROADCASTING_URL, 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMPS);
 	}
 
-	public function setSecondarySecuredBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtmpsBroadcastingUrl" , $v );	}
+	public function setSecondarySecuredBroadcastingUrl ( $v )	{	$this->putInCustomData ( LiveStreamEntry::SECONDARY_RTMPS_BROADCASTING_URL , $v );	}
 	public function getSecondarySecuredBroadcastingUrl (  )
 	{
-		return $this->getDynamicBroadcastUrl('secondaryRtmpsBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMPS);
+		return $this->getDynamicBroadcastUrl(self::SECONDARY_RTMPS_BROADCASTING_URL, 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTMPS);
 	}
 	
-	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "primaryRtspBroadcastingUrl" , $v );	}
+	public function setPrimaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::PRIMARY_RTSP_BROADCASTING_URL , $v );	}
 	public function getPrimaryRtspBroadcastingUrl (  )
 	{
-		return $this->getDynamicBroadcastUrl('primaryRtspBroadcastingUrl', 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
+		return $this->getDynamicBroadcastUrl(self::PRIMARY_RTSP_BROADCASTING_URL, 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
 	}
 	
-	public function setSecondaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( "secondaryRtspBroadcastingUrl" , $v );	}
+	public function setSecondaryRtspBroadcastingUrl ( $v )	{	$this->putInCustomData ( self::SECONDARY_RTSP_BROADCASTING_URL , $v );	}
 	public function getSecondaryRtspBroadcastingUrl (  )
 	{
-		return $this->getDynamicBroadcastUrl('secondaryRtspBroadcastingUrl', 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
+		return $this->getDynamicBroadcastUrl(self::SECONDARY_RTSP_BROADCASTING_URL, 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_RTSP);
 	}
-	
+
+	public function setPrimarySrtBroadcastingUrl ( $v )
+	{
+		$this->putInCustomData ( self::PRIMARY_SRT_BROADCASTING_URL , $v );
+	}
+	public function getPrimarySrtBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl(self::PRIMARY_SRT_BROADCASTING_URL, 'getPrimaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_SRT);
+	}
+
+	public function setSecondarySrtBroadcastingUrl ( $v )
+	{
+		$this->putInCustomData ( self::SECONDARY_SRT_BROADCASTING_URL , $v );
+	}
+	public function getSecondarySrtBroadcastingUrl (  )
+	{
+		return $this->getDynamicBroadcastUrl(self::SECONDARY_SRT_BROADCASTING_URL, 'getSecondaryBroadcastUrl', kBroadcastUrlManager::PROTOCOL_SRT);
+	}
+
+	public function setPrimarySrtStreamId ( $v )
+	{
+		$this->putInCustomData ( self::PRIMARY_SRT_STREAM_ID , $v );
+	}
+	public function getPrimarySrtStreamId (  )
+	{
+		return $this->getSrtStreamId(self::PRIMARY_SRT_STREAM_ID, kBroadcastUrlManager::PRIMARY_MEDIA_SERVER_INDEX);
+	}
+
+	public function setSecondarySrtStreamId ( $v )
+	{
+		$this->putInCustomData ( self::SECONDARY_SRT_STREAM_ID , $v );
+	}
+	public function getSecondarySrtStreamId (  )
+	{
+		return $this->getSrtStreamId(self::SECONDARY_SRT_STREAM_ID, kBroadcastUrlManager::SECONDARY_MEDIA_SERVER_INDEX);
+	}
+
 	public function setPrimaryServerNodeId ( $v )	{	$this->putInCustomData ( "primaryServerNodeId" , $v );	}
 	public function getPrimaryServerNodeId (  )	{	return $this->getFromCustomData( "primaryServerNodeId", null, null );	}
 	
@@ -103,6 +152,19 @@ class LiveStreamEntry extends LiveEntry
 		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
 		$url = $manager->$functionName($this, $protocol);
 		return $url;
+	}
+
+	protected function getSrtStreamId($customDataParam, $sessionType)
+	{
+		$streamId = $this->getFromCustomData($customDataParam);
+		if($streamId)
+		{
+			return $streamId;
+		}
+
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		$streamId = $manager->createSrtStreamId($this, $sessionType);
+		return $streamId;
 	}
 
 	public function getLiveStreamConfigurations($protocol = null, $tag = null, $currentDcOnly = false, array $flavorParamsIds = array(), $format = null)
