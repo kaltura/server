@@ -26,9 +26,9 @@ class myKuserUtils
 		return self::NON_EXISTING_USER_ID; // no result will be returned if no puser exists
 	}
 
-	public static function startsWithSpecialChar($str, array $SPECIAL_CHARS)
+	public static function startsWithSpecialChar($str, array $specialChars)
 	{
-		return $str && in_array($str[0], $SPECIAL_CHARS);
+		return $str && in_array($str[0], $specialChars);
 	}
 
 	public static function sanitizeFields(array $values)
