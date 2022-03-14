@@ -241,11 +241,13 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 					continue;
 				}
 			}
-			
-			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
-			}
+
+			if ($kalturaProperty == 'lastName')
+				if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty, array('+', '=', '@', ',')) || (strlen($this->$kalturaProperty) != 1 && myKuserUtils::startsWithSpecialChar($this->$kalturaProperty, array('-'))))
+					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
+			else
+				if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty, array('+', '=', '-', '@', ',')))
+					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
 		}
 	}
 }
