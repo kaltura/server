@@ -1,3 +1,14 @@
+# Rigel-18.2.0
+## Add permissions to EP User Analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-23641
+
+Add additional permissions to EP User Analytics role on partner 0
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_03_15_add_permissions_to_ep_base_user_role.php
+
+
 # Rigel-18.1.0
 ## EP User Analytics role ##
 * Issue Type: Task
