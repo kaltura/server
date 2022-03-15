@@ -87,6 +87,9 @@ class ScheduleEventResourcePeer extends BaseScheduleEventResourcePeer implements
 			}
 		}
 
+		if($partnerId)
+			$criteria->add(ScheduleEventResourcePeer::PARTNER_ID, $partnerId);
+		
 		return ScheduleEventResourcePeer::doSelect($criteria);
 	}
 
