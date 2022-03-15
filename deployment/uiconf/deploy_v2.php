@@ -341,7 +341,7 @@ class uiConfDeployment
 			$user = uiConfDeployment::$arguments['user'];
 			$group = uiConfDeployment::$arguments['group'];
 			$ret = kFile::chown($localPath, $user, $group);
-			if ($ret !== true && $ret !== 0 && $ret !== 127)
+			if (!$ret)
 			{
 				KalturaLog::debug("chown [$user:$group] failed on path [$localPath] returned value [$ret]");
 				exit(1);
@@ -504,7 +504,7 @@ class uiConfDeployment
 		$user = uiConfDeployment::$arguments['user'];
 		$group = uiConfDeployment::$arguments['group'];
 		$ret = kFile::chown($localPath, $user, $group);
-		if($ret !== true && $ret !== 0)
+		if(!$ret)
 		{
 			KalturaLog::debug("chown [$user:$group] failed on path [$localPath]");
 			exit(1);

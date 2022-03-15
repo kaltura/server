@@ -78,7 +78,7 @@ class kFileBase
 		
 		passthru("chown $user:$group $filePath", $ret);
 		
-		return $ret;
+		return ($ret === 0 || $ret === 127);
 	}
 
     public static function readLastBytesFromFile($file_name, $bytes = 1024)
