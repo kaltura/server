@@ -1568,6 +1568,8 @@ class playManifestAction extends kalturaAction
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
-		$this->servedEntryType = $sourceEntry->getType();
+		$srcEntryType = $sourceEntry->getType();
+		// for simulive case with playlist source - servedEntryType should be MEDIA_CLIP
+		$this->servedEntryType = $srcEntryType == entryType::PLAYLIST ? entryType::MEDIA_CLIP : $srcEntryType;
 	}
 }

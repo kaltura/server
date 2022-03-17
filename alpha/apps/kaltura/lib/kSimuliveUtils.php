@@ -37,27 +37,26 @@ class kSimuliveUtils
 		}
 		// all times should be in ms
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
-		$durations[] = self::roundDuration(min($sourceEntry->getLengthInMsecs(), ($currentEvent->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS) - $startTime));
 
-		list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = myEntryUtils::getEntryAssets($sourceEntry);
+		$sourceEntries = $sourceEntry->getType() == entryType::PLAYLIST ? myPlaylistUtils::retrieveStitchedPlaylistEntries($sourceEntry) : array($sourceEntry);
 
 		// getting the preStart assets (only if the preStartEntry exists)
 		$preStartEntry = kSimuliveUtils::getPreStartEntry($currentEvent);
-		list($preStartFlavorAssets, $preStartCaptionAssets, $preStartAudioAssets) = myEntryUtils::getEntryAssets($preStartEntry);
 		if ($preStartEntry)
 		{
-			$preStartRoundedDuration = self::roundDuration($preStartEntry->getLengthInMsecs());
-			array_unshift($durations, $preStartRoundedDuration);
+			array_unshift($sourceEntries, $preStartEntry);
 		}
 
 		// getting the postEnd assets (only if the postEndEntry exists)
 		$postEndEntry = kSimuliveUtils::getPostEndEntry($currentEvent);
-		list($postEndFlavorAssets, $postEndCaptionAssets, $postEndAudioAssets) = myEntryUtils::getEntryAssets($postEndEntry);
 		if ($postEndEntry)
 		{
-			$postEndRoundedDuration = self::roundDuration($postEndEntry->getLengthInMsecs());
-			$durations[] = $postEndRoundedDuration;
+			$sourceEntries[] = $postEndEntry;
 		}
+
+		list($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets) = self::getSourceAssets($sourceEntries);
+		$durations = self::getSourceDurations($sourceEntries, $currentEvent);
+
 		$endTime = $startTime + array_sum($durations);
 
 		if (self::shouldLiveInterrupt($entry, $currentEvent))
@@ -68,12 +67,13 @@ class kSimuliveUtils
 
 		// creating the flavorAssets array (array of arrays s.t each array contain the flavor assets of all the entries exist)
 		$flavorAssets = array();
-		$flavorAssets = self::mergeAssetArrays($flavorAssets, $preStartFlavorAssets);
-		$flavorAssets = self::mergeAssetArrays($flavorAssets, $mainFlavorAssets);
-		$flavorAssets = self::mergeAssetArrays($flavorAssets, $postEndFlavorAssets);
+		foreach ($entriesFlavorAssets as $entryAssets)
+		{
+			$flavorAssets = self::mergeAssetArrays($flavorAssets, $entryAssets);
+		}
 
-		$captionAssets = self::createPaddedAssetsArray($mainCaptionAssets, $preStartCaptionAssets, $postEndCaptionAssets, count($preStartFlavorAssets) != 0, count($postEndFlavorAssets) != 0);
-		$audioAssets = self::createPaddedAssetsArray($mainAudioAssets, $preStartAudioAssets, $postEndAudioAssets, count($preStartFlavorAssets) != 0, count($postEndFlavorAssets) != 0);
+		$captionAssets = self::createPaddedAssetsArray($entriesCaptionAssets);
+		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
 
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
@@ -225,34 +225,27 @@ class kSimuliveUtils
 	}
 
 	/**
-	 * receiving 3 arrays of assets (caption/flavor), if one of the arrays isn't empty - it will fill the empty arrays 
-	 * with nulls (according to the non empty arrays size). The function returns array of arrays s.t each array 
-	 * has the merged assets (caption OR flavor) of pre+main+post entries padded with nulls for missing assets. 
-	 * @param array $mainAssets
-	 * @param array $preStartAssets
-	 * @param array $postEndAssets
-	 * @param boolean $hasPreStart
-	 * @param boolean $hasPostEnd
+	 * receiving array of asset arrays. padding each asset array with nulls according to the longest array. 
+	 * @param array $assets
 	 * @return array
 	 */
-	protected static function createPaddedAssetsArray ($mainAssets, $preStartAssets, $postEndAssets, $hasPreStart, $hasPostEnd)
+	protected static function createPaddedAssetsArray ($assets)
 	{
-		$assets = array();
-		// we need to handle caption / audio assets only if there is caption asset for at least one of the entries
-		if ($mainAssets || $preStartAssets || $postEndAssets)
+		$paddedAssets = array();
+		$assetsExists = count(array_filter($assets));
+		// we need to handle caption / audio assets only if there is an asset for at least one of the entries
+		if ($assetsExists)
 		{
-			$assetsCount = max(max(count($preStartAssets), count($mainAssets)), count($postEndAssets));
-			// fill the empty caption / audio asset arrays with "nulls"
-			$preStartAssets = array_pad($preStartAssets, $assetsCount, null);
-			$mainAssets = array_pad($mainAssets, $assetsCount, null);
-			$postEndAssets = array_pad($postEndAssets, $assetsCount, null);
+			// null padding should be according to the largest assets array
+			$assetsCount = count(max($assets));
 
-			// creating the assets array (as array of arrays s.t each array contain the caption / audio assets of all the entries exist, padded with nulls if needed)
-			$assets = $hasPreStart ? self::mergeAssetArrays($assets, $preStartAssets) : $assets;
-			$assets = self::mergeAssetArrays($assets, $mainAssets);
-			$assets = $hasPostEnd ? self::mergeAssetArrays($assets, $postEndAssets) : $assets;
+			foreach ($assets as &$asset)
+			{
+				$asset = array_pad($asset, $assetsCount, null);
+				$paddedAssets = self::mergeAssetArrays($paddedAssets, $asset);
+			}
 		}
-		return $assets;
+		return $paddedAssets;
 	}
 
 	/**
@@ -301,5 +294,55 @@ class kSimuliveUtils
 		}
 		// we shouldn't arrive this if $time is inside event
 		return null;
+	}
+
+	/**
+	 * receiving array of entries, returning 3 asset arrays (flavors, captions, audio) 
+	 * s.t each array's i'th element is the asset array of the i'th entry assets.
+	 * @param array $sourceEntries
+	 * @return array
+	 */
+	public static function getSourceAssets($sourceEntries)
+	{
+		$entriesFlavorAssets = array();
+		$entriesCaptionAssets = array();
+		$entriesAudioAssets = array();
+		foreach ($sourceEntries as $srcEntry)
+		{
+			list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = myEntryUtils::getEntryAssets($srcEntry);
+			$entriesFlavorAssets = array_merge($entriesFlavorAssets, array($mainFlavorAssets));
+			$entriesCaptionAssets = array_merge($entriesCaptionAssets, array($mainCaptionAssets));
+			$entriesAudioAssets = array_merge($entriesAudioAssets, array($mainAudioAssets));
+			$durations[] = self::roundDuration($srcEntry->getLengthInMsecs());
+		}
+		return array($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets);
+	}
+
+	/**
+	 * receiving array of entries and event. returning array of durations s.t the i'th element is the duration of the 
+	 * i'th entry. if accumulated duration is exceeding the event's duration - the appropriate duration will be shorten
+	 * in accordance, and all the durations after will be shorten to '1'
+	 * @param array $sourceEntries
+	 * @param ILiveStreamScheduleEvent $event
+	 * @return array
+	 */
+	public static function getSourceDurations($sourceEntries, $event)
+	{
+		$durations = array();
+		$eventDuration = $event->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS - $event->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
+		$aggregatedDuration = 0;
+		foreach ($sourceEntries as $srcEntry)
+		{
+			$entryRoundedDuration = self::roundDuration($srcEntry->getLengthInMsecs());
+			$aggregatedDuration += $entryRoundedDuration;
+			if ($aggregatedDuration >= $eventDuration)
+			{
+				$durations[] = max($entryRoundedDuration - ($aggregatedDuration - $eventDuration), 1); // 1 as 0 is not valid for the packager
+			} else
+			{
+				$durations[] = $entryRoundedDuration;
+			}
+		}
+		return $durations;
 	}
 }
