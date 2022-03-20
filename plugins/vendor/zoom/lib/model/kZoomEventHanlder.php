@@ -142,9 +142,10 @@ class kZoomEventHanlder
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
 				$fileName = $kMeetingMetaData->getUuid() . '_' . $recordingFile->id . ZoomHelper::SUFFIX_ZOOM;
-				$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId);
+				$dropFolderFilesMap = self::loadDropFolderFiles($dropFolderId, $fileName);
 				if(!array_key_exists($fileName, $dropFolderFilesMap))
 				{
+					KalturaLog::debug('No recording named: ' . $fileName);
 					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType) ||
 						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $zoomVendorIntegration->getEnableZoomTranscription() === 0))
 					{
@@ -293,11 +294,11 @@ class kZoomEventHanlder
 		return $newEntry;
 	}
 	
-	protected static function loadDropFolderFiles($dropFolderId)
+	protected static function loadDropFolderFiles($dropFolderId, $fileName)
 	{
 		$statuses = array(KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED);
 		$order = DropFolderFilePeer::CREATED_AT;
-		$dropFolderFiles = self::retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses);
+		$dropFolderFiles = self::retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses, $fileName);
 		$dropFolderFilesMap = array();
 		foreach ($dropFolderFiles as $dropFolderFile)
 		{
@@ -306,12 +307,13 @@ class kZoomEventHanlder
 		return $dropFolderFilesMap;
 	}
 	
-	protected static function retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses)
+	protected static function retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses, $fileName)
 	{
 		$c = new Criteria();
 		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
 		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::NOT_IN);
 		$c->addAnd(DropFolderFilePeer::CREATED_AT, time() - dateUtils::DAY * 3, Criteria::GREATER_EQUAL);
+		$c->addAnd(DropFolderFilePeer::FILE_NAME, $fileName, Criteria::EQUAL);
 		$c->addAscendingOrderByColumn($order);
 		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
 		return $dropFolderFiles;
