@@ -297,8 +297,7 @@ class kZoomEventHanlder
 	protected static function loadDropFolderFiles($dropFolderId, $fileName)
 	{
 		$statuses = array(KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED);
-		$order = DropFolderFilePeer::CREATED_AT;
-		$dropFolderFiles = self::retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses, $fileName);
+		$dropFolderFiles = self::retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $statuses, $fileName);
 		$dropFolderFilesMap = array();
 		foreach ($dropFolderFiles as $dropFolderFile)
 		{
@@ -307,14 +306,12 @@ class kZoomEventHanlder
 		return $dropFolderFilesMap;
 	}
 	
-	protected static function retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $order, $statuses, $fileName)
+	protected static function retrieveByFolderIdOrderAndStatusesNotIn($dropFolderId, $statuses, $fileName)
 	{
 		$c = new Criteria();
 		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
 		$c->addAnd(DropFolderFilePeer::STATUS, $statuses, Criteria::NOT_IN);
-		$c->addAnd(DropFolderFilePeer::CREATED_AT, time() - dateUtils::DAY * 3, Criteria::GREATER_EQUAL);
 		$c->addAnd(DropFolderFilePeer::FILE_NAME, $fileName, Criteria::EQUAL);
-		$c->addAscendingOrderByColumn($order);
 		$dropFolderFiles = DropFolderFilePeer::doSelect($c);
 		return $dropFolderFiles;
 	}
