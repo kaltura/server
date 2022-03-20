@@ -300,14 +300,14 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP2");
 		}
 
-		$this->validatePropertyMinLength('srtPass', 3, true);
+		$this->validatePropertyMinMaxLength('srtPass', 10, 79, true);
 
 		parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validatePropertyMinLength('srtPass', 3, true);
+		$this->validatePropertyMinMaxLength('srtPass', 10, 79, true);
 
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
