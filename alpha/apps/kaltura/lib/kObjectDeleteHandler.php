@@ -307,13 +307,22 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 
     protected function partnerDeleted(Partner $partner)
     {
+        if($partner->getPartnerGroupType() != PartnerGroupType::PUBLISHER)
+        {
+            return;
+        }
+
         //find all admin users of this partner
         $adminUsers = Partner::getAdminLoginUsersList($partner->getPartnerId());
 
+        KalturaLog::debug("deleting partner:" +$partner->getPartnerId() );
         //delete all admin users of the account
+        /* @var $adminUser kuser */
         foreach($adminUsers as $adminUser)
         {
-            $adminUser->delete();
+            KalturaLog::debug("Deleting user:" . ${$adminUser->getPuserId()} . " for partner:" + $partner->getPartnerId());
+            $adminUser->setStatus(KuserStatus::DELETED);
+            $adminUser->save();
         }
     }
 }
