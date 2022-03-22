@@ -132,12 +132,12 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		$startRunTime = time();
-		$meetingFilesOrdered = $this->getMeetingsInStartTimeOrder();
+		$meetingFiles = $this->getMeetingsFromZoom();
 		$fileInStatusProcessingExists = false;
 		
-		if ($meetingFilesOrdered)
+		if ($meetingFiles)
 		{
-			$this->handleMeetingFiles($meetingFilesOrdered, $fileInStatusProcessingExists);
+			$this->handleMeetingFiles($meetingFiles, $fileInStatusProcessingExists);
 		}
 		else
 		{
@@ -190,7 +190,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 	
-	protected function getMeetingsInStartTimeOrder()
+	protected function getMeetingsFromZoom()
 	{
 		$dayToScan = date('Y-m-d', $this->dropFolder->lastHandledMeetingTime);
 
@@ -200,7 +200,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		$pageIndex = 0;
 		$nextPageToken = '';
-		$meetingFilesByStartTime = array();
 		do
 		{
 			$resultZoomList = $this->zoomClient->listRecordings(self::ME, $dayToScan, $nextPageToken, $pageSize);
@@ -209,20 +208,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			{
 				break;
 			}
-			foreach ($meetingFiles as $meetingFile)
-			{
-				$meetingsStartTime = kTimeZoneUtils::strToZuluTime($meetingFile[self::START_TIME]);
-				$meetingFilesByStartTime[$meetingsStartTime] = $meetingFile;
-			}
 			
 			$pageIndex++;
 			$nextPageToken = $resultZoomList && $resultZoomList[self::NEXT_PAGE_TOKEN] ?
 				$resultZoomList[self::NEXT_PAGE_TOKEN] : '';
 			
 		} while ($nextPageToken !== '' && $pageIndex < $maxPages);
-		
-		ksort($meetingFilesByStartTime);
-		return $meetingFilesByStartTime;
+
+		return $meetingFiles;
 	}
 	
 	protected function getMeetings($resultZoomList)
