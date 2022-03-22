@@ -1,4 +1,13 @@
 # Rigel-18.2.0
+## Add permissions to userScore Service ##
+* Issue Type: Task
+* Issue ID: PLAT-23649
+
+Add permissions to the userScore service
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_03_22_add_permissions_userscore.php
+
 ## Add permissions to EP User Analytics role ##
 * Issue Type: Task
 * Issue ID: PLAT-23641
