@@ -297,7 +297,7 @@ class kZoomEventHanlder
 	protected static function loadDropFolderFiles($dropFolderId, $fileName)
 	{
 		$statuses = array(KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED);
-		$dropFolderFiles = self::retrieveByFolderIdOrderAndStatusesNotInAndName($dropFolderId, $statuses, $fileName);
+		$dropFolderFiles = self::retrieveByFolderIdAndStatusesNotInAndName($dropFolderId, $statuses, $fileName);
 		$dropFolderFilesMap = array();
 		foreach ($dropFolderFiles as $dropFolderFile)
 		{
