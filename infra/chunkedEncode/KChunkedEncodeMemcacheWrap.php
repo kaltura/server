@@ -665,10 +665,10 @@ ini_set("memory_limit","512M");
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
 ///////////////
 // DEBUG ONLY
-// $dirName = dirname(__FILE__); //"/web2/content/shared/tmp/qualityTest/TestBench.11";
+// $dirName = dirname(__FILE__); 
 // $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
 // $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
-//$cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
+// $cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
 ///////////////
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';
@@ -768,6 +768,10 @@ ini_set("memory_limit","512M");
 				 * Up to 2 attempts for chunk generation, in order to overcome possible
 				 * zeroed frames issue, caused by too large GOPs in the source files 
 				 */
+			if(isset($job->maxExecTime)) {
+				$maxExecTime = $job->maxExecTime;
+				KalturaLog::log("maxExecTime:$maxExecTime");
+			}
 			for($i=0;$i<2;$i++) {
 				if($i>0){
 					$cmdLine = self::fixCmdLineBackOffset($cmdLine);
@@ -786,6 +790,12 @@ ini_set("memory_limit","512M");
 					break;
 				if(KFFMpegMediaParser::detectEmptyFrames($ffmpegBin, $ffprobeBin, $outFilename)===false)
 					break;
+					// Adjsut the maxExecTime according to attempt
+				if(isset($job->maxExecTime)) {
+					$job->maxExecTime = $maxExecTime*($i+2);
+					$storeManager->SaveJob($job);
+					KalturaLog::log("new maxExecTime:$job->maxExecTime");
+				}
 			}
 
 			if($rv==0) {
