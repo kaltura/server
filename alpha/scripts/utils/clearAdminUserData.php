@@ -2,7 +2,7 @@
 function usage()
 {
     die("\nUsage - clear admin user data: php clearAdminUserData.php <PartnerId> <partnerAdminEmail> <Are you sure : yes/no>\n\n".
-        "FYI - Following this api the user and its login-data will be deleted without any trace.\n\n");
+        "FYI - Following this script, all the account users and their login-data will be deleted without any trace.\n\n");
 }
 if($argc != 4 || $argv[3] !== "yes")
 {
