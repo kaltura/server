@@ -306,7 +306,7 @@ class kZoomEventHanlder
 		return $dropFolderFilesMap;
 	}
 	
-	protected static function retrieveByFolderIdOrderAndStatusesNotInAndName($dropFolderId, $statuses, $fileName)
+	protected static function retrieveByFolderIdAndStatusesNotInAndName($dropFolderId, $statuses, $fileName)
 	{
 		$c = new Criteria();
 		$c->addAnd(DropFolderFilePeer::DROP_FOLDER_ID, $dropFolderId, Criteria::EQUAL);
