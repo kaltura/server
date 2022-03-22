@@ -13,7 +13,7 @@ class kHtmlPurifier
 	const ALLOWED_FRAME_TARGETS = 'allowedFrameTargets';
 	const ALLOWED_REL = 'allowedRel';
 	const HTML_DOCTYPE = "HTMLDoctype";
-	const ALLOWED_ESCAPED_SPECIEL_CHARS = "allowEscapedSpecialChars";
+	const ALLOW_ESCAPED_SPECIEL_CHARS = "allowEscapedSpecialChars";
 
 	
 	private static $purifier = null;
@@ -40,7 +40,7 @@ class kHtmlPurifier
 		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
 		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
 		$decodedModifiedValue = htmlspecialchars_decode($modifiedValueTrimmedSpace);
-		$allowEscapedSpecialChars = kConf::getArrayValue(self::ALLOWED_ESCAPED_SPECIEL_CHARS, self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, true);
+		$allowEscapedSpecialChars = kConf::getArrayValue(self::ALLOW_ESCAPED_SPECIEL_CHARS, self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, true);
 
 		if($modifiedValueTrimmedSpace == $valueTrimmedSpace || ($allowEscapedSpecialChars && $decodedModifiedValue == $valueTrimmedSpace))
 		{
