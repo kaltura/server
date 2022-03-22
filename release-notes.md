@@ -1,4 +1,10 @@
 # Rigel-18.2.0
+## Add SRT domain ##
+* Issue Type: Story
+* Issue ID: LIV-884
+
+Add "srt_domain" to both Primary and backup in broadcast.ini with the host of the srt ingest
+
 ## Add permissions to EP User Analytics role ##
 * Issue Type: Task
 * Issue ID: PLAT-23641
