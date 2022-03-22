@@ -1505,6 +1505,47 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 				}
 			}
 		}
+
+		/********************
+		 * calcMaxExecutionTime
+		 */
+		public function calcMaxExecutionTime($maxExecutionTime)
+		{
+			KalturaLog::log("max:$maxExecutionTime");
+			/*
+			 * Adjust chunk's default maxExecutionTime (matches FHD)
+			 * to all resolutions and to audio stream generation
+			 */
+$vMax = 0;
+$aMax = 0;
+				// Video maxExecutionTime adjusted relatively to resolution pix count/frame area
+			if(isset($this->params->width) && isset($this->params->height) && isset($this->setup->chunkDuration)) {
+				$vMax=round(($maxExecutionTime/(1920*1080))*($this->params->width*$this->params->height)*($this->setup->chunkDuration/60));
+			}
+			if($vMax==0) $vMax = $maxExecutionTime;
+			else if($vMax<1800)	$vMax = 1800;
+			$vMax = max($vMax,30);
+			
+				// Audio maxExecutionTime adjusted to content duration (no chunks for audio)
+			if(isset($this->params->duration) && $this->params->duration>0)
+				$aMax=round($this->params->duration/2);
+			else $aMax = round($maxExecutionTime);
+				// Min execution timeout - at least 30s, to prevent TO's of very short contents
+			$aMax = max($aMax,30);
+
+				// Workarround for long conversions of large MXF file stored on S3
+			if($this->sourceFileDt->containerFormat=="mxf"){
+				$aMax*= 2;
+				$vMax*= 2;
+			}
+				// Very HI br sources tend to cause VERY slow wud transcoding
+			else if($this->sourceFileDt->videoBitRate > 200000) {
+				$aMax*= 10;
+				$vMax*= 2;
+			}
+			KalturaLog::log("vMax:$vMax, aMax:$aMax");
+			return array($vMax,$aMax);
+		}
 	}
 	
 	/********************
