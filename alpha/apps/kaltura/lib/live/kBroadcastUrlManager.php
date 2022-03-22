@@ -262,7 +262,7 @@ class kBroadcastUrlManager
 		$data = $entry->getSrtPass();
 
 		$encryptedToken = kEncryptFileUtils::encryptData($data, $key, $iv);
-		return base64_encode($encryptedToken);
+		return urlencode(base64_encode($encryptedToken));
 	}
 
 	public function createSrtStreamId(LiveStreamEntry $entry, $sessionType)
