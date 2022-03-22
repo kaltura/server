@@ -36,9 +36,6 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 
 		if($object instanceof FileSync)
 			return true;
-
-        if($object instanceof Partner)
-            return true;
 			
 		return false;
 	}
@@ -77,11 +74,8 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 
 		if($object instanceof FileSync)
 			$this->fileSyncDelete($object, $raisedJob);
-
-        if($object instanceof Partner)
-            $this->partnerDeleted($object);
-
-        return true;
+			
+		return true;
 	}
 
 	/**
@@ -305,24 +299,4 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 		}
 	}
 
-    protected function partnerDeleted(Partner $partner)
-    {
-        if($partner->getPartnerGroupType() != PartnerGroupType::PUBLISHER)
-        {
-            return;
-        }
-
-        //find all admin users of this partner
-        $adminUsers = Partner::getAdminLoginUsersList($partner->getPartnerId());
-
-        KalturaLog::debug("deleting partner:" +$partner->getPartnerId() );
-        //delete all admin users of the account
-        /* @var $adminUser kuser */
-        foreach($adminUsers as $adminUser)
-        {
-            KalturaLog::debug("Deleting user:" . ${$adminUser->getPuserId()} . " for partner:" + $partner->getPartnerId());
-            $adminUser->setStatus(KuserStatus::DELETED);
-            $adminUser->save();
-        }
-    }
 }
