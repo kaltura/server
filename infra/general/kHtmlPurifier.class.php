@@ -13,6 +13,8 @@ class kHtmlPurifier
 	const ALLOWED_FRAME_TARGETS = 'allowedFrameTargets';
 	const ALLOWED_REL = 'allowedRel';
 	const HTML_DOCTYPE = "HTMLDoctype";
+	const ALLOW_ESCAPED = "allowEscaped";
+
 	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
@@ -38,8 +40,13 @@ class kHtmlPurifier
 		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
 		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
 		$decodedModifiedValue = htmlspecialchars_decode($modifiedValueTrimmedSpace);
-		
-		if ($modifiedValueTrimmedSpace != $valueTrimmedSpace && $decodedModifiedValue != $valueTrimmedSpace)
+		$allowEscaped = kConf::getArrayValue(self::ALLOW_ESCAPED, self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, true);
+
+		if($modifiedValueTrimmedSpace == $valueTrimmedSpace || ($allowEscaped && $decodedModifiedValue == $valueTrimmedSpace))
+		{
+			return $value;
+		}
+		else
 		{
 			$msg = "Potential Unsafe HTML tags found in $className::$propertyName"
 					. "\nORIGINAL VALUE: [" . $value . "]"
@@ -59,8 +66,6 @@ class kHtmlPurifier
 			$errorMessage = "UNSAFE_HTML_TAGS;Potential Unsafe HTML tags found in [$className]::[$propertyName]";
 			throw new Exception($errorMessage);
 		}
-
-		return $value;
 	}
 
 	public static function isMarkupAllowed( $className, $propertyName )
