@@ -8,6 +8,12 @@ Add permissions to the userScore service
 ### Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_03_22_add_permissions_userscore.php
 
+## Add SRT domain ##
+* Issue Type: Story
+* Issue ID: LIV-884
+
+Add "srt_domain" to both Primary and backup in broadcast.ini with the host of the srt ingest
+
 ## Add permissions to EP User Analytics role ##
 * Issue Type: Task
 * Issue ID: PLAT-23641

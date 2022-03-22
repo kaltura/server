@@ -95,24 +95,28 @@ class kBroadcastUrlManager
 	
 	protected function getHostname ($dc, $primary, $entry, $protocol)
 	{
-		$sourceType = $entry->getSource();
-		$applicationSuffix = $this->getPostfixValue($sourceType);
 		$broadcastConfig = $this->getConfiguration($dc);
 		list($domainParam, $portParam) = self::getUrlParamsByProtocol($protocol);
 		$url = $broadcastConfig[$domainParam];
-		$url = str_replace(array("{entryId}", "{primary}"), array($entry->getId(), $primary ? "p" : "b"), $url);
-		$port = $this->getPort($dc, $portParam, $protocol);
-		
+		$url = str_replace(array('{entryId}', '{primary}'), array($entry->getId(), $primary ? 'p' : 'b'), $url);
+		$url .= ':' . $this->getPort($dc, $portParam, $protocol);
+
+		if ($protocol === kBroadcastUrlManager::PROTOCOL_SRT )
+		{
+			return $url; // as srt protocol doesn't require app route
+		}
+
+		$sourceType = $entry->getSource();
+		$applicationSuffix = $this->getPostfixValue($sourceType);
 		if (isset ($broadcastConfig['application'][$applicationSuffix]))
-			$app = $broadcastConfig['application'][$applicationSuffix];
+			$url .= '/' . $broadcastConfig['application'][$applicationSuffix];
 		else
 		{
 			//return empty url
 			KalturaLog::log("The value for $applicationSuffix does not exist in the broadcast map.");
 			return null;
 		}
-		
-		return "$url:$port/$app";
+		return $url;
 	}
 	
 	protected function getPort($dc, $portParam, $protocol)
