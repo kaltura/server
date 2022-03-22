@@ -14,7 +14,7 @@ require("/opt/kaltura/app/alpha/scripts/bootstrap.php");
 $partnerId = $argv[1];
 $partnerAdminEmail = $argv[2];
 
-//find userLoginData by login email and validate partner ID
+//find partner and validate admin email
 $partner = PartnerPeer::retrieveByPK($partnerId);
 if(!$partner || $partner->getAdminEmail()!==$partnerAdminEmail)
 {
