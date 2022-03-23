@@ -303,6 +303,7 @@ function getUserGroupsUpdates($updatedAt)
 	$c->addSelectColumn(KuserKgroupPeer::KUSER_ID);
 	$c->addSelectColumn(KuserKgroupPeer::PUSER_ID);
 	$c->addSelectColumn(KuserKgroupPeer::PARTNER_ID);
+	$c->addSelectColumn(KuserKgroupPeer::UPDATED_AT);
 	$c->add(KuserKgroupPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(KuserKgroupPeer::UPDATED_AT);
 	$c->setLimit(MAX_ITEMS);
