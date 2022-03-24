@@ -802,6 +802,13 @@ class languageCodeManager
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QHI",null,null,"qhi","Hindi (Audio Described)","Hindi (Audio Described)","qhi");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QPT",null,null,"qpt","Portuguese (Audio Described)","Portuguese (Audio Described)","qpt");
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QIT",null,null,"qit","Italian (Audio Described)","Italian (Audio Described)","qit");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QFI",null,null,"qfi","Finnish (Audio Described)","Finnish (Audio Described)","qfi");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QSW",null,null,"qsw","Swedish (Audio Described)","Swedish (Audio Described)","qsw");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QNO",null,null,"qno","Norwegian (Audio Described)","Norwegian (Audio Described)","qno");            
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QIC",null,null,"qic","Icelandic (Audio Described)","Icelandic (Audio Described)","qic");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QDA",null,null,"qda","Danish (Audio Described)","Danish (Audio Described)","qda");
+        self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"QSM",null,null,"qsm","Northern Sami (Audio Described)","Northern Sami (Audio Described)","qsm");
+
 
         //Adding language that are not part of ISO-639
         self::addLanguageToArrays($tmpArrKeyCode,$tmpArrThreeCodeT,$tmpArrThreeCodeB,$tmpArrKalturaName,"HKK","hkk","hkk","hkk","Hokkien","Hokkien","Hokkien");
