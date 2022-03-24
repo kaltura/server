@@ -86,7 +86,7 @@ class kInfraRedisCacheWrapper extends kInfraBaseCacheWrapper
 	/* (non-PHPdoc)
      * @see kBaseCacheWrapper::get()
      */
-	protected function doGet($key)
+	public function doGet($key)
 	{
 		return $this->callAndDetectErrors('get', array($key));
 	}
