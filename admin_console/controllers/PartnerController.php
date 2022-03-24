@@ -138,8 +138,14 @@ class PartnerController extends Zend_Controller_Action
 	
 	protected function setFieldsFromTemplate(& $config, $newPartner)
 	{
-		$config->excludedAdminRoleName = $newPartner->excludedAdminRoleName;
-		$config->allowedDomains = $newPartner->allowedDomains;
+		if (!is_null($newPartner->excludedAdminRoleName))
+		{
+			$config->excludedAdminRoleName = $newPartner->excludedAdminRoleName;
+		}
+		if (!is_null($newPartner->allowedDomains))
+		{
+			$config->allowedDomains = $newPartner->allowedDomains;
+		}
 	}
 	
 	public function listAction()
