@@ -136,7 +136,7 @@ class PartnerController extends Zend_Controller_Action
 		$this->view->form = $form;
 	}
 	
-	protected function setFieldsFromTemplate(& $config, $newPartner)
+	protected function setFieldsFromTemplate(&$config, $newPartner)
 	{
 		if (!is_null($newPartner->excludedAdminRoleName))
 		{
