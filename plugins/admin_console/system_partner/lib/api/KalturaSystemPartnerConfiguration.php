@@ -809,12 +809,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
-		
 		if(!is_null($this->passwordStructureValidations))
 		{
 			$object_to_fill->setPasswordStructureValidations(
 				array(array($this->passwordStructureValidations,
 				            $this->passwordStructureValidationsDescription)));
+		}
+		else
+		{
+			$object_to_fill->setPasswordStructureValidations('');
 		}
 		
 		if(!is_null($this->secondarySecretRoleId))
@@ -824,6 +827,24 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setSecondarySecretRoleId(null);
+		}
+		
+		if(!is_null($this->excludedAdminRoleName))
+		{
+			$object_to_fill->setExcludedAdminRoleName($this->excludedAdminRoleName);
+		}
+		else
+		{
+			$object_to_fill->setExcludedAdminRoleName('');
+		}
+		
+		if(!is_null($this->allowedDomains))
+		{
+			$object_to_fill->setAllowedDomains($this->allowedDomains);
+		}
+		else
+		{
+			$object_to_fill->setAllowedDomains('');
 		}
 		
 		return $object_to_fill;
