@@ -232,13 +232,11 @@ class kSimuliveUtils
 	protected static function createPaddedAssetsArray ($assets)
 	{
 		$paddedAssets = array();
-		$assetsExists = count(array_filter($assets));
+		// null padding should be according to the largest assets array
+		$assetsCount = count(max($assets));
 		// we need to handle caption / audio assets only if there is an asset for at least one of the entries
-		if ($assetsExists)
+		if ($assetsCount)
 		{
-			// null padding should be according to the largest assets array
-			$assetsCount = count(max($assets));
-
 			foreach ($assets as &$asset)
 			{
 				$asset = array_pad($asset, $assetsCount, null);
@@ -310,9 +308,9 @@ class kSimuliveUtils
 		foreach ($sourceEntries as $srcEntry)
 		{
 			list($mainFlavorAssets, $mainCaptionAssets, $mainAudioAssets) = myEntryUtils::getEntryAssets($srcEntry);
-			$entriesFlavorAssets = array_merge($entriesFlavorAssets, array($mainFlavorAssets));
-			$entriesCaptionAssets = array_merge($entriesCaptionAssets, array($mainCaptionAssets));
-			$entriesAudioAssets = array_merge($entriesAudioAssets, array($mainAudioAssets));
+			$entriesFlavorAssets[] = $mainFlavorAssets;
+			$entriesCaptionAssets[] = $mainCaptionAssets;
+			$entriesAudioAssets[] = $mainAudioAssets;
 		}
 		return array($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets);
 	}
