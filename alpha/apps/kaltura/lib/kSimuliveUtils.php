@@ -313,7 +313,6 @@ class kSimuliveUtils
 			$entriesFlavorAssets = array_merge($entriesFlavorAssets, array($mainFlavorAssets));
 			$entriesCaptionAssets = array_merge($entriesCaptionAssets, array($mainCaptionAssets));
 			$entriesAudioAssets = array_merge($entriesAudioAssets, array($mainAudioAssets));
-			$durations[] = self::roundDuration($srcEntry->getLengthInMsecs());
 		}
 		return array($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets);
 	}
