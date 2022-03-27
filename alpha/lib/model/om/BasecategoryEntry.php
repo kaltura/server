@@ -1477,7 +1477,7 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 	 * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
 	 * @throws     PropelException
 	 */
-	public function copyInto($copyObj, $deepCopy = false)
+	public function copyInto($copyObj, $deepCopy = false, $toDuplicate = true)
 	{
 
 		$copyObj->setPartnerId($this->partner_id);
@@ -1499,12 +1499,16 @@ abstract class BasecategoryEntry extends BaseObject  implements Persistent {
 		$copyObj->setPrivacyContext($this->privacy_context);
 
 		$copyObj->setCreatorKuserId($this->creator_kuser_id);
-
-
-		$copyObj->setNew(true);
-
-		$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
-
+		if ($toDuplicate)
+		{
+			$copyObj->setNew(true);
+			$copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+		}
+		else
+		{
+			$copyObj->setNew(false);
+			$copyObj->setId($this->id);	
+		}
 	}
 
 	/**

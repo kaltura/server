@@ -231,7 +231,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 * @throws Exception
 	 * @return categoryEntry $categoryEntry
 	 */
-	public function add($entryId, $categoryId)
+	public function add($entryId, $categoryId, $toDuplicate = true)
 	{
 		$entry = $this->retrieveEntry($entryId, false);
 		$category = $this->retrieveCategory($categoryId, false);
@@ -244,7 +244,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 
 		if($categoryEntryExists)
 		{
-			$categoryEntryExists->copyInto($this);
+			$categoryEntryExists->copyInto($this, false, $toDuplicate);
 		}
 
 		$this->setStatus(CategoryEntryStatus::ACTIVE);
