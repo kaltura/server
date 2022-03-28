@@ -251,7 +251,6 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 				}
 				$this->$kalturaProperty = self::CHAR_APOSTROPHE . $this->$kalturaProperty;
 			}
-			KalturaLog::info($this->$kalturaProperty);
 		}
 	}
 }
