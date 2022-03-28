@@ -296,7 +296,7 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 		if($entry->getStatus() == entryStatus::NO_CONTENT)
 			return;
 				
-		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($entry->getPartnerId());
+		$storageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($entry->getPartnerId());
 		foreach ($storageProfiles as $profile) 
 		{			
 			/* @var $profile StorageProfile */
