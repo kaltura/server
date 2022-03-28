@@ -165,7 +165,7 @@ class KDLWrap
 					$format = isset($trg->_container->_id)? $trg->_container->_id: null;
 					$fps 	= isset($trg->_video->_frameRate)? $trg->_video->_frameRate: null;
 					$gop 	= isset($trg->_video->_gop)? $trg->_video->_gop: null;
-					$duration = isset($trg->_container->_duration)? round($trg->_container->_duration/1000): null;;
+					$duration = isset($trg->_container->_duration)? round($trg->_container->_duration/1000,2): null;;
 					$height = isset($trg->_video->_height)? $trg->_video->_height: null;
 					$msgStr = null;
 					$rv=KChunkedEncode::verifySupport($vcodec,$acodec,$format,$fps,$gop,$duration,$height,$msgStr);
