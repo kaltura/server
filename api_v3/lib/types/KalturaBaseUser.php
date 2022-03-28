@@ -6,6 +6,8 @@
 */
 class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 {
+	const CHAR_APOSTROPHE 	= "'";
+
 	/**
 	 * @var string
 	 * @filter order
@@ -242,12 +244,14 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 				}
 			}
 
-			if ($kalturaProperty == 'lastName')
-				if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty, array('+', '=', '@', ',')) || (strlen($this->$kalturaProperty) != 1 && myKuserUtils::startsWithSpecialChar($this->$kalturaProperty, array('-'))))
+			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
+			{
+				if (strlen($this->$kalturaProperty) != 1) {
 					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
-			else
-				if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty, array('+', '=', '-', '@', ',')))
-					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
+				}
+				$this->$kalturaProperty = self::CHAR_APOSTROPHE . $this->$kalturaProperty;
+			}
+			KalturaLog::info($this->$kalturaProperty);
 		}
 	}
 }
