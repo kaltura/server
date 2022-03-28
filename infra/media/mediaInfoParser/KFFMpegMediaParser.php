@@ -307,7 +307,7 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 				if(isset($value) && $value!=false && $value<120) 
 					$mediaInfo->videoFrameRate = round($value,3);
 			}
-		}			
+		}	
 		$mediaInfo->videoDar = null;
 		if(isset($stream->display_aspect_ratio)){
 			$display_aspect_ratio = trim($stream->display_aspect_ratio);
@@ -905,8 +905,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 
 		$dataArr = array();
 		$frmSizeAcc=0;
-		$frmSizeAccArr=array("I"=>0,"P"=>0,"B"=>0);
-		$cntArr=array("I"=>0,"P"=>0,"B"=>0);
+		$frmSizeAccArr=array();
+		$cntArr=array();
 		foreach($outputArr as $line){
 			$valsArr = explode(',', $line);
 			if(count($valsArr)<8)
@@ -916,8 +916,14 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			$dataArr[] = $data;
 //KalturaLog::log(json_encode($data));
 			{
-				$cntArr[$pictType]+= 1;
-				$frmSizeAccArr[$pictType]+= $pktSize;
+				if(array_key_exists($pictType, $cntArr)===true) {
+					$cntArr[$pictType]+= 1;
+					$frmSizeAccArr[$pictType]+= $pktSize;
+				}
+				else {
+					$cntArr[$pictType] = 1;
+					$frmSizeAccArr[$pictType] = $pktSize;
+				}
 				$frmSizeAcc+= $pktSize;
 			}
 		}
@@ -934,9 +940,9 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			// Scan for empty frames
 		$emptyArr = array();
 		$fst=PHP_INT_MAX;$lst=0;
-		foreach($dataArr as $data){
+		foreach($dataArr as $idx=>$data){
 			if($data[4]<$threshold) {
-				$emptyArr[] = array("nm"=>$data[6],"sz"=>$data[4],"tp"=>$data[5]);
+				$emptyArr[] = array("ix"=>$idx,"nm"=>$data[6],"sz"=>$data[4],"tp"=>$data[5]);
 				$fst = min($fst,$data[6]); $lst = max($lst,$data[6]);
 			}
 		}
@@ -950,7 +956,10 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		}
 
 		$emptyCnt=count($emptyArr);
-		$empIntervalSz = ($fst>$lst)?0:($lst-$fst+1);
+		if($fst==0 && $lst==0)
+			$empIntervalSz = count($dataArr);
+		else 
+			$empIntervalSz = ($fst>$lst)?0:($lst-$fst+1);
 		if($emptyCnt>3 && $empIntervalSz>0 && $emptyCnt/$empIntervalSz>0.8) {
 			KalturaLog::log("Empty frames:".serialize($emptyArr));
 			KalturaLog::log("RESULT:detected empty frames - num:$emptyCnt, fst:$fst,lst:$lst, emptiness ratio:".($emptyCnt/$empIntervalSz)." ($statStr)");

@@ -296,6 +296,68 @@ function getCategoryEntryUpdates($updatedAt)
 	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
 }
 
+function getUserGroupsUpdates($updatedAt)
+{
+	// get the puser+partner ids
+	$c = new Criteria();
+	$c->addSelectColumn(KuserKgroupPeer::KUSER_ID);
+	$c->addSelectColumn(KuserKgroupPeer::PUSER_ID);
+	$c->addSelectColumn(KuserKgroupPeer::PARTNER_ID);
+	$c->addSelectColumn(KuserKgroupPeer::UPDATED_AT);
+	$c->add(KuserKgroupPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
+	$c->addAscendingOrderByColumn(KuserKgroupPeer::UPDATED_AT);
+	$c->setLimit(MAX_ITEMS);
+	KuserKgroupPeer::setUseCriteriaFilter(false);
+	$stmt = KuserKgroupPeer::doSelectStmt($c);
+	KuserKgroupPeer::setUseCriteriaFilter(true);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	$maxUpdatedAt = 0;
+	$kusers = array();
+	$result = array();
+	foreach ($rows as $row)
+	{
+		$kuserId = $row['KUSER_ID'];
+		$kusers[$kuserId] = '';
+
+		$puserId = $row['PUSER_ID'];
+		$partnerId = $row['PARTNER_ID'];
+		$key = md5($partnerId . '_' . strtolower($puserId));
+		$result[$key] = '';
+
+		$updatedAt = getUnixTimestampFromDate($row['UPDATED_AT']);
+		$maxUpdatedAt = max($maxUpdatedAt, $updatedAt);
+	}
+
+	$con = KuserKgroupPeer::alternativeCon(null);
+	$con->exec('SET SESSION group_concat_max_len = 1000000');
+
+	// get the groups
+	$groupIdsCol = 'GROUP_CONCAT('.KuserKgroupPeer::KGROUP_ID.')';
+	$c = new Criteria();
+	$c->addSelectColumn(KuserKgroupPeer::PARTNER_ID);
+	$c->addSelectColumn(KuserKgroupPeer::PUSER_ID);
+	$c->addSelectColumn($groupIdsCol);
+	$c->addGroupByColumn(KuserKgroupPeer::KUSER_ID);
+	$c->add(KuserKgroupPeer::KUSER_ID, array_keys($kusers), Criteria::IN);
+	$c->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+	$stmt = KuserKgroupPeer::doSelectStmt($c);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	// update user's groups (a user that wasn't fetched in the second query will remain empty)
+	foreach ($rows as $row)
+	{
+		$puserId = $row['PUSER_ID'];
+		$partnerId = $row['PARTNER_ID'];
+
+		$key = md5($partnerId . '_' . strtolower($puserId));
+		$groupsIds = $row[$groupIdsCol];
+		$result[$key] = $groupsIds;
+	}
+
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+}
+
 // parse params
 $params = infraRequestUtils::getRequestParams();
 $requestType = isset($params['type']) ? $params['type'] : null;
@@ -318,6 +380,7 @@ $requestHandlers = array(
 	'user' => 'getUserUpdates',
 	'entry' => 'getEntryUpdates',
 	'categoryEntry' => 'getCategoryEntryUpdates',
+	'userGroups' => 'getUserGroupsUpdates',
 );
 
 if (isset($requestHandlers[$requestType]))

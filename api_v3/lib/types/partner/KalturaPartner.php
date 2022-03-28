@@ -451,6 +451,18 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $isSelfServe;
 	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $allowedDomains;
+	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $excludedAdminRoleName;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
@@ -462,7 +474,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'host', 'cdnHost', 'isFirstLogin', 'logoutUrl', 'partnerParentId','crmId', 'referenceId', 'timeAlignedRenditions','eSearchLanguages',
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
-		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe'
+		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe','allowedDomains',
+		'excludedAdminRoleName'
 	);
 	
 	public function getMapBetweenObjects ( )

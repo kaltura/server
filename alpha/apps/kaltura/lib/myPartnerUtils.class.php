@@ -1466,7 +1466,6 @@ class myPartnerUtils
  		self::copyConversionProfiles($fromPartner, $toPartner);
  	
 		self::saveTemplateObjectsNum($fromPartner, $toPartner);
-
  		// Launch a batch job that will copy the heavy load as an async operation 
   		kJobsManager::addCopyPartnerJob( $fromPartner->getId(), $toPartner->getId() );
  	}

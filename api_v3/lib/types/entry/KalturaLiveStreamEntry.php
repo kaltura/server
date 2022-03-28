@@ -50,13 +50,35 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $primaryRtspBroadcastingUrl;
 	
 	/**
 	 * @var string
+	 * @deprecated
 	 */
 	public $secondaryRtspBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $primarySrtBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $primarySrtStreamId;
+
+	/**
+	 * @var string
+	 */
+	public $secondarySrtBroadcastingUrl;
+
+	/**
+	 * @var string
+	 */
+	public $secondarySrtStreamId;
 	
 	/**
 	 * @var string
@@ -114,6 +136,11 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	 * @readonly
 	 */
 	public $streamUsername;
+
+	/**
+	 * @var string
+	 */
+	public $srtPass;
 	
 	/**
 	 * The Streams primary server node id 
@@ -145,6 +172,10 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"secondarySecuredBroadcastingUrl",
 		"primaryRtspBroadcastingUrl",
 		"secondaryRtspBroadcastingUrl",
+		"primarySrtBroadcastingUrl",
+		"secondarySrtBroadcastingUrl",
+		"primarySrtStreamId",
+		"secondarySrtStreamId",
 		"streamName",
 		"streamUrl",
 	    "hlsStreamUrl",
@@ -152,6 +183,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		"encodingIP2",
 		"streamPassword",
 		"streamUsername",
+		"srtPass",
 		"bitrates" => "streamBitrates",
 		"primaryServerNodeId",
 		"sipToken",
@@ -193,6 +225,11 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->secondarySecuredBroadcastingUrl = null;
 			$this->primaryRtspBroadcastingUrl = null;
 			$this->secondaryRtspBroadcastingUrl = null;
+			$this->primarySrtBroadcastingUrl = null;
+			$this->primarySrtStreamId = null;
+			$this->secondarySrtBroadcastingUrl = null;
+			$this->secondarySrtStreamId = null;
+			$this->srtPass = null;
 		}
 		parent::doFromObject($dbObject, $responseProfile);
 	}
@@ -220,13 +257,14 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	{
 		if(strpos(strtolower(kCurrentContext::$client_lang), "kmc") !== false)
 		{
-			$props_to_skip[] = 'primaryBroadcastingUrl';
-			$props_to_skip[] = 'secondaryBroadcastingUrl';
-			$props_to_skip[] = 'primarySecuredBroadcastingUrl';
-			$props_to_skip[] = 'secondarySecuredBroadcastingUrl';
-			$props_to_skip[] = 'primaryRtspBroadcastingUrl';
-			$props_to_skip[] = 'secondaryRtspBroadcastingUrl';
+			$props_to_skip[] = LiveStreamEntry::PRIMARY_BROADCASTING_URL;
+			$props_to_skip[] = LiveStreamEntry::SECONDARY_BROADCASTING_URL;
+			$props_to_skip[] = LiveStreamEntry::PRIMARY_RTMPS_BROADCASTING_URL;
+			$props_to_skip[] = LiveStreamEntry::SECONDARY_RTMPS_BROADCASTING_URL;
+			$props_to_skip[] = LiveStreamEntry::PRIMARY_RTSP_BROADCASTING_URL;
+			$props_to_skip[] = LiveStreamEntry::SECONDARY_RTSP_BROADCASTING_URL;
 		}
+
 		return parent::toUpdatableObject($object_to_fill, $props_to_skip);
 	}
 
@@ -262,9 +300,18 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 			$this->validatePropertyNotNull("encodingIP2");
 		}
 
+		$this->validatePropertyMinMaxLength('srtPass', 10, 79, true);
+
 		parent::validateForInsert($propertiesToSkip);
 	}
-	
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinMaxLength('srtPass', 10, 79, true);
+
+		parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
 	protected function validateEncodingIP ($ip)
 	{
 		if (!filter_var($this->encodingIP1, FILTER_VALIDATE_IP))

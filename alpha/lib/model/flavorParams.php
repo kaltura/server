@@ -148,7 +148,7 @@ class flavorParams extends assetParams
 		 * Should be '3' to turn both on
 		 */
 	public function setOptimizationPolicy($v){ $this->putInCustomData('OptimizationPolicy', $v);}
-	public function getOptimizationPolicy(){return $this->getFromCustomData('OptimizationPolicy', null, 1);}
+	public function getOptimizationPolicy(){return $this->getFromCustomData('OptimizationPolicy', null, 4);}
 		/*
 		 * When set, IMX sources (mxf/mpeg2/720x608) the top 32 lines will be cropped
 		 */

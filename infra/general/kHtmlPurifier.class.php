@@ -13,6 +13,8 @@ class kHtmlPurifier
 	const ALLOWED_FRAME_TARGETS = 'allowedFrameTargets';
 	const ALLOWED_REL = 'allowedRel';
 	const HTML_DOCTYPE = "HTMLDoctype";
+	const ALLOW_ESCAPED_SPECIAL_CHARS = "allowEscapedSpecialChars";
+
 	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
@@ -37,12 +39,19 @@ class kHtmlPurifier
 		
 		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
 		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
-		
-		if ($modifiedValueTrimmedSpace != $valueTrimmedSpace)
+		$decodedModifiedValue = htmlspecialchars_decode($modifiedValueTrimmedSpace);
+		$allowEscapedSpecialChars = kConf::getArrayValue(self::ALLOW_ESCAPED_SPECIAL_CHARS, self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, true);
+
+		if($modifiedValueTrimmedSpace == $valueTrimmedSpace || ($allowEscapedSpecialChars && $decodedModifiedValue == $valueTrimmedSpace))
+		{
+			return $value;
+		}
+		else
 		{
 			$msg = "Potential Unsafe HTML tags found in $className::$propertyName"
 					. "\nORIGINAL VALUE: [" . $value . "]"
 					. "\nMODIFIED VALUE: [" . $modifiedValue . "]"
+					. "\nDECODED ORIGINAL VALUE: [" . $decodedModifiedValue . "] "
 				;
 			KalturaLog::err( $msg );
 
@@ -57,8 +66,6 @@ class kHtmlPurifier
 			$errorMessage = "UNSAFE_HTML_TAGS;Potential Unsafe HTML tags found in [$className]::[$propertyName]";
 			throw new Exception($errorMessage);
 		}
-
-		return $value;
 	}
 
 	public static function isMarkupAllowed( $className, $propertyName )
