@@ -154,7 +154,6 @@ class PartnerService extends KalturaBaseService
 			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, 'Unknown error');
 		}
 		
-		PermissionPeer::enableForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, PermissionType::SPECIAL_FEATURE, $dbPartner->getPartnerId());
 		$partner = new KalturaPartner(); // start from blank
 		$partner->fromPartner( $dbPartner );
 		$partner->secret = $dbPartner->getSecret();
