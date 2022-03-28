@@ -27,6 +27,7 @@
 				<tags>kmc</tags>
 			</userRole>
 		</request>
+
 		<request service="user" action="add">
 			<user objectType="KalturaUser">
 				<id>template@kaltura.com</id>
