@@ -3605,7 +3605,15 @@ class kFlowHelper
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
 		if (count($nonSourceFlavors) < 2)
 		{
-			return;
+			if (count($nonSourceFlavors) == 0)
+			{
+				return;
+			}
+			
+			if (!self::isAssetDimBiggerThanSource($nonSourceFlavors[0]))
+			{
+				return;
+			}
 		}
 
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
@@ -3619,5 +3627,19 @@ class kFlowHelper
 			$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
 			$highestBitrateFlavor->save();
 		}
+	}
+	
+	protected static function isAssetDimBiggerThanSource(asset $flavorAsset)
+	{
+		$staticContentParams = kConf::get('staticContentAdditionalParams', 'runtime_config', array());
+		$diffNum = isset($staticContentParams['dimension_diff_percentage']) ? $staticContentParams['dimension_diff_percentage'] : 5;
+		
+		$diffPercentage = (100 - $diffNum) / 100;
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
+		
+		$flavorAssetDim = $flavorAsset->getWidth() * $flavorAsset->getHeight();
+		$sourceFlavorDim = $sourceFlavor->getWidth() * $sourceFlavor->getHeight();
+		
+		return ($flavorAssetDim >= $sourceFlavorDim * $diffPercentage);
 	}
 }
