@@ -200,6 +200,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		$pageIndex = 0;
 		$nextPageToken = '';
+		$meetingFilesList = array();
 		do
 		{
 			$resultZoomList = $this->zoomClient->listRecordings(self::ME, $dayToScan, $nextPageToken, $pageSize);
@@ -208,6 +209,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			{
 				break;
 			}
+			$meetingFilesList[] = $meetingFiles;
 			
 			$pageIndex++;
 			$nextPageToken = $resultZoomList && $resultZoomList[self::NEXT_PAGE_TOKEN] ?
@@ -215,7 +217,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			
 		} while ($nextPageToken !== '' && $pageIndex < $maxPages);
 
-		return $meetingFiles;
+		return $meetingFilesList;
 	}
 	
 	protected function getMeetings($resultZoomList)
