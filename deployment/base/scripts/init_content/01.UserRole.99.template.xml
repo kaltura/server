@@ -34,7 +34,6 @@
 				<email>template@kaltura.com</email>
 				<status>1</status>
 				<isAdmin>1</isAdmin>
-				<roleIds>2</roleIds>
 				<fullName>Template Partner</fullName>
 			</user>
 		</request>
