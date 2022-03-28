@@ -39,8 +39,12 @@ if (empty($config))
 
 	if (!file_exists($configFile))
 	{
-		KalturaLog::err("Configuration file [$configFile] not found.");
-		exit(-1);
+		$configFile = generateConfigFile($hostname);
+		if (!file_exists($configFile))
+		{
+			KalturaLog::err("Configuration file [$configFile] not found.");
+			exit(-1);
+		}
 	}
 	$config = parse_ini_file($configFile);
 }
@@ -252,3 +256,72 @@ while (true)
 }
 
 KalturaLog::log('Done');
+
+function generateConfigFile($hostname)
+{
+	$elasticHost = getenv('ELASTIC_HOST_NAME');
+	if (!$elasticHost)
+	{
+		KalturaLog::err("Missing environment variable 'ELASTIC_HOST_NAME' to point to elastic host");
+		exit(-1);
+	}
+	
+	$cmd = "curl -s $elasticHost:9200";
+	exec($cmd, $output);
+	$outputJson = implode('', $output);
+	$elasticResponse = json_decode($outputJson, true);
+	
+	if (!isset($elasticResponse['cluster_name']) || !isset($elasticResponse['version']['number']))
+	{
+		KalturaLog::err("Missing required fields from elastic '$elasticHost' response");
+		exit(-1);
+	}
+	
+	$elasticPopulateSettingsBlock = '[elasticPopulateSettings]';
+	$elasticCluster = "elasticCluster = {$elasticResponse['cluster_name']}";
+	$elasticVersion = "elasticVersion = {$elasticResponse['version']['number']}";
+	$elasticServer = "elasticServer = $elasticHost";
+	$elasticPort = "elasticPort = 9200";
+	$shouldUseMaster = "shouldUseMaster = false";
+	
+	$data = $elasticPopulateSettingsBlock . PHP_EOL;
+	$data .= $elasticCluster . PHP_EOL;
+	$data .= $elasticServer . PHP_EOL;
+	$data .= $elasticPort . PHP_EOL;
+	$data .= $shouldUseMaster . PHP_EOL;
+	$data .= $elasticVersion . PHP_EOL;
+	
+	$populateConfigDir = ROOT_DIR . "/configurations/elastic/populate";
+	if (!is_dir($populateConfigDir))
+	{
+		if (!mkdir($populateConfigDir))
+		{
+			KalturaLog::err("Failed to create directory path '$populateConfigDir'");
+			exit(-1);
+		}
+	}
+	
+	$confFileName = "$populateConfigDir/$hostname.ini";
+	if (!file_put_contents($confFileName, $data, LOCK_EX))
+	{
+		KalturaLog::err("Failed to write to file path '$confFileName'");
+		exit(-1);
+	}
+	
+	passthru("chmod 644 $confFileName", $resultCode);
+	if ($resultCode)
+	{
+		KalturaLog::err("Failed to change permissions to file path '$confFileName'");
+		exit(-1);
+	}
+	
+	unset($resultCode);
+	passthru("chown www-data:www-data $confFileName", $resultCode);
+	if ($resultCode)
+	{
+		KalturaLog::err("Failed to change user:group to file path '$confFileName'");
+		exit(-1);
+	}
+	
+	return $confFileName;
+}
