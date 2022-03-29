@@ -3603,20 +3603,13 @@ class kFlowHelper
 		}
 
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
-		if (count($nonSourceFlavors) < 2)
-		{
-			if (count($nonSourceFlavors) == 0)
-			{
-				return;
-			}
-			
-			if (!self::isAssetDimBiggerThanSource($nonSourceFlavors[0]))
-			{
-				return;
-			}
-		}
-
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		
+		if (self::shouldKeepSourceFlavor($sourceFlavor, $nonSourceFlavors))
+		{
+			return;
+		}
+		
 		$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
 		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
 		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
@@ -3629,17 +3622,33 @@ class kFlowHelper
 		}
 	}
 	
-	protected static function isAssetDimBiggerThanSource(asset $flavorAsset)
+	protected static function shouldKeepSourceFlavor(asset $sourceFlavor, array $nonSourceFlavors)
+	{
+		if (count($nonSourceFlavors) < 2)
+		{
+			if (count($nonSourceFlavors) == 0)
+			{
+				return true;
+			}
+			
+			if (!self::isAssetDimMatchSource($sourceFlavor, $nonSourceFlavors[0]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected static function isAssetDimMatchSource($sourceFlavor, $nonSourceFlavor)
 	{
 		$staticContentParams = kConf::get('staticContentAdditionalParams', 'runtime_config', array());
 		$diffNum = isset($staticContentParams['dimension_diff_percentage']) ? $staticContentParams['dimension_diff_percentage'] : 5;
 		
 		$diffPercentage = (100 - $diffNum) / 100;
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($flavorAsset->getEntryId());
 		
-		$flavorAssetDim = $flavorAsset->getWidth() * $flavorAsset->getHeight();
+		$nonSourceFlavor = $nonSourceFlavor->getWidth() * $nonSourceFlavor->getHeight();
 		$sourceFlavorDim = $sourceFlavor->getWidth() * $sourceFlavor->getHeight();
 		
-		return ($flavorAssetDim >= $sourceFlavorDim * $diffPercentage);
+		return ($nonSourceFlavor >= $sourceFlavorDim * $diffPercentage);
 	}
 }
