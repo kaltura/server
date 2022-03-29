@@ -6,7 +6,7 @@
 */
 class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 {
-	const CHAR_APOSTROPHE 	= "'";
+	const CHAR_APOSTROPHE = "'";
 
 	/**
 	 * @var string
@@ -246,9 +246,6 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 
 			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
 			{
-				if (strlen($this->$kalturaProperty) != 1) {
-					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
-				}
 				$this->$kalturaProperty = self::CHAR_APOSTROPHE . $this->$kalturaProperty;
 			}
 		}
