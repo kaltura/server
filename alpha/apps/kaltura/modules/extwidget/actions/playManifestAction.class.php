@@ -1318,6 +1318,7 @@ class playManifestAction extends kalturaAction
 		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
 		if ($event)
 		{
+			KalturaLog::info('Found event id: [' . $event->getId() . '] ');
 			// serve as simulive only if shouldn't be interrupted by "real" live
 			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
 			{
