@@ -241,11 +241,6 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 					continue;
 				}
 			}
-			
-			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $kalturaProperty);
-			}
 		}
 	}
 }
