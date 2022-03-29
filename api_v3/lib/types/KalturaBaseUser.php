@@ -6,8 +6,6 @@
 */
 class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 {
-	const CHAR_APOSTROPHE = "'";
-
 	/**
 	 * @var string
 	 * @filter order
@@ -242,11 +240,6 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 				{
 					continue;
 				}
-			}
-
-			if(myKuserUtils::startsWithSpecialChar($this->$kalturaProperty))
-			{
-				$this->$kalturaProperty = self::CHAR_APOSTROPHE . $this->$kalturaProperty;
 			}
 		}
 	}
