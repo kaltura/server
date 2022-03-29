@@ -38,7 +38,7 @@ class KSyncPointsMediaInfoParser
 	
 	private function getExtrackStreamInfoCommand($streamIndex)
 	{
-		return "{$this->ffprobeBin} -i {$this->filePath} -select_streams $streamIndex:$streamIndex -v quiet -show_data -show_packets -print_format json";
+		return "{$this->ffprobeBin} -i {$this->filePath} -select_streams $streamIndex -v quiet -show_data -show_packets -print_format json";
 	}
 	
 	public function getStreamSyncPointData()
