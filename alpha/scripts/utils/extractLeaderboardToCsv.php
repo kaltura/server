@@ -2,139 +2,123 @@
 require_once(__DIR__ . '/../bootstrap.php');
 
 
-function getMapKuserToPuser($redisWrapper, $partnerId, $gameObjectType, $gameObjectId)
-{
-	$redisKey = $partnerId . '_' . $gameObjectType . '_' . $gameObjectId;
-	
-	$results = $redisWrapper->doZrevrange($redisKey, 0, -1);
-	if (!$results)
-	{
-		print("No results found for key $redisKey");
-		return array();
-	}
-	
-	$mapKuserPuser = GamePlugin::createMapKuserToPuser($results);
-	
-	return $mapKuserPuser;
-}
+const OUTPUT_FILE = 'leaderboard.csv';
 
-function addRanks($userRows)
-{
-	usort($userRows, function($a, $b)
-	{
-		return $b[0] - $a[0];
-	});
-	
-	$i = 0;
-	$userRowsWithRanks = array();
-	foreach ($userRows as $userRow)
-	{
-		$rank = $i + 1;
-		$userRowsWithRanks[] = array_merge(array($rank), $userRow);
-		$i++;
-	}
-	
-	return $userRowsWithRanks;
-}
+if ($argc < 5)
+	die("Usage: php extractLeaderboardToCsv.php outputPath partnerId gameObjectType gameObjectId"."\n");
 
-function writeLeaderboardToCsv($dataToWrite)
-{
-	$filename = 'leaderboard.csv';
-	$file = fopen($filename, 'w');
-	if (!$file)
-	{
-		print('Failed to create file');
-		return;
-	}
-	
-	foreach ($dataToWrite as $row)
-	{
-		fputcsv($file, $row);
-	}
-	fclose($file);
-}
-
-
-//
-// Script Begins Here //
-//
-
-if ($argc < 3)
-    die("Usage: php extractLeaderboardToCsv.php partnerId gameObjectType gameObjectId"."\n");
-
-$partnerId = $argv[1];
-$gameObjectType = $argv[2];
-$gameObjectId = $argv[3];
+$outputPath = $argv[1];
+$partnerId = $argv[2];
+$gameObjectType = $argv[3];
+$gameObjectId = $argv[4];
 
 $redisWrapper = GamePlugin::initGameServicesRedisInstance();
 if (!$redisWrapper)
 {
-	throw new KalturaAPIException(KalturaErrors::FAILED_INIT_REDIS_INSTANCE);
+	KalturaLog::err('Error: Failed to initialize Redis instance');
+	return;
 }
 
-$mapKuserPuser = getMapKuserToPuser($redisWrapper, $partnerId, $gameObjectType, $gameObjectId);
+$leaderboardScores = getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameObjectId);
 
+$mapKuserPuser = GamePlugin::createMapKuserToPuser($leaderboardScores);
+
+$userScoreReportsMap = getReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper);
 
 $rulesMap = array();
 $userRows = array();
 $userScoresMap = array();
 
-foreach ($mapKuserPuser as $kuser => $puser)
+$gameObjectKey = $gameObjectType . '_' . $gameObjectId;
+
+foreach ($mapKuserPuser as $kuserId => $puser)
 {
-	$userRedisKey = $partnerId . '_report_' . $kuser;
-	
-	$redisValue = $redisWrapper->doGet($userRedisKey);
-	
-	if ($redisValue)
+	if (!isset($userScoreReportsMap[$puser]))
 	{
-		$redisValue = str_replace("'", "\"", $redisValue);
-		$decodedJson = json_decode($redisValue);
+		break;
+	}
+	
+	$userScoreReport = $userScoreReportsMap[$puser];
+	
+	$userScoreReport = str_replace("'", "\"", $userScoreReport);
+	$decodedJson = json_decode($userScoreReport);
+	
+	if (!$decodedJson->gameObjectsReports)
+	{
+		KalturaLog::info("Missing gameObjectReports for user $puser");
+		continue;
+	}
+	
+	foreach ($decodedJson->gameObjectsReports as $gameObject)
+	{
+		if ($gameObject->id != $gameObjectKey)
+		{
+			continue;
+		}
 		
-		$gameObjectKey = $gameObjectType . '_' . $gameObjectId;
+		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puser);
+		if (!$kuser)
+		{
+			KalturaLog::info("Could not find user $puser");
+			break;
+		}
+		
+		$userTotalScore = floor($leaderboardScores[$kuserId]);
+		
+		$userRow = array($userTotalScore, $puser, $kuser->getScreenName(), $kuser->getEmail());
+		if (!$gameObject->rulesData)
+		{
+			KalturaLog::info("Missing rulesData for user $puser");
+			break;
+		}
 		
 		$scores = array();
 		
-		foreach ($decodedJson->gameObjectsReports as $gameObject)
+		foreach ($gameObject->rulesData as $rule)
 		{
-			if ($gameObject->id == $gameObjectKey)
+			if (!isset($rule->id))
 			{
-				print_r($gameObject);
-				
-				$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puser);
-				$userRow = array($gameObject->totalScore, $puser, $kuser->getScreenName(), $kuser->getEmail());
-				
-				foreach ($gameObject->rulesData as $rule)
-				{
-					if (!isset($rulesMap[$rule->id]))
-					{
-						$rulesMap[$rule->id] = $rule->description;
-					}
-					
-					$scores[$rule->id] = $rule->score;
-				}
-				
-				$userScoresMap[$puser] = $scores;
-				
-				$userRows[$puser] = $userRow;
-				
+				KalturaLog::info("Missing ruleId for user $puser");
 				break;
 			}
+			
+			if (!isset($rulesMap[$rule->id]))
+			{
+				$rulesMap[$rule->id] = $rule->description;
+			}
+			
+			$scores[$rule->id] = $rule->score;
 		}
 		
-		if (!$scores)
+		if (!compareSumOfScoresWithTotalScore($scores, $userTotalScore))
 		{
-			print("Could not find gameObject $gameObjectId of Type $gameObjectType for User $puser");
+			KalturaLog::info("Error: User $puser total score of $userTotalScore, does not match with sum of rules from report");
+			KalturaLog::info('Rules ids and scores: ' . print_r($scores));
+			return;
 		}
+		
+		$userScoresMap[$puser] = $scores;
+		
+		$userRows[$puser] = $userRow;
+		
+		break;
+	}
+	
+	if (!isset($userScoresMap[$puser]))
+	{
+		KalturaLog::info("Could not find gameObject $gameObjectId of Type $gameObjectType for User $puser");
 	}
 }
 
 $userRowsWithScores = array();
 
-foreach (array_values($mapKuserPuser) as $puser)
+foreach (array_keys($leaderboardScores) as $kuserId)
 {
+	$puser = $mapKuserPuser[$kuserId];
+	
 	if (!isset($userScoresMap[$puser]))
 	{
-		break;
+		continue;
 	}
 	
 	foreach (array_keys($rulesMap) as $ruleId)
@@ -153,7 +137,88 @@ foreach (array_values($mapKuserPuser) as $puser)
 $userRowsWithRanks = addRanks($userRowsWithScores);
 
 $dataToWrite = array();
-$dataToWrite[] = array_merge(array('rank', 'score', 'userId', 'userName', 'userEmail'), array_values($rulesMap));
+$headerRow = array('rank', 'score', 'userId', 'userName', 'userEmail');
+$dataToWrite[] = array_merge($headerRow, array_values($rulesMap));
 $dataToWrite = array_merge($dataToWrite, $userRowsWithRanks);
 
-writeLeaderboardToCsv($dataToWrite);
+writeLeaderboardToCsv($dataToWrite, $outputPath);
+
+
+function getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameObjectId)
+{
+	$leaderboardRedisKey = $partnerId . '_' . $gameObjectType . '_' . $gameObjectId;
+	
+	$leaderboardScores = $redisWrapper->doZrevrange($leaderboardRedisKey, 0, -1);
+	if (!$leaderboardScores)
+	{
+		KalturaLog::err("No results found for key $leaderboardRedisKey");
+		return array();
+	}
+	
+	return $leaderboardScores;
+}
+
+function getReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper)
+{
+	$userScoreReportsMap = array();
+	
+	foreach ($mapKuserPuser as $kuserId => $puser)
+	{
+		$userRedisKey = $partnerId . '_report_' . $kuserId;
+		
+		$userScoreReport = $redisWrapper->doGet($userRedisKey);
+		
+		if ($userScoreReport)
+		{
+			$userScoreReportsMap[$puser] = $userScoreReport;
+		}
+	}
+	
+	return $userScoreReportsMap;
+}
+
+function compareSumOfScoresWithTotalScore($scores, $totalScore)
+{
+	$sumScores = 0;
+	foreach (array_values($scores) as $score)
+	{
+		$sumScores += $score;
+	}
+	
+	if ($sumScores != $totalScore)
+	{
+		return false;
+	}
+	
+	return true;
+}
+
+function addRanks($userRows)
+{
+	$i = 0;
+	$userRowsWithRanks = array();
+	foreach ($userRows as $userRow)
+	{
+		$rank = $i + 1;
+		$userRowsWithRanks[] = array_merge(array($rank), $userRow);
+		$i++;
+	}
+	
+	return $userRowsWithRanks;
+}
+
+function writeLeaderboardToCsv($dataToWrite, $outputPath)
+{
+	$file = fopen($outputPath . '/' . OUTPUT_FILE, 'w');
+	if (!$file)
+	{
+		KalturaLog::err("Error: Failed to create file $outputPath");
+		return;
+	}
+	
+	foreach ($dataToWrite as $row)
+	{
+		fputcsv($file, $row);
+	}
+	fclose($file);
+}
