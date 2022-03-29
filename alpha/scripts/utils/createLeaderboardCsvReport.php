@@ -5,7 +5,7 @@ require_once(__DIR__ . '/../bootstrap.php');
 const OUTPUT_FILE = 'leaderboard.csv';
 
 if ($argc < 5)
-	die("Usage: php extractLeaderboardToCsv.php outputPath partnerId gameObjectType gameObjectId"."\n");
+	die("Usage: php createLeaderboardCsvReport.php outputPath partnerId gameObjectType gameObjectId"."\n");
 
 $outputPath = $argv[1];
 $partnerId = $argv[2];
