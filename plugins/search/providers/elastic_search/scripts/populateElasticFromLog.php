@@ -37,14 +37,10 @@ if (empty($config))
 {
 	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
 
-	if (!file_exists($configFile))
+	if (!file_exists($configFile) && !generateConfigFile($configFile))
 	{
-		$configFile = generateConfigFile($hostname);
-		if (!file_exists($configFile))
-		{
-			KalturaLog::err("Configuration file [$configFile] not found.");
-			exit(-1);
-		}
+		KalturaLog::err("Configuration file [$configFile] not found.");
+		exit(-1);
 	}
 	$config = parse_ini_file($configFile);
 }
@@ -257,71 +253,59 @@ while (true)
 
 KalturaLog::log('Done');
 
-function generateConfigFile($hostname)
+function generateConfigFile($configFile)
 {
 	$elasticHost = getenv('ELASTIC_HOST_NAME');
+	$elasticPort = 9200;
 	if (!$elasticHost)
 	{
 		KalturaLog::err("Missing environment variable 'ELASTIC_HOST_NAME' to point to elastic host");
-		exit(-1);
+		return false;
 	}
 	
-	$cmd = "curl -s $elasticHost:9200";
-	exec($cmd, $output);
-	$outputJson = implode('', $output);
-	$elasticResponse = json_decode($outputJson, true);
+	exec("curl -s $elasticHost:$elasticPort", $output);
+	$elasticResponse = json_decode(implode('', $output), true);
 	
-	if (!isset($elasticResponse['cluster_name']) || !isset($elasticResponse['version']['number']))
+	$elasticCluster = isset($elasticResponse['cluster_name']) ? $elasticResponse['cluster_name'] : false;
+	$elasticVersion = isset($elasticResponse['version']['number']) ? $elasticResponse['version']['number'] : false;
+	
+	if (!$elasticCluster || !$elasticVersion)
 	{
 		KalturaLog::err("Missing required fields from elastic '$elasticHost' response");
-		exit(-1);
+		return false;
 	}
 	
-	$elasticPopulateSettingsBlock = '[elasticPopulateSettings]';
-	$elasticCluster = "elasticCluster = {$elasticResponse['cluster_name']}";
-	$elasticVersion = "elasticVersion = {$elasticResponse['version']['number']}";
-	$elasticServer = "elasticServer = $elasticHost";
-	$elasticPort = "elasticPort = 9200";
-	$shouldUseMaster = "shouldUseMaster = false";
+	$elasticBlock = "[elasticPopulateSettings]\n
+	elasticCluster = $elasticCluster\n
+	elasticVersion = $elasticVersion\n
+	elasticServer = $elasticHost\n
+	elasticPort = $elasticPort\n
+	shouldUseMaster = false\n";
 	
-	$data = $elasticPopulateSettingsBlock . PHP_EOL;
-	$data .= $elasticCluster . PHP_EOL;
-	$data .= $elasticServer . PHP_EOL;
-	$data .= $elasticPort . PHP_EOL;
-	$data .= $shouldUseMaster . PHP_EOL;
-	$data .= $elasticVersion . PHP_EOL;
-	
-	$populateConfigDir = ROOT_DIR . "/configurations/elastic/populate";
-	if (!is_dir($populateConfigDir))
+	if (!file_exists(dirname($configFile)) &&  !mkdir(dirname($configFile), 0755, true))
 	{
-		if (!mkdir($populateConfigDir))
-		{
-			KalturaLog::err("Failed to create directory path '$populateConfigDir'");
-			exit(-1);
-		}
+		KalturaLog::err('Failed to create directory path "' . dirname($configFile) . '"');
+		return false;
 	}
 	
-	$confFileName = "$populateConfigDir/$hostname.ini";
-	if (!file_put_contents($confFileName, $data, LOCK_EX))
+	if (!file_put_contents($configFile, $elasticBlock, LOCK_EX))
 	{
-		KalturaLog::err("Failed to write to file path '$confFileName'");
-		exit(-1);
+		KalturaLog::err("Failed to write to file path '$configFile'");
+		return false;
 	}
 	
-	passthru("chmod 644 $confFileName", $resultCode);
+	if (!chmod($configFile, 0644))
+	{
+		KalturaLog::err("Failed to change permissions to file path '$configFile'");
+		return false;
+	}
+	
+	passthru("chown www-data:www-data $configFile", $resultCode);
 	if ($resultCode)
 	{
-		KalturaLog::err("Failed to change permissions to file path '$confFileName'");
-		exit(-1);
+		KalturaLog::err("Failed to change user:group to file path '$configFile'");
+		return false;
 	}
 	
-	unset($resultCode);
-	passthru("chown www-data:www-data $confFileName", $resultCode);
-	if ($resultCode)
-	{
-		KalturaLog::err("Failed to change user:group to file path '$confFileName'");
-		exit(-1);
-	}
-	
-	return $confFileName;
+	return true;
 }
