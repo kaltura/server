@@ -266,8 +266,8 @@ function generateConfigFile($configFile)
 	exec("curl -s $elasticHost:$elasticPort", $output);
 	$elasticResponse = json_decode(implode('', $output), true);
 	
-	$elasticCluster = isset($elasticResponse['cluster_name']) ? $elasticResponse['cluster_name'] : false;
-	$elasticVersion = isset($elasticResponse['version']['number']) ? $elasticResponse['version']['number'] : false;
+	$elasticCluster = isset($elasticResponse['cluster_name']) ? $elasticResponse['cluster_name'] : null;
+	$elasticVersion = isset($elasticResponse['version']['number']) ? $elasticResponse['version']['number'] : null;
 	
 	if (!$elasticCluster || !$elasticVersion)
 	{
@@ -275,12 +275,12 @@ function generateConfigFile($configFile)
 		return false;
 	}
 	
-	$elasticBlock = "[elasticPopulateSettings]\n
-	elasticCluster = $elasticCluster\n
-	elasticVersion = $elasticVersion\n
-	elasticServer = $elasticHost\n
-	elasticPort = $elasticPort\n
-	shouldUseMaster = false\n";
+	$elasticBlock = "[elasticPopulateSettings]\n";
+	$elasticBlock .= "elasticCluster = $elasticCluster\n";
+	$elasticBlock .= "elasticVersion = $elasticVersion\n";
+	$elasticBlock .= "elasticServer = $elasticHost\n";
+	$elasticBlock .= "elasticPort = $elasticPort\n";
+	$elasticBlock .= "shouldUseMaster = false\n";
 	
 	if (!file_exists(dirname($configFile)) &&  !mkdir(dirname($configFile), 0755, true))
 	{
