@@ -210,7 +210,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				break;
 			}
 			$meetingFilesList = array_merge($meetingFilesList,  $meetingFiles);
-			
 			$pageIndex++;
 			$nextPageToken = $resultZoomList && $resultZoomList[self::NEXT_PAGE_TOKEN] ?
 				$resultZoomList[self::NEXT_PAGE_TOKEN] : '';
