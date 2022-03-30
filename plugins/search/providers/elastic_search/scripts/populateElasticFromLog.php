@@ -300,12 +300,5 @@ function generateConfigFile($configFile)
 		return false;
 	}
 	
-	passthru("chown www-data:www-data $configFile", $resultCode);
-	if ($resultCode)
-	{
-		KalturaLog::err("Failed to change user:group to file path '$configFile'");
-		return false;
-	}
-	
 	return true;
 }
