@@ -1294,6 +1294,26 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	}
 	
 	/**
+	 * Get the indexed value for the title to index to the search engine
+	 * @param string $title
+	 * @return string
+	 */
+	public function getIndexedtitle()
+	{
+		return self::getIndexedFieldValue('kuserPeer::TITLE', $this->getTitle(), $this->getPartnerId());
+	}
+	
+	/**
+	 * Get the indexed value for the company to index to the search engine
+	 * @param string $company
+	 * @return string
+	 */
+	public function getIndexedCompany()
+	{
+		return self::getIndexedFieldValue('kuserPeer::COMPANY', $this->getCompany(), $this->getPartnerId());
+	}
+	
+	/**
 	 * Returns indexed value for field
 	 * @param string $fieldName
 	 * @param string $fieldValue
@@ -1388,7 +1408,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'permission_names' => $this->getIndexedPermissionNames(), //todo - replace to array
 			'puser_id' => $this->getPuserId(),
 			'members_count' => $this->getMembersCount(),
-			'picture' => $this->getPicture()
+			'picture' => $this->getPicture(),
+			'tile' => $this->getTitle(),
+			'company' => $this->getCompany()
 		);
 		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);

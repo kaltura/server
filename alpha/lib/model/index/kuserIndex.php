@@ -73,6 +73,8 @@ class kuserIndex extends BaseIndexObject
 				'permission_names' => 'indexedPermissionNames',
 				'role_ids' => 'indexedRoleIds',
 				'type' => 'type',
+				'company' => 'company',
+				'title' => 'title',
 			);
 		}
 		return self::$fieldsMap;
@@ -110,6 +112,8 @@ class kuserIndex extends BaseIndexObject
 				'dynamic_attributes' => IIndexable::FIELD_TYPE_JSON,
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 				'type' => IIndexable::FIELD_TYPE_UINT,
+				'company' => IIndexable::FIELD_TYPE_STRING,
+				'title' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
 		return self::$typesMap;
@@ -162,6 +166,8 @@ class kuserIndex extends BaseIndexObject
 				'kuser.PUSER_ID_OR_SCREEN_NAME' => '(puser_id,screen_name)',
 				'kuser.PLUGINS_DATA' => 'plugins_data',
 				'kuser.TYPE' => 'type',
+				'kuser.TITLE' => 'title',
+				'kuser.COMPANY' => 'company',
 			);
 		}
 		return self::$searchableFieldsMap;
@@ -210,6 +216,8 @@ class kuserIndex extends BaseIndexObject
 				"indexed_partner_data_string",
 				"permission_names",
 				"role_ids",
+				"company",
+				"title",
 			);
 		}
 		return self::$matchableFields;
