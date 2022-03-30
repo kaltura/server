@@ -3646,9 +3646,9 @@ class kFlowHelper
 		
 		$diffPercentage = (100 - $diffNum) / 100;
 		
-		$nonSourceFlavor = $nonSourceFlavor->getWidth() * $nonSourceFlavor->getHeight();
+		$nonSourceFlavorDim = $nonSourceFlavor->getWidth() * $nonSourceFlavor->getHeight();
 		$sourceFlavorDim = $sourceFlavor->getWidth() * $sourceFlavor->getHeight();
 		
-		return ($nonSourceFlavor >= $sourceFlavorDim * $diffPercentage);
+		return ($nonSourceFlavorDim >= $sourceFlavorDim * $diffPercentage);
 	}
 }
