@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 if ($argc < 5)
 {
-	die("Usage: php createLeaderboardCsvReport.php outputPath partnerId gameObjectType gameObjectId"."\n");
+	die("Usage: php createGameObjectCsvReport.php outputPath partnerId gameObjectType gameObjectId"."\n");
 }
 
 $outputPath = $argv[1];
