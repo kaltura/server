@@ -2318,4 +2318,20 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		
 		return in_array($rootEntry->getSourceType(), $sourceType);
 	}
+
+	/**
+	 * Returning the duration of the entry received (if entry doesn't exists - return 0)
+	 * @param string $entryId
+	 * @param bool $inMilliseconds
+	 * @return int
+	 */
+	public static function getEntryDuration($entryId, $inMilliseconds = false)
+	{
+		$entry = entryPeer::retrieveByPk($entryId);
+		if (!$entry)
+		{
+			return 0;
+		}
+		return $inMilliseconds ? $entry->getLengthInMsecs() : $entry->getDuration();
+	}
 }
