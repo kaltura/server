@@ -37,7 +37,7 @@ class UserLoginData extends BaseUserLoginData{
 	public function getConfigPartnerId()
 	{
 		$configPartner = PartnerPeer::retrieveByPK($this->config_partner_id);
-		if ($configPartner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+		if ($configPartner && $configPartner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
 		{
 			return $this->getLastloginPartnerId();
 		}
