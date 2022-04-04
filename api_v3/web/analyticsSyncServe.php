@@ -167,12 +167,12 @@ function getUserUpdates($updatedAt)
 	foreach ($rows as $row)
 	{
 		$status = $row['STATUS'];
+		$id = $row['ID'];
 		if ($status == KuserStatus::DELETED)
 		{
-			continue;
+			$id = '';
 		}
-		
-		$id = $row['ID'];
+
 		$puserId = $row['PUSER_ID'];
 		$partnerId = $row['PARTNER_ID'];
 		
