@@ -59,7 +59,7 @@
 				$this->chunkFileFormat = "mp4";
 				$this->concatSettings = "-f concat -safe 0";
 			}
-			kBatchUtils::tryLoadKconfConfig();
+			kBatchUtils::tryLoadSharedStorageKconfConfig(true);
 		}
 		
 		
