@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 if ($argc < 5)
 {
-	die("Usage: php createGameObjectCsvReport.php outputPath partnerId gameObjectType gameObjectId"."\n");
+	die("Usage: php createGameObjectCsvReport.php outputPath partnerId gameObjectType gameObjectId [rulesPath]"."\n");
 }
 
 $outputPath = $argv[1];
@@ -11,35 +11,46 @@ $partnerId = $argv[2];
 $gameObjectType = $argv[3];
 $gameObjectId = $argv[4];
 
-$outputPath =  $outputPath . '/leaderboardCsvReport_' . $partnerId . '_' . time() . '.csv';
+if (isset($argv[5]))
+{
+	$rulesPath = $argv[5];
+}
+
+$time = date('Y-m-d_[H-i-s]', time());
+$outputPath =  $outputPath . '/leaderboardCsvReport_' . $partnerId . '_' . $time . '.csv';
 
 $redisWrapper = GamePlugin::initGameServicesRedisInstance();
 if (!$redisWrapper)
 {
 	KalturaLog::err('Error: Failed to initialize Redis instance');
-	return;
+	exit(1);
 }
 
 $leaderboardScores = getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameObjectId);
 $mapKuserPuser = GamePlugin::createMapKuserToPuser($leaderboardScores);
-$userScoreReportsMap = getReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper);
+$userScoreReportsMap = getAllUsersReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper);
 
 $rulesMap = array();
 $userRows = array();
 $userScoresMap = array();
 
-getUserScoreReports($rulesMap, $userRows,$userScoresMap);
-ksort($rulesMap);
+readRulesAndScoresFromUsersReports($rulesMap, $userRows,$userScoresMap);
+
+if (isset($rulesPath))
+{
+	$rulesMap = readRulesMapFromFile($rulesPath);
+}
+else
+{
+	ksort($rulesMap);
+}
 
 $userRowsWithScores = addScoresToUserRows($userScoresMap);
-$userRowsWithRanks = addRanks($userRowsWithScores);
+$userRowsWithRanks = addRanksToUserRows($userRowsWithScores);
 
-$dataToWrite = array();
-$headerRow = array('rank', 'score', 'userId', 'userName', 'userEmail');
-$dataToWrite[] = array_merge($headerRow, array_values($rulesMap));
-$dataToWrite = array_merge($dataToWrite, $userRowsWithRanks);
+writeLeaderboardToCsv($outputPath, array_values($rulesMap), $userRowsWithRanks);
 
-writeLeaderboardToCsv($dataToWrite, $outputPath);
+exit(0);
 
 
 function getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameObjectId)
@@ -56,7 +67,7 @@ function getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameO
 	return $leaderboardScores;
 }
 
-function getReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper)
+function getAllUsersReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper)
 {
 	$userScoreReportsMap = array();
 	
@@ -75,7 +86,7 @@ function getReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper)
 	return $userScoreReportsMap;
 }
 
-function getUserScoreReports(&$rulesMap, &$userRows, &$userScoresMap)
+function readRulesAndScoresFromUsersReports(&$rulesMap, &$userRows, &$userScoresMap)
 {
 	global $partnerId;
 	global $gameObjectType;
@@ -153,7 +164,7 @@ function getUserScoreReports(&$rulesMap, &$userRows, &$userScoresMap)
 			{
 				KalturaLog::info("Error: User $puserId total score of $userTotalScore, does not match with sum of rules from report");
 				KalturaLog::info('Rules ids and scores: ' . print_r($scores));
-				return;
+				exit(0);
 			}
 			
 			$userScoresMap[$puserId] = $scores;
@@ -168,6 +179,62 @@ function getUserScoreReports(&$rulesMap, &$userRows, &$userScoresMap)
 			KalturaLog::info("Could not find gameObject $gameObjectId of Type $gameObjectType for User $puserId");
 		}
 	}
+}
+
+function readRulesMapFromFile($filePath)
+{
+	$rulesMapFromFile = array();
+	
+	try
+	{
+		$content = file_get_contents($filePath);
+		if (!$content)
+		{
+			KalturaLog::info('Failed to load rules file');
+			exit(1);
+		}
+		
+		$decodedJson = json_decode($content);
+		if (!$decodedJson)
+		{
+			KalturaLog::info('Failed to decode rules json');
+			exit(1);
+		}
+		
+		if (!isset($decodedJson->rules))
+		{
+			KalturaLog::info('Missing rules in rules file');
+			exit(1);
+		}
+		
+		foreach ($decodedJson->rules as $rule)
+		{
+			if (!isset($rule->id) || !isset($rule->description) || !isset($rule->order))
+			{
+				KalturaLog::info('Missing id, description, or order inside a rule');
+				exit(1);
+			}
+			
+			$rulesMapFromFile[$rule->order] = array('id' => $rule->id, 'description' => $rule->description);
+		}
+	}
+	catch (Exception $e)
+	{
+		KalturaLog::info('Failed to load rules file: ' . $e);
+		exit(1);
+	}
+	
+	$rulesMap = array();
+	if ($rulesMapFromFile)
+	{
+		ksort($rulesMapFromFile);
+		foreach ($rulesMapFromFile as $ruleOrder => $ruleDetails)
+		{
+			$rulesMap[$ruleDetails['id']] = $ruleDetails['description'];
+		}
+	}
+	
+	return $rulesMap;
 }
 
 function compareSumOfScoresWithTotalScore($scores, $totalScore)
@@ -186,7 +253,7 @@ function compareSumOfScoresWithTotalScore($scores, $totalScore)
 	return true;
 }
 
-function addScoresToUserRows(&$userScoresMap)
+function addScoresToUserRows($userScoresMap)
 {
 	global $leaderboardScores;
 	global $mapKuserPuser;
@@ -194,6 +261,7 @@ function addScoresToUserRows(&$userScoresMap)
 	global $userRows;
 	
 	$userRowsWithScores = array();
+	$orderedUserScoresMap = array();
 	
 	foreach (array_keys($leaderboardScores) as $kuserId)
 	{
@@ -204,23 +272,27 @@ function addScoresToUserRows(&$userScoresMap)
 			continue;
 		}
 		
+		$orderedUserScoresMap[$puserId] = array();
+		
 		foreach (array_keys($rulesMap) as $ruleId)
 		{
-			if (!isset($userScoresMap[$puserId][$ruleId]))
+			if (isset($userScoresMap[$puserId][$ruleId]))
 			{
-				$userScoresMap[$puserId][$ruleId] = 0;
+				$orderedUserScoresMap[$puserId][$ruleId] = $userScoresMap[$puserId][$ruleId];
+			}
+			else
+			{
+				$orderedUserScoresMap[$puserId][$ruleId] = 0;
 			}
 		}
 		
-		ksort($userScoresMap[$puserId]);
-		
-		$userRowsWithScores[] = array_merge($userRows[$puserId], $userScoresMap[$puserId]);
+		$userRowsWithScores[] = array_merge($userRows[$puserId], $orderedUserScoresMap[$puserId]);
 	}
 	
 	return $userRowsWithScores;
 }
 
-function addRanks($userRows)
+function addRanksToUserRows($userRows)
 {
 	$i = 0;
 	$userRowsWithRanks = array();
@@ -234,8 +306,13 @@ function addRanks($userRows)
 	return $userRowsWithRanks;
 }
 
-function writeLeaderboardToCsv($dataToWrite, $outputPath)
+function writeLeaderboardToCsv($outputPath, $rulesNames, $userRowsWithRanks)
 {
+	$dataToWrite = array();
+	$headerRow = array('rank', 'score', 'userId', 'userName', 'userEmail');
+	$dataToWrite[] = array_merge($headerRow, $rulesNames);
+	$dataToWrite = array_merge($dataToWrite, $userRowsWithRanks);
+	
 	$file = fopen($outputPath, 'w');
 	if (!$file)
 	{
