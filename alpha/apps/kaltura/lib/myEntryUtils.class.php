@@ -690,13 +690,13 @@ class myEntryUtils
 	}
 
 
-	public static function createThumbPaths($entity, $thumbName, $thumbFilename, $format, $version, $thumbDirs)
+	public static function createThumbPaths($entity, $thumbNameAttributes, $thumbFilename, $format, $version, $thumbDirs, $contentPath, $captureRequest = false)
 	{
 		//create final path for thumbnail created
-		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity, $thumbName, $thumbFilename, $version);
+		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity, $entity->getId() . $thumbNameAttributes, $thumbFilename, $version);
 
 		//Add unique id to the processing file path to avoid file being overwritten when several identical (with same parameters) calls are made before the final thumbnail is created
-		$uniqueThumbName = $thumbName . "_" . uniqid() . "_";
+		$uniqueThumbName = $entity->getId() . $thumbNameAttributes . "_" . uniqid() . "_";
 
 		//create path for processing thumbnail request
 		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity->getIntId(), $uniqueThumbName, $thumbFilename, $version);
@@ -713,6 +713,45 @@ class myEntryUtils
 			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
 			return array($finalThumbPath, null);
 		}
+
+		foreach ($thumbDirs as $thumbDir)
+		{
+			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entity->getIntId(), $entity->getId() . $thumbNameAttributes, $thumbFilename, $version);
+			KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
+			if (file_exists($currPath) && @filesize($currPath))
+			{
+				if(myCloudUtils::shouldExportThumbToCloud())
+				{
+					KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath], original file mtime: "
+						. date("Y-m-d H:i:s", filemtime($currPath)) );
+					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
+					if($moveFileSuccess)
+					{
+						header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
+						return array($finalThumbPath, null);
+					}
+					else
+					{
+						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
+					}
+				}
+
+				header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
+				return array($currPath, null);
+			}
+		}
+
+		if ($captureRequest)
+		{
+			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
+			$captureFlavorAsset = myPackagerUtils::getFlavorSupportedByPackagerForThumbCapture($entity->getId());
+			if (is_null($captureFlavorAsset))
+			{
+				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+			}
+			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath);
+		}
+
 		return array($finalThumbPath, $processingThumbPath);
 	}
 
@@ -760,77 +799,47 @@ class myEntryUtils
 			$thumbNameAttributes .= "_duration_" . $entryLengthInMsec;
 
 		if ($orig_image_path)
-			$thumbNameAttributes.= '_oip_'.basename($orig_image_path);
+			$thumbNameAttributes .= '_oip_' . basename($orig_image_path);
 		if ($density)
-			$thumbNameAttributes.= "_dns_{$density}";
-		if($stripProfiles)
+			$thumbNameAttributes .= "_dns_{$density}";
+		if ($stripProfiles)
 			$thumbNameAttributes .= "_stp_{$stripProfiles}";
 
-		if($start_sec != -1)
+		if ($start_sec != -1)
 			$thumbNameAttributes .= "_ssec_{$start_sec}";
-		if($end_sec != -1)
+		if ($end_sec != -1)
 			$thumbNameAttributes .= "_esec_{$end_sec}";
-				
+
 		$entryThumbFilename = $entry->getThumbnail();
-		if(!$entryThumbFilename)
+		if (!$entryThumbFilename)
 		{
-			if($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
-				$entryThumbFilename = $entry->getVersion().".jpg";
+			if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE)
+			{
+				$entryThumbFilename = $entry->getVersion() . ".jpg";
+			}
 			else
+			{
 				$entryThumbFilename = "0.jpg";
+			}
 		}
 		if ($entry->getStatus() != entryStatus::READY || @$entryThumbFilename[0] == '&')
 			$thumbNameAttributes .= "_NOCACHE_";
 		
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
-		$thumbName = $entry->getId() . $thumbNameAttributes;
-		
+
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 
-		list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($entry, $thumbName, $entryThumbFilename, $format, $version, $thumbDirs);
-		if (is_null($processingThumbPath))
-			return $finalThumbPath;
-
-		foreach ($thumbDirs as $thumbDir)
-		{
-			$currPath = $contentPath . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDir, $entry->getIntId(), $thumbName, $entryThumbFilename, $version);
-			KalturaLog::debug("Final path not found [$finalThumbPath], checking if file exists on old mount path [$currPath]");
-			if (file_exists($currPath) && @filesize($currPath))
-			{
-				if(myCloudUtils::shouldExportThumbToCloud())
-				{
-					KalturaLog::debug("File found on old mount, syncing cached thumb from [$currPath] to [$finalThumbPath], original file mtime: "
-						. date("Y-m-d H:i:s", filemtime($currPath)) );
-					$moveFileSuccess = kFile::moveFile($currPath, $finalThumbPath);
-					if($moveFileSuccess)
-					{
-						header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
-						return $finalThumbPath;
-					}
-					else
-					{
-						KalturaLog::debug("Failed to move thumbnail from [$currPath] to [$finalThumbPath], will return oldPath");
-					}
-				}
-
-				header(self::CACHED_THUMB_EXISTS_HEADER . md5($currPath));
-				return $currPath;
-			}
-		}
-
+		$captureRequest = false;
 		if (($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
 		{
-			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
+			$captureRequest = true;
+		}
 
-			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entry);
-			$thumbName = $captureFlavorAsset->getId() . $thumbNameAttributes;
-			$flavorThumbFilename = $captureFlavorAsset->getVersion() . ".jpg";
-
-			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbName, $flavorThumbFilename, $format, $captureFlavorAsset->getVersion(), $thumbDirs);
-			if (is_null($processingThumbPath))
-				return $finalThumbPath;
-
+		list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($entry, $thumbNameAttributes, $entryThumbFilename, $format, $version, $thumbDirs, $contentPath,$captureRequest);
+		if (is_null($processingThumbPath))
+		{
+			return $finalThumbPath;
 		}
 
 		kFile::fullMkdir($processingThumbPath);

@@ -32,7 +32,9 @@ class thumbnailAction extends sfAction
 	{
 		$val = max($min, intval($this->getRequestParameter($name, $default)));
 		if(is_null($max))
+		{
 			return $val;
+		}
 
 		return min($max, $val);
 	}
@@ -186,9 +188,9 @@ class thumbnailAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
 		}
-		if($vid_slice != -1)
+
+		if(($vid_slice != -1) || ($vid_slices != -1))
 		{
-			$vid_slice = (($vid_slices != -1) ? $vid_slice : -1);
 			$vid_slice = (($vid_slice > $vid_slices) ? $vid_slices : $vid_slice);
 		}
 
