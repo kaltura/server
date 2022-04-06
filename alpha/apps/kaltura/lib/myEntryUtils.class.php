@@ -837,7 +837,7 @@ class myEntryUtils
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
 
 		$captureRequest = false;
-		if (($vid_sec != -1) || ($vid_slice != -1) || ($vid_slices != -1))
+		if ($vid_sec != -1 || $vid_slice != -1 || $vid_slices != -1)
 		{
 			$captureRequest = true;
 		}
