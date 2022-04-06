@@ -143,7 +143,7 @@ function getPartnerUpdates($updatedAt)
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}
 	
-	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt, 'totalCount' => count($rows));
 }
 
 function getUserUpdates($updatedAt)
@@ -167,12 +167,12 @@ function getUserUpdates($updatedAt)
 	foreach ($rows as $row)
 	{
 		$status = $row['STATUS'];
-		$id = $row['ID'];
 		if ($status == KuserStatus::DELETED)
 		{
-			$id = '';
+			continue;
 		}
 
+		$id = $row['ID'];
 		$puserId = $row['PUSER_ID'];
 		$partnerId = $row['PARTNER_ID'];
 		
@@ -181,8 +181,8 @@ function getUserUpdates($updatedAt)
 		$updatedAt = new DateTime($row['UPDATED_AT']);
 		$maxUpdatedAt = max($maxUpdatedAt, (int)$updatedAt->format('U'));
 	}
-	
-	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt, 'totalCount' => count($rows));
 }
 
 function getEntryUpdates($updatedAt)
@@ -241,8 +241,8 @@ function getEntryUpdates($updatedAt)
 		$updatedAt = getUnixTimestampFromDate($row['UPDATED_AT']);
 		$maxUpdatedAt = max($maxUpdatedAt, $updatedAt);
 	}
-	
-	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt, 'totalCount' => count($rows));
 }
 
 function getCategoryEntryUpdates($updatedAt)
@@ -258,7 +258,8 @@ function getCategoryEntryUpdates($updatedAt)
 	$stmt = categoryEntryPeer::doSelectStmt($c);
 	categoryEntryPeer::setUseCriteriaFilter(true);
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	
+	$totalCount = count($rows);
+
 	$maxUpdatedAt = 0;
 	$result = array();
 	foreach ($rows as $row)
@@ -292,8 +293,8 @@ function getCategoryEntryUpdates($updatedAt)
 		$categoryIds = implode(',', array_unique(explode(',', $categoryIds)));
 		$result[$entryId] = $categoryIds;
 	}
-	
-	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt, 'totalCount' => $totalCount);
 }
 
 function getUserGroupsUpdates($updatedAt)
@@ -311,6 +312,7 @@ function getUserGroupsUpdates($updatedAt)
 	$stmt = KuserKgroupPeer::doSelectStmt($c);
 	KuserKgroupPeer::setUseCriteriaFilter(true);
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$totalCount = count($rows);
 
 	$maxUpdatedAt = 0;
 	$kusers = array();
@@ -355,7 +357,7 @@ function getUserGroupsUpdates($updatedAt)
 		$result[$key] = $groupsIds;
 	}
 
-	return array('items' => $result, 'updatedAt' => $maxUpdatedAt);
+	return array('items' => $result, 'updatedAt' => $maxUpdatedAt, 'totalCount' => $totalCount);
 }
 
 // parse params
@@ -386,6 +388,8 @@ $requestHandlers = array(
 if (isset($requestHandlers[$requestType]))
 {
 	$result = call_user_func($requestHandlers[$requestType], $updatedAt);
+	$limitReached = $result["totalCount"] == MAX_ITEMS;
+	$result["limitReached"] = $limitReached;
 }
 else
 {
