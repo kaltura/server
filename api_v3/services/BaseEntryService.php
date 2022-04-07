@@ -256,7 +256,7 @@ class BaseEntryService extends KalturaEntryService
 
 		if (!file_exists($entryFullPath))
 		{
-			// Backward compatability - support case in which the required file exist in the other DC
+			// Backward compatibility - support case in which the required file exist in the other DC
 			kFileUtils::dumpApiRequest ( kDataCenterMgr::getRemoteDcExternalUrlByDcId ( 1 - kDataCenterMgr::getCurrentDcId () ) );
 			/*
 			$remoteDCHost = kUploadTokenMgr::getRemoteHostForUploadToken($uploadTokenId, kDataCenterMgr::getCurrentDcId());
@@ -295,7 +295,7 @@ class BaseEntryService extends KalturaEntryService
 	    myEntryUtils::setEntryTypeAndMediaTypeFromFile($dbEntry, $entryFullPath);
 	    $dbEntry->setDefaultModerationStatus();
 		
-		// hack due to KCW of version  from KMC
+		// hack due to KCW of version from KMC
 		if (! is_null ( parent::getConversionQualityFromRequest () ))
 			$dbEntry->setConversionQuality ( parent::getConversionQualityFromRequest () );
 		

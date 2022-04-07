@@ -340,7 +340,7 @@ class PlaylistService extends KalturaEntryService
 	        myPlaylistUtils::setPlaylistContext($corePlaylistContext);
 	    }
 	    
-		// the default of detailed should be true - most of the time the kuse is needed
+		// the default of detailed should be true - most of the time the kuser is needed
 		if (is_null($detailed))
 			 $detailed = true ;
 

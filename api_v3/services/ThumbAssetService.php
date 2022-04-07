@@ -151,7 +151,7 @@ class ThumbAssetService extends KalturaAssetService
 		
 		$defaultThumbKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
     		
- 		//If the thums has the default tag or the entry is in no content and this is the first thumb
+ 		//If the thumbs has the default tag or the entry is in no content and this is the first thumb
  		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || ($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT 
  			&& $thumbAssetsCount == 1 && !kFileSyncUtils::fileSync_exists($defaultThumbKey)))
 		{
@@ -245,7 +245,7 @@ class ThumbAssetService extends KalturaAssetService
         $url = $contentResource->getUrl();
         $fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
 
-        //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+        //curl does not supports sFTP protocol, therefore we will use 'addImportJob'
         if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
         {
             if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
@@ -393,7 +393,7 @@ class ThumbAssetService extends KalturaAssetService
     
     
 	/**
-	 * Serves thumbnail by entry id and thumnail params id
+	 * Serves thumbnail by entry id and thumbnail params id
 	 *  
 	 * @action serveByEntryId
 	 * @param string $entryId
@@ -939,7 +939,7 @@ class ThumbAssetService extends KalturaAssetService
 
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
     		
- 		//If the thums has the default tag or the entry is in no content and this is the first thumb
+ 		//If the thumbs has the default tag or the entry is in no content and this is the first thumb
 		if($dbEntry->getCreateThumb() && 
 			(
 				$dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || 

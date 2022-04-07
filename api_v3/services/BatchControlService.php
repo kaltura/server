@@ -82,7 +82,7 @@ class BatchControlService extends KalturaBaseService
 
 		if(kConf::hasParam('batch_enable_control_panel') && kConf::get('batch_enable_control_panel'))
 		{
-			// gets the control pannel commands
+			// gets the control panel commands
 			$c = new Criteria();
 			$c->add(ControlPanelCommandPeer::SCHEDULER_ID, $schedulerDb->getId());
 			$c->add(ControlPanelCommandPeer::TYPE, KalturaControlPanelCommandType::CONFIG, Criteria::NOT_EQUAL);
@@ -152,7 +152,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	private function getOrCreateScheduler(KalturaScheduler $scheduler)
 	{
-		//handle misconfiguring a batch without id
+		//handle misconfigured batch scheduler
 		if (is_null($scheduler->configuredId))
 		{
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL, 'KalturaScheduler:configuredId');
@@ -198,7 +198,7 @@ class BatchControlService extends KalturaBaseService
 	 */
 	private function getOrCreateSchedulerByHost(KalturaScheduler $scheduler)
 	{
-		//make sure we dont have the same configured_id by mistake
+		//make sure we don't have the same configured_id by mistake
 		if ($scheduler->configuredId)
 		{
 			$c = new Criteria();
@@ -250,7 +250,7 @@ class BatchControlService extends KalturaBaseService
 		$schedulerDb->setLastStatus(time());
 		$schedulerDb->setName($scheduler->name);
 		$schedulerDb->setHost($scheduler->host);
-		$schedulerDb->setDescription('Dynamically allocted scheduler');
+		$schedulerDb->setDescription('Dynamically allocated scheduler');
 		$schedulerDb->setConfiguredId($configuredId);
 		$schedulerDb->save();
 		return $schedulerDb;

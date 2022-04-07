@@ -168,8 +168,8 @@ class CategoryService extends KalturaBaseService
 			}
 		}
 			
-		//it is possible to not all of the sub tree is updated, 
-		//and updateing fileds that will add batch job to reindex categories - might not update all sub categories.
+		//it is possible that not all of the sub tree is updated, 
+		//and updating fields that will add batch job to re-index categories - might not update all sub categories.
 		//batch to index categories or to move categories might miss this category to be moved or index
 		if (($category->parentId != null && $category->parentId !=  $categoryDb->getParentId()) && 
 			$this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
@@ -335,7 +335,7 @@ class CategoryService extends KalturaBaseService
 	}
 	
 	/**
-	 * Move categories that belong to the same parent category to a target categroy - enabled only for ks with disable entitlement
+	 * Move categories that belong to the same parent category to a target category - enabled only for ks with disable entitlement
 	 * 
 	 * @action move
 	 * @param string $categoryIds
