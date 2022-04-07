@@ -426,11 +426,10 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
-				$offset = 0;
-				$requestedOffset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
-				if ($requestedOffset && kSimuliveUtils::isOffsetPlaybackAllowed($this->getRequestParameter('ks', '')))
+				$offset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+				if ($offset && !kSimuliveUtils::isOffsetPlaybackAllowed($this->getRequestParameter('ks', '')))
 				{
-					$offset = $requestedOffset;
+					$offset = 0;
 				}
 				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($assets)

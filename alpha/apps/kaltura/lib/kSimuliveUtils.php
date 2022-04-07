@@ -356,10 +356,6 @@ class kSimuliveUtils
 	 */
 	public static function isOffsetPlaybackAllowed($ksString)
 	{
-		if (kConf::get('serve_flavor_accept_time_offset', 'live', 0))
-		{
-			return true;
-		}
 		try
 		{
 			$ks = kSessionUtils::crackKs($ksString);
