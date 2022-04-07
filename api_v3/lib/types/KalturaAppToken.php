@@ -85,7 +85,8 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	public $sessionDuration;
 
 	/**
-	 * Comma separated privileges to be applied on KS (Kaltura Session) that created using the current token
+	 * Privileges for KS created by this token. User role and privacy like so: setrole:<role id>,privacycontext:<privacy context label>
+	 *
 	 * @var string
 	 */
 	public $sessionPrivileges;
