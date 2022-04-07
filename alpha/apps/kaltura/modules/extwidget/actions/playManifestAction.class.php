@@ -1315,13 +1315,13 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$this->servedEntryType = $this->entry->getType();
-		$scheduleTime = $this->getScheduleTime();
-		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $scheduleTime);
+		$requestedScheduleTime = $this->getRequestedScheduleTime();
+		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $requestedScheduleTime);
 		if ($event)
 		{
 			KalturaLog::info('Found event id: [' . $event->getId() . '] ');
 			// serve as simulive only if shouldn't be interrupted by "real" live (or specific time/offset requested)
-			if ($scheduleTime || !kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
+			if ($requestedScheduleTime || !kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
 			{
 				$this->initEventData($event);
 			}
@@ -1546,7 +1546,7 @@ class playManifestAction extends kalturaAction
 		return array($maxDc, $remoteFlavors);
 	}
 
-    protected function getScheduleTime()
+    protected function getRequestedScheduleTime()
     {
 		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, 0));
 		$offset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
