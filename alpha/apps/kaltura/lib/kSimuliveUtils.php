@@ -347,4 +347,27 @@ class kSimuliveUtils
 		}
 		return $durations;
 	}
+
+	/**
+	 * validating whether offseted playback is allowed (if got admin ks or server configured to always allow) 
+	 * @param string $ksString
+	 * @throws Exception
+	 * @return bool
+	 */
+	public static function isOffsetPlaybackAllowed($ksString)
+	{
+		if (kConf::get('serve_flavor_accept_time_offset', 'live', 0))
+		{
+			return true;
+		}
+		try
+		{
+			$ks = kSessionUtils::crackKs($ksString);
+			return $ks->isAdmin();
+		}
+		catch (Exception $e)
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_KS);
+		}
+	}
 }
