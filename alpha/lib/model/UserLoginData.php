@@ -29,9 +29,19 @@ class UserLoginData extends BaseUserLoginData{
 	{
 		$lastPartner =  $this->getFromCustomData('last_login_partner_id');
 		if (!$lastPartner) {
-			$lastPartner = $this->getConfigPartnerId();
+			$lastPartner = $this->config_partner_id;
 		}
 		return $lastPartner;
+	}
+	
+	public function getConfigPartnerId()
+	{
+		$configPartner = PartnerPeer::retrieveByPK($this->config_partner_id);
+		if ($configPartner && $configPartner->getStatus() != Partner::PARTNER_STATUS_ACTIVE)
+		{
+			return $this->getLastloginPartnerId();
+		}
+		return $this->config_partner_id;
 	}
 	
 	public function isLastLoginPartnerIdSet()
