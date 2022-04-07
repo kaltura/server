@@ -349,7 +349,7 @@ class kSimuliveUtils
 	}
 
 	/**
-	 * validating whether offseted playback is allowed (if got admin ks or server configured to always allow) 
+	 * validating whether offseted playback is allowed (if got admin ks)
 	 * @param string $ksString
 	 * @throws Exception
 	 * @return bool
