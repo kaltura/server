@@ -128,15 +128,15 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		}
 		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->sourceEntryId);
+			$this->validateEntryField('sourceEntryId');
 		}
-		if (isset($this->preStartEntryId) && !entryPeer::retrieveByPK($this->preStartEntryId))
+		if (isset($this->preStartEntryId))
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->preStartEntryId);
+			$this->validateEntryField('preStartEntryId', array(KalturaEntryType::MEDIA_CLIP));
 		}
-		if (isset($this->postEndEntryId) && !entryPeer::retrieveByPK($this->postEndEntryId))
+		if (isset($this->postEndEntryId))
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->postEndEntryId);
+			$this->validateEntryField('postEndEntryId', array(KalturaEntryType::MEDIA_CLIP));
 		}
 	}
 	
@@ -219,6 +219,26 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			$postEndEntry = entryPeer::retrieveByPK($this->postEndEntryId);
 			$this->postEndTime = round($postEndEntry->getDuration());
 			$object_to_fill->setPostEndTime($this->postEndTime);
+		}
+	}
+
+	/**
+	 * @param string $fieldName
+	 * @param array $allowedEntryTypes
+	 * validate the entry defined in 'fieldName' exists and its type supported (if allowedEntryTypes supplied)
+	 * @throws KalturaAPIException
+	 */
+	protected function validateEntryField($fieldName, $allowedEntryTypes = array())
+	{
+		$entryId = $this->$fieldName;
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		if (!empty($allowedEntryTypes) && !in_array($entry->getType(), $allowedEntryTypes))
+		{
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, $fieldName);
 		}
 	}
 }
