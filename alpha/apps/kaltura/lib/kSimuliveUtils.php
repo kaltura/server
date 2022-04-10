@@ -347,4 +347,23 @@ class kSimuliveUtils
 		}
 		return $durations;
 	}
+
+	/**
+	 * validating whether offseted playback is allowed (if got admin ks)
+	 * @param string $ksString
+	 * @throws Exception
+	 * @return bool
+	 */
+	public static function isOffsetPlaybackAllowed($ksString)
+	{
+		try
+		{
+			$ks = kSessionUtils::crackKs($ksString);
+			return $ks->isAdmin();
+		}
+		catch (Exception $e)
+		{
+			KExternalErrors::dieError(KExternalErrors::INVALID_KS);
+		}
+	}
 }
