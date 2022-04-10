@@ -118,7 +118,7 @@ abstract class zoomProcessor
 		$user = $this->getKalturaUser($partnerId, $zoomUser);
 		KBatchBase::unimpersonate();
 		$userId = '';
-		if ($user)
+		if ($user && $hostEmail != '')
 		{
 			$userId = $user->id;
 		}
