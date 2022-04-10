@@ -26,19 +26,19 @@
                 <!-- EventNotificationEventObjectType::ENTRY -->
                 <eventConditions objectType="array">
                     <item objectType="KalturaEventObjectChangedCondition">
-                        <description>Co-editors changed on the entry</description>
-                        <modifiedColumns>entitledUserPuserEdit</modifiedColumns>
+                        <description>Co-publisher changed on the entry</description>
+                        <modifiedColumns>entitledUserPuserPublish</modifiedColumns>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
-                        <description>Check co-editor added</description>
+                        <description>Check Co-publisher added</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code>$scope->getObject() instanceof entry &amp;&amp; $scope->getObject()->getEntitledPusersEdit()</code>
+                            <code>$scope->getObject() instanceof entry &amp;&amp; $scope->getObject()->getEntitledPusersPublish()</code>
                         </field>
                     </item>
                     <item objectType="KalturaEventFieldCondition">
-                        <description>Check co-editor added</description>
+                        <description>Check Co-publisher added</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code>!is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit')) ? array_diff(explode(' ,', $scope->getObject()->getEntitledPusersEdit()), unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit'))) : true</code>
+                            <code>!is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish')) ? array_diff(explode(' ,', $scope->getObject()->getEntitledPusersPublish()), unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish'))) : true</code>
                         </field>
                     </item>
                 </eventConditions>
@@ -91,17 +91,17 @@
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>new_co_editor_email</key>
-                        <description>New co-editor email</description>
+                        <key>new_co_publisher_email</key>
+                        <description>New co-publisher email</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>!is_null(kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), end(explode(',', $scope->getObject()->getEntitledPusersEdit())))) ? (kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(),end(explode(',', $scope->getObject()->getEntitledPusersEdit()))))->getEmail() : ''</code>
+                            <code>!is_null(kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), end(explode(',', $scope->getObject()->getEntitledPusersPublish())))) ? (kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(),end(explode(',', $scope->getObject()->getEntitledPusersPublish()))))->getEmail() : ''</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>new_co_editor</key>
-                        <description>New co-editor ID</description>
+                        <key>new_co_publisher</key>
+                        <description>New co-publisher ID</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>array_shift(array_diff(explode(',', $scope->getObject()->getEntitledPusersEdit()), (!is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit')) ? unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserEdit')) : array())))</code>
+                            <code>array_shift(array_diff(explode(',', $scope->getObject()->getEntitledPusersPublish()), (!is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish')) ? unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish')) : array())))</code>
                         </value>
                     </item>
                 </contentParameters>
