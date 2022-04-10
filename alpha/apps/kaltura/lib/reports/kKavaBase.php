@@ -322,6 +322,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_MEDIA_TYPE => 1,
 			self::DIMENSION_SOURCE_TYPE => 1,
 			self::DIMENSION_STATUS => 1,
+			self::DIMENSION_FLAVOR_PARAMS_ID => 1,
 		),
 		self::DATASOURCE_USER_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
