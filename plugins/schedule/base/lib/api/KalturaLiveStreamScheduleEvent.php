@@ -126,7 +126,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		{
 		    throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'postEndTime');
 		}
-		if (isset($this->sourceEntryId) && !entryPeer::retrieveByPK($this->sourceEntryId))
+		if (isset($this->sourceEntryId))
 		{
 			$this->validateEntryField('sourceEntryId');
 		}
