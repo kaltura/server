@@ -53,8 +53,8 @@ $i=0;
 foreach ( $entries as $entry ) {	 
 ?>
 <td style="font-size: 11px; width: 150px ; background-color:<?= $media_type_style[$entry->getMediaType()] ?>">
-<a href='javascript:investigate ( "<?= $entry->getId() ?>");'>
-<?php=  $entry->getId() . " [" . $entry->getPartnerId() . "]" .
+    <a href='javascript:investigate ( "<?php echo $entry->getId() ?>");'>
+<?php echo  $entry->getId() . " [" . $entry->getPartnerId() . "]" .
 "<br>" . $entry->getName()?></a>
 <br>
 <table border=0>
