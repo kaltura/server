@@ -13,6 +13,7 @@ abstract class zoomProcessor
 	const CMS_USER_FIELD = 'cms_user_id';
 	const MAX_PUSER_LENGTH = 100;
 	const EMAIL = 'email';
+	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
 	
 	/**
 	 * @var kZoomClient
@@ -109,6 +110,12 @@ abstract class zoomProcessor
 	 */
 	protected function getEntryOwnerId($hostEmail)
 	{
+		$userId = $this::KALTURA_ZOOM_DEFAULT_USER;
+		$defaultUser = $this->dropFolder->zoomVendorIntegration->defaultUserId;
+		if($hostEmail == '')
+		{
+			return $defaultUser ? $defaultUser : $userId;
+		}
 		$partnerId = $this->dropFolder->partnerId;
 		$zoomUser = new kZoomUser();
 		$zoomUser->setOriginalName($hostEmail);
@@ -117,20 +124,19 @@ abstract class zoomProcessor
 		/* @var $user KalturaUser */
 		$user = $this->getKalturaUser($partnerId, $zoomUser);
 		KBatchBase::unimpersonate();
-		$userId = '';
-		if ($user && $hostEmail != '')
+		if($user)
 		{
 			$userId = $user->id;
 		}
 		else
 		{
-			if ($this->dropFolder->zoomVendorIntegration->createUserIfNotExist)
+			if($this->dropFolder->zoomVendorIntegration->createUserIfNotExist)
 			{
 				$userId = $zoomUser->getProcessedName();
 			}
-			else if ($this->dropFolder->zoomVendorIntegration->defaultUserId)
+			else if($defaultUser)
 			{
-				$userId = $this->dropFolder->zoomVendorIntegration->defaultUserId;
+				$userId = $defaultUser;
 			}
 		}
 		return $userId;
