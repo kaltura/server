@@ -497,6 +497,14 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 				}
 			}
 		}
+		else
+		{
+			$maxSingleEventDuration = $this->getSingleScheduleEventMaxDuration();
+			if ($this->endDate - $this->startDate > $maxSingleEventDuration)
+			{
+				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
+			}
+		}
 
 		// we can't update a recurrence object and set both until and count so if one of them is going to be updated we set remove the other one.
 		if(!is_null($this->recurrence->until) && !is_null($sourceObject->getRecurrence()) &&  !is_null($sourceObject->getRecurrence()->getCount()))
