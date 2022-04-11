@@ -27,8 +27,8 @@ if (!$redisWrapper)
 }
 
 $leaderboardScores = getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameObjectId);
-$mapKuserPuser = GamePlugin::createMapKuserToPuser($leaderboardScores);
-$userScoreReportsMap = getAllUsersReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper);
+$mapKuserUserDetails = createMapKuserToUserDetails($leaderboardScores);
+$userScoreReportsMap = getAllUsersReportsFromRedis($mapKuserUserDetails, $partnerId, $redisWrapper);
 
 $rulesMap = array();
 $userRows = array();
@@ -67,12 +67,43 @@ function getLeaderboardScores($redisWrapper, $partnerId, $gameObjectType, $gameO
 	return $leaderboardScores;
 }
 
-function getAllUsersReportsFromRedis($mapKuserPuser, $partnerId, $redisWrapper)
+function createMapKuserToUserDetails($results)
+{
+	$kusers = array_keys($results);
+	
+	$users = kuserPeer::retrieveByPKs($kusers);
+	if (!$users)
+	{
+		KalturaLog::info('Failed to retrieve users from DB');
+		return array();
+	}
+	
+	$mapKuserUserDetails = array();
+	foreach ($users as $user)
+	{
+		if ($user->getPuserId())
+		{
+			$mapKuserUserDetails[$user->getId()] = array('id' => $user->getPuserId(), 'fullname' => $user->getFullName(), 'email' => $user->getEmail());
+		}
+		else
+		{
+			$kuserId = $user->getId();
+			$mapKuserUserDetails[$kuserId] = 'Unknown';
+			KalturaLog::info("No user found for kuser $kuserId");
+		}
+	}
+	
+	return $mapKuserUserDetails;
+}
+
+function getAllUsersReportsFromRedis($mapKuserUserDetails, $partnerId, $redisWrapper)
 {
 	$userScoreReportsMap = array();
 	
-	foreach ($mapKuserPuser as $kuserId => $puserId)
+	foreach ($mapKuserUserDetails as $kuserId => $userDetails)
 	{
+		$puserId = $userDetails['id'];
+		
 		$userReportRedisKey = $partnerId . '_report_' . $kuserId;
 		
 		$userScoreReport = $redisWrapper->doGet($userReportRedisKey);
@@ -92,13 +123,15 @@ function readRulesAndScoresFromUsersReports(&$rulesMap, &$userRows, &$userScores
 	global $gameObjectType;
 	global $gameObjectId;
 	global $leaderboardScores;
-	global $mapKuserPuser;
+	global $mapKuserUserDetails;
 	global $userScoreReportsMap;
 	
 	$gameObjectKey = $gameObjectType . '_' . $gameObjectId;
 	
-	foreach ($mapKuserPuser as $kuserId => $puserId)
+	foreach ($mapKuserUserDetails as $kuserId => $userDetails)
 	{
+		$puserId = $userDetails['id'];
+		
 		if (!isset($userScoreReportsMap[$puserId]))
 		{
 			break;
@@ -126,16 +159,9 @@ function readRulesAndScoresFromUsersReports(&$rulesMap, &$userRows, &$userScores
 				continue;
 			}
 			
-			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-			if (!$kuser)
-			{
-				KalturaLog::info("Could not find user $puserId");
-				break;
-			}
-			
 			$userTotalScore = floor($leaderboardScores[$kuserId]);
 			
-			$userRow = array($userTotalScore, $puserId, $kuser->getFullName(), $kuser->getEmail());
+			$userRow = array($userTotalScore, $puserId, $userDetails['fullname'], $userDetails['email']);
 			if (!isset($gameObject->rulesData))
 			{
 				KalturaLog::info("Missing rulesData for user $puserId");
@@ -256,7 +282,7 @@ function compareSumOfScoresWithTotalScore($scores, $totalScore)
 function addScoresToUserRows($userScoresMap)
 {
 	global $leaderboardScores;
-	global $mapKuserPuser;
+	global $mapKuserUserDetails;
 	global $rulesMap;
 	global $userRows;
 	
@@ -265,7 +291,9 @@ function addScoresToUserRows($userScoresMap)
 	
 	foreach (array_keys($leaderboardScores) as $kuserId)
 	{
-		$puserId = $mapKuserPuser[$kuserId];
+		$userDetails = $mapKuserUserDetails[$kuserId];
+		
+		$puserId = $userDetails['id'];
 		
 		if (!isset($userScoresMap[$puserId]))
 		{
