@@ -110,7 +110,7 @@ abstract class zoomProcessor
 	 */
 	protected function getEntryOwnerId($hostEmail)
 	{
-		$userId = $this::KALTURA_ZOOM_DEFAULT_USER;
+		$userId = self::KALTURA_ZOOM_DEFAULT_USER;
 		$defaultUser = $this->dropFolder->zoomVendorIntegration->defaultUserId;
 		if($hostEmail == '')
 		{
