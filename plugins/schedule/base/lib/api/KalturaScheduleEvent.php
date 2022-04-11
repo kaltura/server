@@ -500,7 +500,7 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		else
 		{
 			$maxSingleEventDuration = $this->getSingleScheduleEventMaxDuration();
-			if ($this->endDate - $this->startDate > $maxSingleEventDuration)
+			if ($endDate - $startDate > $maxSingleEventDuration)
 			{
 				throw new KalturaAPIException(KalturaScheduleErrors::MAX_SCHEDULE_DURATION_REACHED, $maxSingleEventDuration);
 			}
