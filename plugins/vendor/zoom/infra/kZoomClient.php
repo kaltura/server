@@ -201,7 +201,7 @@ class kZoomClient
 			KalturaLog ::debug($errMsg);
 			if($response)
 			{
-				KalturaLog::debug(print_r($response, True));
+				KalturaLog::debug(print_r($response, true));
 			}
 			$response = null;
 		}
