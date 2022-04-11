@@ -177,7 +177,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
 		/*
-		Patch for autenticate error while performing an immidiate stop/start. Checkup for duplicate streams moved to
+		    Patch for authenticate error while performing an immediate stop/start. Checkup for duplicate streams moved to
 		media-server for the moment. 
 		if($dbEntry->isStreamAlreadyBroadcasting())
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());

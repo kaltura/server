@@ -615,7 +615,7 @@ class BatchService extends KalturaBatchService
 	}
 
 	/**
-	 * batch extendLockExpiration action allows to extend the expiration of  a BatchJobLock by job id
+	 * batch extendLockExpiration action allows to extend the expiration of a BatchJobLock by job id
 	 *
 	 * @action extendLockExpiration
 	 * @param int $jobId

@@ -421,7 +421,7 @@ class FlavorAssetService extends KalturaAssetService
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
 		$c->addAnd($criterionPartnerOrKn);
 		// there could only be one entry because the query is by primary key.
-		// so using doSelectOne is safe.
+		// so using doSelectOne() is safe.
 		$dbEntry = entryPeer::doSelectOne($c);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -477,7 +477,7 @@ class FlavorAssetService extends KalturaAssetService
 		$criterionPartnerOrKn->addOr($c->getNewCriterion(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_KALTURA_NETWORK));
 		$c->addAnd($criterionPartnerOrKn);
 		// there could only be one entry because the query is by primary key.
-		// so using doSelectOne is safe.
+		// so using doSelectOne() is safe.
 		$dbEntry = entryPeer::doSelectOne($c);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -762,7 +762,7 @@ class FlavorAssetService extends KalturaAssetService
 		$c->add(assetPeer::STATUS, array(flavorAsset::FLAVOR_ASSET_STATUS_DELETED, flavorAsset::FLAVOR_ASSET_STATUS_TEMP), Criteria::NOT_IN);
 		$flavorAssetsDb = assetPeer::doSelect($c);
 		
-		// find what flavot params are required
+		// find what flavor params are required
 		$requiredFlavorParams = array();
 		foreach($flavorAssetsDb as $item)
 			$requiredFlavorParams[$item->getFlavorParamsId()] = true;
