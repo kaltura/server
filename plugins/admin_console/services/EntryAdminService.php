@@ -95,17 +95,24 @@ class EntryAdminService extends KalturaBaseService
 	 */
 	public function restoreDeletedEntryAction($entryId)
 	{
+		KalturaLog::info("Staring restoring entry $entryId");
+
 		$deletedEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$deletedEntry)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
 
 		$fileSyncKeys = array();
-		foreach (entry::getEntryFileSyncSubTypes() as $entrySubType) {
+		foreach (entry::getEntryFileSyncSubTypes() as $entrySubType)
+		{
 			$fileSyncKeys[] = $deletedEntry->getSyncKey($entrySubType);
 		}
 
 		$c = new Criteria();
 		$c->add(assetPeer::ENTRY_ID, $entryId, Criteria::EQUAL);
+		$c->add(assetPeer::STATUS, asset::ASSET_STATUS_DELETED, Criteria::EQUAL);
+
 		assetPeer::setUseCriteriaFilter(false);
 		$deletedAssets = assetPeer::doSelect($c);
 		assetPeer::setUseCriteriaFilter(true);
@@ -123,8 +130,6 @@ class EntryAdminService extends KalturaBaseService
 		}
 		FileSyncPeer::setUseCriteriaFilter(true);
 
-		if (!$this->validateEntryForRestoreDelete($deletedEntry, $fileSyncs, $deletedAssets))
-			throw new KalturaAPIException(KalturaAdminConsoleErrors::ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE, $entryId);
 
 		$this->restoreFileSyncs($fileSyncs);
 
@@ -159,21 +164,27 @@ class EntryAdminService extends KalturaBaseService
 			{
 				$shouldUnDelete = true;
 			}
-			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK){
+			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK)
+			{
 				$linkedId = $fileSync->getLinkedId();
 				FileSyncPeer::setUseCriteriaFilter(false);
 				$linkedFileSync = FileSyncPeer::retrieveByPK($linkedId);
 				FileSyncPeer::setUseCriteriaFilter(true);
-				if ($linkedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY) {
+				if ($linkedFileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
+				{
 					$shouldUnDelete = true;
 					kFileSyncUtils::incrementLinkCountForFileSync($linkedFileSync);
 				}
 			}
 
 			if ($shouldUnDelete)
+			{
 				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_READY);
+			}
 			else
+			{
 				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
+			}
 			$fileSync->save();
 		}
 	}
