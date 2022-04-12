@@ -95,7 +95,7 @@ class EntryAdminService extends KalturaBaseService
 	 */
 	public function restoreDeletedEntryAction($entryId)
 	{
-		KalturaLog::info("Staring restoring entry $entryId");
+		KalturaLog::debug("Staring restoring entry $entryId");
 
 		$deletedEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$deletedEntry)
