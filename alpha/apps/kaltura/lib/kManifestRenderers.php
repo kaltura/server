@@ -1001,7 +1001,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 					$isFirstAudioStream = "NO";
 
 				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
-				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];
+				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];  //here we need to decide what should be displayed as default language name/native $flavor['audioLanguageNativeName']
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\"" . 
 						",AUTOSELECT=$isFirstAudioStream,DEFAULT=$isFirstAudioStream,URI=\"{$flavor['url']}\"";
 				$audioFlavorsArr[] = $content;

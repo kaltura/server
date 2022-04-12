@@ -318,6 +318,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$obj = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
+		$audioLanguageNativeName = null;
 
 		$useTwoCodeLang = true;
 		$threeCodeLanguagePartnersMap = kConf::getMap('three_code_language_partners');
@@ -354,14 +355,19 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			if (!is_null($obj))
 			{
 				if ($useTwoCodeLang)
-					$audioLanguage = $obj[languageCodeManager::ISO639] ? $obj[languageCodeManager::ISO639] : $audioLanguage;
+				{
+					$audioLanguage = $obj[languageCodeManager::ISO639]?$obj[languageCodeManager::ISO639]:$audioLanguage;
+				}
 				else
-					$audioLanguage = $obj[languageCodeManager::ISO639_T] ? $obj[languageCodeManager::ISO639_T] : $obj[languageCodeManager::ISO639_B];
+				{
+					$audioLanguage = $obj[languageCodeManager::ISO639_T]?$obj[languageCodeManager::ISO639_T]:$obj[languageCodeManager::ISO639_B];
+				}
 			}
 		}
 
 		$audioLanguageName = $this->getAudioLanguageName($obj, $audioLanguage);
-		return array($audioLanguage, $audioLanguageName);
+		$audioLanguageNativeName = $this->getAudioLanguageNativeName($obj, $audioLanguage);
+		return array($audioLanguage, $audioLanguageName, $audioLanguageNativeName);
 	}
 	
 	protected function getAudioLanguageName($languageObject, $audioLanguage)
@@ -375,6 +381,17 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $languageObject[languageCodeManager::KALTURA_NAME];
 	}
 	
+	protected function getAudioLanguageNativeName($languageObject, $audioLanguage)
+	{
+		if (is_null($languageObject))
+		{
+			KalturaLog::info("Language object was not found. Setting [$audioLanguage] instead");
+			return $audioLanguage;
+		}
+		
+		return $languageObject[languageCodeManager::ISO_NATIVE_NAME];
+	}
+	
 	/**
 	 * @param string $url
 	 * @param string $urlPrefix
@@ -386,6 +403,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$ext = null;
 		$audioLanguage = null;
 		$audioLanguageName = null;
+		$audioLanguageNativeName = null;
 		$audioLanguageData = null;
 		$audioLabel = null;
 		$audioCodec = null;
@@ -416,10 +434,11 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				{
 					$audioLanguage = 'und';
 					$audioLanguageName = 'Undefined';
+					$audioLanguageNativeName = 'Undefined';
 				}
 				else 
 				{
-					list($audioLanguage, $audioLanguageName) = $audioLanguageData;
+					list($audioLanguage, $audioLanguageName, $audioLanguageNativeName) = $audioLanguageData;
 				}
 				
 				$audioCodec = is_callable(array($flavor, 'getMediaInfo')) ? $this->getAudioCodec($flavor) : null;
@@ -463,6 +482,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'defaultAudio' => $isDefaultAudio,
 				'type' => $type,
 				'frameRate' => $frameRate,
+				'audioLanguageNativeName' => $audioLanguageNativeName,
 			);
 	}
 	
