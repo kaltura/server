@@ -199,6 +199,10 @@ class kZoomClient
 		{
 			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
 			KalturaLog ::debug($errMsg);
+			if($response)
+			{
+				KalturaLog::debug(print_r($response, true));
+			}
 			$response = null;
 		}
 	}
