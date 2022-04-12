@@ -112,9 +112,10 @@ abstract class zoomProcessor
 	{
 		$userId = self::KALTURA_ZOOM_DEFAULT_USER;
 		$defaultUser = $this->dropFolder->zoomVendorIntegration->defaultUserId;
+		$createUserIfNotExist = $this->dropFolder->zoomVendorIntegration->createUserIfNotExist;
 		if($hostEmail == '')
 		{
-			return $defaultUser ? $defaultUser : $userId;
+			return $createUserIfNotExist ? $userId : $defaultUser;
 		}
 		$partnerId = $this->dropFolder->partnerId;
 		$zoomUser = new kZoomUser();
@@ -130,7 +131,7 @@ abstract class zoomProcessor
 		}
 		else
 		{
-			if($this->dropFolder->zoomVendorIntegration->createUserIfNotExist)
+			if($createUserIfNotExist)
 			{
 				$userId = $zoomUser->getProcessedName();
 			}
