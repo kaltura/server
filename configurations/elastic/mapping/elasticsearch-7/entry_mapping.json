@@ -221,6 +221,7 @@
 		"_source": {
 			"enabled": true
 		},
+		"dynamic": false,
 		"properties": {
 			"name": {
 				"type": "text",
