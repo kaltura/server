@@ -1,5 +1,18 @@
 # Rigel-18.3.0
 
+## Modify elastic index mapping to prevent elastic from dynamically mapping unknown objects ##
+* Issue Type: Task
+* Issue ID: FOUN-450
+
+#### Deployment ####
+This is optional, but recomended.
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{  "dynamic": false}'
+
+---
+
 ## Add 'title' and 'company' to kaltura_kuser index as searchable fields ##
 * Issue Type: Task
 * Issue ID: FOUN-440
@@ -7,6 +20,8 @@
 #### Deployment ####
 Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
 ##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
     curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"title": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}},"company": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
     
 #### Known Issues & Limitations ####
@@ -30,6 +45,7 @@ php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
   * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
   * If everything work as expected, you can delete the old kuser index.
 
+---
 
 ## Add missing permission to EP_USER_ANALYTICS ##
 - Issue Type: Task
