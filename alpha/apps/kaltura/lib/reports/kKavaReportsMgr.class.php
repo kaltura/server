@@ -106,6 +106,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LIVE_ENGAGED_USERS_RATIO = 'live_engaged_users_ratio';
 	const METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'live_engaged_users_play_time_ratio';
 	const METRIC_COUNT_ALL_EVENTS = 'count_all';
+	const METRIC_TRANSCODING_DURATION_SEC = 'transcoding_duration_sec';
+	const METRIC_TRANSCODING_DURATION = 'transcoding_duration';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1115,6 +1117,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_TOTAL_JOBS] = self::getLongSumAggregator(
 			self::METRIC_TOTAL_JOBS, self::METRIC_COUNT);
 
+		self::$aggregations_def[self::METRIC_TRANSCODING_DURATION_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
+			self::getLongSumAggregator(
+				self::METRIC_TRANSCODING_DURATION_SEC, self::METRIC_DURATION_SEC));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1153,6 +1160,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_FLAVOR_SIZE_BYTES),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_FLAVOR_SIZE_BYTES, '1048576'));
+
+		self::$metrics_def[self::METRIC_TRANSCODING_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_TRANSCODING_DURATION, self::METRIC_TRANSCODING_DURATION_SEC, '60'));
 
 		self::$metrics_def[self::METRIC_STORAGE_TOTAL_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_STORAGE_SIZE_BYTES),

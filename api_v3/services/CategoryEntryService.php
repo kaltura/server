@@ -226,7 +226,7 @@ class CategoryEntryService extends KalturaBaseService
 		if(!$dbCategoryEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 			
-		//validate user is entiteld to activate entry from category 
+		//validate that the user is allowed to activate entry from category 
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());
@@ -277,7 +277,7 @@ class CategoryEntryService extends KalturaBaseService
 		if(!$dbCategoryEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_IS_NOT_ASSIGNED_TO_CATEGORY);
 			
-		//validate user is entiteld to reject entry from category 
+		//validate that the user is allowed to reject entry from category 
 		if(kEntitlementUtils::getEntitlementEnforcement())
 		{
 			$categoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($categoryId, kCurrentContext::getCurrentKsKuserId());

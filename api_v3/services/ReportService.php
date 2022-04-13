@@ -41,7 +41,7 @@ class ReportService extends KalturaBaseService
 	 * Validates that all object ids are allowed partner ids
 	 * 
 	 * @param string $objectIds comma separated IDs
-	 * @return string comma seperated ids
+	 * @return string comma separated ids
 	 */
 	protected function validateObjectsAreAllowedPartners($reportType, $objectIds, $delimiter)
 	{

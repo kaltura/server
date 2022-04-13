@@ -1,4 +1,5 @@
 # Rigel-18.3.0
+
 ## Add 'title' and 'company' to kaltura_kuser index as searchable fields ##
 * Issue Type: Task
 * Issue ID: FOUN-440
@@ -28,6 +29,7 @@ php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
 * Done! you should be able to search user by 'title' and / or 'company'
   * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
   * If everything work as expected, you can delete the old kuser index.
+
 
 ## Add missing permission to EP_USER_ANALYTICS ##
 - Issue Type: Task

@@ -358,7 +358,7 @@ class LiveReportsService extends KalturaBaseService
 	 * Returns all live entry ids that are live now by partner id 
 	 */
 	protected function getAllLiveEntriesLiveNow() {
-		// Partner ID condition is embeded in the default criteria.
+		// Partner ID condition is embedded in the default criteria.
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$filter = new entryFilter();
 		$filter->setTypeEquel(KalturaEntryType::LIVE_STREAM);

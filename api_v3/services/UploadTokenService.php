@@ -246,7 +246,7 @@ class UploadTokenService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD);
 		}
 		
-		// dont dump an upload to the other DC if it's the first uploaded chunk
+		// don't dump an upload to the other DC if it's the first uploaded chunk
 		// optimizes cases where an upload token is created in one DC and the uploads go to the other
 		if ($uploadTokenStatus != UploadToken::UPLOAD_TOKEN_PENDING)
 		{

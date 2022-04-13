@@ -1315,12 +1315,13 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$this->servedEntryType = $this->entry->getType();
-		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		$requestedScheduleTime = $this->getRequestedScheduleTime();
+		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $requestedScheduleTime);
 		if ($event)
 		{
 			KalturaLog::info('Found event id: [' . $event->getId() . '] ');
-			// serve as simulive only if shouldn't be interrupted by "real" live
-			if (!kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
+			// serve as simulive only if shouldn't be interrupted by "real" live (or specific time/offset requested)
+			if ($requestedScheduleTime || !kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
 			{
 				$this->initEventData($event);
 			}
@@ -1545,11 +1546,12 @@ class playManifestAction extends kalturaAction
 		return array($maxDc, $remoteFlavors);
 	}
 
-    protected function getScheduleTime()
+    protected function getRequestedScheduleTime()
     {
-		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, time()));
-		$time += intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
-		return $time;
+		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, 0));
+		$offset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+		$time = (!$time && $offset) ? time() : $time;
+		return $time + $offset;
     }
 
     protected function isSimuliveFlow()
