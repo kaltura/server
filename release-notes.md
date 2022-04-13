@@ -6,7 +6,7 @@
 
 #### Deployment ####
 Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
-
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
     curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"title": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}},"company": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
     
 #### Known Issues & Limitations ####
