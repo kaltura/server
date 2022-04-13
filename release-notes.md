@@ -1,4 +1,36 @@
 # Rigel-18.3.0
+
+## Add 'title' and 'company' to kaltura_kuser index as searchable fields ##
+* Issue Type: Task
+* Issue ID: FOUN-440
+
+#### Deployment ####
+Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"title": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}},"company": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
+    
+#### Known Issues & Limitations ####
+If Rigel-18.3.0 or later server version already ran and new users were added
+with either 'title' or 'company' (or both) then it is likely that elastic already mapped
+these fields to the kaltura_kuser index map (due to elastic default index 'dynamic' attribute is 'true') 
+If that happened, you will get an error from elastic.
+
+#### Resolution ####
+* Create a new kaltura_kuser index with Rigel-18.3.0 kaltura_kuser.json map (or later)
+* (if you have alias for index) Point 'kaltura_kuser' alias to the new index by following below instructions:
+  * Replace all tokens in the below curl command
+```
+curl -XPOST "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/_aliases" -H 'Content-Type: application/json' -d'{  "actions":[{"add": {"index": "@NEW_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}},{"remove": {"index": "@OLD_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}}]}'
+```
+* Execute 'populateElasticKusers.php' script:
+```
+php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+```
+* Done! you should be able to search user by 'title' and / or 'company'
+  * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
+  * If everything work as expected, you can delete the old kuser index.
+
+
 ## Add missing permission to EP_USER_ANALYTICS ##
 - Issue Type: Task
 - Issue ID: PLAT-23641
