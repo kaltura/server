@@ -1736,8 +1736,8 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
-					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
 				),
 				// storage
 				array(
@@ -1764,8 +1764,8 @@ class kKavaReports extends kKavaReportsMgr
 				),
 			),
 					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
-					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
-					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS),
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS, self::METRIC_AVERAGE_STORAGE_MB),
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS, self::METRIC_AVERAGE_STORAGE_MB),
 
 				)
 			),
@@ -1780,7 +1780,28 @@ class kKavaReports extends kKavaReportsMgr
 				'live_view_time' => self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME,
 				'total_credits' => self::METRIC_SUM_PRICE,
 				'total_jobs_completed' => self::METRIC_TOTAL_JOBS,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'transcoding_duration' => self::METRIC_TRANSCODING_DURATION,
 			),
+		),
+
+		ReportType::FLAVOR_PARAMS_TRANSCODING_USAGE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'flavor_params_id' => self::DIMENSION_FLAVOR_PARAMS_ID,
+				'name' => self::DIMENSION_FLAVOR_PARAMS_ID
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => array('name'),
+				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'peer' => 'assetParamsPeer',
+					'columns' => array('NAME'),
+					'skip_partner_filter' => true,
+				)
+			),
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+			self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
 		),
 	);
 

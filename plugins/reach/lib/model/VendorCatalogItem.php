@@ -150,6 +150,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 			case VendorServiceFeature::INTELLIGENT_TAGGING:
 				$serviceFeatureName = 'intelligent tagging';
 				break;
+			
+			case VendorServiceFeature::DUBBING:
+				$serviceFeatureName = 'dubbing';
+				break;
 
 			default:
 				$serviceFeatureName = '';

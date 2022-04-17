@@ -22,7 +22,7 @@ class KConversionEngineFfmpegAux  extends KJobConversionEngine
 		return KBatchBase::$taskConfig->params->ffmpegAuxCmd;
 	}
 	
-	protected function getCmdLine ($cmd_line , $add_log )
+	protected function getCmdLine ($cmd_line , $add_log, $estimatedeffort = null )
 	{
 		// I have commented out the audio parameters so we don't decrease the quality - it stays as-is
 		$binName = $this->getCmd();

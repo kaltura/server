@@ -511,7 +511,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$loginEmail = $user->getEmail();
 		$roleName = $user->getUserRoleNames();
 		$puserId = $user->getPuserId();
-		
+
 		$bodyParams = null;
 
 
@@ -540,7 +540,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				if (!$adminName) { $adminName = $admin->getPuserId(); }
 				$unsubscribeLink .= $admin->getEmail();
 				$bodyParams = null;
-				
+
+				list($adminName, $creatorUserName, $publisherName) = myKuserUtils::sanitizeFields(array($adminName, $creatorUserName, $publisherName));
+
 				if($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // Mail for admin console user
 				{
 					$bodyParams = array($adminName, $creatorUserName, $loginEmail, $roleName);
@@ -586,11 +588,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$creatorUserName = $creatorUser->getFullName();
 			}
 		}
-		
-		$publisherName = $partner->getName();
+
 		$loginEmail = $user->getEmail();
 		$roleNames = $user->getUserRoleNames();
-		$puserId = $user->getPuserId();
+
+		list($userName, $creatorUserName, $publisherName, $puserId) = myKuserUtils::sanitizeFields(array($userName, $creatorUserName, $partner->getName(), $user->getPuserId()));
+
 		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
 		if (!$existingUser)
 		{
@@ -641,7 +644,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		}
 		else // Not an admin console partner
 		{
-			$authType = $partner->getAuthenticationType();
+			$authType = self::getAuthenticationType($user, $partner);
 			$userLoginData = $user->getLoginData();
 			if ($partner->getUseTwoFactorAuthentication() && !$userLoginData->getSeedFor2FactorAuth())
 			{
@@ -670,11 +673,11 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 					kEmails::TAG_QUICK_START_GUID_LINK => $quickStartGuideLink);
 				if ($authType == PartnerAuthenticationType::SSO)
 				{
-					$associativeBodyParams += [kEmails::TAG_LOGIN_LINK => $bodyParams[3]];
+					$associativeBodyParams[kEmails::TAG_LOGIN_LINK] = $bodyParams[3];
 				}
 			}
 		}
-		
+
 		if ($roleNameToUseDynamicEmailTemplate)
 		{
 			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $roleNameToUseDynamicEmailTemplate);
@@ -703,6 +706,21 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 				$bodyParams
 			);
 		}
+	}
+	
+	public static function getAuthenticationType($user, $partner)
+	{
+		/* @var $user kuser*/
+		$authType = $partner->getAuthenticationType();
+		if ($authType != PartnerAuthenticationType::SSO)
+		{
+			return $authType;
+		}
+		if ($user->getIsSsoExcluded())
+		{
+			return ($partner->getUseTwoFactorAuthentication()) ? PartnerAuthenticationType::TWO_FACTOR_AUTH : PartnerAuthenticationType::PASSWORD_ONLY;
+		}
+		return $authType;
 	}
 
 	public static function getUserMailType($authType, $existingUser)

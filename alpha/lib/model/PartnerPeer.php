@@ -87,4 +87,15 @@ class PartnerPeer extends BasePartnerPeer
 		
 		return $partner;
 	}
+
+    public static function retrieveReadOnlyByPK($pk)
+    {
+        $partner = PartnerPeer::retrieveByPK($pk);
+
+        if(!$partner || $partner->getStatus() !== Partner::PARTNER_STATUS_READ_ONLY)
+            return null;
+
+        return $partner;
+    }
+
 }

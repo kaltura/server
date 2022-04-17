@@ -56,6 +56,10 @@ class kEmails
 	
 	public static function getDynamicEmailUserRoleName($userRoleNames = null)
 	{
+		if (is_null($userRoleNames))
+		{
+			return null;
+		}
 		$rolesArrayFromDynamicMap = explode(',', kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null));
 		$rolesArrayFromUser = explode(',', $userRoleNames);
 		$intersectingRoles = array_intersect($rolesArrayFromDynamicMap, $rolesArrayFromUser);

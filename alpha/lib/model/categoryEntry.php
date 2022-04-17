@@ -231,7 +231,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 * @throws Exception
 	 * @return categoryEntry $categoryEntry
 	 */
-	public function add($entryId, $categoryId)
+	public function add($entryId, $categoryId, $createNew = true)
 	{
 		$entry = $this->retrieveEntry($entryId, false);
 		$category = $this->retrieveCategory($categoryId, false);
@@ -244,7 +244,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 
 		if($categoryEntryExists)
 		{
-			$categoryEntryExists->copyInto($this);
+			$categoryEntryExists->copyInto($this, false, $createNew);
 		}
 
 		$this->setStatus(CategoryEntryStatus::ACTIVE);
@@ -362,7 +362,7 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	 * @param $categoryId
 	 * @throws kCoreException
 	 */
-	protected function validateKuserEntitledToRemoveEntryToCategory(entry $entry, $categoryId)
+	protected function validateKuserEntitledToRemoveEntryToCategory($entry, $categoryId)
 	{
 		if (kEntitlementUtils::getEntitlementEnforcement() &&
 			!$entry->isEntitledKuserEdit(kCurrentContext::getCurrentKsKuserId()) &&

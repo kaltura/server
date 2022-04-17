@@ -257,7 +257,7 @@ class MixingService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
 		
-		// FIXME: temp hack  - when kshow doesn't have a roughcut, and the media entry is not ready, it cannob be queued for append upon import/conversion completion 
+		// FIXME: temp hack  - when kshow doesn't have a rough cut, and the media entry is not ready, it cannot be queued for append upon import/conversion completion 
 		if ($dbMediaEntry->getStatus() != entryStatus::READY)
 		{
 			$kshow->setShowEntryId($mixEntryId);
@@ -289,7 +289,7 @@ class MixingService extends KalturaEntryService
 			
 			if (!$kshow->getHasRoughcut())
 			{
-				// make sure the kshow now does have a roughcut
+				// make sure the kshow now does have a rough cut
 				$kshow->setHasRoughcut(true);	
 				$kshow->save();
 			}

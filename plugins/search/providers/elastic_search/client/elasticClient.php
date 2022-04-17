@@ -29,6 +29,7 @@ class elasticClient
 	const ELASTIC_ACTION_SCROLL = 'scroll';
 	const ELASTIC_ACTION_DELETE = 'delete';
 	const ELASTIC_ACTION_PING = 'ping';
+	const ELASTIC_ACTION_HEALTH = 'health';
 	const ELASTIC_GET_MASTER_INFO = 'get_master_info';
 	const ELASTIC_GET_ALIAS_INFO = 'get_alias_info';
 	const ELASTIC_ACTION_DELETE_BY_QUERY = 'delete_by_query';
@@ -211,26 +212,31 @@ class elasticClient
 		$requestTook = microtime(true) - $requestStart;
 		KalturaLog::debug("Elastic took - " . $requestTook . " seconds");
 
-		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost);
-
 		if (!$response)
 		{
 			$code = $this->getErrorNumber();
 			$message = $this->getError();
 			KalturaLog::err("Elastic client curl error code[" . $code . "] message[" . $message . "]");
+
+			$code = 'CURL_' . $code;
 		}
 		else
 		{
 			KalturaLog::debug("Elastic client response " .$response);
 			//return the response as associative array
 			$response = json_decode($response, true);
-			if (isset($response['error']))
-			{
-				$data = array();
-				$data['errorMsg'] = $response['error'];
-				$data['status'] = $response['status'];
-				throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
-			}
+
+			$code = isset($response['status']) ? 'HTTP_' . $response['status'] : '';
+		}
+
+		KalturaMonitorClient::monitorElasticAccess($monitorActionName, $monitorIndexName, $jsonEncodedBody, $requestTook, $this->elasticHost, $code);
+
+		if ($response && isset($response['error']))
+		{
+			$data = array();
+			$data['errorMsg'] = $response['error'];
+			$data['status'] = $response['status'];
+			throw new kESearchException('Elastic search engine error [' . print_r($response, true) . ']', kESearchException::ELASTIC_SEARCH_ENGINE_ERROR, $data);
 		}
 		
 		return $response;
@@ -437,6 +443,17 @@ class elasticClient
 	{
 		$cmd = $this->elasticHost;
 		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_PING, self::MONITOR_NO_INDEX);
+		return $response;
+	}
+
+	/**
+	 * check health of elastic cluster
+	 * @return mixed
+	 */
+	public function checkHealth()
+	{
+		$cmd = $this->elasticHost . '/_cluster/health';
+		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_HEALTH, self::MONITOR_NO_INDEX);
 		return $response;
 	}
 	

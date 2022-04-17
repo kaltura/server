@@ -1315,10 +1315,26 @@ class playManifestAction extends kalturaAction
 		$this->enforceEncryption();
 		
 		$this->servedEntryType = $this->entry->getType();
-		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry,  $this->getScheduleTime());
+		$requestedScheduleTime = $this->getRequestedScheduleTime();
+		$event = kSimuliveUtils::getPlayableSimuliveEvent($this->entry, $requestedScheduleTime);
 		if ($event)
 		{
-			$this->initEventData($event);
+			KalturaLog::info('Found event id: [' . $event->getId() . '] ');
+			// serve as simulive only if shouldn't be interrupted by "real" live (or specific time/offset requested)
+			if ($requestedScheduleTime || !kSimuliveUtils::shouldLiveInterrupt($this->entry, $event))
+			{
+				$this->initEventData($event);
+			}
+			// for simulive flow - we need to disable anonymous cache to avoid playback faults, and tune cond cache expiry to the closest transition time
+			kApiCache::disableAnonymousCache();
+			$now = time();
+			$closestTransitionTime = kSimuliveUtils::getClosestPlaybackTransitionTime($event, $now);
+			if (!is_null($closestTransitionTime))
+			{
+				$timeToNextTransition = $closestTransitionTime - $now;
+				KalturaLog::info('time to next transition for event ID [' . $event->getId() . "] : $timeToNextTransition");
+				kApiCache::setConditionalCacheExpiry(min($timeToNextTransition, kApiCache::CONDITIONAL_CACHE_EXPIRY));
+			}
 		}
 
 		$renderer = null;
@@ -1410,7 +1426,7 @@ class playManifestAction extends kalturaAction
 		{
 			$renderer->setRestrictAccessControlAllowOriginDomains(true);
 		}
-		
+
 		if (!$this->secureEntryHelper || !$this->secureEntryHelper->shouldDisableCache())
 		{
 			$cache = kPlayManifestCacher::getInstance();
@@ -1530,11 +1546,12 @@ class playManifestAction extends kalturaAction
 		return array($maxDc, $remoteFlavors);
 	}
 
-    protected function getScheduleTime()
+    protected function getRequestedScheduleTime()
     {
-		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, time()));
-		$time += intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
-		return $time;
+		$time = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_URL_PARAM, 0));
+		$offset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+		$time = (!$time && $offset) ? time() : $time;
+		return $time + $offset;
     }
 
     protected function isSimuliveFlow()
@@ -1554,6 +1571,8 @@ class playManifestAction extends kalturaAction
 		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
-		$this->servedEntryType = $sourceEntry->getType();
+		$srcEntryType = $sourceEntry->getType();
+		// for simulive case with playlist source - servedEntryType should be MEDIA_CLIP
+		$this->servedEntryType = $srcEntryType == entryType::PLAYLIST ? entryType::MEDIA_CLIP : $srcEntryType;
 	}
 }

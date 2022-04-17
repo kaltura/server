@@ -8,6 +8,14 @@ require_once KALTURA_ROOT_PATH . '/vendor/htmlpurifier/library/HTMLPurifier.auto
  */
 class kHtmlPurifier
 {
+	const HTML_PURIFIER = 'html_purifier';
+	const ALLOWED_TAGS = 'allowedTags';
+	const ALLOWED_FRAME_TARGETS = 'allowedFrameTargets';
+	const ALLOWED_REL = 'allowedRel';
+	const HTML_DOCTYPE = "HTMLDoctype";
+	const ALLOW_ESCAPED_SPECIAL_CHARS = "allowEscapedSpecialChars";
+
+	
 	private static $purifier = null;
 	private static $AllowedProperties = null;
 	private static $allowedTokenPatterns;
@@ -28,14 +36,23 @@ class kHtmlPurifier
 
 		if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::SANITIZE)
 			return $modifiedValue;
+		
+		$valueTrimmedSpace = preg_replace('/\s+/', '', $value);
+		$modifiedValueTrimmedSpace = preg_replace('/\s+/', '', $modifiedValue);
+		$decodedModifiedValue = htmlspecialchars_decode($modifiedValueTrimmedSpace);
+		$allowEscapedSpecialChars = kConf::getArrayValue(self::ALLOW_ESCAPED_SPECIAL_CHARS, self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, true);
 
-		if ( $modifiedValue != $value )
+		if($modifiedValueTrimmedSpace == $valueTrimmedSpace || ($allowEscapedSpecialChars && $decodedModifiedValue == $valueTrimmedSpace))
+		{
+			return $value;
+		}
+		else
 		{
 			$msg = "Potential Unsafe HTML tags found in $className::$propertyName"
 					. "\nORIGINAL VALUE: [" . $value . "]"
 					. "\nMODIFIED VALUE: [" . $modifiedValue . "]"
+					. "\nDECODED ORIGINAL VALUE: [" . $decodedModifiedValue . "] "
 				;
-
 			KalturaLog::err( $msg );
 
 			if (kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::NOTIFY)
@@ -49,8 +66,6 @@ class kHtmlPurifier
 			$errorMessage = "UNSAFE_HTML_TAGS;Potential Unsafe HTML tags found in [$className]::[$propertyName]";
 			throw new Exception($errorMessage);
 		}
-
-		return $value;
 	}
 
 	public static function isMarkupAllowed( $className, $propertyName )
@@ -84,7 +99,29 @@ class kHtmlPurifier
 		{
 			$config = HTMLPurifier_Config::createDefault();
 			$config->set('Cache.DefinitionImpl', null);
+			$htmlPurifierConf = kConf::get(self::HTML_PURIFIER, kConfMapNames::RUNTIME_CONFIG, array());
+			if ($htmlPurifierConf)
+			{
+				if (isset($htmlPurifierConf[self::HTML_DOCTYPE]))
+				{
+					$config->set('HTML.Doctype', $htmlPurifierConf[self::HTML_DOCTYPE]);
+				}
+				if (isset($htmlPurifierConf[self::ALLOWED_TAGS]))
+				{
+					$config->set('HTML.Allowed', $htmlPurifierConf[self::ALLOWED_TAGS]);
+				}
+				if (isset($htmlPurifierConf[self::ALLOWED_FRAME_TARGETS]))
+				{
+					$config->set('Attr.AllowedFrameTargets', $htmlPurifierConf[self::ALLOWED_FRAME_TARGETS]);
+				}
+				if (isset($htmlPurifierConf[self::ALLOWED_REL]))
+				{
+					$config->set('Attr.AllowedRel', $htmlPurifierConf[self::ALLOWED_REL]);
+				}
+			}
+			
 			self::$purifier = new HTMLPurifier($config);
+			
 			if ( $cacheKey )
 			{
 				apc_store( $cacheKey, self::$purifier );

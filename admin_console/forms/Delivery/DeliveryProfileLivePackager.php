@@ -13,6 +13,10 @@ class Form_Delivery_DeliveryProfileLivePackager extends Form_Delivery_DeliveryPr
 			'filters'		=> array('StringTrim'),
 		));
 
-		return array('livePackagerSigningDomain');
+		$this->addElement('checkbox', 'shouldRedirect', array(
+			'label'			=> 'Should redirect:',
+		));
+
+		return array('livePackagerSigningDomain', 'shouldRedirect');
 	}
 }

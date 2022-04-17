@@ -17,6 +17,10 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_PHP = 3;
 
 	const BATCH_PARTNER_ID = -1;
+	
+	const ON_ERROR = '_onError';
+	
+	static protected $rateLimitKey;
 
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
 	
@@ -596,14 +600,15 @@ class KalturaResponseCacher extends kApiCache
 		
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
 	}
-
+	
 	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
 	{
 		if (!kConf::hasMap('api_rate_limit') || $ksPartnerId == self::BATCH_PARTNER_ID)
 		{
 			return true;
 		}
-
+		
+		self::$rateLimitKey = null;
 		$skipEnforceInternalIp = kConf::get('skip_enforce_internal_ip', 'api_rate_limit', null);
 
 		// if 'api_rate_limit' map contains param 'skip_enforce_internal_ip' with value 1, we will ignore the IP check
@@ -654,7 +659,15 @@ class KalturaResponseCacher extends kApiCache
 
 		$cacheExpiry = isset($rule['_expiry']) ? $rule['_expiry'] : 10;
 		$cache->add($key, 0, $cacheExpiry);
-		$counter = $cache->increment($key);
+		if(isset($rule[self::ON_ERROR]) && $rule[self::ON_ERROR])
+		{
+			$counter = $cache->get($key);
+			self::$rateLimitKey = $key;
+		}
+		else
+		{
+			$counter = $cache->increment($key);
+		}
 		if ($counter <= $rule['_limit'])
 		{
 			return true;
@@ -671,6 +684,22 @@ class KalturaResponseCacher extends kApiCache
 		}
 
 		return false;
+	}
+	
+	public static function onErrorRateLimitProcessing()
+	{
+		if (!isset(self::$rateLimitKey))
+		{
+			return;
+		}
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
+		if (!$cache)
+		{
+			return;
+		}
+		
+		$cache->increment(self::$rateLimitKey);
 	}
 
 	protected static function getApiParamValue($params, $key)

@@ -430,19 +430,17 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				'Bucket' => $bucket,
 				'Prefix' => $key
 			));
+			
 			foreach ($dirListObjectsRaw as $dirListObject)
 			{
-				$dirList[] = array (
-					"path" =>  $bucket . DIRECTORY_SEPARATOR . $dirListObject['Key'],
-					"fileSize" => $dirListObject['Size']
-				);
+				return true;
 			}
 		}
 		catch ( Exception $e )
 		{
 			self::safeLog("Couldn't determine if path [$path] is dir: {$e->getMessage()}");
 		}
-		return count($dirList) >= 1;
+		return false;
 	}
 	
 	protected function getHeadObjectForPath($path)

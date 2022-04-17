@@ -148,10 +148,11 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         foreach ($cuePointsList as $cuePoint)
         {
             $cuePointObj = new KalturaAnnotation();
-            $cuePointObj->text = $cuePoint['title'];
-            $cuePointObj->startTime = $cuePoint['startTime'];
-            $cuePointObj->entryId = $entryId;
-
+	        $cuePointObj->entryId = $entryId;
+	        foreach ($cuePoint as $propName => $value)
+			{
+		        $cuePointObj->$propName = $value;
+	        }
             $this->addCuePoint($cuePointObj);
         }
     }

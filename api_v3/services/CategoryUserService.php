@@ -171,7 +171,6 @@ class CategoryUserService extends KalturaBaseService
 		if ($category->getInheritanceType() == InheritanceType::INHERIT && kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_INHERIT_MEMBERS, $categoryId);		
 		
-		// only manager can remove memnger or users remove himself
 		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($dbCategoryKuser->getCategoryId());
 		if((!$currentKuserCategoryKuser || 
 			($currentKuserCategoryKuser->getPermissionLevel() != CategoryKuserPermissionLevel::MANAGER &&

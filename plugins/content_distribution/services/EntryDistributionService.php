@@ -32,7 +32,7 @@ class EntryDistributionService extends KalturaBaseService
 		$entryDistribution->validateForInsert();
 					
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->distributionProfileId);
-		if (!$dbDistributionProfile)
+		if (!$dbDistributionProfile || ($this->getPartnerId() != $dbDistributionProfile->getPartnerId()))
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $entryDistribution->distributionProfileId);
 		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $entryDistribution->distributionProfileId);
@@ -207,7 +207,7 @@ class EntryDistributionService extends KalturaBaseService
 		
 		$distributionProfileId = $dbEntryDistribution->getDistributionProfileId();
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if(!$dbDistributionProfile)
+		if (!$dbDistributionProfile || ($this->getPartnerId() != $dbDistributionProfile->getPartnerId()))
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
 		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED || $dbDistributionProfile->getSubmitEnabled() == DistributionProfileActionStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);
@@ -249,7 +249,7 @@ class EntryDistributionService extends KalturaBaseService
 		
 		$distributionProfileId = $dbEntryDistribution->getDistributionProfileId();
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if(!$dbDistributionProfile)
+		if (!$dbDistributionProfile || ($this->getPartnerId() != $dbDistributionProfile->getPartnerId()))
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
 		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED || $dbDistributionProfile->getUpdateEnabled() == DistributionProfileActionStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);
@@ -363,7 +363,7 @@ class EntryDistributionService extends KalturaBaseService
 		
 		$distributionProfileId = $dbEntryDistribution->getDistributionProfileId();
 		$dbDistributionProfile = DistributionProfilePeer::retrieveByPK($distributionProfileId);
-		if(!$dbDistributionProfile)
+		if (!$dbDistributionProfile || ($this->getPartnerId() != $dbDistributionProfile->getPartnerId()))
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_NOT_FOUND, $distributionProfileId);
 		if ($dbDistributionProfile->getStatus() == DistributionProfileStatus::DISABLED)
 			throw new KalturaAPIException(ContentDistributionErrors::DISTRIBUTION_PROFILE_DISABLED, $distributionProfileId);

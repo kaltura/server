@@ -133,6 +133,11 @@ class serveFlavorAction extends kalturaAction
 		{
 			$mediaSet['presentationEndTime'] = $endTime + $offset;
 		}
+		else if (!is_null($dvrWindow)) // the case of simulive flow that should be expired now
+		{
+			// expirationTime will cause the hls playlist to be expired from now (as we need to switch from simulive to live)
+			$mediaSet['expirationTime'] = time() * self::SECOND_IN_MILLISECONDS + $offset - self::TIME_MARGIN;
+		}
 
 		if($repeat)
 		{
@@ -421,7 +426,11 @@ class serveFlavorAction extends kalturaAction
 
 			if ($entry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $entry instanceof LiveEntry)
 			{
-				$offset = kConf::get('serve_flavor_accept_time_offset', 'live', 0) ? intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0)): 0;
+				$offset = intval($this->getRequestParameter(kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM, 0));
+				if ($offset && !kSimuliveUtils::isOffsetPlaybackAllowed($this->getRequestParameter('ks', '')))
+				{
+					$offset = 0;
+				}
 				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($assets)
 				{
@@ -504,7 +513,10 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_FOUND);
 		}
 		
-		myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
+		if ($this->shouldEnforceDelivery())
+		{
+			myPartnerUtils::enforceDelivery($entry, $flavorAsset, self::$preferredStorageId);
+		}
 		
 		$version = $this->getRequestParameter( "v" );
 		if (!$version)
@@ -1066,5 +1078,22 @@ class serveFlavorAction extends kalturaAction
 			'path' => $path,
 			'sourceType' => $sourceType,
 		);
+	}
+	
+	private function shouldEnforceDelivery()
+	{
+		if (!($this->pathOnly && self::$requestAuthorized))
+		{
+			return true;
+		}
+		
+		$packagerMappedThumbUrl = kConf::get(myPackagerUtils::PACKAGER_MAPPED_THUMB_URL, kConfMapNames::LOCAL_SETTINGS, null);
+		if (!$packagerMappedThumbUrl)
+		{
+			return true;
+		}
+		
+		$splitThumbUrl = explode("/", $packagerMappedThumbUrl);
+		return !kString::beginsWith($_SERVER['REQUEST_URI'], '/' . $splitThumbUrl[1] . '/');
 	}
 }

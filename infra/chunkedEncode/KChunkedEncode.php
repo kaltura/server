@@ -928,7 +928,15 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 			if(($key=array_search("-tag:v", $params->cmdLineArr))!==false) {
 				$mergeCmd.= " -tag:v ".$params->cmdLineArr[$key+1];
 			}
-
+			
+			if(isset($params->metadata)) {
+				$metadataStr = null;
+				foreach($params->metadata as $metadata){
+					$metadataStr.=" ".implode(" ", $metadata);
+				}
+				$mergeCmd.= $metadataStr;
+			}
+			
 			$mergeCmd.= " -y $mergedFilename";
 			KalturaLog::log("mergeCmd:\n$mergeCmd ".date("Y-m-d H:i:s"));
 			return $mergeCmd;
@@ -1054,7 +1062,16 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
 			if(isset($filterStr))
 				$cmdLine.= " $filterStr";
-			$cmdLine.= " -map 0:a:0 -metadata:s:a:0 language=";
+			
+			if(isset($params->mappings)) {
+				$mappings = implode(" -map ",$params->mappings);
+				$cmdLine.= " -map ".implode(" -map ",$params->mappings);
+			}
+			else
+				$cmdLine.= " -map 0:a:0";
+			
+			$cmdLine.= " -metadata:s:a:0 language=";
+
 			if(isset($params->abitrate)) $cmdLine.= " -b:a ".$params->abitrate."k";
 			if(isset($params->ar)) $cmdLine.= " -ar ".$params->ar;
 			if(isset($params->ac)) $cmdLine.= " -ac ".$params->ac;
@@ -1488,6 +1505,47 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 				}
 			}
 		}
+
+		/********************
+		 * calcMaxExecutionTime
+		 */
+		public function calcMaxExecutionTime($maxExecutionTime)
+		{
+			KalturaLog::log("max:$maxExecutionTime");
+			/*
+			 * Adjust chunk's default maxExecutionTime (matches FHD)
+			 * to all resolutions and to audio stream generation
+			 */
+$vMax = 0;
+$aMax = 0;
+				// Video maxExecutionTime adjusted relatively to resolution pix count/frame area
+			if(isset($this->params->width) && isset($this->params->height) && isset($this->setup->chunkDuration)) {
+				$vMax=round(($maxExecutionTime/(1920*1080))*($this->params->width*$this->params->height)*($this->setup->chunkDuration/60));
+			}
+			if($vMax==0) $vMax = $maxExecutionTime;
+			else if($vMax<1800)	$vMax = 1800;
+			$vMax = max($vMax,30);
+			
+				// Audio maxExecutionTime adjusted to content duration (no chunks for audio)
+			if(isset($this->params->duration) && $this->params->duration>0)
+				$aMax=round($this->params->duration/2);
+			else $aMax = round($maxExecutionTime);
+				// Min execution timeout - at least 30s, to prevent TO's of very short contents
+			$aMax = max($aMax,30);
+
+				// Workarround for long conversions of large MXF file stored on S3
+			if($this->sourceFileDt->containerFormat=="mxf"){
+				$aMax*= 2;
+				$vMax*= 2;
+			}
+				// Very HI br sources tend to cause VERY slow wud transcoding
+			else if($this->sourceFileDt->videoBitRate > 200000) {
+				$aMax*= 10;
+				$vMax*= 2;
+			}
+			KalturaLog::log("vMax:$vMax, aMax:$aMax");
+			return array($vMax,$aMax);
+		}
 	}
 	
 	/********************
@@ -1701,6 +1759,18 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 					break;
 				case "-bsf:v":
 					$this->bsf = $cmdLineArr[$idx+1];
+					break;
+				case "-map":
+					if(!isset($this->mappings))
+						$this->mappings = array();
+					$this->mappings[] = $cmdLineArr[$idx+1];
+					break;
+				default:
+					if(strpos($val,"-metadata")!==false){
+						if(!isset($this->metadata))
+							$this->metadata = array();
+						$this->metadata[] = array($cmdLineArr[$idx],$cmdLineArr[$idx+1]);
+					}
 					break;
 				}
 			}

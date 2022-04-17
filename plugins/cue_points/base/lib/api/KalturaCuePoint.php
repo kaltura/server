@@ -16,7 +16,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	public $id;
 
 	/**
-	 * @var int
+	 * @var bigint
 	 * @filter order
 	 * @readonly
 	 */

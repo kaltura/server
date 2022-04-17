@@ -2,6 +2,7 @@
 
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	const DEFAULT_MAINTENANCE_DC = -1;
+	const SHOULD_REDIRECT = "should_redirect";
 
 	/**
 	 * @var kLiveStreamConfiguration
@@ -50,7 +51,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		$start = microtime(true);
 		$data = curl_exec($ch);
-		KalturaMonitorClient::monitorCurl(parse_url($url, PHP_URL_HOST), microtime(true) - $start);
+		KalturaMonitorClient::monitorCurl(parse_url($url, PHP_URL_HOST), microtime(true) - $start, $ch);
 
 		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
@@ -102,6 +103,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function initLiveStreamConfig()
 	{
+		if($this->params->getResponseFormat() == 'redirect')
+		{
+			$this->shouldRedirect = true;
+		}
+
 		if(!$this->liveStreamConfig)
 			$this->liveStreamConfig = new kLiveStreamConfiguration();
 		
@@ -393,7 +399,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	
 	protected function getRenderer($flavors)
 	{
-		if($this->shouldRedirect) 
+		if($this->getShouldRedirect())
 		{
 			$this->DEFAULT_RENDERER_CLASS = 'kRedirectManifestRenderer';
 		}
@@ -457,5 +463,18 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		return $this->getFromCustomData("livePackagerSigningDomain");
 	}
+
+	public function setShouldRedirect($v)
+	{
+		// sets only the default value in custom data (won't affect "$this->shouldRedirect" which should be changed dynamically)
+		$this->putInCustomData(self::SHOULD_REDIRECT, $v);
+	}
+
+	public function getShouldRedirect()
+	{
+		// if the shouldRedirect changed to true dynamically during the request - it takes priority
+		return $this->shouldRedirect || $this->getFromCustomData(self::SHOULD_REDIRECT, null, false);
+	}
+
 }
 

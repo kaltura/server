@@ -19,6 +19,11 @@ class KalturaLocationScheduleResource extends KalturaScheduleResource
 	 */
 	public function toObject($sourceObject = null, $propertiesToSkip = array())
 	{
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_BLOCK_MEETING_ROOMS, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, "Meeting rooms");
+		}
+
 		if(is_null($sourceObject))
 		{
 			$sourceObject = new LocationScheduleResource();

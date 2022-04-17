@@ -23,6 +23,7 @@
 		public $cmdLine = null;
 		public $state = self::STATE_PENDING;
 
+		public $maxExecTime = 0; 	// Max chunk execution time
 		public $sessionTime = 0;	// Session creation time (secs), batch asset start time
 		public $createTime = 0;		// Chunk job creation time (secs), by batch srv
 		public $queueTime = 0;		// Retrived from the queue time (secs), by scheduler
@@ -125,7 +126,7 @@
 		/* ---------------------------
 		 * detectErrors
 		 */
-		public function detectErrors($manager, $maxExecutionTime, $chunkedEncodeReadIdx)
+		public function detectErrors($manager, $chunkedEncodeReadIdx)
 		{
 			$this->sumJobsStates();
 
@@ -172,6 +173,11 @@
 					continue;
 				}
 				$elapsed = time()-$job->startTime;
+
+				if($job->maxExecTime>0)
+					$maxExecutionTime = $job->maxExecTime;
+				else
+					$maxExecutionTime = $this->maxExecutionTime;
 				if($elapsed>$maxExecutionTime) {
 					/*
 					 * The bellow cond was DISABLED to prevent endless loop and stuck chk on 2nd and further chk job retries.
@@ -353,36 +359,9 @@
 		 */
 		protected function detectErrors($chunkedEncodeReadIdx)
 		{		
-				/*
-				 * Adjust chunk's default maxExecutionTime (matches FHD)
-				 * to all resolutions and to audio stream generation
-				 */
-$vidMaxExecutionTime = 0;
-$audMaxExecutionTime = 0;
-			{
-					// Video maxExecutionTime adjusted relatively to resolution pix count/frame area
-				if(isset($this->chunker->params->width) && isset($this->chunker->params->height) && isset($this->chunker->setup->chunkDuration)) {
-					$vidMaxExecutionTime=round(($this->maxExecutionTime/(1920*1080))*($this->chunker->params->width*$this->chunker->params->height)*($this->chunker->setup->chunkDuration/60));
-				}
-				if($vidMaxExecutionTime==0) $vidMaxExecutionTime = $this->maxExecutionTime;
-				else if($vidMaxExecutionTime<1800)	$vidMaxExecutionTime = 1800;
-				
-					// Audio maxExecutionTime adjusted to content duration (no chunks for audio)
-				if(isset($this->chunker->params->duration) && $this->chunker->params->duration>0)
-					$audMaxExecutionTime=round($this->chunker->params->duration/2);
-				else $audMaxExecutionTime = round($this->maxExecutionTime);
-					// Min execution timeout - at least 30s, to prevent TO's of very short contents
-				$vidMaxExecutionTime = max($vidMaxExecutionTime,30);
-				$audMaxExecutionTime = max($audMaxExecutionTime,30);
-			}
-// Workarround for long conversions of large MXF file stored on S3
-if($this->chunker->sourceFileDt->containerFormat=="mxf"){
-	$audMaxExecutionTime*= 2;
-	$vidMaxExecutionTime*= 2;
-}
-			if($this->videoJobs->detectErrors($this->storeManager, $vidMaxExecutionTime, $chunkedEncodeReadIdx)!=true)
+			if($this->videoJobs->detectErrors($this->storeManager, $chunkedEncodeReadIdx)!=true)
 				return false;
-			return $this->audioJobs->detectErrors($this->storeManager, $audMaxExecutionTime, $chunkedEncodeReadIdx);
+			return $this->audioJobs->detectErrors($this->storeManager, $chunkedEncodeReadIdx);
 		}
 
 		/* ---------------------------
@@ -544,6 +523,7 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 		protected function addVideoJobs($concurrent,$newConcurrency)
 		{
 			KalturaLog::log("Session($this->name) - concurrent:$concurrent, newConcurrency:$newConcurrency");
+			list($vidMaxExecutionTime,$aMax) = $this->chunker->calcMaxExecutionTime($this->maxExecutionTime);
 			
 			$startChunk = count($this->videoJobs->jobs);
 			$chunksToProcess = count($this->videoCmdLines)-$startChunk;
@@ -567,7 +547,7 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 				}
 			}
 			
-			$cnt = $this->addJobs($startChunk, $chunksToProcess, $this->videoJobs->jobs);
+			$cnt = $this->addJobs($startChunk, $chunksToProcess, $vidMaxExecutionTime, $this->videoJobs->jobs);
 			return $cnt;
 		}
 
@@ -576,6 +556,8 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 		 */
 		protected function addAudioJobs($cmdLines=null)
 		{
+		        list($vMax,$audMaxExecutionTime) = $this->chunker->calcMaxExecutionTime($this->maxExecutionTime);
+
 			if(isset($cmdLines))
 				$this->audioCmdLines = $cmdLines;
 			else if(isset($this->audioCmdLines))
@@ -583,7 +565,7 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 			if(isset($cmdLines)) {
 				foreach($cmdLines as $idx=>$cmdLine) {
 					$jobIdx = $idx;
-					$job = $this->addJob($jobIdx, $cmdLine);
+					$job = $this->addJob($jobIdx, $cmdLine, $audMaxExecutionTime);
 					if($job===false) {
 						KalturaLog::log("Session($this->name) - Failed to add job($jobIdx)");
 						return false;
@@ -645,7 +627,7 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 		/* ---------------------------
 		 * addJobs
 		 */
-		protected function addJobs($startChunk, $countChunks, &$jobs)
+		protected function addJobs($startChunk, $countChunks, $maxExecutionTime, &$jobs)
 		{
 			KalturaLog::log("Session($this->name) - params:startChunk($startChunk), countChunks($countChunks)");
 			
@@ -666,7 +648,7 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 					return false;
 				}
 
-				$job = $this->addJob($jobIdx, $cmdLines[$jobIdx]);
+				$job = $this->addJob($jobIdx, $cmdLines[$jobIdx], $maxExecutionTime);
 				if($job===false) {
 					KalturaLog::log("Session($this->name) - Failed to add job($jobIdx)");
 					return false;
@@ -683,9 +665,10 @@ if($this->chunker->sourceFileDt->containerFormat=="mxf"){
 		/* ---------------------------
 		 * addJob
 		 */
-		protected function addJob($jobIdx, $cmdLine)
+		protected function addJob($jobIdx, $cmdLine, $maxExecutionTime)
 		{
 			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
+			$job->maxExecTime = $maxExecutionTime;
 			if($this->storeManager->AddJob($job)===false) {
 				return false;
 			}

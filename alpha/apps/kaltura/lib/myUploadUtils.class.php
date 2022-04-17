@@ -7,6 +7,8 @@ class myUploadUtils
 	const EICAR_MAX_FILE_SIZE = 128;
 	const BAT_FILE_EXTENSION = 'bat';
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
+	const FILE_EXT_WHITELIST = 'file_extensions_whitelist';
+	const SECURITY_MAP = 'security';
 
 	public static function uploadFile ( $file_data , $id , $filename , $hash , $extra_id = null )
 	{
@@ -88,7 +90,7 @@ class myUploadUtils
 		}
 		chmod ( $fullPath , 0777 );
 
-		if (myUploadUtils::isFileTypeRestricted($fullPath))
+		if (myUploadUtils::isFileTypeRestricted($fullPath, $origFilename))
 		{
 			KalturaLog::log ( "Error: File type is not allowed for [$token] [$filename] [$extra_id] [$create_thumb] \n->[$fullPath]" . "\n");
 			return;
@@ -235,18 +237,39 @@ class myUploadUtils
 		return in_array($fileType, $fileTypes['allowed']);
 	}
 
-	public static function isFileTypeRestricted($fullPath, $partnerId = null)
+	public static function isFileTypeRestricted($fullPath, $fileName = null, $partnerId = null)
 	{
 		if(!$partnerId)
 		{
 			$partnerId = kCurrentContext::getCurrentPartnerId();
 		}
-
-		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
-			&& !myUploadUtils::checkIfFileIsAllowed($fullPath))
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId))
+		{
+			if (!myUploadUtils::checkIfFileIsAllowed($fullPath) || !myUploadUtils::checkIfExtensionIsAllowed($fullPath, $fileName))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected static function checkIfExtensionIsAllowed($fullPath, $fileName = null)
+	{
+		$allowedFileTypes = kConf::get(self::FILE_EXT_WHITELIST, self::SECURITY_MAP, null);
+		if (!$allowedFileTypes)
 		{
 			return true;
 		}
+		$fileExtension = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+		if ($fileExtension == '' && $fileName)
+		{
+			$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+		}
+		if ($fileExtension === '' || in_array($fileExtension, $allowedFileTypes))
+		{
+			return true;
+		}
+		KalturaLog::err("File ext: [$fileExtension] is not allowed");
 		return false;
 	}
 	

@@ -12,7 +12,7 @@ class kExecWrapper
 
 		$startTime = microtime(true);
 		$res = exec($command, $output, $return_var);
-		KalturaMonitorClient::monitorExec($command, $startTime);
+		KalturaMonitorClient::monitorExec($command, $startTime, $res === false ? 'ERROR' : '');
 		return $res;
 	}
 
@@ -22,7 +22,7 @@ class kExecWrapper
 
 		$startTime = microtime(true);
 		$res = system($command, $return_var);
-		KalturaMonitorClient::monitorExec($command, $startTime);
+		KalturaMonitorClient::monitorExec($command, $startTime, $res === false ? 'ERROR' : '');
 		return $res;
 	}
 
@@ -52,7 +52,7 @@ class kExecWrapper
 		
 		$startTime = microtime(true);
 		list($return_value, $output, $errorDescription)  = self::runWrappedCommand($command, $filePath);
-		KalturaMonitorClient::monitorExec($command . " " . $filePath, $startTime);
+		KalturaMonitorClient::monitorExec($command . " " . $filePath, $startTime, $return_value ? 'EXEC_' . $return_value : '');
 		return array($return_value, $output, $errorDescription);
 	}
 	

@@ -94,7 +94,7 @@ class PartnerController extends Zend_Controller_Action
 				$partner->additionalParams = $this->getAdditionalParams($form);
 				$templatePartnerId = $form->getValue('partner_template_id');
 				$client->startMultiRequest();
-				$client->partner->register($partner, null, $templatePartnerId);
+				$newPartner = $client->partner->register($partner, null, $templatePartnerId);
 				$config = new Kaltura_Client_SystemPartner_Type_SystemPartnerConfiguration();
 				$config->partnerPackage = $form->getValue('partner_package');
 				$config->partnerPackageClassOfService = $form->getValue('partner_package_class_of_service');
@@ -102,6 +102,7 @@ class PartnerController extends Zend_Controller_Action
 				$config->storageDeleteFromKaltura = true;
 				$config->storageServePriority = Kaltura_Client_Enum_StorageServePriority::EXTERNAL_FIRST;
 				$config->language = $form->getValue('partner_language');
+				$this->setFieldsFromTemplate($config, $newPartner);
 				$systemPartnerPlugin->systemPartner->updateConfiguration('{1:result:id}', $config);
 				
 				// set request timeout
@@ -133,6 +134,18 @@ class PartnerController extends Zend_Controller_Action
 		}
 		
 		$this->view->form = $form;
+	}
+	
+	protected function setFieldsFromTemplate(&$config, $newPartner)
+	{
+		if (!is_null($newPartner->excludedAdminRoleName))
+		{
+			$config->excludedAdminRoleName = $newPartner->excludedAdminRoleName;
+		}
+		if (!is_null($newPartner->allowedDomains))
+		{
+			$config->allowedDomains = $newPartner->allowedDomains;
+		}
 	}
 	
 	public function listAction()

@@ -187,12 +187,7 @@ class MetadataService extends KalturaBaseService
 	 */
 	function addFromFileAction($metadataProfileId, $objectType, $objectId, $xmlFile)
 	{
-		$filePath = $xmlFile['tmp_name'];
-		if(!file_exists($filePath))
-			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
-		
-		$xmlData = file_get_contents($filePath);
-		@unlink($filePath);
+		$xmlData = $this->validateMetadataFile($xmlFile);
 		return $this->addAction($metadataProfileId, $objectType, $objectId, $xmlData);
 	}
 	
@@ -348,12 +343,7 @@ class MetadataService extends KalturaBaseService
 	 */	
 	function updateFromFileAction($id, $xmlFile = null)
 	{
-		$filePath = $xmlFile['tmp_name'];
-		if(!file_exists($filePath))
-			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xmlFile['name']);
-		
-		$xmlData = file_get_contents($filePath);
-		@unlink($filePath);
+		$xmlData = $this->validateMetadataFile($xmlFile);
 		return $this->updateAction($id, $xmlData);
 	}		
 	
@@ -568,14 +558,25 @@ class MetadataService extends KalturaBaseService
 	 */
 	public function updateFromXSLAction ($id, $xslFile)
 	{
-		$xslFilePath = $xslFile['tmp_name'];
-		if(!file_exists($xslFilePath))
-			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $xslFile['name']);
-
-		$xslData = file_get_contents($xslFilePath);
-		@unlink($xslFilePath);
+		$xslData = $this->validateMetadataFile($xslFile);
 
 		return kLock::runLocked("metadata_update_xsl_{$id}", array($this, 'updateFromXSLImpl'), array($id, $xslData));
+	}
+	
+	protected function validateMetadataFile($fileData)
+	{
+		$filePath = $fileData['tmp_name'];
+		$fileName = $fileData['name'];
+		if(!file_exists($filePath))
+			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $fileData['name']);
+		
+		if (myUploadUtils::isFileTypeRestricted($filePath, $fileName))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+		$fileData = file_get_contents($filePath);
+		@unlink($filePath);
+		return $fileData;
 	}
 
 	public function updateFromXSLImpl ($id, $xslData)

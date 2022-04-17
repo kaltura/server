@@ -1,10 +1,269 @@
+# Rigel-18.3.0
+
+## Add 'title' and 'company' to kaltura_kuser index as searchable fields ##
+* Issue Type: Task
+* Issue ID: FOUN-440
+
+#### Deployment ####
+Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"title": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}},"company": {"type": "text","analyzer": "kaltura_text","fields": {"ngrams": {"type": "text","analyzer": "kaltura_ngrams"},"raw": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
+    
+#### Known Issues & Limitations ####
+If Rigel-18.3.0 or later server version already ran and new users were added
+with either 'title' or 'company' (or both) then it is likely that elastic already mapped
+these fields to the kaltura_kuser index map (due to elastic default index 'dynamic' attribute is 'true') 
+If that happened, you will get an error from elastic.
+
+#### Resolution ####
+* Create a new kaltura_kuser index with Rigel-18.3.0 kaltura_kuser.json map (or later)
+* (if you have alias for index) Point 'kaltura_kuser' alias to the new index by following below instructions:
+  * Replace all tokens in the below curl command
+```
+curl -XPOST "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/_aliases" -H 'Content-Type: application/json' -d'{  "actions":[{"add": {"index": "@NEW_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}},{"remove": {"index": "@OLD_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}}]}'
+```
+* Execute 'populateElasticKusers.php' script:
+```
+php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+```
+* Done! you should be able to search user by 'title' and / or 'company'
+  * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
+  * If everything work as expected, you can delete the old kuser index.
+
+
+## Add missing permission to EP_USER_ANALYTICS ##
+- Issue Type: Task
+- Issue ID: PLAT-23641
+
+### Script ###
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "EP user analytics role" TRANSCODING_BASE,BASE_USER_SESSION_PERMISSION realrun
+
+# Rigel-18.2.0
+## Add permissions to userScore Service ##
+* Issue Type: Task
+* Issue ID: PLAT-23649
+
+Add permissions to the userScore service
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_03_22_add_permissions_userscore.php
+
+## Add SRT domain ##
+* Issue Type: Story
+* Issue ID: LIV-884
+
+Add "srt_domain" to both Primary and backup in broadcast.ini with the host of the srt ingest
+
+# Rigel-18.1.0
+## EP User Analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-23627
+
+Add EP User Analytics role on partner 0
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_3_3_create_ep_user_analytics_role_on_partner_0.php
+
+## New Game plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-23508
+
+Add plugin for game services with new API userScore service connected to Redis
+
+### Deployment ###
+* Add Game to plugins.ini
+
+* Add the following to admin.ini
+
+
+    moduls.game.enabled = true
+    moduls.game.permissionType = 2
+    moduls.game.label = "Enable Game Services"
+    moduls.game.permissionName = GAME_PLUGIN_PERMISSION
+    moduls.game.group = GROUP_ENABLE_DISABLE_FEATURES
+
+* Enable checkbox in Partner configuration: 'Enable Game Services'
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_01_17_service_userscore.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+### Configuration ###
+Add/Update a configuration map called 'redis' with following config:
+
+    [game]
+    host=@GAME_REDIS_HOST@
+    port=@GAME_REDIS_PORT@
+    timeout=1.5
+    cluster=1
+    persistent=0
+
+## Update entry ready, entry status equal, media entry ready and unique KMS entry ready email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-30691
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+
+Add scripts:
+
+    Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_entry_ready.php
+
+    Entry status equals:
+    - deployment/updates/scripts/xml/2022_02_16_addEntryStatusEqualEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addMediaEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_addUniqueKmsEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_add_email_event_notification_unique_kms_entry_ready.php
+
+Update scripts:
+
+    Entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_ready.php
+
+    Entry status equals:
+    - deployment/updates/scripts/xml/2022_02_16_updateEntryStatusEqualEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_entry_status_equal.php
+
+    Media entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateMediaEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_media_entry_ready.php
+
+    Unique KMS entry ready:
+    - deployment/updates/scripts/xml/2022_02_16_updateUniqueKmsEntryReadyEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_02_16_deploy_update_email_event_notification_unique_kms_entry_ready.php
+
+
+# Rigel-18.0.0
+## Add permissions to KME partner ##
+Add permissions to KME partner for baseentry service
+
+* Issue Type: Task
+* Issue ID: PLAT-23565
+
+#### Deployment Script ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_02_07_add_permissions_baseentry_list.php
+
+# Quasar-17.19.0
+## Html Purifier configuration for additional attributes ##
+* Issue Type: Task
+* Issue ID: PLAT-23541
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [html_purifier]
+    allowedTags="img[title|src|alt], ul, li, ol, br, a"
+    allowedFrameTargets="_blank"
+    allowedRel="nofollow, noopener, noreferrer"
+
+# Quasar-17.18.0
+## Html Purifier tags configuration ##
+* Issue Type: Task
+* Issue ID: PLAT-23300
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [html_purifier]
+    allowedTags="img[title|src|alt], ul, li, ol, br"
+
+## New Login Data Update Action Added To The User Service
+* Issue Type: Task
+* Issue ID: PLAT-23303
+### Deployment Scripts
+```
+php deployment/updates/scripts/add_permissions/2021_12_23_login_data_password_update.php
+```
+
+## Add the feature "Load thumbnail with KS"
+* Issue Type: Task
+* Issue ID: SUP-30407
+
+### Deployment
+Add the following to admin.ini:
+```
+moduls.loadThumbnailWithKs.enabled = true
+moduls.loadThumbnailWithKs.permissionType = 2
+moduls.loadThumbnailWithKs.label = Load thumbnail with KS
+moduls.loadThumbnailWithKs.permissionName = FEATURE_LOAD_THUMBNAIL_WITH_KS
+moduls.loadThumbnailWithKs.basePermissionType =
+moduls.loadThumbnailWithKs.basePermissionName =
+moduls.loadThumbnailWithKs.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Quasar-17.17.0
+## Move V2 player version and studio versions from base.ini to dedicated map ##
+* Issue Type: Task
+* Issue ID: FEC-11387
+
+:warning: **Breaking Change**: The player and studio versions are no longer exist in base.ini.
+
+### Configuration ###
+Remove `html5_version`, `studio_version` and `studio_v3_version` from _local.ini_ (if exists).  
+Create a new configuration map named _appVersions_.  
+Copy from appVersions.template.ini to the new map, and fill the following values:
+
+    html5_version = v2.91
+    studio_version = v2.2.3
+    studio_v3_version = v3.12.2
+
 # Quasar-17.16.0
+## Disable sending Email notification to admin on new admin registration
+* Issue Type: Task
+* Issue ID: PLAT-23316
+### Deployment
+Add the following to admin.ini
+```
+moduls.adminEmailNotifications.enabled = true
+moduls.adminEmailNotifications.permissionType = 2
+moduls.adminEmailNotifications.label = "Disable email notifications to admins on new admin registration"
+moduls.adminEmailNotifications.permissionName = FEATURE_DISABLE_NEW_USER_EMAIL
+moduls.adminEmailNotifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add permission for self serve partner to get partner object ##
+* Issue Type: Task
+* Issue ID: PLAT-23311
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2021_12_05_add_permissions_partner_get.php
+
 ## Allow setting a user role that is not counted in kmc users quota
 * Issue Type: Task
 * Issue ID: PLAT-23297
 
 ### Configuration
 To enable this feature put the `USER_ROLE` name under 'Excluded administrative (KMC) User Role name' field in admin console partner configuration screen
+
+## Update EmailEventNotificationEntryStatusEqual template ##
+* Issue Type: Task
+* Issue ID: SUP-24181
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+    - deployment/updates/scripts/xml/2021_11_18_EntryStatusEqualEmailNotification.template.xml
+
+Run deployment script:
+
+	- deployment/updates/scripts/2021_11_18_deploy_entry_status_equal_email_notification.php
+
 
 ## Enable using dynamic email templates for user flows based on their user role
 * Issue Type: Task
@@ -28,6 +287,14 @@ dynamic_email_base_link-USER_ROLE = "http://base_url_for_the_template/"
 121 = "Mail Body 1"
 ```
 (The above texts are examples)
+
+## Add new live language flavors to existing systems ##
+* Issue Type: Task
+* Issue ID: SUP-29836
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2021_11_28_add_new_live_languages.php
+
 
 # Quasar-17.15.0 #
 ## Add partner for KME ##

@@ -1852,10 +1852,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 	private static function getCloneConversionProfile($originSourceType,$partner,$sourceEntry)
 	{
-        	if (self::isSourceLive($originSourceType))
-	            return $partner->getDefaultConversionProfileId();
-
-        	return $sourceEntry->getConversionProfileId();
+		if (self::isSourceLive($originSourceType))
+			return $partner->getDefaultConversionProfileId();
+		
+		$conversionProfileId = $sourceEntry->getConversionProfileId();
+		$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionProfileId);
+		if (!$conversionProfile)
+		{
+			KalturaLog::log("Cannot find conversion profile ID: [$conversionProfileId] - deleted? will return partner default");
+			$conversionProfileId = $partner->getDefaultConversionProfileId();
+		}
+		return $conversionProfileId;
 	}
 
  	/*
@@ -2278,5 +2285,53 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		
 		return $categoryEntryIdsArray;
+	}
+	
+	/**
+	 * Check if $entry has an ancestor that is of $sourceType (EntrySourceType)
+	 * @param $entry
+	 * @param array $sourceType
+	 * @return bool
+	 */
+	public static function isAncestorSourceType($entry, $sourceType = array())
+	{
+		if ($entry->getFlowType() == EntryFlowType::TRIM_CONCAT)
+		{
+			$entry = entryPeer::retrieveByPK($entry->getReplacedEntryId());
+			if (!$entry)
+			{
+				return false;
+			}
+		}
+		
+		$rootEntryId = $entry->getRootEntryId(true);
+		if ($entry->getId() == $rootEntryId)
+		{
+			return false;
+		}
+		
+		$rootEntry = entryPeer::retrieveByPKNoFilter($rootEntryId);
+		if (!$rootEntry)
+		{
+			return false;
+		}
+		
+		return in_array($rootEntry->getSourceType(), $sourceType);
+	}
+
+	/**
+	 * Returning the duration of the entry received (if entry doesn't exists - return 0)
+	 * @param string $entryId
+	 * @param bool $inMilliseconds
+	 * @return int
+	 */
+	public static function getEntryDuration($entryId, $inMilliseconds = false)
+	{
+		$entry = entryPeer::retrieveByPk($entryId);
+		if (!$entry)
+		{
+			return 0;
+		}
+		return $inMilliseconds ? $entry->getLengthInMsecs() : $entry->getDuration();
 	}
 }

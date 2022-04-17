@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <!-- Entry Ready -->
+        <!-- Get notification template using system name -->
+        <request service="eventNotificationTemplate" action="listTemplates" plugin="eventNotification" partnerId="0">
+            <filter objectType="KalturaEventNotificationTemplateFilter">
+                <systemNameEqual>Unique_Kms_Entry_Ready</systemNameEqual>
+            </filter>
+            <pager objectType="KalturaFilterPager">
+                <pageSize>1</pageSize>
+            </pager>
+        </request>
+        <!-- Update notification template -->
+        <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
+            <id>{1:result:objects:0:id}</id>
+            <template objectType="KalturaEmailNotificationTemplate">
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Status changed to ready, see KalturaEntryStatus</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof entry &amp;&amp; in_array(entryPeer::STATUS, $scope->getEvent()->getModifiedColumns()) &amp;&amp; $scope->getObject()->getStatus() == entryStatus::READY</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Not temporary</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>!$scope->getObject()->getIsTemporary()</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Not slide entry</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getType() != entryType::DOCUMENT || $scope->getObject()->getMediaType() != entry::ENTRY_MEDIA_TYPE_PDF || (!is_null($scope->getObject()->getParentEntryId()) ? $scope->getObject()->getParentEntryId() == $scope->getObject()->getId() : true)</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaOrCondition">
+                        <conditions objectType="array">
+                            <item objectType="KalturaEventFieldCondition">
+                                <field objectType="KalturaEvalBooleanField">
+                                    <code>!$scope->getObject()->getReplacedEntryId()</code>
+                                </field>
+                            </item>
+                            <item objectType="KalturaEventFieldCondition">
+                                <field objectType="KalturaEvalBooleanField">
+                                    <code>$scope->getObject()->getReplacedEntryId() &amp;&amp; entryPeer::retrieveByPK($scope->getObject()->getReplacedEntryId())->getSourceType()!= EntrySourceType::RECORDED_LIVE</code>
+                                </field>
+                            </item>
+                        </conditions>
+                    </item>
+                    <item objectType="KalturaFieldMatchCondition">
+                        <description>Custom metadata indicates that the entry belongs to the instance</description>
+                        <field objectType="KalturaEvalStringField">
+                            <!-- EntryReady event is out of partner context, so KalturaMatchMetadataCondition won't work here -->
+                            <!-- parseMetadataValues() returns an array of 0 or 1 elements - implode the array to have a string value -->
+                            <code>($metadata = MetadataPeer::retrieveByObject(MetadataProfilePeer::retrieveBySystemName('EntryAdditionalInfo', array($scope->getPartnerId()))->getId(), MetadataObjectType::ENTRY, $scope->getObject()->getId())) ? implode('', kMetadataManager::parseMetadataValues($metadata, "//*[local-name()='Key' and text()='InstanceId']/following-sibling::*[local-name()='Value']")) : ''</code>
+                        </field>
+                        <values objectType="array">
+                            <item objectType="KalturaStringValue">
+                                <value>{instance_id}</value>
+                            </item>
+                        </values>
+                    </item>
+                </eventConditions>
+            </template>
+        </request>
+    </multirequest>
+</xml>

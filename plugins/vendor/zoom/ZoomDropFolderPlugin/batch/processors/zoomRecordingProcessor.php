@@ -125,7 +125,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
 		
 		$resource = new KalturaUrlResource();
-		$redirectUrl = $this->getRedirectUrl($recording);
+		$redirectUrl = $this->getZoomRedirectUrlFromFile($recording);
 		$resource->url = $redirectUrl;
 		$resource->forceAsyncDownload = true;
 		

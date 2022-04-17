@@ -105,7 +105,13 @@ class PartnerService extends KalturaBaseService
 	public function registerAction( KalturaPartner $partner , $cmsPassword = "" , $templatePartnerId = null, $silent = false)
 	{
 		KalturaResponseCacher::disableCache();
-		
+
+		$blockedCountriesList = kConf::getArrayValue( "blockedRegistration", partner::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, "");
+		if($partner->isSelfServe && !myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, null) )
+		{
+			throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, "Action is temporarily blocked from this country");
+		}
+
 		try
 		{
 			$cmsPassword = ($cmsPassword == "") ? null : $cmsPassword;
@@ -300,11 +306,11 @@ class PartnerService extends KalturaBaseService
 			$adminKuser = UserLoginDataPeer::userLoginByEmail($adminEmail, $cmsPassword, $partnerId, $otp);
 		}
 		catch (kUserException $e) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+			throw new KalturaAPIException ( APIErrors::USER_DATA_ERROR, "The data you entered is invalid" );
 		}
 		
 		if (!$adminKuser || !$adminKuser->getIsAdmin()) {
-			throw new KalturaAPIException ( APIErrors::ADMIN_KUSER_NOT_FOUND, "The data you entered is invalid" );
+			throw new KalturaAPIException ( APIErrors::USER_DATA_ERROR, "The data you entered is invalid" );
 		}
 		
 		KalturaLog::log( "Admin Kuser found, going to validate password", KalturaLog::INFO );

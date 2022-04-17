@@ -68,6 +68,7 @@ interface ReportType extends BaseEnum
    const TOP_CUSTOM_VAR2 = 58;
    const TOP_CUSTOM_VAR3 = 59;
    const SELF_SERVE_USAGE = 60;
+   const FLAVOR_PARAMS_TRANSCODING_USAGE = 61;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;
@@ -192,4 +193,11 @@ interface ReportType extends BaseEnum
    const ENGAGEMENT_TOOLS_WEBCAST = 40012;
    const REACTIONS_BREAKDOWN_WEBCAST = 40013;
 
+   // virtual event registration
+   const VE_HIGHLIGHTS = 50000;
+   const VE_REGISTERED_PLATFORMS = 50001;
+   const VE_REGISTERED_INDUSTRY = 50002;
+   const VE_REGISTERED_ROLES = 50003;
+   const VE_REGISTERED_COUNTRIES = 50004;
+   const VE_REGISTERED_WORLD_REGIONS = 50005;
 }

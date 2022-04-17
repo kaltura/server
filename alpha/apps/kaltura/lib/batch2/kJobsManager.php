@@ -599,7 +599,7 @@ class kJobsManager
 		
 		$dbConvertFlavorJob->setObjectId($flavorAssetId);
 		$dbConvertFlavorJob->setObjectType(BatchJobObjectType::ASSET);
-		
+		$convertData->setEstimatedEffort($convertData->calculateEstimatedEffort($dbConvertFlavorJob));
 		return kJobsManager::addJob($dbConvertFlavorJob, $convertData, BatchJobType::CONVERT, $dbCurrentConversionEngine);
 	}
 	
@@ -1866,6 +1866,10 @@ class kJobsManager
 		if(!is_null($jobData->getFilePath()))
 		{
 			$syncKey = $job->getSyncKey(BatchJob::FILE_SYNC_BATCHJOB_SUB_TYPE_BULKUPLOAD);
+			if (myUploadUtils::isFileTypeRestricted($jobData->getFilePath(), $jobData->getFileName()))
+			{
+				throw new APIException(APIErrors::INVALID_FILE_TYPE, $jobData->getFileName());
+			}
 	//		kFileSyncUtils::file_put_contents($syncKey, file_get_contents($csvFileData["tmp_name"]));
 			try{
 				kFileSyncUtils::moveFromFile($jobData->getFilePath(), $syncKey, true);

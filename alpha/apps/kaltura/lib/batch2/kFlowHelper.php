@@ -156,7 +156,7 @@ class kFlowHelper
 		$entryId = $dbBatchJob->getEntryId();
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 
-		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(), $dbBatchJob->getPartnerId()))
+		if(myUploadUtils::isFileTypeRestricted($data->getDestFileLocalPath(),$data->getSrcFileUrl(), $dbBatchJob->getPartnerId()))
 		{
 			if($dbEntry)
 			{
@@ -292,7 +292,15 @@ class kFlowHelper
 			$dbBatchJob->setData($data);
 		}
 
-		
+		if($flavorAsset instanceof captionAsset)
+		{
+			//start convert caption batch Job for import file.
+			if ($flavorAsset->getContainerFormat() == CaptionType::SCC)
+			{
+				kCaptionsContentManager::addConvertCaptionAssetJob($flavorAsset, CaptionType::SCC, CaptionType::SRT);
+			}
+		}
+
 		$data->setFlavorAssetId($flavorAsset->getId());
 		$dbBatchJob->save();
 
@@ -3595,12 +3603,13 @@ class kFlowHelper
 		}
 
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
-		if (count($nonSourceFlavors) < 2)
+		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		
+		if (self::shouldKeepSourceFlavor($sourceFlavor, $nonSourceFlavors))
 		{
 			return;
 		}
-
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
+		
 		$highestBitrateFlavor = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), null, flavorParams::TAG_SOURCE);
 		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
 		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
@@ -3611,5 +3620,35 @@ class kFlowHelper
 			$highestBitrateFlavor->addTags(array(flavorParams::TAG_SOURCE));
 			$highestBitrateFlavor->save();
 		}
+	}
+	
+	protected static function shouldKeepSourceFlavor(asset $sourceFlavor, array $nonSourceFlavors)
+	{
+		if (count($nonSourceFlavors) < 2)
+		{
+			if (count($nonSourceFlavors) == 0)
+			{
+				return true;
+			}
+			
+			if (!self::isAssetDimMatchSource($sourceFlavor, $nonSourceFlavors[0]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected static function isAssetDimMatchSource($sourceFlavor, $nonSourceFlavor)
+	{
+		$staticContentParams = kConf::get('staticContentAdditionalParams', 'runtime_config', array());
+		$diffNum = isset($staticContentParams['dimension_diff_percentage']) ? $staticContentParams['dimension_diff_percentage'] : 5;
+		
+		$diffPercentage = (100 - $diffNum) / 100;
+		
+		$nonSourceFlavorDim = $nonSourceFlavor->getWidth() * $nonSourceFlavor->getHeight();
+		$sourceFlavorDim = $sourceFlavor->getWidth() * $sourceFlavor->getHeight();
+		
+		return ($nonSourceFlavorDim >= $sourceFlavorDim * $diffPercentage);
 	}
 }

@@ -307,10 +307,6 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 	 */
 	public function isValid($data)
 	{
-		$partnerId = $data['partnerId'];
-		if (count(MediaRepurposingUtils::getMrs($partnerId)) > self::MAX_MR_ON_PARTNER)
-			return false;
-		
 		$tasksData = json_decode($data['TasksData']);
 		if (count($tasksData) < 1 || count($tasksData) > self::MAX_TASKS_ON_MR)
 			return false;
@@ -326,5 +322,21 @@ class Form_MediaRepurposingConfigure extends ConfigureForm
 		return true;
 	}
 
+	/**
+	 * Validate the form for create
+	 *
+	 * @param  array $data
+	 * @return boolean
+	 */
+	public function isValidForCreate($data)
+	{
+		$partnerId = $data['partnerId'];
+		if (count(MediaRepurposingUtils::getMrs($partnerId)) > self::MAX_MR_ON_PARTNER)
+		{
+			return false;
+		}
+
+		return $this->isValid($data);
+	}
 
 }

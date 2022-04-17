@@ -172,11 +172,12 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 		
 		/* @var $dbEntry LiveStreamEntry */
-		if ($dbEntry->getStreamPassword() != $token)
+		$manager = kBroadcastUrlManager::getInstance($this->getPartnerId());
+		if ($dbEntry->getStreamPassword() != $token && (!($dbEntry->getSrtPass()) || $manager->getEncryptedSrtPass($dbEntry) != $token))
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_INVALID_TOKEN, $entryId);
 
 		/*
-		Patch for autenticate error while performing an immidiate stop/start. Checkup for duplicate streams moved to
+		    Patch for authenticate error while performing an immediate stop/start. Checkup for duplicate streams moved to
 		media-server for the moment. 
 		if($dbEntry->isStreamAlreadyBroadcasting())
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
@@ -371,6 +372,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveStreamEntry = $this->fetchLiveEntry($id);
 		$liveStreamEntry->setLiveStatusCache();
 		$isLive = $liveStreamEntry->isCurrentlyLive(false, $protocol);
+		KalturaLog::info("isLive response of entry [$id] is [$isLive]");
 		
 		if ($isLive !== null)
 		{

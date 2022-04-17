@@ -25,6 +25,7 @@ class UserRole extends BaseUserRole implements IRelatedObject
 	{
 		$newRole = new UserRole();
 		$newRole->setName($this->getName());
+		$newRole->setSystemName($this->getSystemName());
 		$newRole->setDescription($this->getDescription());
 		$newRole->setStatus($this->getStatus());
 		$newRole->setPermissionNames(parent::getPermissionNames());

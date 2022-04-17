@@ -174,6 +174,8 @@ class KalturaErrors extends APIErrors
 	const VOLUME_MAP_NOT_CONFIGURED = "VOLUME_MAP_NOT_CONFIGURED;;Need to add volume map support to configuration";
 
 	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
+	
+	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Invalid cycle detected in the parent child connection of this entry";
 
 
 	/**
@@ -752,6 +754,20 @@ class KalturaErrors extends APIErrors
 	const MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE = "MUST_FILTER_ON_ENTRY_OR_SERVER_TYPE;;Must filter on entry id or server type";
 	const ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR = "ENTRY_SERVER_NODE_OBJECT_TYPE_ERROR;OBJ_TYPE,ENTRY_SERVER_NODE_ID;There is an error in the DB, object type [@OBJ_TYPE@] of EntryServerNode id [@ENTRY_SERVER_NODE_ID@] is unknown";
 
+	/*
+	 * UserScore service
+	 */
+	const USER_SCORE_PROPERTIES_FILTER_REQUIRED = "USER_SCORE_PROPERTIES_FILTER_REQUIRED;;UserScorePropertiesFilter is required";
+	const USER_ID_EQUAL_REQUIRED = "USER_ID_EQUAL_REQUIRED;;userIdEqual is required";
+	const GAME_OBJECT_ID_REQUIRED = "GAME_OBJECT_ID_REQUIRED;;gameObjectId is required";
+	const GAME_OBJECT_TYPE_REQUIRED = "GAME_OBJECT_TYPE_REQUIRED;;gameObjectType is required";
+	const USER_ID_NOT_FOUND = "USER_ID_NOT_FOUND;USER_ID;userId [@USER_ID@] not found";
+	
+	/*
+	 * Redis
+	 */
+	const FAILED_INIT_REDIS_INSTANCE = "FAILED_INIT_REDIS_INSTANCE;;Failed to initialize Redis instance";
+	
 	/*
 	 * OTP error
 	 */

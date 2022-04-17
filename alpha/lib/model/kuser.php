@@ -30,6 +30,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const RECORDINGS_FOLDER_DELTA_LINK = 'recordings_folder_delta_link';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
+	const CUSTOM_DATA_IS_SSO_EXCLUDED = 'is_sso_excluded';
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
@@ -162,6 +163,11 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		$objectDeleted = false;
 		if($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == KuserStatus::DELETED) {
 			$objectDeleted = true;
+		}
+		
+		if ($this->isCustomDataModified(self::CUSTOM_DATA_IS_SSO_EXCLUDED))
+		{
+			kuserPeer::sendNewUserMail($this, true);
 		}
 			
 		$oldLoginDataId = null;
@@ -680,6 +686,19 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return parent::getisAdmin() == true;
 	}
 	
+	public function getIsSsoExcluded()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_SSO_EXCLUDED, null, false);
+	}
+	
+	/**
+	 * @param bool $isSsoExcluded
+	 */
+	public function setIsSsoExcluded($isSsoExcluded)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_SSO_EXCLUDED, $isSsoExcluded);
+	}
+	
 	/**
 	 * Set language parameter to $language (in custom_data)
 	 * @param string $language
@@ -1044,6 +1063,15 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this;
 	}
 	
+	public function isCustomDataModified($name = null)
+	{
+		if(isset($this->oldCustomDataValues[null][$name])
+			&& (is_null($name) || array_key_exists($name, $this->oldCustomDataValues[null])))
+		{
+			return true;
+		}
+		return false;
+	}
 	
 	public function getIsAccountOwner()
 	{

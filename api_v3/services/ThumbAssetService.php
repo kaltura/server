@@ -9,6 +9,9 @@
  */
 class ThumbAssetService extends KalturaAssetService
 {
+	
+	const IMAGE_FILE_EXT = 'image_file_ext';
+	
 	protected function getEnabledMediaTypes()
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
@@ -148,7 +151,7 @@ class ThumbAssetService extends KalturaAssetService
 		
 		$defaultThumbKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::THUMB);
     		
- 		//If the thums has the default tag or the entry is in no content and this is the first thumb
+ 		//If the thumbs has the default tag or the entry is in no content and this is the first thumb
  		if($dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || ($dbEntry->getStatus() == KalturaEntryStatus::NO_CONTENT 
  			&& $thumbAssetsCount == 1 && !kFileSyncUtils::fileSync_exists($defaultThumbKey)))
 		{
@@ -242,7 +245,7 @@ class ThumbAssetService extends KalturaAssetService
         $url = $contentResource->getUrl();
         $fullPath = sys_get_temp_dir()  . '/' . $thumbAsset->getId() . '.jpg';
 
-        //curl does not supports sftp protocol, therefore we will use 'addImportJob'
+        //curl does not supports sFTP protocol, therefore we will use 'addImportJob'
         if (!kString::beginsWith( $url , infraRequestUtils::PROTOCOL_SFTP))
         {
             if (KCurlWrapper::getDataFromFile($url, $fullPath)  && !myUploadUtils::isFileTypeRestricted($fullPath))
@@ -390,7 +393,7 @@ class ThumbAssetService extends KalturaAssetService
     
     
 	/**
-	 * Serves thumbnail by entry id and thumnail params id
+	 * Serves thumbnail by entry id and thumbnail params id
 	 *  
 	 * @action serveByEntryId
 	 * @param string $entryId
@@ -903,6 +906,12 @@ class ThumbAssetService extends KalturaAssetService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		
+		if (!$this->isThumbValidFileType($fileData['name'])
+			|| myUploadUtils::isFileTypeRestricted($fileData['tmp_name']))
+		{
+			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
+		}
+
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		
 		$dbThumbAsset = new thumbAsset();
@@ -930,7 +939,7 @@ class ThumbAssetService extends KalturaAssetService
 
 		$dbEntryThumbs = assetPeer::retrieveThumbnailsByEntryId($entryId);
     		
- 		//If the thums has the default tag or the entry is in no content and this is the first thumb
+ 		//If the thumbs has the default tag or the entry is in no content and this is the first thumb
 		if($dbEntry->getCreateThumb() && 
 			(
 				$dbThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) || 
@@ -942,6 +951,22 @@ class ThumbAssetService extends KalturaAssetService
 		$thumbAssets = new KalturaThumbAsset();
 		$thumbAssets->fromObject($dbThumbAsset, $this->getResponseProfile());
 		return $thumbAssets;
+	}
+	
+	protected function isThumbValidFileType($fileName, $partnerId = null)
+	{
+		$allowedThumbnailFileTypes = kConf::get(self::IMAGE_FILE_EXT);
+		if(!$partnerId)
+		{
+			$partnerId = kCurrentContext::getCurrentPartnerId();
+		}
+		$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, $partnerId)
+			&& !in_array($fileExtension, $allowedThumbnailFileTypes))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	/**

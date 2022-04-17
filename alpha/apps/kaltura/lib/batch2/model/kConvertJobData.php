@@ -69,6 +69,11 @@ class kConvertJobData extends kConvartableJobData
 	 * @var int
 	 */
 	private $userCpu;
+
+	/**
+	 * @var int
+	 */
+	private $estimatedEffort;
 	
 	/**
 	 * @return the $destFileSyncLocalPath
@@ -386,5 +391,19 @@ class kConvertJobData extends kConvartableJobData
 	 */
 	public function setUserCpu($userCpu) {
 		$this->userCpu = $userCpu;
+	}
+
+	/**
+	 * @return the $estimatedEffort
+	 */
+	public function getEstimatedEffort() {
+		return $this->estimatedEffort;
+	}
+
+	/**
+	 * @param int $estimatedEffort
+	 */
+	public function setEstimatedEffort($estimatedEffort) {
+		$this->estimatedEffort = $estimatedEffort;
 	}
 }

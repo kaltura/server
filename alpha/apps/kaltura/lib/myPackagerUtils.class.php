@@ -340,13 +340,10 @@ class myPackagerUtils
 		{
 			return false;
 		}
-
-//		Temporary logic because recordings for backup streams are not currently supported
-		$currentEntryServerNodes = array(EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId(), EntryServerNodeType::LIVE_PRIMARY));
-		if ($entry->getType() == entryType::LIVE_STREAM)
-		{
-			$currentEntryServerNodes[] = EntryServerNodePeer::retrieveByEntryIdAndServerType($entry->getRootEntryId(), EntryServerNodeType::LIVE_BACKUP);
-		}
+		
+		$currentEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerTypes($entry->getRootEntryId(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP));
+		usort($liveEntryServerNodes, function ($a, $b) {return $a->getServerType() - $b->getServerType();}); // Primary first and secondary last
+		
 		if (!$currentEntryServerNodes)
 		{
 			return false;
@@ -383,10 +380,9 @@ class myPackagerUtils
 					continue;
 				}
 
-				$result = self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$liveParam->getFlavorId()}");
-				if($result)
+				if (self::curlThumbUrlWithOffset('', $calc_vid_sec, $serverNodeUrl, $destThumbPath, $width, $height, '+', '', "-s{$liveParam->getFlavorId()}"))
 				{
-					return $result;
+					return true;
 				}
 			}
 		}

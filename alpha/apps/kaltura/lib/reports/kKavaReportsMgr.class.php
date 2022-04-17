@@ -106,6 +106,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LIVE_ENGAGED_USERS_RATIO = 'live_engaged_users_ratio';
 	const METRIC_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'live_engaged_users_play_time_ratio';
 	const METRIC_COUNT_ALL_EVENTS = 'count_all';
+	const METRIC_TRANSCODING_DURATION_SEC = 'transcoding_duration_sec';
+	const METRIC_TRANSCODING_DURATION = 'transcoding_duration';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -195,6 +197,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_VPAAS_REPORTS_CLASS = 'kKavaVpaasReports';
 	const KAVA_QOE_REPORTS_CLASS = 'kKavaQoeReports';
 	const KAVA_WEBCAST_REPORTS_CLASS = 'kKavaWebcastReports';
+	const KAVA_VE_REGISTRATION_CLASS = 'kKavaVeRegistrationReports';
 
 	/// report settings
 	// report settings - common
@@ -354,6 +357,14 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
 		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED,
 		self::EVENT_TYPE_REACTION_CLICKED,
+		self::EVENT_TYPE_VE_REGISTERED,
+		self::EVENT_TYPE_VE_CONFIRMED,
+		self::EVENT_TYPE_VE_ATTENDED,
+		self::EVENT_TYPE_VE_PARTICIPATED,
+		self::EVENT_TYPE_VE_BLOCKED,
+		self::EVENT_TYPE_VE_UNREGISTERED,
+		self::EVENT_TYPE_VE_INVITED,
+		self::EVENT_TYPE_VE_CREATED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -598,6 +609,7 @@ class kKavaReportsMgr extends kKavaBase
 		2 => self::KAVA_VPAAS_REPORTS_CLASS,
 		3 => self::KAVA_QOE_REPORTS_CLASS,
 		4 => self::KAVA_WEBCAST_REPORTS_CLASS,
+		5 => self::KAVA_VE_REGISTRATION_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
@@ -1105,6 +1117,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_TOTAL_JOBS] = self::getLongSumAggregator(
 			self::METRIC_TOTAL_JOBS, self::METRIC_COUNT);
 
+		self::$aggregations_def[self::METRIC_TRANSCODING_DURATION_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
+			self::getLongSumAggregator(
+				self::METRIC_TRANSCODING_DURATION_SEC, self::METRIC_DURATION_SEC));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1143,6 +1160,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_FLAVOR_SIZE_BYTES),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_FLAVOR_SIZE_BYTES, '1048576'));
+
+		self::$metrics_def[self::METRIC_TRANSCODING_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_TRANSCODING_DURATION, self::METRIC_TRANSCODING_DURATION_SEC, '60'));
 
 		self::$metrics_def[self::METRIC_STORAGE_TOTAL_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_STORAGE_SIZE_BYTES),
@@ -2370,6 +2392,8 @@ class kKavaReportsMgr extends kKavaBase
 			'playlist_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYLIST_ID),
 			'domains' => array(self::DRUID_DIMENSION => self::DIMENSION_DOMAIN),
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
+			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
+			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -4373,6 +4397,43 @@ class kKavaReportsMgr extends kKavaBase
 				}
 			}
 
+			$result[$id] = $output;
+		}
+		return $result;
+	}
+
+	protected static function getUsersInfoFromCustomDataFields($ids, $partner_id, $context)
+	{
+		$enrichedInfoFields = $context['info_fields'];
+		$customDataFields = $context['columns'];
+		array_unshift($context['columns'], 'PUSER_ID');
+		$context['peer'] = 'kuserPeer';
+
+		$result = array();
+		$rows = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($rows as $id => $columns)
+		{
+			if (!is_array($columns))
+			{
+				$result[$id] = $id;
+				continue;
+			}
+			$output = array();
+			$puser = array_shift($columns);
+			$output[] = $puser;
+			$parsedFields = array();
+			foreach ($customDataFields as $field)
+			{
+				$parsedField = json_decode(array_shift($columns), true);
+				$parsedFields[$field] = $parsedField;
+			}
+
+			foreach ($enrichedInfoFields as $enrichedInfoField)
+			{
+				list($customDataField, $infoField) = explode(".", $enrichedInfoField);
+				$customDataField = "CUSTOM_DATA.$customDataField";
+				$output[] = isset($parsedFields[$customDataField][$infoField]) ? $parsedFields[$customDataField][$infoField] : '';
+			}
 			$result[$id] = $output;
 		}
 		return $result;

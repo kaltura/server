@@ -26,7 +26,10 @@ class ZoomHelper
 		'chat_file',
 		'poll'
 	);
-
+	
+	const RECORDING_FILE_STATUS = 'status';
+	const RECORDING_FILE_STATUS_PROCESSING = 'processing';
+	
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
@@ -273,11 +276,16 @@ class ZoomHelper
 		}
 	}
 	
-	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType)
+	public static function orderRecordingFiles($recordingFiles, $recordingStart, $recordingType, &$fileInStatusProcessingExists)
 	{
 		$recordingFilesOrdered = array();
 		foreach($recordingFiles as $recordingFile)
 		{
+			if( isset($recordingFile[self::RECORDING_FILE_STATUS]) && ($recordingFile[self::RECORDING_FILE_STATUS] === self::RECORDING_FILE_STATUS_PROCESSING) )
+			{
+				$fileInStatusProcessingExists = true;
+			}
+			
 			if(!isset($recordingFile[$recordingType]))
 			{
 				continue;
@@ -338,5 +346,21 @@ class ZoomHelper
 			}
 		}
 		return $filesByRecordingType;
+	}
+
+	public static function getRedirectUrl($url)
+	{
+		$redirectUrl = $url;
+		$curl = curl_init($url);
+		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt ($curl, CURLOPT_HEADER, true);
+		curl_setopt ($curl, CURLOPT_NOBODY, true);
+		$result = curl_exec($curl);
+		if ($result !== false)
+		{
+			$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+		}
+		return $redirectUrl;
 	}
 }

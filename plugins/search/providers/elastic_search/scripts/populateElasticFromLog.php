@@ -37,7 +37,7 @@ if (empty($config))
 {
 	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
 
-	if (!file_exists($configFile))
+	if (!file_exists($configFile) && !generateConfigFile($configFile))
 	{
 		KalturaLog::err("Configuration file [$configFile] not found.");
 		exit(-1);
@@ -138,8 +138,8 @@ while (true)
 	}
 	$elasticLogs = $assocElasticLogs;
 
-	$ping = $elasticClient->ping();
-	if (!$ping)
+	$healthPing = $elasticClient->checkHealth();
+	if (!$healthPing)
 	{
 		KalturaLog::err('cannot connect to elastic cluster with client[' . print_r($elasticClient, true) . ']');
 		sleep(5);
@@ -252,3 +252,53 @@ while (true)
 }
 
 KalturaLog::log('Done');
+
+function generateConfigFile($configFile)
+{
+	$elasticHost = getenv('ELASTIC_HOST_NAME');
+	$elasticPort = 9200;
+	if (!$elasticHost)
+	{
+		KalturaLog::err("Missing environment variable 'ELASTIC_HOST_NAME' to point to elastic host");
+		return false;
+	}
+	
+	exec("curl -s $elasticHost:$elasticPort", $output);
+	$elasticResponse = json_decode(implode('', $output), true);
+	
+	$elasticCluster = isset($elasticResponse['cluster_name']) ? $elasticResponse['cluster_name'] : null;
+	$elasticVersion = isset($elasticResponse['version']['number']) ? $elasticResponse['version']['number'] : null;
+	
+	if (!$elasticCluster || !$elasticVersion)
+	{
+		KalturaLog::err("Missing required fields from elastic '$elasticHost' response");
+		return false;
+	}
+	
+	$elasticBlock = "[elasticPopulateSettings]\n";
+	$elasticBlock .= "elasticCluster = $elasticCluster\n";
+	$elasticBlock .= "elasticVersion = $elasticVersion\n";
+	$elasticBlock .= "elasticServer = $elasticHost\n";
+	$elasticBlock .= "elasticPort = $elasticPort\n";
+	$elasticBlock .= "shouldUseMaster = false\n";
+	
+	if (!file_exists(dirname($configFile)) &&  !mkdir(dirname($configFile), 0755, true))
+	{
+		KalturaLog::err('Failed to create directory path "' . dirname($configFile) . '"');
+		return false;
+	}
+	
+	if (!file_put_contents($configFile, $elasticBlock, LOCK_EX))
+	{
+		KalturaLog::err("Failed to write to file path '$configFile'");
+		return false;
+	}
+	
+	if (!chmod($configFile, 0644))
+	{
+		KalturaLog::err("Failed to change permissions to file path '$configFile'");
+		return false;
+	}
+	
+	return true;
+}
