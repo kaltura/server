@@ -23,7 +23,7 @@
 			<width>560</width>
 			<height>395</height>
 			<swfUrl>/flash/kdp3/v3.9.9/kdp3.swf</swfUrl>
-			<html5Url>/html5/html5lib/v2.55.2/mwEmbedLoader.php</html5Url>
+			<html5Url>/html5/html5lib/{latest}/mwEmbedLoader.php</html5Url>
 			<useCdn>1</useCdn>
 			<tags>html5studio,player</tags>
 			<creationMode>2</creationMode>
