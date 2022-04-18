@@ -412,6 +412,7 @@ class myPartnerRegistration
 			$newPartner->save();
 			
 			//$this->configurePartnerByPackage($newPartner);
+			PermissionPeer::enableForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, PermissionType::SPECIAL_FEATURE, $newPartner->getId());
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 

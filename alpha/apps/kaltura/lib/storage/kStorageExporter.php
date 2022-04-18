@@ -292,21 +292,29 @@ class kStorageExporter implements kObjectChangedEventConsumer, kBatchJobStatusEv
 	public static function reExportEntry(entry $entry)
 	{
 		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_REMOTE_STORAGE_RULE, $entry->getPartnerId()))
+		{
 			return;
+		}
 		if($entry->getStatus() == entryStatus::NO_CONTENT)
+		{
 			return;
+		}
 				
-		$storageProfiles = StorageProfilePeer::retrieveExternalByPartnerId($entry->getPartnerId());
+		$storageProfiles = StorageProfilePeer::retrieveAutomaticByPartnerId($entry->getPartnerId());
 		foreach ($storageProfiles as $profile) 
 		{			
 			/* @var $profile StorageProfile */
-			KalturaLog::debug('Checking entry ['.$entry->getId().']re-export to storage ['.$profile->getId().']');
+			KalturaLog::debug('Checking entry ['.$entry->getId().'] re-export to storage ['.$profile->getId().']');
 			$scope = $profile->getScope();
 			$scope->setEntryId($entry->getId());
 			if($profile->triggerFitsReadyAsset($entry->getId()) && $profile->fulfillsRules($scope))
+			{
 				self::tryExportEntry($entry, $profile);
-			else 
+			}
+			else
+			{
 				self::deleteExportedEntry($entry, $profile);
+			}
 		}
 	}
 	

@@ -21,7 +21,7 @@ class NotificationService extends KalturaBaseService
 	function getClientNotificationAction($entryId, $type)
 	{
 		// in case of a multirequest, a mediaService.addFromUploadedFile may fail and therefore the resulting entry id will be empty
-		// in such a case return immidiately without looking for the notification
+	    // in such a case return immediately without looking for the notification
 		if ($entryId == '')
 		{
             throw new KalturaAPIException(KalturaErrors::NOTIFICATION_FOR_ENTRY_NOT_FOUND, $entryId);
