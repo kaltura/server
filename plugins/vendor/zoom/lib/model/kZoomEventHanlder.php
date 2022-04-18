@@ -57,19 +57,6 @@ class kZoomEventHanlder
 				if ($zoomDropFolderId)
 				{
 					$zoomClient = $this->initZoomClient($zoomVendorIntegration);
-					$hostId = $event->object->hostId;
-					$zoomUser = $zoomClient->retrieveZoomUser($hostId);
-					$hostEmail = '';
-					if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
-					{
-						$hostEmail = $zoomUser[self::EMAIL];
-					}
-					$userId = $this->getEntryOwnerId($hostEmail);
-					if ($zoomVendorIntegration->shouldNotIngestRecording($userId))
-					{
-						KalturaLog::notice('The user is configured to not save recordings - Not processing');
-						break;
-					}
 					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration,
 					                               $zoomDropFolder->getConversionProfileId(), $zoomClient, $zoomDropFolder->getFileDeletePolicy());
 				}
@@ -107,7 +94,7 @@ class kZoomEventHanlder
 		}
 	}
 	
-	protected function getEntryOwnerId($hostEmail)
+	protected static function getEntryOwnerId($hostEmail)
 	{
 		$user = kuserPeer::getKuserByEmail($hostEmail);
 		$userId = '';
@@ -152,6 +139,19 @@ class kZoomEventHanlder
 	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, ZoomVendorIntegration $zoomVendorIntegration,
 	                                                   $conversionProfileId, kZoomClient $zoomClient = null, $fileDeletionPolicy = null)
 	{
+		$hostId = $event->object->hostId;
+		$zoomUser = $zoomClient->retrieveZoomUser($hostId);
+		$hostEmail = '';
+		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
+		{
+			$hostEmail = $zoomUser[self::EMAIL];
+		}
+		$userId = self::getEntryOwnerId($hostEmail);
+		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
+		{
+			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
+			return;
+		}
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
 		if (($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads()) ||

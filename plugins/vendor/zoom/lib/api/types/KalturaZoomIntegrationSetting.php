@@ -58,12 +58,12 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	/**
 	 * @var string
 	 */
-	public $optOutGroupIDs;
+	public $optOutGroupIds;
 	
 	/**
 	 * @var string
 	 */
-	public $optInGroupIDs;
+	public $optInGroupIds;
 
 
 	/*
@@ -81,8 +81,8 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'enableZoomTranscription',
 		'zoomAccountDescription',
 		'enableMeetingUpload',
-		'optInGroupIDs',
-		'optOutGroupIDs'
+		'optInGroupIds',
+		'optOutGroupIds'
 	);
 
 	public function getMapBetweenObjects()
