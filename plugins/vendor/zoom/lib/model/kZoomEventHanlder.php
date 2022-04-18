@@ -10,6 +10,7 @@ class kZoomEventHanlder
 	protected $zoomConfiguration;
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const MAP_NAME = 'vendor';
+	const EMAIL = 'email';
 
 	/**
 	 * kZoomEngine constructor.
@@ -42,6 +43,7 @@ class kZoomEventHanlder
 	 */
 	public function processEvent($event)
 	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
 		$zoomVendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($event->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		$zoomDropFolder = self::getZoomDropFolder($zoomVendorIntegration);
 		$zoomDropFolderId =  $zoomDropFolder ? $zoomDropFolder->getId() : null;
@@ -55,6 +57,19 @@ class kZoomEventHanlder
 				if ($zoomDropFolderId)
 				{
 					$zoomClient = $this->initZoomClient($zoomVendorIntegration);
+					$hostId = $event->object->hostId;
+					$zoomUser = $zoomClient->retrieveZoomUser($hostId);
+					$hostEmail = '';
+					if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
+					{
+						$hostEmail = $zoomUser[self::EMAIL];
+					}
+					$userId = $this->getEntryOwnerId($hostEmail);
+					if ($zoomVendorIntegration->shouldNotIngestRecording($userId))
+					{
+						KalturaLog::notice('The user is configured to not save recordings - Not processing');
+						break;
+					}
 					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration,
 					                               $zoomDropFolder->getConversionProfileId(), $zoomClient, $zoomDropFolder->getFileDeletePolicy());
 				}
@@ -90,6 +105,21 @@ class kZoomEventHanlder
 				}
 				break;
 		}
+	}
+	
+	protected function getEntryOwnerId($hostEmail)
+	{
+		$user = kuserPeer::getKuserByEmail($hostEmail);
+		$userId = '';
+		if ($user)
+		{
+			$userId = $user->getId();
+		}
+		else
+		{
+			KalturaLog::debug('User with email: ' . $hostEmail. ' not found');
+		}
+		return $userId;
 	}
 	
 	protected function initZoomClient(ZoomVendorIntegration $zoomVendorIntegration)

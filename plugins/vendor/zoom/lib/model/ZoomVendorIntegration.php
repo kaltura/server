@@ -25,6 +25,8 @@ class ZoomVendorIntegration extends VendorIntegration
 	const ENABLE_ZOOM_TRANSCRIPTION =  'enableZoomTranscription';
 	const ZOOM_ACCOUNT_DESCRIPTION = 'zoomAccountDescription';
 	const ENABLE_MEETING_UPLOAD = 'enableMeetingUpload';
+	const OPT_OUT_GROUP_IDS = 'optOutGroupIDs';
+	const OPT_IN_GROUP_IDS = 'optInGroupIDs';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -78,6 +80,14 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
 	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD);	}
+	
+	public function setOptOutGroupIds($v) { $this->putInCustomData (self::OPT_OUT_GROUP_IDS, $v); }
+	public function addGroupIdToOptOutGroups($v) { $this->putInCustomData ( self::OPT_OUT_GROUP_IDS, $this->getOptOutGroupIds() . ',' . $v); }
+	public function getOptOutGroupIds() { return $this->getFromCustomData ( self::OPT_OUT_GROUP_IDS,null, null); }
+	
+	public function setOptInGroupIds($v) { $this->putInCustomData (self::OPT_IN_GROUP_IDS, $v); }
+	public function addGroupIdToOptInGroups($v) { $this->putInCustomData ( self::OPT_IN_GROUP_IDS, $this->getOptInGroupIds() . ',' . $v); }
+	public function getOptInGroupIds() { return $this->getFromCustomData ( self::OPT_IN_GROUP_IDS,null, null); }
 
 	public function setLastError($v)
 	{
@@ -118,5 +128,37 @@ class ZoomVendorIntegration extends VendorIntegration
 		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);
 		$this->setJwtToken($tokensDataAsArray[self::JWT_TOKEN]);
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+	}
+	
+	public function shouldNotIngestRecording($userId)
+	{
+		$optInGroupIdsArray = explode(',', $this->getOptInGroupIds());
+		$optOutGroupIdsArray = explode(',', $this->getOptOutGroupIds());
+		if($this->isEmptyGroupList($optInGroupIdsArray) && $this->isEmptyGroupList($optOutGroupIdsArray))
+		{
+			return false;
+		}
+		else
+		{
+			$userGroupsArray = KuserKgroupPeer::retrieveKgroupIdsByKuserId($userId);
+			if (!empty(array_intersect($userGroupsArray, $optOutGroupIdsArray)))
+			{
+				return true;
+			}
+			else if (!empty(array_intersect($userGroupsArray, $optInGroupIdsArray)))
+			{
+				return false;
+			}
+			return false;
+		}
+	}
+	
+	protected function isEmptyGroupList($array)
+	{
+		if (is_null($array) || empty($array) || (count($array) == 1 && $array[0] === ''))
+		{
+			return true;
+		}
+		return false;
 	}
 }
