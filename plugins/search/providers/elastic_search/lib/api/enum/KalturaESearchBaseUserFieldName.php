@@ -16,4 +16,6 @@ class KalturaESearchBaseUserFieldName extends KalturaStringEnum
 	const GROUP_IDS = 'group_ids';
 	const ROLE_IDS = 'role_ids';
 	const USER_ID = 'user_id';
+	const TITLE = 'title';
+	const COMPANY = 'company';
 }
