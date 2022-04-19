@@ -667,6 +667,9 @@
 		 */
 		protected function addJob($jobIdx, $cmdLine, $maxExecutionTime)
 		{
+			$params = $this->chunker->params;
+			$source = $params->resolveSourcePath();
+			$cmdLine = str_replace($params->unResolvedSourcePath,$source,$cmdLine);
 			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
 			$job->maxExecTime = $maxExecutionTime;
 			if($this->storeManager->AddJob($job)===false) {
