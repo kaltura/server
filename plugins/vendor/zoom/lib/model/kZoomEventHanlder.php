@@ -11,6 +11,7 @@ class kZoomEventHanlder
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const MAP_NAME = 'vendor';
 	const EMAIL = 'email';
+	const CMS_USER_FIELD = 'cms_user_id';
 
 	/**
 	 * kZoomEngine constructor.
@@ -94,19 +95,56 @@ class kZoomEventHanlder
 		}
 	}
 	
-	protected static function getEntryOwnerId($hostEmail)
+	protected static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomUser)
 	{
-		$user = kuserPeer::getKuserByEmail($hostEmail);
-		$userId = '';
-		if ($user)
+		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomUser);
+		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		if (!$user)
 		{
-			$userId = $user->getId();
+			$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+			if (!$user)
+			{
+				KalturaLog::debug('User with email: ' . $hostEmail . ' not found');
+				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR, $puserId);
+			}
 		}
-		else
+		return $user->getId();
+	}
+	
+	protected static function processZoomUserName($userName, $zoomVendorIntegration, $zoomUser)
+	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
+		$result = $userName;
+		switch ($zoomVendorIntegration->getUserMatching())
 		{
-			KalturaLog::debug('User with email: ' . $hostEmail. ' not found');
+			case kZoomUsersMatching::ADD_POSTFIX:
+				$postFix = $zoomVendorIntegration->getUserPostfix();
+				if (!kString::endsWith($result, $postFix, false))
+				{
+					$result = $result . $postFix;
+				}
+				
+				break;
+			case kZoomUsersMatching::REMOVE_POSTFIX:
+				$postFix = $zoomVendorIntegration->getUserPostfix();
+				if (kString::endsWith($result, $postFix, false))
+				{
+					$result = substr($result, 0, strlen($result) - strlen($postFix));
+				}
+				
+				break;
+			case kZoomUsersMatching::CMS_MATCHING:
+				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
+				{
+					$result = $zoomUser[self::CMS_USER_FIELD];
+				}
+				break;
+			case kZoomUsersMatching::DO_NOT_MODIFY:
+			default:
+				break;
 		}
-		return $userId;
+		
+		return $result;
 	}
 	
 	protected function initZoomClient(ZoomVendorIntegration $zoomVendorIntegration)
@@ -146,7 +184,7 @@ class kZoomEventHanlder
 		{
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
-		$userId = self::getEntryOwnerId($hostEmail);
+		$userId = self::getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomUser);
 		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
 		{
 			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
