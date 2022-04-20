@@ -249,6 +249,12 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
 			}
+			$userId = $this->getUserId($meetingFile);
+			if ($this->shouldExcludeUserRecordingIngest($userId))
+			{
+				KalturaLog::notice('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
+				break;
+			}
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
@@ -580,5 +586,157 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$kZoomDropFolderFile->entryId = $entryId;
 		$this->dropFolderFileService->update($dropFolderFile->id, $kZoomDropFolderFile);
 		$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::HANDLED);
+	}
+	
+	protected function getUserId ($meetingFile)
+	{
+		$hostId = $meetingFile[self::HOST_ID];
+		$zoomUser = $this->zoomClient->retrieveZoomUser($hostId);
+		if (!$zoomUser)
+		{
+			KalturaLog::debug('Zoom User not found');
+			return;
+		}
+		$hostEmail = '';
+		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
+		{
+			$hostEmail = $zoomUser[self::EMAIL];
+		}
+		return $this->getEntryOwnerId($hostEmail);
+	}
+	
+	protected function getEntryOwnerId($hostEmail)
+	{
+		$partnerId = $this->dropFolder->partnerId;
+		$zoomUser = new kZoomUser();
+		$zoomUser->setOriginalName($hostEmail);
+		$zoomUser->setProcessedName($this->processZoomUserName($hostEmail));
+		KBatchBase::impersonate($partnerId);
+		/* @var $user KalturaUser */
+		$user = $this->getKalturaUser($partnerId, $zoomUser);
+		KBatchBase::unimpersonate();
+		$userId = '';
+		if ($user)
+		{
+			$userId = $user->id;
+		}
+		else
+		{
+			KalturaLog::debug('User with email: ' . $hostEmail . ' not found');
+			throw new kExternalException(KalturaErrors::USER_DATA_ERROR, $hostEmail);
+		}
+		return $userId;
+	}
+	
+	/**
+	 * @param int $partnerId
+	 * @param kZoomUser $kZoomUser
+	 * @return kuser
+	 */
+	protected function getKalturaUser($partnerId, $kZoomUser)
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1;
+		$pager->pageIndex = 1;
+		
+		$filter = new KalturaUserFilter();
+		$filter->partnerIdEqual = $partnerId;
+		$filter->idEqual = $kZoomUser->getProcessedName();
+		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
+		if (!$kalturaUser->objects)
+		{
+			$email = $kZoomUser->getOriginalName();
+			$filterUser = new KalturaUserFilter();
+			$filterUser->partnerIdEqual = $partnerId;
+			$filterUser->emailStartsWith = $email;
+			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
+			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
+			{
+				return null;
+			}
+		}
+		
+		if($kalturaUser->objects)
+		{
+			return $kalturaUser->objects[0];
+		}
+		return null;
+	}
+	
+	/**
+	 * @param string $userName
+	 * @return string kalturaUserName
+	 */
+	protected function processZoomUserName($userName)
+	{
+		$result = $userName;
+		switch ($this->dropFolder->zoomVendorIntegration->zoomUserMatchingMode)
+		{
+			case kZoomUsersMatching::ADD_POSTFIX:
+				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
+				if (!kString::endsWith($result, $postFix, false))
+				{
+					$result = $result . $postFix;
+				}
+				
+				break;
+			case kZoomUsersMatching::REMOVE_POSTFIX:
+				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
+				if (kString::endsWith($result, $postFix, false))
+				{
+					$result = substr($result, 0, strlen($result) - strlen($postFix));
+				}
+				
+				break;
+			case kZoomUsersMatching::CMS_MATCHING:
+				$zoomUser = $this->zoomClient->retrieveZoomUser($userName);
+				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
+				{
+					$result = $zoomUser[self::CMS_USER_FIELD];
+				}
+				break;
+			case kZoomUsersMatching::DO_NOT_MODIFY:
+			default:
+				break;
+		}
+		
+		return $result;
+	}
+	
+	protected function shouldExcludeUserRecordingIngest (string $userId)
+	{
+		$optInGroupIdsArray = explode(',', $this->dropFolder->zoomVendorIntegration->optInGroupIds);
+		$optOutGroupIdsArray = explode(',', $this->dropFolder->zoomVendorIntegration->optOutGroupIds);
+		if($this->isEmptyGroupList($optInGroupIdsArray) && $this->isEmptyGroupList($optOutGroupIdsArray))
+		{
+			return false;
+		}
+		$userPager = new KalturaFilterPager();
+		$userPager->pageSize = 1;
+		$userPager->pageIndex = 1;
+		
+		$userFilter = new KalturaGroupUserFilter();
+		$userFilter->userIdEqual = $userId;
+		
+		$userGroupsResponse = KBatchBase::$kClient->userGroup->listAction($userFilter, $userPager);
+		$userGroupsArray = $userGroupsResponse->objects;
+		if (!empty(array_intersect($userGroupsArray, $optOutGroupIdsArray)))
+		{
+			return true;
+		}
+		if (!empty(array_intersect($userGroupsArray, $optInGroupIdsArray)))
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	protected function isEmptyGroupList($array)
+	{
+		if (empty($array) || (count($array) == 1 && $array[0] === ''))
+		{
+			return true;
+		}
+		return false;
 	}
 }
