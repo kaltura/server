@@ -123,8 +123,8 @@ class serveFlavorAction extends kalturaAction
 										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null)
 	{
 		$mpegtsWrapValue = 1 << 33;
-		$offset = intval(($mpegtsWrapValue / 2 - ($firstClipStartTime * 90) % $mpegtsWrapValue) / 90);
 
+		$offset = intval(($mpegtsWrapValue / 2 - ($playlistStartTime * 90) % $mpegtsWrapValue) / 90);
 		$mediaSet['playlistType'] = 'live';
 		$mediaSet['firstClipTime'] = $firstClipStartTime + $offset;
 		$mediaSet['discontinuity'] = $discontinuity;
@@ -431,13 +431,11 @@ class serveFlavorAction extends kalturaAction
 				{
 					$offset = 0;
 				}
-				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				list($durations, $assets, $firstClipStartTime, $endTime, $dvrWindow, $initialClipIndex, $initialSegmentIndex, $playlistStartTime) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($assets)
 				{
 					$sequences = self::buildSequencesArray($assets);
-					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
-					$initialClipIndex = 1; // currently as simulive support only 1 video
-					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
+					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $playlistStartTime, $firstClipStartTime,
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
 					if ($offset)
 					{
