@@ -86,8 +86,8 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'enableZoomTranscription',
 		'zoomAccountDescription',
 		'enableMeetingUpload',
-		'optInGroupIds',
-		'optOutGroupIds',
+		'optInGroupNames',
+		'optOutGroupNames',
 		'groupParticipationType'
 	);
 
