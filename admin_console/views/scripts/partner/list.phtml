@@ -84,10 +84,10 @@
 								<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<?php if ($partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId== 0): ?>
 										<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')): ?>
-                                            <option value="manageNew" ><?php echo $this->translate('Manage'); ?></option>
+                                            <option value="manageNew" ><?php echo $this->translate('Manage - new'); ?></option>
 										<?php endif; ?>
 									<?php elseif (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
-                                        <option value="manageNew" ><?php echo $this->translate('Manage'); ?></option>
+                                        <option value="manageNew" ><?php echo $this->translate('Manage - new'); ?></option>
 									<?php endif;?>
 								<?php endif; ?>
                                 
