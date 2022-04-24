@@ -21,7 +21,25 @@ class kZoomEventHanlder
 	{
 		$this->zoomConfiguration = $zoomConfiguration;
 	}
-
+	
+	private static function shouldExcludeUserFromSavingRecording (kZoomEvent $event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
+	{
+		$hostId = $event->object->hostId;
+		$zoomUser = $zoomClient->retrieveZoomUser($hostId);
+		$hostEmail = '';
+		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
+		{
+			$hostEmail = $zoomUser[self::EMAIL];
+		}
+		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomUser);
+		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
+		{
+			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * @return kZoomEvent
 	 * @throws Exception
@@ -48,6 +66,11 @@ class kZoomEventHanlder
 		$zoomVendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($event->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		$zoomDropFolder = self::getZoomDropFolder($zoomVendorIntegration);
 		$zoomDropFolderId =  $zoomDropFolder ? $zoomDropFolder->getId() : null;
+		$zoomClient = $this->initZoomClient($zoomVendorIntegration);
+		if (self::shouldExcludeUserFromSavingRecording($event, $zoomClient, $zoomVendorIntegration))
+		{
+			return;
+		}
 		switch($event->eventType)
 		{
 			case kEventType::RECORDING_VIDEO_COMPLETED:
@@ -57,7 +80,6 @@ class kZoomEventHanlder
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
 				if ($zoomDropFolderId)
 				{
-					$zoomClient = $this->initZoomClient($zoomVendorIntegration);
 					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration,
 					                               $zoomDropFolder->getConversionProfileId(), $zoomClient, $zoomDropFolder->getFileDeletePolicy());
 				}
@@ -177,19 +199,6 @@ class kZoomEventHanlder
 	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, ZoomVendorIntegration $zoomVendorIntegration,
 	                                                   $conversionProfileId, kZoomClient $zoomClient = null, $fileDeletionPolicy = null)
 	{
-		$hostId = $event->object->hostId;
-		$zoomUser = $zoomClient->retrieveZoomUser($hostId);
-		$hostEmail = '';
-		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
-		{
-			$hostEmail = $zoomUser[self::EMAIL];
-		}
-		$userId = self::getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomUser);
-		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
-		{
-			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
-			return;
-		}
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
 		if (($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads()) ||

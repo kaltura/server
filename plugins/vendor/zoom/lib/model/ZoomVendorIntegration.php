@@ -25,8 +25,9 @@ class ZoomVendorIntegration extends VendorIntegration
 	const ENABLE_ZOOM_TRANSCRIPTION =  'enableZoomTranscription';
 	const ZOOM_ACCOUNT_DESCRIPTION = 'zoomAccountDescription';
 	const ENABLE_MEETING_UPLOAD = 'enableMeetingUpload';
-	const OPT_OUT_GROUP_IDS = 'optOutGroupIds';
-	const OPT_IN_GROUP_IDS = 'optInGroupIds';
+	const OPT_OUT_GROUP_NAMES = 'optOutGroupNames';
+	const OPT_IN_GROUP_NAMES = 'optInGroupNames';
+	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -81,13 +82,48 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
 	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD);	}
 	
-	public function setOptOutGroupIds($v) { $this->putInCustomData (self::OPT_OUT_GROUP_IDS, $v); }
-	public function addGroupIdToOptOutGroups($v) { $this->putInCustomData ( self::OPT_OUT_GROUP_IDS, $this->getOptOutGroupIds() . ',' . $v); }
-	public function getOptOutGroupIds() { return $this->getFromCustomData ( self::OPT_OUT_GROUP_IDS); }
+	public function getOptOutGroupNames() { return $this->getFromCustomData ( self::OPT_OUT_GROUP_NAMES); }
+	public function getOptInGroupNames() { return $this->getFromCustomData ( self::OPT_IN_GROUP_NAMES); }
 	
-	public function setOptInGroupIds($v) { $this->putInCustomData (self::OPT_IN_GROUP_IDS, $v); }
-	public function addGroupIdToOptInGroups($v) { $this->putInCustomData ( self::OPT_IN_GROUP_IDS, $this->getOptInGroupIds() . ',' . $v); }
-	public function getOptInGroupIds() { return $this->getFromCustomData ( self::OPT_IN_GROUP_IDS); }
+	public function setOptOutGroupNames($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
+		{
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, $v);
+		}
+	}
+	
+	public function addGroupNameToOptOutGroups($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
+		{
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, $this->getOptOutGroupNames() . "\r\n" . $v);
+		}
+	}
+	
+	public function setOptInGroupNames($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
+		{
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, $v);
+		}
+	}
+	
+	public function addGroupNameToOptInGroups($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
+		{
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, $this->getOptInGroupNames() . "\r\n" . $v);
+		}
+	}
+	
+	public function setGroupParticipationType($v)
+	{
+		$this->putInCustomData (self::GROUP_PARTICIPATION_TYPE, $v);
+		$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
+		$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
+	}
+	public function getGroupParticipationType() { return $this->getFromCustomData ( self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION); }
 
 	public function setLastError($v)
 	{
@@ -132,29 +168,26 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function shouldExcludeUserRecordingsIngest($userId)
 	{
-		$optInGroupIdsArray = explode(',', $this->getOptInGroupIds());
-		$optOutGroupIdsArray = explode(',', $this->getOptOutGroupIds());
-		if($this->isEmptyGroupList($optInGroupIdsArray) && $this->isEmptyGroupList($optOutGroupIdsArray))
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
 			return false;
 		}
-		$userGroupsArray = KuserKgroupPeer::retrieveKgroupIdsByKuserId($userId);
-		if (!empty(array_intersect($userGroupsArray, $optOutGroupIdsArray)))
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
-			return true;
+			$vendorGroupsNamesArray = explode("\r\n", $this->getOptInGroupNames());
 		}
-		if (!empty(array_intersect($userGroupsArray, $optInGroupIdsArray)))
+		else
 		{
-			return false;
+			$vendorGroupsNamesArray = explode("\r\n", $this->getOptOutGroupNames());
 		}
-		return true;
-	}
-	
-	protected function isEmptyGroupList($array)
-	{
-		if (empty($array) || (count($array) == 1 && $array[0] === ''))
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
+		
+		if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
 		{
-			return true;
+			if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
+			{
+				return true;
+			}
 		}
 		return false;
 	}
