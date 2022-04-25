@@ -119,6 +119,7 @@ class kZoomEventHanlder
 	
 	protected static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomUser)
 	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
 		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomUser);
 		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$user)
@@ -126,11 +127,21 @@ class kZoomEventHanlder
 			$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
 			if (!$user)
 			{
-				KalturaLog::debug('User with email: ' . $hostEmail . ' not found');
-				throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR, $puserId);
+				if ($zoomVendorIntegration->getCreateUserIfNotExist())
+				{
+					$userId = $zoomUser->getProcessedName();
+				}
+				else if ($zoomVendorIntegration->getDefaultUserEMail())
+				{
+					$userId = $zoomVendorIntegration->getDefaultUserEMail();
+				}
 			}
 		}
-		return $user->getId();
+		else
+		{
+			$userId = $user->getId();
+		}
+		return $userId;
 	}
 	
 	protected static function processZoomUserName($userName, $zoomVendorIntegration, $zoomUser)
