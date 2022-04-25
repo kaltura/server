@@ -326,8 +326,7 @@ class kSimuliveUtils
 	public static function getSourceDurations($sourceEntries, $event)
 	{
 		$durations = array();
-		$postEndDurationMs = $event->getPostEndEntryId() ? self::roundDuration(myEntryUtils::getEntryDuration($event->getPostEndEntryId(), true)) : 0;
-		$eventDuration = $event->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS - $event->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS - $postEndDurationMs;
+		$eventDuration = $event->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS - $event->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$aggregatedDuration = 0;
 		foreach ($sourceEntries as $srcEntry)
 		{
@@ -340,10 +339,6 @@ class kSimuliveUtils
 			{
 				$durations[] = $entryRoundedDuration;
 			}
-		}
-		if ($postEndDurationMs)
-		{
-			$durations[count($durations) - 1] = $postEndDurationMs;
 		}
 		return $durations;
 	}
