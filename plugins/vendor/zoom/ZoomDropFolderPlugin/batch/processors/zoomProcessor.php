@@ -38,46 +38,6 @@ abstract class zoomProcessor
 	}
 	
 	/**
-	 * @param string $userName
-	 * @return string kalturaUserName
-	 */
-	protected function processZoomUserName($userName)
-	{
-		$result = $userName;
-		switch ($this->dropFolder->zoomVendorIntegration->zoomUserMatchingMode)
-		{
-			case kZoomUsersMatching::ADD_POSTFIX:
-				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
-				if (!kString::endsWith($result, $postFix, false))
-				{
-					$result = $result . $postFix;
-				}
-				
-				break;
-			case kZoomUsersMatching::REMOVE_POSTFIX:
-				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
-				if (kString::endsWith($result, $postFix, false))
-				{
-					$result = substr($result, 0, strlen($result) - strlen($postFix));
-				}
-				
-				break;
-			case kZoomUsersMatching::CMS_MATCHING:
-				$zoomUser = $this->zoomClient->retrieveZoomUser($userName);
-				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
-				{
-					$result = $zoomUser[self::CMS_USER_FIELD];
-				}
-				break;
-			case kZoomUsersMatching::DO_NOT_MODIFY:
-			default:
-				break;
-		}
-		
-		return $result;
-	}
-	
-	/**
 	 * @param $recordingUuId
 	 * @param $recordingPartnerId
 	 * @return KalturaMediaEntry
@@ -101,74 +61,6 @@ abstract class zoomProcessor
 			KalturaLog::debug('Found entry:' . $kalturaEntry->objects[0]->id);
 		}
 		return $kalturaEntry->objects;
-	}
-	
-	/**
-	 * @param string $hostEmail
-	 * @return string
-	 */
-	protected function getEntryOwnerId($hostEmail)
-	{
-		$partnerId = $this->dropFolder->partnerId;
-		$zoomUser = new kZoomUser();
-		$zoomUser->setOriginalName($hostEmail);
-		$zoomUser->setProcessedName($this->processZoomUserName($hostEmail));
-		KBatchBase::impersonate($partnerId);
-		/* @var $user KalturaUser */
-		$user = $this->getKalturaUser($partnerId, $zoomUser);
-		KBatchBase::unimpersonate();
-		$userId = '';
-		if ($user)
-		{
-			$userId = $user->id;
-		}
-		else
-		{
-			if ($this->dropFolder->zoomVendorIntegration->createUserIfNotExist)
-			{
-				$userId = $zoomUser->getProcessedName();
-			}
-			else if ($this->dropFolder->zoomVendorIntegration->defaultUserId)
-			{
-				$userId = $this->dropFolder->zoomVendorIntegration->defaultUserId;
-			}
-		}
-		return $userId;
-	}
-	
-	/**
-	 * @param int $partnerId
-	 * @param kZoomUser $kZoomUser
-	 * @return kuser
-	 */
-	protected function getKalturaUser($partnerId, $kZoomUser)
-	{
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1;
-		$pager->pageIndex = 1;
-		
-		$filter = new KalturaUserFilter();
-		$filter->partnerIdEqual = $partnerId;
-		$filter->idEqual = $kZoomUser->getProcessedName();
-		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
-		if (!$kalturaUser->objects)
-		{
-			$email = $kZoomUser->getOriginalName();
-			$filterUser = new KalturaUserFilter();
-			$filterUser->partnerIdEqual = $partnerId;
-			$filterUser->emailStartsWith = $email;
-			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
-			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
-			{
-				return null;
-			}
-		}
-		
-		if($kalturaUser->objects)
-		{
-			return $kalturaUser->objects[0];
-		}
-		return null;
 	}
 	
 	protected function createNewUser($partnerId, $puserId)
