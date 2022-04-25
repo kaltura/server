@@ -64,7 +64,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
 		
-		$userId = $this->getEntryOwnerId($hostEmail);
+		$userId = ZoomBatchUtils::getEntryOwnerId($hostEmail, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration, $this->zoomClient);
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $userId);
 		if (in_array($recording->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::AUDIO)))
 		{
@@ -236,7 +236,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		{
 			/* @var $zoomUser kZoomUser */
 			/* @var $kUser KalturaUser */
-			$kUser = $this->getKalturaUser($partnerId, $zoomUser);
+			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser);
 			if($kUser)
 			{
 				if (strtolower($kUser->id) !== $userToExclude)
