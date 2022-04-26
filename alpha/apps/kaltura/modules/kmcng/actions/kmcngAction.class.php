@@ -48,21 +48,27 @@ class kmcngAction extends kalturaAction
 		}
 
 		$kmcngVersion = $kmcngParams["kmcng_version"];
-		$kmcngUrl = kConf::get("kmcng_url", kConfMapNames::RUNTIME_CONFIG, null);
+		$deployUrl = "/apps/kmcng/$kmcngVersion/";
+		
+		$kmcngUrl = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
 		if ($kmcngUrl)
 		{
 			$baseDir = $kmcngUrl;
+			$path = $baseDir . $deployUrl . 'index.html';
+			
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($curl, CURLOPT_URL, $path);
+			$content = curl_exec($curl);
+			curl_close($curl);
 		}
 		else
 		{
-			$baseDir = kConf::get("BASE_DIR", 'system');
+			$baseDir = kConf::get('BASE_DIR', 'system');
+			$path = $baseDir . $deployUrl . 'index.html';
+			$content = file_get_contents($path);
 		}
-		$basePath = $baseDir . "/apps/kmcng/$kmcngVersion/";
-		$deployUrl = "/apps/kmcng/$kmcngVersion/";
-
-		$path = $basePath . "index.html";
-	
-		$content = file_get_contents($path);
+		
 		if ($content === false)
 		{
 			KalturaLog::warning("Couldn't locate kmcng path: $path");
