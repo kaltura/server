@@ -50,10 +50,10 @@ class kmcngAction extends kalturaAction
 		$kmcngVersion = $kmcngParams["kmcng_version"];
 		$deployUrl = "/apps/kmcng/$kmcngVersion/";
 		
-		$kmcngUrl = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
-		if ($kmcngUrl)
+		$appsHost = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
+		if ($appsHost)
 		{
-			$baseDir = $kmcngUrl;
+			$baseDir = $appsHost;
 			$path = $baseDir . $deployUrl . 'index.html';
 			
 			$curl = curl_init();
@@ -233,7 +233,7 @@ class kmcngAction extends kalturaAction
 				'securedServerUri' => $secureCDNServerUri
 			),
 			'kpfServer' => array('kpfPackageManagerBaseUrl' => kconf::get('kpf_package_manager_base_url','local',null), 'kpfPurchaseManagerBaseUrl' => kconf::get('kpf_purchase_manager_base_url', 'local', null)) ,
-			'analyticsServer' => array('uri' => kConf::get('analytics_host', 'local',  null)),
+			'analyticsServer' => array('uri' => kConf::get('analytics_host', 'local',  '')),
 			"externalApps" => array(
 				"studioV2" => $studio,
 				"studioV3" => $studioV3,

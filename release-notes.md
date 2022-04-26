@@ -1,3 +1,14 @@
+# Rigel-18.4.0
+
+## Load kmcng files from url ##
+* Issue Type: Task
+* Issue ID: PLAT-23692
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    apps_host="@APPS_HOST_URL@"
+
 # Rigel-18.3.0
 
 ## Add 'title' and 'company' to kaltura_kuser index as searchable fields ##
