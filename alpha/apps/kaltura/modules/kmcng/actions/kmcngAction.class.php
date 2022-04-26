@@ -56,11 +56,7 @@ class kmcngAction extends kalturaAction
 			$baseDir = $appsHost;
 			$path = $baseDir . $deployUrl . 'index.html';
 			
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_URL, $path);
-			$content = curl_exec($curl);
-			curl_close($curl);
+			$content = KCurlWrapper::getContent($path, null, true);
 		}
 		else
 		{
