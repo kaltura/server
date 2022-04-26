@@ -58,12 +58,12 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	/**
 	 * @var string
 	 */
-	public $optOutGroupIds;
+	public $optOutGroupNames;
 	
 	/**
 	 * @var string
 	 */
-	public $optInGroupIds;
+	public $optInGroupNames;
 	
 	/**
 	 * @var KalturaZoomGroupParticipationType
