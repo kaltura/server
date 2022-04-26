@@ -144,7 +144,7 @@ class kZoomEventHanlder
 		return $userId;
 	}
 	
-	protected static function processZoomUserName($userName, $zoomVendorIntegration, $zoomUser)
+	public static function processZoomUserName($userName, $zoomVendorIntegration, $zoomUser)
 	{
 		/* @var ZoomVendorIntegration $zoomVendorIntegration */
 		$result = $userName;
