@@ -1624,7 +1624,7 @@ $aMax = 0;
 				// The fields bellow used to manage the path resolving process
 		public $unResolvedSourcePath = null;
 		public $pathResolveTime = null;			// Last source path resolve time
-		public $pathResolveInterval = 3600*6;	// Time interval between resolves (6hrs)
+		public $pathResolveInterval = 3600*10;	// Time interval between resolves (10hrs)
 		
 		/********************
 		 *
