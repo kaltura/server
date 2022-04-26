@@ -40,13 +40,17 @@ class kSimuliveUtils
 		$playlistStartTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$sourceEntries = $sourceEntry->getType() == entryType::PLAYLIST ? myPlaylistUtils::retrieveStitchedPlaylistEntries($sourceEntry) : array($sourceEntry);
 
-		// getting the preStart assets (only if the preStartEntry exists)
 		$preStartEntry = kSimuliveUtils::getPreStartEntry($currentEvent);
 		if ($preStartEntry)
 		{
 			array_unshift($sourceEntries, $preStartEntry);
 		}
 
+		$postEndEntry = kSimuliveUtils::getPostEndEntry($currentEvent);
+		if ($postEndEntry)
+		{
+			$sourceEntries[] = $postEndEntry;
+		}
 		list ($sourceEntries, $windowStartTime, $durations, $initialClipIndex, $initialSegmentIndex) = 
 			self::getRelevantEntriesDetails($sourceEntries, $currentEvent, $time * self::SECOND_IN_MILLISECONDS, $dvrWindowMs, $entry->getSegmentDuration());
 
@@ -340,9 +344,8 @@ class kSimuliveUtils
 	}
 
 	/**
-	 * receiving array of all the source entries (including preStart but without postEnd), returning the details of the
-	 * the relevant entries (the past entries that inside the DVR window or the future entries that should start soon. 
-	 * postEnd entry will also be added if shoud start soon)
+	 * receiving array of all the source entries (including preStart and postEnd), returning the details of the
+	 * the relevant entries (the past entries that inside the DVR window or the future entries that should start soon)
 	 * @param array $entries
 	 * @param ILiveStreamScheduleEvent $event
 	 * @param $requestedTime
@@ -353,10 +356,8 @@ class kSimuliveUtils
 	protected static function getRelevantEntriesDetails(array $entries, ILiveStreamScheduleEvent $event, $requestedTime, $dvrWindowMs, $segmentDurationMs)
 	{
 		$entriesList = array();
-		$postEndEntry = kSimuliveUtils::getPostEndEntry($event);
-		$postEndLength = $postEndEntry ? $postEndEntry->getLengthInMsecs() : 0;
-		// the event end time without postEnd
-		$eventEndTime = $event->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS - $postEndLength;
+		// the absolute time of the end of postEnd
+		$postEndAbsTime = $event->getCalculatedEndTime() * self::SECOND_IN_MILLISECONDS;
 		$windowStartTime = $event->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 		$initialClipIndex = 1;
 		$initialSegmentIndex = ceil($windowStartTime / $segmentDurationMs);
@@ -375,7 +376,7 @@ class kSimuliveUtils
 
 		// the end time of the last entry inside the moving window
 		$lastEntryEndTime = $windowStartTime;
-		$endWindow = min($requestedTime + self::MOVING_WINDOW_MARGIN_MS, $eventEndTime);
+		$endWindow = min($requestedTime + self::MOVING_WINDOW_MARGIN_MS, $postEndAbsTime);
 
 		// adding past entries that inside the margined dvr window or future entries that should start soon
 		while (count($entries) && $lastEntryEndTime <= $endWindow)
@@ -389,20 +390,10 @@ class kSimuliveUtils
 		}, $entriesList);
 
 		// if the content end is close
-		if ($requestedTime + self::MOVING_WINDOW_MARGIN_MS >= $eventEndTime)
+		if (($requestedTime + self::MOVING_WINDOW_MARGIN_MS >= $postEndAbsTime) && count($durations))
 		{
-			// chop the last "main" entry to fit the event duration
-			if (count($durations))
-			{
-				$durations[count($durations) - 1] -= self::roundDuration($lastEntryEndTime - $eventEndTime);
-			}
-			// add the postEnd entry if exists
-			if ($postEndEntry)
-			{
-				$entriesList[] = $postEndEntry;
-				$durations[] = self::roundDuration($postEndLength);
-			}
-
+			// chop the last entry to fit the event duration
+			$durations[count($durations) - 1] -= self::roundDuration($lastEntryEndTime - $postEndAbsTime);
 		}
 		return array($entriesList, $windowStartTime, $durations, $initialClipIndex, $initialSegmentIndex);
 	}
