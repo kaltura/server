@@ -6,33 +6,34 @@ class ZoomBatchUtils
 	const EMAIL = 'email';
 	const CMS_USER_FIELD = 'cms_user_id';
 	
-	public static function shouldExcludeUserRecordingIngest (string $userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames)
+	public static function shouldExcludeUserRecordingIngest (string $userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
 	{
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
 			return false;
 		}
+		$userGroupsArray = self::getUserGroupNames($userId, $partnerId);
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
 			$vendorGroupsNamesArray = explode("\r\n", $optInGroupNames);
+			if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
+			{
+				return false;
+			}
+			return true;
 		}
 		else
 		{
 			$vendorGroupsNamesArray = explode("\r\n", $optOutGroupNames);
-		}
-		
-		$userGroupsArray = self::getUserGroupNames($userId);
-		if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
-		{
-			if ($groupParticipationType == 2)
+			if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
 			{
 				return true;
 			}
+			return false;
 		}
-		return false;
 	}
 	
-	protected static function getUserGroupNames($userId)
+	protected static function getUserGroupNames($userId, $partnerId)
 	{
 		$userPager = new KalturaFilterPager();
 		$userPager->pageSize = 1;
@@ -41,7 +42,9 @@ class ZoomBatchUtils
 		$userFilter = new KalturaGroupUserFilter();
 		$userFilter->userIdEqual = $userId;
 		
-		$userGroupsResponse = KBatchBase::$kClient->userGroup->listAction($userFilter, $userPager);
+		KBatchBase::impersonate($partnerId);
+		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter, $userPager);
+		KBatchBase::unimpersonate();
 		$userGroupsArray = $userGroupsResponse->objects;
 		
 		$userGroupNames = array();
