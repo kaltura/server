@@ -172,23 +172,24 @@ class ZoomVendorIntegration extends VendorIntegration
 		{
 			return false;
 		}
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
 			$vendorGroupsNamesArray = explode("\r\n", $this->getOptInGroupNames());
+			if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
+			{
+				return false;
+			}
+			return true;
 		}
 		else
 		{
 			$vendorGroupsNamesArray = explode("\r\n", $this->getOptOutGroupNames());
-		}
-		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
-		
-		if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
-		{
-			if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
+			if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
 			{
 				return true;
 			}
+			return false;
 		}
-		return false;
 	}
 }
