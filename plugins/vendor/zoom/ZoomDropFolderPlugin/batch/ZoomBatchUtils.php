@@ -35,15 +35,11 @@ class ZoomBatchUtils
 	
 	protected static function getUserGroupNames($userId, $partnerId)
 	{
-		$userPager = new KalturaFilterPager();
-		$userPager->pageSize = 1;
-		$userPager->pageIndex = 1;
-		
 		$userFilter = new KalturaGroupUserFilter();
 		$userFilter->userIdEqual = $userId;
 		
 		KBatchBase::impersonate($partnerId);
-		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter, $userPager);
+		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
 		KBatchBase::unimpersonate();
 		$userGroupsArray = $userGroupsResponse->objects;
 		
