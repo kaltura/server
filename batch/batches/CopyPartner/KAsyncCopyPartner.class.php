@@ -120,8 +120,25 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				{
 					self::impersonate($this->toPartnerId);
 					$parentCatId = ($category->parentId != 0) ? $parentCategoryIdMapping[$category->parentId] : null;
-					$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
-					if($result)
+					try
+					{
+						$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
+					}
+					catch (Exception $exception)
+					{
+						$exceptionCode = $exception->getCode();
+						if ($exceptionCode === 'DUPLICATE_CATEGORY')
+						{
+							$categoryFullName = $category->fullName;
+							KalturaLog::info("Category '$categoryFullName' already exists and was not cloned");
+							$result = null;
+						}
+						else
+						{
+							throw $exception;
+						}
+					}
+					if ($result)
 					{
 						$parentCategoryIdMapping[$category->id] = $result->id;
 						$this->log('created category [' . $result->id . ']');

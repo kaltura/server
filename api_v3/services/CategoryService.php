@@ -105,7 +105,7 @@ class CategoryService extends KalturaBaseService
 		{
 			if ($ex instanceof kCoreException)
 			{
-				$this->handleCoreException($ex, $newCategoryDb, $newCategory);
+				$this->handleCoreException($ex, $categoryDb, $newCategory, $parentCategoryId);
 			}
 			else
 			{
@@ -316,7 +316,7 @@ class CategoryService extends KalturaBaseService
 		return $categoryDb->getId();
 	}
 	
-	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category)
+	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category, $parentId = null)
 	{
 		switch($ex->getCode())
 		{
@@ -324,7 +324,14 @@ class CategoryService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $categoryDb->getFullName());
 				
 			case kCoreException::PARENT_ID_IS_CHILD:
-				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $category->parentId, $categoryDb->getId());
+				if ($parentId)
+				{
+					throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $parentId, $categoryDb->getId());
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $category->parentId, $categoryDb->getId());
+				}
 				
 			case kCoreException::DISABLE_CATEGORY_LIMIT_MULTI_PRIVACY_CONTEXT_FORBIDDEN:
 				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_MULTI_PRIVACY_CONTEXT);
