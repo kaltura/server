@@ -187,7 +187,6 @@ class ZoomVendorIntegration extends VendorIntegration
 		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
 		if (empty($userGroupsArray))
 		{
-			KalturaLog::notice('Zoom does not recognize a user with id [' . $userId . '].');
 			return true;
 		}
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
