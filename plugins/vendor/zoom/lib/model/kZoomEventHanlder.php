@@ -22,7 +22,7 @@ class kZoomEventHanlder
 		$this->zoomConfiguration = $zoomConfiguration;
 	}
 	
-	private static function shouldExcludeUserFromSavingRecording (kZoomEvent $event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
+	protected static function shouldExcludeUserFromSavingRecording (kZoomEvent $event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
 	{
 		$hostId = $event->object->hostId;
 		$zoomUser = $zoomClient->retrieveZoomUser($hostId);
@@ -31,7 +31,7 @@ class kZoomEventHanlder
 		{
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
-		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomUser);
+		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomUser, $zoomClient);
 		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
 		{
 			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
@@ -117,10 +117,10 @@ class kZoomEventHanlder
 		}
 	}
 	
-	protected static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomUser)
+	protected static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomUser, $zoomClient)
 	{
 		/* @var ZoomVendorIntegration $zoomVendorIntegration */
-		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomUser);
+		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient);
 		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 		if (!$user)
 		{
@@ -144,7 +144,7 @@ class kZoomEventHanlder
 		return $userId;
 	}
 	
-	public static function processZoomUserName($userName, $zoomVendorIntegration, $zoomUser)
+	public static function processZoomUserName($userName, $zoomVendorIntegration, $zoomClient)
 	{
 		/* @var ZoomVendorIntegration $zoomVendorIntegration */
 		$result = $userName;
@@ -167,9 +167,11 @@ class kZoomEventHanlder
 				
 				break;
 			case kZoomUsersMatching::CMS_MATCHING:
-				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
+				$accessToken = kZoomOauth::getValidAccessToken($zoomVendorIntegration);
+				$userFromZoom = $zoomClient->retrieveZoomUser($userName, $accessToken);
+				if(isset($userFromZoom[self::CMS_USER_FIELD]) && !empty($userFromZoom[self::CMS_USER_FIELD]))
 				{
-					$result = $zoomUser[self::CMS_USER_FIELD];
+					$result = $userFromZoom[self::CMS_USER_FIELD];
 				}
 				break;
 			case kZoomUsersMatching::DO_NOT_MODIFY:

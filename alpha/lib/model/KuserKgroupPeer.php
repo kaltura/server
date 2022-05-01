@@ -75,15 +75,17 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	}
 	
 	/**
-	 * get pgroup ids by kusers id
+	 * get  pgroup ids by kusers
 	 *
 	 * @param array $kuserIds
 	 * @return array
 	 */
-	public static function retrievePgroupIdsByKuserIds($kuserIds){
+	public static function retrievePgroupIdsByKuserIds($kuserIds)
+	{
 		$kuserKgroups = self::retrieveByKuserIds($kuserIds);
 		$pgroupIds = array();
-		foreach ($kuserKgroups as $kuserKgroup){
+		foreach ($kuserKgroups as $kuserKgroup)
+		{
 			/* @var $kuserKgroup KuserKgroup */
 			$pgroupIds[] = $kuserKgroup->getPgroupId();
 		}
