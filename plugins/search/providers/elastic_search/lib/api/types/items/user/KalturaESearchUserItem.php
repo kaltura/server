@@ -32,6 +32,8 @@ class KalturaESearchUserItem extends KalturaESearchAbstractUserItem
 		KalturaESearchUserFieldName::GROUP_IDS => ESearchUserFieldName::GROUP_IDS,
 		KalturaESearchUserFieldName::ROLE_IDS => ESearchUserFieldName::ROLE_IDS,
 		KalturaESearchUserFieldName::USER_ID => ESearchUserFieldName::PUSER_ID,
+		KalturaESearchUserFieldName::TITLE => ESearchUserFieldName::TITLE,
+		KalturaESearchUserFieldName::COMPANY => ESearchUserFieldName::COMPANY,
 	);
 
 	protected function getMapBetweenObjects()
