@@ -13,24 +13,28 @@ class ZoomBatchUtils
 			return false;
 		}
 		$userGroupsArray = self::getUserGroupNames($userId, $partnerId);
+		if (empty($userGroupsArray))
+		{
+			KalturaLog::warning('User with id [' . $userId . '] is not a member of any group. Illegal state.');
+			return true;
+		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
-			$vendorGroupsNamesArray = explode("\r\n", $optInGroupNames);
-			if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
-			{
-				return false;
-			}
-			return true;
+			return self::intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $optInGroupNames));
 		}
 		else
 		{
-			$vendorGroupsNamesArray = explode("\r\n", $optOutGroupNames);
-			if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
-			{
-				return true;
-			}
+			return !(self::intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $optOutGroupNames)));
+		}
+	}
+	
+	protected static function intersectPolicyGroupsAndUserGroups($userGroupsArray, $vendorGroupsNamesArray)
+	{
+		if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
+		{
 			return false;
 		}
+		return true;
 	}
 	
 	protected static function getUserGroupNames($userId, $partnerId)
