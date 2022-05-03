@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @package plugins.kafkaNotification
+ * @subpackage api.objects
+ */
+class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
+{
+    /**
+     * Define the content dynamic parameters
+     * @var string
+     * @requiresPermission update
+     */
+    public $topicNameParameters;
+
+    /**
+     * Define the content dynamic parameters
+     * @var string
+     * @requiresPermission update
+     */
+    public $partitionKey;
+
+
+    private static $map_between_objects = array('topicNameParameters', 'partitionKey');
+
+    public function __construct()
+    {
+        $this->type = KafkaNotificationPlugin::getApiValue(KafkaNotificationTemplateType::KAFKA);
+    }
+
+    /* (non-PHPdoc)
+     * @see KalturaObject::getMapBetweenObjects()
+     */
+    public function getMapBetweenObjects()
+    {
+        return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+    }
+
+    /* (non-PHPdoc)
+     * @see KalturaObject::validateForUpdate()
+     */
+    public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+    {
+        $propertiesToSkip[] = 'type';
+        return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+    }
+
+    /* (non-PHPdoc)
+     * @see KalturaObject::toObject()
+     */
+    public function toObject($dbObject = null, $propertiesToSkip = array())
+    {
+        if (is_null($dbObject))
+            $dbObject = new KafkaNotificationTemplate();
+
+        return parent::toObject($dbObject, $propertiesToSkip);
+    }
+}

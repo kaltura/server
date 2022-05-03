@@ -88,4 +88,13 @@ class RabbitMQPlugin extends KalturaPlugin implements IKalturaPending, IKalturaO
 		
 		return array($dependency);
 	}
+
+    /**
+     * @return int id of dynamic enum in the DB.
+     */
+    public static function getRabbitMQProviderTypeCoreValue($valueName)
+    {
+        $value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+        return kPluginableEnumsManager::apiToCore('QueueProviderType', $value);
+    }
 }

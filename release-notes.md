@@ -1,3 +1,32 @@
+# Rigel-18.5.0
+
+## Add new Kafka and Kafka notifications plugin ##
+
+- Issue Type: Feature
+- Issue ID: FOUN-194
+
+### pre-requisite ###
+
+* Install Rdkafka for refernce view [how to install Rdkafka](https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/rdkafka.installation.html)
+
+### configuration ###
+Enable Kafka and Kafka notifications plugins:
+
+	- Enable Kafka plugin:
+		1. Add the following to plugins.ini file: "Kafka"
+	
+	- Enable Kafka notifications plugin:
+		1. Add the following to plugins.ini file: "KafkaNotification"
+
+Configure Kafka Kaltura configuration:
+
+	- Copy configurations/kafka.template.ini to configurations/kafka.ini and update the folloiwng tokens:
+        @KAFKA_SERVER@ = kafka server
+        @KAFKA_PORT@ = kafka port
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+
 # Rigel-18.4.0
 
 ## Load kmcng files from url ##
