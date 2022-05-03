@@ -82,8 +82,14 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
 	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD);	}
 	
-	public function getOptOutGroupNames() { return $this->getFromCustomData ( self::OPT_OUT_GROUP_NAMES); }
-	public function getOptInGroupNames() { return $this->getFromCustomData ( self::OPT_IN_GROUP_NAMES); }
+	public function getOptOutGroupNames()
+	{
+		return $this->getFromCustomData (self::OPT_OUT_GROUP_NAMES);
+	}
+	public function getOptInGroupNames()
+	{
+		return $this->getFromCustomData (self::OPT_IN_GROUP_NAMES);
+	}
 	
 	public function setOptOutGroupNames($v)
 	{
@@ -119,11 +125,17 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function setGroupParticipationType($v)
 	{
-		$this->putInCustomData (self::GROUP_PARTICIPATION_TYPE, $v);
-		$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
-		$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
+		if ($v != $this->getGroupParticipationType())
+		{
+			$this->putInCustomData(self::GROUP_PARTICIPATION_TYPE, $v);
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
+		}
 	}
-	public function getGroupParticipationType() { return $this->getFromCustomData ( self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION); }
+	public function getGroupParticipationType()
+	{
+		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
+	}
 
 	public function setLastError($v)
 	{
@@ -172,23 +184,28 @@ class ZoomVendorIntegration extends VendorIntegration
 		{
 			return false;
 		}
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
+		if (empty($userGroupsArray))
+		{
+			KalturaLog::warning('User with id [' . $userId . '] is not a member of any group. Illegal state.');
+			return true;
+		}
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
-			$vendorGroupsNamesArray = explode("\r\n", $this->getOptInGroupNames());
+			return $this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptInGroupNames()));
 		}
 		else
 		{
-			$vendorGroupsNamesArray = explode("\r\n", $this->getOptOutGroupNames());
+			return !($this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptOutGroupNames())));
 		}
-		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
-		
+	}
+	
+	protected function intersectPolicyGroupsAndUserGroups($userGroupsArray, $vendorGroupsNamesArray)
+	{
 		if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
 		{
-			if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
-			{
-				return true;
-			}
+			return false;
 		}
-		return false;
+		return true;
 	}
 }

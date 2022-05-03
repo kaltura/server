@@ -37,6 +37,8 @@ class ESearchUserItem extends ESearchItem
 		ESearchUserFieldName::UPDATED_AT => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		ESearchUserFieldName::CREATED_AT => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		ESearchUserFieldName::PUSER_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
+		ESearchUserFieldName::TITLE => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
+		ESearchUserFieldName::COMPANY => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 	);
 
 	private static $multiLanguageFields = array();

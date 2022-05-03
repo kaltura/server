@@ -6,7 +6,7 @@
 class Form_MediaRepurposingTaskDataSubForm extends ConfigureSubForm
 {	
 	
-	private $ignore = array('relatedObjects', 'type', 'stopProcessingOnError');
+	private $ignore = array('relatedObjects', 'type');
 	private $areaStringFields = array('message', 'footer');
 	private $prefix = "";
 

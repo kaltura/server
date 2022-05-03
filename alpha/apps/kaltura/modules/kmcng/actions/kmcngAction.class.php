@@ -48,13 +48,23 @@ class kmcngAction extends kalturaAction
 		}
 
 		$kmcngVersion = $kmcngParams["kmcng_version"];
-		$baseDir = kConf::get("BASE_DIR", 'system');
-		$basePath = $baseDir . "/apps/kmcng/$kmcngVersion/";
 		$deployUrl = "/apps/kmcng/$kmcngVersion/";
-
-		$path = $basePath . "index.html";
-	
-		$content = file_get_contents($path);
+		
+		$appsHost = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
+		if ($appsHost)
+		{
+			$baseDir = $appsHost;
+			$path = $baseDir . $deployUrl . 'index.html';
+			
+			$content = KCurlWrapper::getContent($path, null, true);
+		}
+		else
+		{
+			$baseDir = kConf::get('BASE_DIR', 'system');
+			$path = $baseDir . $deployUrl . 'index.html';
+			$content = file_get_contents($path);
+		}
+		
 		if ($content === false)
 		{
 			KalturaLog::warning("Couldn't locate kmcng path: $path");
@@ -219,6 +229,7 @@ class kmcngAction extends kalturaAction
 				'securedServerUri' => $secureCDNServerUri
 			),
 			'kpfServer' => array('kpfPackageManagerBaseUrl' => kconf::get('kpf_package_manager_base_url','local',null), 'kpfPurchaseManagerBaseUrl' => kconf::get('kpf_purchase_manager_base_url', 'local', null)) ,
+			'analyticsServer' => array('uri' => kConf::get('analytics_host', 'local',  '')),
 			"externalApps" => array(
 				"studioV2" => $studio,
 				"studioV3" => $studioV3,
