@@ -84,11 +84,11 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function getOptOutGroupNames()
 	{
-		return $this->getFromCustomData ( self::OPT_OUT_GROUP_NAMES);
+		return $this->getFromCustomData (self::OPT_OUT_GROUP_NAMES);
 	}
 	public function getOptInGroupNames()
 	{
-		return $this->getFromCustomData ( self::OPT_IN_GROUP_NAMES);
+		return $this->getFromCustomData (self::OPT_IN_GROUP_NAMES);
 	}
 	
 	public function setOptOutGroupNames($v)
@@ -134,7 +134,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	}
 	public function getGroupParticipationType()
 	{
-		return $this->getFromCustomData( self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
+		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
 	}
 
 	public function setLastError($v)
