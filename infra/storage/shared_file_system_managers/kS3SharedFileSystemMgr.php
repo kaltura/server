@@ -29,6 +29,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
+	const S3_URI_PRE_FIX = 's3://';
 	
 	//This works only for SDK V3 for V2 need to use ‌NoSuchKey && getAwsErrorCode
 	//const AWS_404_ERROR = 'NotFound';
@@ -946,5 +947,37 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected function doShouldPollFileExists()
 	{
 		return false;
+	}
+	
+	protected function doCopyFromClientObjectStorage($src, $dest)
+	{
+		if (!$this->validateS3Path($src))
+		{
+			return false;
+		}
+		
+		$src = $this->removeS3PreFixFromPath($src);
+		
+		if (kFile::isSharedPath($dest))
+		{
+			return $this->doCopy($src, $dest);
+		}
+		
+		return $this->copySharedToLocal($src, $dest);
+	}
+	
+	protected function validateS3Path($path)
+	{
+		if (strpos(trim($path), self::S3_URI_PRE_FIX) !== 0)
+		{
+			self::safeLog("Error: invalid s3 path [$path] does not start with 's3://'");
+			return false;
+		}
+		return true;
+	}
+	
+	protected function removeS3PreFixFromPath($path)
+	{
+		return str_replace(self::S3_URI_PRE_FIX, '/', $path);
 	}
 }

@@ -733,4 +733,12 @@ abstract class kSharedFileSystemMgr
 			KalturaLog::$logType($msg);
 		}
 	}
+	
+	// todo move up where all abstract functions are
+	abstract protected function doCopyFromClientObjectStorage($src, $dest);
+	
+	public function copyFromClientObjectStorage($src, $dest)
+	{
+		return $this->doCopyFromClientObjectStorage($src, $dest);
+	}
 }

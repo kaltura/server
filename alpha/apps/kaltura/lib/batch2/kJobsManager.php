@@ -998,7 +998,7 @@ class kJobsManager
 	public static function addImportJob(BatchJob $parentJob = null, $entryId, $partnerId, $entryUrl, asset $asset = null, $subType = null, kImportJobData $jobData = null, $keepCurrentVersion = false)
 	{
 		$entryUrl = str_replace('//', '/', $entryUrl);
-		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)):\//', '$1://', $entryUrl);
+		$entryUrl = preg_replace('/^((https?)|(ftp)|(scp)|(sftp)|(s3)):\//', '$1://', $entryUrl);
 		
 		if (is_null($subType)) 
 		{
@@ -1018,6 +1018,10 @@ class kJobsManager
     		{
     		    $subType = kFileTransferMgrType::HTTPS;
     		}
+			elseif (strpos($entryUrl, 's3:') === 0)
+			{
+				$subType = kFileTransferMgrType::S3;
+			}
     		else 
     		{
     		    $subType = kFileTransferMgrType::HTTP;

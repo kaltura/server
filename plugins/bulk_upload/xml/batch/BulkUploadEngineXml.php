@@ -1766,6 +1766,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			$assetContentResource = $elementToSearchIn->assetContentResource;
 			$resource->assetId = kXml::getXmlAttributeAsString($assetContentResource, "assetId");
 		}
+		elseif(isset($elementToSearchIn->s3UrlContentResource))
+		{
+			$resource = new KalturaS3UrlResource();
+			$s3UrlContentResource = $elementToSearchIn->s3UrlContentResource;
+			$resource->url = kXml::getXmlAttributeAsString($s3UrlContentResource, "url");
+		}
 		
 		return $resource;
 	}

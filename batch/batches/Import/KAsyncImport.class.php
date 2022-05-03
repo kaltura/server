@@ -105,6 +105,11 @@ class KAsyncImport extends KJobHandlerWorker
 			// use SSH file transfer manager for SFTP/SCP
 			return $this->fetchFileSsh($job, $data);
 		}
+		
+		if ($jobSubType == kFileTransferMgrType::S3)
+		{
+			return $this->fetchFileS3($job, $data);
+		}
 
 		try
 		{
@@ -583,5 +588,78 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 		}
 		return $sourceUrl;
+	}
+	
+	
+	/**
+	 * Will take a src file located on AWS s3 (s3://) and fetch it (the s3 bucket must permit the server access to it without key & pass)
+	 * @param KalturaBatchJob $job
+	 * @param KalturaImportJobData $data
+	 * @return KalturaBatchJob
+	 */
+	protected function fetchFileS3(KalturaBatchJob $job, KalturaImportJobData $data)
+	{
+		try
+		{
+			$url = $data->srcFileUrl;
+			if (!$url)
+			{
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing source url', KalturaBatchJobStatus::FAILED);
+				return $job;
+			}
+			
+			// creates a temp file path
+			$fileSize = null;
+			$data->destFileLocalPath = $this->getTempFilePath($url, $fileSize);
+			KalturaLog::debug("destFile [$data->destFileLocalPath]");
+			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
+			
+			$destFileLocalPath = $data->destFileLocalPath;
+			if (!$destFileLocalPath)
+			{
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing destination local path', KalturaBatchJobStatus::FAILED);
+				return $job;
+			}
+			
+			$sharedFsMgr = kSharedFileSystemMgr::getInstance(kSharedFileSystemMgrType::S3);
+			if (!$sharedFsMgr)
+			{
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Error: file transfer manager not found for type [kSharedFileSystemMgrType::S3]", KalturaBatchJobStatus::FAILED);
+				return $job;
+			}
+			
+			// S3 doesn't support headers only so we can't know the size before it's locally in S3 buckets
+			$this->updateJob($job, "Downloading file", KalturaBatchJobStatus::PROCESSING, $data);
+			
+			$result = $sharedFsMgr->copyFromClientObjectStorage($url, $destFileLocalPath);
+			if (!$result)
+			{
+				KalturaLog::debug("Failed to download [$url] to [$destFileLocalPath] - adding to 'retry'");
+				if (!kFile::unlink($destFileLocalPath))
+				{
+					KalturaLog::debug("Failed to unlink file at path [$destFileLocalPath]");
+				}
+				$this->closeJob($job, KalturaBatchJobErrorTypes::HTTP, KalturaBatchJobAppErrors::REMOTE_DOWNLOAD_FAILED, "Failed downloading file to [$destFileLocalPath]", KalturaBatchJobStatus::RETRY);
+				return $job;
+			}
+			
+			$fileSize = kFile::fileSize($destFileLocalPath);
+			$fileSize =  $fileSize ? $fileSize : null;
+			
+			if(!$this->checkFileExists($destFileLocalPath, $fileSize))
+			{
+				$this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::NFS_FILE_DOESNT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::RETRY);
+			}
+			
+			$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+			
+			$job = $this->moveFile($job, $data);
+		}
+		catch (Exception $ex)
+		{
+			$this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, $ex->getCode(), "Error: {$ex->getMessage()}", KalturaBatchJobStatus::FAILED);
+		}
+		
+		return $job;
 	}
 }

@@ -543,6 +543,14 @@
 		</xs:attribute>
 	</xs:complexType>
 
+	<xs:complexType name="T_s3UrlContentResource">
+		<xs:attribute ref="url" use="required">
+			<xs:annotation>
+				<xs:documentation>The AWS S3 file path (need to make sure Kaltura has access to this bucket)</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
 	<xs:complexType name="T_remoteStorageContentResource">
 		<xs:choice maxOccurs="1" minOccurs="1">
 			<xs:element maxOccurs="1" minOccurs="1" name="storageProfileId" type="xs:int">
@@ -708,6 +716,13 @@
 					<xs:annotation>
 						<xs:documentation>
 							Specifies that the content location is a URL (scp/sftp)
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element maxOccurs="1" minOccurs="1" ref="s3UrlContentResource">
+					<xs:annotation>
+						<xs:documentation>
+							Specifies that the content location is in AWS S3 bucket
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
@@ -942,7 +957,7 @@
 	</xs:complexType>
 	<xs:simpleType name="T_url">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="(([hH][tT][tT][pP][sS]?)|(([fF][tT][pP])|([sS][fF][tT][pP])|([sS][cC][pP])))://?(([ 0-9a-zA-Z_!~*'().&amp;=+$%-\[\]]+)?(:[0-9a-zA-Z_!~*'().&amp;=+$%-\[\]]+@)?)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-zA-Z_!~*'()-]+\.)*)(:[0-9]{1,4})?((/?)|(/[ 0-9a-zA-Z_!~*'().;?:@&amp;=+$,%#-\[\]]+)+)"/>
+			<xs:pattern value="(([hH][tT][tT][pP][sS]?)|(([fF][tT][pP])|([sS][fF][tT][pP])|([sS][cC][pP]))|([sS]3))://?(([ 0-9a-zA-Z_!~*'().&amp;=+$%-\[\]]+)?(:[0-9a-zA-Z_!~*'().&amp;=+$%-\[\]]+@)?)?(([0-9]{1,3}\.){3}[0-9]{1,3}|([0-9a-zA-Z_!~*'()-]+\.)*)(:[0-9]{1,4})?((/?)|(/[ 0-9a-zA-Z_!~*'().;?:@&amp;=+$,%#-\[\]]+)+)"/>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -1385,6 +1400,25 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 								</sshUrlContentResource>
 							</thumbnail>
 						</thumbnails>
+					</item>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="s3UrlContentResource" type="T_s3UrlContentResource">
+		<xs:annotation>
+			<xs:documentation>Specifies that the location of content ingestion is in AWS S3 bucket</xs:documentation>
+			<xs:appinfo>
+				<example>
+					<item>
+						<action>add</action>
+						<type>1</type>
+						<media>...</media>
+						<contentAssets>
+							<content>
+								<s3UrlContentResource url="s3://bucket_name/path/video.mp4"></s3UrlContentResource>
+							</content>
+						</contentAssets>
 					</item>
 				</example>
 			</xs:appinfo>
