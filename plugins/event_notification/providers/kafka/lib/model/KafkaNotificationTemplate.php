@@ -55,7 +55,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
         }
 
         $uniqueId = (string)new UniqueId();
-        $eventTime = date('Y-m-d H:i:s');  // maybe unix timestamp
+        $eventTime = date('Y-m-d H:i:s');
         $eventType = $_REQUEST[action];
         $objectType = $_REQUEST[service];
         $objectArray = $scope->getEvent();
@@ -81,11 +81,10 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
             if(in_array($partitionKey,(array)$object ))
             {
                 $queueProvider->sendWithPartitionKey($topicNameParameters, $partitionKey, $msg);
-                //$queueProvider->send($topicNameParameters, $msg);
             }
             else
             {
-                ///should continue or send eror?
+                KalturaLog::err("partition key [$partitionKey] doen't exists in topic [$topicNameParameters]");
             }
 
         } catch (PhpAmqpLib\Exception\AMQPRuntimeException $e) {
