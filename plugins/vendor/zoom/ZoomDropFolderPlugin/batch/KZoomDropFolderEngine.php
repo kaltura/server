@@ -260,7 +260,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			$optOutGroupNames = $this->dropFolder->zoomVendorIntegration->optOutGroupNames;
 			if (ZoomBatchUtils::shouldExcludeUserRecordingIngest($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId))
 			{
-				KalturaLog::notice('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
+				KalturaLog::debug('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
 				break;
 			}
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));

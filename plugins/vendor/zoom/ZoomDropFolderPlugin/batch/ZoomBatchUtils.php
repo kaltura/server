@@ -5,54 +5,36 @@ class ZoomBatchUtils
 	const HOST_ID = 'host_id';
 	const EMAIL = 'email';
 	const CMS_USER_FIELD = 'cms_user_id';
+	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
 	
-	public static function shouldExcludeUserRecordingIngest (string $userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
+	public static function shouldExcludeUserRecordingIngest ($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
 	{
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
 			return false;
 		}
-		$userGroupsArray = self::getUserGroupNames($userId, $partnerId);
-		if (empty($userGroupsArray))
-		{
-			KalturaLog::warning('User with id [' . $userId . '] is not a member of any group. Illegal state.');
-			return true;
-		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
-			return self::intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $optInGroupNames));
+			return self::getUserGroupNames($userId, $partnerId, $optInGroupNames);
 		}
 		else
 		{
-			return !(self::intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $optOutGroupNames)));
+			return !self::getUserGroupNames($userId, $partnerId, $optOutGroupNames);
 		}
 	}
 	
-	protected static function intersectPolicyGroupsAndUserGroups($userGroupsArray, $vendorGroupsNamesArray)
-	{
-		if (!empty(array_intersect($userGroupsArray, $vendorGroupsNamesArray)))
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	protected static function getUserGroupNames($userId, $partnerId)
+	protected static function getUserGroupNames($userId, $partnerId, $vendorGroupList)
 	{
 		$userFilter = new KalturaGroupUserFilter();
 		$userFilter->userIdEqual = $userId;
+		$userFilter->groupIdIn = $vendorGroupList;
 		
 		KBatchBase::impersonate($partnerId);
 		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
 		KBatchBase::unimpersonate();
 		$userGroupsArray = $userGroupsResponse->objects;
-		
-		$userGroupNames = array();
-		foreach ($userGroupsArray as $userGroup)
-		{
-			array_push($userGroupNames, $userGroup->groupId);
-		}
-		return $userGroupNames;
+
+		return empty($userGroupsArray);
 	}
 	
 	public static function getUserId ($zoomClient, $partnerId, $meetingFile, $zoomVendorIntegration)
@@ -74,6 +56,13 @@ class ZoomBatchUtils
 	
 	public static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomClient)
 	{
+		$userId = self::KALTURA_ZOOM_DEFAULT_USER;
+		$defaultUser = $zoomVendorIntegration->defaultUserId;
+		$createUserIfNotExist = $zoomVendorIntegration->createUserIfNotExist;
+		if($hostEmail == '')
+		{
+			return $createUserIfNotExist ? $userId : $defaultUser;
+		}
 		$zoomUser = new kZoomUser();
 		$zoomUser->setOriginalName($hostEmail);
 		$zoomUser->setProcessedName(self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient));
