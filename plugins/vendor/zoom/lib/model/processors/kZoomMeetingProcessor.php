@@ -34,9 +34,11 @@ class kZoomMeetingProcessor extends kZoomRecordingProcessor
 			$result = array();
 			foreach ($participantsEmails as $participantEmail)
 			{
+				$accessToken = kZoomOauth::getValidAccessToken($this->zoomIntegration);
+				$userFromZoom = $this->zoomClient->retrieveZoomUser($participantEmail, $accessToken);
 				$zoomUser = new kZoomUser();
 				$zoomUser->setOriginalName($participantEmail);
-				$zoomUser->setProcessedName($this->processZoomUserName($participantEmail, $this->zoomIntegration));
+				$zoomUser->setProcessedName(kZoomEventHanlder::processZoomUserName($participantEmail, $this->zoomIntegration, $userFromZoom));
 				$result[] = $zoomUser;
 			}
 		}

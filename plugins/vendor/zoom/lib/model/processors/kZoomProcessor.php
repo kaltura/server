@@ -33,47 +33,6 @@ abstract class kZoomProcessor
 	}
 
 	/**
-	 * @param string $userName
-	 * @param ZoomVendorIntegration $zoomIntegration
-	 * @return string kalturaUserName
-	 */
-	protected function processZoomUserName($userName, $zoomIntegration)
-	{
-		$result = $userName;
-		switch ($zoomIntegration->getUserMatching())
-		{
-			case kZoomUsersMatching::DO_NOT_MODIFY:
-				break;
-			case kZoomUsersMatching::ADD_POSTFIX:
-				$postFix = $zoomIntegration->getUserPostfix();
-				if (!kString::endsWith($result, $postFix, false))
-				{
-					$result = $result . $postFix;
-				}
-
-				break;
-			case kZoomUsersMatching::REMOVE_POSTFIX:
-				$postFix = $zoomIntegration->getUserPostfix();
-				if (kString::endsWith($result, $postFix, false))
-				{
-					$result = substr($result, 0, strlen($result) - strlen($postFix));
-				}
-
-				break;
-			case kZoomUsersMatching::CMS_MATCHING:
-				$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
-				$zoomUser = $this->zoomClient->retrieveZoomUser($userName, $accessToken);
-				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
-				{
-					$result = $zoomUser[self::CMS_USER_FIELD];
-				}
-				break;
-		}
-
-		return $result;
-	}
-
-	/**
 	 * user logged in - need to re-init kPermissionManager in order to determine current user's permissions
 	 * @param kuser $dbUser
 	 * @param bool $isAdmin
@@ -125,9 +84,11 @@ abstract class kZoomProcessor
 	protected function getEntryOwner($hostEmail, $zoomIntegration)
 	{
 		$partnerId = $zoomIntegration->getPartnerId();
+		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
+		$userFromZoom = $this->zoomClient->retrieveZoomUser($hostEmail, $accessToken);
 		$zoomUser = new kZoomUser();
 		$zoomUser->setOriginalName($hostEmail);
-		$zoomUser->setProcessedName($this->processZoomUserName($hostEmail, $zoomIntegration));
+		$zoomUser->setProcessedName(kZoomEventHanlder::processZoomUserName($hostEmail, $zoomIntegration, $userFromZoom));
 		$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
 		if (!$dbUser)
 		{
