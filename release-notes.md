@@ -1,3 +1,11 @@
+# Rigel-18.5.0
+## Add STUDIO_BASE permission to KMC_ANALYTICS_ROLE on partner 0 ##
+- Issue Type: Task
+- Issue ID: PLAT-23704
+
+### Script ###
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "Kmc analytics role" STUDIO_BASE realrun
+
 # Rigel-18.4.0
 
 ## Load kmcng files from url ##
