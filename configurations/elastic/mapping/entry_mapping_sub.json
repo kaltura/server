@@ -226,6 +226,7 @@
 			"_all": {
 				"enabled": false
 			},
+			"dynamic": false,
 			"properties" : {
 				"name" : {
 					"type" : "text",
