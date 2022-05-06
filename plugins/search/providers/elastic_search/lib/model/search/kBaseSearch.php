@@ -45,7 +45,8 @@ abstract class kBaseSearch
 	{
 		if ($pager)
 		{
-			$this->query['from'] = $pager->calcOffset();
+			$from = $pager->calcOffset();
+			$this->query['from'] = $from >= 0 ? $from : 0;
 			$this->query['size'] = $pager->getPageSize();
 		}
 	}
