@@ -126,14 +126,13 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 					{
 						$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
 					}
-					catch (Exception $exception)
+					catch (KalturaException $exception)
 					{
-						$exceptionCode = $exception->getCode();
-						if ($exceptionCode === KAsyncCopyPartner::DUPLICATE_CATEGORY)
+						if ($exception->getCode() === KAsyncCopyPartner::DUPLICATE_CATEGORY)
 						{
 							$categoryFullName = $category->fullName;
 							KalturaLog::info("Category '$categoryFullName' already exists and was not cloned");
-							$result = null;
+							continue;
 						}
 						else
 						{
