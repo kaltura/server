@@ -41,11 +41,6 @@ class ZoomBatchUtils
 	{
 		$hostId = $meetingFile[self::HOST_ID];
 		$zoomUser = $zoomClient->retrieveZoomUser($hostId);
-		if (!$zoomUser)
-		{
-			KalturaLog::err('Zoom User not found');
-			return ''; //This will trigger the default user case
-		}
 		$hostEmail = '';
 		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
 		{
