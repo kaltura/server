@@ -15,19 +15,19 @@ class ZoomBatchUtils
 		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
-			return self::getUserGroupNames($userId, $partnerId, $optInGroupNames);
+			return self::isUserNotMemberOfGroups($userId, $partnerId, $optInGroupNames);
 		}
 		else
 		{
-			return !self::getUserGroupNames($userId, $partnerId, $optOutGroupNames);
+			return !self::isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
 		}
 	}
 	
-	protected static function getUserGroupNames($userId, $partnerId, $vendorGroupList)
+	protected static function isUserNotMemberOfGroups($userId, $partnerId, $participationGroupList)
 	{
 		$userFilter = new KalturaGroupUserFilter();
 		$userFilter->userIdEqual = $userId;
-		$userFilter->groupIdIn = $vendorGroupList;
+		$userFilter->groupIdIn = $participationGroupList;
 		
 		KBatchBase::impersonate($partnerId);
 		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
@@ -44,7 +44,7 @@ class ZoomBatchUtils
 		if (!$zoomUser)
 		{
 			KalturaLog::err('Zoom User not found');
-			return null;
+			return ''; //This will trigger the default user case
 		}
 		$hostEmail = '';
 		if(isset($zoomUser[self::EMAIL]) && !empty($zoomUser[self::EMAIL]))
