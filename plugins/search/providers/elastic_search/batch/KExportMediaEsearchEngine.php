@@ -19,9 +19,8 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		{
 			KalturaLog::info ('More than 10000 results detected. Only the first 10000 results will be returned.');
 		}
-		
-		// TODO: at this point, no additional fields are allowed to be passed
-		$this->addHeaderRowToCsv($csvFile, array());
+
+		$this->addHeaderRowToCsv($csvFile, $data->options);
 		
 		$entryPager = new KalturaFilterPager();
 		$entryPager->pageSize = self::PAGE_SIZE;
@@ -59,6 +58,9 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	                                     $mappedFileds = null)
 	{
 		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt ';
+		if($this->getEntryType($additionalFields) == KalturaEntryType::MEDIA_CLIP){
+			$headerRow .= 'Plays, Views, Duration, LastPlayedAt, Captions ';
+		}
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
 		return $csvFile;
@@ -105,7 +107,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			$this->formatTimestamp($entry->createdAt, $data->options),
 			$this->formatTimestamp($entry->updatedAt, $data->options),
 		);
-		
+		$values = array_merge($values, $this->addAdditionalFields($entry, $data->options));
 		return $values;
 	}
 
@@ -136,6 +138,33 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		return $result;
 	}
 	/**
+	 * Function returns an array of captions.
+	 *
+	 * @param string $entryId
+	 *
+	 * @return array;
+	 */
+	protected function retrieveEntryCaptions ($entryId)
+	{
+		$captionEntryFilter = new KalturaCaptionAssetFilter();
+		$captionEntryFilter->entryIdEqual = $entryId;
+		$captionEntryFilter->statusEqual = KalturaCaptionAssetStatus::READY;
+
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = self::PAGE_SIZE;
+
+		$captionAssetList = KBatchBase::$kClient->captionAsset->listAction($captionEntryFilter, $pager);
+		$result = array();
+		/** @var KalturaCaptionAsset $caption */
+		foreach ($captionAssetList->objects as $caption)
+		{
+			$result[] = "$caption->language;$caption->fileExt;$caption->accuracy;";
+		}
+
+		return $result;
+	}
+	/**
 	 * @param int $timestamp
 	 * @param array $options
 	 * @return false|string
@@ -153,5 +182,37 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			}
 		}
 		return $timestamp;
+	}
+	/**
+	 * @param KalturaBaseEntry $entry
+	 * @param array            $options
+	 * @return array
+	 */
+	protected function addAdditionalFields(KalturaBaseEntry $entry, array $options) {
+		if($this->getEntryType($options) == KalturaEntryType::MEDIA_CLIP && $entry instanceof KalturaMediaEntry){
+			$captions = $this->retrieveEntryCaptions($entry->id);
+			return array(
+				$entry->plays,
+				$entry->views,
+				$entry->duration,
+				$entry->lastPlayedAt,
+				!empty($captions) ? implode('|', $captions) : '',
+			);
+		}
+		return array();
+	}
+	/**
+	 * @param $options
+	 * @return int|KalturaEntryType
+	 */
+	protected function getEntryType($options){
+		foreach($options as $option)
+		{
+			if($option instanceof KalturaExportToCsvOptions)
+			{
+				return $option->type;
+			}
+		}
+		return EntryType::AUTOMATIC;
 	}
 }
