@@ -14,15 +14,17 @@
 		
 		public function __construct(array $kafkaConfig)
 		{
-			if ($kafkaConfig['brokers']) {
+			if ($kafkaConfig['brokers'])
+			{
 				$brokers = $kafkaConfig['brokers'];
 				$brokersArray = explode(",", $brokers);
 				$newBrokersArray = array();
-				foreach ($brokersArray as &$broker) {
+				foreach ($brokersArray as &$broker)
+				{
 					$hostAndPort = explode(":", $broker);
 					$host = $hostAndPort[0];
-					if (!$hostAndPort[1]) {
-						//console.log(`${host}${' has no port umber, default port is defined'}`);
+					if (!$hostAndPort[1])
+					{
 						KalturaLog::log($host . " has no port umber, default port is defined");
 						$port = self::DEFAULT_PORT;
 					}
@@ -43,6 +45,12 @@
 			if($this->server)
 			{
 				$conf->set('metadata.broker.list', $this->server . ':' . $this->port);
+			}
+			
+			if ($kafkaConfig['username'] && $kafkaConfig['password'])
+			{
+				$conf->set('sasl.username', $kafkaConfig['username']);
+				$conf->set('sasl.password', $kafkaConfig['password']);
 			}
 			
 			$this->conf = $conf;
