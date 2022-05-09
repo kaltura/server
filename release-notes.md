@@ -21,8 +21,9 @@ Enable Kafka and Kafka notifications plugins:
 Configure Kafka Kaltura configuration:
 
 	- Copy configurations/kafka.template.ini to configurations/kafka.ini and update the folloiwng tokens:
-        @KAFKA_SERVER@ = kafka server
-        @KAFKA_PORT@ = kafka port
+		brokers = kafka brokers list, separated by a comma         
+		server = kafka server
+        port = kafka port
 
 ### Deployment scripts ###
     1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
