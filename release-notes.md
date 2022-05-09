@@ -1,4 +1,16 @@
 # Rigel-18.5.0
+## Disable sending Email notification to admin on new admin registration
+* Issue Type: Task
+* Issue ID: PLAT-23684
+### Deployment
+Add the following to admin.ini
+```
+moduls.htmlPlayerV7.enabled = true
+moduls.htmlPlayerV7.permissionType = 2
+moduls.htmlPlayerV7.label = "Enable TV Platform Studio"
+moduls.htmlPlayerV7.permissionName = FEATURE_HTML5_PLAYER_V7
+moduls.htmlPlayerV7.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## Add STUDIO_BASE permission to KMC_ANALYTICS_ROLE on partner 0 ##
 - Issue Type: Task
 - Issue ID: PLAT-23704
