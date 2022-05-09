@@ -105,7 +105,7 @@ class CategoryService extends KalturaBaseService
 		{
 			if ($ex instanceof kCoreException)
 			{
-				$this->handleCoreException($ex, $categoryDb, $newCategory, $parentCategoryId);
+				$this->handleCoreException($ex, $newCategoryDb, $newCategory, $categoryDb);
 			}
 			else
 			{
@@ -316,19 +316,22 @@ class CategoryService extends KalturaBaseService
 		return $categoryDb->getId();
 	}
 	
-	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category, $parentId = null)
+	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category, $originalCategoryDb = null)
 	{
 		switch($ex->getCode())
 		{
 			case kCoreException::DUPLICATE_CATEGORY:
-				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $categoryDb->getFullName());
+				if (isset($originalCategoryDb))
+				{
+					throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $originalCategoryDb->getFullName());
+				}
+				else
+				{
+					throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $categoryDb->getFullName());
+				}
 				
 			case kCoreException::PARENT_ID_IS_CHILD:
-				if (!isset($parentId))
-				{
-					$parentId = $category->parentId;
-				}
-				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $parentId, $categoryDb->getId());
+				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $category->parentId, $categoryDb->getId());
 				
 			case kCoreException::DISABLE_CATEGORY_LIMIT_MULTI_PRIVACY_CONTEXT_FORBIDDEN:
 				throw new KalturaAPIException(KalturaErrors::CANNOT_SET_MULTI_PRIVACY_CONTEXT);
