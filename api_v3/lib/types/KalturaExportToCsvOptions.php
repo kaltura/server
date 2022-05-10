@@ -13,7 +13,6 @@ class KalturaExportToCsvOptions extends KalturaObject
 	public $format;
 	/**
 	 * @var KalturaEntryType
-	 * @readonly
 	 * @filter eq
 	 */
 	public $type;
