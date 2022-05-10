@@ -71,7 +71,9 @@ function createMapKuserToUserDetails($results)
 {
 	$kusers = array_keys($results);
 	
+	kuserPeer::setUseCriteriaFilter(false);
 	$users = kuserPeer::retrieveByPKs($kusers);
+	kuserPeer::setUseCriteriaFilter(true);
 	if (!$users)
 	{
 		KalturaLog::info('Failed to retrieve users from DB');
@@ -119,7 +121,6 @@ function getAllUsersReportsFromRedis($mapKuserUserDetails, $partnerId, $redisWra
 
 function readRulesAndScoresFromUsersReports(&$rulesMap, &$userRows, &$userScoresMap)
 {
-	global $partnerId;
 	global $gameObjectType;
 	global $gameObjectId;
 	global $leaderboardScores;
