@@ -324,7 +324,7 @@ class CategoryService extends KalturaBaseService
 				$fullName = $categoryDb->getFullName();
 				if (isset($originalCategoryDb))
 				{
-					$fullName =  $originalCategoryDb->getFullName();
+					$fullName = $originalCategoryDb->getFullName();
 				}
 				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $fullName);
 			
