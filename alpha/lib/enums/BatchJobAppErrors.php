@@ -46,4 +46,8 @@ interface BatchJobAppErrors extends BaseEnum
 	const MISSING_ASSETS = 101;
 
 	const MEDIA_REPURPOSING_FAILED = 201;
+	
+	// object storage exceptions
+	const OBJECT_STORAGE_COPY = 301;
+	const OBJECT_STORAGE_FILE_DOES_NOT_EXIST = 302;
 }

@@ -11,4 +11,5 @@ interface BatchJobErrorTypes extends BaseEnum
 	const CURL = 3; // codes list could be found in http://curl.haxx.se/libcurl/c/libcurl-errors.html
 	const KALTURA_API = 4;
 	const KALTURA_CLIENT = 5;
+	const OBJECT_STORAGE = 6;
 }
