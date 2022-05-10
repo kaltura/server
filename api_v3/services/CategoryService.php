@@ -321,15 +321,13 @@ class CategoryService extends KalturaBaseService
 		switch($ex->getCode())
 		{
 			case kCoreException::DUPLICATE_CATEGORY:
+				$fullName = $categoryDb->getFullName();
 				if (isset($originalCategoryDb))
 				{
-					throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $originalCategoryDb->getFullName());
+					$fullName =  $originalCategoryDb->getFullName();
 				}
-				else
-				{
-					throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $categoryDb->getFullName());
-				}
-				
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $fullName);
+			
 			case kCoreException::PARENT_ID_IS_CHILD:
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $category->parentId, $categoryDb->getId());
 				
