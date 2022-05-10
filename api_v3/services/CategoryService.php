@@ -101,11 +101,11 @@ class CategoryService extends KalturaBaseService
 		{
 			$newCategoryDb = category::copyCategory($fromPartnerId, $this->getPartnerId(), $categoryDb, $parentCategoryId);
 		}
-		catch(Exception $ex)
+		catch (Exception $ex)
 		{
 			if ($ex instanceof kCoreException)
 			{
-				$this->handleCoreException($ex, $newCategoryDb, $newCategory);
+				$this->handleCoreException($ex, $newCategoryDb, $newCategory, $categoryDb);
 			}
 			else
 			{
@@ -316,13 +316,18 @@ class CategoryService extends KalturaBaseService
 		return $categoryDb->getId();
 	}
 	
-	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category)
+	private function handleCoreException(kCoreException $ex, category $categoryDb, KalturaCategory $category, $originalCategoryDb = null)
 	{
 		switch($ex->getCode())
 		{
 			case kCoreException::DUPLICATE_CATEGORY:
-				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $categoryDb->getFullName());
-				
+				$fullName = $categoryDb->getFullName();
+				if (isset($originalCategoryDb))
+				{
+					$fullName = $originalCategoryDb->getFullName();
+				}
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_CATEGORY, $fullName);
+			
 			case kCoreException::PARENT_ID_IS_CHILD:
 				throw new KalturaAPIException(KalturaErrors::PARENT_CATEGORY_IS_CHILD, $category->parentId, $categoryDb->getId());
 				
