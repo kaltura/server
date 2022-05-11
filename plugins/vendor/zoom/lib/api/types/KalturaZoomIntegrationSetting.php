@@ -86,9 +86,9 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'enableZoomTranscription',
 		'zoomAccountDescription',
 		'enableMeetingUpload',
-		'groupParticipationType',
 		'optInGroupNames',
-		'optOutGroupNames'
+		'optOutGroupNames',
+		'groupParticipationType'
 	);
 
 	public function getMapBetweenObjects()

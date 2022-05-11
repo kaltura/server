@@ -91,16 +91,6 @@ class ZoomVendorIntegration extends VendorIntegration
 		return $this->getFromCustomData (self::OPT_IN_GROUP_NAMES);
 	}
 	
-	public function setGroupParticipationType($v)
-	{
-		if ($v != $this->getGroupParticipationType())
-		{
-			$this->putInCustomData(self::GROUP_PARTICIPATION_TYPE, $v);
-			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
-			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
-		}
-	}
-	
 	public function setOptOutGroupNames($v)
 	{
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
@@ -133,6 +123,15 @@ class ZoomVendorIntegration extends VendorIntegration
 		}
 	}
 	
+	public function setGroupParticipationType($v)
+	{
+		if ($v != $this->getGroupParticipationType())
+		{
+			$this->putInCustomData(self::GROUP_PARTICIPATION_TYPE, $v);
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
+		}
+	}
 	public function getGroupParticipationType()
 	{
 		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
