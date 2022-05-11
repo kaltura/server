@@ -179,24 +179,23 @@ class ZoomVendorIntegration extends VendorIntegration
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 	}
 	
-	public function shouldExcludeUserRecordingsIngest($userId)
+	public function shouldExcludeUserRecordingsIngest($puserId)
 	{
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
+			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
 			return false;
 		}
-		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByPuserIds($userId);
-		if (empty($userGroupsArray))
-		{
-			KalturaLog::warning('User with id [' . $userId . '] is not a member of any group. Illegal state.');
-			return true;
-		}
+		$kuserIds = array(kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId));
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($kuserIds);
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
+			KalturaLog::debug('Account is configured to OPT IN users that are members of specific groups');
 			return $this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptInGroupNames()));
 		}
 		else
 		{
+			KalturaLog::debug('Account is configured to OPT OUT users that are members of specific groups');
 			return !($this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptOutGroupNames())));
 		}
 	}
