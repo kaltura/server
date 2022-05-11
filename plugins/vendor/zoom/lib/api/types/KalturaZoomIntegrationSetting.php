@@ -54,22 +54,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableMeetingUpload;
-	
-	/**
-	 * @var string
-	 */
-	public $optOutGroupNames;
-	
-	/**
-	 * @var string
-	 */
-	public $optInGroupNames;
-	
-	/**
-	 * @var KalturaZoomGroupParticipationType
-	 */
-	public $groupParticipationType;
-
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -85,10 +69,7 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'jwtToken',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
-		'enableMeetingUpload',
-		'optInGroupNames',
-		'optOutGroupNames',
-		'groupParticipationType'
+		'enableMeetingUpload'
 	);
 
 	public function getMapBetweenObjects()
