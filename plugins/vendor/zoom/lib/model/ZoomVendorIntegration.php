@@ -186,8 +186,8 @@ class ZoomVendorIntegration extends VendorIntegration
 			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
 			return false;
 		}
-		$kuserIds = array(kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId));
-		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($kuserIds);
+		$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId);
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds(array($kuser->getId()));
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
 			KalturaLog::debug('Account is configured to OPT IN users that are members of specific groups');
