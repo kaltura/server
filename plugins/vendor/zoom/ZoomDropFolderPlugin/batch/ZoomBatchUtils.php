@@ -9,10 +9,9 @@ class ZoomBatchUtils
 	
 	public static function shouldExcludeUserRecordingIngest ($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
 	{
-		KalturaLog::debug('Checking if user is configured to be excluded from uploading recordings');
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
-			KalturaLog::debug('Account not configured to opt in or opt out');
+			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
 			return false;
 		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
@@ -35,11 +34,7 @@ class ZoomBatchUtils
 		KBatchBase::impersonate($partnerId);
 		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
 		KBatchBase::unimpersonate();
-		if($userGroupsResponse->totalCount == 0)
-		{
-			KalturaLog::err('User with id ['.$userId.'] is NOT a member of ANY group, Illegal state');
-			throw new kCoreException('User with id ['.$userId.'] is NOT a member of ANY group, Illegal state');
-		}
+		
 		$userGroupsArray = $userGroupsResponse->objects;
 		$userGroupNamesArray = array();
 		foreach ($userGroupsArray as $group)
