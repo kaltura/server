@@ -75,17 +75,22 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			$puserId = substr($puserId, 0, self::MAX_PUSER_LENGTH);
 		return $puserId;
 	}
-	
+
 	/**
 	 * @param int $partner_id
 	 * @param array $puser_ids
+	 * @param bool $include_null
 	 * @return array<kuser>
 	 */
-	public static function getKuserByPartnerAndUids($partner_id, array $puser_ids)
+	public static function getKuserByPartnerAndUids($partner_id, array $puser_ids, $include_null = false)
 	{
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partner_id);
 		$c->add(self::PUSER_ID, $puser_ids, Criteria::IN);
+		if ($include_null)
+		{
+			$c->addOr(self::PUSER_ID, null , Criteria::ISNULL);
+		}
 		return self::doSelect($c);
 	}
 	
