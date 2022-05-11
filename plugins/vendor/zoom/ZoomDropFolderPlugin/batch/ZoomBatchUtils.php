@@ -9,16 +9,20 @@ class ZoomBatchUtils
 	
 	public static function shouldExcludeUserRecordingIngest ($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
 	{
+		KalturaLog::debug('Checking if user is configured to be excluded from uploading recordings');
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
+			KalturaLog::debug('Account not configured to opt in or opt out');
 			return false;
 		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
+			KalturaLog::debug('Account is configured to OPT IN the members of the following groups ['.print_r($optInGroupNames, true).']');
 			return self::isUserNotMemberOfGroups($userId, $partnerId, $optInGroupNames);
 		}
 		else
 		{
+			KalturaLog::debug('Account is configured to OPT OUT the members of the following groups ['.print_r($optOutGroupNames, true).']');
 			return !self::isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
 		}
 	}
@@ -27,14 +31,26 @@ class ZoomBatchUtils
 	{
 		$userFilter = new KalturaGroupUserFilter();
 		$userFilter->userIdEqual = $userId;
-		$userFilter->groupIdIn = $participationGroupList;
 		
 		KBatchBase::impersonate($partnerId);
 		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
 		KBatchBase::unimpersonate();
+		if($userGroupsResponse->totalCount == 0)
+		{
+			KalturaLog::err('User with id ['.$userId.'] is NOT a member of ANY group, Illegal state');
+			throw new kCoreException('User with id ['.$userId.'] is NOT a member of ANY group, Illegal state');
+		}
 		$userGroupsArray = $userGroupsResponse->objects;
-
-		return empty($userGroupsArray);
+		$userGroupNamesArray = array();
+		foreach ($userGroupsArray as $group)
+		{
+			array_push($userGroupNamesArray, $group->groupId);
+		}
+		
+		KalturaLog::debug('User with id ['.$userId.'] is a member of the following groups ['.print_r($userGroupNamesArray, true).']');
+		
+		$intersection = array_intersect($userGroupNamesArray, $participationGroupList);
+		return empty($intersection);
 	}
 	
 	public static function getUserId ($zoomClient, $partnerId, $meetingFile, $zoomVendorIntegration)

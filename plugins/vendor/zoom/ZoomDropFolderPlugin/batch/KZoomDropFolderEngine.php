@@ -256,8 +256,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				break;
 			}
 			$groupParticipationType = $this->dropFolder->zoomVendorIntegration->groupParticipationType;
-			$optInGroupNames = $this->dropFolder->zoomVendorIntegration->optInGroupNames;
-			$optOutGroupNames = $this->dropFolder->zoomVendorIntegration->optOutGroupNames;
+			$optInGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optInGroupNames);
+			$optOutGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optOutGroupNames);
 			if (ZoomBatchUtils::shouldExcludeUserRecordingIngest($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId))
 			{
 				KalturaLog::debug('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
