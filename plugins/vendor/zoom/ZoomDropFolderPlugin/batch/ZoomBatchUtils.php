@@ -16,12 +16,12 @@ class ZoomBatchUtils
 		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
-			KalturaLog::debug('Account is configured to OPT IN the members of the following groups ['.print_r($optInGroupNames, true).']');
+			KalturaLog::debug('Account is configured to OPT IN the users that are members of the following groups ['.print_r($optInGroupNames, true).']');
 			return self::isUserNotMemberOfGroups($userId, $partnerId, $optInGroupNames);
 		}
 		else
 		{
-			KalturaLog::debug('Account is configured to OPT OUT the members of the following groups ['.print_r($optOutGroupNames, true).']');
+			KalturaLog::debug('Account is configured to OPT OUT the users that are members of the following groups ['.print_r($optOutGroupNames, true).']');
 			return !self::isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
 		}
 	}
