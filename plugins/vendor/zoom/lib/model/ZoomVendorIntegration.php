@@ -185,7 +185,7 @@ class ZoomVendorIntegration extends VendorIntegration
 		{
 			return false;
 		}
-		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByPuserIds($userId);
 		if (empty($userGroupsArray))
 		{
 			KalturaLog::warning('User with id [' . $userId . '] is not a member of any group. Illegal state.');
