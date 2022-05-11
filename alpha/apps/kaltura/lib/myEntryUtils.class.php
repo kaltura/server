@@ -842,7 +842,7 @@ class myEntryUtils
 			$captureRequest = true;
 		}
 
-		list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($entry, $thumbNameAttributes, $entryThumbFilename, $format, $version, $thumbDirs, $contentPath,$captureRequest);
+		list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($entry, $thumbNameAttributes, $entryThumbFilename, $format, $version, $thumbDirs, $contentPath, $captureRequest);
 		if (is_null($processingThumbPath))
 		{
 			return $finalThumbPath;
