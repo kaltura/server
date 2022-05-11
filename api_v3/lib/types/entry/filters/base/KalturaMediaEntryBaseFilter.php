@@ -19,6 +19,7 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 		"mediaDateLessThanOrEqual" => "_lte_media_date",
 		"flavorParamsIdsMatchOr" => "_matchor_flavor_params_ids",
 		"flavorParamsIdsMatchAnd" => "_matchand_flavor_params_ids",
+		"displayChildEntry" => "_eq_display_in_search",
 	);
 
 	static private $order_by_map = array
@@ -88,4 +89,9 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 	 * @var string
 	 */
 	public $flavorParamsIdsMatchAnd;
+
+	/**
+ 	* @var KalturaEntryDisplayChildInSearchType
+	 */
+	public $displayChildEntry;
 }
