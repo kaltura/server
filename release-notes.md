@@ -4,7 +4,7 @@
 - Issue ID: PLAT-23704
 
 ### Script ###
-	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "Kmc analytics role" STUDIO_BASE realrun
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_05_11_update_kmc_analytics_user_role.php
 
 # Rigel-18.4.0
 
@@ -71,7 +71,7 @@ php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
 - Issue ID: PLAT-23641
 
 ### Script ###
-	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "EP user analytics role" TRANSCODING_BASE,BASE_USER_SESSION_PERMISSION realrun
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_05_11_update_ep_analytics_user_role.php
 
 # Rigel-18.2.0
 ## Add permissions to userScore Service ##
