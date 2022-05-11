@@ -11,17 +11,14 @@ class ZoomBatchUtils
 	{
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
-			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
 			return false;
 		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
-			KalturaLog::debug('Account is configured to OPT IN the users that are members of the following groups ['.print_r($optInGroupNames, true).']');
 			return self::isUserNotMemberOfGroups($userId, $partnerId, $optInGroupNames);
 		}
 		else
 		{
-			KalturaLog::debug('Account is configured to OPT OUT the users that are members of the following groups ['.print_r($optOutGroupNames, true).']');
 			return !self::isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
 		}
 	}
@@ -30,22 +27,14 @@ class ZoomBatchUtils
 	{
 		$userFilter = new KalturaGroupUserFilter();
 		$userFilter->userIdEqual = $userId;
+		$userFilter->groupIdIn = $participationGroupList;
 		
 		KBatchBase::impersonate($partnerId);
 		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
 		KBatchBase::unimpersonate();
-		
 		$userGroupsArray = $userGroupsResponse->objects;
-		$userGroupNamesArray = array();
-		foreach ($userGroupsArray as $group)
-		{
-			array_push($userGroupNamesArray, $group->groupId);
-		}
-		
-		KalturaLog::debug('User with id ['.$userId.'] is a member of the following groups ['.print_r($userGroupNamesArray, true).']');
-		
-		$intersection = array_intersect($userGroupNamesArray, $participationGroupList);
-		return empty($intersection);
+
+		return empty($userGroupsArray);
 	}
 	
 	public static function getUserId ($zoomClient, $partnerId, $meetingFile, $zoomVendorIntegration)
