@@ -10,6 +10,9 @@ class kZoomEventHanlder
 	protected $zoomConfiguration;
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const MAP_NAME = 'vendor';
+	const EMAIL = 'email';
+	const CMS_USER_FIELD = 'cms_user_id';
+	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
 
 	/**
 	 * kZoomEngine constructor.
@@ -19,7 +22,7 @@ class kZoomEventHanlder
 	{
 		$this->zoomConfiguration = $zoomConfiguration;
 	}
-
+	
 	/**
 	 * @return kZoomEvent
 	 * @throws Exception
@@ -42,9 +45,15 @@ class kZoomEventHanlder
 	 */
 	public function processEvent($event)
 	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
 		$zoomVendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($event->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
 		$zoomDropFolder = self::getZoomDropFolder($zoomVendorIntegration);
 		$zoomDropFolderId =  $zoomDropFolder ? $zoomDropFolder->getId() : null;
+		$zoomClient = $this->initZoomClient($zoomVendorIntegration);
+		if (self::shouldExcludeUserFromSavingRecording($event, $zoomClient, $zoomVendorIntegration))
+		{
+			return;
+		}
 		switch($event->eventType)
 		{
 			case kEventType::RECORDING_VIDEO_COMPLETED:
@@ -54,7 +63,6 @@ class kZoomEventHanlder
 			case kEventType::NEW_RECORDING_VIDEO_COMPLETED:
 				if ($zoomDropFolderId)
 				{
-					$zoomClient = $this->initZoomClient($zoomVendorIntegration);
 					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration,
 					                               $zoomDropFolder->getConversionProfileId(), $zoomClient, $zoomDropFolder->getFileDeletePolicy());
 				}
@@ -90,6 +98,87 @@ class kZoomEventHanlder
 				}
 				break;
 		}
+	}
+	
+	protected static function shouldExcludeUserFromSavingRecording (kZoomEvent $event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
+	{
+		$hostEmail = $event->object->host_email;
+		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomClient);
+		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
+		{
+			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
+			return true;
+		}
+		return false;
+	}
+	
+	protected static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomClient)
+	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
+		$userId = self::KALTURA_ZOOM_DEFAULT_USER;
+		if($hostEmail == '')
+		{
+			return $zoomVendorIntegration->getCreateUserIfNotExist() ? $userId : $zoomVendorIntegration->getDefaultUserEMail();
+		}
+		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient);
+		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		if (!$user)
+		{
+			$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+			if (!$user)
+			{
+				if ($zoomVendorIntegration->getCreateUserIfNotExist())
+				{
+					$userId = $puserId;
+				}
+				else if ($zoomVendorIntegration->getDefaultUserEMail())
+				{
+					$userId = $zoomVendorIntegration->getDefaultUserEMail();
+				}
+			}
+		}
+		else
+		{
+			$userId = $user->getId();
+		}
+		return $userId;
+	}
+	
+	public static function processZoomUserName($userName, $zoomVendorIntegration, $zoomClient)
+	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
+		$result = $userName;
+		switch ($zoomVendorIntegration->getUserMatching())
+		{
+			case kZoomUsersMatching::ADD_POSTFIX:
+				$postFix = $zoomVendorIntegration->getUserPostfix();
+				if (!kString::endsWith($result, $postFix, false))
+				{
+					$result = $result . $postFix;
+				}
+				
+				break;
+			case kZoomUsersMatching::REMOVE_POSTFIX:
+				$postFix = $zoomVendorIntegration->getUserPostfix();
+				if (kString::endsWith($result, $postFix, false))
+				{
+					$result = substr($result, 0, strlen($result) - strlen($postFix));
+				}
+				
+				break;
+			case kZoomUsersMatching::CMS_MATCHING:
+				$zoomUser = $zoomClient->retrieveZoomUser($userName);
+				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
+				{
+					$result = $zoomUser[self::CMS_USER_FIELD];
+				}
+				break;
+			case kZoomUsersMatching::DO_NOT_MODIFY:
+			default:
+				break;
+		}
+		
+		return $result;
 	}
 	
 	protected function initZoomClient(ZoomVendorIntegration $zoomVendorIntegration)
