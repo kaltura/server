@@ -354,6 +354,14 @@ abstract class kSharedFileSystemMgr
 	 */
 	abstract protected function doCopySharedToSharedAllowed();
 	
+	/**
+	 * Will copy from client's object storage url (like 's3://')
+	 * @param $src
+	 * @param $dest
+	 * @return mixed
+	 */
+	abstract protected function doCopyFromClientObjectStorage($src, $dest);
+	
 	
 	public function createDirForPath($filePath)
 	{
@@ -682,6 +690,11 @@ abstract class kSharedFileSystemMgr
 		return $this->doCopyDir($src, $dest, $deleteSrc);
 	}
 	
+	public function copyFromClientObjectStorage($src, $dest)
+	{
+		return $this->doCopyFromClientObjectStorage($src, $dest);
+	}
+	
 	public static function getIsMoveAtomic($temp_file_path)
 	{
 		$temp_file_path = kFile::fixPath($temp_file_path);
@@ -732,13 +745,5 @@ abstract class kSharedFileSystemMgr
 		{
 			KalturaLog::$logType($msg);
 		}
-	}
-	
-	// todo move up where all abstract functions are
-	abstract protected function doCopyFromClientObjectStorage($src, $dest);
-	
-	public function copyFromClientObjectStorage($src, $dest)
-	{
-		return $this->doCopyFromClientObjectStorage($src, $dest);
 	}
 }

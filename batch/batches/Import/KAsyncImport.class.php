@@ -465,8 +465,12 @@ class KAsyncImport extends KJobHandlerWorker
 				}
 			}
 			
-			KalturaLog::debug("rename('$destFile', '$sharedFile')");
-			kFile::moveFile($destFile, $sharedFile);
+			if (!kFile::isSharedPath($destFile))
+			{
+				KalturaLog::debug("rename('$destFile', '$sharedFile')");
+				kFile::moveFile($destFile, $sharedFile);
+			}
+			
 			if(!kFile::checkFileExists($sharedFile))
 			{
 				KalturaLog::err("Error: renamed file doesn't exist");
@@ -599,7 +603,6 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	protected function fetchFileS3(KalturaBatchJob $job, KalturaImportJobData $data)
 	{
-		//todo This variation only works when we have 'enable_import_to_shared' flag turned on
 		try
 		{
 			$url = $data->srcFileUrl;
@@ -608,18 +611,9 @@ class KAsyncImport extends KJobHandlerWorker
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing source url', KalturaBatchJobStatus::FAILED);
 			}
 			
-			// creates a temp file path
-			$fileSize = null;
-//			$data->destFileLocalPath = $this->getTempFilePath($url, $fileSize);
-			KalturaLog::debug("destFile [$data->destFileSharedPath]");
-			$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
-			
-//			$destFileLocalPath = $data->destFileLocalPath;
-			$destFileSharedPath = $data->destFileSharedPath;
-			if (!$destFileSharedPath)
-			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::MISSING_PARAMETERS, 'Error: missing destination path', KalturaBatchJobStatus::FAILED);
-			}
+			$data->destFileLocalPath = $data->destFileSharedPath ? $data->destFileSharedPath : $this->getTempFilePath($url);
+			$destFilePath = $data->destFileLocalPath;
+			KalturaLog::debug("destFile [$destFilePath]");
 			
 			$sharedFsMgr = kSharedFileSystemMgr::getInstance(kSharedFileSystemMgrType::S3);
 			if (!$sharedFsMgr)
@@ -627,31 +621,37 @@ class KAsyncImport extends KJobHandlerWorker
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::APP, KalturaBatchJobAppErrors::ENGINE_NOT_FOUND, "Error: file transfer manager not found for type [kSharedFileSystemMgrType::S3]", KalturaBatchJobStatus::FAILED);
 			}
 			
-			// S3 doesn't support headers only so we can't know the size before it's locally in S3 buckets
-			$job = $this->updateJob($job, "Copying file", KalturaBatchJobStatus::PROCESSING, $data);
+			// S3 doesn't support headers only so we can't know the size before it's in S3 buckets
+			$job = $this->updateJob($job, 'Importing file', KalturaBatchJobStatus::PROCESSING, $data);
 			
-			$result = $sharedFsMgr->copyFromClientObjectStorage($url, $destFileSharedPath);
+			$result = $sharedFsMgr->copyFromClientObjectStorage($url, $destFilePath);
 			if (!$result)
 			{
-				KalturaLog::debug("Failed to copy [$url] to [$destFileSharedPath] - adding to 'retry'");
-				if (!kFile::unlink($destFileSharedPath))
+				KalturaLog::debug("Failed to import [$url] to [$destFilePath] - adding to 'retry'");
+				KalturaLog::debug("Reason = $result");
+				// todo double check if needed
+				if (!kFile::unlink($destFilePath))
 				{
-					KalturaLog::debug("Failed to unlink file at path [$destFileSharedPath]");
+					KalturaLog::debug("Failed to unlink file at path [$destFilePath]");
 				}
 				// todo change BatchJobErrors after you confirm it works
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::OBJECT_STORAGE, KalturaBatchJobAppErrors::OBJECT_STORAGE_COPY, "Failed to copy [$destFileSharedPath]", KalturaBatchJobStatus::RETRY);
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::OBJECT_STORAGE, KalturaBatchJobAppErrors::OBJECT_STORAGE_COPY, "Failed to import from [$url]", KalturaBatchJobStatus::RETRY);
 			}
 			
-			$fileSize = kFile::fileSize($destFileSharedPath);
+			$fileSize = kFile::fileSize($destFilePath);
 			$fileSize =  $fileSize ? $fileSize : null;
 			
-			if(!$this->checkFileExists($destFileSharedPath, $fileSize))
+			if(!$this->checkFileExists($destFilePath, $fileSize))
 			{
-				return $this->closeJob($job, KalturaBatchJobErrorTypes::OBJECT_STORAGE, KalturaBatchJobAppErrors::OBJECT_STORAGE_FILE_DOES_NOT_EXIST, 'File not moved correctly', KalturaBatchJobStatus::RETRY);
+				return $this->closeJob($job, KalturaBatchJobErrorTypes::OBJECT_STORAGE, KalturaBatchJobAppErrors::OBJECT_STORAGE_FILE_DOES_NOT_EXIST, "File does not exist at [$destFilePath]", KalturaBatchJobStatus::RETRY);
 			}
 			
-			$data->destFileLocalPath = $destFileSharedPath;
-			return $this->closeJob($job, null, null, 'Successfully copied file', KalturaBatchJobStatus::FINISHED, $data);
+			if (!kFile::isSharedPath($destFilePath))
+			{
+				$this->updateJob($job, 'File imported, copy to shared folder', KalturaBatchJobStatus::PROCESSED);
+			}
+			
+			return $this->moveFile($job, $data);
 		}
 		catch (Exception $ex)
 		{
