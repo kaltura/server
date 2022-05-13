@@ -202,8 +202,6 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
     		        $user = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
-        			
-        			
         			$categoryUser = KBatchBase::$kClient->categoryUser->add($user);
 		            break;
 		        
@@ -211,7 +209,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		            $categoryUser = $this->createCategoryUserFromResultAndJobData($bulkUploadResult);
         					
         			$bulkUploadResultChunk[] = $bulkUploadResult;
-        			KBatchBase::$kClient->categoryUser->update($bulkUploadResult->categoryId, $bulkUploadResult->userId, $categoryUser);
+        			KBatchBase::$kClient->categoryUser->update($bulkUploadResult->categoryId, $bulkUploadResult->userId, $categoryUser, $bulkUploadResult->override);
 		            break;
 		            
 		        case KalturaBulkUploadAction::DELETE:
@@ -257,28 +255,37 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function createCategoryUserFromResultAndJobData (KalturaBulkUploadResultCategoryUser $bulkUploadCategoryUserResult)
 	{
-	    $categoryUser = new KalturaCategoryUser();
-	    //calculate parentId of the category
-	    
-	    if ($bulkUploadCategoryUserResult->categoryId)
-	    {
-	        $categoryUser->categoryId = $bulkUploadCategoryUserResult->categoryId;
-	    }
-	    else if ($this->categoryReferenceIdMap[$bulkUploadCategoryUserResult->categoryReferenceId])
-	    {
-	        $categoryUser->categoryId = $this->categoryReferenceIdMap[$bulkUploadCategoryUserResult->categoryReferenceId];
-	    }
-	    
-	    if ($bulkUploadCategoryUserResult->userId)
-	        $categoryUser->userId = $bulkUploadCategoryUserResult->userId;
+		$categoryUser = new KalturaCategoryUser();
+		//calculate parentId of the category
+
+		if ($bulkUploadCategoryUserResult->categoryId)
+		{
+			$categoryUser->categoryId = $bulkUploadCategoryUserResult->categoryId;
+		}
+		else if ($this->categoryReferenceIdMap[$bulkUploadCategoryUserResult->categoryReferenceId])
+		{
+			$categoryUser->categoryId = $this->categoryReferenceIdMap[$bulkUploadCategoryUserResult->categoryReferenceId];
+		}
+
+		if ($bulkUploadCategoryUserResult->userId)
+		{
+			$categoryUser->userId = $bulkUploadCategoryUserResult->userId;
+		}
 	        
 	    if (!is_null($bulkUploadCategoryUserResult->permissionLevel))
-	        $categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
-	        
-	    $categoryUser->updateMethod = KalturaUpdateMethodType::AUTOMATIC;
+	    {
+			$categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
+		}
+
 	    if (!is_null($bulkUploadCategoryUserResult->updateMethod))
-	        $categoryUser->updateMethod = $bulkUploadCategoryUserResult->updateMethod; 
-	        
+	    {
+			$categoryUser->updateMethod = $bulkUploadCategoryUserResult->updateMethod;
+		}
+	    else
+		{
+			$categoryUser->updateMethod = KalturaUpdateMethodType::MANUAL;
+		}
+
 	    return $categoryUser;
 	}
 	
@@ -297,6 +304,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			"status",
 		    "permissionLevel",
 		    "updateMethod",
+			"override",
 		);
 	}
 	

@@ -16,6 +16,7 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
     const PERMISSION_LEVEL = "permission_level";
     const UPDATE_METHOD = "update_method";
     const REQUIRED_OBJECT_STATUS = "required_object_status";
+    const OVERRIDE = 'override';
     
    
     /**
@@ -57,6 +58,9 @@ class BulkUploadResultCategoryKuser extends BulkUploadResult
     public function getUpdateMethod()	{return $this->getFromCustomData(self::UPDATE_METHOD);}
 	public function setUpdateMethod($v)	{$this->putInCustomData(self::UPDATE_METHOD, $v);}
 	
-	public function getRequiredStatus(){return $this->getFromCustomData(self::REQUIRED_OBJECT_STATUS);}
-	public function setRequiredStatus($v){$this->putInCustomData(self::REQUIRED_OBJECT_STATUS, $v);}
+	public function getRequiredStatus()	{return $this->getFromCustomData(self::REQUIRED_OBJECT_STATUS);}
+	public function setRequiredStatus($v)	{$this->putInCustomData(self::REQUIRED_OBJECT_STATUS, $v);}
+
+	public function getOverride()	{return $this->getFromCustomData(self::OVERRIDE);}
+	public function setOverride($v)	{$this->putInCustomData(self::OVERRIDE, $v);}
 }

@@ -211,7 +211,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	                        "inheritanceType", "userJoinPolicy", "defaultPermissionLevel", "owner", "partnerData", "partnerSortValue", "moderation");
 	            break;
 	        case BulkUploadObjectType::CATEGORY_USER:
-	            return array ("*categoryId", "userId", "categoryReferenceId", "permissionLevel", "updateMethod", "status",);
+	            return array ("*categoryId", "userId", "categoryReferenceId", "permissionLevel", "updateMethod", "status", "override");
 	            break;
 	        case BulkUploadObjectType::USER:
 	            return array("*screenName", "email", "dateOfBirth", "country", "state", "city", "zip", "gender", "firstName", "lastName", "isAdmin", "tags", "roleIds", "partnerData",);
@@ -298,6 +298,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values[] = $bulkUploadResult->getPermissionLevel();
 	    $values[] = $bulkUploadResult->getUpdateMethod();
 	    $values[] = $bulkUploadResult->getRequiredStatus();
+		$values[] = $bulkUploadResult->getOverride();
 	    
 	    return $values;
 	}

@@ -34,6 +34,11 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
     * @var int
     */
    public $requiredObjectStatus;
+
+	/**
+	 * @var bool
+	 */
+	public $override;
     
     private static $mapBetweenObjects = array
 	(
@@ -43,6 +48,7 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	    "permissionLevel",
 	    "updateMethod",
 		"requiredObjectStatus" => "requiredStatus",
+		"override",
 	);
 	
     public function getMapBetweenObjects()
