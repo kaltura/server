@@ -272,21 +272,21 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			$categoryUser->userId = $bulkUploadCategoryUserResult->userId;
 		}
 	        
-	    if (!is_null($bulkUploadCategoryUserResult->permissionLevel))
-	    {
+		if (!is_null($bulkUploadCategoryUserResult->permissionLevel))
+		{
 			$categoryUser->permissionLevel = $bulkUploadCategoryUserResult->permissionLevel;
 		}
-
-	    if (!is_null($bulkUploadCategoryUserResult->updateMethod))
-	    {
+		
+		if (!is_null($bulkUploadCategoryUserResult->updateMethod))
+		{
 			$categoryUser->updateMethod = $bulkUploadCategoryUserResult->updateMethod;
 		}
-	    else
+		else
 		{
 			$categoryUser->updateMethod = KalturaUpdateMethodType::MANUAL;
 		}
-
-	    return $categoryUser;
+		
+		return $categoryUser;
 	}
 	
 	/**
@@ -296,14 +296,14 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 	protected function getColumns()
 	{
 		return array(
-		    "action",
-		    "categoryUserId",
-		    "categoryId",
-		    "categoryReferenceId",
-		    "userId",
+			"action",
+			"categoryUserId",
+			"categoryId",
+			"categoryReferenceId",
+			"userId",
 			"status",
-		    "permissionLevel",
-		    "updateMethod",
+			"permissionLevel",
+			"updateMethod",
 			"override",
 		);
 	}
