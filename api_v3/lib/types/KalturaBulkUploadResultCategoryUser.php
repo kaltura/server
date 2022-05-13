@@ -44,11 +44,11 @@ class KalturaBulkUploadResultCategoryUser extends KalturaBulkUploadResult
 	(
 	    "categoryId",
 	    "categoryReferenceId",
-		"userId",
+	    "userId",
 	    "permissionLevel",
 	    "updateMethod",
-		"requiredObjectStatus" => "requiredStatus",
-		"override",
+	    "requiredObjectStatus" => "requiredStatus",
+	    "override",
 	);
 	
     public function getMapBetweenObjects()
