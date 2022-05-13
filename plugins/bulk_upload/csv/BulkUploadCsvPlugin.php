@@ -298,7 +298,7 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	    $values[] = $bulkUploadResult->getPermissionLevel();
 	    $values[] = $bulkUploadResult->getUpdateMethod();
 	    $values[] = $bulkUploadResult->getRequiredStatus();
-		$values[] = $bulkUploadResult->getOverride();
+	    $values[] = $bulkUploadResult->getOverride();
 	    
 	    return $values;
 	}
