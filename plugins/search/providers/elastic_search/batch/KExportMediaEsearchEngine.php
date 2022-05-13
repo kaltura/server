@@ -129,7 +129,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		$pager->pageSize = self::PAGE_SIZE;
 		
 		$categoryEntryResult = KBatchBase::$kClient->categoryEntry->listAction($categoryEntryFilter, $pager);
-		
+		$result = array();
 		foreach ($categoryEntryResult->objects as $categoryEntry)
 		{
 			$result[] = $categoryEntry->categoryId;
@@ -188,8 +188,11 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @param array            $options
 	 * @return array
 	 */
-	protected function addAdditionalFields(KalturaBaseEntry $entry, array $options) {
-		if($this->getEntryType($options) == KalturaEntryType::MEDIA_CLIP && $entry instanceof KalturaMediaEntry){
+	protected function addAdditionalFields(KalturaBaseEntry $entry, $options) {
+		if(is_array($options) && $this->getEntryType($options) == KalturaEntryType::MEDIA_CLIP){
+			if(!$entry instanceof KalturaMediaEntry){
+				return array('','','','','');
+			}
 			$captions = $this->retrieveEntryCaptions($entry->id);
 			return array(
 				$entry->plays,
@@ -206,13 +209,15 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @return int|KalturaEntryType
 	 */
 	protected function getEntryType($options){
-		foreach($options as $option)
-		{
-			if($option instanceof KalturaExportToCsvOptions)
+		if(is_array($options)){
+			foreach($options as $option)
 			{
-				return $option->type;
+				if($option instanceof KalturaExportToCsvOptions)
+				{
+					return $option->type;
+				}
 			}
 		}
-		return EntryType::AUTOMATIC;
+		return KalturaEntryType::AUTOMATIC;
 	}
 }

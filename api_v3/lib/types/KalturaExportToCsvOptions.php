@@ -13,7 +13,6 @@ class KalturaExportToCsvOptions extends KalturaObject
 	public $format;
 	/**
 	 * @var KalturaEntryType
-	 * @filter eq
 	 */
 	public $type;
 
@@ -34,7 +33,7 @@ class KalturaExportToCsvOptions extends KalturaObject
 	public function toObject($dbAdditionalField = null, $skip = array())
 	{
 		if(!$dbAdditionalField)
-			$dbAdditionalField = new kFormatField();
+			$dbAdditionalField = new kExportToCsvOptions();
 
 		return parent::toObject($dbAdditionalField, $skip);
 	}
