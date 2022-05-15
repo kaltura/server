@@ -4,16 +4,16 @@
  * @package Core
  * @subpackage model.data
  */
-class kExportToCsvOptions
+class kFormatField
 {
 	/**
 	 * @var string
 	 */
 	public $format;
 	/**
-	 * @var KalturaEntryType
+	 * @var string
 	 */
-	public $type;
+	public $typeEqual;
 
 	/**
 	 * @return string
@@ -32,18 +32,18 @@ class kExportToCsvOptions
 	}
 
 	/**
-	 * @return KalturaEntryType
+	 * @return string
 	 */
-	public function getType()
+	public function getTypeEqual()
 	{
-		return $this->type;
+		return $this->typeEqual;
 	}
 
 	/**
-	 * @param KalturaEntryType $type
+	 * @param string $typeEqual
 	 */
-	public function setType($type)
+	public function setTypeEqual($typeEqual)
 	{
-		$this->type = $type;
+		$this->typeEqual = $typeEqual;
 	}
 }

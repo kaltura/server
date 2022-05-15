@@ -12,14 +12,14 @@ class KalturaExportToCsvOptions extends KalturaObject
 	 */
 	public $format;
 	/**
-	 * @var KalturaEntryType
+	 * @var string
 	 */
-	public $type;
+	public $typeEqual;
 
 	private static $mapBetweenObjects = array
 	(
 		'format',
-		'type'
+		'typeEqual'
 	);
 
 	public function getMapBetweenObjects()
@@ -33,7 +33,7 @@ class KalturaExportToCsvOptions extends KalturaObject
 	public function toObject($dbAdditionalField = null, $skip = array())
 	{
 		if(!$dbAdditionalField)
-			$dbAdditionalField = new kExportToCsvOptions();
+			$dbAdditionalField = new kFormatField();
 
 		return parent::toObject($dbAdditionalField, $skip);
 	}
