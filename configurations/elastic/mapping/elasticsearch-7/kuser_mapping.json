@@ -145,6 +145,7 @@
 		"_source": {
 			"enabled": true
 		},
+		"dynamic": false,
 		"properties": {
 			"group_ids": {
 				"type": "keyword",

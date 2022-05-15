@@ -151,6 +151,7 @@
 			"_all": {
 				"enabled": false
 			},
+			"dynamic": false,
 			"properties" : {
 				"group_ids" : {
 					"type" : "keyword",
