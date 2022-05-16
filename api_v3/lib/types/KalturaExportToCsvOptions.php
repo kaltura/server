@@ -12,14 +12,14 @@ class KalturaExportToCsvOptions extends KalturaObject
 	 */
 	public $format;
 	/**
-	 * @var string
+	 * @var KalturaEntryType
 	 */
 	public $typeEqual;
 
 	private static $mapBetweenObjects = array
 	(
 		'format',
-		'typeEqual'
+		'typeEqual',
 	);
 
 	public function getMapBetweenObjects()

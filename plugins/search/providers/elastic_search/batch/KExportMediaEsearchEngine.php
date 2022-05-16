@@ -59,7 +59,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	{
 		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt ';
 		if($this->getEntryType($additionalFields) == KalturaEntryType::MEDIA_CLIP){
-			$headerRow .= 'Plays, Views, Duration, LastPlayedAt, Captions ';
+			$headerRow .= ',Plays, Views, Duration, LastPlayedAt, Captions ';
 		}
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
@@ -175,7 +175,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		{
 			foreach($options as $option)
 			{
-				if($option instanceof KalturaExportToCsvOptions)
+				if($option instanceof KalturaExportToCsvOptions && !empty($option->format))
 				{
 					return date($option->format, $timestamp);
 				}
@@ -212,9 +212,9 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		if(is_array($options)){
 			foreach($options as $option)
 			{
-				if($option instanceof KalturaExportToCsvOptions)
+				if($option instanceof KalturaExportToCsvOptions && !empty($option->typeEqual))
 				{
-					return $option->type;
+					return $option->typeEqual;
 				}
 			}
 		}
