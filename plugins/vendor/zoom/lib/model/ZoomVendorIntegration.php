@@ -179,24 +179,26 @@ class ZoomVendorIntegration extends VendorIntegration
 		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
 	}
 	
-	public function shouldExcludeUserRecordingsIngest($puserId)
+	public function shouldExcludeUserRecordingsIngest($userId)
 	{
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::NO_CLASSIFICATION)
 		{
 			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
 			return false;
 		}
-		$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId);
+		$kuser = kuserPeer::retrieveByPK($userId);
 		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds(array($kuser->getId()));
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
-			KalturaLog::debug('Account is configured to OPT IN users that are members of groups specified in the integration');
-			return $this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptInGroupNames()));
+			$optInGroupNames = explode("\r\n", $this->getOptInGroupNames());
+			KalturaLog::debug('Account is configured to OPT IN users that are members of the groups ['. print_r($optInGroupNames, true) .']');
+			return $this->intersectPolicyGroupsAndUserGroups($userGroupsArray, $optInGroupNames);
 		}
 		else
 		{
-			KalturaLog::debug('Account is configured to OPT OUT users that are members of groups specified in the integration');
-			return !($this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptOutGroupNames())));
+			$optOutGroupNames = explode("\r\n", $this->getOptOutGroupNames());
+			KalturaLog::debug('Account is configured to OPT OUT users that are members of the groups ['. print_r($optOutGroupNames, true) .']');
+			return !($this->intersectPolicyGroupsAndUserGroups($userGroupsArray, $optOutGroupNames));
 		}
 	}
 	

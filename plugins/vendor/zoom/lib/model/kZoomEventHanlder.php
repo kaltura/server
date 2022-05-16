@@ -100,9 +100,11 @@ class kZoomEventHanlder
 		}
 	}
 	
-	protected static function shouldExcludeUserFromSavingRecording (kZoomEvent $event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
+	protected static function shouldExcludeUserFromSavingRecording ($event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
 	{
-		$hostEmail = $event->object->host_email;
+		/* @var kZoomRecording $object*/
+		$object = $event->object;
+		$hostEmail = $object->hostEmail;
 		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomClient);
 		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
 		{
