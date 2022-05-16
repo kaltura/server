@@ -629,12 +629,11 @@ class KAsyncImport extends KJobHandlerWorker
 			{
 				KalturaLog::debug("Failed to import [$url] to [$destFilePath] - adding to 'retry'");
 				KalturaLog::debug("Reason = $result");
-				// todo double check if needed
-				if (!kFile::unlink($destFilePath))
+				
+				if (kFile::fileSize($destFilePath) && !kFile::unlink($destFilePath))
 				{
 					KalturaLog::debug("Failed to unlink file at path [$destFilePath]");
 				}
-				// todo change BatchJobErrors after you confirm it works
 				return $this->closeJob($job, KalturaBatchJobErrorTypes::OBJECT_STORAGE, KalturaBatchJobAppErrors::OBJECT_STORAGE_COPY, "Failed to import from [$url]", KalturaBatchJobStatus::RETRY);
 			}
 			
