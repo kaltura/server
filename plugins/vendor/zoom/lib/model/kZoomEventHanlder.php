@@ -106,7 +106,7 @@ class kZoomEventHanlder
 		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomClient);
 		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
 		{
-			KalturaLog::notice('The user [' . $hostEmail . '] is configured to not save recordings - Not processing');
+			KalturaLog::notice('The user ['. $userId .'] with email [' . $hostEmail . '] is configured to not save recordings - Not processing');
 			return true;
 		}
 		return false;
