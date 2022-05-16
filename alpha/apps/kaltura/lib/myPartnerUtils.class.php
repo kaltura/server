@@ -84,7 +84,8 @@ class myPartnerUtils
 		if ( !$partner ) {
 			return Partner::VALIDATE_WRONG_LOGIN;
 		}
-		if ($partner->getStatus() != Partner::PARTNER_STATUS_ACTIVE) {
+		if( !in_array($partner->getStatus(), array(Partner::PARTNER_STATUS_ACTIVE,Partner::PARTNER_STATUS_READ_ONLY)))
+		{
 			return Partner::VALIDATE_PARTNER_BLOCKED;
 		}
 		
