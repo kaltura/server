@@ -143,7 +143,7 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED;MEDIA_TYPE;Entry media type \"@MEDIA_TYPE@\" not supported";
 
-    const ENTRY_SOURCE_TYPE_NOT_SUPPORTED = "ENTRY_SOURCE_TYPE_NOT_SUPPORTED;SOURCE_TYPE;Entry source type \"@SOURCE_TYPE@\" not supported";
+	const ENTRY_SOURCE_TYPE_NOT_SUPPORTED = "ENTRY_SOURCE_TYPE_NOT_SUPPORTED;SOURCE_TYPE;Entry source type \"@SOURCE_TYPE@\" not supported";
 
 	const UPLOADED_FILE_NOT_FOUND_BY_TOKEN = "UPLOADED_FILE_NOT_FOUND_BY_TOKEN;;The uploaded file was not found by the given token id, or was already used";
 
