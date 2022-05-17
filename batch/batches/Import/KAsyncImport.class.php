@@ -594,7 +594,6 @@ class KAsyncImport extends KJobHandlerWorker
 		return $sourceUrl;
 	}
 	
-	
 	/**
 	 * Will take a src file located on AWS s3 (s3://) and fetch it (the s3 bucket must permit the server access to it without key & pass)
 	 * @param KalturaBatchJob $job
