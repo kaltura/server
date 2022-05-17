@@ -249,6 +249,20 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
 			}
+			$partnerId = $this->dropFolder->partnerId;
+			$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile,  $this->dropFolder->zoomVendorIntegration);
+			if (!$userId)
+			{
+				break;
+			}
+			$groupParticipationType = $this->dropFolder->zoomVendorIntegration->groupParticipationType;
+			$optInGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optInGroupNames);
+			$optOutGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optOutGroupNames);
+			if (ZoomBatchUtils::shouldExcludeUserRecordingIngest($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId))
+			{
+				KalturaLog::debug('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
+				break;
+			}
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
