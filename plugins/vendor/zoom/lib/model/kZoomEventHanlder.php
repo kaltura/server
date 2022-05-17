@@ -102,13 +102,18 @@ class kZoomEventHanlder
 	
 	protected static function shouldExcludeUserFromSavingRecording ($event, $zoomClient, ZoomVendorIntegration $zoomVendorIntegration)
 	{
+		if ($zoomVendorIntegration->getGroupParticipationType() == kZoomGroupParticipationType::NO_CLASSIFICATION)
+		{
+			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
+			return false;
+		}
 		/* @var kZoomRecording $object*/
-		$object = $event->object;
-		$hostEmail = $object->hostEmail;
+		$eventObject = $event->object;
+		$hostEmail = $eventObject->hostEmail;
 		$userId = self::getEntryOwnerId($hostEmail, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration, $zoomClient);
 		if ($zoomVendorIntegration->shouldExcludeUserRecordingsIngest($userId))
 		{
-			KalturaLog::notice('The user ['. $userId .'] with email [' . $hostEmail . '] is configured to not save recordings - Not processing');
+			KalturaLog::notice('The user ['. $userId .'] is configured to not save recordings - Not processing');
 			return true;
 		}
 		return false;
@@ -141,7 +146,7 @@ class kZoomEventHanlder
 		}
 		else
 		{
-			$userId = $user->getId();
+			$userId = $user->getPuserId();
 		}
 		return $userId;
 	}

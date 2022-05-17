@@ -179,14 +179,9 @@ class ZoomVendorIntegration extends VendorIntegration
 		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
 	}
 	
-	public function shouldExcludeUserRecordingsIngest($userId)
+	public function shouldExcludeUserRecordingsIngest($puserId)
 	{
-		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::NO_CLASSIFICATION)
-		{
-			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
-			return false;
-		}
-		$kuser = kuserPeer::retrieveByPK($userId);
+		$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId);
 		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds(array($kuser->getId()));
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
