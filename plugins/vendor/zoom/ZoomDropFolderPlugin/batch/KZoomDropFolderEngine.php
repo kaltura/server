@@ -242,26 +242,31 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleMeetingFiles($meetingFiles, &$fileInStatusProcessingExists)
 	{
+		$groupParticipationType = $this->dropFolder->zoomVendorIntegration->groupParticipationType;
+		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
+		{
+			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
+			return false;
+		}
+		$partnerId = $this->dropFolder->partnerId;
+		$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFiles[0], $this->dropFolder->zoomVendorIntegration);
+		if (!$userId)
+		{
+			return;
+		}
+		$optInGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optInGroupNames);
+		$optOutGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optOutGroupNames);
+		if (ZoomBatchUtils::shouldExcludeUserRecordingIngest($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId))
+		{
+			KalturaLog::debug('The user [' . $meetingFiles[0][self::HOST_ID] . '] is configured to not save recordings - Not processing');
+			return;
+		}
 		foreach ($meetingFiles as $meetingFile)
 		{
 			if($this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]))
 			{
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
-			}
-			$partnerId = $this->dropFolder->partnerId;
-			$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile,  $this->dropFolder->zoomVendorIntegration);
-			if (!$userId)
-			{
-				break;
-			}
-			$groupParticipationType = $this->dropFolder->zoomVendorIntegration->groupParticipationType;
-			$optInGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optInGroupNames);
-			$optOutGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optOutGroupNames);
-			if (ZoomBatchUtils::shouldExcludeUserRecordingIngest($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId))
-			{
-				KalturaLog::debug('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
-				break;
 			}
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();

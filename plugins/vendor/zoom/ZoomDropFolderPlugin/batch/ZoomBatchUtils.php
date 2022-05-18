@@ -9,11 +9,6 @@ class ZoomBatchUtils
 
 	public static function shouldExcludeUserRecordingIngest ($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
 	{
-		if ($groupParticipationType == KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
-		{
-			KalturaLog::debug('Account is not configured to OPT IN or OPT OUT');
-			return false;
-		}
 		if ($groupParticipationType == KalturaZoomGroupParticipationType::OPT_IN)
 		{
 			KalturaLog::debug('Account is configured to OPT IN the users that are members of the following groups ['.print_r($optInGroupNames, true).']');
