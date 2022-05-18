@@ -37,6 +37,17 @@ class kZoomEventHanlder
 		return $event;
 	}
 
+	protected static function refreshTokensIfNeeded(&$zoomClient, &$zoomVendorIntegration)
+	{
+		/* @var ZoomVendorIntegration $zoomVendorIntegration */
+		/* @var kZoomClient $zoomClient */
+		$zoomTokensData = $zoomVendorIntegration->getTokens();
+		if ($zoomTokensData[kZoomTokens::EXPIRES_IN < time()])
+		{
+			$zoomVendorIntegration->setTokensData($zoomClient->refreshTokens());
+		}
+	}
+	
 	/**
 	 * @param kZoomEvent $event
 	 * @throws KalturaAPIException
@@ -50,6 +61,7 @@ class kZoomEventHanlder
 		$zoomDropFolder = self::getZoomDropFolder($zoomVendorIntegration);
 		$zoomDropFolderId =  $zoomDropFolder ? $zoomDropFolder->getId() : null;
 		$zoomClient = $this->initZoomClient($zoomVendorIntegration);
+		self::refreshTokensIfNeeded($zoomClient, $zoomVendorIntegration);
 		if (self::shouldExcludeUserFromSavingRecording($event, $zoomClient, $zoomVendorIntegration))
 		{
 			return;
