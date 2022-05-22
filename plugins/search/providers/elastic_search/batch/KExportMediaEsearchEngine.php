@@ -57,9 +57,9 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	protected function addHeaderRowToCsv($csvFile, $additionalFields,
 	                                     $mappedFileds = null)
 	{
-		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt ';
+		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt, CreatorId ';
 		if($this->getEntryType($additionalFields) == KalturaEntryType::MEDIA_CLIP){
-			$headerRow .= ',Plays, Views, Duration, LastPlayedAt, Captions ';
+			$headerRow .= ',CategoriesNames, Plays, Views, Duration, LastPlayedAt, Captions ';
 		}
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
@@ -96,18 +96,19 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	protected function getCsvRowValues (KalturaBaseEntry $entry, $data)
 	{
 		$entryCategories = $this->retrieveEntryCategories ($entry->id);
-		
+		$categoriesIds = implode (',', $entryCategories);
 		$values = array(
 			$entry->id,
 			$entry->name,
 			$entry->description,
 			$entry->tags,
-			implode (',', $entryCategories),
+			$categoriesIds,
 			$entry->userId,
 			$this->formatTimestamp($entry->createdAt, $data->options),
 			$this->formatTimestamp($entry->updatedAt, $data->options),
+			$entry->creatorId,
 		);
-		$values = array_merge($values, $this->addAdditionalFields($entry, $data->options));
+		$values = array_merge($values, $this->addAdditionalFields($entry, $data->options, $categoriesIds));
 		return $values;
 	}
 
@@ -136,6 +137,29 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		}
 		
 		return $result;
+	}
+	/**
+	 *
+	 * @param string $categoriesIds
+	 * @return string;
+	 */
+	protected function retrieveCategoriesNames ($categoriesIds)
+	{
+		$categoryEntryFilter = new KalturaCategoryFilter();
+		$categoryEntryFilter->idIn = $categoriesIds;
+
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = self::PAGE_SIZE;
+
+		$categoriesResult = KBatchBase::$kClient->category->listAction($categoryEntryFilter, $pager);
+		$result = array();
+		foreach ($categoriesResult->objects as $category)
+		{
+			$result[] = $category->name;
+		}
+
+		return  implode (',', $result);
 	}
 	/**
 	 * Function returns an array of captions.
@@ -183,18 +207,22 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 		}
 		return $timestamp;
 	}
+
 	/**
 	 * @param KalturaBaseEntry $entry
 	 * @param array            $options
+	 * @param string            $entryCategoriesIds
 	 * @return array
 	 */
-	protected function addAdditionalFields(KalturaBaseEntry $entry, $options) {
+	protected function addAdditionalFields(KalturaBaseEntry $entry, $options, $entryCategoriesIds) {
 		if(is_array($options) && $this->getEntryType($options) == KalturaEntryType::MEDIA_CLIP){
 			if(!$entry instanceof KalturaMediaEntry){
 				return array('','','','','');
 			}
 			$captions = $this->retrieveEntryCaptions($entry->id);
+			$entryCategoriesNames = $this->retrieveCategoriesNames($entryCategoriesIds);
 			return array(
+				$entryCategoriesNames,
 				$entry->plays,
 				$entry->views,
 				$entry->duration,
