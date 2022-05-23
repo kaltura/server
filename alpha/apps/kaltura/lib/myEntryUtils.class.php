@@ -749,12 +749,6 @@ class myEntryUtils
 			{
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			}
-			if ($entity->getThumbGrabbedFromAssetId() != $captureFlavorAsset->getId())
-			{
-				KalturaLog::debug('Update entry [' . $entity->getId() . '] thumbGrabbedFromAssetId value from [' . $entity->getThumbGrabbedFromAssetId() . '] to [' . $captureFlavorAsset->getId() . ']');
-				$entity->setThumbGrabbedFromAssetId($captureFlavorAsset->getId());
-				$entity->justSave();
-			}
 			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath);
 		}
 
