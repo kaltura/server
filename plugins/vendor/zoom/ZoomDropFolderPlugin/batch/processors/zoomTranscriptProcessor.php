@@ -7,6 +7,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 {
 	const ZOOM_TRANSCRIPT_FILE_EXT = 'vtt';
 	const ZOOM_LABEL = 'Zoom';
+	const LABEL_DEL = '_';
 
 	/**
 	 * @param KalturaZoomDropFolderFile $recording
@@ -17,31 +18,28 @@ class zoomTranscriptProcessor extends zoomProcessor
 	 */
 	public function handleRecordingTranscriptComplete($recording, $entry)
 	{
+		$transcriptType = $this->getTranscriptType($recording->recordingFile->fileType);
 		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
-		if ($this->isTranscriptionAlreadyHandled($entry, $captionPlugin))
+		if ($this->isTranscriptionAlreadyHandled($entry, $captionPlugin, $transcriptType))
 		{
 			KalturaLog::debug("Zoom transcription for entry {$entry->id} was already handled");
 			return;
 		}
 
-		if ($recording->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT)
+		try
 		{
-			try
-			{
-				KBatchBase::impersonate($entry->partnerId);
-				$captionAsset = $this->createAssetForTranscription($entry, $captionPlugin);
-				$captionAssetResource = new KalturaUrlResource();
-				$redirectUrl = $this->getZoomRedirectUrlFromFile($recording);
-				$captionAssetResource->url = $redirectUrl;
-				$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
-				KBatchBase::unimpersonate();
-			}
-			catch (Exception $e)
-			{
-				throw new Exception(KalturaZoomErrorMessages::ERROR_HANDLING_TRANSCRIPT);
-			}
+			KBatchBase::impersonate($entry->partnerId);
+			$captionAsset = $this->createAssetForTranscription($entry, $captionPlugin, $transcriptType);
+			$captionAssetResource = new KalturaUrlResource();
+			$redirectUrl = $this->getZoomRedirectUrlFromFile($recording);
+			$captionAssetResource->url = $redirectUrl;
+			$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
+			KBatchBase::unimpersonate();
 		}
-
+		catch (Exception $e)
+		{
+			throw new Exception(KalturaZoomErrorMessages::ERROR_HANDLING_TRANSCRIPT);
+		}
 	}
 
 	/**
@@ -50,11 +48,15 @@ class zoomTranscriptProcessor extends zoomProcessor
 	 * @return KalturaCaptionAsset
 	 * @throws PropelException
 	 */
-	protected function createAssetForTranscription($entry, $captionPlugin)
+	protected function createAssetForTranscription($entry, $captionPlugin, $transcriptType)
 	{
 		$newCaptionAsset = new KalturaCaptionAsset();
 		$newCaptionAsset->language = KalturaLanguage::EN;
 		$newCaptionAsset->label = self::ZOOM_LABEL;
+		if($transcriptType != '')
+		{
+			$newCaptionAsset->label = self::ZOOM_LABEL . self::LABEL_DEL . $transcriptType;
+		}
 		$newCaptionAsset->format = KalturaCaptionType::WEBVTT;
 		$newCaptionAsset->fileExt = self::ZOOM_TRANSCRIPT_FILE_EXT;
 		$newCaptionAsset->source = KalturaCaptionSource::ZOOM;
@@ -68,10 +70,9 @@ class zoomTranscriptProcessor extends zoomProcessor
 	 * @return bool
 	 * @throws KalturaAPIException
 	 */
-	protected function isTranscriptionAlreadyHandled($entry, $captionPlugin)
+	protected function isTranscriptionAlreadyHandled($entry, $captionPlugin, $transcriptType)
 	{
 		$result = false;
-		
 		$filter = new KalturaAssetFilter();
 		$filter->entryIdEqual = $entry->id;
 		KBatchBase::impersonate($entry->partnerId);
@@ -80,7 +81,8 @@ class zoomTranscriptProcessor extends zoomProcessor
 		
 		foreach($list->objects as $captionAsset)
 		{
-			if($captionAsset->source == KalturaCaptionSource::ZOOM)
+			if($captionAsset->source == KalturaCaptionSource::ZOOM &&
+				($captionAsset->label == self::ZOOM_LABEL . self::LABEL_DEL . $transcriptType || $captionAsset->label == self::ZOOM_LABEL))
 			{
 				$result = true;
 				break;
@@ -88,5 +90,18 @@ class zoomTranscriptProcessor extends zoomProcessor
 		}
 
 		return $result;
+	}
+
+	protected function getTranscriptType($enumFileType)
+	{
+		switch($enumFileType)
+		{
+			case kRecordingFileType::TRANSCRIPT:
+				return 'TRANSCRIPT';
+			case kRecordingFileType::CC:
+				return 'CC';
+			default:
+				return '';
+		}
 	}
 }

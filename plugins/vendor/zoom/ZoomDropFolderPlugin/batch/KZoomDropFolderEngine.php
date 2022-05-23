@@ -27,6 +27,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const NEXT_PAGE_TOKEN = 'next_page_token';
 	const ME = 'me';
 	const TRANSCRIPT = 'TRANSCRIPT';
+	const CC = 'CC';
 	const MP4 = 'MP4';
 	const M4A = 'M4A';
 	
@@ -274,7 +275,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 
 					if (count($dropFolderFilesMap) === 0)
 					{
-						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
+						$isTranscript = $recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT || $recordingFile[self::RECORDING_FILE_TYPE] === self::CC;
+						if ($isTranscript && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
 							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
 						{
 							continue;
@@ -288,7 +290,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 								}
-								else if ($recordingFile[self::RECORDING_FILE_TYPE] !== self::TRANSCRIPT)
+								else if (!$isTranscript)
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START]);
@@ -545,7 +547,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		switch ($data->contentMatchPolicy)
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
-				if ($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT)
+
+				$isTranscript = $dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT ||
+					$dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::CC;
+
+				if ($isTranscript)
 				{
 					$transcriptProcessor = new zoomTranscriptProcessor($zoomBaseUrl, $dropFolder);
 					$transcriptProcessor->handleRecordingTranscriptComplete($dropFolderFile, $entry);
