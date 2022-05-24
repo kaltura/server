@@ -978,6 +978,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function removeS3PreFixFromPath($path)
 	{
-		return str_replace(self::S3_URI_PRE_FIX, '/', $path);
+		return str_replace(self::S3_URI_PRE_FIX, '', $path);
 	}
 }
