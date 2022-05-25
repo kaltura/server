@@ -286,6 +286,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			$permissionNames[$name] = $name;
 		}
+
+        if (PermissionPeer::isValidForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, strval(self::$operatingPartnerId))){
+            $permissionNames[PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD] = PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD;
+        }
+        
 		$map[self::PERMISSION_NAMES_ARRAY] = $permissionNames;
 		
 		// get mapping of permissions to permission items
