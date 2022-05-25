@@ -19,5 +19,5 @@ interface ESearchUserFieldName extends BaseEnum
 	const PUSER_ID = 'puser_id';
 	const TITLE = 'title';
 	const COMPANY = 'company';
-
+	const COUNTRY = 'country';
 }

@@ -280,6 +280,20 @@
 					}
 				}
 			},
+			"country": {
+				"type": "text",
+				"analyzer": "kaltura_text",
+				"fields": {
+					"ngrams": {
+						"type": "text",
+						"analyzer": "kaltura_ngrams"
+					},
+					"raw": {
+						"type": "keyword",
+						"normalizer": "kaltura_keyword_normalizer"
+					}
+				}
+			},
 			"role_ids": {
 				"type": "keyword",
 				"normalizer": "kaltura_keyword_normalizer"
