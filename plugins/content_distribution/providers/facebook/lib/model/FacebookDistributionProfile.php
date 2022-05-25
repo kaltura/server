@@ -24,7 +24,7 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 	const CALL_TO_ACTION_TYPE_VALID_VALUES = 'SHOP_NOW,BOOK_TRAVEL,LEARN_MORE,SIGN_UP,DOWNLOAD,WATCH_MORE';
 	const DEFAULT_RE_REQUEST_PERMISSIONS = 'false';
 	// needed permission in order to be able to publish the video to a facebook page
-	const DEFAULT_FACEBOOK_PERMISSIONS = 'manage_pages,publish_pages';
+	const DEFAULT_FACEBOOK_PERMISSIONS = 'pages_manage_posts';
 	// targeting
 	const CUSTOM_DATA_TARGETING_COUNTRIES = 'targetingCountries'; //list
 	const CUSTOM_DATA_TARGETING_REGIONS = 'targetingRegions'; //list
