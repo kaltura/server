@@ -58,7 +58,7 @@ class KalturaAppToken extends KalturaObject implements IFilterable
 	/**
 	 * Expiry time of current token (unix timestamp in seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 */
 	public $expiry;
 

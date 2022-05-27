@@ -52,7 +52,7 @@ class EntryServerNodeService extends KalturaBaseService
 	/**
 	 *
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaEntryServerNode $entryServerNode
 	 * @return KalturaEntryServerNode|null|object
 	 * @throws KalturaAPIException
@@ -73,7 +73,7 @@ class EntryServerNodeService extends KalturaBaseService
 	/**
 	 * Deletes the row in the database
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * @throws KalturaAPIException
 	 */
 	private function deleteAction($id)
@@ -124,7 +124,7 @@ class EntryServerNodeService extends KalturaBaseService
 	 * Validates server node still registered on entry
 	 *
 	 * @action validateRegisteredEntryServerNode
-	 * @param int $id entry server node id
+	 * @param bigint $id entry server node id
 	 *
 	 * @throws KalturaAPIException
 	 */
