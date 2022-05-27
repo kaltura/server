@@ -87,7 +87,7 @@ abstract class KalturaLiveEntry extends KalturaMediaEntry
 	
 	/**
 	 * The time (unix timestamp in milliseconds) in which the entry broadcast started or 0 when the entry is off the air
-	 * @var time
+	 * @var float
 	 */
 	public $currentBroadcastStartTime;
 
