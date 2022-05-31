@@ -8,6 +8,7 @@ return array (
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING' => 'CHAPTERING',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING' => 'DUBBING',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING' => 'INTELLIGENT_TAGGING',
+    'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION' => 'LIVE_CAPTION',
 
     'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
     'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
@@ -127,5 +128,6 @@ return array (
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ERROR' => 'Error',
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ABORTED' => 'Aborted',
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_ENTRY_READY' => 'Pending Entry Ready',
+    'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::SCHEDULED' => 'Scheduled',
 
 );

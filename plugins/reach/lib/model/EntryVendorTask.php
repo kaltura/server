@@ -356,7 +356,20 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		{
 			$this->setFinishTime(time());
 		}
-		
+
+		if ($this->isColumnModified(EntryVendorTaskPeer::STATUS) && in_array($this->getStatus(), array(EntryVendorTaskStatus::REJECTED, EntryVendorTaskStatus::ABORTED)))
+		{
+			if ($this->isScheduled())
+			{
+				// TODO: check existence of jobData & event and consider lateCancelation when refund (probably not here)
+				/* @var $jobData kScheduledVendorTaskData */
+				$jobData = $this->getTaskJobData();
+				$event = $jobData->getScheduleEvent();
+				$event->setStatus(ScheduleEventStatus::CANCELLED);
+				$event->save();
+			}
+		}
+
 		/*
 		$entryDuration = $this->getEntry()->getLengthInMsecs();
 		$taskJobData = $this->getTaskJobData();
@@ -435,6 +448,31 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->indexToSearchIndex();
 	}
 
+	/**
+	 * Code to be run after inserting to database
+	 * @param PropelPDO $con
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		if ($this->isScheduled())
+		{
+			/* @var $taskJobData kScheduledVendorTaskData */
+			$taskJobData = $this->getTaskJobData();
+			$dbLiveCaptionScheduleEvent = new LiveCaptionScheduleEvent(); // TODO: factory that create the event according to the feature type
+			$dbLiveCaptionScheduleEvent->setStartDate($taskJobData->startDate);
+			$dbLiveCaptionScheduleEvent->setEndDate($taskJobData->endDate);
+			$dbLiveCaptionScheduleEvent->setRecurrenceType(0);
+			$dbLiveCaptionScheduleEvent->setSummary($this->getEntryId());
+			$dbLiveCaptionScheduleEvent->setTemplateEntryId($this->getEntryId());
+			$dbLiveCaptionScheduleEvent->save();
+
+			$taskJobData->scheduleEventId = $dbLiveCaptionScheduleEvent->getId();
+			$this->setTaskJobData($taskJobData);
+			$this->setCustomDataObj();
+		}
+		return parent::preInsert($con);
+	}
+
 	public function save(PropelPDO $con = null)
 	{
 		if (in_array(EntryVendorTaskPeer::STATUS, $this->modifiedColumns) &&
@@ -452,6 +490,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			}
 		}
 		parent::save($con);
+	}
+
+	public function isScheduled()
+	{
+		return $this->getTaskJobData() instanceof kScheduledVendorTaskData;
 	}
 
 } // EntryVendorTask

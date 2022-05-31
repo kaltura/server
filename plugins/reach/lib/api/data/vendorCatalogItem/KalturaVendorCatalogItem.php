@@ -235,6 +235,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				$object = new KalturaVendorIntelligentTaggingCatalogItem();
 				break;
 
+			case VendorServiceFeature::LIVE_CAPTION:
+				$object = new KalturaVendorLiveCaptionCatalogItem();
+				break;
+
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();
 				break;

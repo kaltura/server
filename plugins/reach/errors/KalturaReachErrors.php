@@ -76,6 +76,12 @@ class KalturaReachErrors implements kReachErrors
 	const FAILED_EXTEND_ACCESS_KEY = "FAILED_EXTEND_ACCESS_KEY;;Extending accessKey operation failed";
 	
 	const TASK_NOT_CREATED = "TASK_NOT_CREATED;ENTRY_ID,CATALOG_ITEM_ID;Failed to create task for entry [@ENTRY_ID@] and catalog item [@CATALOG_ITEM_ID@]";
+
+	const CATALOG_ITEM_AND_JOB_DATA_MISMATCH = "CATALOG_ITEM_AND_JOB_DATA_MISMATCH;CATALOG_ITEM_TYPE,TASK_DATA_TYPE;The catalogItem type [@CATALOG_ITEM_TYPE@] is not allowed for task data of type [@TASK_DATA_TYPE@]";
+	
+	const TOO_LATE_ORDER = "TOO_LATE_ORDER;ENTRY_ID,CATALOG_ITEM_ID,MINIMAL_ORDER_TIME;Task created too late for entry [@ENTRY_ID@], minimal order time for catalog item [@CATALOG_ITEM_ID@] is [@MINIMAL_ORDER_TIME@ min]";
+
+	const TOO_LONG_SCHEDULED_TASK = "TOO_LONG_SCHEDULED_TASK;TASK_DURATION,DURATION_LIMIT,CATALOG_ITEM_ID;The task duration [@TASK_DURATION@] is exceeding the limit [@DURATION_LIMIT@] defined in catalogItem [@CATALOG_ITEM_ID@]";
 	
 	/* Credit */
 	

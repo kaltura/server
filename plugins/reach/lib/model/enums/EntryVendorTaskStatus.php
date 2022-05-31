@@ -13,4 +13,5 @@ interface EntryVendorTaskStatus extends BaseEnum
 	const ERROR 				= 6;
 	const ABORTED 				= 7;
 	const PENDING_ENTRY_READY	= 8;
+	const SCHEDULED				= 9;
 }
