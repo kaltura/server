@@ -29,6 +29,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	protected $memcache = null;
 	protected $lastError = '';
 	protected $connectAttempts = 0;
+	protected $finalErrors = array("MEMC_SERVER_ERROR object too large for cache\r\n (3)");
 	
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::doInit()
@@ -156,7 +157,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 				self::STAT_COUNT => 1,
 				self::STAT_TIME => $end - $start));
 			
-			if (!$this->lastError)
+			if (!$this->lastError || in_array($this->lastError, $this->finalErrors))
 			{
 				return $result;
 			}
