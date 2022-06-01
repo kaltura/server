@@ -14,7 +14,7 @@ class KAsyncDistributeSubmit extends KAsyncDistribute
 	{
 		return KalturaBatchJobType::DISTRIBUTION_SUBMIT;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KAsyncDistribute::getDistributionEngine()
 	 */
