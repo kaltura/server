@@ -29,7 +29,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 		try
 		{
 			KBatchBase::impersonate($entry->partnerId);
-			$captionAsset = $this->createAssetForTranscription($entry, $captionPlugin, $transcriptType);
+			$captionAsset = $this->createAssetForTranscription($entry, $captionPlugin, $recording);
 			$captionAssetResource = new KalturaUrlResource();
 			$redirectUrl = $this->getZoomRedirectUrlFromFile($recording);
 			$captionAssetResource->url = $redirectUrl;
@@ -48,17 +48,20 @@ class zoomTranscriptProcessor extends zoomProcessor
 	 * @return KalturaCaptionAsset
 	 * @throws PropelException
 	 */
-	protected function createAssetForTranscription($entry, $captionPlugin, $transcriptType)
+	protected function createAssetForTranscription($entry, $captionPlugin, $recording)
 	{
 		$newCaptionAsset = new KalturaCaptionAsset();
 		$newCaptionAsset->language = KalturaLanguage::EN;
 		$newCaptionAsset->label = self::ZOOM_LABEL;
+		$transcriptType = $this->getTranscriptType($recording->recordingFile->fileType);
 		if($transcriptType != '')
 		{
 			$newCaptionAsset->label = self::ZOOM_LABEL . self::LABEL_DEL . $transcriptType;
 		}
-		$newCaptionAsset->format = KalturaCaptionType::WEBVTT;
-		$newCaptionAsset->fileExt = self::ZOOM_TRANSCRIPT_FILE_EXT;
+		$recordingFileExt = $recording->recordingFile->fileExtension;
+		$transcriptFormat = CaptionPlugin::getCaptionFormatFromExtension($recordingFileExt);
+		$newCaptionAsset->format = $transcriptFormat;
+		$newCaptionAsset->fileExt = $recordingFileExt;
 		$newCaptionAsset->source = KalturaCaptionSource::ZOOM;
 		$caption = $captionPlugin->captionAsset->add($entry->id, $newCaptionAsset);
 		return $caption;

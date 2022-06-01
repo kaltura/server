@@ -275,7 +275,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 
 					if (count($dropFolderFilesMap) === 0)
 					{
-						$isTranscript = $recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT || $recordingFile[self::RECORDING_FILE_TYPE] === self::CC;
+						$isTranscript = in_array($recordingFile[self::RECORDING_FILE_TYPE], array(self::TRANSCRIPT, self::CC));
 						if ($isTranscript && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
 							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
 						{
@@ -548,8 +548,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
 
-				$isTranscript = $dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT ||
-					$dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::CC;
+				$isTranscript = in_array($dropFolderFile->recordingFile->fileType, array(self::TRANSCRIPT, self::CC));
 
 				if ($isTranscript)
 				{
