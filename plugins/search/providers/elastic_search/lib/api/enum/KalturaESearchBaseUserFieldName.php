@@ -18,4 +18,5 @@ class KalturaESearchBaseUserFieldName extends KalturaStringEnum
 	const USER_ID = 'user_id';
 	const TITLE = 'title';
 	const COMPANY = 'company';
+	const COUNTRY = 'country';
 }

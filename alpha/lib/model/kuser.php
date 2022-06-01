@@ -57,6 +57,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const UNIVERSAL_PERMISSION = '__ALL__';
 	
 	const MAX_NAME_LEN = 40;
+
+	const MAX_COUNTRY_LEN = 2;
 	
 	private $roughcut_count = -1;
 	
@@ -1390,7 +1392,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'members_count' => $this->getMembersCount(),
 			'picture' => $this->getPicture(),
 			'title' => $this->getTitle(),
-			'company' => $this->getCompany()
+			'company' => $this->getCompany(),
+			'country' => $this->getCountry()
 		);
 		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);
@@ -1530,6 +1533,17 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function getLastName()
 	{
 		return parent::getLastName() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
+	
+	public function setCountry($v)
+	{
+		PeerUtils::setExtension($this, $v, self::MAX_COUNTRY_LEN, __FUNCTION__);
+		return parent::setCountry(kString::alignUtf8String($v, self::MAX_COUNTRY_LEN));
+	}
+	
+	public function getCountry()
+	{
+		return parent::getCountry() . PeerUtils::getExtension($this, __FUNCTION__);
 	}
 	
 }
