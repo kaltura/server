@@ -169,6 +169,11 @@ class MetadataService extends KalturaBaseService
 		
 		$this->deleteOldVersions($dbMetadata);
 		
+		if ($objectType == 1)
+		{
+			//extract values of fields in default/requested language and set them to the entry
+		}
+		
 		return $dbMetadata;
 	}
 

@@ -332,12 +332,53 @@ class BaseEntryService extends KalturaEntryService
 	 * @action get
 	 * @param string $entryId Entry id
 	 * @param int $version Desired version of the data
+	 * @param string $language Desired language to serve the data
 	 * @return KalturaBaseEntry The requested entry
 	 */
-    function getAction($entryId, $version = -1)
+    function getAction($entryId, $version = -1, $language = null)
     {
-    	return $this->getEntry($entryId, $version);
+    	//return $this->getEntry($entryId, $version);
+	    $entry = $this->getEntry($entryId, $version);
+		$metadataCoreObject = MetadataPeer::retrieveByObject(5, 1, $entryId);
+		/**TODO if the default language is the same as the requested language. return without intervention
+		 * the requested language is not in the map, return instance of entry with empty name (list action)
+		*/
+	 
+		if ($metadataCoreObject && $language)
+		{
+			$xml = $this->findMetadataValue($metadataCoreObject, 'Map');
+			if ($xml)
+			{
+				$entry->name = $xml['name']['ENG'];
+				$entry->description = $xml['description']['ENG'];
+			}
+		}
+		return $entry;
     }
+	
+	/**
+	 * @param Metadata $metadataCoreObject
+	 * @param string $field
+	 * @return array|string
+	 */
+	public function findMetadataValue($metadataCoreObject, $field)
+	{
+		$results = array();
+		$key = $metadataCoreObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		$xmlContent = kFileSyncUtils::file_get_contents($key, true, false);
+		
+		$xml = new DOMDocument();
+		$xml->loadXML($xmlContent);
+		
+		$nodes = $xml->getElementsByTagName($field);
+		foreach($nodes as $node)
+		{
+			$results[] = $node->textContent;
+		}
+		
+		$result = json_decode($results[0], true);
+		return $result;
+	}
 
     /**
      * Get remote storage existing paths for the asset.
