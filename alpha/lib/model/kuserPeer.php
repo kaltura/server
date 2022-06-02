@@ -43,7 +43,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		return self::doSelectOne( $c ); 
 	}
 
-    /**
+     /**
      * @param int $partnerId
      * @param string $kuserId
      * @return kuser
@@ -53,12 +53,13 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
         $c = new Criteria();
         $c->add(self::PARTNER_ID, $partnerId);
         $c->add(self::ID, $kuserId);
+
         // in case of more than one deleted kusers - get the last one
         $c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
         return self::doSelectOne($c);
     }
 
-    /**
+     /**
 	 * @param int $partnerId
 	 * @param string $puserId
 	 * @param bool $ignorePuserKuser
