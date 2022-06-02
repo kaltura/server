@@ -42,8 +42,23 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$c->add ( kuserPeer::SCREEN_NAME , $screen_name );
 		return self::doSelectOne( $c ); 
 	}
-	
-	/**
+
+    /**
+     * @param int $partnerId
+     * @param string $kuserId
+     * @return kuser
+     */
+    public static function getKuserByPartnerAndKuserId($partnerId, $kuserId)
+    {
+        $c = new Criteria();
+        $c->add(self::PARTNER_ID, $partnerId);
+        $c->add(self::ID, $kuserId);
+        // in case of more than one deleted kusers - get the last one
+        $c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
+        return self::doSelectOne($c);
+    }
+
+    /**
 	 * @param int $partnerId
 	 * @param string $puserId
 	 * @param bool $ignorePuserKuser
