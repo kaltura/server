@@ -204,6 +204,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $turnAroundTime;
 
+	/**
+	 * The vendor's task internal Id
+	 * @var string
+	 */
+	public $vendorTaskId;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -234,7 +240,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'expectedFinishTime',
 		'serviceType',
 		'serviceFeature',
-		'turnAroundTime'
+		'turnAroundTime',
+		'vendorTaskId'
 	);
 	
 	/* (non-PHPdoc)
