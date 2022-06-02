@@ -1,3 +1,38 @@
+# Rigel-18.7.0
+## Add 'country' to kaltura_kuser index as searchable field ##
+* Issue Type: Task
+* Issue ID: FOUN-456
+
+#### Deployment ####
+Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"country":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+
+#### Known Issues & Limitations ####
+If Rigel-18.7.0 or later server version already ran and new users were added 
+with country field then it is likely that elastic already mapped
+this field to the kaltura_kuser index map (due to elastic default index 'dynamic' attribute is 'true')
+If that happened, you will get an error from elastic.
+
+#### Resolution ####
+* Create a new kaltura_kuser index with Rigel-18.7.0 kaltura_kuser.json map (or later)
+* (if you have alias for index) Point 'kaltura_kuser' alias to the new index by following below instructions:
+    * Replace all tokens in the below curl command
+```
+curl -XPOST "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/_aliases" -H 'Content-Type: application/json' -d'{  "actions":[{"add": {"index": "@NEW_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}},{"remove": {"index": "@OLD_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}}]}'
+```
+* Execute 'populateElasticKusers.php' script:
+```
+php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+```
+* Done! you should be able to search user by 'country'
+    * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
+    * If everything work as expected, you can delete the old kuser index.
+
+---
+
 # Rigel-18.5.0
 ## Add STUDIO_BASE permission to KMC_ANALYTICS_ROLE on partner 0 ##
 - Issue Type: Task
