@@ -12,8 +12,8 @@ class KalturaExportToCsvOptions extends KalturaObject
 	 */
 	public $format;
 	/**
-	 * Additional columns will be added to the report that related to this specific object type(currently only MEDIA_CLIP),
-	 * note that it will not filter the result and other objects will be printed also
+	 * Additional columns will be added to the report that related to this specific object type(currently only MEDIA_CLIP is supported),
+	 * note that it will NOT filter the result and other objects will be printed also
 	 * @var KalturaEntryType
 	 */
 	public $typeEqual;
