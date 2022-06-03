@@ -58,14 +58,24 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	                                     $mappedFileds = null)
 	{
 		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt, CreatorId ';
-		if($this->getEntryType($additionalFields) == KalturaEntryType::MEDIA_CLIP){
-			$headerRow .= ',CategoriesNames, Plays, Views, Duration, LastPlayedAt, Captions ';
-		}
+		$headerRow .= $this->addAdditionalFieldsHeaders($additionalFields);
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
 		return $csvFile;
 	}
-	
+	/**
+	 * @param $additionalFields
+	 * @return string
+	 */
+	protected function addAdditionalFieldsHeaders($additionalFields)
+	{
+		$headerRow = '';
+		if($this->getEntryType($additionalFields) == KalturaEntryType::MEDIA_CLIP){
+			$headerRow = ',CategoriesNames, Plays, Views, Duration, LastPlayedAt, Captions ';
+		}
+		return $headerRow;
+	}
+
 	/**
 	 * The function grabs all the fields values for each entry and adds them as a new row to the csv file
 	 */
