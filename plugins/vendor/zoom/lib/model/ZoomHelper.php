@@ -23,6 +23,7 @@ class ZoomHelper
 		'gallery_view',
 		'audio_only',
 		'audio_transcript',
+		'closed_caption',
 		'chat_file',
 		'poll'
 	);
@@ -255,6 +256,7 @@ class ZoomHelper
 			case 'MP4':
 			case 'CHAT':
 			case 'TRANSCRIPT':
+			case 'CC':
 			case 'M4A':
 				return true;
 			default:
