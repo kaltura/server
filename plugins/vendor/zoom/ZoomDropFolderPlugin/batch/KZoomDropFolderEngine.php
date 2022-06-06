@@ -548,7 +548,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
 
-				$isTranscript = in_array($dropFolderFile->recordingFile->fileType, array(self::TRANSCRIPT, self::CC));
+				$isTranscript = in_array($dropFolderFile->recordingFile->fileType, array(KalturaRecordingFileType::TRANSCRIPT, KalturaRecordingFileType::CC));
 
 				if ($isTranscript)
 				{
