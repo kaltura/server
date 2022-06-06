@@ -19,7 +19,15 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		{
 			foreach($mappedFields as $mappedField)
 			{
-				$ret[$mappedField->key] = $mappedField->value;
+				if (isset($mappedField->usePredefinedFormat) && $mappedField->usePredefinedFormat)
+				{
+					$usePredefinedFormat = true;
+				}
+				else
+				{
+					$usePredefinedFormat = false;
+				}
+				$ret[$mappedField->key] = array('value' => $mappedField->value, 'format' => $usePredefinedFormat);
 			}
 		}
 		return $ret;
@@ -157,18 +165,35 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		foreach($mappedFields as $key => $value)
 		{
 			//if only key
-			if(!isset($value))
+			if(!isset($value['value']))
 			{
-				$defaultRowValues[$key] = isset($item->$key) ? $item->$key : '';
+				$itemValue = isset($item->$key) ? $item->$key : '';
+				if ($value['format'])
+				{
+					$defaultRowValues[$key] = $this->formatValue($itemValue, $key);
+				}
+				else
+				{
+					$defaultRowValues[$key] = $itemValue;
+				}
 				continue;
 			}
 
-			$fieldMap = explode(':', $value);
+			$fieldMap = explode(':', $value['value']);
 
 			//if simple value
 			if(count($fieldMap) == 1)
 			{
-				$defaultRowValues[$key] = isset($item->$value) ? $item->$value : '';
+				$itemField = $value['value'];
+				$itemValue = isset($item->$itemField) ? $item->$itemField : '';
+				if ($value['format'])
+				{
+					$defaultRowValues[$key] = $this->formatValue($itemValue, $value['value']);
+				}
+				else
+				{
+					$defaultRowValues[$key] = $itemValue;
+				}
 				continue;
 			}
 
@@ -294,5 +319,13 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 			}
 		}
 		return $csvRows;
+	}
+	
+	/**
+	 *
+	 */
+	protected function formatValue($value, $valueType)
+	{
+		return $value;
 	}
 }

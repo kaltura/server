@@ -33,4 +33,39 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 	{
 		return MetadataObjectType::ENTRY;
 	}
+	
+	protected function formatValue($value, $valueType)
+	{
+		if ($valueType == 'mediaType')
+		{
+			return $this->getEnumName($value, 'KalturaMediaType');
+		}
+		else if ($valueType == 'status')
+		{
+			return $this->getEnumName($value, 'KalturaEntryStatus');
+		}
+		else if ($valueType == 'createdAt' || $valueType == 'updatedAt')
+		{
+			return date('Y-m-d H:i:s', $value);
+		}
+		else if ($valueType == 'duration')
+		{
+			$formattedDuration =  intdiv($value, 60) . ':' . strval($value % 60);
+			return $formattedDuration;
+		}
+		return $value;
+	}
+	
+	protected function getEnumName($value, $enumClass)
+	{
+		$oClass = new ReflectionClass($enumClass);
+		$constants = $oClass->getConstants();
+		foreach ($constants as $enumName => $enumValue)
+		{
+			if ($value == $enumValue)
+			{
+				return $enumName;
+			}
+		}
+	}
 }
