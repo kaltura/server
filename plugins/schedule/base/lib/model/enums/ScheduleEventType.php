@@ -11,4 +11,5 @@ interface ScheduleEventType extends BaseEnum
 	const MEETING = 4;
 	const LIVE_REDIRECT = 5;
 	const VOD = 6;
+	const LIVE_CAPTION = 7;
 }

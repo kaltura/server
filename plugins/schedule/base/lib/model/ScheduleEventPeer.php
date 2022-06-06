@@ -20,8 +20,9 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	const MEETING_OM_CLASS = 'MeetingScheduleEvent';
 	const BLACKOUT_OM_CLASS = 'BlackoutScheduleEvent';
 	const LIVE_REDIRECT_OM_CLASS = 'LiveRedirectScheduleEvent';
+	const LIVE_CAPTION_OM_CLASS = 'LiveCaptionScheduleEvent';
 	const VOD_OM_CLASS = 'VodScheduleEvent';
-	
+
 	const BLACKOUT_SESSION_CACHE_START_DATE = 'start_date';
 	const BLACKOUT_SESSION_CACHE_END_DATE = 'end_date';
 	const BLACKOUT_SESSION_CACHE_RESULT = 'result';
@@ -36,9 +37,10 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		ScheduleEventType::BLACKOUT => self::BLACKOUT_OM_CLASS,
 		ScheduleEventType::MEETING => self::MEETING_OM_CLASS,
 		ScheduleEventType::LIVE_REDIRECT => self::LIVE_REDIRECT_OM_CLASS,
+		ScheduleEventType::LIVE_CAPTION => self::LIVE_CAPTION_OM_CLASS,
 		ScheduleEventType::VOD => self::VOD_OM_CLASS,
 	);
-	
+
 	/*
 	 * (non-PHPdoc)
 	 * @see BaseScheduleEventPeer::setDefaultCriteriaFilter()

@@ -5,6 +5,8 @@
  */
 abstract class BaseLiveStreamScheduleEvent extends EntryScheduleEvent
 {
+	abstract protected function addCapabilityToTemplateEntry($con);
+
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);

@@ -603,6 +603,10 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 			case ScheduleEventType::VOD:
 				$object = new KalturaVodScheduleEvent();
 				break;
+
+			case ScheduleEventType::LIVE_CAPTION:
+				$object = new KalturaLiveCaptionScheduleEvent();
+				break;
 				
 			default:
 				$object = KalturaPluginManager::loadObject('KalturaScheduleEvent', $sourceObject->getType());
