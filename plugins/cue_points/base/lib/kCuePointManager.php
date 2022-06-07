@@ -345,8 +345,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	}
 
 	/* (non-PHPdoc)
- * @see kObjectReadyForIndexRelatedObjectsConsumer::shouldConsumeReadyForIndexRelatedObjectsEvent()
- */
+ 	* @see kObjectReadyForIndexRelatedObjectsConsumer::shouldConsumeReadyForIndexRelatedObjectsEvent()
+ 	*/
 	public function shouldConsumeReadyForIndexRelatedObjectsEvent(BaseObject $object)
 	{
 		if($object instanceof CuePoint)
@@ -433,8 +433,8 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	}
 
 	/* (non-PHPdoc)
- * @see objectReadyForIndexRelatedObjects::objectReadyForIndexRelatedObjects()
- */
+ 	* @see objectReadyForIndexRelatedObjects::objectReadyForIndexRelatedObjects()
+ 	*/
 	public function objectReadyForIndexRelatedObjects(BaseObject $object)
 	{
 		if($object instanceof CuePoint)
