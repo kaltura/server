@@ -34,7 +34,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_SERVICE_TYPE =    	'serviceType';
 	const CUSTOM_DATA_SERVICE_FEATURE = 	'serviceFeature';
 	const CUSTOM_DATA_TURN_AROUND_TIME =	'turnAroundTime';
-	const CUSTOM_DATA_VENDOR_TASK_ID =      'vendorTaskId';
+	const CUSTOM_DATA_EXTERNAL_TASK_ID =      'externalTaskId';
 	const SEVEN_DAYS =			 604800;
 	const BUSINESS_DAY_FRIDAY = 5;      //Monday is 1
 	const BUSINESS_DAY_NEXT_MONDAY = 8;
@@ -139,9 +139,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->putInCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME, $v);
 	}
 
-	public function setVendorTaskId($v)
+	public function setExternalTaskId($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_VENDOR_TASK_ID, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID, $v);
 	}
 
 
@@ -257,9 +257,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME);
 	}
 
-	public function getVendorTaskId()
+	public function getExternalTaskId()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_VENDOR_TASK_ID);
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID);
 	}
 
 	protected static function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)

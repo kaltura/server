@@ -206,9 +206,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * The vendor's task internal Id
+	 * @requiresPermission insert, update
 	 * @var string
 	 */
-	public $vendorTaskId;
+	public $externalTaskId;
 
 	private static $map_between_objects = array
 	(
@@ -241,7 +242,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'serviceType',
 		'serviceFeature',
 		'turnAroundTime',
-		'vendorTaskId'
+		'externalTaskId'
 	);
 	
 	/* (non-PHPdoc)
