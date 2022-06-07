@@ -67,7 +67,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * Retrieve a EmailIngestionProfile by id
 	 *
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaEmailIngestionProfile
 	 *
 	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
@@ -88,7 +88,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * Update an existing EmailIngestionProfile
 	 *
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaEmailIngestionProfile $EmailIP
 	 * @return KalturaEmailIngestionProfile
 	 *
@@ -114,7 +114,7 @@ class EmailIngestionProfileService extends KalturaEntryService
 	 * Delete an existing EmailIngestionProfile
 	 *
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 *
 	 * @throws KalturaErrors::EMAIL_INGESTION_PROFILE_NOT_FOUND
 	 */

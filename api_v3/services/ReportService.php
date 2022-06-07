@@ -318,7 +318,7 @@ class ReportService extends KalturaBaseService
 	
 	/**
 	 * @action execute
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaKeyValueArray $params
 	 * @return KalturaReportResponse
 	 */
@@ -342,7 +342,7 @@ class ReportService extends KalturaBaseService
 
 	/**
 	 * @action getCsv
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaKeyValueArray $params
 	 * @return file
 	 * @param string $excludedFields
@@ -411,7 +411,7 @@ class ReportService extends KalturaBaseService
 	 * excludedFields can be supplied comma separated
 	 *
 	 * @action getCsvFromStringParams
-	 * @param int $id
+	 * @param bigint $id
 	 * @param string $params
 	 * @param string $excludedFields
 	 * @return file

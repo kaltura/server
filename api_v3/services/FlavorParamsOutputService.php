@@ -20,7 +20,7 @@ class FlavorParamsOutputService extends KalturaBaseService
 	 * Get flavor params output object by ID
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaFlavorParamsOutput
 	 * @throws KalturaErrors::FLAVOR_PARAMS_OUTPUT_ID_NOT_FOUND
 	 */

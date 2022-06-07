@@ -30,7 +30,7 @@ class KalturaSessionInfo extends KalturaObject
 	public $userId;
 
 	/**
-	 * @var int expiry time in seconds (unix timestamp)
+	 * @var time expiry time in seconds (unix timestamp)
 	 * @readonly
 	 */
 	public $expiry;

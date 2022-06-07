@@ -73,7 +73,7 @@ class UiConfService extends KalturaBaseService
 	 * Update an existing UIConf
 	 * 
 	 * @action update
-	 * @param int $id 
+	 * @param bigint $id 
 	 * @param KalturaUiConf $uiConf
 	 * @return KalturaUiConf
 	 *
@@ -98,7 +98,7 @@ class UiConfService extends KalturaBaseService
 	 * Retrieve a UIConf by id
 	 * 
 	 * @action get
-	 * @param int $id 
+	 * @param bigint $id 
 	 * @return KalturaUiConf
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID
@@ -119,7 +119,7 @@ class UiConfService extends KalturaBaseService
 	 * Delete an existing UIConf
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID
 	 */		
@@ -139,7 +139,7 @@ class UiConfService extends KalturaBaseService
 	 * Clone an existing UIConf
 	 * 
 	 * @action clone
-	 * @param int $id 
+	 * @param bigint $id 
 	 * @return KalturaUiConf
 	 *
 	 * @throws APIErrors::INVALID_UI_CONF_ID

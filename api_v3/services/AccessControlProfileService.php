@@ -35,7 +35,7 @@ class AccessControlProfileService extends KalturaBaseService
 	 * Get access control profile by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaAccessControlProfile
 	 * 
 	 * @throws KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND
@@ -55,7 +55,7 @@ class AccessControlProfileService extends KalturaBaseService
 	 * Update access control profile by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaAccessControlProfile $accessControlProfile
 	 * @return KalturaAccessControlProfile
 	 * 
@@ -79,7 +79,7 @@ class AccessControlProfileService extends KalturaBaseService
 	 * Delete access control profile by id
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * 
 	 * @throws KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND
 	 * @throws KalturaErrors::CANNOT_DELETE_DEFAULT_ACCESS_CONTROL
