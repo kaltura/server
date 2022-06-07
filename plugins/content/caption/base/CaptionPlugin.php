@@ -718,7 +718,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	public static function getCaptionFormatFromExtension($fileExtension)
 	{
-		switch($fileExtension)
+		switch(strtolower($fileExtension))
 		{
 			case 'vtt':
 				return CaptionType::WEBVTT;
