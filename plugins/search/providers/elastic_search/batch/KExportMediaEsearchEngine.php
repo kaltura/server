@@ -58,7 +58,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	                                     $mappedFileds = null)
 	{
 		$headerRow = 'EntryID, Name, Description, Tags, Categories, UserID, CreatedAt, UpdatedAt, CreatorId ';
-		$headerRow .= $this->addAdditionalFieldsHeaders($additionalFields);
+		$headerRow .= $this->getAdditionalFieldHeaders($additionalFields);
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', $headerRow));
 		
 		return $csvFile;
@@ -67,7 +67,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @param $additionalFields
 	 * @return string
 	 */
-	protected function addAdditionalFieldsHeaders($additionalFields)
+	protected function getAdditionalFieldHeaders($additionalFields)
 	{
 		$headerRow = '';
 		if($this->getEntryType($additionalFields) == KalturaEntryType::MEDIA_CLIP){
@@ -118,7 +118,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 			$this->formatTimestamp($entry->updatedAt, $data->options),
 			$entry->creatorId,
 		);
-		$values = array_merge($values, $this->addAdditionalFields($entry, $data->options, $categoriesIds));
+		$values = array_merge($values, $this->getAdditionalFields($entry, $data->options, $categoriesIds));
 		return $values;
 	}
 
@@ -224,7 +224,7 @@ class KExportMediaEsearchEngine extends KObjectExportEngine
 	 * @param string            $entryCategoriesIds
 	 * @return array
 	 */
-	protected function addAdditionalFields(KalturaBaseEntry $entry, $options, $entryCategoriesIds) {
+	protected function getAdditionalFields(KalturaBaseEntry $entry, $options, $entryCategoriesIds) {
 		if(is_array($options) && $this->getEntryType($options) == KalturaEntryType::MEDIA_CLIP){
 			if(!$entry instanceof KalturaMediaEntry){
 				return array('','','','','');
