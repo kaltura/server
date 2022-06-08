@@ -14,6 +14,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	const PRE_START_ENTRY_ID = 'pre_start_entry_id';
 	const POST_END_ENTRY_ID = 'post_end_entry_id';
 	const IS_CONTENT_INTERRUPTIBLE = 'is_content_interruptible';
+	const FEATURES_ARRAY = 'live_features';
 	
 	/**
 	 * @param string $v
@@ -95,6 +96,24 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	public function setPostEndTime($v)
 	{
 		$this->putInCustomData(self::POST_END_TIME, $v);
+	}
+
+	/**
+	 * @param array<LiveFeature> $v
+	 */
+	public function setLiveFeatures($v)
+	{
+		$serializedFeatures = serialize($v);
+		$this->putInCustomData(self::FEATURES_ARRAY, $serializedFeatures);
+	}
+
+	/**
+	 * @return array<LiveFeature>
+	 */
+	public function getLiveFeatures()
+	{
+		$serializedFeatures = $this->getFromCustomData(self::FEATURES_ARRAY);
+		return unserialize($serializedFeatures);
 	}
 	
 	public function shiftEvent ($parentEndDate)

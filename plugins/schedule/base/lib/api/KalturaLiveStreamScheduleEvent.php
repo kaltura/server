@@ -47,6 +47,12 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 	 * @var bool
 	 */
 	public $isContentInterruptible;
+
+	/**
+	 * list of live features that apply to the event
+	 * @var KalturaLiveFeaturesArray
+	 */
+	public $liveFeatures;
 	
 	
 	/* (non-PHPdoc)
@@ -76,6 +82,7 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		'preStartEntryId',
 		'postEndEntryId',
 		'isContentInterruptible',
+		'liveFeatures'
 	);
 
 	/* (non-PHPdoc)
@@ -137,6 +144,17 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		if (isset($this->postEndEntryId))
 		{
 			$this->validateEntryField('postEndEntryId', array(KalturaEntryType::MEDIA_CLIP));
+		}
+		if (isset($this->liveFeatures)) {
+			$keys = [];
+			foreach ($this->liveFeatures as $feature)
+			{
+				if (in_array($feature->systemName, $keys))
+				{
+					throw new KalturaAPIException(KalturaErrors::DUPLICATE_LIVE_FEATURE, $feature->systemName);
+				}
+				$keys[] = $feature->systemName;
+			}
 		}
 	}
 	
@@ -241,4 +259,5 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, $fieldName);
 		}
 	}
+
 }
