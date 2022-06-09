@@ -280,6 +280,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
 			$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
 		}
+
+        if (PermissionPeer::isValidForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, strval(self::$operatingPartnerId)))
+        {
+            KalturaLog::debug('Adding DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD permission');
+            $alwaysAllowedInternal = array(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD);
+            $tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
+        }
 		
 		$permissionNames = array();
 		foreach ($tmpPermissionNames as $name)
