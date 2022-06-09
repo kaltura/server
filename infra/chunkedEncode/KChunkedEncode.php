@@ -611,7 +611,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			$cmdLine = "";
 			$chunkData = $this->chunkDataArr[$chunkIdx];
 			{
-				kBatchUtils::addReconnectParams("\"http", $this->cmdLine, $cmdLine);
+				kBatchUtils::addReconnectParams("http", $params->source, $cmdLine);
 				$cmdLine .= " -i ".$this->cmdLine." -t $chunkWithOverlap";
 				if(isset($params->httpHeaderExtPrefix)){
 					$cmdLine = " -headers \"$params->httpHeaderExtPrefix,chunk($chunkIdx)\"".$cmdLine;
@@ -1060,7 +1060,7 @@ KalturaLog::log("oFh:$oFh, chunkFileName:$chunkFileName, mergedFileSize:$mergedF
 				$sourcePath = $params->sourceForAudio;
 			else
 				$sourcePath = $params->unResolvedSourcePath;
-			kBatchUtils::addReconnectParams('http', $sourcePath, $cmdLine);
+			kBatchUtils::addReconnectParams('http', $params->source, $cmdLine);
 			$cmdLine.= " -i \"$sourcePath\"";
 			$cmdLine.= " -vn";
 			if(isset($params->acodec)) $cmdLine.= " -c:a ".$params->acodec;
