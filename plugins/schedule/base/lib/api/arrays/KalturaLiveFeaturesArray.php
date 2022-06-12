@@ -24,6 +24,6 @@ class KalturaLiveFeaturesArray extends KalturaTypedArray
 
 	public function __construct()
 	{
-		parent::__construct("KalturaLiveFeatures");
+		parent::__construct("KalturaLiveFeature");
 	}
 }

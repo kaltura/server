@@ -2,6 +2,7 @@
 /**
  * @package plugins.schedule
  * @subpackage api.objects
+ * @abstract
  */
 abstract class KalturaLiveFeature extends KalturaObject {
 
