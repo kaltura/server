@@ -136,6 +136,11 @@ class kCurrentContext
 	 */
 	public static $executionScope = null;
 
+    /**
+     * @var int
+     */
+    public static $virtual_event_id = null;
+
 	public static function getEntryPoint()
 	{
 		if(self::$service && self::$action)
@@ -177,8 +182,9 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $entry->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-		
-		return $entry;
+        kCurrentContext::$virtual_event_id = null;
+
+        return $entry;
 	}
 	
 	public static function initPartnerByAssetId($assetId)
@@ -199,8 +205,9 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $asset->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-		
-		return $asset;
+        kCurrentContext::$virtual_event_id = null;
+
+        return $asset;
 	}
 	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
@@ -216,7 +223,9 @@ class kCurrentContext
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
-		}
+            kCurrentContext::$virtual_event_id = null;
+
+        }
 		else
 		{
 			try { $ksObj = kSessionUtils::crackKs ( $ksString ); }
@@ -235,8 +244,9 @@ class kCurrentContext
 			kCurrentContext::$ks_uid = $ksObj->user;
 			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
-			
-			if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
+            kCurrentContext::$virtual_event_id = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_VIRTUAL_EVENT_ID);
+
+            if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
 				$requestedPartnerId = null;
 			
 			kCurrentContext::$partner_id = $requestedPartnerId;
