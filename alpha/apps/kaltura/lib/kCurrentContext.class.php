@@ -182,7 +182,7 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $entry->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-        kCurrentContext::$virtual_event_id = null;
+       		kCurrentContext::$virtual_event_id = null;
 
         return $entry;
 	}
@@ -205,7 +205,7 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $asset->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-        kCurrentContext::$virtual_event_id = null;
+        	kCurrentContext::$virtual_event_id = null;
 
         return $asset;
 	}
@@ -223,7 +223,7 @@ class kCurrentContext
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
-            kCurrentContext::$virtual_event_id = null;
+            		kCurrentContext::$virtual_event_id = null;
 
         }
 		else
@@ -244,7 +244,7 @@ class kCurrentContext
 			kCurrentContext::$ks_uid = $ksObj->user;
 			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
-            kCurrentContext::$virtual_event_id = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_VIRTUAL_EVENT_ID);
+            		kCurrentContext::$virtual_event_id = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_VIRTUAL_EVENT_ID);
 
             if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
 				$requestedPartnerId = null;
