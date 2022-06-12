@@ -9,25 +9,25 @@ class LiveCaptionFeature extends LiveFeature
 	 * Url for sending/getting the media
 	 * @var string
 	 */
-	private $mediaUrl;
+	protected $mediaUrl;
 
 	/**
 	 * Identifier for the media url
 	 * @var string
 	 */
-	private $mediaKey;
+	protected $mediaKey;
 
 	/**
 	 * Url for retrieving the captions
 	 * @var string
 	 */
-	private $captionUrl;
+	protected $captionUrl;
 
 	/**
 	 * token for the caption url
 	 * @var string
 	 */
-	private $captionToken;
+	protected $captionToken;
 
 	/**
 	 * @param string $v

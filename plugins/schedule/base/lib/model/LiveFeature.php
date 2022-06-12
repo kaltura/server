@@ -9,19 +9,19 @@ abstract class LiveFeature extends BaseObject
 	 * feature name
 	 * @var string
 	 */
-	private $systemName;
+	protected $systemName;
 
 	/**
 	 * pre start time in seconds
 	 * @var int
 	 */
-	private $preStart;
+	protected $preStart;
 
 	/**
 	 * post end time in seconds
 	 * @var int
 	 */
-	private $postEnd;
+	protected $postEnd;
 
 	abstract function getApiType();
 

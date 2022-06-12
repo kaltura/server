@@ -145,7 +145,8 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		{
 			$this->validateEntryField('postEndEntryId', array(KalturaEntryType::MEDIA_CLIP));
 		}
-		if (isset($this->liveFeatures)) {
+		if (isset($this->liveFeatures))
+		{
 			$keys = [];
 			foreach ($this->liveFeatures as $feature)
 			{
