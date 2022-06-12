@@ -11,6 +11,7 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 	abstract protected function getDefaultHeaderRowToCsv();
 	abstract protected function getDefaultRowValues($item);
 	abstract protected function getMetadataObjectType();
+	abstract protected function getTitleHeader();
 
 	protected function getMappedFieldsAsAssociativeArray($mappedFields)
 	{
@@ -19,13 +20,10 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		{
 			foreach($mappedFields as $mappedField)
 			{
+				$usePredefinedFormat = false;
 				if (isset($mappedField->usePredefinedFormat) && $mappedField->usePredefinedFormat)
 				{
 					$usePredefinedFormat = true;
-				}
-				else
-				{
-					$usePredefinedFormat = false;
 				}
 				$ret[$mappedField->key] = array('value' => $mappedField->value, 'format' => $usePredefinedFormat);
 			}
@@ -41,6 +39,8 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
+		
+		
 
 		$mappedFields = $this->getMappedFieldsAsAssociativeArray($data->mappedFields);
 
@@ -102,6 +102,12 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 			}
 		} while ($pager->pageSize == $returnedSize);
 	}
+	
+	protected function addTitleHeaderToCsv($csvFile)
+	{
+		$titleHeader = $this->getTitleHeader();
+		KCsvWrapper::sanitizedFputCsv($csvFile, array($titleHeader));
+	}
 
 	protected function addHeaderRowToCsv($csvFile, $additionalFields, $mappedFields = null)
 	{
@@ -162,37 +168,33 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		$defaultRowValues = $this->getDefaultRowValues($item);
 
 		//add mapped fields
-		foreach($mappedFields as $key => $value)
+		foreach($mappedFields as $key => $fields)
 		{
+			$value = $fields['value'];
+			
 			//if only key
-			if(!isset($value['value']))
+			if(!isset($value))
 			{
 				$itemValue = isset($item->$key) ? $item->$key : '';
-				if ($value['format'])
+				$defaultRowValues[$key] = $itemValue;
+				if ($fields['format'])
 				{
 					$defaultRowValues[$key] = $this->formatValue($itemValue, $key);
-				}
-				else
-				{
-					$defaultRowValues[$key] = $itemValue;
 				}
 				continue;
 			}
 
-			$fieldMap = explode(':', $value['value']);
+			$fieldMap = explode(':', $value);
 
 			//if simple value
 			if(count($fieldMap) == 1)
 			{
-				$itemField = $value['value'];
+				$itemField = $value;
 				$itemValue = isset($item->$itemField) ? $item->$itemField : '';
-				if ($value['format'])
+				$defaultRowValues[$key] = $itemValue;
+				if ($fields['format'])
 				{
-					$defaultRowValues[$key] = $this->formatValue($itemValue, $value['value']);
-				}
-				else
-				{
-					$defaultRowValues[$key] = $itemValue;
+					$defaultRowValues[$key] = $this->formatValue($itemValue, $value);
 				}
 				continue;
 			}
@@ -321,11 +323,21 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		return $csvRows;
 	}
 	
-	/**
-	 *
-	 */
 	protected function formatValue($value, $valueType)
 	{
 		return $value;
+	}
+	
+	protected function getEnumName($value, $enumClass)
+	{
+		$oClass = new ReflectionClass($enumClass);
+		$constants = $oClass->getConstants();
+		foreach ($constants as $enumName => $enumValue)
+		{
+			if ($value == $enumValue)
+			{
+				return $enumName;
+			}
+		}
 	}
 }

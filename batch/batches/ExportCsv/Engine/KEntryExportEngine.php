@@ -34,8 +34,18 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 		return MetadataObjectType::ENTRY;
 	}
 	
+	protected function getTitleHeader()
+	{
+		return "#-----------------------------------------------\n" .
+			"Report: Entries\n" .
+			"Please note that the data below is filtered based on the filter applied in the report\n" .
+			"#-----------------------------------------------";
+	}
+	
 	protected function formatValue($value, $valueType)
 	{
+		$dateFormatTypes = array('createdAt', 'updatedAt');
+		
 		if ($valueType == 'mediaType')
 		{
 			return $this->getEnumName($value, 'KalturaMediaType');
@@ -44,28 +54,16 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 		{
 			return $this->getEnumName($value, 'KalturaEntryStatus');
 		}
-		else if ($valueType == 'createdAt' || $valueType == 'updatedAt')
+		else if (in_array($valueType, $dateFormatTypes))
 		{
 			return date('Y-m-d H:i:s', $value);
 		}
 		else if ($valueType == 'duration')
 		{
-			$formattedDuration =  intdiv($value, 60) . ':' . strval($value % 60);
+			// Duration format is minutes:seconds
+			$formattedDuration = intdiv($value, 60) . ':' . strval($value % 60);
 			return $formattedDuration;
 		}
 		return $value;
-	}
-	
-	protected function getEnumName($value, $enumClass)
-	{
-		$oClass = new ReflectionClass($enumClass);
-		$constants = $oClass->getConstants();
-		foreach ($constants as $enumName => $enumValue)
-		{
-			if ($value == $enumValue)
-			{
-				return $enumName;
-			}
-		}
 	}
 }
