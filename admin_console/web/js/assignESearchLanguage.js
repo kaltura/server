@@ -48,6 +48,10 @@ function addESearchLanguage() {
 	assignSearchLanguage();
 }
 
+function getESearchLanguages() {
+	getLanguages();
+}
+
 function removeLanguage(language) {
 	var languageStr = $("#e_search_languages")[0].value;
 	var languageObj = jQuery.parseJSON(languageStr);

@@ -113,6 +113,8 @@ class Partner extends BasePartner
 
 	const IS_SELF_SERVE = 'isSelfServe';
 	
+	const DEFAULT_LANGUAGE = 'default_language';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -426,6 +428,23 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData("defaultConversionProfileId", $v);
 	}
+	
+	public function setDefaultLanguage($v)
+	{
+		$this->putInCustomData(self::DEFAULT_LANGUAGE, $v);
+//		$key = languageCodeManager::getLanguageKey($v,$v);
+//		$this->putInCustomData(self::DEFAULT_LANGUAGE, $key);
+	}
+	
+	public function getDefaultLanguage()
+	{
+		return $this->getFromCustomData(self::DEFAULT_LANGUAGE, null, 'EN');
+//		$languageCode = $this->getFromCustomData(self::DEFAULT_LANGUAGE);
+//		$obj = languageCodeManager::getObjectFromTwoCode($languageCode);
+//		return !is_null($obj) ? $obj[languageCodeManager::KALTURA_NAME] : $languageCode;
+	}
+	
+	
 	
 	/**
 	 * Set the live default conversion profile id for the partner

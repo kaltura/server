@@ -496,6 +496,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $isSelfServe;
 	
+	/**
+	 * @var string
+	 */
+	public $defaultLanguage;
 	
 	private static $map_between_objects = array
 	(
@@ -591,6 +595,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'twoFactorAuthenticationMode',
 		'purifyImageContent',
 		'isSelfServe',
+		'defaultLanguage'
 	);
 
 	public function getMapBetweenObjects()
@@ -845,6 +850,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setAllowedDomains('');
+		}
+		
+		if(!is_null($this->defaultLanguage))
+		{
+			$object_to_fill->setDefaultLanguage($this->defaultLanguage);
+		}
+		else
+		{
+			$object_to_fill->setDefaultLanguage('EN');
 		}
 		
 		return $object_to_fill;

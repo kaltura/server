@@ -11,6 +11,12 @@ class kCurrentContext
 	public static $ks;
 	
 	/**
+	 * The specified language in which the request was made
+	 * @var string
+	 */
+	public static $requestLanguage;
+	
+	/**
 	 * @var ks
 	 */
 	public static $ks_object;
@@ -300,5 +306,10 @@ class kCurrentContext
 			kCurrentContext::$ks_kuser_id = 0;
 			
 		return kCurrentContext::$ks_kuser_id;
+	}
+	
+	public static function getRequestLanguage()
+	{
+		return kCurrentContext::$requestLanguage;
 	}
 }

@@ -561,3 +561,17 @@ echo $pluginActionJavascriptStr;
 		);
 	}
 </script>
+
+<script type="text/javascript">
+    function getLanguages()
+    {
+        var partnerId = $("#id")[0].value;
+
+        var url = '<?php echo $this->url(array('controller' => 'search', 'action' => 'get-languages')); ?>';
+        url += '/partnerId/' + partnerId;
+        
+        dialogDiv.load(
+            url
+        );
+    }
+</script>

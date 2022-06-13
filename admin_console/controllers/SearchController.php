@@ -20,7 +20,13 @@ class SearchController extends Zend_Controller_Action
 
 	}
 	
-	protected function getESearchLanguages($client, $partnerId, $currentLanguages = null) {
+	public static function getLanguagesAction($partnerId)
+	{
+		KalturaLog::debug('danielBarak');
+		return self::getSupportedESearchLanguages();
+	}
+	
+	protected static function getESearchLanguages($client, $partnerId, $currentLanguages = null) {
 
 		$partnerService = new Kaltura_Client_SystemPartner_SystemPartnerService($client);
 
@@ -35,7 +41,7 @@ class SearchController extends Zend_Controller_Action
 		return $options;
 	}
 
-	protected function getSupportedESearchLanguages()
+	protected static function getSupportedESearchLanguages()
 	{
 		$langMap = array(
 			'English',

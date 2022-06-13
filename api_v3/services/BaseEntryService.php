@@ -10,6 +10,11 @@ class BaseEntryService extends KalturaEntryService
 {
 	
 	const PLAYBACK_SECRET = 'playback_secret';
+	const NAME = 'name';
+	const DESCRIPTION = 'description';
+	const TAGS = 'tags';
+	const MULTI_LANGUAGE_MAP = 'map';
+	
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
      */
@@ -332,52 +337,45 @@ class BaseEntryService extends KalturaEntryService
 	 * @action get
 	 * @param string $entryId Entry id
 	 * @param int $version Desired version of the data
-	 * @param string $language Desired language to serve the data
 	 * @return KalturaBaseEntry The requested entry
 	 */
-    function getAction($entryId, $version = -1, $language = null)
+    function getAction($entryId, $version = -1)
     {
     	//return $this->getEntry($entryId, $version);
 	    $entry = $this->getEntry($entryId, $version);
-		$metadataCoreObject = MetadataPeer::retrieveByObject(5, 1, $entryId);
-		/**TODO if the default language is the same as the requested language. return without intervention
-		 * the requested language is not in the map, return instance of entry with empty name (list action)
-		*/
-	 
-		if ($metadataCoreObject && $language)
+		$defaultLanguage =  $this->getPartner()->getDefaultLanguage();
+	    $language = kCurrentContext::getRequestLanguage();
+	    /* @var KalturaBaseEntry $entry*/
+		if ($language || $defaultLanguage != $language)
 		{
-			$xml = $this->findMetadataValue($metadataCoreObject, 'Map');
-			if ($xml)
+			$multiLanguageMap = $entry->multiLanguageMapping;
+			if ($multiLanguageMap)
 			{
-				$entry->name = $xml['name']['ENG'];
-				$entry->description = $xml['description']['ENG'];
+				if ($language == 'MULTI')
+				{
+					$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true));
+				}
+				else
+				{
+					$this->updateEntryFieldsByLanguage($entry, json_decode($multiLanguageMap, true), $language);
+				}
 			}
 		}
 		return $entry;
     }
 	
-	/**
-	 * @param Metadata $metadataCoreObject
-	 * @param string $field
-	 * @return array|string
-	 */
-	public function findMetadataValue($metadataCoreObject, $field)
+	protected function updateEntryFieldsByLanguage(&$entry, $multiLanguageMap, $language)
 	{
-		$results = array();
-		$key = $metadataCoreObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		$xmlContent = kFileSyncUtils::file_get_contents($key, true, false);
-		
-		$xml = new DOMDocument();
-		$xml->loadXML($xmlContent);
-		
-		$nodes = $xml->getElementsByTagName($field);
-		foreach($nodes as $node)
-		{
-			$results[] = $node->textContent;
-		}
-		
-		$result = json_decode($results[0], true);
-		return $result;
+		$entry->name = isset($multiLanguageMap[self::NAME][$language]) ? $multiLanguageMap[self::NAME][$language] : $multiLanguageMap[self::NAME][$this->getPartner()->getDefaultLanguage()];
+		$entry->description = isset($multiLanguageMap[self::DESCRIPTION][$language]) ? $multiLanguageMap[self::DESCRIPTION][$language] : $multiLanguageMap[self::DESCRIPTION][$this->getPartner()->getDefaultLanguage()];
+		$entry->tags = isset($multiLanguageMap[self::TAGS][$language]) ? $multiLanguageMap[self::TAGS][$language] : $multiLanguageMap[self::TAGS][$this->getPartner()->getDefaultLanguage()];
+	}
+	
+	protected function setMultiLanguageStringOnField(&$entry, $multiLanguageMap)
+	{
+		$entry->name = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::NAME]);
+		$entry->description = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::DESCRIPTION]);
+		$entry->tags = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::TAGS]);
 	}
 
     /**
@@ -572,22 +570,22 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$filter = new KalturaBaseEntryFilter();
 		}
-
+		
 		if (!$pager)
 		{
 			$pager = new KalturaFilterPager();
 		}
-
+		
 		$clonedFilter = clone $filter;
 		$result = $this->tryListWithFilterExecutor($clonedFilter, $pager);
 		if (!$result)
 		{
 			$result = $filter->getListResponse($pager, $this->getResponseProfile());
 		}
-
 		
-		if ($result->totalCount == 1 && 
-			count($result->objects) == 1 && 
+		
+		if ($result->totalCount == 1 &&
+			count($result->objects) == 1 &&
 			$result->objects[0]->status != KalturaEntryStatus::READY)
 		{
 			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry, 
@@ -601,6 +599,32 @@ class BaseEntryService extends KalturaEntryService
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
+
+		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
+		$language = kCurrentContext::getRequestLanguage();
+		if ($language && $defaultLanguage != $language)
+		{
+			$updatedResponseObjects = array();
+			foreach ($response->objects as $entry)
+			{
+				/* @var KalturaBaseEntry $entry */
+				$multiLanguageMap = $entry->multiLanguageMapping;
+				if ($multiLanguageMap)
+				{
+					if ($language == 'MULTI')
+					{
+						$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true));
+					}
+					else
+					{
+						$this->updateEntryFieldsByLanguage($entry, json_decode($multiLanguageMap, true), $language);
+					}
+
+				}
+				array_push($updatedResponseObjects, $entry);
+			}
+			$response->objects = $updatedResponseObjects;
+		}
 		return $response;
 	}
 	
