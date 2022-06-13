@@ -20,12 +20,12 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		{
 			foreach($mappedFields as $mappedField)
 			{
-				$usePredefinedFormat = false;
-				if (isset($mappedField->usePredefinedFormat) && $mappedField->usePredefinedFormat)
+				$predefinedFormat = false;
+				if (isset($mappedField->predefinedFormat) && $mappedField->predefinedFormat)
 				{
-					$usePredefinedFormat = true;
+					$predefinedFormat = true;
 				}
-				$ret[$mappedField->key] = array('value' => $mappedField->value, 'format' => $usePredefinedFormat);
+				$ret[$mappedField->key] = array('value' => $mappedField->value, 'format' => $predefinedFormat);
 			}
 		}
 		return $ret;

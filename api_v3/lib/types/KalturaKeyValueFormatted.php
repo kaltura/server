@@ -1,15 +1,15 @@
 <?php
 
-class KalturaKeyValueFormatted extends KalturaKeyValue
+class KalturaKeyValueExtended extends KalturaKeyValue
 {
 	/**
 	 * @var KalturaNullableBoolean
 	 */
-	public $usePredefinedFormat;
+	public $predefinedFormat;
 	
 	private static $mapBetweenObjects = array
 	(
-		"usePredefinedFormat",
+		"predefinedFormat",
 	);
 	
 	public function getMapBetweenObjects()
