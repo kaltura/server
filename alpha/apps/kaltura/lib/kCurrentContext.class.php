@@ -225,7 +225,7 @@ class kCurrentContext
 			kCurrentContext::$is_admin_session = false;
             		kCurrentContext::$virtual_event_id = null;
 
-        }
+        	}
 		else
 		{
 			try { $ksObj = kSessionUtils::crackKs ( $ksString ); }
