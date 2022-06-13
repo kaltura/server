@@ -23,7 +23,7 @@ class KalturaLiveChannelSegment extends KalturaObject implements IRelatedFiltera
 	/**
 	 * Segment creation date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */
@@ -32,7 +32,7 @@ class KalturaLiveChannelSegment extends KalturaObject implements IRelatedFiltera
 	/**
 	 * Segment update date as Unix timestamp (In seconds)
 	 * 
-	 * @var int
+	 * @var time
 	 * @readonly
 	 * @filter gte,lte,order
 	 */

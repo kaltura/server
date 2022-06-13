@@ -9,7 +9,7 @@ class KAMFData
 /**
  * @package plugins.cuePoint
  */
-class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectReplacedEventConsumer, kObjectCopiedEventConsumer
+class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEventConsumer, kObjectChangedEventConsumer, kObjectAddedEventConsumer, kObjectReplacedEventConsumer, kObjectCopiedEventConsumer, kObjectReadyForIndexRelatedObjectsConsumer
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY = 1000;
@@ -345,6 +345,18 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	}
 
 	/* (non-PHPdoc)
+ 	* @see kObjectReadyForIndexRelatedObjectsConsumer::shouldConsumeReadyForIndexRelatedObjectsEvent()
+ 	*/
+	public function shouldConsumeReadyForIndexRelatedObjectsEvent(BaseObject $object)
+	{
+		if($object instanceof CuePoint)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/* (non-PHPdoc)
 	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
 	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
@@ -414,8 +426,21 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		if($object instanceof CuePoint)
-			$this->cuePointAdded($object);
+		{
+			kEventsManager::raiseEventDeferred(new kObjectReadyForIndexRelatedObjectsEvent($object));
+		}
+		return true;
+	}
 
+	/* (non-PHPdoc)
+ 	* @see objectReadyForIndexRelatedObjects::objectReadyForIndexRelatedObjects()
+ 	*/
+	public function objectReadyForIndexRelatedObjects(BaseObject $object)
+	{
+		if($object instanceof CuePoint)
+		{
+			$this->cuePointIndexEntry($object);
+		}
 		return true;
 	}
 
@@ -546,7 +571,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	/**
 	 * @param CuePoint $cuePoint
 	 */
-	protected function cuePointAdded(CuePoint $cuePoint)
+	protected function cuePointIndexEntry(CuePoint $cuePoint)
 	{
 		$this->reIndexToSearchEngines($cuePoint);
 	}

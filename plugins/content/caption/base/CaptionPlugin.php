@@ -715,6 +715,25 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		return array(CaptionType::SRT => 'srt' , CaptionType::DFXP => 'dfxp', CaptionType::WEBVTT => 'vtt', CaptionType::SCC =>'scc', CaptionType::CAP => 'cap');
 	}
+
+	public static function getCaptionFormatFromExtension($fileExtension)
+	{
+		switch(strtolower($fileExtension))
+		{
+			case 'vtt':
+				return CaptionType::WEBVTT;
+			case 'srt':
+				return CaptionType::SRT;
+			case 'dfxp':
+				return CaptionType::DFXP;
+			case 'scc':
+				return CaptionType::SCC;
+			case 'cap':
+				return CaptionType::CAP;
+			default:
+				return null;
+		}
+	}
 }
 
 

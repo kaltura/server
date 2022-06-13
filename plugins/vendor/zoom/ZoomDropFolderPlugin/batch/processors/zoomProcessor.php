@@ -8,7 +8,7 @@ abstract class zoomProcessor
 	const ONE_DAY_IN_SECONDS = 86400;
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
-	const URL_ACCESS_TOKEN = '?access_token=';
+	const URL_ACCESS_TOKEN = 'access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const MAX_PUSER_LENGTH = 100;
@@ -84,17 +84,22 @@ abstract class zoomProcessor
 	{
 		$url = null;
 		$redirectUrl = null;
+		$urlAccessToken = "?" . self::URL_ACCESS_TOKEN;
+		if(strpos($recording->recordingFile->downloadUrl, "?") !== false)
+		{
+			$urlAccessToken = "&" . self::URL_ACCESS_TOKEN;
+		}
 		if (isset($recording->recordingFile->downloadToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
+			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $recording->recordingFile->downloadToken;
 		}
 		else if (isset($this->dropFolder->accessToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->accessToken;
+			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->accessToken;
 		}
 		else if (isset($this->dropFolder->jwtToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->jwtToken;
+			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->jwtToken;
 		}
 		
 		if ($url)

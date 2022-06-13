@@ -251,7 +251,7 @@ class PartnerService extends KalturaBaseService
 	 * Retrieve partner object by Id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaPartner
 	 *
 	 * @throws APIErrors::INVALID_PARTNER_ID
@@ -584,7 +584,7 @@ class PartnerService extends KalturaBaseService
 	 * Returns partner public info by Id
 	 *
 	 * @action getPublicInfo
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaPartnerPublicInfo
 	 *
 	 * @throws APIErrors::INVALID_PARTNER_ID

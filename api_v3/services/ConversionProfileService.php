@@ -41,7 +41,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Set Conversion Profile to be the partner default
 	 * 
 	 * @action setAsDefault
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaConversionProfile
 	 * 
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
@@ -143,7 +143,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Get Conversion Profile by ID
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaConversionProfile
 	 * 
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
@@ -165,7 +165,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Update Conversion Profile by ID
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaConversionProfile $conversionProfile
 	 * @return KalturaConversionProfile
 	 * 
@@ -225,7 +225,7 @@ class ConversionProfileService extends KalturaBaseService
 	 * Delete Conversion Profile by ID
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * 
 	 * @throws KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaErrors::CANNOT_DELETE_DEFAULT_CONVERSION_PROFILE

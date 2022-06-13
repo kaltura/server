@@ -31,7 +31,7 @@ class KalturaAccessControlScope extends KalturaObject
 	
 	/**
 	 * Unix timestamp (In seconds) to be used to test entry scheduling, keep null to use now.
-	 * @var int
+	 * @var time
 	 */
 	public $time;
 	

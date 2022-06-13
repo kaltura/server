@@ -10,4 +10,5 @@ interface kRecordingFileType extends BaseEnum
 	const CHAT = 2;
 	const TRANSCRIPT = 3;
 	const AUDIO = 4;
+	const CC = 5;
 }

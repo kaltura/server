@@ -122,7 +122,7 @@ class CategoryService extends KalturaBaseService
 	 * Get Category by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaCategory
 	 */
 	function getAction($id)
@@ -140,7 +140,7 @@ class CategoryService extends KalturaBaseService
 	 * Update Category
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaCategory $category
 	 * @throws KalturaAPIException
 	 * @return KalturaCategory
@@ -203,7 +203,7 @@ class CategoryService extends KalturaBaseService
 	 * Delete a Category
 	 *
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaNullableBoolean $moveEntriesToParentCategory
 	 * @throws KalturaAPIException
 	 */
@@ -274,7 +274,7 @@ class CategoryService extends KalturaBaseService
 	 * Index Category by id
 	 * 
 	 * @action index
-	 * @param int $id
+	 * @param bigint $id
 	 * @param bool $shouldUpdate
 	 * @return int category int id
 	 */

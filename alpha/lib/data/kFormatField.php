@@ -1,12 +1,19 @@
 <?php
 
-
+/**
+ * @package Core
+ * @subpackage model.data
+ */
 class kFormatField
 {
 	/**
 	 * @var string
 	 */
 	public $format;
+	/**
+	 * @var string
+	 */
+	public $typeEqual;
 
 	/**
 	 * @return string
@@ -22,5 +29,21 @@ class kFormatField
 	public function setFormat($format)
 	{
 		$this->format = $format;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTypeEqual()
+	{
+		return $this->typeEqual;
+	}
+
+	/**
+	 * @param string $typeEqual
+	 */
+	public function setTypeEqual($typeEqual)
+	{
+		$this->typeEqual = $typeEqual;
 	}
 }
