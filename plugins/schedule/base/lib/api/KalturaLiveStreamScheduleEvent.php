@@ -147,14 +147,15 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		}
 		if (isset($this->liveFeatures))
 		{
-			$keys = [];
+			$features = [];
 			foreach ($this->liveFeatures as $feature)
 			{
-				if (in_array($feature->systemName, $keys))
+				$name = !empty($feature->systemName) ? $feature->systemName : get_class($feature);
+				if (in_array($name, $features))
 				{
-					throw new KalturaAPIException(KalturaErrors::DUPLICATE_LIVE_FEATURE, $feature->systemName);
+					throw new KalturaAPIException(KalturaErrors::DUPLICATE_LIVE_FEATURE, $name);
 				}
-				$keys[] = $feature->systemName;
+				$features[] = $name;
 			}
 		}
 	}
