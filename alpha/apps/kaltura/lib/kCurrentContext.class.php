@@ -136,10 +136,10 @@ class kCurrentContext
 	 */
 	public static $executionScope = null;
 
-    /**
-     * @var int
-     */
-    public static $virtual_event_id = null;
+    	/**
+     	 * @var int
+     	 */
+    	public static $virtual_event_id = null;
 
 	public static function getEntryPoint()
 	{
@@ -184,7 +184,7 @@ class kCurrentContext
 		kCurrentContext::$is_admin_session = false;
        		kCurrentContext::$virtual_event_id = null;
 
-        return $entry;
+        	return $entry;
 	}
 	
 	public static function initPartnerByAssetId($assetId)
@@ -207,7 +207,7 @@ class kCurrentContext
 		kCurrentContext::$is_admin_session = false;
         	kCurrentContext::$virtual_event_id = null;
 
-        return $asset;
+        	return $asset;
 	}
 	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
@@ -246,7 +246,7 @@ class kCurrentContext
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
             		kCurrentContext::$virtual_event_id = kCurrentContext::$ks_object->getPrivilegeValue(ks::PRIVILEGE_VIRTUAL_EVENT_ID);
 
-            if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
+            		if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
 				$requestedPartnerId = null;
 			
 			kCurrentContext::$partner_id = $requestedPartnerId;
