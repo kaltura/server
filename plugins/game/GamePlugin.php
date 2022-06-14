@@ -161,6 +161,14 @@ class GamePlugin extends KalturaPlugin implements IKalturaServices
 			}
 		}
 		
+		foreach ($kusers as $kuser)
+		{
+			if (!isset($mapKuserPuser[$kuser]))
+			{
+				$mapKuserPuser[$kuser] = 'Unknown';
+			}
+		}
+		
 		return $mapKuserPuser;
 	}
 }
