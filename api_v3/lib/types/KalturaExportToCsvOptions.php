@@ -14,6 +14,7 @@ class KalturaExportToCsvOptions extends KalturaObject
 	/**
 	 * Setting this property will cause additional columns to be added to the final report. The columns will be related to the specific object type passed (currently only MEDIA_CLIP is supported).
 	 * Please note that this property will NOT change the result filter in any way (i.e passing MEDIA_CLIP here will not force the report to return only media items).
+	 * @var KalturaEntryType
 	 */
 	public $typeEqual;
 
