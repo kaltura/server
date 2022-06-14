@@ -17,7 +17,7 @@ if (isset($argv[5]))
 }
 
 $time = date('Y-m-d_[H-i-s]', time());
-$outputPath =  $outputPath . '/leaderboardCsvReport_' . $partnerId . '_' . $time . '.csv';
+$outputPath =  $outputPath . '/leaderboardCsvReport_' . $partnerId . '_' . $gameObjectType . '_' . $gameObjectId . '_' . $time . '.csv';
 
 $redisWrapper = GamePlugin::initGameServicesRedisInstance();
 if (!$redisWrapper)
