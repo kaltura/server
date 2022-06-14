@@ -176,6 +176,19 @@ class kUploadTokenMgr
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
+		
+		$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
+		if ($flavorAsset)
+		{
+			$service = new BaseEntryService();
+			$service->initService('baseEntry', 'baseEntry', 'updateContent');
+			$uploadToken = new KalturaUploadToken();
+			$uploadToken->fromObject($this->_uploadToken);
+			$contentResource = new KalturaUploadedFileTokenResource();
+			$contentResource->token = $uploadToken->id;
+			$entryId = $flavorAsset->getEntryId();
+			$service->updateContentAction($entryId, $contentResource);
+		}
 	}
 	
 	/**
