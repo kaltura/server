@@ -136,10 +136,10 @@ class kCurrentContext
 	 */
 	public static $executionScope = null;
 
-    /**
-     * @var int
-     */
-    public static $virtual_event_id = null;
+    	/**
+    	 * @var int
+     	 */
+    	public static $virtual_event_id = null;
 
 	public static function getEntryPoint()
 	{
@@ -183,7 +183,7 @@ class kCurrentContext
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
 		
-        return $entry;
+        	return $entry;
 	}
 	
 	public static function initPartnerByAssetId($assetId)
@@ -205,7 +205,7 @@ class kCurrentContext
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
 
-        return $asset;
+        	return $asset;
 	}
 	
 	public static function initKsPartnerUser($ksString, $requestedPartnerId = null, $requestedPuserId = null)
@@ -222,7 +222,7 @@ class kCurrentContext
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
 
-        }
+        	}
 		else
 		{
 			try { $ksObj = kSessionUtils::crackKs ( $ksString ); }
