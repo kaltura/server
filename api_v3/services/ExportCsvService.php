@@ -33,14 +33,14 @@ class ExportCsvService extends KalturaBaseService
 	                                       $metadataProfileId = null,
 	                                       $additionalFields = null,
 	                                       KalturaKeyValueArray $mappedFields = null,
-										   KalturaExportToCsvOptions $options = null)
+	                                       KalturaExportToCsvOptions $options = null)
 	{
 		if(!$filter)
 		{
 			$filter = new KalturaUserFilter();
 		}
 		return $this->exportMappedObjectToCsv(ExportObjectType::USER, new kUsersCsvJobData(),
-			$filter, $metadataProfileId, $additionalFields, $mappedFields);
+			$filter, $metadataProfileId, $additionalFields, $mappedFields, $options);
 	}
 
 	/**
@@ -56,7 +56,7 @@ class ExportCsvService extends KalturaBaseService
 	 */
 	public function entryExportToCsvAction(KalturaBaseEntryFilter $filter = null, $metadataProfileId = null,
 	                                       $additionalFields = null, KalturaKeyValueArray $mappedFields = null,
-										   KalturaExportToCsvOptions $options = null)
+	                                       KalturaExportToCsvOptions $options = null)
 	{
 		if (!$filter)
 		{
