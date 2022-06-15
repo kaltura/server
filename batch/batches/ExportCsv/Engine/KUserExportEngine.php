@@ -47,9 +47,20 @@ class KUserExportEngine extends KMappedObjectExportEngine
 	{
 		$dateFormatTypes = array('createdAt', 'lastLoginTime');
 		
+		$statusMapping = array(
+			'BLOCKED' => 'Blocked',
+			'ACTIVE' => 'Active',
+			'DELETED' => 'Deleted',
+		);
+		
 		if ($valueType == 'status')
 		{
-			return $this->getEnumName($value, 'KalturaUserStatus');
+			$enumName = $this->getEnumName($value, 'KalturaUserStatus');
+			if (!isset($statusMapping[$enumName]))
+			{
+				return $enumName;
+			}
+			return $statusMapping[$enumName];
 		}
 		else if (in_array($valueType, $dateFormatTypes))
 		{

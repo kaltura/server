@@ -46,13 +46,46 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 	{
 		$dateFormatTypes = array('createdAt', 'updatedAt');
 		
+		$typeMapping = array(
+			'VIDEO' => 'Video',
+			'IMAGE' => 'Image',
+			'AUDIO' => 'Audio',
+			'LIVE_STREAM_FLASH' => 'Live',
+			'LIVE_STREAM_WINDOWS_MEDIA' => 'Live',
+			'LIVE_STREAM_REAL_MEDIA' => 'Live',
+			'LIVE_STREAM_QUICKTIME' => 'Live',
+		);
+		
+		$statusMapping = array(
+			'ERROR_IMPORTING' => 'Error Uploading',
+			'ERROR_CONVERTING' => 'Error',
+			'IMPORT' => 'Uploading',
+			'PRECONVERT' => 'Converting',
+			'READY' => 'Ready',
+			'DELETED' => 'Deleted',
+			'PENDING' => 'Pending',
+			'MODERATE' => 'Moderate',
+			'BLOCKED' => 'Blocked',
+			'NO_CONTENT' => 'No Media',
+		);
+		
 		if ($valueType == 'mediaType')
 		{
-			return $this->getEnumName($value, 'KalturaMediaType');
+			$enumName = $this->getEnumName($value, 'KalturaMediaType');
+			if (!isset($typeMapping[$enumName]))
+			{
+				return $enumName;
+			}
+			return $typeMapping[$enumName];
 		}
 		else if ($valueType == 'status')
 		{
-			return $this->getEnumName($value, 'KalturaEntryStatus');
+			$enumName = $this->getEnumName($value, 'KalturaEntryStatus');
+			if (!isset($statusMapping[$enumName]))
+			{
+				return $enumName;
+			}
+			return $statusMapping[$enumName];
 		}
 		else if (in_array($valueType, $dateFormatTypes))
 		{
