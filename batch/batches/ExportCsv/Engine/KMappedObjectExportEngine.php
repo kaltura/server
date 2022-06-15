@@ -40,7 +40,10 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
 		
-		
+		if (isset($data->options->defaultHeader) && $data->options->defaultHeader)
+		{
+			$this->addTitleHeaderToCsv($csvFile);
+		}
 
 		$mappedFields = $this->getMappedFieldsAsAssociativeArray($data->mappedFields);
 

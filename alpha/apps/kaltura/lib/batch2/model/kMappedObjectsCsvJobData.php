@@ -22,6 +22,12 @@ abstract class kMappedObjectsCsvJobData extends kExportCsvJobData
 	 * @var array
 	 */
 	protected $mappedFields;
+	
+	/**
+	 * Additional options to set for exporting the csv
+	 * @var kExportToCsvOptions
+	 */
+	protected $options;
 
 	/**
 	 * @return KalturaKeyValue
@@ -69,5 +75,21 @@ abstract class kMappedObjectsCsvJobData extends kExportCsvJobData
 	public function setAdditionalFields($additionalFields)
 	{
 		$this->additionalFields = $additionalFields;
+	}
+	
+	/**
+	 * @return kExportToCsvOptions
+	 */
+	public function getOptions()
+	{
+		return $this->options;
+	}
+	
+	/**
+	 * @param kExportToCsvOptions $options
+	 */
+	public function setOptions($options)
+	{
+		$this->options = $options;
 	}
 }
