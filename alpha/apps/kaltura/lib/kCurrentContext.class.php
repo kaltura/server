@@ -182,8 +182,7 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $entry->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-        kCurrentContext::$virtual_event_id = null;
-
+		
         return $entry;
 	}
 	
@@ -205,7 +204,6 @@ class kCurrentContext
 		kCurrentContext::$partner_id = $asset->getPartnerId();
 		kCurrentContext::$uid = null;
 		kCurrentContext::$is_admin_session = false;
-        kCurrentContext::$virtual_event_id = null;
 
         return $asset;
 	}
@@ -223,7 +221,6 @@ class kCurrentContext
 			kCurrentContext::$partner_id = $requestedPartnerId;
 			kCurrentContext::$uid = $requestedPuserId;
 			kCurrentContext::$is_admin_session = false;
-            kCurrentContext::$virtual_event_id = null;
 
         }
 		else
