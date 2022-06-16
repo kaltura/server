@@ -138,11 +138,11 @@ class RuleEngine extends OpenCalaisConstants
 	 * @param string $value
 	 * @return bool
 	 */
-	protected function checkIfTermMatchingJsonValue($term, $value)
+	protected function checkIfTermMatchingJsonValue(&$term, $value)
 	{
 		$term = strtolower($term);
 		$value = strtolower($value);
-		$value = preg_replace('/(!|"|\?|\'|\.|,|;|\'s)$/', '', $value);
+		$term = preg_replace('/(!|"|\?|\'|\.|,|;|\'s)$/', '', $term);
 		return $term == $value;
 	}
 	/**
