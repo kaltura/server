@@ -99,8 +99,11 @@ class ExportCsvService extends KalturaBaseService
 		$jobData->setUserName($kuser->getPuserId());
 		$jobData->setMappedFields($mappedFields);
 		
-		$dbOptions = $options->toObject();
-		$jobData->setOptions($dbOptions);
+		if ($options)
+		{
+			$dbOptions = $options->toObject();
+			$jobData->setOptions($dbOptions);
+		}
 
 		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), $exportObjectType);
 
