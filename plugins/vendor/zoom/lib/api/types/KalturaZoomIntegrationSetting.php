@@ -69,8 +69,8 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 * @var KalturaZoomGroupParticipationType
 	 */
 	public $groupParticipationType;
-
-
+	
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
@@ -88,7 +88,7 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'enableMeetingUpload',
 		'groupParticipationType',
 		'optInGroupNames',
-		'optOutGroupNames'
+		'optOutGroupNames',
 	);
 
 	public function getMapBetweenObjects()

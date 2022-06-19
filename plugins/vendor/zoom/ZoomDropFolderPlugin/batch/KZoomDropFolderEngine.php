@@ -27,6 +27,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	const NEXT_PAGE_TOKEN = 'next_page_token';
 	const ME = 'me';
 	const TRANSCRIPT = 'TRANSCRIPT';
+	const CC = 'CC';
 	const MP4 = 'MP4';
 	const M4A = 'M4A';
 	
@@ -242,6 +243,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleMeetingFiles($meetingFiles, &$fileInStatusProcessingExists)
 	{
+		$groupParticipationType = $this->dropFolder->zoomVendorIntegration->groupParticipationType;
+		$optInGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optInGroupNames);
+		$optOutGroupNames = explode("\r\n", $this->dropFolder->zoomVendorIntegration->optOutGroupNames);
 		foreach ($meetingFiles as $meetingFile)
 		{
 			if($this->getEntryByReferenceId(zoomProcessor::ZOOM_PREFIX . $meetingFile[self::UUID]))
@@ -249,6 +253,22 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
 			}
+			$partnerId = $this->dropFolder->partnerId;
+			if ($groupParticipationType != KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
+			{
+				$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile, $this->dropFolder->zoomVendorIntegration);
+				if (!$userId)
+				{
+					KalturaLog::err('Could not find user');
+					continue;
+				}
+				if (ZoomBatchUtils::shouldExcludeUserRecordingIngest($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId))
+				{
+					KalturaLog::debug('The user [' . $meetingFile[self::HOST_ID] . '] is configured to not save recordings - Not processing');
+					continue;
+				}
+			}
+
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
@@ -274,7 +294,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 
 					if (count($dropFolderFilesMap) === 0)
 					{
-						if ($recordingFile[self::RECORDING_FILE_TYPE] === self::TRANSCRIPT && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
+						$isTranscript = in_array($recordingFile[self::RECORDING_FILE_TYPE], array(self::TRANSCRIPT, self::CC));
+						if ($isTranscript && isset($this->dropFolder->zoomVendorIntegration->enableZoomTranscription) &&
 							!$this->dropFolder->zoomVendorIntegration->enableZoomTranscription)
 						{
 							continue;
@@ -288,7 +309,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, false);
 								}
-								else if ($recordingFile[self::RECORDING_FILE_TYPE] !== self::TRANSCRIPT)
+								else if (!$isTranscript)
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START]);
@@ -545,7 +566,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		switch ($data->contentMatchPolicy)
 		{
 			case KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW:
-				if ($dropFolderFile->recordingFile->fileType == KalturaRecordingFileType::TRANSCRIPT)
+
+				$isTranscript = in_array($dropFolderFile->recordingFile->fileType, array(KalturaRecordingFileType::TRANSCRIPT, KalturaRecordingFileType::CC));
+
+				if ($isTranscript)
 				{
 					$transcriptProcessor = new zoomTranscriptProcessor($zoomBaseUrl, $dropFolder);
 					$transcriptProcessor->handleRecordingTranscriptComplete($dropFolderFile, $entry);

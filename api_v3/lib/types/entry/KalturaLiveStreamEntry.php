@@ -292,9 +292,13 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 		$propertiesToSkip[] = "id";
 		
 		$this->validatePropertyNotNull("mediaType");
-		$this->validatePropertyNotNull("sourceType");
 		$this->validatePropertyNotNull("streamPassword");
-		if (in_array($this->sourceType, array(KalturaSourceType::AKAMAI_LIVE,KalturaSourceType::AKAMAI_UNIVERSAL_LIVE)))
+		$this->validatePropertyNotNull("sourceType");
+		if ($this->sourceType == KalturaSourceType::AKAMAI_UNIVERSAL_LIVE)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_SOURCE_TYPE_NOT_SUPPORTED, $this->sourceType);
+		}
+		if ($this->sourceType == KalturaSourceType::AKAMAI_LIVE)
 		{
 			$this->validatePropertyNotNull("encodingIP1");
 			$this->validatePropertyNotNull("encodingIP2");
@@ -315,7 +319,7 @@ class KalturaLiveStreamEntry extends KalturaLiveEntry
 	protected function validateEncodingIP ($ip)
 	{
 		if (!filter_var($this->encodingIP1, FILTER_VALIDATE_IP))
-			throw new KalturaAPIException(KalturaErrors::ENCODING_IP_NOT_PINGABLE);	
+			throw new KalturaAPIException(KalturaErrors::ENCODING_IP_NOT_PINGABLE);
 		
 		@exec("ping -w " . kConf::get('ping_default_timeout') . " {$this->encodingIP1}", $output, $return);
 		if ($return)

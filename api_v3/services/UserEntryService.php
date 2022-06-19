@@ -45,7 +45,7 @@ class UserEntryService extends KalturaBaseService {
 	/**
 	 *
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaUserEntry $userEntry
 	 * @return KalturaUserEntry
 	 * @throws KalturaAPIException
@@ -66,7 +66,7 @@ class UserEntryService extends KalturaBaseService {
 
 	/**
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaUserEntry The deleted UserEntry object
  	 * @throws KalturaAPIException
 	 */

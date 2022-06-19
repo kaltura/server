@@ -135,6 +135,11 @@ class kCurrentContext
 	 * @var executionScope
 	 */
 	public static $executionScope = null;
+	
+	/**
+	 * @var int
+	 */
+	public static $virtual_event_id = null;
 
 	public static function getEntryPoint()
 	{
@@ -235,6 +240,7 @@ class kCurrentContext
 			kCurrentContext::$ks_uid = $ksObj->user;
 			kCurrentContext::$master_partner_id = $ksObj->master_partner_id ? $ksObj->master_partner_id : kCurrentContext::$ks_partner_id;
 			kCurrentContext::$is_admin_session = $ksObj->isAdmin();
+			kCurrentContext::$virtual_event_id = $ksObj->getPrivilegeValue(ks::PRIVILEGE_VIRTUAL_EVENT_ID);
 			
 			if($requestedPartnerId == PartnerPeer::GLOBAL_PARTNER && self::$ks_partner_id > PartnerPeer::GLOBAL_PARTNER)
 				$requestedPartnerId = null;

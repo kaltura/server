@@ -13,6 +13,8 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	protected $fromPartnerId;
 	protected $toPartnerId;
 	
+	const DUPLICATE_CATEGORY = 'DUPLICATE_CATEGORY';
+	
 	/* (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
@@ -120,8 +122,24 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 				{
 					self::impersonate($this->toPartnerId);
 					$parentCatId = ($category->parentId != 0) ? $parentCategoryIdMapping[$category->parentId] : null;
-					$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
-					if($result)
+					try
+					{
+						$result = $this->getClient()->category->cloneAction($category->id, $this->fromPartnerId, $parentCatId);
+					}
+					catch (KalturaException $exception)
+					{
+						if ($exception->getCode() === KAsyncCopyPartner::DUPLICATE_CATEGORY)
+						{
+							$categoryFullName = $category->fullName;
+							KalturaLog::info("Category '$categoryFullName' already exists and was not cloned");
+							continue;
+						}
+						else
+						{
+							throw $exception;
+						}
+					}
+					if ($result)
 					{
 						$parentCategoryIdMapping[$category->id] = $result->id;
 						$this->log('created category [' . $result->id . ']');

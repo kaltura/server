@@ -67,7 +67,7 @@ class ThumbParamsService extends KalturaBaseService
 	 * Get Thumb Params by ID
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaThumbParams
 	 */
 	public function getAction($id)
@@ -87,7 +87,7 @@ class ThumbParamsService extends KalturaBaseService
 	 * Update Thumb Params by ID
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaThumbParams $thumbParams
 	 * @return KalturaThumbParams
 	 */
@@ -108,7 +108,7 @@ class ThumbParamsService extends KalturaBaseService
 	 * Delete Thumb Params by ID
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 */
 	public function deleteAction($id)
 	{

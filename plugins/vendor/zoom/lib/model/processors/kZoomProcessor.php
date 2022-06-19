@@ -84,11 +84,9 @@ abstract class kZoomProcessor
 	protected function getEntryOwner($hostEmail, $zoomIntegration)
 	{
 		$partnerId = $zoomIntegration->getPartnerId();
-		$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
-		$userFromZoom = $this->zoomClient->retrieveZoomUser($hostEmail, $accessToken);
 		$zoomUser = new kZoomUser();
 		$zoomUser->setOriginalName($hostEmail);
-		$zoomUser->setProcessedName(kZoomEventHanlder::processZoomUserName($hostEmail, $zoomIntegration, $userFromZoom));
+		$zoomUser->setProcessedName(kZoomEventHanlder::processZoomUserName($hostEmail, $zoomIntegration, $this->zoomClient));
 		$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
 		if (!$dbUser)
 		{

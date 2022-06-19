@@ -73,24 +73,6 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 		$c->add(KuserKgroupPeer::KUSER_ID, $kuserIds, Criteria::IN);
 		return KuserKgroupPeer::doSelect($c);
 	}
-	
-	/**
-	 * get  pgroup ids by kusers
-	 *
-	 * @param array $kuserIds
-	 * @return array
-	 */
-	public static function retrievePgroupIdsByKuserIds($kuserIds)
-	{
-		$kuserKgroups = self::retrieveByKuserIds($kuserIds);
-		$pgroupIds = array();
-		foreach ($kuserKgroups as $kuserKgroup)
-		{
-			/* @var $kuserKgroup KuserKgroup */
-			$pgroupIds[] = $kuserKgroup->getPgroupId();
-		}
-		return $pgroupIds;
-	}
 
 	/**
 	 * @param array $kuserIds
@@ -191,5 +173,23 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
 		
 		return KuserKgroupPeer::doSelectOne($criteria);
+	}
+	
+	/**
+	 * get  pgroup ids by kusers
+	 *
+	 * @param array $kuserIds
+	 * @return array
+	 */
+	public static function retrievePgroupIdsByKuserIds($kuserIds)
+	{
+		$kuserKgroups = self::retrieveByKuserIds($kuserIds);
+		$pgroupIds = array();
+		foreach ($kuserKgroups as $kuserKgroup)
+		{
+			/* @var $kuserKgroup KuserKgroup */
+			$pgroupIds[] = $kuserKgroup->getPgroupId();
+		}
+		return $pgroupIds;
 	}
 } // KuserKgroupPeer

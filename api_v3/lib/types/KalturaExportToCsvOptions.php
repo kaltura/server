@@ -12,9 +12,23 @@ class KalturaExportToCsvOptions extends KalturaObject
 	 */
 	public $format;
 
+	/**
+	 * Setting this property will cause additional columns to be added to the final report. The columns will be related to the specific object type passed (currently only MEDIA_CLIP is supported).
+	 * Please note that this property will NOT change the result filter in any way (i.e passing MEDIA_CLIP here will not force the report to return only media items).
+	 * @var KalturaEntryType
+	 */
+	public $typeEqual;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $defaultHeader;
+
 	private static $mapBetweenObjects = array
 	(
 		'format',
+		'typeEqual',
+		'defaultHeader',
 	);
 
 	public function getMapBetweenObjects()
@@ -25,11 +39,11 @@ class KalturaExportToCsvOptions extends KalturaObject
 	/* (non-PHPdoc)
  	* @see KalturaObject::toObject()
  	*/
-	public function toObject($dbAdditionalField = null, $skip = array())
+	public function toObject($objectToFill = null, $propsToSkip = array())
 	{
-		if(!$dbAdditionalField)
-			$dbAdditionalField = new kFormatField();
-
-		return parent::toObject($dbAdditionalField, $skip);
+		if (is_null($objectToFill))
+			$objectToFill = new kExportToCsvOptions();
+		
+		return parent::toObject($objectToFill, $propsToSkip);
 	}
 }

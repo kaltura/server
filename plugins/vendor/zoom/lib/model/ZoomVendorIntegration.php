@@ -81,62 +81,6 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
 	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD);	}
-	
-	public function getOptOutGroupNames()
-	{
-		return $this->getFromCustomData (self::OPT_OUT_GROUP_NAMES);
-	}
-	public function getOptInGroupNames()
-	{
-		return $this->getFromCustomData (self::OPT_IN_GROUP_NAMES);
-	}
-	
-	public function setGroupParticipationType($v)
-	{
-		if ($v != $this->getGroupParticipationType())
-		{
-			$this->putInCustomData(self::GROUP_PARTICIPATION_TYPE, $v);
-			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
-			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
-		}
-	}
-	
-	public function setOptOutGroupNames($v)
-	{
-		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
-		{
-			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, $v);
-		}
-	}
-	
-	public function addGroupNameToOptOutGroups($v)
-	{
-		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
-		{
-			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, $this->getOptOutGroupNames() . "\r\n" . $v);
-		}
-	}
-	
-	public function setOptInGroupNames($v)
-	{
-		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
-		{
-			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, $v);
-		}
-	}
-	
-	public function addGroupNameToOptInGroups($v)
-	{
-		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
-		{
-			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, $this->getOptInGroupNames() . "\r\n" . $v);
-		}
-	}
-	
-	public function getGroupParticipationType()
-	{
-		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
-	}
 
 	public function setLastError($v)
 	{
@@ -179,25 +123,77 @@ class ZoomVendorIntegration extends VendorIntegration
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 	}
 	
-	public function shouldExcludeUserRecordingsIngest($userId)
+	public function getOptOutGroupNames()
 	{
-		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::NO_CLASSIFICATION)
+		return $this->getFromCustomData (self::OPT_OUT_GROUP_NAMES);
+	}
+	public function getOptInGroupNames()
+	{
+		return $this->getFromCustomData (self::OPT_IN_GROUP_NAMES);
+	}
+	
+	public function setOptOutGroupNames($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
 		{
-			return false;
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, $v);
 		}
-		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds($userId);
-		if (empty($userGroupsArray))
+	}
+	
+	public function addGroupNameToOptOutGroups($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_OUT)
 		{
-			KalturaLog::warning('User with id [' . $userId . '] is not a member of any group. Illegal state.');
-			return true;
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, $this->getOptOutGroupNames() . "\r\n" . $v);
 		}
+	}
+	
+	public function setOptInGroupNames($v)
+	{
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{
-			return $this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptInGroupNames()));
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, $v);
+		}
+	}
+	
+	public function addGroupNameToOptInGroups($v)
+	{
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
+		{
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, $this->getOptInGroupNames() . "\r\n" . $v);
+		}
+	}
+	
+	public function setGroupParticipationType($v)
+	{
+		if ($v != $this->getGroupParticipationType())
+		{
+			$this->putInCustomData(self::GROUP_PARTICIPATION_TYPE, $v);
+			$this->putInCustomData(self::OPT_IN_GROUP_NAMES, '');
+			$this->putInCustomData(self::OPT_OUT_GROUP_NAMES, '');
+		}
+	}
+	
+	public function getGroupParticipationType()
+	{
+		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
+	}
+	
+	public function shouldExcludeUserRecordingsIngest($puserId)
+	{
+		$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId);
+		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds(array($kuser->getId()));
+		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
+		{
+			$optInGroupNames = explode("\r\n", $this->getOptInGroupNames());
+			KalturaLog::debug('Account is configured to OPT IN users that are members of the groups ['. print_r($optInGroupNames, true) .']');
+			return $this->intersectPolicyGroupsAndUserGroups($userGroupsArray, $optInGroupNames);
 		}
 		else
 		{
-			return !($this->intersectPolicyGroupsAndUserGroups($userGroupsArray, explode("\r\n", $this->getOptOutGroupNames())));
+			$optOutGroupNames = explode("\r\n", $this->getOptOutGroupNames());
+			KalturaLog::debug('Account is configured to OPT OUT users that are members of the groups ['. print_r($optOutGroupNames, true) .']');
+			return !($this->intersectPolicyGroupsAndUserGroups($userGroupsArray, $optOutGroupNames));
 		}
 	}
 	

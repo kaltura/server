@@ -39,7 +39,7 @@ class AccessControlService extends KalturaBaseService
 	 * Get Access Control Profile by id
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaAccessControl
 	 */
 	function getAction($id)
@@ -57,7 +57,7 @@ class AccessControlService extends KalturaBaseService
 	 * Update Access Control Profile by id
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaAccessControl $accessControl
 	 * @return KalturaAccessControl
 	 * 
@@ -91,7 +91,7 @@ class AccessControlService extends KalturaBaseService
 	 * Delete Access Control Profile by id
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 */
 	function deleteAction($id)
 	{

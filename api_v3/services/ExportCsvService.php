@@ -22,6 +22,7 @@ class ExportCsvService extends KalturaBaseService
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
 	 * @param KalturaKeyValueArray $mappedFields mapping between field
 	 * headline and its mapped value
+	 * @param KalturaExportToCsvOptions $options
 	 * @return string
 	 *
 	 * @throws APIErrors::USER_EMAIL_NOT_FOUND
@@ -31,14 +32,15 @@ class ExportCsvService extends KalturaBaseService
 	public function userExportToCsvAction (KalturaUserFilter $filter = null,
 	                                       $metadataProfileId = null,
 	                                       $additionalFields = null,
-	                                       KalturaKeyValueArray $mappedFields = null)
+	                                       KalturaKeyValueArray $mappedFields = null,
+	                                       KalturaExportToCsvOptions $options = null)
 	{
 		if(!$filter)
 		{
 			$filter = new KalturaUserFilter();
 		}
 		return $this->exportMappedObjectToCsv(ExportObjectType::USER, new kUsersCsvJobData(),
-			$filter, $metadataProfileId, $additionalFields, $mappedFields);
+			$filter, $metadataProfileId, $additionalFields, $mappedFields, $options);
 	}
 
 	/**
@@ -49,20 +51,22 @@ class ExportCsvService extends KalturaBaseService
 	 * @param int $metadataProfileId
 	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
 	 * @param KalturaKeyValueArray $mappedFields mapping between field headline and its mapped value
+	 * @param KalturaExportToCsvOptions $options
 	 * @return string
 	 */
 	public function entryExportToCsvAction(KalturaBaseEntryFilter $filter = null, $metadataProfileId = null,
-	                                       $additionalFields = null, KalturaKeyValueArray $mappedFields = null)
+	                                       $additionalFields = null, KalturaKeyValueArray $mappedFields = null,
+	                                       KalturaExportToCsvOptions $options = null)
 	{
 		if (!$filter)
 		{
 			$filter = new KalturaBaseEntryFilter();
 		}
 		return $this->exportMappedObjectToCsv(ExportObjectType::ENTRY, new kEntriesCsvJobData(),
-			$filter, $metadataProfileId, $additionalFields, $mappedFields);
+			$filter, $metadataProfileId, $additionalFields, $mappedFields, $options);
 	}
 
-	protected function exportMappedObjectToCsv($exportObjectType, $jobData, $filter, $metadataProfileId, $additionalFields, $mappedFields)
+	protected function exportMappedObjectToCsv($exportObjectType, $jobData, $filter, $metadataProfileId, $additionalFields, $mappedFields, $options)
 	{
 		$kuser = $this->getKuser();
 		if(!$kuser || !$kuser->getEmail())
@@ -94,6 +98,12 @@ class ExportCsvService extends KalturaBaseService
 		$jobData->setUserMail($kuser->getEmail());
 		$jobData->setUserName($kuser->getPuserId());
 		$jobData->setMappedFields($mappedFields);
+		
+		if ($options)
+		{
+			$dbOptions = $options->toObject();
+			$jobData->setOptions($dbOptions);
+		}
 
 		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), $exportObjectType);
 

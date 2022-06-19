@@ -156,7 +156,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 				self::STAT_COUNT => 1,
 				self::STAT_TIME => $end - $start));
 			
-			if (!$this->lastError)
+			if (!$this->lastError || strpos($this->lastError, 'object too large') !== false)
 			{
 				return $result;
 			}

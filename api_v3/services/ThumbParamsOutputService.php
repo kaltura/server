@@ -20,7 +20,7 @@ class ThumbParamsOutputService extends KalturaBaseService
 	 * Get thumb params output object by ID
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaThumbParamsOutput
 	 * @throws KalturaErrors::THUMB_PARAMS_OUTPUT_ID_NOT_FOUND
 	 */

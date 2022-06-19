@@ -8,12 +8,11 @@ abstract class zoomProcessor
 	const ONE_DAY_IN_SECONDS = 86400;
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
-	const URL_ACCESS_TOKEN = '?access_token=';
+	const URL_ACCESS_TOKEN = 'access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const MAX_PUSER_LENGTH = 100;
 	const EMAIL = 'email';
-	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
 	
 	/**
 	 * @var kZoomClient
@@ -36,46 +35,6 @@ abstract class zoomProcessor
 		$accessToken = isset($folder->accessToken) ? $folder->accessToken : null;
 		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
 		$this->dropFolder = $folder;
-	}
-	
-	/**
-	 * @param string $userName
-	 * @return string kalturaUserName
-	 */
-	protected function processZoomUserName($userName)
-	{
-		$result = $userName;
-		switch ($this->dropFolder->zoomVendorIntegration->zoomUserMatchingMode)
-		{
-			case kZoomUsersMatching::ADD_POSTFIX:
-				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
-				if (!kString::endsWith($result, $postFix, false))
-				{
-					$result = $result . $postFix;
-				}
-				
-				break;
-			case kZoomUsersMatching::REMOVE_POSTFIX:
-				$postFix = $this->dropFolder->zoomVendorIntegration->zoomUserPostfix;
-				if (kString::endsWith($result, $postFix, false))
-				{
-					$result = substr($result, 0, strlen($result) - strlen($postFix));
-				}
-				
-				break;
-			case kZoomUsersMatching::CMS_MATCHING:
-				$zoomUser = $this->zoomClient->retrieveZoomUser($userName);
-				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
-				{
-					$result = $zoomUser[self::CMS_USER_FIELD];
-				}
-				break;
-			case kZoomUsersMatching::DO_NOT_MODIFY:
-			default:
-				break;
-		}
-		
-		return $result;
 	}
 	
 	/**
@@ -104,80 +63,6 @@ abstract class zoomProcessor
 		return $kalturaEntry->objects;
 	}
 	
-	/**
-	 * @param string $hostEmail
-	 * @return string
-	 */
-	protected function getEntryOwnerId($hostEmail)
-	{
-		$userId = self::KALTURA_ZOOM_DEFAULT_USER;
-		$defaultUser = $this->dropFolder->zoomVendorIntegration->defaultUserId;
-		$createUserIfNotExist = $this->dropFolder->zoomVendorIntegration->createUserIfNotExist;
-		if($hostEmail == '')
-		{
-			return $createUserIfNotExist ? $userId : $defaultUser;
-		}
-		$partnerId = $this->dropFolder->partnerId;
-		$zoomUser = new kZoomUser();
-		$zoomUser->setOriginalName($hostEmail);
-		$zoomUser->setProcessedName($this->processZoomUserName($hostEmail));
-		KBatchBase::impersonate($partnerId);
-		/* @var $user KalturaUser */
-		$user = $this->getKalturaUser($partnerId, $zoomUser);
-		KBatchBase::unimpersonate();
-		if($user)
-		{
-			$userId = $user->id;
-		}
-		else
-		{
-			if($createUserIfNotExist)
-			{
-				$userId = $zoomUser->getProcessedName();
-			}
-			else if($defaultUser)
-			{
-				$userId = $defaultUser;
-			}
-		}
-		return $userId;
-	}
-	
-	/**
-	 * @param int $partnerId
-	 * @param kZoomUser $kZoomUser
-	 * @return kuser
-	 */
-	protected function getKalturaUser($partnerId, $kZoomUser)
-	{
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1;
-		$pager->pageIndex = 1;
-		
-		$filter = new KalturaUserFilter();
-		$filter->partnerIdEqual = $partnerId;
-		$filter->idEqual = $kZoomUser->getProcessedName();
-		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
-		if (!$kalturaUser->objects)
-		{
-			$email = $kZoomUser->getOriginalName();
-			$filterUser = new KalturaUserFilter();
-			$filterUser->partnerIdEqual = $partnerId;
-			$filterUser->emailStartsWith = $email;
-			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
-			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
-			{
-				return null;
-			}
-		}
-		
-		if($kalturaUser->objects)
-		{
-			return $kalturaUser->objects[0];
-		}
-		return null;
-	}
-	
 	protected function createNewUser($partnerId, $puserId)
 	{
 		if (!is_null($puserId))
@@ -199,17 +84,22 @@ abstract class zoomProcessor
 	{
 		$url = null;
 		$redirectUrl = null;
+		$urlAccessToken = "?" . self::URL_ACCESS_TOKEN;
+		if(strpos($recording->recordingFile->downloadUrl, "?") !== false)
+		{
+			$urlAccessToken = "&" . self::URL_ACCESS_TOKEN;
+		}
 		if (isset($recording->recordingFile->downloadToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $recording->recordingFile->downloadToken;
+			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $recording->recordingFile->downloadToken;
 		}
 		else if (isset($this->dropFolder->accessToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->accessToken;
+			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->accessToken;
 		}
 		else if (isset($this->dropFolder->jwtToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . self::URL_ACCESS_TOKEN . $this->dropFolder->jwtToken;
+			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->jwtToken;
 		}
 		
 		if ($url)

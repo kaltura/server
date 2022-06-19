@@ -73,7 +73,7 @@ class FlavorParamsService extends KalturaBaseService
 	 * Get Flavor Params by ID
 	 * 
 	 * @action get
-	 * @param int $id
+	 * @param bigint $id
 	 * @return KalturaFlavorParams
 	 */
 	public function getAction($id)
@@ -93,7 +93,7 @@ class FlavorParamsService extends KalturaBaseService
 	 * Update Flavor Params by ID
 	 * 
 	 * @action update
-	 * @param int $id
+	 * @param bigint $id
 	 * @param KalturaFlavorParams $flavorParams
 	 * @return KalturaFlavorParams
 	 */
@@ -118,7 +118,7 @@ class FlavorParamsService extends KalturaBaseService
 	 * Delete Flavor Params by ID
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 */
 	public function deleteAction($id)
 	{
