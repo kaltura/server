@@ -19,13 +19,10 @@ class KafkaProvider extends QueueProvider
 			$brokersArray = explode(",", $brokers);
 			$newBrokersArray = array();
 			foreach ($brokersArray as &$broker) {
-				$hostAndPort = explode(":", $broker);
-				$host = $hostAndPort[0];
-				if (!$hostAndPort[1]) {
-					KalturaLog::log($host . " has no port umber, default port is defined");
+				list($host, $port) = explode(":", $broker);
+				if(!$port)
+				{
 					$port = self::DEFAULT_PORT;
-				} else {
-					$port = $hostAndPort[1];
 				}
 				array_push($newBrokersArray, $host . ":" . $port);
 			}
@@ -106,7 +103,7 @@ class KafkaProvider extends QueueProvider
 		$this->producer->purge(RD_KAFKA_PURGE_F_QUEUE);
 	}
 	
-	public function sendWithPartitionKey($queueName, $partitionKey, $kafkaPayload)
+	public function produce($queueName, $partitionKey, $kafkaPayload)
 	{
 		$partitionNum = $this->getTopic($queueName);
 		if ($partitionNum == 0) {
@@ -117,34 +114,7 @@ class KafkaProvider extends QueueProvider
 		for ($retry = 1; ; $retry++) {
 			try {
 				$this->create($queueName);
-				$this->topic->produce($partitionId, 0, json_encode($kafkaPayload));
-				$this->producer->poll(0);
-				$result = $this->producer->flush(10000);
-				break;
-			} catch (Exception $e) {
-				if ($retry == self::MAX_RETRIES) {
-					throw $e;
-				}
-			}
-		}
-		if (!RD_KAFKA_RESP_ERR_NO_ERROR === $result) {
-			KalturaLog::err("producing kafka msg failed");
-		}
-		$this->producer->purge(RD_KAFKA_PURGE_F_QUEUE);
-	}
-	
-	public function sendWithPartitionKeyAvro($queueName, $partitionKey, $message)
-	{
-		$partitionNum = $this->getTopic($queueName);
-		if ($partitionNum == 0) {
-			KalturaLog::err("kafka topic [$queueName] not found");
-		}
-		$partitionId = $this->getPartitionId($partitionKey, $partitionNum);
-		
-		for ($retry = 1; ; $retry++) {
-			try {
-				$this->create($queueName);
-				$this->topic->produce($partitionId, 0, $message);
+				$this->topic->produce($partitionId, 0, $kafkaPayload);
 				$this->producer->poll(0);
 				$result = $this->producer->flush(10000);
 				break;

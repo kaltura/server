@@ -23,7 +23,7 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 	 */
 	protected function addTypeElements(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate)
 	{
-		$format = new Kaltura_Form_Element_EnumSelect('format', array(
+		$format = new Kaltura_Form_Element_EnumSelect('message_format', array(
 			'enum' => 'Kaltura_Client_KafkaNotification_Enum_KafkaNotificationFormat',
 			'label' => 'Format:',
 			'filters' => array('StringTrim'),
@@ -31,5 +31,16 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 		));
 		$this->addElements(array($format));
 		
+		$this->addElement('text', 'topic_name', array(
+			'label'			=> 'topic name:',
+			'size'			=> 60,
+			'filters'		=> array('StringTrim'),
+		));
+		
+		$this->addElement('text', 'partition_key', array(
+			'label'			=> 'partition key:',
+			'size'			=> 60,
+			'filters'		=> array('StringTrim'),
+		));
 	}
 }

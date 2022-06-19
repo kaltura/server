@@ -62,7 +62,6 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		return $this->getFromCustomData(self::CUSTOM_DATA_MESSAGE_FORMAT);
 	}
 	
-	
 	public function dispatch(kScope $scope)
 	{
 		KalturaLog::debug("Dispatching event notification with name [{$this->getName()}] systemName [{$this->getSystemName()}]");
@@ -80,51 +79,34 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		$objectArray = $object->toArray();
 		$oldValues = $this->oldColumnsValues;
 		
-		$msg = json_encode(array(
+		$data = [
 			"uniqueId" => $uniqueId,
 			"eventTime" => $eventTime,
 			"eventType" => $eventType,
 			"objectType" => $objectType,
 			"object" => $objectArray,
 			"oldValues" => $oldValues
-		));
+		];
 		
 		try {
 			$topicName = $this->getTopicName();
-			$subject = $topicName . '-value';
 			$messageFormat = $this->getMessageFormat();
 			
 			$partitionKey = $this->getPartitionKey();
 			$queueProvider = QueueProvider::getInstance(KafkaPlugin::getKafakaQueueProviderTypeCoreValue('Kafka'));
 			
 			if (in_array($partitionKey, (array)$object)) {
-				if ($messageFormat == '2') {
-					$schemaRegistry = new BlockingRegistry(
-						new PromisingRegistry(
-							new Client(['base_uri' => '192.168.56.1:8081'])
-						)
-					);
-					
-					$schemaId = $schemaRegistry->schemaId("schemaName");
-					$schema = $schemaRegistry->schemaForId($schemaId);
-					
-					$io = new \AvroStringIO();
-					$io->write(pack('C', 0));
-					$io->write(pack('N', $schemaId));
-					$encoder = new \AvroIOBinaryEncoder($io);
-					$writer = new \AvroIODatumWriter($schema);
-					$writer->write($msg, $encoder);
-					$kafkaPayload = $io->string();
-					
-					$queueProvider->sendWithPartitionKeyAvro($topicName, $partitionKey, $kafkaPayload);
+				if ($messageFormat == KafkaNotificationFormat::AVRO) {
+					$kafkaPayload = $this->handleAvroMessage($topicName, $schema, $data);
+					$queueProvider->produce($topicName, $partitionKey, $kafkaPayload);
 				} else {
-					$queueProvider->sendWithPartitionKey($topicName, $partitionKey, $msg);
+					$queueProvider->produce($topicName, $partitionKey, json_encode($data));
 				}
 			} else {
 				KalturaLog::err("partition key [$partitionKey] doen't exists in topic [$topicName]");
 			}
 			
-		} catch (PhpAmqpLib\Exception\AMQPRuntimeException $e) {
+		} catch (RdKafka\KafkaErrorException $e) {
 			KalturaLog::debug("Failed to send message with error [" . $e->getMessage() . "]");
 			throw $e;
 		}
@@ -142,5 +124,68 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		// get instance of activated queue proivder and check whether given queue exists
 		$queueProvider = QueueProvider::getInstance();
 		return $queueProvider->exists($queueKey);
+	}
+	
+	/**
+	 * @return BlockingRegistry
+	 * @throws kCoreException
+	 */
+	private function getSchemaRegistry(): BlockingRegistry
+	{
+		if (!kConf::hasMap('kafka')) {
+			throw new kCoreException("Kafka configuration file (kafka.ini) wasn't found!");
+		}
+		
+		$kafkaConfig = kConf::getMap('kafka');
+		$schemaRegistryServer = $kafkaConfig['schemaregistryserver'];
+		$schemaRegistryPort = $kafkaConfig['schemaregistryport'];
+		
+		$schemaRegistry = new BlockingRegistry(
+			new PromisingRegistry(
+				new Client(['base_uri' => $schemaRegistryServer . ":" . $schemaRegistryPort])
+			)
+		);
+		return $schemaRegistry;
+	}
+	
+	/**
+	 * @param int $schemaId
+	 * @param AvroSchema $schema
+	 * @param array $data
+	 * @return string
+	 * @throws AvroIOException
+	 */
+	private function getKafkaPayload(int $schemaId, AvroSchema $schema, array $data): string
+	{
+		$io = new \AvroStringIO();
+		$io->write(pack('C', 0));
+		$io->write(pack('N', $schemaId));
+		$encoder = new \AvroIOBinaryEncoder($io);
+		$writer = new \AvroIODatumWriter($schema);
+		$writer->write($data, $encoder);
+		$kafkaPayload = $io->string();
+		return $kafkaPayload;
+	}
+	
+	/**
+	 * @param string $subject
+	 * @param string $schema
+	 * @param array $data
+	 * @return string
+	 * @throws AvroIOException
+	 * @throws AvroSchemaParseException
+	 * @throws \FlixTech\SchemaRegistryApi\Exception\SchemaRegistryException
+	 * @throws kCoreException
+	 */
+	private function handleAvroMessage(string $topicName, string $schema, array $data): string
+	{
+		$subject = $topicName . '-value';
+		$schemaRegistry = $this->getSchemaRegistry();
+		
+		$schema = $schemaRegistry->latestVersion($subject);
+		$schemaId = $schemaRegistry->schemaId($subject, $schema);
+		
+		$kafkaPayload = $this->getKafkaPayload($schemaId, $schema, $data);
+		return $kafkaPayload;
 	}
 }
