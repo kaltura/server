@@ -77,7 +77,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		$objectArray = $scope->getEvent();
 		$object = $objectArray->getObject();
 		$objectArray = $object->toArray();
-		$oldValues = $this->oldColumnsValues;
+		//$oldValues = $this->oldColumnsValues;
 		
 		$data = [
 			"uniqueId" => $uniqueId,
@@ -85,7 +85,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			"eventType" => $eventType,
 			"objectType" => $objectType,
 			"object" => $objectArray,
-			"oldValues" => $oldValues
+		//	"oldValues" => $oldValues
 		];
 		
 		try {
@@ -97,7 +97,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			
 			if (in_array($partitionKey, (array)$object)) {
 				if ($messageFormat == KafkaNotificationFormat::AVRO) {
-					$kafkaPayload = $this->handleAvroMessage($topicName, $schema, $data);
+					$kafkaPayload = $this->handleAvroMessage($topicName, $data);
 					$queueProvider->produce($topicName, $partitionKey, $kafkaPayload);
 				} else {
 					$queueProvider->produce($topicName, $partitionKey, json_encode($data));
@@ -177,7 +177,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	 * @throws \FlixTech\SchemaRegistryApi\Exception\SchemaRegistryException
 	 * @throws kCoreException
 	 */
-	private function handleAvroMessage(string $topicName, string $schema, array $data): string
+	private function handleAvroMessage(string $topicName, array $data): string
 	{
 		$subject = $topicName . '-value';
 		$schemaRegistry = $this->getSchemaRegistry();
