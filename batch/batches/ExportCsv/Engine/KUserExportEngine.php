@@ -26,7 +26,7 @@ class KUserExportEngine extends KMappedObjectExportEngine
 			'id' => $item->id,
 			'firstName' => $item->firstName,
 			'lastName' => $item->lastName,
-			'email' =>$item->email
+			'email' => $item->email
 		);
 	}
 
