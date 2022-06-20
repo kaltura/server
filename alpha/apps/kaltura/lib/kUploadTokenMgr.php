@@ -178,7 +178,7 @@ class kUploadTokenMgr
 		$this->_uploadToken->save();
 		
 		$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
-		if ($flavorAsset)
+		if ($flavorAsset && $flavorAsset->getType() == assetType::FLAVOR)
 		{
 			$service = new BaseEntryService();
 			$service->initService('baseEntry', 'baseEntry', 'updateContent');
