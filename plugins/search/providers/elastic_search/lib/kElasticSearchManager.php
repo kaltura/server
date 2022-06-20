@@ -249,22 +249,22 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         return false;
     }
 
-	private function addCacheKeyForSphinxLog($cache, $lockKey)
+    private function addCacheKeyForSphinxLog($cache, $lockKey)
+    {
+	if(!$cache)
 	{
-		if(!$cache)
-		{
-			return false;
-		}
-		if($cache->add($lockKey, 0, 60))
-		{
-			return true;
-		}
-		elseif($cache->get($lockKey) == self::MAX_SPHINX_LOG_CACHE_KEYS || !$cache->increment($lockKey))
-		{
-			return false;
-		}
+		return false;
+	}
+	if($cache->add($lockKey, 0, 60))
+	{
 		return true;
 	}
+	elseif($cache->get($lockKey) == self::MAX_SPHINX_LOG_CACHE_KEYS || !$cache->increment($lockKey))
+	{
+		return false;
+	}
+	return true;
+    }
 
     private function retrieveElasticClusterId()
     {
