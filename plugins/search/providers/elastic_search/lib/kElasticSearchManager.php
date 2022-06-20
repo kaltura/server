@@ -13,6 +13,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const CACHE_PREFIX_STICKY_SESSIONS = 'elastic_large_sql_lock_';
     const REPETITIVE_UPDATES_CONFIG_KEY = 'skip_elastic_repetitive_updates';
     const METADATA_MAX_LENGTH = 256;
+    const MAX_SPHINX_LOG_CACHE_KEYS = 1;
 
     /**
      * @param BaseObject $object
@@ -239,7 +240,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         {
             $lockKey = self::CACHE_PREFIX_STICKY_SESSIONS . $object->getElasticObjectName() . '_' . $object->getId();
             $cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_STICKY_SESSIONS);
-            if ($cache && !$cache->add($lockKey, true, 60))
+            if (!$this->addCacheKeyForSphinxLog($cache, $lockKey))
             {
                 KalturaLog::log('skipping saving elastic sphinxLog sql for key ' . $lockKey . ' size is - ' . $commandSize);
                 return true;
@@ -247,6 +248,23 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         }
         return false;
     }
+
+	private function addCacheKeyForSphinxLog($cache, $lockKey)
+	{
+		if(!$cache)
+		{
+			return false;
+		}
+		if($cache->add($lockKey, 0, 60))
+		{
+			return true;
+		}
+		elseif($cache->get($lockKey) == self::MAX_SPHINX_LOG_CACHE_KEYS || !$cache->increment($lockKey))
+		{
+			return false;
+		}
+		return true;
+	}
 
     private function retrieveElasticClusterId()
     {
