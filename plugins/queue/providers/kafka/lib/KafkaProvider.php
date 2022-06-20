@@ -2,10 +2,6 @@
 
 class KafkaProvider extends QueueProvider
 {
-	private $brokersArray = array();
-	private $server;
-	private $port;
-	private $conf;
 	protected $topic = null;
 	protected $producer = null;
 	
@@ -16,6 +12,7 @@ class KafkaProvider extends QueueProvider
 	{
 		if (isset($kafkaConfig['brokers']))
 		{
+			$brokersArray = array();
 			$brokers = $kafkaConfig['brokers'];
 			$brokers = explode(",", $brokers);
 			
@@ -27,33 +24,32 @@ class KafkaProvider extends QueueProvider
 					$port = self::DEFAULT_PORT;
 				}
 				
-				$this->brokersArray[] = "$host:$port";
+				$brokersArray[] = "$host:$port";
 			}
 		}
 		else
 		{
-			$this->server = $kafkaConfig['server'];
-			$this->port = $kafkaConfig['port'];
+			$server = $kafkaConfig['server'];
+			$port = $kafkaConfig['port'];
 		}
 		
 		$conf = new RdKafka\Conf();
 		$conf->set('log_level', (string)LOG_DEBUG);
-		if ($this->server)
+		if ($server)
 		{
-			$conf->set('metadata.broker.list', $this->server . ':' . $this->port);
+			$conf->set('metadata.broker.list', $server . ':' . $port);
 		}
 		
-		if ($kafkaConfig['username'] && $kafkaConfig['password'])
+		if (isset($kafkaConfig['username']) && isset($kafkaConfig['password']))
 		{
 			$conf->set('sasl.username', $kafkaConfig['username']);
 			$conf->set('sasl.password', $kafkaConfig['password']);
 		}
 		
-		$this->conf = $conf;
 		$producer = new RdKafka\Producer($conf);
-		if ($this->brokersArray)
+		if ($brokersArray)
 		{
-			$producer->addBrokers(implode(',', $this->brokersArray));
+			$producer->addBrokers(implode(',', $$brokersArray));
 		}
 		
 		$this->producer = $producer;
@@ -93,7 +89,8 @@ class KafkaProvider extends QueueProvider
 		{
 			KalturaLog::err("producing kafka msg failed");
 		}
-//		$this->producer->purge(RD_KAFKA_PURGE_F_QUEUE);
+		
+		//$this->producer->purge(RD_KAFKA_PURGE_F_QUEUE);
 	}
 	
 	public function produce($topic, $partitionKey, $kafkaPayload)

@@ -1,9 +1,9 @@
 <?php
-//require_once(dirname(__file__) . "/../../../../../../vendor/avro/flix-tech/confluent-schema-registry-api/vendor/autoload.php");
-//
-//use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
-//use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
-//use GuzzleHttp\Client;
+require_once(dirname(__file__) . "/../../../../../../vendor/avro/flix-tech/confluent-schema-registry-api/vendor/autoload.php");
+
+use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
+use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
+use GuzzleHttp\Client;
 
 /**
  * @package plugins.kafkaNotification
@@ -136,7 +136,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			$topicName = $this->getTopicName();
 			$messageFormat = $this->getMessageFormat();
 			$queueProvider = QueueProvider::getInstance(KafkaPlugin::getKafakaQueueProviderTypeCoreValue('Kafka'));
-			$kafkaPayload = $this->getKafkaPayload();
+			$kafkaPayload = $this->getKafkaPayload($topicName, $msg, $messageFormat);
 			
 			if(!$kafkaPayload)
 			{
@@ -154,15 +154,13 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		}
 	}
 	
-	private function getKafkaPayload($topicName, $data)
+	private function getKafkaPayload($topicName, $msg, $messageFormat)
 	{
 		$kafkaPayload = null;
 		
 		if($messageFormat == KafkaNotificationFormat::AVRO)
 		{
-			$kafkaPayload = $this->getAvroPayload($topicName, $data);
-			$queueProvider->produce($topicName, $partitionKey, $kafkaPayload);
-			
+			$kafkaPayload = $this->getAvroPayload($topicName, $msg);
 		}
 		elseif($messageFormat == KafkaNotificationFormat::JSON)
 		{
@@ -180,21 +178,21 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	/**
 	 * @param string $subject
 	 * @param string $schema
-	 * @param array $data
+	 * @param array $msg
 	 * @return string
 	 * @throws AvroIOException
 	 * @throws AvroSchemaParseException
 	 * @throws \FlixTech\SchemaRegistryApi\Exception\SchemaRegistryException
 	 * @throws kCoreException
 	 */
-	private function getAvroPayload($topicName, $data)
+	private function getAvroPayload($topicName, $msg)
 	{
 		list($schema, $schemaId) = $this->getSchemaInfo($topicName . '-value');
 		if(!($schema && $schemaId))
 		{
 			return null;
 		}
-		return $this->buildAvroPayload($schemaId, $schema, $data);
+		return $this->buildAvroPayload($schemaId, $schema, $msg);
 	}
 	
 	private function getSchemaInfo($subject)
@@ -239,18 +237,18 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	/**
 	 * @param int $schemaId
 	 * @param AvroSchema $schema
-	 * @param array $data
+	 * @param array $msg
 	 * @return string
 	 * @throws AvroIOException
 	 */
-	private function buildAvroPayload($schemaId, $schema, $data)
+	private function buildAvroPayload($schemaId, $schema, $msg)
 	{
 		$io = new \AvroStringIO();
 		$io->write(pack('C', 0));
 		$io->write(pack('N', $schemaId));
 		$encoder = new \AvroIOBinaryEncoder($io);
 		$writer = new \AvroIODatumWriter($schema);
-		$writer->write($data, $encoder);
+		$writer->write($msg, $encoder);
 		return $io->string();
 	}
 }
