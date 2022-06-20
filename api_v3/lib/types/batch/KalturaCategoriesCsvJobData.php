@@ -7,7 +7,7 @@ class KalturaCategoriesCsvJobData extends KalturaMappedObjectsCsvJobData
 {
 	
 	/**
-	 * The filter should return the list of entries that need to be specified in the csv.
+	 * The filter should return the list of categories that need to be specified in the csv.
 	 * @var KalturaCategoryFilter
 	 */
 	public $filter;

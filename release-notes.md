@@ -1,3 +1,11 @@
+# Rigel-18.8.0
+## Export categories to CSV
+* Issue Type: Task
+* Issue ID: PLAT-23743
+
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_16_add_category_export_csv_permissions.php
+
 # Rigel-18.7.0
 ## Add 'country' to kaltura_kuser index as searchable field ##
 * Issue Type: Task

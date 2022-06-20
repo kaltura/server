@@ -8,7 +8,7 @@ class KCategoryExportEngine extends KMappedObjectExportEngine
 {
 	protected function getFilterOrderBy()
 	{
-		return KalturaBaseEntryOrderBy::CREATED_AT_ASC;
+		return KalturaCategoryOrderBy::CREATED_AT_ASC;
 	}
 
 	protected function getItemList($filter, $pager)
