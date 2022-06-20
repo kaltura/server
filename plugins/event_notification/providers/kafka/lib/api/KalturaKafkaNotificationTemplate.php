@@ -16,17 +16,26 @@ class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
 	/**
 	 * Define the content dynamic parameters
 	 * @var string
+	 * @requiresPermission update
 	 */
 	public $partitionKey;
 	
 	/**
 	 * Define the content dynamic parameters
 	 * @var KalturaKafkaNotificationFormat
+	 * @requiresPermission update
 	 */
 	public $messageFormat;
 	
+	/**
+	 * Kaltura API object type
+	 * @var string
+	 * @requiresPermission update
+	 */
+	public $apiObjectType;
 	
-	private static $map_between_objects = array('topicName', 'partitionKey', 'messageFormat');
+	
+	private static $map_between_objects = array('topicName', 'partitionKey', 'messageFormat', 'apiObjectType');
 	
 	public function __construct()
 	{

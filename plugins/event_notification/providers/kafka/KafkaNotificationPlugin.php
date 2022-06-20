@@ -26,7 +26,8 @@ class KafkaNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	public static function isAllowedPartner($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if ($partner) {
+		if ($partner)
+		{
 			// check that both the Kafka plugin and the event notification plugin are enabled
 			return $partner->getPluginEnabled(self::PLUGIN_NAME) && EventNotificationPlugin::isAllowedPartner($partnerId);
 		}
@@ -57,8 +58,10 @@ class KafkaNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 	{
 		
 		$class = self::getObjectClass($baseClass, $enumValue);
-		if ($class) {
-			if (is_array($constructorArgs)) {
+		if ($class)
+		{
+			if (is_array($constructorArgs))
+			{
 				$reflect = new ReflectionClass($class);
 				return $reflect->newInstanceArgs($constructorArgs);
 			}
@@ -130,7 +133,8 @@ class KafkaNotificationPlugin extends KalturaPlugin implements IKalturaPermissio
 		$array = array();
 		
 		$langFilePath = __DIR__ . "/config/lang/$locale.php";
-		if (!file_exists($langFilePath)) {
+		if (!file_exists($langFilePath))
+		{
 			$default = 'en';
 			$langFilePath = __DIR__ . "/config/lang/$default.php";
 		}

@@ -1,9 +1,9 @@
 <?php
-require_once(dirname(__file__) . "/../../../../../../vendor/avro/flix-tech/confluent-schema-registry-api/vendor/autoload.php");
-
-use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
-use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
-use GuzzleHttp\Client;
+//require_once(dirname(__file__) . "/../../../../../../vendor/avro/flix-tech/confluent-schema-registry-api/vendor/autoload.php");
+//
+//use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
+//use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
+//use GuzzleHttp\Client;
 
 /**
  * @package plugins.kafkaNotification
@@ -14,6 +14,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	const CUSTOM_DATA_TOPIC_NAME = 'topicName';
 	const CUSTOM_DATA_PARTITION_KEY = 'partitionKey';
 	const CUSTOM_DATA_MESSAGE_FORMAT = 'messageFormat';
+	const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
 	
 	public function __construct()
 	{
@@ -62,108 +63,117 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		return $this->getFromCustomData(self::CUSTOM_DATA_MESSAGE_FORMAT);
 	}
 	
+	public function setApiObjectType($value)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_API_OBJECT_TYPE, $value);
+	}
+	
+	public function getApiObjectType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_API_OBJECT_TYPE);
+	}
+	
 	public function dispatch(kScope $scope)
 	{
 		KalturaLog::debug("Dispatching event notification with name [{$this->getName()}] systemName [{$this->getSystemName()}]");
-		if (!$scope || !($scope instanceof kEventScope)) {
+		if (!$scope || !($scope instanceof kEventScope))
+		{
 			KalturaLog::err('Failed to dispatch due to incorrect scope [' . $scope . ']');
 			return;
 		}
 		
-		$uniqueId = (string)new UniqueId();
-		$eventTime = date('Y-m-d H:i:s');
-		$eventType = $_REQUEST[action];
-		$objectType = $_REQUEST[service];
-		$objectArray = $scope->getEvent();
-		$object = $objectArray->getObject();
-		$objectArray = $object->toArray();
-		//$oldValues = $this->oldColumnsValues;
+		if (!kConf::hasMap('kafka'))
+		{
+			KalturaLog::debug("Kafka configuration file (kafka.ini) wasn't found!");
+			return;
+		}
 		
-		$data = [
-			"uniqueId" => $uniqueId,
-			"eventTime" => $eventTime,
-			"eventType" => $eventType,
-			"objectType" => $objectType,
-			"object" => $objectArray,
-		//	"oldValues" => $oldValues
-		];
+		$object = $scope->getEvent()->getObject();
+		if(!$object)
+		{
+			KalturaLog::debug("Object not found breaking event handling flow");
+			return;
+		}
 		
-		try {
+		
+		$partitionKey = $this->getPartitionKey();
+		$getter = "get" . ucfirst($partitionKey);
+		if(!is_callable(array($object, $getter)))
+		{
+			KalturaLog::debug("Partition key getter not found on object");
+			return;
+		}
+		
+		$partitionKeyValue = $object->$getter();
+		if(!$partitionKeyValue)
+		{
+			KalturaLog::debug("Partition key value [$partitionKeyValue] empty or not found on object");
+			return;
+		}
+		
+		$oldValues = array();
+		if($scope->getEvent() instanceof kObjectChangedEvent)
+		{
+			$oldValues = $scope->getEvent()->getModifiedColumns();
+		}
+		
+		$apiObjectType = $this->getApiObjectType();
+		$apiObject = call_user_func(kCurrentContext::$serializeCallback, $object, $apiObjectType, 1);
+		
+		$msg = array(
+			"uniqueId" => (string)new UniqueId(),
+			"eventTime" => date('Y-m-d H:i:s'),
+			"eventType" => get_class($scope->getEvent()),
+			"objectType" => get_class($object),
+			"virtualEventId" => kCurrentContext::$virtual_event_id,
+			"object" => $apiObject,
+			"oldValues" => $oldValues
+		);
+		KalturaLog::debug("TTT: object " . print_r($msg, true));
+		
+		try
+		{
 			$topicName = $this->getTopicName();
 			$messageFormat = $this->getMessageFormat();
-			
-			$partitionKey = $this->getPartitionKey();
 			$queueProvider = QueueProvider::getInstance(KafkaPlugin::getKafakaQueueProviderTypeCoreValue('Kafka'));
+			$kafkaPayload = $this->getKafkaPayload();
 			
-			if (in_array($partitionKey, (array)$object)) {
-				if ($messageFormat == KafkaNotificationFormat::AVRO) {
-					$kafkaPayload = $this->handleAvroMessage($topicName, $data);
-					$queueProvider->produce($topicName, $partitionKey, $kafkaPayload);
-				} else {
-					$queueProvider->produce($topicName, $partitionKey, json_encode($data));
-				}
-			} else {
-				KalturaLog::err("partition key [$partitionKey] doen't exists in topic [$topicName]");
+			if(!$kafkaPayload)
+			{
+				KalturaLog::debug("Failed to build Kafka payload");
+				return;
 			}
 			
-		} catch (RdKafka\KafkaErrorException $e) {
+			KalturaLog::debug("TTT: topicName [$topicName] partitionKeyValue [$partitionKeyValue] Payload is " . print_r($kafkaPayload, true));
+			$queueProvider->send($topicName, $kafkaPayload, array( "partitionKey" => $partitionKeyValue));
+		}
+		catch (Exception $e)
+		{
 			KalturaLog::debug("Failed to send message with error [" . $e->getMessage() . "]");
-			throw $e;
+			return;
 		}
 	}
 	
-	public function create($queueKey)
+	private function getKafkaPayload($topicName, $data)
 	{
-		// get instance of activated queue proivder and create queue with given name
-		$queueProvider = QueueProvider::getInstance();
-		$queueProvider->create($queueKey);
-	}
-	
-	public function exists($queueKey)
-	{
-		// get instance of activated queue proivder and check whether given queue exists
-		$queueProvider = QueueProvider::getInstance();
-		return $queueProvider->exists($queueKey);
-	}
-	
-	/**
-	 * @return BlockingRegistry
-	 * @throws kCoreException
-	 */
-	private function getSchemaRegistry(): BlockingRegistry
-	{
-		if (!kConf::hasMap('kafka')) {
-			throw new kCoreException("Kafka configuration file (kafka.ini) wasn't found!");
+		$kafkaPayload = null;
+		
+		if($messageFormat == KafkaNotificationFormat::AVRO)
+		{
+			$kafkaPayload = $this->getAvroPayload($topicName, $data);
+			$queueProvider->produce($topicName, $partitionKey, $kafkaPayload);
+			
+		}
+		elseif($messageFormat == KafkaNotificationFormat::JSON)
+		{
+			$kafkaPayload = json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+			
+		}
+		else
+		{
+			KalturaLog::debug("Unknown notification message format [$messageFormat]");
 		}
 		
-		$kafkaConfig = kConf::getMap('kafka');
-		$schemaRegistryServer = $kafkaConfig['schemaregistryserver'];
-		$schemaRegistryPort = $kafkaConfig['schemaregistryport'];
-		
-		$schemaRegistry = new BlockingRegistry(
-			new PromisingRegistry(
-				new Client(['base_uri' => $schemaRegistryServer . ":" . $schemaRegistryPort])
-			)
-		);
-		return $schemaRegistry;
-	}
-	
-	/**
-	 * @param int $schemaId
-	 * @param AvroSchema $schema
-	 * @param array $data
-	 * @return string
-	 * @throws AvroIOException
-	 */
-	private function getKafkaPayload(int $schemaId, AvroSchema $schema, array $data): string
-	{
-		$io = new \AvroStringIO();
-		$io->write(pack('C', 0));
-		$io->write(pack('N', $schemaId));
-		$encoder = new \AvroIOBinaryEncoder($io);
-		$writer = new \AvroIODatumWriter($schema);
-		$writer->write($data, $encoder);
-		$kafkaPayload = $io->string();
 		return $kafkaPayload;
 	}
 	
@@ -177,15 +187,70 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	 * @throws \FlixTech\SchemaRegistryApi\Exception\SchemaRegistryException
 	 * @throws kCoreException
 	 */
-	private function handleAvroMessage(string $topicName, array $data): string
+	private function getAvroPayload($topicName, $data)
 	{
-		$subject = $topicName . '-value';
-		$schemaRegistry = $this->getSchemaRegistry();
+		list($schema, $schemaId) = $this->getSchemaInfo($topicName . '-value');
+		if(!($schema && $schemaId))
+		{
+			return null;
+		}
+		return $this->buildAvroPayload($schemaId, $schema, $data);
+	}
+	
+	private function getSchemaInfo($subject)
+	{
+		
+		$schemaRegistryConfig = kConf::get("schema_registry", "kafka", array());
+		$schemaRegistryServer = isset($schemaRegistryConfig['schema_registry_server']) ? $schemaRegistryConfig['schema_registry_server'] : null;
+		$schemaRegistryPort = isset($schemaRegistryConfig['schema_registry_port']) ? $schemaRegistryConfig['schema_registry_port'] : null;
+		if(!($schemaRegistryServer && $schemaRegistryPort))
+		{
+			KalturaLog::debug("Message configured with Avro payload but cannot find schema registry settings!");
+			return array(null, null);
+		}
+		
+		$schemaRegistry = new BlockingRegistry(
+			new PromisingRegistry(
+				new Client(['base_uri' => $schemaRegistryServer . ":" . $schemaRegistryPort])
+			)
+		);
+		if(!$schemaRegistry)
+		{
+			return array(null, null);
+		}
 		
 		$schema = $schemaRegistry->latestVersion($subject);
-		$schemaId = $schemaRegistry->schemaId($subject, $schema);
+		if(!$schema)
+		{
+			KalturaLog::debug("Missing schema for subject [$subject]!");
+			return array(null, null);
+		}
 		
-		$kafkaPayload = $this->getKafkaPayload($schemaId, $schema, $data);
-		return $kafkaPayload;
+		$schemaId = $schemaRegistry->schemaId($subject, $schema);
+		if(!$schemaId)
+		{
+			KalturaLog::debug("Missing schema ID for subject [$subject] and schema [$schema]!");
+			return array(null, null);
+		}
+		
+		return array($schemaId, $schema);
+	}
+	
+	/**
+	 * @param int $schemaId
+	 * @param AvroSchema $schema
+	 * @param array $data
+	 * @return string
+	 * @throws AvroIOException
+	 */
+	private function buildAvroPayload($schemaId, $schema, $data)
+	{
+		$io = new \AvroStringIO();
+		$io->write(pack('C', 0));
+		$io->write(pack('N', $schemaId));
+		$encoder = new \AvroIOBinaryEncoder($io);
+		$writer = new \AvroIODatumWriter($schema);
+		$writer->write($data, $encoder);
+		return $io->string();
 	}
 }
