@@ -1280,11 +1280,14 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		{
 			$freeText = str_replace('"', '', $freeTexts);
 			$freeText = SphinxUtils::escapeString($freeText);
+			$freeTextHasValue = "^$freeText " . kSphinxSearchManager::HAS_VALUE . kCurrentContext::getCurrentPartnerId() . "$";
 			$freeText = "^$freeText$";
 			$condition = "@(" . $matchFields . ") $freeText";
+			$conditionHasValue = "@(" . $matchFields . ") $freeTextHasValue";
 			if($isLikeExpr)
 				$condition .= " | ^$freeText\\\*";
 			$additionalConditions[] = $condition;
+			$additionalConditions[] = $conditionHasValue;
 		}
 		else
 		{
