@@ -37,7 +37,13 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 			'required' => true,
 		));
 		
-		$this->addDisplayGroup(array('topic_name', 'partition_key', 'message_format'),
+		$this->addElement('text', 'api_object_type', array(
+			'label' => 'api Object Type:',
+			'filters' => array('StringTrim'),
+			'readonly' => true,
+		));
+		
+		$this->addDisplayGroup(array('topic_name', 'partition_key', 'api_object_type', 'message_format'),
 			'kafka_config',
 			array(
 				'decorators' => array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'id' => 'frmAutomaticConfig'))),

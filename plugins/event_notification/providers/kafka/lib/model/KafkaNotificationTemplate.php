@@ -24,10 +24,10 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	
 	public function fulfilled(kEventScope $scope)
 	{
-		if (!kCurrentContext::$serializeCallback)
+		if(!kCurrentContext::$serializeCallback)
 			return false;
 		
-		if (!parent::fulfilled($scope))
+		if(!parent::fulfilled($scope))
 			return false;
 		
 		return true;
@@ -76,13 +76,13 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	public function dispatch(kScope $scope)
 	{
 		KalturaLog::debug("Dispatching event notification with name [{$this->getName()}] systemName [{$this->getSystemName()}]");
-		if (!$scope || !($scope instanceof kEventScope))
+		if(!$scope || !($scope instanceof kEventScope))
 		{
 			KalturaLog::err('Failed to dispatch due to incorrect scope [' . $scope . ']');
 			return;
 		}
 		
-		if (!kConf::hasMap('kafka'))
+		if(!kConf::hasMap('kafka'))
 		{
 			KalturaLog::debug("Kafka configuration file (kafka.ini) wasn't found!");
 			return;
@@ -94,7 +94,6 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			KalturaLog::debug("Object not found breaking event handling flow");
 			return;
 		}
-		
 		
 		$partitionKey = $this->getPartitionKey();
 		$getter = "get" . ucfirst($partitionKey);
@@ -145,9 +144,8 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			}
 			
 			KalturaLog::debug("TTT: topicName [$topicName] partitionKeyValue [$partitionKeyValue] Payload is " . print_r($kafkaPayload, true));
-			$queueProvider->send($topicName, $kafkaPayload, array( "partitionKey" => $partitionKeyValue));
-		}
-		catch (Exception $e)
+			$queueProvider->send($topicName, $kafkaPayload, array("partitionKey" => $partitionKeyValue));
+		} catch (Exception $e)
 		{
 			KalturaLog::debug("Failed to send message with error [" . $e->getMessage() . "]");
 			return;
@@ -197,8 +195,13 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	
 	private function getSchemaInfo($subject)
 	{
+		if(!kConf::hasMap('schemaRegistry'))
+		{
+			throw new kCoreException("schema registry configuration file (schemaRegistry.ini) wasn't found!");
+		}
 		
-		$schemaRegistryConfig = kConf::get("schema_registry", "kafka", array());
+		$schemaRegistryConfig = kConf::getMap('schemaRegistry');
+		
 		$schemaRegistryServer = isset($schemaRegistryConfig['schema_registry_server']) ? $schemaRegistryConfig['schema_registry_server'] : null;
 		$schemaRegistryPort = isset($schemaRegistryConfig['schema_registry_port']) ? $schemaRegistryConfig['schema_registry_port'] : null;
 		if(!($schemaRegistryServer && $schemaRegistryPort))
@@ -212,15 +215,24 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 				new Client(['base_uri' => $schemaRegistryServer . ":" . $schemaRegistryPort])
 			)
 		);
+		
 		if(!$schemaRegistry)
 		{
 			return array(null, null);
 		}
 		
-		$schema = $schemaRegistry->latestVersion($subject);
+		$currentSchemaVersion = $schemaRegistryConfig[$subject];
+		if(!$currentSchemaVersion)
+		{
+			KalturaLog::debug("Missing schema version for [$subject]!");
+			return array(null, null);
+		}
+		
+		$schema = $schemaRegistry->schemaForSubjectAndVersion($subject, $currentSchemaVersion);
+		
 		if(!$schema)
 		{
-			KalturaLog::debug("Missing schema for subject [$subject]!");
+			KalturaLog::debug("Missing schema in schema registry for [$subject]!");
 			return array(null, null);
 		}
 		
@@ -231,7 +243,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			return array(null, null);
 		}
 		
-		return array($schemaId, $schema);
+		return array($schema, $schemaId);
 	}
 	
 	/**
