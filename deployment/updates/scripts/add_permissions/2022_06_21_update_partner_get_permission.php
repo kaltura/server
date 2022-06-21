@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage naos.roles_and_permissions
+ * @subpackage rigel.roles_and_permissions
  */
 
 $addPermissionsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
