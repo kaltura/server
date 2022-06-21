@@ -111,10 +111,11 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			return;
 		}
 		
-		$oldValues = array();
+		$modifiedColumns = array();
 		if($scope->getEvent() instanceof kObjectChangedEvent)
 		{
-			$oldValues = $scope->getEvent()->getModifiedColumns();
+			$modifiedColumns = $scope->getEvent()->getModifiedColumns();
+			$modifiedColumns = $this->buildMessageOldValues($oldValues);
 		}
 		
 		$apiObjectType = $this->getApiObjectType();
@@ -127,9 +128,8 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			"objectType" => get_class($object),
 			"virtualEventId" => kCurrentContext::$virtual_event_id,
 			"object" => $apiObject,
-			"oldValues" => $oldValues
+			"modifiedColumns" => $modifiedColumns
 		);
-		KalturaLog::debug("TTT: object " . print_r($msg, true));
 		
 		try
 		{
@@ -250,5 +250,28 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		$writer = new \AvroIODatumWriter($schema);
 		$writer->write($msg, $encoder);
 		return $io->string();
+	}
+	
+	private function buildMessageOldValues($oldValues)
+	{
+		$result = array();
+		foreach ($oldValues as $key => $value)
+		{
+			if(is_numeric($key))
+			{
+				list($object, $field) = explode(".", $value);
+			}
+			$result[] = $field;
+		}
+		
+		if(isset($oldValues["CUSTOM_DATA"]))
+		{
+			foreach ($oldValues["CUSTOM_DATA"] as $key => $value)
+			{
+				$result = array_merge($result, array_keys($value));
+			}
+		}
+		
+		return $result;
 	}
 }

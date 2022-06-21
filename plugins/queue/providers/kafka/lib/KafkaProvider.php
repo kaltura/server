@@ -10,9 +10,9 @@ class KafkaProvider extends QueueProvider
 	
 	public function __construct(array $kafkaConfig)
 	{
+		$brokersArray = array();
 		if (isset($kafkaConfig['brokers']))
 		{
-			$brokersArray = array();
 			$brokers = $kafkaConfig['brokers'];
 			$brokers = explode(",", $brokers);
 			
@@ -47,7 +47,7 @@ class KafkaProvider extends QueueProvider
 		}
 		
 		$producer = new RdKafka\Producer($conf);
-		if ($brokersArray)
+		if (count($brokersArray))
 		{
 			$producer->addBrokers(implode(',', $$brokersArray));
 		}
