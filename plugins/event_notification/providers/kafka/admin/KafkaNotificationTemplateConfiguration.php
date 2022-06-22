@@ -36,6 +36,7 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 			'filters' => array('StringTrim'),
 			'required' => true,
 		));
+		$this->addElements(array($format));
 		
 		$this->addElement('text', 'api_object_type', array(
 			'label' => 'api Object Type:',

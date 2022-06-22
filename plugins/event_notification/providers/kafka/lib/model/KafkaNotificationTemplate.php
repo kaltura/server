@@ -15,6 +15,8 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	const CUSTOM_DATA_PARTITION_KEY = 'partitionKey';
 	const CUSTOM_DATA_MESSAGE_FORMAT = 'messageFormat';
 	const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
+	const SCHEMA_ID = 'schemaId';
+	const SCHEMA = 'schema';
 	
 	public function __construct()
 	{
@@ -114,7 +116,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		if($scope->getEvent() instanceof kObjectChangedEvent)
 		{
 			$modifiedColumns = $scope->getEvent()->getModifiedColumns();
-			$modifiedColumns = $this->buildMessageOldValues($oldValues);
+			$modifiedColumns = $this->buildMessageOldValues($modifiedColumns);
 		}
 		
 		$apiObjectType = $this->getApiObjectType();
@@ -163,7 +165,6 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		elseif($messageFormat == KafkaNotificationFormat::JSON)
 		{
 			$kafkaPayload = json_encode($msg, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-			
 		}
 		else
 		{
@@ -210,17 +211,6 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			return array(null, null);
 		}
 		
-		$schemaRegistry = new BlockingRegistry(
-			new PromisingRegistry(
-				new Client(['base_uri' => $schemaRegistryServer . ":" . $schemaRegistryPort])
-			)
-		);
-		
-		if(!$schemaRegistry)
-		{
-			return array(null, null);
-		}
-		
 		$currentSchemaVersion = $schemaRegistryConfig[$subject];
 		if(!$currentSchemaVersion)
 		{
@@ -228,19 +218,60 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			return array(null, null);
 		}
 		
-		$schema = $schemaRegistry->schemaForSubjectAndVersion($subject, $currentSchemaVersion);
+		$key = $subject . '_' . $currentSchemaVersion;
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_AVRO_SCHEMAS);
+		if($cache)
+		{
+			$schemaInfo = $cache->get($key);
+			if($schemaInfo)
+			{
+				$schemaId = $schemaInfo[self::SCHEMA_ID];
+				$schema = $schemaInfo[self::SCHEMA];
+			}
+		}
 		
 		if(!$schema)
 		{
-			KalturaLog::debug("Missing schema in schema registry for [$subject]!");
-			return array(null, null);
-		}
-		
-		$schemaId = $schemaRegistry->schemaId($subject, $schema);
-		if(!$schemaId)
-		{
-			KalturaLog::debug("Missing schema ID for subject [$subject] and schema [$schema]!");
-			return array(null, null);
+			$schemaRegistry = new BlockingRegistry(
+				new PromisingRegistry(
+					new Client(['base_uri' => $schemaRegistryServer . ":" . $schemaRegistryPort])
+				)
+			);
+			
+			if(!$schemaRegistry)
+			{
+				return array(null, null);
+			}
+			
+			$schema = $schemaRegistry->schemaForSubjectAndVersion($subject, $currentSchemaVersion);
+			
+			if(!$schema)
+			{
+				KalturaLog::debug("Missing schema in schema registry for [$subject]!");
+				return array(null, null);
+			}
+			
+			$schemaId = $schemaRegistry->schemaId($subject, $schema);
+			if(!$schemaId)
+			{
+				KalturaLog::debug("Missing schema ID for subject [$subject] and schema [$schema]!");
+				return array(null, null);
+			}
+			
+			if($cache)
+			{
+				$schemaInfo = array(
+					self::SCHEMA_ID => $schemaId,
+					self::SCHEMA => $schema
+				);
+				
+				$result = $cache->add($key, $schemaInfo);
+				if(!$result)
+				{
+					KalturaLog::debug("Avro schema [$subject] did not save to cache");
+				}
+			}
 		}
 		
 		return array($schema, $schemaId);

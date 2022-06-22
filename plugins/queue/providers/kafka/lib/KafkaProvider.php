@@ -99,7 +99,6 @@ class KafkaProvider extends QueueProvider
 		{
 			try
 			{
-				//$this->topic->produce($partitionId, 0, json_encode($kafkaPayload));
 				$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, json_encode($kafkaPayload));
 				$this->producer->poll(0);
 				$result = $this->producer->flush(10000);

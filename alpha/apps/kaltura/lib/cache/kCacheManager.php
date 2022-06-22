@@ -39,6 +39,7 @@ class kCacheManager
 	const CACHE_TYPE_AUTH_CACHED_DATA = 'authCachedData';
 	const CACHE_TYPE_DRUID_QUERIES = 'druidQueries';
 	const CACHE_TYPE_PLAYS_VIEWS = 'playsViews';
+	const CACHE_TYPE_AVRO_SCHEMAS = 'avroSchemas';
 
 	protected static $caches = array();
 	
