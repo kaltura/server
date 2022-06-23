@@ -148,10 +148,6 @@ class KalturaEntryService extends KalturaBaseService
 		$dbEntry->setReplacementStatus(entryReplacementStatus::NOT_READY_AND_NOT_APPROVED);
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL) || $dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
-		if ($dbEntry->getMediaType() == null && $tempDbEntry->getMediaType() != null)
-		{
-			$dbEntry->setMediaType($tempDbEntry->getMediaType());
-		}
 		$dbEntry->save();
 
 		$this->attachResource($kResource, $tempDbEntry);

@@ -168,7 +168,7 @@ class kUploadTokenMgr
 		}
 		else
 		{
-			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
+			//We return null file size when we want to fail the upload since it reached max chunks waiting for concat
 			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
 		
@@ -177,19 +177,17 @@ class kUploadTokenMgr
 		
 		$this->_uploadToken->save();
 		
-		if ($this->_uploadToken->getObjectId() && $this->_uploadToken->getStatus() == 3)
+		if ($this->_uploadToken->getObjectId())
 		{
 			$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
-			if ($flavorAsset && $flavorAsset->getType() == assetType::FLAVOR && $flavorAsset->getIsOriginal())
+			if ($flavorAsset && $flavorAsset->getEntryId())
 			{
-				$service = new BaseEntryService();
-				$service->initService('baseEntry', 'baseEntry', 'updateContent');
-				$uploadToken = new KalturaUploadToken();
-				$uploadToken->fromObject($this->_uploadToken);
-				$contentResource = new KalturaUploadedFileTokenResource();
-				$contentResource->token = $uploadToken->id;
-				$entryId = $flavorAsset->getEntryId();
-				$service->updateContentAction($entryId, $contentResource);
+				$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+				if (!$entry->getMediaType() && $flavorAsset->getType())
+				{
+					$entry->setMediaType($flavorAsset->getType());
+					$entry->save();
+				}
 			}
 		}
 	}
