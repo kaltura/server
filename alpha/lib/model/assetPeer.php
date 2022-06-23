@@ -221,10 +221,10 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryId);
-        if(!$skipParamsId)
-        {
-            $c->add(self::FLAVOR_PARAMS_ID, $paramsId);
-        }
+        	if(!$skipParamsId)
+       		{
+           		$c->add(self::FLAVOR_PARAMS_ID, $paramsId);
+        	}
 		// Gonen 10/05/10 - fixed bug when requesting download of original from KMC1 (pre-Andromeda)
 		// migrated entries had all flavors set with flavor_params_ID to 0
 		// all normal entries (not migrated) should have only the original with flavor params 0 (and is_original set to 1)
