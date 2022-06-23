@@ -111,7 +111,9 @@ class kRendererDumpFile implements kRendererBase
 		else
 		{
 			if ($this->key)
+			{
 				kEncryptFileUtils::dumpEncryptFilePart($this->filePath, $this->key, $this->iv, $rangeFrom, $rangeLength);
+			}
 			else
 			{
 				kFile::dumpFilePart($this->filePath, $rangeFrom, $rangeLength);

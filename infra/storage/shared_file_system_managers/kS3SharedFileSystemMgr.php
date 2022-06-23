@@ -701,6 +701,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		$fileUrl = $this->doRealPath($filePath);
 		
+		if (isset($_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE']) && $_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE'] == "ON")
+		{
+			header("Location: $fileUrl");
+			return;
+		}
+		
 		$ch = curl_init();
 		
 		curl_setopt($ch, CURLOPT_URL, $fileUrl);
