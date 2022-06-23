@@ -25,6 +25,20 @@ Configure Kafka Kaltura configuration:
 		server = kafka server
         port = kafka port
 
+Configure schema registry configuration:
+
+	- Copy configurations/schemaRegistry.template.ini to configurations/schemaRegistry.ini and update the folloiwng tokens:
+		schema_registry_server = schema registry server ip        
+		schema_registry_port = schema registry port
+
+        all other fields will contain the current schema version, for example:
+		add_kuser_topic-value=31
+
+Configure cache for schema registry:
+
+	- add to file cache.ini:
+	  avroSchemas = memcacheLocal
+
 ### Deployment scripts ###
     1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
 

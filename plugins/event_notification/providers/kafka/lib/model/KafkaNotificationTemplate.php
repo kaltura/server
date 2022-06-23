@@ -196,6 +196,9 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	
 	private function getSchemaInfo($subject)
 	{
+		$schemaId = null;
+		$schema = null;
+		
 		if(!kConf::hasMap('schemaRegistry'))
 		{
 			throw new kCoreException("schema registry configuration file (schemaRegistry.ini) wasn't found!");
@@ -269,7 +272,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 				$result = $cache->add($key, $schemaInfo);
 				if(!$result)
 				{
-					KalturaLog::debug("Avro schema [$subject] did not save to cache");
+					KalturaLog::debug("Avro schema [$subject] did not save to cache [$key]");
 				}
 			}
 		}
