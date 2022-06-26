@@ -180,16 +180,32 @@ class kUploadTokenMgr
 		if ($this->_uploadToken->getObjectId())
 		{
 			$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
-			if ($flavorAsset && $flavorAsset->getEntryId())
+			if ($flavorAsset && $flavorAsset->getType() == assetType::FLAVOR && $flavorAsset->getEntryId())
 			{
 				$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-				if (!$entry->getMediaType() && $flavorAsset->getType())
+				if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
 				{
-					$entry->setMediaType($flavorAsset->getType());
+					$entry->setMediaType($this->getMediaType());
 					$entry->save();
 				}
 			}
 		}
+	}
+	
+	protected function getMediaType()
+	{
+		if(is_null($this->_uploadToken))
+		{
+			return null;
+		}
+		
+		$fileName = $this->_uploadToken->getFileName();
+		if(!$fileName)
+		{
+			return null;
+		}
+		
+		return myFileUploadService::getMediaTypeFromFileExt(pathinfo($fileName, PATHINFO_EXTENSION));
 	}
 	
 	/**
