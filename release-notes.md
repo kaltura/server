@@ -5,6 +5,14 @@
 
 ### Script ###
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_16_add_category_export_csv_permissions.php
+  
+# Rigel-18.8.0
+## Allow partner -11 to run partner.get
+* Issue Type: Task
+* Issue ID: PLAT-23756
+
+### Script ###
+	php deployment/updates/scripts/add_permissions/2022_06_21_update_partner_get_permission.php
 
 # Rigel-18.7.0
 ## Add 'country' to kaltura_kuser index as searchable field ##
