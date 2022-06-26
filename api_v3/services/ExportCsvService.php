@@ -79,8 +79,8 @@ class ExportCsvService extends KalturaBaseService
 	 * @return string
 	 */
 	public function categoryExportToCsvAction(KalturaCategoryFilter $filter = null, $metadataProfileId = null,
-																  $additionalFields = null, KalturaKeyValueArray $mappedFields = null,
-																  KalturaExportToCsvOptions $options = null)
+	                                       $additionalFields = null, KalturaKeyValueArray $mappedFields = null,
+	                                       KalturaExportToCsvOptions $options = null)
 	{
 		if (!$filter)
 		{

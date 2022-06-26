@@ -1,5 +1,5 @@
-# Rigel-18.8.0
-## Export categories to CSV
+# Rigel-18.9.0
+## Add Export CSV action to Category service
 * Issue Type: Task
 * Issue ID: PLAT-23743
 
