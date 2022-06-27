@@ -189,9 +189,9 @@ class kUploadTokenMgr
 	
 	protected function getAttachedEntry()
 	{
+		$entry = null;
 		if ($this->_uploadToken->getObjectId() && $this->_uploadToken->getObjectType())
 		{
-			$entry = null;
 			switch ($this->_uploadToken->getObjectType())
 			{
 				case self::ENTRY:
@@ -209,8 +209,8 @@ class kUploadTokenMgr
 					break;
 				}
 			}
-			return $entry;
 		}
+		return $entry;
 	}
 	
 	protected function getMediaType()
