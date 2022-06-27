@@ -22,12 +22,18 @@ abstract class KalturaMappedObjectsCsvJobData extends KalturaExportCsvJobData
 	 * @var KalturaKeyValueArray
 	 */
 	public $mappedFields;
+	
+	/**
+	 * @var KalturaExportToCsvOptions
+	 */
+	public $options;
 
 	private static $map_between_objects = array
 	(
 		'metadataProfileId',
 		'additionalFields',
-		'mappedFields'
+		'mappedFields',
+		'options',
 	);
 	
 	/* (non-PHPdoc)

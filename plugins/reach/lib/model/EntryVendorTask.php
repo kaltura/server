@@ -31,9 +31,10 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_TASK_DATA =       	'task_data';
 	const CUSTOM_DATA_OLD_PRICE =       	'old_price';
 	const CUSTOM_DATA_EXPECTED_FINISH_TIME ='expectedFinishTime';
-	const CUSTOM_DATA_SERVICE_TYPE =	'serviceType';
-	const CUSTOM_DATA_SERVICE_FEATURE =	'serviceFeature';
+	const CUSTOM_DATA_SERVICE_TYPE =    	'serviceType';
+	const CUSTOM_DATA_SERVICE_FEATURE = 	'serviceFeature';
 	const CUSTOM_DATA_TURN_AROUND_TIME =	'turnAroundTime';
+	const CUSTOM_DATA_EXTERNAL_TASK_ID =      'externalTaskId';
 	const SEVEN_DAYS =			 604800;
 	const BUSINESS_DAY_FRIDAY = 5;      //Monday is 1
 	const BUSINESS_DAY_NEXT_MONDAY = 8;
@@ -136,6 +137,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function setTurnAroundTime($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME, $v);
+	}
+
+	public function setExternalTaskId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID, $v);
 	}
 
 
@@ -249,6 +255,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function getTurnAroundTime()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_TURN_AROUND_TIME);
+	}
+
+	public function getExternalTaskId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID);
 	}
 
 	protected static function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)

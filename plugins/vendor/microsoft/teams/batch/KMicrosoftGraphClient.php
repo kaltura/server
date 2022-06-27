@@ -42,13 +42,22 @@ class KMicrosoftGraphClient
 		$fields = array('grant_type' => 'client_credentials', 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret, 'resource' => $this->apiUrl);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-		$response = json_decode(curl_exec($ch), true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+		$curlResponse = curl_exec($ch);
 		curl_close($ch);
+		if (!$curlResponse)
+		{
+			return false;
+		}
+
+		$response = json_decode($curlResponse, true);
+
 
 		KalturaLog::info('Auth token generated: [' . $response[MicrosoftGraphFieldNames::ACCESS_TOKEN] . '], expiry: ' . date('c', $response[MicrosoftGraphFieldNames::EXPIRES_ON]));
 		$this->bearerToken = $response[MicrosoftGraphFieldNames::ACCESS_TOKEN];
 		$this->bearerTokenExpiry = $response[MicrosoftGraphFieldNames::EXPIRES_ON];
+
+		return true;
 	}
 
 	public function getCallRecord($callRecordId)
@@ -89,7 +98,12 @@ class KMicrosoftGraphClient
 	{
 		if (!$this->bearerToken || $this->bearerTokenExpiry < time())
 		{
-			$this->authenticate();
+			$authResult = $this->authenticate();
+			if (!$authResult)
+			{
+				KalturaLog::info('Graph API authentication request could not be completed.');
+				return null;
+			}
 		}
 
 		$serviceUrl = $url;
@@ -98,13 +112,15 @@ class KMicrosoftGraphClient
 		$authHeader = "Authorization: Bearer {$this->bearerToken}";
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array($authHeader));
+		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+
 		$result = curl_exec($ch);
 		$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		//TODO add handling for 427 and 503 errors.
 
 		curl_close($ch);
 
-		if ($responseCode == 200)
+		if ($responseCode && $responseCode == 200 && $result)
 		{
 			return json_decode($result, true);
 		}

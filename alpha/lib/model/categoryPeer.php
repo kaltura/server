@@ -17,6 +17,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 	const CATEGORY_ID = 'category.CATEGORY_ID';
 
 	private static $invalid_characters = array('>','<',',');
+	private static $invalid_characters_disable_category_limit = array('>','<');
 	
 	private static $replace_character = "_";
 	
@@ -192,8 +193,14 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 
 	public static function getParsedName($v)
 	{
+		$invalidChars = self::$invalid_characters;
+		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, kCurrentContext::getCurrentPartnerId()))
+		{
+			$invalidChars = self::$invalid_characters_disable_category_limit;
+		}
+		
 		$v = substr($v, 0, self::MAX_CATEGORY_NAME);
-		$v = str_replace(self::$invalid_characters, self::$replace_character, $v);
+		$v = str_replace($invalidChars, self::$replace_character, $v);
 		
 		return $v;
 	}

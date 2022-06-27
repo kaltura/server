@@ -89,6 +89,20 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	 */
 	public $autoFinalize;
 	
+	/**
+	 * The value for the object_type field.
+	 * @var string
+	 * @readonly
+	 */
+	public $attachedObjectType;
+	
+	/**
+	 * The value for the object_id field.
+	 * @var string
+	 * @readonly
+	 */
+	public $attachedObjectId;
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -101,6 +115,8 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 		"createdAt",
 		"updatedAt",
 		"autoFinalize",
+		"attachedObjectType" => "objectType",
+		"attachedObjectId"  => "objectId"
 	);
 
 	/* (non-PHPdoc)

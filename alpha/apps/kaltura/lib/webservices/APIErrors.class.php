@@ -478,4 +478,5 @@ class APIErrors
 
 	const NEW_LOGIN_REQUIRED = 'NEW_LOGIN_REQUIRED;;Switching to requested partner requires re-login';
 
+	const DUPLICATE_LIVE_FEATURE = "DUPLICATE_LIVE_FEATURE;SYSTEM_NAME;Duplicate system name \"@SYSTEM_NAME@\" in provided live feature array";
 }
