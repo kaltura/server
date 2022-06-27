@@ -41,4 +41,26 @@ class KalturaMediaEntryFilter extends KalturaMediaEntryBaseFilter
 		
 		$this->typeIn = implode(',', array_unique($typeArray));
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::getCoreFilter()
+	 */
+	protected function getCoreFilter()
+	{
+		return new mediaEntryFilter();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaFilter::toObject()
+	 */
+	public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
+		/* @var $object_to_fill mediaEntryFilter */
+		if(is_null($object_to_fill))
+		{
+			$object_to_fill = $this->getCoreFilter();
+		}
+		
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}
 }

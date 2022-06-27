@@ -35,4 +35,33 @@ class KalturaEntriesCsvJobData extends KalturaMappedObjectsCsvJobData
 
 		return parent::toObject($dbData, $props_to_skip);
 	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::fromObject()
+	 */
+	public function doFromObject($dbData, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		/* @var $dbData kEntriesCsvJobData */
+		$filter = $dbData->getFilter();
+		$filterType = get_class($filter);
+		switch ($filterType)
+		{
+			case 'entryFilter':
+				$this->filter = new KalturaBaseEntryFilter();
+				break;
+			
+			case 'mediaEntryFilter':
+				$this->filter = new KalturaMediaEntryFilter();
+				break;
+			
+			default:
+				$this->filter = KalturaPluginManager::loadObject('KalturaFilter', $filterType);
+		}
+		if ($this->filter)
+		{
+			$this->filter->fromObject($filter);
+		}
+		
+		parent::doFromObject($dbData, $responseProfile);
+	}
 }
