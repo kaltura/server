@@ -179,8 +179,19 @@ class kUploadTokenMgr
 		
 		$this->_uploadToken->save();
 		
+		$entry = $this->getAttachedEntry();
+		if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
+		{
+			$entry->setMediaType($this->getMediaType());
+			$entry->save();
+		}
+	}
+	
+	protected function getAttachedEntry()
+	{
 		if ($this->_uploadToken->getObjectId() && $this->_uploadToken->getObjectType())
 		{
+			$entry = null;
 			switch ($this->_uploadToken->getObjectType())
 			{
 				case self::ENTRY:
@@ -198,11 +209,7 @@ class kUploadTokenMgr
 					break;
 				}
 			}
-			if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
-			{
-				$entry->setMediaType($this->getMediaType());
-				$entry->save();
-			}
+			return $entry;
 		}
 	}
 	
