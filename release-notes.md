@@ -1,3 +1,11 @@
+# Rigel-18.9.0
+## Add Export CSV action to Category service
+* Issue Type: Task
+* Issue ID: PLAT-23743
+
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_16_add_category_export_csv_permissions.php
+  
 # Rigel-18.8.0
 ## Allow partner -11 to run partner.get
 * Issue Type: Task

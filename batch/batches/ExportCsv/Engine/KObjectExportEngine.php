@@ -19,6 +19,9 @@ abstract class KObjectExportEngine
 
 			case KalturaExportObjectType::ENTRY:
 				return new KEntryExportEngine();
+			
+			case KalturaExportObjectType::CATEGORY:
+				return new KCategoryExportEngine();
 
 			default:
 				return KalturaPluginManager::loadObject('KObjectExportEngine', $objectType);
