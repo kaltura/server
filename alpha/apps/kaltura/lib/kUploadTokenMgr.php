@@ -7,6 +7,8 @@ class kUploadTokenMgr
 	const MAX_APPEND_TIME = 5;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	const CHUNK_SIZE = 102400;
+	const ENTRY = 'entry';
+	const FLAVOR = 'flavorAsset';
 
 	/**
 	 * @var UploadToken
@@ -177,17 +179,29 @@ class kUploadTokenMgr
 		
 		$this->_uploadToken->save();
 		
-		if ($this->_uploadToken->getObjectId())
+		if ($this->_uploadToken->getObjectId() && $this->_uploadToken->getObjectType())
 		{
-			$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
-			if ($flavorAsset && $flavorAsset->getType() == assetType::FLAVOR && $flavorAsset->getEntryId())
+			switch ($this->_uploadToken->getObjectType())
 			{
-				$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
-				if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
+				case self::ENTRY:
 				{
-					$entry->setMediaType($this->getMediaType());
-					$entry->save();
+					$entry = entryPeer::retrieveByPK($this->_uploadToken->getObjectId());
+					break;
 				}
+				case self::FLAVOR:
+				{
+					$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
+					if ($flavorAsset && $flavorAsset->getType() == assetType::FLAVOR && $flavorAsset->getEntryId())
+					{
+						$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+					}
+					break;
+				}
+			}
+			if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
+			{
+				$entry->setMediaType($this->getMediaType());
+				$entry->save();
 			}
 		}
 	}
