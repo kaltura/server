@@ -76,28 +76,28 @@ class KalturaUploadToken extends KalturaObject implements IFilterable
 	public $updatedAt;
 
 	/**
-	 * Upload url - to explicitly determine to which domain to adress the uploadToken->upload call
+	 * Upload url - to explicitly determine to which domain to address the uploadToken->upload call
 	 * @var string
 	 * @readonly
 	 */
 	public $uploadUrl;
 	
 	/**
-	 * autoFinalize - Should the upload be finalized once the file size on disk matches the file size reproted when adding the upload token.
+	 * autoFinalize - Should the upload be finalized once the file size on disk matches the file size reported when adding the upload token.
 	 * @var KalturaNullableBoolean
 	 * @insertonly
 	 */
 	public $autoFinalize;
 	
 	/**
-	 * The value for the object_type field.
+	 * The type of the object this token is attached to.
 	 * @var string
 	 * @readonly
 	 */
 	public $attachedObjectType;
 	
 	/**
-	 * The value for the object_id field.
+	 * The id of the object this token is attached to.
 	 * @var string
 	 * @readonly
 	 */

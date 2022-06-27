@@ -7,6 +7,8 @@ class kUploadTokenMgr
 	const MAX_APPEND_TIME = 5;
 	const MAX_CHUNKS_WAITING_FOR_CONCAT_ALLOWED = 1000;
 	const CHUNK_SIZE = 102400;
+	const ENTRY = 'entry';
+	const FLAVOR = 'flavorAsset';
 
 	/**
 	 * @var UploadToken
@@ -168,7 +170,7 @@ class kUploadTokenMgr
 		}
 		else
 		{
-			//We return null file size when we want to faile the upload since it reached max chunks waiting for concat
+			//We return null file size when we want to fail the upload since it reached max chunks waiting for concat
 			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
 		
@@ -176,6 +178,55 @@ class kUploadTokenMgr
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
+		
+		$entry = $this->getAttachedEntry();
+		if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
+		{
+			$entry->setMediaType($this->getMediaType());
+			$entry->save();
+		}
+	}
+	
+	protected function getAttachedEntry()
+	{
+		$entry = null;
+		if ($this->_uploadToken->getObjectId() && $this->_uploadToken->getObjectType())
+		{
+			switch ($this->_uploadToken->getObjectType())
+			{
+				case self::ENTRY:
+				{
+					$entry = entryPeer::retrieveByPK($this->_uploadToken->getObjectId());
+					break;
+				}
+				case self::FLAVOR:
+				{
+					$flavorAsset = assetPeer::retrieveById($this->_uploadToken->getObjectId());
+					if ($flavorAsset && $flavorAsset->getType() == assetType::FLAVOR && $flavorAsset->getEntryId())
+					{
+						$entry = entryPeer::retrieveByPK($flavorAsset->getEntryId());
+					}
+					break;
+				}
+			}
+		}
+		return $entry;
+	}
+	
+	protected function getMediaType()
+	{
+		if(is_null($this->_uploadToken))
+		{
+			return null;
+		}
+		
+		$fileName = $this->_uploadToken->getFileName();
+		if(!$fileName)
+		{
+			return null;
+		}
+		
+		return myFileUploadService::getMediaTypeFromFileExt(pathinfo($fileName, PATHINFO_EXTENSION));
 	}
 	
 	/**
