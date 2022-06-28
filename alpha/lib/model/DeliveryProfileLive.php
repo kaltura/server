@@ -110,10 +110,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		if(!$this->liveStreamConfig)
 			$this->liveStreamConfig = new kLiveStreamConfiguration();
-		
-		$entry = $this->getDynamicAttributes()->getEntry();
-		if(in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE)))
+
+		if(self::isManualEntryFlow())
 		{
+			$entry = $this->getDynamicAttributes()->getEntry();
 			$this->initManualLiveStreamConfiguration($entry);
 			return;
 		}
@@ -246,7 +246,8 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$flavors = array();
 		
 		$httpUrl = $this->liveStreamConfig->getUrl();
-		if ($this->getDynamicAttributes()->getStreamType() == EntryServerNodeType::LIVE_BACKUP)
+		// the streamType set url in the init func. But for manual live we don't have the init with the entry-server-node
+		if ($this->isManualEntryFlow() && $this->getDynamicAttributes()->getStreamType() == EntryServerNodeType::LIVE_BACKUP)
 		{
 			$httpUrl = $this->liveStreamConfig->getBackupUrl();
 		}
@@ -474,6 +475,15 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		// if the shouldRedirect changed to true dynamically during the request - it takes priority
 		return $this->shouldRedirect || $this->getFromCustomData(self::SHOULD_REDIRECT, null, false);
+	}
+
+	/**
+	 * @return bool - if the source of the entry is external
+	 */
+	public function isManualEntryFlow()
+	{
+		$entry = $this->getDynamicAttributes()->getEntry();
+		return in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE));
 	}
 
 }
