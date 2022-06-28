@@ -702,7 +702,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$fileUrl = $this->doRealPath($filePath);
 		
 		$serveRedirectToStorageSecret = kConf::get("proxy_redirect_to_storage_secret", "secrets", null);
-		if ($serveRedirectToStorageSecret && isset($_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE']) && $_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE'] == $serveRedirectToStorageSecret)
+		if ($serveRedirectToStorageSecret && isset($_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE']) && $_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE'] === $serveRedirectToStorageSecret)
 		{
 			header("Location: $fileUrl");
 			return;
