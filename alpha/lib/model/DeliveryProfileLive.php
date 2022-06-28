@@ -483,7 +483,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	protected function isManualEntryFlow()
 	{
 		$entry = $this->getDynamicAttributes()->getEntry();
-        /* @var $entry LiveEntry */
+		/* @var $entry LiveEntry */
 		return in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE));
 	}
 
