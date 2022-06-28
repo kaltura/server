@@ -71,6 +71,18 @@
 			}
 			return false;
 		}
+		
+		/* ---------------------------
+		 *
+		 */
+		public function resetParams()
+		{
+			$this->history[] = array('h' => $this->hostname, 'id' => $this->id, 'st' =>$this->startTime);
+			
+			//Reset job timestamps
+			$this->queueTime = 0;
+			$this->startTime = 0;
+		}
 	}
 	/*****************************
 	 * End of KChunkedEncodeJobData
@@ -126,13 +138,45 @@
 		/* ---------------------------
 		 * detectErrors
 		 */
-		public function detectErrors($manager, $chunkedEncodeReadIdx)
+		public function detectErrors($manager, $chunkedEncodeReadIdx, $chunker)
 		{
 			$this->sumJobsStates();
 
+			$maxChunks = $chunker->GetMaxChunks();
+			$chunkDurThreshInSec=$chunker->chunkDurThreshInFrames*$chunker->params->frameDuration;
 			foreach($this->jobs as $idx=>$job) {
-				if($job->state==$job::STATE_SUCCESS)
+				if($job->state==$job::STATE_SUCCESS) {			
+					$chunkData = $chunker->GetChunk($job->id);
+					if(isset($job->stat)){
+							/*
+							 * Validate chunk dur
+							 */
+							// Calc the generated chunk duration
+						$generatedChunkDur = $job->stat->finish-$job->stat->start;
+						if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+							$msgStr = "Chunk id ($chunkData->index): too short chunk dur - $generatedChunkDur";
+							$msgStr.= ", should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4);
+							$msgStr.= ", delta:".round($chunkData->gap-$generatedChunkDur,4);
+
+							$job->state = $job::STATE_FAIL;
+							$manager->SaveJob($job);
+							$this->jobs[$idx] = $job;
+							$this->sumJobsStates();
+						}
+					}
 					continue;
+				}
+				
+				if($job->state==$job::STATE_RETRY) {
+					$job->queueTime = 0;
+					$job->startTime = 0;
+					$job->state = $job::STATE_PENDING;
+					$tmpKey = $job->keyIdx;
+					$manager->AddJob($job);
+					$this->jobs[$idx] = $job;
+KalturaLog::log("Retrying chunk ($job->id) - oldKeyIdx:$tmpKey, newKeyIdx:$job->keyIdx, rdIdx:$chunkedEncodeReadIdx");
+				}
+				
 				if($job->startTime==0 || $job->state==$job::STATE_RETRY){
 						/*
 						 * Check for 'job skip' condition
@@ -140,7 +184,6 @@
 						 */
 					if($job->keyIdx<$chunkedEncodeReadIdx-1) {
 						KalturaLog::log("Potential 'job skip' case - jobId:$job->id,state: $job->state,jobKeyIdx:$job->keyIdx,rdIdx:$chunkedEncodeReadIdx");
-
 						/*
 						 * Try 10 attempts to re-fetch the 'skipped' job -
 						 * in order to give the sceduler an opportunity to update the job status
@@ -185,7 +228,9 @@
 					 */
 //					if(!array_key_exists($job->id, $this->failed))
 					{
+						$failedIdx = $job->keyIdx;
 						$this->retryJob($manager, $job);
+						$this->failed[$job->id] = $failedIdx;
 						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
 					}
 				}
@@ -200,7 +245,6 @@
 		{
 			$job->state = $job::STATE_RETRY;
 			$manager->SaveJob($job);
-			$this->failed[$job->id] = $job->keyIdx;
 		}
 		
 	}
@@ -357,11 +401,11 @@
 		/* ---------------------------
 		 * detectErrors
 		 */
-		protected function detectErrors($chunkedEncodeReadIdx)
+		protected function detectErrors($chunkedEncodeReadIdx, $chunker)
 		{		
-			if($this->videoJobs->detectErrors($this->storeManager, $chunkedEncodeReadIdx)!=true)
+			if($this->videoJobs->detectErrors($this->storeManager, $chunkedEncodeReadIdx, $chunker)!=true)
 				return false;
-			return $this->audioJobs->detectErrors($this->storeManager, $chunkedEncodeReadIdx);
+			return $this->audioJobs->detectErrors($this->storeManager, $chunkedEncodeReadIdx, $chunker);
 		}
 
 		/* ---------------------------
@@ -423,7 +467,7 @@
 				return false;
 			}
 			
-			if($this->detectErrors($readIndex)===false){
+			if($this->detectErrors($readIndex, $this->chunker)===false){
 				KalturaLog::log($msgStr="Session($this->name) - Result:FAILED to handle broken chunks!");
 				$this->returnMessages[] = $msgStr;
 				$this->returnStatus = KChunkedEncodeReturnStatus::GenerateVideoError;
@@ -604,7 +648,7 @@
 			$job->state = $job::STATE_PENDING;
 			
 			//Reset job time stamps to avoid exec timeout when retrying failed job
-			$this->resetJobParams($job);
+			$job->resetParams();
 			
 			$job->attempt++;
 			if($this->storeManager->AddJob($job)===false) {
@@ -613,15 +657,6 @@
 			}
 			KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
 			return true;
-		}
-		
-		protected function resetJobParams(&$job)
-		{
-			$job->history[] = array('h' => $job->hostname, 'id' => $job->id, 'st' =>$job->startTime);
-			
-			//Reset job timestamps
-			$job->queueTime = 0;
-			$job->startTime = 0;
 		}
 
 		/* ---------------------------
