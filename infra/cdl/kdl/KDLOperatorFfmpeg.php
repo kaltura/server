@@ -571,6 +571,18 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 		}
 		$srcFile = $cmdLineArr[$keySrc];
 	
+			/*
+			 * Fix bad deinterlace handling.
+			 * deinterlace 'yadif' filter should be applied ONLY on the decoding portion of the splited cmd-lines.
+			 * therefore it is removed from the cmdLineArr, and re-added to the decoding cmd-line after the spilt
+			 */
+		$kArr = array_keys($cmdLineArr,'\'[0:v]yadif\'');
+		if(($keyYadif=array_search('\'[0:v]yadif\'', array_slice($cmdLineArr, $keySrc, null, true)))!==false){
+			KalturaLog::log("$keyYadif - ".print_r($cmdLineArr[$keyYadif],1));
+			unset($cmdLineArr[$keyYadif]);
+			unset($cmdLineArr[$keyYadif-1]);
+		}
+		
 		$kArr = array_keys($cmdLineArr,'-an');
 		if(count($kArr)==0 || ($is2pass && count($kArr)==1)) {
 			/*
@@ -620,6 +632,10 @@ bad  mencoder32 ~/Media/Canon.Rotated.0_qaqsufbl.avi -of lavf -lavfopts format=m
 				$pipeStr.= " -i $srcFile -map 0:v -map 1:a";
 			}
 		}
+			// Revive the 'yadif', if needed
+		if($keyYadif!==false)
+			$cmdLineArr[$keySrc].= " -filter_complex '[0:v]yadif'";
+
 		KalturaLog::log("Fixed part:$pipeStr");
 		$cmdLineArr[$keySrc].= " $pipeStr";
 		$cmdLine = implode(" ", $cmdLineArr);
