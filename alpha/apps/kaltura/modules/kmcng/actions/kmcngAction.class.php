@@ -165,7 +165,7 @@ class kmcngAction extends kalturaAction
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
 				"playerBetaVersionsMap" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfig() : '',
 				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : '',
-				"playerBetaConfVars" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfVars() : ''
+				"playerBetaConfVars" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfVars() : '',
 				"playerOvpVersionsMap" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfig() : '',
 				"playerBetaOvpVersionsMap" => isset($this->content_uiconf_player_v3_beta_ovp_versions) ? $this->content_uiconf_player_v3_beta_ovp_versions->getConfig() : '',
 				"playerOvpConfVars" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfVars() : '',
