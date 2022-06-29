@@ -33,6 +33,12 @@ class Infra_ClientHelper
 		$settings = Zend_Registry::get('config')->settings;
 		return $settings->serviceUrl;
 	}
+	
+	public static function getEpUrl()
+	{
+		$settings = Zend_Registry::get('config')->settings;
+		return $settings->epUrl;
+	}
 
 	public static function getCurlTimeout()
 	{

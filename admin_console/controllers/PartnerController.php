@@ -274,6 +274,16 @@ class PartnerController extends Zend_Controller_Action
 		$url = $this->createNewKmcRedirectionUrl($ks);
 		$this->getResponse()->setRedirect($url);
 	}
+	
+	public function epRedirectAction()
+	{
+		$ks = $this->generateAdminKs();
+		if(!$ks)
+			return;
+		
+		$url = $this->createEpRedirectionUrl($ks);
+		$this->getResponse()->setRedirect($url);
+	}
 
 	private function generateAdminKs()
 	{
@@ -318,6 +328,15 @@ class PartnerController extends Zend_Controller_Action
 		if(substr($url, -1) == '/')
 			$url = substr($url,0,-1);
 		$url .= '/index.php/kmcng/actions/login-by-ks/'.$ks;
+		return $url;
+	}
+	
+	private function createEpRedirectionUrl($ks)
+	{
+		$url = Infra_ClientHelper::getEpUrl();
+		if(substr($url, -1) == '/')
+			$url = substr($url,0,-1);
+		$url .= '/login/login-ks/'.$ks;
 		return $url;
 	}
 
