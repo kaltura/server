@@ -129,7 +129,7 @@ class kmcngAction extends kalturaAction
 
 		$this->playerV3OvpVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_OVP_VERSIONS_TAG, "latest");
 		$this->content_uiconfs_player_v3_ovp_versions = isset($this->playerV3OvpVersionsUiConf) ? array_values($this->playerV3OvpVersionsUiConf) : null;
-		$this->content_uiconf_player_v3_ovp_versions = (is_array($this->content_uiconfs_player_v3_ovp_versions) && reset($this->content_uiconfs_player_v3_ovp_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
+		$this->content_uiconf_player_v3_ovp_versions = (is_array($this->content_uiconfs_player_v3_ovp_versions) && reset($this->content_uiconfs_player_v3_ovp_versions)) ? reset($this->content_uiconfs_player_v3_ovp_versions) : null;
 
 		$this->playerV3BetaOvpVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_OVP_VERSIONS_TAG, "beta");
 		$this->content_uiconfs_player_v3_beta_ovp_versions = isset($this->playerV3BetaOvpVersionsUiConf) ? array_values($this->playerV3BetaOvpVersionsUiConf) : null;
