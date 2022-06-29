@@ -184,6 +184,14 @@ class kUploadTokenMgr
 		{
 			$entry->setMediaType($this->getMediaType());
 			$entry->save();
+			
+			if($entry->getMediaType() == KalturaMediaType::IMAGE)
+			{
+				$contentResource = new KalturaUploadedFileTokenResource();
+				$contentResource->token = $this->_uploadToken->getId();
+				$dbContentResource = $contentResource->toObject();
+				$dbContentResource->attachCreatedObject($entry);
+			}
 		}
 	}
 	
