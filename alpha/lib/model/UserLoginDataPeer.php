@@ -308,7 +308,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	protected static function shouldReturnHash(Partner $partner)
 	{
-		if((kCurrentContext::$ks_partner_id == Partner::SELF_SERVE_PARTNER_ID ) && $partner->getIsSelfServe())
+		if((kCurrentContext::$ks_partner_id == Partner::SELF_SERVE_PARTNER_ID) && $partner->getIsSelfServe())
 		{
 			return true;
 		}
