@@ -6,7 +6,9 @@
 Add to admin.ini under [production]
 
 	settings.epUrl = "https://eventplatform.kaltura.com"
+Add to admin.ini under [production]
 
+	settings.epUrl = "@EP_HOST_URL@"
 ## Add Export CSV action to Category service
 * Issue Type: Task
 * Issue ID: PLAT-23743
