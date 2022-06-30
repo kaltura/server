@@ -91,11 +91,11 @@
 									<?php endif;?>
 								<?php endif; ?>
                             
-                                <?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
-                                    <?php if (Zend_Registry::get('config')->settings->epUrl) :?>
+                                				<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
+                                    					<?php if (Zend_Registry::get('config')->settings->epUrl) :?>
 										<option value="manageEp" ><?php echo $this->translate('Manage - EP'); ?></option>
 									<?php endif;?>
-                                <?php endif; ?>
+                               					 <?php endif; ?>
                                 
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
 									<?php if (Zend_Registry::get('config')->settings->kavaDashboard && Zend_Registry::get('config')->settings->kavaDashboard->partnerUrl &&
