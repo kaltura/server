@@ -84,20 +84,18 @@
 								<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
 									<?php if ($partner->partnerGroupType == Kaltura_Client_Enum_PartnerGroupType::TEMPLATE && $partner->partnerParentId== 0): ?>
 										<?php if (Infra_AclHelper::isAllowed('partner','manage-template-partners')): ?>
-                                            <option value="manageNew" ><?php echo $this->translate('Manage - KMCNG'); ?></option>
+											<option value="manageNew" ><?php echo $this->translate('Manage - KMCNG'); ?></option>
 										<?php endif; ?>
 									<?php elseif (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
-                                        <option value="manageNew" ><?php echo $this->translate('Manage - KMCNG'); ?></option>
+										<option value="manageNew" ><?php echo $this->translate('Manage - KMCNG'); ?></option>
 									<?php endif;?>
 								<?php endif; ?>
-								
-        
-								<?php if ($partner->status != Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
-									<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
-                                        <option value="manageEp" ><?php echo $this->translate('Manage - EP'); ?></option>
+                            
+                                <?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')) :?>
+                                    <?php if (Zend_Registry::get('config')->settings->epUrl) :?>
+										<option value="manageEp" ><?php echo $this->translate('Manage - EP'); ?></option>
 									<?php endif;?>
-								<?php endif; ?>
-                                
+                                <?php endif; ?>
                                 
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
 									<?php if (Zend_Registry::get('config')->settings->kavaDashboard && Zend_Registry::get('config')->settings->kavaDashboard->partnerUrl &&

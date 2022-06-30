@@ -279,7 +279,9 @@ class PartnerController extends Zend_Controller_Action
 	{
 		$ks = $this->generateAdminKs();
 		if(!$ks)
+		{
 			return;
+		}
 		
 		$url = $this->createEpRedirectionUrl($ks);
 		$this->getResponse()->setRedirect($url);
@@ -331,7 +333,7 @@ class PartnerController extends Zend_Controller_Action
 		return $url;
 	}
 	
-	private function createEpRedirectionUrl($ks)
+	protected function createEpRedirectionUrl($ks)
 	{
 		$url = Infra_ClientHelper::getEpUrl();
 		if(substr($url, -1) == '/')
