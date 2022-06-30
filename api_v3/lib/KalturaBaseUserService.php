@@ -146,10 +146,10 @@ class KalturaBaseUserService extends KalturaBaseService
 		
 		try {
 			$ret = UserLoginDataPeer::resetUserPassword($email, $linkType);
-            if($ret!==true)
-            {
-                return $ret;
-            }
+			if($ret!==true)
+			{
+				return $ret;
+			}
 		}
 		catch (kUserException $e) {
 			$code = $e->getCode();
