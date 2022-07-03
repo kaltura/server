@@ -6,8 +6,7 @@
  */
 class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 {
-    	const IGNORE_MRP_RESET_ON_METADATA_UPDATE = "ignoreMRPResetOnMetadataUpdate";
-    	const MR_PROFILES = "MRProfiles";
+    	const MRP_IDS_TO_EXCLUDE_RESET_ON_METADATA_UPDATE = "MRP_ids_to_exclude_reset_on_metadata_update";
 
 	public static function enableMrPermission($partnerId)
 	{
@@ -74,12 +73,8 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 	{
         	$allMediaRepurposingProfilesOnPartner = ScheduledTaskProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId);
         	$mediaRepurposingProfilesWithSearchOnGivenMetadataId = array();
-        	$ignoreMRPResetOnMetadataUpdateConf = kConf::get(self::IGNORE_MRP_RESET_ON_METADATA_UPDATE, kConfMapNames::RUNTIME_CONFIG, array());
-        	$MRProfilesToExclude = array();
-        	if(isset($ignoreMRPResetOnMetadataUpdateConf[self::MR_PROFILES]))
-        	{
-        	    $MRProfilesToExclude = explode(",", $ignoreMRPResetOnMetadataUpdateConf[self::MR_PROFILES]);
-        	}
+        	$MRProfilesToExclude = kConf::get(self::MRP_IDS_TO_EXCLUDE_RESET_ON_METADATA_UPDATE, kConfMapNames::RUNTIME_CONFIG, array());
+
         	foreach($allMediaRepurposingProfilesOnPartner as $mediaRepurposingProfile)
         	{
         	    /* @var $mediaRepurposingProfile ScheduledTaskProfile*/
