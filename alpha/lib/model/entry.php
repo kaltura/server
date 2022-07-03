@@ -3126,7 +3126,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
         	    $flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
         	}
 	
-        	if($flavorAsset && $flavorAsset->getStatus() == asset::ASSET_STATUS_READY)
+        	if($flavorAsset && $flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_READY)
         	{
         	    return $flavorAsset->getDownloadUrl();
         	}
