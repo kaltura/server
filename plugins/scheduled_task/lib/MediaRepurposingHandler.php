@@ -72,29 +72,29 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 
 	private function getMRPWithMetadataSearchByProfile($partnerId, $metadataProfileId)
 	{
-        $allMediaRepurposingProfilesOnPartner = ScheduledTaskProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId);
-        $mediaRepurposingProfilesWithSearchOnGivenMetadataId = array();
-        $ignoreMRPResetOnMetadataUpdateConf = kConf::get(self::IGNORE_MRP_RESET_ON_METADATA_UPDATE, kConfMapNames::RUNTIME_CONFIG, array());
-        $MRProfilesToExclude = array();
-        if(isset($ignoreMRPResetOnMetadataUpdateConf[self::MR_PROFILES]))
-        {
-            $MRProfilesToExclude = explode(",", $ignoreMRPResetOnMetadataUpdateConf[self::MR_PROFILES]);
-        }
-        foreach($allMediaRepurposingProfilesOnPartner as $mediaRepurposingProfile)
-        {
-            /* @var $mediaRepurposingProfile ScheduledTaskProfile*/
-            if(in_array($mediaRepurposingProfile->getId(), $MRProfilesToExclude) || !$mediaRepurposingProfile->getObjectFilter() || !$mediaRepurposingProfile->getObjectFilter()->getAdvancedSearch())
-                continue;
-            $items = $mediaRepurposingProfile->getObjectFilter()->getAdvancedSearch()->getItems(); // always have items in advance search because that how the MR is build
-            foreach($items as $item)
-            {
-                if($item instanceof MetadataSearchFilter && $item->getMetadataProfileId() == $metadataProfileId)
-                {
-                    $mediaRepurposingProfilesWithSearchOnGivenMetadataId[] = $mediaRepurposingProfile->getId();
-                }
-            }
-        }
-        return $mediaRepurposingProfilesWithSearchOnGivenMetadataId;
+        	$allMediaRepurposingProfilesOnPartner = ScheduledTaskProfilePeer::retrieveBySystemName(MediaRepurposingUtils::MEDIA_REPURPOSING_SYSTEM_NAME, $partnerId);
+        	$mediaRepurposingProfilesWithSearchOnGivenMetadataId = array();
+        	$ignoreMRPResetOnMetadataUpdateConf = kConf::get(self::IGNORE_MRP_RESET_ON_METADATA_UPDATE, kConfMapNames::RUNTIME_CONFIG, array());
+        	$MRProfilesToExclude = array();
+        	if(isset($ignoreMRPResetOnMetadataUpdateConf[self::MR_PROFILES]))
+        	{
+        	    $MRProfilesToExclude = explode(",", $ignoreMRPResetOnMetadataUpdateConf[self::MR_PROFILES]);
+        	}
+        	foreach($allMediaRepurposingProfilesOnPartner as $mediaRepurposingProfile)
+        	{
+        	    /* @var $mediaRepurposingProfile ScheduledTaskProfile*/
+        	    if(in_array($mediaRepurposingProfile->getId(), $MRProfilesToExclude) || !$mediaRepurposingProfile->getObjectFilter() || !$mediaRepurposingProfile->getObjectFilter()->getAdvancedSearch())
+        	        continue;
+        	    $items = $mediaRepurposingProfile->getObjectFilter()->getAdvancedSearch()->getItems(); // always have items in advance search because that how the MR is build
+        	    foreach($items as $item)
+        	    {
+        	        if($item instanceof MetadataSearchFilter && $item->getMetadataProfileId() == $metadataProfileId)
+        	        {
+        	            $mediaRepurposingProfilesWithSearchOnGivenMetadataId[] = $mediaRepurposingProfile->getId();
+        	        }
+        	    }
+        	}
+        	return $mediaRepurposingProfilesWithSearchOnGivenMetadataId;
 	}
 
 	private function getMediaRepuposingMetadataProfileId($partnerId)
