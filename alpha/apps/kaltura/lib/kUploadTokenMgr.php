@@ -126,8 +126,33 @@ class kUploadTokenMgr
 		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
 		if (!in_array($this->_uploadToken->getStatus(), $allowedStatuses, true))
 			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
-
+		
 		$this->updateFileName($fileData);
+		
+		$entryUpdated = false;
+		$entry = $this->getAttachedEntry();
+		if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
+		{
+			$mediaType = $this->getMediaType();
+			if ($mediaType)
+			{
+				$entry->setMediaType($this->getMediaType());
+				$entryUpdated = true;
+			}
+			
+			if($entryUpdated)
+			{
+				$entry->save();
+			}
+			
+			if($mediaType && $mediaType == KalturaMediaType::IMAGE)
+			{
+				$contentResource = new KalturaUploadedFileTokenResource();
+				$contentResource->token = $this->_uploadToken->getId();
+				$dbContentResource = $contentResource->toObject();
+				$dbContentResource->attachCreatedObject($entry);
+			}
+		}
 		
 		try
 		{
@@ -178,13 +203,6 @@ class kUploadTokenMgr
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
-		
-		$entry = $this->getAttachedEntry();
-		if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
-		{
-			$entry->setMediaType($this->getMediaType());
-			$entry->save();
-		}
 	}
 	
 	protected function getAttachedEntry()
