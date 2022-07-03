@@ -3117,15 +3117,27 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getDownloadAssetUrl($flavorParamsId)
 	{
-		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
-		if ($flavorAsset && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			return $flavorAsset->getDownloadUrl();
-			
-		if(assetPeer::retrieveOriginalByEntryId($this->getId()))
-			return null; // flavor asset should be created
-			
-		// entry file sync should be used (data or download)
-		return $this->getRawDownloadUrl();
+        if($flavorParamsId == 0)
+        {
+            $flavorAsset = assetPeer::retrieveOriginalByEntryId($this->getId());
+        }
+        else
+        {
+            $flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
+        }
+
+        if($flavorAsset && $flavorAsset->getStatus() == asset::ASSET_STATUS_READY)
+        {
+            return $flavorAsset->getDownloadUrl();
+        }
+
+        if($flavorParamsId != 0 && assetPeer::retrieveOriginalByEntryId($this->getId()))
+        {
+            return null; // flavor asset should be created
+        }
+
+        // entry file sync should be used (data or download)
+        return $this->getRawDownloadUrl();
 	}
 	
 	/*************** Bulk download functions - end ******************/
