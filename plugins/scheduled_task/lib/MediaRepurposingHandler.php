@@ -6,8 +6,8 @@
  */
 class MediaRepurposingHandler implements kObjectDataChangedEventConsumer
 {
-    const IGNORE_MRP_RESET_ON_METADATA_UPDATE = "ignoreMRPResetOnMetadataUpdate";
-    const MR_PROFILES = "MRProfiles";
+    	const IGNORE_MRP_RESET_ON_METADATA_UPDATE = "ignoreMRPResetOnMetadataUpdate";
+    	const MR_PROFILES = "MRProfiles";
 
 	public static function enableMrPermission($partnerId)
 	{
