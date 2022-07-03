@@ -140,7 +140,7 @@ class kUploadTokenMgr
 				$entryUpdated = true;
 			}
 			
-			if($entry->getMediaType() == KalturaMediaType::IMAGE)
+			if($mediaType == KalturaMediaType::IMAGE)
 			{
 				$contentResource = new KalturaUploadedFileTokenResource();
 				$contentResource->token = $this->_uploadToken->getId();
