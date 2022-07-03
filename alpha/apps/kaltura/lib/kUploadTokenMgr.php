@@ -140,6 +140,11 @@ class kUploadTokenMgr
 				$entryUpdated = true;
 			}
 			
+			if($entryUpdated)
+			{
+				$entry->save();
+			}
+			
 			if($mediaType == KalturaMediaType::IMAGE)
 			{
 				$contentResource = new KalturaUploadedFileTokenResource();
@@ -147,11 +152,6 @@ class kUploadTokenMgr
 				$dbContentResource = $contentResource->toObject();
 				$dbContentResource->attachCreatedObject($entry);
 			}
-		}
-		
-		if($entryUpdated)
-		{
-			$entry->save();
 		}
 		
 		try
