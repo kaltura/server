@@ -145,10 +145,10 @@ class KalturaBaseUserService extends KalturaBaseService
 		$this->validateRequestsAmount($email);
 		
 		try {
-			$new_password = UserLoginDataPeer::resetUserPassword($email, $linkType);
-			if (!$new_password)
+			$ret = UserLoginDataPeer::resetUserPassword($email, $linkType);
+			if($ret !== true)
 			{
-				KalturaLog::err(KalturaErrors::LOGIN_DATA_NOT_FOUND . ': ' . $email);
+				return $ret;
 			}
 		}
 		catch (kUserException $e) {
