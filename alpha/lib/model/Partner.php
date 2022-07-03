@@ -113,6 +113,8 @@ class Partner extends BasePartner
 
 	const IS_SELF_SERVE = 'isSelfServe';
 	
+	const DEFAULT_LANGUAGE = 'default_language';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -425,6 +427,16 @@ class Partner extends BasePartner
 	public function setDefaultConversionProfileId($v)
 	{
 		$this->putInCustomData("defaultConversionProfileId", $v);
+	}
+	
+	public function setDefaultLanguage($v)
+	{
+		$this->putInCustomData(self::DEFAULT_LANGUAGE, $v);
+	}
+	
+	public function getDefaultLanguage()
+	{
+		return $this->getFromCustomData(self::DEFAULT_LANGUAGE, null, 'EN');
 	}
 	
 	/**
