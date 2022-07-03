@@ -76,6 +76,7 @@ class KalturaDispatcher
 		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
+		kCurrentContext::$requestLanguage = isset($params['requestLanguage']) ? $params['requestLanguage'] : null;
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 
 		if (!KalturaResponseCacher::rateLimit($service, $action, $params, kCurrentContext::$partner_id, kCurrentContext::$ks_partner_id))
