@@ -117,6 +117,24 @@ class kUploadTokenMgr
 	 */
 	public function uploadFileToToken($fileData, $resume = false, $resumeAt = -1)
 	{
+		if (!$this->_uploadToken->getFileName())
+		{
+			$this->_uploadToken->setFileName($fileData['name']);
+		}
+		$entry = $this->getAttachedEntry();
+		if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
+		{
+			$entry->setMediaType($this->getMediaType());
+			$entry->save();
+			
+			if($entry->getMediaType() == KalturaMediaType::IMAGE)
+			{
+				$contentResource = new KalturaUploadedFileTokenResource();
+				$contentResource->token = $this->_uploadToken->getId();
+				$dbContentResource = $contentResource->toObject();
+				$dbContentResource->attachCreatedObject($entry);
+			}
+		}
 		$this->_autoFinalize = $this->_uploadToken->getAutoFinalize();
 		if($this->_autoFinalize)
 		{
@@ -178,21 +196,6 @@ class kUploadTokenMgr
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
 		
 		$this->_uploadToken->save();
-		
-		$entry = $this->getAttachedEntry();
-		if ($entry && $entry->getType() == entryType::MEDIA_CLIP && !$entry->getMediaType())
-		{
-			$entry->setMediaType($this->getMediaType());
-			$entry->save();
-			
-			if($entry->getMediaType() == KalturaMediaType::IMAGE)
-			{
-				$contentResource = new KalturaUploadedFileTokenResource();
-				$contentResource->token = $this->_uploadToken->getId();
-				$dbContentResource = $contentResource->toObject();
-				$dbContentResource->attachCreatedObject($entry);
-			}
-		}
 	}
 	
 	protected function getAttachedEntry()
