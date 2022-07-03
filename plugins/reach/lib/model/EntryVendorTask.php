@@ -262,6 +262,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID);
 	}
 
+	public function isScheduled()
+	{
+		return $this->getTaskJobData() instanceof kScheduledVendorTaskData;
+	}
+
 	protected static function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
 	{
 
