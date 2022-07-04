@@ -1824,7 +1824,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setMultiLanguageMapping($v)
 	{
-		$multiLangMapping = json_decode($v);
+		$multiLangMapping = json_decode($v, true);
 		foreach ($multiLangMapping[self::NAME] as $nameInLang)
 		{
 			if (kString::alignUtf8String($nameInLang, self::MAX_NAME_LEN) != $nameInLang)
