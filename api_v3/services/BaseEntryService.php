@@ -341,10 +341,10 @@ class BaseEntryService extends KalturaEntryService
     function getAction($entryId, $version = -1)
     {
 		$entry = $this->getEntry($entryId, $version);
-		$defaultLanguage =  $this->getPartner()->getDefaultLanguage();
+		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
 		$language = kCurrentContext::getRequestLanguage();
 		/* @var KalturaBaseEntry $entry*/
-		if ($language || $defaultLanguage != $language)
+		if ($language && $defaultLanguage != $language)
 		{
 			$multiLanguageMap = $entry->multiLanguageMapping;
 			if ($multiLanguageMap)
