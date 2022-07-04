@@ -139,7 +139,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
 	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'interactivity_version';
 	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'volatile_interactivity_version';
-
+	const NAME = 'name';
+	const DESCRIPTION = 'description';
+	const TAGS = 'tags';
+	const MULTI_LANGUAGE_MAPPING = 'multiLanguageMapping';
+	
 	const MAX_NAME_LEN = 256;
 
 	private $appears_in = null;
@@ -1817,7 +1821,25 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
 	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
-
+	
+	public function setMultiLanguageMapping($v)
+	{
+		$multiLangMapping = json_decode($v);
+		foreach ($multiLangMapping[self::NAME] as $nameInLang)
+		{
+			if (kString::alignUtf8String($nameInLang, self::MAX_NAME_LEN) != $nameInLang)
+			{
+				throw new kCoreException('Bad entry name: ' . $nameInLang, KalturaErrors::INVALID_FIELD_VALUE);
+			}
+		}
+		$this->putInCustomData ( self::MULTI_LANGUAGE_MAPPING , $v );
+	}
+	
+	public function getMultiLanguageMapping()
+	{
+		return $this->getFromCustomData(self::MULTI_LANGUAGE_MAPPING, null, null);
+	}
+	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
