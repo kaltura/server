@@ -10,6 +10,10 @@ class BaseEntryService extends KalturaEntryService
 {
 	
 	const PLAYBACK_SECRET = 'playback_secret';
+	const NAME = 'name';
+	const DESCRIPTION = 'description';
+	const TAGS = 'tags';
+	const MULTI = 'MULTI';
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
      */
@@ -336,9 +340,42 @@ class BaseEntryService extends KalturaEntryService
 	 */
     function getAction($entryId, $version = -1)
     {
-    	return $this->getEntry($entryId, $version);
+		$entry = $this->getEntry($entryId, $version);
+		$defaultLanguage =  $this->getPartner()->getDefaultLanguage();
+		$language = kCurrentContext::getRequestLanguage();
+		/* @var KalturaBaseEntry $entry*/
+		if ($language || $defaultLanguage != $language)
+		{
+			$multiLanguageMap = $entry->multiLanguageMapping;
+			if ($multiLanguageMap)
+			{
+				if ($language == self::MULTI)
+				{
+				    $this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true));
+				}
+				else
+				{
+				    $this->updateEntryFieldsByLanguage($entry, json_decode($multiLanguageMap, true), $language);
+				}
+			}
+		}
+		return $entry;
     }
-
+	
+	protected function updateEntryFieldsByLanguage(&$entry, $multiLanguageMap, $language)
+	{
+		$entry->name = isset($multiLanguageMap[self::NAME][$language]) ? $multiLanguageMap[self::NAME][$language] : $multiLanguageMap[self::NAME][$this->getPartner()->getDefaultLanguage()];
+		$entry->description = isset($multiLanguageMap[self::DESCRIPTION][$language]) ? $multiLanguageMap[self::DESCRIPTION][$language] : $multiLanguageMap[self::DESCRIPTION][$this->getPartner()->getDefaultLanguage()];
+		$entry->tags = isset($multiLanguageMap[self::TAGS][$language]) ? $multiLanguageMap[self::TAGS][$language] : $multiLanguageMap[self::TAGS][$this->getPartner()->getDefaultLanguage()];
+	}
+	
+	protected function setMultiLanguageStringOnField(&$entry, $multiLanguageMap)
+	{
+		$entry->name = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::NAME]);
+		$entry->description = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::DESCRIPTION]);
+		$entry->tags = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::TAGS]);
+	}
+	
     /**
      * Get remote storage existing paths for the asset.
      *
