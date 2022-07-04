@@ -597,6 +597,32 @@ class BaseEntryService extends KalturaEntryService
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
+		
+		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
+		$language = kCurrentContext::getRequestLanguage();
+		if ($language && $defaultLanguage != $language)
+		{
+			$updatedResponseObjects = array();
+			foreach ($response->objects as $entry)
+			{
+				/* @var KalturaBaseEntry $entry */
+				$multiLanguageMap = $entry->multiLanguageMapping;
+				if ($multiLanguageMap)
+				{
+					if ($language == 'MULTI')
+					{
+						$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true));
+					}
+					else
+					{
+						$this->updateEntryFieldsByLanguage($entry, json_decode($multiLanguageMap, true), $language);
+					}
+					
+				}
+				array_push($updatedResponseObjects, $entry);
+			}
+			$response->objects = $updatedResponseObjects;
+		}
 		return $response;
 	}
 	
