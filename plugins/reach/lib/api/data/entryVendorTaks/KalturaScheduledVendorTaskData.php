@@ -4,8 +4,6 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-$
-
 class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 {
 	/**
@@ -61,21 +59,15 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 			$object_to_fill = new kScheduledVendorTaskData();
 		}
 
+		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
+
 		if ($this->startDate == null)
 		{
-			if (!isset($connectedEvent))
-			{
-				$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
-			}
 			$this->startDate = $connectedEvent->getStartDate();
 		}
 
 		if ($this->endDate == null)
 		{
-			if (!isset($connectedEvent))
-			{
-				$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
-			}
 			$this->endDate = $connectedEvent->getEndDate();
 		}
 
@@ -95,13 +87,22 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 	private function validateScheduledEvent()
 	{
 		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
-		if(!$connectedEvent)
+		if (!$connectedEvent)
 		{
 			throw new KalturaAPIException(KalturaErrors::SCHEDULE_EVENT_ID_NOT_FOUND, $this->scheduledEventId);
 		}
 
-		$this->validatePropertyMaxValue('startDate', $this->endDate);
-		$this->validatePropertyMinMaxValue('startDate', $connectedEvent->getStartDate(), $connectedEvent->getEndDate());
-		$this->validatePropertyMinMaxValue('endDate', $connectedEvent->getStartDate(), $connectedEvent->getEndDate());
+		if ($this->startDate)
+		{
+			$this->validatePropertyMinMaxValue('startDate', $connectedEvent->getStartDate(null), $connectedEvent->getEndDate(null));
+		}
+		if ($this->endDate)
+		{
+			$this->validatePropertyMinMaxValue('endDate', $connectedEvent->getStartDate(null), $connectedEvent->getEndDate(null));
+		}
+		if ($this->startDate && $this->endDate)
+		{
+			$this->validatePropertyMaxValue('startDate', $this->endDate);
+		}
 	}
 }

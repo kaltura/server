@@ -105,6 +105,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		}
+
 		if ($dbEntryVendorTask->isScheduled())
 		{
 			/* @var $taskJobData kScheduledVendorTaskData */

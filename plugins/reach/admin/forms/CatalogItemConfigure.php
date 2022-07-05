@@ -171,6 +171,30 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$allowResubmission->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($allowResubmission);
 
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
+		{
+			$this->addElement('text', 'minimalRefundTime', array(
+				'label' => 'Minimal Refund Time:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
+
+			$this->addElement('text', 'durationLimit', array(
+				'label' => 'Duration Limit:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
+
+			$this->addElement('text', 'minimalOrderTime', array(
+				'label' => 'Minimal Order Time:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
+		}
+
 		$this->addLine("Pricing Line");
 		$this->addTitle('Pricing:');
 
