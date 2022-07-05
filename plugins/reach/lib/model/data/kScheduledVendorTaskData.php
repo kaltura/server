@@ -2,8 +2,6 @@
 
 
 /**
- * TODO
- *
  * @package plugins.reach
  * @subpackage model
  *
@@ -42,7 +40,8 @@ class kScheduledVendorTaskData extends kVendorTaskData
 	 */
 	public function getScheduleEvent()
 	{
-		if (!$this->scheduleEventId) {
+		if (!$this->scheduleEventId)
+		{
 			return null;
 		}
 		return ScheduleEventPeer::retrieveByPK($this->scheduleEventId);

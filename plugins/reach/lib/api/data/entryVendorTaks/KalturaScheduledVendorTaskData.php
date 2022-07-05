@@ -44,7 +44,8 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
  	 */
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
-		if (!$dbObject) {
+		if (!$dbObject)
+		{
 			$dbObject = new kScheduledVendorTaskData();
 		}
 		return parent::toObject($dbObject, $propsToSkip);
@@ -55,7 +56,8 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
  	 */
 	public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if (is_null($object_to_fill)) {
+		if (is_null($object_to_fill))
+		{
 			$object_to_fill = new kScheduledVendorTaskData();
 		}
 
