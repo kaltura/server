@@ -451,6 +451,49 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->indexToSearchIndex();
 	}
 
+	public function postInsert(PropelPDO $con = null)
+	{
+		parent::postInsert($con);
+
+		switch ($this->getServiceFeature())
+		{
+			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				$taskData = $this->getTaskJobData();
+				$connectedEvent = $taskData->getScheduleEvent();
+				$feature = new LiveCaptionFeature();
+				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
+				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
+				$feature->setSystemName("live-captioning-{$taskData->getStartDate()}");
+				$connectedEvent->setLiveFeatures(array_push($connectedEvent->getLiveFeatures(), $feature));
+				$connectedEvent->save();
+				break;
+		}
+
+	}
+
+	public function postDelete(PropelPDO $con = null)
+	{
+		parent::postDelete($con);
+
+		switch ($this->getServiceFeature())
+		{
+			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				$taskData = $this->getTaskJobData();
+				$connectedEvent = $taskData->getScheduleEvent();
+				$featureList = $connectedEvent->getLiveFeatures();
+				foreach ($featureList as $index => $feature)
+				{
+					if ($feature->getSystemName() == "live-captioning-{$taskData->getStartDate()}")
+					{
+						unset($featureList[$index]);
+					}
+				}
+				$connectedEvent->setLiveFeatures($featureList);
+				$connectedEvent->save();
+				break;
+		}
+	}
+
 	public function save(PropelPDO $con = null)
 	{
 		if (in_array(EntryVendorTaskPeer::STATUS, $this->modifiedColumns) &&
