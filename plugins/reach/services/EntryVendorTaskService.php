@@ -108,23 +108,7 @@ class EntryVendorTaskService extends KalturaBaseService
 
 		if ($dbEntryVendorTask->isScheduled())
 		{
-			/* @var $taskJobData kScheduledVendorTaskData */
-			$taskJobData = $dbEntryVendorTask->getTaskJobData();
-			// validate that the catalogItem type is appropriate
-			if (!$dbVendorCatalogItem instanceof IVendorScheduledCatalogItem)
-			{
-				throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($dbVendorCatalogItem), 'KalturaScheduledVendorTaskData');
-			}
-			if ($taskJobData->getStartDate() - time() < $dbVendorCatalogItem->getMinimalOrderTime() * dateUtils::MINUTE)
-			{
-				throw new KalturaAPIException(KalturaReachErrors::TOO_LATE_ORDER, $dbEntryVendorTask->getEntryId(), $dbVendorCatalogItem->getId(), $dbVendorCatalogItem->getMinimalOrderTime());
-			}
-			$taskDurationSec = $taskJobData->getEndDate() - $taskJobData->getStartDate();
-			$durationLimitSec = $dbVendorCatalogItem->getDurationLimit() * dateUtils::MINUTE;
-			if ($taskDurationSec > $durationLimitSec)
-			{
-				throw new KalturaAPIException(KalturaReachErrors::TOO_LONG_SCHEDULED_TASK, $taskDurationSec, $durationLimitSec, $dbVendorCatalogItem->getId());
-			}
+			$dbEntryVendorTask->getTaskJobData()->validateCatalogLimitations($dbVendorCatalogItem);
 		}
 
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);

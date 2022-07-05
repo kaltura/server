@@ -458,13 +458,19 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				/* @var $taskData kScheduledVendorTaskData */
 				$taskData = $this->getTaskJobData();
+				/* @var $connectedEvent LiveStreamScheduleEvent */
 				$connectedEvent = $taskData->getScheduleEvent();
+
 				$feature = new LiveCaptionFeature();
 				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 				$feature->setSystemName("live-captioning-{$taskData->getStartDate()}");
-				$connectedEvent->setLiveFeatures(array_push($connectedEvent->getLiveFeatures(), $feature));
+
+				$featureList = $connectedEvent->getLiveFeatures();
+				array_push($featureList, $feature);
+				$connectedEvent->setLiveFeatures($featureList);
 				$connectedEvent->save();
 				break;
 		}
@@ -478,7 +484,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				/* @var $taskData kScheduledVendorTaskData */
 				$taskData = $this->getTaskJobData();
+				/* @var $connectedEvent LiveStreamScheduleEvent */
 				$connectedEvent = $taskData->getScheduleEvent();
 				$featureList = $connectedEvent->getLiveFeatures();
 				foreach ($featureList as $index => $feature)

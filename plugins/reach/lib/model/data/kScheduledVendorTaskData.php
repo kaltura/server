@@ -90,4 +90,29 @@ class kScheduledVendorTaskData extends kVendorTaskData
 	{
 		$this->endDate = $endDate;
 	}
+
+	/**
+	 * @param VendorCatalogItem $vendorCatalogItem
+	 * @throws KalturaAPIException
+	 */
+	public function validateCatalogLimitations($vendorCatalogItem)
+	{
+		// validate that the catalogItem type is appropriate
+		if (!$vendorCatalogItem instanceof IVendorScheduledCatalogItem)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), 'KalturaScheduledVendorTaskData');
+		}
+
+		if ($this->getStartDate() - time() < $vendorCatalogItem->getMinimalOrderTime() * dateUtils::MINUTE)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::TOO_LATE_ORDER, $this->getScheduleEventId(), $vendorCatalogItem->getId(), $vendorCatalogItem->getMinimalOrderTime());
+		}
+
+		$taskDurationSec = $this->getEndDate() - $this->getStartDate();
+		$durationLimitSec = $vendorCatalogItem->getDurationLimit() * dateUtils::MINUTE;
+		if ($taskDurationSec > $durationLimitSec)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::TOO_LONG_SCHEDULED_TASK, $taskDurationSec, $durationLimitSec, $vendorCatalogItem->getId());
+		}
+	}
 }
