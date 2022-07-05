@@ -1824,15 +1824,51 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setMultiLanguageMapping($v)
 	{
-		$multiLangMapping = json_decode($v, true);
-		foreach ($multiLangMapping[self::NAME] as $nameInLang)
+		$this->setDefaultValuesFromMultiLangMapping($v);
+		$this->putInCustomData ( self::MULTI_LANGUAGE_MAPPING , $v );
+	}
+	
+	protected Function setDefaultValuesFromMultiLangMapping($v)
+	{
+		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
+		if ($defaultLanguage)
 		{
-			if (kString::alignUtf8String($nameInLang, self::MAX_NAME_LEN) != $nameInLang)
+			$multiLangMapping = json_decode($v, true);
+			$name = $this->getName();
+			$desc = $this->getDescription();
+			$tags = $this->getTags();
+			if ($multiLangMapping[self::NAME])
 			{
-				throw new kCoreException('Bad entry name: ' . $nameInLang, KalturaErrors::INVALID_FIELD_VALUE);
+				$nameFromMap = $this->extractDefaultLanguageValue($multiLangMapping, self::NAME, $defaultLanguage);
+				$this->setName($nameFromMap?$nameFromMap:$name);
+			}
+			if ($multiLangMapping[self::DESCRIPTION])
+			{
+				$descFromMap = $this->extractDefaultLanguageValue($multiLangMapping, self::DESCRIPTION, $defaultLanguage);
+				$this->setDescription($descFromMap?$descFromMap:$desc);
+			}
+			if ($multiLangMapping[self::TAGS])
+			{
+				$tagsFromMap = $this->extractDefaultLanguageValue($multiLangMapping, self::TAGS, $defaultLanguage);
+				$this->setTags($tagsFromMap?$tagsFromMap:$tags);
 			}
 		}
-		$this->putInCustomData ( self::MULTI_LANGUAGE_MAPPING , $v );
+	}
+	
+	protected function extractDefaultLanguageValue($multiLangMapping, $field, $defaultLanguage)
+	{
+		foreach ($multiLangMapping[$field] as $languageKey => $languageValue)
+		{
+			if ($field == self::NAME && kString::alignUtf8String($languageValue, self::MAX_NAME_LEN) != $languageValue)
+			{
+				throw new kCoreException('Bad entry name: ' . $languageValue, KalturaErrors::INVALID_FIELD_VALUE);
+			}
+			if ($defaultLanguage === $languageKey)
+			{
+				return $languageValue;
+			}
+		}
+		return null;
 	}
 	
 	public function getMultiLanguageMapping()
