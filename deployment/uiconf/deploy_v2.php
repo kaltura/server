@@ -31,6 +31,11 @@ $skipAddUiconf = $arguments['no-create'];
 
 //error_reporting(0);
 $confObj = uiConfDeployment::init($arguments['ini']); // get and read the config file
+if (!(isset($confObj->general->component->name) && isset($confObj->general->component->version)))
+{
+	KalturaLog::debug("Error: Source ini missing name or version\n");
+	return;
+}
 
 uiConfDeployment::checkArguments($arguments);
 
