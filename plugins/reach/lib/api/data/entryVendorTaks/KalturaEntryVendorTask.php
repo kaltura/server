@@ -361,4 +361,9 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$json = json_decode($string);
 		return (is_object($json) && json_last_error() == JSON_ERROR_NONE) ? true : false;
 	}
+
+	public function isScheduled()
+	{
+		return $this->taskJobData instanceof KalturaScheduledVendorTaskData;
+	}
 }

@@ -11,7 +11,7 @@ class kScheduledVendorTaskData extends kVendorTaskData
 	/**
 	 * @var int
 	 */
-	public $scheduleEventId;
+	public $scheduledEventId;
 
 	/**
 	 * @var time
@@ -28,9 +28,17 @@ class kScheduledVendorTaskData extends kVendorTaskData
 	 *
 	 * @return     int
 	 */
-	public function getScheduleEventId()
+	public function getScheduledEventId()
 	{
-		return $this->scheduleEventId;
+		return $this->scheduledEventId;
+	}
+
+	/**
+	 * @param int $scheduledEventId
+	 */
+	public function setScheduledEventId($scheduledEventId)
+	{
+		$this->scheduledEventId = $scheduledEventId;
 	}
 
 	/**
@@ -40,19 +48,11 @@ class kScheduledVendorTaskData extends kVendorTaskData
 	 */
 	public function getScheduleEvent()
 	{
-		if (!$this->scheduleEventId)
+		if (!$this->scheduledEventId)
 		{
 			return null;
 		}
-		return ScheduleEventPeer::retrieveByPK($this->scheduleEventId);
-	}
-
-	/**
-	 * @param int $scheduleEventId
-	 */
-	public function setScheduleEventId($scheduleEventId)
-	{
-		$this->scheduleEventId = $scheduleEventId;
+		return ScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 	}
 
 	/**

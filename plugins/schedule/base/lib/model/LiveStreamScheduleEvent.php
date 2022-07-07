@@ -284,4 +284,40 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		}
 		return $transitionTimes;
 	}
+
+	/**
+	 * Adds feature to event
+	 *
+	 * @param LiveFeature $feature
+	 * @throws PropelException
+	 */
+	public function addFeature($feature)
+	{
+		$featureList = $this->getLiveFeatures();
+		array_push($featureList, $feature);
+		$this->setLiveFeatures($featureList);
+		$this->save();
+	}
+
+	/**
+	 * Removes feature from event with a given name
+	 *
+	 * Name of feature to remove
+	 * @param string $featureName
+	 *
+	 * @throws PropelException
+	 */
+	public function removeFeature($featureName)
+	{
+		$featureList = $this->getLiveFeatures();
+		foreach ($featureList as $index => $feature)
+		{
+			if ($feature->getSystemName() == $feature)
+			{
+				unset($featureList[$index]);
+			}
+		}
+		$this->setLiveFeatures($featureList);
+		$this->save();
+	}
 }

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package plugins.reach
+ * @subpackage api.objects
+ */
 class KalturaVendorLiveCaptionCatalogItem extends KalturaVendorCaptionsCatalogItem
 {
 	/**

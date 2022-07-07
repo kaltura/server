@@ -63,4 +63,10 @@ abstract class LiveFeature extends BaseObject
 	{
 		return $this->postEndTime;
 	}
+
+	public static function defaultName($suffix)
+	{
+		$prefix = get_called_class();
+		return "$prefix-$suffix";
+	}
 }
