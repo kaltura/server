@@ -85,9 +85,4 @@ class LiveCaptionFeature extends LiveFeature
 	{
 		return 'KalturaLiveCaptionFeature';
 	}
-
-	public static function defaultName($suffix)
-	{
-		return "live-caption-$suffix";
-	}
 }
