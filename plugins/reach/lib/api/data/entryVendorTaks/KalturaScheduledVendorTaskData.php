@@ -73,7 +73,7 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
 		}
 
-		$this->entryDuration = ($this->endDate - $this->startDate) * 1000;
+		$object_to_fill->setEntryDuration(($this->endDate - $this->startDate) * 1000);
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -105,6 +105,29 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		if ($this->startDate && $this->endDate)
 		{
 			$this->validatePropertyMaxValue('startDate', $this->endDate);
+		}
+	}
+
+	public function validateCatalogLimitations($catalogItemId)
+	{
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
+
+		// validate that the catalogItem type is appropriate
+		if (!$vendorCatalogItem instanceof IVendorScheduledCatalogItem)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), 'KalturaScheduledVendorTaskData');
+		}
+
+		if ($this->startDate - time() < $vendorCatalogItem->getMinimalOrderTime() * dateUtils::MINUTE)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::TOO_LATE_ORDER, $this->scheduledEventId, $vendorCatalogItem->getId(), $vendorCatalogItem->getMinimalOrderTime());
+		}
+
+		$taskDurationSec = $this->endDate - $this->startDate;
+		$durationLimitSec = $vendorCatalogItem->getDurationLimit() * dateUtils::MINUTE;
+		if ($taskDurationSec > $durationLimitSec)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::TOO_LONG_SCHEDULED_TASK, $taskDurationSec, $durationLimitSec, $vendorCatalogItem->getId());
 		}
 	}
 }

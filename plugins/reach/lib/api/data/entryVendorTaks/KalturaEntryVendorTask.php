@@ -262,6 +262,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$object_to_fill = new EntryVendorTask();
 		}
+
+		$this->taskJobData->toInsertableObject($object_to_fill->getTaskJobData());
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -281,6 +283,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		if(isset($this->taskJobData))
 		{
 			$this->taskJobData->validateForInsert();
+			$this->taskJobData->validateCatalogLimitations($this->catalogItemId);
 		}
 		
 		return parent::validateForInsert($propertiesToSkip);
