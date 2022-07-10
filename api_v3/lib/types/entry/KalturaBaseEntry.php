@@ -404,7 +404,13 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @var bool
 	 */
 	public $blockAutoTranscript;
-
+	
+	/**
+	 * Can be used to store a mapping of fields values in different languages
+	 *
+	 * @var string
+	 */
+	public $multiLanguageMapping;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -456,7 +462,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"displayInSearch",
 		"application",
 		"applicationVersion",
-		"blockAutoTranscript"
+		"blockAutoTranscript",
+	    "multiLanguageMapping"
 	 );
 		 
 	public function getMapBetweenObjects()

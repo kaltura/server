@@ -139,7 +139,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const LIVE_THUMB_PATH = "content/templates/entry/thumbnail/live_thumb.jpg";
 	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'interactivity_version';
 	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'volatile_interactivity_version';
-
+	const NAME = 'name';
+	const DESCRIPTION = 'description';
+	const TAGS = 'tags';
+	const MULTI_LANGUAGE_MAPPING = 'multiLanguageMapping';
+	
 	const MAX_NAME_LEN = 256;
 
 	private $appears_in = null;
@@ -1817,7 +1821,61 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
 	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
-
+	
+	public function setMultiLanguageMapping($v)
+	{
+		$this->setDefaultValuesFromMultiLangMapping($v);
+		$this->putInCustomData ( self::MULTI_LANGUAGE_MAPPING , $v );
+	}
+	
+	protected Function setDefaultValuesFromMultiLangMapping($v)
+	{
+		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
+		if ($defaultLanguage)
+		{
+			$multiLangMapping = json_decode($v, true);
+			$name = $this->getName();
+			$desc = $this->getDescription();
+			$tags = $this->getTags();
+			if ($multiLangMapping[self::NAME])
+			{
+				$nameFromMap = $this->extractDefaultLanguageValue($multiLangMapping, self::NAME, $defaultLanguage);
+				$this->setName($nameFromMap?$nameFromMap:$name);
+			}
+			if ($multiLangMapping[self::DESCRIPTION])
+			{
+				$descFromMap = $this->extractDefaultLanguageValue($multiLangMapping, self::DESCRIPTION, $defaultLanguage);
+				$this->setDescription($descFromMap?$descFromMap:$desc);
+			}
+			if ($multiLangMapping[self::TAGS])
+			{
+				$tagsFromMap = $this->extractDefaultLanguageValue($multiLangMapping, self::TAGS, $defaultLanguage);
+				$this->setTags($tagsFromMap?$tagsFromMap:$tags);
+			}
+		}
+	}
+	
+	protected function extractDefaultLanguageValue($multiLangMapping, $field, $defaultLanguage)
+	{
+		foreach ($multiLangMapping[$field] as $languageKey => $languageValue)
+		{
+			if ($field == self::NAME && kString::alignUtf8String($languageValue, self::MAX_NAME_LEN) != $languageValue)
+			{
+				throw new kCoreException('Bad entry name: ' . $languageValue, KalturaErrors::INVALID_FIELD_VALUE);
+			}
+			if ($defaultLanguage === $languageKey)
+			{
+				return $languageValue;
+			}
+		}
+		return null;
+	}
+	
+	public function getMultiLanguageMapping()
+	{
+		return $this->getFromCustomData(self::MULTI_LANGUAGE_MAPPING, null, null);
+	}
+	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
 	{	
