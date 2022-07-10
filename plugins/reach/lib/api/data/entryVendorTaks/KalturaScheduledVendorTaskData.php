@@ -63,17 +63,18 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 
 		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 
-		if (!$this->startDate)
-		{
-			$object_to_fill->setStartDate($connectedEvent->getStartDate(null));
-		}
+//		TODO: add and make work with catalog validations
+//		if (!$this->startDate)
+//		{
+//			$object_to_fill->setStartDate($connectedEvent->getStartDate(null));
+//		}
+//
+//		if (!$this->endDate)
+//		{
+//			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
+//		}
 
-		if (!$this->endDate)
-		{
-			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
-		}
-
-		$object_to_fill->setEntryDuration(($this->endDate - $this->startDate) * 1000);
+		$object_to_fill->setEntryDuration(($object_to_fill->getEndDate() - $object_to_fill->getStartDate()) * 1000);
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
@@ -108,6 +109,11 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		}
 	}
 
+	/**
+	 * @param $catalogItemId
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
 	public function validateCatalogLimitations($catalogItemId)
 	{
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
