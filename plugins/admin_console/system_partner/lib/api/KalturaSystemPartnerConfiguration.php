@@ -858,7 +858,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		else
 		{
-			$object_to_fill->setDefaultLanguage('EN');
+			$object_to_fill->setDefaultLanguage(null);
 		}
 		
 		return $object_to_fill;
