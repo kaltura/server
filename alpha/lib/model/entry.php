@@ -1830,7 +1830,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	protected Function setDefaultValuesFromMultiLangMapping($v)
 	{
-		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$defaultLanguage = $partner->getDefaultLanguage();
 		if ($defaultLanguage)
 		{
 			$multiLangMapping = json_decode($v, true);
