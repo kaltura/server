@@ -63,14 +63,14 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 
 		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 
-		if ($this->startDate == null)
+		if (!$this->startDate)
 		{
-			$this->startDate = $connectedEvent->getStartDate();
+			$object_to_fill->setStartDate($connectedEvent->getStartDate(null));
 		}
 
-		if ($this->endDate == null)
+		if (!$this->endDate)
 		{
-			$this->endDate = $connectedEvent->getEndDate();
+			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
 		}
 
 		$this->entryDuration = ($this->endDate - $this->startDate) * 1000;

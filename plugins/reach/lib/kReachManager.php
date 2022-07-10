@@ -335,6 +335,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		if ($object instanceof EntryVendorTask)
 		{
+			if ($object->isScheduled())
+			{
+				$object->addSchedulingData();
+			}
 			$this->updateReachProfileCreditUsage($object);
 		}
 
@@ -360,7 +364,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& $object->getStatus() == EntryVendorTaskStatus::PENDING
 			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION
 		)
+		{
+			if ($object->isScheduled())
+			{
+				$object->addSchedulingData();
+			}
 			return $this->updateReachProfileCreditUsage($object);
+		}
 
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)

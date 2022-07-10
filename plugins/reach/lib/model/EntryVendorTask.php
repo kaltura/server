@@ -451,10 +451,8 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		$this->indexToSearchIndex();
 	}
 
-	public function postInsert(PropelPDO $con = null)
+	public function addSchedulingData()
 	{
-		parent::postInsert($con);
-
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
@@ -469,23 +467,6 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$feature->setSystemName(LiveCaptionFeature::defaultName($this->getId()));
 
 				$connectedEvent->addFeature($feature);
-				break;
-		}
-
-	}
-
-	public function postDelete(PropelPDO $con = null)
-	{
-		parent::postDelete($con);
-
-		switch ($this->getServiceFeature())
-		{
-			case KalturaVendorServiceFeature::LIVE_CAPTION:
-				/* @var $taskData kScheduledVendorTaskData */
-				$taskData = $this->getTaskJobData();
-				/* @var $connectedEvent LiveStreamScheduleEvent */
-				$connectedEvent = $taskData->getScheduleEvent();
-				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName($this->getId()));
 				break;
 		}
 	}
