@@ -19,7 +19,7 @@ class KalturaRequestConfiguration extends KalturaObject
 	public $ks;
 	
 	/**
-	 * Response language
+	 * Request language
 	 * @var string
 	 */
 	public $requestLanguage;
