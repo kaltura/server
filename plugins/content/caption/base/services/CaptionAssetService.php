@@ -636,7 +636,6 @@ class CaptionAssetService extends KalturaAssetService
 
 		$parsedContent = $captionsContentManager->parse($content);
 		return new kRendererString(json_encode($parsedContent));
-
 	}
 
 	/**
