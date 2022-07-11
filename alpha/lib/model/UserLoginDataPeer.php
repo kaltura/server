@@ -238,16 +238,26 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 
-	public static function checkPasswordValidation($newPassword, $loginData) {
+	public static function checkPasswordValidation($newPassword, $loginData)
+	{
 		// check that new password structure is valid
-		if ($newPassword &&
-			!UserLoginDataPeer::isPasswordStructureValid($newPassword,$loginData->getConfigPartnerId()) ||
-			(strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
+		if (!$newPassword)
+		{
+			return;
+		}
+
+		if (!UserLoginDataPeer::isPasswordStructureValid($newPassword, $loginData->getConfigPartnerId()))
+		{
+			$errorMessage = str_replace('\n', PHP_EOL ,$loginData->getInvalidPasswordStructureMessage());
+			throw new kUserException($errorMessage, kUserException::PASSWORD_STRUCTURE_INVALID);
+		}
+
+		if((strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
 			(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
 			(stripos($newPassword, $loginData->getFullName()) !== false) ||
 			($newPassword == $loginData->getLoginEmail()))
 		{
-			throw new kUserException('', kUserException::PASSWORD_STRUCTURE_INVALID);
+			throw new kUserException('Can\'t contain your name or email', kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
 		
 		if ($loginData->isCommonPassword($newPassword))
@@ -261,9 +271,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 
-		
-
-	
 	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
 	{
 		$c = new Criteria(); 
