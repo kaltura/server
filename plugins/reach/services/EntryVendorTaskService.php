@@ -107,7 +107,6 @@ class EntryVendorTaskService extends KalturaBaseService
 		}
 
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
-		$dbEntryVendorTask->setTaskJobData($entryVendorTask->taskJobData->toInsertableObject($dbEntryVendorTask->getTaskJobData()));
 		self::tryToSave($dbEntryVendorTask);
 		return $dbEntryVendorTask;
 	}

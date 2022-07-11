@@ -262,8 +262,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$object_to_fill = new EntryVendorTask();
 		}
+
+		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
+
+		$object_to_fill->setTaskJobData($this->taskJobData->toInsertableObject($object_to_fill->getTaskJobData()));
 		
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+		return $object_to_fill;
 	}
 	
 	public function validateForInsert($propertiesToSkip = array())

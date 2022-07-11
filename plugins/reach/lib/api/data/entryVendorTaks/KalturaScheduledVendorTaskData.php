@@ -63,16 +63,15 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 
 		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 
-//		TODO: add and make work with catalog validations
-//		if (!$this->startDate)
-//		{
-//			$object_to_fill->setStartDate($connectedEvent->getStartDate(null));
-//		}
-//
-//		if (!$this->endDate)
-//		{
-//			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
-//		}
+		if (!$this->startDate)
+		{
+			$object_to_fill->setStartDate($connectedEvent->getStartDate(null));
+		}
+
+		if (!$this->endDate)
+		{
+			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
+		}
 
 		$object_to_fill->setEntryDuration(($object_to_fill->getEndDate() - $object_to_fill->getStartDate()) * 1000);
 
@@ -117,6 +116,7 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 	public function validateCatalogLimitations($catalogItemId)
 	{
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
+		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 
 		// validate that the catalogItem type is appropriate
 		if (!$vendorCatalogItem instanceof IVendorScheduledCatalogItem)
@@ -124,12 +124,15 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), 'KalturaScheduledVendorTaskData');
 		}
 
-		if ($this->startDate - time() < $vendorCatalogItem->getMinimalOrderTime() * dateUtils::MINUTE)
+		$startTime = $this->startDate ?: $connectedEvent->getStartDate(null);
+		$minimalOrderTimeSec = $vendorCatalogItem->getMinimalOrderTime() * dateUtils::MINUTE;
+		if ($startTime - time() < $minimalOrderTimeSec)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TOO_LATE_ORDER, $this->scheduledEventId, $vendorCatalogItem->getId(), $vendorCatalogItem->getMinimalOrderTime());
 		}
 
-		$taskDurationSec = $this->endDate - $this->startDate;
+		$endTime = $this->endDate ?: $connectedEvent->getEndDate(null);
+		$taskDurationSec = $endTime - $startTime;
 		$durationLimitSec = $vendorCatalogItem->getDurationLimit() * dateUtils::MINUTE;
 		if ($taskDurationSec > $durationLimitSec)
 		{
