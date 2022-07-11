@@ -96,11 +96,11 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 
 		if ($this->startDate)
 		{
-			$this->validatePropertyMinMaxValue('startDate', $connectedEvent->getStartDate(null), $connectedEvent->getEndDate(null));
+			$this->validatePropertyMinMaxValue('startDate', $connectedEvent->getStartDate(null) - ScheduleEventPeer::TIME_MARGIN, $connectedEvent->getEndDate(null));
 		}
 		if ($this->endDate)
 		{
-			$this->validatePropertyMinMaxValue('endDate', $connectedEvent->getStartDate(null), $connectedEvent->getEndDate(null));
+			$this->validatePropertyMinMaxValue('endDate', $connectedEvent->getStartDate(null), $connectedEvent->getEndDate(null) + ScheduleEventPeer::TIME_MARGIN);
 		}
 		if ($this->startDate && $this->endDate)
 		{
