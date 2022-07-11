@@ -294,10 +294,25 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->setPasswordHashKey($loginData->newPassHashKey());
 		$loginData->save();
 
+		//check if its internal server request
+		if(self::shouldReturnHash($partner))
+		{
+			return $loginData->getPasswordHashKey();
+		}
+
 		$userName = str_replace('.', ' ', $loginData->getFullName());
 		$dynamicLink = $dynamicTemplateUserRoleName ? kEmails::getDynamicTemplateBaseLink($dynamicTemplateUserRoleName) : null;
 		self::emailResetPassword(0, $loginData->getLoginEmail(), $userName, self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $dynamicTemplateUserRoleName);
 		return true;
+	}
+
+	protected static function shouldReturnHash(Partner $partner)
+	{
+		if((kCurrentContext::$ks_partner_id == Partner::SELF_SERVE_PARTNER_ID) && $partner->getIsSelfServe())
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	/**

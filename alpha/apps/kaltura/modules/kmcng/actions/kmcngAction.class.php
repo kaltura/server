@@ -7,6 +7,7 @@ class kmcngAction extends kalturaAction
 {
 	const LIVE_ANALYTICS_UICONF_TAG = 'livea_player';
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
+	const PLAYER_V3_OVP_VERSIONS_TAG = 'playerV3OvpVersions';
 
 	public function execute()
 	{
@@ -126,6 +127,14 @@ class kmcngAction extends kalturaAction
 		$this->content_uiconfs_player_v3_beta_versions = isset($this->playerV3BetaVersionsUiConf) ? array_values($this->playerV3BetaVersionsUiConf) : null;
 		$this->content_uiconf_player_v3_beta_versions = (is_array($this->content_uiconfs_player_v3_beta_versions) && reset($this->content_uiconfs_player_v3_beta_versions)) ? reset($this->content_uiconfs_player_v3_beta_versions) : null;
 
+		$this->playerV3OvpVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_OVP_VERSIONS_TAG, "latest");
+		$this->content_uiconfs_player_v3_ovp_versions = isset($this->playerV3OvpVersionsUiConf) ? array_values($this->playerV3OvpVersionsUiConf) : null;
+		$this->content_uiconf_player_v3_ovp_versions = (is_array($this->content_uiconfs_player_v3_ovp_versions) && reset($this->content_uiconfs_player_v3_ovp_versions)) ? reset($this->content_uiconfs_player_v3_ovp_versions) : null;
+
+		$this->playerV3BetaOvpVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_OVP_VERSIONS_TAG, "beta");
+		$this->content_uiconfs_player_v3_beta_ovp_versions = isset($this->playerV3BetaOvpVersionsUiConf) ? array_values($this->playerV3BetaOvpVersionsUiConf) : null;
+		$this->content_uiconf_player_v3_beta_ovp_versions = (is_array($this->content_uiconfs_player_v3_beta_ovp_versions) && reset($this->content_uiconfs_player_v3_beta_ovp_versions)) ? reset($this->content_uiconfs_player_v3_beta_ovp_versions) : null;
+
 
 		$studio = null;
 		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
@@ -156,7 +165,11 @@ class kmcngAction extends kalturaAction
 				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
 				"playerBetaVersionsMap" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfig() : '',
 				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : '',
-				"playerBetaConfVars" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfVars() : ''
+				"playerBetaConfVars" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfVars() : '',
+				"playerOvpVersionsMap" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfig() : '',
+				"playerBetaOvpVersionsMap" => isset($this->content_uiconf_player_v3_beta_ovp_versions) ? $this->content_uiconf_player_v3_beta_ovp_versions->getConfig() : '',
+				"playerOvpConfVars" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfVars() : '',
+				"playerBetaOvpConfVars" => isset($this->content_uiconf_player_v3_beta_ovp_versions) ? $this->content_uiconf_player_v3_beta_ovp_versions->getConfVars() : ''
 			);
 		}
 
