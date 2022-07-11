@@ -603,41 +603,41 @@ class CaptionAssetService extends KalturaAssetService
 		return $this->serveAsset($captionAsset, $fileName);
 	}
 
-    /**
-     * Serves caption by its id
-     *
-     * @action serveAsJson
-     * @param string $captionAssetId
-     * @return file
-     * @ksOptional
-     *
-     * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
-     */
-    public function serveAsJsonAction($captionAssetId)
-    {
-        $captionAsset = $this->validateForDownload($captionAssetId);
-        $syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-        $content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
-        if (!$content)
-            throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
+	/**
+	 * Serves caption by its id
+	 *
+	 * @action serveAsJson
+	 * @param string $captionAssetId
+	 * @return file
+	 * @ksOptional
+	 *
+	 * @throws KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND
+	 */
+	public function serveAsJsonAction($captionAssetId)
+	{
+		$captionAsset = $this->validateForDownload($captionAssetId);
+		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+		$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
+		if (!$content)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
 
-        $content = str_replace(
-            array(
-                kCaptionsContentManager::WINDOWS_LINE_ENDING,
-                kCaptionsContentManager::MAC_LINE_ENDING,
-            ),
-            kCaptionsContentManager::UNIX_LINE_ENDING,
-            $content
-        );
+		$content = str_replace(
+			array(
+				kCaptionsContentManager::WINDOWS_LINE_ENDING,
+				kCaptionsContentManager::MAC_LINE_ENDING,
+			),
+			kCaptionsContentManager::UNIX_LINE_ENDING,
+			$content
+		);
 
-        $captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
-        if (!$captionsContentManager)
-            throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
+		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
+		if (!$captionsContentManager)
+			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
 
-        $parsedContent = $captionsContentManager->parse($content);
-        return new kRendererString(json_encode($parsedContent));
+		$parsedContent = $captionsContentManager->parse($content);
+		return new kRendererString(json_encode($parsedContent));
 
-    }
+	}
 
 	/**
 	 * Serves caption by its id converting it to segmented WebVTT
