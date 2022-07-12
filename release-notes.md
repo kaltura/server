@@ -1,3 +1,10 @@
+# Rigel-18.10.0
+## Add new action CaptionAssetService::serveAsJson
+* Issue Type: Task
+* Issue ID: PLAT-23811
+### Script ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_11_caption_asset_add_serveasjson.php
+
 # Rigel-18.9.0
 ## Add "manage EP" to partner list actions
 * Issue Type: Task
