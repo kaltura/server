@@ -312,8 +312,7 @@ class KalturaBaseUserService extends KalturaBaseService
 			}
 			if ($code == kUserException::PASSWORD_STRUCTURE_INVALID) {
 				$loginData = UserLoginDataPeer::isHashKeyValid($hashKey);
-				$invalidPasswordStructureMessage = $loginData->getInvalidPasswordStructureMessage();
-				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
+				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID, $e->getMessage());
 			}
 			if ($code == kUserException::NEW_PASSWORD_HASH_KEY_EXPIRED) {
 				throw new KalturaAPIException(KalturaErrors::NEW_PASSWORD_HASH_KEY_EXPIRED);
