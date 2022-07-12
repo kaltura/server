@@ -604,7 +604,7 @@ class CaptionAssetService extends KalturaAssetService
 	}
 
 	/**
-	 * Serves caption by its id
+	 * Serves caption file as Json by its ID
 	 *
 	 * @action serveAsJson
 	 * @param string $captionAssetId
@@ -619,8 +619,9 @@ class CaptionAssetService extends KalturaAssetService
 		$syncKey = $captionAsset->getSyncKey(asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_SERVE_WEBVTT_FILE_SIZE);
 		if (!$content)
+		{
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_FILE_NOT_FOUND, $captionAssetId);
-
+		}
 		$content = str_replace(
 			array(
 				kCaptionsContentManager::WINDOWS_LINE_ENDING,
@@ -632,8 +633,9 @@ class CaptionAssetService extends KalturaAssetService
 
 		$captionsContentManager = kCaptionsContentManager::getCoreContentManager($captionAsset->getContainerFormat());
 		if (!$captionsContentManager)
+		{
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
-
+		}
 		$parsedContent = $captionsContentManager->parse($content);
 		return new kRendererString(json_encode($parsedContent));
 	}
