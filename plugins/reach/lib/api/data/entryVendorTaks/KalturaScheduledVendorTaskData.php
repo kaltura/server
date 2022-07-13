@@ -48,7 +48,24 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		{
 			$dbObject = new kScheduledVendorTaskData();
 		}
-		return parent::toObject($dbObject, $propsToSkip);
+
+		$dbObject = parent::toObject($dbObject, $propsToSkip);
+
+		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
+
+		if (!$this->startDate)
+		{
+			$dbObject->setStartDate($connectedEvent->getStartDate(null));
+		}
+
+		if (!$this->endDate)
+		{
+			$dbObject->setEndDate($connectedEvent->getEndDate(null));
+		}
+
+		$dbObject->setEntryDuration(($dbObject->getEndDate() - $dbObject->getStartDate()) * 1000);
+
+		return $dbObject;
 	}
 
 	/* (non-PHPdoc)
@@ -60,20 +77,6 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		{
 			$object_to_fill = new kScheduledVendorTaskData();
 		}
-
-		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
-
-		if (!$this->startDate)
-		{
-			$object_to_fill->setStartDate($connectedEvent->getStartDate(null));
-		}
-
-		if (!$this->endDate)
-		{
-			$object_to_fill->setEndDate($connectedEvent->getEndDate(null));
-		}
-
-		$object_to_fill->setEntryDuration(($object_to_fill->getEndDate() - $object_to_fill->getStartDate()) * 1000);
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
