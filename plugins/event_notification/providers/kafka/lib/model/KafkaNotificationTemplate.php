@@ -145,7 +145,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 				return;
 			}
 			
-			KalturaLog::debug("TTT: topicName [$topicName] partitionKeyValue [$partitionKeyValue] Payload is " . print_r($kafkaPayload, true));
+			KalturaLog::debug("topicName [$topicName] partitionKeyValue [$partitionKeyValue] Payload is " . print_r($kafkaPayload, true));
 			$queueProvider->send($topicName, $kafkaPayload, array("partitionKey" => $partitionKeyValue));
 		} catch (Exception $e)
 		{
@@ -186,7 +186,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	 */
 	private function getAvroPayload($topicName, $msg)
 	{
-		list($schema, $schemaId) = $this->getSchemaInfo($topicName . '-value');
+		list($schema, $schemaId) = $this->getSchemaInfo($topicName);
 		if(!($schema && $schemaId))
 		{
 			return null;

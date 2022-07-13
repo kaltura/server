@@ -49,7 +49,7 @@ class KafkaProvider extends QueueProvider
 		$producer = new RdKafka\Producer($conf);
 		if (count($brokersArray))
 		{
-			$producer->addBrokers(implode(',', $$brokersArray));
+			$producer->addBrokers(implode(',', $brokersArray));
 		}
 		
 		$this->producer = $producer;
