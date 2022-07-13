@@ -224,7 +224,7 @@ class elasticClient
 		}
 		else
 		{
-		      $response = curl_exec($this->ch);
+			$response = curl_exec($this->ch);
 		}
 		$requestTook = microtime(true) - $requestStart;
 		KalturaLog::debug("Elastic took - " . $requestTook . " seconds");
