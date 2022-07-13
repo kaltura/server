@@ -201,19 +201,29 @@ class elasticClient
 		if ($body)
 		{
 			//bulk body is already in json
-			$jsonEncodedBody = ($monitorActionName !== self::ELASTIC_ACTION_BULK) ?
-				(defined("JSON_INVALID_UTF8_IGNORE") ? json_encode($body, JSON_INVALID_UTF8_IGNORE) : json_encode($body))
-				: $body;
+			if($monitorActionName !== self::ELASTIC_ACTION_BULK)
+			{
+				$jsonEncodedBody = defined("JSON_INVALID_UTF8_IGNORE") ? json_encode($body, JSON_INVALID_UTF8_IGNORE) : json_encode($body);
+			}
+			else
+			{
+				$jsonEncodedBody = $body;
+			}
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $jsonEncodedBody);
 			if ($logQuery)
+			{
 				KalturaLog::debug("Elastic client request: ".$jsonEncodedBody);
+			}
 		}
 
 		$requestStart = microtime(true);
-		if(!$jsonEncodedBody) {
+		if(!$jsonEncodedBody)
+		{
 			KalturaLog::debug("Empty jsonEncodedBody, returning empty result set");
-			$response = '{"took":1,"timed_out":false,"_shards":{"total":18,"successful":18,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}';
-		} else {
+			$response = '{"took":0,"timed_out":false,"_shards":{"total":0,"successful":0,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}';
+		}
+		else
+		{
 		      $response = curl_exec($this->ch);
 		}
 		$requestTook = microtime(true) - $requestStart;
