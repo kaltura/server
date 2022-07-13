@@ -363,11 +363,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function setModerationStatus($v)
 	{
-		if($v == $this->getModerationStatus())
-			return $this;
 			
-		if($v == entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION || $v == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW)
+		$moderationStatuses = array(entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION, $v == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW);
+		if (in_array($v, $moderationStatuses)) {
 			$this->incModerationCount();
+		}
+		elseif($v == $this->getModerationStatus()) {
+			return $this;
+		}
 		
 		parent::setModerationStatus($v);
 	}
