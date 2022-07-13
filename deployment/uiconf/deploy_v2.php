@@ -31,9 +31,8 @@ $skipAddUiconf = $arguments['no-create'];
 
 //error_reporting(0);
 $confObj = uiConfDeployment::init($arguments['ini']); // get and read the config file
-if (!(isset($confObj->general->component->name) && isset($confObj->general->component->version)))
+if (!uiConfDeployment::validateIni($confObj))
 {
-	KalturaLog::debug("Error: Source ini missing name or version\n");
 	return;
 }
 
@@ -305,6 +304,22 @@ class uiConfDeployment
 	{
 		return new Zend_Config_Ini($conf_file_path);
  	}
+	 
+	 public static function validateIni($confObj)
+	 {
+		 if (!isset($confObj->general->component) || !isset($confObj->general->component->name) || !isset($confObj->general->component->version))
+		 {
+			 KalturaLog::debug("Error: Source ini missing component.name or component.version\n");
+			 return false;
+		 }
+		 if (!isset($confObj->player))
+		 {
+			 KalturaLog::debug("Error: Source ini missing player configuration\n");
+			 return false;
+		 }
+		 
+		 return true;
+	 }
 	
 	/**
 	 *
