@@ -89,7 +89,7 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		return parent::validateForInsert($propertiesToSkip);
 	}
 
-	private function validateScheduledEvent()
+	protected function validateScheduledEvent()
 	{
 		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 		if (!$connectedEvent)

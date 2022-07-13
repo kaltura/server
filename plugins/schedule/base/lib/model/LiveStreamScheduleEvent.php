@@ -293,7 +293,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	 */
 	public function addFeature($feature)
 	{
-		$featureList = $this->getLiveFeatures() ?: [];
+		$featureList = $this->getLiveFeatures() ?: array();
 		array_push($featureList, $feature);
 		$this->setLiveFeatures($featureList);
 		$this->save();
@@ -309,7 +309,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	 */
 	public function removeFeature($featureName)
 	{
-		$featureList = $this->getLiveFeatures() ?: [];
+		$featureList = $this->getLiveFeatures() ?: array();
 		foreach ($featureList as $index => $feature)
 		{
 			if ($feature->getSystemName() == $feature)

@@ -368,7 +368,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 
 	public static function isEntryTypeSupportedForReach($entryType)
 	{
-		$supportedEntryTypes = kConf::get('reach_supported_entry_types', 'runtime_config', array(entryType::MEDIA_CLIP, entryType::LIVE_STREAM));
+		$supportedEntryTypes = kConf::get('reach_supported_entry_types', kConfMapNames::RUNTIME_CONFIG, array(entryType::MEDIA_CLIP, entryType::LIVE_STREAM));
 
 		return in_array($entryType, $supportedEntryTypes);
 	}
