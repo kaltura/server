@@ -43,6 +43,7 @@ class KalturaESearchEntryBaseItemArray extends KalturaTypedArray
 					break;
 				
 				case 'ESearchCategoryEntryNameItem':
+				case 'ESearchCategoryEntryIdItem':
 					$nObj = new KalturaESearchCategoryEntryItem();
 					break;
 				

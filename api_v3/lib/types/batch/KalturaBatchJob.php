@@ -423,6 +423,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kEntriesCsvJobData':
 				$this->data = new KalturaEntriesCsvJobData();
 				break;
+			
+			case 'kCategoriesCsvJobData':
+				$this->data = new KalturaCategoriesCsvJobData();
+				break;
 
 			case 'kClipConcatJobData':
 				$this->data = new KalturaClipConcatJobData();

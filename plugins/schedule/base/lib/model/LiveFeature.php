@@ -15,13 +15,13 @@ abstract class LiveFeature extends BaseObject
 	 * pre start time in seconds
 	 * @var int
 	 */
-	protected $preStart;
+	protected $preStartTime;
 
 	/**
 	 * post end time in seconds
 	 * @var int
 	 */
-	protected $postEnd;
+	protected $postEndTime;
 
 	abstract function getApiType();
 
@@ -41,26 +41,26 @@ abstract class LiveFeature extends BaseObject
 	/**
 	 * @param int $v
 	 */
-	public function setPreStart($v)
+	public function setPreStartTime($v)
 	{
-		$this->preStart = $v;
+		$this->preStartTime = $v;
 	}
 
-	public function getPreStart()
+	public function getPreStartTime()
 	{
-		return $this->preStart;
+		return $this->preStartTime;
 	}
 
 	/**
 	 * @param int $v
 	 */
-	public function setPostEnd($v)
+	public function setPostEndTime($v)
 	{
-		$this->postEnd = $v;
+		$this->postEndTime = $v;
 	}
 
-	public function getPostEnd()
+	public function getPostEndTime()
 	{
-		return $this->postEnd;
+		return $this->postEndTime;
 	}
 }

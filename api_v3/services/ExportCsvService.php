@@ -65,6 +65,30 @@ class ExportCsvService extends KalturaBaseService
 		return $this->exportMappedObjectToCsv(ExportObjectType::ENTRY, new kEntriesCsvJobData(),
 			$filter, $metadataProfileId, $additionalFields, $mappedFields, $options);
 	}
+	
+	/**
+	 * Creates a batch job that sends an email with a link to download a CSV containing a list of categories
+	 *
+	 * @action categoryExportToCsv
+	 * @actionAlias category.exportToCsv
+	 * @param KalturaCategoryFilter $filter A filter used to exclude specific categories
+	 * @param int $metadataProfileId
+	 * @param KalturaCsvAdditionalFieldInfoArray $additionalFields
+	 * @param KalturaKeyValueArray $mappedFields mapping between field headline and its mapped value
+	 * @param KalturaExportToCsvOptions $options
+	 * @return string
+	 */
+	public function categoryExportToCsvAction(KalturaCategoryFilter $filter = null, $metadataProfileId = null,
+	                                       $additionalFields = null, KalturaKeyValueArray $mappedFields = null,
+	                                       KalturaExportToCsvOptions $options = null)
+	{
+		if (!$filter)
+		{
+			$filter = new KalturaCategoryFilter();
+		}
+		return $this->exportMappedObjectToCsv(ExportObjectType::CATEGORY, new kCategoriesCsvJobData(),
+			$filter, $metadataProfileId, $additionalFields, $mappedFields, $options);
+	}
 
 	protected function exportMappedObjectToCsv($exportObjectType, $jobData, $filter, $metadataProfileId, $additionalFields, $mappedFields, $options)
 	{

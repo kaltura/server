@@ -129,7 +129,7 @@ class Partner extends BasePartner
 			in_array($partner_secret, $additionalSecrets, true) ||
 			(!$admin && $partner_secret === $this->getSecret()))
 		{
-			$ks_max_expiry_in_seconds = $this->getKsMaxExpiryInSeconds();
+			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $this->getKsMaxExpiryInSeconds());
 			return true;
 		}
 		else

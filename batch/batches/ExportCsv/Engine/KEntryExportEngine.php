@@ -18,7 +18,7 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 
 	protected function getDefaultHeaderRowToCsv()
 	{
-		return 'id,name';
+		return 'Entry ID,Name';
 	}
 
 	protected function getDefaultRowValues($item)
