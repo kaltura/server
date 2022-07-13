@@ -637,7 +637,8 @@ class CaptionAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_INVALID_FORMAT, $captionAssetId);
 		}
 		$parsedContent = $captionsContentManager->parse($content);
-		return new kRendererString(json_encode($parsedContent), 'application/json');
+		$response = array('objects' => $parsedContent);
+		return new kRendererString(json_encode($response), 'application/json');
 	}
 
 	/**
