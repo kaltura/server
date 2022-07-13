@@ -201,14 +201,21 @@ class elasticClient
 		if ($body)
 		{
 			//bulk body is already in json
-			$jsonEncodedBody = ($monitorActionName !== self::ELASTIC_ACTION_BULK) ?  json_encode($body) : $body;
+			$jsonEncodedBody = ($monitorActionName !== self::ELASTIC_ACTION_BULK) ?
+				(defined("JSON_INVALID_UTF8_IGNORE") ? json_encode($body, JSON_INVALID_UTF8_IGNORE) : json_encode($body))
+				: $body;
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $jsonEncodedBody);
 			if ($logQuery)
 				KalturaLog::debug("Elastic client request: ".$jsonEncodedBody);
 		}
 
 		$requestStart = microtime(true);
-		$response = curl_exec($this->ch);
+		if(!$jsonEncodedBody) {
+			KalturaLog::debug("Empty jsonEncodedBody, returning empty result set");
+			$response = '{"took":1,"timed_out":false,"_shards":{"total":18,"successful":18,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}';
+		} else {
+		      $response = curl_exec($this->ch);
+		}
 		$requestTook = microtime(true) - $requestStart;
 		KalturaLog::debug("Elastic took - " . $requestTook . " seconds");
 
