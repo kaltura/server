@@ -309,12 +309,12 @@ class uiConfDeployment
 	 {
 		 if (!isset($confObj->general->component) || !isset($confObj->general->component->name) || !isset($confObj->general->component->version))
 		 {
-			 KalturaLog::debug("Error: Source ini missing component.name or component.version\n");
+			 KalturaLog::err("Error: Source ini missing component.name or component.version\n");
 			 return false;
 		 }
 		 if (!isset($confObj->player))
 		 {
-			 KalturaLog::debug("Error: Source ini missing player configuration\n");
+			 KalturaLog::err("Error: Source ini missing player configuration\n");
 			 return false;
 		 }
 		 
