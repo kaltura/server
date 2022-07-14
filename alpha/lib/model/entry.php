@@ -3117,7 +3117,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getDownloadAssetUrl($flavorParamsId)
 	{
-        	if($flavorParamsId === "0")
+		if($flavorParamsId === 0)
         	{
         	    $flavorAsset = assetPeer::retrieveOriginalByEntryId($this->getId());
         	}
