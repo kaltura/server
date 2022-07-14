@@ -24,11 +24,17 @@ $lastPartnerId = 0;
 do
 {
 	$partnersFromDb = getPartnersFromDb();
-	$partnersInfo = getBasicPartnerColumns($partnersFromDb);
-	$filteredPartners = filterInternalPartners($partnersInfo, $ignoreTemplatePartnerId);
-	$partnersWithLastEntryActions = getLastEntryActionsForPartners($filteredPartners);
-	
-	$partnersResults = array_merge($partnersResults, $partnersWithLastEntryActions);
+	foreach ($partnersFromDb as $partner)
+	{
+		$partnerInfo = getBasicPartnerColumns($partner);
+		if (!isInternalPartner($partnerInfo, $ignoreTemplatePartnerId))
+		{
+			continue;
+		}
+		getLastEntryActionsForPartner($partnerInfo);
+		
+		$partnersResults = array_merge($partnersResults, $partnerInfo);
+	}
 }
 while (sizeof($partnersFromDb) == PARTNERS_LIMIT);
 writeResultsToCsv($outputPath, $partnersResults);
@@ -51,73 +57,61 @@ function getPartnersFromDb()
 	// = PartnerPeer::doSelectStmt($c);
 	//$partnersFromDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$partnersFromDb = PartnerPeer::doSelect($c);
+	print_r($partnersFromDb);
 	
-	$lastPartnerId = end($partnersFromDb)['ID'];
+//	$lastPartnerId = end($partnersFromDb)['ID'];
+	$lastPartnerId = end($partnersFromDb)->getId();
 	
 	return $partnersFromDb;
 }
 
-function getBasicPartnerColumns($partnersFromDb)
+function getBasicPartnerColumns($partner)
 {
-	$partnersInfo = array();
-	foreach ($partnersFromDb as $partner)
-	{
-		$customData = myCustomData::fromString($partner['CUSTOM_DATA']);
-		$partnersInfo[$partner['ID']] = array('id' => $partner['ID'], 'email' => $partner['ADMIN_EMAIL'], 'createdAt' => $partner['CREATED_AT'], 'updatedAt' => $partner['UPDATED_AT'],
-			'partnerPackage' => $partner['PARTNER_PACKAGE'], 'internalUseEnabled' => $customData->get('internalUse'), 'templatePartnerId' => $customData->get('i18n_template_partner_id'));
-	}
+//	$customData = myCustomData::fromString($partner['CUSTOM_DATA']);
+//	$partnerInfo = array('id' => $partner['ID'], 'email' => $partner['ADMIN_EMAIL'], 'createdAt' => $partner['CREATED_AT'], 'updatedAt' => $partner['UPDATED_AT'],
+//		'partnerPackage' => $partner['PARTNER_PACKAGE'], 'internalUseEnabled' => $customData->get('internalUse'), 'templatePartnerId' => $customData->get('i18n_template_partner_id'));
+	$partnerInfo = array('id' => $partner->getId(), 'email' => $partner->getAdminEmail(), 'createdAt' => $partner->getCreatedAt(), 'updatedAt' => $partner->getUpdatedAt(),
+		'partnerPackage' => $partner->getPartnerPackage(), 'internalUseEnabled' => $partner->getFromCustomData('internalUse'), 'templatePartnerId' => $partner->getFromCustomData('i18n_template_partner_id'));
 	
-	return $partnersInfo;
+	return $partnerInfo;
 }
 
-function filterInternalPartners($partnersInfo, $ignoreTemplatePartnerId)
+function isInternalPartner(&$partnerInfo, $ignoreTemplatePartnerId)
 {
-	$filteredPartners = array();
-	foreach ($partnersInfo as $partnerInfo)
+	if (isset($ignoreTemplatePartnerId))
 	{
-		$partnerId = $partnerInfo['id'];
-		
-		if (isset($ignoreTemplatePartnerId))
-		{
-			$partnersInfo[$partnerId]['internalUseEnabled'] = ($partnerInfo['internalUseEnabled'] && $partnerInfo['templatePartnerId'] != $ignoreTemplatePartnerId) ? 1 : 0;
-		}
-		else
-		{
-			$partnersInfo[$partnerId]['internalUseEnabled'] = $partnerInfo['internalUseEnabled'] ? 1 : 0;
-		}
-		$partnersInfo[$partnerId]['internalPartnerPackage'] = $partnerInfo['partnerPackage'] == PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL ? 1 : 0;
-		$partnersInfo[$partnerId]['internalKalturaEmail'] = strpos($partnerInfo['email'], INTERNAL_KALTURA_EMAIL) ? 1 : 0;
-		
-		if ($partnersInfo[$partnerId]['internalUseEnabled'] || $partnersInfo[$partnerId]['internalPartnerPackage'] || $partnersInfo[$partnerId]['internalKalturaEmail'])
-		{
-			$filteredPartners[$partnerId] = $partnersInfo[$partnerId];
-		}
+		$partnerInfo['internalUseEnabled'] = ($partnerInfo['internalUseEnabled'] && $partnerInfo['templatePartnerId'] != $ignoreTemplatePartnerId) ? 1 : 0;
+	}
+	else
+	{
+		$partnerInfo['internalUseEnabled'] = $partnerInfo['internalUseEnabled'] ? 1 : 0;
+	}
+	$partnerInfo['internalPartnerPackage'] = $partnerInfo['partnerPackage'] == PartnerPackages::PARTNER_PACKAGE_INTERNAL_TRIAL ? 1 : 0;
+	$partnerInfo['internalKalturaEmail'] = strpos($partnerInfo['email'], INTERNAL_KALTURA_EMAIL) ? 1 : 0;
+	
+	if ($partnerInfo['internalUseEnabled'] || $partnerInfo['internalPartnerPackage'] || $partnerInfo['internalKalturaEmail'])
+	{
+		return true;
 	}
 	
-	return $filteredPartners;
+	return false;
 }
 
-function getLastEntryActionsForPartners($filteredPartners)
+function getLastEntryActionsForPartner(&$partnerInfo)
 {
-	foreach ($filteredPartners as $partner)
+	kCurrentContext::$partner_id = $partnerInfo['id'];
+	
+	$coreResults = searchForLatestOfFieldName(ESearchEntryFieldName::CREATED_AT, ESearchEntryOrderByFieldName::CREATED_AT);
+	if ($coreResults[0]->getObject())
 	{
-		$partnerId = $partner['id'];
-		kCurrentContext::$partner_id = $partnerId;
-		
-		$coreResults = searchForLatestOfFieldName(ESearchEntryFieldName::CREATED_AT, ESearchEntryOrderByFieldName::CREATED_AT);
-		if ($coreResults[0]->getObject())
-		{
-			$filteredPartners[$partnerId]['lastEntryCreatedAt'] = $coreResults[0]->getObject()->getCreatedAt();
-		}
-		
-		$coreResults = searchForLatestOfFieldName(ESearchEntryFieldName::LAST_PLAYED_AT, ESearchEntryOrderByFieldName::LAST_PLAYED_AT);
-		if ($coreResults[0]->getObject())
-		{
-			$filteredPartners[$partnerId]['lastEntryViewedAt'] = $coreResults[0]->getObject()->getLastPlayedAt();
-		}
+		$partnerInfo['lastEntryCreatedAt'] = $coreResults[0]->getObject()->getCreatedAt();
 	}
 	
-	return $filteredPartners;
+	$coreResults = searchForLatestOfFieldName(ESearchEntryFieldName::LAST_PLAYED_AT, ESearchEntryOrderByFieldName::LAST_PLAYED_AT);
+	if ($coreResults[0]->getObject())
+	{
+		$partnerInfo['lastEntryViewedAt'] = $coreResults[0]->getObject()->getLastPlayedAt();
+	}
 }
 
 function searchForLatestOfFieldName($fieldName, $fieldNameOrderBy)
