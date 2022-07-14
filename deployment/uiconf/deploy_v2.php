@@ -256,9 +256,10 @@ class uiConfDeployment
 
 			$deprecatedConfValues = new Criteria();
 			$deprecatedConfValues->add(uiConfPeer::TAGS, $deprecatedTag);
+			$deprecatedConfValues->add(uiConfPeer::UPDATED_AT, time());
 
 			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID
-			$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
+			$deprecatedCount = BasePeer::doUpdate($confCriteria, $deprecatedConfValues, $con);
 
 			KalturaLog::debug("uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag}");
 
