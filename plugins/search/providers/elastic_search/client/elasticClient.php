@@ -217,7 +217,7 @@ class elasticClient
 		}
 
 		$requestStart = microtime(true);
-		if(!$jsonEncodedBody)
+		if(!$jsonEncodedBody && $body)
 		{
 			KalturaLog::debug("Empty jsonEncodedBody, returning empty result set");
 			$response = '{"took":0,"timed_out":false,"_shards":{"total":0,"successful":0,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]}}';
