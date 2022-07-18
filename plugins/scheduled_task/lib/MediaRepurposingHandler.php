@@ -86,6 +86,12 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 			return;
 		}
 
+		kLock::runLocked("metadata_update_xsl_{$mediaRepurposingMetadata->getId()}", array($this, 'updatedJobImpl'), array($dbBatchJob, $mediaRepurposingMetadata));
+
+	}
+
+	public function updatedJobImpl(BatchJob $dbBatchJob, Metadata $mediaRepurposingMetadata)
+	{
 		$key = $mediaRepurposingMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xml = kFileSyncUtils::file_get_contents($key, true, false);
 
@@ -117,7 +123,7 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 				if ($this->shouldUpdateMRMetadata($taskType, $jobProfileId, $dbBatchJob))
 				{
 					$propertyAsDom->nodeValue = $this->getUpdatedPostProcessMRMetadata($propertyAsDom->nodeValue);
-					kLock::runLocked("metadata_update_xsl_{$mediaRepurposingMetadata->getId()}", array('MetadataPlugin', 'updateMetadataFileSync'), array($mediaRepurposingMetadata, $xml->asXML()));
+					MetadataPlugin::updateMetadataFileSync($mediaRepurposingMetadata, $xml->asXML());
 					return;
 				}
 			}
@@ -126,8 +132,8 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
 	{
-		$distributionJobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
-		$supportedBatchJobTypes = array(BatchJobType::STORAGE_EXPORT, $distributionJobType);
+		$distributionBatchJobType = $this->getDistributionBatchJobType();
+		$supportedBatchJobTypes = array(BatchJobType::STORAGE_EXPORT, $distributionBatchJobType);
 
 		if(in_array($dbBatchJob->getJobType(), $supportedBatchJobTypes) && $dbBatchJob->getStatus() == KalturaBatchJobStatus::FINISHED)
 		{
@@ -139,7 +145,7 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 	protected function shouldUpdateMRMetadata($taskType, $jobProfileId, $dbBatchJob)
 	{
 		$distributionTaskType = ScheduledTaskContentDistributionPlugin::getApiValue(DistributeObjectTaskType::DISTRIBUTE);
-		$distributionBatchJobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		$distributionBatchJobType = $this->getDistributionBatchJobType();
 
 		if($taskType == $distributionTaskType && $dbBatchJob->getJobType() == $distributionBatchJobType)
 		{
@@ -166,6 +172,16 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 		$mrMetadataArr = explode(",", $mrMetadata);
 		$day = $mrMetadataArr[3] + 1;
 		return "$mrMetadataArr[0],$mrMetadataArr[2],$day";
+	}
+
+	protected function getDistributionBatchJobType()
+	{
+		$distributionBatchJobType = null;
+		if (class_exists('ContentDistributionPlugin') && KalturaPluginManager::getPluginInstance(ContentDistributionPlugin::getPluginName()))
+		{
+			$distributionBatchJobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
+		}
+		return $distributionBatchJobType;
 	}
 
 	private function getMRPWithMetadataSearchByProfile($partnerId, $metadataProfileId)
