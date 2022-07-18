@@ -265,6 +265,72 @@ class ScheduleEventService extends KalturaBaseService
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
+	/**
+	 * Add feature to live event
+	 *
+	 * @action addLiveFeature
+	 * @param int $scheduledEventId
+	 * @param KalturaLiveFeature $liveFeature
+	 * @param bool $overwrite
+	 * @return KalturaLiveStreamScheduleEvent
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public function addLiveFeatureAction($scheduledEventId, KalturaLiveFeature $liveFeature, $overwrite = false)
+	{
+		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
+		if(!$dbScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
+		}
+
+		if(!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
+		}
+
+		$dbLiveFeature = $liveFeature->toInsertableObject();
+
+		$dbScheduleEvent->addFeature($dbLiveFeature, $overwrite);
+		$dbScheduleEvent->save();
+
+		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
+		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
+
+		return $scheduleEvent;
+	}
+
+	/**
+	 * Remove feature from live event
+	 *
+	 * @action removeLiveFeature
+	 * @param int $scheduledEventId
+	 * @param string $featureName
+	 * @return KalturaLiveStreamScheduleEvent
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public function removeLiveFeatureAction($scheduledEventId, $featureName)
+	{
+		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
+		if(!$dbScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
+		}
+
+		if(!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
+		}
+
+		$dbScheduleEvent->removeFeature($featureName);
+		$dbScheduleEvent->save();
+
+		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
+		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
+
+		return $scheduleEvent;
+	}
 
 	/**
 	 * get schedule recurrences dates
