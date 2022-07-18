@@ -1563,6 +1563,8 @@ class kJobsManager
 			$batchJob->setDc($dc);
 		}
 
+		$batchJob->putInCustomData('storageId', $externalStorage->getId());
+
 		KalturaLog::log("Creating Storage export job, with source file: " . $netStorageExportData->getSrcFileSyncLocalPath()); 
 		return self::addJob($batchJob, $netStorageExportData, BatchJobType::STORAGE_EXPORT, $externalStorage->getProtocol());
 	}
