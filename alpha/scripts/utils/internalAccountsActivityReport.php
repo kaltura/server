@@ -31,7 +31,7 @@ do
 		}
 		getLastEntryActionsForPartner($partnerInfo);
 		
-		$partnersResults = array_merge($partnersResults, $partnerInfo);
+		$partnersResults = array_merge($partnersResults, array($partnerInfo));
 	}
 }
 while (sizeof($partnersFromDb) == PARTNERS_LIMIT);
@@ -52,17 +52,19 @@ function getPartnersFromDb()
 	$c->setLimit(PARTNERS_LIMIT);
 	$c->addAnd(PartnerPeer::ID, $lastPartnerId, Criteria::GREATER_THAN);
 	
-	$partnersFromDb = PartnerPeer::doSelect($c);
+	$stmt = PartnerPeer::doSelectStmt($c);
+	$partnersFromDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	
-	$lastPartnerId = end($partnersFromDb)->getId();
+	$lastPartnerId = end($partnersFromDb)['ID'];
 	
 	return $partnersFromDb;
 }
 
 function getBasicPartnerColumns($partner)
 {
-	$partnerInfo = array('id' => $partner->getId(), 'email' => $partner->getAdminEmail(), 'createdAt' => $partner->getCreatedAt(), 'updatedAt' => $partner->getUpdatedAt(),
-		'partnerPackage' => $partner->getPartnerPackage(), 'internalUseEnabled' => $partner->getFromCustomData('internalUse'), 'templatePartnerId' => $partner->getFromCustomData('i18n_template_partner_id'));
+	$customData = myCustomData::fromString($partner['CUSTOM_DATA']);
+	$partnerInfo = array('id' => $partner['ID'], 'email' => $partner['ADMIN_EMAIL'], 'createdAt' => $partner['CREATED_AT'], 'updatedAt' => $partner['UPDATED_AT'],
+		'partnerPackage' => $partner['PARTNER_PACKAGE'], 'internalUseEnabled' => $customData->get('internalUse'), 'templatePartnerId' => $customData->get('i18n_template_partner_id'));
 	
 	return $partnerInfo;
 }
@@ -93,13 +95,13 @@ function getLastEntryActionsForPartner(&$partnerInfo)
 	kCurrentContext::$partner_id = $partnerInfo['id'];
 	
 	$coreResults = searchForLatestOfFieldName(ESearchEntryFieldName::CREATED_AT, ESearchEntryOrderByFieldName::CREATED_AT);
-	if ($coreResults[0]->getObject())
+	if ($coreResults && $coreResults[0]->getObject())
 	{
 		$partnerInfo['lastEntryCreatedAt'] = $coreResults[0]->getObject()->getCreatedAt();
 	}
 	
 	$coreResults = searchForLatestOfFieldName(ESearchEntryFieldName::LAST_PLAYED_AT, ESearchEntryOrderByFieldName::LAST_PLAYED_AT);
-	if ($coreResults[0]->getObject())
+	if ($coreResults && $coreResults[0]->getObject())
 	{
 		$partnerInfo['lastEntryViewedAt'] = $coreResults[0]->getObject()->getLastPlayedAt();
 	}
