@@ -50,6 +50,7 @@ class kStorageExportJobData extends kStorageJobData
 	
 	public function setStorageExportJobData(StorageProfile $externalStorage, FileSync $fileSync, FileSync $srcFileSync, $force = false)
 	{
+		$this->setStorageId($externalStorage->getId());
 		$this->setServerUrl($externalStorage->getStorageUrl()); 
 	    $this->setServerUsername($externalStorage->getStorageUsername()); 
 	    $this->setServerPassword($externalStorage->getStoragePassword());

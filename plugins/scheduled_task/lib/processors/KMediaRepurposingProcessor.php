@@ -81,7 +81,11 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
 		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
-		$process = $this->createProcessField($object, $profile->objectTasks[0]);
+		$process = null;
+		if(is_array($profile->objectTasks) && count($profile->objectTasks) > 0)
+		{
+			$process = $this->createProcessField($object, $profile->objectTasks[0]);
+		}
 
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
 		{
@@ -129,7 +133,7 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		return null;
 	}
 
-	private function createProcessField($object, $task)
+	protected function createProcessField($object, $task)
 	{
 		$distributeTaskType = ScheduledTaskContentDistributionPlugin::getApiValue('Distribute');
 		$process = null;

@@ -75,6 +75,11 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 		$entryId = $dbBatchJob->getEntryId();
 
 		$mediaRepurposingMetadataProfileId = $this->getMediaRepuposingMetadataProfileId($partnerId);
+		if(!$mediaRepurposingMetadataProfileId)
+		{
+			return;
+		}
+
 		$mediaRepurposingMetadata = MetadataPeer::retrieveByObject($mediaRepurposingMetadataProfileId, MetadataObjectType::ENTRY, $entryId);
 		if(!$mediaRepurposingMetadata)
 		{
@@ -98,6 +103,9 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 			if ($property->getName() == 'MRPData')
 			{
 				$propertyValArr = explode(",", $propertyAsDom->nodeValue);
+				// structure of MRPData in process status:
+				// where profileId is related to task: e.g. storage export task => storage profile Id
+				// mrId,Process:taskType:profileId,taskIndex,unixTimeInDays
 				if(count($propertyValArr) < 4 || strpos($propertyAsDom->nodeValue, 'Process') === false)
 				{
 					continue;
@@ -108,7 +116,7 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 
 				if ($this->shouldUpdateMRMetadata($taskType, $jobProfileId, $dbBatchJob))
 				{
-					$propertyAsDom->nodeValue = $this->getPostProcessMRMetadata($propertyAsDom->nodeValue);
+					$propertyAsDom->nodeValue = $this->getUpdatedPostProcessMRMetadata($propertyAsDom->nodeValue);
 					kLock::runLocked("metadata_update_xsl_{$mediaRepurposingMetadata->getId()}", array('MetadataPlugin', 'updateMetadataFileSync'), array($mediaRepurposingMetadata, $xml->asXML()));
 					return;
 				}
@@ -128,26 +136,32 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 		return false;
 	}
 
-	private function shouldUpdateMRMetadata($taskType, $jobProfileId, $dbBatchJob)
+	protected function shouldUpdateMRMetadata($taskType, $jobProfileId, $dbBatchJob)
 	{
-		$apiValue = ScheduledTaskContentDistributionPlugin::getApiValue(DistributeObjectTaskType::DISTRIBUTE);
+		$distributionTaskType = ScheduledTaskContentDistributionPlugin::getApiValue(DistributeObjectTaskType::DISTRIBUTE);
 		$distributionBatchJobType = ContentDistributionPlugin::getBatchJobTypeCoreValue(ContentDistributionBatchJobType::DISTRIBUTION_SUBMIT);
 
-		$isDistributeTask = $taskType == $apiValue && $dbBatchJob->getJobType() == $distributionBatchJobType &&
-			$dbBatchJob->getData() instanceof kDistributionSubmitJobData && $dbBatchJob->getData()->getDistributionProfileId() == $jobProfileId;
-
-		$isExportTask = $taskType == ObjectTaskType::STORAGE_EXPORT && $dbBatchJob->getJobType() == BatchJobType::STORAGE_EXPORT
-			&& $dbBatchJob->getData() instanceof kStorageExportJobData && $dbBatchJob->getFromCustomData('storageId') == $jobProfileId;
-
-		if($isDistributeTask || $isExportTask)
+		if($taskType == $distributionTaskType && $dbBatchJob->getJobType() == $distributionBatchJobType)
 		{
-			return true;
+			if($dbBatchJob->getData() instanceof kDistributionSubmitJobData
+				&& $dbBatchJob->getData()->getDistributionProfileId() == $jobProfileId)
+			{
+				return true;
+			}
+		}
+
+		elseif($taskType == ObjectTaskType::STORAGE_EXPORT && $dbBatchJob->getJobType() == BatchJobType::STORAGE_EXPORT)
+		{
+			if($dbBatchJob->getData() instanceof kStorageExportJobData && $dbBatchJob->getData()->getStorageId() == $jobProfileId)
+			{
+				return true;
+			}
 		}
 
 		return false;
 	}
 
-	private function getPostProcessMRMetadata($mrMetadata)
+	protected function getUpdatedPostProcessMRMetadata($mrMetadata)
 	{
 		$mrMetadataArr = explode(",", $mrMetadata);
 		$day = $mrMetadataArr[3] + 1;
