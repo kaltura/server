@@ -376,4 +376,13 @@ class kReachUtils
 		$filter->expectedFinishTimeGreaterThanOrEqual = $startTime;
 		$filter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
+
+	public static function refundTask(EntryVendorTask $entryVendorTask) {
+		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
+
+		//Rest task price so that reports will be aligned with the total used credit
+		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
+		$entryVendorTask->setPrice(0);
+		$entryVendorTask->save();
+	}
 }

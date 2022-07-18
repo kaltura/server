@@ -100,9 +100,11 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 
 	/**
 	 * @param array<LiveFeature> $v
+	 * @throws KalturaAPIException
 	 */
 	public function setLiveFeatures($v)
 	{
+		LiveStreamScheduleEvent::validateFeatureList($v);
 		$serializedFeatures = serialize($v);
 		$this->putInCustomData(self::FEATURES_ARRAY, $serializedFeatures);
 	}
@@ -291,12 +293,16 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	 * @param LiveFeature $feature
 	 * @throws PropelException
 	 */
-	public function addFeature($feature)
+	public function addFeature($feature, $overwrite = false)
 	{
+		if ($overwrite)
+		{
+			$this->removeFeature($feature->getSystemName());
+		}
+
 		$featureList = $this->getLiveFeatures() ?: [];
 		array_push($featureList, $feature);
 		$this->setLiveFeatures($featureList);
-		$this->save();
 	}
 
 	/**
@@ -312,12 +318,29 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		$featureList = $this->getLiveFeatures() ?: [];
 		foreach ($featureList as $index => $feature)
 		{
-			if ($feature->getSystemName() == $feature)
+			if ($feature->getSystemName() == $featureName)
 			{
 				unset($featureList[$index]);
 			}
 		}
 		$this->setLiveFeatures($featureList);
-		$this->save();
+	}
+
+	/**
+	 * @param Array<LiveFeature> $featureList
+	 * @throws KalturaAPIException
+	 */
+	public static function validateFeatureList($featureList)
+	{
+		$features = [];
+		foreach ($featureList as $feature)
+		{
+			$name = !empty($feature->getSystemName()) ? $feature->getSystemName() : get_class($feature);
+			if (in_array($name, $features))
+			{
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_LIVE_FEATURE, $name);
+			}
+			$features[] = $name;
+		}
 	}
 }

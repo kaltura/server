@@ -466,7 +466,24 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 				$feature->setSystemName(LiveCaptionFeature::defaultName($this->getId()));
 
-				$connectedEvent->addFeature($feature);
+				$connectedEvent->addFeature($feature, true);
+				$connectedEvent->save();
+				break;
+		}
+	}
+
+	public function removeSchedulingData()
+	{
+		switch ($this->getServiceFeature())
+		{
+			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				/* @var $taskData kScheduledVendorTaskData */
+				$taskData = $this->getTaskJobData();
+				/* @var $connectedEvent LiveStreamScheduleEvent */
+				$connectedEvent = $taskData->getScheduleEvent();
+
+				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName($this->getId()));
+				$connectedEvent->save();
 				break;
 		}
 	}
