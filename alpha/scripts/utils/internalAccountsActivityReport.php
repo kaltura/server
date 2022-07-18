@@ -12,8 +12,6 @@ if (isset($argv[2]))
 {
 	$ignoreTemplatePartnerId = $argv[2];
 }
-// Equivalent:
-// $ignoreTemplatePartnerId = $argv[2] ?? null;
 
 const INTERNAL_KALTURA_EMAIL = '@kaltura.com';
 const PARTNERS_LIMIT = 500;
@@ -54,12 +52,8 @@ function getPartnersFromDb()
 	$c->setLimit(PARTNERS_LIMIT);
 	$c->addAnd(PartnerPeer::ID, $lastPartnerId, Criteria::GREATER_THAN);
 	
-	// = PartnerPeer::doSelectStmt($c);
-	//$partnersFromDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 	$partnersFromDb = PartnerPeer::doSelect($c);
-	print_r($partnersFromDb);
 	
-//	$lastPartnerId = end($partnersFromDb)['ID'];
 	$lastPartnerId = end($partnersFromDb)->getId();
 	
 	return $partnersFromDb;
@@ -67,9 +61,6 @@ function getPartnersFromDb()
 
 function getBasicPartnerColumns($partner)
 {
-//	$customData = myCustomData::fromString($partner['CUSTOM_DATA']);
-//	$partnerInfo = array('id' => $partner['ID'], 'email' => $partner['ADMIN_EMAIL'], 'createdAt' => $partner['CREATED_AT'], 'updatedAt' => $partner['UPDATED_AT'],
-//		'partnerPackage' => $partner['PARTNER_PACKAGE'], 'internalUseEnabled' => $customData->get('internalUse'), 'templatePartnerId' => $customData->get('i18n_template_partner_id'));
 	$partnerInfo = array('id' => $partner->getId(), 'email' => $partner->getAdminEmail(), 'createdAt' => $partner->getCreatedAt(), 'updatedAt' => $partner->getUpdatedAt(),
 		'partnerPackage' => $partner->getPartnerPackage(), 'internalUseEnabled' => $partner->getFromCustomData('internalUse'), 'templatePartnerId' => $partner->getFromCustomData('i18n_template_partner_id'));
 	
