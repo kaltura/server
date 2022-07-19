@@ -1,4 +1,17 @@
 # Rigel-18.10.0
+## Support media repurposing stopProcessingOnError for tasks with batch job
+* Issue Type: Task
+* Issue ID: SUP-32804
+#### Known Issues & Limitations ####
+Using the media repurposing task config "stopProcessingOnError" 
+is not fully supported for tasks that their execution happens in batch jobs
+#### Resolution ####
+tasks of type STORAGE_EXPORT and DISTRIBUTION are now supported via config
+### Configuration ###
+In batch.ini, under [KScheduledTaskRunner : PeriodicWorker] section, Add: 
+	params.supportedPartnerIdsForProcess[]	=  @PARTNER_ID@
+
+# Rigel-18.10.0
 ## Add new action CaptionAssetService::serveAsJson
 * Issue Type: Task
 * Issue ID: PLAT-23811

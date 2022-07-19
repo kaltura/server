@@ -81,22 +81,33 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		$metadata = $this->getMetadataOnObject($object->id, $metadataProfileId);
 
 		$xml = ($metadata && $metadata->xml) ? $metadata->xml : null;
+		$process = null;
+		if(is_array($profile->objectTasks) && count($profile->objectTasks) > 0)
+		{
+			$process = $this->createProcessField($object, $profile->objectTasks[0]);
+		}
+
 		if ($profile->systemName == "MRP") //as the first schedule task running in this MRP
-			$xml = $this->addMetadataXmlField($profile->id, $xml, $error);
+		{
+			$xml = $this->addMetadataXmlField($profile->id, $xml, $error, $process);
+		}
 		elseif (self::startsWith($profile->name, 'MR_'))
 		{ //sub task of MRP
 			$arr = explode(",", self::getMrAdvancedSearchFilter($profile)->items[1]->value);
-			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error);
+			$xml = $this->updateMetadataXmlField($arr[0], $arr[1] + 1, $xml, $error, $process);
 		}
 
 		try
 		{
 			$xml = $xml ? $xml->asXML() : null;
 			if ($metadata && $metadata->id)
+			{
 				$result = $metadataPlugin->metadata->update($metadata->id, $xml);
+			}
 			else
+			{
 				$result = $metadataPlugin->metadata->add($metadataProfileId, KalturaMetadataObjectType::ENTRY, $object->id, $xml);
-
+			}
 		}
 		catch (Exception $e)
 		{
@@ -122,6 +133,36 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		return null;
 	}
 
+	protected function createProcessField($object, $task)
+	{
+		$distributeTaskType = ScheduledTaskContentDistributionPlugin::getApiValue('Distribute');
+		$process = null;
+
+		if($this->shouldProcessTask($object, $task))
+		{
+			switch($task->type)
+			{
+				case ObjectTaskType::STORAGE_EXPORT:
+					$jobProfileId = $task->storageId;
+					break;
+
+				case $distributeTaskType:
+					$jobProfileId = $task->distributionProfileId;
+					break;
+
+				default:
+					$jobProfileId = null;
+			}
+
+			if($task->type && $jobProfileId)
+			{
+				$process = "Process:" . $task->type . ":$jobProfileId";
+			}
+		}
+
+		return $process;
+	}
+
 	/**
 	 * Moves the profile to suspended status
 	 *
@@ -135,15 +176,23 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		KObjectTaskMailNotificationEngine::sendMail(array($address), "Media Repurposing Suspended", "MR profile with id [$profile->name] has been suspended");
 	}
 
-	private function addMetadataXmlField($mrId, $xml_string, $error)
+	private function addMetadataXmlField($mrId, $xml_string, $error, $process)
 	{
 		$xml = simplexml_load_string($xml_string);
 		if (!$xml || !$xml->MRPData)
-			return $this->createFirstMr($mrId, $xml, $error);
+		{
+			return $this->createFirstMr($mrId, $xml, $error, $process);
+		}
 
 		$newVal = "$mrId,1," . self::getUpdateDay();
-		if ($error)
+		if($error)
+		{
 			$newVal = "$mrId,Error,1," . self::getUpdateDay();
+		}
+		elseif($process)
+		{
+			$newVal = "$mrId,$process,1," . self::getUpdateDay();
+		}
 
 		$xml->MRPData[] = $newVal;
 		$target_dom = dom_import_simplexml(current($xml->xpath('//MRPsOnEntry[last()]')));
@@ -152,35 +201,60 @@ class KMediaRepurposingProcessor extends KGenericProcessor
 		return $xml;
 	}
 
-	private function createFirstMr($mrId, $xml = null, $error)
+	private function createFirstMr($mrId, $xml = null, $error, $process)
 	{
-		if (!$xml)
+		if(!$xml)
+		{
 			$xml = new SimpleXMLElement("<metadata/>");
-		if (!isset($xml->Status))
+		}
+		if(!isset($xml->Status))
+		{
 			$xml->addChild('Status', 'Enabled');
+
+		}
 		$xml->addChild('MRPsOnEntry', "MR_$mrId");
-		if ($error)
+		if($error)
+		{
 			$xml->addChild('MRPData', "$mrId,Error,1," . self::getUpdateDay());
+		}
+		elseif($process)
+		{
+			$xml->addChild('MRPData', "$mrId,$process,1," . self::getUpdateDay());
+		}
 		else
+		{
 			$xml->addChild('MRPData', "$mrId,1," . self::getUpdateDay());
+		}
 		return $xml;
 	}
 
-	private function updateMetadataXmlField($mrId, $newStatus, $xml_string, $error)
+	private function updateMetadataXmlField($mrId, $newStatus, $xml_string, $error, $process)
 	{
 		$day = self::getUpdateDay();
-		if ($error)
+		if($error)
+		{
 			$newVal = "$mrId,Error,$newStatus,$day";
+		}
+		elseif($process)
+		{
+			$newVal = "$mrId,$process,$newStatus,$day";
+		}
 		else
+		{
 			$newVal = "$mrId,$newStatus,$day";
+		}
 
 		$xml = simplexml_load_string($xml_string);
-		if ($xml)
+		if($xml)
 		{
 			$mprsData = $xml->xpath('/metadata/MRPData');
-			for ($i = 0; $i < count($mprsData); $i++)
-				if (self::startsWith($mprsData[$i], $mrId . ","))
+			for($i = 0; $i < count($mprsData); $i++)
+			{
+				if(self::startsWith($mprsData[$i], $mrId . ","))
+				{
 					$mprsData[$i][0] = $newVal;
+				}
+			}
 		}
 
 		return $xml;
