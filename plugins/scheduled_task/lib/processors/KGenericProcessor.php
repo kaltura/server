@@ -65,7 +65,7 @@ class KGenericProcessor
 		$supportedPartnerIds = array();
 		if(KBatchBase::$taskConfig->params->supportedPartnerIdsForProcess)
 		{
-			$supportedPartnerIds = KBatchBase::$taskConfig->params->supportedPartnerIdsForProcess;
+			$supportedPartnerIds = KBatchBase::$taskConfig->params->supportedPartnerIdsForProcess->toArray();
 		}
 		return in_array($partnerId, $supportedPartnerIds);
 	}
