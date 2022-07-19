@@ -9,7 +9,7 @@ is not fully supported for tasks that their execution happens in batch jobs
 tasks of type STORAGE_EXPORT and DISTRIBUTION are now supported via config
 ### Configuration ###
 In batch.ini, under [KScheduledTaskRunner : PeriodicWorker] section, Add: 
-params.supportedPartnerIdsForProcess[]	=  @PARTNER_ID@
+	params.supportedPartnerIdsForProcess[]	=  @PARTNER_ID@
 
 # Rigel-18.10.0
 ## Add new action CaptionAssetService::serveAsJson
