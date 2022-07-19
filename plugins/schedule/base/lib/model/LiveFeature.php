@@ -5,6 +5,8 @@
  */
 abstract class LiveFeature extends BaseObject
 {
+	const REACH_FEATURE_PREFIX='reach';
+
 	/**
 	 * feature name
 	 * @var string

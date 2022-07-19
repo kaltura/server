@@ -296,16 +296,18 @@ class ScheduleEventService extends KalturaBaseService
 			if ($feature->getSystemName() == $featureName)
 			{
 				$featureList[$index] = $liveFeature->toUpdatableObject($feature);
-				$this->setLiveFeatures($featureList);
-				$dbScheduleEvent->save();
 				$featureFound = true;
+				break;
 			}
 		}
 
 		if(!$featureFound)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FEATURE_NAME, $featureName);
+			throw new KalturaAPIException(KalturaErrors::FEATURE_NAME_NOT_FOUND, $featureName);
 		}
+
+		$this->setLiveFeatures($featureList);
+		$dbScheduleEvent->save();
 
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());

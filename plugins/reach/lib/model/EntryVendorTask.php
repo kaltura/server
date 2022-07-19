@@ -464,7 +464,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$feature = new LiveCaptionFeature();
 				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
-				$feature->setSystemName(LiveCaptionFeature::defaultName("reach-{$this->getId()}"));
+				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
 
 				$connectedEvent->addFeature($feature, true);
 				$connectedEvent->save();
@@ -482,7 +482,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				/* @var $connectedEvent LiveStreamScheduleEvent */
 				$connectedEvent = $taskData->getScheduleEvent();
 
-				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName($this->getId()));
+				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}"));
 				$connectedEvent->save();
 				break;
 		}
