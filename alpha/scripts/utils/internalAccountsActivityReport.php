@@ -16,11 +16,11 @@ if (isset($argv[2]))
 const INTERNAL_KALTURA_EMAIL = '@kaltura.com';
 const PARTNERS_LIMIT = 500;
 
-$partnersResults = array();
 $lastPartnerId = 0;
-
+writeHeaderToCsv($outputPath);
 do
 {
+	$partnersResults = array();
 	$partnersFromDb = getPartnersFromDb();
 	foreach ($partnersFromDb as $partner)
 	{
@@ -33,10 +33,11 @@ do
 		
 		$partnersResults = array_merge($partnersResults, array($partnerInfo));
 	}
+	
+	writeResultsToCsv($outputPath, $partnersResults);
 }
 while (sizeof($partnersFromDb) == PARTNERS_LIMIT);
-writeResultsToCsv($outputPath, $partnersResults);
-
+// End of script //
 
 function getPartnersFromDb()
 {
@@ -135,17 +136,29 @@ function searchForLatestOfFieldName($fieldName, $fieldNameOrderBy)
 	return $coreResults;
 }
 
+function writeHeaderToCsv($outputPath)
+{
+	$file = fopen($outputPath, 'w');
+	if (!$file)
+	{
+		KalturaLog::err("Error: Failed to create file $outputPath");
+		return;
+	}
+	
+	$headerRow = array('partnerId', 'email', 'created_at', 'updated_at', 'partner_package', 'is_internal_use_enabled', 'template_partner_id', 'is_partner_package_internal', 'is_internal_kaltura_email', 'last_entry_created_at', 'last_entry_viewed_at');
+	fputcsv($file, $headerRow);
+	fclose($file);
+}
+
 function writeResultsToCsv($outputPath, $results)
 {
 	$dataToWrite = array();
-	$headerRow = array('partnerId', 'email', 'created_at', 'updated_at', 'partner_package', 'is_internal_use_enabled', 'template_partner_id', 'is_partner_package_internal', 'is_internal_kaltura_email', 'last_entry_created_at', 'last_entry_viewed_at');
-	$dataToWrite[] = $headerRow;
 	foreach  ($results as $result)
 	{
 		$dataToWrite[] = $result;
 	}
 	
-	$file = fopen($outputPath, 'w');
+	$file = fopen($outputPath, 'a');
 	if (!$file)
 	{
 		KalturaLog::err("Error: Failed to create file $outputPath");
