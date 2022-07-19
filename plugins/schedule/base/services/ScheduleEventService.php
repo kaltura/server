@@ -268,49 +268,15 @@ class ScheduleEventService extends KalturaBaseService
 	/**
 	 * Add feature to live event
 	 *
-	 * @action addLiveFeature
-	 * @param int $scheduledEventId
-	 * @param KalturaLiveFeature $liveFeature
-	 * @param bool $overwrite
-	 * @return KalturaLiveStreamScheduleEvent
-	 * @throws KalturaAPIException
-	 * @throws PropelException
-	 */
-	public function addLiveFeatureAction($scheduledEventId, KalturaLiveFeature $liveFeature, $overwrite = false)
-	{
-		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
-		if(!$dbScheduleEvent)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
-		}
-
-		if(!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
-		}
-
-		$dbLiveFeature = $liveFeature->toInsertableObject();
-
-		$dbScheduleEvent->addFeature($dbLiveFeature, $overwrite);
-		$dbScheduleEvent->save();
-
-		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
-		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
-
-		return $scheduleEvent;
-	}
-
-	/**
-	 * Remove feature from live event
-	 *
-	 * @action removeLiveFeature
+	 * @action updateLiveFeature
 	 * @param int $scheduledEventId
 	 * @param string $featureName
+	 * @param KalturaLiveFeature $liveFeature
 	 * @return KalturaLiveStreamScheduleEvent
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 */
-	public function removeLiveFeatureAction($scheduledEventId, $featureName)
+	public function updateLiveFeatureAction($scheduledEventId, $featureName, KalturaLiveFeature $liveFeature)
 	{
 		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
 		if(!$dbScheduleEvent)
@@ -323,8 +289,23 @@ class ScheduleEventService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
 		}
 
-		$dbScheduleEvent->removeFeature($featureName);
-		$dbScheduleEvent->save();
+		$featureFound = false;
+		$featureList = $dbScheduleEvent->getLiveFeatures() ?: array();
+		foreach ($featureList as $index => $feature)
+		{
+			if ($feature->getSystemName() == $featureName)
+			{
+				$featureList[$index] = $liveFeature->toUpdatableObject($feature);
+				$this->setLiveFeatures($featureList);
+				$dbScheduleEvent->save();
+				$featureFound = true;
+			}
+		}
+
+		if(!$featureFound)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FEATURE_NAME, $featureName);
+		}
 
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());

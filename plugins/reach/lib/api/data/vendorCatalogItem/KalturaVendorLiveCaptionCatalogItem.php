@@ -54,11 +54,6 @@ class KalturaVendorLiveCaptionCatalogItem extends KalturaVendorCaptionsCatalogIt
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
 
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		return parent::validateForInsert($propertiesToSkip);
-	}
-
 	/* (non-PHPdoc)
  	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
  	 */

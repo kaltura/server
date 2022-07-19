@@ -103,7 +103,9 @@ class KalturaErrors extends APIErrors
 
 	const SCHEDULE_EVENT_ID_NOT_FOUND = "SCHEDULE_EVENT_ID_NOT_FOUND;ID;Schedule Event id [@ID@] not found";
 
-	const INVALID_SCHEDULE_EVENT_TYPE = "INVALID_SCHEDULE_EVENT_TYPE;TYPE;Schedule Event id [@ID@] is inappropriate type for action";
+	const INVALID_SCHEDULE_EVENT_TYPE = "INVALID_SCHEDULE_EVENT_TYPE;ID;Schedule Event id [@ID@] is of inappropriate type for action";
+
+	const INVALID_FEATURE_NAME = "INVALID_FEATURE_NAME;NAME;LiveFeature with name [@NAME@] not found";
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 
