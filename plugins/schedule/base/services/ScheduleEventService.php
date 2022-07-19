@@ -306,7 +306,7 @@ class ScheduleEventService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FEATURE_NAME_NOT_FOUND, $featureName);
 		}
 
-		$this->setLiveFeatures($featureList);
+		$dbScheduleEvent->setLiveFeatures($featureList);
 		$dbScheduleEvent->save();
 
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
