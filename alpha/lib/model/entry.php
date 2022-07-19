@@ -350,6 +350,39 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return parent::getName() . PeerUtils::getExtension($this, __FUNCTION__);
 	}
+	
+	protected function getMultiLanguageValue($field)
+	{
+		$value = $this->getValueByField($field);
+		$multiLangMapping = json_decode($this->getMultiLanguageMapping(), true);
+		if ($multiLangMapping)
+		{
+			$value = '';
+			foreach ($multiLangMapping[$field] as $languageValue)
+			{
+				$value = $value ? implode(',', array($value, $languageValue)) : $languageValue;
+			}
+		}
+		
+		return $value;
+	}
+	
+	protected function getValueByField($field)
+	{
+		switch ($field)
+		{
+			case self::NAME:
+				$value = $this->getName();
+				break;
+			case self::DESCRIPTION:
+				$value = $this->getDescription();
+				break;
+			case self::TAGS:
+				$value = explode(',', $this->getTags());
+				break;
+		}
+		return $value;
+	}
 
 	/**
 	 * will handle the flow in case of need to moderate.
@@ -3992,9 +4025,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'entitled_kusers_view' => $this->getEntitledKusersViewArray(),
 			'kuser_id' => $this->getKuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => $this->getName(),
-			'description' => $this->getDescription(),
-			'tags' => explode(',', $this->getTags()),
+			'name' => $this->getMultiLanguageValue(self::NAME),
+			'description' => $this->getMultiLanguageValue(self::DESCRIPTION),
+			'tags' => $this->getMultiLanguageValue(self::TAGS),
 			'partner_id' => $this->getPartnerId(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'reference_id' => $this->getReferenceID(),
