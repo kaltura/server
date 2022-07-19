@@ -2,21 +2,25 @@
 require_once(__DIR__ . '/../bootstrap.php');
 if ($argc < 2)
 {
-	die("Usage: php internalAccountsActivityReport.php outputPath [ignoreTemplatePartnerId]"."\n");
+	die("Usage: php internalAccountsActivityReport.php outputPath [continueAfterPartnerId] [ignoreTemplatePartnerId]"."\n");
 }
 $outputPath = $argv[1];
+$lastPartnerId = 0;
+if (isset($argv[2]))
+{
+	$lastPartnerId = $argv[2];
+}
 // In case a template partner has internalUse active, we wish to ignore it for partners created from the template
 // For this we can use the script using $ignoreTemplatePartnerId
 $ignoreTemplatePartnerId = null;
-if (isset($argv[2]))
+if (isset($argv[3]))
 {
-	$ignoreTemplatePartnerId = $argv[2];
+	$ignoreTemplatePartnerId = $argv[3];
 }
 
 const INTERNAL_KALTURA_EMAIL = '@kaltura.com';
 const PARTNERS_LIMIT = 500;
 
-$lastPartnerId = 0;
 writeHeaderToCsv($outputPath);
 do
 {
