@@ -125,7 +125,7 @@ class RuleEngine extends OpenCalaisConstants
         $cuePoints = array();
         foreach ($textTimes as $textWordTime)
         {
-            if($this->checkIfTermMatchingJsonValue($textWordTime['w'], $nameArray[0]))
+            if($textWordTime['w'] == $nameArray[0])
             {
                 $this->handleCuePoints($cuePoints, $n, $nameArray, $permid);
             }
@@ -133,18 +133,7 @@ class RuleEngine extends OpenCalaisConstants
         }
         return $cuePoints;
     }
-	/**
-	 * @param string $term
-	 * @param string $value
-	 * @return bool
-	 */
-	protected function checkIfTermMatchingJsonValue($term, $value)
-	{
-		$term = strtolower($term);
-		$value = strtolower($value);
-		$value = preg_replace('/(!|"|\?|\'|\.|,|;|\'s)$/', '', $value);
-		return $term == $value;
-	}
+
 	/**
 	 * @param array $cuePoints
 	 * @param int   $key
@@ -158,7 +147,7 @@ class RuleEngine extends OpenCalaisConstants
         $startFrom = $textTimes[$key]['s'];
         for($i = 0; $i < count($nameArray); $i++)
         {
-            if($this->checkIfTermMatchingJsonValue($textTimes[$key]['w'], $nameArray[$i]))
+            if($textTimes[$key]['w'] == $nameArray[$i])
             {
                 $fullName .= $textTimes[$key++]['w'].' ';
             }
