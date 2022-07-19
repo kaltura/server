@@ -1560,6 +1560,7 @@ class reportsInputFilter
 	public $canonical_urls;
 	public $virtual_event_ids;
 	public $origins;
+	public $ui_conf_ids;
 
 
 	public function getFilterBy() {
