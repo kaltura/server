@@ -90,8 +90,9 @@ class SessionService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		
+		$validatedExpiry = $expiry;
 		// verify that partnerId exists and is in correspondence with given secret
-		$result = myPartnerUtils::isValidSecret($partnerId, $secret, "", $expiry, $type);
+		$result = myPartnerUtils::isValidSecret($partnerId, $secret, "", $validatedExpiry, $type);
 		if ($result !== true)
 		{
 			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR, $partnerId );

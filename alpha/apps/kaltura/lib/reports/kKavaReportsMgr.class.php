@@ -108,6 +108,11 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_ALL_EVENTS = 'count_all';
 	const METRIC_TRANSCODING_DURATION_SEC = 'transcoding_duration_sec';
 	const METRIC_TRANSCODING_DURATION = 'transcoding_duration';
+	const METRIC_REACTION_CLAP_COUNT = 'reaction_clap_clicked';
+	const METRIC_REACTION_HEART_COUNT = 'reaction_heart_clicked';
+	const METRIC_REACTION_THINK_COUNT = 'reaction_think_clicked';
+	const METRIC_REACTION_WOW_COUNT = 'reaction_wow_clicked';
+	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
 	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
 
 	// druid intermediate metrics
@@ -740,6 +745,21 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_USER_TYPE, $value),
 				self::getLongSumAggregator($metric, self::METRIC_DELTA));
 		}
+
+		$reaction_type_metrics = array(
+                        self::METRIC_REACTION_CLAP_COUNT => 'Clap',
+                        self::METRIC_REACTION_HEART_COUNT => 'Heart',
+                        self::METRIC_REACTION_THINK_COUNT => 'Think',
+                        self::METRIC_REACTION_WOW_COUNT => 'Wow',
+                        self::METRIC_REACTION_SMILE_COUNT => 'Smile');
+                foreach ($reaction_type_metrics as $metric => $value)
+                {
+                        self::$aggregations_def[$metric] = self::getFilteredAggregator(
+                                self::getAndFilter(array(
+                                        self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_REACTION_CLICKED),
+                                        self::getSelectorFilter(self::DIMENSION_EVENT_VAR1, $value))),
+                                self::getLongSumAggregator($metric, self::METRIC_COUNT));
+                }
 
 		// delta aggregations
 		$delta_metrics = array(
