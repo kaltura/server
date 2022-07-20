@@ -113,6 +113,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_REACTION_THINK_COUNT = 'reaction_think_clicked';
 	const METRIC_REACTION_WOW_COUNT = 'reaction_wow_clicked';
 	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
+	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -446,6 +447,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_UNIQUE_DOMAINS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -492,6 +494,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_OWNERS => true,
 		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
+		self::METRIC_UNIQUE_DOMAINS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -886,7 +889,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::METRIC_UNIQUE_OWNERS,
 			array(self::DIMENSION_ENTRY_OWNER_ID));
 
-
 		self::$aggregations_def[self::METRIC_UNIQUE_SESSIONS] = self::getHyperUniqueAggregator(
 			self::METRIC_UNIQUE_SESSIONS,
 			self::METRIC_UNIQUE_SESSION_ID);
@@ -1141,6 +1143,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
 			self::getLongSumAggregator(
 				self::METRIC_TRANSCODING_DURATION_SEC, self::METRIC_DURATION_SEC));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_DOMAINS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_DOMAINS, array(self::DIMENSION_DOMAIN)));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -2414,6 +2420,7 @@ class kKavaReportsMgr extends kKavaBase
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
+			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
