@@ -71,23 +71,30 @@ class MediaRepurposingHandler implements kObjectDataChangedEventConsumer, kBatch
 
 	public function updatedJob(BatchJob $dbBatchJob)
 	{
-		$partnerId = $dbBatchJob->getPartnerId();
-		$entryId = $dbBatchJob->getEntryId();
-
-		$mediaRepurposingMetadataProfileId = $this->getMediaRepuposingMetadataProfileId($partnerId);
-		if(!$mediaRepurposingMetadataProfileId)
+		try
 		{
-			return;
-		}
+			$partnerId = $dbBatchJob->getPartnerId();
+			$entryId = $dbBatchJob->getEntryId();
 
-		$mediaRepurposingMetadata = MetadataPeer::retrieveByObject($mediaRepurposingMetadataProfileId, MetadataObjectType::ENTRY, $entryId);
-		if(!$mediaRepurposingMetadata)
+			$mediaRepurposingMetadataProfileId = $this->getMediaRepuposingMetadataProfileId($partnerId);
+			if(!$mediaRepurposingMetadataProfileId)
+			{
+				return true;
+			}
+
+			$mediaRepurposingMetadata = MetadataPeer::retrieveByObject($mediaRepurposingMetadataProfileId, MetadataObjectType::ENTRY, $entryId);
+			if(!$mediaRepurposingMetadata)
+			{
+				return true;
+			}
+
+			kLock::runLocked("metadata_update_xsl_{$mediaRepurposingMetadata->getId()}", array($this, 'updatedJobImpl'), array($dbBatchJob, $mediaRepurposingMetadata));
+		}
+		catch(Exception $ex)
 		{
-			return;
+			KalturaLog::err( "Error:" . $ex->getMessage() );
 		}
-
-		kLock::runLocked("metadata_update_xsl_{$mediaRepurposingMetadata->getId()}", array($this, 'updatedJobImpl'), array($dbBatchJob, $mediaRepurposingMetadata));
-
+		return true;
 	}
 
 	public function updatedJobImpl(BatchJob $dbBatchJob, Metadata $mediaRepurposingMetadata)
