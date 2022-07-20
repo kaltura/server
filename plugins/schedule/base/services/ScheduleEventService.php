@@ -290,7 +290,7 @@ class ScheduleEventService extends KalturaBaseService
 		}
 
 		$featureFound = false;
-		$featureList = $dbScheduleEvent->getLiveFeatures() ?: array();
+		$featureList = $dbScheduleEvent->getLiveFeatures();
 		foreach ($featureList as $index => $feature)
 		{
 			if ($feature->getSystemName() == $featureName)
