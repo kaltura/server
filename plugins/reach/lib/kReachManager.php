@@ -504,7 +504,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		kReachUtils::refundTask($entryVendorTask);
 	}
 
-	private function handleAbortTask(EntryVendorTask $entryVendorTask)
+	protected function handleAbortTask(EntryVendorTask $entryVendorTask)
 	{
 		if ($entryVendorTask->isScheduled())
 		{

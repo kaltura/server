@@ -127,14 +127,14 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), 'KalturaScheduledVendorTaskData');
 		}
 
-		$startTime = $this->startDate ?: $connectedEvent->getStartDate(null);
+		$startTime = $this->startDate ? $this->startDate : $connectedEvent->getStartDate(null);
 		$minimalOrderTimeSec = $vendorCatalogItem->getMinimalOrderTime() * dateUtils::MINUTE;
 		if ($startTime - time() < $minimalOrderTimeSec)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TOO_LATE_ORDER, $this->scheduledEventId, $vendorCatalogItem->getId(), $vendorCatalogItem->getMinimalOrderTime());
 		}
 
-		$endTime = $this->endDate ?: $connectedEvent->getEndDate(null);
+		$endTime = $this->endDate ? $this->endDate : $connectedEvent->getEndDate(null);
 		$taskDurationSec = $endTime - $startTime;
 		$durationLimitSec = $vendorCatalogItem->getDurationLimit() * dateUtils::MINUTE;
 		if ($taskDurationSec > $durationLimitSec)
