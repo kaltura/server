@@ -22,6 +22,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const CHAPTERING_OM_CLASS = 'VendorChapteringCatalogItem';
 	const DUBBING_OM_CLASS = 'VendorDubbingCatalogItem';
 	const INTELLIGENT_TAGGING_OM_CLASS = 'VendorIntelligentTaggingCatalogItem';
+	const LIVE_CAPTION_OM_CLASS = 'VendorLiveCaptionCatalogItem';
 	
 	// cache classes by their type
 	protected static $class_types_cache = array(
@@ -32,6 +33,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::CHAPTERING => self::CHAPTERING_OM_CLASS,
 		VendorServiceFeature::DUBBING => self::DUBBING_OM_CLASS,
 		VendorServiceFeature::INTELLIGENT_TAGGING => self::INTELLIGENT_TAGGING_OM_CLASS,
+		VendorServiceFeature::LIVE_CAPTION => self::LIVE_CAPTION_OM_CLASS
 	);
 	
 	public static function setDefaultCriteriaFilter ()

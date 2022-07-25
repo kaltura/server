@@ -390,6 +390,10 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 				$object = new KalturaVendorDubbingCatalogItem();
 				break;
 
+			case VendorServiceFeature::LIVE_CAPTION:
+				$object = new KalturaVendorLiveCaptionCatalogItem();
+				break;
+
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();
 				break;

@@ -103,6 +103,10 @@ class KalturaErrors extends APIErrors
 
 	const SCHEDULE_EVENT_ID_NOT_FOUND = "SCHEDULE_EVENT_ID_NOT_FOUND;ID;Schedule Event id [@ID@] not found";
 
+	const INVALID_SCHEDULE_EVENT_TYPE = "INVALID_SCHEDULE_EVENT_TYPE;ID;Schedule Event id [@ID@] is of inappropriate type for action";
+
+	const FEATURE_NAME_NOT_FOUND = "FEATURE_NAME_NOT_FOUND;NAME;LiveFeature with name [@NAME@] not found";
+
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
 
 	const MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED = "MAX_FILE_SYNCS_FOR_OBJECT_PER_DAY_REACHED;OBJECT_ID;Max update limit was reached. Object ID \"@OBJECT_ID@\" will not updated with latest chnages";
