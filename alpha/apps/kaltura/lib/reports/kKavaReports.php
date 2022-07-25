@@ -1803,6 +1803,13 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
 		),
+
+		ReportType::PLAYER_HIGHLIGHTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'ui_conf_id' => self::DIMENSION_UI_CONF_ID
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_DOMAINS),
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)

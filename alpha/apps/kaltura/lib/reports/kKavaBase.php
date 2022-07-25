@@ -76,6 +76,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_INDUSTRY = 'industry';
 	const DIMENSION_ROLE = 'role';
 	const DIMENSION_ORIGIN = 'origin';
+	const DIMENSION_UI_CONF_ID = 'uiConfId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -270,6 +271,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_UI_CONF_ID => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
