@@ -262,8 +262,22 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 	protected function retrieveUserId ($creatorInfo)
 	{
 		$userInfo = $creatorInfo[MicrosoftGraphFieldNames::USER];
-		if(isset($userInfo[MicrosoftGraphFieldNames::EMAIL]))
-		{
+
+		if (isset($userInfo[MicrosoftGraphFieldNames::EMAIL])) {
+            // find user by email and return id if found
+            $userService = new UserService();
+            $filter = new KalturaUserFilter();
+            $filter->emailLike = $userInfo[MicrosoftGraphFieldNames::EMAIL];
+            $response = $userService->listAction($filter);
+            if ($response->totalCount > 0) {
+                $users = $response->objects;
+                /** @var KalturaUser $user */
+                $user = array_shift($users);
+
+                return $user->id;
+            }
+
+            // else return email
 			return $userInfo[MicrosoftGraphFieldNames::EMAIL];
 		}
 
