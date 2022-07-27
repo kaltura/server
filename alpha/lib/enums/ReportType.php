@@ -70,6 +70,10 @@ interface ReportType extends BaseEnum
    const SELF_SERVE_USAGE = 60;
    const FLAVOR_PARAMS_TRANSCODING_USAGE = 61;
    const PLAYER_HIGHLIGHTS = 62;
+   const COGS_USAGE_HIGHLIGHTS = 70;
+   const CDN_BANDWIDTH_USAGE = 71;
+   const REACH_CATALOG_USAGE = 72;
+   const REACH_PROFILE_USAGE = 73;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;

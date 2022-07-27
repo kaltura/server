@@ -114,6 +114,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_REACTION_WOW_COUNT = 'reaction_wow_clicked';
 	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
 	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
+	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
+	const METRIC_DURATION_TOTAL_MIN = 'total_minutes';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1148,6 +1150,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getCardinalityAggregator(self::METRIC_UNIQUE_DOMAINS, array(self::DIMENSION_DOMAIN)));
 
+		self::$aggregations_def[self::METRIC_TRANSCODING_USER_CPU_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
+			self::getLongSumAggregator(
+				self::METRIC_TRANSCODING_USER_CPU_SEC,self::METRIC_USER_CPU));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1171,6 +1178,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_TOTAL_MSEC, self::METRIC_DURATION_SEC, '1000'));
+
+		self::$metrics_def[self::METRIC_DURATION_TOTAL_MIN] = array(
+			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_DURATION_TOTAL_MIN, self::METRIC_DURATION_SEC, '60'));
 		
 		self::$metrics_def[self::METRIC_BANDWIDTH_SIZE_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
