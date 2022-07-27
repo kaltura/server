@@ -269,7 +269,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			$filter->emailStartsWith = $userInfo[MicrosoftGraphFieldNames::EMAIL];
 			$response = KBatchBase::$kClient->user->listAction($filter);
 			if ($response->totalCount > 0) {
-                return $response->objects[0]->id;
+				return $response->objects[0]->id;
 			}
 
 			// else return email
