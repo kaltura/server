@@ -213,7 +213,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		if(trim($this->systemName) && !$this->isNull('systemName'))
 		{
 			$systemNameTemplate = EventNotificationTemplatePeer::retrieveBySystemName($this->systemName, $id);
-			if ($systemNameTemplates)
+			if ($systemNameTemplate)
 			{
 				throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $this->systemName);
 			}
