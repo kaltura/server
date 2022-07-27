@@ -1,12 +1,49 @@
+# Rigel-18.11.0
+## Add new Kafka and Kafka notifications plugin ##
+- Issue Type: Feature
+- Issue ID: FOUN-194
+
+### pre-requisite ###
+
+* Install Rdkafka for refernce view [how to install Rdkafka](https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/rdkafka.installation.html)
+
+### configuration ###
+Enable Kafka and Kafka notifications plugins:
+
+	To enable Kafka & KafkaNotification plugin add the following to your plugins.ini file :
+	- Kafka
+	- KafkaNotification
+
+Configure Kafka Kaltura configuration:
+
+	Copy configurations/kafka.template.ini to configurations/kafka.ini and update the folloiwng tokens:
+	brokers = kafka brokers list, separated by a comma         
+	server = kafka server
+	port = kafka port
+
+	*** If you work with dynamic kConf maps you also add it from the configuration tab in the admin console
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+
+	2. First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET, TOPIC_NAME) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2022_07_27_add_kafka_user_events.template.xml
+
+	3. Run deployment script:
+	php /opt/kaltura/app/deployment/updates/scripts/2022_07_27_deploy_kafka_user_events.php
+
 # Rigel-18.10.0
 ## Support media repurposing stopProcessingOnError for tasks with batch job
 * Issue Type: Task
 * Issue ID: SUP-32804
+
 #### Known Issues & Limitations ####
 Using the media repurposing task config "stopProcessingOnError" 
 is not fully supported for tasks that their execution happens in batch jobs
+
 #### Resolution ####
 tasks of type STORAGE_EXPORT and DISTRIBUTION are now supported via config
+
 ### Configuration ###
 In batch.ini, under [KScheduledTaskRunner : PeriodicWorker] section, Add: 
 	params.supportedPartnerIdsForProcess[]	=  @PARTNER_ID@
@@ -19,46 +56,6 @@ In batch.ini, under [KScheduledTaskRunner : PeriodicWorker] section, Add:
 ### Script ###
 php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_11_caption_asset_add_serveasjson.php
 
-## Add new Kafka and Kafka notifications plugin ##
-- Issue Type: Feature
-- Issue ID: FOUN-194
-
-### pre-requisite ###
-
-* Install Rdkafka for refernce view [how to install Rdkafka](https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/rdkafka.installation.html)
-
-### configuration ###
-Enable Kafka and Kafka notifications plugins:
-
-	- Enable Kafka plugin:
-		1. Add the following to plugins.ini file: "Kafka"
-	
-	- Enable Kafka notifications plugin:
-		1. Add the following to plugins.ini file: "KafkaNotification"
-
-Configure Kafka Kaltura configuration:
-
-	- Copy configurations/kafka.template.ini to configurations/kafka.ini and update the folloiwng tokens:
-		brokers = kafka brokers list, separated by a comma         
-		server = kafka server
-        port = kafka port
-
-Configure schema registry configuration:
-
-	- Copy configurations/schemaRegistry.template.ini to configurations/schemaRegistry.ini and update the folloiwng tokens:
-		schema_registry_server = schema registry server ip        
-		schema_registry_port = schema registry port
-
-        all other fields will contain the current schema version, for example:
-		add_kuser_topic-value=31
-
-Configure cache for schema registry:
-
-	- add to file cache.ini:
-	  avroSchemas = memcacheLocal
-
-### Deployment scripts ###
-    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
 
 # Rigel-18.9.0
 ## Add "manage EP" to partner list actions
