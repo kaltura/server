@@ -218,6 +218,9 @@ class VirtualEventService extends KalturaBaseService
 		{
 			case kVirtualEventException::INVALID_JSON_DATA:
 				throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_INVALID_REGISTRATION_SCHEMA);
+				
+			default:
+				throw $ex;
 		}
 	}
 }
