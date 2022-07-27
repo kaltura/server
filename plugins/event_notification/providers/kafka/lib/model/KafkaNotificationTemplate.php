@@ -84,7 +84,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			return;
 		}
 		
-		if(!kConf::hasMap('kafka'))
+		if(!kConf::hasMap(kConfMapNames::KAFKA))
 		{
 			KalturaLog::debug("Kafka configuration file (kafka.ini) wasn't found!");
 			return;
@@ -154,7 +154,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		}
 	}
 	
-	private function getKafkaPayload($topicName, $msg, $messageFormat)
+	protected function getKafkaPayload($topicName, $msg, $messageFormat)
 	{
 		$kafkaPayload = null;
 		
@@ -184,7 +184,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	 * @throws \FlixTech\SchemaRegistryApi\Exception\SchemaRegistryException
 	 * @throws kCoreException
 	 */
-	private function getAvroPayload($topicName, $msg)
+	protected function getAvroPayload($topicName, $msg)
 	{
 		list($schema, $schemaId) = $this->getSchemaInfo($topicName);
 		if(!($schema && $schemaId))
@@ -194,12 +194,12 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		return $this->buildAvroPayload($schemaId, $schema, $msg);
 	}
 	
-	private function getSchemaInfo($subject)
+	protected function getSchemaInfo($subject)
 	{
 		$schemaId = null;
 		$schema = null;
 		
-		if(!kConf::hasMap('schemaRegistry'))
+		if(!kConf::hasMap(kConfMapNames::AVRO_SCHEMA_REGISTRY))
 		{
 			throw new kCoreException("schema registry configuration file (schemaRegistry.ini) wasn't found!");
 		}
@@ -287,7 +287,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	 * @return string
 	 * @throws AvroIOException
 	 */
-	private function buildAvroPayload($schemaId, $schema, $msg)
+	protected function buildAvroPayload($schemaId, $schema, $msg)
 	{
 		$io = new \AvroStringIO();
 		$io->write(pack('C', 0));
@@ -298,7 +298,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		return $io->string();
 	}
 	
-	private function buildMessageOldValues($oldValues)
+	protected function buildMessageOldValues($oldValues)
 	{
 		$result = array();
 		foreach ($oldValues as $key => $value)

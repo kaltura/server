@@ -26,8 +26,10 @@ class KafkaPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObje
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if ($baseClass == 'QueueProvider' && $enumValue == self::getKafakaQueueProviderTypeCoreValue(KafkaProviderType::KAFKA)) {
-			if (!kConf::hasMap('kafka')) {
+		if ($baseClass == 'QueueProvider' && $enumValue == self::getKafakaQueueProviderTypeCoreValue(KafkaProviderType::KAFKA))
+		{
+			if (!kConf::hasMap(kConfMapNames::KAFKA))
+			{
 				throw new kCoreException("Kafka configuration file (kafka.ini) wasn't found!");
 			}
 			
@@ -41,12 +43,14 @@ class KafkaPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObje
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
 	{
-		if ($baseClass == 'QueueProvider' && $enumValue == self::getKafakaQueueProviderTypeCoreValue(KafkaProviderType::KAFKA)) {
-			if (!kConf::hasMap('kafka')) {
+		if ($baseClass == 'QueueProvider' && $enumValue == self::getKafakaQueueProviderTypeCoreValue(KafkaProviderType::KAFKA))
+		{
+			if (!kConf::hasMap(kConfMapNames::KAFKA))
+			{
 				throw new kCoreException("Kafka configuration file (kafka.ini) wasn't found!");
 			}
 			
-			$kafkaConfig = kConf::getMap('kafka');
+			$kafkaConfig = kConf::getMap(kConfMapNames::KAFKA);
 			
 			return new KafkaProvider($kafkaConfig, $constructorArgs);
 		}
@@ -82,9 +86,13 @@ class KafkaPlugin extends KalturaPlugin implements IKalturaPending, IKalturaObje
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
+		{
 			return array('KafkaProviderType');
+		}
 		if ($baseEnumName == 'QueueProviderType')
+		{
 			return array('KafkaProviderType');
+		}
 		return array();
 	}
 }
