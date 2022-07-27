@@ -69,6 +69,7 @@ interface ReportType extends BaseEnum
    const TOP_CUSTOM_VAR3 = 59;
    const SELF_SERVE_USAGE = 60;
    const FLAVOR_PARAMS_TRANSCODING_USAGE = 61;
+   const PLAYER_HIGHLIGHTS = 62;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;

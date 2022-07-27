@@ -78,7 +78,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$existingTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
 		if ($existingTask)
 		{
-			if (!$dbVendorCatalogItem->getAllowResubmission() ||
+			if ((!$dbVendorCatalogItem->getAllowResubmission() && !$entryVendorTask->isScheduled()) ||
 				in_array($existingTask->getStatus(), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PROCESSING)))
 			{
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_DUPLICATION, $entryVendorTask->entryId, $entryVendorTask->catalogItemId, $existingTask->getVersion());
@@ -105,6 +105,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		}
+
 		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
 		self::tryToSave($dbEntryVendorTask);
 		return $dbEntryVendorTask;
@@ -346,7 +347,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
 		/* @var EntryVendorTask $dbEntryVendorTask */
-		if(!in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING)))
+		if(!in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED)))
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_ABORT_NOT_MODERATED_TASK, $id);
 		
 		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $dbEntryVendorTask->getUserId())
