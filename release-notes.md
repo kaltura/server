@@ -21,7 +21,7 @@ Configure Kafka Kaltura configuration:
 	server = kafka server
 	port = kafka port
 
-	*** If you work with dynamic kConf maps you also add it from the configuration tab in the admin console
+	*** If you work with dynamic kConf maps, add the configuration above from the configuration tab in the admin console instead
 
 ### Deployment scripts ###
     1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
