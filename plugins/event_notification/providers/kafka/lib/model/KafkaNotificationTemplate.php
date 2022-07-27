@@ -1,9 +1,10 @@
 <?php
-require_once(dirname(__file__) . "/../../../../../../vendor/avro/flix-tech/confluent-schema-registry-api/vendor/autoload.php");
-
-use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
-use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
-use GuzzleHttp\Client;
+//ToDo add support for avro
+//require_once(dirname(__file__) . "/../../../../../../vendor/avro/flix-tech/confluent-schema-registry-api/vendor/autoload.php");
+//
+//use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
+//use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
+//use GuzzleHttp\Client;
 
 /**
  * @package plugins.kafkaNotification
