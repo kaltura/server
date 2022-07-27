@@ -28,15 +28,27 @@ class VirtualEventService extends KalturaBaseService
 	 * @param KalturaVirtualEvent $virtualEvent
 	 * @return KalturaVirtualEvent
 	 *
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 */
 	public function addAction(KalturaVirtualEvent $virtualEvent )
 	{
-		/* @var $dbVirtualEvent VirtualEvent */
-		$this->validateScheduleEvents($virtualEvent);
-		$this->validateGroups($virtualEvent);
-		$dbVirtualEvent = $virtualEvent->toInsertableObject();
-		$dbVirtualEvent->setPartnerId($this->getPartnerId());
-		$dbVirtualEvent->save();
+		try
+		{
+			/* @var $dbVirtualEvent VirtualEvent */
+			$this->validateScheduleEvents($virtualEvent);
+			$this->validateGroups($virtualEvent);
+			$dbVirtualEvent = $virtualEvent->toInsertableObject();
+			$dbVirtualEvent->setPartnerId($this->getPartnerId());
+			$dbVirtualEvent->save();
+		}
+		catch (Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+				$this->handleCoreException($ex);
+			else
+				throw $ex;
+		}
 		
 		// return the saved object
 		$virtualEvent = new KalturaVirtualEvent();
@@ -76,6 +88,7 @@ class VirtualEventService extends KalturaBaseService
 	 * @param KalturaVirtualEvent $virtualEvent
 	 * @return KalturaVirtualEvent
 	 *
+	 * @throws KalturaAPIException
 	 * @throws KalturaVirtualEventErrors::VIRTUAL_EVENT_NOT_FOUND
 	 */
 	public function updateAction($id, KalturaVirtualEvent $virtualEvent)
@@ -89,10 +102,20 @@ class VirtualEventService extends KalturaBaseService
 		$this->validateScheduleEvents($virtualEvent);
 		$this->validateGroups($virtualEvent);
 		
-		// save the object
-		/** @var VirtualEvent $dbVirtualEvent */
-		$dbVirtualEvent = $virtualEvent->toUpdatableObject($dbVirtualEvent);
-		$dbVirtualEvent->save();
+		try
+		{
+			// save the object
+			/** @var VirtualEvent $dbVirtualEvent */
+			$dbVirtualEvent = $virtualEvent->toUpdatableObject($dbVirtualEvent);
+			$dbVirtualEvent->save();
+		}
+		catch (Exception $ex)
+		{
+			if ($ex instanceof kCoreException)
+				$this->handleCoreException($ex);
+			else
+				throw $ex;
+		}
 		
 		// return the saved object
 		$virtualEvent = new KalturaVirtualEvent();
@@ -186,6 +209,15 @@ class VirtualEventService extends KalturaBaseService
 		if(!$dbGroup || $dbGroup->getType() != KuserType::GROUP)
 		{
 			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID, $groupId);
+		}
+	}
+	
+	protected function handleCoreException(kCoreException $ex)
+	{
+		switch ($ex->getCode())
+		{
+			case kVirtualEventException::INVALID_JSON_DATA:
+				throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_INVALID_REGISTRATION_SCHEMA);
 		}
 	}
 }

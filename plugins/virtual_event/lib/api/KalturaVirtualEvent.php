@@ -88,6 +88,12 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public $deletionDueDate;
 	
+	/**
+	 * JSON-Schema of the Registration Form
+	 * @var string
+	 */
+	public $registrationFormSchema;
+	
 	/*
 	 */
 	private static $map_between_objects = array(
@@ -105,6 +111,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'deletionDueDate',
+		'registrationFormSchema'
 	);
 	
 	/* (non-PHPdoc)
