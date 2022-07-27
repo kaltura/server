@@ -80,6 +80,7 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 				'KalturaPlaylist' => 'Playlist',
 				'KalturaCategory' => 'Category',
 				'KalturaUser' => 'User',
+				'KalturaGroupUser' => 'Group user',
 				'KalturaCuePoint' => 'CuePoint',
 				'KalturaAdCuePoint' => 'Ad Cue-Point',
 				'KalturaAnnotation' => 'Annotation',
