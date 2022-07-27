@@ -265,10 +265,9 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 
 		if (isset($userInfo[MicrosoftGraphFieldNames::EMAIL])) {
             // find user by email and return id if found
-            $userService = new UserService();
             $filter = new KalturaUserFilter();
             $filter->emailLike = $userInfo[MicrosoftGraphFieldNames::EMAIL];
-            $response = $userService->listAction($filter);
+            $response = KBatchBase::$kClient->user->listAction($filter);
             if ($response->totalCount > 0) {
                 $users = $response->objects;
                 /** @var KalturaUser $user */
