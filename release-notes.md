@@ -1,4 +1,17 @@
 # Rigel-18.11.0
+
+## Support Live Captions
+* Issue Type: Task
+* Issue ID: LIV-958
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_07_add_permissions_entry_vendor_task_object_externalTaskId.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_06_add_permission_scheduleEvent_mediaPartner.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_19_update_live_feature_action_permissions.php
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "Reach vendor role" SCHEDULE_EVENT_BASE realrun
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "Reach vendor role" SCHEDULE_EVENT_FEATURE_MANAGE realrun
+
+
+
 ## Add new Kafka and Kafka notifications plugin ##
 - Issue Type: Feature
 - Issue ID: FOUN-194
@@ -48,7 +61,6 @@ tasks of type STORAGE_EXPORT and DISTRIBUTION are now supported via config
 In batch.ini, under [KScheduledTaskRunner : PeriodicWorker] section, Add: 
 	params.supportedPartnerIdsForProcess[]	=  @PARTNER_ID@
 
-# Rigel-18.10.0
 ## Add new action CaptionAssetService::serveAsJson
 * Issue Type: Task
 * Issue ID: PLAT-23811
