@@ -162,7 +162,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('name');
-		if (!$this->checkIsValidJson($this->registrationFormSchema))
+		if ($this->registrationFormSchema && !$this->checkIsValidJson($this->registrationFormSchema))
 		{
 			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_INVALID_REGISTRATION_FORM_SCHEMA);
 		}
@@ -172,7 +172,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if (!$this->checkIsValidJson($this->registrationFormSchema))
+		if ($this->registrationFormSchema && !$this->checkIsValidJson($this->registrationFormSchema))
 		{
 			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_INVALID_REGISTRATION_FORM_SCHEMA);
 		}
