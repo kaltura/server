@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+set -e
+
+echo "Running php-cs-fixer in dry run..."
+./vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --ansi --dry-run
+
+echo "Running unit tests..."
+./vendor/bin/phpunit -v --exclude-group integration --coverage-text
+
+echo "Running static analysis..."
+./vendor/bin/phpstan analyse src test --level 0

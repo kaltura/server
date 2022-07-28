@@ -1313,6 +1313,9 @@ return array(
 
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::HTML' => 'HTML',
 	'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat::TEXT' => 'Text',
+	
+	'Kaltura_Client_KafkaNotification_Enum_KafkaNotificationFormat::JSON' => 'JSON',
+	'Kaltura_Client_KafkaNotification_Enum_KafkaNotificationFormat::AVRO' => 'Avro',
 
 	'Kaltura_Client_Enum_ConfMapSourceLocation::FS' => 'File System',
 	'Kaltura_Client_Enum_ConfMapSourceLocation::DB' => 'Database',
