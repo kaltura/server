@@ -106,14 +106,7 @@
 
 	 public function setRegistrationFormSchema($v)
 	 {
-		 // validate $v is a valid JSON object
-		 json_decode($v);
-		 if (json_last_error())
-		 {
-			 throw new kVirtualEventException("Invalid JSON data: [$v]", kVirtualEventException::INVALID_JSON_DATA);
-		 }
 		 $v = str_replace(array("\n", "\r", "\t", "\v", " "), '', $v);
-		 
 		 return $this->putInCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA, $v);
 	 }
  }
