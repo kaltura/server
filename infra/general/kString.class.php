@@ -501,4 +501,15 @@ class kString
 		
 		return preg_match($regex, $string);
 	}
+	
+	public static function checkIsValidJson($string)
+	{
+		if (is_null($string))
+		{
+			return true;
+		}
+		
+		$json = json_decode($string);
+		return (is_object($json) && json_last_error() == JSON_ERROR_NONE) ? true : false;
+	}
 }
