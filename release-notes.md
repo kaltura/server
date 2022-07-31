@@ -1,5 +1,17 @@
 # Rigel-18.11.0
 
+## Add partner for BI ##
+* Issue Type: Task
+* Issue ID: PLAT-23825
+
+### Configuration ###
+First replace all tokens from the ini file below (under kme section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_07_28_bi_add_partner.php
+
 ## Support Live Captions
 * Issue Type: Task
 * Issue ID: LIV-958
