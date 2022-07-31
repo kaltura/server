@@ -129,7 +129,14 @@ class Partner extends BasePartner
 			in_array($partner_secret, $additionalSecrets, true) ||
 			(!$admin && $partner_secret === $this->getSecret()))
 		{
-			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $this->getKsMaxExpiryInSeconds());
+			$partnerKsMaxExpiryInSeconds = $this->getKsMaxExpiryInSeconds();
+			if(!$partnerKsMaxExpiryInSeconds)
+			{
+				// This handles cases where the partner setting is the default mysql value which is null or for some reason set to 0 which is invalid
+				$partnerKsMaxExpiryInSeconds == dateUtils::DAY;
+			}
+			
+			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $partnerKsMaxExpiryInSeconds);
 			return true;
 		}
 		else
