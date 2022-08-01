@@ -49,6 +49,7 @@ function getPartnersFromDb()
 	
 	$c = new Criteria();
 	$c->addSelectColumn(PartnerPeer::ID);
+	$c->addSelectColumn(PartnerPeer::PARTNER_NAME);
 	$c->addSelectColumn(PartnerPeer::ADMIN_EMAIL);
 	$c->addSelectColumn(PartnerPeer::CREATED_AT);
 	$c->addSelectColumn(PartnerPeer::UPDATED_AT);
@@ -68,7 +69,7 @@ function getPartnersFromDb()
 function getBasicPartnerColumns($partner)
 {
 	$customData = myCustomData::fromString($partner['CUSTOM_DATA']);
-	$partnerInfo = array('id' => $partner['ID'], 'email' => $partner['ADMIN_EMAIL'], 'createdAt' => $partner['CREATED_AT'], 'updatedAt' => $partner['UPDATED_AT'],
+	$partnerInfo = array('id' => $partner['ID'], 'partnerName' => $partner['PARTNER_NAME'], 'email' => $partner['ADMIN_EMAIL'], 'createdAt' => $partner['CREATED_AT'], 'updatedAt' => $partner['UPDATED_AT'],
 		'partnerPackage' => $partner['PARTNER_PACKAGE'], 'internalUseEnabled' => $customData->get('internalUse'), 'templatePartnerId' => $customData->get('i18n_template_partner_id'));
 	
 	return $partnerInfo;
@@ -149,7 +150,7 @@ function writeHeaderToCsv($outputPath)
 		return;
 	}
 	
-	$headerRow = array('partnerId', 'email', 'created_at', 'updated_at', 'partner_package', 'is_internal_use_enabled', 'template_partner_id', 'is_partner_package_internal', 'is_internal_kaltura_email', 'last_entry_created_at', 'last_entry_viewed_at');
+	$headerRow = array('partnerId', 'partnerName', 'email', 'created_at', 'updated_at', 'partner_package', 'is_internal_use_enabled', 'template_partner_id', 'is_partner_package_internal', 'is_internal_kaltura_email', 'last_entry_created_at', 'last_entry_viewed_at');
 	fputcsv($file, $headerRow);
 	fclose($file);
 }
