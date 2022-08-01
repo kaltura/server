@@ -132,7 +132,7 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 			case 'VendorLiveCaptionCatalogItem':
 				if (get_class($connectedEvent) !== 'LiveStreamScheduleEvent')
 				{
-					throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($connectedEvent));
+					throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE, get_class($vendorCatalogItem), get_class($connectedEvent));
 				}
 		}
 

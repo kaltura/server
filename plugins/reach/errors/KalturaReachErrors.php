@@ -81,7 +81,7 @@ class KalturaReachErrors implements kReachErrors
 
 	const CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE = "CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE;CATALOG_ITEM_TYPE,EVENT_TYPE;Catalogue item type [@CATALOG_ITEM_TYPE@] does not support event of type [@EVENT_TYPE@]";
 
-	const TASK_EVENT_ENTRY_ID_MISMATCH = "TASK_EVENT_ENTRY_ID_MISMATCH;ENTRY_ID;Task entry id [@ENTRY_ID@] does not match provided scheduled event";
+	const TASK_EVENT_ENTRY_ID_MISMATCH = "TASK_EVENT_ENTRY_ID_MISMATCH;ENTRY_ID,EVENT_ID;Task entry id [@ENTRY_ID@] does not match scheduled event [@EVENT_ID@]";
 
 	const TOO_LATE_ORDER = "TOO_LATE_ORDER;EVENT_ID,CATALOG_ITEM_ID,MINIMAL_ORDER_TIME;Task created too late for event [@EVENT_ID@], minimal order time for catalog item [@CATALOG_ITEM_ID@] is [@MINIMAL_ORDER_TIME@ min]";
 
