@@ -12,6 +12,19 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2022_07_28_bi_add_partner.php
 
+## Add partner for connector framework server ##
+
+* Issue Type: Task
+* Issue ID: - Issue Type: Feature
+- Issue ID: FOUN-578
+
+### Configuration ###
+	Replace all tokens from the ini file (under connectors-framework section) and remove".template" from the file name: 
+	/opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_28_add_connectors_partner.php
+
 ## Support Live Captions
 * Issue Type: Task
 * Issue ID: LIV-958
