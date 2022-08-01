@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage quasar.roles_and_permissions
+ * @subpackage rigel.roles_and_permissions
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../') . '/base/scripts/insertDefaults.php';
@@ -10,7 +10,7 @@ passthru("php $script $config");
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
 
-$config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-14.ini';
+$config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-15.ini';
 passthru("php $script $config");
 
 $config = realpath(dirname(__FILE__)) . '/../../../permissions/service.report.ini';
