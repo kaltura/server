@@ -133,7 +133,7 @@ class Partner extends BasePartner
 			if(!$partnerKsMaxExpiryInSeconds)
 			{
 				// This handles cases where the partner setting is the default mysql value which is null or for some reason set to 0 which is invalid
-				$partnerKsMaxExpiryInSeconds == dateUtils::DAY;
+				$partnerKsMaxExpiryInSeconds = dateUtils::DAY;
 			}
 			
 			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $partnerKsMaxExpiryInSeconds);
