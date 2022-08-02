@@ -158,12 +158,15 @@ class myFileConverter
 			}
 		}
 
-		$conversion_info = new kConversionInfo();
-		$conversion_info->fillFromMetadata( $source_file );
-		$conversion_info->video_width = $width;
-		$conversion_info->video_height = $height;
-		// encapsulate
-		return array ( 'return_value' => $return_value , 'output' => $output , 'conversion_info' => $conversion_info );
+		//ToDo - No one uses the return value of $conversion_info so I dont see a reason to run as it comes with an overhead
+		//For now commenting the below code Will remove in later release
+		return;
+//		$conversion_info = new kConversionInfo();
+//		$conversion_info->fillFromMetadata( $source_file );
+//		$conversion_info->video_width = $width;
+//		$conversion_info->video_height = $height;
+//		// encapsulate
+//		return array ( 'return_value' => $return_value , 'output' => $output , 'conversion_info' => $conversion_info );
 	}
 
 	// Use ffmpeg to extract the video dimensions
