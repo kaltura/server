@@ -73,7 +73,7 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 		return $taskData;
 	}
 
-	public function validateCatalogLimitations($catalogItemId)
+	public function validateCatalogLimitations($vendorCatalogItem)
 	{
 
 	}

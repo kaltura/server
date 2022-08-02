@@ -112,13 +112,12 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 	}
 
 	/**
-	 * @param $catalogItemId
+	 * @param VendorCatalogItem $vendorCatalogItem
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 */
-	public function validateCatalogLimitations($catalogItemId)
+	public function validateCatalogLimitations($vendorCatalogItem)
 	{
-		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
 		$connectedEvent = BaseScheduleEventPeer::retrieveByPK($this->scheduledEventId);
 
 		// validate that the catalogItem type is appropriate
