@@ -79,7 +79,7 @@ class KalturaReachErrors implements kReachErrors
 
 	const CATALOG_ITEM_AND_JOB_DATA_MISMATCH = "CATALOG_ITEM_AND_JOB_DATA_MISMATCH;CATALOG_ITEM_TYPE,TASK_DATA_TYPE;The catalogItem type [@CATALOG_ITEM_TYPE@] is not allowed for task data of type [@TASK_DATA_TYPE@]";
 
-	const CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE = "CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE;CATALOG_ITEM_TYPE,EVENT_TYPE;Catalogue item type [@CATALOG_ITEM_TYPE@] does not support event of type [@EVENT_TYPE@]";
+	const CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE = "CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE;CATALOG_ITEM_TYPE,EVENT_TYPE;Catalog item type [@CATALOG_ITEM_TYPE@] does not support event of type [@EVENT_TYPE@]";
 
 	const TASK_EVENT_ENTRY_ID_MISMATCH = "TASK_EVENT_ENTRY_ID_MISMATCH;ENTRY_ID,EVENT_ID;Task entry id [@ENTRY_ID@] does not match scheduled event [@EVENT_ID@]";
 

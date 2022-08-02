@@ -128,7 +128,8 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		}
 
 		//validate that the scheduled event type fits the catalog item
-		switch (get_class($vendorCatalogItem)){
+		switch (get_class($vendorCatalogItem))
+		{
 			case 'VendorLiveCaptionCatalogItem':
 				if (get_class($connectedEvent) !== 'LiveStreamScheduleEvent')
 				{
