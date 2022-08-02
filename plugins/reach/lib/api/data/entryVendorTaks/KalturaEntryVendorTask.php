@@ -272,7 +272,6 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
 		$this->validateEntryId();
-		$this->validateCatalogLimitations();
 		
 		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
 		{
@@ -283,6 +282,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$this->taskJobData->validateForInsert();
 		}
+
+		$this->validateCatalogLimitations();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
