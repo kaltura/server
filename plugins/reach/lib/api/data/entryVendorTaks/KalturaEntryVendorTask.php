@@ -331,6 +331,16 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
 		}
+
+		if($this->isScheduled())
+		{
+			$connectedEvent = ScheduleEventPeer::retrieveByPK($this->taskJobData->scheduledEventId);
+
+			if ($this->entryId !== $connectedEvent->getTemplateEntryId())
+			{
+				throw new KalturaAPIException(KalturaReachErrors::TASK_EVENT_ENTRY_ID_MISMATCH, $this->entryId, $connectedEvent->getId());
+			}
+		}
 	}
 	
 	/* (non-PHPdoc)

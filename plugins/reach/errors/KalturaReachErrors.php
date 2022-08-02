@@ -79,6 +79,10 @@ class KalturaReachErrors implements kReachErrors
 
 	const CATALOG_ITEM_AND_JOB_DATA_MISMATCH = "CATALOG_ITEM_AND_JOB_DATA_MISMATCH;CATALOG_ITEM_TYPE,TASK_DATA_TYPE;The catalogItem type [@CATALOG_ITEM_TYPE@] is not allowed for task data of type [@TASK_DATA_TYPE@]";
 
+	const CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE = "CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE;CATALOG_ITEM_TYPE,EVENT_TYPE;Catalog item type [@CATALOG_ITEM_TYPE@] does not support event of type [@EVENT_TYPE@]";
+
+	const TASK_EVENT_ENTRY_ID_MISMATCH = "TASK_EVENT_ENTRY_ID_MISMATCH;ENTRY_ID,EVENT_ID;Task entry id [@ENTRY_ID@] does not match scheduled event [@EVENT_ID@]";
+
 	const TOO_LATE_ORDER = "TOO_LATE_ORDER;EVENT_ID,CATALOG_ITEM_ID,MINIMAL_ORDER_TIME;Task created too late for event [@EVENT_ID@], minimal order time for catalog item [@CATALOG_ITEM_ID@] is [@MINIMAL_ORDER_TIME@ min]";
 
 	const TOO_LONG_SCHEDULED_TASK = "TOO_LONG_SCHEDULED_TASK;TASK_DURATION,DURATION_LIMIT,CATALOG_ITEM_ID;The task duration [@TASK_DURATION@] is exceeding the limit [@DURATION_LIMIT@] defined in catalogItem [@CATALOG_ITEM_ID@]";
