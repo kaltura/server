@@ -348,11 +348,16 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	{
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->catalogItemId);
 		//currently a param for simplicity should be made a const with more complex requirement options
-		$featureDataRequirements = array(VendorServiceFeature::LIVE_CAPTION);
+		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
+		$featureType = $vendorCatalogItem->getServiceFeature();
 
-		if (in_array($vendorCatalogItem->getServiceFeature(), $featureDataRequirements))
+		if (key_exists($featureType, $featureToDataMap))
 		{
 			$this->validatePropertyNotNull('taskJobData');
+			if (!$this->taskJobData instanceof $featureToDataMap[$featureType])
+			{
+				throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), get_class($this->taskJobData));
+			}
 		}
 
 		if (isset($this->taskJobData))
