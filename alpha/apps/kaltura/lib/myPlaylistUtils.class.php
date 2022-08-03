@@ -1336,9 +1336,8 @@ HTML;
     	                }
     	                
     	                $replaceValue = $replaceValue->$getter();
-    	                if ($getter == 'gettags')
+    	                if (is_string($replaceValue))
     	                {
-    	                	KalturaLog::debug("replaceValue - $replaceValue");
     	                	$replaceValue = htmlspecialchars($replaceValue);
     	                }
     	            }
