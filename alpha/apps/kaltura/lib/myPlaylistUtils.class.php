@@ -1334,8 +1334,13 @@ HTML;
     	                	$replaceValue = null;
     	                	break;
     	                }
-    	                    
+    	                
     	                $replaceValue = $replaceValue->$getter();
+    	                if ($getter == 'gettags')
+    	                {
+    	                	KalturaLog::debug("replaceValue - $replaceValue");
+    	                	$replaceValue = htmlspecialchars($replaceValue);
+    	                }
     	            }
     	            
     	            if(!$replaceValue)
