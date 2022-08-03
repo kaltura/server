@@ -347,7 +347,6 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	private function validateCatalogLimitations()
 	{
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->catalogItemId);
-		//currently a param for simplicity should be made a const with more complex requirement options
 		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
 		$featureType = $vendorCatalogItem->getServiceFeature();
 
