@@ -464,22 +464,27 @@ class kSessionBase
 
 	public static function generateSession($ksVersion, $adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId = null, $additionalData = null)
 	{
-		$consistentKs = false;
+		$rand = null;
 		$expiry += time();
 		if(strpos($privileges, kSessionBase::PRIVILEGE_DOWNLOAD_ASSET) !== false)
 		{
-			$consistentKs = true;
+			$expiry = ceil($expiry/300) * 300;
+			$rand = $expiry;
 		}
 		
 		if ($ksVersion == 2)
-			return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $consistentKs);
+			return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand);
 
-		return self::generateKsV1($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $consistentKs);
+		return self::generateKsV1($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand);
 	}
 	
-	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $consistentKs = false)
+	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand = null)
 	{
-		$rand = $consistentKs ? $expiry : microtime(true);
+		if(!$rand)
+		{
+			$rand = microtime(true);
+		}
+		
 		$fields = array(
 			$partnerId,
 			$partnerId,
@@ -514,7 +519,7 @@ class kSessionBase
 	}
 
 
-	public static function generateKsV2($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $consistentKs = false)
+	public static function generateKsV2($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand = null)
 	{
 		// build fields array
 		$fields = array();
@@ -539,8 +544,8 @@ class kSessionBase
 
 		// build fields string
 		$fieldsStr = http_build_query($fields, '', '&');
-		$rand = self::createRandomString($consistentKs, $expiry);
-		$fieldsStr = $rand . $fieldsStr;
+		$randomString = self::createRandomString($rand);
+		$fieldsStr = $randomString . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
 
 		// encrypt and encode
@@ -549,25 +554,25 @@ class kSessionBase
 		return str_replace(array('+', '/'), array('-', '_'), base64_encode($decodedKs));
 	}
 	
-	protected static function createRandomString($consistentKs = false, $seedValue = null)
+	protected static function createRandomString($rand = null)
 	{
-		if($consistentKs && $seedValue)
+		if($rand)
 		{
-			srand($seedValue);
+			srand($rand);
 		}
 		
-		$rand = '';
+		$randomString = '';
 		for ($i = 0; $i < self::RANDOM_SIZE; $i++)
 		{
-			$rand .= chr(rand(0, 0xff));
+			$randomString .= chr(rand(0, 0xff));
 		}
 		
-		if($consistentKs && $seedValue)
+		if($rand)
 		{
 			srand();
 		}
 		
-		return $rand;
+		return $randomString;
 	}
 	
 	public function parseKsV2($decodedKs)
