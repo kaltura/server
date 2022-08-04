@@ -466,12 +466,6 @@ class kSessionBase
 	{
 		$rand = null;
 		$expiry += time();
-		$consistentKsPartners = kConf::get('consistent_ks_partners', kConfMapNames::RUNTIME_CONFIG, array());
-		if(in_array(kCurrentContext::getCurrentPartnerId(), $consistentKsPartners) && strpos($privileges, kSessionBase::PRIVILEGE_DOWNLOAD_ASSET) !== false)
-		{
-			$expiry = ceil($expiry/(dateUtils::MINUTE*5)) * (dateUtils::MINUTE*5);
-			$rand = $expiry;
-		}
 		
 		if ($ksVersion == 2)
 			return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand);
