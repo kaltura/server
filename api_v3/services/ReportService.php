@@ -14,7 +14,7 @@ class ReportService extends KalturaBaseService
 		ReportType::VAR_USAGE,
 		ReportType::VPAAS_USAGE_MULTI,
 		ReportType::SELF_SERVE_USAGE_VPAAS,
-		ReportType::COGS_USAGE_HIGHLIGHTS,
+		ReportType::PARTNER_USAGE_HIGHLIGHTS,
 		ReportType::REACH_PROFILE_USAGE,
 		ReportType::REACH_CATALOG_USAGE,
 		ReportType::CDN_BANDWIDTH_USAGE,
@@ -57,8 +57,7 @@ class ReportService extends KalturaBaseService
 		{
 			return $this->getPartnerId();
 		}
-
-		if ($this->getPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if ($this->getPartnerId() == Partner::BI_PARTNER_ID)
 		{
 			return $objectIds;
 		}

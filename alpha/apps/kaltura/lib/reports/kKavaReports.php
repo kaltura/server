@@ -1811,8 +1811,8 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_DOMAINS),
 		),
 
-		ReportType::COGS_USAGE_HIGHLIGHTS => array(
-			self::REPORT_SKIP_PARTNER_FILTER => true,
+		ReportType::PARTNER_USAGE_HIGHLIGHTS => array(
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_DIMENSION_MAP => array(
 				'id' => self::DIMENSION_PARTNER_ID,
 			),
@@ -1837,6 +1837,7 @@ class kKavaReports extends kKavaReportsMgr
 				// storage total
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
 					self::REPORT_METRICS => array(self::METRIC_STORAGE_SIZE_BYTES),
 				)
@@ -1851,6 +1852,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
 		),
 
@@ -1860,6 +1862,7 @@ class kKavaReports extends kKavaReportsMgr
 				'catalog_item_id' => self::DIMENSION_CATALOG_ITEM_ID
 			),
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_METRICS => array(self::METRIC_DURATION_TOTAL_MIN),
 		),
@@ -1871,6 +1874,7 @@ class kKavaReports extends kKavaReportsMgr
 				'status' => self::DIMENSION_STATUS,
 			),
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_METRICS => array(self::METRIC_COUNT_ALL_EVENTS),
 		)

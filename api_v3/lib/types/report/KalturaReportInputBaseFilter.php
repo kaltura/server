@@ -56,7 +56,7 @@ class KalturaReportInputBaseFilter extends KalturaObject
 			$reportInputFilter = new reportsInputFilter();
 
 		$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
-		if ($partner)
+		if ($partner && $partner->getPartnerId() != Partner::BI_PARTNER_ID)
 		{
 			$partnerCreatedAt = $partner->getCreatedAt(null);
 			$partnerCreatedAt -= 86400 * 30;
