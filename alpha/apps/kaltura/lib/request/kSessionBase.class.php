@@ -466,9 +466,10 @@ class kSessionBase
 	{
 		$rand = null;
 		$expiry += time();
-		if(strpos($privileges, kSessionBase::PRIVILEGE_DOWNLOAD_ASSET) !== false)
+		$consistentKsPartners = kConf::get('consistent_ks_partners', kConfMapNames::RUNTIME_CONFIG, array());
+		if(in_array(kCurrentContext::getCurrentPartnerId(), $consistentKsPartners) && strpos($privileges, kSessionBase::PRIVILEGE_DOWNLOAD_ASSET) !== false)
 		{
-			$expiry = ceil($expiry/300) * 300;
+			$expiry = ceil($expiry/(dateUtils::MINUTE*5)) * (dateUtils::MINUTE*5);
 			$rand = $expiry;
 		}
 		
