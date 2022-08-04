@@ -464,16 +464,22 @@ class kSessionBase
 
 	public static function generateSession($ksVersion, $adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId = null, $additionalData = null)
 	{
+		$rand = null;
+		$expiry += time();
+		
 		if ($ksVersion == 2)
-			return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData);
+			return self::generateKsV2($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand);
 
-		return self::generateKsV1($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData);
+		return self::generateKsV1($adminSecretForSigning, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand);
 	}
 	
-	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData)
+	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand = null)
 	{
-		$rand = microtime(true);
-		$expiry = time() + $expiry;
+		if(is_null($rand))
+		{
+			$rand = microtime(true);
+		}
+		
 		$fields = array(
 			$partnerId,
 			$partnerId,
@@ -508,7 +514,7 @@ class kSessionBase
 	}
 
 
-	public static function generateKsV2($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData)
+	public static function generateKsV2($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand = null)
 	{
 		// build fields array
 		$fields = array();
@@ -525,7 +531,7 @@ class kSessionBase
 			else
 				$fields[$splittedPrivilege[0]] = '';
 		}
-		$fields[self::FIELD_EXPIRY] = time() + $expiry;
+		$fields[self::FIELD_EXPIRY] = $expiry;
 		$fields[self::FIELD_TYPE] = $type;
 		$fields[self::FIELD_USER] = $userId;
 		$fields[self::FIELD_MASTER_PARTNER_ID] = $masterPartnerId;
@@ -533,16 +539,35 @@ class kSessionBase
 
 		// build fields string
 		$fieldsStr = http_build_query($fields, '', '&');
-		$rand = '';
-		for ($i = 0; $i < self::RANDOM_SIZE; $i++)
-			$rand .= chr(rand(0, 0xff));
-		$fieldsStr = $rand . $fieldsStr;
+		$randomString = self::createRandomString($rand);
+		$fieldsStr = $randomString . $fieldsStr;
 		$fieldsStr = sha1($fieldsStr, true) . $fieldsStr;
 
 		// encrypt and encode
 		$encryptedFields = self::aesEncrypt($adminSecret, $fieldsStr);
 		$decodedKs = "v2|{$partnerId}|" . $encryptedFields;
 		return str_replace(array('+', '/'), array('-', '_'), base64_encode($decodedKs));
+	}
+	
+	protected static function createRandomString($rand = null)
+	{
+		if(!is_null($rand))
+		{
+			srand($rand);
+		}
+		
+		$randomString = '';
+		for ($i = 0; $i < self::RANDOM_SIZE; $i++)
+		{
+			$randomString .= chr(rand(0, 0xff));
+		}
+		
+		if(!is_null($rand))
+		{
+			srand();
+		}
+		
+		return $randomString;
 	}
 	
 	public function parseKsV2($decodedKs)
