@@ -480,7 +480,7 @@ class kSessionBase
 	
 	public static function generateKsV1($adminSecret, $userId, $type, $partnerId, $expiry, $privileges, $masterPartnerId, $additionalData, $rand = null)
 	{
-		if(!$rand)
+		if(is_null($rand))
 		{
 			$rand = microtime(true);
 		}
@@ -556,7 +556,7 @@ class kSessionBase
 	
 	protected static function createRandomString($rand = null)
 	{
-		if($rand)
+		if(!is_null($rand))
 		{
 			srand($rand);
 		}
@@ -567,7 +567,7 @@ class kSessionBase
 			$randomString .= chr(rand(0, 0xff));
 		}
 		
-		if($rand)
+		if(!is_null($rand))
 		{
 			srand();
 		}
