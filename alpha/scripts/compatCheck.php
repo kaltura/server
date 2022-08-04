@@ -155,7 +155,7 @@ function extendKsExpiry($ks)
 	if (!$adminSecret)
 		return null;
 
-	return kSessionBase::generateKsV1($adminSecret, $ksObj->user, $ksObj->type, $ksObj->partner_id, 86400, $ksObj->privileges, $ksObj->master_partner_id, $ksObj->additional_data);
+	return kSessionBase::generateKsV1($adminSecret, $ksObj->user, $ksObj->type, $ksObj->partner_id, time() + 86400, $ksObj->privileges, $ksObj->master_partner_id, $ksObj->additional_data);
 }
 
 function print_r_reverse($in) {
