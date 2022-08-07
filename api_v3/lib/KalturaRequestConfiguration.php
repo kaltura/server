@@ -19,10 +19,10 @@ class KalturaRequestConfiguration extends KalturaObject
 	public $ks;
 	
 	/**
-	 * Request language
+	 * language
 	 * @var string
 	 */
-	public $requestLanguage;
+	public $language;
 	
 	/**
 	 * Response profile - this attribute will be automatically unset after every API call.

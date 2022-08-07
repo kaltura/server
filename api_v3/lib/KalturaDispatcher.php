@@ -66,7 +66,7 @@ class KalturaDispatcher
         {
              throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
-        
+		
 		$actionParams = $actionReflector->getActionParams();
 		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
@@ -76,7 +76,7 @@ class KalturaDispatcher
 		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
-		kCurrentContext::$requestLanguage = isset($params['requestLanguage']) ? $params['requestLanguage'] : null;
+		kCurrentContext::$language = isset($params['language']) ? $params['language'] : null;
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 
 		if (!KalturaResponseCacher::rateLimit($service, $action, $params, kCurrentContext::$partner_id, kCurrentContext::$ks_partner_id))

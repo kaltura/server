@@ -436,7 +436,7 @@ class Partner extends BasePartner
 	
 	public function getDefaultLanguage()
 	{
-		return $this->getFromCustomData(self::DEFAULT_LANGUAGE, null, null);
+		return $this->getFromCustomData(self::DEFAULT_LANGUAGE, null, 'EN');
 	}
 	
 	/**
