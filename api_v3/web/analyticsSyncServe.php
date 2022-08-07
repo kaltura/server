@@ -9,6 +9,8 @@ define('PARTNER_SECRET', 's');
 define('PARTNER_CRM_ID', 'ci');
 define('PARTNER_VERTICAL', 'v');
 define('PARTNER_PARENT_ID', 'pp');
+define('PARTNER_SERVICE_EDITION', 'se');
+define('PARTNER_ACCOUNT_TYPE','at');
 
 define('ENTRY_KUSER_ID', 'ku');
 define('ENTRY_TYPE', 't');
@@ -70,6 +72,16 @@ function getPartnerVertical($customData)
 	}
 }
 
+function getPartnerAccountType($customData)
+{
+	if (isset($customData['isSelfServe']) && $customData['isSelfServe'])
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
 function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
 	global $sourceFromAdminTag, $externalSources;
@@ -109,6 +121,7 @@ function getPartnerUpdates($updatedAt)
 	$c->addSelectColumn(PartnerPeer::ADMIN_SECRET);
 	$c->addSelectColumn(PartnerPeer::CUSTOM_DATA);
 	$c->addSelectColumn(PartnerPeer::PARTNER_PARENT_ID);
+	$c->addSelectColumn(PartnerPeer::PARTNER_PACKAGE);
 	$c->addSelectColumn(PartnerPeer::UPDATED_AT);
 	$c->add(PartnerPeer::UPDATED_AT, $updatedAt, Criteria::GREATER_EQUAL);
 	$c->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
@@ -133,6 +146,8 @@ function getPartnerUpdates($updatedAt)
 				PARTNER_CRM_ID => isset($customData['crmId']) ? $customData['crmId'] : '',
 				PARTNER_VERTICAL => getPartnerVertical($customData),
 				PARTNER_PARENT_ID => $row['PARTNER_PARENT_ID'],
+				PARTNER_SERVICE_EDITION => $row['PARTNER_PACKAGE'],
+				PARTNER_ACCOUNT_TYPE => getPartnerAccountType($customData),
 			);
 			$info = json_encode($info);
 		}

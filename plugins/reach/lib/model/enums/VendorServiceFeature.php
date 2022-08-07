@@ -12,4 +12,5 @@ interface VendorServiceFeature extends BaseEnum
 	const CHAPTERING            = 5;
 	const INTELLIGENT_TAGGING   = 6;
 	const DUBBING               = 7;
+	const LIVE_CAPTION          = 8;
 }

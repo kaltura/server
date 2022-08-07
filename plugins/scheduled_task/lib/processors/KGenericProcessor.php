@@ -48,6 +48,28 @@ class KGenericProcessor
 		//Nothing To Do in case of Generic.
 	}
 
+	protected function shouldProcessTask($object, $objectTask)
+	{
+		return $object instanceof KalturaBaseEntry && $objectTask->stopProcessingOnError
+			&& in_array($objectTask->type, $this->getSupportedTypesForProcess()) && $this->isPartnerSupportedForProcess($object->partnerId);
+	}
+
+	protected function getSupportedTypesForProcess()
+	{
+		$distributeTaskType = ScheduledTaskContentDistributionPlugin::getApiValue('Distribute');
+		return array(ObjectTaskType::STORAGE_EXPORT, $distributeTaskType);
+	}
+
+	protected function isPartnerSupportedForProcess($partnerId)
+	{
+		$supportedPartnerIds = array();
+		if(KBatchBase::$taskConfig->params->supportedPartnerIdsForProcess)
+		{
+			$supportedPartnerIds = KBatchBase::$taskConfig->params->supportedPartnerIdsForProcess->toArray();
+		}
+		return in_array($partnerId, $supportedPartnerIds);
+	}
+
 	/**
 	 * @param KalturaScheduledTaskProfile $profile
 	 * @return int
@@ -134,6 +156,10 @@ class KGenericProcessor
 			{
 				$objectTaskEngine->execute($object);
 				$tasksCompleted[] = $objectTask->type;
+				if($this->shouldProcessTask($object, $objectTask))
+				{
+					break;
+				}
 			}
 			catch(Exception $ex)
 			{

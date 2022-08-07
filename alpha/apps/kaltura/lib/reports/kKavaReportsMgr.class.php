@@ -32,6 +32,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
 	const METRIC_LIVE_VIEW_PERIOD_PLAY_TIME = 'sum_live_view_period';
+	const METRIC_VOD_VIEW_PERIOD_PLAY_TIME = 'sum_vod_view_period';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME = 'avg_view_period_time';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
@@ -108,6 +109,12 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_ALL_EVENTS = 'count_all';
 	const METRIC_TRANSCODING_DURATION_SEC = 'transcoding_duration_sec';
 	const METRIC_TRANSCODING_DURATION = 'transcoding_duration';
+	const METRIC_REACTION_CLAP_COUNT = 'reaction_clap_clicked';
+	const METRIC_REACTION_HEART_COUNT = 'reaction_heart_clicked';
+	const METRIC_REACTION_THINK_COUNT = 'reaction_think_clicked';
+	const METRIC_REACTION_WOW_COUNT = 'reaction_wow_clicked';
+	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
+	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -120,6 +127,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
 	const METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC = 'live_view_period_play_time';
+	const METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC = 'vod_view_period_play_time';
 	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
 	const METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC = 'live_view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
@@ -441,6 +449,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_UNIQUE_DOMAINS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -487,6 +496,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_OWNERS => true,
 		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
+		self::METRIC_UNIQUE_DOMAINS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -738,6 +748,21 @@ class kKavaReportsMgr extends kKavaBase
 				self::getLongSumAggregator($metric, self::METRIC_DELTA));
 		}
 
+		$reaction_type_metrics = array(
+                        self::METRIC_REACTION_CLAP_COUNT => 'Clap',
+                        self::METRIC_REACTION_HEART_COUNT => 'Heart',
+                        self::METRIC_REACTION_THINK_COUNT => 'Think',
+                        self::METRIC_REACTION_WOW_COUNT => 'Wow',
+                        self::METRIC_REACTION_SMILE_COUNT => 'Smile');
+                foreach ($reaction_type_metrics as $metric => $value)
+                {
+                        self::$aggregations_def[$metric] = self::getFilteredAggregator(
+                                self::getAndFilter(array(
+                                        self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_REACTION_CLICKED),
+                                        self::getSelectorFilter(self::DIMENSION_EVENT_VAR1, $value))),
+                                self::getLongSumAggregator($metric, self::METRIC_COUNT));
+                }
+
 		// delta aggregations
 		$delta_metrics = array(
 			array(self::METRIC_SIZE_BYTES, self::METRIC_STORAGE_SIZE_BYTES, self::METRIC_SIZE_ADDED_BYTES, self::METRIC_SIZE_DELETED_BYTES, null),
@@ -806,6 +831,12 @@ class kKavaReportsMgr extends kKavaBase
 					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD))),
 			self::getLongSumAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 
+		self::$aggregations_def[self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD))),
+			self::getLongSumAggregator(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
 		self::$aggregations_def[self::METRIC_VIEW_BUFFER_TIME_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
 				self::EVENT_TYPE_VIEW,				// realtime
@@ -865,7 +896,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_OWNERS] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_OWNERS,
 			array(self::DIMENSION_ENTRY_OWNER_ID));
-
 
 		self::$aggregations_def[self::METRIC_UNIQUE_SESSIONS] = self::getHyperUniqueAggregator(
 			self::METRIC_UNIQUE_SESSIONS,
@@ -1122,6 +1152,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(
 				self::METRIC_TRANSCODING_DURATION_SEC, self::METRIC_DURATION_SEC));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_DOMAINS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_DOMAINS, array(self::DIMENSION_DOMAIN)));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1140,6 +1174,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
 
 		self::$metrics_def[self::METRIC_DURATION_TOTAL_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
@@ -2394,6 +2433,7 @@ class kKavaReportsMgr extends kKavaBase
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
+			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

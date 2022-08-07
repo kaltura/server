@@ -78,8 +78,8 @@ class kKsUrlTokenizer extends kUrlTokenizer
 			$this->key, 
 			$this->ksObject->user, 
 			kSessionBase::SESSION_TYPE_USER, 
-			$this->partnerId, 
-			$this->window, 
+			$this->partnerId,
+			time() + $this->window,
 			$privileges, 
 			null, 
 			null);

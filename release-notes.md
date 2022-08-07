@@ -1,3 +1,99 @@
+# Rigel-18.11.0
+
+## Add partner for BI ##
+* Issue Type: Task
+* Issue ID: PLAT-23825
+
+### Configuration ###
+First replace all tokens from the ini file below (under kme section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_07_28_bi_add_partner.php
+
+## Add partner for connector framework server ##
+
+* Issue Type: Task
+* Issue ID: - Issue Type: Feature
+- Issue ID: FOUN-578
+
+### Configuration ###
+	Replace all tokens from the ini file (under connectors-framework section) and remove".template" from the file name: 
+	/opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_28_add_connectors_partner.php
+
+## Support Live Captions
+* Issue Type: Task
+* Issue ID: LIV-958
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_07_add_permissions_entry_vendor_task_object_externalTaskId.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_06_06_add_permission_scheduleEvent_mediaPartner.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_19_update_live_feature_action_permissions.php
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "Reach vendor role" SCHEDULE_EVENT_BASE realrun
+	php /opt/kaltura/app/alpha/scripts/utils/permissions/addPermissionToRole.php 0 "Reach vendor role" SCHEDULE_EVENT_FEATURE_MANAGE realrun
+
+
+
+## Add new Kafka and Kafka notifications plugin ##
+- Issue Type: Feature
+- Issue ID: FOUN-194
+
+### pre-requisite ###
+
+* Install Rdkafka for refernce view [how to install Rdkafka](https://arnaud.le-blanc.net/php-rdkafka-doc/phpdoc/rdkafka.installation.html)
+
+### configuration ###
+Enable Kafka and Kafka notifications plugins:
+
+	To enable Kafka & KafkaNotification plugin add the following to your plugins.ini file :
+	- Kafka
+	- KafkaNotification
+
+Configure Kafka Kaltura configuration:
+
+	Copy configurations/kafka.template.ini to configurations/kafka.ini and update the folloiwng tokens:
+	brokers = kafka brokers list, separated by a comma         
+	server = kafka server
+	port = kafka port
+
+	*** If you work with dynamic kConf maps, add the configuration above from the configuration tab in the admin console instead
+
+### Deployment scripts ###
+    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+
+	2. First, replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET, TOPIC_NAME) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2022_07_27_add_kafka_user_events.template.xml
+
+	3. Run deployment script:
+	php /opt/kaltura/app/deployment/updates/scripts/2022_07_27_deploy_kafka_user_events.php
+
+# Rigel-18.10.0
+## Support media repurposing stopProcessingOnError for tasks with batch job
+* Issue Type: Task
+* Issue ID: SUP-32804
+
+#### Known Issues & Limitations ####
+Using the media repurposing task config "stopProcessingOnError" 
+is not fully supported for tasks that their execution happens in batch jobs
+
+#### Resolution ####
+tasks of type STORAGE_EXPORT and DISTRIBUTION are now supported via config
+
+### Configuration ###
+In batch.ini, under [KScheduledTaskRunner : PeriodicWorker] section, Add: 
+	params.supportedPartnerIdsForProcess[]	=  @PARTNER_ID@
+
+## Add new action CaptionAssetService::serveAsJson
+* Issue Type: Task
+* Issue ID: PLAT-23811
+
+### Script ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_11_caption_asset_add_serveasjson.php
+
+
 # Rigel-18.9.0
 ## Add "manage EP" to partner list actions
 * Issue Type: Task

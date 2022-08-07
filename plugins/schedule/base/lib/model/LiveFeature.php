@@ -5,6 +5,8 @@
  */
 abstract class LiveFeature extends BaseObject
 {
+	const REACH_FEATURE_PREFIX='reach';
+
 	/**
 	 * feature name
 	 * @var string
@@ -62,5 +64,11 @@ abstract class LiveFeature extends BaseObject
 	public function getPostEndTime()
 	{
 		return $this->postEndTime;
+	}
+
+	public static function defaultName($suffix)
+	{
+		$prefix = get_called_class();
+		return "$prefix-$suffix";
 	}
 }

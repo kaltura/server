@@ -79,7 +79,15 @@ class KDistributedFileManager
 			
 			$curlWrapper = new KCurlWrapper();
 			$curlHeaderResponse = $curlWrapper->getHeader($remotePath, true, true);
-			$removeServer = isset($curlHeaderResponse->headers['X-Me']) ? $curlHeaderResponse->headers['X-Me'] : "unknown";
+			$removeServer = 'unknown';
+			if (isset($curlHeaderResponse->headers['X-Me']))
+			{
+				$removeServer = $curlHeaderResponse->headers['X-Me'];
+			}
+			else if (isset($curlHeaderResponse->headers['x-me']))
+			{
+				$removeServer = $curlHeaderResponse->headers['x-me'];
+			}
 			
 			if(!$curlHeaderResponse || $curlWrapper->getError())
 			{

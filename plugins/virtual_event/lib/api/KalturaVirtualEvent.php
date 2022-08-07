@@ -88,6 +88,12 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public $deletionDueDate;
 	
+	/**
+	 * JSON-Schema of the Registration Form
+	 * @var string
+	 */
+	public $registrationFormSchema;
+	
 	/*
 	 */
 	private static $map_between_objects = array(
@@ -105,6 +111,7 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'deletionDueDate',
+		'registrationFormSchema'
 	);
 	
 	/* (non-PHPdoc)
@@ -155,6 +162,21 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('name');
+		if (!kString::checkIsValidJson($this->registrationFormSchema))
+		{
+			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_INVALID_REGISTRATION_FORM_SCHEMA);
+		}
+		
 		parent::validateForInsert($propertiesToSkip);
 	}
+	
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if (!kString::checkIsValidJson($this->registrationFormSchema))
+		{
+			throw new KalturaAPIException(KalturaVirtualEventErrors::VIRTUAL_EVENT_INVALID_REGISTRATION_FORM_SCHEMA);
+		}
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
 }

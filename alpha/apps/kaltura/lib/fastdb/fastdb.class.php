@@ -19,12 +19,12 @@ class fdb
     {
         $obj = self::select($class_name, "id={$old_id}");
         if (!$obj) {
-            throw new Exception (self::class . ": error! did not find [{$class_name}] with {$old_id} to duplicate");
+            throw new Exception (__CLASS__ . ": error! did not find [{$class_name}] with {$old_id} to duplicate");
         }
 
         $temp_obj = self::select($class_name, "id={$new_id}");
         if ($temp_obj) {
-            throw new Exception (self::class . ": error! [{$class_name}] with {$new_id} already exists in db. cannot duplicate");
+            throw new Exception (__CLASS__ . ": error! [{$class_name}] with {$new_id} already exists in db. cannot duplicate");
         }
 
         $new_obj = $obj->copy();
@@ -59,7 +59,7 @@ class fdb
 
         if (empty ($class_name)) //|| empty ( $criteria_str ) )
         {
-            throw new Exception (self::class . ": error! cannot execute query for empty class [{$class_name}] or empty criteria [{$criteria_str}]");
+            throw new Exception (__CLASS__ . ": error! cannot execute query for empty class [{$class_name}] or empty criteria [{$criteria_str}]");
         } else {
             self::$last_class_name = $class_name;
             self::$last_criteria_str = $criteria_str;

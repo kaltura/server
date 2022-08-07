@@ -110,7 +110,7 @@ class RabbitMQProvider extends QueueProvider
 	 * (non-PHPdoc)
 	 * @see QueueProvider::send()
 	 */
-	public function send($queueName, $data)
+	public function send($queueName, $data, $msgArgs = array())
 	{
 		// establish connection to RabbitMQ
 		for ($retry = 1; ; $retry++)

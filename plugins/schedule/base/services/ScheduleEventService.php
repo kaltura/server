@@ -265,6 +265,55 @@ class ScheduleEventService extends KalturaBaseService
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 
+	/**
+	 * Add feature to live event
+	 *
+	 * @action updateLiveFeature
+	 * @param int $scheduledEventId
+	 * @param string $featureName
+	 * @param KalturaLiveFeature $liveFeature
+	 * @return KalturaLiveStreamScheduleEvent
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public function updateLiveFeatureAction($scheduledEventId, $featureName, KalturaLiveFeature $liveFeature)
+	{
+		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
+		if(!$dbScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
+		}
+
+		if(!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
+		}
+
+		$featureFound = false;
+		$featureList = $dbScheduleEvent->getLiveFeatures();
+		foreach ($featureList as $index => $feature)
+		{
+			if ($feature->getSystemName() == $featureName)
+			{
+				$featureList[$index] = $liveFeature->toUpdatableObject($feature);
+				$featureFound = true;
+				break;
+			}
+		}
+
+		if(!$featureFound)
+		{
+			throw new KalturaAPIException(KalturaErrors::FEATURE_NAME_NOT_FOUND, $featureName);
+		}
+
+		$dbScheduleEvent->setLiveFeatures($featureList);
+		$dbScheduleEvent->save();
+
+		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
+		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
+
+		return $scheduleEvent;
+	}
 
 	/**
 	 * get schedule recurrences dates

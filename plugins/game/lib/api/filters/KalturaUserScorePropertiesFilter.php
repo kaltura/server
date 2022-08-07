@@ -8,7 +8,7 @@
 class KalturaUserScorePropertiesFilter extends KalturaUserScorePropertiesBaseFilter
 {
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $gameObjectId;
 	
