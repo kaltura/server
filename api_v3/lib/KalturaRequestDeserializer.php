@@ -366,7 +366,7 @@ class KalturaRequestDeserializer
 				continue;
 			}
 			
-			if ($property->isArray() && is_array($value))
+			if (($property->isArray() && is_array($value)) || ($property->isArray() && $type == 'KalturaMultiLingualStringArray' && !is_array($value)))
 			{
 				$arrayObj = new $type();
 				if($property->isAssociativeArray())
@@ -389,6 +389,14 @@ class KalturaRequestDeserializer
 					}
 				}
 				$obj->$name = $arrayObj;
+				if ($type == 'KalturaMultiLingualStringArray' && !is_array($value))
+				{
+					$multiLangString = new KalturaMultiLingualString();
+					$multiLangString->language = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId())->getDefaultLanguage();
+					$multiLangString->value = $value;
+					$multiLangStringArr = new KalturaMultiLingualStringArray();
+					$obj->$name = $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
+				}
 				continue;
 			}
 			

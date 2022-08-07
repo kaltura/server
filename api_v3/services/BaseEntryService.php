@@ -88,8 +88,26 @@ class BaseEntryService extends KalturaEntryService
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
     	
 	    $entry->fromObject($dbEntry, $this->getResponseProfile());
+		$this->handleMultiLanguageMapping($entry);
 	    return $entry;
     }
+	
+	protected function handleMultiLanguageMapping(KalturaBaseEntry &$entry)
+	{
+		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
+		$language = kCurrentContext::getLanguage();
+		if ($language && $defaultLanguage != $language)
+		{
+			$multiLanguageMap = $entry->multiLanguageMapping;
+			if ($multiLanguageMap)
+			{
+				if ($language == self::MULTI)
+				{
+					$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true), $defaultLanguage);
+				}
+			}
+		}
+	}
 	
     /**
      * Attach content resource to entry in status NO_MEDIA
@@ -341,36 +359,24 @@ class BaseEntryService extends KalturaEntryService
     function getAction($entryId, $version = -1)
     {
 		$entry = $this->getEntry($entryId, $version);
-		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
-		$language = kCurrentContext::getRequestLanguage();
-		/* @var KalturaBaseEntry $entry*/
-		if ($language && $defaultLanguage != $language)
-		{
-			$multiLanguageMap = $entry->multiLanguageMapping;
-			if ($multiLanguageMap)
-			{
-				if ($language == self::MULTI)
-				{
-				    $this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true));
-				}
-				else
-				{
-				    $this->updateEntryFieldsByLanguage($entry, json_decode($multiLanguageMap, true), $language);
-				}
-			}
-		}
+	    $this->handleMultiLanguageMapping($entry);
 		return $entry;
     }
 	
-	protected function updateEntryFieldsByLanguage(&$entry, $multiLanguageMap, $language)
+	protected function setMultiLanguageStringOnField(KalturaBaseEntry &$entry, $multiLanguageMap, $defaultLanguage)
 	{
-		$entry->name = isset($multiLanguageMap[self::NAME][$language]) ? $multiLanguageMap[self::NAME][$language] : $multiLanguageMap[self::NAME][$this->getPartner()->getDefaultLanguage()];
-		$entry->description = isset($multiLanguageMap[self::DESCRIPTION][$language]) ? $multiLanguageMap[self::DESCRIPTION][$language] : $multiLanguageMap[self::DESCRIPTION][$this->getPartner()->getDefaultLanguage()];
-		$entry->tags = isset($multiLanguageMap[self::TAGS][$language]) ? $multiLanguageMap[self::TAGS][$language] : $multiLanguageMap[self::TAGS][$this->getPartner()->getDefaultLanguage()];
-	}
-	
-	protected function setMultiLanguageStringOnField(&$entry, $multiLanguageMap)
-	{
+		if ($entry->name)
+		{
+			$multiLanguageMap[self::NAME][$defaultLanguage] = $entry->name;
+		}
+		if ($entry->description)
+		{
+			$multiLanguageMap[self::DESCRIPTION][$defaultLanguage] = $entry->description;
+		}
+		if ($entry->tags)
+		{
+			$multiLanguageMap[self::TAGS][$defaultLanguage] = $entry->tags;
+		}
 		$entry->name = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::NAME]);
 		$entry->description = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::DESCRIPTION]);
 		$entry->tags = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::TAGS]);
@@ -599,7 +605,7 @@ class BaseEntryService extends KalturaEntryService
 		$response->totalCount = $result->totalCount;
 		
 		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
-		$language = kCurrentContext::getRequestLanguage();
+		$language = kCurrentContext::getLanguage();
 		if ($language && $defaultLanguage != $language)
 		{
 			$updatedResponseObjects = array();
@@ -611,13 +617,8 @@ class BaseEntryService extends KalturaEntryService
 				{
 					if ($language == 'MULTI')
 					{
-						$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true));
+						$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true), $defaultLanguage);
 					}
-					else
-					{
-						$this->updateEntryFieldsByLanguage($entry, json_decode($multiLanguageMap, true), $language);
-					}
-					
 				}
 				array_push($updatedResponseObjects, $entry);
 			}

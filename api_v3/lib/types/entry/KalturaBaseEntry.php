@@ -6,6 +6,10 @@
  */
 class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
+	const NAME = 'name';
+	const DESCRIPTION = 'description';
+	const TAGS = 'tags';
+	
 	/**
 	 * Auto generated 10 characters alphanumeric string
 	 * 
@@ -18,7 +22,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Entry name (Min 1 chars)
 	 * 
-	 * @var string
+	 * @var KalturaMultiLingualStringArray
 	 * @filter like,mlikeor,mlikeand,eq,order
 	 * @requiresPermission update
 	 */
@@ -27,7 +31,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Entry description
 	 * 
-	 * @var string
+	 * @var KalturaMultiLingualStringArray
 	 * @requiresPermission update
 	 */
 	public $description;
@@ -61,7 +65,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Entry tags
 	 * 
-	 * @var string
+	 * @var KalturaMultiLingualStringArray
 	 * @filter like,mlikeor,mlikeand
 	 * @requiresPermission update
 	 */
@@ -409,6 +413,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * Can be used to store a mapping of fields values in different languages
 	 *
 	 * @var string
+	 * @readonly
 	 */
 	public $multiLanguageMapping;
 
@@ -418,7 +423,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	private static $map_between_objects = array 
 	 (
 	 	"id", 
-	 	"name", 
+	 	"name",
 	 	"description",
 	 	"tags",
 	 	"adminTags",
@@ -463,7 +468,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"application",
 		"applicationVersion",
 		"blockAutoTranscript",
-	    "multiLanguageMapping"
+	    "multiLanguageMapping",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -534,6 +539,26 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 				$this->userId = $sourceObject->getPuserId();
 			if($this->shouldGet('creatorId', $responseProfile))
 				$this->creatorId = $sourceObject->getCreatorPuserId();
+		}
+		$requestLanguage = kCurrentContext::getLanguage();
+		if($requestLanguage)
+		{
+			$this->injectCorrectLanguageValues($sourceObject, $requestLanguage);
+		}
+	}
+	
+	protected function injectCorrectLanguageValues($sourceObject, $requestLanguage)
+	{
+		$multiLangMapping = json_decode($sourceObject->getMultiLanguageMapping(), true);
+		$name = $sourceObject->extractLanguageValue($multiLangMapping, self::NAME, $requestLanguage);
+		$description = $sourceObject->extractLanguageValue($multiLangMapping, self::DESCRIPTION, $requestLanguage);
+		$tags = $sourceObject->extractLanguageValue($multiLangMapping, self::TAGS, $requestLanguage);
+		$tags = ktagword::updateTags($this->tags, $tags , false );
+		if($multiLangMapping)
+		{
+			$this->name = $name ? $name : $this->name;
+			$this->description = $description ? $description : $this->description;
+			$this->tags = $tags ? $tags : $this->tags;
 		}
 	}
 	
