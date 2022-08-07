@@ -1711,14 +1711,6 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getPhpTimezone($timezone_offset)
 	{
 		$tz_name = self::getPhpTimezoneName($timezone_offset);
-		$tz_offset_hours = $timezone_offset / 60;
-		$offset = '';
-		$offset =  $tz_offset_hours > 0 ? "-" : "";
-
-		$offset.= "$tz_offset_hours" . "00";
-		return $tz_name;
-
-
 		return new DateTimeZone($tz_name);
 	}
 	
