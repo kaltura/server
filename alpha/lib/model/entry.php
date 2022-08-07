@@ -350,37 +350,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return $partner->getDefaultLanguage();
 	}
 	
-	protected function isValidJason($v)
-	{
-		if(is_array($result = json_decode($v, true)))
-		{
-			return $result;
-		}
-		return false;
-	}
-	
-	protected function isValidMap($v)
-	{
-		if (count($v) > 1)
-		{
-			return false;
-		}
-		
-	}
-	
-	protected function processOriginalValue($field, &$originalValue, $update_db = true)
-	{
-		switch ($field)
-		{
-			case self::NAME:
-				$originalValue =  kString::alignUtf8String($originalValue, self::MAX_NAME_LEN);
-				break;
-			case self::TAGS:
-				$originalValue =  trim(ktagword::updateTags($this->tags, $originalValue , $update_db ));
-				break;
-		}
-	}
-	
 	protected function handleMultiLanguageInput($field, &$originalValue, $update_db = true)
 	{
 		$defaultLanguage = $this->getPartnerDefaultLanguage();
@@ -1378,37 +1347,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return parent::setTags($multiLingualResult[self::DEFAULT_VALUE]);
 		}
 		return;
-		
-//		$defaultLanguage = $this->getPartnerDefaultLanguage();
-//		$multiLangMapping = json_decode($this->getMultiLanguageMapping(), true);
-//		$isMapUpdated = false;
-//		$defaultTags = null;
-//		$requestLanguage = kCurrentContext::getLanguage();
-//		if($defaultLanguage)
-//		{
-//			if ($tagsMapping = $this->isValidJason($tags))
-//			{
-//				$defaultTags = $this->removeFromMapping($tagsMapping, $defaultLanguage);
-//				$this->setValueByLanguageInMultiLangMapping($multiLangMapping, self::TAGS, $tagsMapping);
-//				$this->setMultiLanguageMapping(json_encode($multiLangMapping));
-//				$isMapUpdated = true;
-//			}
-//			elseif ($multiLangMapping && $requestLanguage && ($requestLanguage !== $defaultLanguage) && ($requestLanguage !== self::MULTI))
-//			{
-//				$this->setValueByLanguageInMultiLangMapping($multiLangMapping, self::TAGS, trim(ktagword::updateTags($this->tags, $tags , $update_db )), $requestLanguage);
-//				$isMapUpdated = true;
-//			}
-//		}
-//		if($defaultTags)
-//		{
-//			$tags = ktagword::updateTags($this->tags, $defaultTags , $update_db );
-//			$isMapUpdated = false;
-//		}
-//		if(!$isMapUpdated )
-//		{
-//			return parent::setTags(trim(ktagword::updateTags($this->tags, $tags , $update_db )));
-//		}
-//		return;
 	}
 
 	public function setAdminTags($tags)
@@ -2022,45 +1960,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$this->putInCustomData ( self::MULTI_LANGUAGE_MAPPING , $v );
 	}
-	
-	protected function isDefaultLanguageNameAccessible($multiLangMapping)
-	{
-		if (!$this->getName())
-		{
-			return isset($multiLangMapping[self::NAME][$this->getPartnerDefaultLanguage()]);
-		}
-		return true;
-	}
-	
-//	protected Function setDefaultValuesFromMultiLangMapping($multiLangMapping)
-//	{
-//		$defaultLanguage = $this->getPartnerDefaultLanguage();
-//		if ($defaultLanguage)
-//		{
-//			$name = $this->getName();
-//			$desc = $this->getDescription();
-//			$tags = $this->getTags();
-//			if ($multiLangMapping[self::NAME])
-//			{
-//				$nameFromMap = $this->extractLanguageValue($multiLangMapping, self::NAME, $defaultLanguage);
-//				$this->setName($nameFromMap?$nameFromMap:$name);
-//				$this->removeFromMapping($multiLangMapping, self::NAME, $defaultLanguage);
-//			}
-//			if ($multiLangMapping[self::DESCRIPTION])
-//			{
-//				$descFromMap = $this->extractLanguageValue($multiLangMapping, self::DESCRIPTION, $defaultLanguage);
-//				$this->setDescription($descFromMap?$descFromMap:$desc);
-//				$this->removeFromMapping($multiLangMapping, self::DESCRIPTION, $defaultLanguage);
-//			}
-//			if ($multiLangMapping[self::TAGS])
-//			{
-//				$tagsFromMap = $this->extractLanguageValue($multiLangMapping, self::TAGS, $defaultLanguage);
-//				$this->setTags($tagsFromMap?$tagsFromMap:$tags);
-//				$this->removeFromMapping($multiLangMapping, self::TAGS, $defaultLanguage);
-//			}
-//			return json_encode($multiLangMapping, true);
-//		}
-//	}
 	
 	public function extractLanguageValue($multiLangMapping, $field, $language)
 	{
