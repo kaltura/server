@@ -254,9 +254,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				continue;
 			}
 			$partnerId = $this->dropFolder->partnerId;
+			$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile, $this->dropFolder->zoomVendorIntegration);
 			if ($groupParticipationType != KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
 			{
-				$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile, $this->dropFolder->zoomVendorIntegration);
 				if (!$userId)
 				{
 					KalturaLog::err('Could not find user');
@@ -312,7 +312,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								else if (!$isTranscript)
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
-									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START]);
+									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START], $userId);
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -349,7 +349,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return null;
 	}
 	
-	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime)
+	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
@@ -357,6 +357,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
 		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
 		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
+		if ($userId)
+		{
+		    $newEntry->userId = $userId;
+		}
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
 		KBatchBase::unimpersonate();
