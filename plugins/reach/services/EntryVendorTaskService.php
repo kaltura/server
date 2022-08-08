@@ -191,6 +191,13 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
+		if ($dbEntryVendorTask->getServiceFeature() == KalturaVendorServiceFeature::LIVE_CAPTION
+			&& ($entryVendorTask->status == EntryVendorTaskStatus::PROCESSING && in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::ABORTED))
+			|| ($entryVendorTask->status == EntryVendorTaskStatus::ABORTED && in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::PROCESSING)))))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_BETWEEN_PROCESSING_AND_ABORTED, $id, $dbEntryVendorTask->getStatus(), $entryVendorTask->status);
+		}
+		
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		self::tryToSave($dbEntryVendorTask);
 		

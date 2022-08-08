@@ -517,10 +517,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				return;
 			}
+			
+			kReachUtils::refundTask($entryVendorTask);
 		}
-
-		//TODO: enable refund for aborting
-		// return kReachUtils::refundTask($entryVendorTask);
 	}
 
 	protected function getLabelAdditionByType(ReachProfile $reachProfile, $serviceType)
