@@ -69,15 +69,7 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
-		$isAnonymous = false;
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('', 0));
-		foreach ($anonKusers as $anonKuser)
-		{
-			if ($anonKuser->getKuserId() == $object_to_fill->getKuserId())
-			{
-				$isAnonymous = true;
-			}
-		}
+		$isAnonymous = kCurrentContext::$ks_object ? kCurrentContext::$ks_object->isAnonymousSession() : false;
 		if (!$isAnonymous)
 		{
 			$userEntry = UserEntryPeer::retriveUserEntriesSubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
