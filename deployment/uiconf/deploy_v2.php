@@ -31,6 +31,10 @@ $skipAddUiconf = $arguments['no-create'];
 
 //error_reporting(0);
 $confObj = uiConfDeployment::init($arguments['ini']); // get and read the config file
+if (!uiConfDeployment::validateIni($confObj))
+{
+	return;
+}
 
 uiConfDeployment::checkArguments($arguments);
 
@@ -256,9 +260,10 @@ class uiConfDeployment
 
 			$deprecatedConfValues = new Criteria();
 			$deprecatedConfValues->add(uiConfPeer::TAGS, $deprecatedTag);
+			$deprecatedConfValues->add(uiConfPeer::UPDATED_AT, time());
 
 			//Update set tags = $deprecatedTag where ID = $oldUiConf->ID
-			$deprecatedCount = BasePeer::doUpdate($oldConfCriteria, $deprecatedConfValues, $con);
+			$deprecatedCount = BasePeer::doUpdate($confCriteria, $deprecatedConfValues, $con);
 
 			KalturaLog::debug("uiConf number {$oldUiConf[0]} was updated with the tag = {$deprecatedTag}");
 
@@ -300,6 +305,17 @@ class uiConfDeployment
 	{
 		return new Zend_Config_Ini($conf_file_path);
  	}
+	 
+	 public static function validateIni($confObj)
+	 {
+		 if (!isset($confObj->general->component) || !isset($confObj->general->component->name) || !isset($confObj->general->component->version))
+		 {
+			 KalturaLog::err("Error: Source ini missing component.name or component.version\n");
+			 return false;
+		 }
+		 
+		 return true;
+	 }
 	
 	/**
 	 *

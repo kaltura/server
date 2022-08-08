@@ -1,0 +1,106 @@
+dist: trusty
+sudo: required
+language: php
+
+services:
+- docker
+
+php:
+- '7.1'
+- '7.2'
+- '7.3'
+
+env:
+  global:
+  - DOCKER_COMPOSE_VERSION=1.22.0
+  matrix:
+  - DEPENDENCIES="low"
+  - DEPENDENCIES="stable"
+
+before_script:
+- make install-phars
+- if [ "$INTEGRATION_TEST" == "enabled" ]; then sudo rm /usr/local/bin/docker-compose; fi;
+- if [ "$INTEGRATION_TEST" == "enabled" ]; then curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose; fi;
+- if [ "$INTEGRATION_TEST" == "enabled" ]; then chmod +x docker-compose; fi;
+- if [ "$INTEGRATION_TEST" == "enabled" ]; then sudo mv docker-compose /usr/local/bin; fi;
+- composer self-update
+- if [ "$DEPENDENCIES" == "stable" ]; then composer update --prefer-stable; fi;
+- if [ "$DEPENDENCIES" == "low" ]; then composer update --prefer-lowest --prefer-stable; fi;
+
+script:
+- COMPOSER=composer PHP=php make ci-local
+
+jobs:
+  include:
+  - stage: coverage
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    script:
+    - PHP=php make coverage
+  - stage: integration
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    - INTEGRATION_TEST="enabled"
+    - CONFLUENT_VERSION=3.1.2
+    script:
+    - make platform
+    - PHP=php make phpunit-integration
+  - stage: integration
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    - INTEGRATION_TEST="enabled"
+    - CONFLUENT_VERSION=3.2.4
+    script:
+    - make platform
+    - PHP=php make phpunit-integration
+  - stage: integration
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    - INTEGRATION_TEST="enabled"
+    - CONFLUENT_VERSION=3.3.2
+    script:
+    - make platform
+    - PHP=php make phpunit-integration
+  - stage: integration
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    - INTEGRATION_TEST="enabled"
+    - CONFLUENT_VERSION=4.0.2
+    script:
+    - make platform
+    - PHP=php make phpunit-integration
+  - stage: integration
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    - INTEGRATION_TEST="enabled"
+    - CONFLUENT_VERSION=4.1.2
+    script:
+    - make platform
+    - PHP=php make phpunit-integration
+  - stage: integration
+    php: '7.2'
+    env:
+    - DEPENDENCIES="stable"
+    - INTEGRATION_TEST="enabled"
+    - CONFLUENT_VERSION=5.0.0
+    script:
+    - make platform
+    - PHP=php make phpunit-integration
+after_script:
+- make clean
+
+branches:
+  only:
+  - master
+  - '/^ft-.*/'
+  - '/^\d+\.\d+\.\d+$/'
+
+cache:
+  directories:
+  - $HOME/.composer/cache/files

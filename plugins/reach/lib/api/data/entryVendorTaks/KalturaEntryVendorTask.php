@@ -282,6 +282,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$this->taskJobData->validateForInsert();
 		}
+
+		$this->validateCatalogLimitations();
 		
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -322,13 +324,44 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
 		
-		if($dbEntry->getStatus() != entryStatus::READY)
+		if ($dbEntry->getStatus() != entryStatus::READY)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $this->entryId);
 		}
-		if(!ReachPlugin::isEntryTypeSupportedForReach($dbEntry->getType()))
+		if (!ReachPlugin::isEntryTypeSupportedForReach($dbEntry->getType()))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
+		}
+
+		if ($this->isScheduled())
+		{
+			$connectedEvent = ScheduleEventPeer::retrieveByPK($this->taskJobData->scheduledEventId);
+
+			if ($this->entryId !== $connectedEvent->getTemplateEntryId())
+			{
+				throw new KalturaAPIException(KalturaReachErrors::TASK_EVENT_ENTRY_ID_MISMATCH, $this->entryId, $connectedEvent->getId());
+			}
+		}
+	}
+
+	private function validateCatalogLimitations()
+	{
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->catalogItemId);
+		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
+		$featureType = $vendorCatalogItem->getServiceFeature();
+
+		if (key_exists($featureType, $featureToDataMap))
+		{
+			$this->validatePropertyNotNull('taskJobData');
+			if (!$this->taskJobData instanceof $featureToDataMap[$featureType])
+			{
+				throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), get_class($this->taskJobData));
+			}
+		}
+
+		if (isset($this->taskJobData))
+		{
+			$this->taskJobData->validateCatalogLimitations($vendorCatalogItem);
 		}
 	}
 	
@@ -360,5 +393,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	{
 		$json = json_decode($string);
 		return (is_object($json) && json_last_error() == JSON_ERROR_NONE) ? true : false;
+	}
+
+	public function isScheduled()
+	{
+		return $this->taskJobData instanceof KalturaScheduledVendorTaskData;
 	}
 }

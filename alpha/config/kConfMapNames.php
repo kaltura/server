@@ -16,4 +16,6 @@ class kConfMapNames
 	const DYNAMIC_EMAIL_CONTENTS = 'dynamic_email_contents';
 	const REDIS = 'redis';
 	const LIVE_SETTINGS = 'live';
+	const AVRO_SCHEMA_REGISTRY = 'schema_registry';
+	const KAFKA = 'kafka';
 }

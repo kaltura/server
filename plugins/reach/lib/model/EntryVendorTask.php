@@ -262,6 +262,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID);
 	}
 
+	public function isScheduled()
+	{
+		return $this->getTaskJobData() instanceof kScheduledVendorTaskData;
+	}
+
 	protected static function calculateSecondsToNextBusinessDay($currentDateTime, $currentDay, $currentTime)
 	{
 
@@ -444,6 +449,43 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	{
 		parent::postSave($con);
 		$this->indexToSearchIndex();
+	}
+
+	public function addSchedulingData()
+	{
+		switch ($this->getServiceFeature())
+		{
+			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				/* @var $taskData kScheduledVendorTaskData */
+				$taskData = $this->getTaskJobData();
+				/* @var $connectedEvent LiveStreamScheduleEvent */
+				$connectedEvent = $taskData->getScheduleEvent();
+
+				$feature = new LiveCaptionFeature();
+				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
+				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
+				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
+
+				$connectedEvent->addFeature($feature, true);
+				$connectedEvent->save();
+				break;
+		}
+	}
+
+	public function removeSchedulingData()
+	{
+		switch ($this->getServiceFeature())
+		{
+			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				/* @var $taskData kScheduledVendorTaskData */
+				$taskData = $this->getTaskJobData();
+				/* @var $connectedEvent LiveStreamScheduleEvent */
+				$connectedEvent = $taskData->getScheduleEvent();
+
+				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}"));
+				$connectedEvent->save();
+				break;
+		}
 	}
 
 	public function save(PropelPDO $con = null)

@@ -158,12 +158,15 @@ class myFileConverter
 			}
 		}
 
-		$conversion_info = new kConversionInfo();
-		$conversion_info->fillFromMetadata( $source_file );
-		$conversion_info->video_width = $width;
-		$conversion_info->video_height = $height;
-		// encapsulate
-		return array ( 'return_value' => $return_value , 'output' => $output , 'conversion_info' => $conversion_info );
+		//ToDo - No one uses the return value of $conversion_info so I dont see a reason to run as it comes with an overhead
+		//For now commenting the below code Will remove in later release
+		return;
+//		$conversion_info = new kConversionInfo();
+//		$conversion_info->fillFromMetadata( $source_file );
+//		$conversion_info->video_width = $width;
+//		$conversion_info->video_height = $height;
+//		// encapsulate
+//		return array ( 'return_value' => $return_value , 'output' => $output , 'conversion_info' => $conversion_info );
 	}
 
 	// Use ffmpeg to extract the video dimensions
@@ -274,20 +277,20 @@ class myFileConverter
 	{
 		if (!kFile::checkFileExists($source_file))
 		{
-			KalturaLog::log ( self::class . " File not found [$source_file]" );
+			KalturaLog::log ( __CLASS__ . " File not found [$source_file]" );
 			return;
 		}
 
 		if (kFile::isDir($source_file))
 		{
-			KalturaLog::log ( self::class . " Cannot create image from directory [$source_file]" );
+			KalturaLog::log ( __CLASS__ . " Cannot create image from directory [$source_file]" );
 			return;
 		}
 
 		list($sourcewidth, $sourceheight, $type, $attr, $srcIm) = self::createImageByFile($source_file);
 		if (!$srcIm || !$sourcewidth || !$sourceheight)
 		{
-			KalturaLog::log ( self::class . " bad image / dimensions [$source_file]" );
+			KalturaLog::log ( __CLASS__ . " bad image / dimensions [$source_file]" );
 			return;
 		}
 

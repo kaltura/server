@@ -53,7 +53,7 @@ class myObjectCache
 
 		$key = $parnet_clazz . "_" . $id . "_arr_$field_name";
 		
-		KalturaLog::info (  self::class . ":putArray: $key" );
+		KalturaLog::info (  __CLASS__ . ":putArray: $key" );
 //		echo "putArray:" . $key . "(" . count ( $arr ) . ")\n" ;
 		
 		self::$s_memory_cache->put ( $key , $id_list , $this->m_expiry_in_seconds );

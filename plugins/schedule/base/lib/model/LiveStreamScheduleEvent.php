@@ -100,9 +100,11 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 
 	/**
 	 * @param array<LiveFeature> $v
+	 * @throws KalturaAPIException
 	 */
 	public function setLiveFeatures($v)
 	{
+		LiveStreamScheduleEvent::validateFeatureList($v);
 		$serializedFeatures = serialize($v);
 		$this->putInCustomData(self::FEATURES_ARRAY, $serializedFeatures);
 	}
@@ -113,7 +115,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	public function getLiveFeatures()
 	{
 		$serializedFeatures = $this->getFromCustomData(self::FEATURES_ARRAY);
-		return unserialize($serializedFeatures);
+		return unserialize($serializedFeatures) ? unserialize($serializedFeatures) : array();
 	}
 	
 	public function shiftEvent ($parentEndDate)
@@ -283,5 +285,62 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 			$transitionTimes[] = $startScreenTime + $this->getDuration() + $this->getPostEndTime(); // end of postEnd
 		}
 		return $transitionTimes;
+	}
+
+	/**
+	 * Adds feature to event
+	 *
+	 * @param LiveFeature $feature
+	 * @throws PropelException
+	 */
+	public function addFeature($feature, $overwrite = false)
+	{
+		if ($overwrite)
+		{
+			$this->removeFeature($feature->getSystemName());
+		}
+
+		$featureList = $this->getLiveFeatures();
+		array_push($featureList, $feature);
+		$this->setLiveFeatures($featureList);
+	}
+
+	/**
+	 * Removes feature from event with a given name
+	 *
+	 * Name of feature to remove
+	 * @param string $featureName
+	 *
+	 * @throws PropelException
+	 */
+	public function removeFeature($featureName)
+	{
+		$featureList = $this->getLiveFeatures();
+		foreach ($featureList as $index => $feature)
+		{
+			if ($feature->getSystemName() == $featureName)
+			{
+				unset($featureList[$index]);
+			}
+		}
+		$this->setLiveFeatures($featureList);
+	}
+
+	/**
+	 * @param Array<LiveFeature> $featureList
+	 * @throws KalturaAPIException
+	 */
+	public static function validateFeatureList($featureList)
+	{
+		$features = [];
+		foreach ($featureList as $feature)
+		{
+			$name = !empty($feature->getSystemName()) ? $feature->getSystemName() : get_class($feature);
+			if (in_array($name, $features))
+			{
+				throw new KalturaAPIException(KalturaErrors::DUPLICATE_LIVE_FEATURE, $name);
+			}
+			$features[] = $name;
+		}
 	}
 }

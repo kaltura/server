@@ -60,6 +60,10 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			case 'kIntelligentTaggingVendorTaskData':
 				$taskData = new KalturaIntelligentTaggingVendorTaskData();
 				break;
+
+			case 'kScheduledVendorTaskData':
+				$taskData = new KalturaScheduledVendorTaskData();
+				break;
 		}
 		
 		if ($taskData)
@@ -67,5 +71,10 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			$taskData->fromObject($sourceObject, $responseProfile);
 		
 		return $taskData;
+	}
+
+	public function validateCatalogLimitations($vendorCatalogItem)
+	{
+
 	}
 }
