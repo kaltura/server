@@ -337,7 +337,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$connectedEvent = ScheduleEventPeer::retrieveByPK($this->taskJobData->scheduledEventId);
 
-			if ($this->entryId !== $connectedEvent->getTemplateEntryId())
+			if ($connectedEvent && $this->entryId !== $connectedEvent->getTemplateEntryId())
 			{
 				throw new KalturaAPIException(KalturaReachErrors::TASK_EVENT_ENTRY_ID_MISMATCH, $this->entryId, $connectedEvent->getId());
 			}
