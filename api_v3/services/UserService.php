@@ -402,7 +402,7 @@ class UserService extends KalturaBaseUserService
 		
 		try
 		{
-			$updateLoginData = parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
+			parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
 		}
 		catch(KalturaAPIException $e)
 		{
@@ -417,7 +417,16 @@ class UserService extends KalturaBaseUserService
 			}
 			throw $e;
 		}
-		return $updateLoginData;
+
+		$user = KuserPeer::getKuserByEmail($loginDataId, kCurrentContext::$partner_id);
+		$apiUser = new KalturaUser();
+		$apiUser->fromObject($user, $this->getResponseProfile());
+		if(!$user->getIsAdmin())
+		{
+			$apiUser->encryptedSeed = $this->getEncryptSeedBase64($user->getPartner()->getAdminSecret(), $user->getLoginData()->getSeedFor2FactorAuth());
+		}
+
+		return $apiUser;
 	}
 	
 	/**
