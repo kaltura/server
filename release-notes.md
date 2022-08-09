@@ -1,3 +1,12 @@
+# Rigel-18.12.0
+
+## Add systemPartner getConfiguration permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: SSRV-710
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_08_09_self_serve_add_permission_systempartner_getconfiguration.php
+
 # Rigel-18.11.0
 
 ## Add partner for BI ##
