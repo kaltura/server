@@ -419,14 +419,7 @@ class UserService extends KalturaBaseUserService
 		}
 
 		$user = KuserPeer::getKuserByEmail($loginDataId, kCurrentContext::$partner_id);
-		$apiUser = new KalturaUser();
-		$apiUser->fromObject($user, $this->getResponseProfile());
-		if(!$user->getIsAdmin())
-		{
-			$apiUser->encryptedSeed = $this->getEncryptSeedBase64($user->getPartner()->getAdminSecret(), $user->getLoginData()->getSeedFor2FactorAuth());
-		}
-
-		return $apiUser;
+		return $this->getResponseUserWithEncryptedSeed($user);
 	}
 	
 	/**
@@ -583,6 +576,11 @@ class UserService extends KalturaBaseUserService
 			throw $e;
 		}
 		
+		return $this->getResponseUserWithEncryptedSeed($user);
+	}
+
+	protected function getResponseUserWithEncryptedSeed($user)
+	{
 		$apiUser = new KalturaUser();
 		$apiUser->fromObject($user, $this->getResponseProfile());
 		if(!$user->getIsAdmin())
