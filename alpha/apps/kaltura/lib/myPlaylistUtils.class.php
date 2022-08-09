@@ -1336,10 +1336,6 @@ HTML;
     	                }
     	                
     	                $replaceValue = $replaceValue->$getter();
-    	                if (is_string($replaceValue))
-    	                {
-    	                	$replaceValue = htmlspecialchars($replaceValue);
-    	                }
     	            }
     	            
     	            if(!$replaceValue)
@@ -1352,6 +1348,7 @@ HTML;
     	            
     	            if (is_numeric($replaceValue) || is_string($replaceValue))
     	            {
+                        $replaceValue = htmlspecialchars($replaceValue);
                         $propertyAsDom = dom_import_simplexml($property);
                         $propertyAsDom->nodeValue = $replaceValue;
     	            }
