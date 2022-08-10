@@ -369,7 +369,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		{
 			$this->incModerationCount();
 		}
-		elseif($v == $this->getModerationStatus())
+		if($v == $this->getModerationStatus())
 		{
 			return $this;
 		}
