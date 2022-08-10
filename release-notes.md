@@ -1,3 +1,14 @@
+# Rigel-18.12.0
+
+## Support userEntry object to define permission level of user in specific entry context ##
+- Issue Type: Feature
+- Issue ID: 
+
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- EntryPermissionLevel
+
 # Rigel-18.11.0
 
 ## Add partner for BI ##
