@@ -69,18 +69,27 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	public function toInsertableObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
-		$isAnonymous = false;
-		$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('', 0));
-		foreach ($anonKusers as $anonKuser)
+		$isAnonymous = kCurrentContext::$ks_object ? kCurrentContext::$ks_object->isAnonymousSession() : false;
+		if(kCurrentContext::$is_admin_session && $object_to_fill->getKuserId())
 		{
-			if ($anonKuser->getKuserId() == $object_to_fill->getKuserId())
+			$isAnonymous = false;
+			$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('', 0));
+			foreach ($anonKusers as $anonKuser)
 			{
-				$isAnonymous = true;
+				if ($anonKuser->getKuserId() == $object_to_fill->getKuserId())
+				{
+					$isAnonymous = true;
+				}
 			}
 		}
 		if (!$isAnonymous)
 		{
-			$userEntry = UserEntryPeer::retriveUserEntriesSubmitted( $object_to_fill->getKuserId(), $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
+			$kuserId = $object_to_fill->getKuserId();
+			if(kCurrentContext::$ks_object && !kCurrentContext::$is_admin_session)
+			{
+				$kuserId = kCurrentContext::$ks_object->getKuserId();
+			}
+			$userEntry = UserEntryPeer::retriveUserEntriesSubmitted($kuserId, $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 
 			if (count($userEntry) == 0 )
 			{
