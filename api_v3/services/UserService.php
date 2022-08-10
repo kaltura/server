@@ -399,7 +399,11 @@ class UserService extends KalturaBaseUserService
 	public function loginDataResetPasswordAction($loginDataId, $newPassword)
 	{
 		self::validateLoginDataParams(array('id' => $loginDataId));
-		
+		$user = KuserPeer::getKuserByEmail($loginDataId, kCurrentContext::$partner_id);
+		if(!$user)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+		}
 		try
 		{
 			parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
@@ -418,7 +422,6 @@ class UserService extends KalturaBaseUserService
 			throw $e;
 		}
 
-		$user = KuserPeer::getKuserByEmail($loginDataId, kCurrentContext::$partner_id);
 		return $this->getResponseUserWithEncryptedSeed($user);
 	}
 	
