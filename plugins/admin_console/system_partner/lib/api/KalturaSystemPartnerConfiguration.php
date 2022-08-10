@@ -685,8 +685,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
                 throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
             }
         }
-
-		$this->validateAllowedFromEmailWhiteList();
+		
+		if ($sourceObject->getAllowedFromEmailWhiteList() != $this->allowedFromEmailWhiteList)
+		{
+			$this->validateAllowedFromEmailWhiteList();
+		}
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}
 	protected function validateAllowedFromEmailWhiteList()
