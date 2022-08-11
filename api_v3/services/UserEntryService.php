@@ -23,12 +23,7 @@ class UserEntryService extends KalturaBaseService {
 	public function addAction(KalturaUserEntry $userEntry)
 	{
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		$lockUser = kCurrentContext::getCurrentKsKuserId();
-		if(kCurrentContext::$is_admin_session && $dbUserEntry->getKuserId())
-		{
-			$lockUser = $dbUserEntry->getKuserId();
-		}
-		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
+		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $dbUserEntry->getKuserId();
 		$dbUserEntry = kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($dbUserEntry));
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
@@ -37,10 +32,6 @@ class UserEntryService extends KalturaBaseService {
 	
 	public function addUserEntryImpl($dbUserEntry)
 	{
-		if(!kCurrentContext::$is_admin_session)
-		{
-			$dbUserEntry->setKuserId(kCurrentContext::getCurrentKsKuserId());
-		}
 		if($dbUserEntry->checkAlreadyExists())
 		{
 			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_ALREADY_EXISTS);

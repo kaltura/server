@@ -70,8 +70,10 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	{
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
 		$isAnonymous = kCurrentContext::$ks_object ? kCurrentContext::$ks_object->isAnonymousSession() : false;
+		$kuserId = kCurrentContext::$ks_object ? kCurrentContext::$ks_object->getKuserId() : false;
 		if(kCurrentContext::$is_admin_session && $object_to_fill->getKuserId())
 		{
+			$kuserId = $object_to_fill->getKuserId();
 			$isAnonymous = false;
 			$anonKusers = kuserPeer::getKuserByPartnerAndUids(kCurrentContext::getCurrentPartnerId(), array('', 0));
 			foreach ($anonKusers as $anonKuser)
@@ -82,13 +84,9 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 				}
 			}
 		}
+		$object_to_fill->setKuserId($kuserId);
 		if (!$isAnonymous)
 		{
-			$kuserId = $object_to_fill->getKuserId();
-			if(kCurrentContext::$ks_object && !kCurrentContext::$is_admin_session)
-			{
-				$kuserId = kCurrentContext::$ks_object->getKuserId();
-			}
 			$userEntry = UserEntryPeer::retriveUserEntriesSubmitted($kuserId, $this->entryId, QuizPlugin::getCoreValue('UserEntryType', QuizUserEntryType::QUIZ));
 
 			if (count($userEntry) == 0 )
