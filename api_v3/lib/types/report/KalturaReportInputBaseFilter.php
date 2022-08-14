@@ -55,18 +55,21 @@ class KalturaReportInputBaseFilter extends KalturaObject
 		if (!$reportInputFilter)
 			$reportInputFilter = new reportsInputFilter();
 
-		$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
-		if ($partner)
+		if (kCurrentContext::getCurrentPartnerId() != Partner::BI_PARTNER_ID)
 		{
-			$partnerCreatedAt = $partner->getCreatedAt(null);
-			$partnerCreatedAt -= 86400 * 30;
-			if ($this->fromDay)
+			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+			if ($partner)
 			{
-				$this->fromDay = max($this->fromDay, date("Ymd", $partnerCreatedAt));
-			}
-			else if ($this->fromDate)
-			{
-				$this->fromDate = max($this->fromDate, $partnerCreatedAt);
+				$partnerCreatedAt = $partner->getCreatedAt(null);
+				$partnerCreatedAt -= 86400 * 30;
+				if ($this->fromDay)
+				{
+					$this->fromDay = max($this->fromDay, date("Ymd", $partnerCreatedAt));
+				}
+				else if ($this->fromDate)
+				{
+					$this->fromDate = max($this->fromDate, $partnerCreatedAt);
+				}
 			}
 		}
 

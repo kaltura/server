@@ -77,12 +77,15 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_ROLE = 'role';
 	const DIMENSION_ORIGIN = 'origin';
 	const DIMENSION_UI_CONF_ID = 'uiConfId';
+	const DIMENSION_CATALOG_ITEM_ID = 'catalogItemId';
+	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
 
 	// metrics
 	const METRIC_COUNT = 'count';
 	const METRIC_BUFFER_TIME_SUM = 'bufferTimeSum';
 	const METRIC_BITRATE_SUM = 'bitrateSum';
 	const METRIC_EVENT_DOUBLE_SUM1 = 'eventDoubleSum1';
+	const METRIC_USER_CPU = 'userCpu';
 
 	// playback types
 	const PLAYBACK_TYPE_VOD = 'vod';

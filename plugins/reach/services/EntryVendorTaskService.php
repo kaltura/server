@@ -191,6 +191,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
+		if ($entryVendorTask->status == EntryVendorTaskStatus::ABORTED)
+		{
+			self::isAbortAllowed($id, $dbEntryVendorTask);
+		}
+		
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		self::tryToSave($dbEntryVendorTask);
 		
@@ -346,9 +351,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
 		
-		/* @var EntryVendorTask $dbEntryVendorTask */
-		if(!in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED)))
-			throw new KalturaAPIException(KalturaReachErrors::CANNOT_ABORT_NOT_MODERATED_TASK, $id);
+		self::isAbortAllowed($id, $dbEntryVendorTask);
 		
 		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $dbEntryVendorTask->getUserId())
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED, $id, kCurrentContext::$ks_uid);
@@ -555,6 +558,14 @@ class EntryVendorTaskService extends KalturaBaseService
 		catch (kCoreException $e)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED, $e->getMessage());
+		}
+	}
+	
+	public static function isAbortAllowed($id, $dbEntryVendorTask)
+	{
+		if (!in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED)))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CANNOT_ABORT_NOT_MODERATED_TASK, $id);
 		}
 	}
 }
