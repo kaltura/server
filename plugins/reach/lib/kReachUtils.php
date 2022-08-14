@@ -385,4 +385,19 @@ class kReachUtils
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
 	}
+
+	public static function createEventForTask($task) {
+		$jobData = $task->taskJobData;
+
+		$event = new KalturaLiveStreamScheduleEvent();
+		$event->summary = "Auto generated event";
+		$event->startDate = $jobData->startDate;
+		$event->endDate = $jobData->endDate;
+		$event->recurrenceType = ScheduleEventRecurrenceType::NONE;
+		$event->templateEntryId = $task->entryId;
+
+		$dbEvent = $event->toInsertableObject();
+		$dbEvent->save();
+		return $dbEvent;
+	}
 }
