@@ -1,5 +1,17 @@
 # Rigel-18.12.0
 
+## Support userEntry object to define permission level of user in specific entry context ##
+- Issue Type: Feature
+- Issue ID: 
+
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- EntryPermissionLevel
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 ## Add systemPartner getConfiguration permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: SSRV-710
