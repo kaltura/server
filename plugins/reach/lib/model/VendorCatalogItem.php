@@ -108,8 +108,8 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	
 	public function calculatePriceForEntry(entry $entry, $taskDuration = null)
 	{
-		$duration = $taskDuration ? $taskDuration : $entry->getLengthInMsecs();
-		return call_user_func($this->getPricing()->getPriceFunction(), $duration, $this->getPricing()->getPricePerUnit());
+		$durationMsec = $taskDuration ? $taskDuration : $entry->getLengthInMsecs();
+		return call_user_func($this->getPricing()->getPriceFunction(), $durationMsec, $this->getPricing()->getPricePerUnit());
 	}
 	
 	public function getTaskVersion($entryId, $jobData = null)

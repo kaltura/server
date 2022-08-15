@@ -58,14 +58,14 @@ class kReachUtils
 		return $limitedKs;
 	}
 	
-	public static function calcPricePerSecond($duration, $pricePerUnit)
+	public static function calcPricePerSecond($durationMsec, $pricePerUnit)
 	{
-		return ceil($duration/1000) * $pricePerUnit;
+		return ceil($durationMsec/1000) * $pricePerUnit;
 	}
 
-	public static function calcPricePerMinute($duration, $pricePerUnit)
+	public static function calcPricePerMinute($durationMsec, $pricePerUnit)
 	{
-		return ceil($duration/1000/dateUtils::MINUTE) * $pricePerUnit;
+		return ceil($durationMsec/1000/dateUtils::MINUTE) * $pricePerUnit;
 	}
 	
 	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem, $taskDuration = null)
