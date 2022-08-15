@@ -851,4 +851,37 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$c->add(assetPeer::TYPE, assetType::FLAVOR);
 		return assetPeer::doSelect($c);
 	}
+	/**
+	 *
+	 * @param string $entryId
+	 * @param string $tag
+	 * @return array<assets>
+	 */
+	public static function retrieveByEntryIdAndTag($entryId, $tag)
+	{
+		$entryThumbAssets = self::retrieveThumbnailsByEntryId($entryId);
+		return self::filterByTag($entryThumbAssets, $tag);
+	}
+
+
+	/**
+	 * Returns true if this is the only default thumb and there are temp thumbs.
+	 *
+	 * @param string $thumbAssetId
+	 * @param string $entryId
+	 * @return bool
+	 */
+	public static function shouldSetAsDefaultThumb($thumbAssetId,$entryId)
+	{
+		$defaultThumbs = self::retrieveByEntryIdAndTag($entryId, thumbParams::TAG_DEFAULT_THUMB);
+		$tempThumbs = self::retrieveByEntryIdAndTag($entryId, thumbParams::TAG_TEMP_THUMB);
+		if(count($defaultThumbs) != 1)
+			return false;
+		if(count($tempThumbs) > 0){
+			if ($thumbAssetId && $thumbAssetId == $defaultThumbs[0]->getId())
+				return true;
+		}
+		return false;
+
+	}
 }

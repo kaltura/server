@@ -280,9 +280,17 @@ class kBusinessPreConvertDL
 			if($entryThumbAsset->getId() !== $thumbAsset->getId() &&
 			   $entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			   {
-			   	$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			   	return;
-			   }
+				if($entryThumbAsset->hasTag(thumbParams::TAG_TEMP_THUMB))
+			   	{
+			   		$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			   		$entryThumbAsset->save();
+				}
+			   	else
+			   	{
+					$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+					return;
+				}
+			  }	
 		}
 	}
 

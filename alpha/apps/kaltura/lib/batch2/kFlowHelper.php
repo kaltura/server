@@ -1276,7 +1276,8 @@ class kFlowHelper
 		$dbBatchJob->save();
 
 		$entry = $thumbAsset->getentry();
-		if($entry && $entry->getCreateThumb() && $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
+		$shouldSetAsDefault = assetPeer::shouldSetAsDefaultThumb($thumbAsset->getId(), $thumbAsset->getEntryId());
+		if($entry && ($entry->getCreateThumb()||$shouldSetAsDefault) && $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 		{
 			$entry = $dbBatchJob->getEntry(false, false);
 			if(!$entry)
