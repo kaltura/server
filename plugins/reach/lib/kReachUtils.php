@@ -380,7 +380,7 @@ class kReachUtils
 	public static function refundTask(EntryVendorTask $entryVendorTask) {
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 
-		//Rest task price so that reports will be aligned with the total used credit
+		//Reset task price so that reports will be aligned with the total used credit
 		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
@@ -389,8 +389,9 @@ class kReachUtils
 	public static function createEventForTask($task) {
 		$jobData = $task->taskJobData;
 
+		//Creates new object while also running the validators
 		$event = new KalturaLiveStreamScheduleEvent();
-		$event->summary = "Auto generated event";
+		$event->summary = "Auto generated reach event";
 		$event->startDate = $jobData->startDate;
 		$event->endDate = $jobData->endDate;
 		$event->recurrenceType = ScheduleEventRecurrenceType::NONE;
