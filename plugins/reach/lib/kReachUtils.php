@@ -377,7 +377,8 @@ class kReachUtils
 		$filter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
 
-	public static function refundTask(EntryVendorTask $entryVendorTask) {
+	public static function refundTask(EntryVendorTask $entryVendorTask)
+	{
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 
 		//Reset task price so that reports will be aligned with the total used credit
@@ -386,7 +387,8 @@ class kReachUtils
 		$entryVendorTask->save();
 	}
 
-	public static function createEventForTask($task) {
+	public static function createEventForTask($task)
+	{
 		$jobData = $task->taskJobData;
 
 		//Creates new object while also running the validators
