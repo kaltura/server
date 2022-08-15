@@ -482,7 +482,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$pendingEntryReadyTask->setStatus($newStatus);
 			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if($pendingEntryReadyTask->getPrice() == 0)
-				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem()));
+				$taskDuration = $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() ? $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() : null;
+				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem(), $taskDuration));
 			$pendingEntryReadyTask->save();
 		}
 		return true;
@@ -602,7 +603,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			/* @var $pendingEntryVendorTask EntryVendorTask */
 			$oldPrice = $pendingEntryVendorTask->getPrice();
-			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem());
+			$taskDuration = $pendingEntryVendorTask->getTaskJobData()->getEntryDuration() ? $pendingEntryVendorTask->getTaskJobData()->getEntryDuration() : null;
+			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem(), $taskDuration);
 			$priceDiff = $newPrice - $oldPrice;
 			
 			if(!$priceDiff)
@@ -705,7 +707,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL)
+	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $taskDuration = null)
 	{
 		if($entry->getIsTemporary())
 		{
@@ -734,7 +736,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setIsOutputModerated($shouldModerateOutput);
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
-		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
+		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem, $taskDuration));
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());

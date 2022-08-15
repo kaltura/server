@@ -55,25 +55,27 @@ class EntryVendorTaskService extends KalturaBaseService
 		$partnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
 		if (!$partnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT, $entryVendorTask->catalogItemId);
-		
-		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null);
+
+		$dbTaskData = $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null;
+		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $dbTaskData);
+		$taskDuration = $dbTaskData ? $dbTaskData->getEntryDuration() : null;
 		
 		//check if credit has expired
 		if (kReachUtils::hasCreditExpired($dbReachProfile) && $dbVendorCatalogItem->getPricing() && $dbVendorCatalogItem->getPricing()->getPricePerUnit())
 			throw new KalturaAPIException(KalturaReachErrors::CREDIT_EXPIRED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 		
-		if (!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile))
+		if (!kReachUtils::isEnoughCreditLeft($dbEntry, $dbVendorCatalogItem, $dbReachProfile, $taskDuration))
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
 
 		$lockKey = "entryVendorTask_add_" . $entryVendorTask->entryId . '_' . $entryVendorTask->catalogItemId . '_' . kCurrentContext::getCurrentPartnerId() . '_' . $taskVersion;
-		$dbEntryVendorTask = kLock::runLocked($lockKey, array($this, 'addEntryVendorTaskImpl'), array($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem));
+		$dbEntryVendorTask = kLock::runLocked($lockKey, array($this, 'addEntryVendorTaskImpl'), array($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem, $taskDuration));
 
 		// return the saved object
 		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
 		return $entryVendorTask;
 	}
 
-	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem)
+	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem, $taskDuration = null)
 	{
 		$existingTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
 		if ($existingTask)
@@ -100,7 +102,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			}
 		}
 
-		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion);
+		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion, null, EntryVendorTaskCreationMode::MANUAL, $taskDuration);
 		if(!$dbEntryVendorTask)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
