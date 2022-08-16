@@ -106,9 +106,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculatePriceForEntry(entry $entry)
+	public function calculatePriceForEntry(entry $entry, $taskDuration = null)
 	{
-		return call_user_func($this->getPricing()->getPriceFunction(), $entry, $this->getPricing()->getPricePerUnit());
+		$durationMsec = $taskDuration ? $taskDuration : $entry->getLengthInMsecs();
+		return call_user_func($this->getPricing()->getPriceFunction(), $durationMsec, $this->getPricing()->getPricePerUnit());
 	}
 	
 	public function getTaskVersion($entryId, $jobData = null)
