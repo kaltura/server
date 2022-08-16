@@ -83,8 +83,15 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull('scheduledEventId');
-		$this->validateScheduledEvent();
+		if($this->isNull('startDate') || $this->isNull('endDate'))
+		{
+			$this->validatePropertyNotNull('scheduledEventId');
+		}
+
+		if(!$this->isNull('scheduledEventId'))
+		{
+			$this->validateScheduledEvent();
+		}
 
 		return parent::validateForInsert($propertiesToSkip);
 	}
@@ -130,7 +137,7 @@ class KalturaScheduledVendorTaskData extends KalturaVendorTaskData
 		switch (get_class($vendorCatalogItem))
 		{
 			case 'VendorLiveCaptionCatalogItem':
-				if (get_class($connectedEvent) !== 'LiveStreamScheduleEvent')
+				if ($connectedEvent && get_class($connectedEvent) !== 'LiveStreamScheduleEvent')
 				{
 					throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_DOES_NOT_SUPPORT_EVENT_TYPE, get_class($vendorCatalogItem), get_class($connectedEvent));
 				}
