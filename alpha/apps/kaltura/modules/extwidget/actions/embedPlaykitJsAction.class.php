@@ -611,15 +611,15 @@ class embedPlaykitJsAction extends sfAction
 			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null;
 
             // For player latest/beta >= 0.56.0 or canary
-			if (($playerVersion == self::LATEST && version_compare($latestVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
-				($playerVersion == self::BETA && version_compare($betaVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
-				$playerVersion == self::CANARY)
+			if (($ovpPlayerConfig == self::LATEST && version_compare($latestVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
+				($ovpPlayerConfig == self::BETA && version_compare($betaVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
+				$ovpPlayerConfig == self::CANARY)
 			{
-				$this->bundleConfig[self::PLAYKIT_UI_MANAGERS] = $playerVersion;
+				$this->bundleConfig[self::PLAYKIT_UI_MANAGERS] = $ovpPlayerConfig;
                 $this->mergeUIManagersConfig();
 			}
 			// For specific version >= 0.56.0
-			else if (version_compare($playerVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0 &&
+			else if (version_compare($ovpPlayerConfig, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0 &&
 					!is_null($latestVersionMap))
 			{
 				$this->bundleConfig[self::PLAYKIT_UI_MANAGERS] = $latestVersionMap[self::PLAYKIT_UI_MANAGERS];
