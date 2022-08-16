@@ -482,8 +482,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$pendingEntryReadyTask->setStatus($newStatus);
 			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if($pendingEntryReadyTask->getPrice() == 0)
-				$taskDuration =  $pendingEntryReadyTask->getTaskJobData()->getEntryDuration();
+			{
+				$taskDuration = $pendingEntryReadyTask->getTaskJobData() ? $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() : null;
 				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem(), $taskDuration));
+			}
 			$pendingEntryReadyTask->save();
 		}
 		return true;
@@ -603,7 +605,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			/* @var $pendingEntryVendorTask EntryVendorTask */
 			$oldPrice = $pendingEntryVendorTask->getPrice();
-			$taskDuration = $pendingEntryVendorTask->getTaskJobData()->getEntryDuration();
+			$taskDuration = $pendingEntryVendorTask->getTaskJobData() ? $pendingEntryVendorTask->getTaskJobData()->getEntryDuration() : null;
 			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem(), $taskDuration);
 			$priceDiff = $newPrice - $oldPrice;
 			
