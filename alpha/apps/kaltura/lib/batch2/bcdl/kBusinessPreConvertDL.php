@@ -276,13 +276,21 @@ class kBusinessPreConvertDL
 
 		foreach($entryThumbAssets as $entryThumbAsset)
 		{
-			//if we found another asset with a defualt tag. we remove our default tag
+			//if we found another asset with a defualt tag. we remove our default tag. in case that asset with default tag has also temp tag, we remove its default tag.
 			if($entryThumbAsset->getId() !== $thumbAsset->getId() &&
 			   $entryThumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB))
 			   {
-			   	$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
-			   	return;
-			   }
+				if($entryThumbAsset->hasTag(thumbParams::TAG_TEMP_THUMB))
+			   	{
+			   		$entryThumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+			   		$entryThumbAsset->save();
+				}
+			   	else
+			   	{
+					$thumbAsset->removeTags(array(thumbParams::TAG_DEFAULT_THUMB));
+					return;
+				}
+			  }	
 		}
 	}
 
