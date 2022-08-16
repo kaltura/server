@@ -243,7 +243,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
-			throw new kCoreException("Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
+			$msg = "Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]";
+			
+			if (strpos($errDescription, 'syntax error') !== false)
+			{
+				throw new kCoreException($msg, APIErrors::SEARCH_ENGINE_SYNTAX_ERROR);
+			}
+			throw new kCoreException($msg, APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 		}
 		
 		$idsCount = count($ids);
