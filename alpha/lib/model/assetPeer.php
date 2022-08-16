@@ -857,7 +857,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	 * @param string $tag
 	 * @return array<assets>
 	 */
-	public static function retrieveByEntryIdAndTag($entryId, $tag)
+	public static function retrieveThumbAssetsByEntryIdAndTag($entryId, $tag)
 	{
 		$entryThumbAssets = self::retrieveThumbnailsByEntryId($entryId);
 		return self::filterByTag($entryThumbAssets, $tag);
@@ -871,15 +871,20 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	 * @param string $entryId
 	 * @return bool
 	 */
-	public static function shouldSetAsDefaultThumb($thumbAssetId,$entryId)
+	public static function shouldReplaceTemporaryDefaultThumb($thumbAssetId, $entryId)
 	{
-		$defaultThumbs = self::retrieveByEntryIdAndTag($entryId, thumbParams::TAG_DEFAULT_THUMB);
-		$tempThumbs = self::retrieveByEntryIdAndTag($entryId, thumbParams::TAG_TEMP_THUMB);
+		$defaultThumbs = self::retrieveThumbAssetsByEntryIdAndTag($entryId, thumbParams::TAG_DEFAULT_THUMB);
+		$tempThumbs = self::retrieveThumbAssetsByEntryIdAndTag($entryId, thumbParams::TAG_TEMP_THUMB);
 		if(count($defaultThumbs) != 1)
+		{
 			return false;
-		if(count($tempThumbs) > 0){
+		}
+		if(count($tempThumbs) > 0)
+		{
 			if ($thumbAssetId && $thumbAssetId == $defaultThumbs[0]->getId())
+			{
 				return true;
+			}
 		}
 		return false;
 
