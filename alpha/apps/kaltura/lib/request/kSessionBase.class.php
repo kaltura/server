@@ -84,6 +84,8 @@ class kSessionBase
 	const RANDOM_SIZE = 16;
 	const AES_IV = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";	// no need for an IV since we add a random string to the message anyway
 	
+	const FIVE_MINUTES_IN_SECONDS = 300;
+	
 	const FIELD_EXPIRY =              '_e';
 	const FIELD_TYPE =                '_t';
 	const FIELD_USER =                '_u';
@@ -469,7 +471,7 @@ class kSessionBase
 		
 		if(strpos($privileges, kSessionBase::PRIVILEGE_DOWNLOAD_ASSET) !== false)
 		{
-			$expiry = ceil($expiry/(dateUtils::MINUTE*5)) * (dateUtils::MINUTE*5);
+			$expiry = ceil($expiry/self::FIVE_MINUTES_IN_SECONDS) * self::FIVE_MINUTES_IN_SECONDS;
 			$rand = $expiry;
 		}
 		
