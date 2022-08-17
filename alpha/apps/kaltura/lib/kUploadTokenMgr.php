@@ -191,7 +191,17 @@ class kUploadTokenMgr
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
 				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
 			}
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
+			
+			if ($resume)
+			{
+				$lockKey = 'uploadToken_closure_' . $this->_uploadToken->getId();
+				kLock::runLocked($lockKey, array($this, 'uploadedLockImpl'), array($fileSize), 2, 30);
+				return;
+			}
+			else
+			{
+				$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
+			}
 		}
 		else
 		{
@@ -201,9 +211,23 @@ class kUploadTokenMgr
 		
 		$this->_uploadToken->setUploadedFileSize($fileSize);
 		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
-		
 		$this->_uploadToken->save();
 	}
+	
+	public function uploadedLockImpl($fileSize)
+	{
+		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->_uploadToken->getId());
+		if ($dbUploadToken->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD)
+		{
+			throw new KalturaAPIException(kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
+		}
+		
+		$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
+		$this->_uploadToken->setUploadedFileSize($fileSize);
+		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
+		$this->_uploadToken->save();
+	}
+	
 	
 	protected function getAttachedEntry()
 	{
