@@ -29,7 +29,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
-	const NO_UI_MANAGERS_PLAYER_VERSION='7.50.0';
+	const NO_UI_MANAGERS_PLAYER_VERSION='3.50.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -235,7 +235,7 @@ class embedPlaykitJsAction extends sfAction
 		$uiConf = $this->playerConfig;
 		if (property_exists($uiConf, "plugins") && !property_exists($uiconf->plugins, "uiManagers"))
 		{
-			$uiconf->plugins->uiManagers = new stdClass();
+			$uiConf->plugins->uiManagers = new stdClass();
 		}
 	}
 
@@ -610,7 +610,6 @@ class embedPlaykitJsAction extends sfAction
 			$latestVersion = isset($latestVersionMap[self::KALTURA_OVP_PLAYER]) ? $latestVersionMap[self::KALTURA_OVP_PLAYER] : null;
 			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null;
 
-            // For player latest/beta >= 0.56.0 or canary
 			if (($ovpPlayerConfig == self::LATEST && version_compare($latestVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
 				($ovpPlayerConfig == self::BETA && version_compare($betaVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
 				$ovpPlayerConfig == self::CANARY)
@@ -618,7 +617,6 @@ class embedPlaykitJsAction extends sfAction
 				$this->bundleConfig[self::PLAYKIT_UI_MANAGERS] = $ovpPlayerConfig;
                 $this->mergeUIManagersConfig();
 			}
-			// For specific version >= 0.56.0
 			else if (version_compare($ovpPlayerConfig, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0 &&
 					!is_null($latestVersionMap))
 			{
