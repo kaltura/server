@@ -121,7 +121,7 @@ class UploadTokenService extends KalturaBaseService
 			switch ($ex->getCode())
 			{
 				case kCoreException::LOCK_TIMED_OUT:
-					throw new KalturaAPIException(KalturaErrors::LOCK_TIMED_OUT);
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD);
 				default:
 					throw $ex;
 			}
