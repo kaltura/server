@@ -36,6 +36,10 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 		"-createdAt" => "-created_at",
 		"+updatedAt" => "+updated_at",
 		"-updatedAt" => "-updated_at",
+		"+id" => "+id",
+		"-id" => "-id",
+		"+name" => "+name",
+		"-name" => "-name",
 	);
 
 	public function getMapBetweenObjects()
