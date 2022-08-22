@@ -115,6 +115,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_REACTION_WOW_COUNT = 'reaction_wow_clicked';
 	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
 	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
+	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
+	const METRIC_DURATION_TOTAL_MIN = 'total_minutes';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -519,46 +521,46 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $php_timezone_names = array(
-		-840 => 'Pacific/Kiritimati',
-		-780 => 'Pacific/Enderbury',
-		-765 => 'Pacific/Chatham',
-		-720 => 'Pacific/Auckland',
-		-690 => 'Pacific/Norfolk',
-		-660 => 'Asia/Magadan',
-		-630 => 'Australia/Lord_Howe',
-		-600 => 'Australia/Melbourne',
-		-570 => 'Australia/Adelaide',
-		-540 => 'Asia/Tokyo',
-		-525 => 'Australia/Eucla',
-		-480 => 'Asia/Brunei',
-		-420 => 'Asia/Krasnoyarsk',
-		-390 => 'Asia/Rangoon',
-		-360 => 'Asia/Almaty',
-		-345 => 'Asia/Kathmandu',
-		-330 => 'Asia/Colombo',
-		-300 => 'Asia/Karachi',
-		-270 => 'Asia/Kabul',
-		-240 => 'Asia/Dubai',
-		-210 => 'Asia/Tehran',
-		-180 => 'Europe/Moscow',
-		-120 => 'Europe/Helsinki',
-		-60  => 'Europe/Paris',
-		0    => 'Europe/London',
-		60   => 'Atlantic/Azores',
-		120  => 'America/Noronha',
-		180  => 'America/Sao_Paulo',
-		210  => 'America/St_Johns',
-		240  => 'America/Halifax',
-		270  => 'America/Caracas',
-		300  => 'America/New_York',
-		360  => 'America/Chicago',
-		420  => 'America/Denver',
-		480  => 'America/Los_Angeles',
-		540  => 'America/Anchorage',
-		570  => 'Pacific/Marquesas',
-		600  => 'Pacific/Honolulu',
-		660  => 'Pacific/Niue',
-		720  => 'Pacific/Kwajalein',
+		-840 => '+14', //'Pacific/Kiritimati',
+		-780 => '+13', //'Pacific/Enderbury',
+		-765 => '+12:45', //'Pacific/Chatham',
+		-720 => '+12', //Pacific/Auckland',
+		-690 => '+11:30', //'Pacific/Norfolk',
+		-660 => '+11', //'Asia/Magadan',
+		-630 => '+10:30', //'Australia/Lord_Howe',
+		-600 => '+10', //'Australia/Melbourne',
+		-570 => '+9:30', //'Australia/Adelaide',
+		-540 => '+9', //'Asia/Tokyo',
+		-525 => '+8:45', //'Australia/Eucla',
+		-480 => '+8', //'Asia/Brunei',
+		-420 => '+7', //'Asia/Krasnoyarsk',
+		-390 => '+6:30', //'Asia/Rangoon',
+		-360 => '+6', //Asia/Almaty',
+		-345 => '+5:45', //'Asia/Kathmandu',
+		-330 => '+5:30', //'Asia/Colombo',
+		-300 => '+5', //'Asia/Karachi',
+		-270 => '+4:30', //'Asia/Kabul',
+		-240 => '+4', //'Asia/Dubai',
+		-210 => '+3:30', //'Asia/Tehran',
+		-180 => '+3', //'Europe/Moscow'
+		-120 => '+2', //'Europe/Helsinki'
+		-60  => '+1', //'Europe/Paris',
+		0    => '0', //'Europe/London',
+		60   => '-1',  //'Atlantic/Azores',
+		120  => '-2', //'America/Noronha',
+		180  => '-3', //'America/Sao_Paulo',
+		210  => '-3:30', //'America/St_Johns',
+		240  => '-4', //'America/Halifax',
+		270  => '-4:30', //'America/Caracas',
+		300  => '-5', //'America/New_York',
+		360  => '-6', //'America/Chicago',
+		420  => '-7', //'America/Denver',
+		480  => '-8', //'America/Los_Angeles',
+		540  => '-9', //'America/Anchorage',
+		570  => '-9:30', //'Pacific/Marquesas',
+		600  => '-10', //'Pacific/Honolulu',
+		660  => '-11', //'Pacific/Niue',
+		720  => '-12', //'Pacific/Kwajalein',
 	);
 
 	// Note: while technically the druid list could have been the same as the php list,
@@ -1156,6 +1158,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getCardinalityAggregator(self::METRIC_UNIQUE_DOMAINS, array(self::DIMENSION_DOMAIN)));
 
+		self::$aggregations_def[self::METRIC_TRANSCODING_USER_CPU_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
+			self::getLongSumAggregator(
+				self::METRIC_TRANSCODING_USER_CPU_SEC,self::METRIC_USER_CPU));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1184,6 +1191,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_TOTAL_MSEC, self::METRIC_DURATION_SEC, '1000'));
+
+		self::$metrics_def[self::METRIC_DURATION_TOTAL_MIN] = array(
+			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_DURATION_TOTAL_MIN, self::METRIC_DURATION_SEC, '60'));
 		
 		self::$metrics_def[self::METRIC_BANDWIDTH_SIZE_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_BANDWIDTH_SIZE_BYTES),

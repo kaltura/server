@@ -262,8 +262,20 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$object_to_fill = new EntryVendorTask();
 		}
+
+		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
+
+		$jobData = $this->taskJobData;
+		if ($this->isScheduled() && !$jobData->scheduledEventId)
+		{
+			$event = kReachUtils::createEventForTask($this);
+
+			$taskData = $object_to_fill->getTaskJobData();
+			$taskData->setScheduledEventId($event->getId());
+			$object_to_fill->setTaskJobData($taskData);
+		}
 		
-		return parent::toInsertableObject($object_to_fill, $props_to_skip);
+		return $object_to_fill;
 	}
 	
 	public function validateForInsert($propertiesToSkip = array())
@@ -337,7 +349,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			$connectedEvent = ScheduleEventPeer::retrieveByPK($this->taskJobData->scheduledEventId);
 
-			if ($this->entryId !== $connectedEvent->getTemplateEntryId())
+			if ($connectedEvent && $this->entryId !== $connectedEvent->getTemplateEntryId())
 			{
 				throw new KalturaAPIException(KalturaReachErrors::TASK_EVENT_ENTRY_ID_MISMATCH, $this->entryId, $connectedEvent->getId());
 			}
@@ -347,6 +359,11 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	private function validateCatalogLimitations()
 	{
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->catalogItemId);
+		if (!$vendorCatalogItem)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $this->catalogItemId);
+		}
+
 		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
 		$featureType = $vendorCatalogItem->getServiceFeature();
 

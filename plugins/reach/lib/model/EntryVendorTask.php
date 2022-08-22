@@ -481,6 +481,10 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$taskData = $this->getTaskJobData();
 				/* @var $connectedEvent LiveStreamScheduleEvent */
 				$connectedEvent = $taskData->getScheduleEvent();
+				if (!$connectedEvent)
+				{
+					break;
+				}
 
 				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}"));
 				$connectedEvent->save();

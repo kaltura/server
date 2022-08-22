@@ -58,28 +58,29 @@ class kReachUtils
 		return $limitedKs;
 	}
 	
-	public static function calcPricePerSecond(entry $entry, $pricePerUnit)
+	public static function calcPricePerSecond($durationMsec, $pricePerUnit)
 	{
-		return ceil($entry->getLengthInMsecs()/1000) * $pricePerUnit;
+		return ceil($durationMsec/1000) * $pricePerUnit;
 	}
 
-	public static function calcPricePerMinute(entry $entry, $pricePerUnit)
+	public static function calcPricePerMinute($durationMsec, $pricePerUnit)
 	{
-		return ceil($entry->getLengthInMsecs()/1000/dateUtils::MINUTE) * $pricePerUnit;
+		return ceil($durationMsec/1000/dateUtils::MINUTE) * $pricePerUnit;
 	}
 	
-	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem)
+	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem, $taskDuration = null)
 	{
-		return $vendorCatalogItem->calculatePriceForEntry($entry);
+		return $vendorCatalogItem->calculatePriceForEntry($entry, $taskDuration);
 	}
 	
 	/**
 	 * @param $entry
 	 * @param $catalogItem
 	 * @param $reachProfile
+	 * @param $taskDuration
 	 * @return bool
 	 */
-	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile)
+	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile, $taskDuration = null)
 	{
 		$creditUsed = $reachProfile->getUsedCredit();
 		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
@@ -88,7 +89,7 @@ class kReachUtils
 			return true;
 		}
 
-		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem);
+		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem, $taskDuration);
 		
 		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
@@ -377,12 +378,30 @@ class kReachUtils
 		$filter->expectedFinishTimeLessThanOrEqual = $endTime;
 	}
 
-	public static function refundTask(EntryVendorTask $entryVendorTask) {
+	public static function refundTask(EntryVendorTask $entryVendorTask)
+	{
 		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 
-		//Rest task price so that reports will be aligned with the total used credit
+		//Reset task price so that reports will be aligned with the total used credit
 		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
 		$entryVendorTask->setPrice(0);
 		$entryVendorTask->save();
+	}
+
+	public static function createEventForTask($task)
+	{
+		$jobData = $task->taskJobData;
+
+		//Creates new object while also running the validators
+		$event = new KalturaLiveStreamScheduleEvent();
+		$event->summary = "Auto generated reach event";
+		$event->startDate = $jobData->startDate;
+		$event->endDate = $jobData->endDate;
+		$event->recurrenceType = ScheduleEventRecurrenceType::NONE;
+		$event->templateEntryId = $task->entryId;
+
+		$dbEvent = $event->toInsertableObject();
+		$dbEvent->save();
+		return $dbEvent;
 	}
 }

@@ -23,8 +23,7 @@ class UserEntryService extends KalturaBaseService {
 	public function addAction(KalturaUserEntry $userEntry)
 	{
 		$dbUserEntry = $userEntry->toInsertableObject(null, array('type'));
-		$lockUser = $userEntry->userId ? $userEntry->userId : kCurrentContext::getCurrentKsKuserId();
-		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $lockUser;
+		$lockKey = "userEntry_add_" . $this->getPartnerId() . $userEntry->entryId . $dbUserEntry->getKuserId();
 		$dbUserEntry = kLock::runLocked($lockKey, array($this, 'addUserEntryImpl'), array($dbUserEntry));
 		$userEntry->fromObject($dbUserEntry, $this->getResponseProfile());
 
