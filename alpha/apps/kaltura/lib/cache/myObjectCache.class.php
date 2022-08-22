@@ -107,7 +107,7 @@ class myObjectCache
 		}
 
 		$key = $obj_clazz . "_" . $id . "_arr_$field_name";
-		KalturaLog::info (  self::class . ":removeArray: $key" );
+		KalturaLog::info (  __CLASS__ . ":removeArray: $key" );
 		
 		 
 		self::$s_memory_cache->remove ( $key );
