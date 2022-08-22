@@ -90,15 +90,15 @@ class UploadTokenService extends KalturaBaseService
 		$this->restrictPeerToCurrentUser();
 		$uploadTokenDb = UploadTokenPeer::retrieveByPK($uploadTokenId);
 		$this->validateForUpload($uploadTokenDb);
-
+		
 		$uploadTokenMgr = new kUploadTokenMgr($uploadTokenDb, $finalChunk);
 		try
 		{
 			$uploadTokenMgr->uploadFileToToken($fileData, $resume, $resumeAt);
 		}
-		catch(kUploadTokenException $ex)
+		catch (kUploadTokenException $ex)
 		{
-			switch($ex->getCode())
+			switch ($ex->getCode())
 			{
 				case kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD);
@@ -112,6 +112,16 @@ class UploadTokenService extends KalturaBaseService
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_CANNOT_MATCH_EXPECTED_SIZE);
 				case kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED:
 					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED_FOR_UPLOAD);
+				default:
+					throw $ex;
+			}
+		}
+		catch (kCoreException $ex)
+		{
+			switch ($ex->getCode())
+			{
+				case kCoreException::LOCK_TIMED_OUT:
+					throw new KalturaAPIException(KalturaErrors::UPLOAD_TOKEN_INVALID_STATUS_FOR_UPLOAD);
 				default:
 					throw $ex;
 			}

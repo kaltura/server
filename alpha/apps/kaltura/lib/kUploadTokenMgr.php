@@ -123,9 +123,7 @@ class kUploadTokenMgr
 			$this->initUploadTokenMemcache();
 		}
 		
-		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
-		if (!in_array($this->_uploadToken->getStatus(), $allowedStatuses, true))
-			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
+		$this->checkUploadTokenAllowedStatus($this->_uploadToken);
 		
 		$this->updateFileName($fileData);
 		
@@ -184,6 +182,9 @@ class kUploadTokenMgr
 			$fileSize = kFile::fileSize($this->_uploadToken->getUploadTempPath());
 		}
 		
+		$this->_uploadToken->setUploadedFileSize($fileSize);
+		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
+		
 		if ($this->_finalChunk)
 		{
 			if(myUploadUtils::isFileTypeRestricted($this->_uploadToken->getUploadTempPath(), $fileData['name']) && $fileSize)
@@ -191,7 +192,17 @@ class kUploadTokenMgr
 				kFlowHelper::handleUploadFailed($this->_uploadToken);
 				throw new kUploadTokenException("Restricted upload token file type", kUploadTokenException::UPLOAD_TOKEN_FILE_TYPE_RESTRICTED);
 			}
-			$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
+			
+			if ($resume)
+			{
+				$lockKey = 'uploadToken_closure_' . $this->_uploadToken->getId();
+				kLock::runLocked($lockKey, array($this, 'uploadedLockImpl'), array($fileSize));
+				return;
+			}
+			else
+			{
+				$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
+			}
 		}
 		else
 		{
@@ -199,10 +210,26 @@ class kUploadTokenMgr
 			$this->_uploadToken->setStatus(!is_null($fileSize) ? UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD : UploadToken::UPLOAD_TOKEN_ERROR);
 		}
 		
-		$this->_uploadToken->setUploadedFileSize($fileSize);
-		$this->_uploadToken->setDc(kDataCenterMgr::getCurrentDcId());
-		
 		$this->_uploadToken->save();
+	}
+	
+	public function uploadedLockImpl($fileSize)
+	
+	{
+		$dbUploadToken = UploadTokenPeer::retrieveByPK($this->_uploadToken->getId());
+		$this->checkUploadTokenAllowedStatus($dbUploadToken);
+		
+		$this->_uploadToken->setStatus(UploadToken::UPLOAD_TOKEN_FULL_UPLOAD);
+		$this->_uploadToken->save();
+	}
+	
+	protected function checkUploadTokenAllowedStatus($uploadToken)
+	{
+		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
+		if (!in_array($uploadToken->getStatus(), $allowedStatuses, true))
+		{
+			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
+		}
 	}
 	
 	protected function getAttachedEntry()
