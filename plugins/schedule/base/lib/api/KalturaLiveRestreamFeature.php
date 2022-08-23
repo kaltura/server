@@ -1,0 +1,46 @@
+<?php
+/**
+ * @package plugins.schedule
+ * @subpackage api.objects
+ */
+class KalturaLiveRestreamFeature extends KalturaLiveFeature
+{
+	/**
+	 * @var string
+	 */
+	protected $primaryUrl;
+
+	/**
+	 * @var string
+	 */
+	protected $secondaryUrl;
+
+	/**
+	 * @var string
+	 */
+	protected $streamKey;
+
+	private static $map_between_objects = array(
+		'primaryUrl',
+		'secondaryUrl',
+		'streamKey'
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	public function toObject($sourceObject = null, $propertiesToSkip = array())
+	{
+		if(is_null($sourceObject))
+		{
+			$sourceObject = new LiveRestreamFeature();
+		}
+
+		return parent::toObject($sourceObject, $propertiesToSkip);
+	}
+}
