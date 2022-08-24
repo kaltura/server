@@ -14,16 +14,4 @@ if (!file_exists($newTemplateUpdate) || !file_exists($script))
 	return;
 }
 
-passthru("php $script $newTemplateUpdate", $returnVar);
-
-if ($returnVar > 0)
-{
-	$newTemplateUpdate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/2022_03_28_addCoPublishersChangedEmailNewCoPublishersEmailNotification.xml");
-
-	if (!file_exists($newTemplateUpdate))
-	{
-		KalturaLog::err("Missing update script file");
-		return;
-	}
-	passthru("php $script $newTemplateUpdate");
-}
+passthru("php $script $newTemplateUpdate");
