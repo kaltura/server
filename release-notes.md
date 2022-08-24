@@ -1,4 +1,4 @@
-# Rigel 18.12.0
+# Rigel 18.13.0
 ## Changes to Co-editors or Co-publishers changed email event notification templates ##
 * Issue Type: Task
 * Issue ID: SUP-28334
