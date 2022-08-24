@@ -1,3 +1,36 @@
+# Rigel 18.13.0
+## Changes to Co-editors or Co-publishers changed email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts". 
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+
+Add scripts:
+
+    Co editor:
+    - deployment/updates/scripts/xml/2022_03_28_addCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+    - deployment/updates/scripts/2022_03_28_deploy_add_email_event_notification_Co_Editor_Changed.php
+
+    Co publisher:
+    - deployment/updates/scripts/xml/2022_03_28_addCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+    - deployment/updates/scripts/2022_03_28_deploy_add_email_event_notification_Co_Publisher_Changed.php
+
+Update scripts:
+
+    Co editor:
+    - deployment/updates/scripts/xml/2022_03_28_updateCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+    - deployment/updates/scripts/2022_03_28_deploy_update_email_event_notification_Co_Editor_Changed.php
+
+    Co publisher:
+    - deployment/updates/scripts/xml/2022_03_28_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+    - deployment/updates/scripts/2022_03_28_deploy_update_email_event_notification_Co_Publisher_Changed.php
+
+
 # Rigel-18.2.0
 ## Add permissions to userScore Service ##
 * Issue Type: Task
