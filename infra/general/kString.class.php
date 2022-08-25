@@ -531,15 +531,12 @@ class kString
 	
 	public static function validateEscape($str)
 	{
-		preg_match_all('#\\\+$#', $str, $matches);
+		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
 		$valid = true;
 		
-		foreach ($matches[0] as $match)
+		if ($trailingEscapesCount % 2 == 1)
 		{
-			if (strlen($match) % 2 == 1)
-			{
-				$valid = false;
-			}
+			$valid = false;
 		}
 		
 		return $valid;
