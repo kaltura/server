@@ -24,7 +24,8 @@ class multiLingualUtils
 	
 	protected static function removeDefaultLanguageFromMapping(&$multiLangMapping, $object)
 	{
-		$entryDefaultLanguage = kCurrentContext::getLanguage() ? kCurrentContext::getLanguage() : array_keys($multiLangMapping)[0];
+		$contextLanguage = kCurrentContext::getLanguage();
+		$entryDefaultLanguage = ($contextLanguage && $contextLanguage !== self::MULTI) ? kCurrentContext::getLanguage() : array_keys($multiLangMapping)[0];
 		$object->setObjectDefaultLanguage($entryDefaultLanguage);
 		$result = $multiLangMapping[$entryDefaultLanguage];
 		unset($multiLangMapping[$entryDefaultLanguage]);
