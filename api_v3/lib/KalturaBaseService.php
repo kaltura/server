@@ -59,6 +59,9 @@ abstract class KalturaBaseService
 	{
 	}
 	
+	public function adjustArguments(&$arguments = null)
+	{
+	}
 	
 	/**
 	 * Should return true or false for allowing/disallowing kaltura network filter for the given action.

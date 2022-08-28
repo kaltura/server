@@ -243,7 +243,7 @@ class KalturaActionReflector extends KalturaReflector
 	/**
 	 * Transparently call the initService() of the real service class.
 	 */
-	public function initService(KalturaDetachedResponseProfile $responseProfile = null)
+	public function initService(KalturaDetachedResponseProfile $responseProfile = null, &$arguments = null, $actionParams = null)
 	{
 		$instance = $this->getServiceInstance();
 		
@@ -252,7 +252,9 @@ class KalturaActionReflector extends KalturaReflector
 			$instance->setResponseProfile($responseProfile);
 		}
 		
+		$instance->adjustArguments($arguments, $actionParams);
 		$instance->initService($this->_actionServiceId, $this->getActionClassInfo()->serviceName, $this->getActionInfo()->action);
+		
 	}
 	/**
 	 * @return string

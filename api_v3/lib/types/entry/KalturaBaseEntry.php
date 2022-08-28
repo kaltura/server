@@ -416,6 +416,14 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @readonly
 	 */
 	public $multiLanguageMapping;
+	
+	/**
+	 * Keeps the language 2 char code for the default fields
+	 *
+	 * @var string
+	 * @readonly
+	 */
+	public $entryDefaultLanguage;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -469,6 +477,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"applicationVersion",
 		"blockAutoTranscript",
 	    "multiLanguageMapping",
+	    "entryDefaultLanguage",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -541,24 +550,53 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
 		$requestLanguage = kCurrentContext::getLanguage();
-		if($requestLanguage)
+		
+		$this->injectCorrectLanguageValues($sourceObject, $requestLanguage);
+	}
+	
+	protected function injectCorrectLanguageValues($sourceObject, $requestLanguage = null)
+	{
+		$multiLanguageMap = json_decode($sourceObject->getMultiLanguageMapping(), true);
+		if ($requestLanguage == multiLingualUtils::MULTI)
 		{
-			$this->injectCorrectLanguageValues($sourceObject, $requestLanguage);
+			
+			$this->setMultiLanguageStringInField($sourceObject, $multiLanguageMap);
+		}
+		else
+		{
+			$this->setRequestedLanguageStringInField($multiLanguageMap, $sourceObject, $requestLanguage);
 		}
 	}
 	
-	protected function injectCorrectLanguageValues($sourceObject, $requestLanguage)
+	protected function setMultiLanguageStringInField($sourceObject, $multiLanguageMap)
 	{
-		$multiLangMapping = json_decode($sourceObject->getMultiLanguageMapping(), true);
-		$name = $sourceObject->extractLanguageValue($multiLangMapping, self::NAME, $requestLanguage);
-		$description = $sourceObject->extractLanguageValue($multiLangMapping, self::DESCRIPTION, $requestLanguage);
-		$tags = $sourceObject->extractLanguageValue($multiLangMapping, self::TAGS, $requestLanguage);
-		$tags = ktagword::updateTags($this->tags, $tags , false );
-		if($multiLangMapping)
+		$defaultLanguage = $sourceObject->getObjectDefaultLanguage();
+		$supportedFields = $sourceObject->getMultiLingualSupportedFields();
+		foreach ($supportedFields as $fieldName)
 		{
-			$this->name = $name ? $name : $this->name;
-			$this->description = $description ? $description : $this->description;
-			$this->tags = $tags ? $tags : $this->tags;
+			if ($this->$fieldName)
+			{
+				$multiLanguageMap[$fieldName][$defaultLanguage] = $sourceObject->getDefaultFieldValue($fieldName);
+			}
+			$this->$fieldName = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[$fieldName]);
+		}
+	}
+	
+	protected function setRequestedLanguageStringInField($multiLangMapping, $sourceObject, $requestLanguage = null)
+	{
+		$language = $requestLanguage ? $requestLanguage : $this->entryDefaultLanguage;
+		$supportedFields = $sourceObject->getMultiLingualSupportedFields();
+		$supportedFieldsInRequestedLang = array();
+		foreach ($supportedFields as $fieldName)
+		{
+			$supportedFieldsInRequestedLang[$fieldName] = multiLingualUtils::extractLanguageValue($multiLangMapping, $fieldName, $language);
+			if ($fieldName == 'tags')
+			{
+				$supportedFieldsInRequestedLang[$fieldName] = ktagword::updateTags($this->tags, $supportedFieldsInRequestedLang[$fieldName], false);
+			}
+			
+			$this->$fieldName = ($supportedFieldsInRequestedLang[$fieldName] && $supportedFieldsInRequestedLang[$fieldName] !== '') ?
+				$supportedFieldsInRequestedLang[$fieldName] : $sourceObject->getDefaultFieldValue($fieldName);
 		}
 	}
 	

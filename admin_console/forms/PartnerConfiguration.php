@@ -105,11 +105,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'value'			=> 'en',
 		));
-		
-		$this->addElement('text', 'default_language', array(
-			'label'			=> 'Default Language:',
-			'filters'		=> array('StringTrim'),
-		));
 
 		$arr = array();
 		foreach(Zend_Registry::get('config')->languages as $language)
@@ -1026,7 +1021,7 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		//adding display groups
 		
-		$this->addDisplayGroup(array_merge(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language','default_language', 'crossLine'), $permissionNames[self::ELASTIC_OPTIONS]), 'generalInformation', array('legend' => 'General Information'));
+		$this->addDisplayGroup(array_merge(array('partner_name', 'description','admin_name', 'admin_email', 'id', 'kmc_version', 'language', 'crossLine'), $permissionNames[self::ELASTIC_OPTIONS]), 'generalInformation', array('legend' => 'General Information'));
 		$this->addDisplayGroup(array('partner_group_type', 'partner_parent_id','reference_id','crossLine'), 'groupAssociation', array('legend' => 'Multi-Account Group Related information'));
 		
 		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'live_delivery_profile_ids', 'deliveryFormat', 'delivery_profile_type', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
