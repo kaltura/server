@@ -189,6 +189,10 @@ class kApiCache extends kApiCacheBase
 					$this->_ksObj = $ksObj;
 					$this->_ksPartnerId = $ksObj->partner_id;
 				}
+				else
+				{
+					$this->_partnerId = $ksObj->partner_id;
+				}
 			}
 			else if ($parseResult === false)
 			{
