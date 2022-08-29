@@ -179,7 +179,7 @@ while(true)
 					if(!$affected)
 					{
 						$errorInfo = $sphinxCon->errorInfo();
-						KalturaLog::log("Failed to run sphinx update query for sphinxLogId [$sphinxLogId] with error [" . $errorInfo . "]");
+						KalturaLog::err("Failed to run sphinx update query for sphinxLogId [$sphinxLogId] with error [" . $errorInfo . "]");
 					}
 					
 					unset($objectIdSphinxLog[$objectId]);
