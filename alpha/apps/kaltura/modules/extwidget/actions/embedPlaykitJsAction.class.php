@@ -595,8 +595,11 @@ class embedPlaykitJsAction extends sfAction
 						//Set the version of the linkedBy
 						$linkedVersion = $this->bundleConfig[$linked];
 						$linkedByVersion = $this->getPluginBaseVersion($linkedVersion);
-						$this->bundleConfig[$linkedByPlugin] = $linkedByVersion;
-						$this->playerConfig->plugins->$linkedByPlugin = new stdClass();
+						//If version specific - we can't load the linkedBy
+						if($linkedByVersion) {
+							$this->bundleConfig[$linkedByPlugin] = $linkedByVersion;
+							$this->playerConfig->plugins->$linkedByPlugin = new stdClass();
+						}
 					}
 				}
 			}
@@ -611,16 +614,11 @@ class embedPlaykitJsAction extends sfAction
 			case self::CANARY:
 				return $version;
 		}
-		if(strpos($version,"latest") !== false) {
-			return self::LATEST;
-		}
-		if(strpos($version,"beta") !== false) {
-			return self::BETA;
-		}
+		//for dev usage
 		if(strpos($version,"canary") !== false) {
 			return self::CANARY;
 		}
-		return self::LATEST;
+		return null;
 	}
 
 	private function maybeAddAnalyticsPlugins()
