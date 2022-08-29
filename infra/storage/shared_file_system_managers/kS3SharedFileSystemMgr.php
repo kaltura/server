@@ -704,8 +704,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$serveRedirectToStorageSecret = kConf::get("proxy_redirect_to_storage_secret", "local", null);
 		if ($serveRedirectToStorageSecret && isset($_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE']) && $_SERVER['HTTP_X_KALTURA_SERVE_REDIRECT_TO_STORAGE'] === $serveRedirectToStorageSecret)
 		{
-			header("HTTP/1.1 399 Proxy To Url");
-			header("X-Kaltura-Proxy-Url: $fileUrl");
+			header("X-Accel-Redirect: " . "/storage/" . preg_replace('#^https?://#', '', $fileUrl));;
 			return;
 		}
 		
