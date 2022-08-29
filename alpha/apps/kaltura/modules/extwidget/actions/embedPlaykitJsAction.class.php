@@ -593,8 +593,8 @@ class embedPlaykitJsAction extends sfAction
 				foreach ($linkedByPlugins as $linkedByPlugin) {
 					if(!$this->bundleConfig[$linkedByPlugin]) {
 						//Set the version of the linkedBy
-                        $linkedVersion = $this->bundleConfig[$linked];
-                        $linkedByVersion = $this->getPluginBaseVersion($linkedVersion);
+						$linkedVersion = $this->bundleConfig[$linked];
+						$linkedByVersion = $this->getPluginBaseVersion($linkedVersion);
 						$this->bundleConfig[$linkedByPlugin] = $linkedByVersion;
 						$this->playerConfig->plugins->$linkedByPlugin = new stdClass();
 					}
@@ -603,25 +603,25 @@ class embedPlaykitJsAction extends sfAction
 		}
 	}
 
-    private function getPluginBaseVersion($version)
-    {
-        switch($version) {
-            case self::LATEST:
-            case self::BETA:
-            case self::CANARY:
-                return $version;
-        }
-        if(strpos($version,"latest") !== false) {
-            return self::LATEST;
-        }
-        if(strpos($version,"beta") !== false) {
-            return self::BETA;
-        }
-        if(strpos($version,"canary") !== false) {
-            return self::CANARY;
-        }
-        return self::LATEST;
-    }
+	private function getPluginBaseVersion($version)
+	{
+		switch($version) {
+			case self::LATEST:
+			case self::BETA:
+			case self::CANARY:
+				return $version;
+		}
+		if(strpos($version,"latest") !== false) {
+			return self::LATEST;
+		}
+		if(strpos($version,"beta") !== false) {
+			return self::BETA;
+		}
+		if(strpos($version,"canary") !== false) {
+			return self::CANARY;
+		}
+		return self::LATEST;
+	}
 
 	private function maybeAddAnalyticsPlugins()
 	{
