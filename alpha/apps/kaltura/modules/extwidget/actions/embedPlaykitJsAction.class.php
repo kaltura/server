@@ -589,17 +589,39 @@ class embedPlaykitJsAction extends sfAction
 		foreach($pluginsDependenancy as $linked => $linkedBy) {
 			if($this->bundleConfig[$linked])
 			{
-				$depensOnPlugins = explode(",", $linkedBy);
-				foreach ($depensOnPlugins as $depensOnPluginName) {
-					if(!$this->bundleConfig[$depensOnPluginName]) {
-						//Set the version of the
-						$this->bundleConfig[$depensOnPluginName] = $this->bundleConfig[$linked];
-						$this->playerConfig->plugins->$depensOnPluginName = new stdClass();
+				$linkedByPlugins = explode(",", $linkedBy);
+				foreach ($linkedByPlugins as $linkedByPlugin) {
+					if(!$this->bundleConfig[$linkedByPlugin]) {
+						//Set the version of the linkedBy
+                        $linkedVersion = $this->bundleConfig[$linked];
+                        $linkedByVersion = $this->getPluginBaseVersion($linkedVersion);
+						$this->bundleConfig[$linkedByPlugin] = $linkedByVersion;
+						$this->playerConfig->plugins->$linkedByPlugin = new stdClass();
 					}
 				}
 			}
 		}
 	}
+
+    private function getPluginBaseVersion($version)
+    {
+        switch($version) {
+            case self::LATEST:
+            case self::BETA:
+            case self::CANARY:
+                return $version;
+        }
+        if(strpos($version,"latest") !== false) {
+            return self::LATEST;
+        }
+        if(strpos($version,"beta") !== false) {
+            return self::BETA;
+        }
+        if(strpos($version,"canary") !== false) {
+            return self::CANARY;
+        }
+        return self::LATEST;
+    }
 
 	private function maybeAddAnalyticsPlugins()
 	{
