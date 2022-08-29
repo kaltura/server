@@ -59,12 +59,15 @@ class BaseEntryService extends KalturaEntryService
 	{
 		$skipDeserializer = true;
 		$supportedFields = entry::getMultiLingualSupportedFields();
-		foreach ($supportedFields as $fieldName)
+		foreach ($params as $key => $param)
 		{
-			if (isset($params[self::ENTRY][self::MULTI_LINGUAL_NAME]))
+			foreach ($supportedFields as $fieldName)
 			{
-				$params['entry'][$fieldName] = $params['entry'][self::MULTI_LINGUAL.'_'.$fieldName];
-				$skipDeserializer = false;
+				if (isset($param[self::MULTI_LINGUAL . '_' . $fieldName]))
+				{
+					$params[$key][$fieldName] = $param[self::MULTI_LINGUAL . '_' . $fieldName];
+					$skipDeserializer = false;
+				}
 			}
 		}
 		return $skipDeserializer;
