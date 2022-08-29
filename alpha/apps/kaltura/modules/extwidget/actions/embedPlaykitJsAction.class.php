@@ -589,7 +589,7 @@ class embedPlaykitJsAction extends sfAction
 		foreach($pluginsDependenancy as $linked => $linkedBy) {
 			if($this->bundleConfig[$linked])
 			{
-				$depensOnPlugins = explode(",",$linkedBy);
+				$depensOnPlugins = explode(",", $linkedBy);
 				foreach ($depensOnPlugins as $depensOnPluginName) {
 					if(!$this->bundleConfig[$depensOnPluginName]) {
 						//Set the version of the
