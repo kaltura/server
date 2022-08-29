@@ -415,7 +415,7 @@ class KalturaRequestDeserializer
 	protected function generateMultiLingualStringFromString($object, $fieldName, $value)
 	{
 		$multiLangString = new KalturaMultiLingualString();
-		$multiLangString->language = $object->getObjectDefaultLanguage();
+		$multiLangString->language = kCurrentContext::$language ? kCurrentContext::$language : 'EN';
 		$multiLangString->value = $value;
 		$multiLangStringArr = new KalturaMultiLingualStringArray();
 		$object->$fieldName = $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
