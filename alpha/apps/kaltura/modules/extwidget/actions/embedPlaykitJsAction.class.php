@@ -28,6 +28,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+	const MIN_PLAYER_VERSION_FOR_AUTO_LINKING ="3.5.1";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -554,6 +555,52 @@ class embedPlaykitJsAction extends sfAction
 		return array($config,$productVersion,$corePackages);
 	}
 
+	private function addLinkedPlugins()
+	{
+		//check if we are in OVP player only??
+		if(!isset($this->bundleConfig[self::KALTURA_OVP_PLAYER])) {
+			return;
+		}
+
+		$playerVersion = $this->bundleConfig[self::KALTURA_OVP_PLAYER];
+
+		//it should work for Canary / Latest / beta or version > specific
+		$isVersionValid =
+			$playerVersion == self::LATEST ||
+			$playerVersion == self::BETA  ||
+			$playerVersion == self::CANARY ||
+			version_compare($playerVersion, self::MIN_PLAYER_VERSION_FOR_AUTO_LINKING) >= 0;
+		if(!$isVersionValid) {
+			return;
+		}
+
+		//Check that the player has any plugins
+		if(!$this->playerConfig || !$this->playerConfig->plugins ) {
+			return;
+		}
+
+		//get Plagings map
+		$pluginsDependenancy = kConf::get("plugin-dependency", "appVersions",array());
+		if(!$pluginsDependenancy) {
+			return;
+		}
+
+		//Loop on each plugin in the map
+		foreach($pluginsDependenancy as $linked => $linkedBy) {
+			if($this->bundleConfig[$linked])
+			{
+				$depensOnPlugins = explode(",",$linkedBy);
+				foreach ($depensOnPlugins as $depensOnPluginName) {
+					if(!$this->bundleConfig[$depensOnPluginName]) {
+						//Set the version of the
+						$this->bundleConfig[$depensOnPluginName] = $this->bundleConfig[$linked];
+						$this->playerConfig->plugins->$depensOnPluginName = new stdClass();
+					}
+				}
+			}
+		}
+	}
+
 	private function maybeAddAnalyticsPlugins()
 	{
 		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
@@ -743,7 +790,7 @@ class embedPlaykitJsAction extends sfAction
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
-
+		$this->addLinkedPlugins();
 		$this->maybeAddAnalyticsPlugins();
 		$this->setFixVersionsNumber();
 		$this->setBundleName();
