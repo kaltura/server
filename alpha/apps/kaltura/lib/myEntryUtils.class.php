@@ -1856,7 +1856,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			return $partner->getDefaultConversionProfileId();
 		
 		$conversionProfileId = $sourceEntry->getConversionProfileId();
-		$conversionProfile = ConversionProfilePeer::retrieveByPK($conversionProfileId);
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
 		if (!$conversionProfile)
 		{
 			KalturaLog::log("Cannot find conversion profile ID: [$conversionProfileId] - deleted? will return partner default");
