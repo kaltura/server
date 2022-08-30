@@ -127,7 +127,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			"uniqueId" => (string)new UniqueId(),
 			"eventTime" => date('Y-m-d H:i:s'),
 			"eventType" => get_class($scope->getEvent()),
-			"objectType" => get_class($object),
+			"objectType" => $apiObjectType,
 			"virtualEventId" => kCurrentContext::$virtual_event_id,
 			"partnerId" => kCurrentContext::getCurrentPartnerId(),
 			"object" => $apiObject,
