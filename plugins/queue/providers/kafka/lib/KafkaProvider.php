@@ -73,7 +73,7 @@ class KafkaProvider extends QueueProvider
 				$this->create($topicName);
 				$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message, $msgArgs["partitionKey"]);
 				$this->producer->poll(0);
-				$result = $this->producer->flush(100);
+				$result = $this->producer->flush(500);
 				break;
 			}
 			catch (Exception $e)
@@ -101,7 +101,7 @@ class KafkaProvider extends QueueProvider
 			{
 				$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, json_encode($kafkaPayload));
 				$this->producer->poll(0);
-				$result = $this->producer->flush(100);
+				$result = $this->producer->flush(500);
 				break;
 			}
 			catch (Exception $e)
@@ -166,7 +166,7 @@ class KafkaProvider extends QueueProvider
 	
 	public function __destruct()
 	{
-		$this->producer->flush(100);
+		$this->producer->flush(500);
 	}
 	
 }
