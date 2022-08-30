@@ -4,7 +4,9 @@ class KafkaProvider extends QueueProvider
 {
 	protected $topic = null;
 	protected $producer = null;
+	protected $flushTtl = null;
 	
+	const DEFAULT_FLUSH_TTL = 500;
 	const DEFAULT_PORT = 29092;
 	const MAX_RETRIES = 3;
 	
@@ -53,6 +55,7 @@ class KafkaProvider extends QueueProvider
 		}
 		
 		$this->producer = $producer;
+		$this->flushTtl = isset($kafkaConfig['flushTtl']) ? $kafkaConfig['flushTtl'] : self::DEFAULT_FLUSH_TTL;
 		KalturaLog::log("Kafka connection Initialized");
 	}
 	
@@ -73,7 +76,7 @@ class KafkaProvider extends QueueProvider
 				$this->create($topicName);
 				$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message, $msgArgs["partitionKey"]);
 				$this->producer->poll(0);
-				$result = $this->producer->flush(100);
+				$result = $this->producer->flush($this->flushTtl);
 				break;
 			}
 			catch (Exception $e)
@@ -101,7 +104,7 @@ class KafkaProvider extends QueueProvider
 			{
 				$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, json_encode($kafkaPayload));
 				$this->producer->poll(0);
-				$result = $this->producer->flush(100);
+				$result = $this->producer->flush($this->flushTtl);
 				break;
 			}
 			catch (Exception $e)
@@ -166,7 +169,7 @@ class KafkaProvider extends QueueProvider
 	
 	public function __destruct()
 	{
-		$this->producer->flush(100);
+		$this->producer->flush($this->flushTtl);
 	}
 	
 }
