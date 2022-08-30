@@ -1253,8 +1253,14 @@ class LogProcessorApiV3 implements LogProcessor
 				$parsedParams = print_r_reverse($this->params);
 				if (print_r($parsedParams, true) != $this->params)
 				{
-					print "print_r_reverse failed\n";
-					return false;
+					// print_r use space for empty values so we need to remove it
+					$print_r_str = print_r($parsedParams, true);
+					$print_r_str = str_replace(" \n", "\n", $print_r_str);
+					if ($print_r_str != $this->params)
+					{
+						print "print_r_reverse failed\n";
+						return false;
+					}
 				}
 
 				if ($this->isFeed)
