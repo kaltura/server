@@ -26,11 +26,19 @@ class KalturaAccessControlModifyRequestHostRegexAction extends KalturaRuleAction
 	 */
 	public $replacmenServerNodeId;
 	
+	/**
+	 * Set this value if you want to check sif the server is accessible before redirecting traffic to it (this value is in miliseconds)
+	 *
+	 * @var int
+	 */
+	public $checkAliveTimeoutMs;
+	
 	private static $mapBetweenObjects = array
 	(
 		'pattern',
 		'replacement',
 		'replacmenServerNodeId',
+		'checkAliveTimeoutMs',
 	);
 	/**
 	 * Init object type
