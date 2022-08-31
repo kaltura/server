@@ -92,7 +92,7 @@ class ThumbAssetService extends KalturaAssetService
     	$dbThumbAsset = $thumbAsset->toInsertableObject();
     	/* @var $dbThumbAsset thumbAsset */
     	
-		$dbThumbAsset->setEntryId($entryId);
+		$dbThumbAsset->setEntryId($dbEntry->getEntryId());
 		$dbThumbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbThumbAsset->setStatus(thumbAsset::ASSET_STATUS_QUEUED);
 		$dbThumbAsset->save();
