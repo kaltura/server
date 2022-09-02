@@ -27,7 +27,7 @@ class KalturaAccessControlModifyRequestHostRegexAction extends KalturaRuleAction
 	public $replacmenServerNodeId;
 	
 	/**
-	 * Set this value if you want to check sif the server is accessible before redirecting traffic to it (this value is in miliseconds)
+	 * Set this value if you want to check if the server is accessible before redirecting traffic to it (this value is in milliseconds)
 	 *
 	 * @var int
 	 */
