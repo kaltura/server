@@ -10,8 +10,6 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	(
 		"idOrScreenNameStartsWith" => "_likex_puser_id_or_screen_name",
 		'firstNameOrLastNameStartsWith' => "_likex_first_name_or_last_name",
-		"idEqual" => "_eq_puser_id",
-		"idIn" => "_in_puser_id",
 		"roleIdsEqual"	=> "_eq_role_ids",
 		"roleIdsIn"	=>	"_in_role_ids",
 		"permissionNamesMultiLikeAnd" => "_mlikeand_permission_names",
@@ -20,8 +18,6 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 
 	static private $order_by_map = array
 	(
-		"+id" => "+puser_id",
-		"-id" => "-puser_id",
 	);
 
 	public function getMapBetweenObjects()
@@ -79,16 +75,6 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 	 * @var string
 	 */
 	public $idOrScreenNameStartsWith;
-
-	/**
-	 * @var string
-	 */
-	public $idEqual;
-
-	/**
-	 * @var string
-	 */
-	public $idIn;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -144,7 +130,7 @@ class KalturaUserFilter extends KalturaUserBaseFilter
 			$roleCriteria->addSelectColumn(KuserToUserRolePeer::KUSER_ID);
 			$rs = KuserToUserRolePeer::doSelectStmt($roleCriteria);
 			$kuserIds = $rs->fetchAll(PDO::FETCH_COLUMN);
-						
+
 			$c->add(kuserPeer::ID, $kuserIds, KalturaCriteria::IN);
 		}
 
