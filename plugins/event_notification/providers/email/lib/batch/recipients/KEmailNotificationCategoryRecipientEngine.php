@@ -44,7 +44,25 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 			$userList = KBatchBase::$kClient->user->listAction($userFilter, $userPager);
 			foreach ($userList->objects as $user)
 			{
-				$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
+				if($user->type == KalturaUserType::USER)
+				{
+					$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
+				}
+				else if($user->type == KalturaUserType::GROUP)
+				{
+					$groupUserIds = $this->getGroupUserIds($user->id);
+					if(!$groupUserIds)
+						return $recipients;
+
+					$groupUsers = $this->getUsersByUserIds($groupUserIds);
+					if(!$groupUsers)
+						return $recipients;
+
+					foreach($groupUsers as $groupUser)
+					{
+						$recipients[$groupUser->email] = $groupUser->firstName. ' ' . $groupUser->lastName;
+					}
+				}
 			}
 			$pager->pageIndex ++;
 		}
