@@ -8,16 +8,6 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
-	
-	const MULTI_LINGUAL_NAME = 'multiLingual_name';
-	const NAME = 'name';
-	const MULTI_LINGUAL_DESCRIPTION = 'multiLingual_description';
-	const DESCRIPTION = 'description';
-	const MULTI_LINGUAL_TAGS = 'multiLingual_tags';
-	const MULTI_LINGUAL = 'multiLingual';
-	const TAGS = 'tags';
-	const ENTRY = 'entry';
-	
 	const PLAYBACK_SECRET = 'playback_secret';
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
@@ -31,12 +21,15 @@ class BaseEntryService extends KalturaEntryService
             throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, "anonymousRank");
         }
     }
-	
+	/**
+	 * In case there was a need to convert parameters that arrived as strings into multi-lingual strings, the object the service will work with
+	 * should be re deserialized
+	 * This function examines the input and rebuilds the action arguments with the new multi-lingual params
+	**/
 	public function adjustArguments(&$arguments = null, $actionParams = null)
 	{
 		$params = requestUtils::getRequestParams();
-		
-		$skipDeserializer = $this->adjustParameters($params);
+		$skipDeserializer = multiLingualUtils::shouldResetParamsAndDeserialize('entry', $params);
 		
 		if (!$skipDeserializer)
 		{
@@ -53,24 +46,6 @@ class BaseEntryService extends KalturaEntryService
 				$this->setResponseProfile($responseProfile);
 			}
 		}
-	}
-	
-	protected function adjustParameters(&$params)
-	{
-		$skipDeserializer = true;
-		$supportedFields = entry::getMultiLingualSupportedFields();
-		foreach ($params as $key => $param)
-		{
-			foreach ($supportedFields as $fieldName)
-			{
-				if (isset($param[self::MULTI_LINGUAL . '_' . $fieldName]))
-				{
-					$params[$key][$fieldName] = $param[self::MULTI_LINGUAL . '_' . $fieldName];
-					$skipDeserializer = false;
-				}
-			}
-		}
-		return $skipDeserializer;
 	}
 
 	/* (non-PHPdoc)
@@ -134,7 +109,6 @@ class BaseEntryService extends KalturaEntryService
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
     	
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
-//	    multiLingualUtils::handleMultiLanguageMapping($entry);
 		return $entry;
     }
 	

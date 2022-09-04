@@ -17,15 +17,7 @@ Interface IMultiLingual extends IBaseObject
 	 * @param bool $update_db
 	 * @return string
 	 */
-	public function alignFieldValue($field, $value, $update_db);
-	
-	public function setObjectDefaultLanguage($v);
-	
-	public function getObjectDefaultLanguage();
-	
-	public function setMultiLanguageMapping($v);
-	
-	public function getMultiLanguageMapping();
+	public function alignFieldValue($field, $value);
 	
 	public function getDefaultFieldValue($fieldName);
 }

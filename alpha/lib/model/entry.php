@@ -140,7 +140,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const CUSTOM_DATA_INTERACTIVITY_VERSION = 'interactivity_version';
 	const CUSTOM_DATA_VOLATILE_INTERACTIVITY_VERSION = 'volatile_interactivity_version';
 	
-	const ENTRY_DEFAULT_LANGUAGE = 'entry_default_language';
 	const NAME = 'name';
 	const DESCRIPTION = 'description';
 	const TAGS = 'tags';
@@ -148,9 +147,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const MAX_NAME_LEN = 256;
 	
 	protected static $multiLingualSupportedFields = array(
-		'name' => 'name',
-		'description' => 'description',
-		'tags' => 'tags'
+		self::NAME => self::NAME,
+		self::DESCRIPTION => self::DESCRIPTION,
+		self::TAGS => self::TAGS
 	);
 
 	private $appears_in = null;
@@ -352,83 +351,71 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return self::$multiLingualSupportedFields;
 	}
 	
-	public function alignFieldValue($field, $value, $update_db)
+	public function alignFieldValue($field, $value)
 	{
 		$supportedFields = self::getMultiLingualSupportedFields();
 		switch ($field)
 		{
-			case $supportedFields['name']:
+			case $supportedFields[self::NAME]:
 				return kString::alignUtf8String($value, self::MAX_NAME_LEN);
-			case $supportedFields['description']:
+			case $supportedFields[self::DESCRIPTION]:
 				return $value;
-			case $supportedFields['tags']:
-				return ktagword::updateTags($this->tags, $value , $update_db );
+			case $supportedFields[self::TAGS]:
+				return ktagword::updateTags($this->tags, $value);
 			default:
 				return null;
 		}
 	}
 	
-	public function setObjectDefaultLanguage($v)
-	{
-		$this->putInCustomData(self::ENTRY_DEFAULT_LANGUAGE, $v);
-	}
-	
-	public function getObjectDefaultLanguage()
-	{
-		return $this->getFromCustomData(self::ENTRY_DEFAULT_LANGUAGE, null, 'EN');
-	}
-	
 	public function setName($v)
 	{
-		$multiLingualResult = multiLingualUtils::handleMultiLanguageInput($this, self::NAME, $v);
-		PeerUtils::setExtension($this, $multiLingualResult, self::MAX_NAME_LEN, __FUNCTION__);
-		return parent::setName($multiLingualResult);
+		$name = multiLingualUtils::handleMultiLanguageInput($this, self::NAME, $v);
+		PeerUtils::setExtension($this, $name, self::MAX_NAME_LEN, __FUNCTION__);
+		return $name ? parent::setName($name) : null;
 	}
 	
 	public function setDescription ($v)
 	{
-		$multiLingualResult = multiLingualUtils::handleMultiLanguageInput($this, self::DESCRIPTION, $v);
+		$description = multiLingualUtils::handleMultiLanguageInput($this, self::DESCRIPTION, $v);
 		
-		return parent::setDescription($multiLingualResult);
+		return $description ? parent::setDescription($description): null;
 	}
 	
 	public function setTags($tags , $update_db = true )
 	{
-		$multiLingualResult = multiLingualUtils::handleMultiLanguageInput($this, self::TAGS, $tags);
-		return parent::setTags($multiLingualResult);
+		$newTags = multiLingualUtils::handleMultiLanguageInput($this, self::TAGS, $tags);
+		return $newTags ? parent::setTags($newTags) : null;
 	}
 
 	public function getName()
 	{
-		$defaultName = parent::getName() . PeerUtils::getExtension($this, __FUNCTION__);
-		return $defaultName;
+		return parent::getName() . PeerUtils::getExtension($this, __FUNCTION__);
 	}
 	
 	public function getDescription()
 	{
-		$defaultDescription = parent::getDescription();
-		return $defaultDescription;
+		return parent::getDescription();
 	}
 	
 	public function getTags()
 	{
-		$defaultTags = parent::getTags();
-		return $defaultTags;
+		return parent::getTags();
 	}
 	
 	public function getDefaultFieldValue($fieldName)
 	{
-		if (in_array($fieldName, $this->getMultiLingualSupportedFields()))
+		if (!in_array($fieldName, $this->getMultiLingualSupportedFields()))
 		{
-			switch ($fieldName)
-			{
-				case self::NAME:
-					return $this->getName();
-				case self::DESCRIPTION:
-					return $this->getDescription();
-				case self::TAGS:
-					return $this->getTags();
-			}
+			return;
+		}
+		switch ($fieldName)
+		{
+			case self::NAME:
+				return $this->getName();
+			case self::DESCRIPTION:
+				return $this->getDescription();
+			case self::TAGS:
+				return $this->getTags();
 		}
 	}
 
@@ -1894,16 +1881,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	public function setTempTrimEntry ($v)	    { $this->putInCustomData ( "tempTrimEntry" , $v );	}
 	public function getTempTrimEntry ()		{	return $this->getFromCustomData( "tempTrimEntry", null, false );	}
-	
-	public function setMultiLanguageMapping($v)
-	{
-		$this->putInCustomData ( multiLingualUtils::MULTI_LANGUAGE_MAPPING , $v );
-	}
-	
-	public function getMultiLanguageMapping()
-	{
-		return $this->getFromCustomData(multiLingualUtils::MULTI_LANGUAGE_MAPPING, null, null);
-	}
 	
 	// indicates that thumbnail shouldn't be auto captured, because it already supplied by the user
 	public function setCreateThumb ( $v, thumbAsset $thumbAsset = null)		
