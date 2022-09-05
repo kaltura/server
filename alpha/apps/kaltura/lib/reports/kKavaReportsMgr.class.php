@@ -545,7 +545,7 @@ class kKavaReportsMgr extends kKavaBase
 		-180 => '+3', //'Europe/Moscow'
 		-120 => '+2', //'Europe/Helsinki'
 		-60  => '+1', //'Europe/Paris',
-		0    => '0', //'Europe/London',
+		0    => '+0', //'Europe/London',
 		60   => '-1',  //'Atlantic/Azores',
 		120  => '-2', //'America/Noronha',
 		180  => '-3', //'America/Sao_Paulo',

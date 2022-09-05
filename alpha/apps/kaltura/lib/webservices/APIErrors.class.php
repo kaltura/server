@@ -95,6 +95,8 @@ class APIErrors
 	const INTERNAL_DATABASE_ERROR = "INTERNAL_DATABASE_ERROR;;Internal database error";
 	
 	const SEARCH_ENGINE_QUERY_FAILED = "SEARCH_ENGINE_QUERY_FAILED;;Search engine query failed";
+	
+	const SEARCH_ENGINE_SYNTAX_ERROR = "SEARCH_ENGINE_SYNTAX_ERROR;;Search engine syntax error";
 
 	const RETRIEVE_VOLUME_MAP_FAILED = "RETRIEVE_VOLUME_MAP_FAILED;;Could not retrieve volume map for the given Id";
 	
