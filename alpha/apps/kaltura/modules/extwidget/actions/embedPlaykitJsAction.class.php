@@ -23,11 +23,13 @@ class embedPlaykitJsAction extends sfAction
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME = 'uiConfTags';
 	const PLAYKIT_KAVA = 'playkit-kava';
+	const PLAYKIT_UI_MANAGERS= 'playkit-ui-managers';
 	const PLAYKIT_OTT_ANALYTICS = 'playkit-ott-analytics';
 	const KALTURA_OVP_PLAYER = 'kaltura-ovp-player';
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+	const NO_UI_MANAGERS_PLAYER_VERSION='3.50.0';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -226,6 +228,14 @@ class embedPlaykitJsAction extends sfAction
 			}
 			$uiConfI18nArr = json_decode(json_encode($uiConf->ui->translations), true);
 			$uiConf->ui->translations = (object) $this->arrayMergeRecursive($i18nArr, $uiConfI18nArr);
+		}
+	}
+
+	private function mergeUIManagersConfig() {
+		$uiConf = $this->playerConfig;
+		if (property_exists($uiConf, "plugins") && !property_exists($uiconf->plugins, "uiManagers"))
+		{
+			$uiConf->plugins->uiManagers = new stdClass();
 		}
 	}
 
@@ -590,6 +600,32 @@ class embedPlaykitJsAction extends sfAction
 		}
 	}
 
+	private function maybeAddUIManagersPlugin() {
+		$ovpPlayerConfig = isset($this->bundleConfig[self::KALTURA_OVP_PLAYER]) ? $this->bundleConfig[self::KALTURA_OVP_PLAYER] : '';
+
+        if (!isset($this->bundleConfig[self::PLAYKIT_UI_MANAGERS]) && $ovpPlayerConfig)
+		{
+            list($latestVersionMap) = $this->getConfigByVersion("latest");
+			list($betaVersionMap) = $this->getConfigByVersion("beta");
+			$latestVersion = isset($latestVersionMap[self::KALTURA_OVP_PLAYER]) ? $latestVersionMap[self::KALTURA_OVP_PLAYER] : null;
+			$betaVersion = isset($betaVersionMap[self::KALTURA_OVP_PLAYER]) ? $betaVersionMap[self::KALTURA_OVP_PLAYER] : null;
+
+			if (($ovpPlayerConfig == self::LATEST && version_compare($latestVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
+				($ovpPlayerConfig == self::BETA && version_compare($betaVersion, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0) ||
+				$ovpPlayerConfig == self::CANARY)
+			{
+				$this->bundleConfig[self::PLAYKIT_UI_MANAGERS] = $ovpPlayerConfig;
+                $this->mergeUIManagersConfig();
+			}
+			else if (version_compare($ovpPlayerConfig, self::NO_UI_MANAGERS_PLAYER_VERSION) >= 0 &&
+					!is_null($latestVersionMap))
+			{
+				$this->bundleConfig[self::PLAYKIT_UI_MANAGERS] = $latestVersionMap[self::PLAYKIT_UI_MANAGERS];
+                $this->mergeUIManagersConfig();
+			}
+        }
+	}
+
 	private function setFixVersionsNumber()
 	{
 		//if latest/beta version required set version number in config obj
@@ -744,6 +780,7 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
 
+		$this->maybeAddUIManagersPlugin();
 		$this->maybeAddAnalyticsPlugins();
 		$this->setFixVersionsNumber();
 		$this->setBundleName();
