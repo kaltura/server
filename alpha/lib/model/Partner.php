@@ -114,6 +114,8 @@ class Partner extends BasePartner
 
 	const IS_SELF_SERVE = 'isSelfServe';
 	
+	const EP_ALLOWED_TEMPLATES = 'ep_allowed_templates';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2347,6 +2349,16 @@ class Partner extends BasePartner
 	public function isAllowedLogin()
 	{
 		return in_array($this->status, array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
+	}
+	
+	public function getEpAllowedTemplates()
+	{
+		return $this->getFromCustomData(self::EP_ALLOWED_TEMPLATES, null, '');
+	}
+	
+	public function setEpAllowedTemplates($v)
+	{
+		return $this->putInCustomData(self::EP_ALLOWED_TEMPLATES, $v);
 	}
 }
 
