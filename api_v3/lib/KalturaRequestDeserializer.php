@@ -412,10 +412,17 @@ class KalturaRequestDeserializer
 		return $obj;
 	}
 	
+	/**
+	 * This function created a KalturaMultiLingualStringArray that reflects the value of the string that was received in the call
+	 *
+	 * @param $object an object supporting multi-lingual strings
+	 * @param $fieldName the name of the supported field
+	 * @param $value the value of the supported field
+	 */
 	protected function generateMultiLingualStringFromString(&$object, $fieldName, $value)
 	{
 		$multiLangString = new KalturaMultiLingualString();
-		$multiLangString->language = null;
+		$multiLangString->language = 'default';
 		$multiLangString->value = $value;
 		$multiLangStringArr = new KalturaMultiLingualStringArray();
 		$object->$fieldName = $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));

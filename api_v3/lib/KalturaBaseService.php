@@ -59,8 +59,31 @@ abstract class KalturaBaseService
 	{
 	}
 	
-	public function adjustArguments(&$arguments = null)
+	/**
+	 * In case there was a need to convert parameters that arrived as strings into multi-lingual strings, the object the service will work with
+	 * should be re deserialized
+	 * This function examines the input and rebuilds the action arguments with the new multi-lingual params
+	 **/
+	public function adjustArguments(&$arguments = null, $actionParams = null)
 	{
+		$params = requestUtils::getRequestParams();
+		$result = multiLingualUtils::shouldResetParamsAndDeserialize('entry', $params);
+		
+		if (!$result['skipDeserializer'])
+		{
+			$deserializer = new KalturaRequestDeserializer($result['params']);
+			$arguments = $deserializer->buildActionArguments($actionParams);
+			
+			KalturaLog::debug("Dispatching service [" . $this->serviceName . "], action [" . $this->actionName . "], reqIndex [" .
+			                  kCurrentContext::$multiRequest_index . "] with ADJUSTED params " . print_r($arguments, true));
+			
+			$responseProfile = $deserializer->getResponseProfile();
+			if ($responseProfile)
+			{
+				KalturaLog::debug("Response profile: " . print_r($responseProfile, true));
+				$this->setResponseProfile($responseProfile);
+			}
+		}
 	}
 	
 	/**

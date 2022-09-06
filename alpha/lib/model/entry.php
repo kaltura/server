@@ -369,21 +369,38 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	
 	public function setName($v)
 	{
-		$name = multiLingualUtils::handleMultiLanguageInput($this, self::NAME, $v);
+		$name = $v['default'];
+		if (multiLingualUtils::isMultiLingualRequest($v))
+		{
+			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::NAME, $v);
+			$name = $defaultValues['defaultValue'];
+			multiLingualUtils::updateMultiLanguageObject($this, self::NAME, $v, $defaultValues);
+		}
 		PeerUtils::setExtension($this, $name, self::MAX_NAME_LEN, __FUNCTION__);
 		return $name ? parent::setName($name) : null;
 	}
 	
 	public function setDescription ($v)
 	{
-		$description = multiLingualUtils::handleMultiLanguageInput($this, self::DESCRIPTION, $v);
-		
+		$description = $v['default'];
+		if (multiLingualUtils::isMultiLingualRequest($v))
+		{
+			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::DESCRIPTION, $v);
+			$description = $defaultValues['defaultValue'];
+			multiLingualUtils::updateMultiLanguageObject($this, self::DESCRIPTION, $v, $defaultValues);
+		}
 		return $description ? parent::setDescription($description): null;
 	}
 	
 	public function setTags($tags , $update_db = true )
 	{
-		$newTags = multiLingualUtils::handleMultiLanguageInput($this, self::TAGS, $tags);
+		$newTags = $tags['default'];
+		if (multiLingualUtils::isMultiLingualRequest($tags))
+		{
+			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::TAGS, $tags);
+			$newTags = $defaultValues['defaultValue'];
+			multiLingualUtils::updateMultiLanguageObject($this, self::TAGS, $tags, $defaultValues);
+		}
 		return $newTags ? parent::setTags($newTags) : null;
 	}
 

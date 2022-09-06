@@ -19,5 +19,11 @@ Interface IMultiLingual extends IBaseObject
 	 */
 	public function alignFieldValue($field, $value);
 	
+	/**
+	 * finds the correct value for a specific field according to the object default language
+	 *
+	 * @param string $fieldName
+	 * @return string
+	 */
 	public function getDefaultFieldValue($fieldName);
 }
