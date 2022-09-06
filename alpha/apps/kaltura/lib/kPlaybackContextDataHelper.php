@@ -313,8 +313,10 @@ class kPlaybackContextDataHelper
 
 		list($deliveryProfileIds, $deliveryProfilesParamsNotIn) = $this->getProfileIdsToFilter($contextDataHelper);
 
-		if (count($deliveryProfileIds) || $deliveryProfilesParamsNotIn)
+		if (($deliveryProfileIds && count($deliveryProfileIds)) || $deliveryProfilesParamsNotIn)
+		{
 			$this->filterDeliveryProfiles($liveDeliveryProfiles, $deliveryProfileIds, $deliveryProfilesParamsNotIn);
+		}
 
 		$this->filterDeliveryProfilesByStreamerType($liveDeliveryProfiles, $contextDataHelper);
 
