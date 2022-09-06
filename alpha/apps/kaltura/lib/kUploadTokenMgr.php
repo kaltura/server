@@ -226,9 +226,10 @@ class kUploadTokenMgr
 	protected function checkUploadTokenAllowedStatus($uploadToken)
 	{
 		$allowedStatuses = array(UploadToken::UPLOAD_TOKEN_PENDING, UploadToken::UPLOAD_TOKEN_PARTIAL_UPLOAD);
-		if (!in_array($uploadToken->getStatus(), $allowedStatuses, true))
+		$currentStatus = $uploadToken->getStatus();
+		if (!in_array($currentStatus, $allowedStatuses, true))
 		{
-			throw new kUploadTokenException("Invalid upload token status", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
+			throw new kUploadTokenException("Invalid upload token status: [$currentStatus]", kUploadTokenException::UPLOAD_TOKEN_INVALID_STATUS);
 		}
 	}
 	

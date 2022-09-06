@@ -9,6 +9,8 @@ abstract class KalturaUserBaseFilter extends KalturaBaseUserFilter
 {
 	static private $map_between_objects = array
 	(
+		"idEqual" => "_eq_puser_id",
+		"idIn" => "_in_puser_id",
 		"typeEqual" => "_eq_type",
 		"typeIn" => "_in_type",
 		"isAdminEqual" => "_eq_is_admin",
@@ -18,6 +20,8 @@ abstract class KalturaUserBaseFilter extends KalturaBaseUserFilter
 
 	static private $order_by_map = array
 	(
+		"+id" => "+puser_id",
+		"-id" => "-puser_id",
 	);
 
 	public function getMapBetweenObjects()
@@ -29,7 +33,17 @@ abstract class KalturaUserBaseFilter extends KalturaBaseUserFilter
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
 	}
-
+	
+	/**
+	 * @var string
+	 */
+	public $idEqual;
+	
+	/**
+	 * @var string
+	 */
+	public $idIn;
+	
 	/**
 	 * @var KalturaUserType
 	 */

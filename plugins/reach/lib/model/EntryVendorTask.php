@@ -498,7 +498,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 			(in_array($this->status, array(EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::ABORTED))))
 		{
 			if (in_array($this->oldColumnsValues[EntryVendorTaskPeer::STATUS],
-				array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY)))
+				array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_MODERATION, EntryVendorTaskStatus::PENDING_ENTRY_READY, EntryVendorTaskStatus::SCHEDULED)))
 			{
 				return parent::save($con);
 			}

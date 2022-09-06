@@ -285,7 +285,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull("entryId");
 		$this->validateEntryId();
 		
-		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
+		if(!kString::checkIsValidJson($this->partnerData))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
 		}
@@ -315,7 +315,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
 		}
 		
-		if($this->partnerData && !$this->checkIsValidJson($this->partnerData))
+		if(!kString::checkIsValidJson($this->partnerData))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
 		}
@@ -404,12 +404,6 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public function getFilterDocs()
 	{
 		return array();
-	}
-	
-	private function checkIsValidJson($string)
-	{
-		$json = json_decode($string);
-		return (is_object($json) && json_last_error() == JSON_ERROR_NONE) ? true : false;
 	}
 
 	public function isScheduled()

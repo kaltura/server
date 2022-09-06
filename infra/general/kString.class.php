@@ -512,4 +512,27 @@ class kString
 		$json = json_decode($string);
 		return (is_object($json) && json_last_error() == JSON_ERROR_NONE) ? true : false;
 	}
+	
+	public static function validateQuotes($str)
+	{
+		preg_match_all('#\\\\*"#', $str, $matches);
+		$valid = true;
+		
+		foreach ($matches[0] as $match)
+		{
+			if (strlen($match) % 2 == 1)
+			{
+				$valid = !$valid;
+			}
+		}
+		
+		return $valid;
+	}
+	
+	public static function validateEscape($str)
+	{
+		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
+		
+		return $trailingEscapesCount % 2 == 0;
+	}
 }

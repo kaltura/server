@@ -75,7 +75,7 @@ class FlavorAssetService extends KalturaAssetService
      		$dbFlavorAsset->setIsOriginal(true);
     	}
     	
-		$dbFlavorAsset->setEntryId($entryId);
+		$dbFlavorAsset->setEntryId($dbEntry->getEntryId());
 		$dbFlavorAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbFlavorAsset->setStatus(flavorAsset::FLAVOR_ASSET_STATUS_QUEUED);
 		$dbFlavorAsset->save();

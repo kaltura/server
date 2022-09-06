@@ -520,6 +520,10 @@ class KalturaFrontController
 					$object = new KalturaAPIException(APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 					break;
 					
+				case APIErrors::SEARCH_ENGINE_SYNTAX_ERROR:
+					$object = new KalturaAPIException(APIErrors::SEARCH_ENGINE_SYNTAX_ERROR);
+					break;
+					
 				case kCoreException::FILE_NOT_FOUND:
 					$object = new KalturaAPIException(KalturaErrors::FILE_NOT_FOUND);
 					break;

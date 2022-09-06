@@ -1,4 +1,4 @@
-# Rigel-18.13.0
+# Rigel-18.14.0
 
 ## Add partner for game services ##
 * Issue Type: Task
@@ -12,6 +12,37 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2022_08_22_game_services_add_partner.php
 
+# Rigel 18.13.0
+## Changes to Co-editors or Co-publishers changed email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-28334
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+
+Add scripts:
+
+	Co editor:
+		- deployment/updates/scripts/xml/2022_03_28_addCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+		- php deployment/updates/scripts/2022_03_28_deploy_add_email_event_notification_Co_Editor_Changed.php
+	
+	Co publisher:
+		- deployment/updates/scripts/xml/2022_03_28_addCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+		- php deployment/updates/scripts/2022_03_28_deploy_add_email_event_notification_Co_Publisher_Changed.php
+
+Update scripts:
+
+	Co editor:
+		- deployment/updates/scripts/xml/2022_03_28_updateCoEditorsChangedEmailNewCoEditorsEmailNotification.template.xml
+		- php deployment/updates/scripts/2022_03_28_deploy_update_email_event_notification_Co_Editor_Changed.php
+
+	Co publisher:
+		- deployment/updates/scripts/xml/2022_03_28_updateCoPublishersChangedEmailNewCoPublishersEmailNotification.template.xml
+		- php deployment/updates/scripts/2022_03_28_deploy_update_email_event_notification_Co_Publisher_Changed.php
 
 # Rigel-18.12.0
 
