@@ -1,0 +1,33 @@
+{
+  "name": "axel-php/axel",
+  "type": "library",
+  "description": "Accelerated file downloads in PHP using Axel",
+  "keywords": [
+    "download",
+    "download manager",
+    "file download",
+    "download queue",
+    "download accelerator"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ian Outterside",
+      "email": "ian@ianbuildsapps.com",
+      "homepage": "http://ianbuildsapps.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/process": "~2.6",
+    "jeremeamia/superclosure": "~2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "Axel": "src"
+    }
+  }
+}
