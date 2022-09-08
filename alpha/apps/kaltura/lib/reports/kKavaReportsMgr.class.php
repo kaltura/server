@@ -41,6 +41,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_PLAYTHROUGH_RATIO = 'play_through_ratio';
 	const METRIC_UNIQUE_ENTRIES = 'unique_videos';
 	const METRIC_UNIQUE_PLAYED_ENTRIES = 'unique_played_videos';
+	const METRIC_UNIQUE_VOD_PLAYED_ENTRIES = 'unique_vod_played_videos';
+	const METRIC_UNIQUE_LIVE_PLAYED_ENTRIES = 'unique_live_played_videos';
 	const METRIC_UNIQUE_USERS = 'unique_known_users';
 	const METRIC_CARDINALITY = 'cardinality';
 	const METRIC_COUNT_UGC = 'count_ugc';
@@ -92,11 +94,13 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_VIEW_PERIOD_BUFFER_STARTS = 'view_period_buffer_starts';
 	const METRIC_VIEW_PERIOD_FLAVOR_SWITCHES = 'view_period_flavor_switches';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC = 'avg_view_period_time_sec';
+	const METRIC_LIVE_REALTIME_ENGAGEMENT_PLAY_TIME_SEC = 'live_realtime_eng_view_period_play_time_sum';
 	const METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC = 'live_high_eng_view_period_play_time_sum';
 	const METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC = 'live_good_eng_view_period_play_time_sum';
 	const METRIC_LIVE_FAIR_ENGAGEMENT_PLAY_TIME_SEC = 'live_fair_eng_view_period_play_time_sum';
 	const METRIC_LIVE_LOW_ENGAGEMENT_PLAY_TIME_SEC = 'live_low_eng_view_period_play_time_sum';
 	const METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC = 'live_no_eng_view_period_play_time_sum';
+	const METRIC_LIVE_REALTIME_ENGAGEMENT_RATIO = 'live_realtime_eng_view_period_play_time_rate';
 	const METRIC_LIVE_HIGH_ENGAGEMENT_RATIO = 'live_high_eng_view_period_play_time_rate';
 	const METRIC_LIVE_GOOD_ENGAGEMENT_RATIO = 'live_good_eng_view_period_play_time_rate';
 	const METRIC_LIVE_FAIR_ENGAGEMENT_RATIO = 'live_fair_eng_view_period_play_time_rate';
@@ -438,6 +442,8 @@ class kKavaReportsMgr extends kKavaBase
 	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_PLAYED_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_CONTRIBUTORS => 'floor',
 		self::METRIC_VIEW_UNIQUE_AUDIENCE => 'floor',
@@ -475,6 +481,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
 		self::METRIC_UNIQUE_PLAYED_ENTRIES => true,
+		self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES => true,
+		self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
 		self::METRIC_BUFFER_TIME_RATIO => true,
 		self::METRIC_AVG_BITRATE => true,
@@ -879,6 +887,18 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getCardinalityAggregator(self::METRIC_UNIQUE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
+
 		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
@@ -1103,6 +1123,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
 			self::getLongSumAggregator(self::METRIC_LIVE_VIEW_PERIOD_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_LIVE_REALTIME_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$realtime_engagement))),
+			self::getLongSumAggregator(self::METRIC_LIVE_REALTIME_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 
 		self::$aggregations_def[self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1374,6 +1401,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_JOIN_TIME,
 				self::METRIC_JOIN_TIME_SUM,
 				self::METRIC_JOIN_TIME_COUNT));
+
+		self::$metrics_def[self::METRIC_LIVE_REALTIME_ENGAGEMENT_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_REALTIME_ENGAGEMENT_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_LIVE_REALTIME_ENGAGEMENT_RATIO,
+				self::METRIC_LIVE_REALTIME_ENGAGEMENT_PLAY_TIME_SEC,
+				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC));
 
 		self::$metrics_def[self::METRIC_LIVE_HIGH_ENGAGEMENT_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
