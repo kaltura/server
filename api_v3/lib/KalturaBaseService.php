@@ -67,7 +67,7 @@ abstract class KalturaBaseService
 	public function adjustArguments(&$arguments = null, $actionParams = null)
 	{
 		$params = requestUtils::getRequestParams();
-		$result = multiLingualUtils::shouldResetParamsAndDeserialize('entry', $params);
+		$result = multiLingualUtils::shouldResetParamsAndDeserialize($params);
 		
 		if (!$result['skipDeserializer'])
 		{

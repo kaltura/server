@@ -231,22 +231,21 @@ class multiLingualUtils
 	}
 	
 	/**
-	 * @param $object
-	 * @param &$params
+	 * @param $params
 	 * @return array(bool,array)
-	 * If needed this function fixes the params and returns if they should be re deserialized or not
+	 * If needed this function fixes the params and returns a boolean if they should be re deserialized or not
 	 */
-	public static function shouldResetParamsAndDeserialize($object, $params)
+	public static function shouldResetParamsAndDeserialize($params)
 	{
 		$skipDeserializer = true;
-		$supportedFields = $object::getMultiLingualSupportedFields();
 		foreach ($params as $key => $param)
 		{
-			foreach ($supportedFields as $fieldName)
+			foreach ($param as $fieldName => $value)
 			{
-				if (isset($param[self::MULTI_LINGUAL . '_' . $fieldName]))
+				if (self::MULTI_LINGUAL . '_' === substr($fieldName, 0, 13))
 				{
-					$params[$key][$fieldName] = $param[self::MULTI_LINGUAL . '_' . $fieldName];
+					$newFieldName = substr($fieldName, strrpos($fieldName, '_') + 1);
+					$params[$key][$newFieldName] = $param[self::MULTI_LINGUAL . '_' . $newFieldName];
 					$skipDeserializer = false;
 				}
 			}
