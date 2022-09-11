@@ -95,7 +95,7 @@ class kAccessControlModifyRequestHostRegexAction extends kRuleAction
 	}
 	
 	/**
-	 * @param string $replacement
+	 * @param int $checkAliveTimeoutMs
 	 */
 	public function setCheckAliveTimeoutMs($checkAliveTimeoutMs)
 	{
