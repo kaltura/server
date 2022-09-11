@@ -114,7 +114,7 @@ class Partner extends BasePartner
 
 	const IS_SELF_SERVE = 'isSelfServe';
 	
-	const EP_ALLOWED_TEMPLATES = 'ep_allowed_templates';
+	const EVENT_PLATFORM_ALLOWED_TEMPLATES = 'event_platform_allowed_templates';
 	
 	private $cdnWhiteListCache = array();
 
@@ -2351,14 +2351,14 @@ class Partner extends BasePartner
 		return in_array($this->status, array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
 	}
 	
-	public function getEpAllowedTemplates()
+	public function getEventPlatformAllowedTemplates()
 	{
-		return $this->getFromCustomData(self::EP_ALLOWED_TEMPLATES, null, '');
+		return $this->getFromCustomData(self::EVENT_PLATFORM_ALLOWED_TEMPLATES, null, '');
 	}
 	
-	public function setEpAllowedTemplates($v)
+	public function setEventPlatformAllowedTemplates($v)
 	{
-		return $this->putInCustomData(self::EP_ALLOWED_TEMPLATES, $v);
+		return $this->putInCustomData(self::EVENT_PLATFORM_ALLOWED_TEMPLATES, $v);
 	}
 }
 

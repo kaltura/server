@@ -467,7 +467,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @var string
 	 * @requiresPermission insert,update
 	 */
-	public $epAllowedTemplates;
+	public $eventPlatformAllowedTemplates;
 	
 	private static $map_between_objects = array
 	(
@@ -481,7 +481,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe', 'allowedDomains',
-		'excludedAdminRoleName', 'epAllowedTemplates'
+		'excludedAdminRoleName', 'eventPlatformAllowedTemplates'
 	);
 	
 	public function getMapBetweenObjects ( )

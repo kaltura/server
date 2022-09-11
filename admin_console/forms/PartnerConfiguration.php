@@ -605,8 +605,8 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		
-		$this->addElement('text', 'ep_allowed_templates', array(
-			'label'			=> 'EP Allowed Templates:',
+		$this->addElement('text', 'event_platform_allowed_templates', array(
+			'label'			=> 'Event Platform Allowed Templates:',
 			'filters'		=> array('StringTrim'),
 		));
 
@@ -1057,7 +1057,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
 		$this->addDisplayGroup(array('extended_free_trail', 'extended_free_trail_expiry_date', 'extended_free_trail_expiry_reason'), 'accountOptionsMonitorUsage');
 		$this->addDisplayGroup(array('is_first_login', 'crossLine'), 'accountOptions');
-		$this->addDisplayGroup(array('is_self_serve', 'ep_allowed_templates', 'crossLine'), 'selfServeSettings', array('legend' => 'Self Serve Settings'));
+		$this->addDisplayGroup(array('is_self_serve', 'event_platform_allowed_templates', 'crossLine'), 'selfServeSettings', array('legend' => 'Self Serve Settings'));
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
 									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',
