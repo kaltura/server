@@ -12,6 +12,13 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2022_08_22_game_services_add_partner.php
 
+## Add groupUser list permission for game service partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23842
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_09_06_update_groupuser_permission.php
+
 # Rigel 18.13.0
 ## Changes to Co-editors or Co-publishers changed email event notification templates ##
 * Issue Type: Task
