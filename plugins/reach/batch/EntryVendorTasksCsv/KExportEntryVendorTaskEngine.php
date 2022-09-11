@@ -69,8 +69,48 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 			$tasksCount = count($entryVendorTaskList->objects);
 			$totalCount += $tasksCount;
 			$lastObject = end($entryVendorTaskList->objects);
-			$lastCreatedAt = $lastObject->createdAt+1;
+			$lastCreatedAt = $lastObject->createdAt;
 			KalturaLog::debug("Adding More - $tasksCount totalCount - " . $totalCount);
+			$lastCreatedAtFilter = clone $filter;
+			$lastCreatedAtFilter->createdAtGreaterThanOrEqual = $lastCreatedAt;
+			$lastCreatedAtFilter->createdAtLessThanOrEqual = $lastCreatedAt;
+			$lastCreatedAtFilter->orderBy = KalturaEntryVendorTaskOrderBy::ID_ASC;
+			$internalPager = new KalturaFilterPager();
+			$internalPager->pageSize = 500;
+			$internalPager->pageIndex = 1;
+			do {
+				try {
+					$lastCreatedAtVendorTaskList = kBatchBase::$kClient->entryVendorTask->listAction($lastCreatedAtFilter, $internalPager);
+					$returnedLastCreatedAtSize = count($lastCreatedAtVendorTaskList->objects);
+				} catch (Exception $e) {
+					KalturaLog::info("Couldn't list entry Vendor Tasks on date: [$lastCreatedAt] on page:[$internalPager->pageIndex]" . $e->getMessage());
+					$this->apiError = $e;
+					return;
+				}
+				$differedLastCreatedAtObjects = array();
+				foreach ($lastCreatedAtVendorTaskList->objects as $lastCreatedEntryVendorTask) {
+					$found = false;
+					foreach ($entryVendorTaskList->objects as $entryVendorTask) {
+						if ($lastCreatedEntryVendorTask->id == $entryVendorTask->id) {
+							$found = true;
+							break;
+						}
+					}
+					if (!$found) {
+						$differedLastCreatedAtObjects[] = $lastCreatedEntryVendorTask;
+					}
+				}
+				if (count($differedLastCreatedAtObjects)) {
+					$this->addEntryVendorTasksToCsv($differedLastCreatedAtObjects, $csvFile);
+					$differedCount = count($differedLastCreatedAtObjects);
+					$totalCount += $differedCount;
+					KalturaLog::debug("Adding More - $differedCount totalCount - " . $totalCount);
+				}
+				unset($lastCreatedAtVendorTaskList);
+				unset($differedLastCreatedAtObjects);
+				$internalPager->pageIndex+=1;
+			} while ($internalPager->pageSize == $returnedLastCreatedAtSize);
+			$lastCreatedAt += 1;
 			unset($entryVendorTaskList);
 			if (function_exists('gc_collect_cycles')) // php 5.3 and above
 				gc_collect_cycles();
