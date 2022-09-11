@@ -454,6 +454,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					$hasEmptryField = true;
 					break;
 				}
+				$value = array_map('SphinxUtils::escapeString', $value);
 				$values[] = $value;
 			}
 			
