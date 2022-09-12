@@ -64,7 +64,7 @@ abstract class KalturaBaseService
 	 * should be re deserialized
 	 * This function examines the input and rebuilds the action arguments with the new multi-lingual params
 	 **/
-	public function adjustArguments(&$arguments = null, $actionParams = null)
+	public function adjustMultiLingualArguments(&$arguments = null, $actionParams = null)
 	{
 		$params = requestUtils::getRequestParams();
 		$result = multiLingualUtils::shouldResetParamsAndDeserialize($params);

@@ -252,7 +252,7 @@ class KalturaActionReflector extends KalturaReflector
 			$instance->setResponseProfile($responseProfile);
 		}
 		
-		$instance->adjustArguments($arguments, $actionParams);
+		$instance->adjustMultiLingualArguments($arguments, $actionParams);
 		$instance->initService($this->_actionServiceId, $this->getActionClassInfo()->serviceName, $this->getActionInfo()->action);
 		
 	}

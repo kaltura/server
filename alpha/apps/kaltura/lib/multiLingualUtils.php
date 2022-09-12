@@ -8,7 +8,7 @@ class multiLingualUtils
 	
 	/**
 	 * Returns an array containing the default value of the field and the default language of the object.
-	 * Or null in both cells if the db fields are not to be updated
+	 * If the db fields should not be updated, return null in both cells
 	 *
 	 * @param $object
 	 * @param $field
@@ -34,8 +34,8 @@ class multiLingualUtils
 	}
 	
 	/**
-	 * remove from the new mapping the values that should be set in the db fields, and set the fixed mapping in the object
-	 * in the object
+	 * remove from the new mapping the values that should be set in the db fields, and set the adjusted mapping
+	 * in the object's custom data field
 	 * Sets the default language of the object if applicable
 	 *
 	 * @param $object multilingual supported object
@@ -60,8 +60,7 @@ class multiLingualUtils
 	/**
 	 * Returns the language that should be considered as the default language for the object
 	 *
-	 * @return string Returns the language that should be considered as the default language for the object, or
-	 * null if the call does not support multi-lingual strings
+	 * @return string default language for the object, or null if the call does not support multi-lingual strings
 	 *
 	 * @param $object multilingual supported object
 	 * @param array $newMapping new mapping received in the api call
@@ -100,18 +99,18 @@ class multiLingualUtils
 		}
 	}
 	
-	//Returns the default value from the mapping and
+	// Returns the default field value from the mapping
 	protected static function getDefaultValueFromNewMapping($newMapping, $field, $defaultLanguage, $object)
 	{
 		$value = $newMapping[$defaultLanguage];
 		$currentMultiLangMapping = json_decode(self::getMultiLanguageMapping($object), true);
 		
-		if(!$value) // new mapping does not contain value in default language, or input was a single string converted into array
+		if(!$value) // new mapping does not contain value in default language or input was a single string converted into array
 		{
 			if (!$currentMultiLangMapping[$field] ||
 				kCurrentContext::$language === self::getDefaultLanguage($object) ||
 				(strtolower(kCurrentContext::$language) === self::MULTI && isset($newMapping['default'])))
-			{ // input was a single string converted into array, and needs to be set a the default in the db field
+			{ // input was a single string converted into array and needs to be set as the default value in the db field
 				return $newMapping['default'];
 			}
 			// the default in the db field should not be changed
@@ -123,10 +122,9 @@ class multiLingualUtils
 	
 	public static function addFieldMappingToMultiLangMapping(&$multiLangMapping, $field, $value, $object)
 	{
-		$valueToAdd = self::isValueInNewLanguage($object, $value);
-		if ($valueToAdd) // add the new value to the mapping, mapped to the context language
+		if (self::isValueInNewLanguage($object, $value)) // add the new value to the mapping, mapped to the context language
 		{
-			$multiLangMapping[$field][kCurrentContext::$language] = $valueToAdd;
+			$multiLangMapping[$field][kCurrentContext::$language] = $value['default'];
 		}
 		elseif(!isset($value['default']))
 		{
@@ -149,7 +147,7 @@ class multiLingualUtils
 				kCurrentContext::$language !== self::getDefaultLanguage($object) &&
 				strtolower(kCurrentContext::$language) !== self::MULTI)
 			{
-				return $value['default'];
+				return true;
 			}
 			return false;
 		}
@@ -242,7 +240,7 @@ class multiLingualUtils
 		{
 			foreach ($param as $fieldName => $value)
 			{
-				if (self::MULTI_LINGUAL . '_' === substr($fieldName, 0, 13))
+				if (StringHelper::startsWith(self::MULTI_LINGUAL . '_', $fieldName))//self::MULTI_LINGUAL . '_' === substr($fieldName, 0, 13)) //TODO change to startsWith
 				{
 					$newFieldName = substr($fieldName, strrpos($fieldName, '_') + 1);
 					$params[$key][$newFieldName] = $param[self::MULTI_LINGUAL . '_' . $newFieldName];
