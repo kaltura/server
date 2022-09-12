@@ -4022,7 +4022,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getObjectParams($params = null)
 	{
-		$body = array( //TODO concat all names, descriptions and tags in multiple languages
+		$body = array(
 			'parent_id' => $this->getParentEntryId(),
 			'status' => $this->getStatus(),
 			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
