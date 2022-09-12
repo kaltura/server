@@ -106,7 +106,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		}
 		else
 		{
-			$entryVendorTaskFilter->statusIn = EntryVendorTaskStatus::PENDING .','. EntryVendorTaskStatus::PROCESSING.','.EntryVendorTaskStatus::ERROR;
+			$entryVendorTaskFilter->statusIn = EntryVendorTaskStatus::PENDING . ',' . EntryVendorTaskStatus::PROCESSING . ',' . EntryVendorTaskStatus::ERROR . ',' . EntryVendorTaskStatus::SCHEDULED;
 		}
 	}
 
