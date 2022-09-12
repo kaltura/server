@@ -501,6 +501,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $eventPlatformAllowedTemplates;
 	
+	
 	private static $map_between_objects = array
 	(
 		"id",
@@ -853,15 +854,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setAllowedDomains('');
-		}
-		
-		if(!is_null($this->defaultLanguage))
-		{
-			$object_to_fill->setDefaultLanguage($this->defaultLanguage);
-		}
-		else
-		{
-			$object_to_fill->setDefaultLanguage(null);
 		}
 		
 		return $object_to_fill;
