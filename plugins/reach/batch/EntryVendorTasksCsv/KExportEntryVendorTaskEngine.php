@@ -69,12 +69,69 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 			$tasksCount = count($entryVendorTaskList->objects);
 			$totalCount += $tasksCount;
 			$lastObject = end($entryVendorTaskList->objects);
-			$lastCreatedAt = $lastObject->createdAt+1;
+			$lastCreatedAt = $lastObject->createdAt;
 			KalturaLog::debug("Adding More - $tasksCount totalCount - " . $totalCount);
+			$lastCreatedAtTaskObjects = array();
+			foreach (array_reverse($entryVendorTaskList->objects) as $entryVendorTask)
+			{
+				if ($entryVendorTask->createdAt == $lastCreatedAt)
+				{
+					$lastCreatedAtTaskObjects[] = $entryVendorTask->id;
+				}
+				else
+				{
+					break;
+				}
+			}
+			$this->checkForAdditionalObjectsLastCreatedAt($filter, $lastCreatedAt, $lastCreatedAtTaskObjects, $totalCount, $csvFile);
+			$lastCreatedAt += 1;
 			unset($entryVendorTaskList);
 			if (function_exists('gc_collect_cycles')) // php 5.3 and above
 				gc_collect_cycles();
 		} while ($pager->pageSize == $returnedSize);
+	}
+	
+	protected function checkForAdditionalObjectsLastCreatedAt($filter, $lastCreatedAtTimeStamp, $lastCreatedAtTaskObjects, &$totalCount, $csvFile)
+	{
+		$lastCreatedAtFilter = clone $filter;
+		$lastCreatedAtFilter->createdAtGreaterThanOrEqual = $lastCreatedAtTimeStamp;
+		$lastCreatedAtFilter->createdAtLessThanOrEqual = $lastCreatedAtTimeStamp;
+		$lastCreatedAtFilter->orderBy = KalturaEntryVendorTaskOrderBy::ID_ASC;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$pager->pageIndex = 1;
+		do
+		{
+			try
+			{
+				$lastCreatedAtVendorTaskList = kBatchBase::$kClient->entryVendorTask->listAction($lastCreatedAtFilter, $pager);
+				$returnedLastCreatedAtSize = count($lastCreatedAtVendorTaskList->objects);
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::info("Couldn't list entry Vendor Tasks on date: [$lastCreatedAtTimeStamp] on page:[$pager->pageIndex]" . $e->getMessage());
+				$this->apiError = $e;
+				return;
+			}
+			$taskObjectsToAdd = array();
+			foreach ($lastCreatedAtVendorTaskList->objects as $entryVendorTask)
+			{
+				if (!in_array($entryVendorTask->id, $lastCreatedAtTaskObjects))
+				{
+					$taskObjectsToAdd[] = $entryVendorTask;
+				}
+			}
+			if (count($taskObjectsToAdd))
+			{
+				$this->addEntryVendorTasksToCsv($taskObjectsToAdd, $csvFile);
+				$skippedTasksCount = count($taskObjectsToAdd);
+				$totalCount += $skippedTasksCount;
+				KalturaLog::debug("Adding More - $skippedTasksCount totalCount - " . $totalCount);
+			}
+			unset($lastCreatedAtVendorTaskList);
+			unset($taskObjectsToAdd);
+			$pager->pageIndex += 1;
+		} while ($pager->pageSize == $returnedLastCreatedAtSize);
 	}
 	
 	/**
