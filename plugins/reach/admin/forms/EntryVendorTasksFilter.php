@@ -25,6 +25,7 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 			'multiOptions' => array(
 				'' => 'Status',
 				EntryVendorTaskStatus::PENDING => 'PENDING',
+				EntryVendorTaskStatus::SCHEDULED => 'SCHEDULED',
 				EntryVendorTaskStatus::PROCESSING => 'PROCESSING',
 				EntryVendorTaskStatus::ERROR => 'ERROR'
 		)));

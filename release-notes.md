@@ -1,4 +1,4 @@
-# Rigel 18.14.0
+# Rigel-18.14.0
 ## Add event notification that enables to create dynamic app instance ##
 - Issue Type: Task
 - Issue ID: PLAT-23200
@@ -10,8 +10,33 @@
 ### Deployment scripts ###
 	php deployment/updates/scripts/2021_09_01_partner_added_custom_application.php
 
+## Add partner for game services ##
+* Issue Type: Task
+* Issue ID: PLAT-23854
 
-# Rigel 18.13.0
+### Configuration ###
+First replace all tokens from the ini file below (under game services section) and remove ".template" from the file name :
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_08_22_game_services_add_partner.php
+
+## Add permission to insert and update eventPlatformAllowedTemplates property on partner object ##
+* Issue Type: Task
+* Issue ID: PLAT-23857
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_09_07_add_permission_event_platform_allowed_templates_partner_object.php
+
+## Add groupUser list permission for game service partner ##
+* Issue Type: Task
+* Issue ID: PLAT-23842
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_09_06_update_groupuser_permission.php
+
+# Rigel-18.13.0
 ## Changes to Co-editors or Co-publishers changed email event notification templates ##
 * Issue Type: Task
 * Issue ID: SUP-28334
@@ -71,7 +96,7 @@ Enable plugin:
 * Issue ID: PLAT-23825
 
 ### Configuration ###
-First replace all tokens from the ini file below (under kme section) and remove ".template" from the file name :
+First replace all tokens from the ini file below (under bi section) and remove ".template" from the file name :
 
 deployment/base/scripts/init_data/01.Partner.template.ini
 
