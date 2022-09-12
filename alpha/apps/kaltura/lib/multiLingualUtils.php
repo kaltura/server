@@ -260,4 +260,26 @@ class multiLingualUtils
 		}
 		return isset(kCurrentContext::$language);
 	}
+	
+	public static function getFieldValue($dbObject, $fieldName)
+	{
+		$value = $dbObject->getDefaultFieldValue($fieldName);
+		$mapping = self::getMultiLanguageMapping($dbObject);
+		if (!$mapping || ($mapping == ''))
+		{
+			return $value;
+		}
+		return self::concatMultiLingualValuesForField($value, $mapping, $fieldName);
+	}
+	
+	protected static function concatMultiLingualValuesForField($value, $mapping, $fieldName)
+	{
+		$mapping = json_decode($mapping, true);
+		$result = $value;
+		foreach ($mapping[$fieldName] as $languageKey => $currentFieldValue)
+		{
+			$result = $result. ',' .$currentFieldValue;
+		}
+		return $result;
+	}
 }

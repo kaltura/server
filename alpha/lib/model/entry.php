@@ -4022,7 +4022,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getObjectParams($params = null)
 	{
-		$body = array(
+		$body = array( //TODO concat all names, descriptions and tags in multiple languages
 			'parent_id' => $this->getParentEntryId(),
 			'status' => $this->getStatus(),
 			'entitled_kusers_edit' => $this->getEntitledKusersEditArray(),
@@ -4030,9 +4030,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'entitled_kusers_view' => $this->getEntitledKusersViewArray(),
 			'kuser_id' => $this->getKuserId(),
 			'creator_kuser_id' => $this->getCreatorKuserId(),
-			'name' => $this->getName(),
-			'description' => $this->getDescription(),
-			'tags' => explode(',', $this->getTags()),
+			'name' => multiLingualUtils::getFieldValue($this, self::NAME),
+			'description' => multiLingualUtils::getFieldValue($this, self::DESCRIPTION),
+			'tags' => explode(',', multiLingualUtils::getFieldValue($this, self::TAGS)),
 			'partner_id' => $this->getPartnerId(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'reference_id' => $this->getReferenceID(),
