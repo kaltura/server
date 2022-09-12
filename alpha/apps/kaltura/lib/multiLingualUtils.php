@@ -240,7 +240,7 @@ class multiLingualUtils
 		{
 			foreach ($param as $fieldName => $value)
 			{
-				if (StringHelper::startsWith(self::MULTI_LINGUAL . '_', $fieldName))//self::MULTI_LINGUAL . '_' === substr($fieldName, 0, 13)) //TODO change to startsWith
+				if (StringHelper::startsWith(self::MULTI_LINGUAL . '_', $fieldName))
 				{
 					$newFieldName = substr($fieldName, strrpos($fieldName, '_') + 1);
 					$params[$key][$newFieldName] = $param[self::MULTI_LINGUAL . '_' . $newFieldName];
