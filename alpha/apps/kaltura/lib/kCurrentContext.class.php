@@ -16,7 +16,7 @@ class kCurrentContext
 	public static $ks_object;
 	
 	/**
-	 * The specified language in which the request was made
+	 * language code (2char) of the returned object
 	 * @var string
 	 */
 	public static $language;

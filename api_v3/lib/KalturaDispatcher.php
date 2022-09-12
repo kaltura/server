@@ -9,15 +9,7 @@ class KalturaDispatcher
 	private $arguments = null;
 	
 	const OWNER_ONLY_OPTION = "ownerOnly";
-	const BASE_ENTRY_SERVICE = 'baseentry';
-	const MULTI_LINGUAL_NAME = 'multiLingual_name';
-	const NAME = 'name';
-	const MULTI_LINGUAL_DESCRIPTION = 'multiLingual_description';
-	const DESCRIPTION = 'description';
-	const MULTI_LINGUAL_TAGS = 'multiLingual_tags';
-	const TAGS = 'tags';
-	const ENTRY = 'entry';
-	
+
 	/**
 	 * Return a KalturaDispatcher instance
 	 *
@@ -76,12 +68,6 @@ class KalturaDispatcher
              throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
 		
-		if ($service = self::BASE_ENTRY_SERVICE)
-		{
-			$this->normalizeMultiLingualValues($params);
-		}
-		
-		
 		$actionParams = $actionReflector->getActionParams();
 		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
@@ -137,7 +123,7 @@ class KalturaDispatcher
 		
 		// initialize the service before invoking the action on it
 		// action reflector will init the service to maintain the pluginable action transparency
-		$actionReflector->initService($responseProfile);
+		$actionReflector->initService($responseProfile, $this->arguments, $actionParams);
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");
@@ -166,23 +152,6 @@ class KalturaDispatcher
 		return $res;
 	}
 	
-	
-	protected function normalizeMultiLingualValues(&$params)
-	{
-		if (isset($params[self::ENTRY][self::MULTI_LINGUAL_NAME]))
-		{
-			$params[self::ENTRY][self::NAME] = $params[self::ENTRY][self::MULTI_LINGUAL_NAME];
-		}
-		if (isset($params[self::ENTRY][self::MULTI_LINGUAL_DESCRIPTION]))
-		{
-			$params[self::ENTRY][self::DESCRIPTION] = $params[self::ENTRY][self::MULTI_LINGUAL_DESCRIPTION];
-		}
-		if (isset($params[self::ENTRY][self::MULTI_LINGUAL_TAGS]))
-		{
-			$params[self::ENTRY][self::TAGS] = $params[self::ENTRY][self::MULTI_LINGUAL_TAGS];
-		}
-	}
-
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

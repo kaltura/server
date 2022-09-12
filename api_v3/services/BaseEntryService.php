@@ -8,12 +8,7 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
-	
 	const PLAYBACK_SECRET = 'playback_secret';
-	const NAME = 'name';
-	const DESCRIPTION = 'description';
-	const TAGS = 'tags';
-	const MULTI = 'MULTI';
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
      */
@@ -87,27 +82,9 @@ class BaseEntryService extends KalturaEntryService
 		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
     	
-	    $entry->fromObject($dbEntry, $this->getResponseProfile());
-		$this->handleMultiLanguageMapping($entry);
-	    return $entry;
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
+		return $entry;
     }
-	
-	protected function handleMultiLanguageMapping(KalturaBaseEntry &$entry)
-	{
-		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
-		$language = kCurrentContext::getLanguage();
-		if ($language && $defaultLanguage != $language)
-		{
-			$multiLanguageMap = $entry->multiLanguageMapping;
-			if ($multiLanguageMap)
-			{
-				if ($language == self::MULTI)
-				{
-					$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true), $defaultLanguage);
-				}
-			}
-		}
-	}
 	
     /**
      * Attach content resource to entry in status NO_MEDIA
@@ -359,28 +336,8 @@ class BaseEntryService extends KalturaEntryService
     function getAction($entryId, $version = -1)
     {
 		$entry = $this->getEntry($entryId, $version);
-	    $this->handleMultiLanguageMapping($entry);
 		return $entry;
     }
-	
-	protected function setMultiLanguageStringOnField(KalturaBaseEntry &$entry, $multiLanguageMap, $defaultLanguage)
-	{
-		if ($entry->name)
-		{
-			$multiLanguageMap[self::NAME][$defaultLanguage] = $entry->name;
-		}
-		if ($entry->description)
-		{
-			$multiLanguageMap[self::DESCRIPTION][$defaultLanguage] = $entry->description;
-		}
-		if ($entry->tags)
-		{
-			$multiLanguageMap[self::TAGS][$defaultLanguage] = $entry->tags;
-		}
-		$entry->name = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::NAME]);
-		$entry->description = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::DESCRIPTION]);
-		$entry->tags = KalturaKeyValueArray::fromKeyValueArray($multiLanguageMap[self::TAGS]);
-	}
 	
     /**
      * Get remote storage existing paths for the asset.
@@ -604,26 +561,6 @@ class BaseEntryService extends KalturaEntryService
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
 		
-		$defaultLanguage = $this->getPartner()->getDefaultLanguage();
-		$language = kCurrentContext::getLanguage();
-		if ($language && $defaultLanguage != $language)
-		{
-			$updatedResponseObjects = array();
-			foreach ($response->objects as $entry)
-			{
-				/* @var KalturaBaseEntry $entry */
-				$multiLanguageMap = $entry->multiLanguageMapping;
-				if ($multiLanguageMap)
-				{
-					if ($language == 'MULTI')
-					{
-						$this->setMultiLanguageStringOnField($entry, json_decode($multiLanguageMap, true), $defaultLanguage);
-					}
-				}
-				array_push($updatedResponseObjects, $entry);
-			}
-			$response->objects = $updatedResponseObjects;
-		}
 		return $response;
 	}
 	

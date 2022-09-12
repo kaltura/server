@@ -391,11 +391,7 @@ class KalturaRequestDeserializer
 				$obj->$name = $arrayObj;
 				if ($type == 'KalturaMultiLingualStringArray' && !is_array($value))
 				{
-					$multiLangString = new KalturaMultiLingualString();
-					$multiLangString->language = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId())->getDefaultLanguage();
-					$multiLangString->value = $value;
-					$multiLangStringArr = new KalturaMultiLingualStringArray();
-					$obj->$name = $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
+					$this->generateMultiLingualStringFromString($obj, $name, $value);
 				}
 				continue;
 			}
@@ -414,6 +410,22 @@ class KalturaRequestDeserializer
 			}
 		}
 		return $obj;
+	}
+	
+	/**
+	 * This function created a KalturaMultiLingualStringArray that reflects the value of the string that was received in the call
+	 *
+	 * @param $object an object supporting multi-lingual strings
+	 * @param $fieldName the name of the supported field
+	 * @param $value the value of the supported field
+	 */
+	protected function generateMultiLingualStringFromString(&$object, $fieldName, $value)
+	{
+		$multiLangString = new KalturaMultiLingualString();
+		$multiLangString->language = 'default';
+		$multiLangString->value = $value;
+		$multiLangStringArr = new KalturaMultiLingualStringArray();
+		$object->$fieldName = $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
 	}
 	
 	private function castSimpleType($type, $var)

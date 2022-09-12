@@ -210,12 +210,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	public $state;
 	
 	/**
-	 * The default language of the partner
-	 * @var string
-	 */
-	public $defaultLanguage;
-	
-	/**
 	 * @var KalturaKeyValueArray
 	 */
 	public $additionalParams;
@@ -481,7 +475,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe','allowedDomains',
-		'excludedAdminRoleName', 'defaultLanguage'
+		'excludedAdminRoleName'
 	);
 	
 	public function getMapBetweenObjects ( )

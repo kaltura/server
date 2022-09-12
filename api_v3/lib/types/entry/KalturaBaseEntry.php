@@ -408,14 +408,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @var bool
 	 */
 	public $blockAutoTranscript;
-	
-	/**
-	 * Can be used to store a mapping of fields values in different languages
-	 *
-	 * @var string
-	 * @readonly
-	 */
-	public $multiLanguageMapping;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -468,7 +460,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"application",
 		"applicationVersion",
 		"blockAutoTranscript",
-	    "multiLanguageMapping",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -541,25 +532,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
 		$requestLanguage = kCurrentContext::getLanguage();
-		if($requestLanguage)
-		{
-			$this->injectCorrectLanguageValues($sourceObject, $requestLanguage);
-		}
-	}
-	
-	protected function injectCorrectLanguageValues($sourceObject, $requestLanguage)
-	{
-		$multiLangMapping = json_decode($sourceObject->getMultiLanguageMapping(), true);
-		$name = $sourceObject->extractLanguageValue($multiLangMapping, self::NAME, $requestLanguage);
-		$description = $sourceObject->extractLanguageValue($multiLangMapping, self::DESCRIPTION, $requestLanguage);
-		$tags = $sourceObject->extractLanguageValue($multiLangMapping, self::TAGS, $requestLanguage);
-		$tags = ktagword::updateTags($this->tags, $tags , false );
-		if($multiLangMapping)
-		{
-			$this->name = $name ? $name : $this->name;
-			$this->description = $description ? $description : $this->description;
-			$this->tags = $tags ? $tags : $this->tags;
-		}
+		
+		multiLingualUtils::setCorrectLanguageValuesInResponse($this, $sourceObject, $requestLanguage);
 	}
 	
 	public function validateObjectsExist(entry $sourceObject = null)

@@ -413,7 +413,6 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			{
 				if ($property->getArrayType() == 'KalturaMultiLingualString')
 				{
-					echo "KalturaMultiLingualString\n";
 					$propertyElement->setAttribute("name", "multiLingual_".$propName);
 					$multiLingualPropertyElement = $this->_doc->createElement("property");
 					$multiLingualPropertyElement->setAttribute("name", $propName);
