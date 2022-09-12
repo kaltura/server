@@ -388,6 +388,7 @@ class UserService extends KalturaBaseUserService
 	 * @action loginDataResetPassword
 	 * @param string $loginDataId The user's current email address that identified the user for login
 	 * @param string $newPassword The user's new password
+	 * @return KalturaUser The user object represented by the user and login IDs
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
 	 * @throws KalturaErrors::PASSWORD_ALREADY_USED
@@ -399,10 +400,22 @@ class UserService extends KalturaBaseUserService
 	public function loginDataResetPasswordAction($loginDataId, $newPassword)
 	{
 		self::validateLoginDataParams(array('id' => $loginDataId));
-		
+
+		$loginData = UserLoginDataPeer::getByEmail($loginDataId);
+		if(!$loginData)
+		{
+			throw new KalturaAPIException(APIErrors::LOGIN_DATA_NOT_FOUND);
+		}
+
+		$user = kuserPeer::getByLoginDataAndPartner($loginData->getId(), kCurrentContext::$ks_partner_id);
+		if(!$user)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+		}
+
 		try
 		{
-			$updateLoginData = parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
+			parent::updateLoginDataImpl($loginDataId , null , null, $newPassword, null, null, null, true);
 		}
 		catch(KalturaAPIException $e)
 		{
@@ -417,7 +430,7 @@ class UserService extends KalturaBaseUserService
 			}
 			throw $e;
 		}
-		return $updateLoginData;
+		return $this->getResponseUserWithEncryptedSeed($user);
 	}
 	
 	/**
@@ -573,7 +586,12 @@ class UserService extends KalturaBaseUserService
 			}
 			throw $e;
 		}
-		
+
+		return $this->getResponseUserWithEncryptedSeed($user);
+	}
+
+	protected function getResponseUserWithEncryptedSeed($user)
+	{
 		$apiUser = new KalturaUser();
 		$apiUser->fromObject($user, $this->getResponseProfile());
 		if(!$user->getIsAdmin())

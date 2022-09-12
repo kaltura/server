@@ -184,7 +184,7 @@ function readRulesAndScoresFromUsersReports(&$rulesMap, &$userRows, &$userScores
 					$rulesMap[$rule->id] = $rule->description;
 				}
 				
-				$scores[$rule->id] = $rule->score;
+				$scores[$rule->id] = isset($scores[$rule->id]) ? $scores[$rule->id] + $rule->score : $rule->score;
 			}
 			
 			if (!compareSumOfScoresWithTotalScore($scores, $userTotalScore))

@@ -42,7 +42,7 @@ class UserScoreService extends KalturaBaseService
 	
 	/**
 	 * @action update
-	 * @param int $gameObjectId
+	 * @param string $gameObjectId
 	 * @param KalturaGameObjectType $gameObjectType
 	 * @param string $userId
 	 * @param int $score
@@ -86,7 +86,7 @@ class UserScoreService extends KalturaBaseService
 	
 	/**
 	 * @action delete
-	 * @param int $gameObjectId
+	 * @param string $gameObjectId
 	 * @param KalturaGameObjectType $gameObjectType
 	 * @param string $userId
 	 * @return KalturaUserScorePropertiesResponse

@@ -1334,7 +1334,7 @@ HTML;
     	                	$replaceValue = null;
     	                	break;
     	                }
-    	                    
+    	                
     	                $replaceValue = $replaceValue->$getter();
     	            }
     	            
@@ -1349,7 +1349,7 @@ HTML;
     	            if (is_numeric($replaceValue) || is_string($replaceValue))
     	            {
                         $propertyAsDom = dom_import_simplexml($property);
-                        $propertyAsDom->nodeValue = $replaceValue;
+                        $propertyAsDom->nodeValue = htmlspecialchars($replaceValue);
     	            }
 	            }
                         

@@ -12,5 +12,5 @@ abstract class QueueProvider
 
     abstract public function exists($queueName);
     abstract public function create($queueName);    
-    abstract public function send($queueName, $message);    
+    abstract public function send($queueName, $message, $msgArgs = array());
 }

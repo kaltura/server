@@ -1335,7 +1335,7 @@ class kJobsManager
 			$data = new kBulkDownloadJobData();
 		
 			$data->setEntryIds(implode(",", $chunk));
-			$data->setFlavorParamsId($flavorParamsId);
+			$data->setFlavorParamsId((int)$flavorParamsId);
 			$data->setPuserId($puserId);
 		
 			$jobs[] = self::addJob($jobDb, $data, BatchJobType::BULKDOWNLOAD);

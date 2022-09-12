@@ -14,6 +14,10 @@ class ReportService extends KalturaBaseService
 		ReportType::VAR_USAGE,
 		ReportType::VPAAS_USAGE_MULTI,
 		ReportType::SELF_SERVE_USAGE_VPAAS,
+		ReportType::PARTNER_USAGE_HIGHLIGHTS,
+		ReportType::REACH_PROFILE_USAGE,
+		ReportType::REACH_CATALOG_USAGE,
+		ReportType::CDN_BANDWIDTH_USAGE,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -52,6 +56,10 @@ class ReportService extends KalturaBaseService
 		if(!$objectIds && $reportType != ReportType::VPAAS_USAGE_MULTI)
 		{
 			return $this->getPartnerId();
+		}
+		if ($this->getPartnerId() == Partner::BI_PARTNER_ID)
+		{
+			return $objectIds;
 		}
 			
 		$c = new Criteria();

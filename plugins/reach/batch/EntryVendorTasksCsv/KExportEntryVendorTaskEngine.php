@@ -17,6 +17,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		6 => "ERROR",
 		7 => "ABORTED",
 		8 => "PENDING_ENTRY_READY",
+		9 => "SCHEDULED",
 	);
 	
 	static private $serviceFeatureEnumTranslate = array(

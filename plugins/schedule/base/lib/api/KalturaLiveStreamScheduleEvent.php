@@ -145,19 +145,6 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		{
 			$this->validateEntryField('postEndEntryId', array(KalturaEntryType::MEDIA_CLIP));
 		}
-		if (isset($this->liveFeatures))
-		{
-			$features = [];
-			foreach ($this->liveFeatures as $feature)
-			{
-				$name = !empty($feature->systemName) ? $feature->systemName : get_class($feature);
-				if (in_array($name, $features))
-				{
-					throw new KalturaAPIException(KalturaErrors::DUPLICATE_LIVE_FEATURE, $name);
-				}
-				$features[] = $name;
-			}
-		}
 	}
 	
 	/**

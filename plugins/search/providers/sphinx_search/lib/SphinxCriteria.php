@@ -9,6 +9,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 	const RANKER_BM25 = "expr('1000*bm25f(2.0,0.75,{privacy_by_contexts=0,categories=0,kuser_id=0,entitled_kusers=0,sphinx_match_optimizations=0})')";
 	const WEIGHT = '@weight';
 	const MAX_MATCHES = 10000;
+	const SPHINX_SYNTAX_ERR = 'syntax error';
 	
 	protected static $NEGATIVE_COMPARISON_VALUES = array(baseObjectFilter::NOT_IN, baseObjectFilter::NOT, baseObjectFilter::NOT_CONTAINS);
 	/**
@@ -243,7 +244,13 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 		if($ids === false)
 		{
 			list($sqlState, $errCode, $errDescription) = $pdo->errorInfo();
-			throw new kCoreException("Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]", APIErrors::SEARCH_ENGINE_QUERY_FAILED);
+			$msg = "Invalid sphinx query [$sql]\nSQLSTATE error code [$sqlState]\nDriver error code [$errCode]\nDriver error message [$errDescription]";
+			
+			if (strpos($errDescription, self::SPHINX_SYNTAX_ERR) !== false)
+			{
+				throw new kCoreException($msg, APIErrors::SEARCH_ENGINE_SYNTAX_ERROR);
+			}
+			throw new kCoreException($msg, APIErrors::SEARCH_ENGINE_QUERY_FAILED);
 		}
 		
 		$idsCount = count($ids);
@@ -447,6 +454,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					$hasEmptryField = true;
 					break;
 				}
+				$value = array_map('SphinxUtils::escapeString', $value);
 				$values[] = $value;
 			}
 			

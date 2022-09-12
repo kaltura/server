@@ -25,7 +25,7 @@ class thumbParams extends assetParams
 	}
 	
 	const TAG_DEFAULT_THUMB = "default_thumb";
-	
+	const TAG_TEMP_THUMB = "temp_thumb";	
 	const CUSTOM_DATA_FIELD_SOURCE_PARAMS_ID = "ThumbSourceParamsId";
 	const CUSTOM_DATA_FIELD_CROP_TYPE = "ThumbCropType";
 	const CUSTOM_DATA_FIELD_QUALITY = "ThumbQuality";

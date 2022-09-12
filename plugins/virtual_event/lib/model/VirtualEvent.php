@@ -20,6 +20,7 @@
 	const CUSTOM_DATA_FIELD_REGISTRATION_SE_ID = 'registrationScheduleEventId';
 	const CUSTOM_DATA_FIELD_AGENDA_SE_ID = 'agendaScheduleEventId';
 	const CUSTOM_DATA_FIELD_DELETION_DUE_DATE = 'deletionDueDate';
+	const CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA = 'registrationFormSchema';
 	
 	
 	public function __construct ()
@@ -96,5 +97,16 @@
 	 public function setDeletionDueDate($v)
 	 {
 		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_DELETION_DUE_DATE, $v);
+	 }
+	 
+	 public function getRegistrationFormSchema()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA);
+	 }
+
+	 public function setRegistrationFormSchema($v)
+	 {
+		 $v = str_replace(array("\n", "\r", "\t", "\v", " "), '', $v);
+		 return $this->putInCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA, $v);
 	 }
  }

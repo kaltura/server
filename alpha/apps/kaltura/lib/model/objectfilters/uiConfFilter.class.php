@@ -35,7 +35,7 @@ class uiConfFilter extends baseObjectFilter
 			"_mlikeand_partner_tags",	
 			) , NULL );
 
-		$this->allowed_order_fields = array ( "created_at" , "updated_at", "status" , "obj_type")	;
+		$this->allowed_order_fields = array ( "created_at" , "updated_at", "status" , "obj_type", "id", "name")	;
 			
 	}
 

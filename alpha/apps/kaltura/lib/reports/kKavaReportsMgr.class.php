@@ -32,6 +32,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
 	const METRIC_VIEW_PERIOD_PLAY_TIME = 'sum_view_period';
 	const METRIC_LIVE_VIEW_PERIOD_PLAY_TIME = 'sum_live_view_period';
+	const METRIC_VOD_VIEW_PERIOD_PLAY_TIME = 'sum_vod_view_period';
 	const METRIC_AVG_PLAY_TIME = 'avg_time_viewed';
 	const METRIC_AVG_VIEW_PERIOD_PLAY_TIME = 'avg_view_period_time';
 	const METRIC_PLAYER_IMPRESSION_RATIO = 'load_play_ratio';
@@ -40,6 +41,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_PLAYTHROUGH_RATIO = 'play_through_ratio';
 	const METRIC_UNIQUE_ENTRIES = 'unique_videos';
 	const METRIC_UNIQUE_PLAYED_ENTRIES = 'unique_played_videos';
+	const METRIC_UNIQUE_VOD_PLAYED_ENTRIES = 'unique_vod_played_videos';
+	const METRIC_UNIQUE_LIVE_PLAYED_ENTRIES = 'unique_live_played_videos';
 	const METRIC_UNIQUE_USERS = 'unique_known_users';
 	const METRIC_CARDINALITY = 'cardinality';
 	const METRIC_COUNT_UGC = 'count_ugc';
@@ -108,6 +111,14 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COUNT_ALL_EVENTS = 'count_all';
 	const METRIC_TRANSCODING_DURATION_SEC = 'transcoding_duration_sec';
 	const METRIC_TRANSCODING_DURATION = 'transcoding_duration';
+	const METRIC_REACTION_CLAP_COUNT = 'reaction_clap_clicked';
+	const METRIC_REACTION_HEART_COUNT = 'reaction_heart_clicked';
+	const METRIC_REACTION_THINK_COUNT = 'reaction_think_clicked';
+	const METRIC_REACTION_WOW_COUNT = 'reaction_wow_clicked';
+	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
+	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
+	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
+	const METRIC_DURATION_TOTAL_MIN = 'total_minutes';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -120,6 +131,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_QUARTILE_PLAY_TIME_SEC = 'quartile_play_time';
 	const METRIC_VIEW_PERIOD_PLAY_TIME_SEC = 'view_period_play_time';
 	const METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC = 'live_view_period_play_time';
+	const METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC = 'vod_view_period_play_time';
 	const METRIC_VIEW_BUFFER_TIME_SEC = 'view_buffer_time';
 	const METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC = 'live_view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
@@ -428,6 +440,8 @@ class kKavaReportsMgr extends kKavaBase
 	protected static $transform_metrics = array(
 		self::METRIC_UNIQUE_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_PLAYED_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES => 'floor',
+		self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES => 'floor',
 		self::METRIC_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_CONTRIBUTORS => 'floor',
 		self::METRIC_VIEW_UNIQUE_AUDIENCE => 'floor',
@@ -441,6 +455,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_UNIQUE_DOMAINS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -464,6 +479,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => true,
 		self::METRIC_UNIQUE_ENTRIES => true,
 		self::METRIC_UNIQUE_PLAYED_ENTRIES => true,
+		self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES => true,
+		self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES => true,
 		self::METRIC_UNIQUE_USERS => true,
 		self::METRIC_BUFFER_TIME_RATIO => true,
 		self::METRIC_AVG_BITRATE => true,
@@ -487,6 +504,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_OWNERS => true,
 		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
+		self::METRIC_UNIQUE_DOMAINS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -509,46 +527,46 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $php_timezone_names = array(
-		-840 => 'Pacific/Kiritimati',
-		-780 => 'Pacific/Enderbury',
-		-765 => 'Pacific/Chatham',
-		-720 => 'Pacific/Auckland',
-		-690 => 'Pacific/Norfolk',
-		-660 => 'Asia/Magadan',
-		-630 => 'Australia/Lord_Howe',
-		-600 => 'Australia/Melbourne',
-		-570 => 'Australia/Adelaide',
-		-540 => 'Asia/Tokyo',
-		-525 => 'Australia/Eucla',
-		-480 => 'Asia/Brunei',
-		-420 => 'Asia/Krasnoyarsk',
-		-390 => 'Asia/Rangoon',
-		-360 => 'Asia/Almaty',
-		-345 => 'Asia/Kathmandu',
-		-330 => 'Asia/Colombo',
-		-300 => 'Asia/Karachi',
-		-270 => 'Asia/Kabul',
-		-240 => 'Asia/Dubai',
-		-210 => 'Asia/Tehran',
-		-180 => 'Europe/Moscow',
-		-120 => 'Europe/Helsinki',
-		-60  => 'Europe/Paris',
-		0    => 'Europe/London',
-		60   => 'Atlantic/Azores',
-		120  => 'America/Noronha',
-		180  => 'America/Sao_Paulo',
-		210  => 'America/St_Johns',
-		240  => 'America/Halifax',
-		270  => 'America/Caracas',
-		300  => 'America/New_York',
-		360  => 'America/Chicago',
-		420  => 'America/Denver',
-		480  => 'America/Los_Angeles',
-		540  => 'America/Anchorage',
-		570  => 'Pacific/Marquesas',
-		600  => 'Pacific/Honolulu',
-		660  => 'Pacific/Niue',
-		720  => 'Pacific/Kwajalein',
+		-840 => '+14', //'Pacific/Kiritimati',
+		-780 => '+13', //'Pacific/Enderbury',
+		-765 => '+12:45', //'Pacific/Chatham',
+		-720 => '+12', //Pacific/Auckland',
+		-690 => '+11:30', //'Pacific/Norfolk',
+		-660 => '+11', //'Asia/Magadan',
+		-630 => '+10:30', //'Australia/Lord_Howe',
+		-600 => '+10', //'Australia/Melbourne',
+		-570 => '+9:30', //'Australia/Adelaide',
+		-540 => '+9', //'Asia/Tokyo',
+		-525 => '+8:45', //'Australia/Eucla',
+		-480 => '+8', //'Asia/Brunei',
+		-420 => '+7', //'Asia/Krasnoyarsk',
+		-390 => '+6:30', //'Asia/Rangoon',
+		-360 => '+6', //Asia/Almaty',
+		-345 => '+5:45', //'Asia/Kathmandu',
+		-330 => '+5:30', //'Asia/Colombo',
+		-300 => '+5', //'Asia/Karachi',
+		-270 => '+4:30', //'Asia/Kabul',
+		-240 => '+4', //'Asia/Dubai',
+		-210 => '+3:30', //'Asia/Tehran',
+		-180 => '+3', //'Europe/Moscow'
+		-120 => '+2', //'Europe/Helsinki'
+		-60  => '+1', //'Europe/Paris',
+		0    => '+0', //'Europe/London',
+		60   => '-1',  //'Atlantic/Azores',
+		120  => '-2', //'America/Noronha',
+		180  => '-3', //'America/Sao_Paulo',
+		210  => '-3:30', //'America/St_Johns',
+		240  => '-4', //'America/Halifax',
+		270  => '-4:30', //'America/Caracas',
+		300  => '-5', //'America/New_York',
+		360  => '-6', //'America/Chicago',
+		420  => '-7', //'America/Denver',
+		480  => '-8', //'America/Los_Angeles',
+		540  => '-9', //'America/Anchorage',
+		570  => '-9:30', //'Pacific/Marquesas',
+		600  => '-10', //'Pacific/Honolulu',
+		660  => '-11', //'Pacific/Niue',
+		720  => '-12', //'Pacific/Kwajalein',
 	);
 
 	// Note: while technically the druid list could have been the same as the php list,
@@ -738,6 +756,21 @@ class kKavaReportsMgr extends kKavaBase
 				self::getLongSumAggregator($metric, self::METRIC_DELTA));
 		}
 
+		$reaction_type_metrics = array(
+                        self::METRIC_REACTION_CLAP_COUNT => 'Clap',
+                        self::METRIC_REACTION_HEART_COUNT => 'Heart',
+                        self::METRIC_REACTION_THINK_COUNT => 'Think',
+                        self::METRIC_REACTION_WOW_COUNT => 'Wow',
+                        self::METRIC_REACTION_SMILE_COUNT => 'Smile');
+                foreach ($reaction_type_metrics as $metric => $value)
+                {
+                        self::$aggregations_def[$metric] = self::getFilteredAggregator(
+                                self::getAndFilter(array(
+                                        self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_REACTION_CLICKED),
+                                        self::getSelectorFilter(self::DIMENSION_EVENT_VAR1, $value))),
+                                self::getLongSumAggregator($metric, self::METRIC_COUNT));
+                }
+
 		// delta aggregations
 		$delta_metrics = array(
 			array(self::METRIC_SIZE_BYTES, self::METRIC_STORAGE_SIZE_BYTES, self::METRIC_SIZE_ADDED_BYTES, self::METRIC_SIZE_DELETED_BYTES, null),
@@ -806,6 +839,12 @@ class kKavaReportsMgr extends kKavaBase
 					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD))),
 			self::getLongSumAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 
+		self::$aggregations_def[self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD))),
+			self::getLongSumAggregator(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
+
 		self::$aggregations_def[self::METRIC_VIEW_BUFFER_TIME_SEC] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, array(
 				self::EVENT_TYPE_VIEW,				// realtime
@@ -846,6 +885,18 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getCardinalityAggregator(self::METRIC_UNIQUE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_VOD_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_LIVE_PLAYED_ENTRIES, array(self::DIMENSION_ENTRY_ID)));
+
 		self::$aggregations_def[self::METRIC_TOTAL_UNIQUE_PERCENTILES] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
@@ -865,7 +916,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_OWNERS] = self::getCardinalityAggregator(
 			self::METRIC_UNIQUE_OWNERS,
 			array(self::DIMENSION_ENTRY_OWNER_ID));
-
 
 		self::$aggregations_def[self::METRIC_UNIQUE_SESSIONS] = self::getHyperUniqueAggregator(
 			self::METRIC_UNIQUE_SESSIONS,
@@ -1122,6 +1172,15 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(
 				self::METRIC_TRANSCODING_DURATION_SEC, self::METRIC_DURATION_SEC));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_DOMAINS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+			self::getCardinalityAggregator(self::METRIC_UNIQUE_DOMAINS, array(self::DIMENSION_DOMAIN)));
+
+		self::$aggregations_def[self::METRIC_TRANSCODING_USER_CPU_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_STATUS, 'Success'),
+			self::getLongSumAggregator(
+				self::METRIC_TRANSCODING_USER_CPU_SEC,self::METRIC_USER_CPU));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1141,10 +1200,20 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
 
+		self::$metrics_def[self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'));
+
 		self::$metrics_def[self::METRIC_DURATION_TOTAL_MSEC] = array(
 			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_TOTAL_MSEC, self::METRIC_DURATION_SEC, '1000'));
+
+		self::$metrics_def[self::METRIC_DURATION_TOTAL_MIN] = array(
+			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_DURATION_TOTAL_MIN, self::METRIC_DURATION_SEC, '60'));
 		
 		self::$metrics_def[self::METRIC_BANDWIDTH_SIZE_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
@@ -2394,6 +2463,7 @@ class kKavaReportsMgr extends kKavaBase
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
+			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

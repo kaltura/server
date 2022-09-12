@@ -1803,6 +1803,81 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_TRANSCODING_DURATION),
 		),
+
+		ReportType::PLAYER_HIGHLIGHTS => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'ui_conf_id' => self::DIMENSION_UI_CONF_ID
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_UNIQUE_DOMAINS),
+		),
+
+		ReportType::PARTNER_USAGE_HIGHLIGHTS => array(
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_DIMENSION_MAP => array(
+				'id' => self::DIMENSION_PARTNER_ID,
+			),
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
+				),
+				// bandwidth
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
+				),
+				// transcoding
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_USER_CPU_SEC),
+				),
+				// storage total
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
+					self::REPORT_METRICS => array(self::METRIC_STORAGE_SIZE_BYTES),
+				)
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_STORAGE_SIZE_BYTES, self::METRIC_TRANSCODING_USER_CPU_SEC, self::METRIC_BANDWIDTH_SIZE_BYTES),
+		),
+
+		ReportType::CDN_BANDWIDTH_USAGE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'partner_id' => self::DIMENSION_PARTNER_ID,
+				'cdn' => self::DIMENSION_TYPE,
+			),
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
+		),
+
+		ReportType::REACH_CATALOG_USAGE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'partner_id' => self::DIMENSION_PARTNER_ID,
+				'catalog_item_id' => self::DIMENSION_CATALOG_ITEM_ID
+			),
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_METRICS => array(self::METRIC_DURATION_TOTAL_MIN),
+		),
+
+		ReportType::REACH_PROFILE_USAGE => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'partner_id' => self::DIMENSION_PARTNER_ID,
+				'profile_type' => self::DIMENSION_REACH_PROFILE_TYPE,
+				'status' => self::DIMENSION_STATUS,
+			),
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_METRICS => array(self::METRIC_COUNT_ALL_EVENTS),
+		)
 	);
 
 	public static function getReportDef($report_type, $input_filter)

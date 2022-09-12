@@ -64,7 +64,7 @@ class MultiCentersRabbitMQProvider extends QueueProvider
 	 * (non-PHPdoc)
 	 * @see QueueProvider::send()
 	 */
-	public function send($queueName, $data)
+	public function send($queueName, $data, $msgArgs = array())
 	{
 		foreach($this->providers as $provider)
 		{

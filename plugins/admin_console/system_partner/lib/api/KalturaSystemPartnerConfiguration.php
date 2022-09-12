@@ -499,7 +499,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $defaultLanguage;
+	public $eventPlatformAllowedTemplates;
 	
 	private static $map_between_objects = array
 	(
@@ -595,7 +595,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'twoFactorAuthenticationMode',
 		'purifyImageContent',
 		'isSelfServe',
-		'defaultLanguage',
+		'eventPlatformAllowedTemplates',
 	);
 
 	public function getMapBetweenObjects()
@@ -690,8 +690,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
                 throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
             }
         }
-
-		$this->validateAllowedFromEmailWhiteList();
+		
+		if ($sourceObject->getAllowedFromEmailWhiteList() != $this->allowedFromEmailWhiteList)
+		{
+			$this->validateAllowedFromEmailWhiteList();
+		}
 		return parent::validateForUpdate($sourceObject,$propertiesToSkip);
 	}
 	protected function validateAllowedFromEmailWhiteList()

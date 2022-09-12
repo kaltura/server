@@ -452,11 +452,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function setModerationStatus($v)
 	{
-		if($v == $this->getModerationStatus())
-			return $this;
 			
-		if($v == entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION || $v == entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW)
+		$moderationStatuses = array(entry::ENTRY_MODERATION_STATUS_PENDING_MODERATION, entry::ENTRY_MODERATION_STATUS_FLAGGED_FOR_REVIEW);
+		if (in_array($v, $moderationStatuses))
+		{
 			$this->incModerationCount();
+		}
+		if($v == $this->getModerationStatus())
+		{
+			return $this;
+		}
 		
 		parent::setModerationStatus($v);
 	}
@@ -3198,15 +3203,27 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getDownloadAssetUrl($flavorParamsId)
 	{
-		$flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
-		if ($flavorAsset && $flavorAsset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
-			return $flavorAsset->getDownloadUrl();
-			
-		if(assetPeer::retrieveOriginalByEntryId($this->getId()))
-			return null; // flavor asset should be created
-			
-		// entry file sync should be used (data or download)
-		return $this->getRawDownloadUrl();
+		if($flavorParamsId === 0)
+        	{
+        	    $flavorAsset = assetPeer::retrieveOriginalByEntryId($this->getId());
+        	}
+        	else
+        	{
+        	    $flavorAsset = assetPeer::retrieveByEntryIdAndParams($this->getId(), $flavorParamsId);
+        	}
+	
+        	if($flavorAsset && $flavorAsset->getStatus() == flavorAsset::ASSET_STATUS_READY)
+        	{
+        	    return $flavorAsset->getDownloadUrl();
+        	}
+	
+        	if(assetPeer::retrieveOriginalByEntryId($this->getId()))
+        	{
+        	    return null; // flavor asset should be created
+        	}
+	
+        	// entry file sync should be used (data or download)
+        	return $this->getRawDownloadUrl();
 	}
 	
 	/*************** Bulk download functions - end ******************/

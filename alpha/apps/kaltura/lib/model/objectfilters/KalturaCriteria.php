@@ -280,6 +280,16 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
+		if (!kString::validateQuotes($str))
+		{
+			KalturaLog::log("Sphinx Field Error: uneven number of unescaped [\"] for field [$str]");
+		}
+		
+		if (!kString::validateEscape($str))
+		{
+			KalturaLog::log("Sphinx Field Error: unescaped escape char [\\] at EOL for field [$str]");
+		}
+		
 		if($escapeType == SearchIndexFieldEscapeType::DEFAULT_ESCAPE || $escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE )
 		{
 			if ($escapeType == SearchIndexFieldEscapeType::FULL_ESCAPE)

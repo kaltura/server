@@ -247,7 +247,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
-			&& in_array($object->getStatus(), array(EntryVendorTaskStatus::ERROR, EntryVendorTaskStatus::READY))
+			&& in_array($object->getStatus(), array(EntryVendorTaskStatus::ERROR, EntryVendorTaskStatus::READY, EntryVendorTaskStatus::ABORTED))
 		)
 			return true;
 
@@ -335,6 +335,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		if ($object instanceof EntryVendorTask)
 		{
+			if ($object->isScheduled())
+			{
+				$object->addSchedulingData();
+			}
 			$this->updateReachProfileCreditUsage($object);
 		}
 
@@ -360,14 +364,31 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			&& $object->getStatus() == EntryVendorTaskStatus::PENDING
 			&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION
 		)
+		{
+			if ($object->isScheduled())
+			{
+				$object->addSchedulingData();
+			}
 			return $this->updateReachProfileCreditUsage($object);
+		}
 
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
 			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
-			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING))
+			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::SCHEDULED))
 		)
+		{
 			return $this->handleErrorTask($object);
+		}
+
+		if ($object instanceof EntryVendorTask
+			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == EntryVendorTaskStatus::ABORTED
+			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED))
+		)
+		{
+			return $this->handleAbortTask($object);
+		}
 
 		if ($object instanceof EntryVendorTask
 			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
@@ -439,7 +460,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$this->handleEntryDurationChanged($object);
 		return $this->checkPendingEntryTasks($object);
 	}
-	
+
 	private function handleEntryReady(entry $object)
 	{
 		$this->checkAutomaticRules($object, true);
@@ -461,7 +482,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$pendingEntryReadyTask->setStatus($newStatus);
 			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if($pendingEntryReadyTask->getPrice() == 0)
-				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem()));
+			{
+				$taskDuration = $pendingEntryReadyTask->getTaskJobData() ? $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() : null;
+				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem(), $taskDuration));
+			}
 			$pendingEntryReadyTask->save();
 		}
 		return true;
@@ -474,13 +498,31 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function handleErrorTask(EntryVendorTask $entryVendorTask)
 	{
+		if ($entryVendorTask->isScheduled())
+		{
+			$entryVendorTask->removeSchedulingData();
+		}
+
 		//Refund credit for tasks which could not be handled by the service provider
-		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
-		
-		//Rest task price so that reports will be aligned with the total used credit
-		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
-		$entryVendorTask->setPrice(0);
-		$entryVendorTask->save();
+		kReachUtils::refundTask($entryVendorTask);
+	}
+
+	private function handleAbortTask(EntryVendorTask $entryVendorTask)
+	{
+		if ($entryVendorTask->isScheduled())
+		{
+			$entryVendorTask->removeSchedulingData();
+
+			// Prevent refund if task is aborted too late
+			/* @var $catalogItem IVendorScheduledCatalogItem */
+			$catalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->getCatalogItemId());
+			if($entryVendorTask->getTaskJobData()->getStartDate() - time() < $catalogItem->getMinimalRefundTime())
+			{
+				return;
+			}
+			
+			kReachUtils::refundTask($entryVendorTask);
+		}
 	}
 
 	protected function getLabelAdditionByType(ReachProfile $reachProfile, $serviceType)
@@ -563,7 +605,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			/* @var $pendingEntryVendorTask EntryVendorTask */
 			$oldPrice = $pendingEntryVendorTask->getPrice();
-			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem());
+			$taskDuration = $pendingEntryVendorTask->getTaskJobData() ? $pendingEntryVendorTask->getTaskJobData()->getEntryDuration() : null;
+			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem(), $taskDuration);
 			$priceDiff = $newPrice - $oldPrice;
 			
 			if(!$priceDiff)
@@ -630,7 +673,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		if (!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile))
+		$taskDuration = $taskJobData ? $taskJobData->getEntryDuration() : null;
+		if (!kReachUtils::isEnoughCreditLeft($entry, $vendorCatalogItem, $reachProfile, $taskDuration))
 		{
 			KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
@@ -654,7 +698,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC);
+		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $taskDuration);
 		if($entryVendorTask)
 		{
 			if ($taskJobData)
@@ -666,7 +710,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL)
+	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $taskDuration = null)
 	{
 		if($entry->getIsTemporary())
 		{
@@ -695,7 +739,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setIsOutputModerated($shouldModerateOutput);
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
 		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
-		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem));
+		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem, $taskDuration));
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());

@@ -17,6 +17,7 @@ class Partner extends BasePartner
 	const MEDIA_SERVER_PARTNER_ID = -5;
 	const PLAY_SERVER_PARTNER_ID = -6;
 	const SELF_SERVE_PARTNER_ID = -12;
+	const BI_PARTNER_ID = -15;
 
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
@@ -113,6 +114,8 @@ class Partner extends BasePartner
 
 	const IS_SELF_SERVE = 'isSelfServe';
 	
+	const EVENT_PLATFORM_ALLOWED_TEMPLATES = 'event_platform_allowed_templates';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -129,7 +132,14 @@ class Partner extends BasePartner
 			in_array($partner_secret, $additionalSecrets, true) ||
 			(!$admin && $partner_secret === $this->getSecret()))
 		{
-			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $this->getKsMaxExpiryInSeconds());
+			$partnerKsMaxExpiryInSeconds = $this->getKsMaxExpiryInSeconds();
+			if(!$partnerKsMaxExpiryInSeconds)
+			{
+				// This handles cases where the partner setting is the default mysql value which is null or for some reason set to 0 which is invalid
+				$partnerKsMaxExpiryInSeconds = dateUtils::DAY;
+			}
+			
+			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $partnerKsMaxExpiryInSeconds);
 			return true;
 		}
 		else
@@ -2339,6 +2349,16 @@ class Partner extends BasePartner
 	public function isAllowedLogin()
 	{
 		return in_array($this->status, array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
+	}
+	
+	public function getEventPlatformAllowedTemplates()
+	{
+		return $this->getFromCustomData(self::EVENT_PLATFORM_ALLOWED_TEMPLATES, null, '');
+	}
+	
+	public function setEventPlatformAllowedTemplates($v)
+	{
+		return $this->putInCustomData(self::EVENT_PLATFORM_ALLOWED_TEMPLATES, $v);
 	}
 }
 

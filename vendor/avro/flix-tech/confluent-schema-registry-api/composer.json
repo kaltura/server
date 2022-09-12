@@ -1,0 +1,45 @@
+{
+  "name": "flix-tech/confluent-schema-registry-api",
+  "description": "A PHP 7.0+ library to consume the Confluent Schema Registry REST API.",
+  "minimum-stability": "stable",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Ploch",
+      "email": "thomas.ploch@flixbus.com"
+    }
+  ],
+  "require": {
+    "php": "~7.0",
+    "guzzlehttp/guzzle": "~6.3",
+    "beberlei/assert": "~2.7",
+    "flix-tech/avro-php": "^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~6.2",
+    "friendsofphp/php-cs-fixer": "~2.0",
+    "phpstan/phpstan": "~0.8",
+    "raphhh/trex-reflection": "~1.0",
+    "doctrine/cache": "~1.3"
+  },
+  "suggest": {
+    "flix-tech/avro-php": "Needed for decoding and encoding messages in Apache Avro format",
+    "raphhh/trex-reflection": "Needed if you want to use the `RequestCallbackValidator`",
+    "doctrine/cache": "If you want to use the DoctrineCacheAdapter"
+  },
+  "autoload": {
+    "psr-4": {
+      "FlixTech\\SchemaRegistryApi\\": "src/"
+    },
+    "files": [
+      "src/Requests/Functions.php",
+      "src/Constants/Constants.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "FlixTech\\SchemaRegistryApi\\Test\\": "test/"
+    }
+  }
+}
