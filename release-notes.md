@@ -1,14 +1,14 @@
 # Rigel 18.14.0
-## Event notification template for new partner ##
+## Add event notification that enables to create dynamic app instance ##
 - Issue Type: Task
 - Issue ID: PLAT-23200
 
 ### Configuration ###
 	First replace all tokens from the XML files below and remove ".template" from the file name:
-	/opt/kaltura/app/deployment/updates/scripts/xml/2022_09_01_partner_Added_template_Http_Notification.template.xml
+	deployment/updates/scripts/xml/notifications/2022_09_01_partner_added_custom_application_Http_Notification.template.xml
 
 ### Deployment scripts ###
-	php /opt/kaltura/app/deployment/updates/scripts/2021_09_01_partner_Added_template.php
+	php deployment/updates/scripts/2021_09_01_partner_added_custom_application.php
 
 
 # Rigel 18.13.0

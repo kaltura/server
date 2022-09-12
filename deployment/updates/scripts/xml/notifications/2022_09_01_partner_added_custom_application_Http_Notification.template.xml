@@ -15,9 +15,9 @@
     <multirequest>
         <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="@PARTNER_ID@">
             <template objectType="KalturaHttpNotificationTemplate">
-                <name>Partner Added New Template</name>
-                <systemName>PARTNER_ADDED_NEW_TEMPLATE</systemName>
-                <description>HTTP notification template to be sent to mediaspace and partner will be created</description>
+                <name>Partner Added Custom Application</name>
+                <systemName>PARTNER_ADDED_CUSTOM_APPLICATION</systemName>
+                <description>HTTP notification template to be sent to an application and partner will be created</description>
                 <eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
                 <eventObjectType>20</eventObjectType> <!-- EventNotificationEventObjectType::PARTNER -->
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
@@ -33,14 +33,14 @@
                         <key>hn</key>
                         <description>new partner media space hostname</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>($scope->getObject()->getId() . '.kaf.kaltura.com')</code>
+                            <code>($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain_prefix"))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(md5($scope->getObject()->getId() . '.kaf.kaltura.com' . (intval($GLOBALS['start']) + 600)))</code>
+                            <code>(md5($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain_prefix") . (intval($GLOBALS['start']) + 600)))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -68,7 +68,7 @@
                         <key>instanceId</key>
                         <description>instance ID</description>
                         <value objectType="KalturaStringValue">
-                            <value>kaftestme</value>
+                            <value>{instance_id}</value>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -99,7 +99,7 @@
                             <item objectType="KalturaFieldMatchCondition">
                                 <description>custom partner type</description>
                                 <field objectType="KalturaEvalStringField">
-                                    <code>in_array($scope->getDynamicValueByKey("custom_partner_type"), explode(',', ($scope->getObject()->getAdditionalParams())['customPartnerType'] ?? ''))</code>
+                                    <code>isset($scope->getObject()->getAdditionalParams()) &amp;&amp; isset(($scope->getObject()->getAdditionalParams())['customPartnerType']) &amp;&amp; in_array($scope->getDynamicValueByKey("custom_partner_type"), explode(',', ($scope->getObject()->getAdditionalParams())['customPartnerType']))</code>
                                 </field>
                                 <values objectType="array">
                                     <item objectType="KalturaStringValue">
@@ -122,7 +122,21 @@
                         <key>application_profile</key>
                         <description>Application Profile sent to url</description>
                         <value objectType="KalturaStringValue">
-                            <value>mediaspace</value>
+                            <value></value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>instance_id</key>
+                        <description>Instance Id sent to the url</description>
+                        <value objectType="KalturaStringValue">
+                            <value>kaftestme</value>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>domain_prefix</key>
+                        <description>Domain Prefix</description>
+                        <value objectType="KalturaStringValue">
+                            <value>kaf.kaltura.com</value>
                         </value>
                     </item>
                 </userParameters>
