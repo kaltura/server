@@ -1,4 +1,14 @@
 # Rigel-18.14.0
+## Add event notification that enables to create dynamic app instance ##
+- Issue Type: Task
+- Issue ID: PLAT-23200
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	deployment/updates/scripts/xml/notifications/2022_09_01_partner_added_custom_application_Http_Notification.template.xml
+
+### Deployment scripts ###
+	php deployment/updates/scripts/2021_09_01_partner_added_custom_application.php
 
 ## Add partner for game services ##
 * Issue Type: Task
@@ -26,7 +36,7 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2022_09_06_update_groupuser_permission.php
 
-# Rigel 18.13.0
+# Rigel-18.13.0
 ## Changes to Co-editors or Co-publishers changed email event notification templates ##
 * Issue Type: Task
 * Issue ID: SUP-28334
