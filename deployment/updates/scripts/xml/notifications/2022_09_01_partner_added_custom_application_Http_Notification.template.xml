@@ -17,7 +17,7 @@
             <template objectType="KalturaHttpNotificationTemplate">
                 <name>Partner Added Custom Application</name>
                 <systemName>PARTNER_ADDED_CUSTOM_APPLICATION</systemName>
-                <description>HTTP notification template to be sent to an application and partner will be created</description>
+                <description>HTTP notification template to be sent once partner added in order to create a custom application</description>
                 <eventType>2</eventType> <!-- EventNotificationEventType::OBJECT_ADDED -->
                 <eventObjectType>20</eventObjectType> <!-- EventNotificationEventObjectType::PARTNER -->
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
