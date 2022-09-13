@@ -399,9 +399,31 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		{
 			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::TAGS, $tags);
 			$newTags = $defaultValues['defaultValue'];
-			multiLingualUtils::updateMultiLanguageObject($this, self::TAGS, $tags, $defaultValues);
+			$updatedMultiLingualTags = $this->updateMultiLingualTags($tags);
+			multiLingualUtils::updateMultiLanguageObject($this, self::TAGS, $updatedMultiLingualTags, $defaultValues);
 		}
-		return $newTags ? parent::setTags($newTags) : null;
+		if ($newTags)
+		{
+			if($this->tags !== $newTags)
+			{
+				$newTags = ktagword::updateTags($this->tags, $newTags, $update_db);
+			}
+			return parent::setTags(trim($newTags));
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected function updateMultiLingualTags($multiLingualTags)
+	{
+		$updatedMultiLingualTags = array();
+		foreach ($multiLingualTags as $language => $tags)
+		{
+			$updatedMultiLingualTags[$language] = ktagword::updateTags($this->tags, $tags);
+		}
+		return $updatedMultiLingualTags;
 	}
 
 	public function getName()

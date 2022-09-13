@@ -14,7 +14,6 @@ Interface IMultiLingual extends IBaseObject
 	/**
 	 * @param string $field
 	 * @param string $value
-	 * @param bool $update_db
 	 * @return string
 	 */
 	public function alignFieldValue($field, $value);

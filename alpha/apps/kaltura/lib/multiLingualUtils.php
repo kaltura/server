@@ -4,7 +4,8 @@ class multiLingualUtils
 {
 	const MULTI = 'multi';
 	const MULTI_LINGUAL = 'multiLingual';
-	const DEFAULT_LANGUAGE = 'default_language';
+	const DEFAULT_LANGUAGE = 'defaultLanguage';
+	const DEFAULT_VALUE = 'defaultValue';
 	
 	/**
 	 * Returns an array containing the default value of the field and the default language of the object.
@@ -22,13 +23,12 @@ class multiLingualUtils
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, $field);
 		}
-		$result = array('defaultLanguage' => '', 'defaultValue' => '');
-		$contextLanguage = kCurrentContext::getLanguage();
-		$defaultLanguage = self::getDefaultLangFromNewMapping($object, $newMapping, $contextLanguage);
+		$result = array(self::DEFAULT_LANGUAGE => '', self::DEFAULT_VALUE => '');
+		$defaultLanguage = self::getDefaultLangFromNewMapping($object, $newMapping);
 		
-		$result['defaultLanguage'] = $defaultLanguage;
+		$result[self::DEFAULT_LANGUAGE] = $defaultLanguage;
 		$defaultValue = self::getDefaultValueFromNewMapping($newMapping, $field, $defaultLanguage, $object);
-		$result['defaultValue'] = $object->alignFieldValue($field, $defaultValue);
+		$result[self::DEFAULT_VALUE] = $object->alignFieldValue($field, $defaultValue);
 		
 		return $result;
 	}
@@ -40,21 +40,21 @@ class multiLingualUtils
 	 *
 	 * @param $object multilingual supported object
 	 * @param string $field multilingual supported field
-	 * @param array $newMapping new mapping received in the api call
+	 * @param array $newMultiLingualMapping new mapping received in the api call
 	 * @param array $defaultValues holds the default language and value for the current field
 	 */
-	public static function updateMultiLanguageObject(&$object, $field, $newMapping, $defaultValues)
+	public static function updateMultiLanguageObject(&$object, $field, $newMultiLingualMapping, $defaultValues)
 	{
-		if ($defaultValues['defaultLanguage'])
+		if ($defaultValues[self::DEFAULT_LANGUAGE])
 		{
-			self::setDefaultLanguage($object, $defaultValues['defaultLanguage']);
+			self::setDefaultLanguage($object, $defaultValues[self::DEFAULT_LANGUAGE]);
 		}
-		unset($newMapping[$defaultValues['defaultLanguage']]); // removes default value from newMapping to eliminate duplicity
+		unset($newMultiLingualMapping[$defaultValues[self::DEFAULT_LANGUAGE]]); // removes default value from newMapping to eliminate duplicity
 		
-		$multiLangMapping = json_decode(self::getMultiLanguageMapping($object), true);
-		self::addFieldMappingToMultiLangMapping($multiLangMapping, $field, $newMapping, $object);
-		$multiLangMapping = $multiLangMapping ? json_encode($multiLangMapping) : null;
-		self::setMultiLanguageMapping($object, $multiLangMapping);
+		$currentMultiLingualMapping = json_decode(self::getMultiLanguageMapping($object), true);
+		self::addFieldMappingToMultiLangMapping($currentMultiLingualMapping, $field, $newMultiLingualMapping, $object);
+		$currentMultiLingualMapping = $currentMultiLingualMapping ? json_encode($currentMultiLingualMapping) : null;
+		self::setMultiLanguageMapping($object, $currentMultiLingualMapping);
 	}
 	
 	/**
@@ -66,14 +66,15 @@ class multiLingualUtils
 	 * @param array $newMapping new mapping received in the api call
 	 * @param string $contextLanguage the language of the call
 	 **/
-	protected static function getDefaultLangFromNewMapping($object, $newMapping, $contextLanguage)
+	protected static function getDefaultLangFromNewMapping($object, $newMultiLingualMapping)
 	{
-		if (is_null($newMapping) | count($newMapping) == 0)
+		if (is_null($newMultiLingualMapping) | count($newMultiLingualMapping) == 0)
 		{
 			return null;
 		}
-		$currentMultiLangMapping = json_decode(self::getMultiLanguageMapping($object), true);
-		$languageOfFirstItem = array_keys($newMapping)[0];
+		$contextLanguage = kCurrentContext::getLanguage();
+		$currentMultiLingualMapping = json_decode(self::getMultiLanguageMapping($object), true);
+		$languageOfFirstItem = array_keys($newMultiLingualMapping)[0];
 		if (strtolower($contextLanguage) === self::MULTI)
 		{
 			if($languageOfFirstItem)
@@ -85,33 +86,34 @@ class multiLingualUtils
 				return null;
 			}
 		}
-		else  //A specific language was given in the call
+		else  // A specific language was given in the call
 		{
 			if($languageOfFirstItem !== 'default')
 			{
 				throw new KalturaAPIException('Language must be set to MULTI when adding MultiLingualString');
 			}
 			$defaultLanguage = $contextLanguage;
-			if (!self::getDefaultLanguage($object) || !$currentMultiLangMapping)
+			if (!self::getDefaultLanguage($object) || !$currentMultiLingualMapping)
 			{
 				return $defaultLanguage;
 			}
+			return null;
 		}
 	}
 	
-	// Returns the default field value from the mapping
-	protected static function getDefaultValueFromNewMapping($newMapping, $field, $defaultLanguage, $object)
+	// Returns the default field value from the mapping or null if mapping does not contain a default value
+	protected static function getDefaultValueFromNewMapping($newMultiLingualMapping, $field, $defaultLanguage, $object)
 	{
-		$value = $newMapping[$defaultLanguage];
-		$currentMultiLangMapping = json_decode(self::getMultiLanguageMapping($object), true);
+		$value = $newMultiLingualMapping[$defaultLanguage];
+		$currentMultiLingualMapping = json_decode(self::getMultiLanguageMapping($object), true);
 		
 		if(!$value) // new mapping does not contain value in default language or input was a single string converted into array
 		{
-			if (!$currentMultiLangMapping[$field] ||
+			if (!isset($currentMultiLingualMapping[$field]) ||
 				kCurrentContext::$language === self::getDefaultLanguage($object) ||
-				(strtolower(kCurrentContext::$language) === self::MULTI && isset($newMapping['default'])))
+				(strtolower(kCurrentContext::$language) === self::MULTI && isset($newMultiLingualMapping['default'])))
 			{ // input was a single string converted into array and needs to be set as the default value in the db field
-				return $newMapping['default'];
+				return $newMultiLingualMapping['default'];
 			}
 			// the default in the db field should not be changed
 			return null;
@@ -120,19 +122,19 @@ class multiLingualUtils
 		return $value;
 	}
 	
-	public static function addFieldMappingToMultiLangMapping(&$multiLangMapping, $field, $value, $object)
+	public static function addFieldMappingToMultiLangMapping(&$multiLingualMapping, $field, $valueToAdd, $object)
 	{
-		if (self::isValueInNewLanguage($object, $value)) // add the new value to the mapping, mapped to the context language
+		if (self::isValueInNewLanguage($object, $valueToAdd)) // add the new value to the mapping  by mapping it to the context language
 		{
-			$multiLangMapping[$field][kCurrentContext::$language] = $value['default'];
+			$multiLingualMapping[$field][kCurrentContext::$language] = $valueToAdd['default'];
 		}
-		elseif(!isset($value['default']))
+		elseif(!isset($valueToAdd['default']))
 		{
-			foreach ($value as $languageKey => $languageValue)
+			foreach ($valueToAdd as $languageKey => $languageValue)
 			{
-				if ($multiLangMapping[$field][$languageKey] != $languageValue)
+				if ($multiLingualMapping[$field][$languageKey] != $languageValue)
 				{
-					$multiLangMapping[$field][$languageKey] = $languageValue;
+					$multiLingualMapping[$field][$languageKey] = $languageValue;
 				}
 			}
 		}
@@ -141,7 +143,7 @@ class multiLingualUtils
 	protected static function isValueInNewLanguage($object, $value)
 	{
 		$currentMultiLangMapping = json_decode(self::getMultiLanguageMapping($object), true);
-		if (!empty($value) && array_keys($value)[0] === 'default') // add the new value mapped with the lang to the mapping
+		if (!empty($value) && isset($value['default'])) // add the new value mapped with the lang to the mapping
 		{
 			if ($currentMultiLangMapping &&
 				kCurrentContext::$language !== self::getDefaultLanguage($object) &&
@@ -153,13 +155,13 @@ class multiLingualUtils
 		}
 	}
 	
-	public static function getFieldValueByLanguage($multiLangMapping, $field, $language)
+	public static function getFieldValueByLanguage($newMultiLingualMapping, $field, $language)
 	{
-		if (!isset($multiLangMapping[$field][$language]))
+		if (!isset($newMultiLingualMapping[$field][$language]))
 		{
 			return null;
 		}
-		return $multiLangMapping[$field][$language];
+		return $newMultiLingualMapping[$field][$language];
 	}
 	
 	public static function getDefaultLanguage($object)
@@ -192,7 +194,7 @@ class multiLingualUtils
 		}
 		else
 		{
-			self::setRequestedLanguageStringInField($responseObject, $multiLanguageMap, $dbObject, $requestLanguage);
+			self::setRequestedLanguageStringInField($responseObject, $dbObject, $multiLanguageMap, $requestLanguage);
 		}
 	}
 	
@@ -214,14 +216,14 @@ class multiLingualUtils
 		}
 	}
 	
-	protected static function setRequestedLanguageStringInField(&$responseObject, $multiLangMapping, $dbObject, $requestLanguage = null)
+	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null)
 	{
 		$language = $requestLanguage ? $requestLanguage : self::getDefaultLanguage($dbObject);
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
 		foreach ($supportedFields as $fieldName)
 		{
-			$supportedFieldsInRequestedLang[$fieldName] = $dbObject->alignFieldValue($fieldName, self::getFieldValueByLanguage($multiLangMapping, $fieldName, $language));
+			$supportedFieldsInRequestedLang[$fieldName] = $dbObject->alignFieldValue($fieldName, self::getFieldValueByLanguage($newMultiLingualMapping, $fieldName, $language));
 			
 			$responseObject->$fieldName = ($supportedFieldsInRequestedLang[$fieldName] && $supportedFieldsInRequestedLang[$fieldName] !== '') ?
 				$supportedFieldsInRequestedLang[$fieldName] : $dbObject->getDefaultFieldValue($fieldName);
@@ -251,13 +253,21 @@ class multiLingualUtils
 		return array('skipDeserializer' => $skipDeserializer, 'params' => $params);
 	}
 	
-	public static function isMultiLingualRequest ($newMapping)
+	public static function isMultiLingualRequest($newMapping)
 	{
-		$languageOfFirstItem = array_keys($newMapping)[0];
-		if(($languageOfFirstItem !== 'default') && !kCurrentContext::$language)
+		if(!isset($newMapping['default']) && !kCurrentContext::$language)
 		{
 			throw new KalturaAPIException('Language must be set to MULTI when adding MultiLingualString');
 		}
 		return isset(kCurrentContext::$language);
+	}
+	
+	public static function getMultiLingualStringArrayFromString($value)
+	{
+		$multiLangString = new KalturaMultiLingualString();
+		$multiLangString->language = 'default';
+		$multiLangString->value = $value;
+		$multiLangStringArr = new KalturaMultiLingualStringArray();
+		return $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
 	}
 }
