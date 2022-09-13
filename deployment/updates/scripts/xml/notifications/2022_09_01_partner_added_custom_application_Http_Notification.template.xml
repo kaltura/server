@@ -31,16 +31,16 @@
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>hn</key>
-                        <description>new partner media space hostname</description>
+                        <description>new partner application hostname</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain_prefix"))</code>
+                            <code>($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain"))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(md5($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain_prefix") . (intval($GLOBALS['start']) + 600)))</code>
+                            <code>(md5($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain") . (intval($GLOBALS['start']) + 600)))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -133,8 +133,8 @@
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>domain_prefix</key>
-                        <description>Domain Prefix</description>
+                        <key>domain</key>
+                        <description>Domain</description>
                         <value objectType="KalturaStringValue">
                             <value>kaf.kaltura.com</value>
                         </value>
