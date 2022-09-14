@@ -261,7 +261,7 @@ class multiLingualUtils
 		return isset(kCurrentContext::$language);
 	}
 	
-	public static function getElasticFieldValue($dbObject, $fieldName, $concatChar = ' ')
+	public static function getElasticFieldValue($dbObject, $fieldName)
 	{
 		$value = $dbObject->getDefaultFieldValue($fieldName);
 		$mapping = self::getMultiLanguageMapping($dbObject);
@@ -269,17 +269,17 @@ class multiLingualUtils
 		{
 			return $value;
 		}
-		return self::concatMultiLingualValuesForField($value, $mapping, $fieldName, $concatChar);
+		return self::concatMultiLingualValuesForField($value, $mapping, $fieldName);
 	}
 	
-	protected static function concatMultiLingualValuesForField($value, $mapping, $fieldName, $concatChar)
+	protected static function concatMultiLingualValuesForField($value, $mapping, $fieldName)
 	{
 		$mapping = json_decode($mapping, true);
 		$result = $value;
 		foreach ($mapping[$fieldName] as $languageKey => $currentFieldValue)
 		{
-			$result = $result.$concatChar.$currentFieldValue;
+			$result = $result.','.$currentFieldValue;
 		}
-		return $result;
+		return explode(',', $result);
 	}
 }
