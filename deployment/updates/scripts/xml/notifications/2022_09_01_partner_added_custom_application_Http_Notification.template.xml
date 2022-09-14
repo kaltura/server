@@ -33,14 +33,14 @@
                         <key>hn</key>
                         <description>new partner application hostname</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain"))</code>
+                            <code>($scope->getObject()->getId() . '.' . $scope->getDynamicValueByKey("domain"))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
                         <key>sig</key>
                         <description>Signature</description>
                         <value objectType="KalturaEvalStringField">
-                            <code>(md5($scope->getObject()->getId() . $scope->getDynamicValueByKey("domain") . (intval($GLOBALS['start']) + 600)))</code>
+                            <code>(md5($scope->getObject()->getId() . '.' . $scope->getDynamicValueByKey("domain") . (intval($GLOBALS['start']) + 600)))</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -67,8 +67,8 @@
                     <item objectType="KalturaEventNotificationParameter">
                         <key>instanceId</key>
                         <description>instance ID</description>
-                        <value objectType="KalturaStringValue">
-                            <value>{instance_id}</value>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getDynamicValueByKey("instance_id")</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -81,8 +81,8 @@
                     <item objectType="KalturaEventNotificationParameter">
                         <key>applicationProfile</key>
                         <description>application Profile</description>
-                        <value objectType="KalturaStringValue">
-                            <value>{application_profile}</value>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getDynamicValueByKey("application_profile")</code>
                         </value>
                     </item>
                     <item objectType="KalturaEventNotificationParameter">
@@ -99,7 +99,7 @@
                             <item objectType="KalturaFieldMatchCondition">
                                 <description>custom partner type</description>
                                 <field objectType="KalturaEvalStringField">
-                                    <code>isset($scope->getObject()->getAdditionalParams()) &amp;&amp; isset(($scope->getObject()->getAdditionalParams())['customPartnerType']) &amp;&amp; in_array($scope->getDynamicValueByKey("custom_partner_type"), explode(',', ($scope->getObject()->getAdditionalParams())['customPartnerType']))</code>
+                                    <code>$scope->getObject()->getAdditionalParams() &amp;&amp; isset(($scope->getObject()->getAdditionalParams())['customPartnerType']) &amp;&amp; in_array($scope->getDynamicValueByKey("custom_partner_type"), explode(',', ($scope->getObject()->getAdditionalParams())['customPartnerType']))</code>
                                 </field>
                                 <values objectType="array">
                                     <item objectType="KalturaStringValue">
