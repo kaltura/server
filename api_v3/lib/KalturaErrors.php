@@ -43,6 +43,9 @@ class KalturaErrors extends APIErrors
 
 	// ACTION_NAME - action name
 	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN;ACTION_NAME;Action \"@ACTION_NAME@\" is forbidden for use";
+	
+	// LANGUAGE_CODE - language
+	const INVALID_LANGUAGE_CODE = "INVALID_LANGUAGE_CODE;LANGUAGE_CODE; Invalid language code [\"@LANGUAGE_CODE@\"] - must be a valid 2char code";
 
 	// PARAM_NAME - parameter name
 	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER;PARAM_NAME;Missing parameter \"@PARAM_NAME@\"";
