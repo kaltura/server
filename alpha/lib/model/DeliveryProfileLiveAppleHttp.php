@@ -124,9 +124,12 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		
 		foreach ($kLiveStreamParamsArray as $kLiveStreamParams)
 		{
-			if(!$this->isFlavorAllowed($kLiveStreamParams->getFlavorId()))
+			$flavorParamsId = $kLiveStreamParams->getFlavorId();
+			if(!$this->isFlavorAllowed($flavorParamsId) || !assetParamsOutputPeer::retrieveByPK($flavorParamsId))
+			{
 				continue;
-			
+			}
+
 			/* @var $kLiveStreamParams kLiveStreamParams */
 			/* @var $stream kLiveStreamParams */
 			$flavor = array(
