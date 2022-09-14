@@ -280,6 +280,6 @@ class multiLingualUtils
 		{
 			$result = $result.','.$currentFieldValue;
 		}
-		return explode(',', $result);
+		return $result;
 	}
 }
