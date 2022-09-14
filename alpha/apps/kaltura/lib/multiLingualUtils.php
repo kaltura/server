@@ -261,7 +261,7 @@ class multiLingualUtils
 		return isset(kCurrentContext::$language);
 	}
 	
-	public static function getElasticFieldValue($dbObject, $fieldName, $concatChar)
+	public static function getElasticFieldValue($dbObject, $fieldName, $concatChar = ' ')
 	{
 		$value = $dbObject->getDefaultFieldValue($fieldName);
 		$mapping = self::getMultiLanguageMapping($dbObject);
