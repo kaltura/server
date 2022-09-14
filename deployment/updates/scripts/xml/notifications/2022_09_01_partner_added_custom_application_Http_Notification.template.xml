@@ -99,7 +99,7 @@
                             <item objectType="KalturaFieldMatchCondition">
                                 <description>custom partner type</description>
                                 <field objectType="KalturaEvalStringField">
-                                    <code>isset($scope->getObject()->getAdditionalParams()) &amp;&amp; isset(($scope->getObject()->getAdditionalParams())['customPartnerType']) &amp;&amp; in_array($scope->getDynamicValueByKey("custom_partner_type"), explode(',', ($scope->getObject()->getAdditionalParams())['customPartnerType']))</code>
+                                    <code>$scope->getObject()->getAdditionalParams() &amp;&amp; isset(($scope->getObject()->getAdditionalParams())['customPartnerType']) &amp;&amp; in_array($scope->getDynamicValueByKey("custom_partner_type"), explode(',', ($scope->getObject()->getAdditionalParams())['customPartnerType']))</code>
                                 </field>
                                 <values objectType="array">
                                     <item objectType="KalturaStringValue">
