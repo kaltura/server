@@ -1,3 +1,15 @@
+# Rigel-18.15.0
+## Support adding core values to kafka noications ##
+- Issue Type: Task
+- Issue ID: FOUN-702
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2022_09_15_update_kafka_kuser_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2022_09_15_deploy_update_kuser_kafka_notifications.php
+
 # Rigel-18.14.0
 ## Add event notification that enables to create dynamic app instance ##
 - Issue Type: Task
