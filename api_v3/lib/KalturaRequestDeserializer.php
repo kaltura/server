@@ -232,7 +232,20 @@ class KalturaRequestDeserializer
 			$this->validateMaxValue($name, $value, $constraints[KalturaDocCommentParser::MAX_VALUE_CONSTRAINT]);
 		if(array_key_exists(KalturaDocCommentParser::UTF8_TRUNCATE, $constraints))
 			$this->truncateUTF8String($name,$value, $constraints[KalturaDocCommentParser::UTF8_TRUNCATE]);
-		if ($class && $class === 'KalturaMultiLingualString' && $name === 'language')
+		if($this->isMultiLingualString($name, $class))
+		{
+			$this->validateMultiLingualLanguageCode($name,$value);
+		}
+	}
+	
+	protected function isMultiLingualString($name, $class = null)
+	{
+		return ($class && $class === 'KalturaMultiLingualString');
+	}
+	
+	protected function validateMultiLingualLanguageCode($name, &$value)
+	{
+		if ($name === 'language')
 		{
 			$upperCase2charLanguageCode = strtoupper($value);
 			if(!languageCodeManager::getLanguageKey($upperCase2charLanguageCode))

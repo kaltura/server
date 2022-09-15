@@ -240,6 +240,10 @@ class multiLingualUtils
 		$skipDeserializer = true;
 		foreach ($params as $key => $param)
 		{
+			if(!is_array($param))
+			{
+				continue;
+			}
 			foreach ($param as $fieldName => $value)
 			{
 				if (StringHelper::startsWith(self::MULTI_LINGUAL . '_', $fieldName))
