@@ -263,22 +263,22 @@ class multiLingualUtils
 	
 	public static function getElasticFieldValue($dbObject, $fieldName)
 	{
-		$value = $dbObject->getDefaultFieldValue($fieldName);
+		$dbValue = $dbObject->getDefaultFieldValue($fieldName);
 		$mapping = self::getMultiLanguageMapping($dbObject);
 		if (!$mapping || ($mapping == ''))
 		{
-			return $value;
+			return $dbValue;
 		}
-		return self::concatMultiLingualValuesForField($value, $mapping, $fieldName);
+		return self::concatMultiLingualValuesForField($dbValue, $mapping, $fieldName);
 	}
 	
-	protected static function concatMultiLingualValuesForField($value, $mapping, $fieldName)
+	protected static function concatMultiLingualValuesForField($dbValue, $mapping, $fieldName)
 	{
 		$mapping = json_decode($mapping, true);
-		$result = $value;
-		foreach ($mapping[$fieldName] as $languageKey => $currentFieldValue)
+		$result = array($dbValue);
+		foreach ($mapping[$fieldName] as $languageKey => $fieldValueInLang)
 		{
-			$result = $result.','.$currentFieldValue;
+			array_push($result, $fieldValueInLang);
 		}
 		return $result;
 	}
