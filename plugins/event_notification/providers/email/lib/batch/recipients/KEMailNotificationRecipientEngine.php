@@ -40,16 +40,37 @@ abstract class KEmailNotificationRecipientEngine
 	protected function getUsersByUserIds($userIds)
 	{
 		$userFilter = new KalturaUserFilter();
-		$userFilter->idIn = $userIds;
 		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
+		$maxIdIn = 150;
+		$pager->pageSize = $maxIdIn;
+		$idsArray = explode(',', $userIds);
+		$offset = 0;
+		$usersListResponse = array();
+		$allUsers = array();
 
-		$users = KBatchBase::$kClient->user->listAction($userFilter, $pager);
+		while($offset * $maxIdIn < count($idsArray))
+		{
+			$currentUserArrIds = array_slice($idsArray, $offset * $maxIdIn, $maxIdIn);
+			if(count($currentUserArrIds) == 1)
+			{
+				$currentUserStrIds = $currentUserArrIds[0];
+			}
+			else
+			{
+				$currentUserStrIds = implode(',',$currentUserArrIds);
+			}
+			$userFilter->idIn = $currentUserStrIds;
+			$usersListResponse[] = (KBatchBase::$kClient->user->listAction($userFilter, $pager))->objects;
+			$allUsers = array_merge($allUsers, $usersListResponse[$offset]);
+			$offset++;
+		}
 
-		if(!($users->totalCount > 0))
+		if(!(count($allUsers) > 0))
+		{
 			return null;
+		}
 
-		return $users->objects;
+		return $allUsers;
 	}
 
 	protected function getGroupUserIds($groupId)
@@ -61,7 +82,9 @@ abstract class KEmailNotificationRecipientEngine
 
 		$groupUserList = KBatchBase::$kClient->groupUser->listAction($groupFilter, $pager);
 		if(!($groupUserList->totalCount > 0))
+		{
 			return null;
+		}
 
 		$groupUserIds = array();
 		foreach ($groupUserList->objects as $user)

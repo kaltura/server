@@ -19,15 +19,16 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 		$userPager = new KalturaFilterPager();
 		$userPager->pageSize = $pager->pageSize;
 		$maxPagesToScan = 7;
-		if (isset(KBatchBase::$taskConfig->params->maxPagesToScan))
+
+		if(isset(KBatchBase::$taskConfig->params->maxPagesToScan))
 		{
 			$maxPagesToScan = KBatchBase::$taskConfig->params->maxPagesToScan;
 		}
+		$maxRecipients = $pager->pageSize * $maxPagesToScan;
 
 		do
 		{
 			$categoryUserList = KBatchBase::$kClient->categoryUser->listAction($this->recipientJobData->categoryUserFilter, $pager);
-
 			if(count($categoryUserList->objects) == 0)
 			{
 				break;
@@ -40,34 +41,59 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 			}
 
 			$userFilter = new KalturaUserFilter();
-			$userFilter->idIn = implode(',', $categoryUserIds);
+			if(count($categoryUserIds) == 1)
+			{
+				$userFilter->idIn = $categoryUserIds[0];
+			}
+			else
+			{
+				$userFilter->idIn = implode(',', $categoryUserIds);
+			}
 			$userList = KBatchBase::$kClient->user->listAction($userFilter, $userPager);
+
 			foreach ($userList->objects as $user)
 			{
 				if($user->type == KalturaUserType::USER)
 				{
-					$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
+					if (count($recipients) < $maxRecipients)
+					{
+						$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
+					}
+					else
+					{
+						return $recipients;
+					}
 				}
 				else if($user->type == KalturaUserType::GROUP)
 				{
 					$groupUserIds = $this->getGroupUserIds($user->id);
 					if(!$groupUserIds)
-						return $recipients;
+					{
+						break;
+					}
 
 					$groupUsers = $this->getUsersByUserIds($groupUserIds);
 					if(!$groupUsers)
-						return $recipients;
+					{
+						break;
+					}
 
 					foreach($groupUsers as $groupUser)
 					{
-						$recipients[$groupUser->email] = $groupUser->firstName. ' ' . $groupUser->lastName;
+						if (count($recipients) < $maxRecipients)
+						{
+							$recipients[$groupUser->email] = $groupUser->firstName . ' ' . $groupUser->lastName;
+						}
+						else
+						{
+							return $recipients;
+						}
 					}
 				}
 			}
 			$pager->pageIndex ++;
 		}
 		while ( $pager->pageIndex <= $maxPagesToScan );
-
 		return $recipients;
 	}
 }

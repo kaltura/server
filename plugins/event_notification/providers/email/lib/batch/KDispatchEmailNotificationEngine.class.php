@@ -263,6 +263,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		}
 		
 		$recipientsBcc = array();
+
 		if($data->bcc)
 		{
 		    $recipientsBcc = $this->getRecipientArray($data->bcc, $contentParameters);
@@ -274,32 +275,34 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		{
 		    if($recipientsBcc)
 		    {
-			$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk - 1);
-			foreach ($recipients as $email=>$name)
-			{
-			    $recipientsBccHandledCounter++;
-			    if (filter_var($email, FILTER_VALIDATE_EMAIL))
-			    {
-				KalturaLog::info("Adding recipient to BCC recipients $name<$email> , Index:$recipientsBccHandledCounter");
-				self::$mailer->AddBCC($email, $name);
-			    }
-			}
+				$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk - 1);
+				foreach ($recipients as $email=>$name)
+				{
+			    	$recipientsBccHandledCounter++;
+			    	if(filter_var($email, FILTER_VALIDATE_EMAIL))
+			    	{
+					KalturaLog::info("Adding recipient to BCC recipients $name<$email> , Index:$recipientsBccHandledCounter");
+					self::$mailer->AddBCC($email, $name);
+			    	}
+				}
 		    }
 
 		    try 
 		    {
-			KalturaLog::info('Sending Bulk');
-			$success = $this::$mailer->Send();
-			if (!$success)
-			{	
-			    throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
-			}
-		    } catch (Exception $e) 
+				KalturaLog::info('Sending Bulk');
+				$success = $this::$mailer->Send();
+				if (!$success)
+				{
+			    	throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
+				}
+		    }
+			catch (Exception $e)
 		    {
-			throw new kTemporaryException("Sending mail failed with exception: " . $e->getMessage(), $e->getCode());
+				throw new kTemporaryException("Sending mail failed with exception: " . $e->getMessage(), $e->getCode());
 		    }
 
 		    self::$mailer->ClearBCCs();
+			$recipientsBccHandledCounter++;
 		}
 		while($recipientsBccHandledCounter < count($recipientsBcc));
 		
