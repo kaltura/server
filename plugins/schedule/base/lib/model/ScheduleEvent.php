@@ -411,6 +411,29 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		return implode(' ', $system_names);
 	}
 
+	public function getResourceTagsForIndex()
+    {
+        $eventResources = ScheduleEventResourcePeer::retrieveByEventId($this->getId(), $this->getPartnerId());
+
+        $resourceIds = array();
+        $resourceTags = array();
+
+        foreach ($eventResources as $eventResource)
+        {
+            $resourceIds[] = $eventResource->getResourceId();
+        }
+
+        $resources = ScheduleResourcePeer::retrieveByPKs($resourceIds);
+        foreach ($resources as $resource)
+        {
+            if ($resource && $resource->getTags())
+            {
+                $resourceTags = array_merge($resourceTags, explode(',', $resource->getTags()));
+            }
+        }
+        return implode(' ', $resourceTags);
+    }
+
 	public function getSummary()
 	{
 		if (parent::getSummary())
