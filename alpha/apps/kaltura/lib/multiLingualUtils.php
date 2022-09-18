@@ -261,7 +261,7 @@ class multiLingualUtils
 		return isset(kCurrentContext::$language);
 	}
 	
-	public static function getElasticFieldValue($dbObject, $fieldName, $isArray = false)
+	public static function getElasticFieldValue($dbObject, $fieldName, $isCommaSeparatedString = false)
 	{
 		$dbValue = $dbObject->getDefaultFieldValue($fieldName);
 		$mapping = self::getMultiLanguageMapping($dbObject);
@@ -269,28 +269,26 @@ class multiLingualUtils
 		{
 			return $dbValue;
 		}
-		return self::getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isArray);
+		return self::getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isCommaSeparatedString);
 	}
 	
-	protected static function getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isArray = false)
+	protected static function getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isCommaSeparatedString = false)
 	{
 		$mapping = json_decode($mapping, true);
-		if ($isArray)
+		if (!$isCommaSeparatedString)
 		{
-			$result = explode(',', $dbValue);
-			foreach ($mapping[$fieldName] as $languageKey => $fieldValueArrInLang)
-			{
-				$fieldValueArrInLang = explode(',', $fieldValueArrInLang);
-				self::addValuesToArray($fieldValueArrInLang, $result);
-			}
-		}
-		else
-		{
-			$result = array($dbValue);
-			self::addValuesToArray($mapping[$fieldName], $result);
+			$multiLingualArray = array($dbValue);
+			self::addValuesToArray($mapping[$fieldName], $multiLingualArray);
+			return $multiLingualArray;
 		}
 		
-		return $result;
+		$multiLingualArray = explode(',', $dbValue);
+		foreach ($mapping[$fieldName] as $languageKey => $fieldValueArrInLang)
+		{
+			$fieldValueArrInLang = explode(',', $fieldValueArrInLang);
+			self::addValuesToArray($fieldValueArrInLang, $multiLingualArray);
+		}
+		return $multiLingualArray;
 	}
 	
 	protected static function addValuesToArray($arrayValues, &$array)
