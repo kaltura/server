@@ -9,7 +9,6 @@ class KalturaDispatcher
 	private $arguments = null;
 	
 	const OWNER_ONLY_OPTION = "ownerOnly";
-	const MULTI = 'MULTI';
 
 	/**
 	 * Return a KalturaDispatcher instance
@@ -79,7 +78,7 @@ class KalturaDispatcher
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		if (isset($params['language']) &&
-			(strtoupper($params['language']) !== self::MULTI) &&
+			(strtolower($params['language']) !== multiLingualUtils::MULTI) &&
 			!languageCodeManager::getLanguageKey(strtoupper($params['language'])))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_LANGUAGE_CODE, $params['language']);

@@ -234,7 +234,7 @@ class KalturaRequestDeserializer
 			$this->truncateUTF8String($name,$value, $constraints[KalturaDocCommentParser::UTF8_TRUNCATE]);
 		if($this->isMultiLingualString($name, $class))
 		{
-			$this->validateMultiLingualLanguageCode($name,$value);
+			$this->validateMultiLingualLanguageCode($name, $value);
 		}
 	}
 	
