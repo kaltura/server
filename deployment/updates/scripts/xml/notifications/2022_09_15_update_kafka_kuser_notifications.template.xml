@@ -27,7 +27,7 @@
             <template objectType="KalturaHttpNotificationTemplate">
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>kuser_id</key>
+                        <key>kuserId</key>
                         <description>The KuserId Internal Value</description>
                         <value objectType="KalturaEvalStringField">
                             <code>$scope->getEvent()->getObject()->getId()</code>
@@ -49,7 +49,7 @@
             <template objectType="KalturaHttpNotificationTemplate">
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>kuser_id</key>
+                        <key>kuserId</key>
                         <description>The KuserId Internal Value</description>
                         <value objectType="KalturaEvalStringField">
                             <code>$scope->getEvent()->getObject()->getId()</code>
@@ -71,7 +71,7 @@
             <template objectType="KalturaHttpNotificationTemplate">
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
-                        <key>kuser_id</key>
+                        <key>kuserId</key>
                         <description>The KuserId Internal Value</description>
                         <value objectType="KalturaEvalStringField">
                             <code>$scope->getEvent()->getObject()->getId()</code>
