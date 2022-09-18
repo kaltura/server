@@ -4032,7 +4032,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'creator_kuser_id' => $this->getCreatorKuserId(),
 			'name' => multiLingualUtils::getElasticFieldValue($this, self::NAME),
 			'description' =>  multiLingualUtils::getElasticFieldValue($this, self::DESCRIPTION),
-			'tags' =>  multiLingualUtils::getElasticFieldValue($this, self::TAGS),
+			'tags' =>  multiLingualUtils::getElasticFieldValue($this, self::TAGS, true),
 			'partner_id' => $this->getPartnerId(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'reference_id' => $this->getReferenceID(),
