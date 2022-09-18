@@ -12,13 +12,6 @@ Interface IMultiLingual extends IBaseObject
 	public static function getMultiLingualSupportedFields();
 	
 	/**
-	 * @param string $field
-	 * @param string $value
-	 * @return string
-	 */
-	public function alignFieldValue($field, $value);
-	
-	/**
 	 * finds the correct value for a specific field according to the object default language
 	 *
 	 * @param string $fieldName

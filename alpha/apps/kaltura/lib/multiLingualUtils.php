@@ -28,7 +28,7 @@ class multiLingualUtils
 		
 		$result[self::DEFAULT_LANGUAGE] = $defaultLanguage;
 		$defaultValue = self::getDefaultValueFromNewMapping($newMapping, $field, $defaultLanguage, $object);
-		$result[self::DEFAULT_VALUE] = $object->alignFieldValue($field, $defaultValue);
+		$result[self::DEFAULT_VALUE] = $defaultValue;
 		
 		return $result;
 	}
@@ -223,7 +223,7 @@ class multiLingualUtils
 		$supportedFieldsInRequestedLang = array();
 		foreach ($supportedFields as $fieldName)
 		{
-			$supportedFieldsInRequestedLang[$fieldName] = $dbObject->alignFieldValue($fieldName, self::getFieldValueByLanguage($newMultiLingualMapping, $fieldName, $language));
+			$supportedFieldsInRequestedLang[$fieldName] = self::getFieldValueByLanguage($newMultiLingualMapping, $fieldName, $language);
 			
 			$responseObject->$fieldName = ($supportedFieldsInRequestedLang[$fieldName] && $supportedFieldsInRequestedLang[$fieldName] !== '') ?
 				$supportedFieldsInRequestedLang[$fieldName] : $dbObject->getDefaultFieldValue($fieldName);
