@@ -8,7 +8,6 @@
  */
 class BaseEntryService extends KalturaEntryService
 {
-	
 	const PLAYBACK_SECRET = 'playback_secret';
     /* (non-PHPdoc)
      * @see KalturaEntryService::initService()
@@ -83,8 +82,8 @@ class BaseEntryService extends KalturaEntryService
 		
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
     	
-	    $entry->fromObject($dbEntry, $this->getResponseProfile());
-	    return $entry;
+		$entry->fromObject($dbEntry, $this->getResponseProfile());
+		return $entry;
     }
 	
     /**
@@ -336,9 +335,9 @@ class BaseEntryService extends KalturaEntryService
 	 */
     function getAction($entryId, $version = -1)
     {
-    	return $this->getEntry($entryId, $version);
+		return $this->getEntry($entryId, $version);
     }
-
+	
     /**
      * Get remote storage existing paths for the asset.
      *
@@ -560,6 +559,7 @@ class BaseEntryService extends KalturaEntryService
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
+		
 		return $response;
 	}
 	

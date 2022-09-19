@@ -411,6 +411,16 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			}
 			else if ($property->isArray())
 			{
+				if ($property->getArrayType() == 'KalturaMultiLingualString')
+				{
+					$propertyElement->setAttribute("name", "multiLingual_".$propName);
+					$multiLingualPropertyElement = $this->_doc->createElement("property");
+					$multiLingualPropertyElement->setAttribute("name", $propName);
+					$multiLingualPropertyElement->setAttribute("type", "string");
+					
+					$this->finalizePropertyElement($property, $multiLingualPropertyElement);
+					$classElement->appendChild($multiLingualPropertyElement);
+				}
 				$propertyElement->setAttribute("type", "array");
 				$propertyElement->setAttribute("arrayType", $property->getArrayType());
 			}
@@ -435,30 +445,43 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 					$propertyElement->setAttribute("isTime", "1");
 			}
 			
-			$propertyElement->setAttribute("readOnly", $property->isReadOnly() ? "1" : "0");
-			$propertyElement->setAttribute("insertOnly", $property->isInsertOnly() ? "1" : "0");
-			$propertyElement->setAttribute("writeOnly", $property->isWriteOnly() ? "1" : "0");
-
-			if($property->getDynamicType())
-				$propertyElement->setAttribute("valuesEnumType", $property->getDynamicType());
-
-			if($property->getPermissions())
-				$propertyElement->setAttribute("requiresPermissions", implode(',', $property->getPermissions()));
-						
-			$description = $property->getDescription();
-			$description = $this->fixDescription($description);
-			$propertyElement->setAttribute("description", $description);
-
-			foreach($property->getConstraints() as $constraint => $value)
-				$propertyElement->setAttribute($constraint, $value);
-
-			if($property->isDeprecated())
-				$propertyElement->setAttribute("deprecated", "1");
-					
+			$this->finalizePropertyElement($property, $propertyElement);
 			$classElement->appendChild($propertyElement);
 		}
 		
 		return $classElement;
+	}
+	
+	protected function finalizePropertyElement($property, &$propertyElement)
+	{
+		/* @var $property KalturaPropertyInfo */
+		$propertyElement->setAttribute("readOnly", $property->isReadOnly() ? "1" : "0");
+		$propertyElement->setAttribute("insertOnly", $property->isInsertOnly() ? "1" : "0");
+		$propertyElement->setAttribute("writeOnly", $property->isWriteOnly() ? "1" : "0");
+		
+		if($property->getDynamicType())
+		{
+			$propertyElement->setAttribute("valuesEnumType", $property->getDynamicType());
+		}
+		
+		if($property->getPermissions())
+		{
+			$propertyElement->setAttribute("requiresPermissions", implode(',', $property->getPermissions()));
+		}
+		
+		$description = $property->getDescription();
+		$description = $this->fixDescription($description);
+		$propertyElement->setAttribute("description", $description);
+		
+		foreach($property->getConstraints() as $constraint => $value)
+		{
+			$propertyElement->setAttribute($constraint, $value);
+		}
+		
+		if($property->isDeprecated())
+		{
+			$propertyElement->setAttribute("deprecated", "1");
+		}
 	}
 	
 	private function getServiceActionElement(KalturaActionReflector $actionReflector)
