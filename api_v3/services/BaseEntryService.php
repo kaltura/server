@@ -335,8 +335,7 @@ class BaseEntryService extends KalturaEntryService
 	 */
     function getAction($entryId, $version = -1)
     {
-		$entry = $this->getEntry($entryId, $version);
-		return $entry;
+		return $this->getEntry($entryId, $version);
     }
 	
     /**

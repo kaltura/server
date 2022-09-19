@@ -77,7 +77,13 @@ class KalturaDispatcher
 		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
-		kCurrentContext::$language = isset($params['language']) ? $params['language'] : null;
+		if (isset($params['language']) &&
+			(strtolower($params['language']) !== multiLingualUtils::MULTI) &&
+			!languageCodeManager::getLanguageKey(strtoupper($params['language'])))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_LANGUAGE_CODE, $params['language']);
+		}
+		kCurrentContext::$language = isset($params['language']) ? strtoupper($params['language']) : null;
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 
 		if (!KalturaResponseCacher::rateLimit($service, $action, $params, kCurrentContext::$partner_id, kCurrentContext::$ks_partner_id))

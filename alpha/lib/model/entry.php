@@ -351,22 +351,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return self::$multiLingualSupportedFields;
 	}
 	
-	public function alignFieldValue($field, $value)
-	{
-		$supportedFields = self::getMultiLingualSupportedFields();
-		switch ($field)
-		{
-			case $supportedFields[self::NAME]:
-				return kString::alignUtf8String($value, self::MAX_NAME_LEN);
-			case $supportedFields[self::DESCRIPTION]:
-				return $value;
-			case $supportedFields[self::TAGS]:
-				return ktagword::updateTags($this->tags, $value);
-			default:
-				return null;
-		}
-	}
-	
 	public function setName($v)
 	{
 		$name = $v['default'];
@@ -377,7 +361,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			multiLingualUtils::updateMultiLanguageObject($this, self::NAME, $v, $defaultValues);
 		}
 		PeerUtils::setExtension($this, $name, self::MAX_NAME_LEN, __FUNCTION__);
-		return $name ? parent::setName($name) : null;
+		return $name ? parent::setName(kString::alignUtf8String($name, self::MAX_NAME_LEN)) : null;
 	}
 	
 	public function setDescription ($v)
@@ -399,9 +383,31 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		{
 			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::TAGS, $tags);
 			$newTags = $defaultValues['defaultValue'];
-			multiLingualUtils::updateMultiLanguageObject($this, self::TAGS, $tags, $defaultValues);
+			$updatedMultiLingualTags = $this->updateMultiLingualTags($tags);
+			multiLingualUtils::updateMultiLanguageObject($this, self::TAGS, $updatedMultiLingualTags, $defaultValues);
 		}
-		return $newTags ? parent::setTags($newTags) : null;
+		if ($newTags)
+		{
+			if($this->tags !== $newTags)
+			{
+				$newTags = ktagword::updateTags($this->tags, $newTags, $update_db);
+			}
+			return parent::setTags(trim($newTags));
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	protected function updateMultiLingualTags($multiLingualTags)
+	{
+		$updatedMultiLingualTags = array();
+		foreach ($multiLingualTags as $language => $tags)
+		{
+			$updatedMultiLingualTags[$language] = ktagword::updateTags($this->tags, $tags);
+		}
+		return $updatedMultiLingualTags;
 	}
 
 	public function getName()
