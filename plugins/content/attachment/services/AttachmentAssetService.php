@@ -87,7 +87,7 @@ class AttachmentAssetService extends KalturaAssetService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
 		$dbAsset = $attachmentAsset->toInsertableObject();
-		$dbAsset->setEntryId($entryId);
+		$dbAsset->setEntryId($dbEntry->getEntryId());
 		$dbAsset->setPartnerId($dbEntry->getPartnerId());
 		$dbAsset->setStatus(AttachmentAsset::ASSET_STATUS_QUEUED);
 		$dbAsset->save();

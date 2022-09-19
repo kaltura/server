@@ -496,6 +496,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $isSelfServe;
 	
+	/**
+	 * @var string
+	 */
+	public $eventPlatformAllowedTemplates;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -591,6 +596,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'twoFactorAuthenticationMode',
 		'purifyImageContent',
 		'isSelfServe',
+		'eventPlatformAllowedTemplates',
 	);
 
 	public function getMapBetweenObjects()
